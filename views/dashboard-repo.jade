@@ -1,0 +1,68 @@
+extends ./dashboard
+
+block content
+    .navbar.navbar-default
+        .container
+            ul.nav.navbar-nav
+                li.navbar-btn
+                    .btn-group
+                        a.btn.btn-default(href='/repos/')
+                            span.glyphicon.glyphicon-arrow-left
+                            |  Repos
+                        a.btn.btn-default(href='/repos/' + name + '/contributors/')
+                            span.glyphicon.glyphicon-user
+                            |  Contributors
+                        a.btn.btn-default(href='/repos/' + name + '/issues/')
+                            span.glyphicon.glyphicon-th-list
+                            |  Issues
+                        a.btn.btn-default(href='/repos/' + name + '/settings/')
+                            span.glyphicon.glyphicon-cog
+                            |  Settings
+            ul.nav.navbar-nav.navbar-right
+                li.navbar-btn
+                    .input-group
+                        span.input-group-addon
+                            | git
+                        input.form-control(type='text', value='https://github.com')
+
+    .container.dashboard-container
+        .panel.panel-primary
+            .panel-heading
+                p.pull-right updated 2015-11-05 13:04:15
+                h4.panel-title stage
+            .panel-body
+                .row
+                    .col-md-6
+                        .panel.panel-default
+                            .panel-heading
+                                h4.panel-title Git log
+                            .panel-body
+                                | Blah
+                    .col-md-6
+                        .btn-group
+                            a.btn.btn-default(href='/repos/' + name + '/stage/cms/') Go to CMS
+                            a.btn.btn-default(href='/repos/' + name + '/stage/') Go to website
+
+        .btn-group.repo-actions
+            .btn.btn-primary
+                span.glyphicon.glyphicon-arrow-down
+            .btn.btn-primary
+                span.glyphicon.glyphicon-arrow-up
+
+        .panel.panel-primary
+            .panel-heading
+                    p.pull-right updated 2015-11-05 13:04:15
+                    h4.panel-title live
+            .panel-body
+                .row
+                    .col-md-6
+                        .panel.panel-default
+                            .panel-heading
+                                h4.panel-title Git log
+                            .panel-body
+                                | Blah
+                    .col-md-6
+                        .btn-group
+                            a.btn.btn-default(href='/repos/' + name + '/live/cms/') Go to CMS
+                            a.btn.btn-default(href='/repos/' + name + '/live/') Go to website
+

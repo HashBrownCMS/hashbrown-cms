@@ -1,0 +1,28 @@
+body {
+    height: 100%;
+}
+
+.container {
+    height: 100%;
+    max-width: 400px;
+    position: relative;
+}
+
+.panel {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 100%;
+}
+
+input {
+    margin-top: 15px;
+}
+
+input:first-child {
+    margin-top: 0px;
+}
+
+form {
+    margin-bottom: 0px;
+}
