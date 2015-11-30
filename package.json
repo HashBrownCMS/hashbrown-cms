@@ -16,8 +16,9 @@
     "gulp-sass": "^2.1.0"
   },
   "dependencies": {
+    "body-parser": "^1.14.1",
     "express": "^4.13.3",
     "jade": "^1.11.0",
-    "octokat": "^0.4.14"
+    "octokat": "^0.4.15"
   }
 }
