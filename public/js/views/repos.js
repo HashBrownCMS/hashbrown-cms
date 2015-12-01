@@ -1,6 +1,55 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 window._ = require('./core/Templating');
 
+window.helper = {
+    formatDate: function(input) {
+        var date = new Date(input);
+        var output =
+            date.getFullYear() +
+            '-' +
+            date.getMonth() +
+            '-' +
+            date.getDate() +
+            ' ' +
+            date.getHours() +
+            ':' +
+            date.getMinutes() +
+            ':' +
+            date.getSeconds();
+
+        return output;
+    }
+};
+
+window.api = {
+    call: function(url, callback) {
+        $.post(url, { token: localStorage.getItem('gh-oauth-token') }, function(res) {
+            if(res.err) {
+                console.log(res.err);
+                //location = '/';
+            } else {
+                callback(res);
+            }
+        });
+    },
+
+    repos: function(callback) {
+        api.call('/api/repos/', callback);
+    },
+
+    merge: function(user, repo, base, head, callback) {
+        api.call('/api/' + user + '/' + repo + '/merge/' + base + '/' + head, callback);
+    },
+
+    repo: function(user, repo, callback) {
+        api.call('/api/' + user + '/' + repo, callback);
+    },
+
+    branches: function(user, repo, callback) {
+        api.call('/api/' + user + '/' + repo + '/branches/', callback);
+    }
+};
+
 },{"./core/Templating":2}],2:[function(require,module,exports){
 var Templating = {};
 
@@ -140,7 +189,6 @@ module.exports = Templating;
 
 },{}],3:[function(require,module,exports){
 require('../client');
-require('./partials/navbar');
 
 $('.navbar-content').html(
     _.div({class: 'navbar navbar-default'},
@@ -157,84 +205,33 @@ $('.navbar-content').html(
     )
 );
 
-$('.page-content').html(
-    _.div({class: 'container dashboard-container'},
-        _.div({class: 'row'},
-            _.div({class: 'col-md-4'},
-                _.div({class: 'panel panel-primary'}, [
-                    _.div({class: 'panel-heading'},
-                        _.h4({class: 'panel-title'},
-                            'putaitu.github.io'
-                        )
-                    ),
-                    _.div({class: 'panel-body'}, [
-                        _.p('Repo description'),
-                        _.a({class: 'btn btn-primary center-block', href: '/repos/putaitu.github.io/deployment/'},
-                            'Open'
-                        )
-                    ])
-                ])
+api.repos(function(repos) {
+    $('.page-content').html(
+        _.div({class: 'container dashboard-container'},
+            _.div({class: 'row'},
+                _.each(
+                    repos,
+                    function(i, repo) {
+                        return _.div({class: 'col-md-4'},
+                            _.div({class: 'panel panel-primary'}, [
+                                _.div({class: 'panel-heading'},
+                                    _.h4({class: 'panel-title'},
+                                        repo.name
+                                    )
+                                ),
+                                _.div({class: 'panel-body'}, [
+                                    _.p(repo.description),
+                                    _.a({class: 'btn btn-primary center-block', href: '/repos/' + repo.fullName + '/deployment/'},
+                                        'Open'
+                                    )
+                                ])
+                            ])
+                        );
+                    }
+                )
             )
         )
-    )
-);
-
-},{"../client":1,"./partials/navbar":4}],4:[function(require,module,exports){
-$('.navbar-content').html(
-    _.div({class: 'navbar navbar-default'},
-        _.div({class: 'container'}, [
-            _.ul({class: 'nav navbar-nav'}, [
-                _.li(
-                    _.a({href: '/repos/'}, [
-                        _.span({class: 'glyphicon glyphicon-arrow-left'}),
-                        ' Repos'
-                    ])
-                ),
-                _.li(
-                    _.a({href: '/repos/' + req.params.repo + '/deployment/'}, [
-                        _.span({class: 'glyphicon glyphicon-user'}),
-                        ' Deployment'
-                    ])
-                ),
-                _.li(
-                    _.a({href: '/repos/' + req.params.repo + '/contributors/'}, [
-                        _.span({class: 'glyphicon glyphicon-user'}),
-                        ' Contributors'
-                    ])
-                ),
-                _.li(
-                    _.a({href: '/repos/' + req.params.repo + '/issues/'}, [
-                        _.span({class: 'glyphicon glyphicon-th-list'}),
-                        ' Issues'
-                    ])
-                ),
-                _.li(
-                    _.a({href: '/repos/' + req.params.repo + '/settings/'}, [
-                        _.span({class: 'glyphicon glyphicon-cog'}),
-                        ' Settings'
-                    ])
-                )
-            ]),
-            _.ul({class: 'nav navbar-nav navbar-right'},
-                _.li({class: 'navbar-btn'},
-                    _.div({class: 'input-group'}, [
-                        _.span({class: 'input-group-addon'},
-                            'git'
-                        ),
-                        _.input({class: 'form-control', type: 'text', value: 'https://github.com'})
-                    ])
-                )
-            )
-        ])
-    )
-);
-
-// Set active navigation button
-$('.navbar-content .navbar-nav li').each(function(i) {
-    var a = $(this).children('a');
-    var isActive = location.pathname == a.attr('href') || location.pathname + '/' == a.attr('href');
-
-    $(this).toggleClass('active', isActive);
+    );
 });
 
-},{}]},{},[3])
+},{"../client":1}]},{},[3])

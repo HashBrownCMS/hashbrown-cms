@@ -1,6 +1,55 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 window._ = require('./core/Templating');
 
+window.helper = {
+    formatDate: function(input) {
+        var date = new Date(input);
+        var output =
+            date.getFullYear() +
+            '-' +
+            date.getMonth() +
+            '-' +
+            date.getDate() +
+            ' ' +
+            date.getHours() +
+            ':' +
+            date.getMinutes() +
+            ':' +
+            date.getSeconds();
+
+        return output;
+    }
+};
+
+window.api = {
+    call: function(url, callback) {
+        $.post(url, { token: localStorage.getItem('gh-oauth-token') }, function(res) {
+            if(res.err) {
+                console.log(res.err);
+                //location = '/';
+            } else {
+                callback(res);
+            }
+        });
+    },
+
+    repos: function(callback) {
+        api.call('/api/repos/', callback);
+    },
+
+    merge: function(user, repo, base, head, callback) {
+        api.call('/api/' + user + '/' + repo + '/merge/' + base + '/' + head, callback);
+    },
+
+    repo: function(user, repo, callback) {
+        api.call('/api/' + user + '/' + repo, callback);
+    },
+
+    branches: function(user, repo, callback) {
+        api.call('/api/' + user + '/' + repo + '/branches/', callback);
+    }
+};
+
 },{"./core/Templating":2}],2:[function(require,module,exports){
 var Templating = {};
 
@@ -142,90 +191,74 @@ module.exports = Templating;
 require('../client');
 require('./partials/navbar');
 
-$('.page-content').html(
-    _.div({class: 'container'}, [
-        _.div({class: 'panel panel-primary'}, [
-            _.div({class: 'panel-heading'}, [
-                _.p({class: 'pull-right'},
-                    'updated 2015-11-05 13:04:15'
-                ),
-                _.h4({class: 'panel-title'},
-                    'stage'
-                )
-            ]),
-            _.div({class: 'panel-body'},
-                _.div({class: 'row'}, [
-                    _.div({class: 'col-md-6'},
-                        _.div({class: 'panel panel-default'}, [
-                            _.div({class: 'panel-heading'},
-                                _.h4({class: 'panel-title'},
-                                    'Git log'
+api.branches(req.params.user, req.params.repo, function(branches) {
+    $('.page-content').html(
+        _.div({class: 'container'},
+            _.each(
+                branches,
+                function(i, branch) {
+                    i = parseInt(i);
+
+                    function onClickMergeUp() {
+                        api.merge(req.params.user, req.params.repo, branches[i].name, branches[i+1].name, function(merge) {
+                            console.log(merge);
+                        });
+                    }
+
+                    function onClickMergeDown() {
+                        api.merge(req.params.user, req.params.repo, branches[i+1].name, branches[i].name, function(merge) {
+                            console.log(merge);
+                        });
+                    }
+
+                    return [
+                        _.div({class: 'panel panel-primary'}, [
+                            _.div({class: 'panel-heading'}, 
+                                _.h4({class: 'panel-title text-center'},
+                                    branch.name
                                 )
                             ),
                             _.div({class: 'panel-body'},
-                                'Blah'
+                                _.div({class: 'row'}, [
+                                    _.div({class: 'col-md-6'},
+                                        _.div({class: 'panel panel-default'}, [
+                                            _.div({class: 'panel-heading'},
+                                                _.h4({class: 'panel-title'},
+                                                    'updated at ' + helper.formatDate(branch.updated.date) + ' by <a href="mailto:' + branch.updated.email + '">' + branch.updated.name + '</a>'
+                                                )
+                                            ),
+                                            _.div({class: 'panel-body'},
+                                                branch.updated.message
+                                            )
+                                        ])
+                                    ),
+                                    _.div({class: 'col-md-6'},
+                                        _.div({class: 'btn-group'}, [
+                                            _.a({class: 'btn btn-default', href: '/repos/' + req.params.repo + '/stage/cms/'},
+                                                'Go to CMS'
+                                            ),
+                                            _.a({class: 'btn btn-default', href: '/repos/' + req.params.repo + '/stage/'},
+                                                'Go to website'
+                                           )
+                                        ])
+                                    )
+                                ])
                             )
-                        ])
-                    ),
-                    _.div({class: 'col-md-6'},
-                        _.div({class: 'btn-group'}, [
-                            _.a({class: 'btn btn-default', href: '/repos/' + req.params.repo + '/stage/cms/'},
-                                'Go to CMS'
-                            ),
-                            _.a({class: 'btn btn-default', href: '/repos/' + req.params.repo + '/stage/'},
-                                'Go to website'
-                           )
-                        ])
-                    )
-                ])
+                        ]),
+                        i < branches.length - 1 ? _.div({class: 'btn-group repo-actions'}, [
+                            _.button({class: 'btn btn-primary'},
+                                _.span({class: 'glyphicon glyphicon-arrow-down'})
+                            ).click(onClickMergeDown),
+                            _.button({class: 'btn btn-primary'},
+                                _.span({class: 'glyphicon glyphicon-arrow-up'})
+                            ).click(onClickMergeUp)
+                        ]) : null
+                    ];
+                }
             )
-        ]),
-        _.div({class: 'btn-group repo-actions'}, [
-            _.button({class: 'btn btn-primary'},
-                _.span({class: 'glyphicon glyphicon-arrow-down'})
-            ),
-            _.button({class: 'btn btn-primary'},
-                _.span({class: 'glyphicon glyphicon-arrow-up'})
-            )
-        ]),
-        _.div({class: 'panel panel-primary'}, [
-            _.div({class: 'panel-heading'}, [
-                _.p({class: 'pull-right'},
-                    'updated 2015-11-05 13:04:15'
-                ),
-                _.h4({class: 'panel-title'},
-                    'live'
-                )
-            ]),
-            _.div({class: 'panel-body'},
-                _.div({class: 'row'}, [
-                    _.div({class: 'col-md-6'},
-                        _.div({class: 'panel panel-default'}, [
-                            _.div({class: 'panel-heading'},
-                                _.h4({class: 'panel-title'},
-                                    'Git log'
-                                )
-                            ),
-                            _.div({class: 'panel-body'},
-                                'Blah'
-                            )
-                        ])
-                    ),
-                    _.div({class: 'col-md-6'},
-                        _.div({class: 'btn-group'}, [
-                            _.a({class: 'btn btn-default', href: '/repos/' + req.params.repo + '/live/cms/'},
-                                'Go to CMS'
-                            ),
-                            _.a({class: 'btn btn-default', href: '/repos/' + req.params.repo + '/live/'},
-                                'Go to website'
-                            )
-                        ])
-                    )
-                ])
-            )
-        ])
-    ])        
-);
+        )
+    ); 
+});
 
 },{"../client":1,"./partials/navbar":4}],4:[function(require,module,exports){
 $('.navbar-content').html(
@@ -239,7 +272,7 @@ $('.navbar-content').html(
                     ])
                 ),
                 _.li(
-                    _.a({href: '/repos/' + req.params.repo + '/deployment/'}, [
+                    _.a({href: '/repos/' + req.params.user + '/' + req.params.repo + '/deployment/'}, [
                         _.span({class: 'glyphicon glyphicon-user'}),
                         ' Deployment'
                     ])
@@ -269,7 +302,15 @@ $('.navbar-content').html(
                         _.span({class: 'input-group-addon'},
                             'git'
                         ),
-                        _.input({class: 'form-control', type: 'text', value: 'https://github.com'})
+                        function() {
+                            var element = _.input({class: 'form-control', type: 'text', value: ''});
+
+                            api.repo(req.params.user, req.params.repo, function(repo) {
+                                element.attr('value', repo.cloneUrl); 
+                            });
+
+                            return element;
+                        }
                     ])
                 )
             )

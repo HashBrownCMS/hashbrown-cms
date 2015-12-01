@@ -1,5 +1,4 @@
 require('../client');
-require('./partials/navbar');
 
 $('.navbar-content').html(
     _.div({class: 'navbar navbar-default'},
@@ -16,24 +15,31 @@ $('.navbar-content').html(
     )
 );
 
-$('.page-content').html(
-    _.div({class: 'container dashboard-container'},
-        _.div({class: 'row'},
-            _.div({class: 'col-md-4'},
-                _.div({class: 'panel panel-primary'}, [
-                    _.div({class: 'panel-heading'},
-                        _.h4({class: 'panel-title'},
-                            'putaitu.github.io'
-                        )
-                    ),
-                    _.div({class: 'panel-body'}, [
-                        _.p('Repo description'),
-                        _.a({class: 'btn btn-primary center-block', href: '/repos/putaitu.github.io/deployment/'},
-                            'Open'
-                        )
-                    ])
-                ])
+api.repos(function(repos) {
+    $('.page-content').html(
+        _.div({class: 'container dashboard-container'},
+            _.div({class: 'row'},
+                _.each(
+                    repos,
+                    function(i, repo) {
+                        return _.div({class: 'col-md-4'},
+                            _.div({class: 'panel panel-primary'}, [
+                                _.div({class: 'panel-heading'},
+                                    _.h4({class: 'panel-title'},
+                                        repo.name
+                                    )
+                                ),
+                                _.div({class: 'panel-body'}, [
+                                    _.p(repo.description),
+                                    _.a({class: 'btn btn-primary center-block', href: '/repos/' + repo.fullName + '/deployment/'},
+                                        'Open'
+                                    )
+                                ])
+                            ])
+                        );
+                    }
+                )
             )
         )
-    )
-);
+    );
+});

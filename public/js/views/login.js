@@ -1,6 +1,55 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 window._ = require('./core/Templating');
 
+window.helper = {
+    formatDate: function(input) {
+        var date = new Date(input);
+        var output =
+            date.getFullYear() +
+            '-' +
+            date.getMonth() +
+            '-' +
+            date.getDate() +
+            ' ' +
+            date.getHours() +
+            ':' +
+            date.getMinutes() +
+            ':' +
+            date.getSeconds();
+
+        return output;
+    }
+};
+
+window.api = {
+    call: function(url, callback) {
+        $.post(url, { token: localStorage.getItem('gh-oauth-token') }, function(res) {
+            if(res.err) {
+                console.log(res.err);
+                //location = '/';
+            } else {
+                callback(res);
+            }
+        });
+    },
+
+    repos: function(callback) {
+        api.call('/api/repos/', callback);
+    },
+
+    merge: function(user, repo, base, head, callback) {
+        api.call('/api/' + user + '/' + repo + '/merge/' + base + '/' + head, callback);
+    },
+
+    repo: function(user, repo, callback) {
+        api.call('/api/' + user + '/' + repo, callback);
+    },
+
+    branches: function(user, repo, callback) {
+        api.call('/api/' + user + '/' + repo + '/branches/', callback);
+    }
+};
+
 },{"./core/Templating":2}],2:[function(require,module,exports){
 var Templating = {};
 
@@ -148,8 +197,38 @@ function onSubmit(e) {
 
     data.redirect = $(this).attr('action');
 
-    $.post('/api/login/', data, function(val) {
-        console.log(val);
+    $.post('/api/login/', data, function(res) {
+        localStorage.setItem('gh-oauth-token', res.token);
+
+        $.post('/api/orgs/', data, function(orgs) {
+            function onClickEnter() {
+                var sel = $('.orgs select');
+
+                console.log(sel.val());
+            }
+
+            var divCred = $('.cred');
+            var divOrgs = $('.orgs');
+
+            divCred.toggleClass('hidden', true);
+            divOrgs.toggleClass('hidden', false);
+
+            divOrgs.append([
+                _.select({class: 'form-control'},
+                    _.each(
+                        orgs,
+                        function(i, org) {
+                            return _.option({value: org.login}, org.login);
+                        }
+                    )
+                ),
+                _.button({class: 'btn btn-primary form-control'},
+                    'Enter'
+                ).click(onClickEnter)
+            ]);
+
+            console.log(orgs);
+        });
     });
 }
 
@@ -161,13 +240,14 @@ $('.page-content').html(
                     'Putaitu CMS'
                 )
             ),
-            _.div({class: 'panel-body'},
+            _.div({class: 'panel-body cred'},
                 _.form({action: req.query.sender || '/repos/'}, [
-                    _.input({class: 'form-control', name: 'username', type: 'text', placeholder: 'Username'}),
-                    _.input({class: 'form-control', name: 'password', type: 'password', placeholder: 'Password'}),
+                    _.input({class: 'form-control', name: 'username', required: true, type: 'text', placeholder: 'Username'}),
+                    _.input({class: 'form-control', name: 'password', required: true, type: 'password', placeholder: 'Password'}),
                     _.input({class: 'form-control btn btn-primary', type: 'submit', value: 'Login'})
                 ]).on('submit', onSubmit)
-            )
+            ),
+            _.div({class: 'panel-body orgs hidden'})
         ])
     )
 );

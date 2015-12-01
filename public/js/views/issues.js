@@ -1,6 +1,55 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 window._ = require('./core/Templating');
 
+window.helper = {
+    formatDate: function(input) {
+        var date = new Date(input);
+        var output =
+            date.getFullYear() +
+            '-' +
+            date.getMonth() +
+            '-' +
+            date.getDate() +
+            ' ' +
+            date.getHours() +
+            ':' +
+            date.getMinutes() +
+            ':' +
+            date.getSeconds();
+
+        return output;
+    }
+};
+
+window.api = {
+    call: function(url, callback) {
+        $.post(url, { token: localStorage.getItem('gh-oauth-token') }, function(res) {
+            if(res.err) {
+                console.log(res.err);
+                //location = '/';
+            } else {
+                callback(res);
+            }
+        });
+    },
+
+    repos: function(callback) {
+        api.call('/api/repos/', callback);
+    },
+
+    merge: function(user, repo, base, head, callback) {
+        api.call('/api/' + user + '/' + repo + '/merge/' + base + '/' + head, callback);
+    },
+
+    repo: function(user, repo, callback) {
+        api.call('/api/' + user + '/' + repo, callback);
+    },
+
+    branches: function(user, repo, callback) {
+        api.call('/api/' + user + '/' + repo + '/branches/', callback);
+    }
+};
+
 },{"./core/Templating":2}],2:[function(require,module,exports){
 var Templating = {};
 
@@ -158,7 +207,7 @@ $('.navbar-content').html(
                     ])
                 ),
                 _.li(
-                    _.a({href: '/repos/' + req.params.repo + '/deployment/'}, [
+                    _.a({href: '/repos/' + req.params.user + '/' + req.params.repo + '/deployment/'}, [
                         _.span({class: 'glyphicon glyphicon-user'}),
                         ' Deployment'
                     ])
@@ -188,7 +237,15 @@ $('.navbar-content').html(
                         _.span({class: 'input-group-addon'},
                             'git'
                         ),
-                        _.input({class: 'form-control', type: 'text', value: 'https://github.com'})
+                        function() {
+                            var element = _.input({class: 'form-control', type: 'text', value: ''});
+
+                            api.repo(req.params.user, req.params.repo, function(repo) {
+                                element.attr('value', repo.cloneUrl); 
+                            });
+
+                            return element;
+                        }
                     ])
                 )
             )

@@ -9,7 +9,7 @@ $('.navbar-content').html(
                     ])
                 ),
                 _.li(
-                    _.a({href: '/repos/' + req.params.repo + '/deployment/'}, [
+                    _.a({href: '/repos/' + req.params.user + '/' + req.params.repo + '/deployment/'}, [
                         _.span({class: 'glyphicon glyphicon-user'}),
                         ' Deployment'
                     ])
@@ -39,7 +39,15 @@ $('.navbar-content').html(
                         _.span({class: 'input-group-addon'},
                             'git'
                         ),
-                        _.input({class: 'form-control', type: 'text', value: 'https://github.com'})
+                        function() {
+                            var element = _.input({class: 'form-control', type: 'text', value: ''});
+
+                            api.repo(req.params.user, req.params.repo, function(repo) {
+                                element.attr('value', repo.cloneUrl); 
+                            });
+
+                            return element;
+                        }
                     ])
                 )
             )

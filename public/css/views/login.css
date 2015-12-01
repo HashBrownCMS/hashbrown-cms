@@ -12,10 +12,10 @@ body {
   transform: translateY(-50%);
   width: 100%; }
 
-input {
+.form-control {
   margin-top: 15px; }
 
-input:first-child {
+.form-control:first-child {
   margin-top: 0px; }
 
 form {

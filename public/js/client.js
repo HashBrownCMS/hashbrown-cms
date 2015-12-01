@@ -138,4 +138,53 @@ module.exports = Templating;
 },{}],2:[function(require,module,exports){
 window._ = require('./core/Templating');
 
+window.helper = {
+    formatDate: function(input) {
+        var date = new Date(input);
+        var output =
+            date.getFullYear() +
+            '-' +
+            date.getMonth() +
+            '-' +
+            date.getDate() +
+            ' ' +
+            date.getHours() +
+            ':' +
+            date.getMinutes() +
+            ':' +
+            date.getSeconds();
+
+        return output;
+    }
+};
+
+window.api = {
+    call: function(url, callback) {
+        $.post(url, { token: localStorage.getItem('gh-oauth-token') }, function(res) {
+            if(res.err) {
+                console.log(res.err);
+                //location = '/';
+            } else {
+                callback(res);
+            }
+        });
+    },
+
+    repos: function(callback) {
+        api.call('/api/repos/', callback);
+    },
+
+    merge: function(user, repo, base, head, callback) {
+        api.call('/api/' + user + '/' + repo + '/merge/' + base + '/' + head, callback);
+    },
+
+    repo: function(user, repo, callback) {
+        api.call('/api/' + user + '/' + repo, callback);
+    },
+
+    branches: function(user, repo, callback) {
+        api.call('/api/' + user + '/' + repo + '/branches/', callback);
+    }
+};
+
 },{"./core/Templating":1}]},{},[2])
