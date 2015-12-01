@@ -170,8 +170,8 @@ window.api = {
         });
     },
 
-    repos: function(callback) {
-        api.call('/api/repos/', callback);
+    repos: function(user, callback) {
+        api.call('/api/' + user + '/repos/', callback);
     },
 
     merge: function(user, repo, base, head, callback) {

@@ -33,8 +33,8 @@ window.api = {
         });
     },
 
-    repos: function(callback) {
-        api.call('/api/repos/', callback);
+    repos: function(user, callback) {
+        api.call('/api/' + user + '/repos/', callback);
     },
 
     merge: function(user, repo, base, head, callback) {
@@ -197,23 +197,20 @@ function onSubmit(e) {
 
     data.redirect = $(this).attr('action');
 
+    $('.panel-body .btn').toggleClass('disabled', true).val('Loading...');
+
     $.post('/api/login/', data, function(res) {
         localStorage.setItem('gh-oauth-token', res.token);
 
         $.post('/api/orgs/', data, function(orgs) {
             function onClickEnter() {
-                var sel = $('.orgs select');
+                var sel = $('.panel-body select');
 
-                console.log(sel.val());
+                location = '/repos/' + sel.val();
             }
 
-            var divCred = $('.cred');
-            var divOrgs = $('.orgs');
-
-            divCred.toggleClass('hidden', true);
-            divOrgs.toggleClass('hidden', false);
-
-            divOrgs.append([
+            $('.panel-body').empty();
+            $('.panel-body').append([
                 _.select({class: 'form-control'},
                     _.each(
                         orgs,
@@ -240,14 +237,13 @@ $('.page-content').html(
                     'Putaitu CMS'
                 )
             ),
-            _.div({class: 'panel-body cred'},
+            _.div({class: 'panel-body'},
                 _.form({action: req.query.sender || '/repos/'}, [
                     _.input({class: 'form-control', name: 'username', required: true, type: 'text', placeholder: 'Username'}),
                     _.input({class: 'form-control', name: 'password', required: true, type: 'password', placeholder: 'Password'}),
                     _.input({class: 'form-control btn btn-primary', type: 'submit', value: 'Login'})
                 ]).on('submit', onSubmit)
-            ),
-            _.div({class: 'panel-body orgs hidden'})
+            )
         ])
     )
 );

@@ -24,7 +24,7 @@ app.get('/', function(req, res) {
 });
 
 // Repos dashboard
-app.get('/repos/', function(req, res) {
+app.get('/repos/:user', function(req, res) {
     let model = { view: 'repos', req: req };
 
     res.render('index', model);
@@ -98,6 +98,19 @@ app.post('/api/repos', function(req, res) {
     let octo = new octokat({ token: req.body.token });
 
     octo.me.repos.fetch(function(err, val) {
+        if(err) {
+            res.send({ err: err });
+        } else {
+            res.send(val);
+        }
+    });
+});
+
+// Get repos from user
+app.post('/api/:user/repos', function(req, res) {
+    let octo = new octokat({ token: req.body.token });
+
+    octo.fromUrl('/users/' + req.params.user + '/repos').fetch(function(err, val) {
         if(err) {
             res.send({ err: err });
         } else {

@@ -33,8 +33,8 @@ window.api = {
         });
     },
 
-    repos: function(callback) {
-        api.call('/api/repos/', callback);
+    repos: function(user, callback) {
+        api.call('/api/' + user + '/repos/', callback);
     },
 
     merge: function(user, repo, base, head, callback) {
@@ -205,7 +205,7 @@ $('.navbar-content').html(
     )
 );
 
-api.repos(function(repos) {
+api.repos(req.params.user, function(repos) {
     $('.page-content').html(
         _.div({class: 'container dashboard-container'},
             _.div({class: 'row'},
