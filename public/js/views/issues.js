@@ -41,6 +41,10 @@ window.api = {
         api.call('/api/' + user + '/' + repo + '/merge/' + base + '/' + head, callback);
     },
 
+    collaborators: function(user, repo, callback) {
+        api.call('/api/' + user + '/' + repo + '/collaborators', callback);
+    },
+
     repo: function(user, repo, callback) {
         api.call('/api/' + user + '/' + repo, callback);
     },
@@ -213,9 +217,9 @@ $('.navbar-content').html(
                     ])
                 ),
                 _.li(
-                    _.a({href: '/repos/' + req.params.repo + '/contributors/'}, [
+                    _.a({href: '/repos/' + req.params.user + '/' + req.params.repo + '/collaborators/'}, [
                         _.span({class: 'glyphicon glyphicon-user'}),
-                        ' Contributors'
+                        ' Collaborators'
                     ])
                 ),
                 _.li(

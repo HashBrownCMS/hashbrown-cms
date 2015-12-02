@@ -37,6 +37,13 @@ app.get('/repos/:user/:repo/deployment', function(req, res) {
     res.render('index', model);
 });
 
+// Collaborators dashboard
+app.get('/repos/:user/:repo/collaborators', function(req, res) {
+    let model = { view: 'collaborators', req: req };
+
+    res.render('index', model);
+});
+
 // Issues dashboard
 app.get('/repos/:repo/issues', function(req, res) {
     let model = { view: 'issues', req: req };
@@ -63,6 +70,11 @@ app.post('/api/login/', function(req, res) {
 
     octo.authorizations.create(
         {
+            scopes: [
+                'repo',
+                'user',
+                'admin:org'        
+            ],
             note: 'Putaitu CMS token',
             client_id: env.github.client.id,
             client_secret: env.github.client.secret
@@ -115,6 +127,19 @@ app.post('/api/:user/repos', function(req, res) {
             res.send({ err: err });
         } else {
             res.send(val);
+        }
+    });
+});
+
+// Get collaborators
+app.post('/api/:user/:repo/collaborators', function(req, res) {
+    let octo = new octokat({ token: req.body.token });
+
+    octo.fromUrl('/repos/' + req.params.user + '/' + req.params.repo + '/collaborators').fetch(function(err, collaborators) {
+        if(err) {
+            res.send({ err: err });
+        } else {
+            res.send(collaborators);
         }
     });
 });

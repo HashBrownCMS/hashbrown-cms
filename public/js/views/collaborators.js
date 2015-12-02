@@ -193,49 +193,104 @@ module.exports = Templating;
 
 },{}],3:[function(require,module,exports){
 require('../client');
+require('./partials/navbar');
 
+api.collaborators(req.params.user, req.params.repo, function(collaborators) {
+    $('.page-content').html(
+        _.div({class: 'container'},
+            _.div({class: 'row'}, [
+                _.each(
+                    collaborators,
+                    function(i, collaborator) {
+                        return _.div({class: 'col-xs-2'},
+                            _.div({class: 'thumbnail'}, [
+                                _.img({src: collaborator.avatarUrl}),
+                                _.h4({class: 'text-center'},
+                                    collaborator.login
+                                ),
+                                _.button({class: 'btn btn-danger form-control'},
+                                    'Remove'
+                                )
+                            ])
+                        ); 
+                    }
+                ),
+                _.div({class: 'col-xs-2'},
+                    _.div({class: 'thumbnail'},
+                        _.button({class: 'btn btn-success form-control'},
+                            'Add'
+                        )
+                    )
+                )
+            ])
+        )
+    )
+});
+
+},{"../client":1,"./partials/navbar":4}],4:[function(require,module,exports){
 $('.navbar-content').html(
     _.div({class: 'navbar navbar-default'},
-        _.div({class: 'container'},
-            _.ul({class: 'nav navbar-nav'},
+        _.div({class: 'container'}, [
+            _.ul({class: 'nav navbar-nav'}, [
                 _.li(
-                    _.a({href: '/'}, [
+                    _.a({href: '/repos/' + req.params.user}, [
                         _.span({class: 'glyphicon glyphicon-arrow-left'}),
-                        ' Logout'
+                        ' Repos'
+                    ])
+                ),
+                _.li(
+                    _.a({href: '/repos/' + req.params.user + '/' + req.params.repo + '/deployment/'}, [
+                        _.span({class: 'glyphicon glyphicon-upload'}),
+                        ' Deployment'
+                    ])
+                ),
+                _.li(
+                    _.a({href: '/repos/' + req.params.user + '/' + req.params.repo + '/collaborators/'}, [
+                        _.span({class: 'glyphicon glyphicon-user'}),
+                        ' Collaborators'
+                    ])
+                ),
+                _.li(
+                    _.a({href: '/repos/' + req.params.repo + '/issues/'}, [
+                        _.span({class: 'glyphicon glyphicon-th-list'}),
+                        ' Issues'
+                    ])
+                ),
+                _.li(
+                    _.a({href: '/repos/' + req.params.repo + '/settings/'}, [
+                        _.span({class: 'glyphicon glyphicon-cog'}),
+                        ' Settings'
+                    ])
+                )
+            ]),
+            _.ul({class: 'nav navbar-nav navbar-right'},
+                _.li({class: 'navbar-btn'},
+                    _.div({class: 'input-group'}, [
+                        _.span({class: 'input-group-addon'},
+                            'git'
+                        ),
+                        function() {
+                            var element = _.input({class: 'form-control', type: 'text', value: ''});
+
+                            api.repo(req.params.user, req.params.repo, function(repo) {
+                                element.attr('value', repo.cloneUrl); 
+                            });
+
+                            return element;
+                        }
                     ])
                 )
             )
-        )
+        ])
     )
 );
 
-api.repos(req.params.user, function(repos) {
-    $('.page-content').html(
-        _.div({class: 'container dashboard-container'},
-            _.div({class: 'row'},
-                _.each(
-                    repos,
-                    function(i, repo) {
-                        return _.div({class: 'col-md-4'},
-                            _.div({class: 'panel panel-primary'}, [
-                                _.div({class: 'panel-heading'},
-                                    _.h4({class: 'panel-title'},
-                                        repo.name
-                                    )
-                                ),
-                                _.div({class: 'panel-body'}, [
-                                    _.p(repo.description),
-                                    _.a({class: 'btn btn-primary center-block', href: '/repos/' + repo.fullName + '/deployment/'},
-                                        'Open'
-                                    )
-                                ])
-                            ])
-                        );
-                    }
-                )
-            )
-        )
-    );
+// Set active navigation button
+$('.navbar-content .navbar-nav li').each(function(i) {
+    var a = $(this).children('a');
+    var isActive = location.pathname == a.attr('href') || location.pathname + '/' == a.attr('href');
+
+    $(this).toggleClass('active', isActive);
 });
 
-},{"../client":1}]},{},[3])
+},{}]},{},[3])

@@ -41,6 +41,10 @@ window.api = {
         api.call('/api/' + user + '/' + repo + '/merge/' + base + '/' + head, callback);
     },
 
+    collaborators: function(user, repo, callback) {
+        api.call('/api/' + user + '/' + repo + '/collaborators', callback);
+    },
+
     repo: function(user, repo, callback) {
         api.call('/api/' + user + '/' + repo, callback);
     },
@@ -245,14 +249,16 @@ api.branches(req.params.user, req.params.repo, function(branches) {
                                 ])
                             )
                         ]),
-                        i < branches.length - 1 ? _.div({class: 'btn-group repo-actions'}, [
-                            _.button({class: 'btn btn-lg btn-primary'},
-                                _.span({class: 'glyphicon glyphicon-download'})
-                            ).click(onClickMergeDown),
-                            _.button({class: 'btn btn-lg btn-primary'},
-                                _.span({class: 'glyphicon glyphicon-upload'})
-                            ).click(onClickMergeUp)
-                        ]) : null
+                        i < branches.length - 1 ? _.div({class: 'repo-actions'},
+                            _.div({class: 'btn-group'}, [
+                                _.button({class: 'btn btn-lg btn-primary'},
+                                    _.span({class: 'glyphicon glyphicon-download'})
+                                ).click(onClickMergeDown),
+                                _.button({class: 'btn btn-lg btn-primary'},
+                                    _.span({class: 'glyphicon glyphicon-upload'})
+                                ).click(onClickMergeUp)
+                            ])
+                        ) : null
                     ];
                 }
             )
@@ -278,9 +284,9 @@ $('.navbar-content').html(
                     ])
                 ),
                 _.li(
-                    _.a({href: '/repos/' + req.params.repo + '/contributors/'}, [
+                    _.a({href: '/repos/' + req.params.user + '/' + req.params.repo + '/collaborators/'}, [
                         _.span({class: 'glyphicon glyphicon-user'}),
-                        ' Contributors'
+                        ' Collaborators'
                     ])
                 ),
                 _.li(

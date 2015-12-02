@@ -178,6 +178,10 @@ window.api = {
         api.call('/api/' + user + '/' + repo + '/merge/' + base + '/' + head, callback);
     },
 
+    collaborators: function(user, repo, callback) {
+        api.call('/api/' + user + '/' + repo + '/collaborators', callback);
+    },
+
     repo: function(user, repo, callback) {
         api.call('/api/' + user + '/' + repo, callback);
     },
