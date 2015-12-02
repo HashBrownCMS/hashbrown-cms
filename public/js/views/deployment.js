@@ -246,11 +246,11 @@ api.branches(req.params.user, req.params.repo, function(branches) {
                             )
                         ]),
                         i < branches.length - 1 ? _.div({class: 'btn-group repo-actions'}, [
-                            _.button({class: 'btn btn-primary'},
-                                _.span({class: 'glyphicon glyphicon-arrow-down'})
+                            _.button({class: 'btn btn-lg btn-primary'},
+                                _.span({class: 'glyphicon glyphicon-download'})
                             ).click(onClickMergeDown),
-                            _.button({class: 'btn btn-primary'},
-                                _.span({class: 'glyphicon glyphicon-arrow-up'})
+                            _.button({class: 'btn btn-lg btn-primary'},
+                                _.span({class: 'glyphicon glyphicon-upload'})
                             ).click(onClickMergeUp)
                         ]) : null
                     ];
@@ -273,7 +273,7 @@ $('.navbar-content').html(
                 ),
                 _.li(
                     _.a({href: '/repos/' + req.params.user + '/' + req.params.repo + '/deployment/'}, [
-                        _.span({class: 'glyphicon glyphicon-user'}),
+                        _.span({class: 'glyphicon glyphicon-upload'}),
                         ' Deployment'
                     ])
                 ),

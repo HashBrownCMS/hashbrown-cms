@@ -208,7 +208,7 @@ $('.navbar-content').html(
                 ),
                 _.li(
                     _.a({href: '/repos/' + req.params.user + '/' + req.params.repo + '/deployment/'}, [
-                        _.span({class: 'glyphicon glyphicon-user'}),
+                        _.span({class: 'glyphicon glyphicon-upload'}),
                         ' Deployment'
                     ])
                 ),
