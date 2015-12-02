@@ -25,7 +25,7 @@ window.api = {
         $.post(url, { token: localStorage.getItem('gh-oauth-token') }, function(res) {
             if(res.err) {
                 console.log(res.err);
-                //location = '/';
+                alert(res.err.json.message);
             } else {
                 callback(res);
             }

@@ -26,7 +26,7 @@ window.api = {
         $.post(url, { token: localStorage.getItem('gh-oauth-token') }, function(res) {
             if(res.err) {
                 console.log(res.err);
-                //location = '/';
+                alert(res.err.json.message);
             } else {
                 callback(res);
             }
@@ -266,7 +266,7 @@ $('.navbar-content').html(
         _.div({class: 'container'}, [
             _.ul({class: 'nav navbar-nav'}, [
                 _.li(
-                    _.a({href: '/repos/'}, [
+                    _.a({href: '/repos/' + req.params.user}, [
                         _.span({class: 'glyphicon glyphicon-arrow-left'}),
                         ' Repos'
                     ])

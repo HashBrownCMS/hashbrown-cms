@@ -5,37 +5,43 @@ function onSubmit(e) {
 
     var data = $(this).serialize();
 
-    data.redirect = $(this).attr('action');
-
     $('.panel-body .btn').toggleClass('disabled', true).val('Loading...');
 
     $.post('/api/login/', data, function(res) {
-        localStorage.setItem('gh-oauth-token', res.token);
+        console.log(res);
 
-        $.post('/api/orgs/', data, function(orgs) {
-            function onClickEnter() {
-                var sel = $('.panel-body select');
+        if(res.err) {
+            alert(res.err.json.message);
+            $('.panel-body .btn').toggleClass('disabled', false).val('Login');
+        
+        } else {
+            $.post('/api/orgs/', data, function(orgs) {
+                localStorage.setItem('gh-oauth-token', res.token);
 
-                location = '/repos/' + sel.val();
-            }
+                function onClickEnter() {
+                    var sel = $('.panel-body select');
 
-            $('.panel-body').empty();
-            $('.panel-body').append([
-                _.select({class: 'form-control'},
-                    _.each(
-                        orgs,
-                        function(i, org) {
-                            return _.option({value: org.login}, org.login);
-                        }
-                    )
-                ),
-                _.button({class: 'btn btn-primary form-control'},
-                    'Enter'
-                ).click(onClickEnter)
-            ]);
+                    location = '/repos/' + sel.val();
+                }
 
-            console.log(orgs);
-        });
+                $('.panel-body').empty();
+                $('.panel-body').append([
+                    _.select({class: 'form-control'},
+                        _.each(
+                            orgs,
+                            function(i, org) {
+                                return _.option({value: org.login}, org.login);
+                            }
+                        )
+                    ),
+                    _.button({class: 'btn btn-primary form-control'},
+                        'Enter'
+                    ).click(onClickEnter)
+                ]);
+            
+                console.log(orgs);
+            });
+        } 
     });
 }
 

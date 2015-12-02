@@ -69,7 +69,7 @@ app.post('/api/login/', function(req, res) {
         },
         function(err, val) {
             if(err) {
-                res.send(err);
+                res.send({ err: err });
             } else {
                 res.send(val);
             }
