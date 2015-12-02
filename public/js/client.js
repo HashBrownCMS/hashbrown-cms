@@ -174,6 +174,10 @@ window.api = {
         api.call('/api/' + user + '/repos/', callback);
     },
 
+    compare: function(user, repo, base, head, callback) {
+        api.call('/api/' + user + '/' + repo + '/compare/' + base + '/' + head, callback);
+    },
+
     merge: function(user, repo, base, head, callback) {
         api.call('/api/' + user + '/' + repo + '/merge/' + base + '/' + head, callback);
     },

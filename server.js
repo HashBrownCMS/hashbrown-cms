@@ -118,6 +118,19 @@ app.post('/api/repos', function(req, res) {
     });
 });
 
+// Compare branches
+app.post('/api/:user/:repo/compare/:base/:head', function(req, res) {
+    let octo = new octokat({ token: req.body.token });
+
+    octo.fromUrl('/repos/' + req.params.user + '/' + req.params.repo + '/compare/' + req.params.base + '...' + req.params.head).fetch(function(err, val) {
+        if(err) {
+            res.send({ err: err });
+        } else {
+            res.send(val);
+        }
+    });
+});
+
 // Get repos from user
 app.post('/api/:user/repos', function(req, res) {
     let octo = new octokat({ token: req.body.token });

@@ -9,6 +9,13 @@ api.branches(req.params.user, req.params.repo, function(branches) {
                 function(i, branch) {
                     i = parseInt(i);
 
+                    // Set relevant diff data
+                    if(i < branches.length - 1) {
+                        api.compare(req.params.user, req.params.repo, branches[i].name, branches[i+1].name, function(compare) {
+                            console.log(compare.aheadBy)
+                        });
+                    }
+
                     function onClickMergeUp() {
                         api.merge(req.params.user, req.params.repo, branches[i].name, branches[i+1].name, function(merge) {
                             console.log(merge);

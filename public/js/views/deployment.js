@@ -37,6 +37,10 @@ window.api = {
         api.call('/api/' + user + '/repos/', callback);
     },
 
+    compare: function(user, repo, base, head, callback) {
+        api.call('/api/' + user + '/' + repo + '/compare/' + base + '/' + head, callback);
+    },
+
     merge: function(user, repo, base, head, callback) {
         api.call('/api/' + user + '/' + repo + '/merge/' + base + '/' + head, callback);
     },
@@ -202,6 +206,13 @@ api.branches(req.params.user, req.params.repo, function(branches) {
                 branches,
                 function(i, branch) {
                     i = parseInt(i);
+
+                    // Set relevant diff data
+                    if(i < branches.length - 1) {
+                        api.compare(req.params.user, req.params.repo, branches[i].name, branches[i+1].name, function(compare) {
+                            console.log(compare.aheadBy)
+                        });
+                    }
 
                     function onClickMergeUp() {
                         api.merge(req.params.user, req.params.repo, branches[i].name, branches[i+1].name, function(merge) {
