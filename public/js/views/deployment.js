@@ -54,7 +54,19 @@ window.api = {
     },
 
     branches: function(user, repo, callback) {
-        api.call('/api/' + user + '/' + repo + '/branches/', callback);
+        api.call('/api/' + user + '/' + repo + '/branches/', function(branches) {
+            branches.sort(function(a, b) {
+                if (a.name < b.name) {
+                    return -1;
+                } else if (a.name > b.name) {
+                    return 1;
+                } else {
+                    return 0;   
+                }
+            });
+
+            callback(branches);
+        });
     }
 };
 
@@ -279,11 +291,14 @@ function render() {
                                     ),
                                     _.div({class: 'col-md-6'},
                                         _.div({class: 'btn-group'}, [
-                                            _.a({class: 'btn btn-default', href: '/repos/' + req.params.repo + '/stage/cms/'},
+                                            _.a({class: 'btn btn-default', href: '/repos/' + req.params.repo + '/' + branch.name + '/cms/'},
                                                 'Go to CMS'
                                             ),
-                                            _.a({class: 'btn btn-default', href: '/repos/' + req.params.repo + '/stage/'},
+                                            _.a({class: 'btn btn-default', href: '/redir/website/' + req.params.repo + '/' + branch.name},
                                                 'Go to website'
+                                           ),
+                                            _.a({class: 'btn btn-default', href: '/redir/repo/' + req.params.user + '/' + req.params.repo + '/' + branch.name},
+                                                'Go to repo'
                                            )
                                         ])
                                     )

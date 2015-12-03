@@ -191,7 +191,19 @@ window.api = {
     },
 
     branches: function(user, repo, callback) {
-        api.call('/api/' + user + '/' + repo + '/branches/', callback);
+        api.call('/api/' + user + '/' + repo + '/branches/', function(branches) {
+            branches.sort(function(a, b) {
+                if (a.name < b.name) {
+                    return -1;
+                } else if (a.name > b.name) {
+                    return 1;
+                } else {
+                    return 0;   
+                }
+            });
+
+            callback(branches);
+        });
     }
 };
 

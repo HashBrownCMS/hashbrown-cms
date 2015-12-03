@@ -81,11 +81,14 @@ function render() {
                                     ),
                                     _.div({class: 'col-md-6'},
                                         _.div({class: 'btn-group'}, [
-                                            _.a({class: 'btn btn-default', href: '/repos/' + req.params.repo + '/stage/cms/'},
+                                            _.a({class: 'btn btn-default', href: '/repos/' + req.params.repo + '/' + branch.name + '/cms/'},
                                                 'Go to CMS'
                                             ),
-                                            _.a({class: 'btn btn-default', href: '/repos/' + req.params.repo + '/stage/'},
+                                            _.a({class: 'btn btn-default', href: '/redir/website/' + req.params.repo + '/' + branch.name},
                                                 'Go to website'
+                                           ),
+                                            _.a({class: 'btn btn-default', href: '/redir/repo/' + req.params.user + '/' + req.params.repo + '/' + branch.name},
+                                                'Go to repo'
                                            )
                                         ])
                                     )

@@ -59,6 +59,22 @@ app.get('/repos/:repo/:branch/cms', function(req, res) {
 });
 
 /**
+ * Redir
+ */
+// Repo
+app.get('/redir/repo/:user/:repo/:branch', function(req, res) {
+    res.redirect('https://github.com/' + req.params.user + '/' + req.params.repo + '/tree/' + req.params.branch);
+
+    octo.fromUrl('/repos/' + req.params.user + '/' + req.params.repo + '/branches/' + req.params.branch).fetch(function(err, val) {
+        if(err) {
+            res.send({ err: err });
+        } else {
+            res.redirect(val._links.html);
+        }
+    });
+});
+
+/**
  * API
  */
 // Login
