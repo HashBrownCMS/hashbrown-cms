@@ -52,7 +52,7 @@ app.get('/repos/:repo/issues', function(req, res) {
 });
 
 // CMS
-app.get('/repos/:repo/:branch/cms', function(req, res) {
+app.get('/repos/:user/:repo/:branch/cms', function(req, res) {
     let model = { view: 'cms', req: req };
 
     res.render('index', model);
