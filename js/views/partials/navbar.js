@@ -1,4 +1,4 @@
-api.repo(req.params.user, req.params.repo, function(repo) {
+api.repo(function(repo) {
     $('.navbar-content').html(
         _.div({class: 'navbar navbar-default'},
             _.div({class: 'container'}, [
@@ -22,7 +22,7 @@ api.repo(req.params.user, req.params.repo, function(repo) {
                         ])
                     ),
                     _.li(
-                        _.a({href: '/repos/' + req.params.repo + '/issues/'}, [
+                        _.a({href: '/repos/' + req.params.user + '/' + req.params.repo + '/issues/'}, [
                             _.span({class: 'glyphicon glyphicon-exclamation-sign'}),
                             ' Issues'
                         ])

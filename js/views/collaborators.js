@@ -1,7 +1,7 @@
 require('../client');
 require('./partials/navbar');
 
-api.collaborators(req.params.user, req.params.repo, function(collaborators) {
+api.collaborators(function(collaborators) {
     $('.page-content').html(
         _.div({class: 'container'},
             _.div({class: 'row'}, [

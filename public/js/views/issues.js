@@ -1,5 +1,6 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 window._ = require('./core/Templating');
+window.View = require('./core/View');
 
 window.helper = {
     formatDate: function(input) {
@@ -33,28 +34,32 @@ window.api = {
         });
     },
 
-    repos: function(user, callback) {
-        api.call('/api/' + user + '/repos/', callback);
+    repos: function(callback) {
+        api.call('/api/' + req.params.user + '/repos/', callback);
     },
 
-    compare: function(user, repo, base, head, callback) {
-        api.call('/api/' + user + '/' + repo + '/compare/' + base + '/' + head, callback);
+    compare: function(base, head, callback) {
+        api.call('/api/' + req.params.user + '/' + req.params.repo + '/compare/' + base + '/' + head, callback);
     },
 
-    merge: function(user, repo, base, head, callback) {
-        api.call('/api/' + user + '/' + repo + '/merge/' + base + '/' + head, callback);
+    merge: function(base, head, callback) {
+        api.call('/api/' + req.params.user + '/' + req.params.repo + '/merge/' + base + '/' + head, callback);
     },
 
-    collaborators: function(user, repo, callback) {
-        api.call('/api/' + user + '/' + repo + '/collaborators', callback);
+    issues: function(callback) {
+        api.call('/api/' + req.params.user + '/' + req.params.repo + '/issues', callback);
     },
 
-    repo: function(user, repo, callback) {
-        api.call('/api/' + user + '/' + repo, callback);
+    collaborators: function(callback) {
+        api.call('/api/' + req.params.user + '/' + req.params.repo + '/collaborators', callback);
     },
 
-    branches: function(user, repo, callback) {
-        api.call('/api/' + user + '/' + repo + '/branches/', function(branches) {
+    repo: function(callback) {
+        api.call('/api/' + req.params.user + '/' + req.params.repo, callback);
+    },
+
+    branches: function(callback) {
+        api.call('/api/' + req.params.user + '/' + req.params.repo + '/branches/', function(branches) {
             branches.sort(function(a, b) {
                 if (a.name < b.name) {
                     return -1;
@@ -70,7 +75,7 @@ window.api = {
     }
 };
 
-},{"./core/Templating":2}],2:[function(require,module,exports){
+},{"./core/Templating":2,"./core/View":3}],2:[function(require,module,exports){
 var Templating = {};
 
 function append(el, content) {
@@ -208,15 +213,371 @@ Templating.each = function(array, callback) {
 module.exports = Templating;
 
 },{}],3:[function(require,module,exports){
+/**
+ *  jQuery extension
+ */
+(function($){
+  $.event.special.destroyed = {
+    remove: function(o) {
+      if (o.handler) {
+        o.handler()
+      }
+    }
+  }
+})(jQuery)
+
+/**
+ * Instantiating
+ */
+var instances = [];
+
+var View = function(constructor, extensions) {
+    var self = this;
+
+    var name = constructor.toString();
+    name = name.substring('function '.length);
+    name = name.substring(0, name.indexOf('('));
+
+    self.name = name;
+    self.constructor = constructor;
+
+    if(extensions) {
+        for(var k in extensions) {
+            self[k] = extensions[k];
+        }
+    }
+}
+
+View.extend = function(constructor, extensions) {
+    if(constructor) {
+        constructor.prototype = new View(constructor, extensions);
+        
+        return constructor;
+    }
+};
+
+/**
+ * Getting
+ */
+View.getAll = function(type) {
+    var results = [];
+
+    if(type) {
+        for(var i in instances) {
+            var instance = instances[i];
+            var name = instance.constructor.name;
+
+            if(name == type) {
+                results.push(instance);
+            }
+        }
+    } else {
+        results = instances;
+    }
+
+    return results;
+};
+
+View.get = function(type) {
+    var results = View.getAll(type);
+
+    return results.length > 0 ? results[0] : null;
+};
+
+
+/**
+ * Removing
+ */
+View.removeAll = View.clear = function(type) {
+    for(var guid in instances) {
+        var instance = instances[guid];
+        var name = instance.constructor.name;
+        
+        if(!type || name == type) {
+            instance.remove();
+        }
+    }
+}
+
+View.prototype.remove = function(timeout) {
+    var self = this;
+
+    setTimeout(function() {
+        self.trigger('remove');
+
+        if(self.$element && self.$element.length > 0) {
+            self.$element.remove();
+        }
+
+        delete instances[self.guid];
+    }, timeout || 0 );
+};
+
+/**
+ * Reloading
+ * TODO: This doesn't quite work. Might need restructuring
+ */
+View.prototype.reload = function() {
+    var self = this;
+
+    self.constructor();
+
+    return self;
+};
+
+/**
+ * Rendering
+ */
+View.prototype.preRender;
+View.prototype.render;
+View.prototype.postRender;
+
+/**
+ * Init
+ */
+View.prototype.register = function() {
+    var self = this;
+
+    function guid() {
+        function s4() {
+            return Math.floor((1 + Math.random()) * 0x10000)
+                .toString(16)
+                .substring(1);
+        }
+        return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+            s4() + '-' + s4() + s4() + s4();
+    }
+
+    self.guid = guid();
+
+    instances[self.guid] = self;
+
+    return self;
+};
+
+View.prototype.init = function() {
+    var self = this;
+    
+    if(self.preRender) {
+        self.preRender();
+    }
+
+    if(self.render) {
+        self.render();
+    }
+    
+    if(self.postRender) {
+        self.postRender();
+    }
+    
+    if(self.$element) {
+        self.element = self.$element[0];
+        self.$element.data('view', self);
+        self.$element.bind('destroyed', function() {
+           self.remove();
+        });
+    }
+
+    return self;
+};
+
+/**
+ * Events
+ */
+// Trigger an event
+View.prototype.trigger = function(e, obj) {
+    var self = this;
+
+    if(!self.events) {
+        self.events = {
+            destroy: [
+                function () {
+                    self.$element.remove();
+                    delete self;
+                }
+            ]
+        };
+    }
+
+    if(self.events[e]) {
+        for(var i in self.events[e]) {
+            if(self.events[e][i]) {
+                self.events[e][i](obj);
+            }
+        }
+    }
+
+    return self;
+};
+
+// Bind an event
+View.prototype.on = function (e, callback) {
+    var self = this;
+    
+    if(!self.events) {
+        self.events = {
+            destroy: [
+                function () {
+                    self.$element.remove();
+                    delete self;
+                }
+            ]
+        };
+    }
+    
+    if(!self.events[e]) {
+        self.events[e] = [];
+    }
+
+    self.events[e].push(callback);
+
+    return self;
+}; 
+
+// Check if event exists
+View.prototype.hasEvent = function(name) {
+    for(var k in this.events) {
+        if(k == name) {
+            return true;
+        }
+    }
+
+    return false;
+};
+
+// Predefined events
+View.prototype.ready = function(callback) {
+    this.on('ready', callback);
+
+    return this;
+};
+
+/**
+ * Common methods
+ */
+// Adopt values
+View.prototype.adopt = function(args) {
+    for(var k in args) {
+        this[k] = args[k];
+    }
+
+    return this;
+};
+
+// Trigger ready or init
+View.prototype.readyOrInit = function() {
+    if(this.hasEvent('ready')) {
+        this.trigger('ready');
+    } else {
+        this.init();
+    }
+};
+
+/**
+ * Fetch
+ */
+View.prototype.fetch = function() {
+    var self = this;
+
+    function getModel() {
+        // Get model from URL
+        if(!self.model && typeof self.modelUrl === 'string') {
+            $.getJSON(self.modelUrl, function(data) {
+                self.model = data;
+                
+                self.readyOrInit();
+            });
+        
+        // Get model with function
+        } else if(!self.model && typeof self.modelFunction === 'function') {
+            self.modelFunction(function(data) {
+                self.model = data;
+
+                self.readyOrInit();
+            });
+
+        // Just perform the initialisation
+        } else {
+            self.readyOrInit();
+        }
+    }
+
+    // Get rendered content from URL
+    if(typeof self.renderUrl === 'string') {
+        $.ajax({
+            url: self.renderUrl,
+            type: 'get',
+            success: function(html) {
+
+                if(self.$element) {
+                    self.$element.append(html);
+                } else {
+                    self.$element = $(html);
+                }
+
+                // And then get the model
+                getModel();
+            }
+        });
+
+    // Just get the model
+    } else {
+        getModel();    
+    
+    }
+
+    return self;
+};
+
+module.exports = View;
+
+},{}],4:[function(require,module,exports){
 require('../client');
 require('./partials/navbar');
 
-$('.page-content').html(
-    _.div({class: 'container'})
-);
+var Issue = require('./partials/issue');
 
-},{"../client":1,"./partials/navbar":4}],4:[function(require,module,exports){
-api.repo(req.params.user, req.params.repo, function(repo) {
+api.issues(function(issues) {
+    $('.page-content').html(
+        _.div({class: 'container'},
+            _.each(
+                issues,
+                function(i, issue) {
+                    return new Issue({
+                        model: issue
+                    }).$element;
+                }
+            )
+        )
+    );
+});
+
+},{"../client":1,"./partials/issue":5,"./partials/navbar":6}],5:[function(require,module,exports){
+module.exports = View.extend(function(params) {
+    var self = this;
+
+    self.adopt(params);
+    self.register();
+
+    self.fetch();
+},
+{
+    render: function() {
+        var self = this;
+
+        self.$element = _.div({class: 'panel panel-primary'}, [
+            _.div({class: 'panel-heading'},
+                _.h4(self.model.title)
+            ),
+            _.div({class: 'panel-body'},
+                _.p(self.model.body)
+            )
+        ]);
+    }
+});
+
+},{}],6:[function(require,module,exports){
+api.repo(function(repo) {
     $('.navbar-content').html(
         _.div({class: 'navbar navbar-default'},
             _.div({class: 'container'}, [
@@ -240,7 +601,7 @@ api.repo(req.params.user, req.params.repo, function(repo) {
                         ])
                     ),
                     _.li(
-                        _.a({href: '/repos/' + req.params.repo + '/issues/'}, [
+                        _.a({href: '/repos/' + req.params.user + '/' + req.params.repo + '/issues/'}, [
                             _.span({class: 'glyphicon glyphicon-exclamation-sign'}),
                             ' Issues'
                         ])
@@ -281,4 +642,4 @@ api.repo(req.params.user, req.params.repo, function(repo) {
     });
 });
 
-},{}]},{},[3])
+},{}]},{},[4])

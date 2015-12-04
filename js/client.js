@@ -1,4 +1,5 @@
 window._ = require('./core/Templating');
+window.View = require('./core/View');
 
 window.helper = {
     formatDate: function(input) {
@@ -32,28 +33,32 @@ window.api = {
         });
     },
 
-    repos: function(user, callback) {
-        api.call('/api/' + user + '/repos/', callback);
+    repos: function(callback) {
+        api.call('/api/' + req.params.user + '/repos/', callback);
     },
 
-    compare: function(user, repo, base, head, callback) {
-        api.call('/api/' + user + '/' + repo + '/compare/' + base + '/' + head, callback);
+    compare: function(base, head, callback) {
+        api.call('/api/' + req.params.user + '/' + req.params.repo + '/compare/' + base + '/' + head, callback);
     },
 
-    merge: function(user, repo, base, head, callback) {
-        api.call('/api/' + user + '/' + repo + '/merge/' + base + '/' + head, callback);
+    merge: function(base, head, callback) {
+        api.call('/api/' + req.params.user + '/' + req.params.repo + '/merge/' + base + '/' + head, callback);
     },
 
-    collaborators: function(user, repo, callback) {
-        api.call('/api/' + user + '/' + repo + '/collaborators', callback);
+    issues: function(callback) {
+        api.call('/api/' + req.params.user + '/' + req.params.repo + '/issues', callback);
     },
 
-    repo: function(user, repo, callback) {
-        api.call('/api/' + user + '/' + repo, callback);
+    collaborators: function(callback) {
+        api.call('/api/' + req.params.user + '/' + req.params.repo + '/collaborators', callback);
     },
 
-    branches: function(user, repo, callback) {
-        api.call('/api/' + user + '/' + repo + '/branches/', function(branches) {
+    repo: function(callback) {
+        api.call('/api/' + req.params.user + '/' + req.params.repo, callback);
+    },
+
+    branches: function(callback) {
+        api.call('/api/' + req.params.user + '/' + req.params.repo + '/branches/', function(branches) {
             branches.sort(function(a, b) {
                 if (a.name < b.name) {
                     return -1;

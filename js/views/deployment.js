@@ -25,7 +25,7 @@ function compareBranches(base, head) {
 }
 
 function render() {
-    api.branches(req.params.user, req.params.repo, function(branches) {
+    api.branches(function(branches) {
         $('.page-content').html(
             _.div({class: 'container'},
                 _.each(

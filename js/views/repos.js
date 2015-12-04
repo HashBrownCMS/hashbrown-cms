@@ -15,7 +15,7 @@ $('.navbar-content').html(
     )
 );
 
-api.repos(req.params.user, function(repos) {
+api.repos(function(repos) {
     $('.page-content').html(
         _.div({class: 'container dashboard-container'},
             _.div({class: 'row'},

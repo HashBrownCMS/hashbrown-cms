@@ -45,7 +45,7 @@ app.get('/repos/:user/:repo/collaborators', function(req, res) {
 });
 
 // Issues dashboard
-app.get('/repos/:repo/issues', function(req, res) {
+app.get('/repos/:user/:repo/issues', function(req, res) {
     let model = { view: 'issues', req: req };
 
     res.render('index', model);
@@ -165,6 +165,19 @@ app.post('/api/:user/:repo/collaborators', function(req, res) {
     let octo = new octokat({ token: req.body.token });
 
     octo.fromUrl('/repos/' + req.params.user + '/' + req.params.repo + '/collaborators').fetch(function(err, collaborators) {
+        if(err) {
+            res.send({ err: err });
+        } else {
+            res.send(collaborators);
+        }
+    });
+});
+
+// Get issues
+app.post('/api/:user/:repo/issues', function(req, res) {
+    let octo = new octokat({ token: req.body.token });
+
+    octo.fromUrl('/repos/' + req.params.user + '/' + req.params.repo + '/issues').fetch(function(err, collaborators) {
         if(err) {
             res.send({ err: err });
         } else {
