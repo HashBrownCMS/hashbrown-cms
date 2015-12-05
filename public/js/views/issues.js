@@ -536,9 +536,10 @@ require('../client');
 require('./partials/navbar');
 
 var Issue = require('./partials/issue');
+var IssueModal = require('./partials/issue-modal');
 
 api.issues(function(issues) {
-    $('.page-content').html(
+    $('.page-content').html([
         _.div({class: 'container'},
             _.each(
                 issues,
@@ -548,12 +549,75 @@ api.issues(function(issues) {
                     }).$element;
                 }
             )
-        )
-    );
+        ),
+        new IssueModal().$element
+    ]);
 });
 
-},{"../client":1,"./partials/issue":5,"./partials/navbar":6}],5:[function(require,module,exports){
-module.exports = View.extend(function(params) {
+},{"../client":1,"./partials/issue":6,"./partials/issue-modal":5,"./partials/navbar":7}],5:[function(require,module,exports){
+module.exports = View.extend(function IssueModal(params) {
+    var self = this;
+
+    self.adopt(params);
+    self.register();
+
+    self.$element = _.div({class: 'modal fade issue-modal', role: 'dialog'},
+        _.div({class: 'modal-dialog'},
+            _.div({class: 'modal-content'}, [
+                _.div({class: 'modal-header'},
+                   _.button({type: 'button', class: 'close', 'data-dismiss': 'modal'},
+                       _.span({class: 'glyphicon glyphicon-remove'}),
+                        self.$title = _.h4({class: 'modal-title'})
+                    )
+                ),
+                _.div({class: 'modal-body'},
+                    self.$description = _.p()
+                ),
+                _.div({class: 'modal-footer'},
+                    self.$labels = _.div({class: 'labels'})
+                )
+            ])
+        )
+    );
+    
+    self.show = function show(issue) {
+        self.model = issue;
+        self.render();
+        self.$element.modal('show');
+    };
+},
+{
+    render: function() {
+        var self = this;
+       
+        self.$title.html(self.model.title);
+
+        self.$description.html(self.model.description);
+
+        self.$labels.html(
+            _.each(
+                self.model.labels,
+                function(i, label) {
+                    function onClickRemove() {
+
+                    }
+
+                    return _.div({class: 'label'}, [
+                        _.span({class: 'label-text', style: 'background-color: #' + label.color},
+                            label.name
+                        ),
+                        _.button({class: 'btn btn-default label-btn-remove'},
+                            _.span({class: 'glyphicon glyphicon-remove'})
+                        )
+                    ]);
+                }
+            )
+        );
+    }
+});
+
+},{}],6:[function(require,module,exports){
+module.exports = View.extend(function Issue(params) {
     var self = this;
 
     self.adopt(params);
@@ -565,37 +629,22 @@ module.exports = View.extend(function(params) {
     render: function() {
         var self = this;
 
+        function onClick() {
+            View.get('IssueModal').show(self.model);
+        }
+
         self.$element = _.div({class: 'panel panel-primary issue'}, [
             _.div({class: 'panel-heading'},
                 _.h4(self.model.title)
             ),
-            _.div({class: 'panel-body'}, [
-                _.p(self.model.body),
-                _.div({class: 'labels'},
-                    _.each(
-                        self.model.labels,
-                        function(i, label) {
-                            function onClickRemove() {
-
-                            }
-
-                            return _.div({class: 'input-group'},[
-                                _.label({style: 'background-color: #' + label.color},
-                                    label.name
-                                ),
-                                _.button({class: 'input-group-btn'},
-                                    _.span({class: 'glyphicon glyphicon-remove'})
-                                )
-                            ]);
-                        }
-                    )
-                )
-            ])
-        ]);
+            _.div({class: 'panel-body'},
+                _.p(self.model.body)
+            )
+        ]).click(onClick);
     }
 });
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 api.repo(function(repo) {
     $('.navbar-content').html(
         _.div({class: 'navbar navbar-default'},

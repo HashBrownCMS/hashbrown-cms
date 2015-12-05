@@ -2,9 +2,10 @@ require('../client');
 require('./partials/navbar');
 
 var Issue = require('./partials/issue');
+var IssueModal = require('./partials/issue-modal');
 
 api.issues(function(issues) {
-    $('.page-content').html(
+    $('.page-content').html([
         _.div({class: 'container'},
             _.each(
                 issues,
@@ -14,6 +15,7 @@ api.issues(function(issues) {
                     }).$element;
                 }
             )
-        )
-    );
+        ),
+        new IssueModal().$element
+    ]);
 });
