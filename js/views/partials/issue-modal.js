@@ -7,14 +7,14 @@ module.exports = View.extend(function IssueModal(params) {
     self.$element = _.div({class: 'modal fade issue-modal', role: 'dialog'},
         _.div({class: 'modal-dialog'},
             _.div({class: 'modal-content'}, [
-                _.div({class: 'modal-header'},
+                _.div({class: 'modal-header'}, [
                    _.button({type: 'button', class: 'close', 'data-dismiss': 'modal'},
-                       _.span({class: 'glyphicon glyphicon-remove'}),
-                        self.$title = _.h4({class: 'modal-title'})
-                    )
-                ),
+                       _.span({class: 'glyphicon glyphicon-remove'})
+                    ),
+                    self.$title = _.h4({class: 'modal-title'})
+                ]),
                 _.div({class: 'modal-body'},
-                    self.$description = _.p()
+                    self.$body = _.p()
                 ),
                 _.div({class: 'modal-footer'},
                     self.$labels = _.div({class: 'labels'})
@@ -35,7 +35,7 @@ module.exports = View.extend(function IssueModal(params) {
        
         self.$title.html(self.model.title);
 
-        self.$description.html(self.model.description);
+        self.$body.html(self.model.body);
 
         self.$labels.html(
             _.each(
@@ -45,8 +45,8 @@ module.exports = View.extend(function IssueModal(params) {
 
                     }
 
-                    return _.div({class: 'label'}, [
-                        _.span({class: 'label-text', style: 'background-color: #' + label.color},
+                    return _.div({class: 'label', style: 'background-color: #' + label.color}, [
+                        _.span({class: 'label-text'},
                             label.name
                         ),
                         _.button({class: 'btn btn-default label-btn-remove'},

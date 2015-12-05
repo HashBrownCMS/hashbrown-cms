@@ -1,2 +1,12 @@
+.page-content .issue {
+  cursor: pointer; }
+
 .page-content .issue-modal .label .label-text {
-  padding: 4px 6px; }
+  padding: 4px 6px;
+  font-size: 12px; }
+
+.page-content .issue-modal .label .label-btn-remove {
+  font-size: 12px;
+  padding: 4px;
+  background-color: transparent;
+  border: 0px; }

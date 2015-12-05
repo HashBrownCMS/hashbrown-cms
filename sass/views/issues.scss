@@ -1,8 +1,20 @@
 .page-content {
+    .issue {
+        cursor: pointer;
+    }
+
     .issue-modal {
         .label {
             .label-text {
                 padding: 4px 6px;
+                font-size: 12px;
+            }
+
+            .label-btn-remove {
+                font-size: 12px;
+                padding: 4px;
+                background-color: transparent;
+                border: 0px;
             }
         }
     }
