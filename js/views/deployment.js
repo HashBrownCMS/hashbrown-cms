@@ -2,7 +2,7 @@ require('../client');
 require('./partials/navbar');
 
 function compareBranches(base, head) {
-    api.compare(req.params.user, req.params.repo, base, head, function(compare) {
+    api.compare(base, head, function(compare) {
         $h4 = $('#' + base).children('.panel-heading').children('h4');
         
         if(compare.aheadBy > 0) {

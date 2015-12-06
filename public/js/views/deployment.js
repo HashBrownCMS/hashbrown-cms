@@ -592,7 +592,7 @@ require('../client');
 require('./partials/navbar');
 
 function compareBranches(base, head) {
-    api.compare(req.params.user, req.params.repo, base, head, function(compare) {
+    api.compare(base, head, function(compare) {
         $h4 = $('#' + base).children('.panel-heading').children('h4');
         
         if(compare.aheadBy > 0) {
@@ -750,7 +750,7 @@ api.repo(function(repo) {
                         ])
                     ),
                     _.li(
-                        _.a({href: '/repos/' + req.params.repo + '/settings/'}, [
+                        _.a({href: '/repos/' + req.params.user + '/' + req.params.repo + '/settings/'}, [
                             _.span({class: 'glyphicon glyphicon-cog'}),
                             ' Settings'
                         ])

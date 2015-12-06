@@ -51,6 +51,13 @@ app.get('/repos/:user/:repo/issues', function(req, res) {
     res.render('index', model);
 });
 
+// Settings dashboard
+app.get('/repos/:user/:repo/settings', function(req, res) {
+    let model = { view: 'settings', req: req };
+
+    res.render('index', model);
+});
+
 // CMS
 app.get('/repos/:user/:repo/:branch/cms', function(req, res) {
     let model = { view: 'cms', req: req };

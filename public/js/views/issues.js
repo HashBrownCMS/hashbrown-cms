@@ -616,6 +616,7 @@ function updateIssuePositions() {
         }
     );
     
+    $('.sortable').sortable('destroy');
     $('.sortable').sortable({
         forcePlaceholderSize: true,
         connectWith: '.sortable',
@@ -993,7 +994,7 @@ api.repo(function(repo) {
                         ])
                     ),
                     _.li(
-                        _.a({href: '/repos/' + req.params.repo + '/settings/'}, [
+                        _.a({href: '/repos/' + req.params.user + '/' + req.params.repo + '/settings/'}, [
                             _.span({class: 'glyphicon glyphicon-cog'}),
                             ' Settings'
                         ])

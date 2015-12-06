@@ -26,6 +26,7 @@ function updateIssuePositions() {
         }
     );
     
+    $('.sortable').sortable('destroy');
     $('.sortable').sortable({
         forcePlaceholderSize: true,
         connectWith: '.sortable',
