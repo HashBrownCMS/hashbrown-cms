@@ -1,3 +1,36 @@
 .navbar-right {
     margin-right: 0px;
 }
+
+.form-control.form-control-static {
+    background-color: #eee;
+    box-shadow: none;
+}
+
+.input-group.input-group-vertical {
+    display: block;
+        
+    .input-group-addon, .form-control {
+        display: block;
+        float: none;
+    }
+
+    .form-control {
+        border-top-right-radius: 0px;
+
+        &:last-child {
+            border-bottom-left-radius: 5px;
+        }
+    }
+
+    .input-group-addon {
+        &:first-child {
+            border-bottom: 0 none;
+            border-bottom-left-radius: 0;
+            border-right: 1px solid #ccc;
+            border-top-right-radius: 5px;
+            display: block;
+            width: 100%;
+        }
+    }
+}

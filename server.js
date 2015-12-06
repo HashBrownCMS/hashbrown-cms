@@ -177,11 +177,37 @@ app.post('/api/:user/:repo/collaborators', function(req, res) {
 app.post('/api/:user/:repo/issues', function(req, res) {
     let octo = new octokat({ token: req.body.token });
 
-    octo.fromUrl('/repos/' + req.params.user + '/' + req.params.repo + '/issues').fetch(function(err, collaborators) {
+    octo.fromUrl('/repos/' + req.params.user + '/' + req.params.repo + '/issues').fetch(function(err, issues) {
         if(err) {
             res.send({ err: err });
         } else {
-            res.send(collaborators);
+            res.send(issues);
+        }
+    });
+});
+
+// Get labels
+app.post('/api/:user/:repo/labels', function(req, res) {
+    let octo = new octokat({ token: req.body.token });
+
+    octo.fromUrl('/repos/' + req.params.user + '/' + req.params.repo + '/labels').fetch(function(err, labels) {
+        if(err) {
+            res.send({ err: err });
+        } else {
+            res.send(labels);
+        }
+    });
+});
+
+// Get issues
+app.post('/api/:user/:repo/milestones', function(req, res) {
+    let octo = new octokat({ token: req.body.token });
+
+    octo.fromUrl('/repos/' + req.params.user + '/' + req.params.repo + '/milestones').fetch(function(err, milestones) {
+        if(err) {
+            res.send({ err: err });
+        } else {
+            res.send(milestones);
         }
     });
 });

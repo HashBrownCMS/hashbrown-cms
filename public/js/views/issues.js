@@ -49,6 +49,24 @@ window.api = {
     issues: function(callback) {
         api.call('/api/' + req.params.user + '/' + req.params.repo + '/issues', callback);
     },
+    
+    issueColumns: function(callback) {
+        api.call('/api/' + req.params.user + '/' + req.params.repo + '/labels', function(res) {
+            if(res.err) {
+                console.log(res.err);
+                alert(res.err.json.message);
+            } else {
+                res.unshift({ name: 'backlog' });
+                res.push({ name: 'done' });
+                    
+                callback(res);
+            }
+        });
+    },
+
+    milestones: function(callback) {
+        api.call('/api/' + req.params.user + '/' + req.params.repo + '/milestones', callback);
+    },
 
     collaborators: function(callback) {
         api.call('/api/' + req.params.user + '/' + req.params.repo + '/collaborators', callback);
@@ -538,20 +556,93 @@ require('./partials/navbar');
 var Issue = require('./partials/issue');
 var IssueModal = require('./partials/issue-modal');
 
-api.issues(function(issues) {
-    $('.page-content').html([
-        _.div({class: 'container'},
-            _.each(
-                issues,
-                function(i, issue) {
-                    return new Issue({
-                        model: issue
-                    }).$element;
-                }
-            )
-        ),
-        new IssueModal().$element
-    ]);
+function onChangeMilestone() {
+    var id = $('.milestones').val();
+
+    _.each(View.getAll('Issue'),
+        function(i, view) {
+            view.$element.toggle(id == 'all' || view.model.milestone.id == id);
+        }
+    );
+}
+
+function onMoveIssueColumn($issue) {
+    $issue.data('view').scrapeColumn();
+}
+
+api.issueColumns(function(columns) {
+    api.issues(function(issues) {
+        api.milestones(function(milestones) {
+            $('.page-content').html([
+                _.div({class: 'container'}, [
+                    _.select({class: 'form-control milestones'},
+                        _.each([ { id: 'all', title: '(all issues)' } ].concat(milestones),
+                            function(i, milestone) {
+                                return _.option({value: milestone.id},
+                                    milestone.title
+                                );
+                            }
+                        )
+                    ).change(onChangeMilestone),
+                    _.div({class: 'row'},
+                        _.each(
+                            columns,
+                            function(c, column) {
+                                var colSize = 12 / columns.length;
+
+                                return _.div({class: 'col-xs-' + colSize},
+                                    _.div({class: 'panel panel-default column', 'data-name': column.name}, [
+                                        _.div({class: 'panel-heading'},
+                                            _.span(column.name)
+                                        ),
+                                        _.div({class: 'panel-body sortable'},
+                                            _.each(
+                                                issues.filter(function(issue) {
+                                                    var closed = issue.state == 'closed' && column.name == 'done';
+                                                    var backlog = issue.state == 'open' && column.name == 'backlog';
+                                                    
+                                                    if(closed) {
+                                                        return true;
+                                                    }
+
+                                                    for(var l in issue.labels) {
+                                                        var hasLabel = issue.labels[l].name == column.name;
+                                                        
+                                                        if(hasLabel) {
+                                                            return true;
+                                                        }
+                                                    }
+                                                    
+                                                    if(backlog) {
+                                                        return true;
+                                                    }
+
+                                                    return false;
+                                                }),
+                                                function(i, issue) {
+                                                    return new Issue({
+                                                        model: issue
+                                                    }).$element;
+                                                }
+                                            )
+                                        )
+                                    ])
+                                );                  
+                            }
+                        )
+                    )
+                ]),
+                new IssueModal().$element
+            ]);
+
+            $('.sortable').sortable({
+                forcePlaceholderSize: true,
+                connectWith: '.sortable',
+            }).bind('sortupdate', function(e, ui) {
+                onMoveIssueColumn(ui.item);
+            });
+        });
+    });
 });
 
 },{"../client":1,"./partials/issue":6,"./partials/issue-modal":5,"./partials/navbar":7}],5:[function(require,module,exports){
@@ -561,6 +652,39 @@ module.exports = View.extend(function IssueModal(params) {
     self.adopt(params);
     self.register();
 
+    function onClickOK() {
+        $('#' + self.model.id).data('view').sync(self.model);
+        self.hide();
+    }
+
+    function onChangeAssignee() {
+        for(var i in self.collaborators) {
+            if(self.collaborators[i].id == $(this).val()) {
+                self.model.assignee = self.collaborators[i];
+            }
+        }
+    }
+    
+    function onChangeTitle() {
+        self.model.title = $(this).val();
+    }
+    
+    function onChangeBody() {
+        self.model.body = $(this).val();
+    }
+    
+    function onChangeState() {
+        self.model.state = $(this).val();
+    }
+    
+    function onChangeMilestone() {
+        for(var i in self.milestones) {
+            if(self.milestones[i].id == $(this).val()) {
+                self.model.milestone = self.milestones[i];
+            }
+        }
+    }
+
     self.$element = _.div({class: 'modal fade issue-modal', role: 'dialog'},
         _.div({class: 'modal-dialog'},
             _.div({class: 'modal-content'}, [
@@ -568,17 +692,106 @@ module.exports = View.extend(function IssueModal(params) {
                    _.button({type: 'button', class: 'close', 'data-dismiss': 'modal'},
                        _.span({class: 'glyphicon glyphicon-remove'})
                     ),
-                    self.$title = _.h4({class: 'modal-title'})
+                   self.$heading = _.span()
                 ]),
-                _.div({class: 'modal-body'},
-                    self.$body = _.p()
-                ),
-                _.div({class: 'modal-footer'},
-                    self.$labels = _.div({class: 'labels'})
-                )
+                _.div({class: 'modal-body'}, [
+                    _.div({class: 'input-group'}, [
+                        _.span({class: 'input-group-addon'},
+                            'Created by'
+                        ),
+                        self.$user = _.span({class: 'form-control form-control-static'})
+                    ]),
+                    _.div({class: 'input-group'}, [
+                        _.span({class: 'input-group-addon'},
+                            'Assignee'
+                        ),
+                        function () {
+                            self.$assignee = _.select({class: 'form-control'});
+
+                            api.collaborators(function(collaborators) {
+                                self.collaborators = collaborators;
+
+                                self.$assignee.html(
+                                    _.each(
+                                        [ { login: '(none)', id: null } ].concat(collaborators),
+                                        function(i, collaborator) {
+                                            return _.option({value: collaborator.id},
+                                                collaborator.login
+                                            );
+                                        }
+                                    )
+                                );
+                            });
+
+                            return self.$assignee;
+                        }().change(onChangeAssignee)
+                    ]),
+                    _.div({class: 'input-group'}, [
+                        _.span({class: 'input-group-addon'},
+                            'State'
+                        ),
+                        self.$state = _.select({class: 'form-control'},
+                            _.each(
+                                [ 'open', 'closed' ],
+                                function(i, state) {
+                                    return _.option({value: state},
+                                        state
+                                    );
+                                }
+                            )
+                        ).change(onChangeState)
+                    ]),
+                    _.div({class: 'input-group'}, [
+                        _.span({class: 'input-group-addon'},
+                            'Milestone'
+                        ),
+                        function() {
+                            self.$milestone = _.select({class: 'form-control'});
+                                
+                            api.milestones(function(milestones) { 
+                                self.milestones = milestones;
+
+                                self.$milestone.html(
+                                    _.each(
+                                        milestones,
+                                        function(i, milestone) {
+                                            return _.option({value: milestone.id},
+                                                milestone.title
+                                            );
+                                        }
+                                    )
+                                );
+                            });
+
+                            return self.$milestone;
+                        }().change(onChangeMilestone)
+                    ]),
+                    _.div({class: 'input-group'}, [
+                        _.span({class: 'input-group-addon'},
+                            'Title'
+                        ),
+                        self.$title = _.input({type: 'text', class: 'form-control'}).change(onChangeTitle)
+                    ]),
+                    _.div({class: 'input-group input-group-vertical'}, [
+                        _.span({class: 'input-group-addon'},
+                            'Description'
+                        ),
+                        self.$body = _.textarea({class: 'form-control'}).change(onChangeBody)
+                    ])
+                ]),
+                _.div({class: 'modal-footer'}, [
+                    self.$labels = _.div({class: 'labels'}),
+                    _.button({class: 'btn btn-primary'},
+                        'OK'
+                    ).click(onClickOK)
+                ])
             ])
         )
     );
+    
+    self.hide = function show(issue) {
+        self.$element.modal('hide');
+    };
     
     self.show = function show(issue) {
         self.model = issue;
@@ -590,7 +803,21 @@ module.exports = View.extend(function IssueModal(params) {
     render: function() {
         var self = this;
        
-        self.$title.html(self.model.title);
+        console.log(self.model);
+
+        self.$user.html(self.model.user.login);
+
+        if(self.model.assignee) {
+            self.$assignee.val(self.model.assignee.login);
+        }
+
+        self.$state.val(self.model.state);
+        
+        self.$milestone.val(self.model.milestone.id);
+
+        self.$heading.html('Edit issue (id: ' + self.model.id + ')');
+
+        self.$title.attr('value', self.model.title);
 
         self.$body.html(self.model.body);
 
@@ -598,18 +825,21 @@ module.exports = View.extend(function IssueModal(params) {
             _.each(
                 self.model.labels,
                 function(i, label) {
-                    function onClickRemove() {
-
+                    function onClickRemove(e) {
+                        self.model.labels.splice(i, 1);
+                        $label.remove();
                     }
 
-                    return _.div({class: 'label', style: 'background-color: #' + label.color}, [
+                    var $label = _.div({class: 'label', style: 'background-color: #' + label.color}, [
                         _.span({class: 'label-text'},
                             label.name
                         ),
                         _.button({class: 'btn btn-default label-btn-remove'},
                             _.span({class: 'glyphicon glyphicon-remove'})
-                        )
+                        ).click(onClickRemove)
                     ]);
+
+                    return $label;
                 }
             )
         );
@@ -622,25 +852,50 @@ module.exports = View.extend(function Issue(params) {
 
     self.adopt(params);
     self.register();
+    
+    // Init html
+    self.$element = _.div({class: 'panel panel-primary issue'}).click(onClick);
 
     self.fetch();
+    
+    // Private methods
+    function onClick() {
+        View.get('IssueModal').show(self.model);
+    }
+    
+    // Public methods
+    self.scrapeColumn = function scrapeColumn() {
+        console.log('yippie!');
+    };
+    
+    self.sync = function sync(model) {
+        self.model = model;
+
+        console.log(self.model);
+        
+        // TODO: Syncing logic
+        
+        self.render();
+    };
 },
 {
     render: function() {
         var self = this;
 
-        function onClick() {
-            View.get('IssueModal').show(self.model);
-        }
-
-        self.$element = _.div({class: 'panel panel-primary issue'}, [
-            _.div({class: 'panel-heading'},
-                _.h4(self.model.title)
-            ),
+        self.$element.attr('id', self.model.id);
+        self.$element.html([
+            _.div({class: 'panel-heading'}, [
+                _.span(self.model.title),
+                function() {
+                    if(self.model.assignee) {
+                        return _.img({alt: '', src: self.model.assignee.avatarUrl});
+                    }
+                }
+            ]),
             _.div({class: 'panel-body'},
-                _.p(self.model.body)
+                _.span(self.model.body)
             )
-        ]).click(onClick);
+        ]);
     }
 });
 

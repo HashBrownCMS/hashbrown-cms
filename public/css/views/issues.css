@@ -1,12 +1,65 @@
+.navbar-right {
+  margin-right: 0px; }
+
+.form-control.form-control-static {
+  background-color: #eee;
+  box-shadow: none; }
+
+.input-group.input-group-vertical {
+  display: block; }
+  .input-group.input-group-vertical .input-group-addon, .input-group.input-group-vertical .form-control {
+    display: block;
+    float: none; }
+  .input-group.input-group-vertical .form-control {
+    border-top-right-radius: 0px; }
+    .input-group.input-group-vertical .form-control:last-child {
+      border-bottom-left-radius: 5px; }
+  .input-group.input-group-vertical .input-group-addon:first-child {
+    border-bottom: 0 none;
+    border-bottom-left-radius: 0;
+    border-right: 1px solid #ccc;
+    border-top-right-radius: 5px;
+    display: block;
+    width: 100%; }
+
+.page-content .milestones {
+  margin-bottom: 15px; }
+
 .page-content .issue {
   cursor: pointer; }
+  .page-content .issue .panel-heading {
+    position: relative; }
+    .page-content .issue .panel-heading img {
+      position: absolute;
+      top: 0px;
+      right: 0px;
+      height: 100%; }
 
-.page-content .issue-modal .label .label-text {
-  padding: 4px 6px;
-  font-size: 12px; }
+.page-content .issue-modal .modal-body .input-group {
+  margin-top: 15px; }
+  .page-content .issue-modal .modal-body .input-group .input-group-addon {
+    min-width: 120px;
+    text-align: left; }
+  .page-content .issue-modal .modal-body .input-group:first-child {
+    margin-top: 0px; }
 
-.page-content .issue-modal .label .label-btn-remove {
-  font-size: 12px;
-  padding: 4px;
-  background-color: transparent;
-  border: 0px; }
+.page-content .issue-modal .modal-body textarea {
+  resize: none;
+  height: 300px; }
+
+.page-content .issue-modal .labels {
+  float: left;
+  display: block;
+  margin-top: 12px; }
+  .page-content .issue-modal .labels .label .label-text {
+    padding: 0px 4px;
+    font-size: 12px;
+    color: #fff;
+    position: relative;
+    top: 1px; }
+  .page-content .issue-modal .labels .label .label-btn-remove {
+    font-size: 12px;
+    padding: 0px 4px;
+    background-color: transparent;
+    border: 0px;
+    color: #fff; }

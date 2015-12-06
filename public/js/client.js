@@ -505,6 +505,24 @@ window.api = {
     issues: function(callback) {
         api.call('/api/' + req.params.user + '/' + req.params.repo + '/issues', callback);
     },
+    
+    issueColumns: function(callback) {
+        api.call('/api/' + req.params.user + '/' + req.params.repo + '/labels', function(res) {
+            if(res.err) {
+                console.log(res.err);
+                alert(res.err.json.message);
+            } else {
+                res.unshift({ name: 'backlog' });
+                res.push({ name: 'done' });
+                    
+                callback(res);
+            }
+        });
+    },
+
+    milestones: function(callback) {
+        api.call('/api/' + req.params.user + '/' + req.params.repo + '/milestones', callback);
+    },
 
     collaborators: function(callback) {
         api.call('/api/' + req.params.user + '/' + req.params.repo + '/collaborators', callback);

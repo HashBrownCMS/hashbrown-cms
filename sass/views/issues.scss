@@ -1,20 +1,67 @@
+@import '../main';
+
 .page-content {
+    .milestones {
+        margin-bottom: 15px;
+    }
+
     .issue {
         cursor: pointer;
+
+        .panel-heading {
+            position: relative;
+
+            img {
+                position: absolute;
+                top: 0px;
+                right: 0px;
+                height: 100%;
+            }
+        }
     }
 
     .issue-modal {
-        .label {
-            .label-text {
-                padding: 4px 6px;
-                font-size: 12px;
+        .modal-body {
+            .input-group {
+                margin-top: 15px;
+
+                .input-group-addon {
+                    min-width: 120px;
+                    text-align: left;
+                }
+
+                &:first-child {
+                    margin-top: 0px;
+                }
             }
 
-            .label-btn-remove {
-                font-size: 12px;
-                padding: 4px;
-                background-color: transparent;
-                border: 0px;
+            textarea {
+                resize: none;
+                height: 300px;
+            }
+        }
+
+        .labels {
+            float: left;
+            display: block;
+            margin-top: 12px;
+
+            .label {
+                .label-text {
+                    padding: 0px 4px;
+                    font-size: 12px;
+                    color: #fff;
+                    position: relative;
+                    top: 1px;
+                }
+
+                .label-btn-remove {
+                    font-size: 12px;
+                    padding: 0px 4px;
+                    background-color: transparent;
+                    border: 0px;
+                    color: #fff;
+                }
             }
         }
     }
