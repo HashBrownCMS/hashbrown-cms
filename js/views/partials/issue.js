@@ -15,8 +15,38 @@ module.exports = View.extend(function Issue(params) {
     }
     
     // Public methods
-    self.scrapeColumn = function scrapeColumn() {
-        console.log('yippie!');
+    self.updateMilestonePosition = function updateMilestonePosition() {
+        var milestoneId = $('.milestones').val();
+
+        self.$element.toggle(milestoneId == 'all' || self.model.milestone.id == milestoneId);
+    };
+
+    self.updateColumnFromPosition = function updateColumnFromPosition() {
+        var $column = self.$element.parents('.column');
+
+        self.model.state = $column.data('name') == 'done' ? 'closed' : 'open';
+
+        // Update model labels
+    };
+
+    self.updateColumnPosition = function updateColumnPosition() {
+        var column = 'backlog';
+
+        if(self.model.state == 'closed') {
+            column = 'done';
+        
+        } else {
+            for(var l in self.model.labels) {
+                var name = self.model.labels[l].name;
+                
+                if($('.column[data-name="' + name + '"]').length > 0) {
+                    column = name;
+                }
+            }
+        
+        }
+
+        $('.column[data-name="' + column + '"] .sortable').append(self.$element);
     };
     
     self.sync = function sync(model) {
@@ -27,6 +57,9 @@ module.exports = View.extend(function Issue(params) {
         // TODO: Syncing logic
         
         self.render();
+        
+        self.updateColumnPosition();
+        self.updateMilestonePosition();
     };
 },
 {

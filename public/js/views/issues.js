@@ -15,8 +15,6 @@ window.env = {
                 json.putaitu.issues = json.putaitu.issues || {};
                 json.putaitu.issues.columns = json.putaitu.issues.columns || [];
 
-                console.log(json);
-
                 env.json = json;
 
                 callback(env.json);
@@ -607,7 +605,23 @@ function onChangeMilestone() {
 }
 
 function onMoveIssueColumn($issue) {
-    $issue.data('view').scrapeColumn();
+    $issue.data('view').updateColumnFromPosition();
+}
+
+function updateIssuePositions() {
+    _.each(View.getAll('Issue'),
+        function(i, view) {
+            view.updateMilestonePosition();
+            view.updateColumnPosition();
+        }
+    );
+    
+    $('.sortable').sortable({
+        forcePlaceholderSize: true,
+        connectWith: '.sortable',
+    }).bind('sortupdate', function(e, ui) {
+        onMoveIssueColumn(ui.item);
+    });
 }
 
 api.issueColumns(function(columns) {
@@ -615,6 +629,14 @@ api.issueColumns(function(columns) {
         api.milestones(function(milestones) {
             $('.page-content').html([
                 _.div({class: 'container'}, [
+                    _.each(
+                        issues,
+                        function(i, issue) {
+                            return new Issue({
+                                model: issue
+                            }).$element;
+                        }
+                    ),
                     _.div({class: 'input-group p-b-md'}, [
                         _.span({class: 'input-group-addon'},
                             'Milestone'
@@ -636,41 +658,11 @@ api.issueColumns(function(columns) {
                                 var colSize = 12 / columns.length;
 
                                 return _.div({class: 'col-xs-' + colSize},
-                                    _.div({class: 'panel panel-default column', 'data-name': column.name}, [
+                                    _.div({class: 'panel panel-default column', 'data-name': column}, [
                                         _.div({class: 'panel-heading'},
                                             _.span(column)
                                         ),
-                                        _.div({class: 'panel-body sortable'},
-                                            _.each(
-                                                issues.filter(function(issue) {
-                                                    var closed = issue.state == 'closed' && column == 'done';
-                                                    var backlog = issue.state == 'open' && column == 'backlog';
-                                                    
-                                                    if(closed) {
-                                                        return true;
-                                                    }
-
-                                                    for(var l in issue.labels) {
-                                                        var hasLabel = issue.labels[l].name == column;
-                                                        
-                                                        if(hasLabel) {
-                                                            return true;
-                                                        }
-                                                    }
-                                                    
-                                                    if(backlog) {
-                                                        return true;
-                                                    }
-
-                                                    return false;
-                                                }),
-                                                function(i, issue) {
-                                                    return new Issue({
-                                                        model: issue
-                                                    }).$element;
-                                                }
-                                            )
-                                        )
+                                        _.div({class: 'panel-body sortable'})
                                     ])
                                 );                  
                             }
@@ -680,12 +672,7 @@ api.issueColumns(function(columns) {
                 new IssueModal().$element
             ]);
 
-            $('.sortable').sortable({
-                forcePlaceholderSize: true,
-                connectWith: '.sortable',
-            }).bind('sortupdate', function(e, ui) {
-                onMoveIssueColumn(ui.item);
-            });
+            updateIssuePositions();
         });
     });
 });
@@ -907,8 +894,38 @@ module.exports = View.extend(function Issue(params) {
     }
     
     // Public methods
-    self.scrapeColumn = function scrapeColumn() {
-        console.log('yippie!');
+    self.updateMilestonePosition = function updateMilestonePosition() {
+        var milestoneId = $('.milestones').val();
+
+        self.$element.toggle(milestoneId == 'all' || self.model.milestone.id == milestoneId);
+    };
+
+    self.updateColumnFromPosition = function updateColumnFromPosition() {
+        var $column = self.$element.parents('.column');
+
+        self.model.state = $column.data('name') == 'done' ? 'closed' : 'open';
+
+        // Update model labels
+    };
+
+    self.updateColumnPosition = function updateColumnPosition() {
+        var column = 'backlog';
+
+        if(self.model.state == 'closed') {
+            column = 'done';
+        
+        } else {
+            for(var l in self.model.labels) {
+                var name = self.model.labels[l].name;
+                
+                if($('.column[data-name="' + name + '"]').length > 0) {
+                    column = name;
+                }
+            }
+        
+        }
+
+        $('.column[data-name="' + column + '"] .sortable').append(self.$element);
     };
     
     self.sync = function sync(model) {
@@ -919,6 +936,9 @@ module.exports = View.extend(function Issue(params) {
         // TODO: Syncing logic
         
         self.render();
+        
+        self.updateColumnPosition();
+        self.updateMilestonePosition();
     };
 },
 {

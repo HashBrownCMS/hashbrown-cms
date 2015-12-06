@@ -15,8 +15,6 @@ window.env = {
                 json.putaitu.issues = json.putaitu.issues || {};
                 json.putaitu.issues.columns = json.putaitu.issues.columns || [];
 
-                console.log(json);
-
                 env.json = json;
 
                 callback(env.json);

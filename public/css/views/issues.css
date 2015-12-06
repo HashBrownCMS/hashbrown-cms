@@ -62,15 +62,17 @@
   float: left;
   display: block;
   margin-top: 12px; }
-  .page-content .issue-modal .labels .label .label-text {
-    padding: 0px 4px;
-    font-size: 12px;
-    color: #fff;
-    position: relative;
-    top: 1px; }
-  .page-content .issue-modal .labels .label .label-btn-remove {
-    font-size: 12px;
-    padding: 0px 4px;
-    background-color: transparent;
-    border: 0px;
-    color: #fff; }
+  .page-content .issue-modal .labels .label {
+    border: 1px solid #ccc; }
+    .page-content .issue-modal .labels .label .label-text {
+      padding: 0px 4px;
+      font-size: 12px;
+      color: #ccc;
+      position: relative;
+      top: 1px; }
+    .page-content .issue-modal .labels .label .label-btn-remove {
+      font-size: 12px;
+      padding: 0px 4px;
+      background-color: transparent;
+      border: 0px;
+      color: #ccc; }

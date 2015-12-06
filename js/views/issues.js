@@ -15,34 +15,23 @@ function onChangeMilestone() {
 }
 
 function onMoveIssueColumn($issue) {
-    $issue.data('view').scrapeColumn();
+    $issue.data('view').updateColumnFromPosition();
 }
 
 function updateIssuePositions() {
-    var milestoneId = $('.milestones').val();
-
     _.each(View.getAll('Issue'),
         function(i, view) {
-            var issue = view.model
-
-            view.$element.toggle(id == 'all' || issue.milestone.id == milestoneId);
-
-            var column = 'backlog';
-
-            if(issue.state == 'closed') {
-                column = 'done';
-            
-            } else {
-                for(var l in issue.labels) {
-                    column = issue.labels[l].name;
-                    // TODO: FIX!
-                }
-            
-            }
-
-            $('.column[data-name="' + column + '"]').each(function(c) {
+            view.updateMilestonePosition();
+            view.updateColumnPosition();
         }
     );
+    
+    $('.sortable').sortable({
+        forcePlaceholderSize: true,
+        connectWith: '.sortable',
+    }).bind('sortupdate', function(e, ui) {
+        onMoveIssueColumn(ui.item);
+    });
 }
 
 api.issueColumns(function(columns) {
@@ -50,6 +39,14 @@ api.issueColumns(function(columns) {
         api.milestones(function(milestones) {
             $('.page-content').html([
                 _.div({class: 'container'}, [
+                    _.each(
+                        issues,
+                        function(i, issue) {
+                            return new Issue({
+                                model: issue
+                            }).$element;
+                        }
+                    ),
                     _.div({class: 'input-group p-b-md'}, [
                         _.span({class: 'input-group-addon'},
                             'Milestone'
@@ -71,41 +68,11 @@ api.issueColumns(function(columns) {
                                 var colSize = 12 / columns.length;
 
                                 return _.div({class: 'col-xs-' + colSize},
-                                    _.div({class: 'panel panel-default column', 'data-name': column.name}, [
+                                    _.div({class: 'panel panel-default column', 'data-name': column}, [
                                         _.div({class: 'panel-heading'},
                                             _.span(column)
                                         ),
-                                        _.div({class: 'panel-body sortable'},
-                                            _.each(
-                                                issues.filter(function(issue) {
-                                                    var closed = issue.state == 'closed' && column == 'done';
-                                                    var backlog = issue.state == 'open' && column == 'backlog';
-                                                    
-                                                    if(closed) {
-                                                        return true;
-                                                    }
-
-                                                    for(var l in issue.labels) {
-                                                        var hasLabel = issue.labels[l].name == column;
-                                                        
-                                                        if(hasLabel) {
-                                                            return true;
-                                                        }
-                                                    }
-                                                    
-                                                    if(backlog) {
-                                                        return true;
-                                                    }
-
-                                                    return false;
-                                                }),
-                                                function(i, issue) {
-                                                    return new Issue({
-                                                        model: issue
-                                                    }).$element;
-                                                }
-                                            )
-                                        )
+                                        _.div({class: 'panel-body sortable'})
                                     ])
                                 );                  
                             }
@@ -115,12 +82,7 @@ api.issueColumns(function(columns) {
                 new IssueModal().$element
             ]);
 
-            $('.sortable').sortable({
-                forcePlaceholderSize: true,
-                connectWith: '.sortable',
-            }).bind('sortupdate', function(e, ui) {
-                onMoveIssueColumn(ui.item);
-            });
+            updateIssuePositions();
         });
     });
 });
