@@ -2,6 +2,37 @@
 window._ = require('./core/Templating');
 window.View = require('./core/View');
 
+window.env = {
+    json: null,
+
+    get: function(callback) {
+        if(env.json) {
+            callback(env.json);
+        } else {
+            api.getFile('env.json', function(json) {
+                json = JSON.parse(json) || {};
+                json.putaitu = json.putaitu || {};
+                json.putaitu.issues = json.putaitu.issues || {};
+                json.putaitu.issues.columns = json.putaitu.issues.columns || [];
+
+                console.log(json);
+
+                env.json = json;
+
+                callback(env.json);
+            });
+        }
+    },
+
+    set: function(json, callback) {
+        api.setFile(JSON.stringify(json), 'env.json', function() { 
+            env.json = json;
+
+            callback();
+        });
+    }
+};
+
 window.helper = {
     formatDate: function(input) {
         var date = new Date(input);
@@ -23,8 +54,12 @@ window.helper = {
 };
 
 window.api = {
-    call: function(url, callback) {
-        $.post(url, { token: localStorage.getItem('gh-oauth-token') }, function(res) {
+    call: function(url, callback, data) {
+        data = data || {};
+        
+        data.token = localStorage.getItem('gh-oauth-token');
+
+        $.post(url, data, function(res) {
             if(res.err) {
                 console.log(res.err);
                 alert(res.err.json.message);
@@ -45,22 +80,27 @@ window.api = {
     merge: function(base, head, callback) {
         api.call('/api/' + req.params.user + '/' + req.params.repo + '/merge/' + base + '/' + head, callback);
     },
+    
+    getFile: function(path, callback) {
+        api.call('/api/' + req.params.user + '/' + req.params.repo + '/file/get/' + path, callback);
+    },
+    
+    setFile: function(data, path, callback) {
+        api.call('/api/' + req.params.user + '/' + req.params.repo + '/file/set/' + path, callback, data);
+    },
 
     issues: function(callback) {
         api.call('/api/' + req.params.user + '/' + req.params.repo + '/issues', callback);
     },
     
     issueColumns: function(callback) {
-        api.call('/api/' + req.params.user + '/' + req.params.repo + '/labels', function(res) {
-            if(res.err) {
-                console.log(res.err);
-                alert(res.err.json.message);
-            } else {
-                res.unshift({ name: 'backlog' });
-                res.push({ name: 'done' });
-                    
-                callback(res);
-            }
+        env.get(function(json) {
+            var columns = json.putaitu.issues.columns;
+
+            columns.unshift('backlog');
+            columns.push('done');
+                
+            callback(columns);
         });
     },
 
@@ -575,15 +615,20 @@ api.issueColumns(function(columns) {
         api.milestones(function(milestones) {
             $('.page-content').html([
                 _.div({class: 'container'}, [
-                    _.select({class: 'form-control milestones'},
-                        _.each([ { id: 'all', title: '(all issues)' } ].concat(milestones),
-                            function(i, milestone) {
-                                return _.option({value: milestone.id},
-                                    milestone.title
-                                );
-                            }
-                        )
-                    ).change(onChangeMilestone),
+                    _.div({class: 'input-group p-b-md'}, [
+                        _.span({class: 'input-group-addon'},
+                            'Milestone'
+                        ),
+                        _.select({class: 'form-control milestones'},
+                            _.each([ { id: 'all', title: '(all issues)' } ].concat(milestones),
+                                function(i, milestone) {
+                                    return _.option({value: milestone.id},
+                                        milestone.title
+                                    );
+                                }
+                            )
+                        ).change(onChangeMilestone)
+                    ]),
                     _.div({class: 'row'},
                         _.each(
                             columns,
@@ -593,20 +638,20 @@ api.issueColumns(function(columns) {
                                 return _.div({class: 'col-xs-' + colSize},
                                     _.div({class: 'panel panel-default column', 'data-name': column.name}, [
                                         _.div({class: 'panel-heading'},
-                                            _.span(column.name)
+                                            _.span(column)
                                         ),
                                         _.div({class: 'panel-body sortable'},
                                             _.each(
                                                 issues.filter(function(issue) {
-                                                    var closed = issue.state == 'closed' && column.name == 'done';
-                                                    var backlog = issue.state == 'open' && column.name == 'backlog';
+                                                    var closed = issue.state == 'closed' && column == 'done';
+                                                    var backlog = issue.state == 'open' && column == 'backlog';
                                                     
                                                     if(closed) {
                                                         return true;
                                                     }
 
                                                     for(var l in issue.labels) {
-                                                        var hasLabel = issue.labels[l].name == column.name;
+                                                        var hasLabel = issue.labels[l].name == column;
                                                         
                                                         if(hasLabel) {
                                                             return true;
@@ -803,8 +848,6 @@ module.exports = View.extend(function IssueModal(params) {
     render: function() {
         var self = this;
        
-        console.log(self.model);
-
         self.$user.html(self.model.user.login);
 
         if(self.model.assignee) {

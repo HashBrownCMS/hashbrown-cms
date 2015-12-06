@@ -18,20 +18,52 @@ function onMoveIssueColumn($issue) {
     $issue.data('view').scrapeColumn();
 }
 
+function updateIssuePositions() {
+    var milestoneId = $('.milestones').val();
+
+    _.each(View.getAll('Issue'),
+        function(i, view) {
+            var issue = view.model
+
+            view.$element.toggle(id == 'all' || issue.milestone.id == milestoneId);
+
+            var column = 'backlog';
+
+            if(issue.state == 'closed') {
+                column = 'done';
+            
+            } else {
+                for(var l in issue.labels) {
+                    column = issue.labels[l].name;
+                    // TODO: FIX!
+                }
+            
+            }
+
+            $('.column[data-name="' + column + '"]').each(function(c) {
+        }
+    );
+}
+
 api.issueColumns(function(columns) {
     api.issues(function(issues) {
         api.milestones(function(milestones) {
             $('.page-content').html([
                 _.div({class: 'container'}, [
-                    _.select({class: 'form-control milestones'},
-                        _.each([ { id: 'all', title: '(all issues)' } ].concat(milestones),
-                            function(i, milestone) {
-                                return _.option({value: milestone.id},
-                                    milestone.title
-                                );
-                            }
-                        )
-                    ).change(onChangeMilestone),
+                    _.div({class: 'input-group p-b-md'}, [
+                        _.span({class: 'input-group-addon'},
+                            'Milestone'
+                        ),
+                        _.select({class: 'form-control milestones'},
+                            _.each([ { id: 'all', title: '(all issues)' } ].concat(milestones),
+                                function(i, milestone) {
+                                    return _.option({value: milestone.id},
+                                        milestone.title
+                                    );
+                                }
+                            )
+                        ).change(onChangeMilestone)
+                    ]),
                     _.div({class: 'row'},
                         _.each(
                             columns,
@@ -41,20 +73,20 @@ api.issueColumns(function(columns) {
                                 return _.div({class: 'col-xs-' + colSize},
                                     _.div({class: 'panel panel-default column', 'data-name': column.name}, [
                                         _.div({class: 'panel-heading'},
-                                            _.span(column.name)
+                                            _.span(column)
                                         ),
                                         _.div({class: 'panel-body sortable'},
                                             _.each(
                                                 issues.filter(function(issue) {
-                                                    var closed = issue.state == 'closed' && column.name == 'done';
-                                                    var backlog = issue.state == 'open' && column.name == 'backlog';
+                                                    var closed = issue.state == 'closed' && column == 'done';
+                                                    var backlog = issue.state == 'open' && column == 'backlog';
                                                     
                                                     if(closed) {
                                                         return true;
                                                     }
 
                                                     for(var l in issue.labels) {
-                                                        var hasLabel = issue.labels[l].name == column.name;
+                                                        var hasLabel = issue.labels[l].name == column;
                                                         
                                                         if(hasLabel) {
                                                             return true;

@@ -5,6 +5,18 @@
   background-color: #eee;
   box-shadow: none; }
 
+.p-b-xs {
+  margin-bottom: 10px; }
+
+.p-b-sm {
+  margin-bottom: 15px; }
+
+.p-b-md {
+  margin-bottom: 30px; }
+
+.p-b-lg {
+  margin-bottom: 60px; }
+
 .input-group.input-group-vertical {
   display: block; }
   .input-group.input-group-vertical .input-group-addon, .input-group.input-group-vertical .form-control {
@@ -22,14 +34,13 @@
     display: block;
     width: 100%; }
 
-.page-content .milestones {
-  margin-bottom: 30px; }
-
-.page-content .issue {
+.page-content .column .issue {
   cursor: pointer; }
-  .page-content .issue .panel-heading {
+  .page-content .column .issue:last-child {
+    margin-bottom: 0px; }
+  .page-content .column .issue .panel-heading {
     position: relative; }
-    .page-content .issue .panel-heading img {
+    .page-content .column .issue .panel-heading img {
       position: absolute;
       top: 0px;
       right: 0px;

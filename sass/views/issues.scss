@@ -1,21 +1,23 @@
 @import '../main';
 
 .page-content {
-    .milestones {
-        margin-bottom: 30px;
-    }
+    .column {
+        .issue {
+            cursor: pointer;
 
-    .issue {
-        cursor: pointer;
+            &:last-child {
+                margin-bottom: 0px;
+            }
 
-        .panel-heading {
-            position: relative;
+            .panel-heading {
+                position: relative;
 
-            img {
-                position: absolute;
-                top: 0px;
-                right: 0px;
-                height: 100%;
+                img {
+                    position: absolute;
+                    top: 0px;
+                    right: 0px;
+                    height: 100%;
+                }
             }
         }
     }

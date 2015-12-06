@@ -458,6 +458,37 @@ module.exports = View;
 window._ = require('./core/Templating');
 window.View = require('./core/View');
 
+window.env = {
+    json: null,
+
+    get: function(callback) {
+        if(env.json) {
+            callback(env.json);
+        } else {
+            api.getFile('env.json', function(json) {
+                json = JSON.parse(json) || {};
+                json.putaitu = json.putaitu || {};
+                json.putaitu.issues = json.putaitu.issues || {};
+                json.putaitu.issues.columns = json.putaitu.issues.columns || [];
+
+                console.log(json);
+
+                env.json = json;
+
+                callback(env.json);
+            });
+        }
+    },
+
+    set: function(json, callback) {
+        api.setFile(JSON.stringify(json), 'env.json', function() { 
+            env.json = json;
+
+            callback();
+        });
+    }
+};
+
 window.helper = {
     formatDate: function(input) {
         var date = new Date(input);
@@ -479,8 +510,12 @@ window.helper = {
 };
 
 window.api = {
-    call: function(url, callback) {
-        $.post(url, { token: localStorage.getItem('gh-oauth-token') }, function(res) {
+    call: function(url, callback, data) {
+        data = data || {};
+        
+        data.token = localStorage.getItem('gh-oauth-token');
+
+        $.post(url, data, function(res) {
             if(res.err) {
                 console.log(res.err);
                 alert(res.err.json.message);
@@ -501,22 +536,27 @@ window.api = {
     merge: function(base, head, callback) {
         api.call('/api/' + req.params.user + '/' + req.params.repo + '/merge/' + base + '/' + head, callback);
     },
+    
+    getFile: function(path, callback) {
+        api.call('/api/' + req.params.user + '/' + req.params.repo + '/file/get/' + path, callback);
+    },
+    
+    setFile: function(data, path, callback) {
+        api.call('/api/' + req.params.user + '/' + req.params.repo + '/file/set/' + path, callback, data);
+    },
 
     issues: function(callback) {
         api.call('/api/' + req.params.user + '/' + req.params.repo + '/issues', callback);
     },
     
     issueColumns: function(callback) {
-        api.call('/api/' + req.params.user + '/' + req.params.repo + '/labels', function(res) {
-            if(res.err) {
-                console.log(res.err);
-                alert(res.err.json.message);
-            } else {
-                res.unshift({ name: 'backlog' });
-                res.push({ name: 'done' });
-                    
-                callback(res);
-            }
+        env.get(function(json) {
+            var columns = json.putaitu.issues.columns;
+
+            columns.unshift('backlog');
+            columns.push('done');
+                
+            callback(columns);
         });
     },
 

@@ -155,8 +155,6 @@ module.exports = View.extend(function IssueModal(params) {
     render: function() {
         var self = this;
        
-        console.log(self.model);
-
         self.$user.html(self.model.user.login);
 
         if(self.model.assignee) {

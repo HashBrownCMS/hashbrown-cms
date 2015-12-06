@@ -199,6 +199,35 @@ app.post('/api/:user/:repo/labels', function(req, res) {
     });
 });
 
+// Get file
+app.post('/api/:user/:repo/file/get/:path', function(req, res) {
+    let octo = new octokat({ token: req.body.token });
+
+    octo.fromUrl('/repos/' + req.params.user + '/' + req.params.repo + '/contents/' + req.params.path).fetch(function(err, contents) {
+        if(err) {
+            res.send({ err: err });
+        } else {
+            res.send(new Buffer(contents.content, 'base64').toString());
+        }
+    });
+});
+
+// Set file
+app.post('/api/:user/:repo/file/set/:path', function(req, res) {
+    let octo = new octokat({ token: req.body.token });
+
+    octo.fromUrl('/repos/' + req.params.user + '/' + req.params.repo + '/contents/' + req.params.path).create(
+        req.params.data,
+        function(err, contents) {
+            if(err) {
+                res.send({ err: err });
+            } else {
+                res.send(atob(contents.content));
+            }
+        }
+    );
+});
+
 // Get issues
 app.post('/api/:user/:repo/milestones', function(req, res) {
     let octo = new octokat({ token: req.body.token });
