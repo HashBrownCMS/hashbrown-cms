@@ -23,7 +23,21 @@
     }
 
     .issue-modal {
+        .modal-header {
+            p {
+                margin: 0px;
+            }
+        }
+
         .modal-body {
+            .row {
+                margin-top: 15px;
+                
+                &:first-child {
+                    margin-top: 0px;
+                }
+            }
+
             .input-group {
                 margin-top: 15px;
 

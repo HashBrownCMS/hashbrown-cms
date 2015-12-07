@@ -46,6 +46,14 @@
       right: 0px;
       height: 100%; }
 
+.page-content .issue-modal .modal-header p {
+  margin: 0px; }
+
+.page-content .issue-modal .modal-body .row {
+  margin-top: 15px; }
+  .page-content .issue-modal .modal-body .row:first-child {
+    margin-top: 0px; }
+
 .page-content .issue-modal .modal-body .input-group {
   margin-top: 15px; }
   .page-content .issue-modal .modal-body .input-group .input-group-addon {

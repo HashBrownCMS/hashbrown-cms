@@ -44,55 +44,59 @@ module.exports = View.extend(function IssueModal(params) {
                    _.button({type: 'button', class: 'close', 'data-dismiss': 'modal'},
                        _.span({class: 'glyphicon glyphicon-remove'})
                     ),
-                   self.$heading = _.span()
+                    self.$heading = _.span(),
+                    _.p({}, [
+                        'Created by ',
+                        self.$user = _.a()
+                    ])
                 ]),
                 _.div({class: 'modal-body'}, [
-                    _.div({class: 'input-group'}, [
-                        _.span({class: 'input-group-addon'},
-                            'Created by'
-                        ),
-                        self.$user = _.span({class: 'form-control form-control-static'})
-                    ]),
-                    _.div({class: 'input-group'}, [
-                        _.span({class: 'input-group-addon'},
-                            'Assignee'
-                        ),
-                        function () {
-                            self.$assignee = _.select({class: 'form-control'});
+                    _.div({class: 'row'}, [
+                        _.div({class: 'col-xs-6'}, 
+                            _.div({class: 'input-group'}, [
+                                _.span({class: 'input-group-addon'},
+                                    'Assignee'
+                                ),
+                                function () {
+                                    self.$assignee = _.select({class: 'form-control'});
 
-                            api.collaborators(function(collaborators) {
-                                self.collaborators = collaborators;
+                                    api.collaborators(function(collaborators) {
+                                        self.collaborators = collaborators;
 
-                                self.$assignee.html(
+                                        self.$assignee.html(
+                                            _.each(
+                                                [ { login: '(none)', id: null } ].concat(collaborators),
+                                                function(i, collaborator) {
+                                                    return _.option({value: collaborator.id},
+                                                        collaborator.login
+                                                    );
+                                                }
+                                            )
+                                        );
+                                    });
+
+                                    return self.$assignee;
+                                }().change(onChangeAssignee)
+                            ])
+                        ),
+                        _.div({class: 'col-xs-6'}, 
+                            _.div({class: 'input-group'}, [
+                                _.span({class: 'input-group-addon'},
+                                    'State'
+                                ),
+                                self.$state = _.select({class: 'form-control'},
                                     _.each(
-                                        [ { login: '(none)', id: null } ].concat(collaborators),
-                                        function(i, collaborator) {
-                                            return _.option({value: collaborator.id},
-                                                collaborator.login
+                                        [ 'open', 'closed' ],
+                                        function(i, state) {
+                                            return _.option({value: state},
+                                                state
                                             );
                                         }
                                     )
-                                );
-                            });
-
-                            return self.$assignee;
-                        }().change(onChangeAssignee)
-                    ]),
-                    _.div({class: 'input-group'}, [
-                        _.span({class: 'input-group-addon'},
-                            'State'
-                        ),
-                        self.$state = _.select({class: 'form-control'},
-                            _.each(
-                                [ 'open', 'closed' ],
-                                function(i, state) {
-                                    return _.option({value: state},
-                                        state
-                                    );
-                                }
-                            )
-                        ).change(onChangeState)
-                    ]),
+                                ).change(onChangeState)
+                            ])
+                        )
+                    ]),         
                     _.div({class: 'input-group'}, [
                         _.span({class: 'input-group-addon'},
                             'Milestone'
