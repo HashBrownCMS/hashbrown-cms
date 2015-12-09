@@ -91,6 +91,10 @@ window.api = {
         api.call('/api/' + req.params.user + '/' + req.params.repo + '/issues', callback);
     },
     
+    labels: function(callback) {
+        api.call('/api/' + req.params.user + '/' + req.params.repo + '/labels', callback);
+    },
+    
     issueColumns: function(callback) {
         env.get(function(json) {
             var columns = json.putaitu.issues.columns;
