@@ -3,18 +3,22 @@ window.View = require('./core/View');
 
 window.env = {
     json: null,
+    sha: null,
 
     get: function(callback) {
         if(env.json) {
             callback(env.json);
         } else {
-            api.getFile('env.json', function(json) {
+            api.file.get('env.json', function(contents) {
+                var json = atob(contents.content);
+
                 json = JSON.parse(json) || {};
                 json.putaitu = json.putaitu || {};
                 json.putaitu.issues = json.putaitu.issues || {};
                 json.putaitu.issues.columns = json.putaitu.issues.columns || [];
 
                 env.json = json;
+                env.sha = contents.sha;
 
                 callback(env.json);
             });
@@ -22,10 +26,20 @@ window.env = {
     },
 
     set: function(json, callback) {
-        api.setFile(JSON.stringify(json), 'env.json', function() { 
+        json = json || env.json;
+
+        var contents = {
+            content: btoa(JSON.stringify(json)),
+            sha: env.sha,
+            comment: 'Updating env.json'
+        };
+
+        api.file.set(contents, 'env.json', function() { 
             env.json = json;
 
-            callback();
+            if(callback) {
+                callback();
+            }
         });
     }
 };
@@ -59,9 +73,11 @@ window.api = {
         $.post(url, data, function(res) {
             if(res.err) {
                 console.log(res.err);
-                alert(res.err.json.message);
-            } else {
+                alert('(' + res.mode + ') ' + res.url + ': ' + res.err.json.message);
+
+            } else if(callback) {
                 callback(res);
+            
             }
         });
     },
@@ -75,23 +91,35 @@ window.api = {
     },
 
     merge: function(base, head, callback) {
-        api.call('/api/' + req.params.user + '/' + req.params.repo + '/merge/' + base + '/' + head, callback);
+        api.call('/api/' + req.params.user + '/' + req.params.repo + '/merge', callback, { base: base, head: head });
     },
     
-    getFile: function(path, callback) {
-        api.call('/api/' + req.params.user + '/' + req.params.repo + '/file/get/' + path, callback);
-    },
+    file: {
+        get: function(path, callback) {
+            api.call('/api/' + req.params.user + '/' + req.params.repo + '/file/get/' + path, callback);
+        },
+        
+        update: function(data, path, callback) {
+            api.call('/api/' + req.params.user + '/' + req.params.repo + '/file/update/' + path, callback, data);
+        },
     
-    setFile: function(data, path, callback) {
-        api.call('/api/' + req.params.user + '/' + req.params.repo + '/file/set/' + path, callback, data);
+        set: function(data, path, callback) {
+            api.call('/api/' + req.params.user + '/' + req.params.repo + '/file/set/' + path, callback, data);
+        }
     },
 
     issues: function(callback) {
         api.call('/api/' + req.params.user + '/' + req.params.repo + '/issues', callback);
     },
     
-    labels: function(callback) {
-        api.call('/api/' + req.params.user + '/' + req.params.repo + '/labels', callback);
+    labels: {
+        get: function(callback) {
+            api.call('/api/' + req.params.user + '/' + req.params.repo + '/labels/get', callback);
+        },
+
+        set: function(data, callback) {
+            api.call('/api/' + req.params.user + '/' + req.params.repo + '/labels/set', callback, data);
+        }
     },
     
     issueColumns: function(callback) {

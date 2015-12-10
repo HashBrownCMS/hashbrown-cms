@@ -4,6 +4,10 @@ module.exports = View.extend(function IssueModal(params) {
     self.adopt(params);
     self.register();
 
+    api.labels.get(function(labels) {
+        self.labels = labels;
+    });
+
     function onClickOK() {
         $('#' + self.model.id).data('view').sync(self.model);
         self.hide();
@@ -196,6 +200,32 @@ module.exports = View.extend(function IssueModal(params) {
                     return $label;
                 }
             )
+        );
+
+        self.$labels.append(
+           _.div({class: 'dropdown'}, [
+                _.button({class: 'btn btn-default dropdown-toggle', type: 'button', 'data-toggle': 'dropdown'},
+                   _.span({class: 'glyphicon glyphicon-plus'})
+                ),
+                _.ul({class: 'dropdown-menu'},
+                    _.each(self.labels,
+                        function(i, label) {
+                            function onClick(e) {
+                                e.preventDefault();
+
+                                self.model.labels.push(label);
+                                self.render();
+                            }
+
+                            return _.li({style: 'background-color: #' + label.color},
+                                _.a({href: '#'},
+                                    label.name
+                                ).click(onClick) 
+                            );
+                        }
+                    )
+                )
+            ])
         );
     }
 });

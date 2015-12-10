@@ -84,6 +84,33 @@ app.get('/redir/repo/:user/:repo/:branch', function(req, res) {
 /**
  * API
  */
+// Generic call
+function octoCall(req, res, url) {
+    function callback(err, answer) {
+        if(err) {
+            res.send({ mode: req.params.mode, url: url, err: err });
+        } else {
+            res.send(answer);
+        }
+    }
+    
+    let octo = new octokat({ token: req.body.token });
+    
+    switch(req.params.mode) {
+        case 'set':
+            octo.fromUrl(url).create(callback);
+            break;
+        
+        case 'update':
+            octo.fromUrl(url).update(callback);
+            break;
+        
+        case 'get': default:
+            octo.fromUrl(url).fetch(callback);
+            break;
+    }
+}
+
 // Login
 app.post('/api/login/', function(req, res) {
     let octo = new octokat({
@@ -143,122 +170,58 @@ app.post('/api/repos', function(req, res) {
 
 // Compare branches
 app.post('/api/:user/:repo/compare/:base/:head', function(req, res) {
-    let octo = new octokat({ token: req.body.token });
+    let url = '/repos/' + req.params.user + '/' + req.params.repo + '/compare/' + req.params.base + '...' + req.params.head;
 
-    octo.fromUrl('/repos/' + req.params.user + '/' + req.params.repo + '/compare/' + req.params.base + '...' + req.params.head).fetch(function(err, val) {
-        if(err) {
-            res.send({ err: err });
-        } else {
-            res.send(val);
-        }
-    });
+    octoCall(req, res, url);
 });
 
 // Get repos from user
 app.post('/api/:user/repos', function(req, res) {
-    let octo = new octokat({ token: req.body.token });
+    let url = '/users/' + req.params.user + '/repos';
 
-    octo.fromUrl('/users/' + req.params.user + '/repos').fetch(function(err, val) {
-        if(err) {
-            res.send({ err: err });
-        } else {
-            res.send(val);
-        }
-    });
+    octoCall(req, res, url);
 });
 
 // Get collaborators
 app.post('/api/:user/:repo/collaborators', function(req, res) {
-    let octo = new octokat({ token: req.body.token });
+    let url = '/repos/' + req.params.user + '/' + req.params.repo + '/collaborators';
 
-    octo.fromUrl('/repos/' + req.params.user + '/' + req.params.repo + '/collaborators').fetch(function(err, collaborators) {
-        if(err) {
-            res.send({ err: err });
-        } else {
-            res.send(collaborators);
-        }
-    });
+    octoCall(req, res, url);
 });
 
 // Get issues
 app.post('/api/:user/:repo/issues', function(req, res) {
-    let octo = new octokat({ token: req.body.token });
-
-    octo.fromUrl('/repos/' + req.params.user + '/' + req.params.repo + '/issues').fetch(function(err, issues) {
-        if(err) {
-            res.send({ err: err });
-        } else {
-            res.send(issues);
-        }
-    });
+    let url = '/repos/' + req.params.user + '/' + req.params.repo + '/issues';
+    
+    octoCall(req, res, url);
 });
 
-// Get labels
-app.post('/api/:user/:repo/labels', function(req, res) {
-    let octo = new octokat({ token: req.body.token });
+// Get/set labels
+app.post('/api/:user/:repo/labels/:mode', function(req, res) {
+    let url = '/repos/' + req.params.user + '/' + req.params.repo + '/labels';
 
-    octo.fromUrl('/repos/' + req.params.user + '/' + req.params.repo + '/labels').fetch(function(err, labels) {
-        if(err) {
-            res.send({ err: err });
-        } else {
-            res.send(labels);
-        }
-    });
+    octoCall(req, res, url);
 });
 
-// Get file
-app.post('/api/:user/:repo/file/get/:path', function(req, res) {
-    let octo = new octokat({ token: req.body.token });
+// Get/set file
+app.post('/api/:user/:repo/file/:mode/:path', function(req, res) {
+    let url = '/repos/' + req.params.user + '/' + req.params.repo + '/contents/' + req.params.path;
 
-    octo.fromUrl('/repos/' + req.params.user + '/' + req.params.repo + '/contents/' + req.params.path).fetch(function(err, contents) {
-        if(err) {
-            res.send({ err: err });
-        } else {
-            res.send(new Buffer(contents.content, 'base64').toString());
-        }
-    });
-});
-
-// Set file
-app.post('/api/:user/:repo/file/set/:path', function(req, res) {
-    let octo = new octokat({ token: req.body.token });
-
-    octo.fromUrl('/repos/' + req.params.user + '/' + req.params.repo + '/contents/' + req.params.path).create(
-        req.params.data,
-        function(err, contents) {
-            if(err) {
-                res.send({ err: err });
-            } else {
-                res.send(atob(contents.content));
-            }
-        }
-    );
+    octoCall(req, res, url);
 });
 
 // Get issues
 app.post('/api/:user/:repo/milestones', function(req, res) {
-    let octo = new octokat({ token: req.body.token });
-
-    octo.fromUrl('/repos/' + req.params.user + '/' + req.params.repo + '/milestones').fetch(function(err, milestones) {
-        if(err) {
-            res.send({ err: err });
-        } else {
-            res.send(milestones);
-        }
-    });
+    let url = '/repos/' + req.params.user + '/' + req.params.repo + '/milestones';
+    
+    octoCall(req, res, url);
 });
 
 // Get repo
 app.post('/api/:user/:repo', function(req, res) {
-    let octo = new octokat({ token: req.body.token });
-
-    octo.fromUrl('/repos/' + req.params.user + '/' + req.params.repo).fetch(function(err, repo) {
-        if(err) {
-            res.send({ err: err });
-        } else {
-            res.send(repo);
-        }
-    });
+    let url = '/repos/' + req.params.user + '/' + req.params.repo;
+    
+    octoCall(req, res, url);
 });
 
 // Get branches
@@ -291,23 +254,10 @@ app.post('/api/:user/:repo/branches', function(req, res) {
 });
 
 // Merge
-app.post('/api/:user/:repo/merge/:base/:head', function(req, res) {
-    let octo = new octokat({ token: req.body.token });
+app.post('/api/:user/:repo/merge', function(req, res) {
     let url = '/repos/' + req.params.user + '/' + req.params.repo + '/merges';
 
-    octo.fromUrl(url).create(
-        {
-            head: req.params.head,
-            base: req.params.base
-        },
-        function(err, merge) {
-            if(err) {
-                res.send({ err: err });
-            } else {
-                res.send(merge);
-            }
-        }
-    );
+    octoCall(req, res, url);
 });
 
 let server = app.listen(8000);
