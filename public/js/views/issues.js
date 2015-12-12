@@ -649,8 +649,9 @@ function onMoveIssueColumn($issue) {
 
 function onClickNewIssue() {
     var newIssue = {
-        "title": "Issue title",
-        "body": "Issue description"
+        title: 'Issue title',
+        body: 'Issue description',
+        state: 'open'
     };
 
     View.get('IssueModal').show(newIssue);
@@ -688,13 +689,11 @@ api.issueColumns(function(columns) {
                         }
                     ),
                     // Issue actions
-                    _.div({class: 'panel'},
-                        _.div({class: 'panel-body'},
-                            _.button({class: 'btn btn-primary'}, [
-                                _.span({class: 'glyphicon glyphicon-plus'}),
-                                ' New issue'
-                            ]).click(onClickNewIssue)
-                        )
+                    _.div({class: 'btn-group issue-actions'},
+                        _.button({class: 'btn btn-primary'}, [
+                            _.span({class: 'glyphicon glyphicon-plus'}),
+                            ' New issue'
+                        ]).click(onClickNewIssue)
                     ),
                     // Milestone picker
                     _.div({class: 'input-group p-b-md'}, [
@@ -749,6 +748,7 @@ module.exports = View.extend(function IssueModal(params) {
         self.labels = labels;
     });
 
+    // Private methods
     function onClickOK() {
         $('#' + self.model.id).data('view').sync(self.model);
         self.hide();
@@ -781,7 +781,19 @@ module.exports = View.extend(function IssueModal(params) {
             }
         }
     }
+   
+    // Public methods 
+    self.hide = function hide() {
+        self.$element.modal('hide');
+    };
+    
+    self.show = function show(issue) {
+        self.model = issue;
+        self.render();
+        self.$element.modal('show');
+    };
 
+    // Main element
     self.$element = _.div({class: 'modal fade issue-modal', role: 'dialog'},
         _.div({class: 'modal-dialog'},
             _.div({class: 'modal-content'}, [
@@ -853,6 +865,10 @@ module.exports = View.extend(function IssueModal(params) {
                                 self.milestones = milestones;
 
                                 self.$milestone.html(
+                                    _.option({value: -1}, '(none)')
+                                );
+
+                                self.$milestone.append(
                                     _.each(
                                         milestones,
                                         function(i, milestone) {
@@ -889,59 +905,67 @@ module.exports = View.extend(function IssueModal(params) {
             ])
         )
     );
-    
-    self.hide = function show(issue) {
-        self.$element.modal('hide');
-    };
-    
-    self.show = function show(issue) {
-        self.model = issue;
-        self.render();
-        self.$element.modal('show');
-    };
 },
 {
     render: function() {
         var self = this;
        
-        self.$user.html(self.model.user.login);
+        if(self.model.user) {
+            self.$user.html(self.model.user.login);
+        } else {
+            self.$user.html('me');
+        }
 
         if(self.model.assignee) {
             self.$assignee.val(self.model.assignee.login);
+        } else {
+            self.$assignee.val('(none)');
         }
 
         self.$state.val(self.model.state);
         
-        self.$milestone.val(self.model.milestone.id);
+        if(self.model.milestone) {
+            self.$milestone.val(self.model.milestone.id);
+        } else {
+            self.$milestone.val(-1);
+        }
 
-        self.$heading.html('Edit issue (id: ' + self.model.id + ')');
+        if(self.model.id) {
+            self.$heading.html('Edit issue (id: ' + self.model.id + ')');
+        } else {
+            self.$heading.html('New issue');
+        }
 
         self.$title.attr('value', self.model.title);
 
         self.$body.html(self.model.body);
 
-        self.$labels.html(
-            _.each(
-                self.model.labels,
-                function(i, label) {
-                    function onClickRemove(e) {
-                        self.model.labels.splice(i, 1);
-                        $label.remove();
+        if(self.model.labels) {
+            self.$labels.html(
+                _.each(
+                    self.model.labels,
+                    function(i, label) {
+                        function onClickRemove(e) {
+                            self.model.labels.splice(i, 1);
+                            $label.remove();
+                        }
+
+                        var $label = _.div({class: 'label', style: 'background-color: #' + label.color}, [
+                            _.span({class: 'label-text'},
+                                label.name
+                            ),
+                            _.button({class: 'btn btn-default label-btn-remove'},
+                                _.span({class: 'glyphicon glyphicon-remove'})
+                            ).click(onClickRemove)
+                        ]);
+
+                        return $label;
                     }
-
-                    var $label = _.div({class: 'label', style: 'background-color: #' + label.color}, [
-                        _.span({class: 'label-text'},
-                            label.name
-                        ),
-                        _.button({class: 'btn btn-default label-btn-remove'},
-                            _.span({class: 'glyphicon glyphicon-remove'})
-                        ).click(onClickRemove)
-                    ]);
-
-                    return $label;
-                }
-            )
-        );
+                )
+            );
+        } else {
+            self.$labels.empty();
+        }
 
         self.$labels.append(
            _.div({class: 'dropdown'}, [

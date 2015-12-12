@@ -46,6 +46,9 @@
       right: 0px;
       height: 100%; }
 
+.page-content .issue-actions {
+  margin-bottom: 15px; }
+
 .page-content .issue-modal .modal-header p {
   margin: 0px; }
 

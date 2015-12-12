@@ -20,8 +20,9 @@ function onMoveIssueColumn($issue) {
 
 function onClickNewIssue() {
     var newIssue = {
-        "title": "Issue title",
-        "body": "Issue description"
+        title: 'Issue title',
+        body: 'Issue description',
+        state: 'open'
     };
 
     View.get('IssueModal').show(newIssue);
@@ -59,13 +60,11 @@ api.issueColumns(function(columns) {
                         }
                     ),
                     // Issue actions
-                    _.div({class: 'panel'},
-                        _.div({class: 'panel-body'},
-                            _.button({class: 'btn btn-primary'}, [
-                                _.span({class: 'glyphicon glyphicon-plus'}),
-                                ' New issue'
-                            ]).click(onClickNewIssue)
-                        )
+                    _.div({class: 'btn-group issue-actions'},
+                        _.button({class: 'btn btn-primary'}, [
+                            _.span({class: 'glyphicon glyphicon-plus'}),
+                            ' New issue'
+                        ]).click(onClickNewIssue)
                     ),
                     // Milestone picker
                     _.div({class: 'input-group p-b-md'}, [
