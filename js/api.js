@@ -1,3 +1,17 @@
+function appropriateIssue(issue) {
+    // Updating issue milestones requires a number from the GitHub API
+    if(issue.milestone) {
+        issue.milestone = issue.milestone.number;
+    }
+    
+    // Updating issue assignees requires a number from the GitHub API
+    if(issue.assignee) {
+        issue.assignee = issue.assignee.login;
+    }
+
+    return issue;
+}
+
 window.api = {
     call(url, callback, data) {
         data = data || {};
@@ -48,11 +62,11 @@ window.api = {
         },
         
         create: function(data, callback) {
-            api.call('/api/' + req.params.user + '/' + req.params.repo + '/create/issues', callback, data);
+            api.call('/api/' + req.params.user + '/' + req.params.repo + '/create/issues', callback, appropriateIssue(data));
         },
         
         update: function(data, callback) {
-            api.call('/api/' + req.params.user + '/' + req.params.repo + '/update/issues', callback, data);
+            api.call('/api/' + req.params.user + '/' + req.params.repo + '/update/issues', callback, appropriateIssue(data));
         }
     },
     

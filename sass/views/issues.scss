@@ -9,6 +9,24 @@
                 margin-bottom: 0px;
             }
 
+            &.loading {
+                position: relative;
+
+                .panel-spinner {
+                    position: absolute;
+                    width: 100%;
+                    height: 100%;
+                    top: 0px;
+                    left: 0px;
+                    background-color: rgba(255, 255, 255, 0.75);
+                    z-index: 10;
+
+                    .spinner {
+                        display: block;
+                    }
+                }
+            }
+
             .panel-heading {
                 position: relative;
 

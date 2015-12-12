@@ -208,7 +208,7 @@ class IssueModal extends View {
         }
 
         if(view.model.assignee) {
-            view.$assignee.val(view.model.assignee.login);
+            view.$assignee.val(view.model.assignee.id);
         } else {
             view.$assignee.val('(none)');
         }

@@ -21,6 +21,20 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         s(r[o]);
     }return s;
 })({ 1: [function (require, module, exports) {
+        function appropriateIssue(issue) {
+            // Updating issue milestones requires a number from the GitHub API
+            if (issue.milestone) {
+                issue.milestone = issue.milestone.number;
+            }
+
+            // Updating issue assignees requires a number from the GitHub API
+            if (issue.assignee) {
+                issue.assignee = issue.assignee.login;
+            }
+
+            return issue;
+        }
+
         window.api = {
             call: function call(url, callback, data) {
                 data = data || {};
@@ -69,11 +83,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 },
 
                 create: function create(data, callback) {
-                    api.call('/api/' + req.params.user + '/' + req.params.repo + '/create/issues', callback, data);
+                    api.call('/api/' + req.params.user + '/' + req.params.repo + '/create/issues', callback, appropriateIssue(data));
                 },
 
                 update: function update(data, callback) {
-                    api.call('/api/' + req.params.user + '/' + req.params.repo + '/update/issues', callback, data);
+                    api.call('/api/' + req.params.user + '/' + req.params.repo + '/update/issues', callback, appropriateIssue(data));
                 }
             },
 
@@ -866,7 +880,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     }
 
                     if (view.model.assignee) {
-                        view.$assignee.val(view.model.assignee.login);
+                        view.$assignee.val(view.model.assignee.id);
                     } else {
                         view.$assignee.val('(none)');
                     }
@@ -943,11 +957,20 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 return _this3;
             }
 
+            /**
+             * Events
+             */
+
             _createClass(Issue, [{
                 key: "onClick",
                 value: function onClick(e, element, view) {
                     ViewHelper.get('IssueModal').show(view.model);
                 }
+
+                /**
+                 * Sorting actions
+                 */
+
             }, {
                 key: "updateMilestonePosition",
                 value: function updateMilestonePosition() {
@@ -983,6 +1006,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
                     $('.column[data-name="' + column + '"] .sortable').append(this.$element);
                 }
+
+                /**
+                 * Updating
+                 */
+
             }, {
                 key: "update",
                 value: function update() {
@@ -990,6 +1018,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
                     this.updateColumnPosition();
                     this.updateMilestonePosition();
+                }
+            }, {
+                key: "setLoading",
+                value: function setLoading(active) {
+                    this.$element.toggleClass('loading', active);
                 }
             }, {
                 key: "sync",
@@ -1015,6 +1048,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                             });
                         }
                 }
+
+                /**
+                 * Rendering
+                 */
+
             }, {
                 key: "render",
                 value: function render() {
@@ -1025,7 +1063,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                         if (view.model.assignee) {
                             return _.img({ alt: '', src: view.model.assignee.avatarUrl });
                         }
-                    }]), _.div({ class: 'panel-body' }, _.span(view.model.body))]);
+                    }]), _.div({ class: 'panel-body' }, _.span(view.model.body)), _.div({ class: 'panel-spinner' }, _.div({ class: 'spinner' }))]);
                 }
             }]);
 

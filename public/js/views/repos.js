@@ -17,6 +17,20 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         s(r[o]);
     }return s;
 })({ 1: [function (require, module, exports) {
+        function appropriateIssue(issue) {
+            // Updating issue milestones requires a number from the GitHub API
+            if (issue.milestone) {
+                issue.milestone = issue.milestone.number;
+            }
+
+            // Updating issue assignees requires a number from the GitHub API
+            if (issue.assignee) {
+                issue.assignee = issue.assignee.login;
+            }
+
+            return issue;
+        }
+
         window.api = {
             call: function call(url, callback, data) {
                 data = data || {};
@@ -65,11 +79,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 },
 
                 create: function create(data, callback) {
-                    api.call('/api/' + req.params.user + '/' + req.params.repo + '/create/issues', callback, data);
+                    api.call('/api/' + req.params.user + '/' + req.params.repo + '/create/issues', callback, appropriateIssue(data));
                 },
 
                 update: function update(data, callback) {
-                    api.call('/api/' + req.params.user + '/' + req.params.repo + '/update/issues', callback, data);
+                    api.call('/api/' + req.params.user + '/' + req.params.repo + '/update/issues', callback, appropriateIssue(data));
                 }
             },
 

@@ -13,10 +13,16 @@ class Issue extends View {
         this.init();
     }
 
+    /**
+     * Events
+     */
     onClick(e, element, view) {
         ViewHelper.get('IssueModal').show(view.model);
     }
     
+    /**
+     * Sorting actions
+     */
     updateMilestonePosition() {
         let milestoneId = $('.milestones').val();
 
@@ -51,11 +57,18 @@ class Issue extends View {
         $('.column[data-name="' + column + '"] .sortable').append(this.$element);
     }
     
+    /**
+     * Updating
+     */
     update() {
         this.init();
         
         this.updateColumnPosition();
         this.updateMilestonePosition();
+    }
+
+    setLoading(active) {
+        this.$element.toggleClass('loading', active);
     }
 
     sync(model) {
@@ -82,6 +95,9 @@ class Issue extends View {
         }    
     }
     
+    /**
+     * Rendering
+     */
     render() {
         let view = this;
 
@@ -97,6 +113,9 @@ class Issue extends View {
             ]),
             _.div({class: 'panel-body'},
                 _.span(view.model.body)
+            ),
+            _.div({class: 'panel-spinner'},
+                _.div({class: 'spinner'})
             )
         ]);
     }

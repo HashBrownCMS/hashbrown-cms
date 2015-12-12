@@ -14,7 +14,7 @@ app.use(bodyparser.urlencoded({ extended: false }));
 app.use(express.static(__dirname + '/public'));
 
 /**
- * Routes
+ * Views
  */
 // Login
 app.get('/', function(req, res) {
@@ -199,13 +199,6 @@ app.post('/api/:user/:repo/:mode/issues', function(req, res) {
     if(req.params.mode == 'update') {
         url += '/' + req.body.number;
     }
-
-    // Updating issue milestones requires a number from the GitHub API
-    if(req.body.milestone && req.params.mode == 'update' || req.params.mode == 'create') {
-        req.body.milestone = req.body.milestone.number;
-    }
-   
-    console.log(req.body);
 
     apiCall(req, res, url);
 });

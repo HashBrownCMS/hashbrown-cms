@@ -46,10 +46,46 @@
     display: block;
     width: 100%; }
 
+@keyframes spinner {
+  0% {
+    transform: scale(1, 1); }
+  50% {
+    transform: scale(0.75, 0.75); }
+  100% {
+    transform: scale(1, 1); } }
+
+.spinner {
+  display: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 32px;
+  height: 32px;
+  margin: -16px 0px 0px -16px;
+  transform: scale(1, 1);
+  animation-name: spinner;
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 100%; }
+
 .page-content .column .issue {
   cursor: pointer; }
   .page-content .column .issue:last-child {
     margin-bottom: 0px; }
+  .page-content .column .issue.loading {
+    position: relative; }
+    .page-content .column .issue.loading .panel-spinner {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0px;
+      left: 0px;
+      background-color: rgba(255, 255, 255, 0.75);
+      z-index: 10; }
+      .page-content .column .issue.loading .panel-spinner .spinner {
+        display: block; }
   .page-content .column .issue .panel-heading {
     position: relative; }
     .page-content .column .issue .panel-heading img {
