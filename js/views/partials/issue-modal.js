@@ -153,7 +153,8 @@ class IssueModal extends View {
             $panel.append(issueView.$element);
             ViewHelper.get('Issues').updateIssuePositions();
             
-            issueView.sync(view.model);
+            issueView.model = view.model;
+            issueView.sync();
         
         }
         

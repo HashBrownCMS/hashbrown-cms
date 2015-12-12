@@ -2,6 +2,10 @@
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 (function e(t, n, r) {
@@ -18,14 +22,21 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }return s;
 })({ 1: [function (require, module, exports) {
         function appropriateIssue(issue) {
-            // Updating issue milestones requires a number from the GitHub API
+            // Updating issue milestones requires a number only
             if (issue.milestone) {
                 issue.milestone = issue.milestone.number;
             }
 
-            // Updating issue assignees requires a number from the GitHub API
+            // Updating issue assignees requires a login name only
             if (issue.assignee) {
                 issue.assignee = issue.assignee.login;
+            }
+
+            // Updating issue labels requires a string only
+            if (issue.labels) {
+                for (var i in issue.labels) {
+                    issue.labels[i] = issue.labels[i].name;
+                }
             }
 
             return issue;
@@ -626,72 +637,102 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         require('../client');
         require('./partials/navbar');
 
-        env.get(function (config) {
-            api.labels.get(function (labels) {
-                function render() {
-                    function onClickAddLabel() {
-                        var label = {
-                            name: 'new label',
-                            color: 'cccccc'
-                        };
+        var Settings = (function (_View) {
+            _inherits(Settings, _View);
 
-                        var occurrences = 0;
+            function Settings(args) {
+                _classCallCheck(this, Settings);
 
-                        for (var i in labels) {
-                            occurrences += labels[i].name == 'new label' ? 1 : 0;
-                        }
+                // Register events
 
-                        if (occurrences < 1) {
-                            labels.push(label);
+                var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Settings).call(this, args));
 
-                            render();
-                        }
+                _this.on('clickSave', _this.onClickSave);
+                _this.on('clickAddLabel', _this.onClickAddLabel);
+
+                var view = _this;
+
+                env.get(function (config) {
+                    api.labels.fetch(function (labels) {
+                        view.config = config;
+                        view.labels = labels;
+
+                        view.init();
+                    });
+                });
+                return _this;
+            }
+
+            _createClass(Settings, [{
+                key: "onClickAddLabel",
+                value: function onClickAddLabel(e, element, view) {
+                    var label = {
+                        name: 'new label',
+                        color: 'cccccc'
+                    };
+
+                    var occurrences = 0;
+
+                    for (var i in labels) {
+                        occurrences += labels[i].name == 'new label' ? 1 : 0;
                     }
 
-                    function onClickSave() {
-                        var $btn = $(self);
-                        $btn.toggleClass('disabled', true);
-                        $btn.html('Saving...');
+                    if (occurrences < 1) {
+                        labels.push(label);
 
-                        env.set(config, function () {
-                            $btn.toggleClass('disabled', false);
-                            $btn.html(['Save ', _.span({ class: 'glyphicon glyphicon-floppy-disk' })]);
-                        });
-                        /*
-                                        if(labels.length > 0) {
-                                            var processed = 0;
-                        
-                                            function process() {
-                                                api.labels.set(labels[processed], function(res) {
-                                                    processed++;
-                        
-                                                    if(processed < labels.length - 1) {
-                                                        process();
-                                                    } else {
-                                                        $btn.toggleClass('disabled', false);
-                                                        $btn.html([
-                                                            'Save ',
-                                                            _.span({class: 'glyphicon glyphicon-floppy-disk'})
-                                                        ]);
-                                                    } 
-                                                });
-                                            }
-                        
+                        view.render();
+                    }
+                }
+            }, {
+                key: "onClickSave",
+                value: function onClickSave(e, element, view) {
+                    var $btn = $(element);
+                    $btn.toggleClass('disabled', true);
+                    $btn.html('Saving...');
+
+                    env.set(config, function () {
+                        $btn.toggleClass('disabled', false);
+                        $btn.html(['Save ', _.span({ class: 'glyphicon glyphicon-floppy-disk' })]);
+                    });
+                    /*
+                            if(labels.length > 0) {
+                                let processed = 0;
+                    
+                                function process() {
+                                    api.labels.set(labels[processed], function(res) {
+                                        processed++;
+                    
+                                        if(processed < labels.length - 1) {
                                             process();
-                                        }
-                          */
-                    }
+                                        } else {
+                                            $btn.toggleClass('disabled', false);
+                                            $btn.html([
+                                                'Save ',
+                                                _.span({class: 'glyphicon glyphicon-floppy-disk'})
+                                            ]);
+                                        } 
+                                    });
+                                }
+                    
+                                process();
+                            }
+                    */
+                }
+            }, {
+                key: "render",
+                value: function render() {
+                    var view = this;
 
-                    $('.page-content').html(_.div({ class: 'container' }, [_.button({ class: 'btn btn-success pull-right' }, ['Save ', _.span({ class: 'glyphicon glyphicon-floppy-disk' })]).click(onClickSave), _.ul({ class: 'nav nav-tabs', role: 'tablist' }, [_.li({ role: 'presentation', class: 'active' }, _.a({ href: '#issues', 'aria-controls': 'home', role: 'tab', 'data-toggle': 'tab' }, 'Issues'))]), _.div({ class: 'tab-content' }, [_.div({ role: 'tabpanel', class: 'tab-pane active', id: 'issues' }, [_.div({ class: 'row' }, [_.div({ class: 'col-xs-6' }, [_.h4('Columns'), _.ul({ class: 'list-group' }, [_.li({ class: 'list-group-item' }, 'backlog'), _.each(config.putaitu.issues.columns, function (i, column) {
+                    $('.page-content').html(_.div({ class: 'container' }, [_.button({ class: 'btn btn-success pull-right' }, ['Save ', _.span({ class: 'glyphicon glyphicon-floppy-disk' })]).click(view.events.clickSave), _.ul({ class: 'nav nav-tabs', role: 'tablist' }, [_.li({ role: 'presentation', class: 'active' }, _.a({ href: '#issues', 'aria-controls': 'home', role: 'tab', 'data-toggle': 'tab' }, 'Issues'))]), _.div({ class: 'tab-content' }, [_.div({ role: 'tabpanel', class: 'tab-pane active', id: 'issues' }, [_.div({ class: 'row' }, [_.div({ class: 'col-xs-6' }, [_.h4('Columns'), _.ul({ class: 'list-group' }, [_.li({ class: 'list-group-item' }, 'backlog'), _.each(view.config.putaitu.issues.columns, function (i, column) {
                         var $li = _.li({ class: 'list-group-item', 'data-name': column }, [_.span({ class: 'name' }, column), _.button({ class: 'btn close' }, _.span({ class: 'glyphicon glyphicon-remove' })).click(onClickRemove)]);
 
                         function onClickRemove() {
-                            config.putaitu.issues.columns.splice(i, 1);
+                            view.config.putaitu.issues.columns.splice(i, 1);
                             $li.remove();
                         }
 
                         return $li;
-                    }), _.li({ class: 'list-group-item' }, 'done')])]), _.div({ class: 'col-xs-6' }, [_.h4('Labels'), _.ul({ class: 'list-group' }, [_.each(labels, function (i, label) {
+                    }), _.li({ class: 'list-group-item' }, 'done')])]), _.div({ class: 'col-xs-6' }, [_.h4('Labels'), _.ul({ class: 'list-group' }, [_.each(view.labels, function (i, label) {
                         var $li = _.li({ class: 'list-group-item' }, _.div({ class: 'input-group' }, [_.div({ class: 'input-group-btn' }, _.button({ class: 'btn btn-primary' }, _.span({ class: 'glyphicon glyphicon-arrow-left' })).click(onClickAdd)), _.input({ type: 'text', class: 'form-control', value: label.name }).bind('change keyup propertychange paste', onChangeName), _.div({ class: 'input-group-btn' }, [_.input({ type: 'color', class: 'btn btn-default', value: '#' + label.color }).bind('change keyup propertychange paste', onChangeColor), _.button({ class: 'btn btn-danger' }, _.span({ class: 'glyphicon glyphicon-remove' })).click(onClickRemove)])]));
 
                         function onChangeColor() {
@@ -701,12 +742,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                         function onChangeName() {
                             var oldName = label.name;
                             var newName = $(this).val();
-                            var index = config.putaitu.issues.columns.indexOf(oldName);
+                            var index = view.config.putaitu.issues.columns.indexOf(oldName);
 
                             label.name = newName;
 
                             if (index > -1) {
-                                config.putaitu.issues.columns[index] = newName;
+                                view.config.putaitu.issues.columns[index] = newName;
 
                                 $('li[data-name="' + oldName + '"]').each(function (i) {
                                     $(this).attr('data-name', newName);
@@ -716,33 +757,35 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                         }
 
                         function onClickAdd() {
-                            var index = config.putaitu.issues.columns.indexOf(label.name);
+                            var index = view.config.putaitu.issues.columns.indexOf(label.name);
 
                             if (index < 0) {
-                                config.putaitu.issues.columns.push(label.name);
-                                render();
+                                view.config.putaitu.issues.columns.push(label.name);
+                                view.render();
                             }
                         }
 
                         function onClickRemove() {
-                            labels.splice(i, 1);
+                            view.labels.splice(i, 1);
 
-                            var index = config.putaitu.issues.columns.indexOf(label.name);
+                            var index = view.config.putaitu.issues.columns.indexOf(label.name);
 
                             if (index > -1) {
-                                config.putaitu.issues.columns.splice(index, 1);
+                                view.config.putaitu.issues.columns.splice(index, 1);
                             }
 
-                            render();
+                            view.render();
                         }
 
                         return $li;
-                    }), _.li({ class: 'list-group-item' }, _.button({ class: 'btn btn-primary center-block' }, ['Add label ', _.span({ class: 'glyphicon glyphicon-plus' })]).click(onClickAddLabel))])])])])])]));
+                    }), _.li({ class: 'list-group-item' }, _.button({ class: 'btn btn-primary center-block' }, ['Add label ', _.span({ class: 'glyphicon glyphicon-plus' })]).click(view.events.clickAddLabel))])])])])])]));
                 }
+            }]);
 
-                render();
-            });
-        });
+            return Settings;
+        })(View);
+
+        new Settings();
     }, { "../client": 2, "./partials/navbar": 6 }], 6: [function (require, module, exports) {
         api.repo(function (repo) {
             $('.navbar-content').html(_.div({ class: 'navbar navbar-default' }, _.div({ class: 'container' }, [_.ul({ class: 'nav navbar-nav' }, [_.li(_.a({ href: '/repos/' + req.params.user }, [_.span({ class: 'glyphicon glyphicon-arrow-left' }), ' Repos'])), _.li(_.a({ href: '/repos/' + req.params.user + '/' + req.params.repo + '/deployment/' }, [_.span({ class: 'glyphicon glyphicon-upload' }), ' Deployment'])), _.li(_.a({ href: '/repos/' + req.params.user + '/' + req.params.repo + '/collaborators/' }, [_.span({ class: 'glyphicon glyphicon-user' }), ' Collaborators'])), _.li(_.a({ href: '/repos/' + req.params.user + '/' + req.params.repo + '/issues/' }, [_.span({ class: 'glyphicon glyphicon-exclamation-sign' }), ' Issues'])), _.li(_.a({ href: '/repos/' + req.params.user + '/' + req.params.repo + '/settings/' }, [_.span({ class: 'glyphicon glyphicon-cog' }), ' Settings']))]), _.ul({ class: 'nav navbar-nav navbar-right' }, _.li({ class: 'navbar-btn' }, _.div({ class: 'input-group' }, [_.span({ class: 'input-group-addon' }, 'git'), function () {

@@ -31,10 +31,24 @@ class Issue extends View {
 
     updateColumnFromPosition() {
         let $column = this.$element.parents('.column');
+        let columnName = $column.data('name');
 
-        this.model.state = $column.data('name') == 'done' ? 'closed' : 'open';
+        this.model.state = columnName == 'done' ? 'closed' : 'open';
 
-        // Update model labels
+        // Remove column labels
+        for(let i = this.model.labels.length - 1; i >= 0; i--) {
+            let label = this.model.labels[i];
+
+            if($('.column[data-name="' + label.name + '"]').length > 0) {
+                this.model.labels.splice(i, 1);
+            }
+        }
+        
+        // Add new column label
+        this.model.labels.push({ name: columnName });
+
+        // Sync
+        this.sync();
     }
 
     updateColumnPosition() {
@@ -71,17 +85,19 @@ class Issue extends View {
         this.$element.toggleClass('loading', active);
     }
 
-    sync(model) {
+    sync() {
         let view = this;
 
-        view.model = model;
+        // Activate loading state
+        view.$element.toggleClass('loading', true);
 
         // This is a new issue
         if(!view.model.id) {
             api.issues.create(view.model, function(issue) {
                 view.model = issue;
-                
+               
                 view.update();
+                view.$element.toggleClass('loading', false);
             });
 
         // This is an existing issue
@@ -90,6 +106,7 @@ class Issue extends View {
                 view.model = issue;
                 
                 view.update();
+                view.$element.toggleClass('loading', false);
             });
 
         }    

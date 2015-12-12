@@ -22,14 +22,21 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }return s;
 })({ 1: [function (require, module, exports) {
         function appropriateIssue(issue) {
-            // Updating issue milestones requires a number from the GitHub API
+            // Updating issue milestones requires a number only
             if (issue.milestone) {
                 issue.milestone = issue.milestone.number;
             }
 
-            // Updating issue assignees requires a number from the GitHub API
+            // Updating issue assignees requires a login name only
             if (issue.assignee) {
                 issue.assignee = issue.assignee.login;
+            }
+
+            // Updating issue labels requires a string only
+            if (issue.labels) {
+                for (var i in issue.labels) {
+                    issue.labels[i] = issue.labels[i].name;
+                }
             }
 
             return issue;
@@ -657,19 +664,15 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 return _this;
             }
 
+            /**
+             * Actions
+             */
+
             _createClass(Issues, [{
-                key: "onMoveIssueColumn",
-                value: function onMoveIssueColumn($issue) {
-                    $issue.data('view').updateColumnFromPosition();
-                }
-
-                /**
-                 * Events
-                 */
-
-            }, {
                 key: "updateIssuePositions",
                 value: function updateIssuePositions() {
+                    var view = this;
+
                     _.each(ViewHelper.getAll('Issue'), function (i, view) {
                         view.updateMilestonePosition();
                         view.updateColumnPosition();
@@ -680,8 +683,20 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                         forcePlaceholderSize: true,
                         connectWith: '.sortable'
                     }).bind('sortupdate', function (e, ui) {
-                        onMoveIssueColumn(ui.item);
+                        view.onMoveIssueColumn(ui.item);
                     });
+                }
+
+                /**
+                 * Events
+                 */
+
+            }, {
+                key: "onMoveIssueColumn",
+                value: function onMoveIssueColumn($issue) {
+                    var view = $issue.data('view');
+
+                    view.updateColumnFromPosition();
                 }
             }, {
                 key: "onChangeMilestone",
@@ -689,7 +704,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     var id = $('.milestones').val();
 
                     _.each(ViewHelper.getAll('Issue'), function (i, view) {
-                        view.$element.toggle(id == 'all' || view.model.milestone.id == id);
+                        view.$element.toggle(id == 'all' || view.model.milestone && view.model.milestone.id == id);
                     });
                 }
             }, {
@@ -818,7 +833,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                         $panel.append(issueView.$element);
                         ViewHelper.get('Issues').updateIssuePositions();
 
-                        issueView.sync(view.model);
+                        issueView.model = view.model;
+                        issueView.sync();
                     }
 
                     view.hide();
@@ -982,10 +998,24 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 key: "updateColumnFromPosition",
                 value: function updateColumnFromPosition() {
                     var $column = this.$element.parents('.column');
+                    var columnName = $column.data('name');
 
-                    this.model.state = $column.data('name') == 'done' ? 'closed' : 'open';
+                    this.model.state = columnName == 'done' ? 'closed' : 'open';
 
-                    // Update model labels
+                    // Remove column labels
+                    for (var i = this.model.labels.length - 1; i >= 0; i--) {
+                        var label = this.model.labels[i];
+
+                        if ($('.column[data-name="' + label.name + '"]').length > 0) {
+                            this.model.labels.splice(i, 1);
+                        }
+                    }
+
+                    // Add new column label
+                    this.model.labels.push({ name: columnName });
+
+                    // Sync
+                    this.sync();
                 }
             }, {
                 key: "updateColumnPosition",
@@ -1026,10 +1056,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 }
             }, {
                 key: "sync",
-                value: function sync(model) {
+                value: function sync() {
                     var view = this;
 
-                    view.model = model;
+                    // Activate loading state
+                    view.$element.toggleClass('loading', true);
 
                     // This is a new issue
                     if (!view.model.id) {
@@ -1037,6 +1068,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                             view.model = issue;
 
                             view.update();
+                            view.$element.toggleClass('loading', false);
                         });
 
                         // This is an existing issue
@@ -1045,6 +1077,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                                 view.model = issue;
 
                                 view.update();
+                                view.$element.toggleClass('loading', false);
                             });
                         }
                 }

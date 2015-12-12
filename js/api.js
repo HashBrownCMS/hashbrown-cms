@@ -1,12 +1,19 @@
 function appropriateIssue(issue) {
-    // Updating issue milestones requires a number from the GitHub API
+    // Updating issue milestones requires a number only
     if(issue.milestone) {
         issue.milestone = issue.milestone.number;
     }
     
-    // Updating issue assignees requires a number from the GitHub API
+    // Updating issue assignees requires a login name only
     if(issue.assignee) {
         issue.assignee = issue.assignee.login;
+    }
+    
+    // Updating issue labels requires a string only
+    if(issue.labels) {
+        for(let i in issue.labels) {
+            issue.labels[i] = issue.labels[i].name;
+        }
     }
 
     return issue;

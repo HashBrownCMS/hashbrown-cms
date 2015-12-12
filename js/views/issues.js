@@ -7,7 +7,7 @@ let IssueModal = require('./partials/issue-modal');
 class Issues extends View {
     constructor(args) {
         super(args);
-       
+
         let view = this;
 
         api.issueColumns(function(columns) {
@@ -23,14 +23,12 @@ class Issues extends View {
         });
     }
 
-    onMoveIssueColumn($issue) {
-        $issue.data('view').updateColumnFromPosition();
-    }
-
     /**
-     * Events
+     * Actions
      */
     updateIssuePositions() {
+        let view = this;
+
         _.each(ViewHelper.getAll('Issue'),
             function(i, view) {
                 view.updateMilestonePosition();
@@ -43,16 +41,26 @@ class Issues extends View {
             forcePlaceholderSize: true,
             connectWith: '.sortable',
         }).bind('sortupdate', function(e, ui) {
-            onMoveIssueColumn(ui.item);
+            view.onMoveIssueColumn(ui.item);
         });
     }
     
+
+    /**
+     * Events
+     */
+    onMoveIssueColumn($issue) {
+        var view = $issue.data('view');
+        
+        view.updateColumnFromPosition();
+    }
+
     onChangeMilestone() {
         let id = $('.milestones').val();
 
         _.each(ViewHelper.getAll('Issue'),
             function(i, view) {
-                view.$element.toggle(id == 'all' || view.model.milestone.id == id);
+                view.$element.toggle(id == 'all' || (view.model.milestone && view.model.milestone.id == id));
             }
         );
     }
