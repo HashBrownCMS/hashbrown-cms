@@ -688,11 +688,13 @@ api.issueColumns(function(columns) {
                         }
                     ),
                     // Issue actions
-                    _.div({},
-                        _.button({class: 'btn btn-primary'}, [
-                            _.span({class: 'glyphicon glyphicon-plus'}),
-                            ' New issue'
-                        ]).click(onClickNewIssue)
+                    _.div({class: 'panel'},
+                        _.div({class: 'panel-body'},
+                            _.button({class: 'btn btn-primary'}, [
+                                _.span({class: 'glyphicon glyphicon-plus'}),
+                                ' New issue'
+                            ]).click(onClickNewIssue)
+                        )
                     ),
                     // Milestone picker
                     _.div({class: 'input-group p-b-md'}, [
@@ -1037,8 +1039,6 @@ module.exports = View.extend(function Issue(params) {
 {
     render: function() {
         var self = this;
-
-        console.log(JSON.stringify(self.model));
 
         self.$element.attr('id', self.model.id);
         self.$element.html([

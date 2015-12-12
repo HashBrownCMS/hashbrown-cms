@@ -66,8 +66,6 @@ module.exports = View.extend(function Issue(params) {
     render: function() {
         var self = this;
 
-        console.log(JSON.stringify(self.model));
-
         self.$element.attr('id', self.model.id);
         self.$element.html([
             _.div({class: 'panel-heading'}, [
