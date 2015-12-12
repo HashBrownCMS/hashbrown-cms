@@ -11,7 +11,14 @@ window.env = {
             callback(env.json);
         } else {
             api.file.get('env.json', function(contents) {
-                var json = atob(contents.content);
+                var json = '{}';
+                
+                try {
+                    json = atob(contents.content);
+                } catch(e) {
+                    console.log(e);
+                    console.log(contents);
+                }
 
                 json = JSON.parse(json) || {};
                 json.putaitu = json.putaitu || {};
@@ -97,15 +104,15 @@ window.api = {
     
     file: {
         get: function(path, callback) {
-            api.call('/api/' + req.params.user + '/' + req.params.repo + '/file/get/' + path, callback);
+            api.call('/api/' + req.params.user + '/' + req.params.repo + '/get/file/' + path, callback);
         },
         
         update: function(data, path, callback) {
-            api.call('/api/' + req.params.user + '/' + req.params.repo + '/file/update/' + path, callback, data);
+            api.call('/api/' + req.params.user + '/' + req.params.repo + '/update/file/' + path, callback, data);
         },
     
         set: function(data, path, callback) {
-            api.call('/api/' + req.params.user + '/' + req.params.repo + '/file/set/' + path, callback, data);
+            api.call('/api/' + req.params.user + '/' + req.params.repo + '/set/file/' + path, callback, data);
         }
     },
 
@@ -115,11 +122,11 @@ window.api = {
     
     labels: {
         get: function(callback) {
-            api.call('/api/' + req.params.user + '/' + req.params.repo + '/labels/get', callback);
+            api.call('/api/' + req.params.user + '/' + req.params.repo + '/get/labels', callback);
         },
 
         set: function(data, callback) {
-            api.call('/api/' + req.params.user + '/' + req.params.repo + '/labels/set', callback, data);
+            api.call('/api/' + req.params.user + '/' + req.params.repo + '/set/labels', callback, data);
         }
     },
     
@@ -640,6 +647,15 @@ function onMoveIssueColumn($issue) {
     $issue.data('view').updateColumnFromPosition();
 }
 
+function onClickNewIssue() {
+    var newIssue = {
+        "title": "Issue title",
+        "body": "Issue description"
+    };
+
+    View.get('IssueModal').show(newIssue);
+}
+
 function updateIssuePositions() {
     _.each(View.getAll('Issue'),
         function(i, view) {
@@ -662,6 +678,7 @@ api.issueColumns(function(columns) {
         api.milestones(function(milestones) {
             $('.page-content').html([
                 _.div({class: 'container'}, [
+                    // Render all issues outside the columns first
                     _.each(
                         issues,
                         function(i, issue) {
@@ -670,6 +687,14 @@ api.issueColumns(function(columns) {
                             }).$element;
                         }
                     ),
+                    // Issue actions
+                    _.div({},
+                        _.button({class: 'btn btn-primary'}, [
+                            _.span({class: 'glyphicon glyphicon-plus'}),
+                            ' New issue'
+                        ]).click(onClickNewIssue)
+                    ),
+                    // Milestone picker
                     _.div({class: 'input-group p-b-md'}, [
                         _.span({class: 'input-group-addon'},
                             'Milestone'
@@ -684,6 +709,7 @@ api.issueColumns(function(columns) {
                             )
                         ).change(onChangeMilestone)
                     ]),
+                    // Columns
                     _.div({class: 'row'},
                         _.each(
                             columns,
@@ -1011,6 +1037,8 @@ module.exports = View.extend(function Issue(params) {
 {
     render: function() {
         var self = this;
+
+        console.log(JSON.stringify(self.model));
 
         self.$element.attr('id', self.model.id);
         self.$element.html([

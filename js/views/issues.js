@@ -18,6 +18,15 @@ function onMoveIssueColumn($issue) {
     $issue.data('view').updateColumnFromPosition();
 }
 
+function onClickNewIssue() {
+    var newIssue = {
+        "title": "Issue title",
+        "body": "Issue description"
+    };
+
+    View.get('IssueModal').show(newIssue);
+}
+
 function updateIssuePositions() {
     _.each(View.getAll('Issue'),
         function(i, view) {
@@ -40,6 +49,7 @@ api.issueColumns(function(columns) {
         api.milestones(function(milestones) {
             $('.page-content').html([
                 _.div({class: 'container'}, [
+                    // Render all issues outside the columns first
                     _.each(
                         issues,
                         function(i, issue) {
@@ -48,6 +58,14 @@ api.issueColumns(function(columns) {
                             }).$element;
                         }
                     ),
+                    // Issue actions
+                    _.div({},
+                        _.button({class: 'btn btn-primary'}, [
+                            _.span({class: 'glyphicon glyphicon-plus'}),
+                            ' New issue'
+                        ]).click(onClickNewIssue)
+                    ),
+                    // Milestone picker
                     _.div({class: 'input-group p-b-md'}, [
                         _.span({class: 'input-group-addon'},
                             'Milestone'
@@ -62,6 +80,7 @@ api.issueColumns(function(columns) {
                             )
                         ).change(onChangeMilestone)
                     ]),
+                    // Columns
                     _.div({class: 'row'},
                         _.each(
                             columns,

@@ -85,7 +85,7 @@ app.get('/redir/repo/:user/:repo/:branch', function(req, res) {
  * API
  */
 // Generic call
-function octoCall(req, res, url) {
+function apiCall(req, res, url) {
     function callback(err, answer) {
         if(err) {
             res.send({ mode: req.params.mode, url: url, err: err });
@@ -172,56 +172,56 @@ app.post('/api/repos', function(req, res) {
 app.post('/api/:user/:repo/compare/:base/:head', function(req, res) {
     let url = '/repos/' + req.params.user + '/' + req.params.repo + '/compare/' + req.params.base + '...' + req.params.head;
 
-    octoCall(req, res, url);
+    apiCall(req, res, url);
 });
 
 // Get repos from user
 app.post('/api/:user/repos', function(req, res) {
     let url = '/users/' + req.params.user + '/repos';
 
-    octoCall(req, res, url);
+    apiCall(req, res, url);
 });
 
 // Get collaborators
 app.post('/api/:user/:repo/collaborators', function(req, res) {
     let url = '/repos/' + req.params.user + '/' + req.params.repo + '/collaborators';
 
-    octoCall(req, res, url);
+    apiCall(req, res, url);
 });
 
 // Get issues
 app.post('/api/:user/:repo/issues', function(req, res) {
     let url = '/repos/' + req.params.user + '/' + req.params.repo + '/issues';
     
-    octoCall(req, res, url);
+    apiCall(req, res, url);
 });
 
 // Get/set labels
-app.post('/api/:user/:repo/labels/:mode', function(req, res) {
+app.post('/api/:user/:repo/:mode/labels', function(req, res) {
     let url = '/repos/' + req.params.user + '/' + req.params.repo + '/labels';
 
-    octoCall(req, res, url);
+    apiCall(req, res, url);
 });
 
 // Get/set file
-app.post('/api/:user/:repo/file/:mode/:path', function(req, res) {
+app.post('/api/:user/:repo/:mode/file/:path', function(req, res) {
     let url = '/repos/' + req.params.user + '/' + req.params.repo + '/contents/' + req.params.path;
 
-    octoCall(req, res, url);
+    apiCall(req, res, url);
 });
 
 // Get issues
 app.post('/api/:user/:repo/milestones', function(req, res) {
     let url = '/repos/' + req.params.user + '/' + req.params.repo + '/milestones';
     
-    octoCall(req, res, url);
+    apiCall(req, res, url);
 });
 
 // Get repo
 app.post('/api/:user/:repo', function(req, res) {
     let url = '/repos/' + req.params.user + '/' + req.params.repo;
     
-    octoCall(req, res, url);
+    apiCall(req, res, url);
 });
 
 // Get branches
@@ -257,7 +257,7 @@ app.post('/api/:user/:repo/branches', function(req, res) {
 app.post('/api/:user/:repo/merge', function(req, res) {
     let url = '/repos/' + req.params.user + '/' + req.params.repo + '/merges';
 
-    octoCall(req, res, url);
+    apiCall(req, res, url);
 });
 
 let server = app.listen(8000);

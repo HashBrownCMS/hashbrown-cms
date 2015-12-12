@@ -10,7 +10,14 @@ window.env = {
             callback(env.json);
         } else {
             api.file.get('env.json', function(contents) {
-                var json = atob(contents.content);
+                var json = '{}';
+                
+                try {
+                    json = atob(contents.content);
+                } catch(e) {
+                    console.log(e);
+                    console.log(contents);
+                }
 
                 json = JSON.parse(json) || {};
                 json.putaitu = json.putaitu || {};
@@ -96,15 +103,15 @@ window.api = {
     
     file: {
         get: function(path, callback) {
-            api.call('/api/' + req.params.user + '/' + req.params.repo + '/file/get/' + path, callback);
+            api.call('/api/' + req.params.user + '/' + req.params.repo + '/get/file/' + path, callback);
         },
         
         update: function(data, path, callback) {
-            api.call('/api/' + req.params.user + '/' + req.params.repo + '/file/update/' + path, callback, data);
+            api.call('/api/' + req.params.user + '/' + req.params.repo + '/update/file/' + path, callback, data);
         },
     
         set: function(data, path, callback) {
-            api.call('/api/' + req.params.user + '/' + req.params.repo + '/file/set/' + path, callback, data);
+            api.call('/api/' + req.params.user + '/' + req.params.repo + '/set/file/' + path, callback, data);
         }
     },
 
@@ -114,11 +121,11 @@ window.api = {
     
     labels: {
         get: function(callback) {
-            api.call('/api/' + req.params.user + '/' + req.params.repo + '/labels/get', callback);
+            api.call('/api/' + req.params.user + '/' + req.params.repo + '/get/labels', callback);
         },
 
         set: function(data, callback) {
-            api.call('/api/' + req.params.user + '/' + req.params.repo + '/labels/set', callback, data);
+            api.call('/api/' + req.params.user + '/' + req.params.repo + '/set/labels', callback, data);
         }
     },
     
