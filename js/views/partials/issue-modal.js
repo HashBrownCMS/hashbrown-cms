@@ -1,216 +1,247 @@
-module.exports = View.extend(function IssueModal(params) {
-    var self = this;
+'use strict';
 
-    self.adopt(params);
-    self.register();
+let Issue = require('./issue');
 
-    api.labels.get(function(labels) {
-        self.labels = labels;
-    });
+class IssueModal extends View {
+    constructor(args) {
+        super(args);
+        
+        let view = this;
 
-    // Private methods
-    function onClickOK() {
-        $('#' + self.model.id).data('view').sync(self.model);
-        self.hide();
+        api.labels.fetch(function(labels) {
+            view.labels = labels;
+        });
+
+        // Register events
+        this.on('clickOK', this.onClickOK);
+        this.on('changeAssignee', this.onChangeAssignee);
+        this.on('changeTitle', this.onChangeTitle);
+        this.on('changeBody', this.onChangeBody);
+        this.on('changeState', this.onChangeState);
+        this.on('changeMilestone', this.onChangeMilestone);
+
+        // Prerender main element
+        view.$element = _.div({class: 'modal fade issue-modal', role: 'dialog'},
+            _.div({class: 'modal-dialog'},
+                _.div({class: 'modal-content'}, [
+                    _.div({class: 'modal-header'}, [
+                       _.button({type: 'button', class: 'close', 'data-dismiss': 'modal'},
+                           _.span({class: 'glyphicon glyphicon-remove'})
+                        ),
+                        view.$heading = _.span(),
+                        _.p({}, [
+                            'Created by ',
+                            view.$user = _.a()
+                        ])
+                    ]),
+                    _.div({class: 'modal-body'}, [
+                        _.div({class: 'row'}, [
+                            _.div({class: 'col-xs-6'}, 
+                                _.div({class: 'input-group'}, [
+                                    _.span({class: 'input-group-addon'},
+                                        'Assignee'
+                                    ),
+                                    function () {
+                                        view.$assignee = _.select({class: 'form-control'});
+
+                                        api.collaborators(function(collaborators) {
+                                            view.collaborators = collaborators;
+
+                                            view.$assignee.html(
+                                                _.each(
+                                                    [ { login: '(none)', id: null } ].concat(collaborators),
+                                                    function(i, collaborator) {
+                                                        return _.option({value: collaborator.id},
+                                                            collaborator.login
+                                                        );
+                                                    }
+                                                )
+                                            );
+                                        });
+
+                                        return view.$assignee;
+                                    }().change(view.events.changeAssignee)
+                                ])
+                            ),
+                            _.div({class: 'col-xs-6'}, 
+                                _.div({class: 'input-group'}, [
+                                    _.span({class: 'input-group-addon'},
+                                        'State'
+                                    ),
+                                    view.$state = _.select({class: 'form-control'},
+                                        _.each(
+                                            [ 'open', 'closed' ],
+                                            function(i, state) {
+                                                return _.option({value: state},
+                                                    state
+                                                );
+                                            }
+                                        )
+                                    ).change(view.events.changeState)
+                                ])
+                            )
+                        ]),         
+                        _.div({class: 'input-group'}, [
+                            _.span({class: 'input-group-addon'},
+                                'Milestone'
+                            ),
+                            function() {
+                                view.$milestone = _.select({class: 'form-control'});
+                                    
+                                api.milestones(function(milestones) { 
+                                    view.milestones = milestones;
+
+                                    view.$milestone.html(
+                                        _.option({value: -1}, '(none)')
+                                    );
+
+                                    view.$milestone.append(
+                                        _.each(
+                                            milestones,
+                                            function(i, milestone) {
+                                                return _.option({value: milestone.number},
+                                                    milestone.title
+                                                );
+                                            }
+                                        )
+                                    );
+                                });
+
+                                return view.$milestone;
+                            }().change(view.events.changeMilestone)
+                        ]),
+                        _.div({class: 'input-group'}, [
+                            _.span({class: 'input-group-addon'},
+                                'Title'
+                            ),
+                            view.$title = _.input({type: 'text', class: 'form-control'}).change(view.events.changeTitle)
+                        ]),
+                        _.div({class: 'input-group input-group-vertical'}, [
+                            _.span({class: 'input-group-addon'},
+                                'Description'
+                            ),
+                            view.$body = _.textarea({class: 'form-control'}).change(view.events.changeBody)
+                        ])
+                    ]),
+                    _.div({class: 'modal-footer'}, [
+                        view.$labels = _.div({class: 'labels'}),
+                        _.button({class: 'btn btn-primary'},
+                            'OK'
+                        ).click(view.events.clickOK)
+                    ])
+                ])
+            )
+        );
     }
 
-    function onChangeAssignee() {
-        for(var i in self.collaborators) {
-            if(self.collaborators[i].id == $(this).val()) {
-                self.model.assignee = self.collaborators[i];
+    /**
+     * Events
+     */
+    onClickOK(e, element, view) {
+        let $issue = $('.issue[data-id="' + view.model.id + '"]');
+
+        if($issue.length > 0) {
+            $issue.data('view').sync(view.model);
+
+        } else {
+            let issueView = new Issue({
+                model: view.model
+            });
+
+            let $panel = $('.panel[data-name="backlog"] .sortable');
+
+            $panel.append(issueView.$element);
+            ViewHelper.get('Issues').updateIssuePositions();
+            
+            issueView.sync(view.model);
+        
+        }
+        
+        view.hide();
+    }
+
+    onChangeAssignee(e, element, view) {
+        for(let i in view.collaborators) {
+            if(view.collaborators[i].id == $(element).val()) {
+                view.model.assignee = view.collaborators[i];
             }
         }
     }
     
-    function onChangeTitle() {
-        self.model.title = $(this).val();
+    onChangeTitle(e, element, view) {
+        view.model.title = $(element).val();
     }
     
-    function onChangeBody() {
-        self.model.body = $(this).val();
+    onChangeBody(e, element, view) {
+        view.model.body = $(element).val();
     }
     
-    function onChangeState() {
-        self.model.state = $(this).val();
+    onChangeState(e, element, view) {
+        view.model.state = $(element).val();
     }
     
-    function onChangeMilestone() {
-        for(var i in self.milestones) {
-            if(self.milestones[i].id == $(this).val()) {
-                self.model.milestone = self.milestones[i];
+    onChangeMilestone(e, element, view) {
+        for(let i in view.milestones) {
+            if(view.milestones[i].number == $(element).val()) {
+                view.model.milestone = view.milestones[i];
             }
         }
     }
    
-    // Public methods 
-    self.hide = function hide() {
-        self.$element.modal('hide');
-    };
+    hide() {
+        this.$element.modal('hide');
+    }
     
-    self.show = function show(issue) {
-        self.model = issue;
-        self.render();
-        self.$element.modal('show');
-    };
+    show(issue) {
+        this.model = issue;
+        this.$element.modal('show');
+        this.init();
+    }
 
-    // Main element
-    self.$element = _.div({class: 'modal fade issue-modal', role: 'dialog'},
-        _.div({class: 'modal-dialog'},
-            _.div({class: 'modal-content'}, [
-                _.div({class: 'modal-header'}, [
-                   _.button({type: 'button', class: 'close', 'data-dismiss': 'modal'},
-                       _.span({class: 'glyphicon glyphicon-remove'})
-                    ),
-                    self.$heading = _.span(),
-                    _.p({}, [
-                        'Created by ',
-                        self.$user = _.a()
-                    ])
-                ]),
-                _.div({class: 'modal-body'}, [
-                    _.div({class: 'row'}, [
-                        _.div({class: 'col-xs-6'}, 
-                            _.div({class: 'input-group'}, [
-                                _.span({class: 'input-group-addon'},
-                                    'Assignee'
-                                ),
-                                function () {
-                                    self.$assignee = _.select({class: 'form-control'});
+    render() {
+        let view = this;
 
-                                    api.collaborators(function(collaborators) {
-                                        self.collaborators = collaborators;
-
-                                        self.$assignee.html(
-                                            _.each(
-                                                [ { login: '(none)', id: null } ].concat(collaborators),
-                                                function(i, collaborator) {
-                                                    return _.option({value: collaborator.id},
-                                                        collaborator.login
-                                                    );
-                                                }
-                                            )
-                                        );
-                                    });
-
-                                    return self.$assignee;
-                                }().change(onChangeAssignee)
-                            ])
-                        ),
-                        _.div({class: 'col-xs-6'}, 
-                            _.div({class: 'input-group'}, [
-                                _.span({class: 'input-group-addon'},
-                                    'State'
-                                ),
-                                self.$state = _.select({class: 'form-control'},
-                                    _.each(
-                                        [ 'open', 'closed' ],
-                                        function(i, state) {
-                                            return _.option({value: state},
-                                                state
-                                            );
-                                        }
-                                    )
-                                ).change(onChangeState)
-                            ])
-                        )
-                    ]),         
-                    _.div({class: 'input-group'}, [
-                        _.span({class: 'input-group-addon'},
-                            'Milestone'
-                        ),
-                        function() {
-                            self.$milestone = _.select({class: 'form-control'});
-                                
-                            api.milestones(function(milestones) { 
-                                self.milestones = milestones;
-
-                                self.$milestone.html(
-                                    _.option({value: -1}, '(none)')
-                                );
-
-                                self.$milestone.append(
-                                    _.each(
-                                        milestones,
-                                        function(i, milestone) {
-                                            return _.option({value: milestone.id},
-                                                milestone.title
-                                            );
-                                        }
-                                    )
-                                );
-                            });
-
-                            return self.$milestone;
-                        }().change(onChangeMilestone)
-                    ]),
-                    _.div({class: 'input-group'}, [
-                        _.span({class: 'input-group-addon'},
-                            'Title'
-                        ),
-                        self.$title = _.input({type: 'text', class: 'form-control'}).change(onChangeTitle)
-                    ]),
-                    _.div({class: 'input-group input-group-vertical'}, [
-                        _.span({class: 'input-group-addon'},
-                            'Description'
-                        ),
-                        self.$body = _.textarea({class: 'form-control'}).change(onChangeBody)
-                    ])
-                ]),
-                _.div({class: 'modal-footer'}, [
-                    self.$labels = _.div({class: 'labels'}),
-                    _.button({class: 'btn btn-primary'},
-                        'OK'
-                    ).click(onClickOK)
-                ])
-            ])
-        )
-    );
-},
-{
-    render: function() {
-        var self = this;
-       
-        if(self.model.user) {
-            self.$user.html(self.model.user.login);
+        if(view.model.user) {
+            view.$user.html(view.model.user.login);
         } else {
-            self.$user.html('me');
+            view.$user.html('me');
         }
 
-        if(self.model.assignee) {
-            self.$assignee.val(self.model.assignee.login);
+        if(view.model.assignee) {
+            view.$assignee.val(view.model.assignee.login);
         } else {
-            self.$assignee.val('(none)');
+            view.$assignee.val('(none)');
         }
 
-        self.$state.val(self.model.state);
+        view.$state.val(view.model.state);
         
-        if(self.model.milestone) {
-            self.$milestone.val(self.model.milestone.id);
+        if(view.model.milestone) {
+            view.$milestone.val(view.model.milestone.number);
         } else {
-            self.$milestone.val(-1);
+            view.$milestone.val(-1);
         }
 
-        if(self.model.id) {
-            self.$heading.html('Edit issue (id: ' + self.model.id + ')');
+        if(view.model.id) {
+            view.$heading.html('Edit issue (id: ' + view.model.id + ')');
         } else {
-            self.$heading.html('New issue');
+            view.$heading.html('New issue');
         }
 
-        self.$title.attr('value', self.model.title);
+        view.$title.attr('value', view.model.title);
 
-        self.$body.html(self.model.body);
+        view.$body.html(view.model.body);
 
-        if(self.model.labels) {
-            self.$labels.html(
+        if(view.model.labels) {
+            view.$labels.html(
                 _.each(
-                    self.model.labels,
+                    view.model.labels,
                     function(i, label) {
                         function onClickRemove(e) {
-                            self.model.labels.splice(i, 1);
+                            view.model.labels.splice(i, 1);
                             $label.remove();
                         }
 
-                        var $label = _.div({class: 'label', style: 'background-color: #' + label.color}, [
+                        let $label = _.div({class: 'label', style: 'background-color: #' + label.color}, [
                             _.span({class: 'label-text'},
                                 label.name
                             ),
@@ -224,22 +255,22 @@ module.exports = View.extend(function IssueModal(params) {
                 )
             );
         } else {
-            self.$labels.empty();
+            view.$labels.empty();
         }
 
-        self.$labels.append(
+        view.$labels.append(
            _.div({class: 'dropdown'}, [
                 _.button({class: 'btn btn-default dropdown-toggle', type: 'button', 'data-toggle': 'dropdown'},
                    _.span({class: 'glyphicon glyphicon-plus'})
                 ),
                 _.ul({class: 'dropdown-menu'},
-                    _.each(self.labels,
+                    _.each(view.labels,
                         function(i, label) {
                             function onClick(e) {
                                 e.preventDefault();
 
-                                self.model.labels.push(label);
-                                self.render();
+                                view.model.labels.push(label);
+                                view.render();
                             }
 
                             return _.li({style: 'background-color: #' + label.color},
@@ -253,4 +284,6 @@ module.exports = View.extend(function IssueModal(params) {
             ])
         );
     }
-});
+}
+
+module.exports = IssueModal;

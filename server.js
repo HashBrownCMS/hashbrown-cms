@@ -88,7 +88,7 @@ app.get('/redir/repo/:user/:repo/:branch', function(req, res) {
 function apiCall(req, res, url) {
     function callback(err, answer) {
         if(err) {
-            res.send({ mode: req.params.mode, url: url, err: err });
+            res.send({ mode: req.params.mode, url: url, err: err, data: req.body });
         } else {
             res.send(answer);
         }
@@ -96,17 +96,19 @@ function apiCall(req, res, url) {
     
     let octo = new octokat({ token: req.body.token });
     
+    delete req.body.token;
+
     switch(req.params.mode) {
-        case 'set':
-            octo.fromUrl(url).create(callback);
+        case 'create':
+            octo.fromUrl(url).create(req.body, callback);
             break;
         
         case 'update':
-            octo.fromUrl(url).update(callback);
+            octo.fromUrl(url).update(req.body, callback);
             break;
         
-        case 'get': default:
-            octo.fromUrl(url).fetch(callback);
+        case 'fetch': default:
+            octo.fromUrl(url).fetch(req.body, callback);
             break;
     }
 }
@@ -189,10 +191,22 @@ app.post('/api/:user/:repo/collaborators', function(req, res) {
     apiCall(req, res, url);
 });
 
-// Get issues
-app.post('/api/:user/:repo/issues', function(req, res) {
+// Get/set issues
+app.post('/api/:user/:repo/:mode/issues', function(req, res) {
     let url = '/repos/' + req.params.user + '/' + req.params.repo + '/issues';
     
+    // Updating issues requires a number from the GitHub API
+    if(req.params.mode == 'update') {
+        url += '/' + req.body.number;
+    }
+
+    // Updating issue milestones requires a number from the GitHub API
+    if(req.body.milestone && req.params.mode == 'update' || req.params.mode == 'create') {
+        req.body.milestone = req.body.milestone.number;
+    }
+   
+    console.log(req.body);
+
     apiCall(req, res, url);
 });
 

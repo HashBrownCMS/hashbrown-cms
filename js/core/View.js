@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  *  jQuery extension
  */
@@ -12,306 +14,265 @@
 })(jQuery)
 
 /**
- * Instantiating
+ * GUID
  */
-var instances = [];
-
-var View = function(constructor, extensions) {
-    var self = this;
-
-    var name = constructor.toString();
-    name = name.substring('function '.length);
-    name = name.substring(0, name.indexOf('('));
-
-    self.name = name;
-    self.constructor = constructor;
-
-    if(extensions) {
-        for(var k in extensions) {
-            self[k] = extensions[k];
-        }
+function guid() {
+    function s4() {
+        return Math.floor((1 + Math.random()) * 0x10000)
+            .toString(16)
+            .substring(1);
     }
+    return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+        s4() + '-' + s4() + s4() + s4();
 }
 
-View.extend = function(constructor, extensions) {
-    if(constructor) {
-        constructor.prototype = new View(constructor, extensions);
-        
-        return constructor;
-    }
-};
-
 /**
- * Getting
+ * Helper
  */
-View.getAll = function(type) {
-    var results = [];
+let instances = [];
 
-    if(type) {
-        for(var i in instances) {
-            var instance = instances[i];
-            var name = instance.constructor.name;
+class ViewHelper {
+    static getAll(type) {
+        let results = [];
 
-            if(name == type) {
-                results.push(instance);
-            }
-        }
-    } else {
-        results = instances;
-    }
+        if(type) {
+            for(let i in instances) {
+                let instance = instances[i];
+                let name = instance.constructor.name;
 
-    return results;
-};
-
-View.get = function(type) {
-    var results = View.getAll(type);
-
-    return results.length > 0 ? results[0] : null;
-};
-
-
-/**
- * Removing
- */
-View.removeAll = View.clear = function(type) {
-    for(var guid in instances) {
-        var instance = instances[guid];
-        var name = instance.constructor.name;
-        
-        if(!type || name == type) {
-            instance.remove();
-        }
-    }
-}
-
-View.prototype.remove = function(timeout) {
-    var self = this;
-
-    setTimeout(function() {
-        self.trigger('remove');
-
-        if(self.$element && self.$element.length > 0) {
-            self.$element.remove();
-        }
-
-        delete instances[self.guid];
-    }, timeout || 0 );
-};
-
-/**
- * Reloading
- * TODO: This doesn't quite work. Might need restructuring
- */
-View.prototype.reload = function() {
-    var self = this;
-
-    self.constructor();
-
-    return self;
-};
-
-/**
- * Rendering
- */
-View.prototype.preRender;
-View.prototype.render;
-View.prototype.postRender;
-
-/**
- * Init
- */
-View.prototype.register = function() {
-    var self = this;
-
-    function guid() {
-        function s4() {
-            return Math.floor((1 + Math.random()) * 0x10000)
-                .toString(16)
-                .substring(1);
-        }
-        return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
-            s4() + '-' + s4() + s4() + s4();
-    }
-
-    self.guid = guid();
-
-    instances[self.guid] = self;
-
-    return self;
-};
-
-View.prototype.init = function() {
-    var self = this;
-    
-    if(self.preRender) {
-        self.preRender();
-    }
-
-    if(self.render) {
-        self.render();
-    }
-    
-    if(self.postRender) {
-        self.postRender();
-    }
-    
-    if(self.$element) {
-        self.element = self.$element[0];
-        self.$element.data('view', self);
-        self.$element.bind('destroyed', function() {
-           self.remove();
-        });
-    }
-
-    return self;
-};
-
-/**
- * Events
- */
-// Trigger an event
-View.prototype.trigger = function(e, obj) {
-    var self = this;
-
-    if(!self.events) {
-        self.events = {
-            destroy: [
-                function () {
-                    self.$element.remove();
-                    delete self;
+                if(name == type) {
+                    results.push(instance);
                 }
-            ]
-        };
-    }
-
-    if(self.events[e]) {
-        for(var i in self.events[e]) {
-            if(self.events[e][i]) {
-                self.events[e][i](obj);
             }
-        }
-    }
-
-    return self;
-};
-
-// Bind an event
-View.prototype.on = function (e, callback) {
-    var self = this;
-    
-    if(!self.events) {
-        self.events = {
-            destroy: [
-                function () {
-                    self.$element.remove();
-                    delete self;
-                }
-            ]
-        };
-    }
-    
-    if(!self.events[e]) {
-        self.events[e] = [];
-    }
-
-    self.events[e].push(callback);
-
-    return self;
-}; 
-
-// Check if event exists
-View.prototype.hasEvent = function(name) {
-    for(var k in this.events) {
-        if(k == name) {
-            return true;
-        }
-    }
-
-    return false;
-};
-
-// Predefined events
-View.prototype.ready = function(callback) {
-    this.on('ready', callback);
-
-    return this;
-};
-
-/**
- * Common methods
- */
-// Adopt values
-View.prototype.adopt = function(args) {
-    for(var k in args) {
-        this[k] = args[k];
-    }
-
-    return this;
-};
-
-// Trigger ready or init
-View.prototype.readyOrInit = function() {
-    if(this.hasEvent('ready')) {
-        this.trigger('ready');
-    } else {
-        this.init();
-    }
-};
-
-/**
- * Fetch
- */
-View.prototype.fetch = function() {
-    var self = this;
-
-    function getModel() {
-        // Get model from URL
-        if(!self.model && typeof self.modelUrl === 'string') {
-            $.getJSON(self.modelUrl, function(data) {
-                self.model = data;
-                
-                self.readyOrInit();
-            });
-        
-        // Get model with function
-        } else if(!self.model && typeof self.modelFunction === 'function') {
-            self.modelFunction(function(data) {
-                self.model = data;
-
-                self.readyOrInit();
-            });
-
-        // Just perform the initialisation
         } else {
-            self.readyOrInit();
+            results = instances;
+        }
+
+        return results;
+    }
+
+    static get(type) {
+        let results = ViewHelper.getAll(type);
+
+        return results.length > 0 ? results[0] : null;
+    }
+
+    static clear(type) {
+        for(let guid in instances) {
+            let instance = instances[guid];
+            let name = instance.constructor.name;
+            
+            if(!type || name == type) {
+                instance.remove();
+            }
         }
     }
 
-    // Get rendered content from URL
-    if(typeof self.renderUrl === 'string') {
-        $.ajax({
-            url: self.renderUrl,
-            type: 'get',
-            success: function(html) {
+    static remove(timeout) {
+        let view = this;
 
-                if(self.$element) {
-                    self.$element.append(html);
-                } else {
-                    self.$element = $(html);
-                }
+        setTimeout(function() {
+            view.trigger('remove');
 
-                // And then get the model
-                getModel();
+            if(view.$element && view.$element.length > 0) {
+                view.$element.remove();
             }
-        });
 
-    // Just get the model
-    } else {
-        getModel();    
-    
+            delete instances[view.guid];
+        }, timeout || 0 );
+    }
+}
+
+window.ViewHelper = ViewHelper;
+
+/**
+ * Class
+ */
+class View {
+    /**
+     * Init
+     */
+    constructor(args) {
+        this.name = this.getName();
+        this.guid = guid();
+        this.events = {};
+
+        this.adopt(args);
+
+        instances[this.guid] = this;
     }
 
-    return self;
-};
+    getName() {
+        let name = constructor.toString();
+        name = name.substring('function '.length);
+        name = name.substring(0, name.indexOf('('));
 
-module.exports = View;
+        return name;
+    }
+
+    init() {
+        this.prerender();
+        this.render();
+        this.postrender();
+        
+        if(this.$element) {
+            this.element = this.$element[0];
+            this.$element.data('view', this);
+            this.$element.bind('destroyed', function() {
+               $(this).data('view').remove();
+            });
+        }
+    }
+
+
+    // Adopt values
+    adopt(args) {
+        for(let k in args) {
+            this[k] = args[k];
+        }
+
+        return this;
+    }
+
+    /**
+     * Rendering
+     */
+    prerender() {
+
+    }
+
+    fetch() {
+
+    }
+
+    render() {
+
+    }
+
+    postrender() {
+
+    }
+
+    /**
+     * Events
+     */
+    // Destroy
+    destroy() {
+        if(this.$element) {
+            this.$element.remove();
+        }
+
+        instances.splice(this.guid, 1);
+
+        delete this;
+    }
+
+    // Call an event (for internal use)
+    call(callback, data, ui) {
+        callback(data, ui, this);
+    }
+
+    // Trigger an event
+    trigger(e, obj) {
+        if(this.events[e]) {
+            if(this.events[e].length) {
+                for(let i in this.events[e]) {
+                    if(this.events[e][i]) {
+                        this.events[e][i](obj);
+                    }
+                }
+            } else {
+                this.events[e](obj);
+            }
+        }
+    }
+
+    // Bind an event
+    on(e, callback) {
+        let view = this;
+
+        // No events registered, register this as the only event
+        if(!this.events[e]) {
+            this.events[e] = function(data) { view.call(callback, data, this); };
+        
+        // Events have already been registered, add to callback array
+        } else {
+            // Only one event is registered, so convert from a single reference to an array
+            if(!this.events[e].length) {
+                this.events[e] = [
+                    this.events[e]
+                ];
+            }
+           
+            // Insert the event call into the array 
+            this.events[e].push(function(data) { view.call(callback, data, this); });
+        }
+    }
+
+    // Check if event exists
+    hasEvent(name) {
+        for(let k in this.events) {
+            if(k == name) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Fetch
+     */
+    fetch() {
+        let view = this;
+
+        function getModel() {
+            // Get model from URL
+            if(!view.model && typeof view.modelUrl === 'string') {
+                $.getJSON(view.modelUrl, function(data) {
+                    view.model = data;
+                    
+                    view.readyOrInit();
+                });
+            
+            // Get model with function
+            } else if(!view.model && typeof view.modelFunction === 'function') {
+                view.modelFunction(function(data) {
+                    view.model = data;
+
+                    view.readyOrInit();
+                });
+
+            // Just perform the initialisation
+            } else {
+                view.readyOrInit();
+            }
+        }
+
+        // Get rendered content from URL
+        if(typeof view.renderUrl === 'string') {
+            $.ajax({
+                url: view.renderUrl,
+                type: 'get',
+                success: function(html) {
+
+                    if(view.$element) {
+                        view.$element.append(html);
+                    } else {
+                        view.$element = $(html);
+                    }
+
+                    // And then get the model
+                    getModel();
+                }
+            });
+
+        // Just get the model
+        } else {
+            getModel();    
+        
+        }
+    }
+}
+
+window.View = View;

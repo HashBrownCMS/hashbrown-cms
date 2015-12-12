@@ -5,17 +5,29 @@
   background-color: #eee;
   box-shadow: none; }
 
-.p-b-xs {
+.m-b-xs {
   margin-bottom: 10px; }
 
-.p-b-sm {
+.m-b-sm {
   margin-bottom: 15px; }
 
-.p-b-md {
+.m-b-md {
   margin-bottom: 30px; }
 
-.p-b-lg {
+.m-b-lg {
   margin-bottom: 60px; }
+
+.p-b-xs {
+  padding-bottom: 10px; }
+
+.p-b-sm {
+  padding-bottom: 15px; }
+
+.p-b-md {
+  padding-bottom: 30px; }
+
+.p-b-lg {
+  padding-bottom: 60px; }
 
 .input-group.input-group-vertical {
   display: block; }
@@ -45,9 +57,6 @@
       top: 0px;
       right: 0px;
       height: 100%; }
-
-.page-content .issue-actions {
-  margin-bottom: 15px; }
 
 .page-content .issue-modal .modal-header p {
   margin: 0px; }

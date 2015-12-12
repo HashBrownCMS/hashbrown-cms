@@ -1,43 +1,45 @@
-module.exports = View.extend(function Issue(params) {
-    var self = this;
+'use strict';
 
-    self.adopt(params);
-    self.register();
-    
-    // Init html
-    self.$element = _.div({class: 'panel panel-primary issue'}).click(onClick);
+class Issue extends View {
+    constructor(args) {
+        super(args);
 
-    self.fetch();
-    
-    // Private methods
-    function onClick() {
-        View.get('IssueModal').show(self.model);
+        // Register events
+        this.on('click', this.onClick);
+        
+        // Init html
+        this.$element = _.div({class: 'panel panel-primary issue'}).click(this.events.click);
+
+        this.init();
+    }
+
+    onClick(e, element, view) {
+        ViewHelper.get('IssueModal').show(view.model);
     }
     
-    // Public methods
-    self.updateMilestonePosition = function updateMilestonePosition() {
-        var milestoneId = $('.milestones').val();
+    updateMilestonePosition() {
+        let milestoneId = $('.milestones').val();
 
-        self.$element.toggle(milestoneId == 'all' || self.model.milestone.id == milestoneId);
-    };
+        this.$element.toggle(milestoneId == 'all' || this.model.milestone.id == milestoneId);
+    }
 
-    self.updateColumnFromPosition = function updateColumnFromPosition() {
-        var $column = self.$element.parents('.column');
+    updateColumnFromPosition() {
+        let $column = this.$element.parents('.column');
 
-        self.model.state = $column.data('name') == 'done' ? 'closed' : 'open';
+        this.model.state = $column.data('name') == 'done' ? 'closed' : 'open';
 
         // Update model labels
-    };
+    }
 
-    self.updateColumnPosition = function updateColumnPosition() {
-        var column = 'backlog';
+    updateColumnPosition() {
+        let column = 'backlog';
 
-        if(self.model.state == 'closed') {
+        if(this.model.state == 'closed') {
             column = 'done';
         
         } else {
-            for(var l in self.model.labels) {
-                var name = self.model.labels[l].name;
+            for(let l in this.model.labels) {
+                let name = this.model.labels[l].name;
                 
                 if($('.column[data-name="' + name + '"]').length > 0) {
                     column = name;
@@ -46,39 +48,58 @@ module.exports = View.extend(function Issue(params) {
         
         }
 
-        $('.column[data-name="' + column + '"] .sortable').append(self.$element);
-    };
+        $('.column[data-name="' + column + '"] .sortable').append(this.$element);
+    }
     
-    self.sync = function sync(model) {
-        self.model = model;
+    update() {
+        this.init();
+        
+        this.updateColumnPosition();
+        this.updateMilestonePosition();
+    }
 
-        console.log(self.model);
-        
-        // TODO: Syncing logic
-        
-        self.render();
-        
-        self.updateColumnPosition();
-        self.updateMilestonePosition();
-    };
-},
-{
-    render: function() {
-        var self = this;
+    sync(model) {
+        let view = this;
 
-        self.$element.attr('id', self.model.id);
-        self.$element.html([
+        view.model = model;
+
+        // This is a new issue
+        if(!view.model.id) {
+            api.issues.create(view.model, function(issue) {
+                view.model = issue;
+                
+                view.update();
+            });
+
+        // This is an existing issue
+        } else {
+            api.issues.update(view.model, function(issue) {
+                view.model = issue;
+                
+                view.update();
+            });
+
+        }    
+    }
+    
+    render() {
+        let view = this;
+
+        this.$element.attr('data-id', view.model.id);
+        this.$element.html([
             _.div({class: 'panel-heading'}, [
-                _.span(self.model.title),
+                _.span(view.model.title),
                 function() {
-                    if(self.model.assignee) {
-                        return _.img({alt: '', src: self.model.assignee.avatarUrl});
+                    if(view.model.assignee) {
+                        return _.img({alt: '', src: view.model.assignee.avatarUrl});
                     }
                 }
             ]),
             _.div({class: 'panel-body'},
-                _.span(self.model.body)
+                _.span(view.model.body)
             )
         ]);
     }
-});
+}
+
+module.exports = Issue;

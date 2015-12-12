@@ -2,108 +2,132 @@ require('../client');
 require('./partials/navbar');
 
 var Issue = require('./partials/issue');
-var IssueModal = require('./partials/issue-modal');
+let IssueModal = require('./partials/issue-modal');
 
-function onChangeMilestone() {
-    var id = $('.milestones').val();
+class Issues extends View {
+    constructor(args) {
+        super(args);
+       
+        let view = this;
 
-    _.each(View.getAll('Issue'),
-        function(i, view) {
-            view.$element.toggle(id == 'all' || view.model.milestone.id == id);
-        }
-    );
-}
+        api.issueColumns(function(columns) {
+            api.issues.fetch(function(issues) {
+                api.milestones(function(milestones) {
+                    view.columns = columns;
+                    view.issues = issues;
+                    view.milestones = milestones;
 
-function onMoveIssueColumn($issue) {
-    $issue.data('view').updateColumnFromPosition();
-}
+                    view.render();
+                });
+            });
+        });
+    }
 
-function onClickNewIssue() {
-    var newIssue = {
-        title: 'Issue title',
-        body: 'Issue description',
-        state: 'open'
-    };
+    onMoveIssueColumn($issue) {
+        $issue.data('view').updateColumnFromPosition();
+    }
 
-    View.get('IssueModal').show(newIssue);
-}
-
-function updateIssuePositions() {
-    _.each(View.getAll('Issue'),
-        function(i, view) {
-            view.updateMilestonePosition();
-            view.updateColumnPosition();
-        }
-    );
+    /**
+     * Events
+     */
+    updateIssuePositions() {
+        _.each(ViewHelper.getAll('Issue'),
+            function(i, view) {
+                view.updateMilestonePosition();
+                view.updateColumnPosition();
+            }
+        );
+        
+        $('.sortable').sortable('destroy');
+        $('.sortable').sortable({
+            forcePlaceholderSize: true,
+            connectWith: '.sortable',
+        }).bind('sortupdate', function(e, ui) {
+            onMoveIssueColumn(ui.item);
+        });
+    }
     
-    $('.sortable').sortable('destroy');
-    $('.sortable').sortable({
-        forcePlaceholderSize: true,
-        connectWith: '.sortable',
-    }).bind('sortupdate', function(e, ui) {
-        onMoveIssueColumn(ui.item);
-    });
-}
+    onChangeMilestone() {
+        let id = $('.milestones').val();
 
-api.issueColumns(function(columns) {
-    api.issues(function(issues) {
-        api.milestones(function(milestones) {
-            $('.page-content').html([
-                _.div({class: 'container'}, [
-                    // Render all issues outside the columns first
-                    _.each(
-                        issues,
-                        function(i, issue) {
-                            return new Issue({
-                                model: issue
-                            }).$element;
-                        }
-                    ),
-                    // Issue actions
-                    _.div({class: 'btn-group issue-actions'},
-                        _.button({class: 'btn btn-primary'}, [
-                            _.span({class: 'glyphicon glyphicon-plus'}),
-                            ' New issue'
-                        ]).click(onClickNewIssue)
-                    ),
-                    // Milestone picker
-                    _.div({class: 'input-group p-b-md'}, [
-                        _.span({class: 'input-group-addon'},
-                            'Milestone'
-                        ),
-                        _.select({class: 'form-control milestones'},
-                            _.each([ { id: 'all', title: '(all issues)' } ].concat(milestones),
-                                function(i, milestone) {
-                                    return _.option({value: milestone.id},
-                                        milestone.title
-                                    );
-                                }
-                            )
-                        ).change(onChangeMilestone)
-                    ]),
-                    // Columns
-                    _.div({class: 'row'},
-                        _.each(
-                            columns,
-                            function(c, column) {
-                                var colSize = 12 / columns.length;
+        _.each(ViewHelper.getAll('Issue'),
+            function(i, view) {
+                view.$element.toggle(id == 'all' || view.model.milestone.id == id);
+            }
+        );
+    }
 
-                                return _.div({class: 'col-xs-' + colSize},
-                                    _.div({class: 'panel panel-default column', 'data-name': column}, [
-                                        _.div({class: 'panel-heading'},
-                                            _.span(column)
-                                        ),
-                                        _.div({class: 'panel-body sortable'})
-                                    ])
-                                );                  
+    onClickNewIssue() {
+        let newIssue = {
+            title: 'Issue title',
+            body: 'Issue description',
+            state: 'open'
+        };
+
+        ViewHelper.get('IssueModal').show(newIssue);
+    }
+
+    render() {
+        let view = this;
+
+        $('.page-content').html([
+            _.div({class: 'container'}, [
+                // Render all issues outside the columns first
+                _.each(
+                    view.issues,
+                    function(i, issue) {
+                        return new Issue({
+                            model: issue
+                        }).$element;
+                    }
+                ),
+                // Issue actions
+                _.div({class: 'btn-group p-b-sm'},
+                    _.button({class: 'btn btn-primary'}, [
+                        _.span({class: 'glyphicon glyphicon-plus'}),
+                        ' New issue'
+                    ]).click(view.onClickNewIssue)
+                ),
+                // Milestone picker
+                _.div({class: 'input-group p-b-sm'}, [
+                    _.span({class: 'input-group-addon'},
+                        'Milestone'
+                    ),
+                    _.select({class: 'form-control milestones'},
+                        _.each([ { id: 'all', title: '(all issues)' } ].concat(view.milestones),
+                            function(i, milestone) {
+                                return _.option({value: milestone.id},
+                                    milestone.title
+                                );
                             }
                         )
-                    )
+                    ).change(view.onChangeMilestone)
                 ]),
-                new IssueModal().$element
-            ]);
+                // Columns
+                _.div({class: 'row'},
+                    _.each(
+                        view.columns,
+                        function(c, column) {
+                            var colSize = 12 / view.columns.length;
 
-            updateIssuePositions();
-        });
-    });
-});
+                            return _.div({class: 'col-xs-' + colSize},
+                                _.div({class: 'panel panel-default column', 'data-name': column}, [
+                                    _.div({class: 'panel-heading'},
+                                        _.span(column)
+                                    ),
+                                    _.div({class: 'panel-body sortable'})
+                                ])
+                            );                  
+                        }
+                    )
+                )
+            ]),
+            new IssueModal().$element
+        ]);
+
+        // Put the issues into their appropriate columns
+        view.updateIssuePositions();
+    } 
+}
+
+new Issues();

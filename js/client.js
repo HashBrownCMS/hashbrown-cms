@@ -1,5 +1,7 @@
 window._ = require('./core/Templating');
-window.View = require('./core/View');
+require('./core/View');
+
+require('./api');
 
 window.env = {
     json: null,
@@ -9,7 +11,7 @@ window.env = {
         if(env.json) {
             callback(env.json);
         } else {
-            api.file.get('env.json', function(contents) {
+            api.file.fetch('env.json', function(contents) {
                 var json = '{}';
                 
                 try {
@@ -41,7 +43,7 @@ window.env = {
             comment: 'Updating env.json'
         };
 
-        api.file.set(contents, 'env.json', function() { 
+        api.file.create(contents, 'env.json', function() { 
             env.json = json;
 
             if(callback) {
@@ -71,100 +73,3 @@ window.helper = {
     }
 };
 
-window.api = {
-    call: function(url, callback, data) {
-        data = data || {};
-        
-        data.token = localStorage.getItem('gh-oauth-token');
-
-        $.post(url, data, function(res) {
-            if(res.err) {
-                console.log(res.err);
-                alert('(' + res.mode + ') ' + res.url + ': ' + res.err.json.message);
-
-            } else if(callback) {
-                callback(res);
-            
-            }
-        });
-    },
-
-    repos: function(callback) {
-        api.call('/api/' + req.params.user + '/repos/', callback);
-    },
-
-    compare: function(base, head, callback) {
-        api.call('/api/' + req.params.user + '/' + req.params.repo + '/compare/' + base + '/' + head, callback);
-    },
-
-    merge: function(base, head, callback) {
-        api.call('/api/' + req.params.user + '/' + req.params.repo + '/merge', callback, { base: base, head: head });
-    },
-    
-    file: {
-        get: function(path, callback) {
-            api.call('/api/' + req.params.user + '/' + req.params.repo + '/get/file/' + path, callback);
-        },
-        
-        update: function(data, path, callback) {
-            api.call('/api/' + req.params.user + '/' + req.params.repo + '/update/file/' + path, callback, data);
-        },
-    
-        set: function(data, path, callback) {
-            api.call('/api/' + req.params.user + '/' + req.params.repo + '/set/file/' + path, callback, data);
-        }
-    },
-
-    issues: function(callback) {
-        api.call('/api/' + req.params.user + '/' + req.params.repo + '/issues', callback);
-    },
-    
-    labels: {
-        get: function(callback) {
-            api.call('/api/' + req.params.user + '/' + req.params.repo + '/get/labels', callback);
-        },
-
-        set: function(data, callback) {
-            api.call('/api/' + req.params.user + '/' + req.params.repo + '/set/labels', callback, data);
-        }
-    },
-    
-    issueColumns: function(callback) {
-        env.get(function(json) {
-            var columns = json.putaitu.issues.columns;
-
-            columns.unshift('backlog');
-            columns.push('done');
-                
-            callback(columns);
-        });
-    },
-
-    milestones: function(callback) {
-        api.call('/api/' + req.params.user + '/' + req.params.repo + '/milestones', callback);
-    },
-
-    collaborators: function(callback) {
-        api.call('/api/' + req.params.user + '/' + req.params.repo + '/collaborators', callback);
-    },
-
-    repo: function(callback) {
-        api.call('/api/' + req.params.user + '/' + req.params.repo, callback);
-    },
-
-    branches: function(callback) {
-        api.call('/api/' + req.params.user + '/' + req.params.repo + '/branches/', function(branches) {
-            branches.sort(function(a, b) {
-                if (a.name < b.name) {
-                    return -1;
-                } else if (a.name > b.name) {
-                    return 1;
-                } else {
-                    return 0;   
-                }
-            });
-
-            callback(branches);
-        });
-    }
-};
