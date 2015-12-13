@@ -1,48 +1,50 @@
-var Router = {
-    routes: {},
-    url: '/',
+class Router {
+    constructor() {
+        this.routes = {};
+        this.url = '/';
+    }
 
-    route: function(path, controller, args) {
-        var route = Router.routes[path] = {
+    route(path, controller, args) {
+        let route = this.routes[path] = {
             controller: controller,
         };
 
         if(args) {
-            for(var k in args) {
+            for(let k in args) {
                 route[k] = args[k];
             }
         }
-    },
+    }
 
-    go: function(url) {
+    go(url) {
         location.hash = url;
-    },
+    }
         
-    goToBaseDir: function() {
-        var url = Router.url;
-        var base = new String(url).substring(0, url.lastIndexOf('/'));
+    goToBaseDir() {
+        let url = this.url || '/';
+        let base = new String(url).substring(0, url.lastIndexOf('/'));
         
-        Router.go(base);
-    },
+        this.go(base);
+    }
 
-    init: function() {
-        if(Router.route && Router.route.onExit && !Router.route.onExit()) {
+    init() {
+        if(this.route && this.route.onExit && !this.route.onExit()) {
             return false;
         }
 
-        var url = location.hash.slice(1) || '/';
-        var trimmed = url.substring(0, url.indexOf('?'));
+        let url = location.hash.slice(1) || '/';
+        let trimmed = url.substring(0, url.indexOf('?'));
        
         if(trimmed) {
             url = trimmed;
         }
 
-        var route = Router.routes[url];
+        let route = this.routes[url];
 
         if(!route) {
-            for(var k in Router.routes) {
-                var regex = '^' + k + '$';
-                var pattern = new RegExp(regex);
+            for(let k in Router.routes) {
+                let regex = '^' + k + '$';
+                let pattern = new RegExp(regex);
              
                 if(pattern.test(url)) {
                     route = Router.routes[k];
@@ -51,28 +53,28 @@ var Router = {
             }            
         }
 
-        Router.path = url.split('/');
-        Router.args = {};
-        Router.url = url;
-        Router.route = route;
+        this.path = url.split('/');
+        this.args = {};
+        this.url = url;
+        this.route = route;
 
-        if(!Router.path[0] && Router.path.length > 0) {
+        if(!this.path[0] && this.path.length > 0) {
             Router.path.splice(0, 1);
         }
 
-        for(var i = 0; i < Router.path.length - 1; i += 2) {
-            Router.args[Router.path[i]] = Router.path[i+1];
+        for(let i = 0; i < this.path.length - 1; i += 2) {
+            this.args[this.path[i]] = this.path[i+1];
         }
 
         if(route && route.controller) {
             if(route.clear) {
-                View.clear();
+                ViewHelper.clear();
             }
             
             route.controller();
 
         } else {
-            console.log('Invalid route: ' + Router.url);
+            console.log('Invalid route: ' + this.url);
         
         }
     }
@@ -81,4 +83,4 @@ var Router = {
 window.addEventListener('hashchange', Router.init); 
 $(document).ready(Router.init);
 
-module.exports = Router;
+window.Router = Router;

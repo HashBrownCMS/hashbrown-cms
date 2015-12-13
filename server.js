@@ -65,6 +65,12 @@ app.get('/repos/:user/:repo/:branch/cms', function(req, res) {
     res.render('index', model);
 });
 
+app.get('/repos/:user/:repo/:branch/cms/:root/:path*', function(req, res) {
+    let model = { view: 'cms', req: req };
+
+    res.render('index', model);
+});
+
 /**
  * Redir
  */
@@ -242,7 +248,7 @@ app.post('/api/:user/:repo/:mode/labels', function(req, res) {
 });
 
 // Get/set file
-app.post('/api/:user/:repo/:mode/file/:path', function(req, res) {
+app.post('/api/:user/:repo/:mode/file/:path*', function(req, res) {
     let url = '/repos/' + req.params.user + '/' + req.params.repo + '/contents/' + req.params.path;
 
     apiCall(req, res, url);

@@ -20,7 +20,12 @@ gulp.task('sass', function() {
 gulp.task('js', function() {
     gulp.src('./js/client.js')
         .pipe(plumber())
-        .pipe(browserify())
+        .pipe(browserify({
+            paths: [
+                './node_modules/',
+                './'
+            ]
+        }))
         .pipe(babel({
             presets: [ 'es2015' ]
         }))

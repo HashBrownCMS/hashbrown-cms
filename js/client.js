@@ -1,6 +1,7 @@
-window._ = require('./core/Templating');
+require('./core/Templating');
 require('./core/View');
 
+require('./helper');
 require('./api');
 
 window.env = {
@@ -11,7 +12,7 @@ window.env = {
         if(env.json) {
             callback(env.json);
         } else {
-            api.file.fetch('env.json', function(contents) {
+            api.file.fetch('/env.json', function(contents) {
                 var json = '{}';
                 
                 try {
@@ -43,7 +44,7 @@ window.env = {
             comment: 'Updating env.json'
         };
 
-        api.file.create(contents, 'env.json', function() { 
+        api.file.create(contents, '/env.json', function() { 
             env.json = json;
 
             if(callback) {
@@ -52,24 +53,3 @@ window.env = {
         });
     }
 };
-
-window.helper = {
-    formatDate: function(input) {
-        var date = new Date(input);
-        var output =
-            date.getFullYear() +
-            '-' +
-            date.getMonth() +
-            '-' +
-            date.getDate() +
-            ' ' +
-            date.getHours() +
-            ':' +
-            date.getMinutes() +
-            ':' +
-            date.getSeconds();
-
-        return output;
-    }
-};
-

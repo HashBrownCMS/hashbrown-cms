@@ -72,15 +72,15 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
             file: {
                 fetch: function fetch(path, callback) {
-                    api.call('/api/' + req.params.user + '/' + req.params.repo + '/fetch/file/' + path, callback);
+                    api.call('/api/' + req.params.user + '/' + req.params.repo + '/fetch/file' + path, callback);
                 },
 
                 update: function update(data, path, callback) {
-                    api.call('/api/' + req.params.user + '/' + req.params.repo + '/update/file/' + path, callback, data);
+                    api.call('/api/' + req.params.user + '/' + req.params.repo + '/update/file' + path, callback, data);
                 },
 
                 create: function create(data, path, callback) {
-                    api.call('/api/' + req.params.user + '/' + req.params.repo + '/create/file/' + path, callback, data);
+                    api.call('/api/' + req.params.user + '/' + req.params.repo + '/create/file' + path, callback, data);
                 }
             },
 
@@ -156,9 +156,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             }
         };
     }, {}], 2: [function (require, module, exports) {
-        window._ = require('./core/Templating');
+        require('./core/Templating');
         require('./core/View');
 
+        require('./helper');
         require('./api');
 
         window.env = {
@@ -169,7 +170,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 if (env.json) {
                     callback(env.json);
                 } else {
-                    api.file.fetch('env.json', function (contents) {
+                    api.file.fetch('/env.json', function (contents) {
                         var json = '{}';
 
                         try {
@@ -201,7 +202,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     comment: 'Updating env.json'
                 };
 
-                api.file.create(contents, 'env.json', function () {
+                api.file.create(contents, '/env.json', function () {
                     env.json = json;
 
                     if (callback) {
@@ -210,16 +211,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 });
             }
         };
-
-        window.helper = {
-            formatDate: function formatDate(input) {
-                var date = new Date(input);
-                var output = date.getFullYear() + '-' + date.getMonth() + '-' + date.getDate() + ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds();
-
-                return output;
-            }
-        };
-    }, { "./api": 1, "./core/Templating": 3, "./core/View": 4 }], 3: [function (require, module, exports) {
+    }, { "./api": 1, "./core/Templating": 3, "./core/View": 4, "./helper": 5 }], 3: [function (require, module, exports) {
         var Templating = {};
 
         function append(el, content) {
@@ -322,7 +314,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             return elements;
         };
 
-        module.exports = Templating;
+        window._ = Templating;
     }, {}], 4: [function (require, module, exports) {
         'use strict'
 
@@ -634,6 +626,59 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
         window.View = View;
     }, {}], 5: [function (require, module, exports) {
+        var Helper = (function () {
+            function Helper() {
+                _classCallCheck(this, Helper);
+            }
+
+            _createClass(Helper, null, [{
+                key: "formatDate",
+                value: function formatDate(input) {
+                    var date = new Date(input);
+                    var output = date.getFullYear() + '-' + date.getMonth() + '-' + date.getDate() + ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds();
+
+                    return output;
+                }
+            }, {
+                key: "basename",
+                value: function basename(path, extension) {
+                    var base = new String(path).substring(path.lastIndexOf('/') + 1);
+
+                    if (extension) {
+                        base = base.replace(extension, '');
+                    }
+
+                    return base;
+                }
+            }, {
+                key: "basedir",
+                value: function basedir(path) {
+                    var base = new String(path).substring(0, path.lastIndexOf('/'));
+
+                    return base;
+                }
+            }, {
+                key: "truncate",
+                value: function truncate(string, max, addDots) {
+                    var output = string;
+
+                    if (output.length > max) {
+                        output = output.substring(0, max);
+
+                        if (addDots) {
+                            output += '...';
+                        }
+                    }
+
+                    return output;
+                }
+            }]);
+
+            return Helper;
+        })();
+
+        window.helper = Helper;
+    }, {}], 6: [function (require, module, exports) {
         require('../client');
         require('./partials/navbar');
 
@@ -666,7 +711,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         })(View);
 
         new Collaborators();
-    }, { "../client": 2, "./partials/navbar": 6 }], 6: [function (require, module, exports) {
+    }, { "../client": 2, "./partials/navbar": 7 }], 7: [function (require, module, exports) {
         var Navbar = (function (_View2) {
             _inherits(Navbar, _View2);
 
@@ -712,4 +757,4 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         })(View);
 
         new Navbar();
-    }, {}] }, {}, [5]);
+    }, {}] }, {}, [6]);

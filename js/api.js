@@ -51,15 +51,15 @@ window.api = {
     
     file: {
         fetch: function(path, callback) {
-            api.call('/api/' + req.params.user + '/' + req.params.repo + '/fetch/file/' + path, callback);
+            api.call('/api/' + req.params.user + '/' + req.params.repo + '/fetch/file' + path, callback);
         },
         
         update: function(data, path, callback) {
-            api.call('/api/' + req.params.user + '/' + req.params.repo + '/update/file/' + path, callback, data);
+            api.call('/api/' + req.params.user + '/' + req.params.repo + '/update/file' + path, callback, data);
         },
     
         create: function(data, path, callback) {
-            api.call('/api/' + req.params.user + '/' + req.params.repo + '/create/file/' + path, callback, data);
+            api.call('/api/' + req.params.user + '/' + req.params.repo + '/create/file' + path, callback, data);
         }
     },
 

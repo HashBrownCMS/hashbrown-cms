@@ -132,4 +132,4 @@ Templating.each = function(array, callback) {
     return elements;
 };
 
-module.exports = Templating;
+window._ = Templating;
