@@ -84,6 +84,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 }
             },
 
+            tree: {
+                fetch: function fetch(callback) {
+                    api.call('/api/' + req.params.user + '/' + req.params.repo + '/' + req.params.branch + '/fetch/tree', callback);
+                }
+            },
+
             issues: {
                 fetch: function fetch(callback) {
                     api.call('/api/' + req.params.user + '/' + req.params.repo + '/fetch/issues', callback);
@@ -131,20 +137,22 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 api.call('/api/' + req.params.user + '/' + req.params.repo, callback);
             },
 
-            branches: function branches(callback) {
-                api.call('/api/' + req.params.user + '/' + req.params.repo + '/branches/', function (branches) {
-                    branches.sort(function (a, b) {
-                        if (a.name < b.name) {
-                            return -1;
-                        } else if (a.name > b.name) {
-                            return 1;
-                        } else {
-                            return 0;
-                        }
-                    });
+            branches: {
+                get: function get(callback) {
+                    api.call('/api/' + req.params.user + '/' + req.params.repo + '/branches/', function (branches) {
+                        branches.sort(function (a, b) {
+                            if (a.name < b.name) {
+                                return -1;
+                            } else if (a.name > b.name) {
+                                return 1;
+                            } else {
+                                return 0;
+                            }
+                        });
 
-                    callback(branches);
-                });
+                        callback(branches);
+                    });
+                }
             }
         };
     }, {}], 2: [function (require, module, exports) {
@@ -479,9 +487,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 key: "prerender",
                 value: function prerender() {}
             }, {
-                key: "fetch",
-                value: function fetch() {}
-            }, {
                 key: "render",
                 value: function render() {}
             }, {
@@ -587,7 +592,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                             $.getJSON(view.modelUrl, function (data) {
                                 view.model = data;
 
-                                view.readyOrInit();
+                                view.init();
                             });
 
                             // Get model with function
@@ -595,34 +600,29 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                                 view.modelFunction(function (data) {
                                     view.model = data;
 
-                                    view.readyOrInit();
+                                    view.init();
                                 });
 
                                 // Just perform the initialisation
                             } else {
-                                    view.readyOrInit();
+                                    view.init();
                                 }
                     }
 
                     // Get rendered content from URL
                     if (typeof view.renderUrl === 'string') {
-                        $.ajax({
-                            url: view.renderUrl,
-                            type: 'get',
-                            success: function success(html) {
-
-                                if (view.$element) {
-                                    view.$element.append(html);
-                                } else {
-                                    view.$element = $(html);
-                                }
-
-                                // And then get the model
-                                getModel();
+                        $.get(view.renderUrl, function (html) {
+                            if (view.$element) {
+                                view.$element.append(html);
+                            } else {
+                                view.$element = $(html);
                             }
+
+                            // And then get the model
+                            getModel();
                         });
 
-                        // Just get the model
+                        // If no render url is defined, just get the model
                     } else {
                             getModel();
                         }
@@ -637,28 +637,52 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         require('../client');
         require('./partials/navbar');
 
-        api.collaborators(function (collaborators) {
-            $('.page-content').html(_.div({ class: 'container' }, _.div({ class: 'row' }, [_.each(collaborators, function (i, collaborator) {
-                return _.div({ class: 'col-xs-2' }, _.div({ class: 'thumbnail' }, [_.img({ src: collaborator.avatarUrl }), _.h4({ class: 'text-center' }, collaborator.login), _.button({ class: 'btn btn-danger form-control' }, 'Remove')]));
-            }), _.div({ class: 'col-xs-2' }, _.div({ class: 'thumbnail' }, _.button({ class: 'btn btn-success form-control' }, 'Add')))])));
-        });
+        var Collaborators = (function (_View) {
+            _inherits(Collaborators, _View);
+
+            function Collaborators(args) {
+                _classCallCheck(this, Collaborators);
+
+                var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Collaborators).call(this, args));
+
+                var view = _this;
+
+                _this.modelFunction = api.collaborators;
+
+                _this.fetch();
+                return _this;
+            }
+
+            _createClass(Collaborators, [{
+                key: "render",
+                value: function render() {
+                    $('.page-content').html(_.div({ class: 'container' }, _.div({ class: 'row' }, [_.each(this.model, function (i, collaborator) {
+                        return _.div({ class: 'col-xs-2' }, _.div({ class: 'thumbnail' }, [_.img({ src: collaborator.avatarUrl }), _.h4({ class: 'text-center' }, collaborator.login), _.button({ class: 'btn btn-danger form-control' }, 'Remove')]));
+                    }), _.div({ class: 'col-xs-2' }, _.div({ class: 'thumbnail' }, _.button({ class: 'btn btn-success form-control' }, 'Add')))])));
+                }
+            }]);
+
+            return Collaborators;
+        })(View);
+
+        new Collaborators();
     }, { "../client": 2, "./partials/navbar": 6 }], 6: [function (require, module, exports) {
-        var Navbar = (function (_View) {
-            _inherits(Navbar, _View);
+        var Navbar = (function (_View2) {
+            _inherits(Navbar, _View2);
 
             function Navbar(args) {
                 _classCallCheck(this, Navbar);
 
-                var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Navbar).call(this, args));
+                var _this2 = _possibleConstructorReturn(this, Object.getPrototypeOf(Navbar).call(this, args));
 
-                var view = _this;
+                var view = _this2;
 
                 api.repo(function (repo) {
                     view.repo = repo;
 
                     view.init();
                 });
-                return _this;
+                return _this2;
             }
 
             _createClass(Navbar, [{

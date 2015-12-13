@@ -84,6 +84,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 }
             },
 
+            tree: {
+                fetch: function fetch(callback) {
+                    api.call('/api/' + req.params.user + '/' + req.params.repo + '/' + req.params.branch + '/fetch/tree', callback);
+                }
+            },
+
             issues: {
                 fetch: function fetch(callback) {
                     api.call('/api/' + req.params.user + '/' + req.params.repo + '/fetch/issues', callback);
@@ -131,20 +137,22 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 api.call('/api/' + req.params.user + '/' + req.params.repo, callback);
             },
 
-            branches: function branches(callback) {
-                api.call('/api/' + req.params.user + '/' + req.params.repo + '/branches/', function (branches) {
-                    branches.sort(function (a, b) {
-                        if (a.name < b.name) {
-                            return -1;
-                        } else if (a.name > b.name) {
-                            return 1;
-                        } else {
-                            return 0;
-                        }
-                    });
+            branches: {
+                get: function get(callback) {
+                    api.call('/api/' + req.params.user + '/' + req.params.repo + '/branches/', function (branches) {
+                        branches.sort(function (a, b) {
+                            if (a.name < b.name) {
+                                return -1;
+                            } else if (a.name > b.name) {
+                                return 1;
+                            } else {
+                                return 0;
+                            }
+                        });
 
-                    callback(branches);
-                });
+                        callback(branches);
+                    });
+                }
             }
         };
     }, {}], 2: [function (require, module, exports) {
@@ -479,9 +487,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 key: "prerender",
                 value: function prerender() {}
             }, {
-                key: "fetch",
-                value: function fetch() {}
-            }, {
                 key: "render",
                 value: function render() {}
             }, {
@@ -587,7 +592,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                             $.getJSON(view.modelUrl, function (data) {
                                 view.model = data;
 
-                                view.readyOrInit();
+                                view.init();
                             });
 
                             // Get model with function
@@ -595,34 +600,29 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                                 view.modelFunction(function (data) {
                                     view.model = data;
 
-                                    view.readyOrInit();
+                                    view.init();
                                 });
 
                                 // Just perform the initialisation
                             } else {
-                                    view.readyOrInit();
+                                    view.init();
                                 }
                     }
 
                     // Get rendered content from URL
                     if (typeof view.renderUrl === 'string') {
-                        $.ajax({
-                            url: view.renderUrl,
-                            type: 'get',
-                            success: function success(html) {
-
-                                if (view.$element) {
-                                    view.$element.append(html);
-                                } else {
-                                    view.$element = $(html);
-                                }
-
-                                // And then get the model
-                                getModel();
+                        $.get(view.renderUrl, function (html) {
+                            if (view.$element) {
+                                view.$element.append(html);
+                            } else {
+                                view.$element = $(html);
                             }
+
+                            // And then get the model
+                            getModel();
                         });
 
-                        // Just get the model
+                        // If no render url is defined, just get the model
                     } else {
                             getModel();
                         }
@@ -636,23 +636,131 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }, {}], 5: [function (require, module, exports) {
         require('../client');
         require('./partials/navbar');
-    }, { "../client": 2, "./partials/navbar": 6 }], 6: [function (require, module, exports) {
-        var Navbar = (function (_View) {
-            _inherits(Navbar, _View);
+
+        var Tree = require('./partials/cms-tree');
+
+        var CMS = (function (_View) {
+            _inherits(CMS, _View);
+
+            function CMS(args) {
+                _classCallCheck(this, CMS);
+
+                var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(CMS).call(this, args));
+
+                _this.init();
+                return _this;
+            }
+
+            _createClass(CMS, [{
+                key: "render",
+                value: function render() {
+                    $('.page-content').html(_.div({ class: 'cms-container' }, [new Tree().$element]));
+                }
+            }]);
+
+            return CMS;
+        })(View);
+
+        new CMS();
+    }, { "../client": 2, "./partials/cms-tree": 6, "./partials/navbar": 7 }], 6: [function (require, module, exports) {
+        var Tree = (function (_View2) {
+            _inherits(Tree, _View2);
+
+            function Tree(args) {
+                _classCallCheck(this, Tree);
+
+                var _this2 = _possibleConstructorReturn(this, Object.getPrototypeOf(Tree).call(this, args));
+
+                _this2.dirs = {};
+
+                // Prerender container
+                _this2.$element = _.div({ class: 'tree' });
+
+                _this2.modelFunction = api.tree.fetch;
+                _this2.fetch();
+                return _this2;
+            }
+
+            _createClass(Tree, [{
+                key: "sortFoldersFirst",
+                value: function sortFoldersFirst(array) {
+                    array.sort(function (a, b) {
+                        if (a.mode == '040000' && b.mode != '040000') {
+                            return -1;
+                        } else if (a.mode != '040000' && b.mode == '040000') {
+                            return 1;
+                        } else {
+                            return 0;
+                        }
+                    });
+
+                    return array;
+                }
+            }, {
+                key: "filterPath",
+                value: function filterPath(path, recursive) {
+                    function filter(file) {
+                        var i = file.path.indexOf(path);
+
+                        var hasPath = i == 0;
+                        var isNotSelf = file.path != path;
+                        var shouldInclude = true;
+
+                        // Include only direct children if specified
+                        if (hasPath && isNotSelf && !recursive) {
+                            // Trim the path down to after this folder
+                            var base = file.path.replace(path, '');
+
+                            // Files will have a slash at position 0, folders won't have one
+                            shouldInclude = base.indexOf('/') <= 0;
+                        }
+
+                        return hasPath && isNotSelf && shouldInclude;
+                    }
+
+                    return this.model.tree.filter(filter);
+                }
+            }, {
+                key: "getFolderContent",
+                value: function getFolderContent(path, recursive) {
+                    return this.sortFoldersFirst(this.filterPath(path, recursive));
+                }
+            }, {
+                key: "prerender",
+                value: function prerender() {
+                    this.dirs.pages = this.getFolderContent('pages/', true);
+                    this.dirs.media = this.getFolderContent('media/', true);
+                }
+            }, {
+                key: "render",
+                value: function render() {
+                    console.log(this.dirs.pages);
+
+                    this.$element.html();
+                }
+            }]);
+
+            return Tree;
+        })(View);
+
+        module.exports = Tree;
+    }, {}], 7: [function (require, module, exports) {
+        var Navbar = (function (_View3) {
+            _inherits(Navbar, _View3);
 
             function Navbar(args) {
                 _classCallCheck(this, Navbar);
 
-                var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Navbar).call(this, args));
+                var _this3 = _possibleConstructorReturn(this, Object.getPrototypeOf(Navbar).call(this, args));
 
-                var view = _this;
+                var view = _this3;
 
                 api.repo(function (repo) {
                     view.repo = repo;
 
                     view.init();
                 });
-                return _this;
+                return _this3;
             }
 
             _createClass(Navbar, [{

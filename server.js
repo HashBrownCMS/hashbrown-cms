@@ -85,12 +85,17 @@ app.get('/redir/repo/:user/:repo/:branch', function(req, res) {
  * API
  */
 // Generic call
-function apiCall(req, res, url) {
+function apiCall(req, res, url, customCallback) {
     function callback(err, answer) {
         if(err) {
             res.send({ mode: req.params.mode, url: url, err: err, data: req.body });
         } else {
-            res.send(answer);
+            if(customCallback) {
+                customCallback(answer);
+
+            } else {
+                res.send(answer);
+            }
         }
     }
     
@@ -201,6 +206,32 @@ app.post('/api/:user/:repo/:mode/issues', function(req, res) {
     }
 
     apiCall(req, res, url);
+});
+
+// Get refs
+app.post('/api/:user/:repo/:branch/:mode/refs', function(req, res) {
+    let url = '/repos/' + req.params.user + '/' + req.params.repo + '/git/refs';
+
+    apiCall(req, res, url);
+});
+
+// Get tree
+app.post('/api/:user/:repo/:branch/:mode/tree/', function(req, res) {
+    let refsUrl = '/repos/' + req.params.user + '/' + req.params.repo + '/git/refs';
+
+    apiCall(req, res, refsUrl, function(refs) {
+        let sha = '';
+
+        for(let ref of refs) {
+            if(ref.ref == 'refs/heads/' + req.params.branch) {
+                sha = ref.object.sha;
+            }
+        }
+
+        let treeUrl = '/repos/' + req.params.user + '/' + req.params.repo + '/git/trees/' + sha + '?recursive=1';
+
+        apiCall(req, res, treeUrl);
+    });
 });
 
 // Get/set labels

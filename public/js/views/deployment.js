@@ -84,6 +84,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 }
             },
 
+            tree: {
+                fetch: function fetch(callback) {
+                    api.call('/api/' + req.params.user + '/' + req.params.repo + '/' + req.params.branch + '/fetch/tree', callback);
+                }
+            },
+
             issues: {
                 fetch: function fetch(callback) {
                     api.call('/api/' + req.params.user + '/' + req.params.repo + '/fetch/issues', callback);
@@ -131,20 +137,22 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 api.call('/api/' + req.params.user + '/' + req.params.repo, callback);
             },
 
-            branches: function branches(callback) {
-                api.call('/api/' + req.params.user + '/' + req.params.repo + '/branches/', function (branches) {
-                    branches.sort(function (a, b) {
-                        if (a.name < b.name) {
-                            return -1;
-                        } else if (a.name > b.name) {
-                            return 1;
-                        } else {
-                            return 0;
-                        }
-                    });
+            branches: {
+                get: function get(callback) {
+                    api.call('/api/' + req.params.user + '/' + req.params.repo + '/branches/', function (branches) {
+                        branches.sort(function (a, b) {
+                            if (a.name < b.name) {
+                                return -1;
+                            } else if (a.name > b.name) {
+                                return 1;
+                            } else {
+                                return 0;
+                            }
+                        });
 
-                    callback(branches);
-                });
+                        callback(branches);
+                    });
+                }
             }
         };
     }, {}], 2: [function (require, module, exports) {
@@ -479,9 +487,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 key: "prerender",
                 value: function prerender() {}
             }, {
-                key: "fetch",
-                value: function fetch() {}
-            }, {
                 key: "render",
                 value: function render() {}
             }, {
@@ -587,7 +592,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                             $.getJSON(view.modelUrl, function (data) {
                                 view.model = data;
 
-                                view.readyOrInit();
+                                view.init();
                             });
 
                             // Get model with function
@@ -595,34 +600,29 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                                 view.modelFunction(function (data) {
                                     view.model = data;
 
-                                    view.readyOrInit();
+                                    view.init();
                                 });
 
                                 // Just perform the initialisation
                             } else {
-                                    view.readyOrInit();
+                                    view.init();
                                 }
                     }
 
                     // Get rendered content from URL
                     if (typeof view.renderUrl === 'string') {
-                        $.ajax({
-                            url: view.renderUrl,
-                            type: 'get',
-                            success: function success(html) {
-
-                                if (view.$element) {
-                                    view.$element.append(html);
-                                } else {
-                                    view.$element = $(html);
-                                }
-
-                                // And then get the model
-                                getModel();
+                        $.get(view.renderUrl, function (html) {
+                            if (view.$element) {
+                                view.$element.append(html);
+                            } else {
+                                view.$element = $(html);
                             }
+
+                            // And then get the model
+                            getModel();
                         });
 
-                        // Just get the model
+                        // If no render url is defined, just get the model
                     } else {
                             getModel();
                         }
@@ -645,7 +645,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
                 var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Deployment).call(this, args));
 
-                _this.init();
+                _this.modelFunction = api.branches.get;
+
+                _this.fetch();
                 return _this;
             }
 
@@ -679,48 +681,46 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 })(function () {
                     var view = this;
 
-                    api.branches(function (branches) {
-                        $('.page-content').html(_.div({ class: 'container' }, _.each(branches, function (i, branch) {
-                            i = parseInt(i);
+                    $('.page-content').html(_.div({ class: 'container' }, _.each(this.model, function (i, branch) {
+                        i = parseInt(i);
 
-                            function onClickMergeUp(e) {
-                                var $container = $(this).parents('.repo-actions');
+                        function onClickMergeUp(e) {
+                            var $container = $(this).parents('.repo-actions');
 
-                                $container.find('.progress').toggleClass('hidden', false);
-                                $container.find('.btn-group').toggleClass('hidden', true);
+                            $container.find('.progress').toggleClass('hidden', false);
+                            $container.find('.btn-group').toggleClass('hidden', true);
 
-                                api.merge(req.params.user, req.params.repo, branches[i].name, branches[i + 1].name, function (merge) {
-                                    console.log(merge);
-                                    render();
-                                });
-                            }
-
-                            function onClickMergeDown(e) {
-                                var $container = $(this).parents('.repo-actions');
-
-                                $container.find('.progress').toggleClass('hidden', false);
-                                $container.find('.btn-group').toggleClass('hidden', true);
-
-                                api.merge(req.params.user, req.params.repo, branches[i + 1].name, branches[i].name, function (merge) {
-                                    console.log(merge);
-                                    render();
-                                });
-                            }
-
-                            var $branch = _.div({ class: 'panel panel-primary branch', id: branch.name }, [_.div({ class: 'panel-heading' }, _.h4({ class: 'panel-title text-center' }, branch.name)), _.div({ class: 'panel-body' }, _.div({ class: 'row' }, [_.div({ class: 'col-md-6' }, _.div({ class: 'panel panel-default' }, [_.div({ class: 'panel-heading' }, _.h4({ class: 'panel-title' }, 'updated at ' + helper.formatDate(branch.updated.date) + ' by <a href="mailto:' + branch.updated.email + '">' + branch.updated.name + '</a>')), _.div({ class: 'panel-body' }, branch.updated.message)])), _.div({ class: 'col-md-6' }, _.div({ class: 'btn-group' }, [_.a({ class: 'btn btn-default', href: '/repos/' + req.params.user + '/' + req.params.repo + '/' + branch.name + '/cms/' }, 'Go to CMS'), _.a({ class: 'btn btn-default', href: '/redir/website/' + req.params.repo + '/' + branch.name }, 'Go to website'), _.a({ class: 'btn btn-default', href: branch.Links.html }, 'Go to repo')]))]))]);
-
-                            var $actions = _.div({ class: 'repo-actions' }, [_.div({ class: 'progress hidden' }, _.div({ class: 'progress-bar progress-bar-striped active', role: 'progressbar', 'aria-valuenow': 100, 'aria-valuemax': 100, style: 'width:100%' })), _.div({ class: 'btn-group' }, [_.button({ class: 'btn btn-lg btn-primary' }, _.span({ class: 'glyphicon glyphicon-download' })).click(onClickMergeDown), _.button({ class: 'btn btn-lg btn-primary' }, _.span({ class: 'glyphicon glyphicon-upload' })).click(onClickMergeUp)])]);
-
-                            return [$branch, i < branches.length - 1 ? $actions : null];
-                        })));
-
-                        for (var b = 1; b < branches.length; b++) {
-                            var base = branches[b];
-                            var head = branches[b - 1];
-
-                            view.compareBranches(base.name, head.name);
+                            api.merge(req.params.user, req.params.repo, view.model[i].name, view.model[i + 1].name, function (merge) {
+                                console.log(merge);
+                                render();
+                            });
                         }
-                    });
+
+                        function onClickMergeDown(e) {
+                            var $container = $(this).parents('.repo-actions');
+
+                            $container.find('.progress').toggleClass('hidden', false);
+                            $container.find('.btn-group').toggleClass('hidden', true);
+
+                            api.merge(req.params.user, req.params.repo, view.model[i + 1].name, view.model[i].name, function (merge) {
+                                console.log(merge);
+                                render();
+                            });
+                        }
+
+                        var $branch = _.div({ class: 'panel panel-primary branch', id: branch.name }, [_.div({ class: 'panel-heading' }, _.h4({ class: 'panel-title text-center' }, branch.name)), _.div({ class: 'panel-body' }, _.div({ class: 'row' }, [_.div({ class: 'col-md-6' }, _.div({ class: 'panel panel-default' }, [_.div({ class: 'panel-heading' }, _.h4({ class: 'panel-title' }, 'updated at ' + helper.formatDate(branch.updated.date) + ' by <a href="mailto:' + branch.updated.email + '">' + branch.updated.name + '</a>')), _.div({ class: 'panel-body' }, branch.updated.message)])), _.div({ class: 'col-md-6' }, _.div({ class: 'btn-group' }, [_.a({ class: 'btn btn-default', href: '/repos/' + req.params.user + '/' + req.params.repo + '/' + branch.name + '/cms/' }, 'Go to CMS'), _.a({ class: 'btn btn-default', href: '/redir/website/' + req.params.repo + '/' + branch.name }, 'Go to website'), _.a({ class: 'btn btn-default', href: branch.Links.html }, 'Go to repo')]))]))]);
+
+                        var $actions = _.div({ class: 'repo-actions' }, [_.div({ class: 'progress hidden' }, _.div({ class: 'progress-bar progress-bar-striped active', role: 'progressbar', 'aria-valuenow': 100, 'aria-valuemax': 100, style: 'width:100%' })), _.div({ class: 'btn-group' }, [_.button({ class: 'btn btn-lg btn-primary' }, _.span({ class: 'glyphicon glyphicon-download' })).click(onClickMergeDown), _.button({ class: 'btn btn-lg btn-primary' }, _.span({ class: 'glyphicon glyphicon-upload' })).click(onClickMergeUp)])]);
+
+                        return [$branch, i < view.model.length - 1 ? $actions : null];
+                    })));
+
+                    for (var b = 1; b < this.model.length; b++) {
+                        var base = this.model[b];
+                        var head = this.model[b - 1];
+
+                        view.compareBranches(base.name, head.name);
+                    }
                 })
             }]);
 

@@ -63,6 +63,12 @@ window.api = {
         }
     },
 
+    tree: {
+        fetch: function(callback) {
+            api.call('/api/' + req.params.user + '/' + req.params.repo + '/' + req.params.branch + '/fetch/tree', callback);
+        }
+    },
+
     issues: {
         fetch: function(callback) {
             api.call('/api/' + req.params.user + '/' + req.params.repo + '/fetch/issues', callback);
@@ -110,19 +116,21 @@ window.api = {
         api.call('/api/' + req.params.user + '/' + req.params.repo, callback);
     },
 
-    branches: function(callback) {
-        api.call('/api/' + req.params.user + '/' + req.params.repo + '/branches/', function(branches) {
-            branches.sort(function(a, b) {
-                if (a.name < b.name) {
-                    return -1;
-                } else if (a.name > b.name) {
-                    return 1;
-                } else {
-                    return 0;   
-                }
-            });
+    branches: {
+        get: function(callback) {
+            api.call('/api/' + req.params.user + '/' + req.params.repo + '/branches/', function(branches) {
+                branches.sort(function(a, b) {
+                    if (a.name < b.name) {
+                        return -1;
+                    } else if (a.name > b.name) {
+                        return 1;
+                    } else {
+                        return 0;   
+                    }
+                });
 
-            callback(branches);
-        });
+                callback(branches);
+            });
+        }
     }
 };

@@ -141,10 +141,6 @@ class View {
 
     }
 
-    fetch() {
-
-    }
-
     render() {
 
     }
@@ -232,7 +228,7 @@ class View {
                 $.getJSON(view.modelUrl, function(data) {
                     view.model = data;
                     
-                    view.readyOrInit();
+                    view.init();
                 });
             
             // Get model with function
@@ -240,34 +236,29 @@ class View {
                 view.modelFunction(function(data) {
                     view.model = data;
 
-                    view.readyOrInit();
+                    view.init();
                 });
 
             // Just perform the initialisation
             } else {
-                view.readyOrInit();
+                view.init();
             }
         }
 
         // Get rendered content from URL
         if(typeof view.renderUrl === 'string') {
-            $.ajax({
-                url: view.renderUrl,
-                type: 'get',
-                success: function(html) {
-
-                    if(view.$element) {
-                        view.$element.append(html);
-                    } else {
-                        view.$element = $(html);
-                    }
-
-                    // And then get the model
-                    getModel();
+            $.get(view.renderUrl, function(html) {
+                if(view.$element) {
+                    view.$element.append(html);
+                } else {
+                    view.$element = $(html);
                 }
+
+                // And then get the model
+                getModel();
             });
 
-        // Just get the model
+        // If no render url is defined, just get the model
         } else {
             getModel();    
         

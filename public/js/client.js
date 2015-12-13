@@ -80,6 +80,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 }
             },
 
+            tree: {
+                fetch: function fetch(callback) {
+                    api.call('/api/' + req.params.user + '/' + req.params.repo + '/' + req.params.branch + '/fetch/tree', callback);
+                }
+            },
+
             issues: {
                 fetch: function fetch(callback) {
                     api.call('/api/' + req.params.user + '/' + req.params.repo + '/fetch/issues', callback);
@@ -127,20 +133,22 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 api.call('/api/' + req.params.user + '/' + req.params.repo, callback);
             },
 
-            branches: function branches(callback) {
-                api.call('/api/' + req.params.user + '/' + req.params.repo + '/branches/', function (branches) {
-                    branches.sort(function (a, b) {
-                        if (a.name < b.name) {
-                            return -1;
-                        } else if (a.name > b.name) {
-                            return 1;
-                        } else {
-                            return 0;
-                        }
-                    });
+            branches: {
+                get: function get(callback) {
+                    api.call('/api/' + req.params.user + '/' + req.params.repo + '/branches/', function (branches) {
+                        branches.sort(function (a, b) {
+                            if (a.name < b.name) {
+                                return -1;
+                            } else if (a.name > b.name) {
+                                return 1;
+                            } else {
+                                return 0;
+                            }
+                        });
 
-                    callback(branches);
-                });
+                        callback(branches);
+                    });
+                }
             }
         };
     }, {}], 2: [function (require, module, exports) {
@@ -411,9 +419,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 key: "prerender",
                 value: function prerender() {}
             }, {
-                key: "fetch",
-                value: function fetch() {}
-            }, {
                 key: "render",
                 value: function render() {}
             }, {
@@ -519,7 +524,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                             $.getJSON(view.modelUrl, function (data) {
                                 view.model = data;
 
-                                view.readyOrInit();
+                                view.init();
                             });
 
                             // Get model with function
@@ -527,34 +532,29 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                                 view.modelFunction(function (data) {
                                     view.model = data;
 
-                                    view.readyOrInit();
+                                    view.init();
                                 });
 
                                 // Just perform the initialisation
                             } else {
-                                    view.readyOrInit();
+                                    view.init();
                                 }
                     }
 
                     // Get rendered content from URL
                     if (typeof view.renderUrl === 'string') {
-                        $.ajax({
-                            url: view.renderUrl,
-                            type: 'get',
-                            success: function success(html) {
-
-                                if (view.$element) {
-                                    view.$element.append(html);
-                                } else {
-                                    view.$element = $(html);
-                                }
-
-                                // And then get the model
-                                getModel();
+                        $.get(view.renderUrl, function (html) {
+                            if (view.$element) {
+                                view.$element.append(html);
+                            } else {
+                                view.$element = $(html);
                             }
+
+                            // And then get the model
+                            getModel();
                         });
 
-                        // Just get the model
+                        // If no render url is defined, just get the model
                     } else {
                             getModel();
                         }
