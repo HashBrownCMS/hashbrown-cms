@@ -2,6 +2,10 @@
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 (function e(t, n, r) {
@@ -633,82 +637,141 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         require('../client');
         require('./partials/navbar');
 
-        function compareBranches(base, head) {
-            api.compare(base, head, function (compare) {
-                $h4 = $('#' + base).children('.panel-heading').children('h4');
+        var Deployment = (function (_View) {
+            _inherits(Deployment, _View);
 
-                if (compare.aheadBy > 0) {
-                    $h4.append(' (ahead of ' + head + ' by ' + compare.aheadBy + ' commits)');
-                } else if (compare.behindBy > 0) {
-                    $h4.append(' (behind ' + head + ' by ' + compare.behindBy + ' commits)');
-                } else {
-                    $h4.append(' (in sync with ' + head + ')');
+            function Deployment(args) {
+                _classCallCheck(this, Deployment);
+
+                var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Deployment).call(this, args));
+
+                _this.init();
+                return _this;
+            }
+
+            _createClass(Deployment, [{
+                key: "compareBranches",
+                value: function compareBranches(base, head) {
+                    api.compare(base, head, function (compare) {
+                        var $h4 = $('#' + base).children('.panel-heading').children('h4');
+
+                        if (compare.aheadBy > 0) {
+                            $h4.append(' (ahead of ' + head + ' by ' + compare.aheadBy + ' commits)');
+                        } else if (compare.behindBy > 0) {
+                            $h4.append(' (behind ' + head + ' by ' + compare.behindBy + ' commits)');
+                        } else {
+                            $h4.append(' (in sync with ' + head + ')');
+                        }
+                    });
                 }
-            });
-        }
-
-        function render() {
-            api.branches(function (branches) {
-                $('.page-content').html(_.div({ class: 'container' }, _.each(branches, function (i, branch) {
-                    i = parseInt(i);
-
-                    function onClickMergeUp(e) {
-                        var $container = $(this).parents('.repo-actions');
-
-                        $container.find('.progress').toggleClass('hidden', false);
-                        $container.find('.btn-group').toggleClass('hidden', true);
-
-                        api.merge(req.params.user, req.params.repo, branches[i].name, branches[i + 1].name, function (merge) {
-                            console.log(merge);
-                            render();
-                        });
+            }, {
+                key: "render",
+                value: (function (_render) {
+                    function render() {
+                        return _render.apply(this, arguments);
                     }
 
-                    function onClickMergeDown(e) {
-                        var $container = $(this).parents('.repo-actions');
+                    render.toString = function () {
+                        return _render.toString();
+                    };
 
-                        $container.find('.progress').toggleClass('hidden', false);
-                        $container.find('.btn-group').toggleClass('hidden', true);
+                    return render;
+                })(function () {
+                    var view = this;
 
-                        api.merge(req.params.user, req.params.repo, branches[i + 1].name, branches[i].name, function (merge) {
-                            console.log(merge);
-                            render();
-                        });
-                    }
+                    api.branches(function (branches) {
+                        $('.page-content').html(_.div({ class: 'container' }, _.each(branches, function (i, branch) {
+                            i = parseInt(i);
 
-                    var $branch = _.div({ class: 'panel panel-primary branch', id: branch.name }, [_.div({ class: 'panel-heading' }, _.h4({ class: 'panel-title text-center' }, branch.name)), _.div({ class: 'panel-body' }, _.div({ class: 'row' }, [_.div({ class: 'col-md-6' }, _.div({ class: 'panel panel-default' }, [_.div({ class: 'panel-heading' }, _.h4({ class: 'panel-title' }, 'updated at ' + helper.formatDate(branch.updated.date) + ' by <a href="mailto:' + branch.updated.email + '">' + branch.updated.name + '</a>')), _.div({ class: 'panel-body' }, branch.updated.message)])), _.div({ class: 'col-md-6' }, _.div({ class: 'btn-group' }, [_.a({ class: 'btn btn-default', href: '/repos/' + req.params.user + '/' + req.params.repo + '/' + branch.name + '/cms/' }, 'Go to CMS'), _.a({ class: 'btn btn-default', href: '/redir/website/' + req.params.repo + '/' + branch.name }, 'Go to website'), _.a({ class: 'btn btn-default', href: branch.Links.html }, 'Go to repo')]))]))]);
+                            function onClickMergeUp(e) {
+                                var $container = $(this).parents('.repo-actions');
 
-                    var $actions = _.div({ class: 'repo-actions' }, [_.div({ class: 'progress hidden' }, _.div({ class: 'progress-bar progress-bar-striped active', role: 'progressbar', 'aria-valuenow': 100, 'aria-valuemax': 100, style: 'width:100%' })), _.div({ class: 'btn-group' }, [_.button({ class: 'btn btn-lg btn-primary' }, _.span({ class: 'glyphicon glyphicon-download' })).click(onClickMergeDown), _.button({ class: 'btn btn-lg btn-primary' }, _.span({ class: 'glyphicon glyphicon-upload' })).click(onClickMergeUp)])]);
+                                $container.find('.progress').toggleClass('hidden', false);
+                                $container.find('.btn-group').toggleClass('hidden', true);
 
-                    return [$branch, i < branches.length - 1 ? $actions : null];
-                })));
+                                api.merge(req.params.user, req.params.repo, branches[i].name, branches[i + 1].name, function (merge) {
+                                    console.log(merge);
+                                    render();
+                                });
+                            }
 
-                for (var b = 1; b < branches.length; b++) {
-                    var base = branches[b];
-                    var head = branches[b - 1];
+                            function onClickMergeDown(e) {
+                                var $container = $(this).parents('.repo-actions');
 
-                    compareBranches(base.name, head.name);
-                }
-            });
-        }
+                                $container.find('.progress').toggleClass('hidden', false);
+                                $container.find('.btn-group').toggleClass('hidden', true);
 
-        render();
+                                api.merge(req.params.user, req.params.repo, branches[i + 1].name, branches[i].name, function (merge) {
+                                    console.log(merge);
+                                    render();
+                                });
+                            }
+
+                            var $branch = _.div({ class: 'panel panel-primary branch', id: branch.name }, [_.div({ class: 'panel-heading' }, _.h4({ class: 'panel-title text-center' }, branch.name)), _.div({ class: 'panel-body' }, _.div({ class: 'row' }, [_.div({ class: 'col-md-6' }, _.div({ class: 'panel panel-default' }, [_.div({ class: 'panel-heading' }, _.h4({ class: 'panel-title' }, 'updated at ' + helper.formatDate(branch.updated.date) + ' by <a href="mailto:' + branch.updated.email + '">' + branch.updated.name + '</a>')), _.div({ class: 'panel-body' }, branch.updated.message)])), _.div({ class: 'col-md-6' }, _.div({ class: 'btn-group' }, [_.a({ class: 'btn btn-default', href: '/repos/' + req.params.user + '/' + req.params.repo + '/' + branch.name + '/cms/' }, 'Go to CMS'), _.a({ class: 'btn btn-default', href: '/redir/website/' + req.params.repo + '/' + branch.name }, 'Go to website'), _.a({ class: 'btn btn-default', href: branch.Links.html }, 'Go to repo')]))]))]);
+
+                            var $actions = _.div({ class: 'repo-actions' }, [_.div({ class: 'progress hidden' }, _.div({ class: 'progress-bar progress-bar-striped active', role: 'progressbar', 'aria-valuenow': 100, 'aria-valuemax': 100, style: 'width:100%' })), _.div({ class: 'btn-group' }, [_.button({ class: 'btn btn-lg btn-primary' }, _.span({ class: 'glyphicon glyphicon-download' })).click(onClickMergeDown), _.button({ class: 'btn btn-lg btn-primary' }, _.span({ class: 'glyphicon glyphicon-upload' })).click(onClickMergeUp)])]);
+
+                            return [$branch, i < branches.length - 1 ? $actions : null];
+                        })));
+
+                        for (var b = 1; b < branches.length; b++) {
+                            var base = branches[b];
+                            var head = branches[b - 1];
+
+                            view.compareBranches(base.name, head.name);
+                        }
+                    });
+                })
+            }]);
+
+            return Deployment;
+        })(View);
+
+        new Deployment();
     }, { "../client": 2, "./partials/navbar": 6 }], 6: [function (require, module, exports) {
-        api.repo(function (repo) {
-            $('.navbar-content').html(_.div({ class: 'navbar navbar-default' }, _.div({ class: 'container' }, [_.ul({ class: 'nav navbar-nav' }, [_.li(_.a({ href: '/repos/' + req.params.user }, [_.span({ class: 'glyphicon glyphicon-arrow-left' }), ' Repos'])), _.li(_.a({ href: '/repos/' + req.params.user + '/' + req.params.repo + '/deployment/' }, [_.span({ class: 'glyphicon glyphicon-upload' }), ' Deployment'])), _.li(_.a({ href: '/repos/' + req.params.user + '/' + req.params.repo + '/collaborators/' }, [_.span({ class: 'glyphicon glyphicon-user' }), ' Collaborators'])), _.li(_.a({ href: '/repos/' + req.params.user + '/' + req.params.repo + '/issues/' }, [_.span({ class: 'glyphicon glyphicon-exclamation-sign' }), ' Issues'])), _.li(_.a({ href: '/repos/' + req.params.user + '/' + req.params.repo + '/settings/' }, [_.span({ class: 'glyphicon glyphicon-cog' }), ' Settings']))]), _.ul({ class: 'nav navbar-nav navbar-right' }, _.li({ class: 'navbar-btn' }, _.div({ class: 'input-group' }, [_.span({ class: 'input-group-addon' }, 'git'), function () {
-                var element = _.input({ class: 'form-control', type: 'text', value: '' });
+        var Navbar = (function (_View2) {
+            _inherits(Navbar, _View2);
 
-                element.attr('value', repo.cloneUrl);
+            function Navbar(args) {
+                _classCallCheck(this, Navbar);
 
-                return element;
-            }])))])));
+                var _this2 = _possibleConstructorReturn(this, Object.getPrototypeOf(Navbar).call(this, args));
 
-            // Set active navigation button
-            $('.navbar-content .navbar-nav li').each(function (i) {
-                var a = $(this).children('a');
-                var isActive = location.pathname == a.attr('href') || location.pathname + '/' == a.attr('href');
+                var view = _this2;
 
-                $(this).toggleClass('active', isActive);
-            });
-        });
+                api.repo(function (repo) {
+                    view.repo = repo;
+
+                    view.init();
+                });
+                return _this2;
+            }
+
+            _createClass(Navbar, [{
+                key: "render",
+                value: function render() {
+                    var view = this;
+
+                    $('.navbar-content').html(_.div({ class: 'navbar navbar-default' }, _.div({ class: 'container' }, [_.ul({ class: 'nav navbar-nav' }, [_.li(_.a({ href: '/repos/' + req.params.user }, [_.span({ class: 'glyphicon glyphicon-arrow-left' }), ' Repos'])), _.li(_.a({ href: '/repos/' + req.params.user + '/' + req.params.repo + '/deployment/' }, [_.span({ class: 'glyphicon glyphicon-upload' }), ' Deployment'])), _.li(_.a({ href: '/repos/' + req.params.user + '/' + req.params.repo + '/collaborators/' }, [_.span({ class: 'glyphicon glyphicon-user' }), ' Collaborators'])), _.li(_.a({ href: '/repos/' + req.params.user + '/' + req.params.repo + '/issues/' }, [_.span({ class: 'glyphicon glyphicon-exclamation-sign' }), ' Issues'])), _.li(_.a({ href: '/repos/' + req.params.user + '/' + req.params.repo + '/settings/' }, [_.span({ class: 'glyphicon glyphicon-cog' }), ' Settings']))]), _.ul({ class: 'nav navbar-nav navbar-right' }, _.li({ class: 'navbar-btn' }, _.div({ class: 'input-group' }, [_.span({ class: 'input-group-addon' }, 'git'), function () {
+                        var element = _.input({ class: 'form-control', type: 'text', value: '' });
+
+                        element.attr('value', view.repo.cloneUrl);
+
+                        return element;
+                    }])))])));
+
+                    // Set active navigation button
+                    $('.navbar-content .navbar-nav li').each(function (i) {
+                        var a = $(this).children('a');
+                        var isActive = location.pathname == a.attr('href') || location.pathname + '/' == a.attr('href');
+
+                        $(this).toggleClass('active', isActive);
+                    });
+                }
+            }]);
+
+            return Navbar;
+        })(View);
+
+        new Navbar();
     }, {}] }, {}, [5]);

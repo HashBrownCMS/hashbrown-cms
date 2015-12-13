@@ -787,21 +787,49 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
         new Settings();
     }, { "../client": 2, "./partials/navbar": 6 }], 6: [function (require, module, exports) {
-        api.repo(function (repo) {
-            $('.navbar-content').html(_.div({ class: 'navbar navbar-default' }, _.div({ class: 'container' }, [_.ul({ class: 'nav navbar-nav' }, [_.li(_.a({ href: '/repos/' + req.params.user }, [_.span({ class: 'glyphicon glyphicon-arrow-left' }), ' Repos'])), _.li(_.a({ href: '/repos/' + req.params.user + '/' + req.params.repo + '/deployment/' }, [_.span({ class: 'glyphicon glyphicon-upload' }), ' Deployment'])), _.li(_.a({ href: '/repos/' + req.params.user + '/' + req.params.repo + '/collaborators/' }, [_.span({ class: 'glyphicon glyphicon-user' }), ' Collaborators'])), _.li(_.a({ href: '/repos/' + req.params.user + '/' + req.params.repo + '/issues/' }, [_.span({ class: 'glyphicon glyphicon-exclamation-sign' }), ' Issues'])), _.li(_.a({ href: '/repos/' + req.params.user + '/' + req.params.repo + '/settings/' }, [_.span({ class: 'glyphicon glyphicon-cog' }), ' Settings']))]), _.ul({ class: 'nav navbar-nav navbar-right' }, _.li({ class: 'navbar-btn' }, _.div({ class: 'input-group' }, [_.span({ class: 'input-group-addon' }, 'git'), function () {
-                var element = _.input({ class: 'form-control', type: 'text', value: '' });
+        var Navbar = (function (_View2) {
+            _inherits(Navbar, _View2);
 
-                element.attr('value', repo.cloneUrl);
+            function Navbar(args) {
+                _classCallCheck(this, Navbar);
 
-                return element;
-            }])))])));
+                var _this2 = _possibleConstructorReturn(this, Object.getPrototypeOf(Navbar).call(this, args));
 
-            // Set active navigation button
-            $('.navbar-content .navbar-nav li').each(function (i) {
-                var a = $(this).children('a');
-                var isActive = location.pathname == a.attr('href') || location.pathname + '/' == a.attr('href');
+                var view = _this2;
 
-                $(this).toggleClass('active', isActive);
-            });
-        });
+                api.repo(function (repo) {
+                    view.repo = repo;
+
+                    view.init();
+                });
+                return _this2;
+            }
+
+            _createClass(Navbar, [{
+                key: "render",
+                value: function render() {
+                    var view = this;
+
+                    $('.navbar-content').html(_.div({ class: 'navbar navbar-default' }, _.div({ class: 'container' }, [_.ul({ class: 'nav navbar-nav' }, [_.li(_.a({ href: '/repos/' + req.params.user }, [_.span({ class: 'glyphicon glyphicon-arrow-left' }), ' Repos'])), _.li(_.a({ href: '/repos/' + req.params.user + '/' + req.params.repo + '/deployment/' }, [_.span({ class: 'glyphicon glyphicon-upload' }), ' Deployment'])), _.li(_.a({ href: '/repos/' + req.params.user + '/' + req.params.repo + '/collaborators/' }, [_.span({ class: 'glyphicon glyphicon-user' }), ' Collaborators'])), _.li(_.a({ href: '/repos/' + req.params.user + '/' + req.params.repo + '/issues/' }, [_.span({ class: 'glyphicon glyphicon-exclamation-sign' }), ' Issues'])), _.li(_.a({ href: '/repos/' + req.params.user + '/' + req.params.repo + '/settings/' }, [_.span({ class: 'glyphicon glyphicon-cog' }), ' Settings']))]), _.ul({ class: 'nav navbar-nav navbar-right' }, _.li({ class: 'navbar-btn' }, _.div({ class: 'input-group' }, [_.span({ class: 'input-group-addon' }, 'git'), function () {
+                        var element = _.input({ class: 'form-control', type: 'text', value: '' });
+
+                        element.attr('value', view.repo.cloneUrl);
+
+                        return element;
+                    }])))])));
+
+                    // Set active navigation button
+                    $('.navbar-content .navbar-nav li').each(function (i) {
+                        var a = $(this).children('a');
+                        var isActive = location.pathname == a.attr('href') || location.pathname + '/' == a.attr('href');
+
+                        $(this).toggleClass('active', isActive);
+                    });
+                }
+            }]);
+
+            return Navbar;
+        })(View);
+
+        new Navbar();
     }, {}] }, {}, [5]);

@@ -2,6 +2,10 @@
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 (function e(t, n, r) {
@@ -632,11 +636,37 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }, {}], 5: [function (require, module, exports) {
         require('../client');
 
-        $('.navbar-content').html(_.div({ class: 'navbar navbar-default' }, _.div({ class: 'container' }, _.ul({ class: 'nav navbar-nav' }, _.li(_.a({ href: '/' }, [_.span({ class: 'glyphicon glyphicon-arrow-left' }), ' Logout']))))));
+        var Repos = (function (_View) {
+            _inherits(Repos, _View);
 
-        api.repos(function (repos) {
-            $('.page-content').html(_.div({ class: 'container dashboard-container' }, _.div({ class: 'row' }, _.each(repos, function (i, repo) {
-                return _.div({ class: 'col-md-4' }, _.div({ class: 'panel panel-primary' }, [_.div({ class: 'panel-heading' }, _.h4({ class: 'panel-title' }, repo.name)), _.div({ class: 'panel-body' }, [_.p(repo.description), _.a({ class: 'btn btn-primary center-block', href: '/repos/' + repo.fullName + '/deployment/' }, 'Open')])]));
-            }))));
-        });
+            function Repos(args) {
+                _classCallCheck(this, Repos);
+
+                var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Repos).call(this, args));
+
+                var view = _this;
+
+                api.repos(function (repos) {
+                    view.repos = repos;
+
+                    view.init();
+                });
+                return _this;
+            }
+
+            _createClass(Repos, [{
+                key: "render",
+                value: function render() {
+                    $('.navbar-content').html(_.div({ class: 'navbar navbar-default' }, _.div({ class: 'container' }, _.ul({ class: 'nav navbar-nav' }, _.li(_.a({ href: '/' }, [_.span({ class: 'glyphicon glyphicon-arrow-left' }), ' Logout']))))));
+
+                    $('.page-content').html(_.div({ class: 'container dashboard-container' }, _.div({ class: 'row' }, _.each(this.repos, function (i, repo) {
+                        return _.div({ class: 'col-md-4' }, _.div({ class: 'panel panel-primary' }, [_.div({ class: 'panel-heading' }, _.h4({ class: 'panel-title' }, repo.name)), _.div({ class: 'panel-body' }, [_.p(repo.description), _.a({ class: 'btn btn-primary center-block', href: '/repos/' + repo.fullName + '/deployment/' }, 'Open')])]));
+                    }))));
+                }
+            }]);
+
+            return Repos;
+        })(View);
+
+        new Repos();
     }, { "../client": 2 }] }, {}, [5]);

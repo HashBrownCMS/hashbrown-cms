@@ -2,6 +2,10 @@
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 (function e(t, n, r) {
@@ -632,39 +636,66 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }, {}], 5: [function (require, module, exports) {
         require('../client');
 
-        function onSubmit(e) {
-            e.preventDefault();
+        var Login = (function (_View) {
+            _inherits(Login, _View);
 
-            var data = $(this).serialize();
+            function Login(args) {
+                _classCallCheck(this, Login);
 
-            $('.panel-body .btn').toggleClass('disabled', true).val('Loading...');
+                // Register events
 
-            $.post('/api/login/', data, function (res) {
-                console.log(res);
+                var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Login).call(this, args));
 
-                if (res.err) {
-                    alert(res.err.json.message);
-                    $('.panel-body .btn').toggleClass('disabled', false).val('Login');
-                } else {
-                    $.post('/api/orgs/', data, function (orgs) {
-                        localStorage.setItem('gh-oauth-token', res.token);
+                _this.on('submit', _this.onSubmit);
+                _this.on('clickEnter', _this.onClickEnter);
 
-                        function onClickEnter() {
-                            var sel = $('.panel-body select');
+                _this.init();
+                return _this;
+            }
 
-                            location = '/repos/' + sel.val();
+            _createClass(Login, [{
+                key: "onClickEnter",
+                value: function onClickEnter() {
+                    var sel = $('.panel-body select');
+
+                    location = '/repos/' + sel.val();
+                }
+            }, {
+                key: "onSubmit",
+                value: function onSubmit(e, element, view) {
+                    e.preventDefault();
+
+                    var data = $(element).serialize();
+
+                    $('.credentials .btn').toggleClass('disabled', true).val('Loading...');
+
+                    $.post('/api/login/', data, function (res) {
+                        if (res.err) {
+                            alert(res.err.json.message);
+                            $('.credentials .btn').toggleClass('disabled', false).val('Login');
+                        } else {
+                            $.post('/api/orgs/', data, function (orgs) {
+                                $('.credentials').toggleClass('hidden', true);
+                                $('.organization').toggleClass('hidden', false);
+
+                                localStorage.setItem('gh-oauth-token', res.token);
+
+                                $('.organization select').html(_.each(orgs, function (i, org) {
+                                    return _.option({ value: org.login }, org.login);
+                                }));
+                            });
                         }
-
-                        $('.panel-body').empty();
-                        $('.panel-body').append([_.select({ class: 'form-control' }, _.each(orgs, function (i, org) {
-                            return _.option({ value: org.login }, org.login);
-                        })), _.button({ class: 'btn btn-primary form-control' }, 'Enter').click(onClickEnter)]);
-
-                        console.log(orgs);
                     });
                 }
-            });
-        }
+            }, {
+                key: "render",
+                value: function render() {
+                    $('.page-content').html(_.div({ class: 'container' }, [this.$credentials = _.div({ class: 'panel panel-primary credentials' }, [_.div({ class: 'panel-heading' }, _.h4({ class: 'panel-title' }, 'Putaitu CMS: Login')), _.div({ class: 'panel-body' }, _.form({ action: req.query.sender || '/repos/' }, [_.input({ class: 'form-control', name: 'username', required: true, type: 'text', placeholder: 'Username' }), _.input({ class: 'form-control', name: 'password', required: true, type: 'password', placeholder: 'Password' }), _.input({ class: 'form-control btn btn-primary', type: 'submit', value: 'Login' })]).on('submit', this.events.submit))]), this.$organization = _.div({ class: 'panel panel-primary organization hidden' }, [_.div({ class: 'panel-heading' }, _.h4({ class: 'panel-title' }, 'Putaitu CMS: Pick organisation')), _.div({ class: 'panel-body' }, [_.select({ class: 'form-control' }), _.button({ class: 'btn btn-primary form-control' }, 'Enter').click(this.events.clickEnter)])])]));
+                }
+            }]);
 
-        $('.page-content').html(_.div({ class: 'container' }, _.div({ class: 'panel panel-primary' }, [_.div({ class: 'panel-heading' }, _.h4({ class: 'panel-title' }, 'Putaitu CMS')), _.div({ class: 'panel-body' }, _.form({ action: req.query.sender || '/repos/' }, [_.input({ class: 'form-control', name: 'username', required: true, type: 'text', placeholder: 'Username' }), _.input({ class: 'form-control', name: 'password', required: true, type: 'password', placeholder: 'Password' }), _.input({ class: 'form-control btn btn-primary', type: 'submit', value: 'Login' })]).on('submit', onSubmit))])));
+            return Login;
+        })(View);
+
+        new Login();
     }, { "../client": 2 }] }, {}, [5]);
