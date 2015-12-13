@@ -5,7 +5,9 @@ class Tree extends View {
         this.dirs = {};
 
         // Register events
-        this.on('openFolder', this.onOpenFolder);
+        this.on('clickFolder', this.onClickFolder);
+        this.on('clickFile', this.onClickFile);
+        this.on('clickCloseRootNav', this.onClickCloseRootNav);
 
         // Prerender container
         this.$element = _.div({class: 'tree'});
@@ -17,12 +19,35 @@ class Tree extends View {
     /**
      * Events
      */
-    onOpenFolder(e, element, view) {
-        let path = $(e.target).data('path');
+    onClickFolder(e, element, view) {
+        e.preventDefault();
 
+        let path = $(element).attr('href');
+        
+        let $folder = $(element).parent();
+
+        $folder.toggleClass('active');
+        $folder.siblings().each(function(i) {
+            let active = !$folder.hasClass('active');
+
+            $(this).toggleClass('active', active);
+            $(this).find('.folder').toggleClass('active', active);
+        });
+        
         if(path.indexOf('/media') == 0) {
             page(path);
         }
+    }
+
+    onClickFile(e, element, view) {
+        e.preventDefault();
+
+        page($(element).attr('href'));
+    }
+
+    onClickCloseRootNav(e, element, view) {
+        view.$element.find('.nav-root > li').toggleClass('active', false);
+        view.$element.find('.tab-pane').toggleClass('active', false);
     }
 
     /**
@@ -91,10 +116,14 @@ class Tree extends View {
         let view = this;
 
         this.$element.html([
+            // Close root nav button
+            _.button({class: 'btn close'},
+                _.span({class: 'glyphicon glyphicon-remove'})
+            ).click(view.events.clickCloseRootNav),
+
             // Root folders
             this.$rootNav = _.ul({class: 'nav nav-root nav-tabs', role: 'tablist'},
-                _.each(
-                    this.dirs,
+                _.each(this.dirs,
                     function(label, files) {
                         return _.li(
                             { role: 'presentation', class: '' },
@@ -111,53 +140,54 @@ class Tree extends View {
             this.$subNav = _.nav({class: 'tab-content nav-sub'},
                 _.each(this.dirs,
                     function(label, files) {
-                        return _.div({role: 'tab-panel', id: label, class: 'list-group tab-pane'},
-                            _.each(
-                                files,
-                                function(i, file) {
-                                    var isDir = file.mode == '040000';
-                                    var name = helper.basename(file.path);
-                                
-                                    if(isDir) {
-                                        return _.panel({class: 'panel-default'}, [
-                                            _.panel_heading({role: 'tab'},
-                                                _.a({class: 'panel-title collapsed', 'data-toggle': 'collapse', role: 'button', href: '#' + file.sha, 'data-path': '/' + file.path}, [
-                                                    name,
+                        return _.div({role: 'tab-panel', id: label, class: 'tab-pane'},
+                            _.ul({class: 'folder-content'},
+                                _.each(
+                                    files,
+                                    function(i, file) {
+                                        var isDir = file.mode == '040000';
+                                        var name = helper.basename(file.path);
+                                    
+                                        if(isDir) {
+                                            return _.li({class: 'folder'}, [
+                                                _.a({href: '/' + file.path}, [
                                                     _.glyphicon({ class: 'glyphicon-folder-close' }),
-                                                    _.glyphicon({ class: 'glyphicon-folder-open' })
-                                                ]).click(view.events.openFolder)
-                                            ),
-                                            _.panel_collapse({class: 'collapse', role: 'tabpanel', id: file.sha},
-                                                _.panel_body()
-                                            )
-                                        ]);
+                                                    name
+                                                ]).click(view.events.clickFolder),
+                                                _.ul({class: 'folder-content', id: file.sha})
+                                            ]);
 
-                                    } else {
-                                        return _.a({class: 'list-group-item', href: '/' + file.path}, [
-                                            name,
-                                            _.glyphicon({ class: 'glyphicon-file' })
-                                        ]).click(function(e) {
-                                            e.preventDefault();
-
-                                            page($(this).attr('href'));
-                                        });
-
+                                        } else {
+                                            return _.li({class: 'file'},
+                                                _.a({href: '/' + file.path}, [
+                                                    _.glyphicon({ class: 'glyphicon-file' }),
+                                                    name
+                                                ]).click(view.events.clickFile)
+                                            );
+                                        }
                                     }
-                                }
+                                )
                             )
-                        )
+                        );
                     }
                 )
             )
         ]);
 
         // Put files into folders
-        view.$subNav.find('.list-group-item').each(function(i) {
-            let dir = helper.basedir($(this).attr('href'));
+        view.$subNav.find('.file, .folder').each(function(i) {
+            let path = $(this).children('a').attr('href');
+            let dir = helper.basedir(path);
             
-            view.$subNav.find('a[data-path="' + dir + '"]').parents('.panel').eq(0).find('.panel-body').append(
-                $(this)
-            );
+            let $folder = view.$subNav.find('.folder a[href="' + dir + '"]').parent();
+           
+            console.log(dir, $folder.length);
+
+            if($folder) {
+                $folder.children('.folder-content').append(
+                    $(this)
+                );
+            }
         });
     }
 }

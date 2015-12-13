@@ -362,7 +362,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     if (type) {
                         for (var i in instances) {
                             var instance = instances[i];
-                            var name = instance.constructor.name;
+                            var name = instance.name;
 
                             if (name == type) {
                                 results.push(instance);
@@ -378,8 +378,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 key: "get",
                 value: function get(type) {
                     var results = ViewHelper.getAll(type);
+                    var view = results.length > 0 ? results[0] : null;
 
-                    return results.length > 0 ? results[0] : null;
+                    return view;
                 }
             }, {
                 key: "clear",
@@ -427,7 +428,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             function View(args) {
                 _classCallCheck(this, View);
 
-                this.name = this.getName();
+                this.name = this.constructor.name;
                 this.guid = guid();
                 this.events = {};
 
@@ -439,7 +440,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             _createClass(View, [{
                 key: "getName",
                 value: function getName() {
-                    var name = constructor.toString();
+                    var name = this.constructor.toString();
                     name = name.substring('function '.length);
                     name = name.substring(0, name.indexOf('('));
 
@@ -710,7 +711,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     // Pages
                     page('/pages/:path', function (ctx) {
                         api.file.fetch(ctx.path, function (content) {
-                            ViewHelper.get('Editor').show(content);
+                            ViewHelper.get('Editor').open(content);
                         });
                     });
 
@@ -742,7 +743,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
                 var _this2 = _possibleConstructorReturn(this, Object.getPrototypeOf(Editor).call(this, args));
 
-                self.$element = _.div({ class: 'container editor' });
+                _this2.$element = _.div({ class: 'panel editor' });
                 return _this2;
             }
 
@@ -776,7 +777,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 _this3.dirs = {};
 
                 // Register events
-                _this3.on('openFolder', _this3.onOpenFolder);
+                _this3.on('clickFolder', _this3.onClickFolder);
+                _this3.on('clickFile', _this3.onClickFile);
+                _this3.on('clickCloseRootNav', _this3.onClickCloseRootNav);
 
                 // Prerender container
                 _this3.$element = _.div({ class: 'tree' });
@@ -791,13 +794,38 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
              */
 
             _createClass(Tree, [{
-                key: "onOpenFolder",
-                value: function onOpenFolder(e, element, view) {
-                    var path = $(e.target).data('path');
+                key: "onClickFolder",
+                value: function onClickFolder(e, element, view) {
+                    e.preventDefault();
+
+                    var path = $(element).attr('href');
+
+                    var $folder = $(element).parent();
+
+                    $folder.toggleClass('active');
+                    $folder.siblings().each(function (i) {
+                        var active = !$folder.hasClass('active');
+
+                        $(this).toggleClass('active', active);
+                        $(this).find('.folder').toggleClass('active', active);
+                    });
 
                     if (path.indexOf('/media') == 0) {
                         page(path);
                     }
+                }
+            }, {
+                key: "onClickFile",
+                value: function onClickFile(e, element, view) {
+                    e.preventDefault();
+
+                    page($(element).attr('href'));
+                }
+            }, {
+                key: "onClickCloseRootNav",
+                value: function onClickCloseRootNav(e, element, view) {
+                    view.$element.find('.nav-root > li').toggleClass('active', false);
+                    view.$element.find('.tab-pane').toggleClass('active', false);
                 }
 
                 /**
@@ -875,6 +903,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     var view = this;
 
                     this.$element.html([
+                    // Close root nav button
+                    _.button({ class: 'btn close' }, _.span({ class: 'glyphicon glyphicon-remove' })).click(view.events.clickCloseRootNav),
+
                     // Root folders
                     this.$rootNav = _.ul({ class: 'nav nav-root nav-tabs', role: 'tablist' }, _.each(this.dirs, function (label, files) {
                         return _.li({ role: 'presentation', class: '' }, _.a({ href: '#' + label, 'aria-controls': label, role: 'tab', 'data-toggle': 'tab' }, label));
@@ -882,27 +913,30 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
                     // Subfolders
                     this.$subNav = _.nav({ class: 'tab-content nav-sub' }, _.each(this.dirs, function (label, files) {
-                        return _.div({ role: 'tab-panel', id: label, class: 'list-group tab-pane' }, _.each(files, function (i, file) {
+                        return _.div({ role: 'tab-panel', id: label, class: 'tab-pane' }, _.ul({ class: 'folder-content' }, _.each(files, function (i, file) {
                             var isDir = file.mode == '040000';
                             var name = helper.basename(file.path);
 
                             if (isDir) {
-                                return _.panel({ class: 'panel-default' }, [_.panel_heading({ role: 'tab' }, _.a({ class: 'panel-title collapsed', 'data-toggle': 'collapse', role: 'button', href: '#' + file.sha, 'data-path': '/' + file.path }, [name, _.glyphicon({ class: 'glyphicon-folder-close' }), _.glyphicon({ class: 'glyphicon-folder-open' })]).click(view.events.openFolder)), _.panel_collapse({ class: 'collapse', role: 'tabpanel', id: file.sha }, _.panel_body())]);
+                                return _.li({ class: 'folder' }, [_.a({ href: '/' + file.path }, [_.glyphicon({ class: 'glyphicon-folder-close' }), name]).click(view.events.clickFolder), _.ul({ class: 'folder-content', id: file.sha })]);
                             } else {
-                                return _.a({ class: 'list-group-item', href: '/' + file.path }, [name, _.glyphicon({ class: 'glyphicon-file' })]).click(function (e) {
-                                    e.preventDefault();
-
-                                    page($(this).attr('href'));
-                                });
+                                return _.li({ class: 'file' }, _.a({ href: '/' + file.path }, [_.glyphicon({ class: 'glyphicon-file' }), name]).click(view.events.clickFile));
                             }
-                        }));
+                        })));
                     }))]);
 
                     // Put files into folders
-                    view.$subNav.find('.list-group-item').each(function (i) {
-                        var dir = helper.basedir($(this).attr('href'));
+                    view.$subNav.find('.file, .folder').each(function (i) {
+                        var path = $(this).children('a').attr('href');
+                        var dir = helper.basedir(path);
 
-                        view.$subNav.find('a[data-path="' + dir + '"]').parents('.panel').eq(0).find('.panel-body').append($(this));
+                        var $folder = view.$subNav.find('.folder a[href="' + dir + '"]').parent();
+
+                        console.log(dir, $folder.length);
+
+                        if ($folder) {
+                            $folder.children('.folder-content').append($(this));
+                        }
                     });
                 }
             }]);

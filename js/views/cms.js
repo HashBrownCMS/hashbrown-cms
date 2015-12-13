@@ -20,7 +20,7 @@ class CMS extends View {
         // Pages
         page('/pages/:path', function(ctx) {
             api.file.fetch(ctx.path, function(content) {
-                ViewHelper.get('Editor').show(content);
+                ViewHelper.get('Editor').open(content);
             });
         });
         

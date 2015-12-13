@@ -2,7 +2,7 @@ class Editor extends View {
     constructor(args) {
         super(args);
 
-        self.$element = _.div({class: 'container editor'});
+        this.$element = _.div({class: 'panel editor'});
     }
 
     open(content) {

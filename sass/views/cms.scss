@@ -1,2 +1,98 @@
-.page-container {
+.page-content {
+    .tree {
+        .tab-pane {
+            position: relative;
+            height: 0px;
+            transition: height 0.5s ease;
+            opacity: 0;
+            display: block;
+            
+            &.active {
+                opacity: 1;
+                height: 300px;
+                overflow-y: hidden;
+                overflow-x: auto;
+            }
+
+            ul, li {
+                padding: 0px;
+                margin: 0px;
+                list-style-type: none;
+            }
+
+            .folder-content {
+                position: absolute;
+                left: 0px;
+                top: 0px;
+                height: 300px;
+                width: 28%;
+                border-right: 1px solid #ddd;
+
+                a {
+                    display: block;
+                    padding: 5px 15px;
+
+                    .glyphicon {
+                        margin-right: 15px;
+                    }
+                }
+            }
+
+            .folder, .file {
+                height: 30px;
+                
+                >a {
+                    color: #666;
+                }
+                
+                &.active {
+                    background-color: #337ab7;
+                    color: #fff;
+
+                    &:after {
+                        color: #fff;
+                    }
+
+                    >a {
+                        color: #fff;
+                    }
+                }
+            }
+
+            .folder {
+                position: relative;
+
+                &:after {
+                    font-family: 'Glyphicons Halflings';
+                    content: '\e080';
+                    color: #ccc;
+                    position: absolute;
+                    right: 5px;
+                    top: 5px;
+                }
+                
+                &.active {
+                    >.folder-content {
+                        display: block;
+                    }
+                }
+
+                @for $i from 1 through 100 {
+                    $top: ($i - 1) * -30px;
+
+                    &:nth-child(#{$i}) {
+                        .folder-content {
+                            top: $top;
+                        }
+                    }
+                }
+
+                .folder-content {
+                    display: none;
+                    left: 100%;
+                    width: 100%;
+                }
+            }
+        }
+    }
 }

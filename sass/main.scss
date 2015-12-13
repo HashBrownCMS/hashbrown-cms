@@ -1,3 +1,6 @@
+/**
+ * Bootstrap mods
+ */
 .navbar-right {
     margin-right: 0px;
 }
@@ -45,6 +48,17 @@
     }
 }
 
+.collapse.width {
+    height: auto;
+    -webkit-transition: width 0.35s ease;
+    -moz-transition: width 0.35s ease;
+    -o-transition: width 0.35s ease;
+    transition: width 0.35s ease;
+}
+
+/**
+ * Custom elements
+ */
 @keyframes spinner {
     0% { transform: scale(1, 1); }
     50% { transform: scale(0.75, 0.75); }

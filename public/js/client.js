@@ -300,7 +300,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     if (type) {
                         for (var i in instances) {
                             var instance = instances[i];
-                            var name = instance.constructor.name;
+                            var name = instance.name;
 
                             if (name == type) {
                                 results.push(instance);
@@ -316,8 +316,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 key: "get",
                 value: function get(type) {
                     var results = ViewHelper.getAll(type);
+                    var view = results.length > 0 ? results[0] : null;
 
-                    return results.length > 0 ? results[0] : null;
+                    return view;
                 }
             }, {
                 key: "clear",
@@ -365,7 +366,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             function View(args) {
                 _classCallCheck(this, View);
 
-                this.name = this.getName();
+                this.name = this.constructor.name;
                 this.guid = guid();
                 this.events = {};
 
@@ -377,7 +378,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             _createClass(View, [{
                 key: "getName",
                 value: function getName() {
-                    var name = constructor.toString();
+                    var name = this.constructor.toString();
                     name = name.substring('function '.length);
                     name = name.substring(0, name.indexOf('('));
 

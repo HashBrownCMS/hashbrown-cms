@@ -38,7 +38,7 @@ class ViewHelper {
         if(type) {
             for(let i in instances) {
                 let instance = instances[i];
-                let name = instance.constructor.name;
+                let name = instance.name;
 
                 if(name == type) {
                     results.push(instance);
@@ -53,8 +53,9 @@ class ViewHelper {
 
     static get(type) {
         let results = ViewHelper.getAll(type);
+        let view = results.length > 0 ? results[0] : null;
 
-        return results.length > 0 ? results[0] : null;
+        return view;
     }
 
     static clear(type) {
@@ -93,7 +94,7 @@ class View {
      * Init
      */
     constructor(args) {
-        this.name = this.getName();
+        this.name = this.constructor.name;
         this.guid = guid();
         this.events = {};
 
@@ -103,7 +104,7 @@ class View {
     }
 
     getName() {
-        let name = constructor.toString();
+        let name = this.constructor.toString();
         name = name.substring('function '.length);
         name = name.substring(0, name.indexOf('('));
 
