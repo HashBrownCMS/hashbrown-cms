@@ -31,7 +31,7 @@ class Tree extends View {
             let active = !$folder.hasClass('active');
 
             $(this).toggleClass('active', active);
-            $(this).find('.folder').toggleClass('active', active);
+            $(this).find('.folder, .file').toggleClass('active', active);
         });
         
         if(path.indexOf('/media') == 0) {
@@ -42,7 +42,15 @@ class Tree extends View {
     onClickFile(e, element, view) {
         e.preventDefault();
 
-        page($(element).attr('href'));
+        let $file = $(element).parent();
+
+        $file.toggleClass('active', true);
+
+        let active = !$file.hasClass('active');
+
+        $file.siblings('.folder, .file').toggleClass('active', active);
+
+        //page($(element).attr('href'));
     }
 
     onClickCloseRootNav(e, element, view) {

@@ -807,7 +807,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                         var active = !$folder.hasClass('active');
 
                         $(this).toggleClass('active', active);
-                        $(this).find('.folder').toggleClass('active', active);
+                        $(this).find('.folder, .file').toggleClass('active', active);
                     });
 
                     if (path.indexOf('/media') == 0) {
@@ -819,7 +819,15 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 value: function onClickFile(e, element, view) {
                     e.preventDefault();
 
-                    page($(element).attr('href'));
+                    var $file = $(element).parent();
+
+                    $file.toggleClass('active', true);
+
+                    var active = !$file.hasClass('active');
+
+                    $file.siblings('.folder, .file').toggleClass('active', active);
+
+                    //page($(element).attr('href'));
                 }
             }, {
                 key: "onClickCloseRootNav",
