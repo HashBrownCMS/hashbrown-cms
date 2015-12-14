@@ -35,12 +35,12 @@ class Tree extends View {
         });
         
         if(path.indexOf('/media') == 0) {
-            page(path);
+            //page(path);
         }
     }
 
     onClickFile(e, element, view) {
-        e.preventDefault();
+        /*e.preventDefault();
 
         let $file = $(element).parent();
 
@@ -49,8 +49,7 @@ class Tree extends View {
         let active = !$file.hasClass('active');
 
         $file.siblings('.folder, .file').toggleClass('active', active);
-
-        //page($(element).attr('href'));
+        */
     }
 
     onClickCloseRootNav(e, element, view) {
@@ -76,6 +75,19 @@ class Tree extends View {
         });
 
         return array;
+    }
+
+    highlight(path) {
+        $('.tree .folder, .tree .file').toggleClass('active', false);
+
+        let $fileAnchor = $('.tree .file a[href="#/' + path + '"]');
+        let $file = $fileAnchor.parent();
+
+        $file.toggleClass('active', true);
+
+        $file.parents('.folder').toggleClass('active', true);
+
+        console.log(path);
     }
 
     filterPath(path, recursive) {
@@ -158,7 +170,7 @@ class Tree extends View {
                                     
                                         if(isDir) {
                                             return _.li({class: 'folder'}, [
-                                                _.a({href: '/' + file.path}, [
+                                                _.a({href: '#/' + file.path}, [
                                                     _.glyphicon({ class: 'glyphicon-folder-close' }),
                                                     name
                                                 ]).click(view.events.clickFolder),
@@ -167,7 +179,7 @@ class Tree extends View {
 
                                         } else {
                                             return _.li({class: 'file'},
-                                                _.a({href: '/' + file.path}, [
+                                                _.a({href: '#/' + file.path}, [
                                                     _.glyphicon({ class: 'glyphicon-file' }),
                                                     name
                                                 ]).click(view.events.clickFile)
@@ -188,8 +200,6 @@ class Tree extends View {
             let dir = helper.basedir(path);
             
             let $folder = view.$subNav.find('.folder a[href="' + dir + '"]').parent();
-           
-            console.log(dir, $folder.length);
 
             if($folder) {
                 $folder.children('.folder-content').append(

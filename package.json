@@ -14,7 +14,8 @@
     "gulp-babel": "^6.1.1",
     "gulp-browserify": "^0.5.1",
     "gulp-plumber": "^1.0.1",
-    "gulp-sass": "^2.1.0"
+    "gulp-sass": "^2.1.0",
+    "path-to-regexp": "^1.2.1"
   },
   "dependencies": {
     "body-parser": "^1.14.1",

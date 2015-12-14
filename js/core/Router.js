@@ -1,37 +1,31 @@
+'use strict';
+
+let pathToRegexp = require('path-to-regexp');
+
 class Router {
-    constructor() {
-        this.routes = {};
-        this.url = '/';
-    }
+    static route(path, controller) {
+        this.routes = this.routes || [];
 
-    route(path, controller, args) {
-        let route = this.routes[path] = {
-            controller: controller,
-        };
-
-        if(args) {
-            for(let k in args) {
-                route[k] = args[k];
-            }
+        this.routes[path] = {
+            controller: controller
         }
     }
 
-    go(url) {
+    static go(url) {
         location.hash = url;
     }
         
-    goToBaseDir() {
+    static goToBaseDir() {
         let url = this.url || '/';
         let base = new String(url).substring(0, url.lastIndexOf('/'));
         
         this.go(base);
     }
 
-    init() {
-        if(this.route && this.route.onExit && !this.route.onExit()) {
-            return false;
-        }
+    static init() {
+        this.routes = this.routes || [];
 
+        // Get the url
         let url = location.hash.slice(1) || '/';
         let trimmed = url.substring(0, url.indexOf('?'));
        
@@ -39,48 +33,47 @@ class Router {
             url = trimmed;
         }
 
-        let route = this.routes[url];
+        // Look for route
+        let context = {};
+        let route;
 
-        if(!route) {
-            for(let k in Router.routes) {
-                let regex = '^' + k + '$';
-                let pattern = new RegExp(regex);
-             
-                if(pattern.test(url)) {
-                    route = Router.routes[k];
+        // Exact match
+        if(this.routes[url]) {
+            path = this.routes[url];
+
+        // Use path to regexp
+        } else {
+            for(let path in this.routes) {
+                let keys = [];
+                let re = pathToRegexp(path, keys);
+                let values = re.exec(url);
+                
+                // A match was found
+                if(re.test(url)) {
+                    // Set the route
+                    route = this.routes[path];
+
+                    // Add context variables (first result is the entire path)
+                    route.url = url; 
+                    
+                    let counter = 1;
+
+                    for(let key of keys) {
+                        route[key.name] = values[counter];
+                        counter++;
+                    }
                     break;
                 }
-            }            
-        }
-
-        this.path = url.split('/');
-        this.args = {};
-        this.url = url;
-        this.route = route;
-
-        if(!this.path[0] && this.path.length > 0) {
-            Router.path.splice(0, 1);
-        }
-
-        for(let i = 0; i < this.path.length - 1; i += 2) {
-            this.args[this.path[i]] = this.path[i+1];
-        }
-
-        if(route && route.controller) {
-            if(route.clear) {
-                ViewHelper.clear();
             }
-            
-            route.controller();
 
-        } else {
-            console.log('Invalid route: ' + this.url);
-        
+        }
+
+        if(route) {
+            route.controller();
         }
     }
 }
 
-window.addEventListener('hashchange', Router.init); 
-$(document).ready(Router.init);
-
 window.Router = Router;
+window.addEventListener('hashchange', window.Router.init); 
+

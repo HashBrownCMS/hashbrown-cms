@@ -6,9 +6,19 @@ class Editor extends View {
     }
 
     open(content) {
-        this.model = content;
+        let view = this;
 
-        this.render();
+        // TODO: Get right path
+        view.model = content[0];
+
+        view.render();
+
+        // Highlight file in tree
+        let tree = ViewHelper.get('Tree');
+       
+        tree.ready(function() {
+            tree.highlight(view.model.path);
+        });
     }
 
     render() {

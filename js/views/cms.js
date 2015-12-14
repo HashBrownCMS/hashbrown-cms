@@ -1,4 +1,4 @@
-window.page = require('page');
+'use strict';
 
 require('../client');
 require('./partials/navbar');
@@ -15,18 +15,16 @@ class CMS extends View {
     }
 
     initRoutes() {
-        page.base('/repos/' + req.params.user + '/' + req.params.repo + '/' + req.params.branch + '/cms');
-        
         // Pages
-        page('/pages/:path', function(ctx) {
-            api.file.fetch(ctx.path, function(content) {
+        Router.route('/pages/:path*', function() {
+            api.file.fetch('/pages/' + this.path, function(content) {
                 ViewHelper.get('Editor').open(content);
             });
         });
-        
+
         // Media
-        page('/media/:path', function() {
-            console.log(req.params);
+        Router.route('/media/:path*', function() {
+            console.log(this.path);
         });
     }
 
@@ -39,7 +37,7 @@ class CMS extends View {
         );
 
         // Start router
-        page();
+        Router.init();
     }
 }
 

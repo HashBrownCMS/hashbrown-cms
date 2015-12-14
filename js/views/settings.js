@@ -8,6 +8,7 @@ class Settings extends View {
         // Register events
         this.on('clickSave', this.onClickSave);
         this.on('clickAddLabel', this.onClickAddLabel);
+        this.on('changeTheme', this.onChangeTheme);
 
         let view = this;
 
@@ -42,6 +43,14 @@ class Settings extends View {
 
             view.render();
         }
+    }
+
+    // CMS
+    onChangeTheme(e, element, view) {
+        let theme = $(element).val();
+
+        $('head link[href*="bootstrap.min.css"]').attr('href', theme);
+        console.log(theme);
     }
 
     // Global
@@ -224,7 +233,19 @@ class Settings extends View {
 
                     // CMS
                     _.div({role: 'tabpanel', class: 'tab-pane', id: 'cms'}, [
-                        
+                        _.div({class: 'input-group'}, [
+                            _.span({class: 'input-group-addon'},
+                                'Theme'
+                            ),
+                            _.select({class: 'form-control'}, [
+                                _.option({value: 'https://bootswatch.com/cosmo/bootstrap.min.css'},
+                                    'cosmo'
+                                ),
+                                _.option({value: 'https://bootswatch.com/slate/bootstrap.min.css'},
+                                    'slate'
+                                )
+                            ]).change(view.events.changeTheme)
+                        ])
                     ])
                 ])
             ])

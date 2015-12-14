@@ -123,8 +123,18 @@ class View {
                $(this).data('view').remove();
             });
         }
+
+        this.trigger('ready');
+        this.isReady = true;
     }
 
+    ready(callback) {
+        if(this.isReady) {
+            callback();
+        } else {
+            this.on('ready', callback);
+        }
+    }
 
     // Adopt values
     adopt(args) {
@@ -172,14 +182,14 @@ class View {
     // Trigger an event
     trigger(e, obj) {
         if(this.events[e]) {
-            if(this.events[e].length) {
+            if(typeof this.events[e] === 'function') {
+                this.events[e](obj);
+            } else {
                 for(let i in this.events[e]) {
                     if(this.events[e][i]) {
                         this.events[e][i](obj);
                     }
                 }
-            } else {
-                this.events[e](obj);
             }
         }
     }
