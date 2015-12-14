@@ -163,57 +163,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
         require('./helper');
         require('./api');
-
-        window.env = {
-            json: null,
-            sha: null,
-
-            get: function get(callback) {
-                if (env.json) {
-                    callback(env.json);
-                } else {
-                    api.file.fetch('/env.json', function (contents) {
-                        var json = '{}';
-
-                        try {
-                            json = atob(contents.content);
-                        } catch (e) {
-                            console.log(e);
-                            console.log(contents);
-                        }
-
-                        json = JSON.parse(json) || {};
-                        json.putaitu = json.putaitu || {};
-                        json.putaitu.issues = json.putaitu.issues || {};
-                        json.putaitu.issues.columns = json.putaitu.issues.columns || [];
-
-                        env.json = json;
-                        env.sha = contents.sha;
-
-                        callback(env.json);
-                    });
-                }
-            },
-
-            set: function set(json, callback) {
-                json = json || env.json;
-
-                var contents = {
-                    content: btoa(JSON.stringify(json)),
-                    sha: env.sha,
-                    comment: 'Updating env.json'
-                };
-
-                api.file.create(contents, '/env.json', function () {
-                    env.json = json;
-
-                    if (callback) {
-                        callback();
-                    }
-                });
-            }
-        };
-    }, { "./api": 1, "./core/Templating": 3, "./core/View": 4, "./helper": 5 }], 3: [function (require, module, exports) {
+        require('./env');
+    }, { "./api": 1, "./core/Templating": 3, "./core/View": 4, "./env": 5, "./helper": 6 }], 3: [function (require, module, exports) {
         var Templating = {};
 
         function append(el, content) {
@@ -629,6 +580,56 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
         window.View = View;
     }, {}], 5: [function (require, module, exports) {
+        window.env = {
+            json: null,
+            sha: null,
+
+            get: function get(callback) {
+                if (env.json) {
+                    callback(env.json);
+                } else {
+                    api.file.fetch('/env.json', function (contents) {
+                        var json = '{}';
+
+                        try {
+                            json = atob(contents.content);
+                        } catch (e) {
+                            console.log(e);
+                            console.log(contents);
+                        }
+
+                        json = JSON.parse(json) || {};
+                        json.putaitu = json.putaitu || {};
+                        json.putaitu.issues = json.putaitu.issues || {};
+                        json.putaitu.issues.columns = json.putaitu.issues.columns || [];
+
+                        env.json = json;
+                        env.sha = contents.sha;
+
+                        callback(env.json);
+                    });
+                }
+            },
+
+            set: function set(json, callback) {
+                json = json || env.json;
+
+                var contents = {
+                    content: btoa(JSON.stringify(json)),
+                    sha: env.sha,
+                    comment: 'Updating env.json'
+                };
+
+                api.file.create(contents, '/env.json', function () {
+                    env.json = json;
+
+                    if (callback) {
+                        callback();
+                    }
+                });
+            }
+        };
+    }, {}], 6: [function (require, module, exports) {
         var Helper = (function () {
             function Helper() {
                 _classCallCheck(this, Helper);
@@ -681,7 +682,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         })();
 
         window.helper = Helper;
-    }, {}], 6: [function (require, module, exports) {
+    }, {}], 7: [function (require, module, exports) {
         window.page = require('page');
 
         require('../client');
@@ -734,7 +735,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         })(View);
 
         new CMS();
-    }, { "../client": 2, "./partials/cms-editor": 7, "./partials/cms-tree": 8, "./partials/navbar": 9, "page": 11 }], 7: [function (require, module, exports) {
+    }, { "../client": 2, "./partials/cms-editor": 8, "./partials/cms-tree": 9, "./partials/navbar": 10, "page": 12 }], 8: [function (require, module, exports) {
         var Editor = (function (_View2) {
             _inherits(Editor, _View2);
 
@@ -765,7 +766,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         })(View);
 
         module.exports = Editor;
-    }, {}], 8: [function (require, module, exports) {
+    }, {}], 9: [function (require, module, exports) {
         var Tree = (function (_View3) {
             _inherits(Tree, _View3);
 
@@ -953,7 +954,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         })(View);
 
         module.exports = Tree;
-    }, {}], 9: [function (require, module, exports) {
+    }, {}], 10: [function (require, module, exports) {
         var Navbar = (function (_View4) {
             _inherits(Navbar, _View4);
 
@@ -999,11 +1000,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         })(View);
 
         new Navbar();
-    }, {}], 10: [function (require, module, exports) {
+    }, {}], 11: [function (require, module, exports) {
         module.exports = Array.isArray || function (arr) {
             return Object.prototype.toString.call(arr) == '[object Array]';
         };
-    }, {}], 11: [function (require, module, exports) {
+    }, {}], 12: [function (require, module, exports) {
         (function (process) {
             /* globals require, module */
 
@@ -1614,7 +1615,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
             page.sameOrigin = sameOrigin;
         }).call(this, require("rH1JPG"));
-    }, { "path-to-regexp": 12, "rH1JPG": 13 }], 12: [function (require, module, exports) {
+    }, { "path-to-regexp": 13, "rH1JPG": 14 }], 13: [function (require, module, exports) {
         var isarray = require('isarray');
 
         /**
@@ -2004,7 +2005,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
             return stringToRegexp(path, keys, options);
         }
-    }, { "isarray": 10 }], 13: [function (require, module, exports) {
+    }, { "isarray": 11 }], 14: [function (require, module, exports) {
         // shim for using process in browser
 
         var process = module.exports = {};
@@ -2069,4 +2070,4 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         process.chdir = function (dir) {
             throw new Error('process.chdir is not supported');
         };
-    }, {}] }, {}, [6]);
+    }, {}] }, {}, [7]);

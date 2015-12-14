@@ -567,12 +567,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
         window.View = View;
     }, {}], 4: [function (require, module, exports) {
-        require('./core/Templating');
-        require('./core/View');
-
-        require('./helper');
-        require('./api');
-
         window.env = {
             json: null,
             sha: null,
@@ -622,7 +616,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 });
             }
         };
-    }, { "./api": 1, "./core/Templating": 2, "./core/View": 3, "./helper": 5 }], 5: [function (require, module, exports) {
+    }, {}], 5: [function (require, module, exports) {
+        require('./core/Templating');
+        require('./core/View');
+
+        require('./helper');
+        require('./api');
+        require('./env');
+    }, { "./api": 1, "./core/Templating": 2, "./core/View": 3, "./env": 4, "./helper": 6 }], 6: [function (require, module, exports) {
         var Helper = (function () {
             function Helper() {
                 _classCallCheck(this, Helper);
@@ -675,4 +676,4 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         })();
 
         window.helper = Helper;
-    }, {}] }, {}, [4]);
+    }, {}] }, {}, [5]);

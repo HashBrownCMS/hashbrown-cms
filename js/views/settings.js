@@ -21,6 +21,10 @@ class Settings extends View {
         });
     }
 
+    /**
+     * Events
+     */
+    // Labels
     onClickAddLabel(e, element, view) {
         let label = {
             name: 'new label',
@@ -40,6 +44,7 @@ class Settings extends View {
         }
     }
 
+    // Global
     onClickSave(e, element, view) {
         let $btn = $(element);
         $btn.toggleClass('disabled', true);
@@ -52,6 +57,8 @@ class Settings extends View {
                 _.span({class: 'glyphicon glyphicon-floppy-disk'})
             ]);
         });
+
+        // Async saving logic for labels
 /*
         if(labels.length > 0) {
             let processed = 0;
@@ -80,19 +87,35 @@ class Settings extends View {
         let view = this;
 
         $('.page-content').html(
-            _.div({class: 'container'},[
+            _.div({class: 'container'}, [
+                // Save button
                 _.button({class: 'btn btn-success pull-right'}, [
                     'Save ',
                     _.span({class: 'glyphicon glyphicon-floppy-disk'})
                 ]).click(view.events.clickSave),
+                
+                // Tabs
                 _.ul({class: 'nav nav-tabs', role:'tablist'}, [
+
+                    // Issues
                     _.li({role: 'presentation', class: 'active'},
-                        _.a({href:'#issues', 'aria-controls': 'home', role: 'tab', 'data-toggle': 'tab'},
+                        _.a({href:'#issues', 'aria-controls': 'issues', role: 'tab', 'data-toggle': 'tab'},
                             'Issues'
+                        )
+                    ),
+
+                    // CMS
+                    _.li({role: 'presentation'},
+                        _.a({href:'#cms', 'aria-controls': 'cms', role: 'tab', 'data-toggle': 'tab'},
+                            'CMS'
                         )
                     )
                 ]),
+
+                // Tab content
                 _.div({class: 'tab-content'}, [
+
+                    // Issues
                     _.div({role: 'tabpanel', class: 'tab-pane active', id: 'issues'}, [
                         _.div({class: 'row'}, [
                             _.div({class: 'col-xs-6'}, [
@@ -197,6 +220,11 @@ class Settings extends View {
                                 ])
                             ])
                         ])
+                    ]),
+
+                    // CMS
+                    _.div({role: 'tabpanel', class: 'tab-pane', id: 'cms'}, [
+                        
                     ])
                 ])
             ])

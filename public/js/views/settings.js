@@ -161,57 +161,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
         require('./helper');
         require('./api');
-
-        window.env = {
-            json: null,
-            sha: null,
-
-            get: function get(callback) {
-                if (env.json) {
-                    callback(env.json);
-                } else {
-                    api.file.fetch('/env.json', function (contents) {
-                        var json = '{}';
-
-                        try {
-                            json = atob(contents.content);
-                        } catch (e) {
-                            console.log(e);
-                            console.log(contents);
-                        }
-
-                        json = JSON.parse(json) || {};
-                        json.putaitu = json.putaitu || {};
-                        json.putaitu.issues = json.putaitu.issues || {};
-                        json.putaitu.issues.columns = json.putaitu.issues.columns || [];
-
-                        env.json = json;
-                        env.sha = contents.sha;
-
-                        callback(env.json);
-                    });
-                }
-            },
-
-            set: function set(json, callback) {
-                json = json || env.json;
-
-                var contents = {
-                    content: btoa(JSON.stringify(json)),
-                    sha: env.sha,
-                    comment: 'Updating env.json'
-                };
-
-                api.file.create(contents, '/env.json', function () {
-                    env.json = json;
-
-                    if (callback) {
-                        callback();
-                    }
-                });
-            }
-        };
-    }, { "./api": 1, "./core/Templating": 3, "./core/View": 4, "./helper": 5 }], 3: [function (require, module, exports) {
+        require('./env');
+    }, { "./api": 1, "./core/Templating": 3, "./core/View": 4, "./env": 5, "./helper": 6 }], 3: [function (require, module, exports) {
         var Templating = {};
 
         function append(el, content) {
@@ -627,6 +578,56 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
         window.View = View;
     }, {}], 5: [function (require, module, exports) {
+        window.env = {
+            json: null,
+            sha: null,
+
+            get: function get(callback) {
+                if (env.json) {
+                    callback(env.json);
+                } else {
+                    api.file.fetch('/env.json', function (contents) {
+                        var json = '{}';
+
+                        try {
+                            json = atob(contents.content);
+                        } catch (e) {
+                            console.log(e);
+                            console.log(contents);
+                        }
+
+                        json = JSON.parse(json) || {};
+                        json.putaitu = json.putaitu || {};
+                        json.putaitu.issues = json.putaitu.issues || {};
+                        json.putaitu.issues.columns = json.putaitu.issues.columns || [];
+
+                        env.json = json;
+                        env.sha = contents.sha;
+
+                        callback(env.json);
+                    });
+                }
+            },
+
+            set: function set(json, callback) {
+                json = json || env.json;
+
+                var contents = {
+                    content: btoa(JSON.stringify(json)),
+                    sha: env.sha,
+                    comment: 'Updating env.json'
+                };
+
+                api.file.create(contents, '/env.json', function () {
+                    env.json = json;
+
+                    if (callback) {
+                        callback();
+                    }
+                });
+            }
+        };
+    }, {}], 6: [function (require, module, exports) {
         var Helper = (function () {
             function Helper() {
                 _classCallCheck(this, Helper);
@@ -679,7 +680,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         })();
 
         window.helper = Helper;
-    }, {}], 6: [function (require, module, exports) {
+    }, {}], 7: [function (require, module, exports) {
         require('../client');
         require('./partials/navbar');
 
@@ -709,6 +710,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 return _this;
             }
 
+            /**
+             * Events
+             */
+            // Labels
+
             _createClass(Settings, [{
                 key: "onClickAddLabel",
                 value: function onClickAddLabel(e, element, view) {
@@ -729,6 +735,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                         view.render();
                     }
                 }
+
+                // Global
+
             }, {
                 key: "onClickSave",
                 value: function onClickSave(e, element, view) {
@@ -740,6 +749,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                         $btn.toggleClass('disabled', false);
                         $btn.html(['Save ', _.span({ class: 'glyphicon glyphicon-floppy-disk' })]);
                     });
+
+                    // Async saving logic for labels
                     /*
                             if(labels.length > 0) {
                                 let processed = 0;
@@ -769,7 +780,24 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 value: function render() {
                     var view = this;
 
-                    $('.page-content').html(_.div({ class: 'container' }, [_.button({ class: 'btn btn-success pull-right' }, ['Save ', _.span({ class: 'glyphicon glyphicon-floppy-disk' })]).click(view.events.clickSave), _.ul({ class: 'nav nav-tabs', role: 'tablist' }, [_.li({ role: 'presentation', class: 'active' }, _.a({ href: '#issues', 'aria-controls': 'home', role: 'tab', 'data-toggle': 'tab' }, 'Issues'))]), _.div({ class: 'tab-content' }, [_.div({ role: 'tabpanel', class: 'tab-pane active', id: 'issues' }, [_.div({ class: 'row' }, [_.div({ class: 'col-xs-6' }, [_.h4('Columns'), _.ul({ class: 'list-group' }, [_.li({ class: 'list-group-item' }, 'backlog'), _.each(view.config.putaitu.issues.columns, function (i, column) {
+                    $('.page-content').html(_.div({ class: 'container' }, [
+                    // Save button
+                    _.button({ class: 'btn btn-success pull-right' }, ['Save ', _.span({ class: 'glyphicon glyphicon-floppy-disk' })]).click(view.events.clickSave),
+
+                    // Tabs
+                    _.ul({ class: 'nav nav-tabs', role: 'tablist' }, [
+
+                    // Issues
+                    _.li({ role: 'presentation', class: 'active' }, _.a({ href: '#issues', 'aria-controls': 'issues', role: 'tab', 'data-toggle': 'tab' }, 'Issues')),
+
+                    // CMS
+                    _.li({ role: 'presentation' }, _.a({ href: '#cms', 'aria-controls': 'cms', role: 'tab', 'data-toggle': 'tab' }, 'CMS'))]),
+
+                    // Tab content
+                    _.div({ class: 'tab-content' }, [
+
+                    // Issues
+                    _.div({ role: 'tabpanel', class: 'tab-pane active', id: 'issues' }, [_.div({ class: 'row' }, [_.div({ class: 'col-xs-6' }, [_.h4('Columns'), _.ul({ class: 'list-group' }, [_.li({ class: 'list-group-item' }, 'backlog'), _.each(view.config.putaitu.issues.columns, function (i, column) {
                         var $li = _.li({ class: 'list-group-item', 'data-name': column }, [_.span({ class: 'name' }, column), _.button({ class: 'btn close' }, _.span({ class: 'glyphicon glyphicon-remove' })).click(onClickRemove)]);
 
                         function onClickRemove() {
@@ -824,7 +852,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                         }
 
                         return $li;
-                    }), _.li({ class: 'list-group-item' }, _.button({ class: 'btn btn-primary center-block' }, ['Add label ', _.span({ class: 'glyphicon glyphicon-plus' })]).click(view.events.clickAddLabel))])])])])])]));
+                    }), _.li({ class: 'list-group-item' }, _.button({ class: 'btn btn-primary center-block' }, ['Add label ', _.span({ class: 'glyphicon glyphicon-plus' })]).click(view.events.clickAddLabel))])])])]),
+
+                    // CMS
+                    _.div({ role: 'tabpanel', class: 'tab-pane', id: 'cms' }, [])])]));
                 }
             }]);
 
@@ -832,7 +863,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         })(View);
 
         new Settings();
-    }, { "../client": 2, "./partials/navbar": 7 }], 7: [function (require, module, exports) {
+    }, { "../client": 2, "./partials/navbar": 8 }], 8: [function (require, module, exports) {
         var Navbar = (function (_View2) {
             _inherits(Navbar, _View2);
 
@@ -878,4 +909,4 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         })(View);
 
         new Navbar();
-    }, {}] }, {}, [6]);
+    }, {}] }, {}, [7]);
