@@ -1,253 +1,377 @@
-.page-content .tree .tab-pane {
-  position: relative;
-  height: 0px;
-  transition: height 0.5s ease;
-  opacity: 0;
+/**
+ * Bootstrap mods
+ */
+.navbar-right {
+  margin-right: 0px; }
+
+.form-control.form-control-static {
+  background-color: #eee;
+  box-shadow: none; }
+
+.m-b-xs {
+  margin-bottom: 10px; }
+
+.m-b-sm {
+  margin-bottom: 15px; }
+
+.m-b-md {
+  margin-bottom: 30px; }
+
+.m-b-lg {
+  margin-bottom: 60px; }
+
+.p-b-xs {
+  padding-bottom: 10px; }
+
+.p-b-sm {
+  padding-bottom: 15px; }
+
+.p-b-md {
+  padding-bottom: 30px; }
+
+.p-b-lg {
+  padding-bottom: 60px; }
+
+.input-group.input-group-vertical {
   display: block; }
-  .page-content .tree .tab-pane.active {
-    opacity: 1;
-    height: 300px;
-    overflow-y: hidden;
-    overflow-x: auto; }
-  .page-content .tree .tab-pane ul, .page-content .tree .tab-pane li {
-    padding: 0px;
-    margin: 0px;
-    list-style-type: none; }
-  .page-content .tree .tab-pane .folder-content {
-    position: absolute;
-    left: 0px;
-    top: 0px;
-    height: 300px;
-    width: 28%;
-    border-right: 1px solid #ddd; }
-    .page-content .tree .tab-pane .folder-content a {
-      display: block;
-      padding: 5px 15px; }
-      .page-content .tree .tab-pane .folder-content a .glyphicon {
-        margin-right: 15px; }
-  .page-content .tree .tab-pane .folder, .page-content .tree .tab-pane .file {
-    height: 30px; }
-    .page-content .tree .tab-pane .folder > a, .page-content .tree .tab-pane .file > a {
-      color: #666; }
-    .page-content .tree .tab-pane .folder.active, .page-content .tree .tab-pane .file.active {
-      background-color: #337ab7;
-      color: #fff; }
-      .page-content .tree .tab-pane .folder.active:after, .page-content .tree .tab-pane .file.active:after {
-        color: #fff; }
-      .page-content .tree .tab-pane .folder.active > a, .page-content .tree .tab-pane .file.active > a {
-        color: #fff; }
-  .page-content .tree .tab-pane .folder {
-    position: relative; }
-    .page-content .tree .tab-pane .folder:after {
-      font-family: 'Glyphicons Halflings';
-      content: '\e080';
-      color: #ccc;
-      position: absolute;
-      right: 5px;
-      top: 5px; }
-    .page-content .tree .tab-pane .folder.active > .folder-content {
+  .input-group.input-group-vertical .input-group-addon, .input-group.input-group-vertical .form-control {
+    display: block;
+    float: none; }
+  .input-group.input-group-vertical .form-control {
+    border-top-right-radius: 0px; }
+    .input-group.input-group-vertical .form-control:last-child {
+      border-bottom-left-radius: 5px; }
+  .input-group.input-group-vertical .input-group-addon:first-child {
+    border-bottom: 0 none;
+    border-bottom-left-radius: 0;
+    border-right: 1px solid #ccc;
+    border-top-right-radius: 5px;
+    display: block;
+    width: 100%; }
+
+.collapse.width {
+  height: auto;
+  -webkit-transition: width 0.35s ease;
+  -moz-transition: width 0.35s ease;
+  -o-transition: width 0.35s ease;
+  transition: width 0.35s ease; }
+
+/**
+ * Custom elements
+ */
+@keyframes spinner {
+  0% {
+    transform: scale(1, 1); }
+  50% {
+    transform: scale(0.75, 0.75); }
+  100% {
+    transform: scale(1, 1); } }
+
+.page-spinner-container {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.5);
+  z-index: 20; }
+  .page-spinner-container .spinner {
+    display: block; }
+
+.spinner-container {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.5);
+  z-index: 20; }
+  .spinner-container .spinner {
+    display: block; }
+
+.spinner {
+  display: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 32px;
+  height: 32px;
+  margin: -16px 0px 0px -16px;
+  transform: scale(1, 1);
+  animation-name: spinner;
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 100%; }
+
+.page-content {
+  /**
+     * Tree
+     */
+  /**
+     * Editor
+     */ }
+  .page-content .tree {
+    margin-bottom: 15px; }
+    .page-content .tree .tab-pane {
+      position: relative;
+      height: 0px;
+      transition: height 0.5s ease;
+      opacity: 0;
       display: block; }
-    .page-content .tree .tab-pane .folder:nth-child(1) .folder-content {
-      top: 0px; }
-    .page-content .tree .tab-pane .folder:nth-child(2) .folder-content {
-      top: -30px; }
-    .page-content .tree .tab-pane .folder:nth-child(3) .folder-content {
-      top: -60px; }
-    .page-content .tree .tab-pane .folder:nth-child(4) .folder-content {
-      top: -90px; }
-    .page-content .tree .tab-pane .folder:nth-child(5) .folder-content {
-      top: -120px; }
-    .page-content .tree .tab-pane .folder:nth-child(6) .folder-content {
-      top: -150px; }
-    .page-content .tree .tab-pane .folder:nth-child(7) .folder-content {
-      top: -180px; }
-    .page-content .tree .tab-pane .folder:nth-child(8) .folder-content {
-      top: -210px; }
-    .page-content .tree .tab-pane .folder:nth-child(9) .folder-content {
-      top: -240px; }
-    .page-content .tree .tab-pane .folder:nth-child(10) .folder-content {
-      top: -270px; }
-    .page-content .tree .tab-pane .folder:nth-child(11) .folder-content {
-      top: -300px; }
-    .page-content .tree .tab-pane .folder:nth-child(12) .folder-content {
-      top: -330px; }
-    .page-content .tree .tab-pane .folder:nth-child(13) .folder-content {
-      top: -360px; }
-    .page-content .tree .tab-pane .folder:nth-child(14) .folder-content {
-      top: -390px; }
-    .page-content .tree .tab-pane .folder:nth-child(15) .folder-content {
-      top: -420px; }
-    .page-content .tree .tab-pane .folder:nth-child(16) .folder-content {
-      top: -450px; }
-    .page-content .tree .tab-pane .folder:nth-child(17) .folder-content {
-      top: -480px; }
-    .page-content .tree .tab-pane .folder:nth-child(18) .folder-content {
-      top: -510px; }
-    .page-content .tree .tab-pane .folder:nth-child(19) .folder-content {
-      top: -540px; }
-    .page-content .tree .tab-pane .folder:nth-child(20) .folder-content {
-      top: -570px; }
-    .page-content .tree .tab-pane .folder:nth-child(21) .folder-content {
-      top: -600px; }
-    .page-content .tree .tab-pane .folder:nth-child(22) .folder-content {
-      top: -630px; }
-    .page-content .tree .tab-pane .folder:nth-child(23) .folder-content {
-      top: -660px; }
-    .page-content .tree .tab-pane .folder:nth-child(24) .folder-content {
-      top: -690px; }
-    .page-content .tree .tab-pane .folder:nth-child(25) .folder-content {
-      top: -720px; }
-    .page-content .tree .tab-pane .folder:nth-child(26) .folder-content {
-      top: -750px; }
-    .page-content .tree .tab-pane .folder:nth-child(27) .folder-content {
-      top: -780px; }
-    .page-content .tree .tab-pane .folder:nth-child(28) .folder-content {
-      top: -810px; }
-    .page-content .tree .tab-pane .folder:nth-child(29) .folder-content {
-      top: -840px; }
-    .page-content .tree .tab-pane .folder:nth-child(30) .folder-content {
-      top: -870px; }
-    .page-content .tree .tab-pane .folder:nth-child(31) .folder-content {
-      top: -900px; }
-    .page-content .tree .tab-pane .folder:nth-child(32) .folder-content {
-      top: -930px; }
-    .page-content .tree .tab-pane .folder:nth-child(33) .folder-content {
-      top: -960px; }
-    .page-content .tree .tab-pane .folder:nth-child(34) .folder-content {
-      top: -990px; }
-    .page-content .tree .tab-pane .folder:nth-child(35) .folder-content {
-      top: -1020px; }
-    .page-content .tree .tab-pane .folder:nth-child(36) .folder-content {
-      top: -1050px; }
-    .page-content .tree .tab-pane .folder:nth-child(37) .folder-content {
-      top: -1080px; }
-    .page-content .tree .tab-pane .folder:nth-child(38) .folder-content {
-      top: -1110px; }
-    .page-content .tree .tab-pane .folder:nth-child(39) .folder-content {
-      top: -1140px; }
-    .page-content .tree .tab-pane .folder:nth-child(40) .folder-content {
-      top: -1170px; }
-    .page-content .tree .tab-pane .folder:nth-child(41) .folder-content {
-      top: -1200px; }
-    .page-content .tree .tab-pane .folder:nth-child(42) .folder-content {
-      top: -1230px; }
-    .page-content .tree .tab-pane .folder:nth-child(43) .folder-content {
-      top: -1260px; }
-    .page-content .tree .tab-pane .folder:nth-child(44) .folder-content {
-      top: -1290px; }
-    .page-content .tree .tab-pane .folder:nth-child(45) .folder-content {
-      top: -1320px; }
-    .page-content .tree .tab-pane .folder:nth-child(46) .folder-content {
-      top: -1350px; }
-    .page-content .tree .tab-pane .folder:nth-child(47) .folder-content {
-      top: -1380px; }
-    .page-content .tree .tab-pane .folder:nth-child(48) .folder-content {
-      top: -1410px; }
-    .page-content .tree .tab-pane .folder:nth-child(49) .folder-content {
-      top: -1440px; }
-    .page-content .tree .tab-pane .folder:nth-child(50) .folder-content {
-      top: -1470px; }
-    .page-content .tree .tab-pane .folder:nth-child(51) .folder-content {
-      top: -1500px; }
-    .page-content .tree .tab-pane .folder:nth-child(52) .folder-content {
-      top: -1530px; }
-    .page-content .tree .tab-pane .folder:nth-child(53) .folder-content {
-      top: -1560px; }
-    .page-content .tree .tab-pane .folder:nth-child(54) .folder-content {
-      top: -1590px; }
-    .page-content .tree .tab-pane .folder:nth-child(55) .folder-content {
-      top: -1620px; }
-    .page-content .tree .tab-pane .folder:nth-child(56) .folder-content {
-      top: -1650px; }
-    .page-content .tree .tab-pane .folder:nth-child(57) .folder-content {
-      top: -1680px; }
-    .page-content .tree .tab-pane .folder:nth-child(58) .folder-content {
-      top: -1710px; }
-    .page-content .tree .tab-pane .folder:nth-child(59) .folder-content {
-      top: -1740px; }
-    .page-content .tree .tab-pane .folder:nth-child(60) .folder-content {
-      top: -1770px; }
-    .page-content .tree .tab-pane .folder:nth-child(61) .folder-content {
-      top: -1800px; }
-    .page-content .tree .tab-pane .folder:nth-child(62) .folder-content {
-      top: -1830px; }
-    .page-content .tree .tab-pane .folder:nth-child(63) .folder-content {
-      top: -1860px; }
-    .page-content .tree .tab-pane .folder:nth-child(64) .folder-content {
-      top: -1890px; }
-    .page-content .tree .tab-pane .folder:nth-child(65) .folder-content {
-      top: -1920px; }
-    .page-content .tree .tab-pane .folder:nth-child(66) .folder-content {
-      top: -1950px; }
-    .page-content .tree .tab-pane .folder:nth-child(67) .folder-content {
-      top: -1980px; }
-    .page-content .tree .tab-pane .folder:nth-child(68) .folder-content {
-      top: -2010px; }
-    .page-content .tree .tab-pane .folder:nth-child(69) .folder-content {
-      top: -2040px; }
-    .page-content .tree .tab-pane .folder:nth-child(70) .folder-content {
-      top: -2070px; }
-    .page-content .tree .tab-pane .folder:nth-child(71) .folder-content {
-      top: -2100px; }
-    .page-content .tree .tab-pane .folder:nth-child(72) .folder-content {
-      top: -2130px; }
-    .page-content .tree .tab-pane .folder:nth-child(73) .folder-content {
-      top: -2160px; }
-    .page-content .tree .tab-pane .folder:nth-child(74) .folder-content {
-      top: -2190px; }
-    .page-content .tree .tab-pane .folder:nth-child(75) .folder-content {
-      top: -2220px; }
-    .page-content .tree .tab-pane .folder:nth-child(76) .folder-content {
-      top: -2250px; }
-    .page-content .tree .tab-pane .folder:nth-child(77) .folder-content {
-      top: -2280px; }
-    .page-content .tree .tab-pane .folder:nth-child(78) .folder-content {
-      top: -2310px; }
-    .page-content .tree .tab-pane .folder:nth-child(79) .folder-content {
-      top: -2340px; }
-    .page-content .tree .tab-pane .folder:nth-child(80) .folder-content {
-      top: -2370px; }
-    .page-content .tree .tab-pane .folder:nth-child(81) .folder-content {
-      top: -2400px; }
-    .page-content .tree .tab-pane .folder:nth-child(82) .folder-content {
-      top: -2430px; }
-    .page-content .tree .tab-pane .folder:nth-child(83) .folder-content {
-      top: -2460px; }
-    .page-content .tree .tab-pane .folder:nth-child(84) .folder-content {
-      top: -2490px; }
-    .page-content .tree .tab-pane .folder:nth-child(85) .folder-content {
-      top: -2520px; }
-    .page-content .tree .tab-pane .folder:nth-child(86) .folder-content {
-      top: -2550px; }
-    .page-content .tree .tab-pane .folder:nth-child(87) .folder-content {
-      top: -2580px; }
-    .page-content .tree .tab-pane .folder:nth-child(88) .folder-content {
-      top: -2610px; }
-    .page-content .tree .tab-pane .folder:nth-child(89) .folder-content {
-      top: -2640px; }
-    .page-content .tree .tab-pane .folder:nth-child(90) .folder-content {
-      top: -2670px; }
-    .page-content .tree .tab-pane .folder:nth-child(91) .folder-content {
-      top: -2700px; }
-    .page-content .tree .tab-pane .folder:nth-child(92) .folder-content {
-      top: -2730px; }
-    .page-content .tree .tab-pane .folder:nth-child(93) .folder-content {
-      top: -2760px; }
-    .page-content .tree .tab-pane .folder:nth-child(94) .folder-content {
-      top: -2790px; }
-    .page-content .tree .tab-pane .folder:nth-child(95) .folder-content {
-      top: -2820px; }
-    .page-content .tree .tab-pane .folder:nth-child(96) .folder-content {
-      top: -2850px; }
-    .page-content .tree .tab-pane .folder:nth-child(97) .folder-content {
-      top: -2880px; }
-    .page-content .tree .tab-pane .folder:nth-child(98) .folder-content {
-      top: -2910px; }
-    .page-content .tree .tab-pane .folder:nth-child(99) .folder-content {
-      top: -2940px; }
-    .page-content .tree .tab-pane .folder:nth-child(100) .folder-content {
-      top: -2970px; }
-    .page-content .tree .tab-pane .folder .folder-content {
-      display: none;
-      left: 100%;
-      width: 100%; }
+      .page-content .tree .tab-pane.active {
+        opacity: 1;
+        height: 300px;
+        overflow-y: hidden;
+        overflow-x: auto; }
+      .page-content .tree .tab-pane ul, .page-content .tree .tab-pane li {
+        padding: 0px;
+        margin: 0px;
+        list-style-type: none; }
+      .page-content .tree .tab-pane .folder-content {
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        height: 300px;
+        width: 28%;
+        border-right: 1px solid #ddd; }
+        .page-content .tree .tab-pane .folder-content.drag-over {
+          box-shadow: inset 0px 0px 10px #337ab7; }
+        .page-content .tree .tab-pane .folder-content a {
+          display: block;
+          padding: 5px 15px; }
+          .page-content .tree .tab-pane .folder-content a .glyphicon {
+            margin-right: 15px; }
+      .page-content .tree .tab-pane .folder, .page-content .tree .tab-pane .file {
+        height: 30px; }
+        .page-content .tree .tab-pane .folder > a, .page-content .tree .tab-pane .file > a {
+          color: #666; }
+        .page-content .tree .tab-pane .folder.active, .page-content .tree .tab-pane .file.active {
+          color: #fff; }
+          .page-content .tree .tab-pane .folder.active:after, .page-content .tree .tab-pane .file.active:after {
+            color: #fff; }
+          .page-content .tree .tab-pane .folder.active > a, .page-content .tree .tab-pane .file.active > a {
+            color: #fff; }
+      .page-content .tree .tab-pane .file.active {
+        background-color: #337ab7; }
+      .page-content .tree .tab-pane .folder {
+        position: relative; }
+        .page-content .tree .tab-pane .folder:after {
+          font-family: 'Glyphicons Halflings';
+          content: '\e080';
+          color: #ccc;
+          position: absolute;
+          right: 5px;
+          top: 5px; }
+        .page-content .tree .tab-pane .folder.active {
+          background-color: #666; }
+          .page-content .tree .tab-pane .folder.active > .folder-content {
+            display: block; }
+        .page-content .tree .tab-pane .folder:nth-child(1) .folder-content {
+          top: 0px; }
+        .page-content .tree .tab-pane .folder:nth-child(2) .folder-content {
+          top: -30px; }
+        .page-content .tree .tab-pane .folder:nth-child(3) .folder-content {
+          top: -60px; }
+        .page-content .tree .tab-pane .folder:nth-child(4) .folder-content {
+          top: -90px; }
+        .page-content .tree .tab-pane .folder:nth-child(5) .folder-content {
+          top: -120px; }
+        .page-content .tree .tab-pane .folder:nth-child(6) .folder-content {
+          top: -150px; }
+        .page-content .tree .tab-pane .folder:nth-child(7) .folder-content {
+          top: -180px; }
+        .page-content .tree .tab-pane .folder:nth-child(8) .folder-content {
+          top: -210px; }
+        .page-content .tree .tab-pane .folder:nth-child(9) .folder-content {
+          top: -240px; }
+        .page-content .tree .tab-pane .folder:nth-child(10) .folder-content {
+          top: -270px; }
+        .page-content .tree .tab-pane .folder:nth-child(11) .folder-content {
+          top: -300px; }
+        .page-content .tree .tab-pane .folder:nth-child(12) .folder-content {
+          top: -330px; }
+        .page-content .tree .tab-pane .folder:nth-child(13) .folder-content {
+          top: -360px; }
+        .page-content .tree .tab-pane .folder:nth-child(14) .folder-content {
+          top: -390px; }
+        .page-content .tree .tab-pane .folder:nth-child(15) .folder-content {
+          top: -420px; }
+        .page-content .tree .tab-pane .folder:nth-child(16) .folder-content {
+          top: -450px; }
+        .page-content .tree .tab-pane .folder:nth-child(17) .folder-content {
+          top: -480px; }
+        .page-content .tree .tab-pane .folder:nth-child(18) .folder-content {
+          top: -510px; }
+        .page-content .tree .tab-pane .folder:nth-child(19) .folder-content {
+          top: -540px; }
+        .page-content .tree .tab-pane .folder:nth-child(20) .folder-content {
+          top: -570px; }
+        .page-content .tree .tab-pane .folder:nth-child(21) .folder-content {
+          top: -600px; }
+        .page-content .tree .tab-pane .folder:nth-child(22) .folder-content {
+          top: -630px; }
+        .page-content .tree .tab-pane .folder:nth-child(23) .folder-content {
+          top: -660px; }
+        .page-content .tree .tab-pane .folder:nth-child(24) .folder-content {
+          top: -690px; }
+        .page-content .tree .tab-pane .folder:nth-child(25) .folder-content {
+          top: -720px; }
+        .page-content .tree .tab-pane .folder:nth-child(26) .folder-content {
+          top: -750px; }
+        .page-content .tree .tab-pane .folder:nth-child(27) .folder-content {
+          top: -780px; }
+        .page-content .tree .tab-pane .folder:nth-child(28) .folder-content {
+          top: -810px; }
+        .page-content .tree .tab-pane .folder:nth-child(29) .folder-content {
+          top: -840px; }
+        .page-content .tree .tab-pane .folder:nth-child(30) .folder-content {
+          top: -870px; }
+        .page-content .tree .tab-pane .folder:nth-child(31) .folder-content {
+          top: -900px; }
+        .page-content .tree .tab-pane .folder:nth-child(32) .folder-content {
+          top: -930px; }
+        .page-content .tree .tab-pane .folder:nth-child(33) .folder-content {
+          top: -960px; }
+        .page-content .tree .tab-pane .folder:nth-child(34) .folder-content {
+          top: -990px; }
+        .page-content .tree .tab-pane .folder:nth-child(35) .folder-content {
+          top: -1020px; }
+        .page-content .tree .tab-pane .folder:nth-child(36) .folder-content {
+          top: -1050px; }
+        .page-content .tree .tab-pane .folder:nth-child(37) .folder-content {
+          top: -1080px; }
+        .page-content .tree .tab-pane .folder:nth-child(38) .folder-content {
+          top: -1110px; }
+        .page-content .tree .tab-pane .folder:nth-child(39) .folder-content {
+          top: -1140px; }
+        .page-content .tree .tab-pane .folder:nth-child(40) .folder-content {
+          top: -1170px; }
+        .page-content .tree .tab-pane .folder:nth-child(41) .folder-content {
+          top: -1200px; }
+        .page-content .tree .tab-pane .folder:nth-child(42) .folder-content {
+          top: -1230px; }
+        .page-content .tree .tab-pane .folder:nth-child(43) .folder-content {
+          top: -1260px; }
+        .page-content .tree .tab-pane .folder:nth-child(44) .folder-content {
+          top: -1290px; }
+        .page-content .tree .tab-pane .folder:nth-child(45) .folder-content {
+          top: -1320px; }
+        .page-content .tree .tab-pane .folder:nth-child(46) .folder-content {
+          top: -1350px; }
+        .page-content .tree .tab-pane .folder:nth-child(47) .folder-content {
+          top: -1380px; }
+        .page-content .tree .tab-pane .folder:nth-child(48) .folder-content {
+          top: -1410px; }
+        .page-content .tree .tab-pane .folder:nth-child(49) .folder-content {
+          top: -1440px; }
+        .page-content .tree .tab-pane .folder:nth-child(50) .folder-content {
+          top: -1470px; }
+        .page-content .tree .tab-pane .folder:nth-child(51) .folder-content {
+          top: -1500px; }
+        .page-content .tree .tab-pane .folder:nth-child(52) .folder-content {
+          top: -1530px; }
+        .page-content .tree .tab-pane .folder:nth-child(53) .folder-content {
+          top: -1560px; }
+        .page-content .tree .tab-pane .folder:nth-child(54) .folder-content {
+          top: -1590px; }
+        .page-content .tree .tab-pane .folder:nth-child(55) .folder-content {
+          top: -1620px; }
+        .page-content .tree .tab-pane .folder:nth-child(56) .folder-content {
+          top: -1650px; }
+        .page-content .tree .tab-pane .folder:nth-child(57) .folder-content {
+          top: -1680px; }
+        .page-content .tree .tab-pane .folder:nth-child(58) .folder-content {
+          top: -1710px; }
+        .page-content .tree .tab-pane .folder:nth-child(59) .folder-content {
+          top: -1740px; }
+        .page-content .tree .tab-pane .folder:nth-child(60) .folder-content {
+          top: -1770px; }
+        .page-content .tree .tab-pane .folder:nth-child(61) .folder-content {
+          top: -1800px; }
+        .page-content .tree .tab-pane .folder:nth-child(62) .folder-content {
+          top: -1830px; }
+        .page-content .tree .tab-pane .folder:nth-child(63) .folder-content {
+          top: -1860px; }
+        .page-content .tree .tab-pane .folder:nth-child(64) .folder-content {
+          top: -1890px; }
+        .page-content .tree .tab-pane .folder:nth-child(65) .folder-content {
+          top: -1920px; }
+        .page-content .tree .tab-pane .folder:nth-child(66) .folder-content {
+          top: -1950px; }
+        .page-content .tree .tab-pane .folder:nth-child(67) .folder-content {
+          top: -1980px; }
+        .page-content .tree .tab-pane .folder:nth-child(68) .folder-content {
+          top: -2010px; }
+        .page-content .tree .tab-pane .folder:nth-child(69) .folder-content {
+          top: -2040px; }
+        .page-content .tree .tab-pane .folder:nth-child(70) .folder-content {
+          top: -2070px; }
+        .page-content .tree .tab-pane .folder:nth-child(71) .folder-content {
+          top: -2100px; }
+        .page-content .tree .tab-pane .folder:nth-child(72) .folder-content {
+          top: -2130px; }
+        .page-content .tree .tab-pane .folder:nth-child(73) .folder-content {
+          top: -2160px; }
+        .page-content .tree .tab-pane .folder:nth-child(74) .folder-content {
+          top: -2190px; }
+        .page-content .tree .tab-pane .folder:nth-child(75) .folder-content {
+          top: -2220px; }
+        .page-content .tree .tab-pane .folder:nth-child(76) .folder-content {
+          top: -2250px; }
+        .page-content .tree .tab-pane .folder:nth-child(77) .folder-content {
+          top: -2280px; }
+        .page-content .tree .tab-pane .folder:nth-child(78) .folder-content {
+          top: -2310px; }
+        .page-content .tree .tab-pane .folder:nth-child(79) .folder-content {
+          top: -2340px; }
+        .page-content .tree .tab-pane .folder:nth-child(80) .folder-content {
+          top: -2370px; }
+        .page-content .tree .tab-pane .folder:nth-child(81) .folder-content {
+          top: -2400px; }
+        .page-content .tree .tab-pane .folder:nth-child(82) .folder-content {
+          top: -2430px; }
+        .page-content .tree .tab-pane .folder:nth-child(83) .folder-content {
+          top: -2460px; }
+        .page-content .tree .tab-pane .folder:nth-child(84) .folder-content {
+          top: -2490px; }
+        .page-content .tree .tab-pane .folder:nth-child(85) .folder-content {
+          top: -2520px; }
+        .page-content .tree .tab-pane .folder:nth-child(86) .folder-content {
+          top: -2550px; }
+        .page-content .tree .tab-pane .folder:nth-child(87) .folder-content {
+          top: -2580px; }
+        .page-content .tree .tab-pane .folder:nth-child(88) .folder-content {
+          top: -2610px; }
+        .page-content .tree .tab-pane .folder:nth-child(89) .folder-content {
+          top: -2640px; }
+        .page-content .tree .tab-pane .folder:nth-child(90) .folder-content {
+          top: -2670px; }
+        .page-content .tree .tab-pane .folder:nth-child(91) .folder-content {
+          top: -2700px; }
+        .page-content .tree .tab-pane .folder:nth-child(92) .folder-content {
+          top: -2730px; }
+        .page-content .tree .tab-pane .folder:nth-child(93) .folder-content {
+          top: -2760px; }
+        .page-content .tree .tab-pane .folder:nth-child(94) .folder-content {
+          top: -2790px; }
+        .page-content .tree .tab-pane .folder:nth-child(95) .folder-content {
+          top: -2820px; }
+        .page-content .tree .tab-pane .folder:nth-child(96) .folder-content {
+          top: -2850px; }
+        .page-content .tree .tab-pane .folder:nth-child(97) .folder-content {
+          top: -2880px; }
+        .page-content .tree .tab-pane .folder:nth-child(98) .folder-content {
+          top: -2910px; }
+        .page-content .tree .tab-pane .folder:nth-child(99) .folder-content {
+          top: -2940px; }
+        .page-content .tree .tab-pane .folder:nth-child(100) .folder-content {
+          top: -2970px; }
+        .page-content .tree .tab-pane .folder .folder-content {
+          display: none;
+          left: 100%;
+          width: 100%; }
+  .page-content .editor {
+    position: relative;
+    min-height: 200px; }

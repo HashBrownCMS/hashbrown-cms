@@ -4,11 +4,11 @@ var _createClass = (function () { function defineProperties(target, props) { for
 
 function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
 
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 (function e(t, n, r) {
     function s(o, u) {
@@ -161,14 +161,110 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         require('./core/Templating');
         require('./core/View');
         require('./core/Router');
+        require('./core/ContextMenu');
 
         require('./helper');
         require('./api');
         require('./env');
-    }, { "./api": 1, "./core/Router": 3, "./core/Templating": 4, "./core/View": 5, "./env": 6, "./helper": 7 }], 3: [function (require, module, exports) {
+    }, { "./api": 1, "./core/ContextMenu": 3, "./core/Router": 4, "./core/Templating": 5, "./core/View": 6, "./env": 7, "./helper": 8 }], 3: [function (require, module, exports) {
+        'use strict';
+
+        var ContextMenu = (function (_View) {
+            _inherits(ContextMenu, _View);
+
+            function ContextMenu(args) {
+                _classCallCheck(this, ContextMenu);
+
+                // Recycle other context menus
+
+                var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(ContextMenu).call(this, args));
+
+                if ($('.context-menu').length > 0) {
+                    _this.$element = $('.context-menu');
+                } else {
+                    _this.$element = _.ul({ class: 'context-menu dropdown-menu', role: 'menu' });
+                }
+
+                _this.$element.css({
+                    position: 'absolute',
+                    'z-index': 1200,
+                    top: _this.pos.y,
+                    left: _this.pos.x,
+                    display: 'block'
+                });
+
+                _this.fetch();
+                return _this;
+            }
+
+            _createClass(ContextMenu, [{
+                key: "render",
+                value: function render() {
+                    var view = this;
+
+                    view.$element.html(_.each(view.model, function (label, func) {
+                        if (func == '---') {
+                            return _.li({ class: 'dropdown-header' }, label);
+                        } else {
+                            return _.li({ class: typeof func === 'function' ? '' : 'disabled' }, _.a({ tabindex: '-1', href: '#' }, label).click(function (e) {
+                                e.preventDefault();
+                                e.stopPropagation();
+
+                                if (func) {
+                                    func(e);
+
+                                    view.remove();
+                                }
+                            }));
+                        }
+                    }));
+
+                    $('body').append(view.$element);
+                }
+            }]);
+
+            return ContextMenu;
+        })(View);
+
+        // jQuery extention
+
+        jQuery.fn.extend({
+            context: function context(menuItems) {
+                return this.each(function () {
+                    $(this).on('contextmenu', function (e) {
+                        if (e.ctrlKey) {
+                            return;
+                        }
+
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        if (e.which == 3) {
+                            var menu = new ContextMenu({
+                                model: menuItems,
+                                pos: {
+                                    x: e.pageX,
+                                    y: e.pageY
+                                }
+                            });
+                        }
+                    });
+                });
+            }
+        });
+
+        // Event handling
+        $('body').click(function (e) {
+            if ($(e.target).parents('.context-menu').length < 1) {
+                ViewHelper.removeAll('ContextMenu');
+            }
+        });
+    }, {}], 4: [function (require, module, exports) {
         'use strict';
 
         var pathToRegexp = require('path-to-regexp');
+
+        var routes = [];
 
         var Router = (function () {
             function Router() {
@@ -178,9 +274,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             _createClass(Router, null, [{
                 key: "route",
                 value: function route(path, controller) {
-                    this.routes = this.routes || [];
-
-                    this.routes[path] = {
+                    routes[path] = {
                         controller: controller
                     };
                 }
@@ -200,8 +294,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             }, {
                 key: "init",
                 value: function init() {
-                    this.routes = this.routes || [];
-
                     // Get the url
                     var url = location.hash.slice(1) || '/';
                     var trimmed = url.substring(0, url.indexOf('?'));
@@ -209,18 +301,17 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     if (trimmed) {
                         url = trimmed;
                     }
-
                     // Look for route
                     var context = {};
                     var route = undefined;
 
                     // Exact match
-                    if (this.routes[url]) {
-                        path = this.routes[url];
+                    if (routes[url]) {
+                        path = routes[url];
 
                         // Use path to regexp
                     } else {
-                            for (var _path in this.routes) {
+                            for (var _path in routes) {
                                 var keys = [];
                                 var re = pathToRegexp(_path, keys);
                                 var values = re.exec(url);
@@ -228,11 +319,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                                 // A match was found
                                 if (re.test(url)) {
                                     // Set the route
-                                    route = this.routes[_path];
+                                    route = routes[_path];
 
-                                    // Add context variables (first result is the entire path)
+                                    // Add context variables (first result (0) is the entire path,
+                                    // so assign that manually and start the counter at 1 instead)
                                     route.url = url;
-
                                     var counter = 1;
 
                                     var _iteratorNormalCompletion = true;
@@ -275,9 +366,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             return Router;
         })();
 
+        window.addEventListener('hashchange', Router.init);
         window.Router = Router;
-        window.addEventListener('hashchange', window.Router.init);
-    }, { "path-to-regexp": 13 }], 4: [function (require, module, exports) {
+    }, { "path-to-regexp": 14 }], 5: [function (require, module, exports) {
         var Templating = {};
 
         function append(el, content) {
@@ -381,7 +472,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         };
 
         window._ = Templating;
-    }, {}], 5: [function (require, module, exports) {
+    }, {}], 6: [function (require, module, exports) {
         'use strict'
 
         /**
@@ -459,19 +550,32 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     }
                 }
             }, {
-                key: "remove",
-                value: function remove(timeout) {
-                    var view = this;
+                key: "removeAll",
+                value: function removeAll(type) {
+                    var _iteratorNormalCompletion2 = true;
+                    var _didIteratorError2 = false;
+                    var _iteratorError2 = undefined;
 
-                    setTimeout(function () {
-                        view.trigger('remove');
+                    try {
+                        for (var _iterator2 = ViewHelper.getAll(type)[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                            var view = _step2.value;
 
-                        if (view.$element && view.$element.length > 0) {
-                            view.$element.remove();
+                            view.remove();
                         }
-
-                        delete instances[view.guid];
-                    }, timeout || 0);
+                    } catch (err) {
+                        _didIteratorError2 = true;
+                        _iteratorError2 = err;
+                    } finally {
+                        try {
+                            if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                                _iterator2.return();
+                            }
+                        } finally {
+                            if (_didIteratorError2) {
+                                throw _iteratorError2;
+                            }
+                        }
+                    }
                 }
             }]);
 
@@ -521,18 +625,22 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                         this.element = this.$element[0];
                         this.$element.data('view', this);
                         this.$element.bind('destroyed', function () {
-                            $(this).data('view').remove();
+                            var view = $(this).data('view');
+
+                            if (view) {
+                                $(this).data('view').remove();
+                            }
                         });
                     }
 
-                    this.trigger('ready');
+                    this.trigger('ready', this);
                     this.isReady = true;
                 }
             }, {
                 key: "ready",
                 value: function ready(callback) {
                     if (this.isReady) {
-                        callback();
+                        callback(this);
                     } else {
                         this.on('ready', callback);
                     }
@@ -567,18 +675,26 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 /**
                  * Events
                  */
-                // Destroy
+                // Removes the view from DOM and memory
 
             }, {
-                key: "destroy",
-                value: function destroy() {
-                    if (this.$element) {
-                        this.$element.remove();
+                key: "remove",
+                value: function remove(timeout) {
+                    var view = this;
+
+                    if (!view.destroyed) {
+                        view.destroyed = true;
+
+                        setTimeout(function () {
+                            view.trigger('remove');
+
+                            if (view.$element && view.$element.length > 0) {
+                                view.$element.remove();
+                            }
+
+                            instances.splice(view.guid, 1);
+                        }, timeout || 0);
                     }
-
-                    instances.splice(this.guid, 1);
-
-                    delete this;
                 }
 
                 // Call an event (for internal use)
@@ -704,7 +820,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         })();
 
         window.View = View;
-    }, {}], 6: [function (require, module, exports) {
+    }, {}], 7: [function (require, module, exports) {
         window.env = {
             json: null,
             sha: null,
@@ -754,7 +870,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 });
             }
         };
-    }, {}], 7: [function (require, module, exports) {
+    }, {}], 8: [function (require, module, exports) {
         var Helper = (function () {
             function Helper() {
                 _classCallCheck(this, Helper);
@@ -807,7 +923,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         })();
 
         window.helper = Helper;
-    }, {}], 8: [function (require, module, exports) {
+    }, {}], 9: [function (require, module, exports) {
         'use strict';
 
         require('../client');
@@ -816,17 +932,17 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         var Tree = require('./partials/cms-tree');
         var Editor = require('./partials/cms-editor');
 
-        var CMS = (function (_View) {
-            _inherits(CMS, _View);
+        var CMS = (function (_View2) {
+            _inherits(CMS, _View2);
 
             function CMS(args) {
                 _classCallCheck(this, CMS);
 
-                var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(CMS).call(this, args));
+                var _this2 = _possibleConstructorReturn(this, Object.getPrototypeOf(CMS).call(this, args));
 
-                _this.initRoutes();
-                _this.init();
-                return _this;
+                _this2.initRoutes();
+                _this2.init();
+                return _this2;
             }
 
             _createClass(CMS, [{
@@ -834,9 +950,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 value: function initRoutes() {
                     // Pages
                     Router.route('/pages/:path*', function () {
-                        api.file.fetch('/pages/' + this.path, function (content) {
-                            ViewHelper.get('Editor').open(content);
-                        });
+                        ViewHelper.get('Editor').openAsync('/pages/' + this.path);
                     });
 
                     // Media
@@ -858,34 +972,53 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         })(View);
 
         new CMS();
-    }, { "../client": 2, "./partials/cms-editor": 9, "./partials/cms-tree": 10, "./partials/navbar": 11 }], 9: [function (require, module, exports) {
-        var Editor = (function (_View2) {
-            _inherits(Editor, _View2);
+    }, { "../client": 2, "./partials/cms-editor": 10, "./partials/cms-tree": 11, "./partials/navbar": 12 }], 10: [function (require, module, exports) {
+        var Editor = (function (_View3) {
+            _inherits(Editor, _View3);
 
             function Editor(args) {
                 _classCallCheck(this, Editor);
 
-                var _this2 = _possibleConstructorReturn(this, Object.getPrototypeOf(Editor).call(this, args));
+                var _this3 = _possibleConstructorReturn(this, Object.getPrototypeOf(Editor).call(this, args));
 
-                _this2.$element = _.div({ class: 'panel editor' });
-                return _this2;
+                _this3.$element = _.div({ class: 'panel panel-default editor' });
+                return _this3;
             }
 
             _createClass(Editor, [{
                 key: "open",
-                value: function open(content) {
+                value: function open(content, skipHighlight) {
                     var view = this;
 
-                    // TODO: Get right path
-                    view.model = content[0];
+                    view.model = content;
 
                     view.render();
 
-                    // Highlight file in tree
-                    var tree = ViewHelper.get('Tree');
+                    // Highlight file in tree if not skipped
+                    if (!skipHighlight) {
+                        ViewHelper.get('Tree').ready(function (view) {
+                            view.highlight(view.model.path);
+                        });
+                    }
+                }
+            }, {
+                key: "clear",
+                value: function clear() {
+                    this.$element.html(_.div({ class: 'spinner-container' }, _.div({ class: 'spinner' })));
+                }
+            }, {
+                key: "openAsync",
+                value: function openAsync(path) {
+                    var view = this;
 
-                    tree.ready(function () {
-                        tree.highlight(view.model.path);
+                    view.clear();
+
+                    ViewHelper.get('Tree').ready(function (view) {
+                        view.highlight(path.replace('/', ''));
+                    });
+
+                    api.file.fetch(path, function (content) {
+                        view.open(content, true);
                     });
                 }
             }, {
@@ -899,28 +1032,30 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         })(View);
 
         module.exports = Editor;
-    }, {}], 10: [function (require, module, exports) {
-        var Tree = (function (_View3) {
-            _inherits(Tree, _View3);
+    }, {}], 11: [function (require, module, exports) {
+        var Tree = (function (_View4) {
+            _inherits(Tree, _View4);
 
             function Tree(args) {
                 _classCallCheck(this, Tree);
 
-                var _this3 = _possibleConstructorReturn(this, Object.getPrototypeOf(Tree).call(this, args));
+                var _this4 = _possibleConstructorReturn(this, Object.getPrototypeOf(Tree).call(this, args));
 
-                _this3.dirs = {};
+                _this4.dirs = {};
 
                 // Register events
-                _this3.on('clickFolder', _this3.onClickFolder);
-                _this3.on('clickFile', _this3.onClickFile);
-                _this3.on('clickCloseRootNav', _this3.onClickCloseRootNav);
+                _this4.on('clickFolder', _this4.onClickFolder);
+                _this4.on('clickFile', _this4.onClickFile);
+                _this4.on('clickCloseRootNav', _this4.onClickCloseRootNav);
+                _this4.on('clickDeleteItem', _this4.onClickDeleteItem);
+                _this4.on('clickRenameItem', _this4.onClickDeleteItem);
 
                 // Prerender container
-                _this3.$element = _.div({ class: 'tree' });
+                _this4.$element = _.div({ class: 'tree' });
 
-                _this3.modelFunction = api.tree.fetch;
-                _this3.fetch();
-                return _this3;
+                _this4.modelFunction = api.tree.fetch;
+                _this4.fetch();
+                return _this4;
             }
 
             /**
@@ -932,37 +1067,28 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 value: function onClickFolder(e, element, view) {
                     e.preventDefault();
 
-                    var path = $(element).attr('href');
-
-                    var $folder = $(element).parent();
-
-                    $folder.toggleClass('active');
-                    $folder.siblings().each(function (i) {
-                        var active = !$folder.hasClass('active');
-
-                        $(this).toggleClass('active', active);
-                        $(this).find('.folder, .file').toggleClass('active', active);
-                    });
-
-                    if (path.indexOf('/media') == 0) {
-                        //page(path);
-                    }
+                    view.highlight($(element).attr('href').replace('#/', ''));
                 }
             }, {
                 key: "onClickFile",
                 value: function onClickFile(e, element, view) {
-                    /*e.preventDefault();
-                     let $file = $(element).parent();
-                     $file.toggleClass('active', true);
-                     let active = !$file.hasClass('active');
-                     $file.siblings('.folder, .file').toggleClass('active', active);
-                    */
+                    view.highlight($(element).attr('href').replace('#/', ''));
                 }
             }, {
                 key: "onClickCloseRootNav",
                 value: function onClickCloseRootNav(e, element, view) {
                     view.$element.find('.nav-root > li').toggleClass('active', false);
                     view.$element.find('.tab-pane').toggleClass('active', false);
+                }
+            }, {
+                key: "onClickDeleteItem",
+                value: function onClickDeleteItem(e, element, view) {
+                    console.log('dude');
+                }
+            }, {
+                key: "onClickRenameItem",
+                value: function onClickRenameItem(e, element, view) {
+                    console.log('dude');
                 }
 
                 /**
@@ -987,16 +1113,19 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             }, {
                 key: "highlight",
                 value: function highlight(path) {
-                    $('.tree .folder, .tree .file').toggleClass('active', false);
-
-                    var $fileAnchor = $('.tree .file a[href="#/' + path + '"]');
+                    var $fileAnchor = $('.tree li a[href="#/' + path + '"]');
                     var $file = $fileAnchor.parent();
+
+                    $('.tree .file').toggleClass('active', false);
+
+                    // Highlighting a file does not unhighlight a folder
+                    if ($file.hasClass('folder')) {
+                        $('.tree .folder').toggleClass('active', false);
+                    }
 
                     $file.toggleClass('active', true);
 
                     $file.parents('.folder').toggleClass('active', true);
-
-                    console.log(path);
                 }
             }, {
                 key: "filterPath",
@@ -1058,21 +1187,67 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     _.button({ class: 'btn close' }, _.span({ class: 'glyphicon glyphicon-remove' })).click(view.events.clickCloseRootNav),
 
                     // Root folders
-                    this.$rootNav = _.ul({ class: 'nav nav-root nav-tabs', role: 'tablist' }, _.each(this.dirs, function (label, files) {
+                    this.$rootNav = _.ul({ class: 'nav nav-root nav-pills', role: 'tablist' }, _.each(this.dirs, function (label, files) {
                         return _.li({ role: 'presentation', class: '' }, _.a({ href: '#' + label, 'aria-controls': label, role: 'tab', 'data-toggle': 'tab' }, label));
                     })),
 
                     // Subfolders
                     this.$subNav = _.nav({ class: 'tab-content nav-sub' }, _.each(this.dirs, function (label, files) {
                         return _.div({ role: 'tab-panel', id: label, class: 'tab-pane' }, _.ul({ class: 'folder-content' }, _.each(files, function (i, file) {
+                            var contextMenuItems = {
+                                'Rename': view.events.clickRenameItem,
+                                'Delete': view.events.clickDeleteItem
+                            };
+
+                            var dragHandler = {
+                                dragstart: function dragstart(e) {
+                                    e.originalEvent.dataTransfer.setData('href', $el.children('a').attr('href'));
+                                },
+
+                                dragend: function dragend() {}
+                            };
+
+                            var dropHandler = {
+                                dragleave: function dragleave(e) {
+                                    e.preventDefault();
+
+                                    $(this).toggleClass('drag-over', false);
+                                },
+
+                                dragover: function dragover(e) {
+                                    e.preventDefault();
+
+                                    /*let $folder = $(this).parents('.folder');
+                                    let $folderContent = $(this).parents('.folder-content');*/
+
+                                    $(e.target).parents('.folder-content').toggleClass('drag-over', false);
+                                    $(e.target).find('.folder-content').toggleClass('drag-over', false);
+                                    $(e.target).toggleClass('drag-over', true);
+                                },
+
+                                drop: function drop(e) {
+                                    e.preventDefault();
+                                    var href = e.originalEvent.dataTransfer.getData('href');
+
+                                    var $target = $(e.target);
+
+                                    if ($target.hasClass('folder-content')) {
+                                        $target.append($('.tree li a[href="' + href + '"]').parent());
+                                    }
+                                }
+                            };
+
                             var isDir = file.mode == '040000';
                             var name = helper.basename(file.path);
+                            var $el = undefined;
 
                             if (isDir) {
-                                return _.li({ class: 'folder' }, [_.a({ href: '#/' + file.path }, [_.glyphicon({ class: 'glyphicon-folder-close' }), name]).click(view.events.clickFolder), _.ul({ class: 'folder-content', id: file.sha })]);
+                                $el = _.li({ class: 'folder', draggable: 'true' }, [_.a({ href: '#/' + file.path }, [_.glyphicon({ class: 'glyphicon-folder-close' }), name]).click(view.events.clickFolder).context(contextMenuItems).on(dragHandler), _.ul({ class: 'folder-content', id: file.sha }).on(dropHandler)]);
                             } else {
-                                return _.li({ class: 'file' }, _.a({ href: '#/' + file.path }, [_.glyphicon({ class: 'glyphicon-file' }), name]).click(view.events.clickFile));
+                                $el = _.li({ class: 'file', draggable: 'true' }, _.a({ href: '#/' + file.path }, [_.glyphicon({ class: 'glyphicon-file' }), name]).click(view.events.clickFile).context(contextMenuItems).on(dragHandler));
                             }
+
+                            return $el;
                         })));
                     }))]);
 
@@ -1094,23 +1269,23 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         })(View);
 
         module.exports = Tree;
-    }, {}], 11: [function (require, module, exports) {
-        var Navbar = (function (_View4) {
-            _inherits(Navbar, _View4);
+    }, {}], 12: [function (require, module, exports) {
+        var Navbar = (function (_View5) {
+            _inherits(Navbar, _View5);
 
             function Navbar(args) {
                 _classCallCheck(this, Navbar);
 
-                var _this4 = _possibleConstructorReturn(this, Object.getPrototypeOf(Navbar).call(this, args));
+                var _this5 = _possibleConstructorReturn(this, Object.getPrototypeOf(Navbar).call(this, args));
 
-                var view = _this4;
+                var view = _this5;
 
                 api.repo(function (repo) {
                     view.repo = repo;
 
                     view.init();
                 });
-                return _this4;
+                return _this5;
             }
 
             _createClass(Navbar, [{
@@ -1140,11 +1315,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         })(View);
 
         new Navbar();
-    }, {}], 12: [function (require, module, exports) {
+    }, {}], 13: [function (require, module, exports) {
         module.exports = Array.isArray || function (arr) {
             return Object.prototype.toString.call(arr) == '[object Array]';
         };
-    }, {}], 13: [function (require, module, exports) {
+    }, {}], 14: [function (require, module, exports) {
         var isarray = require('isarray');
 
         /**
@@ -1534,4 +1709,4 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
             return stringToRegexp(path, keys, options);
         }
-    }, { "isarray": 12 }] }, {}, [8]);
+    }, { "isarray": 13 }] }, {}, [9]);

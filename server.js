@@ -248,8 +248,11 @@ app.post('/api/:user/:repo/:mode/labels', function(req, res) {
 });
 
 // Get/set file
-app.post('/api/:user/:repo/:mode/file/:path*', function(req, res) {
-    let url = '/repos/' + req.params.user + '/' + req.params.repo + '/contents/' + req.params.path;
+app.post('/api/:user/:repo/:mode/file/*', function(req, res) {
+    let baseUrl = '/api/' + req.params.user + '/' + req.params.repo + '/' + req.params.mode + '/file/';
+    let apiUrl = '/repos/' + req.params.user + '/' + req.params.repo + '/contents/';
+    let path = req.url.replace(baseUrl, '');
+    let url = apiUrl + path;
 
     apiCall(req, res, url);
 });

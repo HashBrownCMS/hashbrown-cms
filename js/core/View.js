@@ -69,18 +69,10 @@ class ViewHelper {
         }
     }
 
-    static remove(timeout) {
-        let view = this;
-
-        setTimeout(function() {
-            view.trigger('remove');
-
-            if(view.$element && view.$element.length > 0) {
-                view.$element.remove();
-            }
-
-            delete instances[view.guid];
-        }, timeout || 0 );
+    static removeAll(type) {
+        for(let view of ViewHelper.getAll(type)) {
+            view.remove();
+        }
     }
 }
 
@@ -120,17 +112,21 @@ class View {
             this.element = this.$element[0];
             this.$element.data('view', this);
             this.$element.bind('destroyed', function() {
-               $(this).data('view').remove();
+                let view = $(this).data('view');
+
+                if(view) {
+                    $(this).data('view').remove();
+                }
             });
         }
 
-        this.trigger('ready');
+        this.trigger('ready', this);
         this.isReady = true;
     }
 
     ready(callback) {
         if(this.isReady) {
-            callback();
+            callback(this);
         } else {
             this.on('ready', callback);
         }
@@ -163,15 +159,23 @@ class View {
     /**
      * Events
      */
-    // Destroy
-    destroy() {
-        if(this.$element) {
-            this.$element.remove();
+    // Removes the view from DOM and memory
+    remove(timeout) {
+        let view = this;
+
+        if(!view.destroyed) {
+            view.destroyed = true;
+
+            setTimeout(function() {
+                view.trigger('remove');
+
+                if(view.$element && view.$element.length > 0) {
+                    view.$element.remove();
+                }
+
+                instances.splice(view.guid, 1);
+            }, timeout || 0 );
         }
-
-        instances.splice(this.guid, 1);
-
-        delete this;
     }
 
     // Call an event (for internal use)

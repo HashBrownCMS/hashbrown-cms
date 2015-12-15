@@ -1,31 +1,33 @@
-module.exports = View.extend(function ContextMenu(params) {
-    var self = this;
+'use strict';
+
+class ContextMenu extends View {
+    constructor(args) {
+        super(args);
+
+        // Recycle other context menus
+        if($('.context-menu').length > 0) {
+            this.$element = $('.context-menu');
+        } else {
+            this.$element = _.ul({ class: 'context-menu dropdown-menu', role: 'menu' });
+        }
+
+        this.$element.css({
+            position: 'absolute',
+            'z-index': 1200,
+            top: this.pos.y,
+            left: this.pos.x,
+            display: 'block'
+        });
+        
+        this.fetch();
+    }
     
-    // Remove other context menus
-    View.removeAll('ContextMenu');
-   
-    self.register();
-    self.adopt(params);
+    render() {
+        var view = this;
 
-    self.$element = _.ul({ class: 'context-menu dropdown-menu', role: 'menu' });
-
-    self.$element.css({
-        position: 'absolute',
-        'z-index': 1200,
-        top: self.pos.y,
-        left: self.pos.x,
-        display: 'block'
-    });
-    
-    self.fetch();
-},
-{
-    render: function() {
-        var self = this;
-
-        self.$element.html(
+        view.$element.html(
             _.each(
-                self.model,
+                view.model,
                 function(label, func) {
                     if(func == '---') {
                         return _.li(
@@ -45,7 +47,7 @@ module.exports = View.extend(function ContextMenu(params) {
                                 if(func) {
                                     func(e);
 
-                                    View.removeAll('ContextMenu');
+                                    view.remove();
                                 }
                             })
                         );
@@ -54,10 +56,11 @@ module.exports = View.extend(function ContextMenu(params) {
             )
         );
 
-        $('body').append(self.$element);
+        $('body').append(view.$element);
     }    
-});
+}
 
+// jQuery extention
 jQuery.fn.extend({
     context: function(menuItems) {
         return this.each(function() {
@@ -83,9 +86,9 @@ jQuery.fn.extend({
     }
 });
 
-// 
+// Event handling
 $('body').click(function(e) {
     if($(e.target).parents('.context-menu').length < 1) {
-        View.removeAll('ContextMenu');
+        ViewHelper.removeAll('ContextMenu');
     }
 });

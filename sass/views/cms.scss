@@ -1,5 +1,12 @@
+@import '../main';
+
 .page-content {
+    /**
+     * Tree
+     */
     .tree {
+        margin-bottom: 15px;
+
         .tab-pane {
             position: relative;
             height: 0px;
@@ -28,6 +35,10 @@
                 width: 28%;
                 border-right: 1px solid #ddd;
 
+                &.drag-over {
+                    box-shadow: inset 0px 0px 10px #337ab7;
+                }
+
                 a {
                     display: block;
                     padding: 5px 15px;
@@ -46,7 +57,6 @@
                 }
                 
                 &.active {
-                    background-color: #337ab7;
                     color: #fff;
 
                     &:after {
@@ -56,6 +66,12 @@
                     >a {
                         color: #fff;
                     }
+                }
+            }
+
+            .file {
+                &.active {
+                    background-color: #337ab7;
                 }
             }
 
@@ -72,6 +88,8 @@
                 }
                 
                 &.active {
+                    background-color: #666;
+                    
                     >.folder-content {
                         display: block;
                     }
@@ -94,5 +112,13 @@
                 }
             }
         }
+    }
+
+    /**
+     * Editor
+     */
+    .editor {
+        position: relative;
+        min-height: 200px;
     }
 }

@@ -2,11 +2,11 @@
 
 let pathToRegexp = require('path-to-regexp');
 
+let routes = [];
+
 class Router {
     static route(path, controller) {
-        this.routes = this.routes || [];
-
-        this.routes[path] = {
+        routes[path] = {
             controller: controller
         }
     }
@@ -23,8 +23,6 @@ class Router {
     }
 
     static init() {
-        this.routes = this.routes || [];
-
         // Get the url
         let url = location.hash.slice(1) || '/';
         let trimmed = url.substring(0, url.indexOf('?'));
@@ -32,18 +30,17 @@ class Router {
         if(trimmed) {
             url = trimmed;
         }
-
         // Look for route
         let context = {};
         let route;
 
         // Exact match
-        if(this.routes[url]) {
-            path = this.routes[url];
+        if(routes[url]) {
+            path = routes[url];
 
         // Use path to regexp
         } else {
-            for(let path in this.routes) {
+            for(let path in routes) {
                 let keys = [];
                 let re = pathToRegexp(path, keys);
                 let values = re.exec(url);
@@ -51,11 +48,11 @@ class Router {
                 // A match was found
                 if(re.test(url)) {
                     // Set the route
-                    route = this.routes[path];
+                    route = routes[path];
 
-                    // Add context variables (first result is the entire path)
+                    // Add context variables (first result (0) is the entire path,
+                    // so assign that manually and start the counter at 1 instead)
                     route.url = url; 
-                    
                     let counter = 1;
 
                     for(let key of keys) {
@@ -74,6 +71,5 @@ class Router {
     }
 }
 
+window.addEventListener('hashchange', Router.init); 
 window.Router = Router;
-window.addEventListener('hashchange', window.Router.init); 
-

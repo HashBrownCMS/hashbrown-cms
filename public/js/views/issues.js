@@ -4,11 +4,11 @@ var _createClass = (function () { function defineProperties(target, props) { for
 
 function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
 
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 (function e(t, n, r) {
     function s(o, u) {
@@ -161,14 +161,110 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         require('./core/Templating');
         require('./core/View');
         require('./core/Router');
+        require('./core/ContextMenu');
 
         require('./helper');
         require('./api');
         require('./env');
-    }, { "./api": 1, "./core/Router": 3, "./core/Templating": 4, "./core/View": 5, "./env": 6, "./helper": 7 }], 3: [function (require, module, exports) {
+    }, { "./api": 1, "./core/ContextMenu": 3, "./core/Router": 4, "./core/Templating": 5, "./core/View": 6, "./env": 7, "./helper": 8 }], 3: [function (require, module, exports) {
+        'use strict';
+
+        var ContextMenu = (function (_View) {
+            _inherits(ContextMenu, _View);
+
+            function ContextMenu(args) {
+                _classCallCheck(this, ContextMenu);
+
+                // Recycle other context menus
+
+                var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(ContextMenu).call(this, args));
+
+                if ($('.context-menu').length > 0) {
+                    _this.$element = $('.context-menu');
+                } else {
+                    _this.$element = _.ul({ class: 'context-menu dropdown-menu', role: 'menu' });
+                }
+
+                _this.$element.css({
+                    position: 'absolute',
+                    'z-index': 1200,
+                    top: _this.pos.y,
+                    left: _this.pos.x,
+                    display: 'block'
+                });
+
+                _this.fetch();
+                return _this;
+            }
+
+            _createClass(ContextMenu, [{
+                key: "render",
+                value: function render() {
+                    var view = this;
+
+                    view.$element.html(_.each(view.model, function (label, func) {
+                        if (func == '---') {
+                            return _.li({ class: 'dropdown-header' }, label);
+                        } else {
+                            return _.li({ class: typeof func === 'function' ? '' : 'disabled' }, _.a({ tabindex: '-1', href: '#' }, label).click(function (e) {
+                                e.preventDefault();
+                                e.stopPropagation();
+
+                                if (func) {
+                                    func(e);
+
+                                    view.remove();
+                                }
+                            }));
+                        }
+                    }));
+
+                    $('body').append(view.$element);
+                }
+            }]);
+
+            return ContextMenu;
+        })(View);
+
+        // jQuery extention
+
+        jQuery.fn.extend({
+            context: function context(menuItems) {
+                return this.each(function () {
+                    $(this).on('contextmenu', function (e) {
+                        if (e.ctrlKey) {
+                            return;
+                        }
+
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        if (e.which == 3) {
+                            var menu = new ContextMenu({
+                                model: menuItems,
+                                pos: {
+                                    x: e.pageX,
+                                    y: e.pageY
+                                }
+                            });
+                        }
+                    });
+                });
+            }
+        });
+
+        // Event handling
+        $('body').click(function (e) {
+            if ($(e.target).parents('.context-menu').length < 1) {
+                ViewHelper.removeAll('ContextMenu');
+            }
+        });
+    }, {}], 4: [function (require, module, exports) {
         'use strict';
 
         var pathToRegexp = require('path-to-regexp');
+
+        var routes = [];
 
         var Router = (function () {
             function Router() {
@@ -178,9 +274,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             _createClass(Router, null, [{
                 key: "route",
                 value: function route(path, controller) {
-                    this.routes = this.routes || [];
-
-                    this.routes[path] = {
+                    routes[path] = {
                         controller: controller
                     };
                 }
@@ -200,8 +294,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             }, {
                 key: "init",
                 value: function init() {
-                    this.routes = this.routes || [];
-
                     // Get the url
                     var url = location.hash.slice(1) || '/';
                     var trimmed = url.substring(0, url.indexOf('?'));
@@ -209,18 +301,17 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     if (trimmed) {
                         url = trimmed;
                     }
-
                     // Look for route
                     var context = {};
                     var route = undefined;
 
                     // Exact match
-                    if (this.routes[url]) {
-                        path = this.routes[url];
+                    if (routes[url]) {
+                        path = routes[url];
 
                         // Use path to regexp
                     } else {
-                            for (var _path in this.routes) {
+                            for (var _path in routes) {
                                 var keys = [];
                                 var re = pathToRegexp(_path, keys);
                                 var values = re.exec(url);
@@ -228,11 +319,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                                 // A match was found
                                 if (re.test(url)) {
                                     // Set the route
-                                    route = this.routes[_path];
+                                    route = routes[_path];
 
-                                    // Add context variables (first result is the entire path)
+                                    // Add context variables (first result (0) is the entire path,
+                                    // so assign that manually and start the counter at 1 instead)
                                     route.url = url;
-
                                     var counter = 1;
 
                                     var _iteratorNormalCompletion = true;
@@ -275,9 +366,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             return Router;
         })();
 
+        window.addEventListener('hashchange', Router.init);
         window.Router = Router;
-        window.addEventListener('hashchange', window.Router.init);
-    }, { "path-to-regexp": 13 }], 4: [function (require, module, exports) {
+    }, { "path-to-regexp": 14 }], 5: [function (require, module, exports) {
         var Templating = {};
 
         function append(el, content) {
@@ -381,7 +472,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         };
 
         window._ = Templating;
-    }, {}], 5: [function (require, module, exports) {
+    }, {}], 6: [function (require, module, exports) {
         'use strict'
 
         /**
@@ -459,19 +550,32 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     }
                 }
             }, {
-                key: "remove",
-                value: function remove(timeout) {
-                    var view = this;
+                key: "removeAll",
+                value: function removeAll(type) {
+                    var _iteratorNormalCompletion2 = true;
+                    var _didIteratorError2 = false;
+                    var _iteratorError2 = undefined;
 
-                    setTimeout(function () {
-                        view.trigger('remove');
+                    try {
+                        for (var _iterator2 = ViewHelper.getAll(type)[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                            var view = _step2.value;
 
-                        if (view.$element && view.$element.length > 0) {
-                            view.$element.remove();
+                            view.remove();
                         }
-
-                        delete instances[view.guid];
-                    }, timeout || 0);
+                    } catch (err) {
+                        _didIteratorError2 = true;
+                        _iteratorError2 = err;
+                    } finally {
+                        try {
+                            if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                                _iterator2.return();
+                            }
+                        } finally {
+                            if (_didIteratorError2) {
+                                throw _iteratorError2;
+                            }
+                        }
+                    }
                 }
             }]);
 
@@ -521,18 +625,22 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                         this.element = this.$element[0];
                         this.$element.data('view', this);
                         this.$element.bind('destroyed', function () {
-                            $(this).data('view').remove();
+                            var view = $(this).data('view');
+
+                            if (view) {
+                                $(this).data('view').remove();
+                            }
                         });
                     }
 
-                    this.trigger('ready');
+                    this.trigger('ready', this);
                     this.isReady = true;
                 }
             }, {
                 key: "ready",
                 value: function ready(callback) {
                     if (this.isReady) {
-                        callback();
+                        callback(this);
                     } else {
                         this.on('ready', callback);
                     }
@@ -567,18 +675,26 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 /**
                  * Events
                  */
-                // Destroy
+                // Removes the view from DOM and memory
 
             }, {
-                key: "destroy",
-                value: function destroy() {
-                    if (this.$element) {
-                        this.$element.remove();
+                key: "remove",
+                value: function remove(timeout) {
+                    var view = this;
+
+                    if (!view.destroyed) {
+                        view.destroyed = true;
+
+                        setTimeout(function () {
+                            view.trigger('remove');
+
+                            if (view.$element && view.$element.length > 0) {
+                                view.$element.remove();
+                            }
+
+                            instances.splice(view.guid, 1);
+                        }, timeout || 0);
                     }
-
-                    instances.splice(this.guid, 1);
-
-                    delete this;
                 }
 
                 // Call an event (for internal use)
@@ -704,7 +820,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         })();
 
         window.View = View;
-    }, {}], 6: [function (require, module, exports) {
+    }, {}], 7: [function (require, module, exports) {
         window.env = {
             json: null,
             sha: null,
@@ -754,7 +870,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 });
             }
         };
-    }, {}], 7: [function (require, module, exports) {
+    }, {}], 8: [function (require, module, exports) {
         var Helper = (function () {
             function Helper() {
                 _classCallCheck(this, Helper);
@@ -807,22 +923,22 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         })();
 
         window.helper = Helper;
-    }, {}], 8: [function (require, module, exports) {
+    }, {}], 9: [function (require, module, exports) {
         require('../client');
         require('./partials/navbar');
 
         var Issue = require('./partials/issue');
         var IssueModal = require('./partials/issue-modal');
 
-        var Issues = (function (_View) {
-            _inherits(Issues, _View);
+        var Issues = (function (_View2) {
+            _inherits(Issues, _View2);
 
             function Issues(args) {
                 _classCallCheck(this, Issues);
 
-                var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Issues).call(this, args));
+                var _this2 = _possibleConstructorReturn(this, Object.getPrototypeOf(Issues).call(this, args));
 
-                var view = _this;
+                var view = _this2;
 
                 api.issueColumns(function (columns) {
                     api.issues.fetch(function (issues) {
@@ -835,7 +951,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                         });
                     });
                 });
-                return _this;
+                return _this2;
             }
 
             /**
@@ -926,32 +1042,32 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         })(View);
 
         new Issues();
-    }, { "../client": 2, "./partials/issue": 10, "./partials/issue-modal": 9, "./partials/navbar": 11 }], 9: [function (require, module, exports) {
+    }, { "../client": 2, "./partials/issue": 11, "./partials/issue-modal": 10, "./partials/navbar": 12 }], 10: [function (require, module, exports) {
         'use strict';
 
         var Issue = require('./issue');
 
-        var IssueModal = (function (_View2) {
-            _inherits(IssueModal, _View2);
+        var IssueModal = (function (_View3) {
+            _inherits(IssueModal, _View3);
 
             function IssueModal(args) {
                 _classCallCheck(this, IssueModal);
 
-                var _this2 = _possibleConstructorReturn(this, Object.getPrototypeOf(IssueModal).call(this, args));
+                var _this3 = _possibleConstructorReturn(this, Object.getPrototypeOf(IssueModal).call(this, args));
 
-                var view = _this2;
+                var view = _this3;
 
                 api.labels.fetch(function (labels) {
                     view.labels = labels;
                 });
 
                 // Register events
-                _this2.on('clickOK', _this2.onClickOK);
-                _this2.on('changeAssignee', _this2.onChangeAssignee);
-                _this2.on('changeTitle', _this2.onChangeTitle);
-                _this2.on('changeBody', _this2.onChangeBody);
-                _this2.on('changeState', _this2.onChangeState);
-                _this2.on('changeMilestone', _this2.onChangeMilestone);
+                _this3.on('clickOK', _this3.onClickOK);
+                _this3.on('changeAssignee', _this3.onChangeAssignee);
+                _this3.on('changeTitle', _this3.onChangeTitle);
+                _this3.on('changeBody', _this3.onChangeBody);
+                _this3.on('changeState', _this3.onChangeState);
+                _this3.on('changeMilestone', _this3.onChangeMilestone);
 
                 // Prerender main element
                 view.$element = _.div({ class: 'modal fade issue-modal', role: 'dialog' }, _.div({ class: 'modal-dialog' }, _.div({ class: 'modal-content' }, [_.div({ class: 'modal-header' }, [_.button({ type: 'button', class: 'close', 'data-dismiss': 'modal' }, _.span({ class: 'glyphicon glyphicon-remove' })), view.$heading = _.span(), _.p({}, ['Created by ', view.$user = _.a()])]), _.div({ class: 'modal-body' }, [_.div({ class: 'row' }, [_.div({ class: 'col-xs-6' }, _.div({ class: 'input-group' }, [_.span({ class: 'input-group-addon' }, 'Assignee'), (function () {
@@ -983,7 +1099,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
                     return view.$milestone;
                 })().change(view.events.changeMilestone)]), _.div({ class: 'input-group' }, [_.span({ class: 'input-group-addon' }, 'Title'), view.$title = _.input({ type: 'text', class: 'form-control' }).change(view.events.changeTitle)]), _.div({ class: 'input-group input-group-vertical' }, [_.span({ class: 'input-group-addon' }, 'Description'), view.$body = _.textarea({ class: 'form-control' }).change(view.events.changeBody)])]), _.div({ class: 'modal-footer' }, [view.$labels = _.div({ class: 'labels' }), _.button({ class: 'btn btn-primary' }, 'OK').click(view.events.clickOK)])])));
-                return _this2;
+                return _this3;
             }
 
             /**
@@ -1125,26 +1241,26 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         })(View);
 
         module.exports = IssueModal;
-    }, { "./issue": 10 }], 10: [function (require, module, exports) {
+    }, { "./issue": 11 }], 11: [function (require, module, exports) {
         'use strict';
 
-        var Issue = (function (_View3) {
-            _inherits(Issue, _View3);
+        var Issue = (function (_View4) {
+            _inherits(Issue, _View4);
 
             function Issue(args) {
                 _classCallCheck(this, Issue);
 
                 // Register events
 
-                var _this3 = _possibleConstructorReturn(this, Object.getPrototypeOf(Issue).call(this, args));
+                var _this4 = _possibleConstructorReturn(this, Object.getPrototypeOf(Issue).call(this, args));
 
-                _this3.on('click', _this3.onClick);
+                _this4.on('click', _this4.onClick);
 
                 // Init html
-                _this3.$element = _.div({ class: 'panel panel-primary issue' }).click(_this3.events.click);
+                _this4.$element = _.div({ class: 'panel panel-primary issue' }).click(_this4.events.click);
 
-                _this3.init();
-                return _this3;
+                _this4.init();
+                return _this4;
             }
 
             /**
@@ -1278,23 +1394,23 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         })(View);
 
         module.exports = Issue;
-    }, {}], 11: [function (require, module, exports) {
-        var Navbar = (function (_View4) {
-            _inherits(Navbar, _View4);
+    }, {}], 12: [function (require, module, exports) {
+        var Navbar = (function (_View5) {
+            _inherits(Navbar, _View5);
 
             function Navbar(args) {
                 _classCallCheck(this, Navbar);
 
-                var _this4 = _possibleConstructorReturn(this, Object.getPrototypeOf(Navbar).call(this, args));
+                var _this5 = _possibleConstructorReturn(this, Object.getPrototypeOf(Navbar).call(this, args));
 
-                var view = _this4;
+                var view = _this5;
 
                 api.repo(function (repo) {
                     view.repo = repo;
 
                     view.init();
                 });
-                return _this4;
+                return _this5;
             }
 
             _createClass(Navbar, [{
@@ -1324,11 +1440,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         })(View);
 
         new Navbar();
-    }, {}], 12: [function (require, module, exports) {
+    }, {}], 13: [function (require, module, exports) {
         module.exports = Array.isArray || function (arr) {
             return Object.prototype.toString.call(arr) == '[object Array]';
         };
-    }, {}], 13: [function (require, module, exports) {
+    }, {}], 14: [function (require, module, exports) {
         var isarray = require('isarray');
 
         /**
@@ -1718,4 +1834,4 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
             return stringToRegexp(path, keys, options);
         }
-    }, { "isarray": 12 }] }, {}, [8]);
+    }, { "isarray": 13 }] }, {}, [9]);
