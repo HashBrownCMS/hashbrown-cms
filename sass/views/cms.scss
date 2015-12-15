@@ -132,5 +132,32 @@
     .editor {
         position: relative;
         min-height: 200px;
+
+        .field-editor-container {
+            width: 100%;
+            margin-bottom: 15px;
+
+            .field-editor-label {
+                min-width: 180px;
+                text-align: left;
+                vertical-align: top;
+                border-bottom: 0px;
+                border-left: 0px;
+                border-right: 0px;
+                border-radius: 0px;
+                background-color: transparent;
+            }
+
+            .field-editor {
+                width: 100%;
+                margin-bottom: 15px;
+
+                .checkbox-editor {
+                    input {
+                        width: 64px;
+                    }
+                }
+            }
+        }
     }
 }

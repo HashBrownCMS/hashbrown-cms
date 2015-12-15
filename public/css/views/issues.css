@@ -8,6 +8,15 @@
   background-color: #eee;
   box-shadow: none; }
 
+.btn-toggle .glyphicon {
+  visibility: hidden; }
+
+.btn-toggle[data-checked="true"] .glyphicon {
+  visibility: visible; }
+
+.btn .glyphicon {
+  line-height: 1.3em; }
+
 .m-b-xs {
   margin-bottom: 10px; }
 

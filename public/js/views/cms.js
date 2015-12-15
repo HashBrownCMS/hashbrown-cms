@@ -155,6 +155,20 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                         callback(branches);
                     });
                 }
+            },
+
+            structs: {
+                pages: {
+                    get: function get(path, callback) {
+                        api.call('/api/' + req.params.user + '/' + req.params.repo + '/get/structs/pages/' + path, callback);
+                    }
+                },
+
+                fields: {
+                    get: function get(callback) {
+                        api.call('/api/' + req.params.user + '/' + req.params.repo + '/get/structs/fields', callback);
+                    }
+                }
             }
         };
     }, {}], 2: [function (require, module, exports) {
@@ -368,7 +382,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
         window.addEventListener('hashchange', Router.init);
         window.Router = Router;
-    }, { "path-to-regexp": 14 }], 5: [function (require, module, exports) {
+    }, { "path-to-regexp": 18 }], 5: [function (require, module, exports) {
         var Templating = {};
 
         function append(el, content) {
@@ -972,7 +986,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         })(View);
 
         new CMS();
-    }, { "../client": 2, "./partials/cms-editor": 10, "./partials/cms-tree": 11, "./partials/navbar": 12 }], 10: [function (require, module, exports) {
+    }, { "../client": 2, "./partials/cms-editor": 10, "./partials/cms-tree": 11, "./partials/navbar": 16 }], 10: [function (require, module, exports) {
         var Editor = (function (_View3) {
             _inherits(Editor, _View3);
 
@@ -981,30 +995,25 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
                 var _this3 = _possibleConstructorReturn(this, Object.getPrototypeOf(Editor).call(this, args));
 
-                _this3.$element = _.div({ class: 'panel panel-default editor' });
+                _this3.initFieldEditors();
+
+                _this3.$element = _.div({ class: 'panel panel-default editor' }, [_.div({ class: 'panel-heading' }), _.div({ class: 'panel-body' })]);
                 return _this3;
             }
 
             _createClass(Editor, [{
-                key: "open",
-                value: function open(content, skipHighlight) {
-                    var view = this;
-
-                    view.model = content;
-
-                    view.render();
-
-                    // Highlight file in tree if not skipped
-                    if (!skipHighlight) {
-                        ViewHelper.get('Tree').ready(function (view) {
-                            view.highlight(view.model.path);
-                        });
-                    }
+                key: "initFieldEditors",
+                value: function initFieldEditors() {
+                    this.fieldEditors = {
+                        'text': require('./field-editors/text'),
+                        'text-html': require('./field-editors/text-html'),
+                        'checkbox': require('./field-editors/checkbox')
+                    };
                 }
             }, {
                 key: "clear",
                 value: function clear() {
-                    this.$element.html(_.div({ class: 'spinner-container' }, _.div({ class: 'spinner' })));
+                    this.$element.children('panel-body').html(_.div({ class: 'spinner-container' }, _.div({ class: 'spinner' })));
                 }
             }, {
                 key: "openAsync",
@@ -1022,9 +1031,67 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                     });
                 }
             }, {
+                key: "open",
+                value: function open(content, skipHighlight) {
+                    var view = this;
+
+                    view.model = content;
+
+                    view.render();
+
+                    // Highlight file in tree if not skipped
+                    if (!skipHighlight) {
+                        ViewHelper.get('Tree').ready(function (view) {
+                            view.highlight(view.model.path);
+                        });
+                    }
+                }
+            }, {
+                key: "getFieldEditor",
+                value: function getFieldEditor(editorName, alias, fieldModel, isArray) {
+                    var FieldEditor = this.fieldEditors[editorName];
+
+                    if (FieldEditor) {
+                        var fieldEditorInstance = new FieldEditor({ model: fieldModel });
+
+                        fieldEditorInstance.on('change', function () {
+                            console.log(fieldModel.value);
+                            // TODO: Do we need to commit something? Probably not.
+                        });
+
+                        return fieldEditorInstance;
+                    }
+                }
+            }, {
                 key: "render",
                 value: function render() {
-                    this.$element.html(JSON.stringify(this.model));
+                    var view = this;
+
+                    api.structs.fields.get(function (fieldStructs) {
+                        api.structs.pages.get(view.model.struct || 'page', function (pageStruct) {
+                            view.$element.children('.panel-heading').html(view.model.name);
+                            view.$element.children('.panel-body').empty();
+
+                            // TODO: Populate struct with model data
+
+                            for (var alias in pageStruct) {
+                                var fieldModel = pageStruct[alias];
+                                var fieldStruct = fieldStructs[fieldModel.struct];
+
+                                if (fieldStruct) {
+                                    var fieldEditorView = view.getFieldEditor(fieldStruct.editor, alias, fieldModel);
+
+                                    if (fieldEditorView) {
+                                        view.$element.children('.panel-body').append(_.div({ class: 'input-group field-editor-container' }, [_.span({ class: 'field-editor-label input-group-addon' }, fieldModel.label), fieldEditorView.$element]));
+                                    } else {
+                                        console.log('No field editor with name "' + fieldStruct.editor + '" was found');
+                                    }
+                                } else {
+                                    console.log('No field struct with name "' + fieldModel.struct + '" was found');
+                                }
+                            }
+                        });
+                    });
                 }
             }]);
 
@@ -1032,7 +1099,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         })(View);
 
         module.exports = Editor;
-    }, {}], 11: [function (require, module, exports) {
+    }, { "./field-editors/checkbox": 12, "./field-editors/text": 15, "./field-editors/text-html": 14 }], 11: [function (require, module, exports) {
         var Tree = (function (_View4) {
             _inherits(Tree, _View4);
 
@@ -1284,22 +1351,196 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
         module.exports = Tree;
     }, {}], 12: [function (require, module, exports) {
-        var Navbar = (function (_View5) {
-            _inherits(Navbar, _View5);
+        'use strict';
+
+        var FieldEditor = require('./field');
+
+        var CheckboxEditor = (function (_FieldEditor) {
+            _inherits(CheckboxEditor, _FieldEditor);
+
+            function CheckboxEditor(args) {
+                _classCallCheck(this, CheckboxEditor);
+
+                var _this5 = _possibleConstructorReturn(this, Object.getPrototypeOf(CheckboxEditor).call(this, args));
+
+                _this5.fetch();
+                return _this5;
+            }
+
+            _createClass(CheckboxEditor, [{
+                key: "renderField",
+                value: function renderField() {
+                    var view = this;
+
+                    return _.div({ class: 'checkbox-editor' }, _.button({ class: 'btn btn-default btn-toggle', 'data-checked': this.model.value }, _.span({ class: 'glyphicon glyphicon-ok' })).click(function (e) {
+                        $(this).attr('data-checked', $(this).attr('data-checked') != 'true');
+
+                        view.onChangeBoolValue(e, this, view);
+                    }));
+                }
+            }]);
+
+            return CheckboxEditor;
+        })(FieldEditor);
+
+        module.exports = CheckboxEditor;
+    }, { "./field": 13 }], 13: [function (require, module, exports) {
+        'use strict';
+
+        var FieldEditor = (function (_View5) {
+            _inherits(FieldEditor, _View5);
+
+            function FieldEditor(args) {
+                _classCallCheck(this, FieldEditor);
+
+                // Register events
+
+                var _this6 = _possibleConstructorReturn(this, Object.getPrototypeOf(FieldEditor).call(this, args));
+
+                _this6.on('changeTextValue', _this6.onChangeTextValue);
+                _this6.on('changeBoolValue', _this6.onChangeBoolValue);
+                return _this6;
+            }
+
+            _createClass(FieldEditor, [{
+                key: "onChangeTextValue",
+                value: function onChangeTextValue(e, element, view) {
+                    view.model.value = $(element).val();
+
+                    view.trigger('change');
+                }
+            }, {
+                key: "onChangeBoolValue",
+                value: function onChangeBoolValue(e, element, view) {
+                    view.model.value = $(element).data('checked');
+
+                    view.trigger('change');
+                }
+            }, {
+                key: "renderField",
+                value: function renderField() {}
+            }, {
+                key: "render",
+                value: function render() {
+                    var _this7 = this;
+
+                    var view = this;
+
+                    if (this.model.isArray) {
+                        (function () {
+                            var onClickAdd = function onClickAdd() {
+                                $(this).before(addField(view.model.value.length, null));
+
+                                view.model.value.push(null);
+                            };
+
+                            var addField = function addField(i, value) {
+                                function onClickRemove() {
+                                    if (view.model.value.length > 1) {
+                                        $field.remove();
+                                        $btnRemove.remove();
+                                        view.model.value.splice(i, 1);
+                                    }
+                                }
+
+                                var $field = view.renderField();
+
+                                var $btnRemove = _.span({ class: 'input-group-btn' }, _.button({ class: 'btn btn-danger' }, [_.span({ class: 'glyphicon glyphicon-remove' })]).click(onClickRemove));
+
+                                return _.div({ class: 'field-editor input-group' }, [$btnRemove, $field]);
+                            };
+
+                            if (!_this7.model.value || _this7.model.value.length < 1) {
+                                _this7.model.value = [null];
+                            }
+
+                            _this7.$element = _.div({ class: 'field-editor-array' }, _.each(_this7.model.value, addField));
+
+                            _this7.$element.append(_.button({ class: 'btn btn-success' }, _.span({ class: 'glyphicon glyphicon-plus' })).click(onClickAdd));
+                        })();
+                    } else {
+                        this.$element = _.div({ class: 'field-editor' }, this.renderField());
+                    }
+                }
+            }]);
+
+            return FieldEditor;
+        })(View);
+
+        module.exports = FieldEditor;
+    }, {}], 14: [function (require, module, exports) {
+        'use strict';
+
+        var FieldEditor = require('./field');
+
+        var TextHtmlEditor = (function (_FieldEditor2) {
+            _inherits(TextHtmlEditor, _FieldEditor2);
+
+            function TextHtmlEditor(args) {
+                _classCallCheck(this, TextHtmlEditor);
+
+                var _this8 = _possibleConstructorReturn(this, Object.getPrototypeOf(TextHtmlEditor).call(this, args));
+
+                _this8.fetch();
+                return _this8;
+            }
+
+            _createClass(TextHtmlEditor, [{
+                key: "renderField",
+                value: function renderField() {
+                    return _.div({ class: 'field-editor text-html-editor' }, _.textarea({ class: 'form-control' }, this.model.value).bind('change paste propertychange keyup', this.events.changeTextValue));
+                }
+            }]);
+
+            return TextHtmlEditor;
+        })(FieldEditor);
+
+        module.exports = TextHtmlEditor;
+    }, { "./field": 13 }], 15: [function (require, module, exports) {
+        'use strict';
+
+        var FieldEditor = require('./field');
+
+        var TextEditor = (function (_FieldEditor3) {
+            _inherits(TextEditor, _FieldEditor3);
+
+            function TextEditor(args) {
+                _classCallCheck(this, TextEditor);
+
+                var _this9 = _possibleConstructorReturn(this, Object.getPrototypeOf(TextEditor).call(this, args));
+
+                _this9.fetch();
+                return _this9;
+            }
+
+            _createClass(TextEditor, [{
+                key: "renderField",
+                value: function renderField() {
+                    return _.div({ class: 'text-editor' }, _.input({ type: 'text', class: 'form-control', value: this.model.value }).bind('change paste propertychange keyup', this.events.changeTextValue));
+                }
+            }]);
+
+            return TextEditor;
+        })(FieldEditor);
+
+        module.exports = TextEditor;
+    }, { "./field": 13 }], 16: [function (require, module, exports) {
+        var Navbar = (function (_View6) {
+            _inherits(Navbar, _View6);
 
             function Navbar(args) {
                 _classCallCheck(this, Navbar);
 
-                var _this5 = _possibleConstructorReturn(this, Object.getPrototypeOf(Navbar).call(this, args));
+                var _this10 = _possibleConstructorReturn(this, Object.getPrototypeOf(Navbar).call(this, args));
 
-                var view = _this5;
+                var view = _this10;
 
                 api.repo(function (repo) {
                     view.repo = repo;
 
                     view.init();
                 });
-                return _this5;
+                return _this10;
             }
 
             _createClass(Navbar, [{
@@ -1329,11 +1570,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         })(View);
 
         new Navbar();
-    }, {}], 13: [function (require, module, exports) {
+    }, {}], 17: [function (require, module, exports) {
         module.exports = Array.isArray || function (arr) {
             return Object.prototype.toString.call(arr) == '[object Array]';
         };
-    }, {}], 14: [function (require, module, exports) {
+    }, {}], 18: [function (require, module, exports) {
         var isarray = require('isarray');
 
         /**
@@ -1723,4 +1964,4 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
             return stringToRegexp(path, keys, options);
         }
-    }, { "isarray": 13 }] }, {}, [9]);
+    }, { "isarray": 17 }] }, {}, [9]);

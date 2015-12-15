@@ -155,6 +155,20 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                         callback(branches);
                     });
                 }
+            },
+
+            structs: {
+                pages: {
+                    get: function get(path, callback) {
+                        api.call('/api/' + req.params.user + '/' + req.params.repo + '/get/structs/pages/' + path, callback);
+                    }
+                },
+
+                fields: {
+                    get: function get(callback) {
+                        api.call('/api/' + req.params.user + '/' + req.params.repo + '/get/structs/fields', callback);
+                    }
+                }
             }
         };
     }, {}], 2: [function (require, module, exports) {

@@ -1,0 +1,13 @@
+{
+    "string": { "label": "Text", "editor": "text" },
+    "htmlString": { "label": "Rich text", "editor": "text-html" },
+    "integer": { "label": "Number", "editor": "number", "decimals": false },
+    "float": { "label": "Number (decimals)", "editor": "number", "decimals": true },
+    "date": { "label": "Date", "editor": "picker-date" },
+    "media": { "label": "Media", "editor": "picker-media" },
+    "node": { "label": "Node", "editor": "picker-node" },
+    "nestedNode": { "label": "Nested node", "editor": "nested-node" },
+    "template": { "label": "Template", "editor": "picker-template" },
+    "bool": { "label": "Checkbox", "editor": "checkbox" },
+    "switch": { "label": "Switch", "editor": "switch", "keys": [ "true", "false" ] }
+}

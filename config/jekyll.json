@@ -1,0 +1,6 @@
+{
+    "paths": {
+        "env": "/_env.json",
+        "pages": "/_pages"
+    }
+}

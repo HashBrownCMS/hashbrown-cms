@@ -132,5 +132,19 @@ window.api = {
                 callback(branches);
             });
         }
+    },
+
+    structs: {
+        pages: {
+            get: function(path, callback) {
+                api.call('/api/' + req.params.user + '/' + req.params.repo + '/get/structs/pages/' + path, callback);
+            }
+        },
+
+        fields: {
+            get: function(callback) {
+                api.call('/api/' + req.params.user + '/' + req.params.repo + '/get/structs/fields', callback);
+            }
+        }
     }
 };
