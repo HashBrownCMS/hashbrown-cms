@@ -157,6 +157,8 @@
         background-color: #337ab7; }
       .page-content .tree .tab-pane .folder {
         position: relative; }
+        .page-content .tree .tab-pane .folder > a.drag-over {
+          box-shadow: inset 0px 0px 10px #337ab7; }
         .page-content .tree .tab-pane .folder:after {
           font-family: 'Glyphicons Halflings';
           content: '\e080';
@@ -166,6 +168,8 @@
           top: 5px; }
         .page-content .tree .tab-pane .folder.active {
           background-color: #666; }
+          .page-content .tree .tab-pane .folder.active > a.drag-over {
+            box-shadow: inset 0px 0px 10px #fff; }
           .page-content .tree .tab-pane .folder.active > .folder-content {
             display: block; }
         .page-content .tree .tab-pane .folder:nth-child(1) .folder-content {

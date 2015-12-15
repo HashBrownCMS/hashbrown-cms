@@ -166,6 +166,7 @@ class Tree extends View {
                                             },
 
                                             dragend: function() {
+                                                $('.drag-over').toggleClass('drag-over', false);
                                             }
                                         };
 
@@ -173,7 +174,7 @@ class Tree extends View {
                                             dragleave: function(e) {
                                                 e.preventDefault();
 
-                                                $(this).toggleClass('drag-over', false);
+                                                $(e.target).toggleClass('drag-over', false);
                                             },
 
                                             dragover: function(e) {
@@ -191,10 +192,22 @@ class Tree extends View {
                                                 e.preventDefault();
                                                 let href = e.originalEvent.dataTransfer.getData('href');
 
+                                                let $fileAnchor = $('.tree li a[href="' + href + '"]');
+                                                let $file = $fileAnchor.parent();
                                                 let $target = $(e.target);
 
-                                                if($target.hasClass('folder-content')) {
-                                                    $target.append($('.tree li a[href="' + href + '"]').parent());
+                                                // Is this is a folder, redirect to folder content container
+                                                if($target.siblings('.folder-content').length > 0) {
+                                                    $target = $target.siblings('.folder-content');
+                                                }
+
+                                                let isFolder = $target.hasClass('folder-content');
+                                                let isSelf = $target.is($fileAnchor.siblings('.folder-content'));
+
+                                                if(isFolder && !isSelf) {
+                                                    $target.append($file);
+
+                                                    view.highlight(href.replace('#/', ''));
                                                 }
                                             }
                                         };

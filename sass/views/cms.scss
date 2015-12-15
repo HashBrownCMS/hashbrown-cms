@@ -77,6 +77,12 @@
 
             .folder {
                 position: relative;
+               
+                >a { 
+                    &.drag-over {
+                        box-shadow: inset 0px 0px 10px #337ab7;
+                    }
+                }
 
                 &:after {
                     font-family: 'Glyphicons Halflings';
@@ -90,6 +96,12 @@
                 &.active {
                     background-color: #666;
                     
+                    >a { 
+                        &.drag-over {
+                            box-shadow: inset 0px 0px 10px #fff;
+                        }
+                    }
+
                     >.folder-content {
                         display: block;
                     }

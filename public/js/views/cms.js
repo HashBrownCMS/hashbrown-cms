@@ -1204,14 +1204,16 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                                     e.originalEvent.dataTransfer.setData('href', $el.children('a').attr('href'));
                                 },
 
-                                dragend: function dragend() {}
+                                dragend: function dragend() {
+                                    $('.drag-over').toggleClass('drag-over', false);
+                                }
                             };
 
                             var dropHandler = {
                                 dragleave: function dragleave(e) {
                                     e.preventDefault();
 
-                                    $(this).toggleClass('drag-over', false);
+                                    $(e.target).toggleClass('drag-over', false);
                                 },
 
                                 dragover: function dragover(e) {
@@ -1229,10 +1231,22 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                                     e.preventDefault();
                                     var href = e.originalEvent.dataTransfer.getData('href');
 
+                                    var $fileAnchor = $('.tree li a[href="' + href + '"]');
+                                    var $file = $fileAnchor.parent();
                                     var $target = $(e.target);
 
-                                    if ($target.hasClass('folder-content')) {
-                                        $target.append($('.tree li a[href="' + href + '"]').parent());
+                                    // Is this is a folder, redirect to folder content container
+                                    if ($target.siblings('.folder-content').length > 0) {
+                                        $target = $target.siblings('.folder-content');
+                                    }
+
+                                    var isFolder = $target.hasClass('folder-content');
+                                    var isSelf = $target.is($fileAnchor.siblings('.folder-content'));
+
+                                    if (isFolder && !isSelf) {
+                                        $target.append($file);
+
+                                        view.highlight(href.replace('#/', ''));
                                     }
                                 }
                             };
