@@ -313,7 +313,7 @@ class GitHub {
     pageStruct(req, res) {
         let octo = new octokat({ token: req.body.token });
 
-        // Get the default struct
+        // Get the base struct
         let baseStruct = require('../../structs/page.json');
         let baseString = JSON.stringify(baseStruct);
 
