@@ -321,6 +321,7 @@ class GitHub {
             let output = baseStruct;
 
             if(!err) {
+                // Primitive struct merge
                 let thisString = new Buffer(file.content, file.encoding).toString().replace(/\n/g, '');
             
                 baseString = baseString.slice(0, -1);
