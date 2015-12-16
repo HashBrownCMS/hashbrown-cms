@@ -47,7 +47,7 @@ class DatePicker extends FieldEditor {
 
             // Update data
             $el.attr('data-date', date.toString());
-            $el.children('date-picker-preview').html(date.toString());
+            $el.children('.date-picker-preview').html(date.toString());
             view.events.changeDateValue(date);
         }
 
@@ -57,7 +57,7 @@ class DatePicker extends FieldEditor {
         }
         
         function onChangeMonth() {
-            date.setMonth($(this).val());
+            date.setMonth($(this).val() - 1);
             update();
         }
         
@@ -81,9 +81,9 @@ class DatePicker extends FieldEditor {
             update();
         }
 
-        let $el = _.div({class: 'input-group date-picker'}, [
+        let $el = _.div({class: 'date-picker'}, [
             _.input({class: 'form-control date-picker-year', type: 'number', value: date.getFullYear()}).bind('change paste propertychange keyup', onChangeYear),
-            _.input({class: 'form-control date-picker-month', type: 'number', value: date.getMonth()}).bind('change paste propertychange keyup', onChangeMonth),
+            _.input({class: 'form-control date-picker-month', type: 'number', value: date.getMonth() + 1}).bind('change paste propertychange keyup', onChangeMonth),
             _.input({class: 'form-control date-picker-day', type: 'number', value: date.getDate()}).bind('change paste propertychange keyup', onChangeDay),
             _.input({class: 'form-control date-picker-hour', type: 'number', value: date.getHours()}).bind('change paste propertychange keyup', onChangeHour),
             _.input({class: 'form-control date-picker-minute', type: 'number', value: date.getMinutes()}).bind('change paste propertychange keyup', onChangeMinute),

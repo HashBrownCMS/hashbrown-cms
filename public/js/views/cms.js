@@ -1553,7 +1553,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
                         // Update data
                         $el.attr('data-date', date.toString());
-                        $el.children('date-picker-preview').html(date.toString());
+                        $el.children('.date-picker-preview').html(date.toString());
                         view.events.changeDateValue(date);
                     }
 
@@ -1563,7 +1563,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                     }
 
                     function onChangeMonth() {
-                        date.setMonth($(this).val());
+                        date.setMonth($(this).val() - 1);
                         update();
                     }
 
@@ -1587,7 +1587,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                         update();
                     }
 
-                    var $el = _.div({ class: 'input-group date-picker' }, [_.input({ class: 'form-control date-picker-year', type: 'number', value: date.getFullYear() }).bind('change paste propertychange keyup', onChangeYear), _.input({ class: 'form-control date-picker-month', type: 'number', value: date.getMonth() }).bind('change paste propertychange keyup', onChangeMonth), _.input({ class: 'form-control date-picker-day', type: 'number', value: date.getDate() }).bind('change paste propertychange keyup', onChangeDay), _.input({ class: 'form-control date-picker-hour', type: 'number', value: date.getHours() }).bind('change paste propertychange keyup', onChangeHour), _.input({ class: 'form-control date-picker-minute', type: 'number', value: date.getMinutes() }).bind('change paste propertychange keyup', onChangeMinute), _.input({ class: 'form-control date-picker-second', type: 'number', value: date.getSeconds() }).bind('change paste propertychange keyup', onChangeSecond), _.div({ class: 'date-picker-preview' }, date.toString())]);
+                    var $el = _.div({ class: 'date-picker' }, [_.input({ class: 'form-control date-picker-year', type: 'number', value: date.getFullYear() }).bind('change paste propertychange keyup', onChangeYear), _.input({ class: 'form-control date-picker-month', type: 'number', value: date.getMonth() + 1 }).bind('change paste propertychange keyup', onChangeMonth), _.input({ class: 'form-control date-picker-day', type: 'number', value: date.getDate() }).bind('change paste propertychange keyup', onChangeDay), _.input({ class: 'form-control date-picker-hour', type: 'number', value: date.getHours() }).bind('change paste propertychange keyup', onChangeHour), _.input({ class: 'form-control date-picker-minute', type: 'number', value: date.getMinutes() }).bind('change paste propertychange keyup', onChangeMinute), _.input({ class: 'form-control date-picker-second', type: 'number', value: date.getSeconds() }).bind('change paste propertychange keyup', onChangeSecond), _.div({ class: 'date-picker-preview' }, date.toString())]);
 
                     return $el;
                 }
