@@ -126,6 +126,9 @@ textarea {
      */ }
   .page-content .tree {
     margin-bottom: 15px; }
+    .page-content .tree .nav-root {
+      margin: 0px;
+      padding: 0px; }
     .page-content .tree .tab-pane {
       position: relative;
       height: 0px;
@@ -392,13 +395,17 @@ textarea {
     position: relative;
     min-height: 200px; }
     .page-content .editor > .panel-heading {
-      position: relative; }
+      position: relative;
+      padding: 0px;
+      height: 56px; }
+      .page-content .editor > .panel-heading .field-anchors {
+        padding: 10px 15px;
+        float: left; }
+        .page-content .editor > .panel-heading .field-anchors a {
+          padding: 6px 12px; }
       .page-content .editor > .panel-heading .content-actions {
-        position: absolute;
-        right: 0px;
-        top: 0px;
-        padding: 2px 15px;
-        border-left: 1px solid #ddd;
+        padding: 10px 15px;
+        float: right;
         border-top-right-radius: 2px; }
     .page-content .editor .field-editor-container {
       width: 100%;

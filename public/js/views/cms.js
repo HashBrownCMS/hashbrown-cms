@@ -455,7 +455,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
         window.addEventListener('hashchange', Router.init);
         window.Router = Router;
-    }, { "path-to-regexp": 19 }], 5: [function (require, module, exports) {
+    }, { "path-to-regexp": 20 }], 5: [function (require, module, exports) {
         var Templating = {};
 
         function append(el, content) {
@@ -1036,7 +1036,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 key: "initRoutes",
                 value: function initRoutes() {
                     // Pages
-                    Router.route('/_pages/:path*', function () {
+                    Router.route('/_content/:path*', function () {
                         ViewHelper.get('Editor').openAsync(this.path);
                     });
 
@@ -1059,7 +1059,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         })(View);
 
         new CMS();
-    }, { "../client": 2, "./partials/cms-editor": 10, "./partials/cms-tree": 11, "./partials/navbar": 17 }], 10: [function (require, module, exports) {
+    }, { "../client": 2, "./partials/cms-editor": 10, "./partials/cms-tree": 11, "./partials/navbar": 18 }], 10: [function (require, module, exports) {
         var Editor = (function (_View3) {
             _inherits(Editor, _View3);
 
@@ -1075,7 +1075,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
                 _this3.initFieldEditors();
 
-                _this3.$element = _.div({ class: 'panel panel-default editor' }, [_.div({ class: 'panel-heading' }, [_.div({ class: 'btn-group content-actions' }, [_.button({ class: 'btn btn-success btn-publish' }, ['Save ', _.span({ class: 'glyphicon glyphicon-floppy-disk' })]).click(_this3.events.clickSave), _.button({ class: 'btn btn-success btn-publish' }, ['Publish ', _.span({ class: 'glyphicon glyphicon-upload' })]).click(_this3.events.clickPublish)]), _.h4({ class: 'panel-title' }, '&nbsp;')]), _.div({ class: 'panel-body' })]);
+                _this3.$element = _.div({ class: 'panel panel-default editor' }, [_.div({ class: 'panel-heading' }, [_.div({ class: 'btn-group content-actions' }, [_.button({ class: 'btn btn-success btn-publish' }, ['Save ', _.span({ class: 'glyphicon glyphicon-floppy-disk' })]).click(_this3.events.clickSave), _.button({ class: 'btn btn-success btn-publish' }, ['Publish ', _.span({ class: 'glyphicon glyphicon-upload' })]).click(_this3.events.clickPublish)]), _.div({ class: 'btn-group field-anchors' })]), _.div({ class: 'panel-body' })]);
                 return _this3;
             }
 
@@ -1108,6 +1108,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                     this.fieldEditors = {
                         'text': require('./field-editors/text'),
                         'text-html': require('./field-editors/text-html'),
+                        'url': require('./field-editors/url'),
                         'checkbox': require('./field-editors/checkbox'),
                         'template-picker': require('./field-editors/template-picker')
                     };
@@ -1124,10 +1125,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
                     view.clear();
 
-                    view.path = '/_pages/' + path;
+                    view.path = '/_content/' + path;
 
                     ViewHelper.get('Tree').ready(function (view) {
-                        view.highlight('_pages/' + path);
+                        view.highlight('_content/' + path);
                     });
 
                     api.file.fetch(view.path, function (content) {
@@ -1168,30 +1169,47 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
                     api.structs.fields.fetch(function (fieldStructs) {
                         api.structs.pages.fetch(view.model.struct || 'page', function (pageStruct) {
-                            view.$element.children('.panel-heading').children('.panel-title').html(view.model.title.value);
+                            view.$element.children('.panel-heading').children('.field-anchors').empty();
                             view.$element.children('.panel-body').empty();
 
                             var populated = {};
 
                             // TODO: Populate page struct with content
-                            populated = view.model;
+                            //populated = view.model;
+
+                            for (var k in pageStruct) {
+                                populated[k] = view.model[k] || pageStruct[k];
+                            }
 
                             view.model = populated;
 
                             for (var alias in view.model) {
-                                var fieldModel = view.model[alias];
-                                var fieldStruct = fieldStructs[fieldModel.struct];
+                                // This is an anchor point
+                                if (alias.indexOf('#') == 0) {
+                                    var onClickAnchor = function onClickAnchor(e) {
+                                        e.preventDefault();
+                                    };
 
-                                if (fieldStruct) {
-                                    var fieldEditorView = view.getFieldEditor(fieldStruct.editor, alias, fieldModel);
+                                    var ref = 'field-anchor-' + alias.replace('#', '');
 
-                                    if (fieldEditorView) {
-                                        view.$element.children('.panel-body').append(_.div({ class: 'input-group field-editor-container' }, [_.span({ class: 'field-editor-label input-group-addon' }, fieldModel.label), fieldEditorView.$element]));
-                                    } else {
-                                        console.log('No field editor with name "' + fieldStruct.editor + '" was found');
-                                    }
+                                    view.$element.children('.panel-heading').children('.field-anchors').append(_.button({ class: 'btn btn-default' }, view.model[alias]).click(onClickAnchor));
+
+                                    view.$element.children('.panel-body').append(_.h4({ class: 'field-anchor', id: ref }, view.model[alias]));
                                 } else {
-                                    console.log('No field struct with name "' + fieldModel.struct + '" was found');
+                                    var fieldModel = view.model[alias];
+                                    var fieldStruct = fieldStructs[fieldModel.struct];
+
+                                    if (fieldStruct) {
+                                        var fieldEditorView = view.getFieldEditor(fieldStruct.editor, alias, fieldModel);
+
+                                        if (fieldEditorView) {
+                                            view.$element.children('.panel-body').append(_.div({ class: 'input-group field-editor-container' }, [_.span({ class: 'field-editor-label input-group-addon' }, fieldModel.label), fieldEditorView.$element]));
+                                        } else {
+                                            console.log('No field editor with name "' + fieldStruct.editor + '" was found');
+                                        }
+                                    } else {
+                                        console.log('No field struct with name "' + fieldModel.struct + '" was found');
+                                    }
                                 }
                             }
                         });
@@ -1203,7 +1221,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         })(View);
 
         module.exports = Editor;
-    }, { "./field-editors/checkbox": 12, "./field-editors/template-picker": 14, "./field-editors/text": 16, "./field-editors/text-html": 15 }], 11: [function (require, module, exports) {
+    }, { "./field-editors/checkbox": 12, "./field-editors/template-picker": 14, "./field-editors/text": 16, "./field-editors/text-html": 15, "./field-editors/url": 17 }], 11: [function (require, module, exports) {
         var Tree = (function (_View4) {
             _inherits(Tree, _View4);
 
@@ -1222,7 +1240,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 _this4.on('clickRenameItem', _this4.onClickDeleteItem);
 
                 // Prerender container
-                _this4.$element = _.div({ class: 'tree' });
+                _this4.$element = _.div({ class: 'tree panel panel-default' }, [_.div({ class: 'panel-heading' }), _.div({ class: 'panel-body' })]);
 
                 _this4.modelFunction = api.tree.fetch;
                 _this4.fetch();
@@ -1340,7 +1358,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
             }, {
                 key: "prerender",
                 value: function prerender() {
-                    this.dirs.pages = this.getFolderContent('_pages/', true);
+                    this.dirs.content = this.getFolderContent('_content/', true);
                     this.dirs.media = this.getFolderContent('media/', true);
                 }
 
@@ -1353,15 +1371,16 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 value: function render() {
                     var view = this;
 
-                    this.$element.html([
+                    this.$element.children('.panel-heading').html([
                     // Close root nav button
                     _.button({ class: 'btn close' }, _.span({ class: 'glyphicon glyphicon-remove' })).click(view.events.clickCloseRootNav),
 
                     // Root folders
-                    this.$rootNav = _.ul({ class: 'nav nav-root nav-pills', role: 'tablist' }, _.each(this.dirs, function (label, files) {
-                        return _.li({ role: 'presentation', class: '' }, _.a({ href: '#' + label, 'aria-controls': label, role: 'tab', 'data-toggle': 'tab' }, label));
-                    })),
+                    this.$rootNav = _.ul({ class: 'nav-root btn-group', role: 'tablist' }, _.each(this.dirs, function (label, files) {
+                        return _.a({ class: 'btn btn-default', href: '#' + label, 'aria-controls': label, role: 'tab', 'data-toggle': 'tab' }, label);
+                    }))]);
 
+                    this.$element.children('.panel-body').html([
                     // Subfolders
                     this.$subNav = _.nav({ class: 'tab-content nav-sub' }, _.each(this.dirs, function (label, files) {
                         return _.div({ role: 'tab-panel', id: label, class: 'tab-pane' }, _.ul({ class: 'folder-content' }, _.each(files, function (i, file) {
@@ -1637,8 +1656,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
             _createClass(TextHtmlEditor, [{
                 key: "renderField",
-                value: function renderField() {
-                    return _.div({ class: 'text-html-editor' }, _.textarea({ class: 'form-control' }, this.model.value).bind('change paste propertychange keyup', this.events.changeTextValue));
+                value: function renderField(value) {
+                    return _.div({ class: 'text-html-editor' }, _.textarea({ class: 'form-control' }, value).bind('change paste propertychange keyup', this.events.changeTextValue));
                 }
             }]);
 
@@ -1675,22 +1694,52 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
         module.exports = TextEditor;
     }, { "./field": 13 }], 17: [function (require, module, exports) {
+        'use strict';
+
+        var FieldEditor = require('./field');
+
+        var UrlEditor = (function (_FieldEditor5) {
+            _inherits(UrlEditor, _FieldEditor5);
+
+            function UrlEditor(args) {
+                _classCallCheck(this, UrlEditor);
+
+                var _this11 = _possibleConstructorReturn(this, Object.getPrototypeOf(UrlEditor).call(this, args));
+
+                _this11.fetch();
+                return _this11;
+            }
+
+            _createClass(UrlEditor, [{
+                key: "renderField",
+                value: function renderField(value) {
+                    value = value || location.hash.replace('#/_content', '').replace('.json', '');
+
+                    return _.div({ class: 'url-editor' }, _.input({ class: 'form-control', type: 'text', value: value }).bind('change paste propertychange keyup', this.events.changeTextValue));
+                }
+            }]);
+
+            return UrlEditor;
+        })(FieldEditor);
+
+        module.exports = UrlEditor;
+    }, { "./field": 13 }], 18: [function (require, module, exports) {
         var Navbar = (function (_View6) {
             _inherits(Navbar, _View6);
 
             function Navbar(args) {
                 _classCallCheck(this, Navbar);
 
-                var _this11 = _possibleConstructorReturn(this, Object.getPrototypeOf(Navbar).call(this, args));
+                var _this12 = _possibleConstructorReturn(this, Object.getPrototypeOf(Navbar).call(this, args));
 
-                var view = _this11;
+                var view = _this12;
 
                 api.repo(function (repo) {
                     view.repo = repo;
 
                     view.init();
                 });
-                return _this11;
+                return _this12;
             }
 
             _createClass(Navbar, [{
@@ -1720,11 +1769,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         })(View);
 
         new Navbar();
-    }, {}], 18: [function (require, module, exports) {
+    }, {}], 19: [function (require, module, exports) {
         module.exports = Array.isArray || function (arr) {
             return Object.prototype.toString.call(arr) == '[object Array]';
         };
-    }, {}], 19: [function (require, module, exports) {
+    }, {}], 20: [function (require, module, exports) {
         var isarray = require('isarray');
 
         /**
@@ -2114,4 +2163,4 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
             return stringToRegexp(path, keys, options);
         }
-    }, { "isarray": 18 }] }, {}, [9]);
+    }, { "isarray": 19 }] }, {}, [9]);

@@ -12,7 +12,10 @@ class Tree extends View {
         this.on('clickRenameItem', this.onClickDeleteItem);
 
         // Prerender container
-        this.$element = _.div({class: 'tree'});
+        this.$element = _.div({class: 'tree panel panel-default'}, [
+            _.div({class: 'panel-heading'}),
+            _.div({class: 'panel-body'})
+        ]);
 
         this.modelFunction = api.tree.fetch;
         this.fetch();
@@ -115,7 +118,7 @@ class Tree extends View {
      * Tree data
      */
     prerender() {
-        this.dirs.pages = this.getFolderContent('_pages/', true);
+        this.dirs.content = this.getFolderContent('_content/', true);
         this.dirs.media = this.getFolderContent('media/', true);
     }
 
@@ -125,27 +128,25 @@ class Tree extends View {
     render() {
         let view = this;
 
-        this.$element.html([
+        this.$element.children('.panel-heading').html([
             // Close root nav button
             _.button({class: 'btn close'},
                 _.span({class: 'glyphicon glyphicon-remove'})
             ).click(view.events.clickCloseRootNav),
 
             // Root folders
-            this.$rootNav = _.ul({class: 'nav nav-root nav-pills', role: 'tablist'},
+            this.$rootNav = _.ul({class: 'nav-root btn-group', role: 'tablist'},
                 _.each(this.dirs,
                     function(label, files) {
-                        return _.li(
-                            { role: 'presentation', class: '' },
-                            _.a(
-                                { href: '#' + label, 'aria-controls': label, role: 'tab', 'data-toggle': 'tab' },
-                                label
-                            )
-                        )
+                        return _.a({class: 'btn btn-default', href: '#' + label, 'aria-controls': label, role: 'tab', 'data-toggle': 'tab' },
+                            label
+                        );
                     }
                 )
-            ),
+            )
+        ]);
 
+        this.$element.children('.panel-body').html([
             // Subfolders
             this.$subNav = _.nav({class: 'tab-content nav-sub'},
                 _.each(this.dirs,

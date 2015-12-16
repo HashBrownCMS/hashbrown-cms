@@ -1,6 +1,7 @@
 {
     "string": { "label": "Text", "editor": "text" },
     "htmlString": { "label": "Rich text", "editor": "text-html" },
+    "url": { "label": "URL", "editor": "url" },
     "integer": { "label": "Number", "editor": "number", "decimals": false },
     "float": { "label": "Number (decimals)", "editor": "number", "decimals": true },
     "date": { "label": "Date", "editor": "date-picker" },

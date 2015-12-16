@@ -20,9 +20,7 @@ class Editor extends View {
                         _.span({class: 'glyphicon glyphicon-upload'})
                     ]).click(this.events.clickPublish),
                 ]),
-                _.h4({class: 'panel-title'},
-                    '&nbsp;'
-                )
+                _.div({class: 'btn-group field-anchors'})
             ]),
             _.div({class: 'panel-body'})
         ]);
@@ -50,6 +48,7 @@ class Editor extends View {
         this.fieldEditors = {
             'text': require('./field-editors/text'),
             'text-html': require('./field-editors/text-html'),
+            'url': require('./field-editors/url'),
             'checkbox': require('./field-editors/checkbox'),
             'template-picker': require('./field-editors/template-picker')
         };
@@ -68,10 +67,10 @@ class Editor extends View {
 
         view.clear();
        
-        view.path = '/_pages/' + path;
+        view.path = '/_content/' + path;
 
         ViewHelper.get('Tree').ready(function(view) {
-            view.highlight('_pages/' + path);
+            view.highlight('_content/' + path);
         });
         
         api.file.fetch(view.path, function(content) {
@@ -109,40 +108,66 @@ class Editor extends View {
 
         api.structs.fields.fetch(function(fieldStructs) {
             api.structs.pages.fetch(view.model.struct || 'page', function(pageStruct) {
-                view.$element.children('.panel-heading').children('.panel-title').html(view.model.title.value);
+                view.$element.children('.panel-heading').children('.field-anchors').empty();
                 view.$element.children('.panel-body').empty();
 
                 let populated = {};
 
                 // TODO: Populate page struct with content
-                populated = view.model;
+                //populated = view.model;
+                
+                for(let k in pageStruct) {
+                    populated[k] = view.model[k] || pageStruct[k];
+                }
 
                 view.model = populated;
 
                 for(let alias in view.model) {
-                    let fieldModel = view.model[alias];
-                    let fieldStruct = fieldStructs[fieldModel.struct];
+                    // This is an anchor point
+                    if(alias.indexOf('#') == 0) {
+                        let ref = 'field-anchor-' + alias.replace('#', '');
 
-                    if(fieldStruct) {
-                        let fieldEditorView = view.getFieldEditor(fieldStruct.editor, alias, fieldModel);
-
-                        if(fieldEditorView) {
-                            view.$element.children('.panel-body').append(
-                                _.div({class: 'input-group field-editor-container'}, [
-                                    _.span({class: 'field-editor-label input-group-addon'},
-                                        fieldModel.label
-                                    ),
-                                    fieldEditorView.$element
-                                ])
-                            );
-                        
-                        } else {
-                            console.log('No field editor with name "' + fieldStruct.editor + '" was found');
-                        
+                        function onClickAnchor(e) {
+                            e.preventDefault();
                         }
 
+                        view.$element.children('.panel-heading').children('.field-anchors').append(
+                            _.button({class: 'btn btn-default'},
+                                view.model[alias]
+                            ).click(onClickAnchor)
+                        );
+
+                        view.$element.children('.panel-body').append(
+                            _.h4({class: 'field-anchor', id: ref},
+                                view.model[alias]
+                            )
+                        );
+
                     } else {
-                        console.log('No field struct with name "' + fieldModel.struct + '" was found');
+                        let fieldModel = view.model[alias];
+                        let fieldStruct = fieldStructs[fieldModel.struct];
+
+                        if(fieldStruct) {
+                            let fieldEditorView = view.getFieldEditor(fieldStruct.editor, alias, fieldModel);
+
+                            if(fieldEditorView) {
+                                view.$element.children('.panel-body').append(
+                                    _.div({class: 'input-group field-editor-container'}, [
+                                        _.span({class: 'field-editor-label input-group-addon'},
+                                            fieldModel.label
+                                        ),
+                                        fieldEditorView.$element
+                                    ])
+                                );
+                            
+                            } else {
+                                console.log('No field editor with name "' + fieldStruct.editor + '" was found');
+                            
+                            }
+
+                        } else {
+                            console.log('No field struct with name "' + fieldModel.struct + '" was found');
+                        }
                     }
                 }
             });

@@ -18,6 +18,10 @@ class Jekyll {
             delete model.token;
         }
 
+        // The "permalink" key is used in Jekyll instead of "url"
+        model.permalink = model.url;
+        delete model.url;
+
         let yml = yamljs.stringify(model);
 
         yml = '---\n' + yml + '\n---';

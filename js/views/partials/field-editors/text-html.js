@@ -9,10 +9,10 @@ class TextHtmlEditor extends FieldEditor {
         this.fetch();
     }
 
-    renderField() {
+    renderField(value) {
         return _.div({class: 'text-html-editor'}, 
             _.textarea({class: 'form-control'},
-                this.model.value
+                value
             ).bind('change paste propertychange keyup', this.events.changeTextValue)
         );
     }

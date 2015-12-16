@@ -7,6 +7,11 @@
     .tree {
         margin-bottom: 15px;
 
+        .nav-root {
+            margin: 0px;
+            padding: 0px;
+        }
+
         .tab-pane {
             position: relative;
             height: 0px;
@@ -135,15 +140,27 @@
 
         >.panel-heading {
             position: relative;
+            padding: 0px;
+            height: 56px;
+
+            .field-anchors {
+                padding: 10px 15px;
+                float: left;
+
+                a {
+                    padding: 6px 12px;
+                }
+            }
 
             .content-actions {
-                position: absolute;
-                right: 0px;
-                top: 0px;
-                padding: 2px 15px;
-                border-left: 1px solid #ddd;
+                padding: 10px 15px;
+                float: right;
                 border-top-right-radius: 2px;
             }
+        }
+
+        .field-anchor {
+
         }
 
         .field-editor-container {
