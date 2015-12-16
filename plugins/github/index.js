@@ -317,6 +317,7 @@ class GitHub {
         let baseStruct = require('../../structs/page.json');
         let baseString = JSON.stringify(baseStruct);
 
+        // Get the specified struct
         octo.fromUrl('/repos/' + req.params.user + '/' + req.params.repo + '/contents/_structs/pages/' + req.params.struct + '.json').fetch(function(err, file) {
             let output = baseStruct;
 
