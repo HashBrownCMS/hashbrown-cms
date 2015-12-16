@@ -115,7 +115,7 @@ class Tree extends View {
      * Tree data
      */
     prerender() {
-        this.dirs.pages = this.getFolderContent('pages/', true);
+        this.dirs.pages = this.getFolderContent('_pages/', true);
         this.dirs.media = this.getFolderContent('media/', true);
     }
 

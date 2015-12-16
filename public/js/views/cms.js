@@ -48,71 +48,45 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
             call: function call(url, callback, data) {
                 data = data || {};
 
-                data.token = localStorage.getItem('gh-oauth-token');
+                data.token = localStorage.getItem('api-token');
 
                 $.post(url, data, function (res) {
                     if (res.err) {
-                        console.log(res.data);
-                        alert('(' + res.mode + ') ' + res.url + ': ' + res.err.json.message);
+                        console.log(res.err, res.data);
+
+                        if (res.err.json) {
+                            alert('(' + res.mode + ') ' + res.url + ': ' + res.err.json.message);
+                        }
                     } else if (callback) {
                         callback(res);
                     }
                 });
             },
 
-            repos: function repos(callback) {
-                api.call('/api/' + req.params.user + '/repos/', callback);
-            },
-
-            compare: function compare(base, head, callback) {
-                api.call('/api/' + req.params.user + '/' + req.params.repo + '/compare/' + base + '/' + head, callback);
-            },
-
-            merge: function merge(base, head, callback) {
-                api.call('/api/' + req.params.user + '/' + req.params.repo + '/merge', callback, { base: base, head: head });
-            },
-
-            file: {
-                fetch: function fetch(path, callback) {
-                    api.call('/api/' + req.params.user + '/' + req.params.repo + '/fetch/file' + path, callback);
-                },
-
-                update: function update(data, path, callback) {
-                    api.call('/api/' + req.params.user + '/' + req.params.repo + '/update/file' + path, callback, data);
-                },
-
-                create: function create(data, path, callback) {
-                    api.call('/api/' + req.params.user + '/' + req.params.repo + '/create/file' + path, callback, data);
-                }
-            },
-
-            tree: {
-                fetch: function fetch(callback) {
-                    api.call('/api/' + req.params.user + '/' + req.params.repo + '/' + req.params.branch + '/fetch/tree', callback);
-                }
-            },
-
+            /**
+             * Issue tracking
+             */
             issues: {
                 fetch: function fetch(callback) {
-                    api.call('/api/' + req.params.user + '/' + req.params.repo + '/fetch/issues', callback);
+                    api.call('/api/issue-tracking/issues/fetch/' + req.params.user + '/' + req.params.repo, callback);
                 },
 
                 create: function create(data, callback) {
-                    api.call('/api/' + req.params.user + '/' + req.params.repo + '/create/issues', callback, appropriateIssue(data));
+                    api.call('/api/issue-tracking/issues/create/' + req.params.user + '/' + req.params.repo, callback, appropriateIssue(data));
                 },
 
                 update: function update(data, callback) {
-                    api.call('/api/' + req.params.user + '/' + req.params.repo + '/update/issues', callback, appropriateIssue(data));
+                    api.call('/api/issue-tracking/issues/update/' + req.params.user + '/' + req.params.repo, callback, appropriateIssue(data));
                 }
             },
 
             labels: {
                 fetch: function fetch(callback) {
-                    api.call('/api/' + req.params.user + '/' + req.params.repo + '/fetch/labels', callback);
+                    api.call('/api/issue-tracking/labels/fetch/' + req.params.user + '/' + req.params.repo, callback);
                 },
 
                 create: function create(data, callback) {
-                    api.call('/api/' + req.params.user + '/' + req.params.repo + '/create/labels', callback, data);
+                    api.call('/api/issue-tracking/labels/create/' + req.params.user + '/' + req.params.repo, callback, data);
                 }
             },
 
@@ -127,21 +101,31 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 });
             },
 
-            milestones: function milestones(callback) {
-                api.call('/api/' + req.params.user + '/' + req.params.repo + '/milestones', callback);
+            milestones: {
+                fetch: function fetch(callback) {
+                    api.call('/api/issue-tracking/milestones/fetch/' + req.params.user + '/' + req.params.repo, callback);
+                }
             },
 
-            collaborators: function collaborators(callback) {
-                api.call('/api/' + req.params.user + '/' + req.params.repo + '/collaborators', callback);
+            /**
+             * Organisations
+             */
+            collaborators: {
+                fetch: function fetch(callback) {
+                    api.call('/api/collaborators/fetch/' + req.params.user + '/' + req.params.repo, callback);
+                }
             },
 
+            /** 
+             * Git
+             */
             repo: function repo(callback) {
-                api.call('/api/' + req.params.user + '/' + req.params.repo, callback);
+                api.call('/api/git/repo/' + req.params.user + '/' + req.params.repo, callback);
             },
 
             branches: {
                 get: function get(callback) {
-                    api.call('/api/' + req.params.user + '/' + req.params.repo + '/branches/', function (branches) {
+                    api.call('/api/git/branches/' + req.params.user + '/' + req.params.repo, function (branches) {
                         branches.sort(function (a, b) {
                             if (a.name < b.name) {
                                 return -1;
@@ -157,17 +141,106 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 }
             },
 
+            file: {
+                fetch: function fetch(path, callback) {
+                    api.call('/api/git/file/fetch/' + req.params.user + '/' + req.params.repo + '/' + path, function (contents) {
+                        callback(atob(contents.content));
+                    });
+                },
+
+                update: function update(data, path, callback) {
+                    api.call('/api/git/file/update/' + req.params.user + '/' + req.params.repo + '/' + path, callback, data);
+                },
+
+                create: function create(data, path, callback) {
+                    api.call('/api/git/file/create/' + req.params.user + '/' + req.params.repo + '/' + path, callback, data);
+                }
+            },
+
+            tree: {
+                fetch: function fetch(callback) {
+                    api.call('/api/git/tree/fetch/' + req.params.user + '/' + req.params.repo + '/' + req.params.branch, callback);
+                }
+            },
+
+            repos: function repos(callback) {
+                api.call('/api/git/repos/' + req.params.user, callback);
+            },
+
+            compare: function compare(base, head, callback) {
+                api.call('/api/git/compare/' + req.params.user + '/' + req.params.repo + '/' + base + '/' + head, callback);
+            },
+
+            merge: function merge(base, head, callback) {
+                api.call('/api/git/merge/' + req.params.user + '/' + req.params.repo, callback, { base: base, head: head });
+            },
+
+            /** 
+             * Abstract CMS
+             */
             structs: {
                 pages: {
-                    get: function get(path, callback) {
-                        api.call('/api/' + req.params.user + '/' + req.params.repo + '/get/structs/pages/' + path, callback);
+                    fetch: function fetch(path, callback) {
+                        api.call('/api/structs/pages/fetch/' + req.params.user + '/' + req.params.repo + '/' + path, callback);
                     }
                 },
 
                 fields: {
-                    get: function get(callback) {
-                        api.call('/api/' + req.params.user + '/' + req.params.repo + '/get/structs/fields', callback);
+                    fetch: function fetch(callback) {
+                        api.call('/api/structs/fields/fetch/' + req.params.user + '/' + req.params.repo, callback);
                     }
+                }
+            },
+
+            content: {
+                publish: function publish(json, path, callback) {
+                    api.content.bake(json, function (baked) {
+                        var data = {
+                            content: btoa(baked),
+                            message: 'Published content'
+                        };
+
+                        api.call('/api/content/publish/' + req.params.user + '/' + req.params.repo + '/' + req.params.branch + '/' + path, callback, data);
+                    });
+                },
+
+                save: function save(json, path, callback) {
+                    console.log(json);
+                },
+
+                bake: function bake(page, callback) {
+                    function bakeProperty(prop) {
+                        var type = Object.prototype.toString.call(prop);
+                        var baked = '';
+
+                        if (type === '[object Array]') {
+                            baked = [];
+
+                            for (var i in prop) {
+                                baked.push(bakeProperty(prop[i]));
+                            }
+                        } else if (prop.value) {
+                            baked = prop.value;
+                        }
+
+                        return baked;
+                    }
+
+                    function bakeProperties(json) {
+                        var baked = {};
+
+                        for (var k in json) {
+                            var prop = json[k];
+
+                            baked[k] = bakeProperty(prop);
+                        }
+
+                        return baked;
+                    }
+
+                    var baked = bakeProperties(page);
+
+                    api.call('/api/content/bake', callback, baked);
                 }
             }
         };
@@ -382,7 +455,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
         window.addEventListener('hashchange', Router.init);
         window.Router = Router;
-    }, { "path-to-regexp": 18 }], 5: [function (require, module, exports) {
+    }, { "path-to-regexp": 19 }], 5: [function (require, module, exports) {
         var Templating = {};
 
         function append(el, content) {
@@ -963,8 +1036,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 key: "initRoutes",
                 value: function initRoutes() {
                     // Pages
-                    Router.route('/pages/:path*', function () {
-                        ViewHelper.get('Editor').openAsync('/pages/' + this.path);
+                    Router.route('/_pages/:path*', function () {
+                        ViewHelper.get('Editor').openAsync(this.path);
                     });
 
                     // Media
@@ -986,28 +1059,57 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         })(View);
 
         new CMS();
-    }, { "../client": 2, "./partials/cms-editor": 10, "./partials/cms-tree": 11, "./partials/navbar": 16 }], 10: [function (require, module, exports) {
+    }, { "../client": 2, "./partials/cms-editor": 10, "./partials/cms-tree": 11, "./partials/navbar": 17 }], 10: [function (require, module, exports) {
         var Editor = (function (_View3) {
             _inherits(Editor, _View3);
 
             function Editor(args) {
                 _classCallCheck(this, Editor);
 
+                // Register events
+
                 var _this3 = _possibleConstructorReturn(this, Object.getPrototypeOf(Editor).call(this, args));
+
+                _this3.on('clickPublish', _this3.onClickPublish);
+                _this3.on('clickSave', _this3.onClickSave);
 
                 _this3.initFieldEditors();
 
-                _this3.$element = _.div({ class: 'panel panel-default editor' }, [_.div({ class: 'panel-heading' }), _.div({ class: 'panel-body' })]);
+                _this3.$element = _.div({ class: 'panel panel-default editor' }, [_.div({ class: 'panel-heading' }, [_.div({ class: 'btn-group content-actions' }, [_.button({ class: 'btn btn-success btn-publish' }, ['Save ', _.span({ class: 'glyphicon glyphicon-floppy-disk' })]).click(_this3.events.clickSave), _.button({ class: 'btn btn-success btn-publish' }, ['Publish ', _.span({ class: 'glyphicon glyphicon-upload' })]).click(_this3.events.clickPublish)]), _.h4({ class: 'panel-title' }, '&nbsp;')]), _.div({ class: 'panel-body' })]);
                 return _this3;
             }
 
+            /**
+             * Events
+             */
+
             _createClass(Editor, [{
+                key: "onClickPublish",
+                value: function onClickPublish(e, element, view) {
+                    api.content.publish(view.model, view.path, function () {
+                        console.log('done!');
+                    });
+                }
+            }, {
+                key: "onClickSave",
+                value: function onClickSave(e, element, view) {
+                    api.content.save(view.model, view.path, function () {
+                        console.log('done!');
+                    });
+                }
+
+                /**
+                 * Actions
+                 */
+
+            }, {
                 key: "initFieldEditors",
                 value: function initFieldEditors() {
                     this.fieldEditors = {
                         'text': require('./field-editors/text'),
                         'text-html': require('./field-editors/text-html'),
-                        'checkbox': require('./field-editors/checkbox')
+                        'checkbox': require('./field-editors/checkbox'),
+                        'template-picker': require('./field-editors/template-picker')
                     };
                 }
             }, {
@@ -1022,12 +1124,14 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
                     view.clear();
 
+                    view.path = '/_pages/' + path;
+
                     ViewHelper.get('Tree').ready(function (view) {
-                        view.highlight(path.replace('/', ''));
+                        view.highlight('_pages/' + path);
                     });
 
-                    api.file.fetch(path, function (content) {
-                        view.open(content, true);
+                    api.file.fetch(view.path, function (content) {
+                        view.open(JSON.parse(content), true);
                     });
                 }
             }, {
@@ -1054,11 +1158,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                     if (FieldEditor) {
                         var fieldEditorInstance = new FieldEditor({ model: fieldModel });
 
-                        fieldEditorInstance.on('change', function () {
-                            console.log(fieldModel.value);
-                            // TODO: Do we need to commit something? Probably not.
-                        });
-
                         return fieldEditorInstance;
                     }
                 }
@@ -1067,15 +1166,20 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 value: function render() {
                     var view = this;
 
-                    api.structs.fields.get(function (fieldStructs) {
-                        api.structs.pages.get(view.model.struct || 'page', function (pageStruct) {
-                            view.$element.children('.panel-heading').html(view.model.name);
+                    api.structs.fields.fetch(function (fieldStructs) {
+                        api.structs.pages.fetch(view.model.struct || 'page', function (pageStruct) {
+                            view.$element.children('.panel-heading').children('.panel-title').html(view.model.name);
                             view.$element.children('.panel-body').empty();
 
-                            // TODO: Populate struct with model data
+                            var populated = {};
 
-                            for (var alias in pageStruct) {
-                                var fieldModel = pageStruct[alias];
+                            // TODO: Populate page struct with content
+                            populated = view.model;
+
+                            view.model = populated;
+
+                            for (var alias in view.model) {
+                                var fieldModel = view.model[alias];
                                 var fieldStruct = fieldStructs[fieldModel.struct];
 
                                 if (fieldStruct) {
@@ -1099,7 +1203,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         })(View);
 
         module.exports = Editor;
-    }, { "./field-editors/checkbox": 12, "./field-editors/text": 15, "./field-editors/text-html": 14 }], 11: [function (require, module, exports) {
+    }, { "./field-editors/checkbox": 12, "./field-editors/template-picker": 14, "./field-editors/text": 16, "./field-editors/text-html": 15 }], 11: [function (require, module, exports) {
         var Tree = (function (_View4) {
             _inherits(Tree, _View4);
 
@@ -1236,7 +1340,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
             }, {
                 key: "prerender",
                 value: function prerender() {
-                    this.dirs.pages = this.getFolderContent('pages/', true);
+                    this.dirs.pages = this.getFolderContent('_pages/', true);
                     this.dirs.media = this.getFolderContent('media/', true);
                 }
 
@@ -1405,14 +1509,26 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
             _createClass(FieldEditor, [{
                 key: "onChangeTextValue",
                 value: function onChangeTextValue(e, element, view) {
-                    view.model.value = $(element).val();
+                    if (view.model.isArray) {
+                        var i = $(element).parents('.field-editor').index();
+
+                        view.model.value[i] = $(element).val();
+                    } else {
+                        view.model.value = $(element).val();
+                    }
 
                     view.trigger('change');
                 }
             }, {
                 key: "onChangeBoolValue",
                 value: function onChangeBoolValue(e, element, view) {
-                    view.model.value = $(element).data('checked');
+                    if (view.model.isArray) {
+                        var i = $(element).parents('.field-editor').index();
+
+                        view.model.value[i] = $(element).data('checked') || false;
+                    } else {
+                        view.model.value = $(element).data('checked');
+                    }
 
                     view.trigger('change');
                 }
@@ -1429,6 +1545,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                     if (this.model.isArray) {
                         (function () {
                             var onClickAdd = function onClickAdd() {
+                                view.model.value = view.model.value || [];
+
                                 $(this).before(addField(view.model.value.length, null));
 
                                 view.model.value.push(null);
@@ -1443,7 +1561,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                                     }
                                 }
 
-                                var $field = view.renderField();
+                                var $field = view.renderField(value);
 
                                 var $btnRemove = _.span({ class: 'input-group-btn' }, _.button({ class: 'btn btn-danger' }, [_.span({ class: 'glyphicon glyphicon-remove' })]).click(onClickRemove));
 
@@ -1459,7 +1577,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                             _this7.$element.append(_.button({ class: 'btn btn-success' }, _.span({ class: 'glyphicon glyphicon-plus' })).click(onClickAdd));
                         })();
                     } else {
-                        this.$element = _.div({ class: 'field-editor' }, this.renderField());
+                        this.$element = _.div({ class: 'field-editor' }, this.renderField(this.model.value));
                     }
                 }
             }]);
@@ -1473,22 +1591,54 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
         var FieldEditor = require('./field');
 
-        var TextHtmlEditor = (function (_FieldEditor2) {
-            _inherits(TextHtmlEditor, _FieldEditor2);
+        var TemplatePicker = (function (_FieldEditor2) {
+            _inherits(TemplatePicker, _FieldEditor2);
 
-            function TextHtmlEditor(args) {
-                _classCallCheck(this, TextHtmlEditor);
+            function TemplatePicker(args) {
+                _classCallCheck(this, TemplatePicker);
 
-                var _this8 = _possibleConstructorReturn(this, Object.getPrototypeOf(TextHtmlEditor).call(this, args));
+                var _this8 = _possibleConstructorReturn(this, Object.getPrototypeOf(TemplatePicker).call(this, args));
 
                 _this8.fetch();
                 return _this8;
             }
 
+            _createClass(TemplatePicker, [{
+                key: "renderField",
+                value: function renderField() {
+                    var view = this;
+
+                    return _.div({ class: 'template-picker' }, _.select({ class: 'form-control' }, _.each(view.model.allowed || [], function (i, template) {
+                        return _.option({ value: template }, template);
+                    })).change(this.events.changeTextValue));
+                }
+            }]);
+
+            return TemplatePicker;
+        })(FieldEditor);
+
+        module.exports = TemplatePicker;
+    }, { "./field": 13 }], 15: [function (require, module, exports) {
+        'use strict';
+
+        var FieldEditor = require('./field');
+
+        var TextHtmlEditor = (function (_FieldEditor3) {
+            _inherits(TextHtmlEditor, _FieldEditor3);
+
+            function TextHtmlEditor(args) {
+                _classCallCheck(this, TextHtmlEditor);
+
+                var _this9 = _possibleConstructorReturn(this, Object.getPrototypeOf(TextHtmlEditor).call(this, args));
+
+                _this9.fetch();
+                return _this9;
+            }
+
             _createClass(TextHtmlEditor, [{
                 key: "renderField",
                 value: function renderField() {
-                    return _.div({ class: 'field-editor text-html-editor' }, _.textarea({ class: 'form-control' }, this.model.value).bind('change paste propertychange keyup', this.events.changeTextValue));
+                    return _.div({ class: 'text-html-editor' }, _.textarea({ class: 'form-control' }, this.model.value).bind('change paste propertychange keyup', this.events.changeTextValue));
                 }
             }]);
 
@@ -1496,27 +1646,27 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         })(FieldEditor);
 
         module.exports = TextHtmlEditor;
-    }, { "./field": 13 }], 15: [function (require, module, exports) {
+    }, { "./field": 13 }], 16: [function (require, module, exports) {
         'use strict';
 
         var FieldEditor = require('./field');
 
-        var TextEditor = (function (_FieldEditor3) {
-            _inherits(TextEditor, _FieldEditor3);
+        var TextEditor = (function (_FieldEditor4) {
+            _inherits(TextEditor, _FieldEditor4);
 
             function TextEditor(args) {
                 _classCallCheck(this, TextEditor);
 
-                var _this9 = _possibleConstructorReturn(this, Object.getPrototypeOf(TextEditor).call(this, args));
+                var _this10 = _possibleConstructorReturn(this, Object.getPrototypeOf(TextEditor).call(this, args));
 
-                _this9.fetch();
-                return _this9;
+                _this10.fetch();
+                return _this10;
             }
 
             _createClass(TextEditor, [{
                 key: "renderField",
-                value: function renderField() {
-                    return _.div({ class: 'text-editor' }, _.input({ type: 'text', class: 'form-control', value: this.model.value }).bind('change paste propertychange keyup', this.events.changeTextValue));
+                value: function renderField(value) {
+                    return _.div({ class: 'text-editor' }, _.input({ type: 'text', class: 'form-control', value: value }).bind('change paste propertychange keyup', this.events.changeTextValue));
                 }
             }]);
 
@@ -1524,23 +1674,23 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         })(FieldEditor);
 
         module.exports = TextEditor;
-    }, { "./field": 13 }], 16: [function (require, module, exports) {
+    }, { "./field": 13 }], 17: [function (require, module, exports) {
         var Navbar = (function (_View6) {
             _inherits(Navbar, _View6);
 
             function Navbar(args) {
                 _classCallCheck(this, Navbar);
 
-                var _this10 = _possibleConstructorReturn(this, Object.getPrototypeOf(Navbar).call(this, args));
+                var _this11 = _possibleConstructorReturn(this, Object.getPrototypeOf(Navbar).call(this, args));
 
-                var view = _this10;
+                var view = _this11;
 
                 api.repo(function (repo) {
                     view.repo = repo;
 
                     view.init();
                 });
-                return _this10;
+                return _this11;
             }
 
             _createClass(Navbar, [{
@@ -1570,11 +1720,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         })(View);
 
         new Navbar();
-    }, {}], 17: [function (require, module, exports) {
+    }, {}], 18: [function (require, module, exports) {
         module.exports = Array.isArray || function (arr) {
             return Object.prototype.toString.call(arr) == '[object Array]';
         };
-    }, {}], 18: [function (require, module, exports) {
+    }, {}], 19: [function (require, module, exports) {
         var isarray = require('isarray');
 
         /**
@@ -1964,4 +2114,4 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
             return stringToRegexp(path, keys, options);
         }
-    }, { "isarray": 17 }] }, {}, [9]);
+    }, { "isarray": 18 }] }, {}, [9]);

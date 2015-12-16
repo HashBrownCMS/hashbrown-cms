@@ -5,7 +5,7 @@
     "noFollow": { "struct": "bool", "label": "No follow" },
     "createDate": { "struct": "date", "label": "Created", "locked": true },
     "changeDate": { "struct": "date", "label": "Updated", "locked": true },
-    "template": { "struct": "template", "label": "Template" },
+    "template": { "struct": "template", "label": "Template", "allowed": [ "page", "example" ] },
     "heading": { "struct": "string", "label": "Heading", "isArray": true },
     "body": { "struct": "htmlString", "label": "Body" }
 }

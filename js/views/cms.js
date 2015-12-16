@@ -16,8 +16,8 @@ class CMS extends View {
 
     initRoutes() {
         // Pages
-        Router.route('/pages/:path*', function() {
-            ViewHelper.get('Editor').openAsync('/pages/' + this.path);
+        Router.route('/_pages/:path*', function() {
+            ViewHelper.get('Editor').openAsync(this.path);
         });
 
         // Media

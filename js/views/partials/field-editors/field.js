@@ -10,13 +10,29 @@ class FieldEditor extends View {
     }
 
     onChangeTextValue(e, element, view) {
-        view.model.value = $(element).val();
+        if(view.model.isArray) {
+            let i = $(element).parents('.field-editor').index();
+                
+            view.model.value[i] = $(element).val();
+
+        } else {
+            view.model.value = $(element).val();
+        
+        }
 
         view.trigger('change');
     }
     
     onChangeBoolValue(e, element, view) {
-        view.model.value = $(element).data('checked');
+        if(view.model.isArray) {
+            let i = $(element).parents('.field-editor').index();
+                
+            view.model.value[i] = $(element).data('checked') || false;
+
+        } else {
+            view.model.value = $(element).data('checked');
+        
+        }
 
         view.trigger('change');
     }
@@ -30,6 +46,8 @@ class FieldEditor extends View {
 
         if(this.model.isArray) {
             function onClickAdd() {
+                view.model.value = view.model.value || [];
+
                 $(this).before(
                     addField(view.model.value.length, null)
                 );
@@ -46,7 +64,7 @@ class FieldEditor extends View {
                     }
                 }
 
-                let $field = view.renderField();
+                let $field = view.renderField(value);
 
                 let $btnRemove = _.span({class: 'input-group-btn'},
                     _.button({class: 'btn btn-danger'}, [
@@ -76,7 +94,7 @@ class FieldEditor extends View {
         
         } else {
             this.$element = _.div({class: 'field-editor'},
-                this.renderField()
+                this.renderField(this.model.value)
             );
         
         }

@@ -44,7 +44,7 @@ class IssueModal extends View {
                                     function () {
                                         view.$assignee = _.select({class: 'form-control'});
 
-                                        api.collaborators(function(collaborators) {
+                                        api.collaborators.fetch(function(collaborators) {
                                             view.collaborators = collaborators;
 
                                             view.$assignee.html(
@@ -88,7 +88,7 @@ class IssueModal extends View {
                             function() {
                                 view.$milestone = _.select({class: 'form-control'});
                                     
-                                api.milestones(function(milestones) { 
+                                api.milestones.fetch(function(milestones) { 
                                     view.milestones = milestones;
 
                                     view.$milestone.html(

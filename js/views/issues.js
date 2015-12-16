@@ -12,7 +12,7 @@ class Issues extends View {
 
         api.issueColumns(function(columns) {
             api.issues.fetch(function(issues) {
-                api.milestones(function(milestones) {
+                api.milestones.fetch(function(milestones) {
                     view.columns = columns;
                     view.issues = issues;
                     view.milestones = milestones;

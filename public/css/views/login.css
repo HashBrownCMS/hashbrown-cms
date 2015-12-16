@@ -17,6 +17,9 @@
 .btn .glyphicon {
   line-height: 1.3em; }
 
+textarea {
+  resize: none; }
+
 .m-b-xs {
   margin-bottom: 10px; }
 

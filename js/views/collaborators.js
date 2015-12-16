@@ -7,7 +7,7 @@ class Collaborators extends View {
 
         let view = this;
    
-        this.modelFunction = api.collaborators;
+        this.modelFunction = api.collaborators.fetch;
 
         this.fetch();
     }

@@ -3,11 +3,11 @@
     "htmlString": { "label": "Rich text", "editor": "text-html" },
     "integer": { "label": "Number", "editor": "number", "decimals": false },
     "float": { "label": "Number (decimals)", "editor": "number", "decimals": true },
-    "date": { "label": "Date", "editor": "picker-date" },
-    "media": { "label": "Media", "editor": "picker-media" },
-    "node": { "label": "Node", "editor": "picker-node" },
+    "date": { "label": "Date", "editor": "date-picker" },
+    "media": { "label": "Media", "editor": "media-picker" },
+    "node": { "label": "Node", "editor": "node-picker" },
     "nestedNode": { "label": "Nested node", "editor": "nested-node" },
-    "template": { "label": "Template", "editor": "picker-template" },
+    "template": { "label": "Template", "editor": "template-picker" },
     "bool": { "label": "Checkbox", "editor": "checkbox" },
     "switch": { "label": "Switch", "editor": "switch", "keys": [ "true", "false" ] }
 }

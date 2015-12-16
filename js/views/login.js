@@ -34,7 +34,7 @@ class Login extends View {
                     $('.credentials').toggleClass('hidden', true);
                     $('.organization').toggleClass('hidden', false);
 
-                    localStorage.setItem('gh-oauth-token', res.token);
+                    localStorage.setItem('api-token', res.token);
 
                     $('.organization select').html(
                         _.each(

@@ -17,6 +17,9 @@
 .btn .glyphicon {
   line-height: 1.3em; }
 
+textarea {
+  resize: none; }
+
 .m-b-xs {
   margin-bottom: 10px; }
 
@@ -388,6 +391,15 @@
   .page-content .editor {
     position: relative;
     min-height: 200px; }
+    .page-content .editor > .panel-heading {
+      position: relative; }
+      .page-content .editor > .panel-heading .content-actions {
+        position: absolute;
+        right: 0px;
+        top: 0px;
+        padding: 2px 15px;
+        border-left: 1px solid #ddd;
+        border-top-right-radius: 2px; }
     .page-content .editor .field-editor-container {
       width: 100%;
       margin-bottom: 15px; }
@@ -403,5 +415,7 @@
       .page-content .editor .field-editor-container .field-editor {
         width: 100%;
         margin-bottom: 15px; }
+        .page-content .editor .field-editor-container .field-editor .text-html-editor textarea {
+          height: 300px; }
         .page-content .editor .field-editor-container .field-editor .checkbox-editor input {
           width: 64px; }

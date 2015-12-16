@@ -133,6 +133,19 @@
         position: relative;
         min-height: 200px;
 
+        >.panel-heading {
+            position: relative;
+
+            .content-actions {
+                position: absolute;
+                right: 0px;
+                top: 0px;
+                padding: 2px 15px;
+                border-left: 1px solid #ddd;
+                border-top-right-radius: 2px;
+            }
+        }
+
         .field-editor-container {
             width: 100%;
             margin-bottom: 15px;
@@ -151,6 +164,12 @@
             .field-editor {
                 width: 100%;
                 margin-bottom: 15px;
+
+                .text-html-editor {
+                    textarea {
+                        height: 300px;
+                    }
+                }
 
                 .checkbox-editor {
                     input {
