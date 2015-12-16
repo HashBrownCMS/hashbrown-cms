@@ -1168,7 +1168,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
                     api.structs.fields.fetch(function (fieldStructs) {
                         api.structs.pages.fetch(view.model.struct || 'page', function (pageStruct) {
-                            view.$element.children('.panel-heading').children('.panel-title').html(view.model.name);
+                            view.$element.children('.panel-heading').children('.panel-title').html(view.model.title.value);
                             view.$element.children('.panel-body').empty();
 
                             var populated = {};

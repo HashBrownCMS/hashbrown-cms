@@ -411,7 +411,9 @@ textarea {
         border-left: 0px;
         border-right: 0px;
         border-radius: 0px;
-        background-color: transparent; }
+        border-color: #efefef;
+        background-color: transparent;
+        color: #777; }
       .page-content .editor .field-editor-container .field-editor {
         width: 100%;
         margin-bottom: 15px; }
