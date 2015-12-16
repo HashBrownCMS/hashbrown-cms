@@ -129,6 +129,8 @@ textarea {
     .page-content .tree .nav-root {
       margin: 0px;
       padding: 0px; }
+    .page-content .tree > .panel-body {
+      padding: 0px; }
     .page-content .tree .tab-pane {
       position: relative;
       height: 0px;
@@ -395,18 +397,9 @@ textarea {
     position: relative;
     min-height: 200px; }
     .page-content .editor > .panel-heading {
-      position: relative;
-      padding: 0px;
-      height: 56px; }
-      .page-content .editor > .panel-heading .field-anchors {
-        padding: 10px 15px;
-        float: left; }
-        .page-content .editor > .panel-heading .field-anchors a {
-          padding: 6px 12px; }
+      position: relative; }
       .page-content .editor > .panel-heading .content-actions {
-        padding: 10px 15px;
-        float: right;
-        border-top-right-radius: 2px; }
+        float: right; }
     .page-content .editor .field-editor-container {
       width: 100%;
       margin-bottom: 15px; }
@@ -424,6 +417,15 @@ textarea {
       .page-content .editor .field-editor-container .field-editor {
         width: 100%;
         margin-bottom: 15px; }
+        .page-content .editor .field-editor-container .field-editor .date-picker {
+          position: relative;
+          max-width: 280px; }
+          .page-content .editor .field-editor-container .field-editor .date-picker .form-control {
+            width: 33.33%;
+            float: left; }
+          .page-content .editor .field-editor-container .field-editor .date-picker .date-picker-preview {
+            color: #777;
+            font-size: 12px; }
         .page-content .editor .field-editor-container .field-editor .text-html-editor textarea {
           height: 300px; }
         .page-content .editor .field-editor-container .field-editor .checkbox-editor input {

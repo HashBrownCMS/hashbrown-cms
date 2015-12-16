@@ -135,7 +135,7 @@ class Tree extends View {
             ).click(view.events.clickCloseRootNav),
 
             // Root folders
-            this.$rootNav = _.ul({class: 'nav-root btn-group', role: 'tablist'},
+            this.$rootNav = _.div({class: 'nav-root btn-group', role: 'tablist'},
                 _.each(this.dirs,
                     function(label, files) {
                         return _.a({class: 'btn btn-default', href: '#' + label, 'aria-controls': label, role: 'tab', 'data-toggle': 'tab' },

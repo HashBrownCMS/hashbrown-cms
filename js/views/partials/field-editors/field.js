@@ -22,7 +22,21 @@ class FieldEditor extends View {
 
         view.trigger('change');
     }
-    
+
+    onChangeDateValue(e, element, view) {
+        if(view.model.isArray) {
+            let i = $(element).parents('.field-editor').index();
+                
+            view.model.value[i] = $(element).data('date');
+
+        } else {
+            view.model.value = $(element).data('date');
+        
+        }
+
+        view.trigger('change');
+    }
+
     onChangeBoolValue(e, element, view) {
         if(view.model.isArray) {
             let i = $(element).parents('.field-editor').index();

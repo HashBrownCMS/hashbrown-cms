@@ -12,6 +12,10 @@
             padding: 0px;
         }
 
+        >.panel-body {
+            padding: 0px;
+        }
+
         .tab-pane {
             position: relative;
             height: 0px;
@@ -140,22 +144,9 @@
 
         >.panel-heading {
             position: relative;
-            padding: 0px;
-            height: 56px;
-
-            .field-anchors {
-                padding: 10px 15px;
-                float: left;
-
-                a {
-                    padding: 6px 12px;
-                }
-            }
 
             .content-actions {
-                padding: 10px 15px;
                 float: right;
-                border-top-right-radius: 2px;
             }
         }
 
@@ -183,6 +174,21 @@
             .field-editor {
                 width: 100%;
                 margin-bottom: 15px;
+
+                .date-picker {
+                    position: relative;
+                    max-width: 280px;
+                    
+                    .form-control {
+                        width: 33.33%;
+                        float: left;
+                    }
+
+                    .date-picker-preview {
+                        color: #777;
+                        font-size: 12px;
+                    }
+                }
 
                 .text-html-editor {
                     textarea {

@@ -50,7 +50,8 @@ class Editor extends View {
             'text-html': require('./field-editors/text-html'),
             'url': require('./field-editors/url'),
             'checkbox': require('./field-editors/checkbox'),
-            'template-picker': require('./field-editors/template-picker')
+            'template-picker': require('./field-editors/template-picker'),
+            'date-picker': require('./field-editors/date-picker')
         };
     }
 
