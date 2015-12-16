@@ -314,13 +314,19 @@ class GitHub {
         let octo = new octokat({ token: req.body.token });
 
         // Get the default struct
-        let page = require('../../structs/page.json');
+        let baseStruct = require('../../structs/page.json');
+        let baseString = JSON.stringify(baseStruct);
 
-        octo.fromUrl('/repos/' + req.params.user + '/' + req.params.repo + '/contents/structs/' + req.params.struct + '.json').fetch(function(err, file) {
-            let output = page;
+        octo.fromUrl('/repos/' + req.params.user + '/' + req.params.repo + '/contents/_structs/pages/' + req.params.struct + '.json').fetch(function(err, file) {
+            let output = baseStruct;
 
             if(!err) {
-                console.log(file.content);
+                let thisString = new Buffer(file.content, file.encoding).toString().replace(/\n/g, '');
+            
+                baseString = baseString.slice(0, -1);
+                thisString = thisString.substring(1);
+
+                output = JSON.parse(baseString + ',' + thisString);
             }
 
             res.send(output);  
