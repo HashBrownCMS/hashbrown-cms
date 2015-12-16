@@ -185,6 +185,18 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                     }
                 },
 
+                sections: {
+                    fetch: function fetch(path, callback) {
+                        api.call('/api/structs/sections/fetch/' + req.params.user + '/' + req.params.repo + '/' + path, callback);
+                    }
+                },
+
+                blocks: {
+                    fetch: function fetch(path, callback) {
+                        api.call('/api/structs/blocks/fetch/' + req.params.user + '/' + req.params.repo + '/' + path, callback);
+                    }
+                },
+
                 fields: {
                     fetch: function fetch(callback) {
                         api.call('/api/structs/fields/fetch/' + req.params.user + '/' + req.params.repo, callback);

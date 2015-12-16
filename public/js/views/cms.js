@@ -185,6 +185,18 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                     }
                 },
 
+                sections: {
+                    fetch: function fetch(path, callback) {
+                        api.call('/api/structs/sections/fetch/' + req.params.user + '/' + req.params.repo + '/' + path, callback);
+                    }
+                },
+
+                blocks: {
+                    fetch: function fetch(path, callback) {
+                        api.call('/api/structs/blocks/fetch/' + req.params.user + '/' + req.params.repo + '/' + path, callback);
+                    }
+                },
+
                 fields: {
                     fetch: function fetch(callback) {
                         api.call('/api/structs/fields/fetch/' + req.params.user + '/' + req.params.repo, callback);
@@ -1169,7 +1181,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                     var view = this;
 
                     api.structs.fields.fetch(function (fieldStructs) {
-                        api.structs.pages.fetch(view.model.struct || 'page', function (pageStruct) {
+                        api.structs.pages.fetch(view.model.struct, function (pageStruct) {
                             view.$element.children('.panel-heading').children('.field-anchors').empty();
                             view.$element.children('.panel-body').empty();
 
@@ -1179,7 +1191,13 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                             //populated = view.model;
 
                             for (var k in pageStruct) {
-                                populated[k] = view.model[k] || pageStruct[k];
+                                var prop = pageStruct[k];
+
+                                if (view.model[k] && view.model[k].value) {
+                                    prop.value = view.model[k].value;
+                                }
+
+                                populated[k] = prop;
                             }
 
                             view.model = populated;

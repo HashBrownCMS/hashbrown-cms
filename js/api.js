@@ -162,6 +162,18 @@ window.api = {
                 api.call('/api/structs/pages/fetch/' + req.params.user + '/' + req.params.repo + '/' + path, callback);
             }
         },
+        
+        sections: {
+            fetch: function(path, callback) {
+                api.call('/api/structs/sections/fetch/' + req.params.user + '/' + req.params.repo + '/' + path, callback);
+            }
+        },
+        
+        blocks: {
+            fetch: function(path, callback) {
+                api.call('/api/structs/blocks/fetch/' + req.params.user + '/' + req.params.repo + '/' + path, callback);
+            }
+        },
 
         fields: {
             fetch: function(callback) {

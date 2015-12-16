@@ -311,10 +311,20 @@ class GitHub {
      * Get/set page struct
      */
     pageStruct(req, res) {
-        // Get the default struct
-        let page = require('../../structs/' + req.params.struct + '.json');
+        let octo = new octokat({ token: req.body.token });
 
-        res.send(page);
+        // Get the default struct
+        let page = require('../../structs/page.json');
+
+        octo.fromUrl('/repos/' + req.params.user + '/' + req.params.repo + '/contents/structs/' + req.params.struct + '.json').fetch(function(err, file) {
+            let output = page;
+
+            if(!err) {
+                console.log(file.content);
+            }
+
+            res.send(output);  
+        });
     }
     
     /** 

@@ -1,12 +1,42 @@
 {
     "#seo": "SEO",
-    "title": { "struct": "string", "label": "Page title" },
-    "description": { "struct": "string", "label": "Page description" },
-    "noIndex": { "struct": "bool", "label": "No index" },
-    "noFollow": { "struct": "bool", "label": "No follow" },
+    "title": {
+        "struct": "string",
+        "label": "Title"
+    },
+    "description": {
+        "struct": "string",
+        "label": "Description"
+    },
+    "noIndex": {
+        "struct": "bool",
+        "label": "No index"
+    },
+    "noFollow": {
+        "struct": "bool",
+        "label": "No follow"
+    },
+    
     "#main": "Main properties",
-    "createDate": { "struct": "date", "label": "Created", "locked": true },
-    "changeDate": { "struct": "date", "label": "Updated", "locked": true },
-    "url": { "struct": "url", "label": "URL" },
-    "template": { "struct": "template", "label": "Template", "allowed": [ "page", "example" ] }
+    "createDate": {
+        "struct": "date",
+        "label": "Created",
+        "locked": true
+    },
+    "changeDate": {
+        "struct": "date",
+        "label": "Updated",
+        "locked": true
+    },
+    "url": {
+        "struct": "url", "label": "URL"
+    },
+    "template": {
+        "struct": "template",
+        "label": "Template",
+        "allowed": [
+            "page",
+            "example"
+        ]
+    }
 }

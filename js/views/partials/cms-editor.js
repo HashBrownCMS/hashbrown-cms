@@ -108,7 +108,7 @@ class Editor extends View {
         let view = this;
 
         api.structs.fields.fetch(function(fieldStructs) {
-            api.structs.pages.fetch(view.model.struct || 'page', function(pageStruct) {
+            api.structs.pages.fetch(view.model.struct, function(pageStruct) {
                 view.$element.children('.panel-heading').children('.field-anchors').empty();
                 view.$element.children('.panel-body').empty();
 
@@ -118,7 +118,13 @@ class Editor extends View {
                 //populated = view.model;
                 
                 for(let k in pageStruct) {
-                    populated[k] = view.model[k] || pageStruct[k];
+                    let prop = pageStruct[k];
+
+                    if(view.model[k] && view.model[k].value) {
+                        prop.value = view.model[k].value;
+                    }
+
+                    populated[k] = prop;
                 }
 
                 view.model = populated;
