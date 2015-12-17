@@ -205,6 +205,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
             },
 
             content: {
+                fetch: function fetch(path, callback) {
+                    api.call('/api/content/fetch/' + req.params.user + '/' + req.params.repo + '/' + path, callback);
+                },
+
                 publish: function publish(json, path, callback) {
                     api.content.bake(json, function (baked) {
                         var data = {
@@ -1048,7 +1052,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 key: "initRoutes",
                 value: function initRoutes() {
                     // Pages
-                    Router.route('/_content/:path*', function () {
+                    Router.route('/content/:path*', function () {
                         ViewHelper.get('Editor').openAsync(this.path);
                     });
 
@@ -1087,7 +1091,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
                 _this3.initFieldEditors();
 
-                _this3.$element = _.div({ class: 'panel panel-default editor' }, [_.div({ class: 'panel-heading' }, [_.div({ class: 'btn-group content-actions' }, [_.button({ class: 'btn btn-success btn-publish' }, ['Save ', _.span({ class: 'glyphicon glyphicon-floppy-disk' })]).click(_this3.events.clickSave), _.button({ class: 'btn btn-success btn-publish' }, ['Publish ', _.span({ class: 'glyphicon glyphicon-upload' })]).click(_this3.events.clickPublish)]), _.div({ class: 'btn-group field-anchors' })]), _.div({ class: 'panel-body' })]);
+                _this3.$element = _.div({ class: 'panel panel-default editor' }, [_.div({ class: 'panel-heading' }, [_.div({ class: 'btn-group content-actions' }, [_.button({ class: 'btn btn-primary btn-publish' }, ['Save ', _.span({ class: 'glyphicon glyphicon-floppy-disk' })]).click(_this3.events.clickSave), _.button({ class: 'btn btn-success btn-publish' }, ['Publish ', _.span({ class: 'glyphicon glyphicon-upload' })]).click(_this3.events.clickPublish)]), _.div({ class: 'btn-group field-anchors' })]), _.div({ class: 'panel-body' })]);
                 return _this3;
             }
 
@@ -1138,14 +1142,12 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
                     view.clear();
 
-                    view.path = '/_content/' + path;
-
                     ViewHelper.get('Tree').ready(function (view) {
-                        view.highlight('_content/' + path);
+                        view.highlight(path);
                     });
 
-                    api.file.fetch(view.path, function (content) {
-                        view.open(JSON.parse(content), true);
+                    api.content.fetch(path, function (content) {
+                        view.open(content, true);
                     });
                 }
             }, {
@@ -1181,57 +1183,43 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                     var view = this;
 
                     api.structs.fields.fetch(function (fieldStructs) {
-                        api.structs.pages.fetch(view.model.struct, function (pageStruct) {
-                            view.$element.children('.panel-heading').children('.field-anchors').empty();
-                            view.$element.children('.panel-body').empty();
+                        view.$element.children('.panel-heading').children('.field-anchors').empty();
+                        view.$element.children('.panel-body').empty();
 
-                            var populated = {};
-
-                            // TODO: Populate page struct with content
-                            //populated = view.model;
-
-                            for (var k in pageStruct) {
-                                var prop = pageStruct[k];
-
-                                if (view.model[k] && view.model[k].value) {
-                                    prop.value = view.model[k].value;
-                                }
-
-                                populated[k] = prop;
+                        var _loop = function _loop(anchorLabel) {
+                            // Render anchor points
+                            function onClickAnchor(e) {
+                                e.preventDefault();
                             }
 
-                            view.model = populated;
+                            view.$element.children('.panel-heading').children('.field-anchors').append(_.button({ class: 'btn btn-default' }, anchorLabel).click(onClickAnchor));
 
-                            for (var alias in view.model) {
-                                // This is an anchor point
-                                if (alias.indexOf('#') == 0) {
-                                    var onClickAnchor = function onClickAnchor(e) {
-                                        e.preventDefault();
-                                    };
+                            view.$element.children('.panel-body').append(_.h4({ class: 'field-anchor' }, anchorLabel));
 
-                                    var ref = 'field-anchor-' + alias.replace('#', '');
+                            // Render properties
+                            var props = view.model[anchorLabel];
 
-                                    view.$element.children('.panel-heading').children('.field-anchors').append(_.button({ class: 'btn btn-default' }, view.model[alias]).click(onClickAnchor));
+                            for (var alias in props) {
+                                var fieldModel = props[alias];
+                                var fieldStruct = fieldStructs[fieldModel.struct];
 
-                                    view.$element.children('.panel-body').append(_.h4({ class: 'field-anchor', id: ref }, view.model[alias]));
-                                } else {
-                                    var fieldModel = view.model[alias];
-                                    var fieldStruct = fieldStructs[fieldModel.struct];
+                                if (fieldStruct) {
+                                    var fieldEditorView = view.getFieldEditor(fieldStruct.editor, alias, fieldModel);
 
-                                    if (fieldStruct) {
-                                        var fieldEditorView = view.getFieldEditor(fieldStruct.editor, alias, fieldModel);
-
-                                        if (fieldEditorView) {
-                                            view.$element.children('.panel-body').append(_.div({ class: 'input-group field-editor-container' }, [_.span({ class: 'field-editor-label input-group-addon' }, fieldModel.label), fieldEditorView.$element]));
-                                        } else {
-                                            console.log('No field editor with name "' + fieldStruct.editor + '" was found');
-                                        }
+                                    if (fieldEditorView) {
+                                        view.$element.children('.panel-body').append(_.div({ class: 'input-group field-editor-container' }, [_.span({ class: 'field-editor-label input-group-addon' }, fieldModel.label), fieldEditorView.$element]));
                                     } else {
-                                        console.log('No field struct with name "' + fieldModel.struct + '" was found');
+                                        console.log('No field editor with name "' + fieldStruct.editor + '" was found');
                                     }
+                                } else {
+                                    console.log('No field struct with name "' + fieldModel.struct + '" was found');
                                 }
                             }
-                        });
+                        };
+
+                        for (var anchorLabel in view.model) {
+                            _loop(anchorLabel);
+                        }
                     });
                 }
             }]);
@@ -1465,9 +1453,9 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                             var $el = undefined;
 
                             if (isDir) {
-                                $el = _.li({ class: 'folder', draggable: 'true' }, [_.a({ href: '#/' + file.path }, [_.glyphicon({ class: 'glyphicon-folder-close' }), name]).click(view.events.clickFolder).context(contextMenuItems).on(dragHandler), _.ul({ class: 'folder-content', id: file.sha }).on(dropHandler)]);
+                                $el = _.li({ class: 'folder', draggable: 'true' }, [_.a({ href: '#/' + file.path.replace('_', '') }, [_.glyphicon({ class: 'glyphicon-folder-close' }), name]).click(view.events.clickFolder).context(contextMenuItems).on(dragHandler), _.ul({ class: 'folder-content', id: file.sha }).on(dropHandler)]);
                             } else {
-                                $el = _.li({ class: 'file', draggable: 'true' }, _.a({ href: '#/' + file.path }, [_.glyphicon({ class: 'glyphicon-file' }), name]).click(view.events.clickFile).context(contextMenuItems).on(dragHandler));
+                                $el = _.li({ class: 'file', draggable: 'true' }, _.a({ href: '#/' + file.path.replace('_', '').replace('.json', '') }, [_.glyphicon({ class: 'glyphicon-file' }), name]).click(view.events.clickFile).context(contextMenuItems).on(dragHandler));
                             }
 
                             return $el;
@@ -1605,7 +1593,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                         update();
                     }
 
-                    var $el = _.div({ class: 'date-picker' }, [_.input({ class: 'form-control date-picker-year', type: 'number', value: date.getFullYear() }).bind('change paste propertychange keyup', onChangeYear), _.input({ class: 'form-control date-picker-month', type: 'number', value: date.getMonth() + 1 }).bind('change paste propertychange keyup', onChangeMonth), _.input({ class: 'form-control date-picker-day', type: 'number', value: date.getDate() }).bind('change paste propertychange keyup', onChangeDay), _.input({ class: 'form-control date-picker-hour', type: 'number', value: date.getHours() }).bind('change paste propertychange keyup', onChangeHour), _.input({ class: 'form-control date-picker-minute', type: 'number', value: date.getMinutes() }).bind('change paste propertychange keyup', onChangeMinute), _.input({ class: 'form-control date-picker-second', type: 'number', value: date.getSeconds() }).bind('change paste propertychange keyup', onChangeSecond), _.div({ class: 'date-picker-preview' }, date.toString())]);
+                    var $el = _.div({ class: 'date-picker' }, _.div({ class: 'date-picker-preview' }, date.toString()));
+
+                    if (!view.model.locked) {
+                        $el.append([_.input({ class: 'form-control date-picker-year', type: 'number', value: date.getFullYear() }).bind('change paste propertychange keyup', onChangeYear), _.input({ class: 'form-control date-picker-month', type: 'number', value: date.getMonth() + 1 }).bind('change paste propertychange keyup', onChangeMonth), _.input({ class: 'form-control date-picker-day', type: 'number', value: date.getDate() }).bind('change paste propertychange keyup', onChangeDay), _.input({ class: 'form-control date-picker-hour', type: 'number', value: date.getHours() }).bind('change paste propertychange keyup', onChangeHour), _.input({ class: 'form-control date-picker-minute', type: 'number', value: date.getMinutes() }).bind('change paste propertychange keyup', onChangeMinute), _.input({ class: 'form-control date-picker-second', type: 'number', value: date.getSeconds() }).bind('change paste propertychange keyup', onChangeSecond)]);
+                    }
 
                     return $el;
                 }

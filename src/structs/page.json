@@ -1,0 +1,43 @@
+{
+    "SEO": {
+        "title": {
+            "struct": "string",
+            "label": "Title"
+        },
+        "description": {
+            "struct": "string",
+            "label": "Description"
+        },
+        "noIndex": {
+            "struct": "bool",
+            "label": "No index"
+        },
+        "noFollow": {
+            "struct": "bool",
+            "label": "No follow"
+        }
+    },
+    "Properties" : {
+        "createDate": {
+            "struct": "date",
+            "label": "Created",
+            "locked": true
+        },
+        "changeDate": {
+            "struct": "date",
+            "label": "Updated",
+            "locked": true
+        },
+        "url": {
+            "struct": "url", "label": "URL"
+        },
+        "template": {
+            "struct": "template",
+            "label": "Template",
+            "allowed": [
+                "page",
+                "example"
+            ]
+        }
+    }
+}

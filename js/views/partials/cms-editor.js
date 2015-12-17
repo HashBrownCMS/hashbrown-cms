@@ -11,7 +11,7 @@ class Editor extends View {
         this.$element = _.div({class: 'panel panel-default editor'}, [
             _.div({class: 'panel-heading'}, [
                 _.div({class: 'btn-group content-actions'}, [
-                    _.button({class: 'btn btn-success btn-publish'}, [
+                    _.button({class: 'btn btn-primary btn-publish'}, [
                         'Save ',
                         _.span({class: 'glyphicon glyphicon-floppy-disk'})
                     ]).click(this.events.clickSave),
@@ -68,14 +68,12 @@ class Editor extends View {
 
         view.clear();
        
-        view.path = '/_content/' + path;
-
         ViewHelper.get('Tree').ready(function(view) {
-            view.highlight('_content/' + path);
+            view.highlight(path);
         });
         
-        api.file.fetch(view.path, function(content) {
-            view.open(JSON.parse(content), true);
+        api.content.fetch(path, function(content) {
+            view.open(content, true);
         });
     }
     
@@ -108,76 +106,58 @@ class Editor extends View {
         let view = this;
 
         api.structs.fields.fetch(function(fieldStructs) {
-            api.structs.pages.fetch(view.model.struct, function(pageStruct) {
-                view.$element.children('.panel-heading').children('.field-anchors').empty();
-                view.$element.children('.panel-body').empty();
+            view.$element.children('.panel-heading').children('.field-anchors').empty();
+            view.$element.children('.panel-body').empty();
 
-                let populated = {};
-
-                // TODO: Populate page struct with content
-                //populated = view.model;
-                
-                for(let k in pageStruct) {
-                    let prop = pageStruct[k];
-
-                    if(view.model[k] && view.model[k].value) {
-                        prop.value = view.model[k].value;
-                    }
-
-                    populated[k] = prop;
+            for(let anchorLabel in view.model) {
+                // Render anchor points
+                function onClickAnchor(e) {
+                    e.preventDefault();
                 }
 
-                view.model = populated;
+                view.$element.children('.panel-heading').children('.field-anchors').append(
+                    _.button({class: 'btn btn-default'},
+                        anchorLabel
+                    ).click(onClickAnchor)
+                );
+                
 
-                for(let alias in view.model) {
-                    // This is an anchor point
-                    if(alias.indexOf('#') == 0) {
-                        let ref = 'field-anchor-' + alias.replace('#', '');
+                view.$element.children('.panel-body').append(
+                    _.h4({class: 'field-anchor'},
+                        anchorLabel
+                    )
+                );
+                
+                // Render properties
+                let props = view.model[anchorLabel];
 
-                        function onClickAnchor(e) {
-                            e.preventDefault();
+                for(let alias in props) {
+                    let fieldModel = props[alias];
+                    let fieldStruct = fieldStructs[fieldModel.struct];
+
+                    if(fieldStruct) {
+                        let fieldEditorView = view.getFieldEditor(fieldStruct.editor, alias, fieldModel);
+
+                        if(fieldEditorView) {
+                            view.$element.children('.panel-body').append(
+                                _.div({class: 'input-group field-editor-container'}, [
+                                    _.span({class: 'field-editor-label input-group-addon'},
+                                        fieldModel.label
+                                    ),
+                                    fieldEditorView.$element
+                                ])
+                            );
+                        
+                        } else {
+                            console.log('No field editor with name "' + fieldStruct.editor + '" was found');
+                        
                         }
-
-                        view.$element.children('.panel-heading').children('.field-anchors').append(
-                            _.button({class: 'btn btn-default'},
-                                view.model[alias]
-                            ).click(onClickAnchor)
-                        );
-
-                        view.$element.children('.panel-body').append(
-                            _.h4({class: 'field-anchor', id: ref},
-                                view.model[alias]
-                            )
-                        );
 
                     } else {
-                        let fieldModel = view.model[alias];
-                        let fieldStruct = fieldStructs[fieldModel.struct];
-
-                        if(fieldStruct) {
-                            let fieldEditorView = view.getFieldEditor(fieldStruct.editor, alias, fieldModel);
-
-                            if(fieldEditorView) {
-                                view.$element.children('.panel-body').append(
-                                    _.div({class: 'input-group field-editor-container'}, [
-                                        _.span({class: 'field-editor-label input-group-addon'},
-                                            fieldModel.label
-                                        ),
-                                        fieldEditorView.$element
-                                    ])
-                                );
-                            
-                            } else {
-                                console.log('No field editor with name "' + fieldStruct.editor + '" was found');
-                            
-                            }
-
-                        } else {
-                            console.log('No field struct with name "' + fieldModel.struct + '" was found');
-                        }
+                        console.log('No field struct with name "' + fieldModel.struct + '" was found');
                     }
                 }
-            });
+            }
         });
     }
 }

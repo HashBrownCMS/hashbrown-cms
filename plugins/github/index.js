@@ -3,6 +3,9 @@
 let octokat = require('octokat');
 let env = require('../../env.json');
 
+let Content = require('../../src/models/content/content');
+let Debug = require('../../src/helpers/debug');
+
 class GitHub {
     /**
      * Constructor
@@ -34,7 +37,7 @@ class GitHub {
 
         // Abstract CMS operations
         controller.hook('post', '/api/content/publish/:user/:repo/:branch/*', this.publish);
-        controller.hook('post', '/api/structs/pages/:mode/:user/:repo/:struct*', this.pageStruct);
+        controller.hook('post', '/api/content/:mode/:user/:repo/*', this.content);
         controller.hook('post', '/api/structs/fields/:mode/:user/:repo', this.fieldStruct);
 
         // Redirects
@@ -307,32 +310,65 @@ class GitHub {
     }
     
     /**
-     * Page struct
-     * Get/set page struct
+     * Page content
+     * Get page content
      */
-    pageStruct(req, res) {
+    content(req, res) {
+        let baseUrl = '/api/content/' + req.params.mode + '/' + req.params.user + '/' + req.params.repo + '/';
+        let contentPath = req.url.replace(baseUrl, '');
+
         let octo = new octokat({ token: req.body.token });
 
-        // Get the base struct
-        let baseStruct = require('../../structs/page.json');
-        let baseString = JSON.stringify(baseStruct);
+        let content = new Content();
+        
+        console.log('GitHub: Start getting Content "' + contentPath + '"!');
+        
+        function contentAsyncFunction() {
+            return new Promise(function(callback) {
+                let url = '/repos/' + req.params.user + '/' + req.params.repo + '/contents/_content/' + contentPath + '.json';
 
-        // Get the specified struct
-        octo.fromUrl('/repos/' + req.params.user + '/' + req.params.repo + '/contents/_structs/pages/' + req.params.struct + '.json').fetch(function(err, file) {
-            let output = baseStruct;
+                console.log('    GitHub: Fetching Content "' + contentPath + '"...');
+                
+                octo.fromUrl(url).fetch(function(err, file) {
+                    if(!err) {
+                        console.log('    GitHub: Parsing JSON for Content "' + contentPath + '"...')
+                        
+                        callback(JSON.parse(new Buffer(file.content, file.encoding).toString()));
+                    
+                    } else {
+                        console.log('    GitHub [ERROR]:', err, url);
+                        
+                        callback({});
+                    
+                    }
+                });
+            });
+        }
 
-            if(!err) {
-                // Primitive struct merge
-                let thisString = new Buffer(file.content, file.encoding).toString().replace(/\n/g, '');
-            
-                baseString = baseString.slice(0, -1);
-                thisString = thisString.substring(1);
+        function structAsyncFunction(structPath) {
+            return new Promise(function(callback) {
 
-                output = JSON.parse(baseString + ',' + thisString);
-            }
+                let url = '/repos/' + req.params.user + '/' + req.params.repo + '/contents/_structs/' + structPath + '.json';
 
-            res.send(output);  
-        });
+                console.log('    GitHub: Fetching Struct "' + structPath + '"...');
+
+                octo.fromUrl(url).fetch(function(err, file) {
+                    if(!err) {
+                        console.log('    GitHub: Parsing JSON for Struct "' + structPath + '"...')
+                        callback(JSON.parse(new Buffer(file.content, file.encoding).toString()));
+                    } else {
+                        console.log('    GitHub [ERROR]:', err);
+                        callback({});
+                    }
+                });
+            });
+        }
+
+        content.fetchAsync(contentAsyncFunction, structAsyncFunction)
+            .then(function() {
+                console.log('GitHub: Done getting Content "' + contentPath + '"!');
+                res.send(content.data);
+            }).catch(Debug.error);
     }
     
     /** 
@@ -341,7 +377,7 @@ class GitHub {
      */
     fieldStruct(req, res) {
         // Get the default structs
-        let page = require('../../structs/fields.json');
+        let page = require('../../src/structs/fields.json');
 
         res.send(page);
     }
@@ -359,7 +395,6 @@ class GitHub {
     publish(req, res) {
         let baseUrl = '/api/content/publish/' + req.params.user + '/' + req.params.repo + '/' + req.params.branch + '/';
         let apiUrl = '/repos/' + req.params.user + '/' + req.params.repo + '/contents/';
-        let path = req.url;
         
         // Remove the base url to get the file path
         path = path.replace(baseUrl, '');

@@ -81,17 +81,22 @@ class DatePicker extends FieldEditor {
             update();
         }
 
-        let $el = _.div({class: 'date-picker'}, [
-            _.input({class: 'form-control date-picker-year', type: 'number', value: date.getFullYear()}).bind('change paste propertychange keyup', onChangeYear),
-            _.input({class: 'form-control date-picker-month', type: 'number', value: date.getMonth() + 1}).bind('change paste propertychange keyup', onChangeMonth),
-            _.input({class: 'form-control date-picker-day', type: 'number', value: date.getDate()}).bind('change paste propertychange keyup', onChangeDay),
-            _.input({class: 'form-control date-picker-hour', type: 'number', value: date.getHours()}).bind('change paste propertychange keyup', onChangeHour),
-            _.input({class: 'form-control date-picker-minute', type: 'number', value: date.getMinutes()}).bind('change paste propertychange keyup', onChangeMinute),
-            _.input({class: 'form-control date-picker-second', type: 'number', value: date.getSeconds()}).bind('change paste propertychange keyup', onChangeSecond),
+        let $el = _.div({class: 'date-picker'},
             _.div({class: 'date-picker-preview'},
                 date.toString()
             )
-        ]);
+        );
+
+        if(!view.model.locked) {
+            $el.append([
+                _.input({class: 'form-control date-picker-year', type: 'number', value: date.getFullYear()}).bind('change paste propertychange keyup', onChangeYear),
+                _.input({class: 'form-control date-picker-month', type: 'number', value: date.getMonth() + 1}).bind('change paste propertychange keyup', onChangeMonth),
+                _.input({class: 'form-control date-picker-day', type: 'number', value: date.getDate()}).bind('change paste propertychange keyup', onChangeDay),
+                _.input({class: 'form-control date-picker-hour', type: 'number', value: date.getHours()}).bind('change paste propertychange keyup', onChangeHour),
+                _.input({class: 'form-control date-picker-minute', type: 'number', value: date.getMinutes()}).bind('change paste propertychange keyup', onChangeMinute),
+                _.input({class: 'form-control date-picker-second', type: 'number', value: date.getSeconds()}).bind('change paste propertychange keyup', onChangeSecond),
+            ]);
+        }
 
         return $el;
     }

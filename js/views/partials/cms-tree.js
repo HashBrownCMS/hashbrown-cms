@@ -219,7 +219,7 @@ class Tree extends View {
                                    
                                         if(isDir) {
                                             $el = _.li({class: 'folder', draggable: 'true'}, [
-                                                _.a({href: '#/' + file.path}, [
+                                                _.a({href: '#/' + file.path.replace('_', '')}, [
                                                     _.glyphicon({ class: 'glyphicon-folder-close' }),
                                                     name
                                                 ]).click(view.events.clickFolder).context(contextMenuItems).on(dragHandler),
@@ -228,7 +228,7 @@ class Tree extends View {
 
                                         } else {
                                             $el = _.li({class: 'file', draggable: 'true'},
-                                                _.a({href: '#/' + file.path}, [
+                                                _.a({href: '#/' + file.path.replace('_', '').replace('.json', '')}, [
                                                     _.glyphicon({ class: 'glyphicon-file' }),
                                                     name
                                                 ]).click(view.events.clickFile).context(contextMenuItems).on(dragHandler)

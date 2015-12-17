@@ -205,6 +205,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
             },
 
             content: {
+                fetch: function fetch(path, callback) {
+                    api.call('/api/content/fetch/' + req.params.user + '/' + req.params.repo + '/' + path, callback);
+                },
+
                 publish: function publish(json, path, callback) {
                     api.content.bake(json, function (baked) {
                         var data = {

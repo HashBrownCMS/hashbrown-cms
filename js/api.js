@@ -183,6 +183,10 @@ window.api = {
     },
 
     content: {
+        fetch: function(path, callback) {
+            api.call('/api/content/fetch/' + req.params.user + '/' + req.params.repo + '/' + path, callback);
+        },
+
         publish: function(json, path, callback) {
             api.content.bake(json, function(baked) {
                 let data = {
