@@ -7,11 +7,11 @@ window.env = {
         if(env.json) {
             callback(env.json);
         } else {
-            api.file.fetch('/_env.json', function(content) {
+            api.file.fetch('/_env.json', function(data) {
                 let json = {};
                 
                 try {
-                    json = JSON.parse(content);
+                    json = JSON.parse(data.content);
                 } catch(e) {
                     Debug.log(e, 'env');    
                 }
@@ -30,13 +30,11 @@ window.env = {
     set: function(json, callback) {
         json = json || env.json;
 
-        let contents = {
-            content: btoa(JSON.stringify(json)),
-            sha: '', // << TODO: Find a way to get the sha!!! 
-            comment: 'Updating env.json'
+        let data = {
+            content: JSON.stringify(json),
         };
 
-        api.file.create(contents, '/_env.json', function() { 
+        api.file.create(data, '/_env.json', function() { 
             env.json = json;
 
             if(callback) {

@@ -247,16 +247,18 @@ class GitHub {
         let path = req.url.replace(baseUrl, '');
         let url = apiUrl + path;
 
+        // GitHub needs a commit message and base64 encoded content
         if(req.params.mode == 'create' || req.params.mode == 'update') {
-            req.body = {
-                content: new Buffer(req.body).toString('base64'),
-                comment: 'Committed by Putaitu CMS',
-                sha: '' // TODO: How to get this?!
-            };
+            console.log(req.body);
+
+            req.body.content = new Buffer(req.body.content).toString('base64');
+            req.body.comment = 'Committed by Putaitu CMS';
         }
 
         GitHub.apiCall(req, res, url, function(contents) {
-            res.send(new Buffer(file.content, 'base64').toString());
+            contents.content = new Buffer(contents.content, 'base64').toString();
+
+            res.send(contents);
         });
     }
     

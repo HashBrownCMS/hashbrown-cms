@@ -157,9 +157,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
             file: {
                 fetch: function fetch(path, callback) {
-                    api.call('/api/git/file/fetch/' + req.params.user + '/' + req.params.repo + '/' + path, function (data) {
-                        callback(data);
-                    });
+                    api.call('/api/git/file/fetch/' + req.params.user + '/' + req.params.repo + '/' + path, callback);
                 },
 
                 update: function update(data, path, callback) {
@@ -244,10 +242,9 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 },
 
                 publish: function publish(json, path, callback) {
-                    api.content.bake(json, function (baked) {
+                    api.content.bake(baked, function (baked) {
                         var data = {
-                            content: btoa(baked),
-                            message: 'Published content'
+                            content: JSON.stringify(baked)
                         };
 
                         api.call('/api/content/publish/' + req.params.user + '/' + req.params.repo + '/' + req.params.branch + '/' + path, callback, data);
@@ -255,7 +252,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 },
 
                 save: function save(json, path, callback) {
-                    api.file.create(JSON.stringify(json), '/_content/' + path + '.json', callback);
+                    var data = {
+                        content: JSON.stringify(json)
+                    };
+
+                    api.file.create(data, '/_content/' + path + '.json', callback);
                 },
 
                 bake: function bake(page, callback) {
@@ -967,11 +968,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 if (env.json) {
                     callback(env.json);
                 } else {
-                    api.file.fetch('/_env.json', function (content) {
+                    api.file.fetch('/_env.json', function (data) {
                         var json = {};
 
                         try {
-                            json = JSON.parse(content);
+                            json = JSON.parse(data.content);
                         } catch (e) {
                             Debug.log(e, 'env');
                         }
@@ -990,13 +991,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
             set: function set(json, callback) {
                 json = json || env.json;
 
-                var contents = {
-                    content: btoa(JSON.stringify(json)),
-                    sha: '', // << TODO: Find a way to get the sha!!!
-                    comment: 'Updating env.json'
+                var data = {
+                    content: JSON.stringify(json)
                 };
 
-                api.file.create(contents, '/_env.json', function () {
+                api.file.create(data, '/_env.json', function () {
                     env.json = json;
 
                     if (callback) {

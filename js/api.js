@@ -120,9 +120,7 @@ window.api = {
 
     file: {
         fetch: function(path, callback) {
-            api.call('/api/git/file/fetch/' + req.params.user + '/' + req.params.repo + '/' + path, function(data) {
-                callback(data)
-            });
+            api.call('/api/git/file/fetch/' + req.params.user + '/' + req.params.repo + '/' + path, callback);
         },
         
         update: function(data, path, callback) {
@@ -208,10 +206,9 @@ window.api = {
         },
 
         publish: function(json, path, callback) {
-            api.content.bake(json, function(baked) {
+            api.content.bake(baked, function(baked) {
                 let data = {
-                    content: btoa(baked),
-                    message: 'Published content'
+                    content: JSON.stringify(baked)
                 };
 
                 api.call('/api/content/publish/' + req.params.user + '/' + req.params.repo + '/' + req.params.branch + '/' + path, callback, data);
@@ -219,7 +216,11 @@ window.api = {
         },
 
         save: function(json, path, callback) {
-            api.file.create(JSON.stringify(json), '/_content/' + path + '.json', callback);
+            let data = {
+                content: JSON.stringify(json)
+            };
+
+            api.file.create(data, '/_content/' + path + '.json', callback);
         },
 
         bake: function(page, callback) {
