@@ -247,7 +247,17 @@ class GitHub {
         let path = req.url.replace(baseUrl, '');
         let url = apiUrl + path;
 
-        GitHub.apiCall(req, res, url);
+        if(req.params.mode == 'create' || req.params.mode == 'update') {
+            req.body = {
+                content: new Buffer(req.body).toString('base64'),
+                comment: 'Committed by Putaitu CMS',
+                sha: '' // TODO: How to get this?!
+            };
+        }
+
+        GitHub.apiCall(req, res, url, function(contents) {
+            res.send(new Buffer(file.content, 'base64').toString());
+        });
     }
     
     /**

@@ -157,8 +157,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
             file: {
                 fetch: function fetch(path, callback) {
-                    api.call('/api/git/file/fetch/' + req.params.user + '/' + req.params.repo + '/' + path, function (contents) {
-                        callback(atob(contents.content), contents.sha);
+                    api.call('/api/git/file/fetch/' + req.params.user + '/' + req.params.repo + '/' + path, function (data) {
+                        callback(data);
                     });
                 },
 
@@ -953,13 +953,12 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
         window.env = {
             json: null,
-            sha: null,
 
             get: function get(callback) {
                 if (env.json) {
                     callback(env.json);
                 } else {
-                    api.file.fetch('/_env.json', function (content, sha) {
+                    api.file.fetch('/_env.json', function (content) {
                         var json = {};
 
                         try {
@@ -973,7 +972,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                         json.putaitu.issues.columns = json.putaitu.issues.columns || [];
 
                         env.json = json;
-                        env.sha = sha;
 
                         callback(env.json);
                     });
@@ -985,7 +983,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
                 var contents = {
                     content: btoa(JSON.stringify(json)),
-                    sha: env.sha,
+                    sha: '', // << TODO: Find a way to get the sha!!!
                     comment: 'Updating env.json'
                 };
 

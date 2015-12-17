@@ -2,13 +2,12 @@ let Debug = require('../src/helpers/debug');
 
 window.env = {
     json: null,
-    sha: null,
 
     get: function(callback) {
         if(env.json) {
             callback(env.json);
         } else {
-            api.file.fetch('/_env.json', function(content, sha) {
+            api.file.fetch('/_env.json', function(content) {
                 let json = {};
                 
                 try {
@@ -22,7 +21,6 @@ window.env = {
                 json.putaitu.issues.columns = json.putaitu.issues.columns || [];
 
                 env.json = json;
-                env.sha = sha;
 
                 callback(env.json);
             });
@@ -34,7 +32,7 @@ window.env = {
 
         let contents = {
             content: btoa(JSON.stringify(json)),
-            sha: env.sha,
+            sha: '', // << TODO: Find a way to get the sha!!! 
             comment: 'Updating env.json'
         };
 
