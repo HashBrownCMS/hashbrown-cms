@@ -38,7 +38,8 @@ class GitHub {
         // Abstract CMS operations
         controller.hook('post', '/api/content/publish/:user/:repo/:branch/*', this.publish);
         controller.hook('post', '/api/content/:mode/:user/:repo/*', this.content);
-        controller.hook('post', '/api/structs/fields/:mode/:user/:repo', this.fieldStruct);
+        controller.hook('post', '/api/structs/:mode/:user/:repo/*', this.structs);
+        controller.hook('post', '/api/templates/:mode/:user/:repo/*', this.templates);
 
         // Redirects
         controller.hook('get', '/redir/repo/:user/:repo/:branch', this.redir);
@@ -375,12 +376,28 @@ class GitHub {
     }
     
     /** 
-     * Field struct
-     * Get/set field structs
+     * Structs
+     * Get/set structs
      */
-    fieldStruct(req, res) {
+    structs(req, res) {
+        let baseUrl = '/api/structs/' + req.params.mode + '/' + req.params.user + '/' + req.params.repo + '/';
+        let structPath = req.url.replace(baseUrl, '');
+        
         // Get the default structs
-        let page = require('../../src/structs/fields.json');
+        let page = require('../../src/structs/' + structPath + '.json');
+
+        res.send(page);
+    }
+    
+    /** 
+     * Templates
+     * Get/set templates
+     */
+    templates(req, res) {
+        let baseUrl = '/api/templates/' + req.params.mode + '/' + req.params.user + '/' + req.params.repo + '/';
+        let structPath = req.url.replace(baseUrl, '');
+        
+        // Get the default structs
 
         res.send(page);
     }

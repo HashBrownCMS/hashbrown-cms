@@ -181,25 +181,45 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
             structs: {
                 pages: {
                     fetch: function fetch(path, callback) {
-                        api.call('/api/structs/pages/fetch/' + req.params.user + '/' + req.params.repo + '/' + path, callback);
+                        api.call('/api/structs/fetch/' + req.params.user + '/' + req.params.repo + '/pages/' + path, callback);
                     }
                 },
 
                 sections: {
                     fetch: function fetch(path, callback) {
-                        api.call('/api/structs/sections/fetch/' + req.params.user + '/' + req.params.repo + '/' + path, callback);
+                        api.call('/api/structs/fetch/' + req.params.user + '/' + req.params.repo + '/sections/' + path, callback);
                     }
                 },
 
                 blocks: {
                     fetch: function fetch(path, callback) {
-                        api.call('/api/structs/blocks/fetch/' + req.params.user + '/' + req.params.repo + '/' + path, callback);
+                        api.call('/api/structs/fetch/' + req.params.user + '/' + req.params.repo + '/blocks/' + path, callback);
                     }
                 },
 
                 fields: {
                     fetch: function fetch(callback) {
-                        api.call('/api/structs/fields/fetch/' + req.params.user + '/' + req.params.repo, callback);
+                        api.call('/api/structs/fetch/' + req.params.user + '/' + req.params.repo + '/fields', callback);
+                    }
+                }
+            },
+
+            templates: {
+                pages: {
+                    fetch: function fetch(path, callback) {
+                        api.call('/api/templates/fetch/' + req.params.user + '/' + req.params.repo + '/pages/' + path, callback);
+                    }
+                },
+
+                sections: {
+                    fetch: function fetch(path, callback) {
+                        api.call('/api/templates/fetch/' + req.params.user + '/' + req.params.repo + '/blocks/' + path, callback);
+                    }
+                },
+
+                blocks: {
+                    fetch: function fetch(path, callback) {
+                        api.call('/api/templates/fetch/' + req.params.user + '/' + req.params.repo + '/blocks/' + path, callback);
                     }
                 }
             },

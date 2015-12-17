@@ -110,7 +110,7 @@ class Editor extends View {
         let view = this;
 
         api.structs.fields.fetch(function(fieldStructs) {
-            view.$element.children('.panel-heading').children('.field-anchors').empty();
+            view.$element.children('.panel-heading').removeClass('hidden').children('.field-anchors').empty();
             view.$element.children('.panel-body').empty();
 
             for(let anchorLabel in view.model) {
