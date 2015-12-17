@@ -1,5 +1,7 @@
 'use strict';
 
+let env = require('../../env.json');
+
 function makeTitle(src) {
     let title = 'Putaitu ';
     
@@ -23,7 +25,21 @@ class Debug {
     }
 
     static log(msg, src) {
-        console.log(makeTitle(src), msg);
+        if(env.debug.verbosity > 0) {
+            console.log(makeTitle(src), msg);
+        }
+    }
+    
+    static log2(msg, src) {
+        if(env.debug.verbosity > 1) {
+            console.log('-- ' + makeTitle(src), msg);
+        }
+    }
+    
+    static log3(msg, src) {
+        if(env.debug.verbosity > 2) {
+            console.log('--- ' + makeTitle(src), msg);
+        }
     }
 }
 

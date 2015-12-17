@@ -41,10 +41,10 @@ class FieldEditor extends View {
         if(view.model.isArray) {
             let i = $(element).parents('.field-editor').index();
                 
-            view.model.value[i] = $(element).data('checked') || false;
+            view.model.value[i] = $(element).attr('data-checked') == 'true';
 
         } else {
-            view.model.value = $(element).data('checked');
+            view.model.value = $(element).attr('data-checked') == 'true';
         
         }
 

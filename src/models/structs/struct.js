@@ -16,7 +16,7 @@ class Struct {
      * Merge a struct with another. This method is being used when a struct derives from a parent
      */
     adoptStruct(struct) {
-        Debug.log('Adopting Struct data...', this);
+        Debug.log2('Adopting Struct data...', this);
         
         for(let anchorLabel in struct) {
             if(!this.data[anchorLabel]) {
@@ -40,7 +40,7 @@ class Struct {
     adoptStructAsync(asyncFunction, path) {
         let struct = this;
 
-        Debug.log('Getting Struct data to adopt for "' + path + '"...', struct);
+        Debug.log2('Getting Struct data to adopt for "' + path + '"...', struct);
 
         return new Promise(function(callback) {
             asyncFunction(path)
@@ -58,7 +58,7 @@ class Struct {
      * Merges content from a content node, but only if the given fields exist in this struct
      */
     adoptContent(content) {
-        Debug.log('Adopting Content data...', this);
+        Debug.log2('Adopting Content data...', this);
 
         for(let anchorLabel in content) {
             // Only accept data from anchor labels already existing in this struct
@@ -81,17 +81,17 @@ class Struct {
      * Adopt content asynchronously
      * Takes a function for getting the JSON data
      */
-    adoptContentAsync(asyncFunction) {
+    adoptContentAsync(asyncFunction, path) {
         let struct = this;
 
+        Debug.log2('Getting Content data to adopt for "' + path + '"...', struct);
+
         return new Promise(function(callback) {
-            asyncFunction()
+            asyncFunction(path)
                 .then(function(json) {
                     struct.adoptContent(json);
-
-                    if(callback) {
-                        callback();
-                    }
+                        
+                    callback();
                 }).catch(Debug.error);
         });
     }
@@ -105,7 +105,7 @@ class Struct {
 
         // Get parent by path
         function getParent(path, callback) {
-            Debug.log('Getting parent Struct "' + path + '"...', struct)
+            Debug.log2('Getting parent Struct "' + path + '"...', struct)
             
             asyncFunction(function(json) {
                 // Automatically adopt the JSON values
@@ -124,7 +124,7 @@ class Struct {
         }
 
         return new Promise(function(callback) {
-            Debug.log('Checking for parent Struct...', struct)
+            Debug.log2('Checking for parent Struct...', struct)
 
             // Check for initial parent
             if(struct.data.parentStruct) {
@@ -134,7 +134,7 @@ class Struct {
 
             // If no parent, just exit
             } else {
-                Debug.log('No parent found.', struct)
+                Debug.log2('No parent found.', struct)
                 
                 callback();
             

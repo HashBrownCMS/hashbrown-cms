@@ -219,7 +219,7 @@ window.api = {
         },
 
         save: function(json, path, callback) {
-            console.log(json);
+            api.file.create(JSON.stringify(json), '/_content/' + path + '.json', callback);
         },
 
         bake: function(page, callback) {

@@ -23,7 +23,7 @@ class Content {
 
                     // Get the struct with the struct fetching promise
                     if(content.data.presentation.struct.value) {
-                        Debug.log('Getting Struct "' + content.data.presentation.struct.value + '"...', content);
+                        Debug.log2('Getting Struct "' + content.data.presentation.struct.value + '"...', content);
 
                         content.getStruct(structAsyncFunction)
                             .then(callback)
@@ -50,7 +50,7 @@ class Content {
             // Get the base struct
             let struct = new Struct();
             
-            Debug.log('Applying Struct base...', content);
+            Debug.log2('Applying Struct base...', content);
        
             // Include the respective bases for each struct directory 
             if(content.data.presentation.struct.value.indexOf('pages/') == 0) {
@@ -64,7 +64,7 @@ class Content {
             
             }
 
-            Debug.log('Invoking struct fetching promise from plugin...', content);
+            Debug.log2('Invoking struct fetching promise from plugin...', content);
 
             // Adopt the values of the child page struct
             struct.adoptStructAsync(asyncFunction, content.data.presentation.struct.value)

@@ -23,6 +23,20 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         s(r[o]);
     }return s;
 })({ 1: [function (require, module, exports) {
+        module.exports = {
+            "plugins": {
+                "github": {
+                    "client": {
+                        "id": "d8390386d316435085fd",
+                        "secret": "da7efffe15e224a74768b3dc26dce5f9a08ad58c"
+                    }
+                }
+            },
+            "debug": {
+                "verbosity": 3
+            }
+        };
+    }, {}], 2: [function (require, module, exports) {
         function appropriateIssue(issue) {
             // Updating issue milestones requires a number only
             if (issue.milestone) {
@@ -241,7 +255,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 },
 
                 save: function save(json, path, callback) {
-                    console.log(json);
+                    api.file.create(JSON.stringify(json), '/_content/' + path + '.json', callback);
                 },
 
                 bake: function bake(page, callback) {
@@ -280,7 +294,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 }
             }
         };
-    }, {}], 2: [function (require, module, exports) {
+    }, {}], 3: [function (require, module, exports) {
         'use strict';
 
         var ContextMenu = (function (_View) {
@@ -373,7 +387,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 ViewHelper.removeAll('ContextMenu');
             }
         });
-    }, {}], 3: [function (require, module, exports) {
+    }, {}], 4: [function (require, module, exports) {
         'use strict';
 
         var pathToRegexp = require('path-to-regexp');
@@ -482,7 +496,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
         window.addEventListener('hashchange', Router.init);
         window.Router = Router;
-    }, { "path-to-regexp": 10 }], 4: [function (require, module, exports) {
+    }, { "path-to-regexp": 11 }], 5: [function (require, module, exports) {
         var Templating = {};
 
         function append(el, content) {
@@ -586,7 +600,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         };
 
         window._ = Templating;
-    }, {}], 5: [function (require, module, exports) {
+    }, {}], 6: [function (require, module, exports) {
         'use strict'
 
         /**
@@ -934,7 +948,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         })();
 
         window.View = View;
-    }, {}], 6: [function (require, module, exports) {
+    }, {}], 7: [function (require, module, exports) {
         var Debug = require('../src/helpers/debug');
 
         window.env = {
@@ -984,7 +998,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 });
             }
         };
-    }, { "../src/helpers/debug": 11 }], 7: [function (require, module, exports) {
+    }, { "../src/helpers/debug": 12 }], 8: [function (require, module, exports) {
         require('./core/Templating');
         require('./core/View');
         require('./core/Router');
@@ -993,7 +1007,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         require('./helper');
         require('./api');
         require('./env');
-    }, { "./api": 1, "./core/ContextMenu": 2, "./core/Router": 3, "./core/Templating": 4, "./core/View": 5, "./env": 6, "./helper": 8 }], 8: [function (require, module, exports) {
+    }, { "./api": 2, "./core/ContextMenu": 3, "./core/Router": 4, "./core/Templating": 5, "./core/View": 6, "./env": 7, "./helper": 9 }], 9: [function (require, module, exports) {
         var Helper = (function () {
             function Helper() {
                 _classCallCheck(this, Helper);
@@ -1046,11 +1060,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         })();
 
         window.helper = Helper;
-    }, {}], 9: [function (require, module, exports) {
+    }, {}], 10: [function (require, module, exports) {
         module.exports = Array.isArray || function (arr) {
             return Object.prototype.toString.call(arr) == '[object Array]';
         };
-    }, {}], 10: [function (require, module, exports) {
+    }, {}], 11: [function (require, module, exports) {
         var isarray = require('isarray');
 
         /**
@@ -1440,8 +1454,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
             return stringToRegexp(path, keys, options);
         }
-    }, { "isarray": 9 }], 11: [function (require, module, exports) {
+    }, { "isarray": 10 }], 12: [function (require, module, exports) {
         'use strict';
+
+        var env = require('../../env.json');
 
         function makeTitle(src) {
             var title = 'Putaitu ';
@@ -1471,7 +1487,23 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
             }, {
                 key: "log",
                 value: function log(msg, src) {
-                    console.log(makeTitle(src), msg);
+                    if (env.debug.verbosity > 0) {
+                        console.log(makeTitle(src), msg);
+                    }
+                }
+            }, {
+                key: "log2",
+                value: function log2(msg, src) {
+                    if (env.debug.verbosity > 1) {
+                        console.log('-- ' + makeTitle(src), msg);
+                    }
+                }
+            }, {
+                key: "log3",
+                value: function log3(msg, src) {
+                    if (env.debug.verbosity > 2) {
+                        console.log('--- ' + makeTitle(src), msg);
+                    }
                 }
             }]);
 
@@ -1479,4 +1511,4 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         })();
 
         module.exports = Debug;
-    }, {}] }, {}, [7]);
+    }, { "../../env.json": 1 }] }, {}, [8]);

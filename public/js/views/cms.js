@@ -23,6 +23,20 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         s(r[o]);
     }return s;
 })({ 1: [function (require, module, exports) {
+        module.exports = {
+            "plugins": {
+                "github": {
+                    "client": {
+                        "id": "d8390386d316435085fd",
+                        "secret": "da7efffe15e224a74768b3dc26dce5f9a08ad58c"
+                    }
+                }
+            },
+            "debug": {
+                "verbosity": 3
+            }
+        };
+    }, {}], 2: [function (require, module, exports) {
         function appropriateIssue(issue) {
             // Updating issue milestones requires a number only
             if (issue.milestone) {
@@ -241,7 +255,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 },
 
                 save: function save(json, path, callback) {
-                    console.log(json);
+                    api.file.create(JSON.stringify(json), '/_content/' + path + '.json', callback);
                 },
 
                 bake: function bake(page, callback) {
@@ -280,7 +294,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 }
             }
         };
-    }, {}], 2: [function (require, module, exports) {
+    }, {}], 3: [function (require, module, exports) {
         require('./core/Templating');
         require('./core/View');
         require('./core/Router');
@@ -289,7 +303,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         require('./helper');
         require('./api');
         require('./env');
-    }, { "./api": 1, "./core/ContextMenu": 3, "./core/Router": 4, "./core/Templating": 5, "./core/View": 6, "./env": 7, "./helper": 8 }], 3: [function (require, module, exports) {
+    }, { "./api": 2, "./core/ContextMenu": 4, "./core/Router": 5, "./core/Templating": 6, "./core/View": 7, "./env": 8, "./helper": 9 }], 4: [function (require, module, exports) {
         'use strict';
 
         var ContextMenu = (function (_View) {
@@ -382,7 +396,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 ViewHelper.removeAll('ContextMenu');
             }
         });
-    }, {}], 4: [function (require, module, exports) {
+    }, {}], 5: [function (require, module, exports) {
         'use strict';
 
         var pathToRegexp = require('path-to-regexp');
@@ -491,7 +505,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
         window.addEventListener('hashchange', Router.init);
         window.Router = Router;
-    }, { "path-to-regexp": 22 }], 5: [function (require, module, exports) {
+    }, { "path-to-regexp": 23 }], 6: [function (require, module, exports) {
         var Templating = {};
 
         function append(el, content) {
@@ -595,7 +609,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         };
 
         window._ = Templating;
-    }, {}], 6: [function (require, module, exports) {
+    }, {}], 7: [function (require, module, exports) {
         'use strict'
 
         /**
@@ -943,7 +957,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         })();
 
         window.View = View;
-    }, {}], 7: [function (require, module, exports) {
+    }, {}], 8: [function (require, module, exports) {
         var Debug = require('../src/helpers/debug');
 
         window.env = {
@@ -993,7 +1007,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 });
             }
         };
-    }, { "../src/helpers/debug": 23 }], 8: [function (require, module, exports) {
+    }, { "../src/helpers/debug": 24 }], 9: [function (require, module, exports) {
         var Helper = (function () {
             function Helper() {
                 _classCallCheck(this, Helper);
@@ -1046,7 +1060,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         })();
 
         window.helper = Helper;
-    }, {}], 9: [function (require, module, exports) {
+    }, {}], 10: [function (require, module, exports) {
         'use strict';
 
         require('../client');
@@ -1095,7 +1109,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         })(View);
 
         new CMS();
-    }, { "../client": 2, "./partials/cms-editor": 10, "./partials/cms-tree": 11, "./partials/navbar": 20 }], 10: [function (require, module, exports) {
+    }, { "../client": 3, "./partials/cms-editor": 11, "./partials/cms-tree": 12, "./partials/navbar": 21 }], 11: [function (require, module, exports) {
         var Editor = (function (_View3) {
             _inherits(Editor, _View3);
 
@@ -1168,32 +1182,25 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                     });
 
                     api.content.fetch(path, function (content) {
-                        view.open(content, true);
+                        view.model = content;
+                        view.path = path;
+
+                        view.render();
                     });
-                }
-            }, {
-                key: "open",
-                value: function open(content, skipHighlight) {
-                    var view = this;
-
-                    view.model = content;
-
-                    view.render();
-
-                    // Highlight file in tree if not skipped
-                    if (!skipHighlight) {
-                        ViewHelper.get('Tree').ready(function (view) {
-                            view.highlight('content/' + view.model.path);
-                        });
-                    }
                 }
             }, {
                 key: "getFieldEditor",
                 value: function getFieldEditor(editorName, alias, fieldModel, isArray) {
-                    var FieldEditor = this.fieldEditors[editorName];
+                    var view = this;
+
+                    var FieldEditor = view.fieldEditors[editorName];
 
                     if (FieldEditor) {
                         var fieldEditorInstance = new FieldEditor({ model: fieldModel });
+
+                        fieldEditorInstance.on('change', function () {
+                            console.log(view.model);
+                        });
 
                         return fieldEditorInstance;
                     }
@@ -1249,7 +1256,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         })(View);
 
         module.exports = Editor;
-    }, { "./field-editors/checkbox": 12, "./field-editors/date-picker": 13, "./field-editors/struct-picker": 15, "./field-editors/template-picker": 16, "./field-editors/text": 18, "./field-editors/text-html": 17, "./field-editors/url": 19 }], 11: [function (require, module, exports) {
+    }, { "./field-editors/checkbox": 13, "./field-editors/date-picker": 14, "./field-editors/struct-picker": 16, "./field-editors/template-picker": 17, "./field-editors/text": 19, "./field-editors/text-html": 18, "./field-editors/url": 20 }], 12: [function (require, module, exports) {
         var Tree = (function (_View4) {
             _inherits(Tree, _View4);
 
@@ -1501,7 +1508,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         })(View);
 
         module.exports = Tree;
-    }, {}], 12: [function (require, module, exports) {
+    }, {}], 13: [function (require, module, exports) {
         'use strict';
 
         var FieldEditor = require('./field');
@@ -1535,7 +1542,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         })(FieldEditor);
 
         module.exports = CheckboxEditor;
-    }, { "./field": 14 }], 13: [function (require, module, exports) {
+    }, { "./field": 15 }], 14: [function (require, module, exports) {
         'use strict';
 
         var FieldEditor = require('./field');
@@ -1628,7 +1635,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         })(FieldEditor);
 
         module.exports = DatePicker;
-    }, { "./field": 14 }], 14: [function (require, module, exports) {
+    }, { "./field": 15 }], 15: [function (require, module, exports) {
         'use strict';
 
         var FieldEditor = (function (_View5) {
@@ -1678,9 +1685,9 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                     if (view.model.isArray) {
                         var i = $(element).parents('.field-editor').index();
 
-                        view.model.value[i] = $(element).data('checked') || false;
+                        view.model.value[i] = $(element).attr('data-checked') == 'true';
                     } else {
-                        view.model.value = $(element).data('checked');
+                        view.model.value = $(element).attr('data-checked') == 'true';
                     }
 
                     view.trigger('change');
@@ -1739,7 +1746,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         })(View);
 
         module.exports = FieldEditor;
-    }, {}], 15: [function (require, module, exports) {
+    }, {}], 16: [function (require, module, exports) {
         'use strict';
 
         var FieldEditor = require('./field');
@@ -1771,7 +1778,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         })(FieldEditor);
 
         module.exports = StructPicker;
-    }, { "./field": 14 }], 16: [function (require, module, exports) {
+    }, { "./field": 15 }], 17: [function (require, module, exports) {
         'use strict';
 
         var FieldEditor = require('./field');
@@ -1803,7 +1810,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         })(FieldEditor);
 
         module.exports = TemplatePicker;
-    }, { "./field": 14 }], 17: [function (require, module, exports) {
+    }, { "./field": 15 }], 18: [function (require, module, exports) {
         'use strict';
 
         var FieldEditor = require('./field');
@@ -1831,7 +1838,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         })(FieldEditor);
 
         module.exports = TextHtmlEditor;
-    }, { "./field": 14 }], 18: [function (require, module, exports) {
+    }, { "./field": 15 }], 19: [function (require, module, exports) {
         'use strict';
 
         var FieldEditor = require('./field');
@@ -1859,7 +1866,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         })(FieldEditor);
 
         module.exports = TextEditor;
-    }, { "./field": 14 }], 19: [function (require, module, exports) {
+    }, { "./field": 15 }], 20: [function (require, module, exports) {
         'use strict';
 
         var FieldEditor = require('./field');
@@ -1889,7 +1896,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         })(FieldEditor);
 
         module.exports = UrlEditor;
-    }, { "./field": 14 }], 20: [function (require, module, exports) {
+    }, { "./field": 15 }], 21: [function (require, module, exports) {
         var Navbar = (function (_View6) {
             _inherits(Navbar, _View6);
 
@@ -1935,11 +1942,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         })(View);
 
         new Navbar();
-    }, {}], 21: [function (require, module, exports) {
+    }, {}], 22: [function (require, module, exports) {
         module.exports = Array.isArray || function (arr) {
             return Object.prototype.toString.call(arr) == '[object Array]';
         };
-    }, {}], 22: [function (require, module, exports) {
+    }, {}], 23: [function (require, module, exports) {
         var isarray = require('isarray');
 
         /**
@@ -2329,8 +2336,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
             return stringToRegexp(path, keys, options);
         }
-    }, { "isarray": 21 }], 23: [function (require, module, exports) {
+    }, { "isarray": 22 }], 24: [function (require, module, exports) {
         'use strict';
+
+        var env = require('../../env.json');
 
         function makeTitle(src) {
             var title = 'Putaitu ';
@@ -2360,7 +2369,23 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
             }, {
                 key: "log",
                 value: function log(msg, src) {
-                    console.log(makeTitle(src), msg);
+                    if (env.debug.verbosity > 0) {
+                        console.log(makeTitle(src), msg);
+                    }
+                }
+            }, {
+                key: "log2",
+                value: function log2(msg, src) {
+                    if (env.debug.verbosity > 1) {
+                        console.log('-- ' + makeTitle(src), msg);
+                    }
+                }
+            }, {
+                key: "log3",
+                value: function log3(msg, src) {
+                    if (env.debug.verbosity > 2) {
+                        console.log('--- ' + makeTitle(src), msg);
+                    }
                 }
             }]);
 
@@ -2368,4 +2393,4 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         })();
 
         module.exports = Debug;
-    }, {}] }, {}, [9]);
+    }, { "../../env.json": 1 }] }, {}, [10]);

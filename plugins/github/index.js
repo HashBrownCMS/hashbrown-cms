@@ -262,7 +262,7 @@ class GitHub {
     
     /**
      * Repo
-     * Get rpository information
+     * Get repository information
      */
     repo(req, res) {
         let url = '/repos/' + req.params.user + '/' + req.params.repo;
@@ -325,17 +325,17 @@ class GitHub {
 
         let content = new Content();
         
-        Debug.log('>>>>>> Start getting Content "' + contentPath + '"!', logSrc);
+        Debug.log('Start getting Content "' + contentPath + '"!', logSrc);
         
         function contentAsyncFunction() {
             return new Promise(function(callback) {
                 let url = '/repos/' + req.params.user + '/' + req.params.repo + '/contents/_content/' + contentPath + '.json';
 
-                Debug.log('Fetching Content "' + contentPath + '"...', logSrc);
+                Debug.log2('Fetching Content "' + contentPath + '"...', logSrc);
                 
                 octo.fromUrl(url).fetch(function(err, file) {
                     if(!err) {
-                        Debug.log('Parsing JSON for Content "' + contentPath + '"...', logSrc)
+                        Debug.log2('Parsing JSON for Content "' + contentPath + '"...', logSrc)
 
                         callback(JSON.parse(new Buffer(file.content, file.encoding).toString()));
                     
@@ -354,15 +354,18 @@ class GitHub {
 
                 let url = '/repos/' + req.params.user + '/' + req.params.repo + '/contents/_structs/' + structPath + '.json';
 
-                Debug.log('Fetching Struct "' + structPath + '"...', logSrc);
+                Debug.log2('Fetching Struct "' + structPath + '"...', logSrc);
 
                 octo.fromUrl(url).fetch(function(err, file) {
                     if(!err) {
-                        Debug.log('Parsing JSON for Struct "' + structPath + '"...', logSrc)
+                        Debug.log2('Parsing JSON for Struct "' + structPath + '"...', logSrc)
+
                         callback(JSON.parse(new Buffer(file.content, file.encoding).toString()));
+
                     } else {
                         Debug.error(err, logSrc);
                         callback({});
+
                     }
                 });
             });
@@ -370,7 +373,7 @@ class GitHub {
 
         content.fetchAsync(contentAsyncFunction, structAsyncFunction)
             .then(function() {
-                Debug.log('>>>>>> Done getting Content "' + contentPath + '"!', logSrc);
+                Debug.log('Done getting Content "' + contentPath + '"!', logSrc);
                 res.send(content.data);
             }).catch(Debug.error);
     }

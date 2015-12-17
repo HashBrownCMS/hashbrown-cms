@@ -23,6 +23,20 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         s(r[o]);
     }return s;
 })({ 1: [function (require, module, exports) {
+        module.exports = {
+            "plugins": {
+                "github": {
+                    "client": {
+                        "id": "d8390386d316435085fd",
+                        "secret": "da7efffe15e224a74768b3dc26dce5f9a08ad58c"
+                    }
+                }
+            },
+            "debug": {
+                "verbosity": 3
+            }
+        };
+    }, {}], 2: [function (require, module, exports) {
         function appropriateIssue(issue) {
             // Updating issue milestones requires a number only
             if (issue.milestone) {
@@ -241,7 +255,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 },
 
                 save: function save(json, path, callback) {
-                    console.log(json);
+                    api.file.create(JSON.stringify(json), '/_content/' + path + '.json', callback);
                 },
 
                 bake: function bake(page, callback) {
@@ -280,7 +294,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 }
             }
         };
-    }, {}], 2: [function (require, module, exports) {
+    }, {}], 3: [function (require, module, exports) {
         require('./core/Templating');
         require('./core/View');
         require('./core/Router');
@@ -289,7 +303,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         require('./helper');
         require('./api');
         require('./env');
-    }, { "./api": 1, "./core/ContextMenu": 3, "./core/Router": 4, "./core/Templating": 5, "./core/View": 6, "./env": 7, "./helper": 8 }], 3: [function (require, module, exports) {
+    }, { "./api": 2, "./core/ContextMenu": 4, "./core/Router": 5, "./core/Templating": 6, "./core/View": 7, "./env": 8, "./helper": 9 }], 4: [function (require, module, exports) {
         'use strict';
 
         var ContextMenu = (function (_View) {
@@ -382,7 +396,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 ViewHelper.removeAll('ContextMenu');
             }
         });
-    }, {}], 4: [function (require, module, exports) {
+    }, {}], 5: [function (require, module, exports) {
         'use strict';
 
         var pathToRegexp = require('path-to-regexp');
@@ -491,7 +505,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
         window.addEventListener('hashchange', Router.init);
         window.Router = Router;
-    }, { "path-to-regexp": 12 }], 5: [function (require, module, exports) {
+    }, { "path-to-regexp": 13 }], 6: [function (require, module, exports) {
         var Templating = {};
 
         function append(el, content) {
@@ -595,7 +609,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         };
 
         window._ = Templating;
-    }, {}], 6: [function (require, module, exports) {
+    }, {}], 7: [function (require, module, exports) {
         'use strict'
 
         /**
@@ -943,7 +957,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         })();
 
         window.View = View;
-    }, {}], 7: [function (require, module, exports) {
+    }, {}], 8: [function (require, module, exports) {
         var Debug = require('../src/helpers/debug');
 
         window.env = {
@@ -993,7 +1007,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 });
             }
         };
-    }, { "../src/helpers/debug": 13 }], 8: [function (require, module, exports) {
+    }, { "../src/helpers/debug": 14 }], 9: [function (require, module, exports) {
         var Helper = (function () {
             function Helper() {
                 _classCallCheck(this, Helper);
@@ -1046,7 +1060,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         })();
 
         window.helper = Helper;
-    }, {}], 9: [function (require, module, exports) {
+    }, {}], 10: [function (require, module, exports) {
         require('../client');
         require('./partials/navbar');
 
@@ -1141,7 +1155,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         })(View);
 
         new Deployment();
-    }, { "../client": 2, "./partials/navbar": 10 }], 10: [function (require, module, exports) {
+    }, { "../client": 3, "./partials/navbar": 11 }], 11: [function (require, module, exports) {
         var Navbar = (function (_View3) {
             _inherits(Navbar, _View3);
 
@@ -1187,11 +1201,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         })(View);
 
         new Navbar();
-    }, {}], 11: [function (require, module, exports) {
+    }, {}], 12: [function (require, module, exports) {
         module.exports = Array.isArray || function (arr) {
             return Object.prototype.toString.call(arr) == '[object Array]';
         };
-    }, {}], 12: [function (require, module, exports) {
+    }, {}], 13: [function (require, module, exports) {
         var isarray = require('isarray');
 
         /**
@@ -1581,8 +1595,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
             return stringToRegexp(path, keys, options);
         }
-    }, { "isarray": 11 }], 13: [function (require, module, exports) {
+    }, { "isarray": 12 }], 14: [function (require, module, exports) {
         'use strict';
+
+        var env = require('../../env.json');
 
         function makeTitle(src) {
             var title = 'Putaitu ';
@@ -1612,7 +1628,23 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
             }, {
                 key: "log",
                 value: function log(msg, src) {
-                    console.log(makeTitle(src), msg);
+                    if (env.debug.verbosity > 0) {
+                        console.log(makeTitle(src), msg);
+                    }
+                }
+            }, {
+                key: "log2",
+                value: function log2(msg, src) {
+                    if (env.debug.verbosity > 1) {
+                        console.log('-- ' + makeTitle(src), msg);
+                    }
+                }
+            }, {
+                key: "log3",
+                value: function log3(msg, src) {
+                    if (env.debug.verbosity > 2) {
+                        console.log('--- ' + makeTitle(src), msg);
+                    }
                 }
             }]);
 
@@ -1620,4 +1652,4 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         })();
 
         module.exports = Debug;
-    }, {}] }, {}, [9]);
+    }, { "../../env.json": 1 }] }, {}, [10]);

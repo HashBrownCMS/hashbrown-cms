@@ -71,36 +71,30 @@ class Editor extends View {
         let view = this;
 
         view.clear();
-       
+
         ViewHelper.get('Tree').ready(function(view) {
             view.highlight('content/' + path);
         });
         
         api.content.fetch(path, function(content) {
-            view.open(content, true);
+            view.model = content;
+            view.path = path;
+
+            view.render();
         });
     }
     
-    open(content, skipHighlight) {
+    getFieldEditor(editorName, alias, fieldModel, isArray) {
         let view = this;
 
-        view.model = content;
-
-        view.render();
-
-        // Highlight file in tree if not skipped
-        if(!skipHighlight) {
-            ViewHelper.get('Tree').ready(function(view) {
-                view.highlight('content/' + view.model.path);
-            });
-        }
-    }
-
-    getFieldEditor(editorName, alias, fieldModel, isArray) {
-        let FieldEditor = this.fieldEditors[editorName];
+        let FieldEditor = view.fieldEditors[editorName];
 
         if(FieldEditor) {
             let fieldEditorInstance = new FieldEditor({ model: fieldModel });
+
+            fieldEditorInstance.on('change', function() {
+                console.log(view.model)
+            });
 
             return fieldEditorInstance;
         }
