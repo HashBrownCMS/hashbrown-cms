@@ -1,3 +1,5 @@
+let Debug = require('../src/helpers/debug');
+
 window.env = {
     json: null,
     sha: null,
@@ -6,23 +8,21 @@ window.env = {
         if(env.json) {
             callback(env.json);
         } else {
-            api.file.fetch('/env.json', function(contents) {
-                var json = '{}';
+            api.file.fetch('/_env.json', function(content, sha) {
+                let json = {};
                 
                 try {
-                    json = atob(contents.content);
+                    json = JSON.parse(content);
                 } catch(e) {
-                    console.log(e);
-                    console.log(contents);
+                    Debug.log(e, 'env');    
                 }
-
-                json = JSON.parse(json) || {};
+               
                 json.putaitu = json.putaitu || {};
                 json.putaitu.issues = json.putaitu.issues || {};
                 json.putaitu.issues.columns = json.putaitu.issues.columns || [];
 
                 env.json = json;
-                env.sha = contents.sha;
+                env.sha = sha;
 
                 callback(env.json);
             });
@@ -32,13 +32,13 @@ window.env = {
     set: function(json, callback) {
         json = json || env.json;
 
-        var contents = {
+        let contents = {
             content: btoa(JSON.stringify(json)),
             sha: env.sha,
             comment: 'Updating env.json'
         };
 
-        api.file.create(contents, '/env.json', function() { 
+        api.file.create(contents, '/_env.json', function() { 
             env.json = json;
 
             if(callback) {

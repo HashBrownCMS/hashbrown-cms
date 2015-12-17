@@ -1,0 +1,14 @@
+{
+    "presentation": {
+        "struct": {
+            "struct": "struct",
+            "label": "Struct",
+            "allowed": []
+        },
+        "template": {
+            "struct": "template",
+            "label": "Template",
+            "allowed": []
+        }
+    }
+}

@@ -1,5 +1,5 @@
 {
-    "SEO": {
+    "meta": {
         "title": {
             "struct": "string",
             "label": "Title"
@@ -8,6 +8,9 @@
             "struct": "string",
             "label": "Description"
         },
+        "url": {
+            "struct": "url", "label": "URL"
+        },
         "noIndex": {
             "struct": "bool",
             "label": "No index"
@@ -15,9 +18,7 @@
         "noFollow": {
             "struct": "bool",
             "label": "No follow"
-        }
-    },
-    "Properties" : {
+        },
         "createDate": {
             "struct": "date",
             "label": "Created",
@@ -27,17 +28,18 @@
             "struct": "date",
             "label": "Updated",
             "locked": true
-        },
-        "url": {
-            "struct": "url", "label": "URL"
+        }
+    },
+    "presentation": {
+        "struct": {
+            "struct": "struct",
+            "label": "Struct",
+            "allowed": []
         },
         "template": {
             "struct": "template",
             "label": "Template",
-            "allowed": [
-                "page",
-                "example"
-            ]
+            "allowed": []
         }
     }
 }

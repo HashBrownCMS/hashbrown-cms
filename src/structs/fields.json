@@ -9,6 +9,7 @@
     "node": { "label": "Node", "editor": "node-picker" },
     "nestedNode": { "label": "Nested node", "editor": "nested-node" },
     "template": { "label": "Template", "editor": "template-picker" },
+    "struct": { "label": "Struct", "editor": "struct-picker" },
     "bool": { "label": "Checkbox", "editor": "checkbox" },
     "switch": { "label": "Switch", "editor": "switch", "keys": [ "true", "false" ] }
 }

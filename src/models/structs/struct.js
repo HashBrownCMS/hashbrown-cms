@@ -16,7 +16,7 @@ class Struct {
      * Merge a struct with another. This method is being used when a struct derives from a parent
      */
     adoptStruct(struct) {
-        console.log('    Putaitu [Struct]: Adopting Struct data...');
+        Debug.log('Adopting Struct data...', this);
         
         for(let anchorLabel in struct) {
             if(!this.data[anchorLabel]) {
@@ -40,7 +40,7 @@ class Struct {
     adoptStructAsync(asyncFunction, path) {
         let struct = this;
 
-        console.log('    Putaitu [Struct]: Getting Struct data to adopt for "' + path + '"...');
+        Debug.log('Getting Struct data to adopt for "' + path + '"...', struct);
 
         return new Promise(function(callback) {
             asyncFunction(path)
@@ -58,6 +58,8 @@ class Struct {
      * Merges content from a content node, but only if the given fields exist in this struct
      */
     adoptContent(content) {
+        Debug.log('Adopting Content data...', this);
+
         for(let anchorLabel in content) {
             // Only accept data from anchor labels already existing in this struct
             if(this.data[anchorLabel]) {
@@ -103,7 +105,7 @@ class Struct {
 
         // Get parent by path
         function getParent(path, callback) {
-            console.log('    Putaitu [Struct]: Getting parent Struct "' + path + '"...')
+            Debug.log('Getting parent Struct "' + path + '"...', struct)
             
             asyncFunction(function(json) {
                 // Automatically adopt the JSON values
@@ -122,7 +124,7 @@ class Struct {
         }
 
         return new Promise(function(callback) {
-            console.log('    Putaitu [Struct]: Checking for parent Struct...')
+            Debug.log('Checking for parent Struct...', struct)
 
             // Check for initial parent
             if(struct.data.parentStruct) {
@@ -132,7 +134,7 @@ class Struct {
 
             // If no parent, just exit
             } else {
-                console.log('    Putaitu [Struct]: No parent found.')
+                Debug.log('No parent found.', struct)
                 
                 callback();
             

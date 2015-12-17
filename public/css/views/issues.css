@@ -8,11 +8,17 @@
   background-color: #eee;
   box-shadow: none; }
 
-.btn-toggle .glyphicon {
-  visibility: hidden; }
-
-.btn-toggle[data-checked="true"] .glyphicon {
-  visibility: visible; }
+.btn-toggle {
+  height: 24px;
+  width: 24px;
+  padding: 0px; }
+  .btn-toggle .glyphicon {
+    visibility: hidden;
+    position: static;
+    display: block;
+    line-height: 1em !important; }
+  .btn-toggle[data-checked="true"] .glyphicon {
+    visibility: visible; }
 
 .btn .glyphicon {
   line-height: 1.3em; }
@@ -116,6 +122,12 @@ textarea {
   animation-timing-function: ease;
   background-color: rgba(0, 0, 0, 0.5);
   border-radius: 100%; }
+
+/**
+ * Global settings
+ */
+body {
+  background-color: #2e6da4; }
 
 .page-content .column .issue {
   cursor: pointer; }

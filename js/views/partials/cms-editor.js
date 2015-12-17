@@ -9,7 +9,7 @@ class Editor extends View {
         this.initFieldEditors();
 
         this.$element = _.div({class: 'panel panel-default editor'}, [
-            _.div({class: 'panel-heading'}, [
+            _.div({class: 'panel-heading hidden'}, [
                 _.div({class: 'btn-group content-actions'}, [
                     _.button({class: 'btn btn-primary btn-publish'}, [
                         'Save ',
@@ -22,7 +22,10 @@ class Editor extends View {
                 ]),
                 _.div({class: 'btn-group field-anchors'})
             ]),
-            _.div({class: 'panel-body'})
+            _.div({class: 'panel-body'}, [
+                _.h1('Welcome to the Putaitu CMS editor!'),
+                _.p('Pick a content node from the navigation menu above to begin')
+            ])
         ]);
     }
 
@@ -51,6 +54,7 @@ class Editor extends View {
             'url': require('./field-editors/url'),
             'checkbox': require('./field-editors/checkbox'),
             'template-picker': require('./field-editors/template-picker'),
+            'struct-picker': require('./field-editors/struct-picker'),
             'date-picker': require('./field-editors/date-picker')
         };
     }
@@ -69,7 +73,7 @@ class Editor extends View {
         view.clear();
        
         ViewHelper.get('Tree').ready(function(view) {
-            view.highlight(path);
+            view.highlight('content/' + path);
         });
         
         api.content.fetch(path, function(content) {
@@ -87,7 +91,7 @@ class Editor extends View {
         // Highlight file in tree if not skipped
         if(!skipHighlight) {
             ViewHelper.get('Tree').ready(function(view) {
-                view.highlight(view.model.path);
+                view.highlight('content/' + view.model.path);
             });
         }
     }

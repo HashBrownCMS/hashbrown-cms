@@ -189,6 +189,8 @@ class GitHub {
             url += '/' + req.body.number;
         }
 
+        req.body.state = 'all';
+
         GitHub.apiCall(req, res, url);
     }
    
@@ -317,26 +319,27 @@ class GitHub {
         let baseUrl = '/api/content/' + req.params.mode + '/' + req.params.user + '/' + req.params.repo + '/';
         let contentPath = req.url.replace(baseUrl, '');
 
+        let logSrc = 'GitHub';
         let octo = new octokat({ token: req.body.token });
 
         let content = new Content();
         
-        console.log('GitHub: Start getting Content "' + contentPath + '"!');
+        Debug.log('>>>>>> Start getting Content "' + contentPath + '"!', logSrc);
         
         function contentAsyncFunction() {
             return new Promise(function(callback) {
                 let url = '/repos/' + req.params.user + '/' + req.params.repo + '/contents/_content/' + contentPath + '.json';
 
-                console.log('    GitHub: Fetching Content "' + contentPath + '"...');
+                Debug.log('Fetching Content "' + contentPath + '"...', logSrc);
                 
                 octo.fromUrl(url).fetch(function(err, file) {
                     if(!err) {
-                        console.log('    GitHub: Parsing JSON for Content "' + contentPath + '"...')
-                        
+                        Debug.log('Parsing JSON for Content "' + contentPath + '"...', logSrc)
+
                         callback(JSON.parse(new Buffer(file.content, file.encoding).toString()));
                     
                     } else {
-                        console.log('    GitHub [ERROR]:', err, url);
+                        Debug.log(err, logSrc, url);
                         
                         callback({});
                     
@@ -350,14 +353,14 @@ class GitHub {
 
                 let url = '/repos/' + req.params.user + '/' + req.params.repo + '/contents/_structs/' + structPath + '.json';
 
-                console.log('    GitHub: Fetching Struct "' + structPath + '"...');
+                Debug.log('Fetching Struct "' + structPath + '"...', logSrc);
 
                 octo.fromUrl(url).fetch(function(err, file) {
                     if(!err) {
-                        console.log('    GitHub: Parsing JSON for Struct "' + structPath + '"...')
+                        Debug.log('Parsing JSON for Struct "' + structPath + '"...', logSrc)
                         callback(JSON.parse(new Buffer(file.content, file.encoding).toString()));
                     } else {
-                        console.log('    GitHub [ERROR]:', err);
+                        Debug.error(err, logSrc);
                         callback({});
                     }
                 });
@@ -366,7 +369,7 @@ class GitHub {
 
         content.fetchAsync(contentAsyncFunction, structAsyncFunction)
             .then(function() {
-                console.log('GitHub: Done getting Content "' + contentPath + '"!');
+                Debug.log('>>>>>> Done getting Content "' + contentPath + '"!', logSrc);
                 res.send(content.data);
             }).catch(Debug.error);
     }

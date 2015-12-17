@@ -144,7 +144,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
             file: {
                 fetch: function fetch(path, callback) {
                     api.call('/api/git/file/fetch/' + req.params.user + '/' + req.params.repo + '/' + path, function (contents) {
-                        callback(atob(contents.content));
+                        callback(atob(contents.content), contents.sha);
                     });
                 },
 
@@ -924,6 +924,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
         window.View = View;
     }, {}], 7: [function (require, module, exports) {
+        var Debug = require('../src/helpers/debug');
+
         window.env = {
             json: null,
             sha: null,
@@ -932,23 +934,21 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 if (env.json) {
                     callback(env.json);
                 } else {
-                    api.file.fetch('/env.json', function (contents) {
-                        var json = '{}';
+                    api.file.fetch('/_env.json', function (content, sha) {
+                        var json = {};
 
                         try {
-                            json = atob(contents.content);
+                            json = JSON.parse(content);
                         } catch (e) {
-                            console.log(e);
-                            console.log(contents);
+                            Debug.log(e, 'env');
                         }
 
-                        json = JSON.parse(json) || {};
                         json.putaitu = json.putaitu || {};
                         json.putaitu.issues = json.putaitu.issues || {};
                         json.putaitu.issues.columns = json.putaitu.issues.columns || [];
 
                         env.json = json;
-                        env.sha = contents.sha;
+                        env.sha = sha;
 
                         callback(env.json);
                     });
@@ -964,7 +964,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                     comment: 'Updating env.json'
                 };
 
-                api.file.create(contents, '/env.json', function () {
+                api.file.create(contents, '/_env.json', function () {
                     env.json = json;
 
                     if (callback) {
@@ -973,7 +973,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 });
             }
         };
-    }, {}], 8: [function (require, module, exports) {
+    }, { "../src/helpers/debug": 12 }], 8: [function (require, module, exports) {
         var Helper = (function () {
             function Helper() {
                 _classCallCheck(this, Helper);
@@ -1456,4 +1456,43 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
             return stringToRegexp(path, keys, options);
         }
-    }, { "isarray": 10 }] }, {}, [9]);
+    }, { "isarray": 10 }], 12: [function (require, module, exports) {
+        'use strict';
+
+        function makeTitle(src) {
+            var title = 'Putaitu ';
+
+            if (typeof src === 'string') {
+                title += '(' + src + ')';
+            } else if (src && src.constructor) {
+                title += '(' + src.constructor.name + ')';
+            }
+
+            title += ':';
+
+            return title;
+        }
+
+        var Debug = (function () {
+            function Debug() {
+                _classCallCheck(this, Debug);
+            }
+
+            _createClass(Debug, null, [{
+                key: "error",
+                value: function error(err, src, obj) {
+                    console.log('[ERROR] ' + makeTitle(src), err, obj);
+                    console.trace();
+                }
+            }, {
+                key: "log",
+                value: function log(msg, src) {
+                    console.log(makeTitle(src), msg);
+                }
+            }]);
+
+            return Debug;
+        })();
+
+        module.exports = Debug;
+    }, {}] }, {}, [9]);

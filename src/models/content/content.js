@@ -21,9 +21,9 @@ class Content {
                     // Set immediate result as data temporarily
                     content.data = json;
 
-                    // Get the content struct with the struct fetching promise
-                    if(content.data.struct) {
-                        console.log('    Putaitu [Content]: Getting Struct "' + content.data.struct + '"...');
+                    // Get the struct with the struct fetching promise
+                    if(content.data.presentation.struct.value) {
+                        Debug.log('Getting Struct "' + content.data.presentation.struct.value + '"...', content);
 
                         content.getStruct(structAsyncFunction)
                             .then(callback)
@@ -31,7 +31,7 @@ class Content {
                         
                     // No struct was specified, exit
                     } else {
-                        console.log('Putaitu [ERROR]: Content has no struct specified!', json);
+                        Debug.error('Content has no struct specified!', content, json);
 
                         callback();
                     }
@@ -50,27 +50,25 @@ class Content {
             // Get the base struct
             let struct = new Struct();
             
-            console.log('    Putaitu [Content]: Applying Struct base...');
+            Debug.log('Applying Struct base...', content);
        
             // Include the respective bases for each struct directory 
-            if(content.data.struct.indexOf('pages/') == 0) {
+            if(content.data.presentation.struct.value.indexOf('pages/') == 0) {
                 struct.adoptStruct(require('../../structs/page.json'));
             
-            } else if(content.data.struct.indexOf('sections/') == 0) {
+            } else if(content.data.presentation.struct.value.indexOf('sections/') == 0) {
                 struct.adoptStruct(require('../../structs/section.json'));
             
-            } else if(content.data.struct.indexOf('blocks/') == 0) {
+            } else if(content.data.presentation.struct.value.indexOf('blocks/') == 0) {
                 struct.adoptStruct(require('../../structs/block.json'));
             
             }
 
-            console.log('    Putaitu [Content]: Invoking struct fetching promise from plugin...');
+            Debug.log('Invoking struct fetching promise from plugin...', content);
 
             // Adopt the values of the child page struct
-            struct.adoptStructAsync(asyncFunction, content.data.struct)
+            struct.adoptStructAsync(asyncFunction, content.data.presentation.struct.value)
                 .then(function() {
-                    console.log('    Putaitu [Content]: Adopting Struct data from "' + content.data.struct + '"...');
-
                     // Adopt the content data into the struct, to weed out any leftover values
                     struct.adoptContent(content.data);
 

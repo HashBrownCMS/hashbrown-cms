@@ -121,7 +121,7 @@ window.api = {
     file: {
         fetch: function(path, callback) {
             api.call('/api/git/file/fetch/' + req.params.user + '/' + req.params.repo + '/' + path, function(contents) {
-                callback(atob(contents.content))
+                callback(atob(contents.content), contents.sha)
             });
         },
         

@@ -9,7 +9,7 @@ class Tree extends View {
         this.on('clickFile', this.onClickFile);
         this.on('clickCloseRootNav', this.onClickCloseRootNav);
         this.on('clickDeleteItem', this.onClickDeleteItem);
-        this.on('clickRenameItem', this.onClickDeleteItem);
+        this.on('clickRenameItem', this.onClickRenameItem);
 
         // Prerender container
         this.$element = _.div({class: 'tree panel panel-default'}, [
@@ -40,11 +40,11 @@ class Tree extends View {
     }
 
     onClickDeleteItem(e, element, view) {
-        console.log('dude');
+        console.log('deleted');
     }
     
     onClickRenameItem(e, element, view) {
-        console.log('dude');
+        console.log('renamed');
     }
 
     /**
@@ -214,7 +214,7 @@ class Tree extends View {
                                         };
 
                                         let isDir = file.mode == '040000';
-                                        let name = helper.basename(file.path);
+                                        let name = helper.basename(file.path).replace('.json', '');
                                         let $el;
                                    
                                         if(isDir) {

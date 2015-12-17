@@ -145,13 +145,19 @@
         >.panel-heading {
             position: relative;
 
+            .field-anchors {
+                .btn {
+                    text-transform: capitalize;
+                }
+            }
+
             .content-actions {
                 float: right;
             }
         }
 
         .field-anchor {
-
+            text-transform: capitalize;
         }
 
         .field-editor-container {
