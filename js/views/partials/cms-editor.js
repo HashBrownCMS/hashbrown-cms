@@ -111,17 +111,23 @@ class Editor extends View {
                 // Render anchor points
                 function onClickAnchor(e) {
                     e.preventDefault();
+                
+                    let $btn = $(this);
+
+                    $('html, body').animate({
+                        scrollTop: $('#' + $btn.attr('aria-scrollto')) 
+                    }, 500);
                 }
 
-                view.$element.children('.panel-heading').children('.field-anchors').append(
-                    _.button({class: 'btn btn-default'},
+                let $btn = view.$element.children('.panel-heading').children('.field-anchors').append(
+                    _.button({class: 'btn btn-default', 'aria-scrollto': 'anchor-' + anchorLabel},
                         anchorLabel
                     ).click(onClickAnchor)
                 );
                 
 
-                view.$element.children('.panel-body').append(
-                    _.h4({class: 'field-anchor'},
+                let $h4 = view.$element.children('.panel-body').append(
+                    _.h4({id: 'anchor-' + anchorLabel, class: 'field-anchor'},
                         anchorLabel
                     )
                 );

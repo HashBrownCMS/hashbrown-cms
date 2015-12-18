@@ -24,11 +24,16 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
     }return s;
 })({ 1: [function (require, module, exports) {
         module.exports = {
-            "github": {
-                "client": {
-                    "id": "d8390386d316435085fd",
-                    "secret": "da7efffe15e224a74768b3dc26dce5f9a08ad58c"
+            "plugins": {
+                "github": {
+                    "client": {
+                        "id": "d8390386d316435085fd",
+                        "secret": "da7efffe15e224a74768b3dc26dce5f9a08ad58c"
+                    }
                 }
+            },
+            "debug": {
+                "verbosity": 3
             }
         };
     }, {}], 2: [function (require, module, exports) {
@@ -1210,11 +1215,19 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                             // Render anchor points
                             function onClickAnchor(e) {
                                 e.preventDefault();
+
+                                var $btn = $(this);
+
+                                console.log($btn.attr('aria-scrollto'));
+
+                                $('html, body').animate({
+                                    scrollTop: $('#' + $btn.attr('aria-scrollto'))
+                                }, 500);
                             }
 
-                            view.$element.children('.panel-heading').children('.field-anchors').append(_.button({ class: 'btn btn-default' }, anchorLabel).click(onClickAnchor));
+                            var $btn = view.$element.children('.panel-heading').children('.field-anchors').append(_.button({ class: 'btn btn-default', 'aria-scrollto': 'anchor-' + anchorLabel }, anchorLabel).click(onClickAnchor));
 
-                            view.$element.children('.panel-body').append(_.h4({ class: 'field-anchor' }, anchorLabel));
+                            var $h4 = view.$element.children('.panel-body').append(_.h4({ id: 'anchor-' + anchorLabel, class: 'field-anchor' }, anchorLabel));
 
                             // Render properties
                             var props = view.model[anchorLabel];

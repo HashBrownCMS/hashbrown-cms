@@ -337,7 +337,7 @@ class GitHub {
 
         let content = new Content();
         
-        Debug.log('Start getting Content "' + contentPath + '"!', logSrc);
+        Debug.log('Start getting Content "' + contentPath + '"', logSrc);
         
         function contentAsyncFunction() {
             return new Promise(function(callback) {
@@ -385,7 +385,7 @@ class GitHub {
 
         content.fetchAsync(contentAsyncFunction, structAsyncFunction)
             .then(function() {
-                Debug.log('Done getting Content "' + contentPath + '"!', logSrc);
+                Debug.log('Done getting Content "' + contentPath + '"', logSrc);
                 res.send(content.data);
             }).catch(Debug.error);
     }

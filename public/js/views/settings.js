@@ -24,11 +24,16 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
     }return s;
 })({ 1: [function (require, module, exports) {
         module.exports = {
-            "github": {
-                "client": {
-                    "id": "d8390386d316435085fd",
-                    "secret": "da7efffe15e224a74768b3dc26dce5f9a08ad58c"
+            "plugins": {
+                "github": {
+                    "client": {
+                        "id": "d8390386d316435085fd",
+                        "secret": "da7efffe15e224a74768b3dc26dce5f9a08ad58c"
+                    }
                 }
+            },
+            "debug": {
+                "verbosity": 3
             }
         };
     }, {}], 2: [function (require, module, exports) {
