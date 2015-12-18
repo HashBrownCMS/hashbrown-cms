@@ -9,7 +9,7 @@ class PluginController {
         let folders = fs.readdirSync('./plugins');
 
         for(let path of folders) {
-            let plugin = require('../plugins/' + path);
+            let plugin = require('../../plugins/' + path);
 
             new plugin(this);
         }

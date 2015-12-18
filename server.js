@@ -1,7 +1,7 @@
 'use strict';
 
 let express = require('express');
-let plugincontroller = require('./controllers/plugin');
+let plugincontroller = require('./src/controllers/plugin');
 let bodyparser = require('body-parser');
 
 let env = require('./env.json');
@@ -20,6 +20,6 @@ app.use(express.static(__dirname + '/public'));
 plugincontroller.init(app);
 
 // Views
-require('./routes/views')(app, env);
+require('./src/routes/views')(app, env);
 
 let server = app.listen(8000);
