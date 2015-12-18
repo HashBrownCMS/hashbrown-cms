@@ -1218,10 +1218,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
                                 var $btn = $(this);
 
-                                console.log($btn.attr('aria-scrollto'));
-
                                 $('html, body').animate({
-                                    scrollTop: $('#' + $btn.attr('aria-scrollto'))
+                                    scrollTop: $('#' + $btn.attr('aria-scrollto')).offset().top
                                 }, 500);
                             }
 

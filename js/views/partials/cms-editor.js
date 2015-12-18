@@ -115,7 +115,7 @@ class Editor extends View {
                     let $btn = $(this);
 
                     $('html, body').animate({
-                        scrollTop: $('#' + $btn.attr('aria-scrollto')) 
+                        scrollTop: $('#' + $btn.attr('aria-scrollto')).offset().top 
                     }, 500);
                 }
 
