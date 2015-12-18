@@ -7,9 +7,10 @@ class PluginController {
         this.app = app;
 
         let folders = fs.readdirSync('./plugins');
-
-        for(let path of folders) {
-            let plugin = require('../../plugins/' + path);
+        
+        for(let folder of folders) {
+            let path = '../../plugins/' + folder;
+            let plugin = require(path);
 
             new plugin(this);
         }
