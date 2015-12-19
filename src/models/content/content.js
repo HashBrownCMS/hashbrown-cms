@@ -80,6 +80,54 @@ class Content {
                 }).catch(Debug.error);
         });
     }
+
+    /**
+     * Bake content into flat object
+     */
+    static bake(content) {
+        function bakeProperty(prop) {
+            let type = Object.prototype.toString.call(prop);
+            let baked;
+
+            // This is an array
+            if(type === '[object Array]') {
+                baked = [];
+
+                for(let i in prop) {
+                    baked.push(bakeProperty(prop[i]));
+                }
+            
+            // This is a struct
+            } else if(prop.value) {
+                baked = bakeProperty(prop.value);
+            
+            // This is a normal value
+            } else {
+                baked = prop.toString();
+                
+            }
+
+            return baked || '';
+        }
+
+        function bakeProperties(json) {
+            let baked = {};
+
+            for(let k in json) {
+                let prop = json[k];
+
+                baked[k] = bakeProperty(prop.value);
+            }   
+
+            return baked;
+        }
+        
+        Debug.log2('Baking...', this);
+
+        let baked = bakeProperties(content);
+
+        return baked;
+    }
 }
 
 module.exports = Content;

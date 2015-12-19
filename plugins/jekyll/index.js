@@ -1,5 +1,6 @@
 'use strict';
 
+let Content = require('../../src/models/content/content');
 let yamljs = require('yamljs');
 
 class Jekyll {
@@ -12,11 +13,7 @@ class Jekyll {
      * Converts content from JSON to YAML
      */
     bake(req, res) {
-        let model = req.body;
-
-        if(model.token) {
-            delete model.token;
-        }
+        let model = Content.bake(req.body.data);
 
         // The "permalink" key is used in Jekyll instead of "url"
         model.permalink = model.url;

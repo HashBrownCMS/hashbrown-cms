@@ -107,7 +107,7 @@ class Editor extends View {
             view.$element.children('.panel-heading').removeClass('hidden').children('.field-anchors').empty();
             view.$element.children('.panel-body').empty();
 
-            for(let anchorLabel in view.model) {
+            for(let anchorLabel in view.model.data) {
                 // Render anchor points
                 function onClickAnchor(e) {
                     e.preventDefault();
@@ -133,7 +133,7 @@ class Editor extends View {
                 );
                 
                 // Render properties
-                let props = view.model[anchorLabel];
+                let props = view.model.data[anchorLabel];
 
                 for(let alias in props) {
                     let fieldModel = props[alias];

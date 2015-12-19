@@ -36,8 +36,9 @@ class GitHub {
         controller.hook('post', '/api/issue-tracking/milestones/:mode/:user/:repo', this.milestones);
 
         // Abstract CMS operations
-        controller.hook('post', '/api/content/publish/:user/:repo/:branch/*', this.publish);
-        controller.hook('post', '/api/content/:mode/:user/:repo/*', this.content);
+        controller.hook('post', '/api/content/publish/:user/:repo/:branch/*', this.contentPublish);
+        controller.hook('post', '/api/content/save/:user/:repo/:branch/*', this.contentSave);
+        controller.hook('post', '/api/content/fetch/:user/:repo/:branch/*', this.contentFetch);
         controller.hook('post', '/api/structs/:mode/:user/:repo/*', this.structs);
         controller.hook('post', '/api/templates/:mode/:user/:repo/*', this.templates);
 
@@ -53,6 +54,8 @@ class GitHub {
         function callback(err, answer) {
             if(err) {
                 res.send({ mode: req.params.mode, url: url, err: err, data: req.body.data });
+                Debug.error(err.json != null ? err.json.message : err, 'GitHub', req.body.data);
+           
             } else {
                 if(customCallback) {
                     customCallback(answer);
@@ -63,8 +66,13 @@ class GitHub {
             }
         }
         
-        let octo = new octokat({ token: req.body.token });
+        let octo = new octokat({ token: req.body.buffer.token });
         
+        // Get the sha from the buffer
+        if(req.body.buffer.sha) {
+            req.body.data.sha = req.body.buffer.sha;
+        }
+
         switch(req.params.mode) {
             case 'create':
                 octo.fromUrl(url).create(req.body.data, callback);
@@ -135,7 +143,7 @@ class GitHub {
      * Gets repositories for current organisaion
      */
     repos(req, res) {
-        let octo = new octokat({ token: req.body.token });
+        let octo = new octokat({ token: req.body.buffer.token });
 
         octo.me.repos.fetch(function(err, val) {
             if(err) {
@@ -283,7 +291,7 @@ class GitHub {
      * Get/set branches of a given repository
      */
     branches(req, res) {
-        let octo = new octokat({ token: req.body.token });
+        let octo = new octokat({ token: req.body.buffer.token });
         let url = '/repos/' + req.params.user + '/' + req.params.repo + '/branches';
 
         octo.fromUrl(url).fetch(function(err, branches) {
@@ -321,20 +329,22 @@ class GitHub {
     }
     
     /**
-     * Page content
-     * Get page content
+     * Content fetch
      */
-    content(req, res) {
-        let baseUrl = '/api/content/' + req.params.mode + '/' + req.params.user + '/' + req.params.repo + '/';
+    contentFetch(req, res) {
+        let baseUrl = '/api/content/fetch/' + req.params.user + '/' + req.params.repo + '/' + req.params.branch + '/';
         let contentPath = req.url.replace(baseUrl, '');
 
         let logSrc = 'GitHub';
-        let octo = new octokat({ token: req.body.token });
+        let octo = new octokat({ token: req.body.buffer.token });
 
         let content = new Content();
-        
+    
+        let sha = '';
+
         Debug.log('Start getting Content "' + contentPath + '"', logSrc);
-        
+       
+        // Fetching content file, will be called once 
         function contentAsyncFunction() {
             return new Promise(function(callback) {
                 let url = '/repos/' + req.params.user + '/' + req.params.repo + '/contents/_content/' + contentPath + '.json';
@@ -346,6 +356,8 @@ class GitHub {
                         Debug.log2('Parsing JSON for Content "' + contentPath + '"...', logSrc)
 
                         let data = JSON.parse(new Buffer(file.content, file.encoding).toString());
+
+                        sha = file.sha;
 
                         callback(data);
                     
@@ -359,6 +371,7 @@ class GitHub {
             });
         }
 
+        // Fetching struct files, may be called more than once 
         function structAsyncFunction(structPath) {
             return new Promise(function(callback) {
 
@@ -370,7 +383,9 @@ class GitHub {
                     if(!err) {
                         Debug.log2('Parsing JSON for Struct "' + structPath + '"...', logSrc)
 
-                        callback(JSON.parse(new Buffer(file.content, file.encoding).toString()));
+                        let data = JSON.parse(new Buffer(file.content, file.encoding).toString());
+
+                        callback(data);
 
                     } else {
                         Debug.error(err, logSrc);
@@ -381,13 +396,55 @@ class GitHub {
             });
         }
 
+        // Start the fetching process using the async fetching functions
         content.fetchAsync(contentAsyncFunction, structAsyncFunction)
             .then(function() {
                 Debug.log('Done getting Content "' + contentPath + '"', logSrc);
-                res.send(content.data);
+                
+                // Store sha in buffer
+                content.buffer = { sha: sha };
+                
+                res.send(content);
             }).catch(Debug.error);
     }
     
+    /**
+     * Content publish
+     */
+    contentPublish(req, res) {
+        let baseUrl = '/api/content/publish/' + req.params.user + '/' + req.params.repo + '/' + req.params.branch + '/';
+        let contentPath = req.url.replace(baseUrl, '');
+        let apiUrl = '/repos/' + req.params.user + '/' + req.params.repo + '/contents/content/' + contentPath + '.md';
+        
+        req.params.mode = 'create';
+        
+        GitHub.apiCall(req, res, contentPath);
+    }
+    
+    /**
+     * Content save
+     */
+    contentSave(req, res) {
+        let baseUrl = '/api/content/save/' + req.params.user + '/' + req.params.repo + '/' + req.params.branch + '/';
+        let contentPath = req.url.replace(baseUrl, '');
+        let apiUrl = '/repos/' + req.params.user + '/' + req.params.repo + '/contents/_content/' + contentPath + '.json';
+        
+        req.params.mode = 'create';
+
+        Debug.log('Saving Content "' + contentPath + '"...', 'GitHub');
+
+        req.body.data = {
+            content: new Buffer(JSON.stringify(req.body.data)).toString('base64'),
+            message: 'Content saved by Putaitu CMS'
+        };
+
+        GitHub.apiCall(req, res, apiUrl, function(file) {
+            res.send(file.content);
+
+            Debug.log('Done saving content "' + contentPath + '"', 'GitHub');
+        });
+    }
+
     /** 
      * Structs
      * Get/set structs
@@ -420,34 +477,6 @@ class GitHub {
      */
     redir(req, res) {
         res.redirect('https://github.com/' + req.params.user + '/' + req.params.repo + '/tree/' + req.params.branch);
-    }
-
-    /**
-     * Publish content
-     */
-    publish(req, res) {
-        let baseUrl = '/api/content/publish/' + req.params.user + '/' + req.params.repo + '/' + req.params.branch + '/';
-        let apiUrl = '/repos/' + req.params.user + '/' + req.params.repo + '/contents/';
-        
-        // Remove the base url to get the file path
-        path = path.replace(baseUrl, '');
-
-        // No underscores for published content
-        path = path.replace('_', '');
-        
-        // Use markdown extension
-        path = path.replace('.json', '.md');
-        
-        // If any leftover leading slashes, remove them
-        if(path.indexOf('/') == 0) {
-            path = path.replace('/', '');
-        }   
-
-        let url = apiUrl + path;
-
-        req.params.mode = 'create';
-
-        GitHub.apiCall(req, res, url);
     }
 }
 

@@ -20,17 +20,16 @@ function appropriateIssue(issue) {
 }
 
 window.api = {
-    call(url, callback, data) {
-        data = data || {};
+    call(url, callback, obj) {
+        obj = obj || {};
         
-        let content = {
-            token: localStorage.getItem('api-token'),
-            data: data
-        };
+        obj.buffer = obj.buffer || {};
+        obj.buffer.token = localStorage.getItem('api-token');
 
-        $.post(url, content, function(res) {
+        $.post(url, obj, function(res) {
             if(res.err) {
-                console.log(res.err, res.data);
+                console.log('Error:', res.err);
+                console.log('Data:', res.data);
 
                 if(res.err.json) {
                     alert('(' + res.mode + ') ' + res.url + ': ' + res.err.json.message);
@@ -205,62 +204,23 @@ window.api = {
 
     content: {
         fetch: function(path, callback) {
-            api.call('/api/content/fetch/' + req.params.user + '/' + req.params.repo + '/' + path, callback);
+            api.call('/api/content/fetch/' + req.params.user + '/' + req.params.repo + '/' + req.params.branch + '/' + path, callback);
         },
 
-        publish: function(json, path, callback) {
-            api.content.bake(baked, function(baked) {
-                let data = {
-                    content: JSON.stringify(baked)
-                };
+        publish: function(content, path, callback) {
+            api.content.bake(content.data, function(baked) {
+                content.data = baked;
 
                 api.call('/api/content/publish/' + req.params.user + '/' + req.params.repo + '/' + req.params.branch + '/' + path, callback, data);
             });
         },
 
-        save: function(json, path, callback) {
-            let data = {
-                content: JSON.stringify(json)
-            };
-
-            api.file.create(data, '/_content/' + path + '.json', callback);
+        save: function(content, path, callback) {
+            api.call('/api/content/save/' + req.params.user + '/' + req.params.repo + '/' + req.params.branch + '/' + path, callback, content);
         },
 
-        bake: function(page, callback) {
-            function bakeProperty(prop) {
-                let type = Object.prototype.toString.call(prop);
-                let baked = '';
-
-                if(type === '[object Array]') {
-                    baked = [];
-
-                    for(let i in prop) {
-                        baked.push(bakeProperty(prop[i]));
-                    }
-                
-                } else if(prop.value) {
-                    baked = prop.value;
-                
-                }
-
-                return baked;
-            }
-
-            function bakeProperties(json) {
-                let baked = {};
-
-                for(let k in json) {
-                    let prop = json[k];
-
-                    baked[k] = bakeProperty(prop);
-                }   
-
-                return baked;
-            }
-            
-            let baked = bakeProperties(page);
-
-            api.call('/api/content/bake', callback, baked);
+        bake: function(content, callback) {
+            api.call('/api/content/bake', callback, content);
         }
     }
 };

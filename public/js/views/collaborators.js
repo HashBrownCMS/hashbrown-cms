@@ -68,17 +68,16 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         }
 
         window.api = {
-            call: function call(url, callback, data) {
-                data = data || {};
+            call: function call(url, callback, obj) {
+                obj = obj || {};
 
-                var content = {
-                    token: localStorage.getItem('api-token'),
-                    data: data
-                };
+                obj.buffer = obj.buffer || {};
+                obj.buffer.token = localStorage.getItem('api-token');
 
-                $.post(url, content, function (res) {
+                $.post(url, obj, function (res) {
                     if (res.err) {
-                        console.log(res.err, res.data);
+                        console.log('Error:', res.err);
+                        console.log('Data:', res.data);
 
                         if (res.err.json) {
                             alert('(' + res.mode + ') ' + res.url + ': ' + res.err.json.message);
@@ -250,60 +249,23 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
             content: {
                 fetch: function fetch(path, callback) {
-                    api.call('/api/content/fetch/' + req.params.user + '/' + req.params.repo + '/' + path, callback);
+                    api.call('/api/content/fetch/' + req.params.user + '/' + req.params.repo + '/' + req.params.branch + '/' + path, callback);
                 },
 
-                publish: function publish(json, path, callback) {
-                    api.content.bake(baked, function (baked) {
-                        var data = {
-                            content: JSON.stringify(baked)
-                        };
+                publish: function publish(content, path, callback) {
+                    api.content.bake(content.data, function (baked) {
+                        content.data = baked;
 
                         api.call('/api/content/publish/' + req.params.user + '/' + req.params.repo + '/' + req.params.branch + '/' + path, callback, data);
                     });
                 },
 
-                save: function save(json, path, callback) {
-                    var data = {
-                        content: JSON.stringify(json)
-                    };
-
-                    api.file.create(data, '/_content/' + path + '.json', callback);
+                save: function save(content, path, callback) {
+                    api.call('/api/content/save/' + req.params.user + '/' + req.params.repo + '/' + req.params.branch + '/' + path, callback, content);
                 },
 
-                bake: function bake(page, callback) {
-                    function bakeProperty(prop) {
-                        var type = Object.prototype.toString.call(prop);
-                        var baked = '';
-
-                        if (type === '[object Array]') {
-                            baked = [];
-
-                            for (var i in prop) {
-                                baked.push(bakeProperty(prop[i]));
-                            }
-                        } else if (prop.value) {
-                            baked = prop.value;
-                        }
-
-                        return baked;
-                    }
-
-                    function bakeProperties(json) {
-                        var baked = {};
-
-                        for (var k in json) {
-                            var prop = json[k];
-
-                            baked[k] = bakeProperty(prop);
-                        }
-
-                        return baked;
-                    }
-
-                    var baked = bakeProperties(page);
-
-                    api.call('/api/content/bake', callback, baked);
+                bake: function bake(content, callback) {
+                    api.call('/api/content/bake', callback, content);
                 }
             }
         };
@@ -1580,7 +1542,12 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
             _createClass(Debug, null, [{
                 key: "error",
                 value: function error(err, src, obj) {
-                    console.log('[ERROR] ' + makeTitle(src), err, obj);
+                    if (obj) {
+                        console.log('[ERROR] ' + makeTitle(src), err, obj);
+                    } else {
+                        console.log('[ERROR] ' + makeTitle(src), err);
+                    }
+
                     console.trace();
                 }
             }, {

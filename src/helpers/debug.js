@@ -20,7 +20,12 @@ function makeTitle(src) {
 
 class Debug {
     static error(err, src, obj) {
-        console.log('[ERROR] ' + makeTitle(src), err, obj);
+        if(obj) {
+            console.log('[ERROR] ' + makeTitle(src), err, obj);
+        } else {
+            console.log('[ERROR] ' + makeTitle(src), err);
+        }
+            
         console.trace();
     }
 
