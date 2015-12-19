@@ -23,9 +23,12 @@ window.api = {
     call(url, callback, data) {
         data = data || {};
         
-        data.token = localStorage.getItem('api-token');
+        let content = {
+            token: localStorage.getItem('api-token'),
+            data: data
+        };
 
-        $.post(url, data, function(res) {
+        $.post(url, content, function(res) {
             if(res.err) {
                 console.log(res.err, res.data);
 

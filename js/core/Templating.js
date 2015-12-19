@@ -117,7 +117,11 @@ for(var i in elementTypes) {
 for(var i in bootstrapTypes) {
     declareBootstrapMethod(bootstrapTypes[i]);
 }
- 
+
+Templating.if = function(condition, content) {
+    return condition ? content : null;
+};
+
 Templating.each = function(array, callback) {
     var elements = [];
 

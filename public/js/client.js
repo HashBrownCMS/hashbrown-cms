@@ -32,6 +32,15 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                     }
                 }
             },
+            "menu": {
+                "hide": {
+                    "all": false,
+                    "deployment": false,
+                    "collaborators": false,
+                    "issues": false,
+                    "settings": false
+                }
+            },
             "debug": {
                 "verbosity": 3
             }
@@ -62,9 +71,12 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
             call: function call(url, callback, data) {
                 data = data || {};
 
-                data.token = localStorage.getItem('api-token');
+                var content = {
+                    token: localStorage.getItem('api-token'),
+                    data: data
+                };
 
-                $.post(url, data, function (res) {
+                $.post(url, content, function (res) {
                     if (res.err) {
                         console.log(res.err, res.data);
 
@@ -586,6 +598,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
             declareBootstrapMethod(bootstrapTypes[i]);
         }
 
+        Templating.if = function (condition, content) {
+            return condition ? content : null;
+        };
+
         Templating.each = function (array, callback) {
             var elements = [];
 
@@ -953,11 +969,15 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         var Debug = require('../src/helpers/debug');
 
         window.env = {
-            json: null,
+            remote: null,
+            local: require('../env.json'),
 
+            /** 
+             * Get remote env.json
+             */
             get: function get(callback) {
-                if (env.json) {
-                    callback(env.json);
+                if (remote.json) {
+                    callback(remote.json);
                 } else {
                     api.file.fetch('/_env.json', function (data) {
                         var json = {};
@@ -972,13 +992,16 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                         json.putaitu.issues = json.putaitu.issues || {};
                         json.putaitu.issues.columns = json.putaitu.issues.columns || [];
 
-                        env.json = json;
+                        env.remote = json;
 
-                        callback(env.json);
+                        callback(env.remote);
                     });
                 }
             },
 
+            /** 
+             * Set remote env.json
+             */
             set: function set(json, callback) {
                 json = json || env.json;
 
@@ -995,7 +1018,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 });
             }
         };
-    }, { "../src/helpers/debug": 12 }], 8: [function (require, module, exports) {
+    }, { "../env.json": 1, "../src/helpers/debug": 12 }], 8: [function (require, module, exports) {
         require('./core/Templating');
         require('./core/View');
         require('./core/Router');

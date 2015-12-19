@@ -1,11 +1,15 @@
 let Debug = require('../src/helpers/debug');
 
 window.env = {
-    json: null,
+    remote: null,
+    local: require('../env.json'),
 
+    /** 
+     * Get remote env.json
+     */
     get: function(callback) {
-        if(env.json) {
-            callback(env.json);
+        if(remote.json) {
+            callback(remote.json);
         } else {
             api.file.fetch('/_env.json', function(data) {
                 let json = {};
@@ -20,13 +24,16 @@ window.env = {
                 json.putaitu.issues = json.putaitu.issues || {};
                 json.putaitu.issues.columns = json.putaitu.issues.columns || [];
 
-                env.json = json;
+                env.remote = json;
 
-                callback(env.json);
+                callback(env.remote);
             });
         }
     },
 
+    /** 
+     * Set remote env.json
+     */
     set: function(json, callback) {
         json = json || env.json;
 

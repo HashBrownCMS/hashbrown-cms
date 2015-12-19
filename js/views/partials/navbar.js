@@ -17,52 +17,62 @@ class Navbar extends View {
         $('.navbar-content').html(
             _.div({class: 'navbar navbar-default'},
                 _.div({class: 'container'}, [
-                    _.ul({class: 'nav navbar-nav'}, [
-                        _.li(
-                            _.a({href: '/repos/' + req.params.user}, [
-                                _.span({class: 'glyphicon glyphicon-arrow-left'}),
-                                ' Repos'
-                            ])
-                        ),
-                        _.li(
-                            _.a({href: '/repos/' + req.params.user + '/' + req.params.repo + '/deployment/'}, [
-                                _.span({class: 'glyphicon glyphicon-upload'}),
-                                ' Deployment'
-                            ])
-                        ),
-                        _.li(
-                            _.a({href: '/repos/' + req.params.user + '/' + req.params.repo + '/collaborators/'}, [
-                                _.span({class: 'glyphicon glyphicon-user'}),
-                                ' Collaborators'
-                            ])
-                        ),
-                        _.li(
-                            _.a({href: '/repos/' + req.params.user + '/' + req.params.repo + '/issues/'}, [
-                                _.span({class: 'glyphicon glyphicon-exclamation-sign'}),
-                                ' Issues'
-                            ])
-                        ),
-                        _.li(
-                            _.a({href: '/repos/' + req.params.user + '/' + req.params.repo + '/settings/'}, [
-                                _.span({class: 'glyphicon glyphicon-cog'}),
-                                ' Settings'
-                            ])
-                        )
-                    ]),
-                    _.ul({class: 'nav navbar-nav navbar-right'},
-                        _.li({class: 'navbar-btn'},
-                            _.div({class: 'input-group'}, [
-                                _.span({class: 'input-group-addon'},
-                                    'git'
-                                ),
-                                function() {
-                                    var element = _.input({class: 'form-control', type: 'text', value: ''});
+                    _.if(!env.local.menu.hide.all, 
+                        _.ul({class: 'nav navbar-nav'}, [
+                            _.li(
+                                _.a({href: '/repos/' + req.params.user}, [
+                                    _.span({class: 'glyphicon glyphicon-arrow-left'}),
+                                    ' Repos'
+                                ])
+                            ),
+                            _.if(!env.local.menu.hide.deployment,
+                                _.li(
+                                    _.a({href: '/repos/' + req.params.user + '/' + req.params.repo + '/deployment/'}, [
+                                        _.span({class: 'glyphicon glyphicon-upload'}),
+                                        ' Deployment'
+                                    ])
+                                )
+                            ),
+                            _.if(!env.local.menu.hide.collaborators,
+                                _.li(
+                                    _.a({href: '/repos/' + req.params.user + '/' + req.params.repo + '/collaborators/'}, [
+                                        _.span({class: 'glyphicon glyphicon-user'}),
+                                        ' Collaborators'
+                                    ])
+                                )
+                            ),
+                            _.if(!env.local.menu.hide.issues,
+                                _.li(
+                                    _.a({href: '/repos/' + req.params.user + '/' + req.params.repo + '/issues/'}, [
+                                        _.span({class: 'glyphicon glyphicon-exclamation-sign'}),
+                                        ' Issues'
+                                    ])
+                                )
+                            ),
+                            _.if(!env.local.menu.hide.settings,
+                                _.li(
+                                    _.a({href: '/repos/' + req.params.user + '/' + req.params.repo + '/settings/'}, [
+                                        _.span({class: 'glyphicon glyphicon-cog'}),
+                                        ' Settings'
+                                    ])
+                                )
+                            )
+                        ]),
+                        _.ul({class: 'nav navbar-nav navbar-right'},
+                            _.li({class: 'navbar-btn'},
+                                _.div({class: 'input-group'}, [
+                                    _.span({class: 'input-group-addon'},
+                                        'git'
+                                    ),
+                                    function() {
+                                        var element = _.input({class: 'form-control', type: 'text', value: ''});
 
-                                    element.attr('value', view.repo.cloneUrl); 
-                                    
-                                    return element;
-                                }
-                            ])
+                                        element.attr('value', view.repo.cloneUrl); 
+                                        
+                                        return element;
+                                    }
+                                ])
+                            )
                         )
                     )
                 ])

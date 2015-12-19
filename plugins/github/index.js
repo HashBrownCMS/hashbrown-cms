@@ -52,7 +52,7 @@ class GitHub {
     static apiCall(req, res, url, customCallback) {
         function callback(err, answer) {
             if(err) {
-                res.send({ mode: req.params.mode, url: url, err: err, data: req.body });
+                res.send({ mode: req.params.mode, url: url, err: err, data: req.body.data });
             } else {
                 if(customCallback) {
                     customCallback(answer);
@@ -65,19 +65,17 @@ class GitHub {
         
         let octo = new octokat({ token: req.body.token });
         
-        delete req.body.token;
-
         switch(req.params.mode) {
             case 'create':
-                octo.fromUrl(url).create(req.body, callback);
+                octo.fromUrl(url).create(req.body.data, callback);
                 break;
             
             case 'update':
-                octo.fromUrl(url).update(req.body, callback);
+                octo.fromUrl(url).update(req.body.data, callback);
                 break;
             
             case 'fetch': default:
-                octo.fromUrl(url).fetch(req.body, callback);
+                octo.fromUrl(url).fetch(req.body.data, callback);
                 break;
         }
     }
@@ -187,10 +185,10 @@ class GitHub {
         
         // Updating issues requires a number from the GitHub API
         if(req.params.mode == 'update') {
-            url += '/' + req.body.number;
+            url += '/' + req.body.data.number;
         }
 
-        req.body.state = 'all';
+        req.body.data.state = 'all';
 
         GitHub.apiCall(req, res, url);
     }
@@ -249,10 +247,8 @@ class GitHub {
 
         // GitHub needs a commit message and base64 encoded content
         if(req.params.mode == 'create' || req.params.mode == 'update') {
-            console.log(req.body);
-
-            req.body.content = new Buffer(req.body.content).toString('base64');
-            req.body.comment = 'Committed by Putaitu CMS';
+            req.body.data.content = new Buffer(req.body.content).toString('base64');
+            req.body.data.comment = 'Committed by Putaitu CMS';
         }
 
         GitHub.apiCall(req, res, url, function(contents) {
@@ -349,7 +345,9 @@ class GitHub {
                     if(!err) {
                         Debug.log2('Parsing JSON for Content "' + contentPath + '"...', logSrc)
 
-                        callback(JSON.parse(new Buffer(file.content, file.encoding).toString()));
+                        let data = JSON.parse(new Buffer(file.content, file.encoding).toString());
+
+                        callback(data);
                     
                     } else {
                         Debug.log(err, logSrc, url);

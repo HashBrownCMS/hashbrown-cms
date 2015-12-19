@@ -32,6 +32,15 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                     }
                 }
             },
+            "menu": {
+                "hide": {
+                    "all": false,
+                    "deployment": false,
+                    "collaborators": false,
+                    "issues": false,
+                    "settings": false
+                }
+            },
             "debug": {
                 "verbosity": 3
             }
@@ -62,9 +71,12 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
             call: function call(url, callback, data) {
                 data = data || {};
 
-                data.token = localStorage.getItem('api-token');
+                var content = {
+                    token: localStorage.getItem('api-token'),
+                    data: data
+                };
 
-                $.post(url, data, function (res) {
+                $.post(url, content, function (res) {
                     if (res.err) {
                         console.log(res.err, res.data);
 
@@ -595,6 +607,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
             declareBootstrapMethod(bootstrapTypes[i]);
         }
 
+        Templating.if = function (condition, content) {
+            return condition ? content : null;
+        };
+
         Templating.each = function (array, callback) {
             var elements = [];
 
@@ -962,11 +978,15 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         var Debug = require('../src/helpers/debug');
 
         window.env = {
-            json: null,
+            remote: null,
+            local: require('../env.json'),
 
+            /** 
+             * Get remote env.json
+             */
             get: function get(callback) {
-                if (env.json) {
-                    callback(env.json);
+                if (remote.json) {
+                    callback(remote.json);
                 } else {
                     api.file.fetch('/_env.json', function (data) {
                         var json = {};
@@ -981,13 +1001,16 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                         json.putaitu.issues = json.putaitu.issues || {};
                         json.putaitu.issues.columns = json.putaitu.issues.columns || [];
 
-                        env.json = json;
+                        env.remote = json;
 
-                        callback(env.json);
+                        callback(env.remote);
                     });
                 }
             },
 
+            /** 
+             * Set remote env.json
+             */
             set: function set(json, callback) {
                 json = json || env.json;
 
@@ -1004,7 +1027,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 });
             }
         };
-    }, { "../src/helpers/debug": 14 }], 9: [function (require, module, exports) {
+    }, { "../env.json": 1, "../src/helpers/debug": 14 }], 9: [function (require, module, exports) {
         var Helper = (function () {
             function Helper() {
                 _classCallCheck(this, Helper);
@@ -1114,13 +1137,13 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 value: function render() {
                     var view = this;
 
-                    $('.navbar-content').html(_.div({ class: 'navbar navbar-default' }, _.div({ class: 'container' }, [_.ul({ class: 'nav navbar-nav' }, [_.li(_.a({ href: '/repos/' + req.params.user }, [_.span({ class: 'glyphicon glyphicon-arrow-left' }), ' Repos'])), _.li(_.a({ href: '/repos/' + req.params.user + '/' + req.params.repo + '/deployment/' }, [_.span({ class: 'glyphicon glyphicon-upload' }), ' Deployment'])), _.li(_.a({ href: '/repos/' + req.params.user + '/' + req.params.repo + '/collaborators/' }, [_.span({ class: 'glyphicon glyphicon-user' }), ' Collaborators'])), _.li(_.a({ href: '/repos/' + req.params.user + '/' + req.params.repo + '/issues/' }, [_.span({ class: 'glyphicon glyphicon-exclamation-sign' }), ' Issues'])), _.li(_.a({ href: '/repos/' + req.params.user + '/' + req.params.repo + '/settings/' }, [_.span({ class: 'glyphicon glyphicon-cog' }), ' Settings']))]), _.ul({ class: 'nav navbar-nav navbar-right' }, _.li({ class: 'navbar-btn' }, _.div({ class: 'input-group' }, [_.span({ class: 'input-group-addon' }, 'git'), function () {
+                    $('.navbar-content').html(_.div({ class: 'navbar navbar-default' }, _.div({ class: 'container' }, [_.if(!env.local.menu.hide.all, _.ul({ class: 'nav navbar-nav' }, [_.li(_.a({ href: '/repos/' + req.params.user }, [_.span({ class: 'glyphicon glyphicon-arrow-left' }), ' Repos'])), _.if(!env.local.menu.hide.deployment, _.li(_.a({ href: '/repos/' + req.params.user + '/' + req.params.repo + '/deployment/' }, [_.span({ class: 'glyphicon glyphicon-upload' }), ' Deployment']))), _.if(!env.local.menu.hide.collaborators, _.li(_.a({ href: '/repos/' + req.params.user + '/' + req.params.repo + '/collaborators/' }, [_.span({ class: 'glyphicon glyphicon-user' }), ' Collaborators']))), _.if(!env.local.menu.hide.issues, _.li(_.a({ href: '/repos/' + req.params.user + '/' + req.params.repo + '/issues/' }, [_.span({ class: 'glyphicon glyphicon-exclamation-sign' }), ' Issues']))), _.if(!env.local.menu.hide.settings, _.li(_.a({ href: '/repos/' + req.params.user + '/' + req.params.repo + '/settings/' }, [_.span({ class: 'glyphicon glyphicon-cog' }), ' Settings'])))]), _.ul({ class: 'nav navbar-nav navbar-right' }, _.li({ class: 'navbar-btn' }, _.div({ class: 'input-group' }, [_.span({ class: 'input-group-addon' }, 'git'), function () {
                         var element = _.input({ class: 'form-control', type: 'text', value: '' });
 
                         element.attr('value', view.repo.cloneUrl);
 
                         return element;
-                    }])))])));
+                    }]))))])));
 
                     // Set active navigation button
                     $('.navbar-content .navbar-nav li').each(function (i) {

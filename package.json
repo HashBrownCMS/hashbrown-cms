@@ -20,6 +20,7 @@
   "dependencies": {
     "body-parser": "^1.14.1",
     "express": "^4.13.3",
+    "express-session": "^1.12.1",
     "jade": "^1.11.0",
     "octokat": "^0.4.15",
     "restler": "^3.4.0",
