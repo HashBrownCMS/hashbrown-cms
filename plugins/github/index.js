@@ -139,22 +139,6 @@ class GitHub {
     }
 
     /**
-     * Repos
-     * Gets repositories for current organisaion
-     */
-    repos(req, res) {
-        let octo = new octokat({ token: req.body.buffer.token });
-
-        octo.me.repos.fetch(function(err, val) {
-            if(err) {
-                res.send({ err: err });
-            } else {
-                res.send(val);
-            }
-        });
-    }
-
-    /**
      * Compare
      * Compare two branches (base and head)
      */

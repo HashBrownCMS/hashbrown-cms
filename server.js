@@ -10,7 +10,7 @@ let app = express();
 
 app.set('view engine', 'jade');
 
-app.use(bodyparser.urlencoded({ extended: false }));
+app.use(bodyparser.urlencoded({ extended: true }));
 app.use(express.static(__dirname + '/public'));
 
 /**
