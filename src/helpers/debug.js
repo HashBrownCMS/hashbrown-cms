@@ -25,8 +25,11 @@ class Debug {
         } else {
             console.log('[ERROR] ' + makeTitle(src), err);
         }
-            
-        console.trace();
+
+        if(env.debug.trace) {
+            console.log('-------- TRACE --------');        
+            console.trace();
+        }
     }
 
     static log(msg, src) {

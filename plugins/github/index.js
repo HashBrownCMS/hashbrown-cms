@@ -25,6 +25,7 @@ class GitHub {
 
         // Auth operations
         controller.hook('post', '/api/login', this.login);
+        controller.hook('post', '/api/authorizations', this.authorizations);
 
         // Organisation operations
         controller.hook('post', '/api/orgs', this.orgs);
@@ -66,26 +67,42 @@ class GitHub {
             }
         }
         
-        let octo = new octokat({ token: req.body.buffer.token });
+        if(!req.body) {
+            Debug.error('Request body is missing!', 'GitHub', req);
         
-        // Get the sha from the buffer
-        if(req.body.buffer.sha) {
-            req.body.data.sha = req.body.buffer.sha;
-        }
+        } else if(!req.body.buffer) {
+            Debug.error('Buffer object is missing from request body!', 'GitHub', req.body);
 
-        switch(req.params.mode) {
-            case 'create':
-                octo.fromUrl(url).create(req.body.data, callback);
-                break;
+        } else {
+            let octo = new octokat({ token: req.body.buffer.token });
             
-            case 'update':
-                octo.fromUrl(url).update(req.body.data, callback);
-                break;
-            
-            case 'fetch': default:
-                octo.fromUrl(url).fetch(req.body.data, callback);
-                break;
+            // Get the sha from the buffer
+            if(req.body.buffer.sha) {
+                req.body.data.sha = req.body.buffer.sha;
+            }
+
+            switch(req.params.mode) {
+                case 'create':
+                    octo.fromUrl(url).create(req.body.data, callback);
+                    break;
+                
+                case 'update':
+                    octo.fromUrl(url).update(req.body.data, callback);
+                    break;
+                
+                case 'fetch': default:
+                    octo.fromUrl(url).fetch(req.body.data, callback);
+                    break;
+            }
         }
+    }
+
+    /** 
+     * Authorisations
+     * Check which level of authorisation is currently granted
+     */
+    authorizations(req, res) {
+        GitHub.apiCall(req, res, '/applications/' + env.plugins.github.client.id + '/tokens/' + req.body.buffer.token);
     }
 
     /**
