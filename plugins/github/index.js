@@ -174,10 +174,27 @@ class GitHub {
      */
     issues(req, res) {
         let url = '/repos/' + req.params.user + '/' + req.params.repo + '/issues';
-        
+       
+        if(!req.body.data) {
+            req.body.data = {};
+        }
+
         // Updating issues requires a number from the GitHub API
         if(req.params.mode == 'update') {
             url += '/' + req.body.data.number;
+        }
+
+        // Updating and creating issues takes different values than they send
+        if(req.params.mode == 'update' || req.params.mode == 'create') {
+            // Assignees require only a string
+            if(req.body.data.assignee) {
+                req.body.data.assignee = req.body.data.assignee.login;
+            }
+
+            // Milestones require a number
+            if(req.body.data.milestone) {
+                req.body.data.milestone = req.body.data.milestone.number;
+            }
         }
 
         req.body.data.state = 'all';
@@ -331,7 +348,7 @@ class GitHub {
         // Fetching content file, will be called once 
         function contentAsyncFunction() {
             return new Promise(function(callback) {
-                let url = '/repos/' + req.params.user + '/' + req.params.repo + '/contents/_content/' + contentPath + '.json';
+                let url = '/repos/' + req.params.user + '/' + req.params.repo + '/contents/_putaitu/content/' + contentPath + '.json';
 
                 Debug.log2('Fetching Content "' + contentPath + '"...', logSrc);
                 
@@ -359,7 +376,7 @@ class GitHub {
         function structAsyncFunction(structPath) {
             return new Promise(function(callback) {
 
-                let url = '/repos/' + req.params.user + '/' + req.params.repo + '/contents/_structs/' + structPath + '.json';
+                let url = '/repos/' + req.params.user + '/' + req.params.repo + '/contents/_putaitu/structs/' + structPath + '.json';
 
                 Debug.log2('Fetching Struct "' + structPath + '"...', logSrc);
 
@@ -411,7 +428,7 @@ class GitHub {
     contentSave(req, res) {
         let baseUrl = '/api/content/save/' + req.params.user + '/' + req.params.repo + '/' + req.params.branch + '/';
         let contentPath = req.url.replace(baseUrl, '');
-        let apiUrl = '/repos/' + req.params.user + '/' + req.params.repo + '/contents/_content/' + contentPath + '.json';
+        let apiUrl = '/repos/' + req.params.user + '/' + req.params.repo + '/contents/_putaitu/content/' + contentPath + '.json';
         
         req.params.mode = 'create';
 

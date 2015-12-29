@@ -55,7 +55,8 @@ class Editor extends View {
             'checkbox': require('./field-editors/checkbox'),
             'template-picker': require('./field-editors/template-picker'),
             'struct-picker': require('./field-editors/struct-picker'),
-            'date-picker': require('./field-editors/date-picker')
+            'date-picker': require('./field-editors/date-picker'),
+            'block': require('./field-editors/block')
         };
     }
 
@@ -100,15 +101,12 @@ class Editor extends View {
         }
     }
 
-    render() {
-        let view = this;
+    renderModelData(modelData, $el, anchorsInHeading) {
+        $el.empty();
 
-        api.structs.fields.fetch(function(fieldStructs) {
-            view.$element.children('.panel-heading').removeClass('hidden').children('.field-anchors').empty();
-            view.$element.children('.panel-body').empty();
-
-            for(let anchorLabel in view.model.data) {
-                // Render anchor points
+        for(let anchorLabel in modelData) {
+            // If specified, render anchor navigation buttons in heading
+            if(anchorsInHeading) {
                 function onClickAnchor(e) {
                     e.preventDefault();
                 
@@ -119,49 +117,61 @@ class Editor extends View {
                     }, 500);
                 }
 
-                let $btn = view.$element.children('.panel-heading').children('.field-anchors').append(
+                let $btn = this.$element.children('.panel-heading').children('.field-anchors').append(
                     _.button({class: 'btn btn-default', 'aria-scrollto': 'anchor-' + anchorLabel},
                         anchorLabel
                     ).click(onClickAnchor)
                 );
-                
+            }
 
-                let $h4 = view.$element.children('.panel-body').append(
-                    _.h4({id: 'anchor-' + anchorLabel, class: 'field-anchor'},
-                        anchorLabel
-                    )
-                );
-                
-                // Render properties
-                let props = view.model.data[anchorLabel];
+            // Render anchor points
+            let $h4 = $el.append(
+                _.h4({id: 'anchor-' + anchorLabel, class: 'field-anchor'},
+                    anchorLabel
+                )
+            );
+            
+            // Render properties
+            let props = modelData[anchorLabel];
 
-                for(let alias in props) {
-                    let fieldModel = props[alias];
-                    let fieldStruct = fieldStructs[fieldModel.struct];
+            for(let alias in props) {
+                let fieldModel = props[alias];
+                let fieldStruct = this.fieldStructs[fieldModel.struct];
 
-                    if(fieldStruct) {
-                        let fieldEditorView = view.getFieldEditor(fieldStruct.editor, alias, fieldModel);
+                if(fieldStruct) {
+                    let fieldEditorView = this.getFieldEditor(fieldStruct.editor, alias, fieldModel);
 
-                        if(fieldEditorView) {
-                            view.$element.children('.panel-body').append(
-                                _.div({class: 'input-group field-editor-container'}, [
-                                    _.span({class: 'field-editor-label input-group-addon'},
-                                        fieldModel.label
-                                    ),
-                                    fieldEditorView.$element
-                                ])
-                            );
-                        
-                        } else {
-                            console.log('No field editor with name "' + fieldStruct.editor + '" was found');
-                        
-                        }
-
+                    if(fieldEditorView) {
+                        $el.append(
+                            _.div({class: 'input-group field-editor-container'}, [
+                                _.span({class: 'field-editor-label input-group-addon'},
+                                    fieldModel.label
+                                ),
+                                fieldEditorView.$element
+                            ])
+                        );
+                    
                     } else {
-                        console.log('No field struct with name "' + fieldModel.struct + '" was found');
+                        console.log('No field editor with name "' + fieldStruct.editor + '" was found');
+                    
                     }
+
+                } else {
+                    console.log('No field struct with name "' + fieldModel.struct + '" was found');
                 }
             }
+        }
+    }
+
+    render() {
+        let view = this;
+
+        api.structs.fields.fetch(function(fieldStructs) {
+            view.fieldStructs = fieldStructs;
+
+            view.$element.children('.panel-heading').removeClass('hidden').children('.field-anchors').empty();
+
+            view.renderModelData(view.model.data, view.$element.children('.panel-body'), true);
         });
     }
 }

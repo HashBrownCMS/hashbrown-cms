@@ -126,9 +126,6 @@ textarea {
 /**
  * Global settings
  */
-body {
-  background-color: #2e6da4; }
-
 .repo-actions {
   margin: 0px auto 20px;
   text-align: center; }

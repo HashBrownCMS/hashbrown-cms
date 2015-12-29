@@ -476,7 +476,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
         window.addEventListener('hashchange', Router.init);
         window.Router = Router;
-    }, { "path-to-regexp": 23 }], 6: [function (require, module, exports) {
+    }, { "path-to-regexp": 24 }], 6: [function (require, module, exports) {
         var Templating = {};
 
         function append(el, content) {
@@ -943,10 +943,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
              * Get remote env.json
              */
             get: function get(callback) {
-                if (remote.json) {
-                    callback(remote.json);
+                if (env.remote && env.remote.json) {
+                    callback(env.remote.json);
                 } else {
-                    api.file.fetch('/_env.json', function (data) {
+                    api.file.fetch('/_putaitu/env.json', function (data) {
                         var json = {};
 
                         try {
@@ -976,7 +976,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                     content: JSON.stringify(json)
                 };
 
-                api.file.create(data, '/_env.json', function () {
+                api.file.create(data, '/_putaitu/env.json', function () {
                     env.json = json;
 
                     if (callback) {
@@ -985,7 +985,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 });
             }
         };
-    }, { "../env.json": 1, "../src/helpers/debug": 24 }], 9: [function (require, module, exports) {
+    }, { "../env.json": 1, "../src/helpers/debug": 25 }], 9: [function (require, module, exports) {
         var Helper = (function () {
             function Helper() {
                 _classCallCheck(this, Helper);
@@ -1087,7 +1087,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         })(View);
 
         new CMS();
-    }, { "../client": 3, "./partials/cms-editor": 11, "./partials/cms-tree": 12, "./partials/navbar": 21 }], 11: [function (require, module, exports) {
+    }, { "../client": 3, "./partials/cms-editor": 11, "./partials/cms-tree": 12, "./partials/navbar": 22 }], 11: [function (require, module, exports) {
         var Editor = (function (_View3) {
             _inherits(Editor, _View3);
 
@@ -1140,7 +1140,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                         'checkbox': require('./field-editors/checkbox'),
                         'template-picker': require('./field-editors/template-picker'),
                         'struct-picker': require('./field-editors/struct-picker'),
-                        'date-picker': require('./field-editors/date-picker')
+                        'date-picker': require('./field-editors/date-picker'),
+                        'block': require('./field-editors/block')
                     };
                 }
             }, {
@@ -1184,17 +1185,14 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                     }
                 }
             }, {
-                key: "render",
-                value: function render() {
-                    var view = this;
+                key: "renderModelData",
+                value: function renderModelData(modelData, $el, anchorsInHeading) {
+                    $el.empty();
 
-                    api.structs.fields.fetch(function (fieldStructs) {
-                        view.$element.children('.panel-heading').removeClass('hidden').children('.field-anchors').empty();
-                        view.$element.children('.panel-body').empty();
-
-                        var _loop = function _loop(anchorLabel) {
-                            // Render anchor points
-                            function onClickAnchor(e) {
+                    for (var anchorLabel in modelData) {
+                        // If specified, render anchor navigation buttons in heading
+                        if (anchorsInHeading) {
+                            var onClickAnchor = function onClickAnchor(e) {
                                 e.preventDefault();
 
                                 var $btn = $(this);
@@ -1202,36 +1200,46 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                                 $('html, body').animate({
                                     scrollTop: $('#' + $btn.attr('aria-scrollto')).offset().top
                                 }, 500);
-                            }
+                            };
 
-                            var $btn = view.$element.children('.panel-heading').children('.field-anchors').append(_.button({ class: 'btn btn-default', 'aria-scrollto': 'anchor-' + anchorLabel }, anchorLabel).click(onClickAnchor));
-
-                            var $h4 = view.$element.children('.panel-body').append(_.h4({ id: 'anchor-' + anchorLabel, class: 'field-anchor' }, anchorLabel));
-
-                            // Render properties
-                            var props = view.model.data[anchorLabel];
-
-                            for (var alias in props) {
-                                var fieldModel = props[alias];
-                                var fieldStruct = fieldStructs[fieldModel.struct];
-
-                                if (fieldStruct) {
-                                    var fieldEditorView = view.getFieldEditor(fieldStruct.editor, alias, fieldModel);
-
-                                    if (fieldEditorView) {
-                                        view.$element.children('.panel-body').append(_.div({ class: 'input-group field-editor-container' }, [_.span({ class: 'field-editor-label input-group-addon' }, fieldModel.label), fieldEditorView.$element]));
-                                    } else {
-                                        console.log('No field editor with name "' + fieldStruct.editor + '" was found');
-                                    }
-                                } else {
-                                    console.log('No field struct with name "' + fieldModel.struct + '" was found');
-                                }
-                            }
-                        };
-
-                        for (var anchorLabel in view.model.data) {
-                            _loop(anchorLabel);
+                            var $btn = this.$element.children('.panel-heading').children('.field-anchors').append(_.button({ class: 'btn btn-default', 'aria-scrollto': 'anchor-' + anchorLabel }, anchorLabel).click(onClickAnchor));
                         }
+
+                        // Render anchor points
+                        var $h4 = $el.append(_.h4({ id: 'anchor-' + anchorLabel, class: 'field-anchor' }, anchorLabel));
+
+                        // Render properties
+                        var props = modelData[anchorLabel];
+
+                        for (var alias in props) {
+                            var fieldModel = props[alias];
+                            var fieldStruct = this.fieldStructs[fieldModel.struct];
+
+                            if (fieldStruct) {
+                                var fieldEditorView = this.getFieldEditor(fieldStruct.editor, alias, fieldModel);
+
+                                if (fieldEditorView) {
+                                    $el.append(_.div({ class: 'input-group field-editor-container' }, [_.span({ class: 'field-editor-label input-group-addon' }, fieldModel.label), fieldEditorView.$element]));
+                                } else {
+                                    console.log('No field editor with name "' + fieldStruct.editor + '" was found');
+                                }
+                            } else {
+                                console.log('No field struct with name "' + fieldModel.struct + '" was found');
+                            }
+                        }
+                    }
+                }
+            }, {
+                key: "render",
+                value: function render() {
+                    var view = this;
+
+                    api.structs.fields.fetch(function (fieldStructs) {
+                        view.fieldStructs = fieldStructs;
+
+                        view.$element.children('.panel-heading').removeClass('hidden').children('.field-anchors').empty();
+
+                        view.renderModelData(view.model.data, view.$element.children('.panel-body'), true);
                     });
                 }
             }]);
@@ -1240,7 +1248,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         })(View);
 
         module.exports = Editor;
-    }, { "./field-editors/checkbox": 13, "./field-editors/date-picker": 14, "./field-editors/struct-picker": 16, "./field-editors/template-picker": 17, "./field-editors/text": 19, "./field-editors/text-html": 18, "./field-editors/url": 20 }], 12: [function (require, module, exports) {
+    }, { "./field-editors/block": 13, "./field-editors/checkbox": 14, "./field-editors/date-picker": 15, "./field-editors/struct-picker": 17, "./field-editors/template-picker": 18, "./field-editors/text": 20, "./field-editors/text-html": 19, "./field-editors/url": 21 }], 12: [function (require, module, exports) {
         var Tree = (function (_View4) {
             _inherits(Tree, _View4);
 
@@ -1377,7 +1385,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
             }, {
                 key: "prerender",
                 value: function prerender() {
-                    this.dirs.content = this.getFolderContent('_content/', true);
+                    this.dirs.content = this.getFolderContent('_putaitu/content/', true);
                     this.dirs.media = this.getFolderContent('media/', true);
                 }
 
@@ -1465,9 +1473,9 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                             var $el = undefined;
 
                             if (isDir) {
-                                $el = _.li({ class: 'folder', draggable: 'true' }, [_.a({ href: '#/' + file.path.replace('_', '') }, [_.glyphicon({ class: 'glyphicon-folder-close' }), name]).click(view.events.clickFolder).context(contextMenuItems).on(dragHandler), _.ul({ class: 'folder-content', id: file.sha }).on(dropHandler)]);
+                                $el = _.li({ class: 'folder', draggable: 'true' }, [_.a({ href: '#/' + file.path.replace('_putaitu/', '') }, [_.glyphicon({ class: 'glyphicon-folder-close' }), name]).click(view.events.clickFolder).context(contextMenuItems).on(dragHandler), _.ul({ class: 'folder-content', id: file.sha }).on(dropHandler)]);
                             } else {
-                                $el = _.li({ class: 'file', draggable: 'true' }, _.a({ href: '#/' + file.path.replace('_', '').replace('.json', '') }, [_.glyphicon({ class: 'glyphicon-file' }), name]).click(view.events.clickFile).context(contextMenuItems).on(dragHandler));
+                                $el = _.li({ class: 'file', draggable: 'true' }, _.a({ href: '#/' + file.path.replace('_putaitu/', '').replace('.json', '') }, [_.glyphicon({ class: 'glyphicon-file' }), name]).click(view.events.clickFile).context(contextMenuItems).on(dragHandler));
                             }
 
                             return $el;
@@ -1497,16 +1505,52 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
         var FieldEditor = require('./field');
 
-        var CheckboxEditor = (function (_FieldEditor) {
-            _inherits(CheckboxEditor, _FieldEditor);
+        var Section = (function (_FieldEditor) {
+            _inherits(Section, _FieldEditor);
+
+            function Section(args) {
+                _classCallCheck(this, Section);
+
+                var _this5 = _possibleConstructorReturn(this, Object.getPrototypeOf(Section).call(this, args));
+
+                _this5.fetch();
+                return _this5;
+            }
+
+            _createClass(Section, [{
+                key: "renderField",
+                value: function renderField(value) {
+                    var editor = ViewHelper.get('Editor');
+
+                    var $el = _.div({ class: 'section-editor' });
+
+                    console.log(value);
+
+                    editor.renderModelData(value, $el);
+
+                    return $el;
+                }
+            }]);
+
+            return Section;
+        })(FieldEditor);
+
+        module.exports = Section;
+    }, { "./field": 16 }], 14: [function (require, module, exports) {
+        'use strict';
+
+        var FieldEditor = require('./field');
+
+        var CheckboxEditor = (function (_FieldEditor2) {
+            _inherits(CheckboxEditor, _FieldEditor2);
 
             function CheckboxEditor(args) {
                 _classCallCheck(this, CheckboxEditor);
 
-                var _this5 = _possibleConstructorReturn(this, Object.getPrototypeOf(CheckboxEditor).call(this, args));
+                var _this6 = _possibleConstructorReturn(this, Object.getPrototypeOf(CheckboxEditor).call(this, args));
 
-                _this5.fetch();
-                return _this5;
+                _this6.fetch();
+                return _this6;
             }
 
             _createClass(CheckboxEditor, [{
@@ -1526,21 +1570,21 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         })(FieldEditor);
 
         module.exports = CheckboxEditor;
-    }, { "./field": 15 }], 14: [function (require, module, exports) {
+    }, { "./field": 16 }], 15: [function (require, module, exports) {
         'use strict';
 
         var FieldEditor = require('./field');
 
-        var DatePicker = (function (_FieldEditor2) {
-            _inherits(DatePicker, _FieldEditor2);
+        var DatePicker = (function (_FieldEditor3) {
+            _inherits(DatePicker, _FieldEditor3);
 
             function DatePicker(args) {
                 _classCallCheck(this, DatePicker);
 
-                var _this6 = _possibleConstructorReturn(this, Object.getPrototypeOf(DatePicker).call(this, args));
+                var _this7 = _possibleConstructorReturn(this, Object.getPrototypeOf(DatePicker).call(this, args));
 
-                _this6.fetch();
-                return _this6;
+                _this7.fetch();
+                return _this7;
             }
 
             _createClass(DatePicker, [{
@@ -1619,7 +1663,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         })(FieldEditor);
 
         module.exports = DatePicker;
-    }, { "./field": 15 }], 15: [function (require, module, exports) {
+    }, { "./field": 16 }], 16: [function (require, module, exports) {
         'use strict';
 
         var FieldEditor = (function (_View5) {
@@ -1630,11 +1674,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
                 // Register events
 
-                var _this7 = _possibleConstructorReturn(this, Object.getPrototypeOf(FieldEditor).call(this, args));
+                var _this8 = _possibleConstructorReturn(this, Object.getPrototypeOf(FieldEditor).call(this, args));
 
-                _this7.on('changeTextValue', _this7.onChangeTextValue);
-                _this7.on('changeBoolValue', _this7.onChangeBoolValue);
-                return _this7;
+                _this8.on('changeTextValue', _this8.onChangeTextValue);
+                _this8.on('changeBoolValue', _this8.onChangeBoolValue);
+                return _this8;
             }
 
             _createClass(FieldEditor, [{
@@ -1682,7 +1726,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
             }, {
                 key: "render",
                 value: function render() {
-                    var _this8 = this;
+                    var _this9 = this;
 
                     var view = this;
 
@@ -1712,13 +1756,13 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                                 return _.div({ class: 'field-editor input-group' }, [$btnRemove, $field]);
                             };
 
-                            if (!_this8.model.value || _this8.model.value.length < 1) {
-                                _this8.model.value = [null];
+                            if (!_this9.model.value || _this9.model.value.length < 1) {
+                                _this9.model.value = [null];
                             }
 
-                            _this8.$element = _.div({ class: 'field-editor-array' }, _.each(_this8.model.value, addField));
+                            _this9.$element = _.div({ class: 'field-editor-array' }, _.each(_this9.model.value, addField));
 
-                            _this8.$element.append(_.button({ class: 'btn btn-success' }, _.span({ class: 'glyphicon glyphicon-plus' })).click(onClickAdd));
+                            _this9.$element.append(_.button({ class: 'btn btn-success' }, _.span({ class: 'glyphicon glyphicon-plus' })).click(onClickAdd));
                         })();
                     } else {
                         this.$element = _.div({ class: 'field-editor' }, this.renderField(this.model.value));
@@ -1730,21 +1774,21 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         })(View);
 
         module.exports = FieldEditor;
-    }, {}], 16: [function (require, module, exports) {
+    }, {}], 17: [function (require, module, exports) {
         'use strict';
 
         var FieldEditor = require('./field');
 
-        var StructPicker = (function (_FieldEditor3) {
-            _inherits(StructPicker, _FieldEditor3);
+        var StructPicker = (function (_FieldEditor4) {
+            _inherits(StructPicker, _FieldEditor4);
 
             function StructPicker(args) {
                 _classCallCheck(this, StructPicker);
 
-                var _this9 = _possibleConstructorReturn(this, Object.getPrototypeOf(StructPicker).call(this, args));
+                var _this10 = _possibleConstructorReturn(this, Object.getPrototypeOf(StructPicker).call(this, args));
 
-                _this9.fetch();
-                return _this9;
+                _this10.fetch();
+                return _this10;
             }
 
             _createClass(StructPicker, [{
@@ -1762,21 +1806,21 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         })(FieldEditor);
 
         module.exports = StructPicker;
-    }, { "./field": 15 }], 17: [function (require, module, exports) {
+    }, { "./field": 16 }], 18: [function (require, module, exports) {
         'use strict';
 
         var FieldEditor = require('./field');
 
-        var TemplatePicker = (function (_FieldEditor4) {
-            _inherits(TemplatePicker, _FieldEditor4);
+        var TemplatePicker = (function (_FieldEditor5) {
+            _inherits(TemplatePicker, _FieldEditor5);
 
             function TemplatePicker(args) {
                 _classCallCheck(this, TemplatePicker);
 
-                var _this10 = _possibleConstructorReturn(this, Object.getPrototypeOf(TemplatePicker).call(this, args));
+                var _this11 = _possibleConstructorReturn(this, Object.getPrototypeOf(TemplatePicker).call(this, args));
 
-                _this10.fetch();
-                return _this10;
+                _this11.fetch();
+                return _this11;
             }
 
             _createClass(TemplatePicker, [{
@@ -1794,21 +1838,21 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         })(FieldEditor);
 
         module.exports = TemplatePicker;
-    }, { "./field": 15 }], 18: [function (require, module, exports) {
+    }, { "./field": 16 }], 19: [function (require, module, exports) {
         'use strict';
 
         var FieldEditor = require('./field');
 
-        var TextHtmlEditor = (function (_FieldEditor5) {
-            _inherits(TextHtmlEditor, _FieldEditor5);
+        var TextHtmlEditor = (function (_FieldEditor6) {
+            _inherits(TextHtmlEditor, _FieldEditor6);
 
             function TextHtmlEditor(args) {
                 _classCallCheck(this, TextHtmlEditor);
 
-                var _this11 = _possibleConstructorReturn(this, Object.getPrototypeOf(TextHtmlEditor).call(this, args));
+                var _this12 = _possibleConstructorReturn(this, Object.getPrototypeOf(TextHtmlEditor).call(this, args));
 
-                _this11.fetch();
-                return _this11;
+                _this12.fetch();
+                return _this12;
             }
 
             _createClass(TextHtmlEditor, [{
@@ -1822,21 +1866,21 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         })(FieldEditor);
 
         module.exports = TextHtmlEditor;
-    }, { "./field": 15 }], 19: [function (require, module, exports) {
+    }, { "./field": 16 }], 20: [function (require, module, exports) {
         'use strict';
 
         var FieldEditor = require('./field');
 
-        var TextEditor = (function (_FieldEditor6) {
-            _inherits(TextEditor, _FieldEditor6);
+        var TextEditor = (function (_FieldEditor7) {
+            _inherits(TextEditor, _FieldEditor7);
 
             function TextEditor(args) {
                 _classCallCheck(this, TextEditor);
 
-                var _this12 = _possibleConstructorReturn(this, Object.getPrototypeOf(TextEditor).call(this, args));
+                var _this13 = _possibleConstructorReturn(this, Object.getPrototypeOf(TextEditor).call(this, args));
 
-                _this12.fetch();
-                return _this12;
+                _this13.fetch();
+                return _this13;
             }
 
             _createClass(TextEditor, [{
@@ -1850,21 +1894,21 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         })(FieldEditor);
 
         module.exports = TextEditor;
-    }, { "./field": 15 }], 20: [function (require, module, exports) {
+    }, { "./field": 16 }], 21: [function (require, module, exports) {
         'use strict';
 
         var FieldEditor = require('./field');
 
-        var UrlEditor = (function (_FieldEditor7) {
-            _inherits(UrlEditor, _FieldEditor7);
+        var UrlEditor = (function (_FieldEditor8) {
+            _inherits(UrlEditor, _FieldEditor8);
 
             function UrlEditor(args) {
                 _classCallCheck(this, UrlEditor);
 
-                var _this13 = _possibleConstructorReturn(this, Object.getPrototypeOf(UrlEditor).call(this, args));
+                var _this14 = _possibleConstructorReturn(this, Object.getPrototypeOf(UrlEditor).call(this, args));
 
-                _this13.fetch();
-                return _this13;
+                _this14.fetch();
+                return _this14;
             }
 
             _createClass(UrlEditor, [{
@@ -1880,23 +1924,23 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         })(FieldEditor);
 
         module.exports = UrlEditor;
-    }, { "./field": 15 }], 21: [function (require, module, exports) {
+    }, { "./field": 16 }], 22: [function (require, module, exports) {
         var Navbar = (function (_View6) {
             _inherits(Navbar, _View6);
 
             function Navbar(args) {
                 _classCallCheck(this, Navbar);
 
-                var _this14 = _possibleConstructorReturn(this, Object.getPrototypeOf(Navbar).call(this, args));
+                var _this15 = _possibleConstructorReturn(this, Object.getPrototypeOf(Navbar).call(this, args));
 
-                var view = _this14;
+                var view = _this15;
 
                 api.repo(function (repo) {
                     view.repo = repo;
 
                     view.init();
                 });
-                return _this14;
+                return _this15;
             }
 
             _createClass(Navbar, [{
@@ -1926,11 +1970,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         })(View);
 
         new Navbar();
-    }, {}], 22: [function (require, module, exports) {
+    }, {}], 23: [function (require, module, exports) {
         module.exports = Array.isArray || function (arr) {
             return Object.prototype.toString.call(arr) == '[object Array]';
         };
-    }, {}], 23: [function (require, module, exports) {
+    }, {}], 24: [function (require, module, exports) {
         var isarray = require('isarray');
 
         /**
@@ -2320,7 +2364,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
             return stringToRegexp(path, keys, options);
         }
-    }, { "isarray": 22 }], 24: [function (require, module, exports) {
+    }, { "isarray": 23 }], 25: [function (require, module, exports) {
         'use strict';
 
         var env = require('../../env.json');

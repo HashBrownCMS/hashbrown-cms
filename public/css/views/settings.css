@@ -126,8 +126,5 @@ textarea {
 /**
  * Global settings
  */
-body {
-  background-color: #2e6da4; }
-
 .page-content .input-group .btn {
   min-height: 34px; }

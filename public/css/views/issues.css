@@ -126,9 +126,6 @@ textarea {
 /**
  * Global settings
  */
-body {
-  background-color: #2e6da4; }
-
 .page-content .column .issue {
   cursor: pointer; }
   .page-content .column .issue:last-child {

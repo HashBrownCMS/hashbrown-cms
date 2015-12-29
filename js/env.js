@@ -8,10 +8,10 @@ window.env = {
      * Get remote env.json
      */
     get: function(callback) {
-        if(remote.json) {
-            callback(remote.json);
+        if(env.remote && env.remote.json) {
+            callback(env.remote.json);
         } else {
-            api.file.fetch('/_env.json', function(data) {
+            api.file.fetch('/_putaitu/env.json', function(data) {
                 let json = {};
                 
                 try {
@@ -41,7 +41,7 @@ window.env = {
             content: JSON.stringify(json),
         };
 
-        api.file.create(data, '/_env.json', function() { 
+        api.file.create(data, '/_putaitu/env.json', function() { 
             env.json = json;
 
             if(callback) {

@@ -93,7 +93,7 @@ class Issue extends View {
 
         // This is a new issue
         if(!view.model.id) {
-            api.issues.create(view.model, function(issue) {
+            api.issues.create({ data: view.model }, function(issue) {
                 view.model = issue;
                
                 view.update();
@@ -102,7 +102,7 @@ class Issue extends View {
 
         // This is an existing issue
         } else {
-            api.issues.update(view.model, function(issue) {
+            api.issues.update({data: view.model}, function(issue) {
                 view.model = issue;
                 
                 view.update();

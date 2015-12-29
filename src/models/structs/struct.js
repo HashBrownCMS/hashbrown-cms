@@ -69,6 +69,7 @@ class Struct {
                     let property = properties[alias];
 
                     // Only accept values from aliases that already exist in this struct
+                    // TODO: Implement nested content starting point here
                     if(this.data[anchorLabel][alias]) {
                         this.data[anchorLabel][alias].value = property.value;
                     }

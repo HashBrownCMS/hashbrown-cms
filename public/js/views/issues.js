@@ -943,10 +943,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
              * Get remote env.json
              */
             get: function get(callback) {
-                if (remote.json) {
-                    callback(remote.json);
+                if (env.remote && env.remote.json) {
+                    callback(env.remote.json);
                 } else {
-                    api.file.fetch('/_env.json', function (data) {
+                    api.file.fetch('/_putaitu/env.json', function (data) {
                         var json = {};
 
                         try {
@@ -976,7 +976,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                     content: JSON.stringify(json)
                 };
 
-                api.file.create(data, '/_env.json', function () {
+                api.file.create(data, '/_putaitu/env.json', function () {
                     env.json = json;
 
                     if (callback) {
@@ -1469,7 +1469,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
                     // This is a new issue
                     if (!view.model.id) {
-                        api.issues.create(view.model, function (issue) {
+                        api.issues.create({ data: view.model }, function (issue) {
                             view.model = issue;
 
                             view.update();
@@ -1478,7 +1478,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
                         // This is an existing issue
                     } else {
-                            api.issues.update(view.model, function (issue) {
+                            api.issues.update({ data: view.model }, function (issue) {
                                 view.model = issue;
 
                                 view.update();

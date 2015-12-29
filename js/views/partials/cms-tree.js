@@ -118,7 +118,7 @@ class Tree extends View {
      * Tree data
      */
     prerender() {
-        this.dirs.content = this.getFolderContent('_content/', true);
+        this.dirs.content = this.getFolderContent('_putaitu/content/', true);
         this.dirs.media = this.getFolderContent('media/', true);
     }
 
@@ -219,7 +219,7 @@ class Tree extends View {
                                    
                                         if(isDir) {
                                             $el = _.li({class: 'folder', draggable: 'true'}, [
-                                                _.a({href: '#/' + file.path.replace('_', '')}, [
+                                                _.a({href: '#/' + file.path.replace('_putaitu/', '')}, [
                                                     _.glyphicon({ class: 'glyphicon-folder-close' }),
                                                     name
                                                 ]).click(view.events.clickFolder).context(contextMenuItems).on(dragHandler),
@@ -228,7 +228,7 @@ class Tree extends View {
 
                                         } else {
                                             $el = _.li({class: 'file', draggable: 'true'},
-                                                _.a({href: '#/' + file.path.replace('_', '').replace('.json', '')}, [
+                                                _.a({href: '#/' + file.path.replace('_putaitu/', '').replace('.json', '')}, [
                                                     _.glyphicon({ class: 'glyphicon-file' }),
                                                     name
                                                 ]).click(view.events.clickFile).context(contextMenuItems).on(dragHandler)
