@@ -34,7 +34,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
             },
             "menu": {
                 "hide": {
-                    "all": false
+                    "all": false,
+                    "deployment": false,
+                    "collaborators": false,
+                    "issues": false,
+                    "settings": false
                 }
             },
             "debug": {
