@@ -123,8 +123,68 @@ textarea {
   background-color: rgba(0, 0, 0, 0.5);
   border-radius: 100%; }
 
+.navbar-content {
+  position: fixed;
+  width: 100%;
+  top: 0px;
+  left: 0px;
+  z-index: 50; }
+  .navbar-content > .navbar {
+    border-radius: 0px; }
+
 /**
  * Global settings
  */
+body {
+  padding-top: 70px; }
+
+/**
+ * Theme
+ * TODO: Move into theme file
+ */
+body .navbar-content .navbar {
+  background-color: #009688;
+  border: 0px; }
+  body .navbar-content .navbar li a, body .navbar-content .navbar li a:focus, body .navbar-content .navbar li a:hover, body .navbar-content .navbar li a:active {
+    color: #fff; }
+
+body .page-content .editor {
+  background-color: #e0f2f1; }
+  body .page-content .editor .field-anchor {
+    margin-bottom: 0px;
+    padding: 10px 0px 10px 15px;
+    background-color: #009688;
+    color: #fff; }
+  body .page-content .editor .field-editor-container {
+    border-left: 5px solid #009688;
+    margin-bottom: 0px;
+    padding-top: 15px; }
+    body .page-content .editor .field-editor-container .field-editor-label {
+      color: #009688; }
+    body .page-content .editor .field-editor-container .field-editor .form-control {
+      border-width: 0px; }
+
+body .page-content .panel-default.column {
+  background-color: #e0f2f1; }
+
+body .page-content .panel {
+  border-width: 0px;
+  box-shadow: none; }
+  body .page-content .panel .panel-heading {
+    background-color: #4db6ac;
+    border-width: 0px;
+    color: #fff; }
+  body .page-content .panel .panel-body {
+    border-width: 0px; }
+  body .page-content .panel .panel-footer {
+    border-width: 0px; }
+
+body .page-content .btn-default {
+  background-color: #26a69a;
+  border-width: 0px;
+  color: #fff; }
+  body .page-content .btn-default:hover {
+    background-color: #80cbc4; }
+
 .page-content .input-group .btn {
   min-height: 34px; }

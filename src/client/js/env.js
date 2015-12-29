@@ -1,8 +1,8 @@
-let Debug = require('../src/helpers/debug');
+let Debug = require('../../helpers/debug');
 
 window.env = {
     remote: null,
-    local: require('../env.json'),
+    local: require('../../../env.json'),
 
     /** 
      * Get remote env.json

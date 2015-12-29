@@ -9,23 +9,29 @@ class Editor extends View {
         this.initFieldEditors();
 
         this.$element = _.div({class: 'panel panel-default editor'}, [
-            _.div({class: 'panel-heading hidden'}, [
-                _.div({class: 'btn-group content-actions'}, [
-                    _.button({class: 'btn btn-primary btn-publish'}, [
-                        'Save ',
-                        _.span({class: 'glyphicon glyphicon-floppy-disk'})
-                    ]).click(this.events.clickSave),
-                    _.button({class: 'btn btn-success btn-publish'}, [
-                        'Publish ',
-                        _.span({class: 'glyphicon glyphicon-upload'})
-                    ]).click(this.events.clickPublish),
-                ]),
-                _.div({class: 'btn-group field-anchors'})
-            ]),
-            _.div({class: 'panel-body'}, [
-                _.h1('Welcome to the Putaitu CMS editor!'),
-                _.p('Pick a content node from the navigation menu above to begin')
-            ])
+            _.div({class: 'panel-body'},
+                _.div({class: 'row'}, [
+                    _.div({class: 'col-md-3 editor-nav'},
+                        _.div({}, [
+                            _.div({class: 'btn-group-vertical field-anchors'}),
+                            _.div({class: 'btn-group content-actions'}, [
+                                _.button({class: 'btn btn-primary btn-publish'}, [
+                                    'Save ',
+                                    _.span({class: 'glyphicon glyphicon-floppy-disk'})
+                                ]).click(this.events.clickSave),
+                                _.button({class: 'btn btn-success btn-publish'}, [
+                                    'Publish ',
+                                    _.span({class: 'glyphicon glyphicon-upload'})
+                                ]).click(this.events.clickPublish),
+                            ])
+                        ])
+                    ),
+                    _.div({class: 'col-md-9 editor-content'}, [
+                        _.h1('Welcome to the Putaitu CMS editor!'),
+                        _.p('Pick a content node from the navigation menu above to begin')
+                    ])
+                ])
+            )
         ]);
     }
 
@@ -56,12 +62,12 @@ class Editor extends View {
             'template-picker': require('./field-editors/template-picker'),
             'struct-picker': require('./field-editors/struct-picker'),
             'date-picker': require('./field-editors/date-picker'),
-            'block': require('./field-editors/block')
+            'block': require('./field-editors/block-picker')
         };
     }
 
     clear() {
-        this.$element.children('panel-body').html(
+        this.$element.find('editor-content').html(
             _.div({class: 'spinner-container'},
                 _.div({class: 'spinner'})
             )
@@ -101,23 +107,23 @@ class Editor extends View {
         }
     }
 
-    renderModelData(modelData, $el, anchorsInHeading) {
+    renderModelData(modelData, $el, anchorNav) {
         $el.empty();
 
         for(let anchorLabel in modelData) {
-            // If specified, render anchor navigation buttons in heading
-            if(anchorsInHeading) {
+            // If specified, render anchor navigation buttons
+            if(anchorNav) {
                 function onClickAnchor(e) {
                     e.preventDefault();
                 
                     let $btn = $(this);
 
                     $('html, body').animate({
-                        scrollTop: $('#' + $btn.attr('aria-scrollto')).offset().top 
+                        scrollTop: $('#' + $btn.attr('aria-scrollto')).offset().top - 160
                     }, 500);
                 }
 
-                let $btn = this.$element.children('.panel-heading').children('.field-anchors').append(
+                let $btn = this.$element.find('.field-anchors').append(
                     _.button({class: 'btn btn-default', 'aria-scrollto': 'anchor-' + anchorLabel},
                         anchorLabel
                     ).click(onClickAnchor)
@@ -169,9 +175,9 @@ class Editor extends View {
         api.structs.fields.fetch(function(fieldStructs) {
             view.fieldStructs = fieldStructs;
 
-            view.$element.children('.panel-heading').removeClass('hidden').children('.field-anchors').empty();
+            view.$element.find('.field-anchors').empty();
 
-            view.renderModelData(view.model.data, view.$element.children('.panel-body'), true);
+            view.renderModelData(view.model.data, view.$element.find('.editor-content'), true);
         });
     }
 }

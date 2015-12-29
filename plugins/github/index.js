@@ -212,6 +212,17 @@ class GitHub {
             if(req.body.data.milestone) {
                 req.body.data.milestone = req.body.data.milestone.number;
             }
+
+            // Labels are submitted as strings
+            if(req.body.data.labels) {
+                for(let i in req.body.data.labels) {
+                    req.body.data.labels[i] = req.body.data.labels[i].name;
+                }
+
+            } else {
+                req.body.data.labels = [];
+
+            }
         }
 
         req.body.data.state = 'all';

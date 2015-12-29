@@ -43,9 +43,11 @@ class Issue extends View {
                 this.model.labels.splice(i, 1);
             }
         }
-        
+       
         // Add new column label
-        this.model.labels.push({ name: columnName });
+        if(columnName != 'done' && columnName != 'backlog') {
+            this.model.labels.push({ name: columnName });
+        }
 
         // Sync
         this.sync();
@@ -104,7 +106,7 @@ class Issue extends View {
         } else {
             api.issues.update({data: view.model}, function(issue) {
                 view.model = issue;
-                
+
                 view.update();
                 view.$element.toggleClass('loading', false);
             });

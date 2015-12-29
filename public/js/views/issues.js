@@ -2,13 +2,13 @@
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
 
 (function e(t, n, r) {
     function s(o, u) {
@@ -34,11 +34,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
             },
             "menu": {
                 "hide": {
-                    "all": false,
-                    "deployment": false,
-                    "collaborators": false,
-                    "issues": false,
-                    "settings": false
+                    "all": false
                 }
             },
             "debug": {
@@ -46,1524 +42,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
             }
         };
     }, {}], 2: [function (require, module, exports) {
-        function appropriateIssue(issue) {
-            // Updating issue milestones requires a number only
-            if (issue.milestone) {
-                issue.milestone = issue.milestone.number;
-            }
-
-            // Updating issue assignees requires a login name only
-            if (issue.assignee) {
-                issue.assignee = issue.assignee.login;
-            }
-
-            // Updating issue labels requires a string only
-            if (issue.labels) {
-                for (var i in issue.labels) {
-                    issue.labels[i] = issue.labels[i].name;
-                }
-            }
-
-            return issue;
-        }
-
-        window.api = {
-            call: function call(url, callback, obj) {
-                obj = obj || {};
-
-                obj.buffer = obj.buffer || {};
-                obj.buffer.token = localStorage.getItem('api-token');
-
-                $.post(url, obj, function (res) {
-                    if (res.err) {
-                        console.log('Error:', res.err);
-                        console.log('Data:', res.data);
-
-                        if (res.err.json) {
-                            alert('(' + res.mode + ') ' + res.url + ': ' + res.err.json.message);
-                        }
-                    } else if (callback) {
-                        callback(res);
-                    }
-                });
-            },
-
-            /**
-             * Issue tracking
-             */
-            issues: {
-                fetch: function fetch(callback) {
-                    api.call('/api/issue-tracking/issues/fetch/' + req.params.user + '/' + req.params.repo, callback);
-                },
-
-                create: function create(data, callback) {
-                    api.call('/api/issue-tracking/issues/create/' + req.params.user + '/' + req.params.repo, callback, appropriateIssue(data));
-                },
-
-                update: function update(data, callback) {
-                    api.call('/api/issue-tracking/issues/update/' + req.params.user + '/' + req.params.repo, callback, appropriateIssue(data));
-                }
-            },
-
-            labels: {
-                fetch: function fetch(callback) {
-                    api.call('/api/issue-tracking/labels/fetch/' + req.params.user + '/' + req.params.repo, callback);
-                },
-
-                create: function create(data, callback) {
-                    api.call('/api/issue-tracking/labels/create/' + req.params.user + '/' + req.params.repo, callback, data);
-                }
-            },
-
-            issueColumns: function issueColumns(callback) {
-                env.get(function (json) {
-                    var columns = json.putaitu.issues.columns;
-
-                    columns.unshift('backlog');
-                    columns.push('done');
-
-                    callback(columns);
-                });
-            },
-
-            milestones: {
-                fetch: function fetch(callback) {
-                    api.call('/api/issue-tracking/milestones/fetch/' + req.params.user + '/' + req.params.repo, callback);
-                }
-            },
-
-            /**
-             * Organisations
-             */
-            collaborators: {
-                fetch: function fetch(callback) {
-                    api.call('/api/collaborators/fetch/' + req.params.user + '/' + req.params.repo, callback);
-                }
-            },
-
-            /** 
-             * Git
-             */
-            repo: function repo(callback) {
-                api.call('/api/git/repo/' + req.params.user + '/' + req.params.repo, callback);
-            },
-
-            branches: {
-                get: function get(callback) {
-                    api.call('/api/git/branches/' + req.params.user + '/' + req.params.repo, function (branches) {
-                        branches.sort(function (a, b) {
-                            if (a.name < b.name) {
-                                return -1;
-                            } else if (a.name > b.name) {
-                                return 1;
-                            } else {
-                                return 0;
-                            }
-                        });
-
-                        callback(branches);
-                    });
-                }
-            },
-
-            file: {
-                fetch: function fetch(path, callback) {
-                    api.call('/api/git/file/fetch/' + req.params.user + '/' + req.params.repo + '/' + path, callback);
-                },
-
-                update: function update(data, path, callback) {
-                    api.call('/api/git/file/update/' + req.params.user + '/' + req.params.repo + '/' + path, callback, data);
-                },
-
-                create: function create(data, path, callback) {
-                    api.call('/api/git/file/create/' + req.params.user + '/' + req.params.repo + '/' + path, callback, data);
-                }
-            },
-
-            tree: {
-                fetch: function fetch(callback) {
-                    api.call('/api/git/tree/fetch/' + req.params.user + '/' + req.params.repo + '/' + req.params.branch, callback);
-                }
-            },
-
-            repos: function repos(callback) {
-                api.call('/api/git/repos/' + req.params.user, callback);
-            },
-
-            compare: function compare(base, head, callback) {
-                api.call('/api/git/compare/' + req.params.user + '/' + req.params.repo + '/' + base + '/' + head, callback);
-            },
-
-            merge: function merge(base, head, callback) {
-                api.call('/api/git/merge/' + req.params.user + '/' + req.params.repo, callback, { base: base, head: head });
-            },
-
-            /** 
-             * Abstract CMS
-             */
-            structs: {
-                pages: {
-                    fetch: function fetch(path, callback) {
-                        api.call('/api/structs/fetch/' + req.params.user + '/' + req.params.repo + '/pages/' + path, callback);
-                    }
-                },
-
-                sections: {
-                    fetch: function fetch(path, callback) {
-                        api.call('/api/structs/fetch/' + req.params.user + '/' + req.params.repo + '/sections/' + path, callback);
-                    }
-                },
-
-                blocks: {
-                    fetch: function fetch(path, callback) {
-                        api.call('/api/structs/fetch/' + req.params.user + '/' + req.params.repo + '/blocks/' + path, callback);
-                    }
-                },
-
-                fields: {
-                    fetch: function fetch(callback) {
-                        api.call('/api/structs/fetch/' + req.params.user + '/' + req.params.repo + '/fields', callback);
-                    }
-                }
-            },
-
-            templates: {
-                pages: {
-                    fetch: function fetch(path, callback) {
-                        api.call('/api/templates/fetch/' + req.params.user + '/' + req.params.repo + '/pages/' + path, callback);
-                    }
-                },
-
-                sections: {
-                    fetch: function fetch(path, callback) {
-                        api.call('/api/templates/fetch/' + req.params.user + '/' + req.params.repo + '/blocks/' + path, callback);
-                    }
-                },
-
-                blocks: {
-                    fetch: function fetch(path, callback) {
-                        api.call('/api/templates/fetch/' + req.params.user + '/' + req.params.repo + '/blocks/' + path, callback);
-                    }
-                }
-            },
-
-            content: {
-                fetch: function fetch(path, callback) {
-                    api.call('/api/content/fetch/' + req.params.user + '/' + req.params.repo + '/' + req.params.branch + '/' + path, callback);
-                },
-
-                publish: function publish(content, path, callback) {
-                    api.content.bake(content.data, function (baked) {
-                        content.data = baked;
-
-                        api.call('/api/content/publish/' + req.params.user + '/' + req.params.repo + '/' + req.params.branch + '/' + path, callback, data);
-                    });
-                },
-
-                save: function save(content, path, callback) {
-                    api.call('/api/content/save/' + req.params.user + '/' + req.params.repo + '/' + req.params.branch + '/' + path, callback, content);
-                },
-
-                bake: function bake(content, callback) {
-                    api.call('/api/content/bake', callback, content);
-                }
-            }
-        };
-    }, {}], 3: [function (require, module, exports) {
-        require('./core/Templating');
-        require('./core/View');
-        require('./core/Router');
-        require('./core/ContextMenu');
-
-        require('./helper');
-        require('./api');
-        require('./env');
-    }, { "./api": 2, "./core/ContextMenu": 4, "./core/Router": 5, "./core/Templating": 6, "./core/View": 7, "./env": 8, "./helper": 9 }], 4: [function (require, module, exports) {
-        'use strict';
-
-        var ContextMenu = (function (_View) {
-            _inherits(ContextMenu, _View);
-
-            function ContextMenu(args) {
-                _classCallCheck(this, ContextMenu);
-
-                // Recycle other context menus
-
-                var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(ContextMenu).call(this, args));
-
-                if ($('.context-menu').length > 0) {
-                    _this.$element = $('.context-menu');
-                } else {
-                    _this.$element = _.ul({ class: 'context-menu dropdown-menu', role: 'menu' });
-                }
-
-                _this.$element.css({
-                    position: 'absolute',
-                    'z-index': 1200,
-                    top: _this.pos.y,
-                    left: _this.pos.x,
-                    display: 'block'
-                });
-
-                _this.fetch();
-                return _this;
-            }
-
-            _createClass(ContextMenu, [{
-                key: "render",
-                value: function render() {
-                    var view = this;
-
-                    view.$element.html(_.each(view.model, function (label, func) {
-                        if (func == '---') {
-                            return _.li({ class: 'dropdown-header' }, label);
-                        } else {
-                            return _.li({ class: typeof func === 'function' ? '' : 'disabled' }, _.a({ tabindex: '-1', href: '#' }, label).click(function (e) {
-                                e.preventDefault();
-                                e.stopPropagation();
-
-                                if (func) {
-                                    func(e);
-
-                                    view.remove();
-                                }
-                            }));
-                        }
-                    }));
-
-                    $('body').append(view.$element);
-                }
-            }]);
-
-            return ContextMenu;
-        })(View);
-
-        // jQuery extention
-
-        jQuery.fn.extend({
-            context: function context(menuItems) {
-                return this.each(function () {
-                    $(this).on('contextmenu', function (e) {
-                        if (e.ctrlKey) {
-                            return;
-                        }
-
-                        e.preventDefault();
-                        e.stopPropagation();
-
-                        if (e.which == 3) {
-                            var menu = new ContextMenu({
-                                model: menuItems,
-                                pos: {
-                                    x: e.pageX,
-                                    y: e.pageY
-                                }
-                            });
-                        }
-                    });
-                });
-            }
-        });
-
-        // Event handling
-        $('body').click(function (e) {
-            if ($(e.target).parents('.context-menu').length < 1) {
-                ViewHelper.removeAll('ContextMenu');
-            }
-        });
-    }, {}], 5: [function (require, module, exports) {
-        'use strict';
-
-        var pathToRegexp = require('path-to-regexp');
-
-        var routes = [];
-
-        var Router = (function () {
-            function Router() {
-                _classCallCheck(this, Router);
-            }
-
-            _createClass(Router, null, [{
-                key: "route",
-                value: function route(path, controller) {
-                    routes[path] = {
-                        controller: controller
-                    };
-                }
-            }, {
-                key: "go",
-                value: function go(url) {
-                    location.hash = url;
-                }
-            }, {
-                key: "goToBaseDir",
-                value: function goToBaseDir() {
-                    var url = this.url || '/';
-                    var base = new String(url).substring(0, url.lastIndexOf('/'));
-
-                    this.go(base);
-                }
-            }, {
-                key: "init",
-                value: function init() {
-                    // Get the url
-                    var url = location.hash.slice(1) || '/';
-                    var trimmed = url.substring(0, url.indexOf('?'));
-
-                    if (trimmed) {
-                        url = trimmed;
-                    }
-                    // Look for route
-                    var context = {};
-                    var route = undefined;
-
-                    // Exact match
-                    if (routes[url]) {
-                        path = routes[url];
-
-                        // Use path to regexp
-                    } else {
-                            for (var _path in routes) {
-                                var keys = [];
-                                var re = pathToRegexp(_path, keys);
-                                var values = re.exec(url);
-
-                                // A match was found
-                                if (re.test(url)) {
-                                    // Set the route
-                                    route = routes[_path];
-
-                                    // Add context variables (first result (0) is the entire path,
-                                    // so assign that manually and start the counter at 1 instead)
-                                    route.url = url;
-                                    var counter = 1;
-
-                                    var _iteratorNormalCompletion = true;
-                                    var _didIteratorError = false;
-                                    var _iteratorError = undefined;
-
-                                    try {
-                                        for (var _iterator = keys[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                                            var key = _step.value;
-
-                                            route[key.name] = values[counter];
-                                            counter++;
-                                        }
-                                    } catch (err) {
-                                        _didIteratorError = true;
-                                        _iteratorError = err;
-                                    } finally {
-                                        try {
-                                            if (!_iteratorNormalCompletion && _iterator.return) {
-                                                _iterator.return();
-                                            }
-                                        } finally {
-                                            if (_didIteratorError) {
-                                                throw _iteratorError;
-                                            }
-                                        }
-                                    }
-
-                                    break;
-                                }
-                            }
-                        }
-
-                    if (route) {
-                        route.controller();
-                    }
-                }
-            }]);
-
-            return Router;
-        })();
-
-        window.addEventListener('hashchange', Router.init);
-        window.Router = Router;
-    }, { "path-to-regexp": 15 }], 6: [function (require, module, exports) {
-        var Templating = {};
-
-        function append(el, content) {
-            if (Object.prototype.toString.call(content) === '[object Array]') {
-                for (var i in content) {
-                    append(el, content[i]);
-                }
-            } else if (content) {
-                el.append(content);
-            }
-        }
-
-        function create(tag, attr, content) {
-            var el = $('<' + tag + '></' + tag + '>');
-
-            // If the attribute parameter fails, it's probably an element or a string
-            try {
-                for (var k in attr) {
-                    el.attr(k, attr[k]);
-                }
-            } catch (err) {
-                content = attr;
-            }
-
-            append(el, content);
-
-            return el;
-        }
-
-        function declareMethod(type) {
-            Templating[type] = function (attr, content) {
-                return create(type, attr, content);
-            };
-        }
-
-        function declareBootstrapMethod(type) {
-            var tagName = 'div';
-
-            if (type.indexOf('|') > -1) {
-                tagName = type.split('|')[1];
-                type = type.split('|')[0];
-            }
-
-            var functionName = type.replace(/-/g, '_');
-
-            Templating[functionName] = function (attr, content) {
-                return create(tagName, attr, content).addClass(type);
-            };
-        }
-
-        var elementTypes = [
-        // Block elements
-        'div', 'section', 'nav', 'hr', 'label', 'textarea', 'audio', 'video', 'canvas', 'iframe',
-
-        // Inline elements
-        'img',
-
-        // Table elements
-        'table', 'thead', 'tbody', 'th', 'td', 'tr',
-
-        // Select
-        'select', 'option', 'input',
-
-        // Headings
-        'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-
-        // Body text
-        'span', 'p', 'strong', 'b',
-
-        // Action buttons
-        'a', 'button',
-
-        // List
-        'ol', 'ul', 'li',
-
-        // Forms
-        'form', 'input'];
-
-        var bootstrapTypes = ['row', 'col', 'col-xs-1', 'col-xs-2', 'col-xs-3', 'col-xs-4', 'col-xs-5', 'col-xs-6', 'col-xs-7', 'col-xs-8', 'col-xs-9', 'col-xs-10', 'col-xs-11', 'col-xs-12', 'col-sm-1', 'col-sm-2', 'col-sm-3', 'col-sm-4', 'col-sm-5', 'col-sm-6', 'col-sm-7', 'col-sm-8', 'col-sm-9', 'col-sm-10', 'col-sm-11', 'col-sm-12', 'col-md-1', 'col-md-2', 'col-md-3', 'col-md-4', 'col-md-5', 'col-md-6', 'col-md-7', 'col-md-8', 'col-md-9', 'col-md-10', 'col-md-11', 'col-md-12', 'col-lg-1', 'col-lg-2', 'col-lg-3', 'col-lg-4', 'col-lg-5', 'col-lg-6', 'col-lg-7', 'col-lg-8', 'col-lg-9', 'col-lg-10', 'col-lg-11', 'col-lg-12', 'jumbotron', 'container', 'panel', 'panel-heading', 'panel-footer', 'panel-collapse', 'panel-body', 'navbar|nav', 'navbar-nav|ul', 'collapse', 'glyphicon|span', 'btn|button', 'btn-group', 'list-group', 'list-group-item', 'input-group', 'input-group-btn|span', 'input-group-addon|span', 'form-control|input'];
-
-        for (var i in elementTypes) {
-            declareMethod(elementTypes[i]);
-        }
-
-        for (var i in bootstrapTypes) {
-            declareBootstrapMethod(bootstrapTypes[i]);
-        }
-
-        Templating.if = function (condition, content) {
-            return condition ? content : null;
-        };
-
-        Templating.each = function (array, callback) {
-            var elements = [];
-
-            for (var i in array) {
-                var element = callback(i, array[i]);
-
-                if (element) {
-                    elements.push(element);
-                }
-            }
-
-            return elements;
-        };
-
-        window._ = Templating;
-    }, {}], 7: [function (require, module, exports) {
-        'use strict'
-
-        /**
-         *  jQuery extension
-         */
-        ;
-        (function ($) {
-            $.event.special.destroyed = {
-                remove: function remove(o) {
-                    if (o.handler) {
-                        o.handler();
-                    }
-                }
-            };
-        })(jQuery);
-
-        /**
-         * GUID
-         */
-        function guid() {
-            function s4() {
-                return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
-            }
-            return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
-        }
-
-        /**
-         * Helper
-         */
-        var instances = [];
-
-        var ViewHelper = (function () {
-            function ViewHelper() {
-                _classCallCheck(this, ViewHelper);
-            }
-
-            _createClass(ViewHelper, null, [{
-                key: "getAll",
-                value: function getAll(type) {
-                    var results = [];
-
-                    if (type) {
-                        for (var i in instances) {
-                            var instance = instances[i];
-                            var name = instance.name;
-
-                            if (name == type) {
-                                results.push(instance);
-                            }
-                        }
-                    } else {
-                        results = instances;
-                    }
-
-                    return results;
-                }
-            }, {
-                key: "get",
-                value: function get(type) {
-                    var results = ViewHelper.getAll(type);
-                    var view = results.length > 0 ? results[0] : null;
-
-                    return view;
-                }
-            }, {
-                key: "clear",
-                value: function clear(type) {
-                    for (var _guid in instances) {
-                        var instance = instances[_guid];
-                        var name = instance.constructor.name;
-
-                        if (!type || name == type) {
-                            instance.remove();
-                        }
-                    }
-                }
-            }, {
-                key: "removeAll",
-                value: function removeAll(type) {
-                    var _iteratorNormalCompletion2 = true;
-                    var _didIteratorError2 = false;
-                    var _iteratorError2 = undefined;
-
-                    try {
-                        for (var _iterator2 = ViewHelper.getAll(type)[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                            var view = _step2.value;
-
-                            view.remove();
-                        }
-                    } catch (err) {
-                        _didIteratorError2 = true;
-                        _iteratorError2 = err;
-                    } finally {
-                        try {
-                            if (!_iteratorNormalCompletion2 && _iterator2.return) {
-                                _iterator2.return();
-                            }
-                        } finally {
-                            if (_didIteratorError2) {
-                                throw _iteratorError2;
-                            }
-                        }
-                    }
-                }
-            }]);
-
-            return ViewHelper;
-        })();
-
-        window.ViewHelper = ViewHelper;
-
-        /**
-         * Class
-         */
-
-        var View = (function () {
-            /**
-             * Init
-             */
-
-            function View(args) {
-                _classCallCheck(this, View);
-
-                this.name = this.constructor.name;
-                this.guid = guid();
-                this.events = {};
-
-                this.adopt(args);
-
-                instances[this.guid] = this;
-            }
-
-            _createClass(View, [{
-                key: "getName",
-                value: function getName() {
-                    var name = this.constructor.toString();
-                    name = name.substring('function '.length);
-                    name = name.substring(0, name.indexOf('('));
-
-                    return name;
-                }
-            }, {
-                key: "init",
-                value: function init() {
-                    this.prerender();
-                    this.render();
-                    this.postrender();
-
-                    if (this.$element) {
-                        this.element = this.$element[0];
-                        this.$element.data('view', this);
-                        this.$element.bind('destroyed', function () {
-                            var view = $(this).data('view');
-
-                            if (view) {
-                                $(this).data('view').remove();
-                            }
-                        });
-                    }
-
-                    this.trigger('ready', this);
-                    this.isReady = true;
-                }
-            }, {
-                key: "ready",
-                value: function ready(callback) {
-                    if (this.isReady) {
-                        callback(this);
-                    } else {
-                        this.on('ready', callback);
-                    }
-                }
-
-                // Adopt values
-
-            }, {
-                key: "adopt",
-                value: function adopt(args) {
-                    for (var k in args) {
-                        this[k] = args[k];
-                    }
-
-                    return this;
-                }
-
-                /**
-                 * Rendering
-                 */
-
-            }, {
-                key: "prerender",
-                value: function prerender() {}
-            }, {
-                key: "render",
-                value: function render() {}
-            }, {
-                key: "postrender",
-                value: function postrender() {}
-
-                /**
-                 * Events
-                 */
-                // Removes the view from DOM and memory
-
-            }, {
-                key: "remove",
-                value: function remove(timeout) {
-                    var view = this;
-
-                    if (!view.destroyed) {
-                        view.destroyed = true;
-
-                        setTimeout(function () {
-                            view.trigger('remove');
-
-                            if (view.$element && view.$element.length > 0) {
-                                view.$element.remove();
-                            }
-
-                            instances.splice(view.guid, 1);
-                        }, timeout || 0);
-                    }
-                }
-
-                // Call an event (for internal use)
-
-            }, {
-                key: "call",
-                value: function call(callback, data, ui) {
-                    callback(data, ui, this);
-                }
-
-                // Trigger an event
-
-            }, {
-                key: "trigger",
-                value: function trigger(e, obj) {
-                    if (this.events[e]) {
-                        if (typeof this.events[e] === 'function') {
-                            this.events[e](obj);
-                        } else {
-                            for (var i in this.events[e]) {
-                                if (this.events[e][i]) {
-                                    this.events[e][i](obj);
-                                }
-                            }
-                        }
-                    }
-                }
-
-                // Bind an event
-
-            }, {
-                key: "on",
-                value: function on(e, callback) {
-                    var view = this;
-
-                    // No events registered, register this as the only event
-                    if (!this.events[e]) {
-                        this.events[e] = function (data) {
-                            view.call(callback, data, this);
-                        };
-
-                        // Events have already been registered, add to callback array
-                    } else {
-                            // Only one event is registered, so convert from a single reference to an array
-                            if (!this.events[e].length) {
-                                this.events[e] = [this.events[e]];
-                            }
-
-                            // Insert the event call into the array
-                            this.events[e].push(function (data) {
-                                view.call(callback, data, this);
-                            });
-                        }
-                }
-
-                // Check if event exists
-
-            }, {
-                key: "hasEvent",
-                value: function hasEvent(name) {
-                    for (var k in this.events) {
-                        if (k == name) {
-                            return true;
-                        }
-                    }
-
-                    return false;
-                }
-
-                /**
-                 * Fetch
-                 */
-
-            }, {
-                key: "fetch",
-                value: function fetch() {
-                    var view = this;
-
-                    function getModel() {
-                        // Get model from URL
-                        if (!view.model && typeof view.modelUrl === 'string') {
-                            $.getJSON(view.modelUrl, function (data) {
-                                view.model = data;
-
-                                view.init();
-                            });
-
-                            // Get model with function
-                        } else if (!view.model && typeof view.modelFunction === 'function') {
-                                view.modelFunction(function (data) {
-                                    view.model = data;
-
-                                    view.init();
-                                });
-
-                                // Just perform the initialisation
-                            } else {
-                                    view.init();
-                                }
-                    }
-
-                    // Get rendered content from URL
-                    if (typeof view.renderUrl === 'string') {
-                        $.get(view.renderUrl, function (html) {
-                            if (view.$element) {
-                                view.$element.append(html);
-                            } else {
-                                view.$element = $(html);
-                            }
-
-                            // And then get the model
-                            getModel();
-                        });
-
-                        // If no render url is defined, just get the model
-                    } else {
-                            getModel();
-                        }
-                }
-            }]);
-
-            return View;
-        })();
-
-        window.View = View;
-    }, {}], 8: [function (require, module, exports) {
-        var Debug = require('../src/helpers/debug');
-
-        window.env = {
-            remote: null,
-            local: require('../env.json'),
-
-            /** 
-             * Get remote env.json
-             */
-            get: function get(callback) {
-                if (env.remote && env.remote.json) {
-                    callback(env.remote.json);
-                } else {
-                    api.file.fetch('/_putaitu/env.json', function (data) {
-                        var json = {};
-
-                        try {
-                            json = JSON.parse(data.content);
-                        } catch (e) {
-                            Debug.log(e, 'env');
-                        }
-
-                        json.putaitu = json.putaitu || {};
-                        json.putaitu.issues = json.putaitu.issues || {};
-                        json.putaitu.issues.columns = json.putaitu.issues.columns || [];
-
-                        env.remote = json;
-
-                        callback(env.remote);
-                    });
-                }
-            },
-
-            /** 
-             * Set remote env.json
-             */
-            set: function set(json, callback) {
-                json = json || env.json;
-
-                var data = {
-                    content: JSON.stringify(json)
-                };
-
-                api.file.create(data, '/_putaitu/env.json', function () {
-                    env.json = json;
-
-                    if (callback) {
-                        callback();
-                    }
-                });
-            }
-        };
-    }, { "../env.json": 1, "../src/helpers/debug": 16 }], 9: [function (require, module, exports) {
-        var Helper = (function () {
-            function Helper() {
-                _classCallCheck(this, Helper);
-            }
-
-            _createClass(Helper, null, [{
-                key: "formatDate",
-                value: function formatDate(input) {
-                    var date = new Date(input);
-                    var output = date.getFullYear() + '-' + date.getMonth() + '-' + date.getDate() + ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds();
-
-                    return output;
-                }
-            }, {
-                key: "basename",
-                value: function basename(path, extension) {
-                    var base = new String(path).substring(path.lastIndexOf('/') + 1);
-
-                    if (extension) {
-                        base = base.replace(extension, '');
-                    }
-
-                    return base;
-                }
-            }, {
-                key: "basedir",
-                value: function basedir(path) {
-                    var base = new String(path).substring(0, path.lastIndexOf('/'));
-
-                    return base;
-                }
-            }, {
-                key: "truncate",
-                value: function truncate(string, max, addDots) {
-                    var output = string;
-
-                    if (output.length > max) {
-                        output = output.substring(0, max);
-
-                        if (addDots) {
-                            output += '...';
-                        }
-                    }
-
-                    return output;
-                }
-            }]);
-
-            return Helper;
-        })();
-
-        window.helper = Helper;
-    }, {}], 10: [function (require, module, exports) {
-        require('../client');
-        require('./partials/navbar');
-
-        var Issue = require('./partials/issue');
-        var IssueModal = require('./partials/issue-modal');
-
-        var Issues = (function (_View2) {
-            _inherits(Issues, _View2);
-
-            function Issues(args) {
-                _classCallCheck(this, Issues);
-
-                var _this2 = _possibleConstructorReturn(this, Object.getPrototypeOf(Issues).call(this, args));
-
-                var view = _this2;
-
-                api.issueColumns(function (columns) {
-                    api.issues.fetch(function (issues) {
-                        api.milestones.fetch(function (milestones) {
-                            view.columns = columns;
-                            view.issues = issues;
-                            view.milestones = milestones;
-
-                            view.render();
-                        });
-                    });
-                });
-                return _this2;
-            }
-
-            /**
-             * Actions
-             */
-
-            _createClass(Issues, [{
-                key: "updateIssuePositions",
-                value: function updateIssuePositions() {
-                    var view = this;
-
-                    _.each(ViewHelper.getAll('Issue'), function (i, view) {
-                        view.updateMilestonePosition();
-                        view.updateColumnPosition();
-                    });
-
-                    $('.sortable').sortable('destroy');
-                    $('.sortable').sortable({
-                        forcePlaceholderSize: true,
-                        connectWith: '.sortable'
-                    }).bind('sortupdate', function (e, ui) {
-                        view.onMoveIssueColumn(ui.item);
-                    });
-                }
-
-                /**
-                 * Events
-                 */
-
-            }, {
-                key: "onMoveIssueColumn",
-                value: function onMoveIssueColumn($issue) {
-                    var view = $issue.data('view');
-
-                    view.updateColumnFromPosition();
-                }
-            }, {
-                key: "onChangeMilestone",
-                value: function onChangeMilestone() {
-                    var id = $('.milestones').val();
-
-                    _.each(ViewHelper.getAll('Issue'), function (i, view) {
-                        view.$element.toggle(id == 'all' || view.model.milestone && view.model.milestone.id == id);
-                    });
-                }
-            }, {
-                key: "onClickNewIssue",
-                value: function onClickNewIssue() {
-                    var newIssue = {
-                        title: 'Issue title',
-                        body: 'Issue description',
-                        state: 'open'
-                    };
-
-                    ViewHelper.get('IssueModal').show(newIssue);
-                }
-            }, {
-                key: "render",
-                value: function render() {
-                    var view = this;
-
-                    $('.page-content').html([_.div({ class: 'container' }, [
-                    // Render all issues outside the columns first
-                    _.each(view.issues, function (i, issue) {
-                        return new Issue({
-                            model: issue
-                        }).$element;
-                    }),
-                    // Issue actions
-                    _.div({ class: 'btn-group p-b-sm' }, _.button({ class: 'btn btn-primary' }, [_.span({ class: 'glyphicon glyphicon-plus' }), ' New issue']).click(view.onClickNewIssue)),
-                    // Milestone picker
-                    _.div({ class: 'input-group p-b-sm' }, [_.span({ class: 'input-group-addon' }, 'Milestone'), _.select({ class: 'form-control milestones' }, _.each([{ id: 'all', title: '(all issues)' }].concat(view.milestones), function (i, milestone) {
-                        return _.option({ value: milestone.id }, milestone.title);
-                    })).change(view.onChangeMilestone)]),
-                    // Columns
-                    _.div({ class: 'row' }, _.each(view.columns, function (c, column) {
-                        var colSize = 12 / view.columns.length;
-
-                        return _.div({ class: 'col-xs-' + colSize }, _.div({ class: 'panel panel-default column', 'data-name': column }, [_.div({ class: 'panel-heading' }, _.span(column)), _.div({ class: 'panel-body sortable' })]));
-                    }))]), new IssueModal().$element]);
-
-                    // Put the issues into their appropriate columns
-                    view.updateIssuePositions();
-                }
-            }]);
-
-            return Issues;
-        })(View);
-
-        new Issues();
-    }, { "../client": 3, "./partials/issue": 12, "./partials/issue-modal": 11, "./partials/navbar": 13 }], 11: [function (require, module, exports) {
-        'use strict';
-
-        var Issue = require('./issue');
-
-        var IssueModal = (function (_View3) {
-            _inherits(IssueModal, _View3);
-
-            function IssueModal(args) {
-                _classCallCheck(this, IssueModal);
-
-                var _this3 = _possibleConstructorReturn(this, Object.getPrototypeOf(IssueModal).call(this, args));
-
-                var view = _this3;
-
-                api.labels.fetch(function (labels) {
-                    view.labels = labels;
-                });
-
-                // Register events
-                _this3.on('clickOK', _this3.onClickOK);
-                _this3.on('changeAssignee', _this3.onChangeAssignee);
-                _this3.on('changeTitle', _this3.onChangeTitle);
-                _this3.on('changeBody', _this3.onChangeBody);
-                _this3.on('changeState', _this3.onChangeState);
-                _this3.on('changeMilestone', _this3.onChangeMilestone);
-
-                // Prerender main element
-                view.$element = _.div({ class: 'modal fade issue-modal', role: 'dialog' }, _.div({ class: 'modal-dialog' }, _.div({ class: 'modal-content' }, [_.div({ class: 'modal-header' }, [_.button({ type: 'button', class: 'close', 'data-dismiss': 'modal' }, _.span({ class: 'glyphicon glyphicon-remove' })), view.$heading = _.span(), _.p({}, ['Created by ', view.$user = _.a()])]), _.div({ class: 'modal-body' }, [_.div({ class: 'row' }, [_.div({ class: 'col-xs-6' }, _.div({ class: 'input-group' }, [_.span({ class: 'input-group-addon' }, 'Assignee'), (function () {
-                    view.$assignee = _.select({ class: 'form-control' });
-
-                    api.collaborators.fetch(function (collaborators) {
-                        view.collaborators = collaborators;
-
-                        view.$assignee.html(_.each([{ login: '(none)', id: null }].concat(collaborators), function (i, collaborator) {
-                            return _.option({ value: collaborator.id }, collaborator.login);
-                        }));
-                    });
-
-                    return view.$assignee;
-                })().change(view.events.changeAssignee)])), _.div({ class: 'col-xs-6' }, _.div({ class: 'input-group' }, [_.span({ class: 'input-group-addon' }, 'State'), view.$state = _.select({ class: 'form-control' }, _.each(['open', 'closed'], function (i, state) {
-                    return _.option({ value: state }, state);
-                })).change(view.events.changeState)]))]), _.div({ class: 'input-group' }, [_.span({ class: 'input-group-addon' }, 'Milestone'), (function () {
-                    view.$milestone = _.select({ class: 'form-control' });
-
-                    api.milestones.fetch(function (milestones) {
-                        view.milestones = milestones;
-
-                        view.$milestone.html(_.option({ value: -1 }, '(none)'));
-
-                        view.$milestone.append(_.each(milestones, function (i, milestone) {
-                            return _.option({ value: milestone.number }, milestone.title);
-                        }));
-                    });
-
-                    return view.$milestone;
-                })().change(view.events.changeMilestone)]), _.div({ class: 'input-group' }, [_.span({ class: 'input-group-addon' }, 'Title'), view.$title = _.input({ type: 'text', class: 'form-control' }).change(view.events.changeTitle)]), _.div({ class: 'input-group input-group-vertical' }, [_.span({ class: 'input-group-addon' }, 'Description'), view.$body = _.textarea({ class: 'form-control' }).change(view.events.changeBody)])]), _.div({ class: 'modal-footer' }, [view.$labels = _.div({ class: 'labels' }), _.button({ class: 'btn btn-primary' }, 'OK').click(view.events.clickOK)])])));
-                return _this3;
-            }
-
-            /**
-             * Events
-             */
-
-            _createClass(IssueModal, [{
-                key: "onClickOK",
-                value: function onClickOK(e, element, view) {
-                    var $issue = $('.issue[data-id="' + view.model.id + '"]');
-
-                    if ($issue.length > 0) {
-                        $issue.data('view').sync(view.model);
-                    } else {
-                        var issueView = new Issue({
-                            model: view.model
-                        });
-
-                        var $panel = $('.panel[data-name="backlog"] .sortable');
-
-                        $panel.append(issueView.$element);
-                        ViewHelper.get('Issues').updateIssuePositions();
-
-                        issueView.model = view.model;
-                        issueView.sync();
-                    }
-
-                    view.hide();
-                }
-            }, {
-                key: "onChangeAssignee",
-                value: function onChangeAssignee(e, element, view) {
-                    for (var i in view.collaborators) {
-                        if (view.collaborators[i].id == $(element).val()) {
-                            view.model.assignee = view.collaborators[i];
-                        }
-                    }
-                }
-            }, {
-                key: "onChangeTitle",
-                value: function onChangeTitle(e, element, view) {
-                    view.model.title = $(element).val();
-                }
-            }, {
-                key: "onChangeBody",
-                value: function onChangeBody(e, element, view) {
-                    view.model.body = $(element).val();
-                }
-            }, {
-                key: "onChangeState",
-                value: function onChangeState(e, element, view) {
-                    view.model.state = $(element).val();
-                }
-            }, {
-                key: "onChangeMilestone",
-                value: function onChangeMilestone(e, element, view) {
-                    for (var i in view.milestones) {
-                        if (view.milestones[i].number == $(element).val()) {
-                            view.model.milestone = view.milestones[i];
-                        }
-                    }
-                }
-            }, {
-                key: "hide",
-                value: function hide() {
-                    this.$element.modal('hide');
-                }
-            }, {
-                key: "show",
-                value: function show(issue) {
-                    this.model = issue;
-                    this.$element.modal('show');
-                    this.init();
-                }
-            }, {
-                key: "render",
-                value: function render() {
-                    var view = this;
-
-                    if (view.model.user) {
-                        view.$user.html(view.model.user.login);
-                    } else {
-                        view.$user.html('me');
-                    }
-
-                    if (view.model.assignee) {
-                        view.$assignee.val(view.model.assignee.id);
-                    } else {
-                        view.$assignee.val('(none)');
-                    }
-
-                    view.$state.val(view.model.state);
-
-                    if (view.model.milestone) {
-                        view.$milestone.val(view.model.milestone.number);
-                    } else {
-                        view.$milestone.val(-1);
-                    }
-
-                    if (view.model.id) {
-                        view.$heading.html('Edit issue (id: ' + view.model.id + ')');
-                    } else {
-                        view.$heading.html('New issue');
-                    }
-
-                    view.$title.attr('value', view.model.title);
-
-                    view.$body.html(view.model.body);
-
-                    if (view.model.labels) {
-                        view.$labels.html(_.each(view.model.labels, function (i, label) {
-                            function onClickRemove(e) {
-                                view.model.labels.splice(i, 1);
-                                $label.remove();
-                            }
-
-                            var $label = _.div({ class: 'label', style: 'background-color: #' + label.color }, [_.span({ class: 'label-text' }, label.name), _.button({ class: 'btn btn-default label-btn-remove' }, _.span({ class: 'glyphicon glyphicon-remove' })).click(onClickRemove)]);
-
-                            return $label;
-                        }));
-                    } else {
-                        view.$labels.empty();
-                    }
-
-                    view.$labels.append(_.div({ class: 'dropdown' }, [_.button({ class: 'btn btn-default dropdown-toggle', type: 'button', 'data-toggle': 'dropdown' }, _.span({ class: 'glyphicon glyphicon-plus' })), _.ul({ class: 'dropdown-menu' }, _.each(view.labels, function (i, label) {
-                        function onClick(e) {
-                            e.preventDefault();
-
-                            view.model.labels.push(label);
-                            view.render();
-                        }
-
-                        return _.li({ style: 'background-color: #' + label.color }, _.a({ href: '#' }, label.name).click(onClick));
-                    }))]));
-                }
-            }]);
-
-            return IssueModal;
-        })(View);
-
-        module.exports = IssueModal;
-    }, { "./issue": 12 }], 12: [function (require, module, exports) {
-        'use strict';
-
-        var Issue = (function (_View4) {
-            _inherits(Issue, _View4);
-
-            function Issue(args) {
-                _classCallCheck(this, Issue);
-
-                // Register events
-
-                var _this4 = _possibleConstructorReturn(this, Object.getPrototypeOf(Issue).call(this, args));
-
-                _this4.on('click', _this4.onClick);
-
-                // Init html
-                _this4.$element = _.div({ class: 'panel panel-primary issue' }).click(_this4.events.click);
-
-                _this4.init();
-                return _this4;
-            }
-
-            /**
-             * Events
-             */
-
-            _createClass(Issue, [{
-                key: "onClick",
-                value: function onClick(e, element, view) {
-                    ViewHelper.get('IssueModal').show(view.model);
-                }
-
-                /**
-                 * Sorting actions
-                 */
-
-            }, {
-                key: "updateMilestonePosition",
-                value: function updateMilestonePosition() {
-                    var milestoneId = $('.milestones').val();
-
-                    this.$element.toggle(milestoneId == 'all' || this.model.milestone.id == milestoneId);
-                }
-            }, {
-                key: "updateColumnFromPosition",
-                value: function updateColumnFromPosition() {
-                    var $column = this.$element.parents('.column');
-                    var columnName = $column.data('name');
-
-                    this.model.state = columnName == 'done' ? 'closed' : 'open';
-
-                    // Remove column labels
-                    for (var i = this.model.labels.length - 1; i >= 0; i--) {
-                        var label = this.model.labels[i];
-
-                        if ($('.column[data-name="' + label.name + '"]').length > 0) {
-                            this.model.labels.splice(i, 1);
-                        }
-                    }
-
-                    // Add new column label
-                    this.model.labels.push({ name: columnName });
-
-                    // Sync
-                    this.sync();
-                }
-            }, {
-                key: "updateColumnPosition",
-                value: function updateColumnPosition() {
-                    var column = 'backlog';
-
-                    if (this.model.state == 'closed') {
-                        column = 'done';
-                    } else {
-                        for (var l in this.model.labels) {
-                            var name = this.model.labels[l].name;
-
-                            if ($('.column[data-name="' + name + '"]').length > 0) {
-                                column = name;
-                            }
-                        }
-                    }
-
-                    $('.column[data-name="' + column + '"] .sortable').append(this.$element);
-                }
-
-                /**
-                 * Updating
-                 */
-
-            }, {
-                key: "update",
-                value: function update() {
-                    this.init();
-
-                    this.updateColumnPosition();
-                    this.updateMilestonePosition();
-                }
-            }, {
-                key: "setLoading",
-                value: function setLoading(active) {
-                    this.$element.toggleClass('loading', active);
-                }
-            }, {
-                key: "sync",
-                value: function sync() {
-                    var view = this;
-
-                    // Activate loading state
-                    view.$element.toggleClass('loading', true);
-
-                    // This is a new issue
-                    if (!view.model.id) {
-                        api.issues.create({ data: view.model }, function (issue) {
-                            view.model = issue;
-
-                            view.update();
-                            view.$element.toggleClass('loading', false);
-                        });
-
-                        // This is an existing issue
-                    } else {
-                            api.issues.update({ data: view.model }, function (issue) {
-                                view.model = issue;
-
-                                view.update();
-                                view.$element.toggleClass('loading', false);
-                            });
-                        }
-                }
-
-                /**
-                 * Rendering
-                 */
-
-            }, {
-                key: "render",
-                value: function render() {
-                    var view = this;
-
-                    this.$element.attr('data-id', view.model.id);
-                    this.$element.html([_.div({ class: 'panel-heading' }, [_.span(view.model.title), function () {
-                        if (view.model.assignee) {
-                            return _.img({ alt: '', src: view.model.assignee.avatarUrl });
-                        }
-                    }]), _.div({ class: 'panel-body' }, _.span(view.model.body)), _.div({ class: 'panel-spinner' }, _.div({ class: 'spinner' }))]);
-                }
-            }]);
-
-            return Issue;
-        })(View);
-
-        module.exports = Issue;
-    }, {}], 13: [function (require, module, exports) {
-        var Navbar = (function (_View5) {
-            _inherits(Navbar, _View5);
-
-            function Navbar(args) {
-                _classCallCheck(this, Navbar);
-
-                var _this5 = _possibleConstructorReturn(this, Object.getPrototypeOf(Navbar).call(this, args));
-
-                var view = _this5;
-
-                api.repo(function (repo) {
-                    view.repo = repo;
-
-                    view.init();
-                });
-                return _this5;
-            }
-
-            _createClass(Navbar, [{
-                key: "render",
-                value: function render() {
-                    var view = this;
-
-                    $('.navbar-content').html(_.div({ class: 'navbar navbar-default' }, _.div({ class: 'container' }, [_.if(!env.local.menu.hide.all, _.ul({ class: 'nav navbar-nav' }, [_.li(_.a({ href: '/repos/' + req.params.user }, [_.span({ class: 'glyphicon glyphicon-arrow-left' }), ' Repos'])), _.if(!env.local.menu.hide.deployment, _.li(_.a({ href: '/repos/' + req.params.user + '/' + req.params.repo + '/deployment/' }, [_.span({ class: 'glyphicon glyphicon-upload' }), ' Deployment']))), _.if(!env.local.menu.hide.collaborators, _.li(_.a({ href: '/repos/' + req.params.user + '/' + req.params.repo + '/collaborators/' }, [_.span({ class: 'glyphicon glyphicon-user' }), ' Collaborators']))), _.if(!env.local.menu.hide.issues, _.li(_.a({ href: '/repos/' + req.params.user + '/' + req.params.repo + '/issues/' }, [_.span({ class: 'glyphicon glyphicon-exclamation-sign' }), ' Issues']))), _.if(!env.local.menu.hide.settings, _.li(_.a({ href: '/repos/' + req.params.user + '/' + req.params.repo + '/settings/' }, [_.span({ class: 'glyphicon glyphicon-cog' }), ' Settings'])))]), _.ul({ class: 'nav navbar-nav navbar-right' }, _.li({ class: 'navbar-btn' }, _.div({ class: 'input-group' }, [_.span({ class: 'input-group-addon' }, 'git'), function () {
-                        var element = _.input({ class: 'form-control', type: 'text', value: '' });
-
-                        element.attr('value', view.repo.cloneUrl);
-
-                        return element;
-                    }]))))])));
-
-                    // Set active navigation button
-                    $('.navbar-content .navbar-nav li').each(function (i) {
-                        var a = $(this).children('a');
-                        var isActive = location.pathname == a.attr('href') || location.pathname + '/' == a.attr('href');
-
-                        $(this).toggleClass('active', isActive);
-                    });
-                }
-            }]);
-
-            return Navbar;
-        })(View);
-
-        new Navbar();
-    }, {}], 14: [function (require, module, exports) {
         module.exports = Array.isArray || function (arr) {
             return Object.prototype.toString.call(arr) == '[object Array]';
         };
-    }, {}], 15: [function (require, module, exports) {
+    }, {}], 3: [function (require, module, exports) {
         var isarray = require('isarray');
 
         /**
@@ -1953,7 +435,1523 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
             return stringToRegexp(path, keys, options);
         }
-    }, { "isarray": 14 }], 16: [function (require, module, exports) {
+    }, { "isarray": 2 }], 4: [function (require, module, exports) {
+        function appropriateIssue(issue) {
+            // Updating issue milestones requires a number only
+            if (issue.milestone) {
+                issue.milestone = issue.milestone.number;
+            }
+
+            // Updating issue assignees requires a login name only
+            if (issue.assignee) {
+                issue.assignee = issue.assignee.login;
+            }
+
+            // Updating issue labels requires a string only
+            if (issue.labels) {
+                for (var i in issue.labels) {
+                    issue.labels[i] = issue.labels[i].name;
+                }
+            }
+
+            return issue;
+        }
+
+        window.api = {
+            call: function call(url, callback, obj) {
+                obj = obj || {};
+
+                obj.buffer = obj.buffer || {};
+                obj.buffer.token = localStorage.getItem('api-token');
+
+                $.post(url, obj, function (res) {
+                    if (res.err) {
+                        console.log('Error:', res.err);
+                        console.log('Data:', res.data);
+
+                        if (res.err.json) {
+                            alert('(' + res.mode + ') ' + res.url + ': ' + res.err.json.message);
+                        }
+                    } else if (callback) {
+                        callback(res);
+                    }
+                });
+            },
+
+            /**
+             * Issue tracking
+             */
+            issues: {
+                fetch: function fetch(callback) {
+                    api.call('/api/issue-tracking/issues/fetch/' + req.params.user + '/' + req.params.repo, callback);
+                },
+
+                create: function create(data, callback) {
+                    api.call('/api/issue-tracking/issues/create/' + req.params.user + '/' + req.params.repo, callback, appropriateIssue(data));
+                },
+
+                update: function update(data, callback) {
+                    api.call('/api/issue-tracking/issues/update/' + req.params.user + '/' + req.params.repo, callback, appropriateIssue(data));
+                }
+            },
+
+            labels: {
+                fetch: function fetch(callback) {
+                    api.call('/api/issue-tracking/labels/fetch/' + req.params.user + '/' + req.params.repo, callback);
+                },
+
+                create: function create(data, callback) {
+                    api.call('/api/issue-tracking/labels/create/' + req.params.user + '/' + req.params.repo, callback, data);
+                }
+            },
+
+            issueColumns: function issueColumns(callback) {
+                env.get(function (json) {
+                    var columns = json.putaitu.issues.columns;
+
+                    columns.unshift('backlog');
+                    columns.push('done');
+
+                    callback(columns);
+                });
+            },
+
+            milestones: {
+                fetch: function fetch(callback) {
+                    api.call('/api/issue-tracking/milestones/fetch/' + req.params.user + '/' + req.params.repo, callback);
+                }
+            },
+
+            /**
+             * Organisations
+             */
+            collaborators: {
+                fetch: function fetch(callback) {
+                    api.call('/api/collaborators/fetch/' + req.params.user + '/' + req.params.repo, callback);
+                }
+            },
+
+            /** 
+             * Git
+             */
+            repo: function repo(callback) {
+                api.call('/api/git/repo/' + req.params.user + '/' + req.params.repo, callback);
+            },
+
+            branches: {
+                get: function get(callback) {
+                    api.call('/api/git/branches/' + req.params.user + '/' + req.params.repo, function (branches) {
+                        branches.sort(function (a, b) {
+                            if (a.name < b.name) {
+                                return -1;
+                            } else if (a.name > b.name) {
+                                return 1;
+                            } else {
+                                return 0;
+                            }
+                        });
+
+                        callback(branches);
+                    });
+                }
+            },
+
+            file: {
+                fetch: function fetch(path, callback) {
+                    api.call('/api/git/file/fetch/' + req.params.user + '/' + req.params.repo + '/' + path, callback);
+                },
+
+                update: function update(data, path, callback) {
+                    api.call('/api/git/file/update/' + req.params.user + '/' + req.params.repo + '/' + path, callback, data);
+                },
+
+                create: function create(data, path, callback) {
+                    api.call('/api/git/file/create/' + req.params.user + '/' + req.params.repo + '/' + path, callback, data);
+                }
+            },
+
+            tree: {
+                fetch: function fetch(callback) {
+                    api.call('/api/git/tree/fetch/' + req.params.user + '/' + req.params.repo + '/' + req.params.branch, callback);
+                }
+            },
+
+            repos: function repos(callback) {
+                api.call('/api/git/repos/' + req.params.user, callback);
+            },
+
+            compare: function compare(base, head, callback) {
+                api.call('/api/git/compare/' + req.params.user + '/' + req.params.repo + '/' + base + '/' + head, callback);
+            },
+
+            merge: function merge(base, head, callback) {
+                api.call('/api/git/merge/' + req.params.user + '/' + req.params.repo, callback, { base: base, head: head });
+            },
+
+            /** 
+             * Abstract CMS
+             */
+            structs: {
+                pages: {
+                    fetch: function fetch(path, callback) {
+                        api.call('/api/structs/fetch/' + req.params.user + '/' + req.params.repo + '/pages/' + path, callback);
+                    }
+                },
+
+                sections: {
+                    fetch: function fetch(path, callback) {
+                        api.call('/api/structs/fetch/' + req.params.user + '/' + req.params.repo + '/sections/' + path, callback);
+                    }
+                },
+
+                blocks: {
+                    fetch: function fetch(path, callback) {
+                        api.call('/api/structs/fetch/' + req.params.user + '/' + req.params.repo + '/blocks/' + path, callback);
+                    }
+                },
+
+                fields: {
+                    fetch: function fetch(callback) {
+                        api.call('/api/structs/fetch/' + req.params.user + '/' + req.params.repo + '/fields', callback);
+                    }
+                }
+            },
+
+            templates: {
+                pages: {
+                    fetch: function fetch(path, callback) {
+                        api.call('/api/templates/fetch/' + req.params.user + '/' + req.params.repo + '/pages/' + path, callback);
+                    }
+                },
+
+                sections: {
+                    fetch: function fetch(path, callback) {
+                        api.call('/api/templates/fetch/' + req.params.user + '/' + req.params.repo + '/blocks/' + path, callback);
+                    }
+                },
+
+                blocks: {
+                    fetch: function fetch(path, callback) {
+                        api.call('/api/templates/fetch/' + req.params.user + '/' + req.params.repo + '/blocks/' + path, callback);
+                    }
+                }
+            },
+
+            content: {
+                fetch: function fetch(path, callback) {
+                    api.call('/api/content/fetch/' + req.params.user + '/' + req.params.repo + '/' + req.params.branch + '/' + path, callback);
+                },
+
+                publish: function publish(content, path, callback) {
+                    api.content.bake(content.data, function (baked) {
+                        content.data = baked;
+
+                        api.call('/api/content/publish/' + req.params.user + '/' + req.params.repo + '/' + req.params.branch + '/' + path, callback, data);
+                    });
+                },
+
+                save: function save(content, path, callback) {
+                    api.call('/api/content/save/' + req.params.user + '/' + req.params.repo + '/' + req.params.branch + '/' + path, callback, content);
+                },
+
+                bake: function bake(content, callback) {
+                    api.call('/api/content/bake', callback, content);
+                }
+            }
+        };
+    }, {}], 5: [function (require, module, exports) {
+        require('./core/Templating');
+        require('./core/View');
+        require('./core/Router');
+        require('./core/ContextMenu');
+
+        require('./helper');
+        require('./api');
+        require('./env');
+    }, { "./api": 4, "./core/ContextMenu": 6, "./core/Router": 7, "./core/Templating": 8, "./core/View": 9, "./env": 10, "./helper": 11 }], 6: [function (require, module, exports) {
+        'use strict';
+
+        var ContextMenu = (function (_View) {
+            _inherits(ContextMenu, _View);
+
+            function ContextMenu(args) {
+                _classCallCheck(this, ContextMenu);
+
+                // Recycle other context menus
+
+                var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(ContextMenu).call(this, args));
+
+                if ($('.context-menu').length > 0) {
+                    _this.$element = $('.context-menu');
+                } else {
+                    _this.$element = _.ul({ class: 'context-menu dropdown-menu', role: 'menu' });
+                }
+
+                _this.$element.css({
+                    position: 'absolute',
+                    'z-index': 1200,
+                    top: _this.pos.y,
+                    left: _this.pos.x,
+                    display: 'block'
+                });
+
+                _this.fetch();
+                return _this;
+            }
+
+            _createClass(ContextMenu, [{
+                key: "render",
+                value: function render() {
+                    var view = this;
+
+                    view.$element.html(_.each(view.model, function (label, func) {
+                        if (func == '---') {
+                            return _.li({ class: 'dropdown-header' }, label);
+                        } else {
+                            return _.li({ class: typeof func === 'function' ? '' : 'disabled' }, _.a({ tabindex: '-1', href: '#' }, label).click(function (e) {
+                                e.preventDefault();
+                                e.stopPropagation();
+
+                                if (func) {
+                                    func(e);
+
+                                    view.remove();
+                                }
+                            }));
+                        }
+                    }));
+
+                    $('body').append(view.$element);
+                }
+            }]);
+
+            return ContextMenu;
+        })(View);
+
+        // jQuery extention
+
+        jQuery.fn.extend({
+            context: function context(menuItems) {
+                return this.each(function () {
+                    $(this).on('contextmenu', function (e) {
+                        if (e.ctrlKey) {
+                            return;
+                        }
+
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        if (e.which == 3) {
+                            var menu = new ContextMenu({
+                                model: menuItems,
+                                pos: {
+                                    x: e.pageX,
+                                    y: e.pageY
+                                }
+                            });
+                        }
+                    });
+                });
+            }
+        });
+
+        // Event handling
+        $('body').click(function (e) {
+            if ($(e.target).parents('.context-menu').length < 1) {
+                ViewHelper.removeAll('ContextMenu');
+            }
+        });
+    }, {}], 7: [function (require, module, exports) {
+        'use strict';
+
+        var pathToRegexp = require('path-to-regexp');
+
+        var routes = [];
+
+        var Router = (function () {
+            function Router() {
+                _classCallCheck(this, Router);
+            }
+
+            _createClass(Router, null, [{
+                key: "route",
+                value: function route(path, controller) {
+                    routes[path] = {
+                        controller: controller
+                    };
+                }
+            }, {
+                key: "go",
+                value: function go(url) {
+                    location.hash = url;
+                }
+            }, {
+                key: "goToBaseDir",
+                value: function goToBaseDir() {
+                    var url = this.url || '/';
+                    var base = new String(url).substring(0, url.lastIndexOf('/'));
+
+                    this.go(base);
+                }
+            }, {
+                key: "init",
+                value: function init() {
+                    // Get the url
+                    var url = location.hash.slice(1) || '/';
+                    var trimmed = url.substring(0, url.indexOf('?'));
+
+                    if (trimmed) {
+                        url = trimmed;
+                    }
+                    // Look for route
+                    var context = {};
+                    var route = undefined;
+
+                    // Exact match
+                    if (routes[url]) {
+                        path = routes[url];
+
+                        // Use path to regexp
+                    } else {
+                            for (var _path in routes) {
+                                var keys = [];
+                                var re = pathToRegexp(_path, keys);
+                                var values = re.exec(url);
+
+                                // A match was found
+                                if (re.test(url)) {
+                                    // Set the route
+                                    route = routes[_path];
+
+                                    // Add context variables (first result (0) is the entire path,
+                                    // so assign that manually and start the counter at 1 instead)
+                                    route.url = url;
+                                    var counter = 1;
+
+                                    var _iteratorNormalCompletion = true;
+                                    var _didIteratorError = false;
+                                    var _iteratorError = undefined;
+
+                                    try {
+                                        for (var _iterator = keys[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                                            var key = _step.value;
+
+                                            route[key.name] = values[counter];
+                                            counter++;
+                                        }
+                                    } catch (err) {
+                                        _didIteratorError = true;
+                                        _iteratorError = err;
+                                    } finally {
+                                        try {
+                                            if (!_iteratorNormalCompletion && _iterator.return) {
+                                                _iterator.return();
+                                            }
+                                        } finally {
+                                            if (_didIteratorError) {
+                                                throw _iteratorError;
+                                            }
+                                        }
+                                    }
+
+                                    break;
+                                }
+                            }
+                        }
+
+                    if (route) {
+                        route.controller();
+                    }
+                }
+            }]);
+
+            return Router;
+        })();
+
+        window.addEventListener('hashchange', Router.init);
+        window.Router = Router;
+    }, { "path-to-regexp": 3 }], 8: [function (require, module, exports) {
+        var Templating = {};
+
+        function append(el, content) {
+            if (Object.prototype.toString.call(content) === '[object Array]') {
+                for (var i in content) {
+                    append(el, content[i]);
+                }
+            } else if (content) {
+                el.append(content);
+            }
+        }
+
+        function create(tag, attr, content) {
+            var el = $('<' + tag + '></' + tag + '>');
+
+            // If the attribute parameter fails, it's probably an element or a string
+            try {
+                for (var k in attr) {
+                    el.attr(k, attr[k]);
+                }
+            } catch (err) {
+                content = attr;
+            }
+
+            append(el, content);
+
+            return el;
+        }
+
+        function declareMethod(type) {
+            Templating[type] = function (attr, content) {
+                return create(type, attr, content);
+            };
+        }
+
+        function declareBootstrapMethod(type) {
+            var tagName = 'div';
+
+            if (type.indexOf('|') > -1) {
+                tagName = type.split('|')[1];
+                type = type.split('|')[0];
+            }
+
+            var functionName = type.replace(/-/g, '_');
+
+            Templating[functionName] = function (attr, content) {
+                return create(tagName, attr, content).addClass(type);
+            };
+        }
+
+        var elementTypes = [
+        // Block elements
+        'div', 'section', 'nav', 'hr', 'label', 'textarea', 'audio', 'video', 'canvas', 'iframe',
+
+        // Inline elements
+        'img',
+
+        // Table elements
+        'table', 'thead', 'tbody', 'th', 'td', 'tr',
+
+        // Select
+        'select', 'option', 'input',
+
+        // Headings
+        'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+
+        // Body text
+        'span', 'p', 'strong', 'b',
+
+        // Action buttons
+        'a', 'button',
+
+        // List
+        'ol', 'ul', 'li',
+
+        // Forms
+        'form', 'input'];
+
+        var bootstrapTypes = ['row', 'col', 'col-xs-1', 'col-xs-2', 'col-xs-3', 'col-xs-4', 'col-xs-5', 'col-xs-6', 'col-xs-7', 'col-xs-8', 'col-xs-9', 'col-xs-10', 'col-xs-11', 'col-xs-12', 'col-sm-1', 'col-sm-2', 'col-sm-3', 'col-sm-4', 'col-sm-5', 'col-sm-6', 'col-sm-7', 'col-sm-8', 'col-sm-9', 'col-sm-10', 'col-sm-11', 'col-sm-12', 'col-md-1', 'col-md-2', 'col-md-3', 'col-md-4', 'col-md-5', 'col-md-6', 'col-md-7', 'col-md-8', 'col-md-9', 'col-md-10', 'col-md-11', 'col-md-12', 'col-lg-1', 'col-lg-2', 'col-lg-3', 'col-lg-4', 'col-lg-5', 'col-lg-6', 'col-lg-7', 'col-lg-8', 'col-lg-9', 'col-lg-10', 'col-lg-11', 'col-lg-12', 'jumbotron', 'container', 'panel', 'panel-heading', 'panel-footer', 'panel-collapse', 'panel-body', 'navbar|nav', 'navbar-nav|ul', 'collapse', 'glyphicon|span', 'btn|button', 'btn-group', 'list-group', 'list-group-item', 'input-group', 'input-group-btn|span', 'input-group-addon|span', 'form-control|input'];
+
+        for (var i in elementTypes) {
+            declareMethod(elementTypes[i]);
+        }
+
+        for (var i in bootstrapTypes) {
+            declareBootstrapMethod(bootstrapTypes[i]);
+        }
+
+        Templating.if = function (condition, content) {
+            return condition ? content : null;
+        };
+
+        Templating.each = function (array, callback) {
+            var elements = [];
+
+            for (var i in array) {
+                var element = callback(i, array[i]);
+
+                if (element) {
+                    elements.push(element);
+                }
+            }
+
+            return elements;
+        };
+
+        window._ = Templating;
+    }, {}], 9: [function (require, module, exports) {
+        'use strict'
+
+        /**
+         *  jQuery extension
+         */
+        ;
+        (function ($) {
+            $.event.special.destroyed = {
+                remove: function remove(o) {
+                    if (o.handler) {
+                        o.handler();
+                    }
+                }
+            };
+        })(jQuery);
+
+        /**
+         * GUID
+         */
+        function guid() {
+            function s4() {
+                return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+            }
+            return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+        }
+
+        /**
+         * Helper
+         */
+        var instances = [];
+
+        var ViewHelper = (function () {
+            function ViewHelper() {
+                _classCallCheck(this, ViewHelper);
+            }
+
+            _createClass(ViewHelper, null, [{
+                key: "getAll",
+                value: function getAll(type) {
+                    var results = [];
+
+                    if (type) {
+                        for (var i in instances) {
+                            var instance = instances[i];
+                            var name = instance.name;
+
+                            if (name == type) {
+                                results.push(instance);
+                            }
+                        }
+                    } else {
+                        results = instances;
+                    }
+
+                    return results;
+                }
+            }, {
+                key: "get",
+                value: function get(type) {
+                    var results = ViewHelper.getAll(type);
+                    var view = results.length > 0 ? results[0] : null;
+
+                    return view;
+                }
+            }, {
+                key: "clear",
+                value: function clear(type) {
+                    for (var _guid in instances) {
+                        var instance = instances[_guid];
+                        var name = instance.constructor.name;
+
+                        if (!type || name == type) {
+                            instance.remove();
+                        }
+                    }
+                }
+            }, {
+                key: "removeAll",
+                value: function removeAll(type) {
+                    var _iteratorNormalCompletion2 = true;
+                    var _didIteratorError2 = false;
+                    var _iteratorError2 = undefined;
+
+                    try {
+                        for (var _iterator2 = ViewHelper.getAll(type)[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                            var view = _step2.value;
+
+                            view.remove();
+                        }
+                    } catch (err) {
+                        _didIteratorError2 = true;
+                        _iteratorError2 = err;
+                    } finally {
+                        try {
+                            if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                                _iterator2.return();
+                            }
+                        } finally {
+                            if (_didIteratorError2) {
+                                throw _iteratorError2;
+                            }
+                        }
+                    }
+                }
+            }]);
+
+            return ViewHelper;
+        })();
+
+        window.ViewHelper = ViewHelper;
+
+        /**
+         * Class
+         */
+
+        var View = (function () {
+            /**
+             * Init
+             */
+
+            function View(args) {
+                _classCallCheck(this, View);
+
+                this.name = this.constructor.name;
+                this.guid = guid();
+                this.events = {};
+
+                this.adopt(args);
+
+                instances[this.guid] = this;
+            }
+
+            _createClass(View, [{
+                key: "getName",
+                value: function getName() {
+                    var name = this.constructor.toString();
+                    name = name.substring('function '.length);
+                    name = name.substring(0, name.indexOf('('));
+
+                    return name;
+                }
+            }, {
+                key: "init",
+                value: function init() {
+                    this.prerender();
+                    this.render();
+                    this.postrender();
+
+                    if (this.$element) {
+                        this.element = this.$element[0];
+                        this.$element.data('view', this);
+                        this.$element.bind('destroyed', function () {
+                            var view = $(this).data('view');
+
+                            if (view) {
+                                $(this).data('view').remove();
+                            }
+                        });
+                    }
+
+                    this.trigger('ready', this);
+                    this.isReady = true;
+                }
+            }, {
+                key: "ready",
+                value: function ready(callback) {
+                    if (this.isReady) {
+                        callback(this);
+                    } else {
+                        this.on('ready', callback);
+                    }
+                }
+
+                // Adopt values
+
+            }, {
+                key: "adopt",
+                value: function adopt(args) {
+                    for (var k in args) {
+                        this[k] = args[k];
+                    }
+
+                    return this;
+                }
+
+                /**
+                 * Rendering
+                 */
+
+            }, {
+                key: "prerender",
+                value: function prerender() {}
+            }, {
+                key: "render",
+                value: function render() {}
+            }, {
+                key: "postrender",
+                value: function postrender() {}
+
+                /**
+                 * Events
+                 */
+                // Removes the view from DOM and memory
+
+            }, {
+                key: "remove",
+                value: function remove(timeout) {
+                    var view = this;
+
+                    if (!view.destroyed) {
+                        view.destroyed = true;
+
+                        setTimeout(function () {
+                            view.trigger('remove');
+
+                            if (view.$element && view.$element.length > 0) {
+                                view.$element.remove();
+                            }
+
+                            instances.splice(view.guid, 1);
+                        }, timeout || 0);
+                    }
+                }
+
+                // Call an event (for internal use)
+
+            }, {
+                key: "call",
+                value: function call(callback, data, ui) {
+                    callback(data, ui, this);
+                }
+
+                // Trigger an event
+
+            }, {
+                key: "trigger",
+                value: function trigger(e, obj) {
+                    if (this.events[e]) {
+                        if (typeof this.events[e] === 'function') {
+                            this.events[e](obj);
+                        } else {
+                            for (var i in this.events[e]) {
+                                if (this.events[e][i]) {
+                                    this.events[e][i](obj);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Bind an event
+
+            }, {
+                key: "on",
+                value: function on(e, callback) {
+                    var view = this;
+
+                    // No events registered, register this as the only event
+                    if (!this.events[e]) {
+                        this.events[e] = function (data) {
+                            view.call(callback, data, this);
+                        };
+
+                        // Events have already been registered, add to callback array
+                    } else {
+                            // Only one event is registered, so convert from a single reference to an array
+                            if (!this.events[e].length) {
+                                this.events[e] = [this.events[e]];
+                            }
+
+                            // Insert the event call into the array
+                            this.events[e].push(function (data) {
+                                view.call(callback, data, this);
+                            });
+                        }
+                }
+
+                // Check if event exists
+
+            }, {
+                key: "hasEvent",
+                value: function hasEvent(name) {
+                    for (var k in this.events) {
+                        if (k == name) {
+                            return true;
+                        }
+                    }
+
+                    return false;
+                }
+
+                /**
+                 * Fetch
+                 */
+
+            }, {
+                key: "fetch",
+                value: function fetch() {
+                    var view = this;
+
+                    function getModel() {
+                        // Get model from URL
+                        if (!view.model && typeof view.modelUrl === 'string') {
+                            $.getJSON(view.modelUrl, function (data) {
+                                view.model = data;
+
+                                view.init();
+                            });
+
+                            // Get model with function
+                        } else if (!view.model && typeof view.modelFunction === 'function') {
+                                view.modelFunction(function (data) {
+                                    view.model = data;
+
+                                    view.init();
+                                });
+
+                                // Just perform the initialisation
+                            } else {
+                                    view.init();
+                                }
+                    }
+
+                    // Get rendered content from URL
+                    if (typeof view.renderUrl === 'string') {
+                        $.get(view.renderUrl, function (html) {
+                            if (view.$element) {
+                                view.$element.append(html);
+                            } else {
+                                view.$element = $(html);
+                            }
+
+                            // And then get the model
+                            getModel();
+                        });
+
+                        // If no render url is defined, just get the model
+                    } else {
+                            getModel();
+                        }
+                }
+            }]);
+
+            return View;
+        })();
+
+        window.View = View;
+    }, {}], 10: [function (require, module, exports) {
+        var Debug = require('../../helpers/debug');
+
+        window.env = {
+            remote: null,
+            local: require('../../../env.json'),
+
+            /** 
+             * Get remote env.json
+             */
+            get: function get(callback) {
+                if (env.remote && env.remote.json) {
+                    callback(env.remote.json);
+                } else {
+                    api.file.fetch('/_putaitu/env.json', function (data) {
+                        var json = {};
+
+                        try {
+                            json = JSON.parse(data.content);
+                        } catch (e) {
+                            Debug.log(e, 'env');
+                        }
+
+                        json.putaitu = json.putaitu || {};
+                        json.putaitu.issues = json.putaitu.issues || {};
+                        json.putaitu.issues.columns = json.putaitu.issues.columns || [];
+
+                        env.remote = json;
+
+                        callback(env.remote);
+                    });
+                }
+            },
+
+            /** 
+             * Set remote env.json
+             */
+            set: function set(json, callback) {
+                json = json || env.json;
+
+                var data = {
+                    content: JSON.stringify(json)
+                };
+
+                api.file.create(data, '/_putaitu/env.json', function () {
+                    env.json = json;
+
+                    if (callback) {
+                        callback();
+                    }
+                });
+            }
+        };
+    }, { "../../../env.json": 1, "../../helpers/debug": 16 }], 11: [function (require, module, exports) {
+        var Helper = (function () {
+            function Helper() {
+                _classCallCheck(this, Helper);
+            }
+
+            _createClass(Helper, null, [{
+                key: "formatDate",
+                value: function formatDate(input) {
+                    var date = new Date(input);
+                    var output = date.getFullYear() + '-' + date.getMonth() + '-' + date.getDate() + ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds();
+
+                    return output;
+                }
+            }, {
+                key: "basename",
+                value: function basename(path, extension) {
+                    var base = new String(path).substring(path.lastIndexOf('/') + 1);
+
+                    if (extension) {
+                        base = base.replace(extension, '');
+                    }
+
+                    return base;
+                }
+            }, {
+                key: "basedir",
+                value: function basedir(path) {
+                    var base = new String(path).substring(0, path.lastIndexOf('/'));
+
+                    return base;
+                }
+            }, {
+                key: "truncate",
+                value: function truncate(string, max, addDots) {
+                    var output = string;
+
+                    if (output.length > max) {
+                        output = output.substring(0, max);
+
+                        if (addDots) {
+                            output += '...';
+                        }
+                    }
+
+                    return output;
+                }
+            }]);
+
+            return Helper;
+        })();
+
+        window.helper = Helper;
+    }, {}], 12: [function (require, module, exports) {
+        require('../client');
+        require('./partials/navbar');
+
+        var Issue = require('./partials/issue');
+        var IssueModal = require('./partials/issue-modal');
+
+        var Issues = (function (_View2) {
+            _inherits(Issues, _View2);
+
+            function Issues(args) {
+                _classCallCheck(this, Issues);
+
+                var _this2 = _possibleConstructorReturn(this, Object.getPrototypeOf(Issues).call(this, args));
+
+                var view = _this2;
+
+                api.issueColumns(function (columns) {
+                    api.issues.fetch(function (issues) {
+                        api.milestones.fetch(function (milestones) {
+                            view.columns = columns;
+                            view.issues = issues;
+                            view.milestones = milestones;
+
+                            view.render();
+                        });
+                    });
+                });
+                return _this2;
+            }
+
+            /**
+             * Actions
+             */
+
+            _createClass(Issues, [{
+                key: "updateIssuePositions",
+                value: function updateIssuePositions() {
+                    var view = this;
+
+                    _.each(ViewHelper.getAll('Issue'), function (i, view) {
+                        view.updateMilestonePosition();
+                        view.updateColumnPosition();
+                    });
+
+                    $('.sortable').sortable('destroy');
+                    $('.sortable').sortable({
+                        forcePlaceholderSize: true,
+                        connectWith: '.sortable'
+                    }).bind('sortupdate', function (e, ui) {
+                        view.onMoveIssueColumn(ui.item);
+                    });
+                }
+
+                /**
+                 * Events
+                 */
+
+            }, {
+                key: "onMoveIssueColumn",
+                value: function onMoveIssueColumn($issue) {
+                    var view = $issue.data('view');
+
+                    view.updateColumnFromPosition();
+                }
+            }, {
+                key: "onChangeMilestone",
+                value: function onChangeMilestone() {
+                    var id = $('.milestones').val();
+
+                    _.each(ViewHelper.getAll('Issue'), function (i, view) {
+                        view.$element.toggle(id == 'all' || view.model.milestone && view.model.milestone.id == id);
+                    });
+                }
+            }, {
+                key: "onClickNewIssue",
+                value: function onClickNewIssue() {
+                    var newIssue = {
+                        title: 'Issue title',
+                        body: 'Issue description',
+                        state: 'open'
+                    };
+
+                    ViewHelper.get('IssueModal').show(newIssue);
+                }
+            }, {
+                key: "render",
+                value: function render() {
+                    var view = this;
+
+                    $('.page-content').html([_.div({ class: 'container' }, [
+                    // Render all issues outside the columns first
+                    _.each(view.issues, function (i, issue) {
+                        return new Issue({
+                            model: issue
+                        }).$element;
+                    }),
+                    // Issue actions
+                    _.div({ class: 'btn-group p-b-sm' }, _.button({ class: 'btn btn-primary' }, [_.span({ class: 'glyphicon glyphicon-plus' }), ' New issue']).click(view.onClickNewIssue)),
+                    // Milestone picker
+                    _.div({ class: 'input-group p-b-sm' }, [_.span({ class: 'input-group-addon' }, 'Milestone'), _.select({ class: 'form-control milestones' }, _.each([{ id: 'all', title: '(all issues)' }].concat(view.milestones), function (i, milestone) {
+                        return _.option({ value: milestone.id }, milestone.title);
+                    })).change(view.onChangeMilestone)]),
+                    // Columns
+                    _.div({ class: 'row' }, _.each(view.columns, function (c, column) {
+                        var colSize = 12 / view.columns.length;
+
+                        return _.div({ class: 'col-xs-' + colSize }, _.div({ class: 'panel panel-default column', 'data-name': column }, [_.div({ class: 'panel-heading' }, _.span(column)), _.div({ class: 'panel-body sortable' })]));
+                    }))]), new IssueModal().$element]);
+
+                    // Put the issues into their appropriate columns
+                    view.updateIssuePositions();
+                }
+            }]);
+
+            return Issues;
+        })(View);
+
+        new Issues();
+    }, { "../client": 5, "./partials/issue": 14, "./partials/issue-modal": 13, "./partials/navbar": 15 }], 13: [function (require, module, exports) {
+        'use strict';
+
+        var Issue = require('./issue');
+
+        var IssueModal = (function (_View3) {
+            _inherits(IssueModal, _View3);
+
+            function IssueModal(args) {
+                _classCallCheck(this, IssueModal);
+
+                var _this3 = _possibleConstructorReturn(this, Object.getPrototypeOf(IssueModal).call(this, args));
+
+                var view = _this3;
+
+                api.labels.fetch(function (labels) {
+                    view.labels = labels;
+                });
+
+                // Register events
+                _this3.on('clickOK', _this3.onClickOK);
+                _this3.on('changeAssignee', _this3.onChangeAssignee);
+                _this3.on('changeTitle', _this3.onChangeTitle);
+                _this3.on('changeBody', _this3.onChangeBody);
+                _this3.on('changeState', _this3.onChangeState);
+                _this3.on('changeMilestone', _this3.onChangeMilestone);
+
+                // Prerender main element
+                view.$element = _.div({ class: 'modal fade issue-modal', role: 'dialog' }, _.div({ class: 'modal-dialog' }, _.div({ class: 'modal-content' }, [_.div({ class: 'modal-header' }, [_.button({ type: 'button', class: 'close', 'data-dismiss': 'modal' }, _.span({ class: 'glyphicon glyphicon-remove' })), view.$heading = _.span(), _.p({}, ['Created by ', view.$user = _.a()])]), _.div({ class: 'modal-body' }, [_.div({ class: 'row' }, [_.div({ class: 'col-xs-6' }, _.div({ class: 'input-group' }, [_.span({ class: 'input-group-addon' }, 'Assignee'), (function () {
+                    view.$assignee = _.select({ class: 'form-control' });
+
+                    api.collaborators.fetch(function (collaborators) {
+                        view.collaborators = collaborators;
+
+                        view.$assignee.html(_.each([{ login: '(none)', id: null }].concat(collaborators), function (i, collaborator) {
+                            return _.option({ value: collaborator.id }, collaborator.login);
+                        }));
+                    });
+
+                    return view.$assignee;
+                })().change(view.events.changeAssignee)])), _.div({ class: 'col-xs-6' }, _.div({ class: 'input-group' }, [_.span({ class: 'input-group-addon' }, 'State'), view.$state = _.select({ class: 'form-control' }, _.each(['open', 'closed'], function (i, state) {
+                    return _.option({ value: state }, state);
+                })).change(view.events.changeState)]))]), _.div({ class: 'input-group' }, [_.span({ class: 'input-group-addon' }, 'Milestone'), (function () {
+                    view.$milestone = _.select({ class: 'form-control' });
+
+                    api.milestones.fetch(function (milestones) {
+                        view.milestones = milestones;
+
+                        view.$milestone.html(_.option({ value: -1 }, '(none)'));
+
+                        view.$milestone.append(_.each(milestones, function (i, milestone) {
+                            return _.option({ value: milestone.number }, milestone.title);
+                        }));
+                    });
+
+                    return view.$milestone;
+                })().change(view.events.changeMilestone)]), _.div({ class: 'input-group' }, [_.span({ class: 'input-group-addon' }, 'Title'), view.$title = _.input({ type: 'text', class: 'form-control' }).change(view.events.changeTitle)]), _.div({ class: 'input-group input-group-vertical' }, [_.span({ class: 'input-group-addon' }, 'Description'), view.$body = _.textarea({ class: 'form-control' }).change(view.events.changeBody)])]), _.div({ class: 'modal-footer' }, [view.$labels = _.div({ class: 'labels' }), _.button({ class: 'btn btn-primary' }, 'OK').click(view.events.clickOK)])])));
+                return _this3;
+            }
+
+            /**
+             * Events
+             */
+
+            _createClass(IssueModal, [{
+                key: "onClickOK",
+                value: function onClickOK(e, element, view) {
+                    var $issue = $('.issue[data-id="' + view.model.id + '"]');
+
+                    if ($issue.length > 0) {
+                        $issue.data('view').sync(view.model);
+                    } else {
+                        var issueView = new Issue({
+                            model: view.model
+                        });
+
+                        var $panel = $('.panel[data-name="backlog"] .sortable');
+
+                        $panel.append(issueView.$element);
+                        ViewHelper.get('Issues').updateIssuePositions();
+
+                        issueView.model = view.model;
+                        issueView.sync();
+                    }
+
+                    view.hide();
+                }
+            }, {
+                key: "onChangeAssignee",
+                value: function onChangeAssignee(e, element, view) {
+                    for (var i in view.collaborators) {
+                        if (view.collaborators[i].id == $(element).val()) {
+                            view.model.assignee = view.collaborators[i];
+                        }
+                    }
+                }
+            }, {
+                key: "onChangeTitle",
+                value: function onChangeTitle(e, element, view) {
+                    view.model.title = $(element).val();
+                }
+            }, {
+                key: "onChangeBody",
+                value: function onChangeBody(e, element, view) {
+                    view.model.body = $(element).val();
+                }
+            }, {
+                key: "onChangeState",
+                value: function onChangeState(e, element, view) {
+                    view.model.state = $(element).val();
+                }
+            }, {
+                key: "onChangeMilestone",
+                value: function onChangeMilestone(e, element, view) {
+                    for (var i in view.milestones) {
+                        if (view.milestones[i].number == $(element).val()) {
+                            view.model.milestone = view.milestones[i];
+                        }
+                    }
+                }
+            }, {
+                key: "hide",
+                value: function hide() {
+                    this.$element.modal('hide');
+                }
+            }, {
+                key: "show",
+                value: function show(issue) {
+                    this.model = issue;
+                    this.$element.modal('show');
+                    this.init();
+                }
+            }, {
+                key: "render",
+                value: function render() {
+                    var view = this;
+
+                    if (view.model.user) {
+                        view.$user.html(view.model.user.login);
+                    } else {
+                        view.$user.html('me');
+                    }
+
+                    if (view.model.assignee) {
+                        view.$assignee.val(view.model.assignee.id);
+                    } else {
+                        view.$assignee.val('(none)');
+                    }
+
+                    view.$state.val(view.model.state);
+
+                    if (view.model.milestone) {
+                        view.$milestone.val(view.model.milestone.number);
+                    } else {
+                        view.$milestone.val(-1);
+                    }
+
+                    if (view.model.id) {
+                        view.$heading.html('Edit issue (id: ' + view.model.id + ')');
+                    } else {
+                        view.$heading.html('New issue');
+                    }
+
+                    view.$title.attr('value', view.model.title);
+
+                    view.$body.html(view.model.body);
+
+                    if (view.model.labels) {
+                        view.$labels.html(_.each(view.model.labels, function (i, label) {
+                            function onClickRemove(e) {
+                                view.model.labels.splice(i, 1);
+                                $label.remove();
+                            }
+
+                            var $label = _.div({ class: 'label', style: 'background-color: #' + label.color }, [_.span({ class: 'label-text' }, label.name), _.button({ class: 'btn btn-default label-btn-remove' }, _.span({ class: 'glyphicon glyphicon-remove' })).click(onClickRemove)]);
+
+                            return $label;
+                        }));
+                    } else {
+                        view.$labels.empty();
+                    }
+
+                    view.$labels.append(_.div({ class: 'dropdown' }, [_.button({ class: 'btn btn-default dropdown-toggle', type: 'button', 'data-toggle': 'dropdown' }, _.span({ class: 'glyphicon glyphicon-plus' })), _.ul({ class: 'dropdown-menu' }, _.each(view.labels, function (i, label) {
+                        function onClick(e) {
+                            e.preventDefault();
+
+                            view.model.labels.push(label);
+                            view.render();
+                        }
+
+                        return _.li({ style: 'background-color: #' + label.color }, _.a({ href: '#' }, label.name).click(onClick));
+                    }))]));
+                }
+            }]);
+
+            return IssueModal;
+        })(View);
+
+        module.exports = IssueModal;
+    }, { "./issue": 14 }], 14: [function (require, module, exports) {
+        'use strict';
+
+        var Issue = (function (_View4) {
+            _inherits(Issue, _View4);
+
+            function Issue(args) {
+                _classCallCheck(this, Issue);
+
+                // Register events
+
+                var _this4 = _possibleConstructorReturn(this, Object.getPrototypeOf(Issue).call(this, args));
+
+                _this4.on('click', _this4.onClick);
+
+                // Init html
+                _this4.$element = _.div({ class: 'panel panel-primary issue' }).click(_this4.events.click);
+
+                _this4.init();
+                return _this4;
+            }
+
+            /**
+             * Events
+             */
+
+            _createClass(Issue, [{
+                key: "onClick",
+                value: function onClick(e, element, view) {
+                    ViewHelper.get('IssueModal').show(view.model);
+                }
+
+                /**
+                 * Sorting actions
+                 */
+
+            }, {
+                key: "updateMilestonePosition",
+                value: function updateMilestonePosition() {
+                    var milestoneId = $('.milestones').val();
+
+                    this.$element.toggle(milestoneId == 'all' || this.model.milestone.id == milestoneId);
+                }
+            }, {
+                key: "updateColumnFromPosition",
+                value: function updateColumnFromPosition() {
+                    var $column = this.$element.parents('.column');
+                    var columnName = $column.data('name');
+
+                    this.model.state = columnName == 'done' ? 'closed' : 'open';
+
+                    // Remove column labels
+                    for (var i = this.model.labels.length - 1; i >= 0; i--) {
+                        var label = this.model.labels[i];
+
+                        if ($('.column[data-name="' + label.name + '"]').length > 0) {
+                            this.model.labels.splice(i, 1);
+                        }
+                    }
+
+                    // Add new column label
+                    if (columnName != 'done' && columnName != 'backlog') {
+                        this.model.labels.push({ name: columnName });
+                    }
+
+                    // Sync
+                    this.sync();
+                }
+            }, {
+                key: "updateColumnPosition",
+                value: function updateColumnPosition() {
+                    var column = 'backlog';
+
+                    if (this.model.state == 'closed') {
+                        column = 'done';
+                    } else {
+                        for (var l in this.model.labels) {
+                            var name = this.model.labels[l].name;
+
+                            if ($('.column[data-name="' + name + '"]').length > 0) {
+                                column = name;
+                            }
+                        }
+                    }
+
+                    $('.column[data-name="' + column + '"] .sortable').append(this.$element);
+                }
+
+                /**
+                 * Updating
+                 */
+
+            }, {
+                key: "update",
+                value: function update() {
+                    this.init();
+
+                    this.updateColumnPosition();
+                    this.updateMilestonePosition();
+                }
+            }, {
+                key: "setLoading",
+                value: function setLoading(active) {
+                    this.$element.toggleClass('loading', active);
+                }
+            }, {
+                key: "sync",
+                value: function sync() {
+                    var view = this;
+
+                    // Activate loading state
+                    view.$element.toggleClass('loading', true);
+
+                    // This is a new issue
+                    if (!view.model.id) {
+                        api.issues.create({ data: view.model }, function (issue) {
+                            view.model = issue;
+
+                            view.update();
+                            view.$element.toggleClass('loading', false);
+                        });
+
+                        // This is an existing issue
+                    } else {
+                            api.issues.update({ data: view.model }, function (issue) {
+                                view.model = issue;
+
+                                view.update();
+                                view.$element.toggleClass('loading', false);
+                            });
+                        }
+                }
+
+                /**
+                 * Rendering
+                 */
+
+            }, {
+                key: "render",
+                value: function render() {
+                    var view = this;
+
+                    this.$element.attr('data-id', view.model.id);
+                    this.$element.html([_.div({ class: 'panel-heading' }, [_.span(view.model.title), function () {
+                        if (view.model.assignee) {
+                            return _.img({ alt: '', src: view.model.assignee.avatarUrl });
+                        }
+                    }]), _.div({ class: 'panel-body' }, _.span(view.model.body)), _.div({ class: 'panel-spinner' }, _.div({ class: 'spinner' }))]);
+                }
+            }]);
+
+            return Issue;
+        })(View);
+
+        module.exports = Issue;
+    }, {}], 15: [function (require, module, exports) {
+        var Navbar = (function (_View5) {
+            _inherits(Navbar, _View5);
+
+            function Navbar(args) {
+                _classCallCheck(this, Navbar);
+
+                var _this5 = _possibleConstructorReturn(this, Object.getPrototypeOf(Navbar).call(this, args));
+
+                var view = _this5;
+
+                api.repo(function (repo) {
+                    view.repo = repo;
+
+                    view.init();
+                });
+                return _this5;
+            }
+
+            _createClass(Navbar, [{
+                key: "render",
+                value: function render() {
+                    var view = this;
+
+                    $('.navbar-content').html(_.div({ class: 'navbar navbar-default' }, _.div({ class: 'container' }, [_.if(!env.local.menu.hide.all, _.ul({ class: 'nav navbar-nav' }, [_.li(_.a({ href: '/repos/' + req.params.user }, [_.span({ class: 'glyphicon glyphicon-arrow-left' }), ' Repos'])), _.if(!env.local.menu.hide.deployment, _.li(_.a({ href: '/repos/' + req.params.user + '/' + req.params.repo + '/deployment/' }, [_.span({ class: 'glyphicon glyphicon-upload' }), ' Deployment']))), _.if(!env.local.menu.hide.collaborators, _.li(_.a({ href: '/repos/' + req.params.user + '/' + req.params.repo + '/collaborators/' }, [_.span({ class: 'glyphicon glyphicon-user' }), ' Collaborators']))), _.if(!env.local.menu.hide.issues, _.li(_.a({ href: '/repos/' + req.params.user + '/' + req.params.repo + '/issues/' }, [_.span({ class: 'glyphicon glyphicon-exclamation-sign' }), ' Issues']))), _.if(!env.local.menu.hide.settings, _.li(_.a({ href: '/repos/' + req.params.user + '/' + req.params.repo + '/settings/' }, [_.span({ class: 'glyphicon glyphicon-cog' }), ' Settings'])))]), _.ul({ class: 'nav navbar-nav navbar-right' }, _.li({ class: 'navbar-btn' }, _.div({ class: 'input-group' }, [_.span({ class: 'input-group-addon' }, 'git'), function () {
+                        var element = _.input({ class: 'form-control', type: 'text', value: '' });
+
+                        element.attr('value', view.repo.cloneUrl);
+
+                        return element;
+                    }]))))])));
+
+                    // Set active navigation button
+                    $('.navbar-content .navbar-nav li').each(function (i) {
+                        var a = $(this).children('a');
+                        var isActive = location.pathname == a.attr('href') || location.pathname + '/' == a.attr('href');
+
+                        $(this).toggleClass('active', isActive);
+                    });
+                }
+            }]);
+
+            return Navbar;
+        })(View);
+
+        new Navbar();
+    }, {}], 16: [function (require, module, exports) {
         'use strict';
 
         var env = require('../../env.json');
@@ -1986,7 +1984,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                         console.log('[ERROR] ' + makeTitle(src), err);
                     }
 
-                    console.trace();
+                    if (env.debug.trace) {
+                        console.log('-------- TRACE --------');
+                        console.trace();
+                    }
                 }
             }, {
                 key: "log",
@@ -2015,4 +2016,4 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         })();
 
         module.exports = Debug;
-    }, { "../../env.json": 1 }] }, {}, [10]);
+    }, { "../../env.json": 1 }] }, {}, [12]);

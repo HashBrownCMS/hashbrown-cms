@@ -139,8 +139,118 @@ textarea {
     border-radius: 100%;
 }
 
+.navbar-content {
+    position: fixed;
+    width: 100%;
+    top: 0px;
+    left: 0px;
+    z-index: 50;
+
+    >.navbar {
+        border-radius: 0px;
+    }
+}
+
 /**
  * Global settings
  */
 body {
+    padding-top: 70px;
+}
+
+/**
+ * Theme
+ * TODO: Move into theme file
+ */
+body {
+    $m50: #e0f2f1;
+    $m100: #b2dfdb;
+    $m200: #80cbc4;
+    $m300: #4db6ac;
+    $m400: #26a69a;
+    $m500: #009688;
+    $m900: #004d40;
+
+    // Navbar
+    .navbar-content {
+        .navbar {
+            background-color: $m500;
+            border: 0px;
+
+            li {
+                a {
+                    &, &:focus, &:hover, &:active {
+                        color: #fff;
+                    }
+                }
+            }
+        }
+    }
+
+    // Page
+    .page-content {
+        // CMS
+        .editor {
+            background-color: $m50;
+
+            .field-anchor {
+                margin-bottom: 0px;
+                padding: 10px 0px 10px 15px;
+                background-color: $m500;
+                color: #fff;
+            }
+
+            .field-editor-container {
+                border-left: 5px solid $m500;
+                margin-bottom: 0px;
+                padding-top: 15px;
+
+                .field-editor-label {
+                    color: $m500;
+                }
+
+                .field-editor {
+                    .form-control {
+                        border-width: 0px;
+                    }
+                }
+            }
+        }
+
+        // Issues
+        .panel-default.column {
+            background-color: $m50;
+        }
+
+        // Panels
+        .panel {
+            border-width: 0px;
+            box-shadow: none;
+
+            .panel-heading {
+                background-color: $m300;
+                border-width: 0px;
+                color: #fff;
+            }
+    
+            .panel-body {
+                border-width: 0px;
+            }
+
+            .panel-footer {
+                border-width: 0px;
+            }
+        }
+
+        // Buttons
+        .btn-default {
+            background-color: $m400;
+            border-width: 0px;
+            color: #fff;
+
+            &:hover {
+                background-color: $m200;
+            }
+        }
+    }
 }

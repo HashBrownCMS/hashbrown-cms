@@ -5,12 +5,12 @@ var plumber = require('gulp-plumber');
 var babel = require('gulp-babel');
 
 gulp.task('sass', function() {
-    gulp.src('./sass/main.scss')
+    gulp.src('./src/client/sass/main.scss')
         .pipe(plumber())
         .pipe(sass())
         .pipe(gulp.dest('./public/css'));
     
-    gulp.src('./sass/views/*.scss')
+    gulp.src('./src/client/sass/views/*.scss')
         .pipe(plumber())
         .pipe(sass())
         .pipe(gulp.dest('./public/css/views'));
@@ -18,7 +18,7 @@ gulp.task('sass', function() {
 
 
 gulp.task('js', function() {
-    gulp.src('./js/client.js')
+    gulp.src('./src/client/js/client.js')
         .pipe(plumber())
         .pipe(browserify({
             paths: [
@@ -31,7 +31,7 @@ gulp.task('js', function() {
         }))
         .pipe(gulp.dest('./public/js'));
 
-    gulp.src('./js/views/*.js')
+    gulp.src('./src/client/js/views/*.js')
         .pipe(plumber())
         .pipe(browserify())
         .pipe(babel({
@@ -42,8 +42,8 @@ gulp.task('js', function() {
 });
 
 gulp.task('watch', function() {
-    gulp.watch('./js/**/*.js', [ 'js' ]);
-    gulp.watch('./sass/**/*.scss', [ 'sass' ]);
+    gulp.watch('./src/client/js/**/*.js', [ 'js' ]);
+    gulp.watch('./src/client/sass/**/*.scss', [ 'sass' ]);
 });
 
 gulp.task('default', [ 'sass', 'js', 'watch' ]);

@@ -123,10 +123,71 @@ textarea {
   background-color: rgba(0, 0, 0, 0.5);
   border-radius: 100%; }
 
+.navbar-content {
+  position: fixed;
+  width: 100%;
+  top: 0px;
+  left: 0px;
+  z-index: 50; }
+  .navbar-content > .navbar {
+    border-radius: 0px; }
+
 /**
  * Global settings
  */
+body {
+  padding-top: 70px; }
+
+/**
+ * Theme
+ * TODO: Move into theme file
+ */
+body .navbar-content .navbar {
+  background-color: #009688;
+  border: 0px; }
+  body .navbar-content .navbar li a, body .navbar-content .navbar li a:focus, body .navbar-content .navbar li a:hover, body .navbar-content .navbar li a:active {
+    color: #fff; }
+
+body .page-content .editor {
+  background-color: #e0f2f1; }
+  body .page-content .editor .field-anchor {
+    margin-bottom: 0px;
+    padding: 10px 0px 10px 15px;
+    background-color: #009688;
+    color: #fff; }
+  body .page-content .editor .field-editor-container {
+    border-left: 5px solid #009688;
+    margin-bottom: 0px;
+    padding-top: 15px; }
+    body .page-content .editor .field-editor-container .field-editor-label {
+      color: #009688; }
+    body .page-content .editor .field-editor-container .field-editor .form-control {
+      border-width: 0px; }
+
+body .page-content .panel-default.column {
+  background-color: #e0f2f1; }
+
+body .page-content .panel {
+  border-width: 0px;
+  box-shadow: none; }
+  body .page-content .panel .panel-heading {
+    background-color: #4db6ac;
+    border-width: 0px;
+    color: #fff; }
+  body .page-content .panel .panel-body {
+    border-width: 0px; }
+  body .page-content .panel .panel-footer {
+    border-width: 0px; }
+
+body .page-content .btn-default {
+  background-color: #26a69a;
+  border-width: 0px;
+  color: #fff; }
+  body .page-content .btn-default:hover {
+    background-color: #80cbc4; }
+
 .page-content {
+  padding-top: 52px;
   /**
      * Tree
      */
@@ -134,23 +195,35 @@ textarea {
      * Editor
      */ }
   .page-content .tree {
-    margin-bottom: 15px; }
+    position: fixed;
+    z-index: 40;
+    width: 100%;
+    padding-top: 70px;
+    top: 0px;
+    left: 0px;
+    background-color: #fff; }
     .page-content .tree .nav-root {
       margin: 0px;
       padding: 0px; }
-    .page-content .tree > .panel-body {
-      padding: 0px; }
+    .page-content .tree .panel {
+      margin-bottom: 0px;
+      border-bottom-left-radius: 0px;
+      border-bottom-right-radius: 0px;
+      box-shadow: none; }
+      .page-content .tree .panel .panel-heading {
+        border-bottom: 0px; }
+      .page-content .tree .panel .panel-body {
+        padding: 0px; }
     .page-content .tree .tab-pane {
       position: relative;
       height: 0px;
-      transition: height 0.5s ease;
-      opacity: 0;
-      display: block; }
+      transition: height 0.5s ease; }
       .page-content .tree .tab-pane.active {
-        opacity: 1;
+        border-top: 1px solid #ddd;
         height: 300px;
         overflow-y: hidden;
-        overflow-x: auto; }
+        overflow-x: auto;
+        box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.25); }
       .page-content .tree .tab-pane ul, .page-content .tree .tab-pane li {
         padding: 0px;
         margin: 0px;
@@ -404,13 +477,19 @@ textarea {
           width: 100%; }
   .page-content .editor {
     position: relative;
-    min-height: 200px; }
-    .page-content .editor > .panel-heading {
-      position: relative; }
-      .page-content .editor > .panel-heading .field-anchors .btn {
-        text-transform: capitalize; }
-      .page-content .editor > .panel-heading .content-actions {
-        float: right; }
+    min-height: 200px;
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px; }
+    .page-content .editor .editor-nav > div {
+      position: fixed; }
+    .page-content .editor .editor-nav .field-anchors {
+      display: block;
+      margin-bottom: 15px; }
+      .page-content .editor .editor-nav .field-anchors .btn {
+        text-transform: capitalize;
+        text-align: left; }
+    .page-content .editor .editor-nav .content-actions {
+      display: block; }
     .page-content .editor .field-anchor {
       text-transform: capitalize; }
     .page-content .editor .field-editor-container {

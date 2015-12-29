@@ -12,10 +12,14 @@ class Tree extends View {
         this.on('clickRenameItem', this.onClickRenameItem);
 
         // Prerender container
-        this.$element = _.div({class: 'tree panel panel-default'}, [
-            _.div({class: 'panel-heading'}),
-            _.div({class: 'panel-body'})
-        ]);
+        this.$element = _.div({class: 'tree'},
+            _.div({class: 'container'},
+                _.div({class: 'panel panel-default'}, [
+                _.div({class: 'panel-heading'}),
+                _.div({class: 'panel-body'})
+                ])
+            )
+        );
 
         this.modelFunction = api.tree.fetch;
         this.fetch();
@@ -67,10 +71,24 @@ class Tree extends View {
         return array;
     }
 
-    highlight(path) {
+    picker(path) {
+        this.highlight(path, true);
+    }
+
+    highlight(path, expandPane) {
         let $fileAnchor = $('.tree li a[href="#/' + path + '"]');
         let $file = $fileAnchor.parent();
 
+        // If specified, expand the parent pane
+        if(expandPane) {
+            // Set all panes inactive
+            $('.tree .tab-pane').toggleClass('active', false);
+
+            // Set current pane active
+            $file.parents('.tab-pane').toggleClass('active', true);
+        }
+
+        // Set all file elements inactive
         $('.tree .file').toggleClass('active', false);
 
         // Highlighting a file does not unhighlight a folder
@@ -78,6 +96,7 @@ class Tree extends View {
             $('.tree .folder').toggleClass('active', false);
         }
         
+        // Set current file element active
         $file.toggleClass('active', true);
 
         $file.parents('.folder').toggleClass('active', true);
@@ -128,7 +147,7 @@ class Tree extends View {
     render() {
         let view = this;
 
-        this.$element.children('.panel-heading').html([
+        this.$element.find('.panel-heading').html([
             // Close root nav button
             _.button({class: 'btn close'},
                 _.span({class: 'glyphicon glyphicon-remove'})
@@ -146,7 +165,7 @@ class Tree extends View {
             )
         ]);
 
-        this.$element.children('.panel-body').html([
+        this.$element.find('.panel-body').html([
             // Subfolders
             this.$subNav = _.nav({class: 'tab-content nav-sub'},
                 _.each(this.dirs,
