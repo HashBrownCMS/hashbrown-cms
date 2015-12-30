@@ -142,49 +142,54 @@ body {
  * Theme
  * TODO: Move into theme file
  */
-body .navbar-content .navbar {
-  background-color: #009688;
-  border: 0px; }
-  body .navbar-content .navbar li a, body .navbar-content .navbar li a:focus, body .navbar-content .navbar li a:hover, body .navbar-content .navbar li a:active {
-    color: #fff; }
-
-body .page-content .editor {
+body {
   background-color: #e0f2f1; }
-  body .page-content .editor .field-anchor {
-    margin-bottom: 0px;
-    padding: 10px 0px 10px 15px;
+  body .navbar-content .navbar {
     background-color: #009688;
-    color: #fff; }
+    border: 0px; }
+    body .navbar-content .navbar li a, body .navbar-content .navbar li a:focus, body .navbar-content .navbar li a:hover, body .navbar-content .navbar li a:active {
+      color: #fff; }
+  body .page-content .tree {
+    background-color: #e0f2f1; }
+  body .page-content .editor .field-anchor {
+    margin: 15px 0px 0px 0px;
+    padding: 10px 0px 10px 10px;
+    border-left: 5px solid #009688;
+    color: #009688;
+    font-size: 28px; }
+    body .page-content .editor .field-anchor:first-child {
+      margin-top: 0px; }
   body .page-content .editor .field-editor-container {
+    border: 0px;
     border-left: 5px solid #009688;
     margin-bottom: 0px;
     padding-top: 15px; }
     body .page-content .editor .field-editor-container .field-editor-label {
-      color: #009688; }
-    body .page-content .editor .field-editor-container .field-editor .form-control {
+      border-width: 0px;
+      color: #999; }
+    body .page-content .editor .field-editor-container .field-editor {
       border-width: 0px; }
-
-body .page-content .panel-default.column {
-  background-color: #e0f2f1; }
-
-body .page-content .panel {
-  border-width: 0px;
-  box-shadow: none; }
-  body .page-content .panel .panel-heading {
-    background-color: #4db6ac;
+      body .page-content .editor .field-editor-container .field-editor .form-control {
+        border-width: 0px;
+        box-shadow: none;
+        border-bottom: 2px solid #009688; }
+  body .page-content .panel {
+    border-width: 0px;
+    box-shadow: none; }
+    body .page-content .panel .panel-heading {
+      background-color: #4db6ac;
+      border-width: 0px;
+      color: #fff; }
+    body .page-content .panel .panel-body {
+      border-width: 0px; }
+    body .page-content .panel .panel-footer {
+      border-width: 0px; }
+  body .page-content .btn-default {
+    background-color: #26a69a;
     border-width: 0px;
     color: #fff; }
-  body .page-content .panel .panel-body {
-    border-width: 0px; }
-  body .page-content .panel .panel-footer {
-    border-width: 0px; }
-
-body .page-content .btn-default {
-  background-color: #26a69a;
-  border-width: 0px;
-  color: #fff; }
-  body .page-content .btn-default:hover {
-    background-color: #80cbc4; }
+    body .page-content .btn-default:hover {
+      background-color: #80cbc4; }
 
 .repo-actions {
   margin: 0px auto 20px;

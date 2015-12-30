@@ -32,13 +32,11 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
                     }
                 }
             },
-            "menu": {
-                "hide": {
-                    "all": false
-                }
-            },
             "debug": {
                 "verbosity": 3
+            },
+            "menu": {
+                "hide": {}
             }
         };
     }, {}], 2: [function (require, module, exports) {
@@ -979,12 +977,12 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
 
         window._ = Templating;
     }, {}], 9: [function (require, module, exports) {
-        'use strict'
+        'use strict';
 
         /**
          *  jQuery extension
          */
-        ;
+
         (function ($) {
             $.event.special.destroyed = {
                 remove: function remove(o) {

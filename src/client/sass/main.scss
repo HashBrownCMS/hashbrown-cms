@@ -163,14 +163,19 @@ body {
  * TODO: Move into theme file
  */
 body {
-    $m50: #e0f2f1;
+    $m50: #e0f2f1; 
     $m100: #b2dfdb;
     $m200: #80cbc4;
     $m300: #4db6ac;
     $m400: #26a69a;
     $m500: #009688;
+    $m600: #00897b;
+    $m700: #00796b;
+    $m800: #00695c;
     $m900: #004d40;
 
+    background-color: $m50;
+    
     // Navbar
     .navbar-content {
         .navbar {
@@ -190,36 +195,44 @@ body {
     // Page
     .page-content {
         // CMS
-        .editor {
+        .tree {
             background-color: $m50;
+        }
 
+        .editor {
             .field-anchor {
-                margin-bottom: 0px;
-                padding: 10px 0px 10px 15px;
-                background-color: $m500;
-                color: #fff;
+                margin: 15px 0px 0px 0px;
+                padding: 10px 0px 10px 10px;
+                border-left: 5px solid $m500;
+                color: $m500;
+                font-size: 28px;
+
+                &:first-child {
+                    margin-top: 0px;
+                }
             }
 
             .field-editor-container {
+                border: 0px;
                 border-left: 5px solid $m500;
                 margin-bottom: 0px;
                 padding-top: 15px;
 
                 .field-editor-label {
-                    color: $m500;
+                    border-width: 0px;
+                    color: #999;
                 }
 
                 .field-editor {
+                    border-width: 0px;
+                    
                     .form-control {
                         border-width: 0px;
+                        box-shadow: none;
+                        border-bottom: 2px solid $m500;
                     }
                 }
             }
-        }
-
-        // Issues
-        .panel-default.column {
-            background-color: $m50;
         }
 
         // Panels
