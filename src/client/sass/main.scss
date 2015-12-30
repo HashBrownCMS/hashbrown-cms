@@ -183,6 +183,33 @@ body {
             border: 0px;
 
             li {
+                &.active {
+                    a {
+                        color: $m500;
+                        background-color: $m50;
+                        position: relative;
+                        z-index: 10;
+                    
+                        &:after, &:before {
+                            content: '';
+                            width: 15px;
+                            height: 100%;
+                            position: absolute;
+                            top: 0px;
+                        }
+                        
+                        &:before {
+                            background-image: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.15));
+                            left: -15px;
+                        }
+                        
+                        &:after {
+                            background-image: linear-gradient(to left, transparent, rgba(0, 0, 0, 0.15));
+                            right: -15px;
+                        }
+                    }
+                }
+
                 a {
                     &, &:focus, &:hover, &:active {
                         color: #fff;
@@ -235,6 +262,23 @@ body {
             }
         }
 
+        // Issues
+        .panel.column {
+            background-color: transparent;
+            border-left: 5px solid $m500;
+            border-radius: 0px;
+
+            >.panel-heading {
+                background-color: transparent;
+                color: $m500;
+                font-size: 2em;
+            }
+                
+            >.panel-body {
+                background-color: transparent;
+            }
+        }
+
         // Panels
         .panel {
             border-width: 0px;
@@ -256,7 +300,7 @@ body {
         }
 
         // Buttons
-        .btn-default {
+        .btn {
             background-color: $m400;
             border-width: 0px;
             color: #fff;

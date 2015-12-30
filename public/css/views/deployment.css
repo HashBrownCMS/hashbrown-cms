@@ -147,6 +147,23 @@ body {
   body .navbar-content .navbar {
     background-color: #009688;
     border: 0px; }
+    body .navbar-content .navbar li.active a {
+      color: #009688;
+      background-color: #e0f2f1;
+      position: relative;
+      z-index: 10; }
+      body .navbar-content .navbar li.active a:after, body .navbar-content .navbar li.active a:before {
+        content: '';
+        width: 15px;
+        height: 100%;
+        position: absolute;
+        top: 0px; }
+      body .navbar-content .navbar li.active a:before {
+        background-image: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.15));
+        left: -15px; }
+      body .navbar-content .navbar li.active a:after {
+        background-image: linear-gradient(to left, transparent, rgba(0, 0, 0, 0.15));
+        right: -15px; }
     body .navbar-content .navbar li a, body .navbar-content .navbar li a:focus, body .navbar-content .navbar li a:hover, body .navbar-content .navbar li a:active {
       color: #fff; }
   body .page-content .tree {
@@ -173,6 +190,16 @@ body {
         border-width: 0px;
         box-shadow: none;
         border-bottom: 2px solid #009688; }
+  body .page-content .panel.column {
+    background-color: transparent;
+    border-left: 5px solid #009688;
+    border-radius: 0px; }
+    body .page-content .panel.column > .panel-heading {
+      background-color: transparent;
+      color: #009688;
+      font-size: 2em; }
+    body .page-content .panel.column > .panel-body {
+      background-color: transparent; }
   body .page-content .panel {
     border-width: 0px;
     box-shadow: none; }
@@ -184,11 +211,11 @@ body {
       border-width: 0px; }
     body .page-content .panel .panel-footer {
       border-width: 0px; }
-  body .page-content .btn-default {
+  body .page-content .btn {
     background-color: #26a69a;
     border-width: 0px;
     color: #fff; }
-    body .page-content .btn-default:hover {
+    body .page-content .btn:hover {
       background-color: #80cbc4; }
 
 .repo-actions {
