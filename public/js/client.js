@@ -1,14 +1,14 @@
 "use strict";
 
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
 
 (function e(t, n, r) {
     function s(o, u) {
@@ -660,7 +660,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
     }, {}], 5: [function (require, module, exports) {
         'use strict';
 
-        var ContextMenu = (function (_View) {
+        var ContextMenu = function (_View) {
             _inherits(ContextMenu, _View);
 
             function ContextMenu(args) {
@@ -715,7 +715,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
             }]);
 
             return ContextMenu;
-        })(View);
+        }(View);
 
         // jQuery extention
 
@@ -757,7 +757,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
 
         var routes = [];
 
-        var Router = (function () {
+        var Router = function () {
             function Router() {
                 _classCallCheck(this, Router);
             }
@@ -855,7 +855,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
             }]);
 
             return Router;
-        })();
+        }();
 
         window.addEventListener('hashchange', Router.init);
         window.Router = Router;
@@ -999,7 +999,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
          */
         var instances = [];
 
-        var ViewHelper = (function () {
+        var ViewHelper = function () {
             function ViewHelper() {
                 _classCallCheck(this, ViewHelper);
             }
@@ -1075,7 +1075,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
             }]);
 
             return ViewHelper;
-        })();
+        }();
 
         window.ViewHelper = ViewHelper;
 
@@ -1083,7 +1083,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
          * Class
          */
 
-        var View = (function () {
+        var View = function () {
             /**
              * Init
              */
@@ -1312,7 +1312,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
             }]);
 
             return View;
-        })();
+        }();
 
         window.View = View;
     }, {}], 9: [function (require, module, exports) {
@@ -1378,7 +1378,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
         require('./api');
         require('./env');
     }, { "./api": 4, "./core/ContextMenu": 5, "./core/Router": 6, "./core/Templating": 7, "./core/View": 8, "./env": 9, "./helper": 11 }], 11: [function (require, module, exports) {
-        var Helper = (function () {
+        var Helper = function () {
             function Helper() {
                 _classCallCheck(this, Helper);
             }
@@ -1427,7 +1427,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
             }]);
 
             return Helper;
-        })();
+        }();
 
         window.helper = Helper;
     }, {}], 12: [function (require, module, exports) {
@@ -1449,7 +1449,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
             return title;
         }
 
-        var Debug = (function () {
+        var Debug = function () {
             function Debug() {
                 _classCallCheck(this, Debug);
             }
@@ -1492,7 +1492,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
             }]);
 
             return Debug;
-        })();
+        }();
 
         module.exports = Debug;
     }, { "../../env.json": 1 }] }, {}, [10]);

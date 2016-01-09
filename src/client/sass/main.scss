@@ -253,10 +253,14 @@ body {
                 .field-editor {
                     border-width: 0px;
                     
-                    .form-control {
+                    input.form-control {
                         border-width: 0px;
                         box-shadow: none;
                         border-bottom: 2px solid $m500;
+                    }
+
+                    select.form-control {
+                        
                     }
                 }
             }

@@ -12,16 +12,29 @@ class TemplatePicker extends FieldEditor {
     renderField() {
         let view = this;
 
+        view.model.allowed = ['dude', 'sweet']
+
         return _.div({class: 'template-picker'}, 
-            _.select({class: 'form-control'},
-                _.each(view.model.allowed || [],
-                    function(i, template) {
-                        return _.option({value: template},
-                            template
-                        );
-                    }
+            _.div({class: 'form-control dropdown'}, [
+                _.button({class: 'btn btn-default dropdown-toggle'},
+                    view.model.value
+                ),
+                _.ul({class: 'dropdown-menu'}, 
+                    _.each(view.model.allowed || [],
+                        function(i, template) {
+                            function onClick(e) {
+                                e.preventDefault();
+                                
+                                view.events.changeTextValue(e);
+                            }
+                            
+                            return _.li(
+                                _.a(template)
+                            );
+                        }
+                    )
                 )
-            ).change(this.events.changeTextValue)
+            ])
         );
     }
 }

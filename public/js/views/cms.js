@@ -1,14 +1,14 @@
 "use strict";
 
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
 
 (function e(t, n, r) {
     function s(o, u) {
@@ -669,7 +669,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
     }, { "./api": 4, "./core/ContextMenu": 6, "./core/Router": 7, "./core/Templating": 8, "./core/View": 9, "./env": 10, "./helper": 11 }], 6: [function (require, module, exports) {
         'use strict';
 
-        var ContextMenu = (function (_View) {
+        var ContextMenu = function (_View) {
             _inherits(ContextMenu, _View);
 
             function ContextMenu(args) {
@@ -724,7 +724,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
             }]);
 
             return ContextMenu;
-        })(View);
+        }(View);
 
         // jQuery extention
 
@@ -766,7 +766,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
 
         var routes = [];
 
-        var Router = (function () {
+        var Router = function () {
             function Router() {
                 _classCallCheck(this, Router);
             }
@@ -864,7 +864,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
             }]);
 
             return Router;
-        })();
+        }();
 
         window.addEventListener('hashchange', Router.init);
         window.Router = Router;
@@ -1008,7 +1008,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
          */
         var instances = [];
 
-        var ViewHelper = (function () {
+        var ViewHelper = function () {
             function ViewHelper() {
                 _classCallCheck(this, ViewHelper);
             }
@@ -1084,7 +1084,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
             }]);
 
             return ViewHelper;
-        })();
+        }();
 
         window.ViewHelper = ViewHelper;
 
@@ -1092,7 +1092,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
          * Class
          */
 
-        var View = (function () {
+        var View = function () {
             /**
              * Init
              */
@@ -1321,7 +1321,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
             }]);
 
             return View;
-        })();
+        }();
 
         window.View = View;
     }, {}], 10: [function (require, module, exports) {
@@ -1378,7 +1378,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
             }
         };
     }, { "../../../env.json": 1, "../../helpers/debug": 25 }], 11: [function (require, module, exports) {
-        var Helper = (function () {
+        var Helper = function () {
             function Helper() {
                 _classCallCheck(this, Helper);
             }
@@ -1427,7 +1427,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
             }]);
 
             return Helper;
-        })();
+        }();
 
         window.helper = Helper;
     }, {}], 12: [function (require, module, exports) {
@@ -1439,7 +1439,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
         var Tree = require('./partials/cms-tree');
         var Editor = require('./partials/cms-editor');
 
-        var CMS = (function (_View2) {
+        var CMS = function (_View2) {
             _inherits(CMS, _View2);
 
             function CMS(args) {
@@ -1476,11 +1476,11 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
             }]);
 
             return CMS;
-        })(View);
+        }(View);
 
         new CMS();
     }, { "../client": 5, "./partials/cms-editor": 13, "./partials/cms-tree": 14, "./partials/navbar": 24 }], 13: [function (require, module, exports) {
-        var Editor = (function (_View3) {
+        var Editor = function (_View3) {
             _inherits(Editor, _View3);
 
             function Editor(args) {
@@ -1637,11 +1637,11 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
             }]);
 
             return Editor;
-        })(View);
+        }(View);
 
         module.exports = Editor;
     }, { "./field-editors/block-picker": 15, "./field-editors/checkbox": 16, "./field-editors/date-picker": 17, "./field-editors/struct-picker": 19, "./field-editors/template-picker": 20, "./field-editors/text": 22, "./field-editors/text-html": 21, "./field-editors/url": 23 }], 14: [function (require, module, exports) {
-        var Tree = (function (_View4) {
+        var Tree = function (_View4) {
             _inherits(Tree, _View4);
 
             function Tree(args) {
@@ -1905,7 +1905,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
             }]);
 
             return Tree;
-        })(View);
+        }(View);
 
         module.exports = Tree;
     }, {}], 15: [function (require, module, exports) {
@@ -1913,7 +1913,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
 
         var FieldEditor = require('./field');
 
-        var BlockPicker = (function (_FieldEditor) {
+        var BlockPicker = function (_FieldEditor) {
             _inherits(BlockPicker, _FieldEditor);
 
             function BlockPicker(args) {
@@ -1939,7 +1939,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
             }]);
 
             return BlockPicker;
-        })(FieldEditor);
+        }(FieldEditor);
 
         module.exports = BlockPicker;
     }, { "./field": 18 }], 16: [function (require, module, exports) {
@@ -1947,7 +1947,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
 
         var FieldEditor = require('./field');
 
-        var CheckboxEditor = (function (_FieldEditor2) {
+        var CheckboxEditor = function (_FieldEditor2) {
             _inherits(CheckboxEditor, _FieldEditor2);
 
             function CheckboxEditor(args) {
@@ -1973,7 +1973,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
             }]);
 
             return CheckboxEditor;
-        })(FieldEditor);
+        }(FieldEditor);
 
         module.exports = CheckboxEditor;
     }, { "./field": 18 }], 17: [function (require, module, exports) {
@@ -1981,7 +1981,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
 
         var FieldEditor = require('./field');
 
-        var DatePicker = (function (_FieldEditor3) {
+        var DatePicker = function (_FieldEditor3) {
             _inherits(DatePicker, _FieldEditor3);
 
             function DatePicker(args) {
@@ -2066,13 +2066,13 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
             }]);
 
             return DatePicker;
-        })(FieldEditor);
+        }(FieldEditor);
 
         module.exports = DatePicker;
     }, { "./field": 18 }], 18: [function (require, module, exports) {
         'use strict';
 
-        var FieldEditor = (function (_View5) {
+        var FieldEditor = function (_View5) {
             _inherits(FieldEditor, _View5);
 
             function FieldEditor(args) {
@@ -2177,7 +2177,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
             }]);
 
             return FieldEditor;
-        })(View);
+        }(View);
 
         module.exports = FieldEditor;
     }, {}], 19: [function (require, module, exports) {
@@ -2185,7 +2185,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
 
         var FieldEditor = require('./field');
 
-        var StructPicker = (function (_FieldEditor4) {
+        var StructPicker = function (_FieldEditor4) {
             _inherits(StructPicker, _FieldEditor4);
 
             function StructPicker(args) {
@@ -2209,7 +2209,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
             }]);
 
             return StructPicker;
-        })(FieldEditor);
+        }(FieldEditor);
 
         module.exports = StructPicker;
     }, { "./field": 18 }], 20: [function (require, module, exports) {
@@ -2217,7 +2217,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
 
         var FieldEditor = require('./field');
 
-        var TemplatePicker = (function (_FieldEditor5) {
+        var TemplatePicker = function (_FieldEditor5) {
             _inherits(TemplatePicker, _FieldEditor5);
 
             function TemplatePicker(args) {
@@ -2234,14 +2234,22 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
                 value: function renderField() {
                     var view = this;
 
-                    return _.div({ class: 'template-picker' }, _.select({ class: 'form-control' }, _.each(view.model.allowed || [], function (i, template) {
-                        return _.option({ value: template }, template);
-                    })).change(this.events.changeTextValue));
+                    view.model.allowed = ['dude', 'sweet'];
+
+                    return _.div({ class: 'template-picker' }, _.div({ class: 'form-control dropdown' }, [_.button({ class: 'btn btn-default dropdown-toggle' }, view.model.value), _.ul({ class: 'dropdown-menu' }, _.each(view.model.allowed || [], function (i, template) {
+                        function onClick(e) {
+                            e.preventDefault();
+
+                            view.events.changeTextValue(e);
+                        }
+
+                        return _.li(_.a(template));
+                    }))]));
                 }
             }]);
 
             return TemplatePicker;
-        })(FieldEditor);
+        }(FieldEditor);
 
         module.exports = TemplatePicker;
     }, { "./field": 18 }], 21: [function (require, module, exports) {
@@ -2249,7 +2257,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
 
         var FieldEditor = require('./field');
 
-        var TextHtmlEditor = (function (_FieldEditor6) {
+        var TextHtmlEditor = function (_FieldEditor6) {
             _inherits(TextHtmlEditor, _FieldEditor6);
 
             function TextHtmlEditor(args) {
@@ -2269,7 +2277,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
             }]);
 
             return TextHtmlEditor;
-        })(FieldEditor);
+        }(FieldEditor);
 
         module.exports = TextHtmlEditor;
     }, { "./field": 18 }], 22: [function (require, module, exports) {
@@ -2277,7 +2285,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
 
         var FieldEditor = require('./field');
 
-        var TextEditor = (function (_FieldEditor7) {
+        var TextEditor = function (_FieldEditor7) {
             _inherits(TextEditor, _FieldEditor7);
 
             function TextEditor(args) {
@@ -2297,7 +2305,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
             }]);
 
             return TextEditor;
-        })(FieldEditor);
+        }(FieldEditor);
 
         module.exports = TextEditor;
     }, { "./field": 18 }], 23: [function (require, module, exports) {
@@ -2305,7 +2313,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
 
         var FieldEditor = require('./field');
 
-        var UrlEditor = (function (_FieldEditor8) {
+        var UrlEditor = function (_FieldEditor8) {
             _inherits(UrlEditor, _FieldEditor8);
 
             function UrlEditor(args) {
@@ -2327,11 +2335,11 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
             }]);
 
             return UrlEditor;
-        })(FieldEditor);
+        }(FieldEditor);
 
         module.exports = UrlEditor;
     }, { "./field": 18 }], 24: [function (require, module, exports) {
-        var Navbar = (function (_View6) {
+        var Navbar = function (_View6) {
             _inherits(Navbar, _View6);
 
             function Navbar(args) {
@@ -2373,7 +2381,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
             }]);
 
             return Navbar;
-        })(View);
+        }(View);
 
         new Navbar();
     }, {}], 25: [function (require, module, exports) {
@@ -2395,7 +2403,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
             return title;
         }
 
-        var Debug = (function () {
+        var Debug = function () {
             function Debug() {
                 _classCallCheck(this, Debug);
             }
@@ -2438,7 +2446,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
             }]);
 
             return Debug;
-        })();
+        }();
 
         module.exports = Debug;
     }, { "../../env.json": 1 }] }, {}, [12]);

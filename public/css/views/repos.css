@@ -186,7 +186,7 @@ body {
       color: #999; }
     body .page-content .editor .field-editor-container .field-editor {
       border-width: 0px; }
-      body .page-content .editor .field-editor-container .field-editor .form-control {
+      body .page-content .editor .field-editor-container .field-editor input.form-control {
         border-width: 0px;
         box-shadow: none;
         border-bottom: 2px solid #009688; }

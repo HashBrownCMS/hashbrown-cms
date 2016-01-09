@@ -1,14 +1,14 @@
 "use strict";
 
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
 
 (function e(t, n, r) {
     function s(o, u) {
@@ -669,7 +669,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
     }, { "./api": 4, "./core/ContextMenu": 6, "./core/Router": 7, "./core/Templating": 8, "./core/View": 9, "./env": 10, "./helper": 11 }], 6: [function (require, module, exports) {
         'use strict';
 
-        var ContextMenu = (function (_View) {
+        var ContextMenu = function (_View) {
             _inherits(ContextMenu, _View);
 
             function ContextMenu(args) {
@@ -724,7 +724,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
             }]);
 
             return ContextMenu;
-        })(View);
+        }(View);
 
         // jQuery extention
 
@@ -766,7 +766,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
 
         var routes = [];
 
-        var Router = (function () {
+        var Router = function () {
             function Router() {
                 _classCallCheck(this, Router);
             }
@@ -864,7 +864,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
             }]);
 
             return Router;
-        })();
+        }();
 
         window.addEventListener('hashchange', Router.init);
         window.Router = Router;
@@ -1008,7 +1008,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
          */
         var instances = [];
 
-        var ViewHelper = (function () {
+        var ViewHelper = function () {
             function ViewHelper() {
                 _classCallCheck(this, ViewHelper);
             }
@@ -1084,7 +1084,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
             }]);
 
             return ViewHelper;
-        })();
+        }();
 
         window.ViewHelper = ViewHelper;
 
@@ -1092,7 +1092,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
          * Class
          */
 
-        var View = (function () {
+        var View = function () {
             /**
              * Init
              */
@@ -1321,7 +1321,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
             }]);
 
             return View;
-        })();
+        }();
 
         window.View = View;
     }, {}], 10: [function (require, module, exports) {
@@ -1378,7 +1378,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
             }
         };
     }, { "../../../env.json": 1, "../../helpers/debug": 16 }], 11: [function (require, module, exports) {
-        var Helper = (function () {
+        var Helper = function () {
             function Helper() {
                 _classCallCheck(this, Helper);
             }
@@ -1427,7 +1427,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
             }]);
 
             return Helper;
-        })();
+        }();
 
         window.helper = Helper;
     }, {}], 12: [function (require, module, exports) {
@@ -1437,7 +1437,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
         var Issue = require('./partials/issue');
         var IssueModal = require('./partials/issue-modal');
 
-        var Issues = (function (_View2) {
+        var Issues = function (_View2) {
             _inherits(Issues, _View2);
 
             function Issues(args) {
@@ -1546,7 +1546,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
             }]);
 
             return Issues;
-        })(View);
+        }(View);
 
         new Issues();
     }, { "../client": 5, "./partials/issue": 14, "./partials/issue-modal": 13, "./partials/navbar": 15 }], 13: [function (require, module, exports) {
@@ -1554,7 +1554,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
 
         var Issue = require('./issue');
 
-        var IssueModal = (function (_View3) {
+        var IssueModal = function (_View3) {
             _inherits(IssueModal, _View3);
 
             function IssueModal(args) {
@@ -1577,7 +1577,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
                 _this3.on('changeMilestone', _this3.onChangeMilestone);
 
                 // Prerender main element
-                view.$element = _.div({ class: 'modal fade issue-modal', role: 'dialog' }, _.div({ class: 'modal-dialog' }, _.div({ class: 'modal-content' }, [_.div({ class: 'modal-header' }, [_.button({ type: 'button', class: 'close', 'data-dismiss': 'modal' }, _.span({ class: 'glyphicon glyphicon-remove' })), view.$heading = _.span(), _.p({}, ['Created by ', view.$user = _.a()])]), _.div({ class: 'modal-body' }, [_.div({ class: 'row' }, [_.div({ class: 'col-xs-6' }, _.div({ class: 'input-group' }, [_.span({ class: 'input-group-addon' }, 'Assignee'), (function () {
+                view.$element = _.div({ class: 'modal fade issue-modal', role: 'dialog' }, _.div({ class: 'modal-dialog' }, _.div({ class: 'modal-content' }, [_.div({ class: 'modal-header' }, [_.button({ type: 'button', class: 'close', 'data-dismiss': 'modal' }, _.span({ class: 'glyphicon glyphicon-remove' })), view.$heading = _.span(), _.p({}, ['Created by ', view.$user = _.a()])]), _.div({ class: 'modal-body' }, [_.div({ class: 'row' }, [_.div({ class: 'col-xs-6' }, _.div({ class: 'input-group' }, [_.span({ class: 'input-group-addon' }, 'Assignee'), function () {
                     view.$assignee = _.select({ class: 'form-control' });
 
                     api.collaborators.fetch(function (collaborators) {
@@ -1589,9 +1589,9 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
                     });
 
                     return view.$assignee;
-                })().change(view.events.changeAssignee)])), _.div({ class: 'col-xs-6' }, _.div({ class: 'input-group' }, [_.span({ class: 'input-group-addon' }, 'State'), view.$state = _.select({ class: 'form-control' }, _.each(['open', 'closed'], function (i, state) {
+                }().change(view.events.changeAssignee)])), _.div({ class: 'col-xs-6' }, _.div({ class: 'input-group' }, [_.span({ class: 'input-group-addon' }, 'State'), view.$state = _.select({ class: 'form-control' }, _.each(['open', 'closed'], function (i, state) {
                     return _.option({ value: state }, state);
-                })).change(view.events.changeState)]))]), _.div({ class: 'input-group' }, [_.span({ class: 'input-group-addon' }, 'Milestone'), (function () {
+                })).change(view.events.changeState)]))]), _.div({ class: 'input-group' }, [_.span({ class: 'input-group-addon' }, 'Milestone'), function () {
                     view.$milestone = _.select({ class: 'form-control' });
 
                     api.milestones.fetch(function (milestones) {
@@ -1605,7 +1605,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
                     });
 
                     return view.$milestone;
-                })().change(view.events.changeMilestone)]), _.div({ class: 'input-group' }, [_.span({ class: 'input-group-addon' }, 'Title'), view.$title = _.input({ type: 'text', class: 'form-control' }).change(view.events.changeTitle)]), _.div({ class: 'input-group input-group-vertical' }, [_.span({ class: 'input-group-addon' }, 'Description'), view.$body = _.textarea({ class: 'form-control' }).change(view.events.changeBody)])]), _.div({ class: 'modal-footer' }, [view.$labels = _.div({ class: 'labels' }), _.button({ class: 'btn btn-primary' }, 'OK').click(view.events.clickOK)])])));
+                }().change(view.events.changeMilestone)]), _.div({ class: 'input-group' }, [_.span({ class: 'input-group-addon' }, 'Title'), view.$title = _.input({ type: 'text', class: 'form-control' }).change(view.events.changeTitle)]), _.div({ class: 'input-group input-group-vertical' }, [_.span({ class: 'input-group-addon' }, 'Description'), view.$body = _.textarea({ class: 'form-control' }).change(view.events.changeBody)])]), _.div({ class: 'modal-footer' }, [view.$labels = _.div({ class: 'labels' }), _.button({ class: 'btn btn-primary' }, 'OK').click(view.events.clickOK)])])));
                 return _this3;
             }
 
@@ -1745,13 +1745,13 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
             }]);
 
             return IssueModal;
-        })(View);
+        }(View);
 
         module.exports = IssueModal;
     }, { "./issue": 14 }], 14: [function (require, module, exports) {
         'use strict';
 
-        var Issue = (function (_View4) {
+        var Issue = function (_View4) {
             _inherits(Issue, _View4);
 
             function Issue(args) {
@@ -1900,11 +1900,11 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
             }]);
 
             return Issue;
-        })(View);
+        }(View);
 
         module.exports = Issue;
     }, {}], 15: [function (require, module, exports) {
-        var Navbar = (function (_View5) {
+        var Navbar = function (_View5) {
             _inherits(Navbar, _View5);
 
             function Navbar(args) {
@@ -1946,7 +1946,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
             }]);
 
             return Navbar;
-        })(View);
+        }(View);
 
         new Navbar();
     }, {}], 16: [function (require, module, exports) {
@@ -1968,7 +1968,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
             return title;
         }
 
-        var Debug = (function () {
+        var Debug = function () {
             function Debug() {
                 _classCallCheck(this, Debug);
             }
@@ -2011,7 +2011,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
             }]);
 
             return Debug;
-        })();
+        }();
 
         module.exports = Debug;
     }, { "../../env.json": 1 }] }, {}, [12]);
