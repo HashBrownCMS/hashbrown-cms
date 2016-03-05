@@ -34,6 +34,13 @@ app.use(express.static(__dirname + '/public'));
 new ApiController(app);
 
 // ----------
+// View
+// ----------
+app.get('/', function(req, res) {
+    res.render('index');
+});
+
+// ----------
 // Server
 // ----------
 let server = app.listen(8000);

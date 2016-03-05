@@ -43,7 +43,7 @@ class ContentHelper {
     }
 
     /**
-     * Finds a single MongoDb document
+     * Finds a single MongoDB document
      *
      * @param {Object} query
      *
@@ -66,6 +66,30 @@ class ContentHelper {
     }
     
     /**
+     * Updates a MongoDB document
+     *
+     * @param {Object} query
+     * @param {Object} doc
+     *
+     * @return {Promise} promise
+     */
+    static mongoUpdate(collectionName, query, doc) {
+        return new Promise(function(callback) {
+            console.log('[MongoDB] Updating document with query ' + JSON.stringify(query) + ' in collection "' + collectionName + '"...');
+        
+            ContentHelper.getDatabase().then(function(db) {
+                db.collection(collectionName).update(query, function(findErr) {
+                    if(findErr) {
+                        throw findErr;
+                    }
+
+                    callback();
+                });
+            });
+        });
+    }
+
+    /**
      * Gets a Page object by id
      *
      * @param {Number} id
@@ -73,9 +97,12 @@ class ContentHelper {
      * @return {Promise} promise
      */
     static getPageById(id) {
-        return ContentHelper.mongoFindOne('pages', {
-            _id: new mongodb.ObjectId(id)
-        });
+        return ContentHelper.mongoFindOne(
+            'pages',
+            {
+                _id: new mongodb.ObjectId(id)
+            }
+        );
     }
     
     /**
@@ -87,7 +114,13 @@ class ContentHelper {
      * @return {Bool} Success
      */
     static setPageById(id, page) {
-        return true;
+        return ContentHelper.mongoUpdate(
+            'pages',
+            {
+                _id: new mongodb.ObjectId(id)
+            },
+            page
+        );
     }
 }
 

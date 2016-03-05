@@ -10,12 +10,15 @@
   "license": "ISC",
   "devDependencies": {
     "babel-preset-es2015": "^6.3.13",
+    "bootstrap": "^3.3.6",
     "gulp": "^3.9.0",
     "gulp-babel": "^6.1.1",
     "gulp-browserify": "^0.5.1",
     "gulp-plumber": "^1.0.1",
     "gulp-sass": "^2.1.0",
-    "path-to-regexp": "^1.2.1"
+    "jquery": "^2.2.1",
+    "path-to-regexp": "^1.2.1",
+    "putaitu.js": "^1.0.4"
   },
   "dependencies": {
     "bluebird": "^3.3.3",

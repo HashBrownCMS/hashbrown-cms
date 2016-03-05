@@ -36,7 +36,10 @@ class ApiController extends Controller {
         let id = req.params.id;
         let page = req.body;
         
-        return ContentHelper.setPageById(id, page);
+        ContentHelper.setPageById(id, page)
+        .then(function() {
+            res.send('Hooray!');
+        });
     }
 }
 

@@ -5,15 +5,10 @@ var plumber = require('gulp-plumber');
 var babel = require('gulp-babel');
 
 gulp.task('sass', function() {
-    gulp.src('./src/client/sass/main.scss')
+    gulp.src('./src/client/sass/client.scss')
         .pipe(plumber())
         .pipe(sass())
         .pipe(gulp.dest('./public/css'));
-    
-    gulp.src('./src/client/sass/views/*.scss')
-        .pipe(plumber())
-        .pipe(sass())
-        .pipe(gulp.dest('./public/css/views'));
 });
 
 
@@ -30,15 +25,6 @@ gulp.task('js', function() {
             presets: [ 'es2015' ]
         }))
         .pipe(gulp.dest('./public/js'));
-
-    gulp.src('./src/client/js/views/*.js')
-        .pipe(plumber())
-        .pipe(browserify())
-        .pipe(babel({
-            presets: [ 'es2015' ]
-        }))
-        .pipe(gulp.dest('./public/js/views'));
-
 });
 
 gulp.task('watch', function() {
