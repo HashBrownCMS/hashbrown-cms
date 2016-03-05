@@ -1,5 +1,8 @@
 'use strict';
 
+// Promise
+let Promise = require('bluebird');
+
 // MongoDB client
 let mongodb = require('mongodb');
 let mongoClient = mongodb.MongoClient;
@@ -11,11 +14,17 @@ let config = require('../../../config.json');
 class ContentHelper {
     /**
      * Inits the MongoDB database
+     *
+     * @return {Promise} promise
      */
-    static initMongo() {
+    static getDatabase() {
         return new Promise(function(callback) {
             if(!mongoDatabase) {
-                MongoClient.connect(env.connectionString, function(connectErr, db) {
+                mongoClient.connect(config.mongodb.connectionString, function(connectErr, db) {
+                    if(connectErr) {
+                        throw connectErr;
+                    }
+                    
                     if(db) {
                         mongoDatabase = db;
                         callback(mongoDatabase);
@@ -42,13 +51,16 @@ class ContentHelper {
      */
     static mongoFindOne(collectionName, query) {
         return new Promise(function(callback) {
-                    mongoDatabase.collection(collectionName).findOne({id: id}, function(findErr, doc) {
-                        if(findErr) {
-                            throw findErr;
-                        }
+            console.log('[MongoDB] Looking up document with query ' + JSON.stringify(query) + ' in collection "' + collectionName + '"...');
 
-                        callback(doc);
-                    });
+            ContentHelper.getDatabase().then(function(db) {
+                db.collection(collectionName).findOne(query, function(findErr, doc) {
+                    if(findErr) {
+                        throw findErr;
+                    }
+
+                    callback(doc);
+                });
             });
         });
     }
@@ -61,6 +73,8 @@ class ContentHelper {
      * @return {Promise} promise
      */
     static getPageById(id) {
+        return ContentHelper.mongoFindOne('pages', {
+            _id: new mongodb.ObjectId(id)
         });
     }
     

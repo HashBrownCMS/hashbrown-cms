@@ -17,11 +17,16 @@ class ApiController extends Controller {
 
     /**
      * Gets a Page object by id
+     *
+     * @return {Object} Page
      */
     getPage(req, res) {
         let id = req.params.id;
-
-        return ContentHelper.getPageById(id);
+    
+        ContentHelper.getPageById(id)
+        .then(function(page) {
+            res.send(page);
+        });
     }
 
     /**
@@ -34,3 +39,5 @@ class ApiController extends Controller {
         return ContentHelper.setPageById(id, page);
     }
 }
+
+module.exports = ApiController;

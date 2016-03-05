@@ -3,8 +3,13 @@
 // ----------
 // Plugins
 // ----------
+let Promise = require('bluebird');
 let express = require('express');
 let bodyparser = require('body-parser');
+
+Promise.onPossiblyUnhandledRejection(function(error){
+    throw error;
+});
 
 // ----------
 // Controllers
@@ -25,6 +30,8 @@ app.set('view engine', 'jade');
 
 app.use(bodyparser.urlencoded({ extended: true }));
 app.use(express.static(__dirname + '/public'));
+
+new ApiController(app);
 
 // ----------
 // Server
