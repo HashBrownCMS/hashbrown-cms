@@ -9,10 +9,11 @@ require('bootstrap');
 let JSONEditor = require('./views/JSONEditor');
 
 Router.route('/jsoneditor/page/:id', function() {
-    alert(this.id);
-    $('body').html(new JSONEditor({
+    let jsonEditor = new JSONEditor({
         modelUrl: '/api/content/page/' + this.id
-    }).$element);
+    });
+    
+    $('body').html(jsonEditor.$element);
 });
 
 Router.init();

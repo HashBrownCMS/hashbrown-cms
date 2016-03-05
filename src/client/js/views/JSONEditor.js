@@ -17,3 +17,5 @@ class JSONEditor extends View {
         );
     }
 }
+
+module.exports = JSONEditor;
