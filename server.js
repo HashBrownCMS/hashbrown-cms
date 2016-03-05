@@ -9,7 +9,7 @@ let bodyparser = require('body-parser');
 // ----------
 // Controllers
 // ----------
-let ViewController = require('./src/server/controllers/ViewController');
+let ApiController = require('./src/server/controllers/ApiController');
 
 // ----------
 // Config
@@ -30,3 +30,5 @@ app.use(express.static(__dirname + '/public'));
 // Server
 // ----------
 let server = app.listen(8000);
+
+console.log('Putaitu CMS running on port 8000');
