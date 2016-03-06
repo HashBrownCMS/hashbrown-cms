@@ -17,6 +17,7 @@
     "gulp-plumber": "^1.0.1",
     "gulp-sass": "^2.1.0",
     "jquery": "^2.2.1",
+    "js-beautify": "^1.6.2",
     "path-to-regexp": "^1.2.1",
     "putaitu.js": "^1.0.4"
   },
@@ -24,7 +25,9 @@
     "bluebird": "^3.3.3",
     "body-parser": "^1.14.1",
     "express": "^4.13.3",
+    "glob": "^7.0.3",
     "jade": "^1.11.0",
+    "jsonschema": "^1.1.0",
     "mongodb": "^2.1.7",
     "octokat": "^0.4.15",
     "restler": "^3.4.0",

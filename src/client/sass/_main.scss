@@ -1,0 +1,48 @@
+@import '_colors';
+
+html, body {
+    height: 100%;
+}
+
+// Bootstrap fixes
+.btn {
+    &, &:focus, &:hover, &:active, &:active:focus {
+        outline: none;
+    }
+}
+
+// Flex classes
+.flex-vertical {
+    display: flex;
+    flex-direction: column;
+
+    .flex-expand {
+        flex-grow: 1;
+    }
+}
+
+.flex-horizontal {
+    display: flex;
+    flex-direction: row;
+
+    .flex-expand {
+        flex-grow: 1;
+    }
+}
+
+// Main container
+.putaitu-cms-container {
+    display: flex;
+    height: 100%;
+    
+    .navspace {
+        width: 300px;
+        height: 100%;
+    }
+    
+    .workspace {
+        flex-grow: 1;
+        height: 100%;
+    }
+}
+

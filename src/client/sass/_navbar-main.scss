@@ -1,0 +1,63 @@
+.navbar-main {
+    display: flex;
+    height: 100%;
+    width: 100%;
+
+    .tab-buttons {
+        width: 60px;
+        height: 100%;
+        background-color: $dark-grey;
+
+        .btn {
+            width: 60px;
+            height: 60px;
+            background-color: $dark-grey;
+            color: $lightest-grey;
+            padding: 0px;
+            margin: 0px;
+            border-radius: 0px;
+            margin-bottom: 1px;
+
+            &.active, &:hover {
+                background-color: $darker-grey;
+            }
+
+            .fa {
+                height: 40px;
+                line-height: 40px;
+                font-size: 24px;
+                width: 100%;
+                display: block;
+            }
+
+            p {
+                margin: 0px;
+                font-size: 10px;
+                height: 20px;
+                line-height: 20px;
+            }
+        }
+    }
+
+    .tab-panes {
+        height: 100%;
+        flex-grow: 1;
+
+        .pane {
+            margin: 0px;
+            height: 100%;
+            width: 100%;
+            display: none;
+
+            &.active {
+                display: block;
+            }
+
+            .pane-item {
+                p {
+                    margin: 0px;
+                }
+            }
+        }
+    }
+}

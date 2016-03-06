@@ -6,14 +6,23 @@ window.$ = window.jQuery = require('jquery');
 require('bootstrap');
 
 // Views
+let NavbarMain = require('./views/NavbarMain');
 let JSONEditor = require('./views/JSONEditor');
 
-Router.route('/jsoneditor/page/:id', function() {
+// -----------
+// Persistent views
+// -----------
+let navbarMain = new NavbarMain();
+
+// -----------
+// Routes
+// -----------
+Router.route('/jsoneditor/pages/:id', function() {
     let jsonEditor = new JSONEditor({
         modelUrl: '/api/content/page/' + this.id
     });
     
-    $('body').html(jsonEditor.$element);
+    $('.workspace').html(jsonEditor.$element);
 });
 
 Router.init();
