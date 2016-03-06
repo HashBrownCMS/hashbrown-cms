@@ -16,6 +16,7 @@ class ApiController extends Controller {
         app.post('/api/content/page/:id', this.postPage);
 
         app.get('/api/schemas', this.getSchemas);
+        app.get('/api/schemas/:id', this.getSchema);
     }
 
     /**
@@ -35,11 +36,17 @@ class ApiController extends Controller {
      */
     getPage(req, res) {
         let id = req.params.id;
-    
-        ContentHelper.getPageById(id)
-        .then(function(page) {
-            res.send(page);
-        });
+   
+        if(id && id != 'undefined') {
+            ContentHelper.getPageById(id)
+            .then(function(page) {
+                res.send(page);
+            });
+        
+        } else {
+            throw '[Api] Page id is undefined';
+        
+        }
     }
 
     /**
@@ -62,6 +69,18 @@ class ApiController extends Controller {
         ContentHelper.getAllSchemas()
         .then(function(schemas) {
             res.send(schemas);
+        });
+    }
+    
+    /**
+     * Get a Schema object by id
+     */
+    getSchema(req, res) {
+        let id = req.params.id;
+
+        ContentHelper.getSchemaById(id)
+        .then(function(schema) {
+            res.send(schema);
         });
     }
 }

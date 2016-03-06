@@ -17,9 +17,19 @@ let navbarMain = new NavbarMain();
 // -----------
 // Routes
 // -----------
+// Page edit
 Router.route('/jsoneditor/pages/:id', function() {
     let jsonEditor = new JSONEditor({
         modelUrl: '/api/content/page/' + this.id
+    });
+    
+    $('.workspace').html(jsonEditor.$element);
+});
+
+// Schema edit
+Router.route('/jsoneditor/schemas/:id', function() {
+    let jsonEditor = new JSONEditor({
+        modelUrl: '/api/schemas/' + this.id
     });
     
     $('.workspace').html(jsonEditor.$element);

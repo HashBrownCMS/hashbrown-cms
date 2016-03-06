@@ -2579,7 +2579,9 @@ var NavbarMain=require('./views/NavbarMain');var JSONEditor=require('./views/JSO
 var navbarMain=new NavbarMain(); // -----------
 // Routes
 // -----------
-Router.route('/jsoneditor/pages/:id',function(){var jsonEditor=new JSONEditor({modelUrl:'/api/content/page/'+this.id});$('.workspace').html(jsonEditor.$element);});Router.init();},{"./views/JSONEditor":27,"./views/NavbarMain":29,"bootstrap":1,"jquery":15,"putaitu.js":25}],27:[function(require,module,exports){'use strict'; // Lib
+// Page edit
+Router.route('/jsoneditor/pages/:id',function(){var jsonEditor=new JSONEditor({modelUrl:'/api/content/page/'+this.id});$('.workspace').html(jsonEditor.$element);}); // Schema edit
+Router.route('/jsoneditor/schemas/:id',function(){var jsonEditor=new JSONEditor({modelUrl:'/api/schemas/'+this.id});$('.workspace').html(jsonEditor.$element);});Router.init();},{"./views/JSONEditor":27,"./views/NavbarMain":29,"bootstrap":1,"jquery":15,"putaitu.js":25}],27:[function(require,module,exports){'use strict'; // Lib
 var beautify=require('js-beautify').js_beautify; // Views
 var MessageModal=require('./MessageModal'); /**
  * A basic JSON editor for any object
@@ -2598,10 +2600,10 @@ var MessageModal=require('./MessageModal'); /**
      *
      * @param {String} uri
      * @param {String} name
-     */_createClass(NavbarMain,[{key:"renderPane",value:function renderPane(params){var view=this;var $button=_.button({class:'btn'},[_.span({class:'fa fa-'+params.icon}),_.p(params.name)]).click(function(){view.showTab(params.name);});var $pane=_.div({class:'pane list-group','data-name':params.name},_.div({class:'pane-content'}));if(params.uri){$.getJSON(params.uri,function(items){$pane.html(_.each(items,function(i,item){return _.a({href:'#/jsoneditor/'+params.name+'/'+item._id,class:'pane-item list-group-item'},_.p(item.title));}));});}if(this.$element.find('.tab-panes .pane').length<1){$pane.addClass('active');$button.addClass('active');}this.$element.find('.tab-panes').append($pane);this.$element.find('.tab-buttons').append($button);} /**
+     */_createClass(NavbarMain,[{key:"renderPane",value:function renderPane(params){var view=this;var $button=_.button({class:'btn','data-name':params.name},[_.span({class:'fa fa-'+params.icon}),_.p(params.name)]).click(function(){view.showTab(params.name);});var $pane=_.div({class:'pane list-group','data-name':params.name},_.div({class:'pane-content'}));if(params.uri){$.getJSON(params.uri,function(items){$pane.html(_.each(items,function(i,item){return _.a({href:'#/jsoneditor/'+params.name+'/'+(item.id||item._id),class:'pane-item list-group-item'},_.p(item.title||item.name||item.id));}));});}if(this.$element.find('.tab-panes .pane').length<1){$pane.addClass('active');$button.addClass('active');}this.$element.find('.tab-panes').append($pane);this.$element.find('.tab-buttons').append($button);} /**
      * Shows a tab
      *
      * @param {String} tabName
-     */},{key:"showTab",value:function showTab(tabName){this.$element.find('.tab-panes .pane').each(function(i){$(this).toggleClass('active',$(this).attr('data-name')==tabName);});}},{key:"render",value:function render(){this.$element.html([ // Tab buttons
+     */},{key:"showTab",value:function showTab(tabName){this.$element.find('.tab-panes .pane').each(function(i){$(this).toggleClass('active',$(this).attr('data-name')==tabName);});this.$element.find('.tab-buttons .btn').each(function(i){$(this).toggleClass('active',$(this).attr('data-name')==tabName);});}},{key:"render",value:function render(){this.$element.html([ // Tab buttons
 _.div({class:'tab-buttons'},[]), // Tab panes
 _.div({class:'tab-panes'})]);$('.navspace').html(this.$element);this.renderPane({uri:'/api/content/pages',name:'pages',icon:'file'});this.renderPane({uri:'/api/content/sections',name:'sections',icon:'th'});this.renderPane({uri:'/api/schemas',name:'schemas',icon:'gears'});}}]);return NavbarMain;}(View);module.exports=NavbarMain;},{}]},{},[26]);

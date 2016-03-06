@@ -21,7 +21,7 @@ class NavbarMain extends View {
     renderPane(params) {
         let view = this;
         
-        let $button = _.button({class: 'btn'}, [
+        let $button = _.button({class: 'btn', 'data-name': params.name}, [
             _.span({class: 'fa fa-' + params.icon}),
             _.p(params.name)
         ]).click(function() { view.showTab(params.name); });
@@ -34,8 +34,8 @@ class NavbarMain extends View {
             $.getJSON(params.uri, function(items) {
                 $pane.html(
                     _.each(items, function(i, item) {
-                        return _.a({href: '#/jsoneditor/' + params.name + '/' + item._id, class: 'pane-item list-group-item'},
-                            _.p(item.title)
+                        return _.a({href: '#/jsoneditor/' + params.name + '/' + (item.id || item._id), class: 'pane-item list-group-item'},
+                            _.p(item.title || item.name || item.id)
                         );
                     })
                 );
@@ -58,6 +58,10 @@ class NavbarMain extends View {
      */
     showTab(tabName) {
         this.$element.find('.tab-panes .pane').each(function(i) {
+            $(this).toggleClass('active', $(this).attr('data-name') == tabName);
+        });
+        
+        this.$element.find('.tab-buttons .btn').each(function(i) {
             $(this).toggleClass('active', $(this).attr('data-name') == tabName);
         });
     }

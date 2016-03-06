@@ -1,7 +1,5 @@
 'use strict';
 
-let glob = require('glob');
-
 // Promise
 let Promise = require('bluebird');
 
@@ -175,7 +173,11 @@ class ContentHelper {
      */
     static getAllSchemas() {
         return new Promise(function(callback) {
-            glob('/schemas/*/*.schema', function(err, names) {
+            fs.readdir('./schemas', function(err, names) {
+                names = names.filter(function(file) {
+                    return file.substr(-7) === '.schema';
+                })
+
                 if(err) {
                     throw err;
                 }
@@ -187,7 +189,7 @@ class ContentHelper {
                     function readNextSchema() {
                         let name = queue[0];
 
-                        fs.readFile(name, function(err, data) {
+                        fs.readFile('./schemas/' + name, function(err, data) {
                             if(err) {
                                 throw err;
                             }
@@ -223,14 +225,13 @@ class ContentHelper {
     /**
      * Gets a Schema object by id
      *
-     * @param {String} category
      * @param {Number} id
      *
      * @ return {Promise} promise
      */
-    static getSchema(category, id) {
+    static getSchemaById(id) {
         return new Promise(function(callback) {
-            fs.readFile('/schemas/' + category + '/' + id + '.schema', 'utf8', function(err, data) {
+            fs.readFile('./schemas/' + id + '.schema', 'utf8', function(err, data) {
                 if(err) {
                     throw err;
                 }
@@ -243,7 +244,6 @@ class ContentHelper {
     /**
      * Sets a Schema object by id
      *
-     * @param {String} category
      * @param {Number} id
      * @param {Object} schema
      *
@@ -251,7 +251,7 @@ class ContentHelper {
      */
     static setSchema(category, id, schema) {
         return new Promise(function(callback) {
-            fs.writeFile('/schemas/' + category + '/' + id + '.schema', JSON.stringify(schema), 'utf8', function(err, data) {
+            fs.writeFile('/schemas/' + id + '.schema', JSON.stringify(schema), 'utf8', function(err, data) {
                 if(err) {
                     throw err;
                 }
