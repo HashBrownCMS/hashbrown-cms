@@ -214,7 +214,7 @@ class ContentHelper {
 
                             // If the queue still has items in it, we should continue reading...
                             if(queue.length > 0) {
-                                readSchema();
+                                readNextSchema();
 
                             // ...if not, we'll return all the loaded schemas
                             } else {
