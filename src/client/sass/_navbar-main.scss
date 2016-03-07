@@ -42,6 +42,7 @@
     .tab-panes {
         height: 100%;
         flex-grow: 1;
+        background-color: $lighter-grey;
 
         .pane {
             margin: 0px;

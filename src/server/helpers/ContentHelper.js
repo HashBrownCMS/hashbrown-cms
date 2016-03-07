@@ -121,6 +121,18 @@ class ContentHelper {
     }
     
     /**
+     * Gets all Section objects
+     *
+     * @return {Promise} promise
+     */
+    static getAllSections() {
+        return ContentHelper.mongoFind(
+            'sections',
+            {}
+        );
+    }
+    
+    /**
      * Gets all Page objects
      *
      * @return {Promise} promise
@@ -167,13 +179,13 @@ class ContentHelper {
     }
 
     /**
-     * Gets a list of all Schema objects
+     * Gets a list of all schema objects
      *
      * @return {Promise} promise
      */
-    static getAllSchemas() {
+    static getAllSchemas(type) {
         return new Promise(function(callback) {
-            fs.readdir('./schemas', function(err, names) {
+            fs.readdir('./schemas/' + type, function(err, names) {
                 names = names.filter(function(file) {
                     return file.substr(-7) === '.schema';
                 })
@@ -189,7 +201,7 @@ class ContentHelper {
                     function readNextSchema() {
                         let name = queue[0];
 
-                        fs.readFile('./schemas/' + name, function(err, data) {
+                        fs.readFile('./schemas/' + type + '/' + name, function(err, data) {
                             if(err) {
                                 throw err;
                             }
@@ -223,15 +235,15 @@ class ContentHelper {
     }
 
     /**
-     * Gets a Schema object by id
+     * Gets a schema object by id
      *
      * @param {Number} id
      *
-     * @ return {Promise} promise
+     * @return {Promise} promise
      */
-    static getSchemaById(id) {
+    static getSchema(type, id) {
         return new Promise(function(callback) {
-            fs.readFile('./schemas/' + id + '.schema', 'utf8', function(err, data) {
+            fs.readFile('./schemas/' + type + '/' + id + '.schema', 'utf8', function(err, data) {
                 if(err) {
                     throw err;
                 }
@@ -242,16 +254,16 @@ class ContentHelper {
     }
     
     /**
-     * Sets a Schema object by id
+     * Sets a schema object by id
      *
      * @param {Number} id
      * @param {Object} schema
      *
-     * @ return {Promise} promise
+     * @return {Promise} promise
      */
-    static setSchema(category, id, schema) {
+    static setSchema(type, id, schema) {
         return new Promise(function(callback) {
-            fs.writeFile('/schemas/' + id + '.schema', JSON.stringify(schema), 'utf8', function(err, data) {
+            fs.writeFile('/schemas/' + type + '/' + id + '.schema', JSON.stringify(schema), 'utf8', function(err, data) {
                 if(err) {
                     throw err;
                 }

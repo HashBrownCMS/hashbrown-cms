@@ -65,7 +65,8 @@ html, body {
         line-height: 20px; }
   .navbar-main .tab-panes {
     height: 100%;
-    flex-grow: 1; }
+    flex-grow: 1;
+    background-color: #eeeeee; }
     .navbar-main .tab-panes .pane {
       margin: 0px;
       height: 100%;

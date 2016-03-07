@@ -2523,7 +2523,7 @@ var _this=_possibleConstructorReturn(this,Object.getPrototypeOf(ContextMenu).cal
 jQuery.fn.extend({context:function context(menuItems){return this.each(function(){$(this).on('contextmenu',function(e){if(e.ctrlKey){return;}e.preventDefault();e.stopPropagation();if(e.which==3){var menu=new ContextMenu({model:menuItems,pos:{x:e.pageX,y:e.pageY}});}});});}}); // Event handling
 $('body').click(function(e){if($(e.target).parents('.context-menu').length<1){ViewHelper.removeAll('ContextMenu');}});},{}],22:[function(require,module,exports){'use strict';var pathToRegexp=require('path-to-regexp');var routes=[];var Router=function(){function Router(){_classCallCheck(this,Router);}_createClass(Router,null,[{key:"route",value:function route(path,controller){routes[path]={controller:controller};}},{key:"go",value:function go(url){location.hash=url;}},{key:"goToBaseDir",value:function goToBaseDir(){var url=this.url||'/';var base=new String(url).substring(0,url.lastIndexOf('/'));this.go(base);}},{key:"init",value:function init(){ // Get the url
 var url=location.hash.slice(1)||'/';var trimmed=url.substring(0,url.indexOf('?'));if(trimmed){url=trimmed;} // Look for route
-var context={};var route=undefined; // Exact match
+var context={};var route=void 0; // Exact match
 if(routes[url]){route=routes[url]; // Use path to regexp
 }else {for(var path in routes){var keys=[];var re=pathToRegexp(path,keys);var values=re.exec(url); // A match was found
 if(re.test(url)){ // Set the route
@@ -2573,15 +2573,16 @@ if(typeof view.renderUrl==='string'){$.get(view.renderUrl,function(html){if(view
 getModel();}); // If no render url is defined, just get the model
 }else {getModel();}}}]);return View;}();window.View=View;},{}],25:[function(require,module,exports){require('./Router');require('./Templating');require('./View');require('./ContextMenu');},{"./ContextMenu":21,"./Router":22,"./Templating":23,"./View":24}],26:[function(require,module,exports){'use strict'; // Libraries
 require('putaitu.js');window.$=window.jQuery=require('jquery');require('bootstrap'); // Views
-var NavbarMain=require('./views/NavbarMain');var JSONEditor=require('./views/JSONEditor'); // -----------
+var NavbarMain=require('./views/NavbarMain');var JSONEditor=require('./views/JSONEditor');var PageEditor=require('./views/PageEditor'); // -----------
 // Persistent views
 // -----------
 var navbarMain=new NavbarMain(); // -----------
 // Routes
 // -----------
 // Page edit
-Router.route('/jsoneditor/pages/:id',function(){var jsonEditor=new JSONEditor({modelUrl:'/api/content/page/'+this.id});$('.workspace').html(jsonEditor.$element);}); // Schema edit
-Router.route('/jsoneditor/schemas/:id',function(){var jsonEditor=new JSONEditor({modelUrl:'/api/schemas/'+this.id});$('.workspace').html(jsonEditor.$element);});Router.init();},{"./views/JSONEditor":27,"./views/NavbarMain":29,"bootstrap":1,"jquery":15,"putaitu.js":25}],27:[function(require,module,exports){'use strict'; // Lib
+Router.route('/jsoneditor/pages/:id',function(){var pageEditor=new JSONEditor({modelUrl:'/api/pages/'+this.id});navbarMain.showTab('pages');$('.workspace').html(jsonEditor.$element);}); // Object schema edit
+Router.route('/jsoneditor/objectSchemas/:id',function(){var jsonEditor=new JSONEditor({modelUrl:'/api/objectSchemas/'+this.id});navbarMain.showTab('objectSchemas');$('.workspace').html(jsonEditor.$element);}); // Field schema edit
+Router.route('/jsoneditor/fieldSchemas/:id',function(){var jsonEditor=new JSONEditor({modelUrl:'/api/fieldSchemas/'+this.id});navbarMain.showTab('fieldSchemas');$('.workspace').html(jsonEditor.$element);});Router.init();},{"./views/JSONEditor":27,"./views/NavbarMain":29,"./views/PageEditor":30,"bootstrap":1,"jquery":15,"putaitu.js":25}],27:[function(require,module,exports){'use strict'; // Lib
 var beautify=require('js-beautify').js_beautify; // Views
 var MessageModal=require('./MessageModal'); /**
  * A basic JSON editor for any object
@@ -2600,10 +2601,24 @@ var MessageModal=require('./MessageModal'); /**
      *
      * @param {String} uri
      * @param {String} name
-     */_createClass(NavbarMain,[{key:"renderPane",value:function renderPane(params){var view=this;var $button=_.button({class:'btn','data-name':params.name},[_.span({class:'fa fa-'+params.icon}),_.p(params.name)]).click(function(){view.showTab(params.name);});var $pane=_.div({class:'pane list-group','data-name':params.name},_.div({class:'pane-content'}));if(params.uri){$.getJSON(params.uri,function(items){$pane.html(_.each(items,function(i,item){return _.a({href:'#/jsoneditor/'+params.name+'/'+(item.id||item._id),class:'pane-item list-group-item'},_.p(item.title||item.name||item.id));}));});}if(this.$element.find('.tab-panes .pane').length<1){$pane.addClass('active');$button.addClass('active');}this.$element.find('.tab-panes').append($pane);this.$element.find('.tab-buttons').append($button);} /**
+     */_createClass(NavbarMain,[{key:"renderPane",value:function renderPane(params){var view=this;var $button=_.button({class:'btn','data-route':params.route},[_.span({class:'fa fa-'+params.icon}),_.p(params.label)]).click(function(){view.showTab(params.route);});var $pane=_.div({class:'pane list-group','data-route':params.route},_.div({class:'pane-content'}));if(params.api){$.getJSON(params.api,function(items){if(!window.resources){window.resources=[];}window.resources[params.route]=items;$pane.html(_.each(items,function(i,item){return _.a({href:'#/jsoneditor/'+params.route+'/'+(item.id||item._id),class:'pane-item list-group-item'},_.p(item.title||item.name||item.id));}));});}if(this.$element.find('.tab-panes .pane').length<1){$pane.addClass('active');$button.addClass('active');}this.$element.find('.tab-panes').append($pane);this.$element.find('.tab-buttons').append($button);} /**
      * Shows a tab
      *
      * @param {String} tabName
-     */},{key:"showTab",value:function showTab(tabName){this.$element.find('.tab-panes .pane').each(function(i){$(this).toggleClass('active',$(this).attr('data-name')==tabName);});this.$element.find('.tab-buttons .btn').each(function(i){$(this).toggleClass('active',$(this).attr('data-name')==tabName);});}},{key:"render",value:function render(){this.$element.html([ // Tab buttons
+     */},{key:"showTab",value:function showTab(tabRoute){this.$element.find('.tab-panes .pane').each(function(i){$(this).toggleClass('active',$(this).attr('data-route')==tabRoute);});this.$element.find('.tab-buttons .btn').each(function(i){$(this).toggleClass('active',$(this).attr('data-route')==tabRoute);});}},{key:"render",value:function render(){this.$element.html([ // Tab buttons
 _.div({class:'tab-buttons'},[]), // Tab panes
-_.div({class:'tab-panes'})]);$('.navspace').html(this.$element);this.renderPane({uri:'/api/content/pages',name:'pages',icon:'file'});this.renderPane({uri:'/api/content/sections',name:'sections',icon:'th'});this.renderPane({uri:'/api/schemas',name:'schemas',icon:'gears'});}}]);return NavbarMain;}(View);module.exports=NavbarMain;},{}]},{},[26]);
+_.div({class:'tab-panes'})]);$('.navspace').html(this.$element);this.renderPane({api:'/api/pages',label:'Pages',route:'pages',icon:'file'});this.renderPane({api:'/api/sections',label:'Sections',route:'sections',icon:'th'});this.renderPane({api:'/api/objectSchemas',label:'Objects',route:'objectSchemas',icon:'gears'});this.renderPane({api:'/api/fieldSchemas',label:'Fields',route:'fieldSchemas',icon:'list-ul'});}}]);return NavbarMain;}(View);module.exports=NavbarMain;},{}],30:[function(require,module,exports){'use strict';var PageEditor=function(_View5){_inherits(PageEditor,_View5);function PageEditor(params){_classCallCheck(this,PageEditor);return _possibleConstructorReturn(this,Object.getPrototypeOf(PageEditor).call(this,params));} /**
+     * Renders a field
+     *
+     * @param {Object} field
+     * @param {Object} schema
+     *
+     * @return {Object} element
+     */_createClass(PageEditor,[{key:"renderField",value:function renderField(field,schema){} /**
+     * Renders an object
+     *
+     * @param {Object} data
+     * @param {Object} schema
+     *
+     * @return {Object} element
+     */},{key:"renderObject",value:function renderObject(object,schema){}},{key:"render",value:function render(){var objectSchemas=window.resources['objectSchemas'];var pageSchema={};for(var i in objectSchemas){if(objectSchemas[i].id==this.model.schemaId){pageSchema=objectSchemas[i];break;}}this.$element=_.div({class:'page-editor'},this.renderObject(this.model,pageSchema));}}]);return PageEditor;}(View);module.exports=PageEditor;},{}]},{},[26]);

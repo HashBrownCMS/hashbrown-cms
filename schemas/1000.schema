@@ -1,8 +1,0 @@
-{
-    "id": "1000",
-    "name": "Page",
-    "type": "object",
-    "properties": {
-        "title": {"type": "string"}   
-    }
-}

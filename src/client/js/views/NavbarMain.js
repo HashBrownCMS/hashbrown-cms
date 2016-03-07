@@ -20,21 +20,27 @@ class NavbarMain extends View {
      */
     renderPane(params) {
         let view = this;
-        
-        let $button = _.button({class: 'btn', 'data-name': params.name}, [
+       
+        let $button = _.button({class: 'btn', 'data-route': params.route}, [
             _.span({class: 'fa fa-' + params.icon}),
-            _.p(params.name)
-        ]).click(function() { view.showTab(params.name); });
+            _.p(params.label)
+        ]).click(function() { view.showTab(params.route); });
         
-        let $pane = _.div({class: 'pane list-group', 'data-name': params.name},
+        let $pane = _.div({class: 'pane list-group', 'data-route': params.route},
             _.div({class: 'pane-content'})
         );
 
-        if(params.uri) {
-            $.getJSON(params.uri, function(items) {
+        if(params.api) {
+            $.getJSON(params.api, function(items) {
+                if(!window.resources) {
+                    window.resources = [];
+                }
+
+                window.resources[params.route] = items;
+
                 $pane.html(
                     _.each(items, function(i, item) {
-                        return _.a({href: '#/jsoneditor/' + params.name + '/' + (item.id || item._id), class: 'pane-item list-group-item'},
+                        return _.a({href: '#/jsoneditor/' + params.route + '/' + (item.id || item._id), class: 'pane-item list-group-item'},
                             _.p(item.title || item.name || item.id)
                         );
                     })
@@ -56,13 +62,13 @@ class NavbarMain extends View {
      *
      * @param {String} tabName
      */
-    showTab(tabName) {
+    showTab(tabRoute) {
         this.$element.find('.tab-panes .pane').each(function(i) {
-            $(this).toggleClass('active', $(this).attr('data-name') == tabName);
+            $(this).toggleClass('active', $(this).attr('data-route') == tabRoute);
         });
         
         this.$element.find('.tab-buttons .btn').each(function(i) {
-            $(this).toggleClass('active', $(this).attr('data-name') == tabName);
+            $(this).toggleClass('active', $(this).attr('data-route') == tabRoute);
         });
     }
 
@@ -79,21 +85,31 @@ class NavbarMain extends View {
         $('.navspace').html(this.$element);
 
         this.renderPane({
-            uri: '/api/content/pages',
-            name: 'pages',
+            api: '/api/pages',
+            label: 'Pages',
+            route: 'pages',
             icon: 'file'
         });
 
         this.renderPane({
-            uri: '/api/content/sections',
-            name: 'sections',
+            api: '/api/sections',
+            label: 'Sections',
+            route: 'sections',
             icon: 'th'
         });
         
         this.renderPane({
-            uri: '/api/schemas',
-            name: 'schemas',
+            api: '/api/objectSchemas',
+            label: 'Objects',
+            route: 'objectSchemas',
             icon: 'gears'
+        });
+        
+        this.renderPane({
+            api: '/api/fieldSchemas',
+            label: 'Fields',
+            route: 'fieldSchemas',
+            icon: 'list-ul'
         });
     }
 }
