@@ -24,7 +24,7 @@ class SchemaHelper {
                 }
 
                 let queue = names || [];
-                let schemas = [];
+                let schemas = {};
 
                 if(queue.length > 0) {
                     function readNextSchema() {
@@ -35,8 +35,10 @@ class SchemaHelper {
                                 throw err;
                             }
 
+                            let schema = JSON.parse(date);
+
                             // Add the loaded schema to the output array
-                            schemas[schemas.length] = JSON.parse(data);
+                            schemas[schema.id] = schema;
 
                             // Shift the queue (removes the first element of the array)
                             queue.shift();

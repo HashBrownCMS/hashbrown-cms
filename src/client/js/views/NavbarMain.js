@@ -111,6 +111,13 @@ class NavbarMain extends View {
             route: 'fieldSchemas',
             icon: 'list-ul'
         });
+        
+        this.renderPane({
+            api: '/api/fieldViews',
+            label: 'Field views',
+            route: 'fieldViews',
+            icon: 'list-ul'
+        });
     }
 }
 

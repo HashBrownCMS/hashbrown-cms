@@ -3,6 +3,7 @@
 let Controller = require('./Controller');
 let ContentHelper = require('../helpers/ContentHelper');
 let SchemaHelper = require('../helpers/SchemaHelper');
+let ViewHelper = require('../helpers/ViewHelper');
 
 /**
  * The main API controller
@@ -25,7 +26,7 @@ class ApiController extends Controller {
         
         app.get('/api/sections', ApiController.getSections);
 
-        app.get('/api/views/fields.js', ApiController.getFieldViews);
+        app.get('/api/fieldViews', ApiController.getFieldViews);
     }
     
     /**
@@ -129,7 +130,10 @@ class ApiController extends Controller {
      * Get all editor views
      */
     static getFieldViews(req, res) {
-        
+        ViewHelper.getAllViews('field')
+        .then(function(views) {
+            res.send(views);
+        });    
     }
 }
 

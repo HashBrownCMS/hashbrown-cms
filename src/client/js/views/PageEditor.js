@@ -1,5 +1,7 @@
 'use strict';
 
+let jade = require('jade');
+
 class PageEditor extends View {
     constructor(params) {
         super(params);
@@ -17,8 +19,26 @@ class PageEditor extends View {
      *
      * @return {Object} element
      */
-    renderFieldValue(fieldValue, schema) {
+    renderFieldValue(fieldValue, schemaValue) {
+        let fieldSchema = resources['fieldSchemas'][schemaValue.$ref];
 
+        if(fieldSchema) {
+            let fieldView = resources['fieldViews'][fieldSchema.id];
+            
+            console.log(fieldSchema);
+            console.log(fieldView);
+        }
+    
+
+        /*
+
+        if(template) {
+            return jade.compile(template, fieldValue);
+
+        } else {
+            console.log('[PageEditor] No template found for schema id "' + schema.id + '"');
+        
+        }*/
     }
 
     /**
@@ -31,8 +51,6 @@ class PageEditor extends View {
      */
     renderObject(object, schema) {
         let view = this;
-
-        console.log(schema);
 
         return _.div({class: 'object'}, [
             _.each(schema.properties, function(key, value) {
