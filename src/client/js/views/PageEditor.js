@@ -25,20 +25,14 @@ class PageEditor extends View {
         if(fieldSchema) {
             let fieldView = resources['fieldViews'][fieldSchema.id];
             
-            console.log(fieldSchema);
-            console.log(fieldView);
+            if(fieldView) {
+                return jade.compile(fieldView, { value: fieldValue });
+
+            } else {
+                console.log('[PageEditor] No template found for schema id "' + fieldSchema.id + '"');
+            
+            }
         }
-    
-
-        /*
-
-        if(template) {
-            return jade.compile(template, fieldValue);
-
-        } else {
-            console.log('[PageEditor] No template found for schema id "' + schema.id + '"');
-        
-        }*/
     }
 
     /**

@@ -35,7 +35,7 @@ class SchemaHelper {
                                 throw err;
                             }
 
-                            let schema = JSON.parse(date);
+                            let schema = JSON.parse(data);
 
                             // Add the loaded schema to the output array
                             schemas[schema.id] = schema;
@@ -66,15 +66,15 @@ class SchemaHelper {
     }
 
     /**
-     * Gets a schema object by id
+     * Gets a schema object by alias
      *
-     * @param {Number} id
+     * @param {String} alias
      *
      * @return {Promise} promise
      */
-    static getSchema(type, id) {
+    static getSchema(type, alias) {
         return new Promise(function(callback) {
-            fs.readFile('./schemas/' + type + '/' + id + '.schema', 'utf8', function(err, data) {
+            fs.readFile('./schemas/' + type + '/' + alias + '.schema', 'utf8', function(err, data) {
                 if(err) {
                     throw err;
                 }

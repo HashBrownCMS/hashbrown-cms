@@ -4648,15 +4648,7 @@ _.div({class:'tab-panes'})]);$('.navspace').html(this.$element);this.renderPane(
      * @param {Object} schema
      *
      * @return {Object} element
-     */_createClass(PageEditor,[{key:"renderFieldValue",value:function renderFieldValue(fieldValue,schemaValue){console.log(schemaValue.$ref);var fieldSchema=resources['fieldSchemas'][schemaValue.$ref];if(fieldSchema){var fieldView=resources['fieldViews'][fieldSchema.id];console.log(fieldSchema);console.log(fieldView);} /*
-
-        if(template) {
-            return jade.compile(template, fieldValue);
-
-        } else {
-            console.log('[PageEditor] No template found for schema id "' + schema.id + '"');
-        
-        }*/} /**
+     */_createClass(PageEditor,[{key:"renderFieldValue",value:function renderFieldValue(fieldValue,schemaValue){var fieldSchema=resources['fieldSchemas'][schemaValue.$ref];if(fieldSchema){var fieldView=resources['fieldViews'][fieldSchema.id];if(fieldView){return jade.compile(fieldView,{value:fieldValue});}else {console.log('[PageEditor] No template found for schema id "'+fieldSchema.id+'"');}}} /**
      * Renders an object
      *
      * @param {Object} data
