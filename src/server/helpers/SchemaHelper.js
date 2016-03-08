@@ -66,15 +66,15 @@ class SchemaHelper {
     }
 
     /**
-     * Gets a schema object by alias
+     * Gets a schema object by id
      *
-     * @param {String} alias
+     * @param {Number} id
      *
      * @return {Promise} promise
      */
-    static getSchema(type, alias) {
+    static getSchema(type, id) {
         return new Promise(function(callback) {
-            fs.readFile('./schemas/' + type + '/' + alias + '.schema', 'utf8', function(err, data) {
+            fs.readFile('./schemas/' + type + '/' + id + '.schema', 'utf8', function(err, data) {
                 if(err) {
                     throw err;
                 }
