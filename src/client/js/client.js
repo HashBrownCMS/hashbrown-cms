@@ -19,7 +19,7 @@ let navbarMain = new NavbarMain();
 // Routes
 // -----------
 // Page edit
-Router.route('/jsoneditor/pages/:id', function() {
+Router.route('/pages/:id', function() {
     let pageEditor = new PageEditor({
         modelUrl: '/api/pages/' + this.id
     });
@@ -30,7 +30,7 @@ Router.route('/jsoneditor/pages/:id', function() {
 });
 
 // Object schema edit
-Router.route('/jsoneditor/objectSchemas/:id', function() {
+Router.route('/objectSchemas/:id', function() {
     let jsonEditor = new JSONEditor({
         modelUrl: '/api/objectSchemas/' + this.id
     });
@@ -41,7 +41,7 @@ Router.route('/jsoneditor/objectSchemas/:id', function() {
 });
 
 // Field schema edit
-Router.route('/jsoneditor/fieldSchemas/:id', function() {
+Router.route('/fieldSchemas/:id', function() {
     let jsonEditor = new JSONEditor({
         modelUrl: '/api/fieldSchemas/' + this.id
     });

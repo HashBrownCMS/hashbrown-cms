@@ -40,8 +40,8 @@ class NavbarMain extends View {
 
                 $pane.html(
                     _.each(items, function(i, item) {
-                        return _.a({href: '#/jsoneditor/' + params.route + '/' + (item.id || item._id), class: 'pane-item list-group-item'},
-                            _.p(item.title || item.name || item.id)
+                        return _.a({href: '#/' + params.route + '/' + (item.id || item._id || i), class: 'pane-item list-group-item'},
+                            _.p(item.title || item.name || item.id || item._id || i)
                         );
                     })
                 );
@@ -74,11 +74,7 @@ class NavbarMain extends View {
 
     render() {
         this.$element.html([
-            // Tab buttons
-            _.div({class: 'tab-buttons'}, [
-            ]),
-
-            // Tab panes
+            _.div({class: 'tab-buttons'}),
             _.div({class: 'tab-panes'})
         ]);
 
@@ -111,13 +107,10 @@ class NavbarMain extends View {
             route: 'fieldSchemas',
             icon: 'list-ul'
         });
-        
-        this.renderPane({
-            api: '/api/fieldViews',
-            label: 'Field views',
-            route: 'fieldViews',
-            icon: 'list-ul'
-        });
+       
+        $.getJSON('/api/fieldViews', function(fieldViews) {
+            window.resources['fieldViews'] = fieldViews;
+        }); 
     }
 }
 

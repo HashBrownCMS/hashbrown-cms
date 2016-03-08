@@ -12,26 +12,54 @@ class PageEditor extends View {
     }
 
     /**
-     * Renders a field value
+     * Renders a field view
      *
      * @param {Object} field
      * @param {Object} schema
      *
      * @return {Object} element
      */
-    renderFieldValue(fieldValue, schemaValue) {
+    renderFieldView(fieldValue, schemaValue) {
+        function onChange() {
+            let valueName = $(this).data('name');
+
+            if(valueName) {
+                fieldValue[valueName] = $(this).val();
+            
+            } else {
+                fieldValue = $(this).val();
+
+            }
+
+            console.log(fieldValue);
+        }
+
         let fieldSchema = resources['fieldSchemas'][schemaValue.$ref];
 
         if(fieldSchema) {
             let fieldView = resources['fieldViews'][fieldSchema.id];
             
             if(fieldView) {
-                return jade.compile(fieldView, { value: fieldValue });
+                let fieldElement = jade.compile(fieldView)({ value: fieldValue });
+                let $fieldElement = $(fieldElement);
+
+                $fieldElement.attr('data-field-schema-id', fieldSchema.id);
+
+                // Input
+                $fieldElement.find('input').each(function(i) {
+                    $(this).bind('change propertychange keyup paste', onChange);
+                });
+
+                return $fieldElement;
 
             } else {
-                console.log('[PageEditor] No template found for schema id "' + fieldSchema.id + '"');
+                console.log('[PageEditor] No template found for field schema id "' + fieldSchema.id + '"');
             
             }
+        
+        } else {
+            console.log('[PageEditor] No field schema found for $ref "' + schemaValue.$ref + '"');
+
         }
     }
 
@@ -50,10 +78,10 @@ class PageEditor extends View {
             _.each(schema.properties, function(key, value) {
                 return _.div({class: 'field-container'}, [
                     _.div({class: 'field-key'},
-                        key
+                        value.label || key
                     ),
                     _.div({class: 'field-value'},
-                        view.renderFieldValue(object[key], schema.properties[key])
+                        view.renderFieldView(object[key], schema.properties[key])
                     )
                 ]);
             })
