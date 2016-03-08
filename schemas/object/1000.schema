@@ -3,11 +3,11 @@
     "name": "Page",
     "type": "object",
     "properties": {
-        "createDate": {"$ref": "1002", "disabled": true},
-        "updateDate": {"$ref": "1002", "disabled": true},
         "title": {"$ref": "1000"},
         "description": {"$ref": "1000"},
         "url": {"$ref": "1003"},
+        "createDate": {"$ref": "1002", "disabled": true},
+        "updateDate": {"$ref": "1002", "disabled": true},
         "schemaId": { "$ref": "1004" }
     }
 }

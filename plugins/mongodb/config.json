@@ -1,0 +1,4 @@
+{
+    "host": "http://localhost",
+    "connectionString": "mongodb://localhost/putaitu-cms"
+}

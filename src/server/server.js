@@ -12,16 +12,6 @@ Promise.onPossiblyUnhandledRejection(function(error){
 });
 
 // ----------
-// Controllers
-// ----------
-let ApiController = require('./src/server/controllers/ApiController');
-
-// ----------
-// Config
-// ----------
-let config = require('./config.json');
-
-// ----------
 // Express app
 // ----------
 let app = express();
@@ -29,9 +19,16 @@ let app = express();
 app.set('view engine', 'jade');
 
 app.use(bodyparser.urlencoded({ extended: true }));
-app.use(express.static(__dirname + '/public'));
+app.use(express.static(appRoot + '/public'));
 
-new ApiController(app);
+// ----------
+// Controllers
+// ----------
+let ApiController = require(appRoot + '/src/server/controllers/ApiController');
+let PluginController = require(appRoot + '/src/server/controllers/PluginController');
+
+PluginController.init();
+ApiController.init(app);
 
 // ----------
 // View
@@ -45,4 +42,4 @@ app.get('/', function(req, res) {
 // ----------
 let server = app.listen(8000);
 
-console.log('Putaitu CMS running on port 8000');
+console.log('[Putaitu CMS] Running on port 8000');

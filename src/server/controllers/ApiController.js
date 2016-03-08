@@ -2,32 +2,36 @@
 
 let Controller = require('./Controller');
 let ContentHelper = require('../helpers/ContentHelper');
+let SchemaHelper = require('../helpers/SchemaHelper');
 
 /**
  * The main API controller
  */
 class ApiController extends Controller {
-    constructor(app) {
-        super(app);
-    
+    /**
+     * Initialises this controller
+     */
+    static init(app) {
         // Register routes
-        app.get('/api/pages', this.getPages);
-        app.get('/api/pages/:id', this.getPage);
-        app.post('/api/pages/:id', this.postPage);
+        app.get('/api/pages', ApiController.getPages);
+        app.get('/api/pages/:id', ApiController.getPage);
+        app.post('/api/pages/:id', ApiController.postPage);
 
-        app.get('/api/objectSchemas', this.getObjectSchemas);
-        app.get('/api/objectSchemas/:id', this.getObjectSchema);
+        app.get('/api/objectSchemas', ApiController.getObjectSchemas);
+        app.get('/api/objectSchemas/:id', ApiController.getObjectSchema);
         
-        app.get('/api/fieldSchemas', this.getFieldSchemas);
-        app.get('/api/fieldSchemas/:id', this.getFieldSchema);
+        app.get('/api/fieldSchemas', ApiController.getFieldSchemas);
+        app.get('/api/fieldSchemas/:id', ApiController.getFieldSchema);
         
-        app.get('/api/sections', this.getSections);
+        app.get('/api/sections', ApiController.getSections);
+
+        app.get('/api/views/fields.js', ApiController.getFieldViews);
     }
     
     /**
      * Gets a list of all Section objects
      */
-    getSections(req, res) {
+    static getSections(req, res) {
         ContentHelper.getAllSections()
         .then(function(sections) {
             res.send(sections);
@@ -37,7 +41,7 @@ class ApiController extends Controller {
     /**
      * Gets a list of all Page objects
      */
-    getPages(req, res) {
+    static getPages(req, res) {
         ContentHelper.getAllPages()
         .then(function(pages) {
             res.send(pages);
@@ -49,7 +53,7 @@ class ApiController extends Controller {
      *
      * @return {Object} Page
      */
-    getPage(req, res) {
+    static getPage(req, res) {
         let id = req.params.id;
    
         if(id && id != 'undefined') {
@@ -67,7 +71,7 @@ class ApiController extends Controller {
     /**
      * Posts a Page object by id
      */
-    postPage(req, res) {
+    static postPage(req, res) {
         let id = req.params.id;
         let page = req.body;
         
@@ -80,8 +84,8 @@ class ApiController extends Controller {
     /**
      * Get a list of all content schema objects
      */
-    getObjectSchemas(req, res) {
-        ContentHelper.getAllSchemas('object')
+    static getObjectSchemas(req, res) {
+        SchemaHelper.getAllSchemas('object')
         .then(function(schemas) {
             res.send(schemas);
         });
@@ -90,10 +94,10 @@ class ApiController extends Controller {
     /**
      * Get a content schema object by id
      */
-    getObjectSchema(req, res) {
+    static getObjectSchema(req, res) {
         let id = req.params.id;
 
-        ContentHelper.getSchema('object', id)
+        SchemaHelper.getSchema('object', id)
         .then(function(schema) {
             res.send(schema);
         });
@@ -102,8 +106,8 @@ class ApiController extends Controller {
     /**
      * Get a list of all field schema objects
      */
-    getFieldSchemas(req, res) {
-        ContentHelper.getAllSchemas('field')
+    static getFieldSchemas(req, res) {
+        SchemaHelper.getAllSchemas('field')
         .then(function(schemas) {
             res.send(schemas);
         });
@@ -112,13 +116,20 @@ class ApiController extends Controller {
     /**
      * Get a field schema object by id
      */
-    getFieldSchema(req, res) {
+    static getFieldSchema(req, res) {
         let id = req.params.id;
 
-        ContentHelper.getSchema('field', id)
+        SchemaHelper.getSchema('field', id)
         .then(function(schema) {
             res.send(schema);
         });
+    }
+
+    /**
+     * Get all editor views
+     */
+    static getFieldViews(req, res) {
+        
     }
 }
 

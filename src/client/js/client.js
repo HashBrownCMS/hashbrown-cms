@@ -20,13 +20,13 @@ let navbarMain = new NavbarMain();
 // -----------
 // Page edit
 Router.route('/jsoneditor/pages/:id', function() {
-    let pageEditor = new JSONEditor({
+    let pageEditor = new PageEditor({
         modelUrl: '/api/pages/' + this.id
     });
-    
+   
     navbarMain.showTab('pages');
     
-    $('.workspace').html(jsonEditor.$element);
+    $('.workspace').html(pageEditor.$element);
 });
 
 // Object schema edit

@@ -1,0 +1,19 @@
+.page-editor {
+    height: 100%;
+    overflow-y: auto;
+    padding: 15px;
+
+    .object {
+        .field-container {
+            display: flex;
+
+            .field-key {
+                width: 300px;
+            }
+
+            .field-value {
+                flex-grow: 1;
+            }
+        }
+    }
+}

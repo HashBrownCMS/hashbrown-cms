@@ -3,17 +3,21 @@
 class PageEditor extends View {
     constructor(params) {
         super(params);
+
+        this.$element = _.div({class: 'page-editor'});
+
+        this.fetch();
     }
 
     /**
-     * Renders a field
+     * Renders a field value
      *
      * @param {Object} field
      * @param {Object} schema
      *
      * @return {Object} element
      */
-    renderField(field, schema) {
+    renderFieldValue(fieldValue, schema) {
 
     }
 
@@ -26,11 +30,26 @@ class PageEditor extends View {
      * @return {Object} element
      */
     renderObject(object, schema) {
+        let view = this;
 
+        console.log(schema);
+
+        return _.div({class: 'object'}, [
+            _.each(schema.properties, function(key, value) {
+                return _.div({class: 'field-container'}, [
+                    _.div({class: 'field-key'},
+                        key
+                    ),
+                    _.div({class: 'field-value'},
+                        view.renderFieldValue(object[key], schema.properties[key])
+                    )
+                ]);
+            })
+        ]);
     }
 
     render() {
-        let objectSchemas = window.resources['objectSchemas'];
+        let objectSchemas = resources['objectSchemas'];
         let pageSchema = {};
 
         for(let i in objectSchemas) {
@@ -40,7 +59,7 @@ class PageEditor extends View {
             }
         }
 
-        this.$element = _.div({class: 'page-editor'},
+        this.$element.html(
             this.renderObject(this.model, pageSchema)
         );
     }

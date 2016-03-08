@@ -33,6 +33,17 @@ html, body {
     overflow: auto;
     display: block; }
 
+.page-editor {
+  height: 100%;
+  overflow-y: auto;
+  padding: 15px; }
+  .page-editor .object .field-container {
+    display: flex; }
+    .page-editor .object .field-container .field-key {
+      width: 300px; }
+    .page-editor .object .field-container .field-value {
+      flex-grow: 1; }
+
 .navbar-main {
   display: flex;
   height: 100%;
