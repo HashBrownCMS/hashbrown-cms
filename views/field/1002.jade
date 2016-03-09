@@ -1,2 +1,5 @@
 .field-editor.date-editor
-    p=value
+    if disabled
+        p=value
+    else
+        input.form-control(type="date", value=value)

@@ -29,6 +29,17 @@ Router.route('/pages/:id', function() {
     $('.workspace').html(pageEditor.$element);
 });
 
+// Page edit (JSON editor)
+Router.route('/pages/json/:id', function() {
+    let pageEditor = new JSONEditor({
+        modelUrl: '/api/pages/' + this.id
+    });
+   
+    navbarMain.showTab('pages');
+    
+    $('.workspace').html(pageEditor.$element);
+});
+
 // Object schema edit
 Router.route('/objectSchemas/:id', function() {
     let jsonEditor = new JSONEditor({

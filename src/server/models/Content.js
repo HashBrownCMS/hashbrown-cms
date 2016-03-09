@@ -8,10 +8,8 @@ let Validator = require('jsonschema').Validator;
  * The base class for all Content types
  */
 class Content {
-    constructor(model) {
-        this.model = model;
-
-        this.validateSchema();
+    constructor(data) {
+        this.data = data;
     }
 
     /**
@@ -29,20 +27,33 @@ class Content {
      * @return {Promise} promise
      */
     getSchema() {
-        let view = this;
+        let model = this;
 
         return new Promise(function(callback) {
             if(!view.schemaCache) {
-                ContentHelper.getSchema(view.getType(), view.model.schemaId)
+                ContentHelper.getSchema(view.getType(), model.data.schemaId)
                 .then(function(schema) {
-                    view.schemaCache = schema;
+                    model.schemaCache = schema;
 
-                    callback(view.schemaCache);
+                    callback(model.schemaCache);
                 });
             } else {
-                callback(view.schemaCache);
+                callback(model.schemaCache);
             }
         });
+    }
+
+    /**
+     * Gets the published state
+     *
+     * @return {Boolean} state
+     */
+    isPublished() {
+        let unpublishDateIsNull = this.data.unpublishDate == null || typeof this.data.unpublishDate == 'undefined';
+        let unpublishDateHasPassed = this.data.unpublishDate < Date.now()
+
+        // Get the state
+        return unpublishDateIsNull || unpublishDateHasPassed;
     }
 
     /**
@@ -56,10 +67,12 @@ class Content {
             .then(function(schema) {
                 let validator = new Validator();
 
-                let result = validator.validate(this.model, schema);
+                let result = validator.validate(this.data, schema);
 
                 console.log(result);
-            };
+            });
         });
     }    
 }
+
+module.exports = Content;

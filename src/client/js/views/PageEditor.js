@@ -1,6 +1,13 @@
 'use strict';
 
+// Lib
 let jade = require('jade');
+
+// Models
+let Page = require('../../../server/models/Page');
+
+// Views
+let MessageModal = require('./MessageModal');
 
 class PageEditor extends View {
     constructor(params) {
@@ -9,6 +16,43 @@ class PageEditor extends View {
         this.$element = _.div({class: 'page-editor'});
 
         this.fetch();
+    }
+
+    /**
+     * Event: Click reload. Fetches the model again
+     */
+    onClickReload() {
+        this.fetch();
+    }
+
+    /**
+     * Event: Click save. Posts the model to the modelUrl
+     */
+    onClickSave() {
+        let view = this;
+
+        $.post(
+            this.modelUrl,
+            this.model,
+            function() {
+                console.log('[PageEditor] Saved model to ' + view.modelUrl);
+            },
+            function(err) {
+                new MessageModal({
+                    model: {
+                        title: 'Error',
+                        body: err
+                    }
+                });
+            }
+        );
+    }
+
+    /**
+     * Event: Click toggle publish
+     */
+    onClickTogglePublish() {
+
     }
 
     /**
@@ -40,7 +84,7 @@ class PageEditor extends View {
             let fieldView = resources['fieldViews'][fieldSchema.id];
             
             if(fieldView) {
-                let fieldElement = jade.compile(fieldView)({ value: fieldValue });
+                let fieldElement = jade.compile(fieldView)({ value: fieldValue, disabled: schemaValue.disabled, resources });
                 let $fieldElement = $(fieldElement);
 
                 $fieldElement.attr('data-field-schema-id', fieldSchema.id);
@@ -89,6 +133,9 @@ class PageEditor extends View {
     }
 
     render() {
+        let view = this;
+
+        let page = new Page(this.model);
         let objectSchemas = resources['objectSchemas'];
         let pageSchema = {};
 
@@ -99,9 +146,22 @@ class PageEditor extends View {
             }
         }
 
-        this.$element.html(
-            this.renderObject(this.model, pageSchema)
-        );
+        this.$element.html([
+            this.renderObject(this.model, pageSchema),
+            _.div({class: 'pull-left btn-group flex-horizontal'}, [
+                _.button({class: 'btn btn-primary flex-expand'},
+                    _.span({class: 'fa fa-refresh'})
+                ).click(function() { view.onClickReload(); }),
+                _.button({class: 'btn btn-primary flex-expand'}, [
+                    (page.isPublished() ? 'Unpublish' : 'Publish') + ' ',
+                    _.span({class: 'fa fa-newspaper-o'})
+                ]).click(function() { view.onClickTogglePublish(); }),
+                _.button({class: 'btn btn-success flex-expand'}, [
+                    'Save ',
+                    _.span({class: 'fa fa-save'})
+                ]).click(function() { view.onClickSave(); })
+            ])
+        ]);
     }
 }
 

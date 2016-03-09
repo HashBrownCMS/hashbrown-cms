@@ -65,11 +65,14 @@ class JSONEditor extends View {
             _.textarea({class: 'flex-expand'},
                 this.value
             ).bind('keyup change propertychange paste', function() { view.onChangeText($(this)); }),
-            _.div({class: 'btn-group flex-horizontal'}, [
-                _.button({class: 'btn btn-primary flex-expand'}, 'Reload')
-                    .click(function() { view.onClickReload(); }),
-                _.button({class: 'btn btn-success flex-expand'}, 'Save')
-                    .click(function() { view.onClickSave(); })
+            _.div({class: 'pull-left btn-group flex-horizontal'}, [
+                _.button({class: 'btn btn-primary flex-expand'},
+                    _.span({class: 'fa fa-refresh'})
+                ).click(function() { view.onClickReload(); }),
+                _.button({class: 'btn btn-success flex-expand'}, [
+                    'Save ',
+                    _.span({class: 'fa fa-save'})
+                ]).click(function() { view.onClickSave(); })
             ])
         ]);
     }

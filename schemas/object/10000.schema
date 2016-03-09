@@ -1,0 +1,15 @@
+{
+    "id": "10000",
+    "name": "Page",
+    "type": "object",
+    "properties": {
+        "title": {"$ref": "1000", "label": "Title"},
+        "description": {"$ref": "1000", "label": "Description"},
+        "url": {"$ref": "1003", "label": "URL"},
+        "createDate": {"$ref": "1002", "disabled": true, "label": "Created at"},
+        "updateDate": {"$ref": "1002", "disabled": true, "label": "Updated at"},
+        "publishDate": {"$ref": "1002", "label": "Published at"},
+        "unpublishDate": {"$ref": "1002", "label": "Unpublished at"},
+        "schemaId": { "$ref": "1004", "label": "Schema" }
+    }
+}

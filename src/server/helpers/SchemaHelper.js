@@ -74,7 +74,7 @@ class SchemaHelper {
      */
     static getSchema(type, id) {
         return new Promise(function(callback) {
-            fs.readFile('./schemas/' + type + '/' + id + '.schema', 'utf8', function(err, data) {
+            fs.readFile(appRoot + '/schemas/' + type + '/' + id + '.schema', 'utf8', function(err, data) {
                 if(err) {
                     throw err;
                 }
@@ -94,7 +94,7 @@ class SchemaHelper {
      */
     static setSchema(type, id, schema) {
         return new Promise(function(callback) {
-            fs.writeFile('/schemas/' + type + '/' + id + '.schema', JSON.stringify(schema), 'utf8', function(err, data) {
+            fs.writeFile(appRoot + '/schemas/' + type + '/' + id + '.schema', JSON.stringify(schema), 'utf8', function(err, data) {
                 if(err) {
                     throw err;
                 }
