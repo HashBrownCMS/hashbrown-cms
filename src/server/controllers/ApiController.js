@@ -13,16 +13,12 @@ class ApiController extends Controller {
      * Initialises this controller
      */
     static init(app) {
-        // Register routes
         app.get('/api/pages', ApiController.getPages);
         app.get('/api/pages/:id', ApiController.getPage);
         app.post('/api/pages/:id', ApiController.postPage);
 
-        app.get('/api/objectSchemas', ApiController.getObjectSchemas);
-        app.get('/api/objectSchemas/:id', ApiController.getObjectSchema);
-        
-        app.get('/api/fieldSchemas', ApiController.getFieldSchemas);
-        app.get('/api/fieldSchemas/:id', ApiController.getFieldSchema);
+        app.get('/api/schemas', ApiController.getSchemas);
+        app.get('/api/schemas/:id', ApiController.getSchema);
         
         app.get('/api/sections', ApiController.getSections);
 
@@ -78,15 +74,15 @@ class ApiController extends Controller {
         
         ContentHelper.setPageById(id, page)
         .then(function() {
-            res.send('Hooray!');
+            res.sendStatus(200);
         });
     }
 
     /**
-     * Get a list of all content schema objects
+     * Get a list of all schema objects
      */
-    static getObjectSchemas(req, res) {
-        SchemaHelper.getAllSchemas('object')
+    static getSchemas(req, res) {
+        SchemaHelper.getAllSchemas()
         .then(function(schemas) {
             res.send(schemas);
         });
@@ -95,37 +91,15 @@ class ApiController extends Controller {
     /**
      * Get a content schema object by id
      */
-    static getObjectSchema(req, res) {
+    static getSchema(req, res) {
         let id = req.params.id;
 
-        SchemaHelper.getSchema('object', id)
+        SchemaHelper.getSchema(id)
         .then(function(schema) {
             res.send(schema);
         });
     }
     
-    /**
-     * Get a list of all field schema objects
-     */
-    static getFieldSchemas(req, res) {
-        SchemaHelper.getAllSchemas('field')
-        .then(function(schemas) {
-            res.send(schemas);
-        });
-    }
-    
-    /**
-     * Get a field schema object by id
-     */
-    static getFieldSchema(req, res) {
-        let id = req.params.id;
-
-        SchemaHelper.getSchema('field', id)
-        .then(function(schema) {
-            res.send(schema);
-        });
-    }
-
     /**
      * Get all editor views
      */

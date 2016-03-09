@@ -95,17 +95,10 @@ class NavbarMain extends View {
         });
         
         this.renderPane({
-            api: '/api/objectSchemas',
-            label: 'Objects',
-            route: 'objectSchemas',
+            api: '/api/schemas',
+            label: 'Schemas',
+            route: 'schemas',
             icon: 'gears'
-        });
-        
-        this.renderPane({
-            api: '/api/fieldSchemas',
-            label: 'Fields',
-            route: 'fieldSchemas',
-            icon: 'list-ul'
         });
        
         $.getJSON('/api/fieldViews', function(fieldViews) {

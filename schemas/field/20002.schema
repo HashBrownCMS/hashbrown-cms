@@ -1,5 +1,6 @@
 {
-    "id": "1002",
+    "id": "20002",
+    "icon": "calendar",
     "name": "Date",
     "type": "date"
 }

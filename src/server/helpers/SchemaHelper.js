@@ -5,6 +5,7 @@ let Promise = require('bluebird');
 
 // Libs
 let fs = require('fs');
+let glob = require('glob');
 
 class SchemaHelper {
     /**
@@ -12,25 +13,21 @@ class SchemaHelper {
      *
      * @return {Promise} promise
      */
-    static getAllSchemas(type) {
+    static getAllSchemas() {
         return new Promise(function(callback) {
-            fs.readdir(appRoot + '/schemas/' + type, function(err, names) {
-                names = names.filter(function(file) {
-                    return file.substr(-7) === '.schema';
-                })
-
+            glob(appRoot + '/schemas/*/*.schema', function(err, paths) {
                 if(err) {
                     throw err;
                 }
 
-                let queue = names || [];
+                let queue = paths || [];
                 let schemas = {};
 
                 if(queue.length > 0) {
                     function readNextSchema() {
-                        let name = queue[0];
+                        let path = queue[0];
 
-                        fs.readFile(appRoot + '/schemas/' + type + '/' + name, function(err, data) {
+                        fs.readFile(path, function(err, data) {
                             if(err) {
                                 throw err;
                             }
@@ -72,15 +69,30 @@ class SchemaHelper {
      *
      * @return {Promise} promise
      */
-    static getSchema(type, id) {
+    static getSchema(id) {
         return new Promise(function(callback) {
-            fs.readFile(appRoot + '/schemas/' + type + '/' + id + '.schema', 'utf8', function(err, data) {
+            glob(appRoot + '/schemas/*/' + id + '.schema', function(err, paths) {
                 if(err) {
                     throw err;
                 }
+                
+                if(paths.length == 0) {
+                    throw 'No schemas by id "' + id + '" found';
 
-                callback(JSON.parse(data));
-            }); 
+                } else if (paths.length == 1) {
+                    fs.readFile(paths[0], 'utf8', function(err, data) {
+                        if(err) {
+                            throw err;
+                        }
+
+                        callback(JSON.parse(data));
+                    }); 
+
+                } else {
+                    throw 'More than one schema found with id "' + id + '": ' + paths.json(', ');
+
+                }
+            });
         });
     }
     
@@ -92,15 +104,30 @@ class SchemaHelper {
      *
      * @return {Promise} promise
      */
-    static setSchema(type, id, schema) {
+    static setSchema(id, schema) {
         return new Promise(function(callback) {
-            fs.writeFile(appRoot + '/schemas/' + type + '/' + id + '.schema', JSON.stringify(schema), 'utf8', function(err, data) {
+            glob(appRoot + '/schemas/*/' + id + '.schema', function(err, paths) {
                 if(err) {
                     throw err;
                 }
+                
+                if(paths.length == 0) {
+                    throw 'No schemas by id "' + id + '" found';
 
-                callback();
-            }); 
+                } else if (paths.length == 1) {
+                    fs.writeFile(paths[0], JSON.stringify(schema), 'utf8', function(err, data) {
+                        if(err) {
+                            throw err;
+                        }
+
+                        callback();
+                    }); 
+
+                } else {
+                    throw 'More than one schema found with id "' + id + '": ' + paths.json(', ');
+
+                }
+            });
         });
     }
 }

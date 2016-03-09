@@ -56,6 +56,32 @@ class PageEditor extends View {
     }
 
     /**
+     * Event: On click remove
+     */
+    onClickDelete() {
+        new MessageModal({
+            model: {
+                title: 'Delete page',
+                body: 'Are you sure you want to delete this page?'
+            },
+            buttons: [
+                {
+                    label: 'Cancel',
+                    class: 'btn-default',
+                    callback: function() {
+                    }
+                },
+                {
+                    label: 'OK',
+                    class: 'btn-danger',
+                    callback: function() {
+                    }
+                }
+            ]
+        });
+    }
+
+    /**
      * Renders a field view
      *
      * @param {Object} field
@@ -78,7 +104,7 @@ class PageEditor extends View {
             console.log(fieldValue);
         }
 
-        let fieldSchema = resources['fieldSchemas'][schemaValue.$ref];
+        let fieldSchema = resources['schemas'][schemaValue.$ref];
 
         if(fieldSchema) {
             let fieldView = resources['fieldViews'][fieldSchema.id];
@@ -119,6 +145,9 @@ class PageEditor extends View {
         return _.div({class: 'object'}, [
             _.each(schema.properties, function(key, value) {
                 return _.div({class: 'field-container'}, [
+                    _.div({class: 'field-icon'},
+                        _.span({class: 'fa fa-' + value.icon})
+                    ),
                     _.div({class: 'field-key'},
                         value.label || key
                     ),
@@ -130,36 +159,61 @@ class PageEditor extends View {
         ]);
     }
 
+    /**
+     * Gets a schema with $parent included recursively
+     *
+     * @param {Number} id
+     *
+     * @return {Object} schema
+     */
+    getSchemaWithParents(id) {
+        let schema = $.extend(true, {}, resources.schemas[id]);
+
+        if(schema) {
+            if(schema.$parent) {
+                let parentSchema = this.getSchemaWithParents(schema.$parent);
+
+                for(let k in schema.properties) {
+                    parentSchema.properties[k] = schema.properties[k];
+                }
+
+                schema = parentSchema;
+            }
+        } else {
+            console.log('No schema with id "' + id + '" available in resources');
+        }
+
+        return schema;
+    }
+
+
     render() {
         let view = this;
 
         let page = new Page(this.model);
-        let objectSchemas = resources['objectSchemas'];
-        let pageSchema = {};
+        let pageSchema = this.getSchemaWithParents(this.model.schemaId);
 
-        for(let i in objectSchemas) {
-            if(objectSchemas[i].id == this.model.schemaId) {
-                pageSchema = objectSchemas[i];
-                break;
-            }
+        if(pageSchema) {
+            this.$element.html([
+                this.renderObject(this.model, pageSchema),
+                _.div({class: 'pull-left btn-group flex-horizontal'}, [
+                    _.button({class: 'btn btn-danger flex-expand'},
+                        _.span({class: 'fa fa-trash'})
+                    ).click(function() { view.onClickDelete(); }),
+                    _.button({class: 'btn btn-primary flex-expand'},
+                        _.span({class: 'fa fa-refresh'})
+                    ).click(function() { view.onClickReload(); }),
+                    _.button({class: 'btn btn-default flex-expand'}, [
+                        (page.isPublished() ? 'Unpublish' : 'Publish') + ' ',
+                        _.span({class: 'fa fa-newspaper-o'})
+                    ]).click(function() { view.onClickTogglePublish(); }),
+                    _.button({class: 'btn btn-success flex-expand'}, [
+                        'Save ',
+                        _.span({class: 'fa fa-save'})
+                    ]).click(function() { view.onClickSave(); })
+                ])
+            ]);
         }
-
-        this.$element.html([
-            this.renderObject(this.model, pageSchema),
-            _.div({class: 'pull-left btn-group flex-horizontal'}, [
-                _.button({class: 'btn btn-primary flex-expand'},
-                    _.span({class: 'fa fa-refresh'})
-                ).click(function() { view.onClickReload(); }),
-                _.button({class: 'btn btn-primary flex-expand'}, [
-                    (page.isPublished() ? 'Unpublish' : 'Publish') + ' ',
-                    _.span({class: 'fa fa-newspaper-o'})
-                ]).click(function() { view.onClickTogglePublish(); }),
-                _.button({class: 'btn btn-success flex-expand'}, [
-                    'Save ',
-                    _.span({class: 'fa fa-save'})
-                ]).click(function() { view.onClickSave(); })
-            ])
-        ]);
     }
 }
 

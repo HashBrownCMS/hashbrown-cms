@@ -40,25 +40,14 @@ Router.route('/pages/json/:id', function() {
     $('.workspace').html(pageEditor.$element);
 });
 
-// Object schema edit
-Router.route('/objectSchemas/:id', function() {
+// Schema edit
+Router.route('/schemas/:id', function() {
     let jsonEditor = new JSONEditor({
-        modelUrl: '/api/objectSchemas/' + this.id
+        modelUrl: '/api/schemas/' + this.id
     });
     
-    navbarMain.showTab('objectSchemas');
+    navbarMain.showTab('schemas');
     
-    $('.workspace').html(jsonEditor.$element);
-});
-
-// Field schema edit
-Router.route('/fieldSchemas/:id', function() {
-    let jsonEditor = new JSONEditor({
-        modelUrl: '/api/fieldSchemas/' + this.id
-    });
-    
-    navbarMain.showTab('fieldSchemas');
-
     $('.workspace').html(jsonEditor.$element);
 });
 

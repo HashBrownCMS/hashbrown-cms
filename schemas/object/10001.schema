@@ -1,0 +1,9 @@
+{
+    "id": "10001",
+    "name": "Test Page",
+    "type": "object",
+    "$parent": "10000",
+    "properties": {
+        "body": {"$ref": "20000", "label": "Body"}
+    }
+}
