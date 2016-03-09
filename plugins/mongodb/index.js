@@ -169,6 +169,8 @@ class MongoDB {
      * @return {Promise} promise
      */
     static setPageById(id, page) {
+        page.updateDate = Date.now();
+
         return MongoDB.updateOne(
             'pages',
             {

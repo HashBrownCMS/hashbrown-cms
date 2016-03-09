@@ -5388,7 +5388,7 @@ var MessageModal=require('./MessageModal');var PageEditor=function(_View5){_inhe
      * @param {Object} schema
      *
      * @return {Object} element
-     */},{key:"renderFieldView",value:function renderFieldView(fieldValue,schemaValue){function onChange(){var valueName=$(this).data('name');if(valueName){fieldValue[valueName]=$(this).val();}else {fieldValue=$(this).val();}console.log(fieldValue);}var fieldSchema=resources['fieldSchemas'][schemaValue.$ref];if(fieldSchema){var fieldView=resources['fieldViews'][fieldSchema.id];if(fieldView){var fieldElement=jade.compile(fieldView)({value:fieldValue,disabled:schemaValue.disabled,resources:resources});var $fieldElement=$(fieldElement);$fieldElement.attr('data-field-schema-id',fieldSchema.id); // Input
+     */},{key:"renderFieldView",value:function renderFieldView(fieldValue,schemaValue){function onChange(){var valueName=$(this).data('name');if(valueName){fieldValue[valueName]=$(this).val();}else {fieldValue=$(this).val();}console.log(fieldValue);}var fieldSchema=resources['fieldSchemas'][schemaValue.$ref];if(fieldSchema){var fieldView=resources['fieldViews'][fieldSchema.id];if(fieldView){var fieldElement=jade.compile(fieldView)({value:fieldValue,disabled:schemaValue.disabled,resources:resources});var $fieldElement=$(fieldElement); // Input
 $fieldElement.find('input').each(function(i){$(this).bind('change propertychange keyup paste',onChange);});return $fieldElement;}else {console.log('[PageEditor] No template found for field schema id "'+fieldSchema.id+'"');}}else {console.log('[PageEditor] No field schema found for $ref "'+schemaValue.$ref+'"');}} /**
      * Renders an object
      *

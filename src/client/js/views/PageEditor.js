@@ -87,8 +87,6 @@ class PageEditor extends View {
                 let fieldElement = jade.compile(fieldView)({ value: fieldValue, disabled: schemaValue.disabled, resources });
                 let $fieldElement = $(fieldElement);
 
-                $fieldElement.attr('data-field-schema-id', fieldSchema.id);
-
                 // Input
                 $fieldElement.find('input').each(function(i) {
                     $(this).bind('change propertychange keyup paste', onChange);

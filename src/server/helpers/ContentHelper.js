@@ -52,6 +52,8 @@ class ContentHelper {
      * @return {Promise} promise
      */
     static setPageById(id, page) {
+        page.updateDate = Date.now();
+
         return new Promise(function(callback) {
             callback();   
         });
