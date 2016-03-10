@@ -2,6 +2,10 @@
     "id": "10000",
     "name": "Page",
     "type": "object",
+    "defaultTabId": "90000",
+    "tabs": {
+        "90000": "Meta"
+    },
     "properties": {
         "title": {"$ref": "20000", "label": "Title"},
         "description": {"$ref": "20000", "label": "Description"},

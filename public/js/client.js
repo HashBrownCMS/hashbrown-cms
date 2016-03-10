@@ -4490,7 +4490,7 @@ var _this2=_possibleConstructorReturn(this,Object.getPrototypeOf(ContextMenu).ca
 jQuery.fn.extend({context:function context(menuItems){return this.each(function(){$(this).on('contextmenu',function(e){if(e.ctrlKey){return;}e.preventDefault();e.stopPropagation();if(e.which==3){var menu=new ContextMenu({model:menuItems,pos:{x:e.pageX,y:e.pageY}});}});});}}); // Event handling
 $('body').click(function(e){if($(e.target).parents('.context-menu').length<1){ViewHelper.removeAll('ContextMenu');}});},{}],61:[function(require,module,exports){'use strict';var pathToRegexp=require('path-to-regexp');var routes=[];var Router=function(){function Router(){_classCallCheck2(this,Router);}_createClass(Router,null,[{key:"route",value:function route(path,controller){routes[path]={controller:controller};}},{key:"go",value:function go(url){location.hash=url;}},{key:"goToBaseDir",value:function goToBaseDir(){var url=this.url||'/';var base=new String(url).substring(0,url.lastIndexOf('/'));this.go(base);}},{key:"init",value:function init(){ // Get the url
 var url=location.hash.slice(1)||'/';var trimmed=url.substring(0,url.indexOf('?'));if(trimmed){url=trimmed;} // Look for route
-var context={};var route=undefined; // Exact match
+var context={};var route=void 0; // Exact match
 if(routes[url]){route=routes[url]; // Use path to regexp
 }else {for(var path in routes){var keys=[];var re=pathToRegexp(path,keys);var values=re.exec(url); // A match was found
 if(re.test(url)){ // Set the route
@@ -5397,7 +5397,7 @@ $fieldElement.find('input').each(function(i){$(this).bind('change propertychange
      * @param {Object} schema
      *
      * @return {Object} element
-     */},{key:"renderObject",value:function renderObject(object,schema){var view=this;return _.div({class:'object'},[_.each(schema.properties,function(key,value){return _.div({class:'field-container'},[_.div({class:'field-icon'},_.span({class:'fa fa-'+value.icon})),_.div({class:'field-key'},value.label||key),_.div({class:'field-value'},view.renderFieldView(object[key],schema.properties[key]))]);})]);} /**
+     */},{key:"renderObject",value:function renderObject(object,schema){var view=this;return _.div({class:'object'},[_.ul({class:'nav nav-tabs'},_.each(schema.tabs,function(id,tab){return _.li({class:id==schema.defaultTabId?'active':''},_.a({'data-toggle':'tab',href:'#tab-'+id},tab));})),_.div({class:'tab-content'},_.each(schema.tabs,function(id,tab){var properties={};for(var alias in schema.properties){var property=schema.properties[alias];var noTabAssigned=!property.tabId&&id==schema.defaultTabId;var thisTabAssigned=property.tabId==schema.defaultTabId;if(noTabAssigned||thisTabAssigned){properties[alias]=property;}}return _.div({id:id,class:'tab-pane'+(id==schema.defaultTabId?' active':'')},_.each(properties,function(key,value){return _.div({class:'field-container'},[_.div({class:'field-icon'},_.span({class:'fa fa-'+value.icon})),_.div({class:'field-key'},value.label||key),_.div({class:'field-value'},view.renderFieldView(object[key],schema.properties[key]))]);}));}))]);} /**
      * Gets a schema with $parent included recursively
      *
      * @param {Number} id

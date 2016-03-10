@@ -143,19 +143,46 @@ class PageEditor extends View {
         let view = this;
 
         return _.div({class: 'object'}, [
-            _.each(schema.properties, function(key, value) {
-                return _.div({class: 'field-container'}, [
-                    _.div({class: 'field-icon'},
-                        _.span({class: 'fa fa-' + value.icon})
-                    ),
-                    _.div({class: 'field-key'},
-                        value.label || key
-                    ),
-                    _.div({class: 'field-value'},
-                        view.renderFieldView(object[key], schema.properties[key])
-                    )
-                ]);
-            })
+            _.ul({class: 'nav nav-tabs'}, 
+                _.each(schema.tabs, function(id, tab) {
+                    return _.li({class: id == schema.defaultTabId ? 'active' : ''}, 
+                        _.a({'data-toggle': 'tab', href: '#tab-' + id},
+                            tab
+                        )
+                    );
+                })
+            ),
+            _.div({class: 'tab-content'},
+                _.each(schema.tabs, function(id, tab) {
+                    let properties = {};
+                    
+                    for(let alias in schema.properties) {
+                        let property = schema.properties[alias];
+                        let noTabAssigned = !property.tabId && id == schema.defaultTabId;
+                        let thisTabAssigned = property.tabId == schema.defaultTabId;
+
+                        if(noTabAssigned || thisTabAssigned) {
+                            properties[alias] = property;
+                        }
+                    }
+
+                    return _.div({id: id, class: 'tab-pane' + (id == schema.defaultTabId ? ' active' : '')}, 
+                        _.each(properties, function(key, value) {
+                            return _.div({class: 'field-container'}, [
+                                _.div({class: 'field-icon'},
+                                    _.span({class: 'fa fa-' + value.icon})
+                                ),
+                                _.div({class: 'field-key'},
+                                    value.label || key
+                                ),
+                                _.div({class: 'field-value'},
+                                    view.renderFieldView(object[key], schema.properties[key])
+                                )
+                            ]);
+                        })
+                    );
+                })
+            )
         ]);
     }
 
