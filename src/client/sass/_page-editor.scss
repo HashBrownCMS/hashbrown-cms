@@ -1,11 +1,15 @@
 .page-editor {
     height: 100%;
-    display: flex;
-    flex-direction: column;
-    overflow-y: auto;
 
     >.object {
-        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+
+        >.tab-content {
+            flex-grow: 1;
+            overflow-y: auto;
+        }
     }
 
     .object {
@@ -28,10 +32,26 @@
 
             .field-value {
                 flex-grow: 1;
+            
+                .rich-text-editor {
+                    margin: 0px;
 
-                textarea {
-                    resize: none;
-                    height: 300px;
+                    .rte-output {
+                        h1, h2, h3, h4, h5, h6 {
+                            &:first-child {
+                                margin-top: 0px;
+                            }   
+                        }   
+                        
+                        height: 300px;
+                        overflow-y: auto;
+                    }
+
+                    textarea {
+                        height: 200px;
+                        resize: none;
+                        overflow: hidden;
+                    }
                 }
             }
         }

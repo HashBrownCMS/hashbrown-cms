@@ -1,5 +1,9 @@
 'use strict';
 
+// Lib
+let marked = require('marked');
+let toMarkdown = require('to-markdown');
+
 // Models
 let Page = require('../../../server/models/Page');
 
@@ -86,14 +90,18 @@ class PageEditor extends View {
      * @param {Function} handler
      */
     bindChangeEvent($fieldElement, fieldValue, handler) {
-        function onChange() {
-            let valueName = $(this).data('name');
+        function onChange($element) {
+            if($(this).length > 0) {
+                $element = $(this);
+            }
+
+            let valueName = $element.data('name');
 
             if(valueName) {
-                fieldValue[valueName] = $(this).val();
+                fieldValue[valueName] = $element.val();
             
             } else {
-                fieldValue = $(this).val();
+                fieldValue = $element.val();
 
             }
 
@@ -105,10 +113,27 @@ class PageEditor extends View {
             $(this).bind('change propertychange keyup paste', onChange);
         });
         
-        // Text area
-        $fieldElement.find('textarea').each(function(i) {
-            $(this).bind('change propertychange keyup paste', onChange);
-        });
+        // RTE
+        if($fieldElement.hasClass('rich-text-editor')) {
+            let $textarea = $fieldElement.find('textarea');
+            let $output = $fieldElement.find('.rte-output');
+            
+            $output.attr('contenteditable', true);
+
+            $output.bind('change propertychange keyup paste', function() {
+                $textarea.val(toMarkdown($output.html()));
+            
+                onChange($textarea);
+            });
+
+            $textarea.bind('change propertychange keyup paste', function() {
+                $output.html(marked($textarea.val()));
+            
+                onChange($textarea);
+            });
+            
+            $output.html(marked($textarea.val()));
+        }
     }
 
     /**
@@ -254,24 +279,25 @@ class PageEditor extends View {
 
         if(pageSchema) {
             this.$element.html([
-                this.renderObject(this.model, pageSchema),
-                _.div({class: 'panel panel-default panel-buttons'}, 
-                    _.div({class: 'btn-group flex-horizontal'}, [
-                        _.button({class: 'btn btn-danger flex-expand'},
-                            _.span({class: 'fa fa-trash'})
-                        ).click(function() { view.onClickDelete(); }),
-                        _.button({class: 'btn btn-primary flex-expand'},
-                            _.span({class: 'fa fa-refresh'})
-                        ).click(function() { view.onClickReload(); }),
-                        _.button({class: 'btn btn-default flex-expand'}, [
-                            (page.isPublished() ? 'Unpublish' : 'Publish') + ' ',
-                            _.span({class: 'fa fa-newspaper-o'})
-                        ]).click(function() { view.onClickTogglePublish(); }),
-                        _.button({class: 'btn btn-success flex-expand'}, [
-                            'Save ',
-                            _.span({class: 'fa fa-save'})
-                        ]).click(function() { view.onClickSave(); })
-                    ])
+                this.renderObject(this.model, pageSchema).append(
+                    _.div({class: 'panel panel-default panel-buttons'}, 
+                        _.div({class: 'btn-group'}, [
+                            _.button({class: 'btn btn-danger'},
+                                _.span({class: 'fa fa-trash'})
+                            ).click(function() { view.onClickDelete(); }),
+                            _.button({class: 'btn btn-primary'},
+                                _.span({class: 'fa fa-refresh'})
+                            ).click(function() { view.onClickReload(); }),
+                            _.button({class: 'btn btn-default'}, [
+                                (page.isPublished() ? 'Unpublish' : 'Publish') + ' ',
+                                _.span({class: 'fa fa-newspaper-o'})
+                            ]).click(function() { view.onClickTogglePublish(); }),
+                            _.button({class: 'btn btn-success'}, [
+                                'Save ',
+                                _.span({class: 'fa fa-save'})
+                            ]).click(function() { view.onClickSave(); })
+                        ])
+                    )
                 )
             ]);
         }

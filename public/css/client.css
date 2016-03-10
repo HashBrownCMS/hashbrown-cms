@@ -33,11 +33,8 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
       border-width: 0px;
       border-top-width: 1px;
       border-radius: 0px; }
-      .putaitu-cms-container .workspace .panel-buttons .btn-group {
-        float: left; }
-        .putaitu-cms-container .workspace .panel-buttons .btn-group:after {
-          content: '';
-          clear: both; }
+      .putaitu-cms-container .workspace .panel-buttons .btn-group .btn span {
+        line-height: 20px; }
 
 .json-editor {
   width: 100%;
@@ -48,12 +45,14 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
     border: 0px; }
 
 .page-editor {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto; }
+  height: 100%; }
   .page-editor > .object {
-    flex-grow: 1; }
+    display: flex;
+    flex-direction: column;
+    height: 100%; }
+    .page-editor > .object > .tab-content {
+      flex-grow: 1;
+      overflow-y: auto; }
   .page-editor .object .nav-tabs {
     padding: 15px 0px 0px 15px;
     background-color: #ddd; }
@@ -66,9 +65,17 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
       width: 300px; }
     .page-editor .object .field-container .field-value {
       flex-grow: 1; }
-      .page-editor .object .field-container .field-value textarea {
-        resize: none;
-        height: 300px; }
+      .page-editor .object .field-container .field-value .rich-text-editor {
+        margin: 0px; }
+        .page-editor .object .field-container .field-value .rich-text-editor .rte-output {
+          height: 300px;
+          overflow-y: auto; }
+          .page-editor .object .field-container .field-value .rich-text-editor .rte-output h1:first-child, .page-editor .object .field-container .field-value .rich-text-editor .rte-output h2:first-child, .page-editor .object .field-container .field-value .rich-text-editor .rte-output h3:first-child, .page-editor .object .field-container .field-value .rich-text-editor .rte-output h4:first-child, .page-editor .object .field-container .field-value .rich-text-editor .rte-output h5:first-child, .page-editor .object .field-container .field-value .rich-text-editor .rte-output h6:first-child {
+            margin-top: 0px; }
+        .page-editor .object .field-container .field-value .rich-text-editor textarea {
+          height: 200px;
+          resize: none;
+          overflow: hidden; }
 
 .navbar-main {
   display: flex;
@@ -119,3 +126,17 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
         margin: 0px; }
         .navbar-main .tab-panes .pane .pane-item p {
           margin: 0px; }
+
+.media-viewer {
+  display: flex;
+  flex-direction: column;
+  margin: 0px;
+  height: 100%; }
+  .media-viewer .panel-body {
+    flex-grow: 1;
+    position: relative; }
+    .media-viewer .panel-body > * {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%); }

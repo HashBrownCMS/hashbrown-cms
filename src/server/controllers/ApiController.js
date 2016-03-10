@@ -4,6 +4,7 @@ let Controller = require('./Controller');
 let ContentHelper = require('../helpers/ContentHelper');
 let SchemaHelper = require('../helpers/SchemaHelper');
 let ViewHelper = require('../helpers/ViewHelper');
+let MediaHelper = require('../helpers/MediaHelper');
 
 /**
  * The main API controller
@@ -23,9 +24,21 @@ class ApiController extends Controller {
         
         app.get('/api/sections', ApiController.getSections);
 
+        app.get('/api/media', ApiController.getMedia);
+        
         app.get('/api/fieldViews', ApiController.getFieldViews);
     }
-    
+   
+    /**
+     * Gets a list of media objects
+     */
+    static getMedia(req, res) {
+        MediaHelper.getAllMedia()
+        .then(function(paths) {
+            res.send(paths)
+        }); 
+    }
+
     /**
      * Gets a list of all Section objects
      */

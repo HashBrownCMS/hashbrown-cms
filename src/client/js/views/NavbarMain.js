@@ -36,9 +36,15 @@ class NavbarMain extends View {
             $pane.html(
                 _.each(items, function(i, item) {
                     let id = item.id || item._id || i;
+                    let path = item.shortPath || item.path || id;
                     let name = item.title || item.name || id;
 
-                    return _.a({'data-id': id, href: '#/' + params.route + '/' + id, class: 'pane-item list-group-item'},
+                    return _.a({
+                        'data-id': id,
+                        'data-path': path,
+                        href: '#/' + params.route + '/' + path,
+                        class: 'pane-item list-group-item'
+                    },
                         _.p(name)
                     );
                 })
@@ -76,12 +82,17 @@ class NavbarMain extends View {
         let view = this;
 
         this.$element.find('.pane-item').each(function(i) {
-            $(this).toggleClass('active', false);
+            let $item = $(this);
 
-            if($(this).attr('data-id') == id) {
-                $(this).toggleClass('active', true);
+            $item.toggleClass('active', false);
+            
+            if(
+                $item.attr('data-id') == id ||
+                $item.attr('data-path') == id
+            ) {
+                $item.toggleClass('active', true);
 
-                view.showTab($(this).parents('.pane').attr('data-route'));
+                view.showTab($item.parents('.pane').attr('data-route'));
             }
         });
     }
@@ -106,6 +117,13 @@ class NavbarMain extends View {
             label: 'Sections',
             route: 'sections',
             icon: 'th'
+        });
+        
+        this.renderPane({
+            resource: 'media',
+            label: 'Media',
+            route: 'media',
+            icon: 'file-image-o'
         });
         
         this.renderPane({

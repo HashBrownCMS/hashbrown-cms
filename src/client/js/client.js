@@ -1,15 +1,16 @@
 'use strict';
 
 // Libraries
-require('putaitu.js');
 window.$ = window.jQuery = require('jquery');
 require('bootstrap');
+require('putaitu.js');
 let jade = require('jade');
 
 // Views
 let NavbarMain = require('./views/NavbarMain');
 let JSONEditor = require('./views/JSONEditor');
 let PageEditor = require('./views/PageEditor');
+let MediaViewer = require('./views/MediaViewer');
 
 // -----------
 // Ready functions
@@ -21,7 +22,7 @@ function onReady(callback) {
 }
 
 function checkReady() {
-    if(resourcesLoaded >= 4) {
+    if(resourcesLoaded >= resourcesRequired) {
         for(let i in onReadyCallbacks) {
             onReadyCallbacks[i]();
         }
@@ -31,7 +32,7 @@ function checkReady() {
 // -----------
 // Preload resources
 // -----------
-let resourcesRequired = 4;
+let resourcesRequired = 5;
 let resourcesLoaded = 0;
 
 window.resources = {};
@@ -63,6 +64,13 @@ $.getJSON('/api/fieldViews', function(fieldViews) {
     }
     
     window.resources.fieldViews = fieldViews;
+    
+    resourcesLoaded++;
+    checkReady();
+});
+
+$.getJSON('/api/media', function(media) {
+    window.resources.media = media;
     
     resourcesLoaded++;
     checkReady();
@@ -103,6 +111,17 @@ Router.route('/schemas/:id', function() {
     ViewHelper.get('NavbarMain').highlightItem(this.id);
     
     $('.workspace').html(jsonEditor.$element);
+});
+
+// Media preview
+Router.route('/media/:url', function() {
+    let mediaViewer = new MediaViewer({
+        mediaPath: '/media/' + this.url
+    });
+    
+    ViewHelper.get('NavbarMain').highlightItem(this.url);
+    
+    $('.workspace').html(mediaViewer.$element);
 });
 
 // ----------

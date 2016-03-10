@@ -20,6 +20,7 @@ app.set('view engine', 'jade');
 
 app.use(bodyparser.urlencoded({ extended: true }));
 app.use(express.static(appRoot + '/public'));
+app.use('/media', express.static(appRoot + '/media'));
 
 // ----------
 // Controllers

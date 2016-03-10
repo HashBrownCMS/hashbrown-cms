@@ -15,7 +15,7 @@ class SchemaHelper {
      */
     static getAllSchemas() {
         return new Promise(function(callback) {
-            glob(appRoot + '/schemas/*/*.schema', function(err, paths) {
+            glob(appRoot + '/schemas/**/*.schema', function(err, paths) {
                 if(err) {
                     throw err;
                 }

@@ -56,11 +56,10 @@ button, a {
             border-radius: 0px;
 
             .btn-group {
-                float: left;
-
-                &:after {
-                    content: '';
-                    clear: both;
+                .btn {
+                    span {
+                        line-height: 20px;
+                    }
                 }
             }
         }
