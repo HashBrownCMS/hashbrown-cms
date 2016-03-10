@@ -25,6 +25,8 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
   .putaitu-cms-container .workspace {
     flex-grow: 1;
     height: 100%; }
+    .putaitu-cms-container .workspace .panel-danger {
+      margin: 0px; }
     .putaitu-cms-container .workspace .panel-buttons {
       padding: 15px;
       margin: 0px;

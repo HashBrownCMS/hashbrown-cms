@@ -14,7 +14,10 @@ class JSONEditor extends View {
         super(params);
 
         this.$element = _.div({class: 'json-editor flex-vertical'});
-        this.$error = _.div({class: 'panel panel-danger'});
+        this.$error = _.div({class: 'panel panel-danger'}, [
+            _.div({class: 'panel-heading'}),
+            _.div({class: 'panel-body'})
+        ]).hide();
 
         this.fetch();
     }
@@ -61,7 +64,8 @@ class JSONEditor extends View {
             this.$error.hide();
 
         } catch(e) {
-            this.$error.html(e);
+            this.$error.children('.panel-heading').html('JSON error');
+            this.$error.children('.panel-body').html(e);
             this.$error.show();
         }
     }

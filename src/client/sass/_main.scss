@@ -44,6 +44,10 @@ button, a {
         flex-grow: 1;
         height: 100%;
 
+        .panel-danger {
+            margin: 0px;    
+        }
+
         .panel-buttons {
             padding: 15px;
             margin: 0px;
