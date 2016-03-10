@@ -134,6 +134,13 @@ class PageEditor extends View {
             
             $output.html(marked($textarea.val()));
         }
+
+        // Date picker
+        if($fieldElement.hasClass('date-editor')) {
+            let $input = $fieldElement.find('input');
+
+            $input.datepicker();
+        }
     }
 
     /**

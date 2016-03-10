@@ -1,7 +1,7 @@
-- value = value ? new Date(value).toString() : null;
+- date = new Date(value).toString();
 
 .field-editor.date-editor
     if disabled
-        p=value
+        p=date
     else
-        input.form-control(type="date", value=value)
+        input.form-control(type="text", value=value)

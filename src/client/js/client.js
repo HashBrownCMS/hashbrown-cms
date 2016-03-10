@@ -4,6 +4,7 @@
 window.$ = window.jQuery = require('jquery');
 require('bootstrap');
 require('putaitu.js');
+require('bootstrap-datepicker');
 let jade = require('jade');
 
 // Views
