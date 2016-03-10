@@ -35,8 +35,11 @@ class NavbarMain extends View {
 
             $pane.html(
                 _.each(items, function(i, item) {
-                    return _.a({href: '#/' + params.route + '/' + (item.id || item._id || i), class: 'pane-item list-group-item'},
-                        _.p(item.title || item.name || item.id || item._id || i)
+                    let id = item.id || item._id || i;
+                    let name = item.title || item.name || id;
+
+                    return _.a({'data-id': id, href: '#/' + params.route + '/' + id, class: 'pane-item list-group-item'},
+                        _.p(name)
                     );
                 })
             );
@@ -63,6 +66,23 @@ class NavbarMain extends View {
         
         this.$element.find('.tab-buttons .btn').each(function(i) {
             $(this).toggleClass('active', $(this).attr('data-route') == tabRoute);
+        });
+    }
+
+    /**
+     * Highlights an item
+     */
+    highlightItem(id) {
+        let view = this;
+
+        this.$element.find('.pane-item').each(function(i) {
+            $(this).toggleClass('active', false);
+
+            if($(this).attr('data-id') == id) {
+                $(this).toggleClass('active', true);
+
+                view.showTab($(this).parents('.pane').attr('data-route'));
+            }
         });
     }
 

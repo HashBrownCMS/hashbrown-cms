@@ -79,14 +79,13 @@ class PageEditor extends View {
     }
 
     /**
-     * Renders a field view
+     * Binds a change event to a field view
      *
-     * @param {Object} field
-     * @param {Object} schema
-     *
-     * @return {Object} element
+     * @param {Object} $fieldElement
+     * @param {Object} fieldValue
+     * @param {Function} handler
      */
-    renderFieldView(fieldValue, schemaValue) {
+    bindChangeEvent($fieldElement, fieldValue, handler) {
         function onChange() {
             let valueName = $(this).data('name');
 
@@ -98,9 +97,30 @@ class PageEditor extends View {
 
             }
 
-            console.log(fieldValue);
+            handler(fieldValue);
         }
 
+        // Input
+        $fieldElement.find('input').each(function(i) {
+            $(this).bind('change propertychange keyup paste', onChange);
+        });
+        
+        // Text area
+        $fieldElement.find('textarea').each(function(i) {
+            $(this).bind('change propertychange keyup paste', onChange);
+        });
+    }
+
+    /**
+     * Renders a field view
+     *
+     * @param {Object} field
+     * @param {Object} schema
+     * @param {Function} inputHandler
+     *
+     * @return {Object} element
+     */
+    renderFieldView(fieldValue, schemaValue, inputHandler) {
         let fieldSchema = resources.schemas[schemaValue.$ref];
 
         if(fieldSchema) {
@@ -110,10 +130,7 @@ class PageEditor extends View {
                 let fieldElement = fieldView({ value: fieldValue, disabled: schemaValue.disabled, resources });
                 let $fieldElement = $(fieldElement);
 
-                // Input
-                $fieldElement.find('input').each(function(i) {
-                    $(this).bind('change propertychange keyup paste', onChange);
-                });
+                this.bindChangeEvent($fieldElement, fieldValue, inputHandler);
 
                 return $fieldElement;
 
@@ -175,7 +192,13 @@ class PageEditor extends View {
                                     value.label || key
                                 ),
                                 _.div({class: 'field-value'},
-                                    view.renderFieldView(object[key], schema.properties[key])
+                                    view.renderFieldView(
+                                        object[key],
+                                        schema.properties[key],
+                                        function(newValue) {
+                                            object[key] = newValue;
+                                        }
+                                    )
                                 )
                             ]);
                         })

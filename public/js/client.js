@@ -5349,9 +5349,9 @@ var resourcesRequired=4;var resourcesLoaded=0;window.resources={};$.getJSON('/ap
 // Routes
 // -----------
 // Page edit
-Router.route('/pages/:id',function(){var pageEditor=new PageEditor({modelUrl:'/api/pages/'+this.id});ViewHelper.get('NavbarMain').showTab('pages');$('.workspace').html(pageEditor.$element);}); // Page edit (JSON editor)
-Router.route('/pages/json/:id',function(){var pageEditor=new JSONEditor({modelUrl:'/api/pages/'+this.id});ViewHelper.get('NavbarMain').showTab('pages');$('.workspace').html(pageEditor.$element);}); // Schema edit
-Router.route('/schemas/:id',function(){var jsonEditor=new JSONEditor({modelUrl:'/api/schemas/'+this.id});ViewHelper.get('NavbarMain').showTab('schemas');$('.workspace').html(jsonEditor.$element);}); // ----------
+Router.route('/pages/:id',function(){var pageEditor=new PageEditor({modelUrl:'/api/pages/'+this.id});ViewHelper.get('NavbarMain').highlightItem(this.id);$('.workspace').html(pageEditor.$element);}); // Page edit (JSON editor)
+Router.route('/pages/json/:id',function(){var pageEditor=new JSONEditor({modelUrl:'/api/pages/'+this.id});ViewHelper.get('NavbarMain').highlightItem(this.id);$('.workspace').html(pageEditor.$element);}); // Schema edit
+Router.route('/schemas/:id',function(){var jsonEditor=new JSONEditor({modelUrl:'/api/schemas/'+this.id});ViewHelper.get('NavbarMain').highlightItem(this.id);$('.workspace').html(jsonEditor.$element);}); // ----------
 // Init
 // ----------
 onReady(function(){new NavbarMain();Router.init();});},{"./views/JSONEditor":74,"./views/NavbarMain":76,"./views/PageEditor":77,"bootstrap":5,"jade":25,"jquery":47,"putaitu.js":64}],74:[function(require,module,exports){'use strict'; // Lib
@@ -5373,11 +5373,13 @@ var MessageModal=require('./MessageModal'); /**
      *
      * @param {String} uri
      * @param {String} name
-     */_createClass(NavbarMain,[{key:"renderPane",value:function renderPane(params){var view=this;var $button=_.button({class:'btn','data-route':params.route},[_.span({class:'fa fa-'+params.icon}),_.p(params.label)]).click(function(){view.showTab(params.route);});var $pane=_.div({class:'pane list-group','data-route':params.route},_.div({class:'pane-content'}));if(params.resource){var items=window.resources[params.resource];$pane.html(_.each(items,function(i,item){return _.a({href:'#/'+params.route+'/'+(item.id||item._id||i),class:'pane-item list-group-item'},_.p(item.title||item.name||item.id||item._id||i));}));}if(this.$element.find('.tab-panes .pane').length<1){$pane.addClass('active');$button.addClass('active');}this.$element.find('.tab-panes').append($pane);this.$element.find('.tab-buttons').append($button);} /**
+     */_createClass(NavbarMain,[{key:"renderPane",value:function renderPane(params){var view=this;var $button=_.button({class:'btn','data-route':params.route},[_.span({class:'fa fa-'+params.icon}),_.p(params.label)]).click(function(){view.showTab(params.route);});var $pane=_.div({class:'pane list-group','data-route':params.route},_.div({class:'pane-content'}));if(params.resource){var items=window.resources[params.resource];$pane.html(_.each(items,function(i,item){var id=item.id||item._id||i;var name=item.title||item.name||id;return _.a({'data-id':id,href:'#/'+params.route+'/'+id,class:'pane-item list-group-item'},_.p(name));}));}if(this.$element.find('.tab-panes .pane').length<1){$pane.addClass('active');$button.addClass('active');}this.$element.find('.tab-panes').append($pane);this.$element.find('.tab-buttons').append($button);} /**
      * Shows a tab
      *
      * @param {String} tabName
-     */},{key:"showTab",value:function showTab(tabRoute){this.$element.find('.tab-panes .pane').each(function(i){$(this).toggleClass('active',$(this).attr('data-route')==tabRoute);});this.$element.find('.tab-buttons .btn').each(function(i){$(this).toggleClass('active',$(this).attr('data-route')==tabRoute);});}},{key:"render",value:function render(){this.$element.html([_.div({class:'tab-buttons'}),_.div({class:'tab-panes'})]);$('.navspace').html(this.$element);this.renderPane({resource:'pages',label:'Pages',route:'pages',icon:'file'});this.renderPane({resource:'sections',label:'Sections',route:'sections',icon:'th'});this.renderPane({resource:'schemas',label:'Schemas',route:'schemas',icon:'gears'});}}]);return NavbarMain;}(View);module.exports=NavbarMain;},{}],77:[function(require,module,exports){'use strict'; // Models
+     */},{key:"showTab",value:function showTab(tabRoute){this.$element.find('.tab-panes .pane').each(function(i){$(this).toggleClass('active',$(this).attr('data-route')==tabRoute);});this.$element.find('.tab-buttons .btn').each(function(i){$(this).toggleClass('active',$(this).attr('data-route')==tabRoute);});} /**
+     * Highlights an item
+     */},{key:"highlightItem",value:function highlightItem(id){var view=this;this.$element.find('.pane-item').each(function(i){$(this).toggleClass('active',false);if($(this).attr('data-id')==id){$(this).toggleClass('active',true);view.showTab($(this).parents('.pane').attr('data-route'));}});}},{key:"render",value:function render(){this.$element.html([_.div({class:'tab-buttons'}),_.div({class:'tab-panes'})]);$('.navspace').html(this.$element);this.renderPane({resource:'pages',label:'Pages',route:'pages',icon:'file'});this.renderPane({resource:'sections',label:'Sections',route:'sections',icon:'th'});this.renderPane({resource:'schemas',label:'Schemas',route:'schemas',icon:'gears'});}}]);return NavbarMain;}(View);module.exports=NavbarMain;},{}],77:[function(require,module,exports){'use strict'; // Models
 var Page=require('../../../server/models/Page'); // Views
 var MessageModal=require('./MessageModal');var PageEditor=function(_View5){_inherits(PageEditor,_View5);function PageEditor(params){_classCallCheck2(this,PageEditor);var _this6=_possibleConstructorReturn(this,Object.getPrototypeOf(PageEditor).call(this,params));_this6.$element=_.div({class:'page-editor'});_this6.fetch();return _this6;} /**
      * Event: Click reload. Fetches the model again
@@ -5388,21 +5390,29 @@ var MessageModal=require('./MessageModal');var PageEditor=function(_View5){_inhe
      */},{key:"onClickTogglePublish",value:function onClickTogglePublish(){} /**
      * Event: On click remove
      */},{key:"onClickDelete",value:function onClickDelete(){new MessageModal({model:{title:'Delete page',body:'Are you sure you want to delete this page?'},buttons:[{label:'Cancel',class:'btn-default',callback:function callback(){}},{label:'OK',class:'btn-danger',callback:function callback(){}}]});} /**
+     * Binds a change event to a field view
+     *
+     * @param {Object} $fieldElement
+     * @param {Object} fieldValue
+     * @param {Function} handler
+     */},{key:"bindChangeEvent",value:function bindChangeEvent($fieldElement,fieldValue,handler){function onChange(){var valueName=$(this).data('name');if(valueName){fieldValue[valueName]=$(this).val();}else {fieldValue=$(this).val();}handler(fieldValue);} // Input
+$fieldElement.find('input').each(function(i){$(this).bind('change propertychange keyup paste',onChange);}); // Text area
+$fieldElement.find('textarea').each(function(i){$(this).bind('change propertychange keyup paste',onChange);});} /**
      * Renders a field view
      *
      * @param {Object} field
      * @param {Object} schema
+     * @param {Function} inputHandler
      *
      * @return {Object} element
-     */},{key:"renderFieldView",value:function renderFieldView(fieldValue,schemaValue){function onChange(){var valueName=$(this).data('name');if(valueName){fieldValue[valueName]=$(this).val();}else {fieldValue=$(this).val();}console.log(fieldValue);}var fieldSchema=resources.schemas[schemaValue.$ref];if(fieldSchema){var fieldView=resources.fieldViews[fieldSchema.id];if(fieldView){var fieldElement=fieldView({value:fieldValue,disabled:schemaValue.disabled,resources:resources});var $fieldElement=$(fieldElement); // Input
-$fieldElement.find('input').each(function(i){$(this).bind('change propertychange keyup paste',onChange);});return $fieldElement;}else {console.log('[PageEditor] No template found for field schema id "'+fieldSchema.id+'"');}}else {console.log('[PageEditor] No field schema found for $ref "'+schemaValue.$ref+'"');}} /**
+     */},{key:"renderFieldView",value:function renderFieldView(fieldValue,schemaValue,inputHandler){var fieldSchema=resources.schemas[schemaValue.$ref];if(fieldSchema){var fieldView=resources.fieldViews[fieldSchema.id];if(fieldView){var fieldElement=fieldView({value:fieldValue,disabled:schemaValue.disabled,resources:resources});var $fieldElement=$(fieldElement);this.bindChangeEvent($fieldElement,fieldValue,inputHandler);return $fieldElement;}else {console.log('[PageEditor] No template found for field schema id "'+fieldSchema.id+'"');}}else {console.log('[PageEditor] No field schema found for $ref "'+schemaValue.$ref+'"');}} /**
      * Renders an object
      *
      * @param {Object} data
      * @param {Object} schema
      *
      * @return {Object} element
-     */},{key:"renderObject",value:function renderObject(object,schema){var view=this;return _.div({class:'object'},[_.ul({class:'nav nav-tabs'},_.each(schema.tabs,function(id,tab){return _.li({class:id==schema.defaultTabId?'active':''},_.a({'data-toggle':'tab',href:'#tab-'+id},tab));})),_.div({class:'tab-content'},_.each(schema.tabs,function(id,tab){var properties={};for(var alias in schema.properties){var property=schema.properties[alias];var noTabAssigned=!property.tabId;var isMetaTab=tab=='Meta';var thisTabAssigned=property.tabId==id;if(noTabAssigned&&isMetaTab||thisTabAssigned){properties[alias]=property;}}return _.div({id:'tab-'+id,class:'tab-pane'+(id==schema.defaultTabId?' active':'')},_.each(properties,function(key,value){return _.div({class:'field-container'},[_.div({class:'field-icon'},_.span({class:'fa fa-'+value.icon})),_.div({class:'field-key'},value.label||key),_.div({class:'field-value'},view.renderFieldView(object[key],schema.properties[key]))]);}));}))]);} /**
+     */},{key:"renderObject",value:function renderObject(object,schema){var view=this;return _.div({class:'object'},[_.ul({class:'nav nav-tabs'},_.each(schema.tabs,function(id,tab){return _.li({class:id==schema.defaultTabId?'active':''},_.a({'data-toggle':'tab',href:'#tab-'+id},tab));})),_.div({class:'tab-content'},_.each(schema.tabs,function(id,tab){var properties={};for(var alias in schema.properties){var property=schema.properties[alias];var noTabAssigned=!property.tabId;var isMetaTab=tab=='Meta';var thisTabAssigned=property.tabId==id;if(noTabAssigned&&isMetaTab||thisTabAssigned){properties[alias]=property;}}return _.div({id:'tab-'+id,class:'tab-pane'+(id==schema.defaultTabId?' active':'')},_.each(properties,function(key,value){return _.div({class:'field-container'},[_.div({class:'field-icon'},_.span({class:'fa fa-'+value.icon})),_.div({class:'field-key'},value.label||key),_.div({class:'field-value'},view.renderFieldView(object[key],schema.properties[key],function(newValue){object[key]=newValue;}))]);}));}))]);} /**
      * Gets a schema with $parent included recursively
      *
      * @param {Number} id

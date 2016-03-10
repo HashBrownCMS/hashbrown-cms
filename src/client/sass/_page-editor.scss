@@ -28,6 +28,11 @@
 
             .field-value {
                 flex-grow: 1;
+
+                textarea {
+                    resize: none;
+                    height: 300px;
+                }
             }
         }
     }

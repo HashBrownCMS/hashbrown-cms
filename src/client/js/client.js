@@ -77,7 +77,7 @@ Router.route('/pages/:id', function() {
         modelUrl: '/api/pages/' + this.id
     });
    
-    ViewHelper.get('NavbarMain').showTab('pages');
+    ViewHelper.get('NavbarMain').highlightItem(this.id);
     
     $('.workspace').html(pageEditor.$element);
 });
@@ -87,8 +87,9 @@ Router.route('/pages/json/:id', function() {
     let pageEditor = new JSONEditor({
         modelUrl: '/api/pages/' + this.id
     });
-   
-    ViewHelper.get('NavbarMain').showTab('pages');
+  
+     
+    ViewHelper.get('NavbarMain').highlightItem(this.id);
     
     $('.workspace').html(pageEditor.$element);
 });
@@ -99,7 +100,7 @@ Router.route('/schemas/:id', function() {
         modelUrl: '/api/schemas/' + this.id
     });
     
-    ViewHelper.get('NavbarMain').showTab('schemas');
+    ViewHelper.get('NavbarMain').highlightItem(this.id);
     
     $('.workspace').html(jsonEditor.$element);
 });

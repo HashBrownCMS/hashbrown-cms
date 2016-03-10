@@ -66,6 +66,9 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
       width: 300px; }
     .page-editor .object .field-container .field-value {
       flex-grow: 1; }
+      .page-editor .object .field-container .field-value textarea {
+        resize: none;
+        height: 300px; }
 
 .navbar-main {
   display: flex;
