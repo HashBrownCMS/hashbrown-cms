@@ -14,7 +14,8 @@ class JSONEditor extends View {
         super(params);
 
         this.$element = _.div({class: 'json-editor flex-vertical'});
-        
+        this.$error = _.div({class: 'panel panel-danger'});
+
         this.fetch();
     }
 
@@ -54,6 +55,15 @@ class JSONEditor extends View {
      */
     onChangeText($textarea) {
         this.value = $textarea.val();
+
+        try {
+            this.model = JSON.parse(this.value);
+            this.$error.hide();
+
+        } catch(e) {
+            this.$error.html(e);
+            this.$error.show();
+        }
     }
 
     render() {
@@ -65,15 +75,18 @@ class JSONEditor extends View {
             _.textarea({class: 'flex-expand'},
                 this.value
             ).bind('keyup change propertychange paste', function() { view.onChangeText($(this)); }),
-            _.div({class: 'pull-left btn-group flex-horizontal'}, [
-                _.button({class: 'btn btn-primary flex-expand'},
-                    _.span({class: 'fa fa-refresh'})
-                ).click(function() { view.onClickReload(); }),
-                _.button({class: 'btn btn-success flex-expand'}, [
-                    'Save ',
-                    _.span({class: 'fa fa-save'})
-                ]).click(function() { view.onClickSave(); })
-            ])
+            this.$error,
+            _.div({class: 'panel panel-default panel-buttons'}, 
+                _.div({class: 'pull-left btn-group flex-horizontal'}, [
+                    _.button({class: 'btn btn-primary flex-expand'},
+                        _.span({class: 'fa fa-refresh'})
+                    ).click(function() { view.onClickReload(); }),
+                    _.button({class: 'btn btn-success flex-expand'}, [
+                        'Save ',
+                        _.span({class: 'fa fa-save'})
+                    ]).click(function() { view.onClickSave(); })
+                ])
+            )
         ]);
     }
 }

@@ -1,11 +1,26 @@
 .page-editor {
     height: 100%;
+    display: flex;
+    flex-direction: column;
     overflow-y: auto;
-    padding: 15px;
+
+    >.object {
+        flex-grow: 1;
+    }
 
     .object {
+        .nav-tabs {
+            padding: 15px 0px 0px 15px;
+            background-color: $lighter-grey;
+        }
+
+        .tab-content {
+            padding: 15px;
+        }
+
         .field-container {
             display: flex;
+            margin-bottom: 15px;
 
             .field-key {
                 width: 300px;

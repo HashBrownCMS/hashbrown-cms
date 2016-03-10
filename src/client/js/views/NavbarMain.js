@@ -30,22 +30,16 @@ class NavbarMain extends View {
             _.div({class: 'pane-content'})
         );
 
-        if(params.api) {
-            $.getJSON(params.api, function(items) {
-                if(!window.resources) {
-                    window.resources = [];
-                }
+        if(params.resource) {
+            let items = window.resources[params.resource];
 
-                window.resources[params.route] = items;
-
-                $pane.html(
-                    _.each(items, function(i, item) {
-                        return _.a({href: '#/' + params.route + '/' + (item.id || item._id || i), class: 'pane-item list-group-item'},
-                            _.p(item.title || item.name || item.id || item._id || i)
-                        );
-                    })
-                );
-            });
+            $pane.html(
+                _.each(items, function(i, item) {
+                    return _.a({href: '#/' + params.route + '/' + (item.id || item._id || i), class: 'pane-item list-group-item'},
+                        _.p(item.title || item.name || item.id || item._id || i)
+                    );
+                })
+            );
         }
 
         if(this.$element.find('.tab-panes .pane').length < 1) {
@@ -81,29 +75,25 @@ class NavbarMain extends View {
         $('.navspace').html(this.$element);
 
         this.renderPane({
-            api: '/api/pages',
+            resource: 'pages',
             label: 'Pages',
             route: 'pages',
             icon: 'file'
         });
 
         this.renderPane({
-            api: '/api/sections',
+            resource: 'sections',
             label: 'Sections',
             route: 'sections',
             icon: 'th'
         });
         
         this.renderPane({
-            api: '/api/schemas',
+            resource: 'schemas',
             label: 'Schemas',
             route: 'schemas',
             icon: 'gears'
         });
-       
-        $.getJSON('/api/fieldViews', function(fieldViews) {
-            window.resources['fieldViews'] = fieldViews;
-        }); 
     }
 }
 

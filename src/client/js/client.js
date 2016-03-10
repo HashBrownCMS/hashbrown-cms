@@ -4,6 +4,7 @@
 require('putaitu.js');
 window.$ = window.jQuery = require('jquery');
 require('bootstrap');
+let jade = require('jade');
 
 // Views
 let NavbarMain = require('./views/NavbarMain');
@@ -11,9 +12,61 @@ let JSONEditor = require('./views/JSONEditor');
 let PageEditor = require('./views/PageEditor');
 
 // -----------
-// Persistent views
+// Ready functions
 // -----------
-let navbarMain = new NavbarMain();
+let onReadyCallbacks = [];
+
+function onReady(callback) {
+    onReadyCallbacks.push(callback);
+}
+
+function checkReady() {
+    if(resourcesLoaded >= 4) {
+        for(let i in onReadyCallbacks) {
+            onReadyCallbacks[i]();
+        }
+    }
+}
+
+// -----------
+// Preload resources
+// -----------
+let resourcesRequired = 4;
+let resourcesLoaded = 0;
+
+window.resources = {};
+
+$.getJSON('/api/pages', function(pages) {
+    window.resources.pages = pages;
+
+    resourcesLoaded++;
+    checkReady();
+});
+
+$.getJSON('/api/sections', function(sections) {
+    window.resources.sections = sections;
+    
+    resourcesLoaded++;
+    checkReady();
+});
+
+$.getJSON('/api/schemas', function(schemas) {
+    window.resources.schemas = schemas;
+    
+    resourcesLoaded++;
+    checkReady();
+});
+
+$.getJSON('/api/fieldViews', function(fieldViews) {
+    for(let id in fieldViews) {
+        fieldViews[id] = jade.compile(fieldViews[id]);
+    }
+    
+    window.resources.fieldViews = fieldViews;
+    
+    resourcesLoaded++;
+    checkReady();
+});
 
 // -----------
 // Routes
@@ -24,7 +77,7 @@ Router.route('/pages/:id', function() {
         modelUrl: '/api/pages/' + this.id
     });
    
-    navbarMain.showTab('pages');
+    ViewHelper.get('NavbarMain').showTab('pages');
     
     $('.workspace').html(pageEditor.$element);
 });
@@ -35,7 +88,7 @@ Router.route('/pages/json/:id', function() {
         modelUrl: '/api/pages/' + this.id
     });
    
-    navbarMain.showTab('pages');
+    ViewHelper.get('NavbarMain').showTab('pages');
     
     $('.workspace').html(pageEditor.$element);
 });
@@ -46,9 +99,16 @@ Router.route('/schemas/:id', function() {
         modelUrl: '/api/schemas/' + this.id
     });
     
-    navbarMain.showTab('schemas');
+    ViewHelper.get('NavbarMain').showTab('schemas');
     
     $('.workspace').html(jsonEditor.$element);
 });
 
-Router.init();
+// ----------
+// Init
+// ----------
+onReady(function() {
+    new NavbarMain();
+
+    Router.init();
+});

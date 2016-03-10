@@ -49,12 +49,18 @@
             height: 100%;
             width: 100%;
             display: none;
+            border-right: 1px solid $light-grey;
 
             &.active {
                 display: block;
             }
 
             .pane-item {
+                border-radius: 0px;
+                border: none;
+                border-bottom: 1px solid $light-grey;
+                margin: 0px;
+
                 p {
                     margin: 0px;
                 }

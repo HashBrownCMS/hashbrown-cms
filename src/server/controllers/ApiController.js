@@ -19,6 +19,7 @@ class ApiController extends Controller {
 
         app.get('/api/schemas', ApiController.getSchemas);
         app.get('/api/schemas/:id', ApiController.getSchema);
+        app.post('/api/schemas/:id', ApiController.setSchema);
         
         app.get('/api/sections', ApiController.getSections);
 
@@ -97,6 +98,19 @@ class ApiController extends Controller {
         SchemaHelper.getSchema(id)
         .then(function(schema) {
             res.send(schema);
+        });
+    }
+    
+    /**
+     * Set a content schema object by id
+     */
+    static setSchema(req, res) {
+        let id = req.params.id;
+        let schema = req.body;
+
+        SchemaHelper.setSchema(id, schema)
+        .then(function() {
+            res.sendStatus(200);
         });
     }
     

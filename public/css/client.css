@@ -1,8 +1,8 @@
 html, body {
   height: 100%; }
 
-.btn, .btn:focus, .btn:hover, .btn:active, .btn:active:focus {
-  outline: none; }
+button, button:focus, button:hover, button:active, button:active:focus, a, a:focus, a:hover, a:active, a:active:focus {
+  outline: none !important; }
 
 .flex-vertical {
   display: flex;
@@ -25,20 +25,41 @@ html, body {
   .putaitu-cms-container .workspace {
     flex-grow: 1;
     height: 100%; }
+    .putaitu-cms-container .workspace .panel-buttons {
+      padding: 15px;
+      margin: 0px;
+      border-width: 0px;
+      border-top-width: 1px;
+      border-radius: 0px; }
+      .putaitu-cms-container .workspace .panel-buttons .btn-group {
+        float: left; }
+        .putaitu-cms-container .workspace .panel-buttons .btn-group:after {
+          content: '';
+          clear: both; }
 
 .json-editor {
   width: 100%;
   height: 100%; }
   .json-editor textarea {
     overflow: auto;
-    display: block; }
+    display: block;
+    border: 0px; }
 
 .page-editor {
   height: 100%;
-  overflow-y: auto;
-  padding: 15px; }
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto; }
+  .page-editor > .object {
+    flex-grow: 1; }
+  .page-editor .object .nav-tabs {
+    padding: 15px 0px 0px 15px;
+    background-color: #ddd; }
+  .page-editor .object .tab-content {
+    padding: 15px; }
   .page-editor .object .field-container {
-    display: flex; }
+    display: flex;
+    margin-bottom: 15px; }
     .page-editor .object .field-container .field-key {
       width: 300px; }
     .page-editor .object .field-container .field-value {
@@ -77,13 +98,19 @@ html, body {
   .navbar-main .tab-panes {
     height: 100%;
     flex-grow: 1;
-    background-color: #eeeeee; }
+    background-color: #ddd; }
     .navbar-main .tab-panes .pane {
       margin: 0px;
       height: 100%;
       width: 100%;
-      display: none; }
+      display: none;
+      border-right: 1px solid #cccccc; }
       .navbar-main .tab-panes .pane.active {
         display: block; }
-      .navbar-main .tab-panes .pane .pane-item p {
+      .navbar-main .tab-panes .pane .pane-item {
+        border-radius: 0px;
+        border: none;
+        border-bottom: 1px solid #cccccc;
         margin: 0px; }
+        .navbar-main .tab-panes .pane .pane-item p {
+          margin: 0px; }

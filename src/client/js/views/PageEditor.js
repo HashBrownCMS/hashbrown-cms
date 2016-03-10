@@ -1,8 +1,5 @@
 'use strict';
 
-// Lib
-let jade = require('jade');
-
 // Models
 let Page = require('../../../server/models/Page');
 
@@ -104,13 +101,13 @@ class PageEditor extends View {
             console.log(fieldValue);
         }
 
-        let fieldSchema = resources['schemas'][schemaValue.$ref];
+        let fieldSchema = resources.schemas[schemaValue.$ref];
 
         if(fieldSchema) {
-            let fieldView = resources['fieldViews'][fieldSchema.id];
+            let fieldView = resources.fieldViews[fieldSchema.id];
             
             if(fieldView) {
-                let fieldElement = jade.compile(fieldView)({ value: fieldValue, disabled: schemaValue.disabled, resources });
+                let fieldElement = fieldView({ value: fieldValue, disabled: schemaValue.disabled, resources });
                 let $fieldElement = $(fieldElement);
 
                 // Input
@@ -158,15 +155,17 @@ class PageEditor extends View {
                     
                     for(let alias in schema.properties) {
                         let property = schema.properties[alias];
-                        let noTabAssigned = !property.tabId && id == schema.defaultTabId;
-                        let thisTabAssigned = property.tabId == schema.defaultTabId;
 
-                        if(noTabAssigned || thisTabAssigned) {
+                        let noTabAssigned = !property.tabId;
+                        let isMetaTab = tab == 'Meta';
+                        let thisTabAssigned = property.tabId == id;
+
+                        if((noTabAssigned && isMetaTab) || thisTabAssigned) {
                             properties[alias] = property;
                         }
                     }
 
-                    return _.div({id: id, class: 'tab-pane' + (id == schema.defaultTabId ? ' active' : '')}, 
+                    return _.div({id: 'tab-' + id, class: 'tab-pane' + (id == schema.defaultTabId ? ' active' : '')}, 
                         _.each(properties, function(key, value) {
                             return _.div({class: 'field-container'}, [
                                 _.div({class: 'field-icon'},
@@ -197,17 +196,27 @@ class PageEditor extends View {
         let schema = $.extend(true, {}, resources.schemas[id]);
 
         if(schema) {
+            // Merge parent with current schema
+            // Since the child schema should override any duplicate content, the parent is transformed first, then returned as the resulting schema
             if(schema.$parent) {
                 let parentSchema = this.getSchemaWithParents(schema.$parent);
 
                 for(let k in schema.properties) {
-                    parentSchema.properties[k] = schema.properties[k];
+                   parentSchema.properties[k] = schema.properties[k];
                 }
+                
+                for(let k in schema.tabs) {
+                   parentSchema.tabs[k] = schema.tabs[k];
+                }
+
+                parentSchema.defaultTabId = schema.defaultTabId;
 
                 schema = parentSchema;
             }
+
         } else {
             console.log('No schema with id "' + id + '" available in resources');
+        
         }
 
         return schema;
@@ -223,22 +232,24 @@ class PageEditor extends View {
         if(pageSchema) {
             this.$element.html([
                 this.renderObject(this.model, pageSchema),
-                _.div({class: 'pull-left btn-group flex-horizontal'}, [
-                    _.button({class: 'btn btn-danger flex-expand'},
-                        _.span({class: 'fa fa-trash'})
-                    ).click(function() { view.onClickDelete(); }),
-                    _.button({class: 'btn btn-primary flex-expand'},
-                        _.span({class: 'fa fa-refresh'})
-                    ).click(function() { view.onClickReload(); }),
-                    _.button({class: 'btn btn-default flex-expand'}, [
-                        (page.isPublished() ? 'Unpublish' : 'Publish') + ' ',
-                        _.span({class: 'fa fa-newspaper-o'})
-                    ]).click(function() { view.onClickTogglePublish(); }),
-                    _.button({class: 'btn btn-success flex-expand'}, [
-                        'Save ',
-                        _.span({class: 'fa fa-save'})
-                    ]).click(function() { view.onClickSave(); })
-                ])
+                _.div({class: 'panel panel-default panel-buttons'}, 
+                    _.div({class: 'btn-group flex-horizontal'}, [
+                        _.button({class: 'btn btn-danger flex-expand'},
+                            _.span({class: 'fa fa-trash'})
+                        ).click(function() { view.onClickDelete(); }),
+                        _.button({class: 'btn btn-primary flex-expand'},
+                            _.span({class: 'fa fa-refresh'})
+                        ).click(function() { view.onClickReload(); }),
+                        _.button({class: 'btn btn-default flex-expand'}, [
+                            (page.isPublished() ? 'Unpublish' : 'Publish') + ' ',
+                            _.span({class: 'fa fa-newspaper-o'})
+                        ]).click(function() { view.onClickTogglePublish(); }),
+                        _.button({class: 'btn btn-success flex-expand'}, [
+                            'Save ',
+                            _.span({class: 'fa fa-save'})
+                        ]).click(function() { view.onClickSave(); })
+                    ])
+                )
             ]);
         }
     }

@@ -5,9 +5,9 @@ html, body {
 }
 
 // Bootstrap fixes
-.btn {
+button, a {
     &, &:focus, &:hover, &:active, &:active:focus {
-        outline: none;
+        outline: none !important;
     }
 }
 
@@ -43,6 +43,22 @@ html, body {
     .workspace {
         flex-grow: 1;
         height: 100%;
+
+        .panel-buttons {
+            padding: 15px;
+            margin: 0px;
+            border-width: 0px;
+            border-top-width: 1px;
+            border-radius: 0px;
+
+            .btn-group {
+                float: left;
+
+                &:after {
+                    content: '';
+                    clear: both;
+                }
+            }
+        }
     }
 }
-

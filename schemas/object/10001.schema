@@ -1,15 +1,1 @@
-{
-    "id": "10001",
-    "name": "Test Page",
-    "type": "object",
-    "$parent": "10000",
-    "defaultTabId": "90001",
-    "tabs": {
-        "90001": "Content"
-    },
-    "properties": {
-        "title": {"$ref": "20000", "label": "Title", "tabId": "10001"},
-        "description": {"$ref": "20000", "label": "Description", "tabId": "10001"},
-        "body": {"$ref": "20000", "label": "Body", "tabId": "10001"}
-    }
-}
+{"id":"10001","name":"Test Page","type":"object","$parent":"10000","defaultTabId":"90001","tabs":{"90001":"Content"},"properties":{"title":{"$ref":"20000","label":"Title","tabId":"90001"},"description":{"$ref":"20000","label":"Description","tabId":"90001"},"body":{"$ref":"20000","label":"Body","tabId":"90001"}}}
