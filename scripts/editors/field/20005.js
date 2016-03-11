@@ -14,6 +14,7 @@ resources.editors['20005'] = function(params) {
     };
 
     this.$element = _.div({class: 'field-editor period-editor flex-horizontal input-group'}, [
+        this.$toggle = _.input({class: 'form-control', type: 'checkbox'}),
         this.$from = _.input({class: 'form-control', type: 'text', value: params.value.from}),
         _.div({class: 'arrow-middle'},
             _.span({class: 'fa fa-arrow-right'})

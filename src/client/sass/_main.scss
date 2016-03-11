@@ -27,6 +27,26 @@ button, a {
     }
 }
 
+// Google material
+.btn {
+    border-radius: 0px;
+
+    &.btn-primary {
+        background-color: material-color('blue', '500');
+        border-color: material-color('blue', '500');
+    
+        &:hover {
+            background-color: material-color('blue', '300');
+            border-color: material-color('blue', '300');
+        }
+        
+        &:active {
+            background-color: material-color('blue', '600');
+            border-color: material-color('blue', '600');
+        }
+    }
+}
+
 // Flex classes
 .flex-vertical {
     display: flex;

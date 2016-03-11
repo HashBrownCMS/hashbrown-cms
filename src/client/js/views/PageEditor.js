@@ -265,11 +265,11 @@ class PageEditor extends View {
                             _.button({class: 'btn btn-primary'},
                                 _.span({class: 'fa fa-refresh'})
                             ).click(function() { view.onClickReload(); }),
-                            _.button({class: 'btn btn-default'}, [
+                            _.button({class: 'btn btn-primary'}, [
                                 (page.isPublished() ? 'Unpublish' : 'Publish') + ' ',
                                 _.span({class: 'fa fa-newspaper-o'})
                             ]).click(function() { view.onClickTogglePublish(); }),
-                            view.$saveBtn = _.button({class: 'btn btn-success btn-save'}, [
+                            view.$saveBtn = _.button({class: 'btn btn-primary btn-save'}, [
                                 _.span({class: 'text-default'}, 'Save '),
                                 _.span({class: 'icon-default fa fa-save'}),
                                 _.span({class: 'text-saving'}, 'Saving '),

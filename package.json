@@ -22,6 +22,7 @@
     "js-beautify": "^1.6.2",
     "marked": "^0.3.5",
     "path-to-regexp": "^1.2.1",
+    "sass-material-colors": "0.0.5",
     "to-markdown": "^2.0.1"
   },
   "dependencies": {

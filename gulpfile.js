@@ -7,7 +7,11 @@ var babel = require('gulp-babel');
 gulp.task('sass', function() {
     gulp.src('./src/client/sass/client.scss')
         .pipe(plumber())
-        .pipe(sass())
+        .pipe(sass({
+            includePaths: [
+                './node_modules/sass-material-colors/sass/'
+            ]
+        }))
         .pipe(gulp.dest('./public/css'));
 });
 

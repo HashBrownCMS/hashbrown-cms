@@ -1,3 +1,13 @@
+/**
+ * Retrieves a color value from the $material-colors Sass map
+ * Inspired by https://github.com/nilskaspersson/Google-Material-UI-Color-Palette/
+ *
+ * @function
+ * @param {string} color-name             - quoted, lower-case, dasherized color
+ *                                          name (e.g. 'pink', 'amber')
+ * @param {string} [color-variant='500']  - quoted, lowercase color variant (e.g.
+ *                                          '200', 'a100')
+ */
 @import url(https://fonts.googleapis.com/css?family=Roboto);
 @import url(https://fonts.googleapis.com/css?family=Roboto+Mono);
 @keyframes rotate {
@@ -13,6 +23,18 @@ html, body {
 
 button, button:focus, button:hover, button:active, button:active:focus, a, a:focus, a:hover, a:active, a:active:focus {
   outline: none !important; }
+
+.btn {
+  border-radius: 0px; }
+  .btn.btn-primary {
+    background-color: #2196f3;
+    border-color: #2196f3; }
+    .btn.btn-primary:hover {
+      background-color: #64b5f6;
+      border-color: #64b5f6; }
+    .btn.btn-primary:active {
+      background-color: #1e88e5;
+      border-color: #1e88e5; }
 
 .flex-vertical {
   display: flex;
@@ -82,9 +104,17 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
       flex-grow: 1;
       overflow-y: auto; }
   .page-editor .object .nav-tabs {
-    padding: 15px 0px 0px 15px;
-    background-color: #ddd;
-    font-size: 14px; }
+    padding: 18px 0px 0px 15px;
+    background-color: #2196f3;
+    font-size: 14px;
+    position: relative;
+    font-weight: bold;
+    text-transform: uppercase; }
+    .page-editor .object .nav-tabs li:not(.active) a {
+      color: #e3f2fd; }
+      .page-editor .object .nav-tabs li:not(.active) a, .page-editor .object .nav-tabs li:not(.active) a:hover, .page-editor .object .nav-tabs li:not(.active) a:focus {
+        background-color: transparent;
+        border: 0px; }
   .page-editor .object .tab-content {
     padding: 15px; }
   .page-editor .object .field-container {
