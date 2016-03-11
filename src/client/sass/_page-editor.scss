@@ -32,7 +32,19 @@
 
             .field-value {
                 flex-grow: 1;
-            
+           
+                .period-editor {
+                    width: 100px;
+
+                    .arrow-middle {
+                        padding: 5px;
+
+                        span {
+                            line-height: 20px;
+                        }
+                    }
+                }
+
                 .rich-text-editor {
                     margin: 0px;
 

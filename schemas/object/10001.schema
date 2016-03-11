@@ -1,1 +1,32 @@
-{"id":"10001","name":"Example Page","type":"object","$parent":"10000","defaultTabId":"90001","tabs":{"90001":"Content"},"properties":{"publishDate":{"$ref":"20002","label":"Published at","tabId":"90001"},"unpublishDate":{"$ref":"20002","label":"Unpublished at","tabId":"90001"},"title":{"$ref":"20000","label":"Title","tabId":"90001"},"description":{"$ref":"20000","label":"Description","tabId":"90001"},"body":{"$ref":"20001","label":"Body","tabId":"90001"}}}
+{
+	"id": "10001",
+	"name": "Example Page",
+	"type": "object",
+	"$parent": "10000",
+	"defaultTabId": "90001",
+	"tabs": {
+		"90001": "Content"
+	},
+	"properties": {
+        "publication": {
+            "$ref": "20005",
+            "label": "Publication",
+            "tabId": "90001"
+        },
+		"title": {
+			"$ref": "20000",
+			"label": "Title",
+			"tabId": "90001"
+		},
+		"description": {
+			"$ref": "20000",
+			"label": "Description",
+			"tabId": "90001"
+		},
+		"body": {
+			"$ref": "20001",
+			"label": "Body",
+			"tabId": "90001"
+		}
+	}
+}

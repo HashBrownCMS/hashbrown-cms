@@ -6,15 +6,16 @@
     .tab-buttons {
         width: 60px;
         height: 100%;
-        background-color: $dark-grey;
+        background-color: $darkest-grey;
 
         .btn {
             width: 60px;
             height: 60px;
-            background-color: $dark-grey;
+            background-color: $darkest-grey;
             color: $lightest-grey;
             padding: 0px;
             margin: 0px;
+            border: none;
             border-radius: 0px;
             margin-bottom: 1px;
 
@@ -42,7 +43,7 @@
     .tab-panes {
         height: 100%;
         flex-grow: 1;
-        background-color: $lighter-grey;
+        background-color: $darker-grey;
 
         .pane {
             margin: 0px;
@@ -58,8 +59,15 @@
             .pane-item {
                 border-radius: 0px;
                 border: none;
-                border-bottom: 1px solid $light-grey;
+                border-bottom: 1px solid $dark-grey;
+                color: $lightest-grey;
+                background-color: $darker-grey;
                 margin: 0px;
+
+                &.active {
+                    background-color: $lightest-grey;
+                    color: $darker-grey;
+                }
 
                 p {
                     margin: 0px;

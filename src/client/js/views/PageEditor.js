@@ -1,8 +1,8 @@
 'use strict';
 
 // Lib
-let marked = require('marked');
-let toMarkdown = require('to-markdown');
+window.markdownToHtml = require('marked');
+window.htmlToMarkdown = require('to-markdown');
 
 // Models
 let Page = require('../../../server/models/Page');
@@ -23,6 +23,8 @@ class PageEditor extends View {
      * Event: Click reload. Fetches the model again
      */
     onClickReload() {
+        this.model = null;
+
         this.fetch();
     }
 
@@ -110,67 +112,6 @@ class PageEditor extends View {
     }
 
     /**
-     * Binds a change event to a field view
-     *
-     * @param {Object} $fieldElement
-     * @param {Object} fieldValue
-     * @param {Function} handler
-     */
-    bindChangeEvent($fieldElement, fieldValue, handler) {
-        function onChange($element) {
-            if($(this).length > 0) {
-                $element = $(this);
-            }
-
-            let valueName = $element.data('name');
-
-            if(valueName) {
-                fieldValue[valueName] = $element.val();
-            
-            } else {
-                fieldValue = $element.val();
-
-            }
-
-            handler(fieldValue);
-        }
-
-        // Input
-        $fieldElement.find('input').each(function(i) {
-            $(this).bind('change propertychange keyup paste', onChange);
-        });
-        
-        // RTE
-        if($fieldElement.hasClass('rich-text-editor')) {
-            let $textarea = $fieldElement.find('textarea');
-            let $output = $fieldElement.find('.rte-output');
-            
-            $output.attr('contenteditable', true);
-
-            $output.bind('change propertychange keyup paste', function() {
-                $textarea.val(toMarkdown($output.html()));
-            
-                onChange($textarea);
-            });
-
-            $textarea.bind('change propertychange keyup paste', function() {
-                $output.html(marked($textarea.val()));
-            
-                onChange($textarea);
-            });
-            
-            $output.html(marked($textarea.val()));
-        }
-
-        // Date picker
-        if($fieldElement.hasClass('date-editor')) {
-            let $input = $fieldElement.find('input');
-
-            $input.datepicker();
-        }
-    }
-
-    /**
      * Renders a field view
      *
      * @param {Object} field
@@ -179,35 +120,23 @@ class PageEditor extends View {
      *
      * @return {Object} element
      */
-    renderFieldView(fieldValue, schemaValue, inputHandler) {
+    renderFieldView(fieldValue, schemaValue, onChange) {
         let fieldSchema = resources.schemas[schemaValue.$ref];
 
         if(fieldSchema) {
-            let fieldView = resources.fieldViews[fieldSchema.id];
+            let fieldEditor = resources.editors[fieldSchema.id];
             
-            if(fieldView) {
-                let bindEvents;
-                let idString = 'field-editor-' + $('.field-editor').length;
-
-                let fieldElement = fieldView({
+            if(fieldEditor) {
+                let fieldEditorInstance = new fieldEditor({
                     value: fieldValue,
                     disabled: schemaValue.disabled,
-                    resources: resources,
-                    id: idString,
-                    onFieldEditorsReady: this.onFieldEditorsReady
+                    onChange: onChange
                 });
-                let $fieldElement = $(fieldElement);
 
-                if(bindEvents) {
-                    bindEvents(idString);
-                }
-
-                this.bindChangeEvent($fieldElement, fieldValue, inputHandler);
-
-                return $fieldElement;
+                return fieldEditorInstance.$element;
 
             } else {
-                console.log('[PageEditor] No template found for field schema id "' + fieldSchema.id + '"');
+                console.log('[PageEditor] No editor found for field schema id "' + fieldSchema.id + '"');
             
             }
         

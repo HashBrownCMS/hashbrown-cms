@@ -70,6 +70,36 @@ class NavbarMain extends View {
     }
 
     /**
+     * Renders the settings pane
+     */
+    renderSettingsPane() {
+        let view = this;
+       
+        let $button = _.button({class: 'btn', 'data-route': 'settings'}, [
+            _.span({class: 'fa fa-wrench'}),
+            _.p('Settings')
+        ]).click(function() { view.showTab('settings'); });
+        
+        let $pane = _.div({class: 'pane list-group', 'data-route': 'settings'},
+            _.div({class: 'pane-content'})
+        );
+
+        $pane.html([
+            _.a({href: '#/settings/something', class: 'pane-item list-group-item'},
+                'Something'
+            )
+        ]);
+
+        if(this.$element.find('.tab-panes .pane').length < 1) {
+            $pane.addClass('active');
+            $button.addClass('active');
+        }
+
+        this.$element.find('.tab-panes').append($pane);
+        this.$element.find('.tab-buttons').append($button);
+    }
+
+    /**
      * Shows a tab
      *
      * @param {String} tabName
@@ -141,6 +171,8 @@ class NavbarMain extends View {
             route: 'schemas',
             icon: 'gears'
         });
+
+        this.renderSettingsPane();
     }
 }
 

@@ -81,6 +81,12 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
       width: 300px; }
     .page-editor .object .field-container .field-value {
       flex-grow: 1; }
+      .page-editor .object .field-container .field-value .period-editor {
+        width: 100px; }
+        .page-editor .object .field-container .field-value .period-editor .arrow-middle {
+          padding: 5px; }
+          .page-editor .object .field-container .field-value .period-editor .arrow-middle span {
+            line-height: 20px; }
       .page-editor .object .field-container .field-value .rich-text-editor {
         margin: 0px; }
         .page-editor .object .field-container .field-value .rich-text-editor .rte-output {
@@ -100,18 +106,19 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
   .navbar-main .tab-buttons {
     width: 60px;
     height: 100%;
-    background-color: #333333; }
+    background-color: #222; }
     .navbar-main .tab-buttons .btn {
       width: 60px;
       height: 60px;
-      background-color: #333333;
+      background-color: #222;
       color: #f1f1f1;
       padding: 0px;
       margin: 0px;
+      border: none;
       border-radius: 0px;
       margin-bottom: 1px; }
       .navbar-main .tab-buttons .btn.active, .navbar-main .tab-buttons .btn:hover {
-        background-color: #111111; }
+        background-color: #333; }
       .navbar-main .tab-buttons .btn .fa {
         height: 40px;
         line-height: 40px;
@@ -126,7 +133,7 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
   .navbar-main .tab-panes {
     height: 100%;
     flex-grow: 1;
-    background-color: #ddd; }
+    background-color: #333; }
     .navbar-main .tab-panes .pane {
       margin: 0px;
       height: 100%;
@@ -138,8 +145,13 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
       .navbar-main .tab-panes .pane .pane-item {
         border-radius: 0px;
         border: none;
-        border-bottom: 1px solid #cccccc;
+        border-bottom: 1px solid #444;
+        color: #f1f1f1;
+        background-color: #333;
         margin: 0px; }
+        .navbar-main .tab-panes .pane .pane-item.active {
+          background-color: #f1f1f1;
+          color: #333; }
         .navbar-main .tab-panes .pane .pane-item p {
           margin: 0px; }
 

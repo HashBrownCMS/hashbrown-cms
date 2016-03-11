@@ -33,10 +33,12 @@ function checkReady() {
 // -----------
 // Preload resources
 // -----------
-let resourcesRequired = 5;
+let resourcesRequired = 4;
 let resourcesLoaded = 0;
 
-window.resources = {};
+window.resources = {
+    editors: []
+};
 
 $.getJSON('/api/pages', function(pages) {
     window.resources.pages = pages;
@@ -54,17 +56,6 @@ $.getJSON('/api/sections', function(sections) {
 
 $.getJSON('/api/schemas', function(schemas) {
     window.resources.schemas = schemas;
-    
-    resourcesLoaded++;
-    checkReady();
-});
-
-$.getJSON('/api/fieldViews', function(fieldViews) {
-    for(let id in fieldViews) {
-        fieldViews[id] = jade.compile(fieldViews[id]);
-    }
-    
-    window.resources.fieldViews = fieldViews;
     
     resourcesLoaded++;
     checkReady();

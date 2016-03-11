@@ -12,8 +12,7 @@
         "url": {"$ref": "20003", "label": "URL"},
         "createDate": {"$ref": "20002", "disabled": true, "label": "Created at"},
         "updateDate": {"$ref": "20002", "disabled": true, "label": "Updated at"},
-        "publishDate": {"$ref": "20002", "label": "Published at"},
-        "unpublishDate": {"$ref": "20002", "label": "Unpublished at"},
+        "publication": {"$ref": "20005", "label": "Publication"},
         "schemaId": { "$ref": "20004", "label": "Schema" }
     }
 }

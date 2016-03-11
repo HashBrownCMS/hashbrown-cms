@@ -4,6 +4,7 @@ let Controller = require('./Controller');
 let ContentHelper = require('../helpers/ContentHelper');
 let SchemaHelper = require('../helpers/SchemaHelper');
 let ViewHelper = require('../helpers/ViewHelper');
+let ScriptHelper = require('../helpers/ScriptHelper');
 let MediaHelper = require('../helpers/MediaHelper');
 
 /**
@@ -26,7 +27,7 @@ class ApiController extends Controller {
 
         app.get('/api/media', ApiController.getMedia);
         
-        app.get('/api/fieldViews', ApiController.getFieldViews);
+        app.get('/scripts/editors.js', ApiController.getEditors);
     }
    
     /**
@@ -128,12 +129,12 @@ class ApiController extends Controller {
     }
     
     /**
-     * Get all editor views
+     * Get all editors
      */
-    static getFieldViews(req, res) {
-        ViewHelper.getAllViews('field')
-        .then(function(views) {
-            res.send(views);
+    static getEditors(req, res) {
+        ScriptHelper.getAllScripts('/editors/**/*.js', true)
+        .then(function(editors) {
+            res.send(editors);
         });    
     }
 }
