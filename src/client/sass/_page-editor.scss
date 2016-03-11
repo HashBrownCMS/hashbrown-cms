@@ -16,6 +16,7 @@
         .nav-tabs {
             padding: 15px 0px 0px 15px;
             background-color: $lighter-grey;
+            font-size: 14px;
         }
 
         .tab-content {
@@ -27,12 +28,24 @@
             margin-bottom: 15px;
 
             .field-key {
-                width: 300px;
+                width: 200px;
             }
 
             .field-value {
                 flex-grow: 1;
-           
+         
+                button {
+                    line-height: 20px;
+                    text-transform: uppercase;
+                    font-weight: bold;
+                    padding-left: 30px;
+                    padding-right: 30px;
+                }
+
+                input, select, option, textarea, button {
+                    font-size: 12px;
+                }
+
                 .period-editor {
                     width: 100px;
 

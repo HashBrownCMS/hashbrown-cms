@@ -21,12 +21,12 @@ class NavbarMain extends View {
     renderPane(params) {
         let view = this;
        
-        let $button = _.button({class: 'btn', 'data-route': params.route}, [
+        let $button = _.button({'data-route': params.route}, [
             _.span({class: 'fa fa-' + params.icon}),
-            _.p(params.label)
+            _.span(params.label)
         ]).click(function() { view.showTab(params.route); });
         
-        let $pane = _.div({class: 'pane list-group', 'data-route': params.route},
+        let $pane = _.div({class: 'pane', 'data-route': params.route},
             _.div({class: 'pane-content'})
         );
 
@@ -39,6 +39,11 @@ class NavbarMain extends View {
                     let name = item.title || item.name || id;
                     let routingPath = item.shortPath || item.path || id;
                     let folderPath = item.path || item.shortPath || item.schemaType;
+                    let icon = item.icon;
+
+                    if(item.schemaId) {
+                        icon = resources.schemas[item.schemaId].icon;
+                    }
 
                     // Render folder
                     if(folderPath) {
@@ -50,10 +55,11 @@ class NavbarMain extends View {
                         'data-routing-path': routingPath,
                         'data-folder-path': folderPath,
                         href: '#/' + params.route + '/' + routingPath,
-                        class: 'pane-item list-group-item'
-                    },
-                        _.p(name)
-                    );
+                        class: 'pane-item'
+                    }, [
+                        icon ? _.span({class: 'fa fa-' + icon}) : null,
+                        _.span(name)
+                    ]);
 
                     return $element;
                 })
@@ -75,18 +81,18 @@ class NavbarMain extends View {
     renderSettingsPane() {
         let view = this;
        
-        let $button = _.button({class: 'btn', 'data-route': 'settings'}, [
+        let $button = _.button({'data-route': 'settings'}, [
             _.span({class: 'fa fa-wrench'}),
-            _.p('Settings')
+            _.span('Settings')
         ]).click(function() { view.showTab('settings'); });
         
-        let $pane = _.div({class: 'pane list-group', 'data-route': 'settings'},
+        let $pane = _.div({class: 'pane', 'data-route': 'settings'},
             _.div({class: 'pane-content'})
         );
 
         $pane.html([
-            _.a({href: '#/settings/something', class: 'pane-item list-group-item'},
-                'Something'
+            _.a({href: '#/settings/something', class: 'pane-item'},
+                _.span('Something')
             )
         ]);
 
@@ -109,7 +115,7 @@ class NavbarMain extends View {
             $(this).toggleClass('active', $(this).attr('data-route') == tabRoute);
         });
         
-        this.$element.find('.tab-buttons .btn').each(function(i) {
+        this.$element.find('.tab-buttons button').each(function(i) {
             $(this).toggleClass('active', $(this).attr('data-route') == tabRoute);
         });
     }

@@ -1,5 +1,1 @@
-{
-    "id": "20003",
-    "name": "Url",
-    "type": "string"
-}
+{"id":"20003","name":"Url","icon":"link","type":"string","schemaType":"field"}

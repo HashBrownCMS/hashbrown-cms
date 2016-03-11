@@ -1,5 +1,1 @@
-{
-    "id": "20001",
-    "name": "Rich Text",
-    "type": "string"
-}
+{"id":"20001","name":"Rich Text","icon":"font","type":"string","schemaType":"field"}

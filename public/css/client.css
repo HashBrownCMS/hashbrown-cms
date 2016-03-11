@@ -1,3 +1,5 @@
+@import url(https://fonts.googleapis.com/css?family=Roboto);
+@import url(https://fonts.googleapis.com/css?family=Roboto+Mono);
 @keyframes rotate {
   from {
     transform: rotate(0deg); }
@@ -5,7 +7,9 @@
     transform: rotate(359deg); } }
 
 html, body {
-  height: 100%; }
+  height: 100%;
+  font-family: 'Roboto';
+  font-size: 12px; }
 
 button, button:focus, button:hover, button:active, button:active:focus, a, a:focus, a:hover, a:active, a:active:focus {
   outline: none !important; }
@@ -26,7 +30,7 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
   display: flex;
   height: 100%; }
   .endomon-cms-container .navspace {
-    width: 300px;
+    width: 500px;
     height: 100%; }
   .endomon-cms-container .workspace {
     flex-grow: 1;
@@ -39,8 +43,15 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
       border-width: 0px;
       border-top-width: 1px;
       border-radius: 0px; }
-      .endomon-cms-container .workspace .panel-buttons .btn-group .btn span {
-        line-height: 20px; }
+      .endomon-cms-container .workspace .panel-buttons .btn-group .btn {
+        line-height: 20px;
+        font-size: 12px;
+        text-transform: uppercase;
+        font-weight: bold;
+        padding-left: 30px;
+        padding-right: 30px; }
+        .endomon-cms-container .workspace .panel-buttons .btn-group .btn span {
+          line-height: 20px; }
       .endomon-cms-container .workspace .panel-buttons .btn-save .text-saving, .endomon-cms-container .workspace .panel-buttons .btn-save .icon-saving {
         display: none; }
       .endomon-cms-container .workspace .panel-buttons .btn-save .icon-saving {
@@ -56,6 +67,7 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
   width: 100%;
   height: 100%; }
   .json-editor textarea {
+    font-family: 'Roboto Mono';
     overflow: auto;
     display: block;
     border: 0px; }
@@ -71,16 +83,25 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
       overflow-y: auto; }
   .page-editor .object .nav-tabs {
     padding: 15px 0px 0px 15px;
-    background-color: #ddd; }
+    background-color: #ddd;
+    font-size: 14px; }
   .page-editor .object .tab-content {
     padding: 15px; }
   .page-editor .object .field-container {
     display: flex;
     margin-bottom: 15px; }
     .page-editor .object .field-container .field-key {
-      width: 300px; }
+      width: 200px; }
     .page-editor .object .field-container .field-value {
       flex-grow: 1; }
+      .page-editor .object .field-container .field-value button {
+        line-height: 20px;
+        text-transform: uppercase;
+        font-weight: bold;
+        padding-left: 30px;
+        padding-right: 30px; }
+      .page-editor .object .field-container .field-value input, .page-editor .object .field-container .field-value select, .page-editor .object .field-container .field-value option, .page-editor .object .field-container .field-value textarea, .page-editor .object .field-container .field-value button {
+        font-size: 12px; }
       .page-editor .object .field-container .field-value .period-editor {
         width: 100px; }
         .page-editor .object .field-container .field-value .period-editor .arrow-middle {
@@ -104,11 +125,12 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
   height: 100%;
   width: 100%; }
   .navbar-main .tab-buttons {
-    width: 60px;
+    width: 200px;
     height: 100%;
     background-color: #222; }
-    .navbar-main .tab-buttons .btn {
-      width: 60px;
+    .navbar-main .tab-buttons button {
+      display: block;
+      width: 200px;
       height: 60px;
       background-color: #222;
       color: #f1f1f1;
@@ -116,20 +138,22 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
       margin: 0px;
       border: none;
       border-radius: 0px;
-      margin-bottom: 1px; }
-      .navbar-main .tab-buttons .btn.active, .navbar-main .tab-buttons .btn:hover {
+      clear: both; }
+      .navbar-main .tab-buttons button.active, .navbar-main .tab-buttons button:hover {
         background-color: #333; }
-      .navbar-main .tab-buttons .btn .fa {
-        height: 40px;
-        line-height: 40px;
-        font-size: 24px;
-        width: 100%;
-        display: block; }
-      .navbar-main .tab-buttons .btn p {
+      .navbar-main .tab-buttons button span {
         margin: 0px;
-        font-size: 10px;
-        height: 20px;
-        line-height: 20px; }
+        height: 60px;
+        line-height: 60px;
+        display: block;
+        float: left; }
+        .navbar-main .tab-buttons button span.fa {
+          text-align: center;
+          font-size: 24px;
+          width: 60px;
+          display: block; }
+        .navbar-main .tab-buttons button span:not(.fa) {
+          flex-grow: 1; }
   .navbar-main .tab-panes {
     height: 100%;
     flex-grow: 1;
@@ -143,17 +167,28 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
       .navbar-main .tab-panes .pane.active {
         display: block; }
       .navbar-main .tab-panes .pane .pane-item {
+        display: block;
         border-radius: 0px;
         border: none;
         border-bottom: 1px solid #444;
         color: #f1f1f1;
         background-color: #333;
-        margin: 0px; }
+        margin: 0px;
+        height: 60px;
+        padding: 0px 15px;
+        clear: both; }
+        .navbar-main .tab-panes .pane .pane-item, .navbar-main .tab-panes .pane .pane-item:focus, .navbar-main .tab-panes .pane .pane-item:hover, .navbar-main .tab-panes .pane .pane-item:active {
+          text-decoration: none; }
         .navbar-main .tab-panes .pane .pane-item.active {
           background-color: #f1f1f1;
           color: #333; }
-        .navbar-main .tab-panes .pane .pane-item p {
-          margin: 0px; }
+        .navbar-main .tab-panes .pane .pane-item span {
+          height: 60px;
+          line-height: 60px;
+          display: block;
+          float: left; }
+          .navbar-main .tab-panes .pane .pane-item span.fa {
+            margin-right: 15px; }
 
 .media-viewer {
   display: flex;

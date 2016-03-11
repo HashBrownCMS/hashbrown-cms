@@ -234,6 +234,7 @@ class PageEditor extends View {
                 }
 
                 parentSchema.defaultTabId = schema.defaultTabId;
+                parentSchema.icon = schema.icon;
 
                 schema = parentSchema;
             }

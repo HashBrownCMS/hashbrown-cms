@@ -1,10 +1,1 @@
-{
-    "id": "20005",
-    "icon": "calendar",
-    "name": "Period",
-    "type": "period",
-    "properties": {
-        "from": {"$ref": "20002", "label": "From"},
-        "to": {"$ref": "20002", "label": "To"}
-    }
-}
+{"id":"20005","name":"Period","icon":"calendar","type":"period","properties":{"from":{"$ref":"20002","label":"From"},"to":{"$ref":"20002","label":"To"}},"schemaType":"field"}

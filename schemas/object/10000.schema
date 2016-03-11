@@ -3,6 +3,7 @@
     "name": "Page",
     "type": "object",
     "defaultTabId": "90000",
+    "icon": "file",
     "tabs": {
         "90000": "Meta"
     },

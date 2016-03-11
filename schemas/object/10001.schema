@@ -2,6 +2,7 @@
 	"id": "10001",
 	"name": "Example Page",
 	"type": "object",
+    "icon": "file",
 	"$parent": "10000",
 	"defaultTabId": "90001",
 	"tabs": {

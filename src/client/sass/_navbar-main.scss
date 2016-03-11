@@ -4,12 +4,13 @@
     width: 100%;
 
     .tab-buttons {
-        width: 60px;
+        width: 200px;
         height: 100%;
         background-color: $darkest-grey;
 
-        .btn {
-            width: 60px;
+        button {
+            display: block;
+            width: 200px;
             height: 60px;
             background-color: $darkest-grey;
             color: $lightest-grey;
@@ -17,25 +18,29 @@
             margin: 0px;
             border: none;
             border-radius: 0px;
-            margin-bottom: 1px;
+            clear: both;
 
             &.active, &:hover {
                 background-color: $darker-grey;
             }
 
-            .fa {
-                height: 40px;
-                line-height: 40px;
-                font-size: 24px;
-                width: 100%;
-                display: block;
-            }
-
-            p {
+            span {
                 margin: 0px;
-                font-size: 10px;
-                height: 20px;
-                line-height: 20px;
+                height: 60px;
+                line-height: 60px;
+                display: block;
+                float: left;
+            
+                &.fa {
+                    text-align: center;
+                    font-size: 24px;
+                    width: 60px;
+                    display: block;
+                }
+
+                &:not(.fa) {
+                    flex-grow: 1;
+                }
             }
         }
     }
@@ -57,20 +62,35 @@
             }
 
             .pane-item {
+                display: block;
                 border-radius: 0px;
                 border: none;
                 border-bottom: 1px solid $dark-grey;
                 color: $lightest-grey;
                 background-color: $darker-grey;
                 margin: 0px;
+                height: 60px;
+                padding: 0px 15px;
+                clear: both;
+
+                &, &:focus, &:hover, &:active {
+                    text-decoration: none;
+                }
 
                 &.active {
                     background-color: $lightest-grey;
                     color: $darker-grey;
                 }
 
-                p {
-                    margin: 0px;
+                span {
+                    height: 60px;
+                    line-height: 60px;
+                    display: block;
+                    float: left;
+
+                    &.fa {
+                        margin-right: 15px;
+                    }
                 }
             }
         }
