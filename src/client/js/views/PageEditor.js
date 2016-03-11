@@ -32,13 +32,17 @@ class PageEditor extends View {
     onClickSave() {
         let view = this;
 
-        $.post(
-            this.modelUrl,
-            this.model,
-            function() {
+        view.$saveBtn.toggleClass('saving', true);
+
+        $.ajax({
+            type: 'post',
+            url: view.modelUrl,
+            data: view.model,
+            success: function() {
                 console.log('[PageEditor] Saved model to ' + view.modelUrl);
+                view.$saveBtn.toggleClass('saving', false);
             },
-            function(err) {
+            error: function(err) {
                 new MessageModal({
                     model: {
                         title: 'Error',
@@ -46,7 +50,7 @@ class PageEditor extends View {
                     }
                 });
             }
-        );
+        });
     }
 
     /**
@@ -299,9 +303,11 @@ class PageEditor extends View {
                                 (page.isPublished() ? 'Unpublish' : 'Publish') + ' ',
                                 _.span({class: 'fa fa-newspaper-o'})
                             ]).click(function() { view.onClickTogglePublish(); }),
-                            _.button({class: 'btn btn-success'}, [
-                                'Save ',
-                                _.span({class: 'fa fa-save'})
+                            view.$saveBtn = _.button({class: 'btn btn-success btn-save'}, [
+                                _.span({class: 'text-default'}, 'Save '),
+                                _.span({class: 'icon-default fa fa-save'}),
+                                _.span({class: 'text-saving'}, 'Saving '),
+                                _.span({class: 'icon-saving fa fa-refresh'})
                             ]).click(function() { view.onClickSave(); })
                         ])
                     )

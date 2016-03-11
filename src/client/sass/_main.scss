@@ -1,5 +1,18 @@
 @import '_colors';
 
+// ----------
+// Animations
+// ----------
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+    
+    to {
+        transform: rotate(359deg);
+    }
+}
+
 html, body {
     height: 100%;
 }
@@ -59,6 +72,30 @@ button, a {
                 .btn {
                     span {
                         line-height: 20px;
+                    }
+                }
+            }
+
+            .btn-save {
+                .text-saving, .icon-saving {
+                    display: none;
+                }
+
+                .icon-saving {
+                    animation: rotate 1s infinite linear;
+                }
+
+                &.saving {
+                    .text-default, .icon-default {
+                        display: none;
+                    }
+
+                    .text-saving {
+                        display: inline;
+                    }
+
+                    .icon-saving {
+                        display: inline-block;
                     }
                 }
             }

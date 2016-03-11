@@ -5,6 +5,7 @@ let Promise = require('bluebird');
 
 // Libs
 let fs = require('fs');
+let path = require('path');
 let glob = require('glob');
 
 class SchemaHelper {
@@ -15,7 +16,7 @@ class SchemaHelper {
      */
     static getAllSchemas() {
         return new Promise(function(callback) {
-            glob(appRoot + '/schemas/**/*.schema', function(err, paths) {
+            glob(appRoot + '/schemas/*/*.schema', function(err, paths) {
                 if(err) {
                     throw err;
                 }
@@ -25,14 +26,18 @@ class SchemaHelper {
 
                 if(queue.length > 0) {
                     function readNextSchema() {
-                        let path = queue[0];
+                        let schemaPath = queue[0];
 
-                        fs.readFile(path, function(err, data) {
+                        fs.readFile(schemaPath, function(err, data) {
                             if(err) {
                                 throw err;
                             }
 
                             let schema = JSON.parse(data);
+
+                            let parentDirName = path.dirname(schemaPath).replace(appRoot + '/schemas/', '');
+
+                            schema.schemaType = parentDirName;
 
                             // Add the loaded schema to the output array
                             schemas[schema.id] = schema;
@@ -80,12 +85,19 @@ class SchemaHelper {
                     throw 'No schemas by id "' + id + '" found';
 
                 } else if (paths.length == 1) {
-                    fs.readFile(paths[0], 'utf8', function(err, data) {
+                    let schemaPath = paths[0];
+
+                    fs.readFile(schemaPath, 'utf8', function(err, data) {
                         if(err) {
                             throw err;
                         }
 
-                        callback(JSON.parse(data));
+                        let schema = JSON.parse(data);
+                        let parentDirName = path.dirname(schemaPath).replace(appRoot + '/schemas/', '');
+
+                        schema.schemaType = parentDirName;
+
+                        callback(schema);
                     }); 
 
                 } else {

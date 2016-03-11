@@ -1,3 +1,9 @@
+@keyframes rotate {
+  from {
+    transform: rotate(0deg); }
+  to {
+    transform: rotate(359deg); } }
+
 html, body {
   height: 100%; }
 
@@ -35,6 +41,16 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
       border-radius: 0px; }
       .endomon-cms-container .workspace .panel-buttons .btn-group .btn span {
         line-height: 20px; }
+      .endomon-cms-container .workspace .panel-buttons .btn-save .text-saving, .endomon-cms-container .workspace .panel-buttons .btn-save .icon-saving {
+        display: none; }
+      .endomon-cms-container .workspace .panel-buttons .btn-save .icon-saving {
+        animation: rotate 1s infinite linear; }
+      .endomon-cms-container .workspace .panel-buttons .btn-save.saving .text-default, .endomon-cms-container .workspace .panel-buttons .btn-save.saving .icon-default {
+        display: none; }
+      .endomon-cms-container .workspace .panel-buttons .btn-save.saving .text-saving {
+        display: inline; }
+      .endomon-cms-container .workspace .panel-buttons .btn-save.saving .icon-saving {
+        display: inline-block; }
 
 .json-editor {
   width: 100%;

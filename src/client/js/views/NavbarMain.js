@@ -36,17 +36,26 @@ class NavbarMain extends View {
             $pane.html(
                 _.each(items, function(i, item) {
                     let id = item.id || item._id || i;
-                    let path = item.shortPath || item.path || id;
                     let name = item.title || item.name || id;
+                    let routingPath = item.shortPath || item.path || id;
+                    let folderPath = item.path || item.shortPath || item.schemaType;
 
-                    return _.a({
+                    // Render folder
+                    if(folderPath) {
+                        // TODO: Render folder
+                    }
+
+                    let $element = _.a({
                         'data-id': id,
-                        'data-path': path,
+                        'data-routing-path': routingPath,
+                        'data-folder-path': folderPath,
                         href: '#/' + params.route + '/' + path,
                         class: 'pane-item list-group-item'
                     },
                         _.p(name)
                     );
+
+                    return $element;
                 })
             );
         }
@@ -78,7 +87,7 @@ class NavbarMain extends View {
     /**
      * Highlights an item
      */
-    highlightItem(id) {
+    highlightItem(route) {
         let view = this;
 
         this.$element.find('.pane-item').each(function(i) {
@@ -87,8 +96,8 @@ class NavbarMain extends View {
             $item.toggleClass('active', false);
             
             if(
-                $item.attr('data-id') == id ||
-                $item.attr('data-path') == id
+                $item.attr('data-id') == route ||
+                $item.attr('data-routing-path') == route
             ) {
                 $item.toggleClass('active', true);
 
