@@ -49,7 +49,7 @@ class NavbarMain extends View {
                         'data-id': id,
                         'data-routing-path': routingPath,
                         'data-folder-path': folderPath,
-                        href: '#/' + params.route + '/' + path,
+                        href: '#/' + params.route + '/' + routingPath,
                         class: 'pane-item list-group-item'
                     },
                         _.p(name)

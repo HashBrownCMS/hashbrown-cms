@@ -1,3 +1,16 @@
-.field-editor.url-editor
+script.
+    alert('TODO: Bind events');
+
+    bindEvents = function(id) {
+        alert(id);
+        
+        $('#' + id + ' .btn').click(function() {
+            alert('dude');
+        });
+    };
+
+.field-editor.url-editor(id=id)
     p
-        | !{value || '(no url provided)' }
+        | !{ value || '(no url provided)' }
+        button.btn.btn-default
+            | set url

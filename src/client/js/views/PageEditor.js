@@ -87,6 +87,29 @@ class PageEditor extends View {
     }
 
     /**
+     * Binds event to fire when field editors are ready
+     * Or fires them if no callback was passed
+     *
+     * @param {Function} callback
+     */
+    onFieldEditorsReady(callback) {
+        if(!this.fieldEditorReadyCallbacks) {
+            this.fieldEditorReadyCallbacks = [];
+        }
+
+        if(callback) {
+            this.fieldEditorReadyCallbacks.push(callback);
+
+        } else {
+            for(let registeredCallback of this.fieldEditorReadyCallbacks) {
+                registeredCallback();
+            }
+
+            this.fieldEditorReadyCallbacks = [];
+        }
+    }
+
+    /**
      * Binds a change event to a field view
      *
      * @param {Object} $fieldElement
@@ -163,8 +186,21 @@ class PageEditor extends View {
             let fieldView = resources.fieldViews[fieldSchema.id];
             
             if(fieldView) {
-                let fieldElement = fieldView({ value: fieldValue, disabled: schemaValue.disabled, resources });
+                let bindEvents;
+                let idString = 'field-editor-' + $('.field-editor').length;
+
+                let fieldElement = fieldView({
+                    value: fieldValue,
+                    disabled: schemaValue.disabled,
+                    resources: resources,
+                    id: idString,
+                    onFieldEditorsReady: this.onFieldEditorsReady
+                });
                 let $fieldElement = $(fieldElement);
+
+                if(bindEvents) {
+                    bindEvents(idString);
+                }
 
                 this.bindChangeEvent($fieldElement, fieldValue, inputHandler);
 
@@ -313,6 +349,8 @@ class PageEditor extends View {
                     )
                 )
             ]);
+
+            this.onFieldEditorsReady();
         }
     }
 }
