@@ -3,7 +3,7 @@
 // Libraries
 window.$ = window.jQuery = require('jquery');
 require('bootstrap');
-require('putaitu.js');
+require('exomon');
 require('bootstrap-datepicker');
 let jade = require('jade');
 

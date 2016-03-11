@@ -43,4 +43,4 @@ app.get('/', function(req, res) {
 // ----------
 let server = app.listen(8000);
 
-console.log('[Putaitu CMS] Running on port 8000');
+console.log('[Endomon CMS] Running on port 8000');

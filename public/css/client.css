@@ -16,24 +16,24 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
   .flex-horizontal .flex-expand {
     flex-grow: 1; }
 
-.putaitu-cms-container {
+.endomon-cms-container {
   display: flex;
   height: 100%; }
-  .putaitu-cms-container .navspace {
+  .endomon-cms-container .navspace {
     width: 300px;
     height: 100%; }
-  .putaitu-cms-container .workspace {
+  .endomon-cms-container .workspace {
     flex-grow: 1;
     height: 100%; }
-    .putaitu-cms-container .workspace .panel-danger {
+    .endomon-cms-container .workspace .panel-danger {
       margin: 0px; }
-    .putaitu-cms-container .workspace .panel-buttons {
+    .endomon-cms-container .workspace .panel-buttons {
       padding: 15px;
       margin: 0px;
       border-width: 0px;
       border-top-width: 1px;
       border-radius: 0px; }
-      .putaitu-cms-container .workspace .panel-buttons .btn-group .btn span {
+      .endomon-cms-container .workspace .panel-buttons .btn-group .btn span {
         line-height: 20px; }
 
 .json-editor {
