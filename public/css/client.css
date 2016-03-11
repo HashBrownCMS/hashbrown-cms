@@ -91,7 +91,8 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
     display: flex;
     margin-bottom: 15px; }
     .page-editor .object .field-container .field-key {
-      width: 200px; }
+      width: 200px;
+      line-height: 30px; }
     .page-editor .object .field-container .field-value {
       flex-grow: 1; }
       .page-editor .object .field-container .field-value button {
