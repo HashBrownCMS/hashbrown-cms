@@ -7,6 +7,9 @@
         width: 200px;
         height: 100%;
         background-color: $darkest-grey;
+        box-shadow: 2px 0px 10px 3px rgba(0, 0, 0, 0.5);
+        position: relative;
+        z-index: 10;
 
         button {
             display: block;
@@ -33,7 +36,7 @@
             
                 &.fa {
                     text-align: center;
-                    font-size: 24px;
+                    font-size: 20px;
                     width: 60px;
                     display: block;
                 }
@@ -49,13 +52,16 @@
         height: 100%;
         flex-grow: 1;
         background-color: $darker-grey;
+        box-shadow: 2px 0px 10px 3px rgba(0, 0, 0, 0.5);
+        position: relative;
+        z-index: 5;
 
         .pane {
             margin: 0px;
             height: 100%;
             width: 100%;
             display: none;
-            border-right: 1px solid $light-grey;
+            border: none;
 
             &.active {
                 display: block;

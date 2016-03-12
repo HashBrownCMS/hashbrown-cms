@@ -28,22 +28,124 @@ button, a {
 }
 
 // Google material
-.btn {
-    border-radius: 0px;
-
-    &.btn-primary {
-        background-color: material-color('blue', '500');
-        border-color: material-color('blue', '500');
+@mixin set-button($class, $color) {
+    &.btn-#{$class} {
+        background-color: material-color($color, '500');
+        border-color: material-color($color, '500');
     
         &:hover {
-            background-color: material-color('blue', '300');
-            border-color: material-color('blue', '300');
+            background-color: material-color($color, '400');
+            border-color: material-color($color, '400');
         }
         
         &:active {
-            background-color: material-color('blue', '600');
-            border-color: material-color('blue', '600');
+            background-color: material-color($color, '600');
+            border-color: material-color($color, '600');
         }
+    }
+}
+
+// Buttons
+.btn {
+    border-radius: 0px;
+
+    @include set-button('primary', 'blue');
+    @include set-button('danger', 'red');
+
+    &.btn-raised {
+        box-shadow: 0px 2px 3px 1px rgba(0, 0, 0, 0.2);
+        position: relative;
+        top: -2px;
+
+        &:active {
+            top: 0px;
+            box-shadow: 0px 0px 1px 1px rgba(0, 0, 0, 0.2);
+        } 
+    }
+}
+
+// Button group
+.btn-group {
+    display: flex;
+
+    &:after {
+        content: '';
+        clear: both;
+    }
+
+    .btn {
+        display: block;
+        flex-grow: 1;
+    }
+}
+
+// Input
+.form-control {
+    &.disabled {
+        pointer-events: none;
+        opacity: 0.5;
+    }
+}
+
+// Tabs
+.nav-tabs {
+    padding: 18px 0px 0px 15px;
+    background-color: material-color('blue', '500');
+    font-size: 14px;
+    position: relative;
+    font-weight: bold;
+    text-transform: uppercase;
+
+    li:not(.active) {
+        a {
+            color: material-color('blue', '50');
+            
+            &, &:hover, &:focus {
+                background-color: transparent;
+                border: 0px;
+            }
+        }
+    }
+    
+    li {
+        a {
+            border-radius: 0px;
+        }
+    }
+}
+
+// Switch
+.switch {
+    width: 30px;
+    height: 10px;
+    background-color: material-color('grey', '400');
+    position: relative;
+    border-radius: 50px;
+
+    label {
+        display: block;
+        width: 16px;
+        height: 16px;
+        position: absolute;
+        top: 50%;
+        left: 10%;
+        cursor: pointer;
+        background-color: material-color('grey', '100');
+        border-radius: 50px;
+        box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.25);
+        transition: all 0.25s ease;
+        transform: translate(-50%, -50%);
+    }
+
+    input[type=checkbox] {
+        visibility: hidden;
+
+        &:checked {
+            & + label {
+                left: 90%;
+                background-color: material-color('blue', '500');
+            }  
+        }  
     }
 }
 
@@ -92,16 +194,26 @@ button, a {
             border-radius: 0px;
 
             .btn-group {
+                float: right;
+
                 .btn {
                     line-height: 20px;
                     font-size: 12px;
                     text-transform: uppercase;
                     font-weight: bold;
-                    padding-left: 30px;
-                    padding-right: 30px;
+                    margin-right: 15px;
+                    width: 110px;
 
+                    &:last-child {
+                        margin-right: 0px;
+                    }
+                    
                     span {
                         line-height: 20px;
+                    
+                        &.fa {
+                            font-size: 18px;
+                        }
                     }
                 }
             }

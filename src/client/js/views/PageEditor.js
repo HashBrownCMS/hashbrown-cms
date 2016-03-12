@@ -259,21 +259,15 @@ class PageEditor extends View {
                 this.renderObject(this.model, pageSchema).append(
                     _.div({class: 'panel panel-default panel-buttons'}, 
                         _.div({class: 'btn-group'}, [
-                            _.button({class: 'btn btn-danger'},
-                                _.span({class: 'fa fa-trash'})
+                            _.button({class: 'btn btn-danger btn-raised'},
+                                'Delete'
                             ).click(function() { view.onClickDelete(); }),
-                            _.button({class: 'btn btn-primary'},
-                                _.span({class: 'fa fa-refresh'})
+                            _.button({class: 'btn btn-default btn-raised'},
+                                'Reload'
                             ).click(function() { view.onClickReload(); }),
-                            _.button({class: 'btn btn-primary'}, [
-                                (page.isPublished() ? 'Unpublish' : 'Publish') + ' ',
-                                _.span({class: 'fa fa-newspaper-o'})
-                            ]).click(function() { view.onClickTogglePublish(); }),
-                            view.$saveBtn = _.button({class: 'btn btn-primary btn-save'}, [
+                            view.$saveBtn = _.button({class: 'btn btn-primary btn-raised btn-save'}, [
                                 _.span({class: 'text-default'}, 'Save '),
-                                _.span({class: 'icon-default fa fa-save'}),
                                 _.span({class: 'text-saving'}, 'Saving '),
-                                _.span({class: 'icon-saving fa fa-refresh'})
                             ]).click(function() { view.onClickSave(); })
                         ])
                     )

@@ -13,26 +13,6 @@
     }
 
     .object {
-        .nav-tabs {
-            padding: 18px 0px 0px 15px;
-            background-color: material-color('blue', '500');
-            font-size: 14px;
-            position: relative;
-            font-weight: bold;
-            text-transform: uppercase;
-
-            li:not(.active) {
-                a {
-                    color: material-color('blue', '50');
-                    
-                    &, &:hover, &:focus {
-                        background-color: transparent;
-                        border: 0px;
-                    }
-                }
-            }
-        }
-
         .tab-content {
             padding: 15px;
         }
@@ -62,7 +42,9 @@
                 }
 
                 .period-editor {
-                    width: 100px;
+                    .input-group {
+                        width: 300px;
+                    }
 
                     .arrow-middle {
                         padding: 5px;
