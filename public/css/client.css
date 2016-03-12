@@ -10,12 +10,6 @@
  */
 @import url(https://fonts.googleapis.com/css?family=Roboto);
 @import url(https://fonts.googleapis.com/css?family=Roboto+Mono);
-@keyframes rotate {
-  from {
-    transform: rotate(0deg); }
-  to {
-    transform: rotate(359deg); } }
-
 html, body {
   height: 100%;
   font-family: 'Roboto';
@@ -24,8 +18,26 @@ html, body {
 button, button:focus, button:hover, button:active, button:active:focus, a, a:focus, a:hover, a:active, a:active:focus {
   outline: none !important; }
 
+/**
+ * Colour a button
+ */
+.modal .modal-dialog {
+  max-width: 500px; }
+  .modal .modal-dialog .modal-content {
+    border-radius: 0px; }
+    .modal .modal-dialog .modal-content .modal-header {
+      border-bottom: 0px; }
+    .modal .modal-dialog .modal-content .modal-footer {
+      border-top: 0px; }
+      .modal .modal-dialog .modal-content .modal-footer .btn {
+        background-color: transparent;
+        border: 0px;
+        color: #2196f3; }
+
 .btn {
-  border-radius: 0px; }
+  border-radius: 0px;
+  font-weight: bold;
+  text-transform: uppercase; }
   .btn.btn-primary {
     background-color: #2196f3;
     border-color: #2196f3; }
@@ -149,16 +161,12 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
             line-height: 20px; }
             .endomon-cms-container .workspace .panel-buttons .btn-group .btn span.fa {
               font-size: 18px; }
-      .endomon-cms-container .workspace .panel-buttons .btn-save .text-saving, .endomon-cms-container .workspace .panel-buttons .btn-save .icon-saving {
+      .endomon-cms-container .workspace .panel-buttons .btn-save .text-saving {
         display: none; }
-      .endomon-cms-container .workspace .panel-buttons .btn-save .icon-saving {
-        animation: rotate 1s infinite linear; }
-      .endomon-cms-container .workspace .panel-buttons .btn-save.saving .text-default, .endomon-cms-container .workspace .panel-buttons .btn-save.saving .icon-default {
+      .endomon-cms-container .workspace .panel-buttons .btn-save.saving .text-default {
         display: none; }
       .endomon-cms-container .workspace .panel-buttons .btn-save.saving .text-saving {
         display: inline; }
-      .endomon-cms-container .workspace .panel-buttons .btn-save.saving .icon-saving {
-        display: inline-block; }
 
 .json-editor {
   width: 100%;

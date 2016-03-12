@@ -32,12 +32,9 @@ class MessageModal extends View {
         this.$element = _.div({class: 'modal fade'},
             _.div({class: 'modal-dialog'},
                 _.div({class: 'modal-content'}, [
-                    _.div({class: 'modal-header'}, [
-                        _.button({class: 'close', 'data-dismiss': 'modal'},
-                            _.span({class: 'fa fa-close'})
-                        ),
+                    _.div({class: 'modal-header'},
                         _.h4({class: 'modal-title'}, this.model.title)
-                    ]),
+                    ),
                     _.div({class: 'modal-body'},
                         this.model.body
                     ),
