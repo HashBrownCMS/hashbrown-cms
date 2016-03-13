@@ -2,7 +2,7 @@ resources.editors['20005'] = function(params) {
     var editor = this;
 
     params.value = params.value || {};
-    params.value.enabled = typeof params.value.enabled === 'undefined' || params.value.enabled == true || params.value.enabled == "true";
+    params.value.enabled = params.value.enabled == true || params.value.enabled == "true";
 
     var toDate = new Date(params.value.to);
     var fromDate = new Date(params.value.from);

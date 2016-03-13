@@ -15,6 +15,7 @@ class ApiController extends Controller {
      * Initialises this controller
      */
     static init(app) {
+        app.get('/api/pages/new', ApiController.createPage);
         app.get('/api/pages', ApiController.getPages);
         app.get('/api/pages/:id', ApiController.getPage);
         app.post('/api/pages/:id', ApiController.postPage);
@@ -78,6 +79,18 @@ class ApiController extends Controller {
             throw '[Api] Page id is undefined';
         
         }
+    }
+    
+    /**
+     * Creates a new Page object
+     *
+     * @return {Object} Page
+     */
+    static createPage(req, res) {
+        ContentHelper.createPage()
+        .then(function(page) {
+            res.send(page);
+        });
     }
 
     /**

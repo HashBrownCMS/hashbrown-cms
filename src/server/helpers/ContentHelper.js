@@ -58,6 +58,20 @@ class ContentHelper {
             callback();   
         });
     }
+
+    /**
+     * Creates a new page
+     * This method must be overridden by a plugin
+     *
+     * @return {Promise} promise
+     */
+    static createPage() {
+        let page = Page.create();
+
+        return new Promise(function(callback) {
+            callback(page.data);   
+        });
+    }
 }
 
 module.exports = ContentHelper;

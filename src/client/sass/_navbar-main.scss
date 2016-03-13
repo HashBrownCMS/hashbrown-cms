@@ -23,6 +23,10 @@
             border-radius: 0px;
             clear: both;
 
+            &[data-route="about"] {
+                font-weight: bold;
+            }
+
             &.active, &:hover {
                 background-color: $darker-grey;
             }
@@ -56,53 +60,93 @@
         position: relative;
         z-index: 5;
 
-        .pane {
-            margin: 0px;
-            height: 100%;
-            width: 100%;
+        .pane-container {
             display: none;
-            border: none;
-
+            flex-direction: column;
+            
             &.active {
-                display: block;
+                display: flex;
             }
 
-            .pane-item-container {
-                .pane-item {
+            .pane-toolbar {
+                height: 30px;
+                display: flex;
+                flex-direction: row;
+            
+                button {
+                    background-color: material-color('blue', '500');
                     display: block;
-                    border-radius: 0px;
-                    border: none;
-                    border-bottom: 1px solid $dark-grey;
-                    color: $lightest-grey;
-                    background-color: $darker-grey;
-                    margin: 0px;
-                    height: 60px;
-                    padding: 0px 15px;
-                    clear: both;
-
-                    &, &:focus, &:hover, &:active {
-                        text-decoration: none;
-                    }
-
-                    &.active {
-                        background-color: $lightest-grey;
-                        color: $darker-grey;
-                    }
-
-                    span {
-                        height: 60px;
-                        line-height: 60px;
-                        display: block;
-                        float: left;
-
-                        &.fa {
-                            margin-right: 15px;
-                        }
+                    height: 30px;
+                    border: 0px;
+                    text-align: center;
+                    flex-grow: 1;
+                    color: #fff;
+                    text-transform: uppercase;
+                    font-weight: bold;
+                
+                    &:hover {
+                        background-color: material-color('blue', '400');
                     }
                 }
+            }
 
-                .children {
-                    padding-left: 30px;
+            .pane {
+                margin: 0px;
+                flex-grow: 1;
+                width: 100%;
+                border: none;
+                overflow-y: auto;
+
+                .pane-item-container {
+                    &.active {
+                        >.pane-item {
+                            border-right: 5px solid material-color('grey', '300');
+                            background-color: material-color('grey', '800');
+                            
+                            &:hover {
+                                background-color: material-color('grey', '800');
+                                border-right: 5px solid material-color('grey', '500');
+                            }
+                        }
+                    }
+
+                    .pane-item {
+                        display: block;
+                        border-radius: 0px;
+                        border: none;
+                        color: $lightest-grey;
+                        background-color: $darker-grey;
+                        margin: 0px;
+                        height: 60px;
+                        padding: 0px 15px;
+                        clear: both;
+
+                        &, &:focus, &:hover, &:active {
+                            text-decoration: none;
+                        }
+
+                        &:hover {
+                            background-color: material-color('grey', '800');
+                            border-right: 5px solid material-color('grey', '500');
+                        }
+
+                        span {
+                            height: 60px;
+                            line-height: 60px;
+                            display: block;
+                            float: left;
+
+                            &.fa {
+                                margin-right: 15px;
+                            }
+                        }
+                    }
+
+                    .children {
+                        .pane-item-container {
+                            padding-left: 15px;
+                        }
+                    }
                 }
             }
         }

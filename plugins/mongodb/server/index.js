@@ -14,6 +14,9 @@ let config = require('./config.json');
 // Helpers
 let ContentHelper = require(appRoot + '/src/server/helpers/ContentHelper');
 
+// Models
+let Page = require(appRoot + '/src/server/models/Page');
+
 class MongoDB {
     /**
      * Inits the MongoDB database
@@ -57,8 +60,12 @@ class MongoDB {
         return new Promise(function(callback) {
             console.log('[MongoDB] Finding document with query ' + JSON.stringify(query) + ' in collection "' + collectionName + '"...');
 
+            let pattern = {
+                _id: 0
+            };
+
             MongoDB.getDatabase().then(function(db) {
-                db.collection(collectionName).findOne(query, function(findErr, doc) {
+                db.collection(collectionName).findOne(query, pattern, function(findErr, doc) {
                     if(findErr) {
                         throw findErr;
                     }
@@ -81,8 +88,12 @@ class MongoDB {
         return new Promise(function(callback) {
             console.log('[MongoDB] Finding documents with query ' + JSON.stringify(query) + ' in collection "' + collectionName + '"...');
 
+            let pattern = {
+                _id: 0
+            };
+
             MongoDB.getDatabase().then(function(db) {
-                db.collection(collectionName).find(query).toArray(function(findErr, docs) {
+                db.collection(collectionName).find(query, pattern).toArray(function(findErr, docs) {
                     if(findErr) {
                         throw findErr;
                     }
@@ -115,6 +126,32 @@ class MongoDB {
                     }
 
                     callback();
+                });
+            });
+        });
+    }
+    
+    /**
+     * Inserts a single MongoDB document
+     *
+     * @param {Object} doc
+     *
+     * @return {Promise} promise
+     */
+    static insertOne(collectionName, doc) {
+        // Make sure the MongoId isn't included
+        delete doc['_id'];
+
+        return new Promise(function(callback) {
+            console.log('[MongoDB] Inserting new document into collection "' + collectionName + '"...');
+        
+            MongoDB.getDatabase().then(function(db) {
+                db.collection(collectionName).insertOne(doc, function(insertErr) {
+                    if(insertErr) {
+                        throw insertErr;
+                    }
+
+                    callback(doc);
                 });
             });
         });
@@ -155,7 +192,7 @@ class MongoDB {
         return MongoDB.findOne(
             'pages',
             {
-                _id: new mongodb.ObjectId(id)
+                id: id
             }
         );
     }
@@ -174,12 +211,27 @@ class MongoDB {
         return MongoDB.updateOne(
             'pages',
             {
-                _id: new mongodb.ObjectId(id)
+                id: id
             },
             page
         );
     }
 
+    /**
+     * Creates a new page
+     * This method must be overridden by a plugin
+     *
+     * @return {Promise} promise
+     */
+    static createPage() {
+        let page = Page.create();
+
+        return MongoDB.insertOne(
+            'pages',
+            page.data
+        );
+    }
+    
     /**
      * Initialises this plugin
      */
@@ -187,6 +239,7 @@ class MongoDB {
         console.log('[MongoDB] Initialising MongoDB plugin');
 
         // Override ContentHelper methods
+        ContentHelper.createPage = MongoDB.createPage;
         ContentHelper.getAllPages = MongoDB.getAllPages;
         ContentHelper.getPageById = MongoDB.getPageById;
         ContentHelper.setPageById = MongoDB.setPageById;

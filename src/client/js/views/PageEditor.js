@@ -4,9 +4,6 @@
 window.markdownToHtml = require('marked');
 window.htmlToMarkdown = require('to-markdown');
 
-// Models
-let Page = require('../../../server/models/Page');
-
 // Views
 let MessageModal = require('./MessageModal');
 
@@ -34,6 +31,13 @@ class PageEditor extends View {
             success: function() {
                 console.log('[PageEditor] Saved model to ' + view.modelUrl);
                 view.$saveBtn.toggleClass('saving', false);
+            
+                reloadResource('pages', function() {
+                    let navbar = ViewHelper.get('NavbarMain');
+
+                    navbar.fetch();
+                    navbar.highlightItem(view.model.id);
+                });
             },
             error: function(err) {
                 new MessageModal({
@@ -111,7 +115,7 @@ class PageEditor extends View {
      *
      * @return {Object} element
      */
-    renderFieldView(fieldValue, schemaValue, onChange) {
+    renderFieldView(fieldValue, schemaValue, onChange, config) {
         let fieldSchema = resources.schemas[schemaValue.schemaId];
 
         if(fieldSchema) {
@@ -121,7 +125,8 @@ class PageEditor extends View {
                 let fieldEditorInstance = new fieldEditor({
                     value: fieldValue,
                     disabled: schemaValue.disabled,
-                    onChange: onChange
+                    onChange: onChange,
+                    config: config
                 });
 
                 return fieldEditorInstance.$element;
@@ -189,7 +194,8 @@ class PageEditor extends View {
                                         schema.properties[key],
                                         function(newValue) {
                                             object[key] = newValue;
-                                        }
+                                        },
+                                        value.config
                                     )
                                 )
                             ]);
@@ -242,7 +248,6 @@ class PageEditor extends View {
     render() {
         let view = this;
 
-        let page = new Page(this.model);
         let pageSchema = this.getSchemaWithParents(this.model.schemaId);
 
         if(pageSchema) {

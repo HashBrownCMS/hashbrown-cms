@@ -1,5 +1,7 @@
 'use strict';
 
+let crypto = require('crypto');
+
 let Promise = require('bluebird');
 let ContentHelper = require('../helpers/ContentHelper');
 let Validator = require('jsonschema').Validator;
@@ -10,6 +12,19 @@ let Validator = require('jsonschema').Validator;
 class Content {
     constructor(data) {
         this.data = data;
+    }
+
+    /**
+     * Creates a new Content object
+     *
+     * @return {Object} content
+     */
+    static create() {
+        let content = new Content({});
+        
+        content.data.id = crypto.randomBytes(20).toString('hex');
+    
+        return content;
     }
 
     /**

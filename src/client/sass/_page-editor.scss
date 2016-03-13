@@ -37,8 +37,23 @@
                     padding-right: 30px;
                 }
 
-                input, select, option, textarea, button {
-                    font-size: 12px;
+                input, select, option, textarea, button, p {
+                    font-size: 14px;
+                }
+
+                select {
+                    option {
+                        padding: 5px;
+                    }
+                }
+
+                .date-editor {
+                    height: 30px;
+                    
+                    p {
+                        line-height: 30px;
+                        margin: 0px;
+                    }
                 }
 
                 .period-editor {

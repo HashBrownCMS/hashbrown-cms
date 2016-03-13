@@ -36,6 +36,14 @@ function checkReady() {
 let resourcesRequired = 4;
 let resourcesLoaded = 0;
 
+window.reloadResource = function reloadResource(name, callback) {
+    $.getJSON('/api/' + name, function(result) {
+        window.resources[name] = result;
+
+        callback(result);
+    });
+};
+
 window.resources = {
     editors: []
 };
@@ -87,7 +95,6 @@ Router.route('/pages/json/:id', function() {
     let pageEditor = new JSONEditor({
         modelUrl: '/api/pages/' + this.id
     });
-  
      
     ViewHelper.get('NavbarMain').highlightItem(this.id);
     

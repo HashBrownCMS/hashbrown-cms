@@ -50,6 +50,10 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
 .input-group .input-group-btn {
   padding-left: 15px; }
 
+.context-menu {
+  border-radius: 0px;
+  box-shadow: 0px 2px 3px 1px rgba(0, 0, 0, 0.2); }
+
 .btn {
   border-radius: 0px;
   font-weight: bold;
@@ -229,8 +233,15 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
         font-weight: bold;
         padding-left: 30px;
         padding-right: 30px; }
-      .page-editor .object .field-container .field-value input, .page-editor .object .field-container .field-value select, .page-editor .object .field-container .field-value option, .page-editor .object .field-container .field-value textarea, .page-editor .object .field-container .field-value button {
-        font-size: 12px; }
+      .page-editor .object .field-container .field-value input, .page-editor .object .field-container .field-value select, .page-editor .object .field-container .field-value option, .page-editor .object .field-container .field-value textarea, .page-editor .object .field-container .field-value button, .page-editor .object .field-container .field-value p {
+        font-size: 14px; }
+      .page-editor .object .field-container .field-value select option {
+        padding: 5px; }
+      .page-editor .object .field-container .field-value .date-editor {
+        height: 30px; }
+        .page-editor .object .field-container .field-value .date-editor p {
+          line-height: 30px;
+          margin: 0px; }
       .page-editor .object .field-container .field-value .period-editor .input-group {
         width: 300px; }
         .page-editor .object .field-container .field-value .period-editor .input-group input {
@@ -273,6 +284,8 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
       border: none;
       border-radius: 0px;
       clear: both; }
+      .navbar-main .tab-buttons button[data-route="about"] {
+        font-weight: bold; }
       .navbar-main .tab-buttons button.active, .navbar-main .tab-buttons button:hover {
         background-color: #333; }
       .navbar-main .tab-buttons button span {
@@ -295,39 +308,63 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
     box-shadow: 2px 0px 10px 3px rgba(0, 0, 0, 0.5);
     position: relative;
     z-index: 5; }
-    .navbar-main .tab-panes .pane {
-      margin: 0px;
-      height: 100%;
-      width: 100%;
+    .navbar-main .tab-panes .pane-container {
       display: none;
-      border: none; }
-      .navbar-main .tab-panes .pane.active {
-        display: block; }
-      .navbar-main .tab-panes .pane .pane-item-container .pane-item {
-        display: block;
-        border-radius: 0px;
-        border: none;
-        border-bottom: 1px solid #444;
-        color: #f1f1f1;
-        background-color: #333;
-        margin: 0px;
-        height: 60px;
-        padding: 0px 15px;
-        clear: both; }
-        .navbar-main .tab-panes .pane .pane-item-container .pane-item, .navbar-main .tab-panes .pane .pane-item-container .pane-item:focus, .navbar-main .tab-panes .pane .pane-item-container .pane-item:hover, .navbar-main .tab-panes .pane .pane-item-container .pane-item:active {
-          text-decoration: none; }
-        .navbar-main .tab-panes .pane .pane-item-container .pane-item.active {
-          background-color: #f1f1f1;
-          color: #333; }
-        .navbar-main .tab-panes .pane .pane-item-container .pane-item span {
-          height: 60px;
-          line-height: 60px;
+      flex-direction: column; }
+      .navbar-main .tab-panes .pane-container.active {
+        display: flex; }
+      .navbar-main .tab-panes .pane-container .pane-toolbar {
+        height: 30px;
+        display: flex;
+        flex-direction: row; }
+        .navbar-main .tab-panes .pane-container .pane-toolbar button {
+          background-color: #2196f3;
           display: block;
-          float: left; }
-          .navbar-main .tab-panes .pane .pane-item-container .pane-item span.fa {
-            margin-right: 15px; }
-      .navbar-main .tab-panes .pane .pane-item-container .children {
-        padding-left: 30px; }
+          height: 30px;
+          border: 0px;
+          text-align: center;
+          flex-grow: 1;
+          color: #fff;
+          text-transform: uppercase;
+          font-weight: bold; }
+          .navbar-main .tab-panes .pane-container .pane-toolbar button:hover {
+            background-color: #42a5f5; }
+      .navbar-main .tab-panes .pane-container .pane {
+        margin: 0px;
+        flex-grow: 1;
+        width: 100%;
+        border: none;
+        overflow-y: auto; }
+        .navbar-main .tab-panes .pane-container .pane .pane-item-container.active > .pane-item {
+          border-right: 5px solid #e0e0e0;
+          background-color: #424242; }
+          .navbar-main .tab-panes .pane-container .pane .pane-item-container.active > .pane-item:hover {
+            background-color: #424242;
+            border-right: 5px solid #9e9e9e; }
+        .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item {
+          display: block;
+          border-radius: 0px;
+          border: none;
+          color: #f1f1f1;
+          background-color: #333;
+          margin: 0px;
+          height: 60px;
+          padding: 0px 15px;
+          clear: both; }
+          .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item, .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item:focus, .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item:hover, .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item:active {
+            text-decoration: none; }
+          .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item:hover {
+            background-color: #424242;
+            border-right: 5px solid #9e9e9e; }
+          .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item span {
+            height: 60px;
+            line-height: 60px;
+            display: block;
+            float: left; }
+            .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item span.fa {
+              margin-right: 15px; }
+        .navbar-main .tab-panes .pane-container .pane .pane-item-container .children .pane-item-container {
+          padding-left: 15px; }
 
 .media-viewer {
   display: flex;
