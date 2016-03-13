@@ -4,7 +4,7 @@ let Controller = require('./Controller');
 let ContentHelper = require('../helpers/ContentHelper');
 let SchemaHelper = require('../helpers/SchemaHelper');
 let ViewHelper = require('../helpers/ViewHelper');
-let ScriptHelper = require('../helpers/ScriptHelper');
+let PluginHelper = require('../helpers/PluginHelper');
 let MediaHelper = require('../helpers/MediaHelper');
 
 /**
@@ -132,7 +132,7 @@ class ApiController extends Controller {
      * Get all editors
      */
     static getEditors(req, res) {
-        ScriptHelper.getAllScripts('/editors/**/*.js', true)
+        PluginHelper.getAllClientScripts('/editors/*/*.js')
         .then(function(editors) {
             res.send(editors);
         });    

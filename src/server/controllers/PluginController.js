@@ -2,22 +2,32 @@
 
 let Controller = require('./Controller');
 
+// Promise
+let Promise = require('bluebird');
+
 // Libs
 let fs = require('fs');
+let glob = require('glob');
 
 /**
  * A controller for managing Plugins
  */
 class PluginController extends Controller {
+    /**
+     * Initialises all plugins located at /plugins/:name/server/index.js
+     */
     static init() {
-        let folders = fs.readdirSync(appRoot + '/plugins');
-        
-        for(let folder of folders) {
-            let path = appRoot + '/plugins/' + folder + '/index.js';
-            let plugin = require(path);
+        return new Promise(function(callback) {
+            glob(appRoot + '/plugins/*/server/index.js', function(err, paths) {
+                for(let path of paths) {
+                    let plugin = require(path);
 
-            plugin.init();
-        }
+                    plugin.init();
+                }
+
+                callback();
+            });
+        });
     }
 }
 
