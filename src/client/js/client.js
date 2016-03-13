@@ -3,8 +3,8 @@
 // Libraries
 window.$ = window.jQuery = require('jquery');
 require('bootstrap');
-require('exomon');
 require('bootstrap-datepicker');
+require('exomon');
 let jade = require('jade');
 
 // Views

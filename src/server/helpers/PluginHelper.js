@@ -1,5 +1,12 @@
 'use strict';
 
+// Promse
+let Promise = require('bluebird');
+
+// Libs
+let glob = require('glob');
+let fs = require('fs');
+
 class PluginHelper {
     /**
      * Gets a compiled file with all client scripts in the plugin folders
@@ -9,13 +16,13 @@ class PluginHelper {
      * @return {String} scripts
      */
     static getAllClientScripts(pattern) {
+        let scriptPath = appRoot + '/plugins/*/client/js' + pattern;
+
         return new Promise(function(callback) {
-            glob(appRoot + '/plugins/*/client/js' + pattern, function(err, paths) {
+            glob(scriptPath, function(err, paths) {
                 if(err) {
                     throw err;
                 }
-
-                console.log(paths);
 
                 let queue = paths || [];
                 let concatenated = '';

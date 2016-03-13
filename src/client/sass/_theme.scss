@@ -67,6 +67,11 @@ button, a {
 
     @include set-button-color('primary', 'blue');
     @include set-button-color('danger', 'red');
+    @include set-button-color('success', 'green');
+
+    &:active {
+        box-shadow: none;
+    }
 
     &.btn-raised {
         box-shadow: 0px 2px 3px 1px rgba(0, 0, 0, 0.2);

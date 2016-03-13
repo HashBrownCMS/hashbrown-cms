@@ -56,6 +56,17 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
     .btn.btn-danger:active {
       background-color: #e53935;
       border-color: #e53935; }
+  .btn.btn-success {
+    background-color: #4caf50;
+    border-color: #4caf50; }
+    .btn.btn-success:hover {
+      background-color: #66bb6a;
+      border-color: #66bb6a; }
+    .btn.btn-success:active {
+      background-color: #43a047;
+      border-color: #43a047; }
+  .btn:active {
+    box-shadow: none; }
   .btn.btn-raised {
     box-shadow: 0px 2px 3px 1px rgba(0, 0, 0, 0.2);
     position: relative;

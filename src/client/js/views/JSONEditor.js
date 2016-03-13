@@ -81,14 +81,13 @@ class JSONEditor extends View {
             ).bind('keyup change propertychange paste', function() { view.onChangeText($(this)); }),
             this.$error,
             _.div({class: 'panel panel-default panel-buttons'}, 
-                _.div({class: 'pull-left btn-group flex-horizontal'}, [
-                    _.button({class: 'btn btn-primary flex-expand'},
-                        _.span({class: 'fa fa-refresh'})
+                _.div({class: 'btn-group'}, [
+                    _.button({class: 'btn btn-rasied btn-primary'},
+                        'Reload'
                     ).click(function() { view.onClickReload(); }),
-                    _.button({class: 'btn btn-success flex-expand'}, [
-                        'Save ',
-                        _.span({class: 'fa fa-save'})
-                    ]).click(function() { view.onClickSave(); })
+                    _.button({class: 'btn btn-raised btn-success'},
+                        'Save '
+                    ).click(function() { view.onClickSave(); })
                 ])
             )
         ]);

@@ -20,15 +20,6 @@ class PageEditor extends View {
     }
 
     /**
-     * Event: Click reload. Fetches the model again
-     */
-    onClickReload() {
-        this.model = null;
-
-        this.fetch();
-    }
-
-    /**
      * Event: Click save. Posts the model to the modelUrl
      */
     onClickSave() {
@@ -262,10 +253,7 @@ class PageEditor extends View {
                             _.button({class: 'btn btn-danger btn-raised'},
                                 'Delete'
                             ).click(function() { view.onClickDelete(); }),
-                            _.button({class: 'btn btn-default btn-raised'},
-                                'Reload'
-                            ).click(function() { view.onClickReload(); }),
-                            view.$saveBtn = _.button({class: 'btn btn-primary btn-raised btn-save'}, [
+                            view.$saveBtn = _.button({class: 'btn btn-success btn-raised btn-save'}, [
                                 _.span({class: 'text-default'}, 'Save '),
                                 _.span({class: 'text-saving'}, 'Saving '),
                             ]).click(function() { view.onClickSave(); })
