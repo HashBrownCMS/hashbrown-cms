@@ -34,6 +34,22 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
         border: 0px;
         color: #2196f3; }
 
+.form-control, .form-control:active, .form-control:focus {
+  background-color: transparent;
+  border-radius: 0px;
+  box-shadow: none;
+  border: 0px;
+  border-bottom: 2px solid #2196f3; }
+
+.input-group .input-group-addon {
+  background-color: transparent;
+  border-radius: 0px;
+  box-shadow: none;
+  border: 0px; }
+
+.input-group .input-group-btn {
+  padding-left: 15px; }
+
 .btn {
   border-radius: 0px;
   font-weight: bold;
@@ -217,6 +233,8 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
         font-size: 12px; }
       .page-editor .object .field-container .field-value .period-editor .input-group {
         width: 300px; }
+        .page-editor .object .field-container .field-value .period-editor .input-group input {
+          text-align: center; }
       .page-editor .object .field-container .field-value .period-editor .arrow-middle {
         padding: 5px; }
         .page-editor .object .field-container .field-value .period-editor .arrow-middle span {
@@ -285,7 +303,7 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
       border: none; }
       .navbar-main .tab-panes .pane.active {
         display: block; }
-      .navbar-main .tab-panes .pane .pane-item {
+      .navbar-main .tab-panes .pane .pane-item-container .pane-item {
         display: block;
         border-radius: 0px;
         border: none;
@@ -296,18 +314,20 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
         height: 60px;
         padding: 0px 15px;
         clear: both; }
-        .navbar-main .tab-panes .pane .pane-item, .navbar-main .tab-panes .pane .pane-item:focus, .navbar-main .tab-panes .pane .pane-item:hover, .navbar-main .tab-panes .pane .pane-item:active {
+        .navbar-main .tab-panes .pane .pane-item-container .pane-item, .navbar-main .tab-panes .pane .pane-item-container .pane-item:focus, .navbar-main .tab-panes .pane .pane-item-container .pane-item:hover, .navbar-main .tab-panes .pane .pane-item-container .pane-item:active {
           text-decoration: none; }
-        .navbar-main .tab-panes .pane .pane-item.active {
+        .navbar-main .tab-panes .pane .pane-item-container .pane-item.active {
           background-color: #f1f1f1;
           color: #333; }
-        .navbar-main .tab-panes .pane .pane-item span {
+        .navbar-main .tab-panes .pane .pane-item-container .pane-item span {
           height: 60px;
           line-height: 60px;
           display: block;
           float: left; }
-          .navbar-main .tab-panes .pane .pane-item span.fa {
+          .navbar-main .tab-panes .pane .pane-item-container .pane-item span.fa {
             margin-right: 15px; }
+      .navbar-main .tab-panes .pane .pane-item-container .children {
+        padding-left: 30px; }
 
 .media-viewer {
   display: flex;

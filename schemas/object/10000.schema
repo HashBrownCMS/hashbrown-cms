@@ -8,12 +8,12 @@
         "90000": "Meta"
     },
     "properties": {
-        "title": {"$ref": "20000", "label": "Title"},
-        "description": {"$ref": "20000", "label": "Description"},
-        "url": {"$ref": "20003", "label": "URL"},
-        "createDate": {"$ref": "20002", "disabled": true, "label": "Created at"},
-        "updateDate": {"$ref": "20002", "disabled": true, "label": "Updated at"},
-        "publication": {"$ref": "20005", "label": "Publication"},
-        "schemaId": { "$ref": "20004", "label": "Schema" }
+        "title": {"schemaId": "20000", "label": "Title"},
+        "description": {"schemaId": "20000", "label": "Description"},
+        "url": {"schemaId": "20003", "label": "URL"},
+        "createDate": {"schemaId": "20002", "disabled": true, "label": "Created at"},
+        "updateDate": {"schemaId": "20002", "disabled": true, "label": "Updated at"},
+        "publication": {"schemaId": "20005", "label": "Publication"},
+        "schemaId": { "schemaId": "20004", "label": "Schema" }
     }
 }

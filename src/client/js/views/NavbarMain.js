@@ -32,38 +32,69 @@ class NavbarMain extends View {
 
         if(params.resource) {
             let items = window.resources[params.resource];
+            let sortingQueue = [];
 
             $pane.html(
                 _.each(items, function(i, item) {
                     let id = item.id || item._id || i;
                     let name = item.title || item.name || id;
                     let routingPath = item.shortPath || item.path || id;
-                    let folderPath = item.path || item.shortPath || item.schemaType;
+                    let parentDirSelector;
                     let icon = item.icon;
 
+                    // Content
                     if(item.schemaId) {
                         icon = resources.schemas[item.schemaId].icon;
                     }
 
-                    // Render folder
-                    if(folderPath) {
-                        // TODO: Render folder
+                    let $element = _.div({class: 'pane-item-container'}, [
+                        _.a({
+                            'data-id': id,
+                            'data-routing-path': routingPath,
+                            href: '#/' + params.route + '/' + routingPath,
+                            class: 'pane-item'
+                        }, [
+                            icon ? _.span({class: 'fa fa-' + icon}) : null,
+                            _.span(name)
+                        ]),
+                        _.div({class: 'children'})
+                    ]);
+
+                    switch(params.route) {
+                        // Schema
+                        case 'schemas':
+                            $element.attr('data-schema-id', item.id);
+                            
+                            if(item.parentSchemaId) {
+                                parentDirSelector = '.pane-item-container[data-schema-id="' + item.parentSchemaId + '"] .children';
+                            } else {
+                                parentDirSelector = '.pane-dir[data-dir="' + item.schemaType + '"] .children';
+                            }
+                            break;
                     }
 
-                    let $element = _.a({
-                        'data-id': id,
-                        'data-routing-path': routingPath,
-                        'data-folder-path': folderPath,
-                        href: '#/' + params.route + '/' + routingPath,
-                        class: 'pane-item'
-                    }, [
-                        icon ? _.span({class: 'fa fa-' + icon}) : null,
-                        _.span(name)
-                    ]);
+                    sortingQueue.push({
+                        parentDirSelector: parentDirSelector,
+                        $element: $element
+                    });
 
                     return $element;
                 })
             );
+
+            // Sort items into hierarchy
+            for(let queueItem of sortingQueue) {    
+                // Find parent item
+                let $parentDir = $pane.find(queueItem.parentDirSelector);
+            
+                if($parentDir.length > 0) {
+                    $parentDir.append(queueItem.$element);
+                
+                // TODO: Create parent item
+                } else {
+                    
+                }
+            }
         }
 
         if(this.$element.find('.tab-panes .pane').length < 1) {

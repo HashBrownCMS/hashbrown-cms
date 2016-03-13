@@ -67,36 +67,42 @@
                 display: block;
             }
 
-            .pane-item {
-                display: block;
-                border-radius: 0px;
-                border: none;
-                border-bottom: 1px solid $dark-grey;
-                color: $lightest-grey;
-                background-color: $darker-grey;
-                margin: 0px;
-                height: 60px;
-                padding: 0px 15px;
-                clear: both;
-
-                &, &:focus, &:hover, &:active {
-                    text-decoration: none;
-                }
-
-                &.active {
-                    background-color: $lightest-grey;
-                    color: $darker-grey;
-                }
-
-                span {
-                    height: 60px;
-                    line-height: 60px;
+            .pane-item-container {
+                .pane-item {
                     display: block;
-                    float: left;
+                    border-radius: 0px;
+                    border: none;
+                    border-bottom: 1px solid $dark-grey;
+                    color: $lightest-grey;
+                    background-color: $darker-grey;
+                    margin: 0px;
+                    height: 60px;
+                    padding: 0px 15px;
+                    clear: both;
 
-                    &.fa {
-                        margin-right: 15px;
+                    &, &:focus, &:hover, &:active {
+                        text-decoration: none;
                     }
+
+                    &.active {
+                        background-color: $lightest-grey;
+                        color: $darker-grey;
+                    }
+
+                    span {
+                        height: 60px;
+                        line-height: 60px;
+                        display: block;
+                        float: left;
+
+                        &.fa {
+                            margin-right: 15px;
+                        }
+                    }
+                }
+
+                .children {
+                    padding-left: 30px;
                 }
             }
         }

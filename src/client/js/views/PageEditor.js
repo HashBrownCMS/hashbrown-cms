@@ -112,7 +112,7 @@ class PageEditor extends View {
      * @return {Object} element
      */
     renderFieldView(fieldValue, schemaValue, onChange) {
-        let fieldSchema = resources.schemas[schemaValue.$ref];
+        let fieldSchema = resources.schemas[schemaValue.schemaId];
 
         if(fieldSchema) {
             let fieldEditor = resources.editors[fieldSchema.id];
@@ -132,7 +132,7 @@ class PageEditor extends View {
             }
         
         } else {
-            console.log('[PageEditor] No field schema found for $ref "' + schemaValue.$ref + '"');
+            console.log('[PageEditor] No field schema found for schema id "' + schemaValue.schemaId + '"');
 
         }
     }
@@ -201,7 +201,7 @@ class PageEditor extends View {
     }
 
     /**
-     * Gets a schema with $parent included recursively
+     * Gets a schema with parent included recursively
      *
      * @param {Number} id
      *
@@ -213,8 +213,8 @@ class PageEditor extends View {
         if(schema) {
             // Merge parent with current schema
             // Since the child schema should override any duplicate content, the parent is transformed first, then returned as the resulting schema
-            if(schema.$parent) {
-                let parentSchema = this.getSchemaWithParents(schema.$parent);
+            if(schema.parentSchemaId) {
+                let parentSchema = this.getSchemaWithParents(schema.parentSchemaId);
 
                 for(let k in schema.properties) {
                    parentSchema.properties[k] = schema.properties[k];

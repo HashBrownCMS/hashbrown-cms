@@ -5,10 +5,9 @@ resources.editors['20003'] = function(params) {
         this.$input = _.input({class: 'form-control', value: params.value})
             .bind('change propertychange paste keyup', function() { this.onChange(); }),
         _.div({class: 'input-group-btn'},
-            _.button({class: 'btn btn-default'}, [
-                'Regenerate ',
-                _.span({class: 'fa fa-refresh'})
-            ]).click(function() { editor.regenerate(); })
+            _.button({class: 'btn btn-primary'},
+                'Regenerate '
+            ).click(function() { editor.regenerate(); })
         )
     ]);
 

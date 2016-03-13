@@ -59,6 +59,30 @@ button, a {
     }
 }
 
+// Input
+.form-control {
+    &, &:active, &:focus {
+        background-color: transparent;
+        border-radius: 0px;
+        box-shadow: none;
+        border: 0px;
+        border-bottom: 2px solid material-color('blue', '500');
+    }
+}
+
+.input-group {
+    .input-group-addon {
+        background-color: transparent;
+        border-radius: 0px;
+        box-shadow: none;
+        border: 0px;
+    }
+    
+    .input-group-btn {
+        padding-left: 15px;
+    }
+}
+
 // Buttons
 .btn {
     border-radius: 0px;
