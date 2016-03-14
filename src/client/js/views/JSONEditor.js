@@ -54,6 +54,50 @@ class JSONEditor extends View {
     }
 
     /**
+     * Event: On click remove
+     */
+    onClickDelete() {
+        let view = this;
+
+        function onSuccess() {
+            console.log('[PageEditor] Removed page with id "' + view.model.id + '"'); 
+        
+            reloadResource('pages', function() {
+                ViewHelper.get('NavbarMain').reload();
+                
+                // Cancel the JSONEditor view
+                location.hash = '/pages/';
+            });
+        }
+
+        new MessageModal({
+            model: {
+                title: 'Delete item',
+                body: 'Are you sure you want to delete the item "' + (view.model.title || view.model.name || view.model.id) + '"?'
+            },
+            buttons: [
+                {
+                    label: 'Cancel',
+                    class: 'btn-default',
+                    callback: function() {
+                    }
+                },
+                {
+                    label: 'OK',
+                    class: 'btn-danger',
+                    callback: function() {
+                        $.ajax({
+                            url: '/api/pages/' + view.model.id,
+                            type: 'DELETE',
+                            success: onSuccess
+                        });
+                    }
+                }
+            ]
+        });
+    }
+
+    /**
      * Event: Change text. Make sure the value is up to date
      */
     onChangeText($textarea) {
@@ -82,7 +126,10 @@ class JSONEditor extends View {
             this.$error,
             _.div({class: 'panel panel-default panel-buttons'}, 
                 _.div({class: 'btn-group'}, [
-                    _.button({class: 'btn btn-rasied btn-primary'},
+                    _.button({class: 'btn btn-danger btn-raised'},
+                        'Delete'
+                    ).click(function() { view.onClickDelete(); }),
+                    _.button({class: 'btn btn-raised btn-primary'},
                         'Reload'
                     ).click(function() { view.onClickReload(); }),
                     _.button({class: 'btn btn-raised btn-success'},

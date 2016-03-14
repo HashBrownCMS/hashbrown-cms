@@ -22,9 +22,9 @@ class Page extends Content {
 
         let page = new Page(content.data);
 
-        page.data.createdate = Date.now();
-        page.data.updatedate = Date.now();
-        page.data.schemaId = '10000';
+        page.data.createDate = Date.now();
+        page.data.updateDate = Date.now();
+        page.data.schemaId = page.data.schemaId || '10000';
 
         return page;
     }

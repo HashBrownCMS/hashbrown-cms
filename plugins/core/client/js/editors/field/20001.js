@@ -1,7 +1,12 @@
+/**
+ * A rich text editor
+ */
 resources.editors['20001'] = function(params) {
     var editor = this;
 
+    // Main element
     this.$element = _.div({class: 'field-editor rich-text-editor panel panel-default'}, [
+        // Toolbar
         _.div({class: 'panel-heading'}, 
             _.div({class: 'btn-group'}, [
                 _.button({class: 'btn btn-default', 'data-wrap': 'strong'}, 
@@ -12,6 +17,8 @@ resources.editors['20001'] = function(params) {
                 )
             ])
         ),
+        
+        // HTML output 
         _.div({class: 'panel-body'},
             this.$output = _.div({class: 'rte-output', contenteditable: true})
                 .bind('change propertychange keyup paste', function() {
@@ -20,6 +27,8 @@ resources.editors['20001'] = function(params) {
                     editor.onChange();
                 })
         ),
+
+        // Markdown editor
         _.div({class: 'panel-footer'},
             this.$textarea = _.textarea({class: 'form-control', type: 'text'}, 
                 params.value
@@ -31,9 +40,11 @@ resources.editors['20001'] = function(params) {
         )
     ]);
 
+    // Change event
     this.onChange = function onChange() {
         params.onChange(this.$textarea.val());
     };
 
+    // Initial call to render markdown as HTML
     this.$output.html(markdownToHtml(this.$textarea.val()));
 };

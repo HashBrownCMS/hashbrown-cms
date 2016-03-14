@@ -38,7 +38,7 @@
                 display: block;
                 float: left;
             
-                &.fa {
+                &.fa, &.about-logo {
                     text-align: center;
                     font-size: 20px;
                     width: 60px;
@@ -62,37 +62,15 @@
 
         .pane-container {
             display: none;
-            flex-direction: column;
-            
-            &.active {
-                display: flex;
-            }
+            height: 100%;
 
-            .pane-toolbar {
-                height: 30px;
-                display: flex;
-                flex-direction: row;
-            
-                button {
-                    background-color: material-color('blue', '500');
-                    display: block;
-                    height: 30px;
-                    border: 0px;
-                    text-align: center;
-                    flex-grow: 1;
-                    color: #fff;
-                    text-transform: uppercase;
-                    font-weight: bold;
-                
-                    &:hover {
-                        background-color: material-color('blue', '400');
-                    }
-                }
+            &.active {
+                display: block;
             }
 
             .pane {
                 margin: 0px;
-                flex-grow: 1;
+                height: 100%;
                 width: 100%;
                 border: none;
                 overflow-y: auto;

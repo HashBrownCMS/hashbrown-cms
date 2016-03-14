@@ -20,8 +20,13 @@
     }
 }
 
+// About logo
+.about-logo {
+    color: material-color('green', '500');
+}
+
 // Main container
-.endomon-cms-container {
+.cms-container {
     display: flex;
     height: 100%;
     
@@ -33,6 +38,12 @@
     .workspace {
         flex-grow: 1;
         height: 100%;
+
+        .dashboard-container {
+            padding: 30px;
+            height: 100%;
+            overflow-y: auto;
+        }
 
         .panel-danger {
             margin: 0px;    

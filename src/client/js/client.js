@@ -85,8 +85,12 @@ $.getJSON('/api/media', function(media) {
 Router.route('/pages/', function() {
     ViewHelper.get('NavbarMain').showTab('pages');
     
-    // TODO: Nice this up a bit
-    $('.workspace').html('Click on a page');
+    $('.workspace').html(
+        _.div({class: 'dashboard-container'}, [
+            _.h1('Pages dashboard'),
+            _.p('Please click on a page to proceed')
+        ])
+    );
 });
 
 // Page edit

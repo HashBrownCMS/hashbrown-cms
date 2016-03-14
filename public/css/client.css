@@ -160,43 +160,50 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
   .flex-horizontal .flex-expand {
     flex-grow: 1; }
 
-.endomon-cms-container {
+.about-logo {
+  color: #4caf50; }
+
+.cms-container {
   display: flex;
   height: 100%; }
-  .endomon-cms-container .navspace {
+  .cms-container .navspace {
     width: 500px;
     height: 100%; }
-  .endomon-cms-container .workspace {
+  .cms-container .workspace {
     flex-grow: 1;
     height: 100%; }
-    .endomon-cms-container .workspace .panel-danger {
+    .cms-container .workspace .dashboard-container {
+      padding: 30px;
+      height: 100%;
+      overflow-y: auto; }
+    .cms-container .workspace .panel-danger {
       margin: 0px; }
-    .endomon-cms-container .workspace .panel-buttons {
+    .cms-container .workspace .panel-buttons {
       padding: 15px;
       margin: 0px;
       border-width: 0px;
       border-top-width: 1px;
       border-radius: 0px; }
-      .endomon-cms-container .workspace .panel-buttons .btn-group {
+      .cms-container .workspace .panel-buttons .btn-group {
         float: right; }
-        .endomon-cms-container .workspace .panel-buttons .btn-group .btn {
+        .cms-container .workspace .panel-buttons .btn-group .btn {
           line-height: 20px;
           font-size: 12px;
           text-transform: uppercase;
           font-weight: bold;
           margin-right: 15px;
           width: 110px; }
-          .endomon-cms-container .workspace .panel-buttons .btn-group .btn:last-child {
+          .cms-container .workspace .panel-buttons .btn-group .btn:last-child {
             margin-right: 0px; }
-          .endomon-cms-container .workspace .panel-buttons .btn-group .btn span {
+          .cms-container .workspace .panel-buttons .btn-group .btn span {
             line-height: 20px; }
-            .endomon-cms-container .workspace .panel-buttons .btn-group .btn span.fa {
+            .cms-container .workspace .panel-buttons .btn-group .btn span.fa {
               font-size: 18px; }
-      .endomon-cms-container .workspace .panel-buttons .btn-save .text-saving {
+      .cms-container .workspace .panel-buttons .btn-save .text-saving {
         display: none; }
-      .endomon-cms-container .workspace .panel-buttons .btn-save.saving .text-default {
+      .cms-container .workspace .panel-buttons .btn-save.saving .text-default {
         display: none; }
-      .endomon-cms-container .workspace .panel-buttons .btn-save.saving .text-saving {
+      .cms-container .workspace .panel-buttons .btn-save.saving .text-saving {
         display: inline; }
 
 .json-editor {
@@ -294,7 +301,7 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
         line-height: 60px;
         display: block;
         float: left; }
-        .navbar-main .tab-buttons button span.fa {
+        .navbar-main .tab-buttons button span.fa, .navbar-main .tab-buttons button span.about-logo {
           text-align: center;
           font-size: 20px;
           width: 60px;
@@ -310,28 +317,12 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
     z-index: 5; }
     .navbar-main .tab-panes .pane-container {
       display: none;
-      flex-direction: column; }
+      height: 100%; }
       .navbar-main .tab-panes .pane-container.active {
-        display: flex; }
-      .navbar-main .tab-panes .pane-container .pane-toolbar {
-        height: 30px;
-        display: flex;
-        flex-direction: row; }
-        .navbar-main .tab-panes .pane-container .pane-toolbar button {
-          background-color: #2196f3;
-          display: block;
-          height: 30px;
-          border: 0px;
-          text-align: center;
-          flex-grow: 1;
-          color: #fff;
-          text-transform: uppercase;
-          font-weight: bold; }
-          .navbar-main .tab-panes .pane-container .pane-toolbar button:hover {
-            background-color: #42a5f5; }
+        display: block; }
       .navbar-main .tab-panes .pane-container .pane {
         margin: 0px;
-        flex-grow: 1;
+        height: 100%;
         width: 100%;
         border: none;
         overflow-y: auto; }

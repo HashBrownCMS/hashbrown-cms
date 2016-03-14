@@ -31,8 +31,35 @@ class NavbarMain extends View {
 
                 copiedPage.parentId = parentId;
                     
-                $.post('/api/pages/new/', copiedPage, function(pastedPage) {
-                    reloadResource('pages', function() { view.fetch(); });
+                $.post('/api/pages/new/', copiedPage, function() {
+                    reloadResource('pages', function() {
+                        view.reload();
+                    });
+
+                    view.onClickPastePage = null;
+                });
+            });
+        }
+    }
+
+    /**
+     * Event: Click cut page
+     */
+    onClickCutPage() {
+        let view = this;
+        let id = $('.context-menu-target-element').data('id');
+
+        // This function should only exist if an item has been cut
+        view.onClickPastePage = function onClickPastePage() {
+            let parentId = $('.context-menu-target-element').data('id');
+            
+            $.getJSON('/api/pages/' + id, function(cutPage) {
+                cutPage.parentId = parentId;
+                    
+                $.post('/api/pages/' + id, cutPage, function() {
+                    reloadResource('pages', function() {
+                        view.reload();
+                    });
 
                     view.onClickPastePage = null;
                 });
@@ -46,24 +73,25 @@ class NavbarMain extends View {
     onClickRemovePage() {
         let view = this;
         let id = $('.context-menu-target-element').data('id');
+        let name = $('.context-menu-target-element').data('name');
         
         function onSuccess() {
             console.log('[NavbarMain] Removed page with id "' + id + '"'); 
         
-            // Cancel the PageEditor view, if it was displaying the deleted page
-            if(ViewHelper.get('PageEditor').model.id == id) {
-                location.hash = '/pages/';
-            }
-
             reloadResource('pages', function() {
-                view.fetch();
+                view.reload();
+                
+                // Cancel the PageEditor view, if it was displaying the deleted page
+                if(location.hash == '#/pages/' + id) {
+                    location.hash = '/pages/';
+                }
             });
         }
 
         new MessageModal({
             model: {
                 title: 'Delete page',
-                body: 'Are you sure you want to delete this page?'
+                body: 'Are you sure you want to delete the page "' + name + '"?'
             },
             buttons: [
                 {
@@ -79,7 +107,7 @@ class NavbarMain extends View {
                         $.ajax({
                             url: '/api/pages/' + id,
                             type: 'DELETE',
-                            done: onSuccess
+                            success: onSuccess
                         });
                     }
                 }
@@ -99,7 +127,17 @@ class NavbarMain extends View {
         let $button = _.button({'data-route': params.route}, [
             _.span({class: 'fa fa-' + params.icon}),
             _.span(params.label)
-        ]).click(function() { view.showTab(params.route); });
+        ]).click(function() {
+            let $currentTab = view.$element.find('.pane-container.active');
+
+            if(params.route == $currentTab.attr('data-route')) {
+                location.hash = '/' + params.route + '/';
+            
+            } else {
+                view.showTab(params.route);
+            
+            }
+        });
         
         let $pane = _.div({class: 'pane'},
             _.div({class: 'pane-content'})
@@ -136,6 +174,7 @@ class NavbarMain extends View {
                     }, [
                         _.a({
                             'data-id': id,
+                            'data-name': name,
                             href: '#/' + params.route + '/' + routingPath,
                             class: 'pane-item'
                         }, [
@@ -248,7 +287,9 @@ class NavbarMain extends View {
         let view = this;
        
         let $button = _.button({'data-route': 'about'}, [
-            _.span({class: 'fa fa-question'}),
+            _.span({class: 'about-logo'}, 
+                'E'
+            ),
             _.span('Endomon CMS')
         ]).click(function() { view.showTab('about'); });
         
@@ -329,6 +370,30 @@ class NavbarMain extends View {
     }
 
     /**
+     * Reloads this view
+     */
+    reload() {
+        let $currentTab = this.$element.find('.pane-container.active');
+        let $currentItem = this.$element.find('.pane-container.active .pane-item-container.active');
+
+        this.fetch();
+
+        if($currentTab.length > 0) {
+            let currentTabName = $currentTab.attr('data-route');
+
+            if($currentItem.length > 0) {
+                let currentRoute = $currentItem.attr('data-id') || $currentItem.attr('data-routing-path');
+            
+                this.highlightItem(currentRoute);
+            
+            } else {
+                this.showTab(currentTabName);
+
+            }
+        }
+    }
+    
+    /**
      * Highlights an item
      */
     highlightItem(route) {
@@ -370,12 +435,12 @@ class NavbarMain extends View {
             contextMenu: {
                 'This page': '---',
                 'Rename': function() { view.onClickRenamePage(); },
-                'Remove': function() { view.onClickRemovePage(); },
                 'Copy': function() { view.onClickCopyPage(); },
                 'Cut': function() { view.onClickCutPage(); },
+                'Paste': function() { view.onClickPastePage(); },
+                'Remove': function() { view.onClickRemovePage(); },
                 'General': '---',
-                'Create new page': function() { view.onClickCreateNewPage(); },
-                'Paste page': function() { view.onClickPastePage(); }
+                'Create new': function() { view.onClickCreateNewPage(); }
             }
         });
 

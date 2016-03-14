@@ -61,10 +61,23 @@ class PageEditor extends View {
      * Event: On click remove
      */
     onClickDelete() {
+        let view = this;
+
+        function onSuccess() {
+            console.log('[PageEditor] Removed page with id "' + view.model.id + '"'); 
+        
+            reloadResource('pages', function() {
+                ViewHelper.get('NavbarMain').reload();
+                
+                // Cancel the PageEditor view
+                location.hash = '/pages/';
+            });
+        }
+
         new MessageModal({
             model: {
                 title: 'Delete page',
-                body: 'Are you sure you want to delete this page?'
+                body: 'Are you sure you want to delete the page "' + view.model.title + '"?'
             },
             buttons: [
                 {
@@ -77,6 +90,11 @@ class PageEditor extends View {
                     label: 'OK',
                     class: 'btn-danger',
                     callback: function() {
+                        $.ajax({
+                            url: '/api/pages/' + view.model.id,
+                            type: 'DELETE',
+                            success: onSuccess
+                        });
                     }
                 }
             ]
