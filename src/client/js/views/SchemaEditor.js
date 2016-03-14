@@ -1,3 +1,6 @@
+// Icons
+let icons = require('../icons.json').icons;
+
 /**
  * The editor for schemas
  *
