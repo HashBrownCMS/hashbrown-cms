@@ -45,6 +45,88 @@
             overflow-y: auto;
         }
 
+        .editor {
+            .field-container {
+                display: flex;
+                margin-bottom: 15px;
+
+                .field-key {
+                    width: 200px;
+                    line-height: 30px;
+                }
+
+                .field-value {
+                    flex-grow: 1;
+             
+                    button {
+                        line-height: 20px;
+                        text-transform: uppercase;
+                        font-weight: bold;
+                        padding-left: 30px;
+                        padding-right: 30px;
+                    }
+
+                    input, select, option, textarea, p {
+                        font-size: 14px;
+                    }
+
+                    select {
+                        option {
+                            padding: 5px;
+                        }
+                    }
+
+                    .date-editor {
+                        height: 30px;
+                        
+                        p {
+                            line-height: 30px;
+                            margin: 0px;
+                        }
+                    }
+
+                    .period-editor {
+                        .input-group {
+                            width: 300px;
+                        
+                            input {
+                                text-align: center;
+                            }
+                        }
+
+                        .arrow-middle {
+                            padding: 5px;
+
+                            span {
+                                line-height: 20px;
+                            }
+                        }
+                    }
+
+                    .rich-text-editor {
+                        margin: 0px;
+
+                        .rte-output {
+                            h1, h2, h3, h4, h5, h6 {
+                                &:first-child {
+                                    margin-top: 0px;
+                                }   
+                            }   
+                            
+                            height: 300px;
+                            overflow-y: auto;
+                        }
+
+                        textarea {
+                            height: 200px;
+                            resize: none;
+                            overflow: hidden;
+                        }
+                    }
+                }
+            }
+        }
+
         .panel-danger {
             margin: 0px;    
         }
@@ -61,7 +143,6 @@
 
                 .btn {
                     line-height: 20px;
-                    font-size: 12px;
                     text-transform: uppercase;
                     font-weight: bold;
                     margin-right: 15px;

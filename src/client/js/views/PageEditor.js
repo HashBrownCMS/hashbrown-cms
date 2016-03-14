@@ -11,7 +11,7 @@ class PageEditor extends View {
     constructor(params) {
         super(params);
 
-        this.$element = _.div({class: 'page-editor'});
+        this.$element = _.div({class: 'editor page-editor'});
 
         this.fetch();
     }
@@ -35,8 +35,7 @@ class PageEditor extends View {
                 reloadResource('pages', function() {
                     let navbar = ViewHelper.get('NavbarMain');
 
-                    navbar.fetch();
-                    navbar.highlightItem(view.model.id);
+                    navbar.reload();
                 });
             },
             error: function(err) {
@@ -161,14 +160,14 @@ class PageEditor extends View {
     }
 
     /**
-     * Renders an object
+     * Renders a Page object
      *
      * @param {Object} data
      * @param {Object} schema
      *
      * @return {Object} element
      */
-    renderObject(object, schema) {
+    renderPageObject(object, schema) {
         let view = this;
 
         return _.div({class: 'object'}, [
@@ -224,53 +223,14 @@ class PageEditor extends View {
         ]);
     }
 
-    /**
-     * Gets a schema with parent included recursively
-     *
-     * @param {Number} id
-     *
-     * @return {Object} schema
-     */
-    getSchemaWithParents(id) {
-        let schema = $.extend(true, {}, resources.schemas[id]);
-
-        if(schema) {
-            // Merge parent with current schema
-            // Since the child schema should override any duplicate content, the parent is transformed first, then returned as the resulting schema
-            if(schema.parentSchemaId) {
-                let parentSchema = this.getSchemaWithParents(schema.parentSchemaId);
-
-                for(let k in schema.properties) {
-                   parentSchema.properties[k] = schema.properties[k];
-                }
-                
-                for(let k in schema.tabs) {
-                   parentSchema.tabs[k] = schema.tabs[k];
-                }
-
-                parentSchema.defaultTabId = schema.defaultTabId;
-                parentSchema.icon = schema.icon;
-
-                schema = parentSchema;
-            }
-
-        } else {
-            console.log('No schema with id "' + id + '" available in resources');
-        
-        }
-
-        return schema;
-    }
-
-
     render() {
         let view = this;
 
-        let pageSchema = this.getSchemaWithParents(this.model.schemaId);
+        let pageSchema = getSchemaWithParents(this.model.schemaId);
 
         if(pageSchema) {
             this.$element.html([
-                this.renderObject(this.model, pageSchema).append(
+                this.renderPageObject(this.model, pageSchema).append(
                     _.div({class: 'panel panel-default panel-buttons'}, 
                         _.div({class: 'btn-group'}, [
                             _.button({class: 'btn btn-danger btn-raised'},

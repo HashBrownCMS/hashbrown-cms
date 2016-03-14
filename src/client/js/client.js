@@ -11,7 +11,11 @@ let jade = require('jade');
 let NavbarMain = require('./views/NavbarMain');
 let JSONEditor = require('./views/JSONEditor');
 let PageEditor = require('./views/PageEditor');
+let SchemaEditor = require('./views/SchemaEditor');
 let MediaViewer = require('./views/MediaViewer');
+
+// Helper function
+require('./helpers');
 
 // -----------
 // Ready functions
@@ -117,6 +121,17 @@ Router.route('/pages/json/:id', function() {
 
 // Schema edit
 Router.route('/schemas/:id', function() {
+    let schemaEditor = new SchemaEditor({
+        modelUrl: '/api/schemas/' + this.id
+    });
+    
+    ViewHelper.get('NavbarMain').highlightItem(this.id);
+    
+    $('.workspace').html(schemaEditor.$element);
+});
+
+// Schema edit (JSON editor)
+Router.route('/schemas/json/:id', function() {
     let jsonEditor = new JSONEditor({
         modelUrl: '/api/schemas/' + this.id
     });

@@ -1,0 +1,11 @@
+.schema-editor {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+
+    >.schema {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding: 15px;
+    }
+}

@@ -67,6 +67,8 @@ button, a {
         box-shadow: none;
         border: 0px;
         border-bottom: 2px solid material-color('blue', '500');
+        padding-left: 0px;
+        padding-right: 0px;
     }
 }
 
@@ -94,6 +96,7 @@ button, a {
     border-radius: 0px;
     font-weight: bold;
     text-transform: uppercase;
+    font-size: 12px;
 
     @include set-button-color('primary', 'blue');
     @include set-button-color('danger', 'red');

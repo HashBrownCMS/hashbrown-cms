@@ -207,17 +207,13 @@ class NavbarMain extends View {
                                 queueItem.parentDirAttr = {'data-schema-id': item.parentSchemaId };
 
                             } else {
-                                let schemaType = 'invalid';
                                 let schemaId = parseInt(item.id);
 
-                                if(schemaId < 20000) {
-                                    schemaType = 'Object';
-                                } else if(schemaId < 30000) {
-                                    schemaType = 'Field';
+                                // We only want to create parent directories for fields
+                                if(schemaId >= 20000) {
+                                    queueItem.createDir = true;
+                                    queueItem.parentDirAttr = {'data-schema-type': 'Fields' };
                                 }
-
-                                queueItem.createDir = true;
-                                queueItem.parentDirAttr = {'data-schema-type': schemaType };
                             }
                             break;
                     }
