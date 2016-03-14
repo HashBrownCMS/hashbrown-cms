@@ -140,11 +140,11 @@ class SchemaEditor extends View {
         let view = this;
 
         function onClickBrowse() {
-            $modal.modal('show');
+            $element.find('.modal').modal('show');
         }
 
         function onClickSearch() {
-            let query = $modal.find('input').val();
+            let query = $element.find('.modal input').val();
 
             console.log(query);
         }
@@ -153,7 +153,7 @@ class SchemaEditor extends View {
             _.button({class: 'btn btn-default'},
                 _.span({class: 'fa fa-' + this.model.icon})
             ).click(onClickBrowse),
-            let $modal = _.div({class: 'modal fade'},
+            _.div({class: 'modal fade'},
                 _.div({class: 'modal-dialog'},
                     _.div({class: 'modal-content'},
                         _.div({class: 'modal-body'}, [
