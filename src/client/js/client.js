@@ -1,9 +1,6 @@
 'use strict';
 
 // Libraries
-window.$ = window.jQuery = require('jquery');
-require('bootstrap');
-require('bootstrap-datepicker');
 require('exomon');
 let jade = require('jade');
 

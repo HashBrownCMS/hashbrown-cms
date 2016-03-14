@@ -137,7 +137,50 @@ class SchemaEditor extends View {
      * @return {Object} element
      */
     renderIconEditor() {
-        let $element = _.div({class: 'icon-editor'});
+        let view = this;
+
+        function onClickBrowse() {
+            $modal.modal('show');
+        }
+
+        function onClickSearch() {
+            let query = $modal.find('input').val();
+
+            console.log(query);
+        }
+
+        let $element = _.div({class: 'icon-editor'}, [
+            _.button({class: 'btn btn-default'},
+                _.span({class: 'fa fa-' + this.model.icon})
+            ).click(onClickBrowse),
+            let $modal = _.div({class: 'modal fade'},
+                _.div({class: 'modal-dialog'},
+                    _.div({class: 'modal-content'},
+                        _.div({class: 'modal-body'}, [
+                            _.div({class: 'input-group'}, [
+                                _.input({type: 'text', class: 'form-control'}),
+                                _.div({class: 'input-group-btn'},
+                                    _.button({class: 'btn btn-primary'},
+                                        'Search'
+                                    ).click(onClickSearch)
+                                )
+                            ]),
+                            _.each(icons, function(i, icon) {
+                                function onClickSelect() {
+                                    view.model.icon = icon;
+
+                                    $element.find('.btn-icon-browse .fa').attr('class', 'fa fa-' + icon);
+                                }
+                                
+                                return _.button({class: 'btn btn-default'},
+                                    _.span({class: 'fa fa-' + icon})
+                                ).click(onClickSelect);
+                            })
+                        ])
+                    )
+                )
+            )
+        ]);
         
         return $element;
     }
