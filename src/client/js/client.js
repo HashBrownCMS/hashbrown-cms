@@ -31,8 +31,10 @@ function checkReady() {
 }
 
 // -----------
-// Preload resources
+// Preload resources 
 // -----------
+
+// TODO: Use a queue instead of this horribleness
 let resourcesRequired = 4;
 let resourcesLoaded = 0;
 

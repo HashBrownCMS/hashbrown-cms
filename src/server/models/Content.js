@@ -17,11 +17,14 @@ class Content {
     /**
      * Creates a new Content object
      *
+     * @param {Object} data
+     *
      * @return {Object} content
      */
-    static create() {
-        let content = new Content({});
+    static create(data) {
+        let content = new Content(data || {});
         
+        // Create unique id
         content.data.id = crypto.randomBytes(20).toString('hex');
     
         return content;

@@ -223,8 +223,8 @@ class MongoDB {
      *
      * @return {Promise} promise
      */
-    static createPage() {
-        let page = Page.create();
+    static createPage(data) {
+        let page = Page.create(data);
 
         return MongoDB.insertOne(
             'pages',

@@ -15,9 +15,9 @@ class ApiController extends Controller {
      * Initialises this controller
      */
     static init(app) {
-        app.get('/api/pages/new', ApiController.createPage);
         app.get('/api/pages', ApiController.getPages);
         app.get('/api/pages/:id', ApiController.getPage);
+        app.post('/api/pages/new', ApiController.createPage);
         app.post('/api/pages/:id', ApiController.postPage);
 
         app.get('/api/schemas', ApiController.getSchemas);
@@ -87,7 +87,7 @@ class ApiController extends Controller {
      * @return {Object} Page
      */
     static createPage(req, res) {
-        ContentHelper.createPage()
+        ContentHelper.createPage(req.body)
         .then(function(page) {
             res.send(page);
         });

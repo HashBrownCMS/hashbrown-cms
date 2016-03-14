@@ -13,10 +13,12 @@ class Page extends Content {
     /**
      * Creates a new Page object
      *
+     * @param {Object} data
+     *
      * @return {Page} page
      */
-    static create(){
-        let content = Content.create();
+    static create(data){
+        let content = Content.create(data);
 
         let page = new Page(content.data);
 

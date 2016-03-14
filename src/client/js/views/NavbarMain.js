@@ -13,6 +13,35 @@ class NavbarMain extends View {
     }
 
     /**
+     * Event: Click copy page
+     */
+    onClickCopyPage() {
+        let view = this;
+        let id = $('.context-menu-target-element').data('id');
+
+        // This function should only exist if an item has been copied
+        view.onClickPastePage = function onClickPastePage() {
+            let parentId = $('.context-menu-target-element').data('id');
+            
+            $.getJSON('/api/pages/' + id, function(copiedPage) {
+                console.log('copied  ', copiedPage);
+
+                delete copiedPage['id'];
+
+                copiedPage.parentId = parentId;
+                    
+                $.post('/api/pages/new/', copiedPage, function(pastedPage) {
+                    reloadResource('pages', function() { view.fetch(); });
+
+                    console.log('pasted  ', pastedPage);
+
+                    view.onClickPastePage = null;
+                });
+            });
+        }
+    }
+
+    /**
      * Fetches pane information and renders it
      *
      * @param {String} uri
@@ -30,22 +59,11 @@ class NavbarMain extends View {
             _.div({class: 'pane-content'})
         );
 
-        let $toolbar = _.div({class: 'pane-toolbar', 'data-route': params.route}, [
-           _.button({class: 'pane-toolbar-btn'},
-               'Bleh'
-           ),    
-           _.button({class: 'pane-toolbar-btn'},
-               'Bleh'
-           ),     
-           _.button({class: 'pane-toolbar-btn'},
-               'Bleh'
-           )     
-        ]);
-
         if(params.resource) {
             let items = window.resources[params.resource];
             let sortingQueue = [];
 
+            // Items
             $pane.append(
                 _.each(items, function(i, item) {
                     let id = item.id || i;
@@ -54,15 +72,17 @@ class NavbarMain extends View {
                     let queueItem = {};
                     let icon = item.icon;
 
+                    // Truncate long names
                     if(name.length > 18) {
                         name = name.substring(0, 18) + '...';
                     }
 
-                    // Content
+                    // If this item has a schema id, fetch the appropriate icon
                     if(item.schemaId) {
                         icon = resources.schemas[item.schemaId].icon;
                     }
 
+                    // Item element
                     let $element = _.div({
                         class: 'pane-item-container',
                         'data-routing-path': routingPath,
@@ -79,6 +99,12 @@ class NavbarMain extends View {
                         _.div({class: 'children'})
                     ]);
 
+                    // Attach context menu
+                    if(params.contextMenu) {
+                        $element.find('a').context(params.contextMenu);
+                    }
+
+                    // Specific sorting behaviours for every tab route
                     switch(params.route) {
                         // Pages & sections
                         case 'pages': case 'sections':
@@ -111,8 +137,10 @@ class NavbarMain extends View {
                             break;
                     }
 
+                    // Add element to queue
                     queueItem.$element = $element;
 
+                    // Add queue item to sorting queue
                     sortingQueue.push(queueItem);
 
                     return $element;
@@ -154,10 +182,9 @@ class NavbarMain extends View {
             }
         }
 
-        let $paneContainer = _.div({class: 'pane-container', 'data-route': params.route}, [
-            $toolbar,
+        let $paneContainer = _.div({class: 'pane-container', 'data-route': params.route},
             $pane
-        ]);
+        );
 
         if(this.$element.find('.tab-panes .pane-container').length < 1) {
             $paneContainer.addClass('active');
@@ -278,6 +305,8 @@ class NavbarMain extends View {
     }
 
     render() {
+        let view = this;
+
         this.$element.html([
             _.div({class: 'tab-buttons'}),
             _.div({class: 'tab-panes'})
@@ -291,7 +320,17 @@ class NavbarMain extends View {
             resource: 'pages',
             label: 'Pages',
             route: 'pages',
-            icon: 'file'
+            icon: 'file',
+            contextMenu: {
+                'This page': '---',
+                'Rename': function() { view.onClickRenamePage(); },
+                'Delete': function() { view.onClickDeletePage(); },
+                'Copy': function() { view.onClickCopyPage(); },
+                'Cut': function() { view.onClickCutPage(); },
+                'General': '---',
+                'Create new page': function() { view.onClickCreateNewPage(); },
+                'Paste page': function() { view.onClickPastePage(); }
+            }
         });
 
         this.renderPane({
