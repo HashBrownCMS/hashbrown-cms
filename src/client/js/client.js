@@ -81,6 +81,14 @@ $.getJSON('/api/media', function(media) {
 // -----------
 // Routes
 // -----------
+// Page tab
+Router.route('/pages/', function() {
+    ViewHelper.get('NavbarMain').showTab('pages');
+    
+    // TODO: Nice this up a bit
+    $('.workspace').html('Click on a page');
+});
+
 // Page edit
 Router.route('/pages/:id', function() {
     let pageEditor = new PageEditor({

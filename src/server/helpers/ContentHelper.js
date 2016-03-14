@@ -58,6 +58,20 @@ class ContentHelper {
             callback();   
         });
     }
+    
+    /**
+     * Removes a Page object by id
+     * This method must be overridden by a plugin
+     *
+     * @param {Number} id
+     *
+     * @return {Promise} promise
+     */
+    static removePageById(id) {
+        return new Promise(function(callback) {
+            callback();   
+        });
+    }
 
     /**
      * Creates a new page

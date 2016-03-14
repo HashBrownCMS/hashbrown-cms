@@ -158,6 +158,29 @@ class MongoDB {
     }
     
     /**
+     * Removes a single MongoDB document
+     *
+     * @param {Object} query
+     *
+     * @return {Promise} promise
+     */
+    static removeOne(collectionName, query) {
+        return new Promise(function(callback) {
+            console.log('[MongoDB] Removing document with query ' + JSON.stringify(query) + ' in collection "' + collectionName + '"...');
+        
+            MongoDB.getDatabase().then(function(db) {
+                db.collection(collectionName).remove(query, true, function(findErr) {
+                    if(findErr) {
+                        throw findErr;
+                    }
+
+                    callback();
+                });
+            });
+        });
+    }
+
+    /**
      * Gets all Section objects
      *
      * @return {Promise} promise
@@ -219,7 +242,8 @@ class MongoDB {
 
     /**
      * Creates a new page
-     * This method must be overridden by a plugin
+     *
+     * @param {Object} date
      *
      * @return {Promise} promise
      */
@@ -233,13 +257,31 @@ class MongoDB {
     }
     
     /**
+     * Removes a page
+     *
+     * @param {Number} id
+     *
+     * @return {Promise} promise
+     */
+    static removePageById(id) {
+        return MongoDB.removeOne(
+            'pages',
+            {
+                id: id
+            }
+        );
+    }
+    
+    /**
      * Initialises this plugin
      */
     static init() {
         console.log('[MongoDB] Initialising MongoDB plugin');
 
         // Override ContentHelper methods
+        // TODO: Restructure this to use event handlers instead
         ContentHelper.createPage = MongoDB.createPage;
+        ContentHelper.removePageById = MongoDB.removePageById;
         ContentHelper.getAllPages = MongoDB.getAllPages;
         ContentHelper.getPageById = MongoDB.getPageById;
         ContentHelper.setPageById = MongoDB.setPageById;

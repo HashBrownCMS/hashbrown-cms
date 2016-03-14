@@ -19,6 +19,7 @@ class ApiController extends Controller {
         app.get('/api/pages/:id', ApiController.getPage);
         app.post('/api/pages/new', ApiController.createPage);
         app.post('/api/pages/:id', ApiController.postPage);
+        app.delete('/api/pages/:id', ApiController.deletePage);
 
         app.get('/api/schemas', ApiController.getSchemas);
         app.get('/api/schemas/:id', ApiController.getSchema);
@@ -101,6 +102,18 @@ class ApiController extends Controller {
         let page = req.body;
         
         ContentHelper.setPageById(id, page)
+        .then(function() {
+            res.sendStatus(200);
+        });
+    }
+    
+    /**
+     * Deletes a Page object by id
+     */
+    static deletePage(req, res) {
+        let id = req.params.id;
+        
+        ContentHelper.removePageById(id)
         .then(function() {
             res.sendStatus(200);
         });

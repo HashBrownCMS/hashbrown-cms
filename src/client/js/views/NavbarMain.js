@@ -1,5 +1,8 @@
 'use strict';
 
+// Views
+let MessageModal = require('./MessageModal');
+
 /**
  * The main navbar
  */
@@ -24,8 +27,6 @@ class NavbarMain extends View {
             let parentId = $('.context-menu-target-element').data('id');
             
             $.getJSON('/api/pages/' + id, function(copiedPage) {
-                console.log('copied  ', copiedPage);
-
                 delete copiedPage['id'];
 
                 copiedPage.parentId = parentId;
@@ -33,12 +34,57 @@ class NavbarMain extends View {
                 $.post('/api/pages/new/', copiedPage, function(pastedPage) {
                     reloadResource('pages', function() { view.fetch(); });
 
-                    console.log('pasted  ', pastedPage);
-
                     view.onClickPastePage = null;
                 });
             });
         }
+    }
+
+    /**
+     * Event: Click remove page
+     */
+    onClickRemovePage() {
+        let view = this;
+        let id = $('.context-menu-target-element').data('id');
+        
+        function onSuccess() {
+            console.log('[NavbarMain] Removed page with id "' + id + '"'); 
+        
+            // Cancel the PageEditor view, if it was displaying the deleted page
+            if(ViewHelper.get('PageEditor').model.id == id) {
+                location.hash = '/pages/';
+            }
+
+            reloadResource('pages', function() {
+                view.fetch();
+            });
+        }
+
+        new MessageModal({
+            model: {
+                title: 'Delete page',
+                body: 'Are you sure you want to delete this page?'
+            },
+            buttons: [
+                {
+                    label: 'Cancel',
+                    class: 'btn-default',
+                    callback: function() {
+                    }
+                },
+                {
+                    label: 'OK',
+                    class: 'btn-danger',
+                    callback: function() {
+                        $.ajax({
+                            url: '/api/pages/' + id,
+                            type: 'DELETE',
+                            done: onSuccess
+                        });
+                    }
+                }
+            ]
+        });
     }
 
     /**
@@ -324,7 +370,7 @@ class NavbarMain extends View {
             contextMenu: {
                 'This page': '---',
                 'Rename': function() { view.onClickRenamePage(); },
-                'Delete': function() { view.onClickDeletePage(); },
+                'Remove': function() { view.onClickRemovePage(); },
                 'Copy': function() { view.onClickCopyPage(); },
                 'Cut': function() { view.onClickCutPage(); },
                 'General': '---',
