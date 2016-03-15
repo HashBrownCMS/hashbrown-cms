@@ -2,26 +2,25 @@
 
 // Libs
 let multer = require('multer');
-let storage = multer.diskStorage({
-    destination: function(req, file, cb) {
-        cb(null, appRoot + '/storage/temp/');
-    },
-    filename: function(req, file, cb) {
-        let split = file.originalname.split('.');
-        let name = split[0];
-        let extension = split[1];
-
-        name = name.replace(/\W+/g, '-').toLowerCase() + Date.now();
-       
-        if(extension) {
-            name += '.' + extension;
-        }
-
-        cb(null, name);
-    }
-});
 let uploadMedia = multer({
-    storage: storage
+    storage: multer.diskStorage({
+        destination: function(req, file, cb) {
+            cb(null, appRoot + '/storage/temp/');
+        },
+        filename: function(req, file, cb) {
+            let split = file.originalname.split('.');
+            let name = split[0];
+            let extension = split[1];
+
+            name = name.replace(/\W+/g, '-').toLowerCase();
+           
+            if(extension) {
+                name += '.' + extension;
+            }
+
+            cb(null, name);
+        }
+    })
 });
 
 // Models
@@ -58,6 +57,7 @@ class ApiController extends Controller {
         app.get('/api/media', ApiController.getMedia);
         app.post('/api/media/new', uploadMedia.single('media'), ApiController.createMedia);
         app.post('/api/media/:id', uploadMedia.single('media'), ApiController.setMedia);
+        app.delete('/api/media/:id', ApiController.deleteMedia);
         
         app.get('/scripts/editors.js', ApiController.getEditors);
     }
@@ -72,6 +72,18 @@ class ApiController extends Controller {
         }); 
     }
     
+    /**
+     * Deletes a Media object
+     */
+    static deleteMedia(req, res) {
+        let id = req.params.id;
+
+        MediaHelper.removeMedia(id)
+        .then(function() {
+            res.sendStatus(200);
+        });
+    }
+
     /**
      * Sets a Media object
      */

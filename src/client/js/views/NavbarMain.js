@@ -68,6 +68,19 @@ class NavbarMain extends View {
     }
 
     /**
+     * Event: Click new page
+     */
+    onClickNewPage() {
+        let view = this;
+
+        $.post('/api/pages/new/', function() {
+            reloadResource('pages', function() {
+                view.reload();
+            });
+        });
+    }
+
+    /**
      * Event: Click remove page
      */
     onClickRemovePage() {
@@ -81,7 +94,7 @@ class NavbarMain extends View {
             reloadResource('pages', function() {
                 view.reload();
                 
-                // Cancel the PageEditor view, if it was displaying the deleted page
+                // Cancel the PageEditor view if it was displaying the deleted page
                 if(location.hash == '#/pages/' + id) {
                     location.hash = '/pages/';
                 }
@@ -106,6 +119,54 @@ class NavbarMain extends View {
                     callback: function() {
                         $.ajax({
                             url: '/api/pages/' + id,
+                            type: 'DELETE',
+                            success: onSuccess
+                        });
+                    }
+                }
+            ]
+        });
+    }
+
+    /**
+     * Event: Click remove media
+     */
+    onClickRemoveMedia() {
+        let view = this;
+        let id = $('.context-menu-target-element').data('id');
+        let name = $('.context-menu-target-element').data('name');
+        
+        function onSuccess() {
+            console.log('[NavbarMain] Removed media with id "' + id + '"'); 
+        
+            reloadResource('media', function() {
+                view.reload();
+                
+                // Cancel the MediaViever view if it was displaying the deleted object
+                if(location.hash == '#/media/' + id) {
+                    location.hash = '/media/';
+                }
+            });
+        }
+
+        new MessageModal({
+            model: {
+                title: 'Delete media',
+                body: 'Are you sure you want to delete the media object "' + name + '"?'
+            },
+            buttons: [
+                {
+                    label: 'Cancel',
+                    class: 'btn-default',
+                    callback: function() {
+                    }
+                },
+                {
+                    label: 'OK',
+                    class: 'btn-danger',
+                    callback: function() {
+                        $.ajax({
+                            url: '/api/media/' + id,
                             type: 'DELETE',
                             success: onSuccess
                         });
@@ -168,7 +229,9 @@ class NavbarMain extends View {
             $uploadModal.find('form').submit();
         }
 
-        function onSubmit() {
+        function onSubmit(e) {
+            e.preventDefault();
+
             $uploadModal.find('.spinner-container').toggleClass('hidden', false);
             
             $.ajax({
@@ -182,8 +245,12 @@ class NavbarMain extends View {
 
                     let navbar = ViewHelper.get('NavbarMain')
                 
-                    navbar.reload();
-                    location = '/#/media/' + id;
+                    reloadResource('media', function() {
+                        navbar.reload();
+                        location.hash = '/media/' + id;
+
+                        $uploadModal.modal('hide');
+                    });
                 }
             });
         }
@@ -258,6 +325,11 @@ class NavbarMain extends View {
             let items = window.resources[params.resource];
             let sortingQueue = [];
 
+            // Attach item context menu
+            if(params.paneContextMenu) {
+                $pane.context(params.paneContextMenu);
+            }
+
             // Items
             $pane.append(
                 _.each(items, function(i, item) {
@@ -295,9 +367,9 @@ class NavbarMain extends View {
                         _.div({class: 'children'})
                     ]);
 
-                    // Attach context menu
-                    if(params.contextMenu) {
-                        $element.find('a').context(params.contextMenu);
+                    // Attach item context menu
+                    if(params.itemContextMenu) {
+                        $element.find('a').context(params.itemContextMenu);
                     }
 
                     // Specific sorting behaviours for every tab route
@@ -539,15 +611,17 @@ class NavbarMain extends View {
             label: 'Pages',
             route: 'pages',
             icon: 'file',
-            contextMenu: {
+            itemContextMenu: {
                 'This page': '---',
                 'Rename': function() { view.onClickRenamePage(); },
                 'Copy': function() { view.onClickCopyPage(); },
                 'Cut': function() { view.onClickCutPage(); },
                 'Paste': function() { view.onClickPastePage(); },
-                'Remove': function() { view.onClickRemovePage(); },
+                'Remove': function() { view.onClickRemovePage(); }
+            },
+            paneContextMenu: {
                 'General': '---',
-                'Create new': function() { view.onClickCreateNewPage(); }
+                'Create new': function() { view.onClickNewPage(); }
             }
         });
 
@@ -563,8 +637,11 @@ class NavbarMain extends View {
             label: 'Media',
             route: 'media',
             icon: 'file-image-o',
-            contextMenu: {
+            itemContextMenu: {
                 'This media': '---',
+                'Remove': function() { view.onClickRemoveMedia(); }
+            },
+            paneContextMenu: {
                 'General': '---',
                 'Upload new media': function() { view.onClickUploadMedia(); }
             }

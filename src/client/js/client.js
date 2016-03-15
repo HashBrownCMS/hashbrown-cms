@@ -82,7 +82,7 @@ $.getJSON('/api/media', function(media) {
 // -----------
 // Routes
 // -----------
-// Page tab
+// Page dashboard
 Router.route('/pages/', function() {
     ViewHelper.get('NavbarMain').showTab('pages');
     
@@ -139,14 +139,26 @@ Router.route('/schemas/json/:id', function() {
 });
 
 // Media preview
-Router.route('/media/:url', function() {
+Router.route('/media/:id', function() {
     let mediaViewer = new MediaViewer({
-        mediaPath: '/media/' + this.url
+        mediaId: this.id
     });
     
-    ViewHelper.get('NavbarMain').highlightItem(this.url);
+    ViewHelper.get('NavbarMain').highlightItem(this.id);
     
     $('.workspace').html(mediaViewer.$element);
+});
+
+// Media dashboard
+Router.route('/media/', function() {
+    ViewHelper.get('NavbarMain').showTab('media');
+    
+    $('.workspace').html(
+        _.div({class: 'dashboard-container'}, [
+            _.h1('Media dashboard'),
+            _.p('Please click on a media object to proceed')
+        ])
+    );
 });
 
 // ----------

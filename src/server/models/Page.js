@@ -26,6 +26,8 @@ class Page extends Content {
         page.data.updateDate = Date.now();
         page.data.schemaId = page.data.schemaId || '10000';
 
+        page.data.title = 'New page';
+
         return page;
     }
 }

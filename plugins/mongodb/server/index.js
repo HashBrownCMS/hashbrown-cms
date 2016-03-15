@@ -250,8 +250,6 @@ class MongoDB {
     static createPage(data) {
         let page = Page.create(data);
 
-        console.log(page);
-            
         return MongoDB.insertOne(
             'pages',
             page.data

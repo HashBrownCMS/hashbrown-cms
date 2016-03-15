@@ -36,7 +36,9 @@ function ready() {
 // ----------
 let ApiController = require(appRoot + '/src/server/controllers/ApiController');
 let PluginController = require(appRoot + '/src/server/controllers/PluginController');
+let MediaController = require(appRoot + '/src/server/controllers/MediaController');
 
+MediaController.init(app);
 ApiController.init(app);
 PluginController.init()
     .then(ready);

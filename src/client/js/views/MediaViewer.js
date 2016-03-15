@@ -42,12 +42,12 @@ class MediaViewer extends View {
         this.$element = _.div({class: 'media-viewer panel panel-default'}, [ 
             _.div({class: 'panel-heading'},
                 _.h4({class: 'panel-title'},
-                    this.mediaPath
+                    this.mediaId
                 )
             ),
             _.div({class: 'panel-body'},
                 function() {
-                    return _.img({class: 'img-responsive', src: view.mediaPath})                    
+                    return _.img({class: 'img-responsive', src: '/media/' + view.mediaId})                    
                 }()
             ),
             _.div({class: 'panel-footer'},
