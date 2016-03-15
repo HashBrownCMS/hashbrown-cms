@@ -296,8 +296,7 @@ class NavbarMain extends View {
     /**
      * Fetches pane information and renders it
      *
-     * @param {String} uri
-     * @param {String} name
+     * @param {Object} params
      */
     renderPane(params) {
         let view = this;
@@ -321,127 +320,101 @@ class NavbarMain extends View {
             _.div({class: 'pane-content'})
         );
 
-        if(params.resource) {
-            let items = window.resources[params.resource];
-            let sortingQueue = [];
+        let items = params.items;
+        let sortingQueue = [];
 
-            // Attach item context menu
-            if(params.paneContextMenu) {
-                $pane.context(params.paneContextMenu);
-            }
+        // Attach item context menu
+        if(params.paneContextMenu) {
+            $pane.context(params.paneContextMenu);
+        }
 
-            // Items
-            $pane.append(
-                _.each(items, function(i, item) {
-                    let id = item.id || i;
-                    let name = item.title || item.name || id;
-                    let routingPath = item.shortPath || item.path || id;
-                    let queueItem = {};
-                    let icon = item.icon;
+        // Items
+        $pane.append(
+            _.each(items, function(i, item) {
+                let id = item.id || i;
+                let name = item.title || item.name || id;
+                let routingPath = item.shortPath || item.path || id;
+                let queueItem = {};
+                let icon = item.icon;
 
-                    // Truncate long names
-                    if(name.length > 18) {
-                        name = name.substring(0, 18) + '...';
-                    }
+                // Truncate long names
+                if(name.length > 18) {
+                    name = name.substring(0, 18) + '...';
+                }
 
-                    // If this item has a schema id, fetch the appropriate icon
-                    if(item.schemaId) {
-                        icon = resources.schemas[item.schemaId].icon;
-                    }
+                // If this item has a schema id, fetch the appropriate icon
+                if(item.schemaId) {
+                    icon = resources.schemas[item.schemaId].icon;
+                }
 
-                    // Item element
-                    let $element = _.div({
-                        class: 'pane-item-container',
-                        'data-routing-path': routingPath,
-                        draggable: true
+                // Item element
+                let $element = _.div({
+                    class: 'pane-item-container',
+                    'data-routing-path': routingPath,
+                    draggable: true
+                }, [
+                    _.a({
+                        'data-id': id,
+                        'data-name': name,
+                        href: '#/' + params.route + '/' + routingPath,
+                        class: 'pane-item'
                     }, [
+                        icon ? _.span({class: 'fa fa-' + icon}) : null,
+                        _.span(name)
+                    ]),
+                    _.div({class: 'children'})
+                ]);
+
+                // Attach item context menu
+                if(params.itemContextMenu) {
+                    $element.find('a').context(params.itemContextMenu);
+                }
+                
+                // Add element to queue item
+                queueItem.$element = $element;
+
+                // Use specific sorting behaviours
+                if(params.sort) {
+                    params.sort(item, queueItem);
+                }
+
+                // Add queue item to sorting queue
+                sortingQueue.push(queueItem);
+
+                return $element;
+            })
+        );
+
+        // Sort items into hierarchy
+        for(let queueItem of sortingQueue) {
+            if(queueItem.parentDirAttr) { 
+                // Find parent item
+                let parentDirAttrKey = Object.keys(queueItem.parentDirAttr)[0];
+                let parentDirAttrValue = queueItem.parentDirAttr[parentDirAttrKey];
+                let parentDirSelector = '.pane-item-container[' + parentDirAttrKey + '="' + parentDirAttrValue + '"]';
+                let $parentDir = $pane.find(parentDirSelector);
+          
+                if($parentDir.length > 0) {
+                    $parentDir.children('.children').append(queueItem.$element);
+                
+                // Create parent item
+                } else if(queueItem.createDir) {
+                    $parentDir = _.div({class: 'pane-item-container'}, [
                         _.a({
-                            'data-id': id,
-                            'data-name': name,
-                            href: '#/' + params.route + '/' + routingPath,
                             class: 'pane-item'
                         }, [
-                            icon ? _.span({class: 'fa fa-' + icon}) : null,
-                            _.span(name)
+                            _.span({class: 'fa fa-folder'}),
+                            _.span(parentDirAttrValue)
                         ]),
                         _.div({class: 'children'})
                     ]);
-
-                    // Attach item context menu
-                    if(params.itemContextMenu) {
-                        $element.find('a').context(params.itemContextMenu);
-                    }
-
-                    // Specific sorting behaviours for every tab route
-                    switch(params.route) {
-                        // Pages & sections
-                        case 'pages': case 'sections':
-                            $element.attr('data-content-id', item.id);
-                           
-                            queueItem.parentDirAttr = {'data-content-id': item.parentId };
-                            
-                            break;
-
-                        // Schema
-                        case 'schemas':
-                            $element.attr('data-schema-id', item.id);
-                            
-                            if(item.parentSchemaId) {
-                                queueItem.parentDirAttr = {'data-schema-id': item.parentSchemaId };
-
-                            } else {
-                                let schemaId = parseInt(item.id);
-
-                                // We only want to create parent directories for fields
-                                if(schemaId >= 20000) {
-                                    queueItem.createDir = true;
-                                    queueItem.parentDirAttr = {'data-schema-type': 'Fields' };
-                                }
-                            }
-                            break;
-                    }
-
-                    // Add element to queue
-                    queueItem.$element = $element;
-
-                    // Add queue item to sorting queue
-                    sortingQueue.push(queueItem);
-
-                    return $element;
-                })
-            );
-
-            // Sort items into hierarchy
-            for(let queueItem of sortingQueue) {
-                if(queueItem.parentDirAttr) { 
-                    // Find parent item
-                    let parentDirAttrKey = Object.keys(queueItem.parentDirAttr)[0];
-                    let parentDirAttrValue = queueItem.parentDirAttr[parentDirAttrKey];
-                    let parentDirSelector = '.pane-item-container[' + parentDirAttrKey + '="' + parentDirAttrValue + '"]';
-                    let $parentDir = $pane.find(parentDirSelector);
-              
-                    if($parentDir.length > 0) {
-                        $parentDir.children('.children').append(queueItem.$element);
                     
-                    // Create parent item
-                    } else if(queueItem.createDir) {
-                        $parentDir = _.div({class: 'pane-item-container'}, [
-                            _.a({
-                                class: 'pane-item'
-                            }, [
-                                _.span({class: 'fa fa-folder'}),
-                                _.span(parentDirAttrValue)
-                            ]),
-                            _.div({class: 'children'})
-                        ]);
-                        
-                        $parentDir.attr(parentDirAttrKey, parentDirAttrValue);
+                    $parentDir.attr(parentDirAttrKey, parentDirAttrValue);
 
-                        // TODO: Append to correct parent
-                        $pane.append($parentDir); 
-                        
-                        $parentDir.children('.children').append(queueItem.$element);
-                    }
+                    // TODO: Append to correct parent
+                    $pane.append($parentDir); 
+                    
+                    $parentDir.children('.children').append(queueItem.$element);
                 }
             }
         }
@@ -607,10 +580,10 @@ class NavbarMain extends View {
         this.renderAboutPane();
 
         this.renderPane({
-            resource: 'pages',
             label: 'Pages',
             route: 'pages',
             icon: 'file',
+            items: resources.pages,
             itemContextMenu: {
                 'This page': '---',
                 'Rename': function() { view.onClickRenamePage(); },
@@ -622,21 +595,30 @@ class NavbarMain extends View {
             paneContextMenu: {
                 'General': '---',
                 'Create new': function() { view.onClickNewPage(); }
+            },
+            sort: function(item, queueItem) {
+                queueItem.$element.attr('data-content-id', item.id);
+                queueItem.parentDirAttr = {'data-content-id': item.parentId };
             }
         });
 
         this.renderPane({
-            resource: 'sections',
             label: 'Sections',
             route: 'sections',
-            icon: 'th'
+            icon: 'th',
+            items: resources.sections,
+            sort: function(item, queueItem) {
+                queueItem.$element.attr('data-content-id', item.id);
+                queueItem.parentDirAttr = {'data-content-id': item.parentId };
+            }
+
         });
         
         this.renderPane({
-            resource: 'media',
             label: 'Media',
             route: 'media',
             icon: 'file-image-o',
+            items: resources.media,
             itemContextMenu: {
                 'This media': '---',
                 'Remove': function() { view.onClickRemoveMedia(); }
@@ -648,10 +630,26 @@ class NavbarMain extends View {
         });
         
         this.renderPane({
-            resource: 'schemas',
             label: 'Schemas',
             route: 'schemas',
-            icon: 'gears'
+            icon: 'gears',
+            items: resources.schemas,
+            sort: function(item, queueItem) {
+                queueItem.$element.attr('data-schema-id', item.id);
+                
+                if(item.parentSchemaId) {
+                    queueItem.parentDirAttr = {'data-schema-id': item.parentSchemaId };
+
+                } else {
+                    let schemaId = parseInt(item.id);
+
+                    // We only want to create parent directories for fields
+                    if(schemaId >= 20000) {
+                        queueItem.createDir = true;
+                        queueItem.parentDirAttr = {'data-schema-type': 'Fields'};
+                    }
+                }
+            }
         });
 
         this.renderSettingsPane();
