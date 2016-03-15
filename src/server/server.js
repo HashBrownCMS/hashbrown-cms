@@ -17,12 +17,10 @@ Promise.onPossiblyUnhandledRejection(function(error){
 let app = express();
 
 app.set('view engine', 'jade');
+app.set('views', appRoot + '/src/server/views');
 
-app.use(bodyparser.urlencoded({ extended: true }));
+app.use(bodyparser.urlencoded({ extended: true }))
 app.use(express.static(appRoot + '/public'));
-app.use('/media', express.static(appRoot + '/media'));
-
-
 
 // ----------
 // Ready callback

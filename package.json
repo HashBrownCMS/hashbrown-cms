@@ -33,6 +33,7 @@
     "jade": "^1.11.0",
     "jsonschema": "^1.1.0",
     "mongodb": "^2.1.7",
+    "multer": "^1.1.0",
     "octokat": "^0.4.15",
     "restler": "^3.4.0",
     "yamljs": "^0.2.4"

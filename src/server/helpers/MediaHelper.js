@@ -3,6 +3,7 @@
 // Lib
 let glob = require('glob');
 let path = require('path');
+let fs = require('fs');
 
 // Promise
 let Promise = require('bluebird');
@@ -15,22 +16,43 @@ class MediaHelper {
      */
     static getAllMedia() {
         return new Promise(function(callback) {
-            glob(appRoot + '/media/**/*', function(err, paths) {
+            glob(appRoot + '/public/media/*', function(err, paths) {
                 let list = [];
-
+                
                 for(let i in paths) {
-                    let thisPath = paths[i].replace(appRoot, '')
-                    let shortPath = thisPath.replace('/media/', '');
-
+                    let id = path.basename(paths[i]);
+                
                     list[list.length] = {
-                        name: path.basename(shortPath),
-                        shortPath: shortPath,
-                        path: thisPath,
-                        id: 80000 + i
+                        id: id
                     };
                 }
                                        
                 callback(list);
+            });
+        });
+    }
+
+    /**
+     * Sets a Media object
+     *
+     * @param {Number} id
+     * @param {Object} file
+     *
+     * @return {Promise} promise
+     */
+    static setMediaData(id, file) {
+        return new Promise(function(callback) {
+            let oldPath = file.path;
+            let name = path.basename(oldPath);
+            let newPath = appRoot + '/storage/media/' + name;
+            let linkPath = appRoot + '/public/media/' + id;
+
+            console.log('[MediaHelper] Setting media data at "' + newPath + '" for id "' + id + '"...');
+
+            fs.rename(oldPath, newPath, function() {
+                fs.symlink(newPath, linkPath, function() {
+                    callback();
+                });
             });
         });
     }

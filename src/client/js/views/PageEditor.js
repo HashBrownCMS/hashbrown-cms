@@ -35,6 +35,7 @@ class PageEditor extends View {
                 reloadResource('pages', function() {
                     let navbar = ViewHelper.get('NavbarMain');
 
+                    view.reload();
                     navbar.reload();
                 });
             },
@@ -98,6 +99,15 @@ class PageEditor extends View {
                 }
             ]
         });
+    }
+
+    /**
+     * Reload this view
+     */
+    reload() {
+        this.model = null;
+        
+        this.fetch();
     }
 
     /**

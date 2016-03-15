@@ -116,6 +116,117 @@ class NavbarMain extends View {
     }
 
     /**
+     * Event: Click upload media
+     */
+    onClickUploadMedia() {
+        let view = this;
+
+        function onChangeFile() {
+            let input = $(this);
+            let numFiles = this.files ? this.files.length : 1;
+            
+            if(numFiles > 0) {
+                let file = this.files[0];
+
+                let isImage =
+                    file.type == 'image/png' ||
+                    file.type == 'image/jpeg' ||
+                    file.type == 'image/gif';
+
+                let isVideo =
+                    file.type == 'video/mpeg' ||
+                    file.type == 'video/mp4' ||
+                    file.type == 'video/quicktime' ||
+                    file.type == 'video/x-matroska';
+
+                let reader = new FileReader();
+
+                reader.onload = function(e) {
+                    if(isImage) {
+                        $uploadModal.find('.media-preview').html(
+                            _.img({src: e.target.result })
+                        );
+                    }
+
+                    if(isVideo) {
+                        $uploadModal.find('.media-preview').html(
+                            _.video({src: e.target.result })
+                        );
+                    }
+
+                    $uploadModal.find('.spinner-container').toggleClass('hidden', true);
+                }
+                        
+                $uploadModal.find('.spinner-container').toggleClass('hidden', false);
+
+                reader.readAsDataURL(file);
+                console.log('Reading data of file type ' + file.type + '...');
+            }
+        }
+        
+        function onClickUpload() {
+            $uploadModal.find('form').submit();
+        }
+
+        function onSubmit() {
+            $uploadModal.find('.spinner-container').toggleClass('hidden', false);
+            
+            $.ajax({
+                url: '/api/media/new',
+                type: 'POST',
+                data: new FormData(this),
+                processData: false,
+                contentType: false,
+                success: function(id) {
+                    $uploadModal.find('.spinner-container').toggleClass('hidden', true);
+
+                    let navbar = ViewHelper.get('NavbarMain')
+                
+                    navbar.reload();
+                    location = '/#/media/' + id;
+                }
+            });
+        }
+
+        let $uploadModal = _.div({class: 'modal modal-upload-media fade'},
+            _.div({class: 'modal-dialog'},
+                _.div({class: 'modal-content'}, [
+                    _.div({class: 'modal-header'},
+                        _.h4({class: 'modal-title'}, 'Upload a file')
+                    ),
+                    _.div({class: 'modal-body'}, [
+                        _.div({class: 'spinner-container hidden'},
+                            _.span({class: 'spinner fa fa-refresh'})
+                        ),
+                        _.div({class: 'media-preview'})
+                    ]),
+                    _.div({class: 'modal-footer'}, [
+                        _.div({class: 'input-group'}, [
+                            _.form({class: 'form-control'},
+                                _.input({type: 'file', name: 'media'})
+                                    .change(onChangeFile)
+                            ).submit(onSubmit),
+                            _.div({class: 'input-group-btn'},
+                                _.button({class: 'btn btn-success'},
+                                    'Upload'
+                                ).click(onClickUpload)
+                            )
+                        ])
+                    ])
+                ])
+            )
+        );
+
+        $uploadModal.on('hidden.bs.modal', function() {
+            $uploadModal.remove();
+        });
+
+        $('body').append($uploadModal);
+
+        $uploadModal.modal('show');
+    }
+
+    /**
      * Fetches pane information and renders it
      *
      * @param {String} uri
@@ -451,7 +562,12 @@ class NavbarMain extends View {
             resource: 'media',
             label: 'Media',
             route: 'media',
-            icon: 'file-image-o'
+            icon: 'file-image-o',
+            contextMenu: {
+                'This media': '---',
+                'General': '---',
+                'Upload new media': function() { view.onClickUploadMedia(); }
+            }
         });
         
         this.renderPane({
