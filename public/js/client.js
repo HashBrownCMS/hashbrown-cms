@@ -2827,13 +2827,13 @@ var resourcesRequired=4;var resourcesLoaded=0;window.reloadResource=function rel
 // Routes
 // -----------
 // Page dashboard
-Router.route('/pages/',function(){ViewHelper.get('NavbarMain').showTab('pages');$('.workspace').html(_.div({class:'dashboard-container'},[_.h1('Pages dashboard'),_.p('Please click on a page to proceed')]));}); // Page edit
+Router.route('/pages/',function(){ViewHelper.get('NavbarMain').showTab('/pages/');$('.workspace').html(_.div({class:'dashboard-container'},[_.h1('Pages dashboard'),_.p('Please click on a page to proceed')]));}); // Page edit
 Router.route('/pages/:id',function(){var pageEditor=new PageEditor({modelUrl:'/api/pages/'+this.id});ViewHelper.get('NavbarMain').highlightItem(this.id);$('.workspace').html(pageEditor.$element);}); // Page edit (JSON editor)
 Router.route('/pages/json/:id',function(){var pageEditor=new JSONEditor({modelUrl:'/api/pages/'+this.id});ViewHelper.get('NavbarMain').highlightItem(this.id);$('.workspace').html(pageEditor.$element);}); // Schema edit
 Router.route('/schemas/:id',function(){var schemaEditor=new SchemaEditor({modelUrl:'/api/schemas/'+this.id});ViewHelper.get('NavbarMain').highlightItem(this.id);$('.workspace').html(schemaEditor.$element);}); // Schema edit (JSON editor)
 Router.route('/schemas/json/:id',function(){var jsonEditor=new JSONEditor({modelUrl:'/api/schemas/'+this.id});ViewHelper.get('NavbarMain').highlightItem(this.id);$('.workspace').html(jsonEditor.$element);}); // Media preview
 Router.route('/media/:id',function(){var mediaViewer=new MediaViewer({mediaId:this.id});ViewHelper.get('NavbarMain').highlightItem(this.id);$('.workspace').html(mediaViewer.$element);}); // Media dashboard
-Router.route('/media/',function(){ViewHelper.get('NavbarMain').showTab('media');$('.workspace').html(_.div({class:'dashboard-container'},[_.h1('Media dashboard'),_.p('Please click on a media object to proceed')]));}); // ----------
+Router.route('/media/',function(){ViewHelper.get('NavbarMain').showTab('/media/');$('.workspace').html(_.div({class:'dashboard-container'},[_.h1('Media dashboard'),_.p('Please click on a media object to proceed')]));}); // ----------
 // Init
 // ----------
 onReady(function(){new NavbarMain();Router.init();});},{"./helpers":50,"./views/JSONEditor":52,"./views/MediaViewer":53,"./views/NavbarMain":55,"./views/PageEditor":56,"./views/SchemaEditor":57,"exomon":11,"jade":16}],50:[function(require,module,exports){ /**

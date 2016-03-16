@@ -4,6 +4,7 @@
 let glob = require('glob');
 let path = require('path');
 let fs = require('fs');
+let rimraf = require('rimraf');
 
 // Promise
 let Promise = require('bluebird');
@@ -109,7 +110,7 @@ class MediaHelper {
      */
     static removeMedia(id) {
         return new Promise(function(callback) {
-            fs.unlink(appRoot + '/' + id, function(err) {
+            rimraf(appRoot + '/storage/media/' + id, function(err) {
                 if(err) {
                     throw err;
                 }

@@ -84,7 +84,7 @@ $.getJSON('/api/media', function(media) {
 // -----------
 // Page dashboard
 Router.route('/pages/', function() {
-    ViewHelper.get('NavbarMain').showTab('pages');
+    ViewHelper.get('NavbarMain').showTab('/pages/');
     
     $('.workspace').html(
         _.div({class: 'dashboard-container'}, [
@@ -151,7 +151,7 @@ Router.route('/media/:id', function() {
 
 // Media dashboard
 Router.route('/media/', function() {
-    ViewHelper.get('NavbarMain').showTab('media');
+    ViewHelper.get('NavbarMain').showTab('/media/');
     
     $('.workspace').html(
         _.div({class: 'dashboard-container'}, [
