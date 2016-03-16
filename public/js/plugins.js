@@ -23,28 +23,19 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 })({ 1: [function (require, module, exports) {
         'use strict';
 
-        /**
-         * A simple string editor
-         */
+        var DateEditor = function (_View) {
+            _inherits(DateEditor, _View);
 
-        var StringEditor = function (_View) {
-            _inherits(StringEditor, _View);
+            function DateEditor(params) {
+                _classCallCheck(this, DateEditor);
 
-            function StringEditor(params) {
-                _classCallCheck(this, StringEditor);
-
-                var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(StringEditor).call(this, params));
+                var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(DateEditor).call(this, params));
 
                 _this.init();
                 return _this;
             }
 
-            /**
-             * Event: Change
-             */
-
-
-            _createClass(StringEditor, [{
+            _createClass(DateEditor, [{
                 key: "onChange",
                 value: function onChange() {
                     this.trigger('change', this.$input.val());
@@ -54,17 +45,181 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 value: function render() {
                     var editor = this;
 
-                    // Main element
-                    this.$element = _.div({ class: 'field-editor string-editor' }, this.$input = _.input({ class: 'form-control', value: this.value }).bind('change propertychange paste keyup', function () {
-                        editor.onChange();
-                    }));
+                    var date = new Date(this.value);
+
+                    this.$element = _.div({ class: 'field-editor date-editor' }, this.disabled ? _.p({}, date) : this.$input = _.input({ class: 'form-control', type: 'text', value: this.value }));
+
+                    if (this.$input) {
+                        this.$input.datepicker();
+
+                        this.$input.on('changeDate', function () {
+                            editor.onChange();
+                        });
+                    }
                 }
             }]);
 
-            return StringEditor;
+            return DateEditor;
         }(View);
 
-        resources.editors['20000'] = StringEditor;
+        resources.editors['20002'] = DateEditor;
+    }, {}] }, {}, [1]);
+"use strict";
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+(function e(t, n, r) {
+    function s(o, u) {
+        if (!n[o]) {
+            if (!t[o]) {
+                var a = typeof require == "function" && require;if (!u && a) return a(o, !0);if (i) return i(o, !0);throw new Error("Cannot find module '" + o + "'");
+            }var f = n[o] = { exports: {} };t[o][0].call(f.exports, function (e) {
+                var n = t[o][1][e];return s(n ? n : e);
+            }, f, f.exports, e, t, n, r);
+        }return n[o].exports;
+    }var i = typeof require == "function" && require;for (var o = 0; o < r.length; o++) {
+        s(r[o]);
+    }return s;
+})({ 1: [function (require, module, exports) {
+        'use strict';
+
+        var PageReferenceEditor = function (_View) {
+            _inherits(PageReferenceEditor, _View);
+
+            function PageReferenceEditor(params) {
+                _classCallCheck(this, PageReferenceEditor);
+
+                var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(PageReferenceEditor).call(this, params));
+
+                _this.init();
+                return _this;
+            }
+
+            _createClass(PageReferenceEditor, [{
+                key: "onChange",
+                value: function onChange() {
+                    this.trigger('change', this.$select.val());
+                }
+            }, {
+                key: "render",
+                value: function render() {
+                    var editor = this;
+
+                    this.$element = _.div({ class: 'field-editor input-group page-reference-editor' }, [this.$select = _.select({ class: 'form-control' }, _.each(window.resources.pages, function (id, page) {
+                        return _.option({ value: page.id }, page.title);
+                    })).change(function () {
+                        editor.onChange();
+                    }), _.div({ class: 'input-group-btn' }, this.$clearBtn = _.button({ class: 'btn btn-primary' }, 'Clear'))]);
+
+                    this.$select.val(editor.value);
+
+                    this.$clearBtn.click(function () {
+                        editor.$select.val(null);
+
+                        editor.onChange();
+                    });
+                }
+            }]);
+
+            return PageReferenceEditor;
+        }(View);
+
+        resources.editors['20006'] = PageReferenceEditor;
+    }, {}] }, {}, [1]);
+"use strict";
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+(function e(t, n, r) {
+    function s(o, u) {
+        if (!n[o]) {
+            if (!t[o]) {
+                var a = typeof require == "function" && require;if (!u && a) return a(o, !0);if (i) return i(o, !0);throw new Error("Cannot find module '" + o + "'");
+            }var f = n[o] = { exports: {} };t[o][0].call(f.exports, function (e) {
+                var n = t[o][1][e];return s(n ? n : e);
+            }, f, f.exports, e, t, n, r);
+        }return n[o].exports;
+    }var i = typeof require == "function" && require;for (var o = 0; o < r.length; o++) {
+        s(r[o]);
+    }return s;
+})({ 1: [function (require, module, exports) {
+        'use strict';
+
+        var PeriodEditor = function (_View) {
+            _inherits(PeriodEditor, _View);
+
+            function PeriodEditor(params) {
+                _classCallCheck(this, PeriodEditor);
+
+                var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(PeriodEditor).call(this, params));
+
+                _this.init();
+                return _this;
+            }
+
+            _createClass(PeriodEditor, [{
+                key: "onChange",
+                value: function onChange() {
+                    var newValue = {
+                        enabled: this.$toggle[0].checked,
+                        from: this.$from.val(),
+                        to: this.$to.val()
+                    };
+
+                    this.trigger('change', newValue);
+                }
+            }, {
+                key: "render",
+                value: function render() {
+                    var editor = this;
+
+                    editor.value = editor.value || {};
+                    editor.value.enabled = editor.value.enabled == true || editor.value.enabled == "true";
+
+                    var toDate = new Date(editor.value.to);
+                    var fromDate = new Date(editor.value.from);
+                    var switchId = 'switch-' + $('.switch').length;
+
+                    this.$element = _.div({ class: 'field-editor period-editor' }, _.div({ class: 'input-group' }, [this.$from = _.input({ class: 'form-control' + (editor.value.enabled ? '' : ' disabled'), type: 'text', value: editor.value.from }), _.div({ class: 'arrow-middle input-group-addon' }, _.span({ class: 'fa fa-arrow-right' })), this.$to = _.input({ class: 'form-control' + (editor.value.enabled ? '' : ' disabled'), type: 'text', value: editor.value.to }), _.div({ class: 'input-group-addon' }, _.div({ class: 'switch' }, [this.$toggle = _.input({ id: switchId, class: 'form-control switch', type: 'checkbox' }), _.label({ for: switchId })]))]));
+
+                    this.$from.datepicker();
+                    this.$to.datepicker();
+
+                    this.$toggle[0].checked = editor.value.enabled;
+
+                    this.$from.on('changeDate', function () {
+                        editor.onChange();
+                    });
+
+                    this.$to.on('changeDate', function () {
+                        editor.onChange();
+                    });
+
+                    this.$toggle.on('change', function () {
+                        editor.$from.toggleClass('disabled', !this.checked);
+                        editor.$to.toggleClass('disabled', !this.checked);
+
+                        editor.onChange();
+                    });
+                }
+            }]);
+
+            return PeriodEditor;
+        }(View);
+
+        resources.editors['20005'] = PeriodEditor;
     }, {}] }, {}, [1]);
 "use strict";
 
@@ -2026,139 +2181,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 })({ 1: [function (require, module, exports) {
         'use strict';
 
-        var DateEditor = function (_View) {
-            _inherits(DateEditor, _View);
-
-            function DateEditor(params) {
-                _classCallCheck(this, DateEditor);
-
-                var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(DateEditor).call(this, params));
-
-                _this.init();
-                return _this;
-            }
-
-            _createClass(DateEditor, [{
-                key: "onChange",
-                value: function onChange() {
-                    this.trigger('change', this.$input.val());
-                }
-            }, {
-                key: "render",
-                value: function render() {
-                    var editor = this;
-
-                    var date = new Date(this.value);
-
-                    this.$element = _.div({ class: 'field-editor date-editor' }, this.disabled ? _.p({}, date) : this.$input = _.input({ class: 'form-control', type: 'text', value: this.value }));
-
-                    if (this.$input) {
-                        this.$input.datepicker();
-
-                        this.$input.on('changeDate', function () {
-                            editor.onChange();
-                        });
-                    }
-                }
-            }]);
-
-            return DateEditor;
-        }(View);
-
-        resources.editors['20002'] = DateEditor;
-    }, {}] }, {}, [1]);
-"use strict";
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-(function e(t, n, r) {
-    function s(o, u) {
-        if (!n[o]) {
-            if (!t[o]) {
-                var a = typeof require == "function" && require;if (!u && a) return a(o, !0);if (i) return i(o, !0);throw new Error("Cannot find module '" + o + "'");
-            }var f = n[o] = { exports: {} };t[o][0].call(f.exports, function (e) {
-                var n = t[o][1][e];return s(n ? n : e);
-            }, f, f.exports, e, t, n, r);
-        }return n[o].exports;
-    }var i = typeof require == "function" && require;for (var o = 0; o < r.length; o++) {
-        s(r[o]);
-    }return s;
-})({ 1: [function (require, module, exports) {
-        'use strict';
-
-        var UrlEditor = function (_View) {
-            _inherits(UrlEditor, _View);
-
-            function UrlEditor(params) {
-                _classCallCheck(this, UrlEditor);
-
-                var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(UrlEditor).call(this, params));
-
-                _this.init();
-                return _this;
-            }
-
-            _createClass(UrlEditor, [{
-                key: "regenerate",
-                value: function regenerate() {
-                    this.$input.val('/new-url/');
-
-                    this.trigger('change', this.$input.val());
-                }
-            }, {
-                key: "onChange",
-                value: function onChange() {
-                    this.trigger('change', this.$input.val());
-                }
-            }, {
-                key: "render",
-                value: function render() {
-                    var editor = this;
-
-                    this.$element = _.div({ class: 'field-editor url-editor input-group' }, [this.$input = _.input({ class: 'form-control', value: this.value }).bind('change propertychange paste keyup', function () {
-                        this.onChange();
-                    }), _.div({ class: 'input-group-btn' }, _.button({ class: 'btn btn-primary' }, 'Regenerate ').click(function () {
-                        editor.regenerate();
-                    }))]);
-                }
-            }]);
-
-            return UrlEditor;
-        }(View);
-
-        resources.editors['20003'] = UrlEditor;
-    }, {}] }, {}, [1]);
-"use strict";
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-(function e(t, n, r) {
-    function s(o, u) {
-        if (!n[o]) {
-            if (!t[o]) {
-                var a = typeof require == "function" && require;if (!u && a) return a(o, !0);if (i) return i(o, !0);throw new Error("Cannot find module '" + o + "'");
-            }var f = n[o] = { exports: {} };t[o][0].call(f.exports, function (e) {
-                var n = t[o][1][e];return s(n ? n : e);
-            }, f, f.exports, e, t, n, r);
-        }return n[o].exports;
-    }var i = typeof require == "function" && require;for (var o = 0; o < r.length; o++) {
-        s(r[o]);
-    }return s;
-})({ 1: [function (require, module, exports) {
-        'use strict';
-
         var SchemaReferenceEditor = function (_View) {
             _inherits(SchemaReferenceEditor, _View);
 
@@ -2238,69 +2260,48 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 })({ 1: [function (require, module, exports) {
         'use strict';
 
-        var PeriodEditor = function (_View) {
-            _inherits(PeriodEditor, _View);
+        /**
+         * A simple string editor
+         */
 
-            function PeriodEditor(params) {
-                _classCallCheck(this, PeriodEditor);
+        var StringEditor = function (_View) {
+            _inherits(StringEditor, _View);
 
-                var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(PeriodEditor).call(this, params));
+            function StringEditor(params) {
+                _classCallCheck(this, StringEditor);
+
+                var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(StringEditor).call(this, params));
 
                 _this.init();
                 return _this;
             }
 
-            _createClass(PeriodEditor, [{
+            /**
+             * Event: Change
+             */
+
+
+            _createClass(StringEditor, [{
                 key: "onChange",
                 value: function onChange() {
-                    var newValue = {
-                        enabled: this.$toggle[0].checked,
-                        from: this.$from.val(),
-                        to: this.$to.val()
-                    };
-
-                    this.trigger('change', newValue);
+                    this.trigger('change', this.$input.val());
                 }
             }, {
                 key: "render",
                 value: function render() {
                     var editor = this;
 
-                    editor.value = editor.value || {};
-                    editor.value.enabled = editor.value.enabled == true || editor.value.enabled == "true";
-
-                    var toDate = new Date(editor.value.to);
-                    var fromDate = new Date(editor.value.from);
-                    var switchId = 'switch-' + $('.switch').length;
-
-                    this.$element = _.div({ class: 'field-editor period-editor' }, _.div({ class: 'input-group' }, [this.$from = _.input({ class: 'form-control' + (editor.value.enabled ? '' : ' disabled'), type: 'text', value: editor.value.from }), _.div({ class: 'arrow-middle input-group-addon' }, _.span({ class: 'fa fa-arrow-right' })), this.$to = _.input({ class: 'form-control' + (editor.value.enabled ? '' : ' disabled'), type: 'text', value: editor.value.to }), _.div({ class: 'input-group-addon' }, _.div({ class: 'switch' }, [this.$toggle = _.input({ id: switchId, class: 'form-control switch', type: 'checkbox' }), _.label({ for: switchId })]))]));
-
-                    this.$from.datepicker();
-                    this.$to.datepicker();
-
-                    this.$toggle[0].checked = editor.value.enabled;
-
-                    this.$from.on('changeDate', function () {
+                    // Main element
+                    this.$element = _.div({ class: 'field-editor string-editor' }, this.$input = _.input({ class: 'form-control', value: this.value }).bind('change propertychange paste keyup', function () {
                         editor.onChange();
-                    });
-
-                    this.$to.on('changeDate', function () {
-                        editor.onChange();
-                    });
-
-                    this.$toggle.on('change', function () {
-                        editor.$from.toggleClass('disabled', !this.checked);
-                        editor.$to.toggleClass('disabled', !this.checked);
-
-                        editor.onChange();
-                    });
+                    }));
                 }
             }]);
 
-            return PeriodEditor;
+            return StringEditor;
         }(View);
 
-        resources.editors['20005'] = PeriodEditor;
+        resources.editors['20000'] = StringEditor;
     }, {}] }, {}, [1]);
 "use strict";
 
@@ -2327,46 +2328,45 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 })({ 1: [function (require, module, exports) {
         'use strict';
 
-        var PageReferenceEditor = function (_View) {
-            _inherits(PageReferenceEditor, _View);
+        var UrlEditor = function (_View) {
+            _inherits(UrlEditor, _View);
 
-            function PageReferenceEditor(params) {
-                _classCallCheck(this, PageReferenceEditor);
+            function UrlEditor(params) {
+                _classCallCheck(this, UrlEditor);
 
-                var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(PageReferenceEditor).call(this, params));
+                var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(UrlEditor).call(this, params));
 
                 _this.init();
                 return _this;
             }
 
-            _createClass(PageReferenceEditor, [{
+            _createClass(UrlEditor, [{
+                key: "regenerate",
+                value: function regenerate() {
+                    this.$input.val('/new-url/');
+
+                    this.trigger('change', this.$input.val());
+                }
+            }, {
                 key: "onChange",
                 value: function onChange() {
-                    this.trigger('change', this.$select.val());
+                    this.trigger('change', this.$input.val());
                 }
             }, {
                 key: "render",
                 value: function render() {
                     var editor = this;
 
-                    this.$element = _.div({ class: 'field-editor input-group page-reference-editor' }, [this.$select = _.select({ class: 'form-control' }, _.each(window.resources.pages, function (id, page) {
-                        return _.option({ value: page.id }, page.title);
-                    })).change(function () {
-                        editor.onChange();
-                    }), _.div({ class: 'input-group-btn' }, this.$clearBtn = _.button({ class: 'btn btn-primary' }, 'Clear'))]);
-
-                    this.$select.val(editor.value);
-
-                    this.$clearBtn.click(function () {
-                        editor.$select.val(null);
-
-                        editor.onChange();
-                    });
+                    this.$element = _.div({ class: 'field-editor url-editor input-group' }, [this.$input = _.input({ class: 'form-control', value: this.value }).bind('change propertychange paste keyup', function () {
+                        this.onChange();
+                    }), _.div({ class: 'input-group-btn' }, _.button({ class: 'btn btn-primary' }, 'Regenerate ').click(function () {
+                        editor.regenerate();
+                    }))]);
                 }
             }]);
 
-            return PageReferenceEditor;
+            return UrlEditor;
         }(View);
 
-        resources.editors['20006'] = PageReferenceEditor;
+        resources.editors['20003'] = UrlEditor;
     }, {}] }, {}, [1]);
