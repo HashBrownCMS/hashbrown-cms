@@ -16,14 +16,16 @@ class MediaHelper {
      */
     static getAllMedia() {
         return new Promise(function(callback) {
-            glob(appRoot + '/storage/media/*', function(err, paths) {
+            glob(appRoot + '/storage/media/*/*', function(err, paths) {
                 let list = [];
                 
                 for(let i in paths) {
-                    let filename = path.basename(paths[i]);
-                    let id = filename.substring(0, filename.indexOf('_'));
-                    let name = filename.substring(filename.indexOf('_') + 1);
+                    let name = path.basename(paths[i]);
+                    let id = paths[i];
                     
+                    id = id.replace('/' + name, '');
+                    id = id.substring(id.lastIndexOf('/') + 1);
+
                     // Remove file extension
                     name = name.replace(/\.[^/.]+$/, '');
 
@@ -50,9 +52,17 @@ class MediaHelper {
         return new Promise(function(callback) {
             let oldPath = file.path;
             let name = path.basename(oldPath);
-            let newPath = appRoot + '/storage/media/' + id + '_' + name;
+            let newDir = appRoot + '/storage/media/' + id;
+            let newPath = newDir + '/' + name;
 
             console.log('[MediaHelper] Setting media data at "' + newPath + '" for id "' + id + '"...');
+
+            if(!fs.existsSync(newDir)){
+                fs.mkdirSync(newDir);
+            } else {
+                // TODO: Remove old content
+
+            }
 
             fs.rename(oldPath, newPath, function() {
                 callback();
@@ -69,46 +79,21 @@ class MediaHelper {
      */
     static getMediaData(id) {
         return new Promise(function(callback) {
-            MediaHelper.getMediaPath(id)
-            .then(function(path) {
-                if(path) {
-                    fs.readFile(appRoot + path, 'binary', function(err, data) {
+            fs.readdir(appRoot + '/storage/media/' + id, function(err, files) {
+                if(err) {
+                    throw err;
+                }
+
+                if(files.length > 0) {
+                    fs.readFile(appRoot + '/storage/media/' + '/' + id + '/' + files[0], 'binary', function(err, data) {
                         if(err) {
                             throw err;
                         }
 
                         callback(data);
                     });
-
                 } else {
                     callback(null);
-                }
-            });
-        });
-    }
-
-    /**
-     * Gets path of a Media object
-     *
-     * @param {Number} id
-     *
-     * @return {Promise} promise
-     */
-    static getMediaPath(id) {
-        return new Promise(function(callback) {
-            glob(appRoot + '/storage/media/**/' + id + '_*', function(err, paths) {
-                if(paths && paths.length > 0) {
-                    if(paths.length == 1) {
-                        let path = paths[0].replace(appRoot, '') || '';
-                    
-                        callback(path);
-                    } else {
-                        throw 'More than one media object matches id "' + id + '"';
-
-                    }
-                
-                } else {
-                    throw 'No media found by id "' + id + '"';
                 
                 }
             });
@@ -124,16 +109,13 @@ class MediaHelper {
      */
     static removeMedia(id) {
         return new Promise(function(callback) {
-            MediaHelper.getMediaPath(id)
-            .then(function(path) {
-                fs.unlink(appRoot + path, function(err) {
-                    if(err) {
-                        throw err;
-                    }
+            fs.unlink(appRoot + '/' + id, function(err) {
+                if(err) {
+                    throw err;
+                }
 
-                    callback();
-                });
-            }); 
+                callback();
+            });
         });
     }
 }

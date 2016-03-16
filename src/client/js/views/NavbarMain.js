@@ -300,15 +300,20 @@ class NavbarMain extends View {
      */
     renderPane(params) {
         let view = this;
+        let $icon = params.$icon;
        
+        if(!$icon) {        
+            $icon = _.span({class: 'fa fa-' + params.icon});
+        }
+
         let $button = _.button({'data-route': params.route}, [
-            _.span({class: 'fa fa-' + params.icon}),
+            $icon,
             _.span(params.label)
         ]).click(function() {
             let $currentTab = view.$element.find('.pane-container.active');
 
             if(params.route == $currentTab.attr('data-route')) {
-                location.hash = '/' + params.route + '/';
+                location.hash = params.route;
             
             } else {
                 view.showTab(params.route);
@@ -336,6 +341,7 @@ class NavbarMain extends View {
                 let routingPath = item.shortPath || item.path || id;
                 let queueItem = {};
                 let icon = item.icon;
+                let $icon;
 
                 // Truncate long names
                 if(name.length > 18) {
@@ -347,6 +353,10 @@ class NavbarMain extends View {
                     icon = resources.schemas[item.schemaId].icon;
                 }
 
+                if(icon) {
+                    $icon = _.span({class: 'fa fa-' + icon});
+                }
+
                 // Item element
                 let $element = _.div({
                     class: 'pane-item-container',
@@ -356,10 +366,10 @@ class NavbarMain extends View {
                     _.a({
                         'data-id': id,
                         'data-name': name,
-                        href: '#/' + params.route + '/' + routingPath,
+                        href: '#' + params.route + routingPath,
                         class: 'pane-item'
                     }, [
-                        icon ? _.span({class: 'fa fa-' + icon}) : null,
+                        $icon,
                         _.span(name)
                     ]),
                     _.div({class: 'children'})
@@ -433,80 +443,6 @@ class NavbarMain extends View {
     }
     
     /**
-     * Renders the about pane
-     */
-    renderAboutPane() {
-        let view = this;
-       
-        let $button = _.button({'data-route': 'about'}, [
-            _.span({class: 'about-logo'}, 
-                'E'
-            ),
-            _.span('Endomon CMS')
-        ]).click(function() { view.showTab('about'); });
-        
-        let $pane = _.div({class: 'pane'},
-            _.div({class: 'pane-content'})
-        );
-
-        $pane.html([
-            _.div({class: 'pane-item-container'}, 
-                _.a({href: '#/about/version', class: 'pane-item'},
-                    _.span('Version')
-                )
-            )
-        ]);
-
-        if(this.$element.find('.tab-panes .pane').length < 1) {
-            $pane.addClass('active');
-            $button.addClass('active');
-        }
-
-        let $paneContainer = _.div({class: 'pane-container', 'data-route': 'about'},
-            $pane
-        );
-
-        this.$element.find('.tab-panes').append($paneContainer);
-        this.$element.find('.tab-buttons').append($button);
-    }
-
-    /**
-     * Renders the settings pane
-     */
-    renderSettingsPane() {
-        let view = this;
-       
-        let $button = _.button({'data-route': 'settings'}, [
-            _.span({class: 'fa fa-wrench'}),
-            _.span('Settings')
-        ]).click(function() { view.showTab('settings'); });
-        
-        let $pane = _.div({class: 'pane'},
-            _.div({class: 'pane-content'})
-        );
-
-        $pane.html([
-            _.div({class: 'pane-item-container'}, 
-                _.a({href: '#/settings/something', class: 'pane-item'},
-                    _.span('Something')
-                )
-            )
-        ]);
-
-        if(this.$element.find('.tab-panes .pane').length < 1) {
-            $pane.addClass('active');
-            $button.addClass('active');
-        }
-
-        let $paneContainer = _.div({class: 'pane-container', 'data-route': 'settings'},
-            $pane
-        );
-        
-        this.$element.find('.tab-panes').append($paneContainer);
-        this.$element.find('.tab-buttons').append($button);
-    }
-
-    /**
      * Shows a tab
      *
      * @param {String} tabName
@@ -577,11 +513,21 @@ class NavbarMain extends View {
 
         $('.navspace').html(this.$element);
         
-        this.renderAboutPane();
+        this.renderPane({
+            label: 'Endomon CMS',
+            route: '/',
+            $icon: _.span({class: 'about-logo'}, 'E'),
+            items: [
+                {
+                    name: 'About',
+                    path: 'about'
+                }
+            ]
+        });
 
         this.renderPane({
             label: 'Pages',
-            route: 'pages',
+            route: '/pages/',
             icon: 'file',
             items: resources.pages,
             itemContextMenu: {
@@ -604,7 +550,7 @@ class NavbarMain extends View {
 
         this.renderPane({
             label: 'Sections',
-            route: 'sections',
+            route: '/sections/',
             icon: 'th',
             items: resources.sections,
             sort: function(item, queueItem) {
@@ -616,7 +562,7 @@ class NavbarMain extends View {
         
         this.renderPane({
             label: 'Media',
-            route: 'media',
+            route: '/media/',
             icon: 'file-image-o',
             items: resources.media,
             itemContextMenu: {
@@ -631,7 +577,7 @@ class NavbarMain extends View {
         
         this.renderPane({
             label: 'Schemas',
-            route: 'schemas',
+            route: '/schemas/',
             icon: 'gears',
             items: resources.schemas,
             sort: function(item, queueItem) {
@@ -652,7 +598,17 @@ class NavbarMain extends View {
             }
         });
 
-        this.renderSettingsPane();
+        this.renderPane({
+            label: 'Settings',
+            route: '/settings/',
+            icon: 'wrench',
+            items: [
+                {
+                    name: 'Something',
+                    path: 'something'
+                }
+            ]
+        });
     }
 }
 
