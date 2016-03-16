@@ -1,29 +1,44 @@
-resources.editors['20004'] = function(params) {
-    var editor = this;
-    
-    this.onChange = function onChange() {
-        params.onChange(this.$select.val());
-    };
+'use strict';
 
-    this.$element = _.div({class: 'field-editor schema-editor'},
-        this.$select = _.select({class: 'form-control'},
-            _.each(window.resources.schemas, function(id, schema) {
-                if(params.config) {
-                    var id = parseInt(schema.id);
+class SchemaReferenceEditor extends View {
+    constructor(params) {
+        super(params);
+        
+        this.init();
+    }
 
-                    if(params.config.min && id < params.config.min) {
-                        return;
+    /**
+     * Event: Change input
+     */
+    onChange() {
+        this.trigger('change', this.$select.val());
+    }
+
+    render() {
+        var editor = this;
+        
+        this.$element = _.div({class: 'field-editor schema-reference-editor'},
+            this.$select = _.select({class: 'form-control'},
+                _.each(window.resources.schemas, function(id, schema) {
+                    if(editor.config) {
+                        var id = parseInt(schema.id);
+
+                        if(editor.config.min && id < editor.config.min) {
+                            return;
+                        }
+                        
+                        if(editor.config.max && id > editor.config.max) {
+                            return;
+                        }
                     }
-                    
-                    if(params.config.max && id > params.config.max) {
-                        return;
-                    }
-                }
 
-                return _.option({value: schema.id}, schema.name);
-            })
-        ).change(function() { editor.onChange(); })
-    );
+                    return _.option({value: schema.id}, schema.name);
+                })
+            ).change(function() { editor.onChange(); })
+        );
 
-    this.$select.val(params.value);
+        this.$select.val(editor.value);
+    }
 }
+
+resources.editors['20004'] = SchemaReferenceEditor;

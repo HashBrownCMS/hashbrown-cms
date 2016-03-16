@@ -1,24 +1,36 @@
-resources.editors['20002'] = function(params) {
-    var editor = this;
+'use strict';
 
-    var date = new Date(params.value);
+class DateEditor extends View {
+    constructor(params) {
+        super(params);
 
-    this.onChange = function onChange() {
-        params.onChange(this.$input.val());
-    };
+        this.init();
+    }
 
-    this.$element = _.div({class: 'field-editor date-editor'},
-        params.disabled ? 
-            _.p({}, date)
-        :
-            this.$input = _.input({class: 'form-control', type: 'text', value: params.value})
-    );
+    onChange() {
+        this.trigger('change', this.$input.val());
+    }
 
-    if(this.$input) {
-        this.$input.datepicker();
+    render() {
+        var editor = this;
 
-        this.$input.on('changeDate', function() {
-            editor.onChange();
-        })
+        var date = new Date(this.value);
+
+        this.$element = _.div({class: 'field-editor date-editor'},
+            this.disabled ? 
+                _.p({}, date)
+            :
+                this.$input = _.input({class: 'form-control', type: 'text', value: this.value})
+        );
+
+        if(this.$input) {
+            this.$input.datepicker();
+
+            this.$input.on('changeDate', function() {
+                editor.onChange();
+            })
+        }
     }
 }
+
+resources.editors['20002'] = DateEditor;

@@ -1,9 +1,5 @@
 'use strict';
 
-// Lib
-window.markdownToHtml = require('marked');
-window.htmlToMarkdown = require('to-markdown');
-
 // Views
 let MessageModal = require('./MessageModal');
 
@@ -152,9 +148,14 @@ class PageEditor extends View {
                 let fieldEditorInstance = new fieldEditor({
                     value: fieldValue,
                     disabled: schemaValue.disabled,
-                    onChange: onChange,
                     config: config
                 });
+
+                if(fieldEditorInstance.on) {
+                    fieldEditorInstance.on('change', onChange);
+                } else {
+                    fieldEditorInstance.onChange = onChange;
+                }
 
                 return fieldEditorInstance.$element;
 

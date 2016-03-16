@@ -1,58 +1,68 @@
-resources.editors['20005'] = function(params) {
-    var editor = this;
+'use strict';
 
-    params.value = params.value || {};
-    params.value.enabled = params.value.enabled == true || params.value.enabled == "true";
+class PeriodEditor extends View {
+    constructor(params) {
+        super(params);
 
-    var toDate = new Date(params.value.to);
-    var fromDate = new Date(params.value.from);
-    var switchId = 'switch-' + $('.switch').length;
+        this.init();
+    }
 
-    this.onChange = function onChange() {
+    onChange() {
         var newValue = {
             enabled: this.$toggle[0].checked,
             from: this.$from.val(),
             to: this.$to.val()
         };
         
-        params.onChange(newValue);
+        this.trigger('change', newValue);
+    }
 
-        console.log(newValue);
-    };
+    render() {
+        var editor = this;
 
-    this.$element = _.div({class: 'field-editor period-editor'},
-        _.div({class: 'input-group'}, [      
-            this.$from = _.input({class: 'form-control' + (params.value.enabled ? '' : ' disabled'), type: 'text', value: params.value.from}),
-            _.div({class: 'arrow-middle input-group-addon'},
-                _.span({class: 'fa fa-arrow-right'})
-            ),
-            this.$to = _.input({class: 'form-control' + (params.value.enabled ? '' : ' disabled'), type: 'text', value: params.value.to}),
-            _.div({class: 'input-group-addon'},
-                _.div({class: 'switch'}, [
-                    this.$toggle = _.input({id: switchId, class: 'form-control switch', type: 'checkbox'}),
-                    _.label({for: switchId})
-                ])
-            )
-        ])
-    );
+        editor.value = editor.value || {};
+        editor.value.enabled = editor.value.enabled == true || editor.value.enabled == "true";
 
-    this.$from.datepicker();
-    this.$to.datepicker();
+        var toDate = new Date(editor.value.to);
+        var fromDate = new Date(editor.value.from);
+        var switchId = 'switch-' + $('.switch').length;
 
-    this.$toggle[0].checked = params.value.enabled;
+        this.$element = _.div({class: 'field-editor period-editor'},
+            _.div({class: 'input-group'}, [      
+                this.$from = _.input({class: 'form-control' + (editor.value.enabled ? '' : ' disabled'), type: 'text', value: editor.value.from}),
+                _.div({class: 'arrow-middle input-group-addon'},
+                    _.span({class: 'fa fa-arrow-right'})
+                ),
+                this.$to = _.input({class: 'form-control' + (editor.value.enabled ? '' : ' disabled'), type: 'text', value: editor.value.to}),
+                _.div({class: 'input-group-addon'},
+                    _.div({class: 'switch'}, [
+                        this.$toggle = _.input({id: switchId, class: 'form-control switch', type: 'checkbox'}),
+                        _.label({for: switchId})
+                    ])
+                )
+            ])
+        );
 
-    this.$from.on('changeDate', function() {
-        editor.onChange();
-    })
-    
-    this.$to.on('changeDate', function() {
-        editor.onChange();
-    })
+        this.$from.datepicker();
+        this.$to.datepicker();
 
-    this.$toggle.on('change', function() {
-        editor.$from.toggleClass('disabled', !this.checked);
-        editor.$to.toggleClass('disabled', !this.checked);
+        this.$toggle[0].checked = editor.value.enabled;
+
+        this.$from.on('changeDate', function() {
+            editor.onChange();
+        })
         
-        editor.onChange();
-    });
+        this.$to.on('changeDate', function() {
+            editor.onChange();
+        })
+
+        this.$toggle.on('change', function() {
+            editor.$from.toggleClass('disabled', !this.checked);
+            editor.$to.toggleClass('disabled', !this.checked);
+            
+            editor.onChange();
+        });
+    }
 }
+
+resources.editors['20005'] = PeriodEditor;

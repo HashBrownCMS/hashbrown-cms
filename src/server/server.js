@@ -6,9 +6,29 @@
 let Promise = require('bluebird');
 let express = require('express');
 let bodyparser = require('body-parser');
+let exec = require('child_process').exec;
 
 Promise.onPossiblyUnhandledRejection(function(error){
     throw error;
+});
+
+// ----------
+// Gulp
+// ----------
+let gulp = exec('cd ' + appRoot + ' && gulp', {
+    cdw: appRoot
+});
+
+gulp.stdout.on('data', (data) => {
+    console.log('[Gulp] ' + data);
+});
+
+gulp.stderr.on('data', (data) => {
+    console.log('[Gulp] ' + data);
+});
+
+gulp.on('close', (data) => {
+    console.log('[Gulp] ' + data);
 });
 
 // ----------

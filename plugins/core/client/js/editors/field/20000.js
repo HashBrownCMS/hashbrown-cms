@@ -1,17 +1,31 @@
+'use strict';
+
 /**
  * A simple string editor
  */
-resources.editors['20000'] = function(params) {
-    var editor = this;
+class StringEditor extends View {
+    constructor(params) {
+        super(params);
 
-    // Main element
-    this.$element = _.div({class: 'field-editor string-editor'},
-        this.$input = _.input({class: 'form-control', value: params.value})
-            .bind('change propertychange paste keyup', function() { editor.onChange(); })
-    );
+        this.init();
+    }
 
-    // Change event
-    this.onChange = function onChange() {
-        params.onChange(this.$input.val());
-    };
-};
+    /**
+     * Event: Change
+     */
+    onChange() {
+        this.trigger('change', this.$input.val());
+    }
+    
+    render() {
+        var editor = this;
+
+        // Main element
+        this.$element = _.div({class: 'field-editor string-editor'},
+            this.$input = _.input({class: 'form-control', value: this.value})
+                .bind('change propertychange paste keyup', function() { editor.onChange(); })
+        );
+    }
+}
+
+resources.editors['20000'] = StringEditor;
