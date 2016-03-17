@@ -62,7 +62,8 @@ class JSONEditor extends View {
         function onSuccess() {
             console.log('[PageEditor] Removed page with id "' + view.model.id + '"'); 
         
-            reloadResource('pages', function() {
+            reloadResource('pages')
+            .then(function() {
                 ViewHelper.get('NavbarMain').reload();
                 
                 // Cancel the JSONEditor view

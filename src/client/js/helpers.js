@@ -1,3 +1,12 @@
+let Promise = require('bluebird');
+
+let onReadyCallbacks = {
+    resources: [],
+    navbar: []
+};
+
+let isReady = {};
+
 /**
  * Gets a schema with parent included recursively
  *
@@ -35,4 +44,63 @@ window.getSchemaWithParents = function getSchemaWithParents(id) {
     }
 
     return schema;
+}
+
+/**
+ * Reloads a resource
+ */
+window.reloadResource = function reloadResource(name) {
+    return new Promise(function(callback) {
+        $.getJSON('/api/' + name, function(result) {
+            window.resources[name] = result;
+
+            callback(result);
+        });
+    });
+};
+
+/**
+ * Reloads all resources
+ */
+window.reloadAllResources = function reloadAllResources() {
+    return new Promise(function(callback) {
+        let queue = ['pages', 'sections', 'schemas', 'media'];
+
+        function processQueue(name) {
+            window.reloadResource(name)
+            .then(function() {
+                queue.pop();
+
+                if(queue.length < 1) {
+                    callback();
+                }
+            });
+        }
+
+        for(let name of queue) {
+            processQueue(name);
+        }
+    });
+};
+
+/**
+ * Adds a ready callback to the queue or executes it if given key is already triggered
+ */
+window.onReady = function onReady(name, callback) {
+    if(isReady[name]) {
+        callback();
+    
+    } else {
+        onReadyCallbacks[name].push(callback);
+    
+    }
+}
+
+/**
+ * Triggers a key
+ */
+window.triggerReady = function triggerReady(name) {
+    for(let callback of onReadyCallbacks[name]) {
+        callback();
+    }
 }

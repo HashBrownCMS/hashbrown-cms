@@ -3,6 +3,7 @@
 // Libraries
 require('exomon');
 let jade = require('jade');
+let Promise = require('bluebird');
 
 // Views
 let NavbarMain = require('./views/NavbarMain');
@@ -15,69 +16,21 @@ let MediaViewer = require('./views/MediaViewer');
 require('./helpers');
 
 // -----------
-// Ready functions
-// -----------
-let onReadyCallbacks = [];
-
-function onReady(callback) {
-    onReadyCallbacks.push(callback);
-}
-
-function checkReady() {
-    if(resourcesLoaded >= resourcesRequired) {
-        for(let i in onReadyCallbacks) {
-            onReadyCallbacks[i]();
-        }
-    }
-}
-
-// -----------
 // Preload resources 
 // -----------
-
-// TODO: Use a queue instead of this horribleness
-let resourcesRequired = 4;
-let resourcesLoaded = 0;
-
-window.reloadResource = function reloadResource(name, callback) {
-    $.getJSON('/api/' + name, function(result) {
-        window.resources[name] = result;
-
-        callback(result);
-    });
-};
-
 window.resources = {
-    editors: []
+    editors: [],
+    pages: [],
+    sections: [],
+    schemas: [],
+    media: []
 };
 
-$.getJSON('/api/pages', function(pages) {
-    window.resources.pages = pages;
-
-    resourcesLoaded++;
-    checkReady();
+window.reloadAllResources()
+.then(function() {
+    triggerReady('resources');
 });
 
-$.getJSON('/api/sections', function(sections) {
-    window.resources.sections = sections;
-    
-    resourcesLoaded++;
-    checkReady();
-});
-
-$.getJSON('/api/schemas', function(schemas) {
-    window.resources.schemas = schemas;
-    
-    resourcesLoaded++;
-    checkReady();
-});
-
-$.getJSON('/api/media', function(media) {
-    window.resources.media = media;
-    
-    resourcesLoaded++;
-    checkReady();
-});
 
 // -----------
 // Routes
@@ -164,7 +117,7 @@ Router.route('/media/', function() {
 // ----------
 // Init
 // ----------
-onReady(function() {
+onReady('resources', function() {
     new NavbarMain();
 
     Router.init();

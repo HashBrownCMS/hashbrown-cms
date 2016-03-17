@@ -28,7 +28,8 @@ class PageEditor extends View {
                 console.log('[PageEditor] Saved model to ' + view.modelUrl);
                 view.$saveBtn.toggleClass('saving', false);
             
-                reloadResource('pages', function() {
+                reloadResource('pages')
+                .then(function() {
                     let navbar = ViewHelper.get('NavbarMain');
 
                     view.reload();
@@ -62,7 +63,8 @@ class PageEditor extends View {
         function onSuccess() {
             console.log('[PageEditor] Removed page with id "' + view.model.id + '"'); 
         
-            reloadResource('pages', function() {
+            reloadResource('pages')
+            .then(function() {
                 ViewHelper.get('NavbarMain').reload();
                 
                 // Cancel the PageEditor view

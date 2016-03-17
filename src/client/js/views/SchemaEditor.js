@@ -32,7 +32,8 @@ class SchemaEditor extends View {
                 console.log('[SchemaEditor] Saved model to ' + view.modelUrl);
                 view.$saveBtn.toggleClass('saving', false);
             
-                reloadResource('schemas', function() {
+                reloadResource('schemas')
+                .then(function() {
                     let navbar = ViewHelper.get('NavbarMain');
                     
                     navbar.reload();

@@ -32,7 +32,8 @@ class NavbarMain extends View {
                 copiedPage.parentId = parentId;
                     
                 $.post('/api/pages/new/', copiedPage, function() {
-                    reloadResource('pages', function() {
+                    reloadResource('pages')
+                    .then(function() {
                         view.reload();
                     });
 
@@ -57,7 +58,8 @@ class NavbarMain extends View {
                 cutPage.parentId = parentId;
                     
                 $.post('/api/pages/' + id, cutPage, function() {
-                    reloadResource('pages', function() {
+                    reloadResource('pages')
+                    .then(function() {
                         view.reload();
                     });
 
@@ -74,7 +76,8 @@ class NavbarMain extends View {
         let view = this;
 
         $.post('/api/pages/new/', function() {
-            reloadResource('pages', function() {
+            reloadResource('pages')
+            .then(function() {
                 view.reload();
             });
         });
@@ -91,7 +94,8 @@ class NavbarMain extends View {
         function onSuccess() {
             console.log('[NavbarMain] Removed page with id "' + id + '"'); 
         
-            reloadResource('pages', function() {
+            reloadResource('pages')
+            .then(function() {
                 view.reload();
                 
                 // Cancel the PageEditor view if it was displaying the deleted page
@@ -139,7 +143,8 @@ class NavbarMain extends View {
         function onSuccess() {
             console.log('[NavbarMain] Removed media with id "' + id + '"'); 
         
-            reloadResource('media', function() {
+            reloadResource('media')
+            .then(function() {
                 view.reload();
                 
                 // Cancel the MediaViever view if it was displaying the deleted object
@@ -245,7 +250,8 @@ class NavbarMain extends View {
 
                     let navbar = ViewHelper.get('NavbarMain')
                 
-                    reloadResource('media', function() {
+                    reloadResource('media')
+                    .then(function() {
                         navbar.reload();
                         location.hash = '/media/' + id;
 
@@ -609,6 +615,8 @@ class NavbarMain extends View {
                 }
             ]
         });
+
+        triggerReady('navbar');
     }
 }
 
