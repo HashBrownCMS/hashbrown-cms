@@ -41,6 +41,10 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
         line-height: 80px;
         font-size: 48px;
         color: #2196f3; }
+  .panel-login .panel-body .spinner-container {
+    background-color: transparent;
+    min-height: 100px;
+    height: auto; }
   .panel-login .btn {
     margin-top: 15px;
     display: block;

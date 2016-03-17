@@ -1,11 +1,36 @@
-.issues-editor {
+/**
+ * Retrieves a color value from the $material-colors Sass map
+ * Inspired by https://github.com/nilskaspersson/Google-Material-UI-Color-Palette/
+ *
+ * @function
+ * @param {string} color-name             - quoted, lower-case, dasherized color
+ *                                          name (e.g. 'pink', 'amber')
+ * @param {string} [color-variant='500']  - quoted, lowercase color variant (e.g.
+ *                                          '200', 'a100')
+ */
+.board-editor {
+  display: flex; }
+  .board-editor .column {
+    flex-grow: 1; }
+
+.issues-editor, .board-editor {
   padding: 15px;
   height: 100%;
   overflow-y: auto; }
-  .issues-editor .issue {
-    margin-bottom: 15px; }
-    .issues-editor .issue .panel {
-      margin: 0px; }
-    .issues-editor .issue .issue-children {
-      padding: 0px 0px 0px 15px;
-      border-left: 2px solid #ccc; }
+  .issues-editor a[data-toggle="collapse"], .board-editor a[data-toggle="collapse"] {
+    text-align: right;
+    display: block; }
+    .issues-editor a[data-toggle="collapse"] .issue-count, .board-editor a[data-toggle="collapse"] .issue-count {
+      margin-right: 5px; }
+    .issues-editor a[data-toggle="collapse"] .fa-chevron-up, .board-editor a[data-toggle="collapse"] .fa-chevron-up {
+      display: none; }
+    .issues-editor a[data-toggle="collapse"][aria-expanded="true"], .board-editor a[data-toggle="collapse"][aria-expanded="true"] {
+      margin-bottom: 10px; }
+      .issues-editor a[data-toggle="collapse"][aria-expanded="true"] .fa-chevron-down, .board-editor a[data-toggle="collapse"][aria-expanded="true"] .fa-chevron-down {
+        display: none; }
+      .issues-editor a[data-toggle="collapse"][aria-expanded="true"] .fa-chevron-up, .board-editor a[data-toggle="collapse"][aria-expanded="true"] .fa-chevron-up {
+        display: inline-block; }
+  .issues-editor .panel .panel-footer, .board-editor .panel .panel-footer {
+    padding: 10px; }
+    .issues-editor .panel .panel-footer .issue-children .issue:last-child .panel, .board-editor .panel .panel-footer .issue-children .issue:last-child .panel {
+      margin-bottom: 0px; }

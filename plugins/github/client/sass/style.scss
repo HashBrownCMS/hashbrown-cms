@@ -1,18 +1,56 @@
-.issues-editor {
+@import 'sass-material-colors';
+
+.board-editor {
+    display: flex;
+
+    .column {
+        flex-grow: 1;
+    }
+}
+
+.issues-editor, .board-editor {
     padding: 15px;
     height: 100%;
     overflow-y: auto;
 
-    .issue {
-        margin-bottom: 15px;
+    a[data-toggle="collapse"] {
+        text-align: right;
+        display: block;
 
-        .panel {
-            margin: 0px;
+        .issue-count {
+            margin-right: 5px;
         }
 
-        .issue-children {
-            padding: 0px 0px 0px 15px;
-            border-left: 2px solid #ccc;
+        .fa-chevron-up {
+            display: none;
+        }
+
+        &[aria-expanded="true"] {
+            margin-bottom: 10px;
+            
+            .fa-chevron-down {
+                display: none;
+            }
+            
+            .fa-chevron-up {
+                display: inline-block;
+            }
+        }
+    }
+
+    .panel {
+        .panel-footer {
+            padding: 10px;
+
+            .issue-children {
+                .issue {
+                    &:last-child {
+                        .panel {
+                            margin-bottom: 0px;
+                        }
+                    }
+                }   
+            }
         }
     }
 }

@@ -2,7 +2,6 @@
 
 // Lib
 let markdownToHtml = require('marked');
-let htmlToMarkdown = require('to-markdown');
 
 class IssuesEditor extends View {
     constructor(params) {
@@ -23,17 +22,36 @@ class IssuesEditor extends View {
             let $issue = $(this);
 
             let milestoneId = $issue.attr('data-milestone');
-            let $milestone = view.$element.find('.milestone[data-id="' + milestoneId + '"] .milestone-issues');
+            let $milestone = view.$element.find('.milestone[data-id="' + milestoneId + '"]');
 
             let parentNumber = $issue.attr('data-parent');
-            let $parentContainer = view.$element.find('.issue[data-number="' + parentNumber + '"] >.issue-children');
+            let $parentIssue = view.$element.find('.issue[data-number="' + parentNumber + '"]');
            
             if($milestone.length > 0) {
-                $milestone.append($issue);
+                $milestone.find('.milestone-issues').append($issue);
+
+                $milestone.children('.panel').children('.panel-footer').children('a').children('.issue-count').html($milestone.find('.issue').length);
             }
             
-            if($parentContainer.length > 0) {
-                $parentContainer.append($issue);
+            if($parentIssue.length > 0) {
+                let $panel = $parentIssue.children('.panel');
+                
+                if($panel.find('.panel-footer').length < 1) {
+                    $panel.append(
+                        _.div({class: 'panel-footer'}, [
+                            _.a({'data-toggle': 'collapse', href: '#collapse-' + parentNumber}, [
+                                _.span({class: 'issue-count'}),
+                                _.span({class: 'fa fa-chevron-up'}),    
+                                _.span({class: 'fa fa-chevron-down'})    
+                            ]),
+                            _.div({id: 'collapse-' + parentNumber, class: 'collapse issue-children'})
+                        ])
+                    );
+                }
+              
+                $panel.children('.panel-footer').children('.issue-children').append($issue);
+
+                $panel.children('.panel-footer').children('a').children('.issue-count').html($panel.find('.issue').length);
             }
         });
     }
@@ -61,14 +79,26 @@ class IssuesEditor extends View {
      * @param {Object} milestone
      */
     renderMilestone(milestone) {
+        console.log(milestone);
+
         let $milestone = _.div({class: 'milestone', 'data-id': milestone.id},
-            _.div({class: 'panel'}, [
+            _.div({class: 'panel panel-default'}, [
                 _.div({class: 'panel-heading'}, 
                     _.h4({class: 'panel-title'},
                         milestone.title
                     )
                 ),
-                _.div({class: 'panel-body milestone-issues'})
+                _.div({class: 'panel-body'},
+                   milestone.description 
+                ),
+                _.div({class: 'panel-footer'}, [
+                    _.a({'data-toggle': 'collapse', href: '#collapse-' + milestone.id, 'aria-expanded': true}, [
+                        _.span({class: 'issue-count'}),
+                        _.span({class: 'fa fa-chevron-up'}),    
+                        _.span({class: 'fa fa-chevron-down'})    
+                    ]),
+                    _.div({id: 'collapse-' + milestone.id, class: 'collapse in milestone-issues'})
+                ])
             ])
         );
 
@@ -114,17 +144,16 @@ class IssuesEditor extends View {
                     'data-parent': view.getParentIssue(issue),
                     'data-milestone': issue.milestone ? issue.milestone.id : ''
                 }, [
-                    _.div({class: 'panel panel-primary'}, [
+                    _.div({class: 'panel panel-default'}, [
                         _.div({class: 'panel-heading'},
                             _.h4({class: 'panel-title'},
                                 issue.title
                             )
-                        ),   
-                        _.div({class: 'panel-body'}, 
+                        ),
+                        _.div({class: 'panel-body issue-body'},
                             markdownToHtml(body)
                         )
-                    ]),
-                    _.div({class: 'issue-children'})
+                    ])
                 ]);
 
                 return $issue;

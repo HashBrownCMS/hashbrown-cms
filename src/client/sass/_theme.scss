@@ -62,6 +62,14 @@ button, a {
         }
     }
 
+    .panel-body {
+        .spinner-container {
+            background-color: transparent;
+            min-height: 100px;
+            height: auto;
+        }
+    }
+
     .btn {
         margin-top: 15px;
         display: block;

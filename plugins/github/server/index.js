@@ -1,7 +1,7 @@
 'use strict';
 
 let request = require('request');
-let config = require('../config.json');
+let config = require('./config.json');
 let Promise = require('bluebird');
 
 let credentials = {
@@ -19,11 +19,19 @@ class GitHub {
      * Logs in the user
      */
     static postLogin(req, res) {
-        let usr = req.body.usr;
-        let pwd = req.body.pwd;
+        // In some cases we might just want to check whether or not we're logged in
+        if(req.body) {
+            let usr = req.body.usr;
+            let pwd = req.body.pwd;
 
-        credentials.usr = usr;
-        credentials.pwd = pwd;
+            if(usr) {
+                credentials.usr = usr;
+            }
+             
+            if(pwd) {   
+                credentials.pwd = pwd;
+            }
+        }
 
         GitHub.apiCall('user')
         .then(function(result) {
