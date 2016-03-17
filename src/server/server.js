@@ -60,7 +60,7 @@ let MediaController = require(appRoot + '/src/server/controllers/MediaController
 
 MediaController.init(app);
 ApiController.init(app);
-PluginController.init()
+PluginController.init(app)
     .then(ready);
 
 // ----------

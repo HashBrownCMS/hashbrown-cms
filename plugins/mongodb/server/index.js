@@ -275,7 +275,7 @@ class MongoDB {
     /**
      * Initialises this plugin
      */
-    static init() {
+    static init(app) {
         console.log('[MongoDB] Initialising MongoDB plugin');
 
         // Override ContentHelper methods
