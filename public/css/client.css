@@ -21,6 +21,31 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
 /**
  * Colour a button
  */
+.panel-login {
+  margin: 0px auto;
+  width: 300px;
+  box-shadow: 0px 2px 3px 1px rgba(0, 0, 0, 0.2);
+  background-color: #f5f5f5; }
+  .panel-login .panel-heading {
+    text-align: center;
+    padding-top: 30px; }
+    .panel-login .panel-heading .login-icon {
+      background-color: #bbdefb;
+      margin: 0px auto;
+      text-align: center;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      display: inline-block; }
+      .panel-login .panel-heading .login-icon .fa {
+        line-height: 80px;
+        font-size: 48px;
+        color: #2196f3; }
+  .panel-login .btn {
+    margin-top: 15px;
+    display: block;
+    width: 100%; }
+
 .modal .modal-dialog {
   max-width: 500px; }
   .modal .modal-dialog .modal-content {

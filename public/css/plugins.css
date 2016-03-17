@@ -1,0 +1,11 @@
+.issues-editor {
+  padding: 15px;
+  height: 100%;
+  overflow-y: auto; }
+  .issues-editor .issue {
+    margin-bottom: 15px; }
+    .issues-editor .issue .panel {
+      margin: 0px; }
+    .issues-editor .issue .issue-children {
+      padding: 0px 0px 0px 15px;
+      border-left: 2px solid #ccc; }

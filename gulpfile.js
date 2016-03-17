@@ -41,14 +41,14 @@ gulp.task('js', function() {
  * Compile SASS for plugins
  */
 gulp.task('sass-plugins', function() {
-    gulp.src('./plugins/**/client/sass/**/*.scss')
+    gulp.src('./plugins/*/client/sass/**/*.scss')
         .pipe(plumber())
         .pipe(sass({
             includePaths: [
                 './node_modules/sass-material-colors/sass/'
             ]
         }))
-        .pipe(concat('plugins.js'))
+        .pipe(concat('plugins.css'))
         .pipe(gulp.dest('./public/css/'));
 });
 
@@ -56,7 +56,7 @@ gulp.task('sass-plugins', function() {
  * Compile JS for plugins
  */
 gulp.task('js-plugins', function() {
-    gulp.src('./plugins/**/client/js/**/*.js')
+    gulp.src('./plugins/*/client/js/**/*.js')
         .pipe(plumber())
         .pipe(browserify({
             paths: [
@@ -77,8 +77,8 @@ gulp.task('watch', function() {
     gulp.watch('./src/client/sass/**/*.scss', [ 'sass' ]);
     
     // Watch plugin code
-    gulp.watch('./plugins/**/client/js/**/*.js', [ 'js-plugins' ]);
-    gulp.watch('./plugins/**/client/sass/**/*.scss', [ 'sass-plugins' ]);
+    gulp.watch('./plugins/*/client/js/**/*.js', [ 'js-plugins' ]);
+    gulp.watch('./plugins/*/client/sass/**/*.scss', [ 'sass-plugins' ]);
 });
 
 gulp.task('default', [ 'sass', 'js', 'sass-plugins', 'js-plugins', 'watch' ]);
