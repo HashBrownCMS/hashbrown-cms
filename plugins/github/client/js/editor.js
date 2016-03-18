@@ -95,7 +95,7 @@ function checkLogin() {
             error: function() {
                 showLogin()
                 .then(function() {
-                    location.reload();
+                    callback();
                 });
             }
         });
@@ -105,7 +105,15 @@ function checkLogin() {
 Router.route('/github/', function() {
     ViewHelper.get('NavbarMain').showTab('/github/');
     
-    showLogin();
+    checkLogin()
+    .then(function() {
+        $('.workspace').html(
+            _.div({class: 'dashboard-container'}, [
+                _.h1('GitHub dashboard'),
+                _.p('Please pick a feature to proceed')
+            ])
+        );
+    });
 });
 
 Router.route('/github/issues/', function() {
