@@ -1,6 +1,6 @@
 'use strict';
 
-let config;
+let config = require('../../config.json');
 
 // Lib
 let markdownToHtml = require('marked');
@@ -22,8 +22,20 @@ class BoardEditor extends View {
         
         this.$element.find('.issue').each(function(i) {
             let $issue = $(this);
-        
+            let labels = $issue.data('labels');
+
             let $column = view.$element.find('.column[data-name="backlog"]');
+
+            if(labels) {
+                for(let label of labels) {
+                    let $foundColumn = view.$element.find('.column[data-name="' + label.name + '"]');
+
+                    if($foundColumn.length > 0) {
+                        $column = $foundColumn;
+                        break;
+                    }
+                }
+            }
 
             $column.find('.column-issues').append($issue);   
         });
@@ -76,7 +88,7 @@ class BoardEditor extends View {
                     class: 'issue',
                     'data-id': issue.id,
                     'data-number': issue.number,
-                    'data-milestone': issue.milestone ? issue.milestone.id : ''
+                    'data-milestone': issue.milestone ? issue.milestone.id : '',
                 }, [
                     _.div({class: 'panel panel-default'}, [
                         _.div({class: 'panel-heading'},
@@ -90,11 +102,18 @@ class BoardEditor extends View {
                     ])
                 ]);
 
+                $issue.data('labels', issue.labels);
+
                 return $issue;
             })        
         );
 
         this.$element.append(this.renderColumn('backlog'));
+    
+        for(let columnName of config.board.columns) {
+            this.$element.append(this.renderColumn(columnName));
+        }
+            
         this.$element.append(this.renderColumn('closed'));
 
         this.sortIssues();
