@@ -366,8 +366,7 @@ class NavbarMain extends View {
                 // Item element
                 let $element = _.div({
                     class: 'pane-item-container',
-                    'data-routing-path': routingPath,
-                    draggable: true
+                    'data-routing-path': routingPath
                 }, [
                     _.a({
                         'data-id': id,
@@ -438,6 +437,10 @@ class NavbarMain extends View {
         let $paneContainer = _.div({class: 'pane-container', 'data-route': params.route},
             $pane
         );
+
+        if(params.sortable) {
+            // TODO: Handle sortable logic
+        }
 
         if(this.$element.find('.tab-panes .pane-container').length < 1) {
             $paneContainer.addClass('active');
@@ -551,6 +554,12 @@ class NavbarMain extends View {
             sort: function(item, queueItem) {
                 queueItem.$element.attr('data-content-id', item.id);
                 queueItem.parentDirAttr = {'data-content-id': item.parentId };
+            },
+            sortable: {
+                onEnd: function(e) {
+                    // e.oldIndex;
+                    // e.newIndex;
+                }
             }
         });
 

@@ -20,6 +20,11 @@
     }
 }
 
+// Drag and drop
+.dragdrop-placeholder {
+    border: 2px dashed material-color('grey', '100');
+}
+
 // About logo
 .about-logo {
     color: material-color('green', '500');

@@ -57,6 +57,21 @@ class BoardEditor extends View {
         return $column;
     }
 
+    /**
+     * Applies html5sortable plugin
+     */
+    applySortable() {
+        this.$element.find('.column >.panel-body').sortable('destroy');
+
+        this.$element.find('.column >.panel-body').sortable({
+            items: '.issue',
+            forcePlaceholderSize: true,
+            connectWith: '.column .panel-body'
+        }).on('sortstop', function(e, ui) {
+            alert(ui.data('id'));
+        });
+    }
+
     render() {
         let view = this;
 
@@ -117,6 +132,8 @@ class BoardEditor extends View {
         this.$element.append(this.renderColumn('closed'));
 
         this.sortIssues();
+
+        this.applySortable();
     }
 }
 
