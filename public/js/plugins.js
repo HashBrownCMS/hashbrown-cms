@@ -242,7 +242,7 @@ var markdownToHtml=require('marked');var BoardEditor=function(_View){_inherits(B
      * Renders a column
      */},{key:"renderColumn",value:function renderColumn(name){var $column=_.div({class:'column','data-name':name},_.div({class:'panel panel-default'},[_.div({class:'panel-heading'},_.h4({class:'panel-title'},name)),_.div({class:'panel-body column-issues'})]));return $column;} /**
      * Applies html5sortable plugin
-     */},{key:"applySortable",value:function applySortable(){this.$element.find('.column >.panel-body').sortable('destroy');this.$element.find('.column >.panel-body').sortable({items:'.issue',forcePlaceholderSize:true,connectWith:'.column .panel-body'}).on('sortstop',function(e,ui){alert(ui.data('id'));});}},{key:"render",value:function render(){var view=this;this.$element.empty();this.$element.append(_.each(this.model,function(i,issue){ // assignee {String}
+     */},{key:"applySortable",value:function applySortable(){$('.board-editor .column-issues').sortable('destroy');$('.board-editor .column-issues').sortable({items:'.issue',forcePlaceholderSize:true,connectWith:'.board-editor .column-issues'}).on('sortstop',function(e,ui){alert(ui.data('id'));});}},{key:"render",value:function render(){var view=this;this.$element.empty();this.$element.append(_.each(this.model,function(i,issue){ // assignee {String}
 // body {String}
 // closed_at {String}
 // comments {Number}

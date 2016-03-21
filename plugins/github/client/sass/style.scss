@@ -2,11 +2,25 @@
 
 .board-editor {
     display: flex;
-
+    overflow-y: initial;
+    
     .column {
         flex-grow: 1;
         flex-basis: 50%;
         padding: 0px 5px;
+        height: 100%;
+
+        >.panel {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            margin: 0px;
+
+            .column-issues {
+                flex-grow: 1;
+                overflow-y: auto;
+            }   
+        }
     }
 }
 

@@ -61,12 +61,12 @@ class BoardEditor extends View {
      * Applies html5sortable plugin
      */
     applySortable() {
-        this.$element.find('.column >.panel-body').sortable('destroy');
+        $('.board-editor .column-issues').sortable('destroy');
 
-        this.$element.find('.column >.panel-body').sortable({
+        $('.board-editor .column-issues').sortable({
             items: '.issue',
             forcePlaceholderSize: true,
-            connectWith: '.column .panel-body'
+            connectWith: '.board-editor .column-issues'
         }).on('sortstop', function(e, ui) {
             alert(ui.data('id'));
         });
