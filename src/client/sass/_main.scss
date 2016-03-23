@@ -20,8 +20,8 @@
     }
 }
 
-// Drag and drop
-.dragdrop-placeholder {
+// Sortable
+.sortable-placeholder {
     border: 2px dashed material-color('grey', '100');
 }
 
@@ -98,6 +98,7 @@
     
     .navspace {
         width: 500px;
+        flex-basis: 500px;
         height: 100%;
     }
     

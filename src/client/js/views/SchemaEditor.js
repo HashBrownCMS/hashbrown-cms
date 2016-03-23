@@ -17,6 +17,13 @@ class SchemaEditor extends View {
     }
     
     /**
+     * Event: Click advanced. Routes to the JSON editor
+     */
+    onClickAdvanced() {
+        location.hash = '/schemas/json/' + this.model.id;
+    }
+
+    /**
      * Event: Click save. Posts the model to the modelUrl
      */
     onClickSave() {
@@ -306,6 +313,9 @@ class SchemaEditor extends View {
                 this.renderFields(),
                 _.div({class: 'panel panel-default panel-buttons'}, 
                     _.div({class: 'btn-group'}, [
+                        _.button({class: 'btn btn-embedded'},
+                            'Advanced'
+                        ).click(function() { view.onClickAdvanced(); }),
                         _.button({class: 'btn btn-danger btn-raised'},
                             'Delete'
                         ).click(function() { view.onClickDelete(); }),

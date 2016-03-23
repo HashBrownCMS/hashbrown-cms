@@ -192,7 +192,7 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
   .flex-horizontal .flex-expand {
     flex-grow: 1; }
 
-.dragdrop-placeholder {
+.sortable-placeholder {
   border: 2px dashed #f5f5f5; }
 
 .about-logo {
@@ -248,6 +248,7 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
   height: 100%; }
   .cms-container .navspace {
     width: 500px;
+    flex-basis: 500px;
     height: 100%; }
   .cms-container .workspace {
     flex-grow: 1;
