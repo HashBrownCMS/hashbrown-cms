@@ -13,6 +13,13 @@ class PageEditor extends View {
     }
 
     /**
+     * Event: Click advanced. Routes to the JSON editor
+     */
+    onClickAdvanced() {
+        location.hash = '/pages/json/' + this.model.id;
+    }
+
+    /**
      * Event: Click save. Posts the model to the modelUrl
      */
     onClickSave() {
@@ -134,9 +141,9 @@ class PageEditor extends View {
     /**
      * Renders a field view
      *
-     * @param {Object} field
-     * @param {Object} schema
-     * @param {Function} inputHandler
+     * @param {Object} fieldValue
+     * @param {Object} schemaValue
+     * @param {Function} onChange
      *
      * @return {Object} element
      */
@@ -149,15 +156,11 @@ class PageEditor extends View {
             if(fieldEditor) {
                 let fieldEditorInstance = new fieldEditor({
                     value: fieldValue,
-                    disabled: schemaValue.disabled,
-                    config: config
+                    disabled: schemaValue.disabled || false,
+                    config: config || {}
                 });
 
-                if(fieldEditorInstance.on) {
-                    fieldEditorInstance.on('change', onChange);
-                } else {
-                    fieldEditorInstance.onChange = onChange;
-                }
+                fieldEditorInstance.on('change', onChange);
 
                 return fieldEditorInstance.$element;
 
@@ -246,6 +249,9 @@ class PageEditor extends View {
                 this.renderPageObject(this.model, pageSchema).append(
                     _.div({class: 'panel panel-default panel-buttons'}, 
                         _.div({class: 'btn-group'}, [
+                            _.button({class: 'btn btn-embedded'},
+                                'Advanced'
+                            ).click(function() { view.onClickAdvanced(); }),
                             _.button({class: 'btn btn-danger btn-raised'},
                                 'Delete'
                             ).click(function() { view.onClickDelete(); }),
