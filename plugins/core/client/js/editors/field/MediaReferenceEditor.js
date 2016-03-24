@@ -15,7 +15,7 @@ class MediaReferenceEditor extends View {
         let editor = this;
         
         function onClickOK() {
-            if(editor.config.single) {
+            if(!editor.config.multiple) {
                 editor.value = $modal.find('.thumbnail.active').attr('data-id');
             
             } else {
@@ -44,7 +44,7 @@ class MediaReferenceEditor extends View {
                         _.div({class: 'row'},
                             _.each(resources.media, function(i, media) {
                                 function onClick() {
-                                    if(editor.config.single) {
+                                    if(!editor.config.multiple) {
                                         $modal.find('.thumbnail').toggleClass('active', false);
                                         $(this).toggleClass('active', true);
                                     } else {
@@ -53,7 +53,7 @@ class MediaReferenceEditor extends View {
                                 }
                                 
                                 return _.div({class: 'col-md-3'},  
-                                    _.button({class: 'list-group-item thumbnail'}, [
+                                    _.button({class: 'list-group-item thumbnail', 'data-id': media.id}, [
                                         _.img({class: 'img-responsive', src: '/media/' + media.id}),
                                         _.label(media.name)  
                                     ]).click(onClick)
@@ -70,7 +70,7 @@ class MediaReferenceEditor extends View {
             )
         );
 
-        if(editor.config.single) {
+        if(!editor.config.multiple) {
             $modal.find('.thumbnail[data-id="' + editor.value + '"]').toggleClass('active', true);
 
         } else {

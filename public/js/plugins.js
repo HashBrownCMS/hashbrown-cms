@@ -1760,7 +1760,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                     var editor = this;
 
                     function onClickOK() {
-                        if (editor.config.single) {
+                        if (!editor.config.multiple) {
                             editor.value = $modal.find('.thumbnail.active').attr('data-id');
                         } else {
                             editor.value = [];
@@ -1777,7 +1777,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
                     var $modal = _.div({ class: 'modal fade media-modal' }, _.div({ class: 'modal-dialog' }, _.div({ class: 'modal-content' }, [_.div({ class: 'modal-header' }, [_.button({ class: 'close', 'data-dismiss': 'modal' }, _.span({ class: 'fa fa-close' })), _.h4('Pick a media object')]), _.div({ class: 'modal-body' }, _.div({ class: 'row' }, _.each(resources.media, function (i, media) {
                         function onClick() {
-                            if (editor.config.single) {
+                            if (!editor.config.multiple) {
                                 $modal.find('.thumbnail').toggleClass('active', false);
                                 $(this).toggleClass('active', true);
                             } else {
@@ -1785,10 +1785,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                             }
                         }
 
-                        return _.div({ class: 'col-md-3' }, _.button({ class: 'list-group-item thumbnail' }, [_.img({ class: 'img-responsive', src: '/media/' + media.id }), _.label(media.name)]).click(onClick));
+                        return _.div({ class: 'col-md-3' }, _.button({ class: 'list-group-item thumbnail', 'data-id': media.id }, [_.img({ class: 'img-responsive', src: '/media/' + media.id }), _.label(media.name)]).click(onClick));
                     }))), _.div({ class: 'modal-footer' }, _.button({ class: 'btn btn-primary' }, 'OK').click(onClickOK))])));
 
-                    if (editor.config.single) {
+                    if (!editor.config.multiple) {
                         $modal.find('.thumbnail[data-id="' + editor.value + '"]').toggleClass('active', true);
                     } else {
                         editor.value = editor.value || [];
