@@ -1811,7 +1811,17 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 value: function render() {
                     var editor = this;
 
-                    this.$element = _.div({ class: 'field-editor media-reference-editor' }, [this.$button = _.button({ class: 'btn btn-primary' }, 'Browse').click(function () {
+                    var $images = void 0;
+
+                    if (!editor.config.multiple) {
+                        $images = _.img({ class: 'img-responsive', src: '/media/' + editor.value });
+                    } else {
+                        $images = _.each(editor.value, function (i, val) {
+                            return _.img({ class: 'img-responsive', src: '/media/' + val });
+                        });
+                    }
+
+                    this.$element = _.div({ class: 'field-editor media-reference-editor' }, [_.div({ class: 'thumbnail' }, $images), this.$button = _.button({ class: 'btn btn-primary' }, 'Browse').click(function () {
                         editor.onClickBrowse();
                     })]);
                 }
