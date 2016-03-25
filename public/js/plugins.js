@@ -1814,14 +1814,14 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                     var $images = void 0;
 
                     if (!editor.config.multiple) {
-                        $images = _.img({ class: 'img-responsive', src: '/media/' + editor.value });
+                        $images = _.div({ class: 'list-group-item' }, _.img({ src: '/media/' + editor.value }));
                     } else {
                         $images = _.each(editor.value, function (i, val) {
-                            return _.img({ class: 'img-responsive', src: '/media/' + val });
+                            return _.div({ class: 'list-group-item' }, _.img({ src: '/media/' + val }));
                         });
                     }
 
-                    this.$element = _.div({ class: 'field-editor media-reference-editor' }, [_.div({ class: 'thumbnail' }, $images), this.$button = _.button({ class: 'btn btn-primary' }, 'Browse').click(function () {
+                    this.$element = _.div({ class: 'field-editor list-group media-reference-editor' }, [$images, this.$button = _.button({ class: 'list-group-item btn btn-primary' }, 'Browse').click(function () {
                         editor.onClickBrowse();
                     })]);
                 }

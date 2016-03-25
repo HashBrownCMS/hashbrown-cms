@@ -46,3 +46,7 @@
     padding: 10px; }
     .issues-editor .panel .panel-footer .issue-children .issue:last-child .panel, .board-editor .panel .panel-footer .issue-children .issue:last-child .panel {
       margin-bottom: 0px; }
+
+.media-reference-editor .list-group-item img {
+  max-width: 60px;
+  max-height: 60px; }
