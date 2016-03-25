@@ -1745,6 +1745,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
                 var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(MediaReferenceEditor).call(this, params));
 
+                _this.$element = _.div({ class: 'field-editor media-reference-editor' }, [_this.$body = _.div({ class: 'thumbnail-container' }), _this.$footer = _.div()]);
+
                 _this.init();
                 return _this;
             }
@@ -1753,6 +1755,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 key: "onChange",
                 value: function onChange() {
                     this.trigger('change', this.value);
+
+                    this.render();
                 }
             }, {
                 key: "onClickBrowse",
@@ -1775,7 +1779,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                         $modal.modal('hide');
                     }
 
-                    var $modal = _.div({ class: 'modal fade media-modal' }, _.div({ class: 'modal-dialog' }, _.div({ class: 'modal-content' }, [_.div({ class: 'modal-header' }, [_.button({ class: 'close', 'data-dismiss': 'modal' }, _.span({ class: 'fa fa-close' })), _.h4('Pick a media object')]), _.div({ class: 'modal-body' }, _.div({ class: 'row' }, _.each(resources.media, function (i, media) {
+                    var $modal = _.div({ class: 'modal fade media-modal' }, _.div({ class: 'modal-dialog' }, _.div({ class: 'modal-content' }, [_.div({ class: 'modal-header' }, _.input({ class: 'form-control', placeholder: 'Search media' })), _.div({ class: 'modal-body' }, _.div({ class: 'thumbnail-container' }, _.each(resources.media, function (i, media) {
                         function onClick() {
                             if (!editor.config.multiple) {
                                 $modal.find('.thumbnail').toggleClass('active', false);
@@ -1785,7 +1789,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                             }
                         }
 
-                        return _.div({ class: 'col-md-3' }, _.button({ class: 'list-group-item thumbnail', 'data-id': media.id }, [_.img({ class: 'img-responsive', src: '/media/' + media.id }), _.label(media.name)]).click(onClick));
+                        return _.button({
+                            class: 'thumbnail thumbnail-sm',
+                            'data-id': media.id,
+                            style: 'background-image: url(\'/media/' + media.id + '\')'
+                        }, [_.label(media.name)]).click(onClick);
                     }))), _.div({ class: 'modal-footer' }, _.button({ class: 'btn btn-primary' }, 'OK').click(onClickOK))])));
 
                     if (!editor.config.multiple) {
@@ -1814,16 +1822,24 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                     var $images = void 0;
 
                     if (!editor.config.multiple) {
-                        $images = _.div({ class: 'list-group-item' }, _.img({ src: '/media/' + editor.value }));
+                        $images = _.div({
+                            class: 'thumbnail thumbnail-sm',
+                            style: 'background-image: url(\'/media/' + editor.value + '\')'
+                        });
                     } else {
                         $images = _.each(editor.value, function (i, val) {
-                            return _.div({ class: 'list-group-item' }, _.img({ src: '/media/' + val }));
+                            return _.div({
+                                class: 'thumbnail thumbnail-sm',
+                                style: 'background-image: url(\'/media/' + val + '\')'
+                            });
                         });
                     }
 
-                    this.$element = _.div({ class: 'field-editor list-group media-reference-editor' }, [$images, this.$button = _.button({ class: 'list-group-item btn btn-primary' }, 'Browse').click(function () {
+                    this.$body.html($images);
+
+                    this.$footer.html(this.$button = _.button({ class: 'btn btn-primary' }, 'Browse').click(function () {
                         editor.onClickBrowse();
-                    })]);
+                    }));
                 }
             }]);
 

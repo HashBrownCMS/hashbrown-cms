@@ -23,10 +23,16 @@ class JSONEditor extends View {
     }
 
     /**
-     * Event: Click reload. Fetches the model again
+     * Event: Click basic. Returns to the regular editor
      */
-    onClickReload() {
-        this.fetch();
+    onClickBasic() {
+        let url = $('.navbar-main .pane-container.active .pane-item-container.active .pane-item').attr('href');
+    
+        if(url) {
+            location = url;
+        } else {
+            console.log('[JSONEditor] Invalid url "' + url + '"');
+        }
     }
 
     /**
@@ -127,12 +133,12 @@ class JSONEditor extends View {
             this.$error,
             _.div({class: 'panel panel-default panel-buttons'}, 
                 _.div({class: 'btn-group'}, [
+                    _.button({class: 'btn btn-embedded'},
+                        'Basic'
+                    ).click(function() { view.onClickBasic(); }),
                     _.button({class: 'btn btn-danger btn-raised'},
                         'Delete'
                     ).click(function() { view.onClickDelete(); }),
-                    _.button({class: 'btn btn-raised btn-primary'},
-                        'Reload'
-                    ).click(function() { view.onClickReload(); }),
                     _.button({class: 'btn btn-raised btn-success'},
                         'Save '
                     ).click(function() { view.onClickSave(); })
