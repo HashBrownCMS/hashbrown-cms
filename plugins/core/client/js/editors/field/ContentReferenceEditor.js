@@ -12,7 +12,7 @@ class ContentReferenceEditor extends View {
     }
 
     render() {
-        var editor = this;
+        let editor = this;
 
         this.$element = _.div({class: 'field-editor input-group content-reference-editor'}, [
             this.$select = _.select({class: 'form-control'},
