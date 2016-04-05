@@ -106,28 +106,35 @@ class SchemaEditor extends View {
                 parentTabs = view.parentSchema.tabs;
             }
 
-            $element.empty();
-            $element.append(
+            let $tabs = _.div({class: 'chip-group'});
+
+            $element.html($tabs);
+            
+            $tabs.append(
                 _.each(parentTabs, function(id, label) {
-                    return _.p({class: 'tab'},
-                        label + ' (inherited)'
+                    return _.div({class: 'tab chip'},
+                        _.p({class: 'chip-label'},
+                            label + ' (inherited)'
+                        )
                     );
                 })
             );
-            $element.append(
+
+            $tabs.append(
                 _.each(view.model.tabs, function(id, label) {
-                    return _.div({class: 'tab input-group', 'data-id': id}, [
-                        _.input({type: 'text', class: 'form-control', value: label})
+                    return _.div({class: 'tab chip', 'data-id': id}, [
+                        _.input({type: 'text', class: 'chip-label', value: label})
                             .bind('keyup change propertychange paste', onInputChange),
-                        _.div({class: 'input-group-btn'},
-                            _.button({class: 'btn btn-danger'}, 
-                                'Remove'
-                            ).click(onClickRemove)
-                        )
+                        _.button({class: 'btn chip-remove'}, 
+                            _.span({class: 'fa fa-remove'})
+                        ).click(onClickRemove)
                     ]);
-                }),
-                _.button({class: 'btn btn-primary'},
-                    _.span('Add tab')
+                })
+            );
+
+            $tabs.append(
+                _.button({class: 'btn chip-add'},
+                    _.span({class: 'fa fa-plus'})
                 ).click(onClickAdd)
             );
         }

@@ -21,6 +21,56 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
 /**
  * Colour a button
  */
+.chip-group .chip {
+  margin: 0px 0px 8px 8px;
+  height: 32px;
+  line-height: 32px;
+  padding: 0px 4px;
+  border-radius: 16px;
+  background-color: #eeeeee;
+  display: inline-block; }
+  .chip-group .chip input.chip-label {
+    max-width: 100px; }
+  .chip-group .chip .chip-label {
+    color: #757575;
+    margin: 0px 8px 0px 8px;
+    height: 32px;
+    line-height: 32px;
+    background-color: transparent;
+    border: 0px;
+    padding: 0px; }
+  .chip-group .chip .chip-remove {
+    margin: 0px 0px 0px 4px;
+    background-color: transparent;
+    padding: 0px !important;
+    height: 32px;
+    width: 24px;
+    position: relative;
+    top: -2px; }
+    .chip-group .chip .chip-remove .fa {
+      color: #757575;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%); }
+
+.chip-group .chip-add {
+  margin: 0px 0px 8px 8px;
+  height: 32px;
+  width: 32px;
+  line-height: 32px;
+  border-radius: 16px;
+  background-color: #757575;
+  display: inline-block;
+  padding: 0px !important;
+  position: relative; }
+  .chip-group .chip-add .fa {
+    color: #eeeeee;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); }
+
 .thumbnail {
   background-position: center;
   background-size: cover;
