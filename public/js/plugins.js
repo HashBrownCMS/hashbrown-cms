@@ -1761,6 +1761,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 value: function render() {
                     var editor = this;
 
+                    this.value = parseInt(this.value);
+
                     var date = new Date(this.value);
 
                     this.$element = _.div({ class: 'field-editor date-editor' }, this.disabled ? _.p({}, date) : this.$input = _.input({ class: 'form-control', type: 'text', value: this.value }));

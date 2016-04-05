@@ -14,6 +14,8 @@ class DateEditor extends View {
     render() {
         var editor = this;
 
+        this.value = parseInt(this.value);
+
         var date = new Date(this.value);
 
         this.$element = _.div({class: 'field-editor date-editor'},
