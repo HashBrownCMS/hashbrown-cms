@@ -290,7 +290,7 @@ class SchemaEditor extends View {
 
         let $element = _.div({class: 'schema'});
         
-        // Page type
+        // Content type
         if(this.model.id < 20000) {
             $element.html([
                 this.renderField('Icon', this.renderIconEditor()),    

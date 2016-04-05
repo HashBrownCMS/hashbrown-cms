@@ -5,54 +5,42 @@ let Promise = require('bluebird');
 
 class ContentHelper {
     /**
-     * Gets all Section objects
+     * Gets all Content objects
      * This method must be overridden by a plugin
      *
      * @return {Promise} promise
      */
-    static getAllSections() {
-        return new Promise(function(callback) {
-            callback([]);   
-        });
-    }
-    
-    /**
-     * Gets all Page objects
-     * This method must be overridden by a plugin
-     *
-     * @return {Promise} promise
-     */
-    static getAllPages() {
+    static getAllContent() {
         return new Promise(function(callback) {
             callback([]);   
         });
     }
 
     /**
-     * Gets a Page object by id
+     * Gets a Content object by id
      * This method must be overridden by a plugin
      *
      * @param {Number} id
      *
      * @return {Promise} promise
      */
-    static getPageById(id) {
+    static getContentById(id) {
         return new Promise(function(callback) {
             callback({});   
         });
     }
     
     /**
-     * Sets a Page object by id
+     * Sets a Content object by id
      * This method must be overridden by a plugin
      *
      * @param {Number} id
-     * @param {Object} page
+     * @param {Object} content
      *
      * @return {Promise} promise
      */
-    static setPageById(id, page) {
-        page.updateDate = Date.now();
+    static setContentById(id, content) {
+        content.updateDate = Date.now();
 
         return new Promise(function(callback) {
             callback();   
@@ -60,30 +48,30 @@ class ContentHelper {
     }
     
     /**
-     * Removes a Page object by id
+     * Removes a Content object by id
      * This method must be overridden by a plugin
      *
      * @param {Number} id
      *
      * @return {Promise} promise
      */
-    static removePageById(id) {
+    static removeContentById(id) {
         return new Promise(function(callback) {
             callback();   
         });
     }
 
     /**
-     * Creates a new page
+     * Creates a new content
      * This method must be overridden by a plugin
      *
      * @return {Promise} promise
      */
-    static createPage() {
-        let page = Page.create();
+    static createContent() {
+        let content = Content.create();
 
         return new Promise(function(callback) {
-            callback(page.data);   
+            callback(content.data);   
         });
     }
 }

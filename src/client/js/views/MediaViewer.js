@@ -16,7 +16,7 @@ class MediaViewer extends View {
     onClickDelete() {
         new MessageModal({
             model: {
-                title: 'Delete page',
+                title: 'Delete content',
                 body: 'Are you sure you want to delete this?'
             },
             buttons: [

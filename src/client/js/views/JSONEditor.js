@@ -66,14 +66,14 @@ class JSONEditor extends View {
         let view = this;
 
         function onSuccess() {
-            console.log('[PageEditor] Removed page with id "' + view.model.id + '"'); 
+            console.log('[JsonEditor] Removed content with id "' + view.model.id + '"'); 
         
-            reloadResource('pages')
+            reloadResource('content')
             .then(function() {
                 ViewHelper.get('NavbarMain').reload();
                 
                 // Cancel the JSONEditor view
-                location.hash = '/pages/';
+                location.hash = '/content/';
             });
         }
 
@@ -94,7 +94,7 @@ class JSONEditor extends View {
                     class: 'btn-danger',
                     callback: function() {
                         $.ajax({
-                            url: '/api/pages/' + view.model.id,
+                            url: '/api/content/' + view.model.id,
                             type: 'DELETE',
                             success: onSuccess
                         });

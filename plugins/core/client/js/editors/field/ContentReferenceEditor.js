@@ -1,6 +1,6 @@
 'use strict';
 
-class PageReferenceEditor extends View {
+class ContentReferenceEditor extends View {
     constructor(params) {
         super(params);
 
@@ -14,10 +14,10 @@ class PageReferenceEditor extends View {
     render() {
         var editor = this;
 
-        this.$element = _.div({class: 'field-editor input-group page-reference-editor'}, [
+        this.$element = _.div({class: 'field-editor input-group content-reference-editor'}, [
             this.$select = _.select({class: 'form-control'},
-                _.each(window.resources.pages, function(id, page) {
-                    return _.option({value: page.id}, page.title);
+                _.each(window.resources.content, function(id, node) {
+                    return _.option({value: node.id}, node.title);
                 })
             ).change(function() { editor.onChange(); }),
             _.div({class: 'input-group-btn'}, 
@@ -37,4 +37,4 @@ class PageReferenceEditor extends View {
     }
 }
 
-resources.editors['20006'] = PageReferenceEditor;
+resources.editors['20006'] = ContentReferenceEditor;

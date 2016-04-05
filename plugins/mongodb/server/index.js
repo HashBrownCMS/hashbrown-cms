@@ -15,7 +15,7 @@ let config = require('./config.json');
 let ContentHelper = require(appRoot + '/src/server/helpers/ContentHelper');
 
 // Models
-let Page = require(appRoot + '/src/server/models/Page');
+let Content = require(appRoot + '/src/server/models/Content');
 
 class MongoDB {
     /**
@@ -181,39 +181,27 @@ class MongoDB {
     }
 
     /**
-     * Gets all Section objects
+     * Gets all Content objects
      *
      * @return {Promise} promise
      */
-    static getAllSections() {
+    static getAllContent() {
         return MongoDB.find(
-            'sections',
-            {}
-        );
-    }
-    
-    /**
-     * Gets all Page objects
-     *
-     * @return {Promise} promise
-     */
-    static getAllPages() {
-        return MongoDB.find(
-            'pages',
+            'content',
             {}
         );
     }
 
     /**
-     * Gets a Page object by id
+     * Gets a Content object by id
      *
      * @param {Number} id
      *
      * @return {Promise} promise
      */
-    static getPageById(id) {
+    static getContentById(id) {
         return MongoDB.findOne(
-            'pages',
+            'content',
             {
                 id: id
             }
@@ -221,51 +209,51 @@ class MongoDB {
     }
     
     /**
-     * Sets a Page object by id
+     * Sets a Content object by id
      *
      * @param {Number} id
-     * @param {Object} page
+     * @param {Object} content
      *
      * @return {Promise} promise
      */
-    static setPageById(id, page) {
-        page.updateDate = Date.now();
+    static setContentById(id, content) {
+        content.updateDate = Date.now();
 
         return MongoDB.updateOne(
-            'pages',
+            'content',
             {
                 id: id
             },
-            page
+            content
         );
     }
 
     /**
-     * Creates a new page
+     * Creates a new content
      *
      * @param {Object} date
      *
      * @return {Promise} promise
      */
-    static createPage(data) {
-        let page = Page.create(data);
+    static createContent(data) {
+        let content = Content.create(data);
 
         return MongoDB.insertOne(
-            'pages',
-            page.data
+            'content',
+            content.data
         );
     }
     
     /**
-     * Removes a page
+     * Removes a content
      *
      * @param {Number} id
      *
      * @return {Promise} promise
      */
-    static removePageById(id) {
+    static removeContentById(id) {
         return MongoDB.removeOne(
-            'pages',
+            'content',
             {
                 id: id
             }
@@ -280,12 +268,11 @@ class MongoDB {
 
         // Override ContentHelper methods
         // TODO: Restructure this to use event handlers instead
-        ContentHelper.createPage = MongoDB.createPage;
-        ContentHelper.removePageById = MongoDB.removePageById;
-        ContentHelper.getAllPages = MongoDB.getAllPages;
-        ContentHelper.getPageById = MongoDB.getPageById;
-        ContentHelper.setPageById = MongoDB.setPageById;
-        ContentHelper.getAllSections = MongoDB.getAllSections;
+        ContentHelper.createContent = MongoDB.createContent;
+        ContentHelper.removeContentById = MongoDB.removeContentById;
+        ContentHelper.getAllContent = MongoDB.getAllContent;
+        ContentHelper.getContentById = MongoDB.getContentById;
+        ContentHelper.setContentById = MongoDB.setContentById;
     }
 }
 

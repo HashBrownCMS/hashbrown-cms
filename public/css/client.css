@@ -403,16 +403,16 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
     display: block;
     border: 0px; }
 
-.page-editor {
+.content-editor {
   height: 100%; }
-  .page-editor > .object {
+  .content-editor > .object {
     display: flex;
     flex-direction: column;
     height: 100%; }
-    .page-editor > .object > .tab-content {
+    .content-editor > .object > .tab-content {
       flex-grow: 1;
       overflow-y: auto; }
-  .page-editor .object .tab-content {
+  .content-editor .object .tab-content {
     padding: 15px; }
 
 .schema-editor {

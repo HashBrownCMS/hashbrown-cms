@@ -8,7 +8,7 @@ let Promise = require('bluebird');
 // Views
 let NavbarMain = require('./views/NavbarMain');
 let JSONEditor = require('./views/JSONEditor');
-let PageEditor = require('./views/PageEditor');
+let ContentEditor = require('./views/ContentEditor');
 let SchemaEditor = require('./views/SchemaEditor');
 let MediaViewer = require('./views/MediaViewer');
 
@@ -20,8 +20,7 @@ require('./helpers');
 // -----------
 window.resources = {
     editors: [],
-    pages: [],
-    sections: [],
+    content: [],
     schemas: [],
     media: []
 };
@@ -35,38 +34,38 @@ window.reloadAllResources()
 // -----------
 // Routes
 // -----------
-// Page dashboard
-Router.route('/pages/', function() {
-    ViewHelper.get('NavbarMain').showTab('/pages/');
+// Content dashboard
+Router.route('/content/', function() {
+    ViewHelper.get('NavbarMain').showTab('/content/');
     
     $('.workspace').html(
         _.div({class: 'dashboard-container'}, [
-            _.h1('Pages dashboard'),
-            _.p('Please click on a page to proceed')
+            _.h1('Content dashboard'),
+            _.p('Please click on a content node to proceed')
         ])
     );
 });
 
-// Page edit
-Router.route('/pages/:id', function() {
-    let pageEditor = new PageEditor({
-        modelUrl: '/api/pages/' + this.id
+// Content edit
+Router.route('/content/:id', function() {
+    let contentEditor = new ContentEditor({
+        modelUrl: '/api/content/' + this.id
     });
    
     ViewHelper.get('NavbarMain').highlightItem(this.id);
     
-    $('.workspace').html(pageEditor.$element);
+    $('.workspace').html(contentEditor.$element);
 });
 
-// Page edit (JSON editor)
-Router.route('/pages/json/:id', function() {
-    let pageEditor = new JSONEditor({
-        modelUrl: '/api/pages/' + this.id
+// Content edit (JSON editor)
+Router.route('/content/json/:id', function() {
+    let contentEditor = new JSONEditor({
+        modelUrl: '/api/content/' + this.id
     });
      
     ViewHelper.get('NavbarMain').highlightItem(this.id);
     
-    $('.workspace').html(pageEditor.$element);
+    $('.workspace').html(contentEditor.$element);
 });
 
 // Schema edit

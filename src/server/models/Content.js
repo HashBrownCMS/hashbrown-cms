@@ -24,9 +24,13 @@ class Content {
     static create(data) {
         let content = new Content(data || {});
         
-        // Create unique id
         content.data.id = crypto.randomBytes(20).toString('hex');
-    
+        content.data.createDate = Date.now();
+        content.data.updateDate = Date.now();
+        content.data.schemaId = content.data.schemaId || '10000';
+
+        content.data.title = 'New content';
+
         return content;
     }
 

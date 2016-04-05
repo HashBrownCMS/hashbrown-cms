@@ -42,18 +42,16 @@ class ApiController extends Controller {
      * Initialises this controller
      */
     static init(app) {
-        app.get('/api/pages', ApiController.getPages);
-        app.get('/api/pages/:id', ApiController.getPage);
-        app.post('/api/pages/new', ApiController.createPage);
-        app.post('/api/pages/:id', ApiController.postPage);
-        app.delete('/api/pages/:id', ApiController.deletePage);
+        app.get('/api/content', ApiController.getAllContent);
+        app.get('/api/content/:id', ApiController.getContent);
+        app.post('/api/content/new', ApiController.createContent);
+        app.post('/api/content/:id', ApiController.postContent);
+        app.delete('/api/content/:id', ApiController.deleteContent);
 
         app.get('/api/schemas', ApiController.getSchemas);
         app.get('/api/schemas/:id', ApiController.getSchema);
         app.post('/api/schemas/:id', ApiController.setSchema);
         
-        app.get('/api/sections', ApiController.getSections);
-
         app.get('/api/media', ApiController.getMedia);
         app.post('/api/media/new', uploadMedia.single('media'), ApiController.createMedia);
         app.post('/api/media/:id', uploadMedia.single('media'), ApiController.setMedia);
@@ -121,77 +119,67 @@ class ApiController extends Controller {
     }
 
     /**
-     * Gets a list of all Section objects
+     * Gets a list of all Content objects
      */
-    static getSections(req, res) {
-        ContentHelper.getAllSections()
-        .then(function(sections) {
-            res.send(sections);
+    static getAllContent(req, res) {
+        ContentHelper.getAllContent()
+        .then(function(nodes) {
+            res.send(nodes);
         });
     }
 
     /**
-     * Gets a list of all Page objects
-     */
-    static getPages(req, res) {
-        ContentHelper.getAllPages()
-        .then(function(pages) {
-            res.send(pages);
-        });
-    }
-
-    /**
-     * Gets a Page object by id
+     * Gets a Content object by id
      *
-     * @return {Object} Page
+     * @return {Object} Content
      */
-    static getPage(req, res) {
+    static getContent(req, res) {
         let id = req.params.id;
    
         if(id && id != 'undefined') {
-            ContentHelper.getPageById(id)
-            .then(function(page) {
-                res.send(page);
+            ContentHelper.getContentById(id)
+            .then(function(node) {
+                res.send(node);
             });
         
         } else {
-            throw '[Api] Page id is undefined';
+            throw '[Api] Content id is undefined';
         
         }
     }
     
     /**
-     * Creates a new Page object
+     * Creates a new Content object
      *
-     * @return {Object} Page
+     * @return {Object} Content
      */
-    static createPage(req, res) {
-        ContentHelper.createPage(req.body)
-        .then(function(page) {
-            res.send(page);
+    static createContent(req, res) {
+        ContentHelper.createContent(req.body)
+        .then(function(node) {
+            res.send(node);
         });
     }
 
     /**
-     * Posts a Page object by id
+     * Posts a Content object by id
      */
-    static postPage(req, res) {
+    static postContent(req, res) {
         let id = req.params.id;
-        let page = req.body;
+        let node = req.body;
         
-        ContentHelper.setPageById(id, page)
+        ContentHelper.setContentById(id, node)
         .then(function() {
             res.sendStatus(200);
         });
     }
     
     /**
-     * Deletes a Page object by id
+     * Deletes a Content object by id
      */
-    static deletePage(req, res) {
+    static deleteContent(req, res) {
         let id = req.params.id;
         
-        ContentHelper.removePageById(id)
+        ContentHelper.removeContentById(id)
         .then(function() {
             res.sendStatus(200);
         });

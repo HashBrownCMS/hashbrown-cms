@@ -64,7 +64,7 @@ window.reloadResource = function reloadResource(name) {
  */
 window.reloadAllResources = function reloadAllResources() {
     return new Promise(function(callback) {
-        let queue = ['pages', 'sections', 'schemas', 'media'];
+        let queue = ['content', 'schemas', 'media'];
 
         function processQueue(name) {
             window.reloadResource(name)

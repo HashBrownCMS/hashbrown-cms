@@ -1,13 +1,13 @@
 'use strict';
 
-let MediaHelper = require('../helpers/MediaHelper');
+let crypto = require('crypto');
 
-let Content = require('./Content');
+let MediaHelper = require('../helpers/MediaHelper');
 
 /**
  * The base class for all Media objects
  */
-class Media extends Content {
+class Media {
     /**
      * Creates a new Media object
      *
@@ -20,6 +20,7 @@ class Media extends Content {
 
         let media = new Media(content.data);
     
+        media.data.id = crypto.randomBytes(20).toString('hex');
         media.uploadPromise = MediaHelper.setMediaData(media.data.id, file);
 
         return media;

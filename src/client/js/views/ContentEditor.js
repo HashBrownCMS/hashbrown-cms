@@ -3,11 +3,11 @@
 // Views
 let MessageModal = require('./MessageModal');
 
-class PageEditor extends View {
+class ContentEditor extends View {
     constructor(params) {
         super(params);
 
-        this.$element = _.div({class: 'editor page-editor'});
+        this.$element = _.div({class: 'editor content-editor'});
 
         this.fetch();
     }
@@ -16,7 +16,7 @@ class PageEditor extends View {
      * Event: Click advanced. Routes to the JSON editor
      */
     onClickAdvanced() {
-        location.hash = '/pages/json/' + this.model.id;
+        location.hash = '/content/json/' + this.model.id;
     }
 
     /**
@@ -32,10 +32,10 @@ class PageEditor extends View {
             url: view.modelUrl,
             data: view.model,
             success: function() {
-                console.log('[PageEditor] Saved model to ' + view.modelUrl);
+                console.log('[ContentEditor] Saved model to ' + view.modelUrl);
                 view.$saveBtn.toggleClass('saving', false);
             
-                reloadResource('pages')
+                reloadResource('content')
                 .then(function() {
                     let navbar = ViewHelper.get('NavbarMain');
 
@@ -68,21 +68,21 @@ class PageEditor extends View {
         let view = this;
 
         function onSuccess() {
-            console.log('[PageEditor] Removed page with id "' + view.model.id + '"'); 
+            console.log('[ContentEditor] Removed content with id "' + view.model.id + '"'); 
         
-            reloadResource('pages')
+            reloadResource('content')
             .then(function() {
                 ViewHelper.get('NavbarMain').reload();
                 
-                // Cancel the PageEditor view
-                location.hash = '/pages/';
+                // Cancel the ContentEditor view
+                location.hash = '/content/';
             });
         }
 
         new MessageModal({
             model: {
-                title: 'Delete page',
-                body: 'Are you sure you want to delete the page "' + view.model.title + '"?'
+                title: 'Delete content',
+                body: 'Are you sure you want to delete the content "' + view.model.title + '"?'
             },
             buttons: [
                 {
@@ -96,7 +96,7 @@ class PageEditor extends View {
                     class: 'btn-danger',
                     callback: function() {
                         $.ajax({
-                            url: '/api/pages/' + view.model.id,
+                            url: '/api/content/' + view.model.id,
                             type: 'DELETE',
                             success: onSuccess
                         });
@@ -165,25 +165,25 @@ class PageEditor extends View {
                 return fieldEditorInstance.$element;
 
             } else {
-                console.log('[PageEditor] No editor found for field schema id "' + fieldSchema.id + '"');
+                console.log('[ContentEditor] No editor found for field schema id "' + fieldSchema.id + '"');
             
             }
         
         } else {
-            console.log('[PageEditor] No field schema found for schema id "' + schemaValue.schemaId + '"');
+            console.log('[ContentEditor] No field schema found for schema id "' + schemaValue.schemaId + '"');
 
         }
     }
 
     /**
-     * Renders a Page object
+     * Renders a Content object
      *
      * @param {Object} data
      * @param {Object} schema
      *
      * @return {Object} element
      */
-    renderPageObject(object, schema) {
+    renderContentObject(object, schema) {
         let view = this;
 
         return _.div({class: 'object'}, [
@@ -242,11 +242,11 @@ class PageEditor extends View {
     render() {
         let view = this;
 
-        let pageSchema = getSchemaWithParents(this.model.schemaId);
+        let contentSchema = getSchemaWithParents(this.model.schemaId);
 
-        if(pageSchema) {
+        if(contentSchema) {
             this.$element.html([
-                this.renderPageObject(this.model, pageSchema).append(
+                this.renderContentObject(this.model, contentSchema).append(
                     _.div({class: 'panel panel-default panel-buttons'}, 
                         _.div({class: 'btn-group'}, [
                             _.button({class: 'btn btn-embedded'},
@@ -269,4 +269,4 @@ class PageEditor extends View {
     }
 }
 
-module.exports = PageEditor;
+module.exports = ContentEditor;
