@@ -2,10 +2,15 @@
 
 var gulp = require('gulp');
 var sass = require('gulp-sass');
-var browserify = require('gulp-browserify');
 var plumber = require('gulp-plumber');
 var babel = require('gulp-babel');
 var concat = require('gulp-concat');
+var source = require('vinyl-source-stream');
+var sourcemaps = require('gulp-sourcemaps');
+var buffer = require('vinyl-buffer');
+var browserify = require('browserify');
+var glob = require('glob');
+var eventstream = require('event-stream');
 
 class PluginWatcher {
     /**
@@ -13,9 +18,9 @@ class PluginWatcher {
      */
     static register() {
         /**
-         * Compile SASS for plugins
+         * Compile SASS
          */
-        gulp.task('sass-plugins', function() {
+        gulp.task('sass', function() {
             gulp.src(appRoot + '/plugins/*/client/sass/**/*.scss')
                 .pipe(plumber())
                 .pipe(sass({
@@ -28,36 +33,40 @@ class PluginWatcher {
         });
 
         /**
-         * Compile JS for plugins
+         * Compile JS
          */
-        gulp.task('js-plugins', function() {
-            gulp.src(appRoot + '/plugins/*/client/js/**/*.js')
-                .pipe(plumber())
-                .pipe(browserify({
-                    paths: [
-                        appRoot + '/node_modules/',
-                        appRoot + '/'
-                    ]
-                }))
-                .pipe(babel({
-                    presets: [ 'es2015' ]
-                }))
-                .pipe(concat('plugins.js'))
-                .pipe(gulp.dest(appRoot + '/public/js/'));
+        gulp.task('js', function() {
+            glob(appRoot + '/plugins/*/client/js/client.js', function(err, files) {
+                if(err) {
+                    done(err);
+                }
+
+                return browserify(files)
+                    .bundle()
+                    .pipe(source('client.js'))
+                    .pipe(buffer())
+                    .pipe(sourcemaps.init({loadMaps: true}))
+                        .pipe(babel({
+                            presets: [ 'es2015' ]
+                        }))
+                    .pipe(concat('plugins.js'))
+                    .pipe(gulp.dest(appRoot + '/public/js/'));
+            });
+
         });
         
         /**
          * Watch plugin code
          */
-        gulp.task('watch-plugins', function() {
-            gulp.watch(appRoot + '/plugins/*/client/js/**/*.js', [ 'js-plugins' ]);
-            gulp.watch(appRoot + '/plugins/*/client/sass/**/*.scss', [ 'sass-plugins' ]);
+        gulp.task('watch', function() {
+            gulp.watch(appRoot + '/plugins/*/client/js/**/*.js', [ 'js' ]);
+            gulp.watch(appRoot + '/plugins/*/client/sass/**/*.scss', [ 'sass' ]);
         });
         
         // ----------
         // Default tasks
         // ----------
-        gulp.task('default', [ 'sass-plugins', 'js-plugins', 'watch-plugins' ]);
+        gulp.task('default', [ 'sass', 'js', 'watch' ]);
     }
 
     /**

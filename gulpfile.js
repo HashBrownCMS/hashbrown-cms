@@ -1,9 +1,11 @@
 var gulp = require('gulp');
 var sass = require('gulp-sass');
-var browserify = require('gulp-browserify');
 var plumber = require('gulp-plumber');
 var babel = require('gulp-babel');
-var concat = require('gulp-concat');
+var source = require('vinyl-source-stream');
+var sourcemaps = require('gulp-sourcemaps');
+var buffer = require('vinyl-buffer');
+var browserify = require('browserify');
 
 /**
  * Compile native SASS
@@ -23,18 +25,17 @@ gulp.task('sass', function() {
  * Compile native JS
  */
 gulp.task('js', function() {
-    gulp.src('./src/client/js/client.js')
+    return browserify('./src/client/js/client.js')
+        .bundle()
         .pipe(plumber())
-        .pipe(browserify({
-            paths: [
-                './node_modules/',
-                './'
-            ]
-        }))
-        .pipe(babel({
-            presets: [ 'es2015' ]
-        }))
-        .pipe(gulp.dest('./public/js'));
+        .pipe(source('client.js'))
+        .pipe(buffer())
+        .pipe(sourcemaps.init({loadMaps: true}))
+            .pipe(babel({
+                presets: [ 'es2015' ]
+            }))
+        .pipe(sourcemaps.write('./'))
+        .pipe(gulp.dest('./public/js/'));
 });
 
 /**
