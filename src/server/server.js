@@ -13,25 +13,6 @@ Promise.onPossiblyUnhandledRejection(function(error){
 });
 
 // ----------
-// Gulp
-// ----------
-let gulp = exec('cd ' + appRoot + ' && gulp', {
-    cdw: appRoot
-});
-
-gulp.stdout.on('data', (data) => {
-    console.log('[Gulp] ' + data);
-});
-
-gulp.stderr.on('data', (data) => {
-    console.log('[Gulp] ' + data);
-});
-
-gulp.on('close', (data) => {
-    console.log('[Gulp] ' + data);
-});
-
-// ----------
 // Express app
 // ----------
 let app = express();
@@ -50,6 +31,13 @@ function ready() {
 
     console.log('[Endomon CMS] Running on port 8000');
 }
+
+// ----------
+// Watchers
+// ----------
+let PluginWatcher = require(appRoot + '/src/server/watchers/PluginWatcher');
+
+PluginWatcher.init();
 
 // ----------
 // Controllers
