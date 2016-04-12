@@ -120,7 +120,7 @@ class MediaReferenceEditor extends View {
 
         this.$footer.html(
             this.$button = _.button({class: 'btn btn-primary'},
-                'Browse'
+                'Add media'
             ).click(function() { editor.onClickBrowse(); })
         );
     }
