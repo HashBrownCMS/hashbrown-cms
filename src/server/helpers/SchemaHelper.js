@@ -34,6 +34,9 @@ class SchemaHelper {
                             }
 
                             let schema = JSON.parse(data);
+                            let parentDirName = path.dirname(schemaPath).replace(appRoot + '/schemas/', '');
+
+                            schema.schemaType = parentDirName;
 
                             // Add the loaded schema to the output array
                             schemas[schema.id] = schema;
