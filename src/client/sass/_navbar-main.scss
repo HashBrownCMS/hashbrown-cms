@@ -88,6 +88,36 @@
                         }
                     }
 
+                    &.pane-folder-container {
+                        &.open {
+                            .pane-folder {
+                                .fa-folder {
+                                    display: none;
+                                }
+                            }
+
+                            .children {
+                                display: block;
+                            }
+                        }
+
+                        &:not(.open) {
+                            .pane-folder {
+                                .fa-folder-open {
+                                    display: none;
+                                }
+                            }
+                        }
+
+                        .pane-folder {
+                            text-transform: capitalize;
+                        }
+                        
+                        .children {
+                            display: none;
+                        }
+                    }
+
                     .pane-item {
                         display: block;
                         border-radius: 0px;
@@ -98,6 +128,7 @@
                         height: 60px;
                         padding: 0px 15px;
                         clear: both;
+                        cursor: pointer;
 
                         &, &:focus, &:hover, &:active {
                             text-decoration: none;

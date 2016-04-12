@@ -501,6 +501,16 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
           .navbar-main .tab-panes .pane-container .pane .pane-item-container.active > .pane-item:hover {
             background-color: #424242;
             border-right: 5px solid #9e9e9e; }
+        .navbar-main .tab-panes .pane-container .pane .pane-item-container.pane-folder-container.open .pane-folder .fa-folder {
+          display: none; }
+        .navbar-main .tab-panes .pane-container .pane .pane-item-container.pane-folder-container.open .children {
+          display: block; }
+        .navbar-main .tab-panes .pane-container .pane .pane-item-container.pane-folder-container:not(.open) .pane-folder .fa-folder-open {
+          display: none; }
+        .navbar-main .tab-panes .pane-container .pane .pane-item-container.pane-folder-container .pane-folder {
+          text-transform: capitalize; }
+        .navbar-main .tab-panes .pane-container .pane .pane-item-container.pane-folder-container .children {
+          display: none; }
         .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item {
           display: block;
           border-radius: 0px;
@@ -510,7 +520,8 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
           margin: 0px;
           height: 60px;
           padding: 0px 15px;
-          clear: both; }
+          clear: both;
+          cursor: pointer; }
           .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item, .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item:focus, .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item:hover, .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item:active {
             text-decoration: none; }
           .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item:hover {

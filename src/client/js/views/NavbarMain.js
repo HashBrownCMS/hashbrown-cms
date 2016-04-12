@@ -414,13 +414,18 @@ class NavbarMain extends View {
                 
                 // Create parent item
                 } else if(queueItem.createDir) {
-                    $parentDir = _.div({class: 'pane-item-container'}, [
+                    function onClickDir() {
+                        $parentDir.toggleClass('open');
+                    }
+
+                    $parentDir = _.div({class: 'pane-item-container pane-folder-container'}, [
                         _.a({
-                            class: 'pane-item'
+                            class: 'pane-item pane-folder'
                         }, [
                             _.span({class: 'fa fa-folder'}),
+                            _.span({class: 'fa fa-folder-open'}),
                             _.span(parentDirAttrValue)
-                        ]),
+                        ]).click(onClickDir),
                         _.div({class: 'children'})
                     ]);
                     
@@ -506,6 +511,8 @@ class NavbarMain extends View {
                 $item.attr('data-routing-path') == route
             ) {
                 $item.toggleClass('active', true);
+
+                $item.parents('.pane-folder-container').toggleClass('open', true);
 
                 view.showTab($item.parents('.pane-container').attr('data-route'));
             }
