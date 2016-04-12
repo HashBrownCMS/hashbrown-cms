@@ -423,8 +423,20 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
     flex-grow: 1;
     overflow-y: auto;
     padding: 15px; }
-    .schema-editor > .schema .icon-editor .modal .btn {
-      width: 20%; }
+    .schema-editor > .schema .icon-editor .modal .modal-dialog {
+      width: 900px;
+      max-width: calc(100% - 30px); }
+    .schema-editor > .schema .icon-editor .modal .icon-search {
+      margin-bottom: 15px; }
+    .schema-editor > .schema .icon-editor .modal .btn-icon {
+      text-align: left;
+      padding: 10px 15px !important;
+      width: 25%;
+      overflow: hidden;
+      text-overflow: ellipsis; }
+      .schema-editor > .schema .icon-editor .modal .btn-icon .fa {
+        font-size: 20px;
+        margin-right: 15px; }
 
 .navbar-main {
   display: flex;

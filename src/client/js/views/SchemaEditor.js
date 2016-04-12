@@ -58,6 +58,26 @@ class SchemaEditor extends View {
     }
 
     /**
+     * Renders the name editor
+     *
+     * @return {Object} element
+     */
+    renderNameEditor() {
+        let view = this;
+
+        function onInputChange() {
+            view.model.name = $(this).val();
+        }
+
+        let $element = _.div({class: 'name-editor'},
+            _.input({class: 'form-control', type: 'text', value: view.model.name, placholder: 'Write the schema name here'})
+                .on('change', onInputChange)
+        );
+
+        return $element;
+    }
+
+    /**
      * Renders the tabs editor
      *  
      * @return {Object} element
@@ -158,38 +178,48 @@ class SchemaEditor extends View {
             $element.find('.modal').modal('show');
         }
 
-        function onClickSearch() {
-            let query = $element.find('.modal input').val();
+        function onSearch() {
+            let query = $element.find('.icon-search input').val().toLowerCase();
 
-            console.log(query);
+            if(query.length > 2 || query.length == 0) {
+                view.$element.find('.btn-icon').each(function(i) {
+                    let $btn = $(this);
+                    let name = $btn.children('.icon-name').html();
+
+                    $btn.toggle(name.indexOf(query) > -1);
+                });
+            }
         }
 
         let $element = _.div({class: 'icon-editor'}, [
-            _.button({class: 'btn btn-default'},
+            _.button({class: 'btn btn-icon-browse btn-default'},
                 _.span({class: 'fa fa-' + this.model.icon})
             ).click(onClickBrowse),
             _.div({class: 'modal fade'},
                 _.div({class: 'modal-dialog'},
                     _.div({class: 'modal-content'},
                         _.div({class: 'modal-body'}, [
-                            _.div({class: 'input-group'}, [
-                                _.input({type: 'text', class: 'form-control'}),
-                                _.div({class: 'input-group-btn'},
-                                    _.button({class: 'btn btn-primary'},
-                                        'Search'
-                                    ).click(onClickSearch)
-                                )
+                            _.div({class: 'icon-search'}, [
+                                _.input({type: 'text', class: 'form-control', placeholder: 'Search for icons'})
+                                    .on('keyup', function(e) {
+                                        if(e.which == 13) {
+                                            onSearch();
+                                        }
+                                    }),
                             ]),
                             _.each(icons, function(i, icon) {
-                                function onClickSelect() {
+                                function onClickButton() {
                                     view.model.icon = icon;
 
                                     $element.find('.btn-icon-browse .fa').attr('class', 'fa fa-' + icon);
+
+                                    $element.find('.modal').modal('hide');
                                 }
                                 
-                                return _.button({class: 'btn btn-default'},
-                                    _.span({class: 'fa fa-' + icon})
-                                ).click(onClickSelect);
+                                return _.button({class: 'btn btn-default btn-icon'}, [
+                                    _.span({class: 'fa fa-' + icon}),
+                                    _.span({class: 'icon-name'}, icon)
+                                ]).click(onClickButton);
                             })
                         ])
                     )
@@ -291,13 +321,26 @@ class SchemaEditor extends View {
         let $element = _.div({class: 'schema'});
         
         // Content type
-        if(this.model.id < 20000) {
-            $element.html([
-                this.renderField('Icon', this.renderIconEditor()),    
-                this.renderField('Parent', this.renderParentEditor()),    
-                this.renderField('Default tab', this.renderDefaultTabEditor()),    
-                this.renderField('Tabs', this.renderTabsEditor())
-            ]);
+        $element.empty();
+
+        if(this.model.name) {
+            $element.append(this.renderField('Name', this.renderNameEditor())); 
+        }
+
+        if(this.model.icon) {
+            $element.append(this.renderField('Icon', this.renderIconEditor()));   
+        }
+
+        if(this.model.parentSchemaId) {
+            $element.append(this.renderField('Parent', this.renderParentEditor()));
+        }
+
+        if(this.model.defaultTabId) {
+            $element.append(this.renderField('Default tab', this.renderDefaultTabEditor()));
+        }
+
+        if(this.model.tabs) {
+            $element.append(this.renderField('Tabs', this.renderTabsEditor()));
         }
 
         return $element;
