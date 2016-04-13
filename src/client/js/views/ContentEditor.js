@@ -151,7 +151,7 @@ class ContentEditor extends View {
         let fieldSchema = resources.schemas[schemaValue.schemaId];
 
         if(fieldSchema) {
-            let fieldEditor = resources.editors[fieldSchema.id];
+            let fieldEditor = resources.editors[fieldSchema.editorId];
             
             if(fieldEditor) {
                 let fieldEditorInstance = new fieldEditor({
@@ -165,7 +165,7 @@ class ContentEditor extends View {
                 return fieldEditorInstance.$element;
 
             } else {
-                console.log('[ContentEditor] No editor found for field schema id "' + fieldSchema.id + '"');
+                console.log('[ContentEditor] No editor by id "' + fieldSchema.editorId + '" found for field schema id "' + fieldSchema.id + '"');
             
             }
         

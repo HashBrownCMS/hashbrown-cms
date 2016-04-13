@@ -58,6 +58,35 @@ class SchemaEditor extends View {
     }
 
     /**
+     * Renders the editor picker
+     *
+     * @return {Object} element
+     */
+    renderEditorPicker() {
+        let view = this;
+
+        function onChange() {
+            view.model.editorId = $(this).val();
+        }
+
+        let $select;
+
+        let $element = _.div({class: 'editor-picker'},
+            $select = _.select({class: 'form-control'},
+                _.each(resources.editors, function(id, view) {
+                    return _.option({value: id}, view.name);
+                })
+            ).change(onChange)
+        );
+
+        if(view.model.editorId) {
+            $select.val(view.model.editorId);
+        }
+
+        return $element;
+    }
+
+    /**
      * Renders the name editor
      *
      * @return {Object} element
@@ -201,10 +230,8 @@ class SchemaEditor extends View {
                         _.div({class: 'modal-body'}, [
                             _.div({class: 'icon-search'}, [
                                 _.input({type: 'text', class: 'form-control', placeholder: 'Search for icons'})
-                                    .on('keyup', function(e) {
-                                        if(e.which == 13) {
-                                            onSearch();
-                                        }
+                                    .on('change', function(e) {
+                                        onSearch();
                                     }),
                             ]),
                             _.each(icons, function(i, icon) {
@@ -326,9 +353,13 @@ class SchemaEditor extends View {
         if(this.model.name) {
             $element.append(this.renderField('Name', this.renderNameEditor())); 
         }
-
+        
         if(this.model.icon) {
             $element.append(this.renderField('Icon', this.renderIconEditor()));   
+        }
+
+        if(this.model.editorId) {
+            $element.append(this.renderField('Field editor', this.renderEditorPicker()));
         }
 
         if(this.model.parentSchemaId) {

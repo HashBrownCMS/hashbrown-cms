@@ -501,15 +501,15 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
           .navbar-main .tab-panes .pane-container .pane .pane-item-container.active > .pane-item:hover {
             background-color: #424242;
             border-right: 5px solid #9e9e9e; }
-        .navbar-main .tab-panes .pane-container .pane .pane-item-container.pane-folder-container.open .pane-folder .fa-folder {
+          .navbar-main .tab-panes .pane-container .pane .pane-item-container.active > .pane-item .btn-children-toggle {
+            right: 0px; }
+        .navbar-main .tab-panes .pane-container .pane .pane-item-container.open > .pane-item .btn-children-toggle .fa-caret-right {
           display: none; }
-        .navbar-main .tab-panes .pane-container .pane .pane-item-container.pane-folder-container.open .children {
+        .navbar-main .tab-panes .pane-container .pane .pane-item-container.open > .children {
           display: block; }
-        .navbar-main .tab-panes .pane-container .pane .pane-item-container.pane-folder-container:not(.open) .pane-folder .fa-folder-open {
+        .navbar-main .tab-panes .pane-container .pane .pane-item-container:not(.open) > .pane-item .btn-children-toggle .fa-caret-down {
           display: none; }
-        .navbar-main .tab-panes .pane-container .pane .pane-item-container.pane-folder-container .pane-folder {
-          text-transform: capitalize; }
-        .navbar-main .tab-panes .pane-container .pane .pane-item-container.pane-folder-container .children {
+        .navbar-main .tab-panes .pane-container .pane .pane-item-container:not(.open) > .children {
           display: none; }
         .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item {
           display: block;
@@ -521,12 +521,28 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
           height: 60px;
           padding: 0px 15px;
           clear: both;
-          cursor: pointer; }
+          cursor: pointer;
+          position: relative; }
           .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item, .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item:focus, .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item:hover, .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item:active {
             text-decoration: none; }
           .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item:hover {
             background-color: #424242;
             border-right: 5px solid #9e9e9e; }
+            .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item:hover .btn-children-toggle {
+              right: 0px; }
+          .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item .btn-children-toggle {
+            position: absolute;
+            top: 0px;
+            right: 5px;
+            height: 100%;
+            width: 32px;
+            padding: 0px;
+            background-color: transparent;
+            border: none; }
+            .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item .btn-children-toggle .fa {
+              margin: 0px;
+              display: block;
+              width: 100%; }
           .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item span {
             height: 60px;
             line-height: 60px;

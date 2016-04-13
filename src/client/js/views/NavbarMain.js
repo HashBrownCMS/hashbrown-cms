@@ -1,6 +1,6 @@
-'use strict';
+    'use strict';
 
-// Views
+    // Views
 let MessageModal = require('./MessageModal');
 
 /**
@@ -409,23 +409,25 @@ class NavbarMain extends View {
                 let parentDirSelector = '.pane-item-container[' + parentDirAttrKey + '="' + parentDirAttrValue + '"]';
                 let $parentDir = $pane.find(parentDirSelector);
           
+                function onClickChildrenToggle(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    $parentDir.toggleClass('open');
+                }
+
                 if($parentDir.length > 0) {
                     $parentDir.children('.children').append(queueItem.$element);
                 
                 // Create parent item
                 } else if(queueItem.createDir) {
-                    function onClickDir() {
-                        $parentDir.toggleClass('open');
-                    }
-
-                    $parentDir = _.div({class: 'pane-item-container pane-folder-container'}, [
+                    $parentDir = _.div({class: 'pane-item-container'}, [
                         _.a({
-                            class: 'pane-item pane-folder'
+                            class: 'pane-item'
                         }, [
                             _.span({class: 'fa fa-folder'}),
-                            _.span({class: 'fa fa-folder-open'}),
                             _.span(parentDirAttrValue)
-                        ]).click(onClickDir),
+                        ]),
                         _.div({class: 'children'})
                     ]);
                     
@@ -435,6 +437,20 @@ class NavbarMain extends View {
                     $pane.append($parentDir); 
                     
                     $parentDir.children('.children').append(queueItem.$element);
+                }
+
+                let $paneItem = $parentDir.children('.pane-item');
+                let $childrenToggle = $paneItem.children('.btn-children-toggle');
+                
+                if($childrenToggle.length <= 0) {
+                    $childrenToggle = _.button({class: 'btn-children-toggle'}, [
+                        _.span({class:'fa fa-caret-down'}),
+                        _.span({class:'fa fa-caret-right'})
+                    ]);
+
+                    $paneItem.append($childrenToggle);
+
+                    $childrenToggle.click(onClickChildrenToggle);
                 }
             }
         }
@@ -512,7 +528,7 @@ class NavbarMain extends View {
             ) {
                 $item.toggleClass('active', true);
 
-                $item.parents('.pane-folder-container').toggleClass('open', true);
+                $item.parents('.pane-item-container').toggleClass('open', true);
 
                 view.showTab($item.parents('.pane-container').attr('data-route'));
             }

@@ -5,6 +5,29 @@ require('exomon');
 let jade = require('jade');
 let Promise = require('bluebird');
 
+
+
+let Template = require('exomon/Templating2');
+
+let test = new Template({
+    div: { 'data-something': 'dude',
+        p: 'dude',
+        span: { class: 'fa fa-caret-down',
+            content: 'sweet'
+        }
+    },
+    input: { type: 'text', value: 'dude',
+        events: {
+            change: function() { console.log($(this).val()); }
+        }
+    }
+});
+
+console.log(
+    test
+);
+
+
 // Views
 let NavbarMain = require('./views/NavbarMain');
 let JSONEditor = require('./views/JSONEditor');
@@ -19,7 +42,7 @@ require('./helpers');
 // Preload resources 
 // -----------
 window.resources = {
-    editors: [],
+    editors: {},
     content: [],
     schemas: [],
     media: []

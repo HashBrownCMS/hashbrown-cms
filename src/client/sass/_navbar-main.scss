@@ -85,35 +85,37 @@
                                 background-color: material-color('grey', '800');
                                 border-right: 5px solid material-color('grey', '500');
                             }
+
+                            .btn-children-toggle {
+                                right: 0px;
+                            }
                         }
                     }
 
-                    &.pane-folder-container {
-                        &.open {
-                            .pane-folder {
-                                .fa-folder {
-                                    display: none;
-                                }
-                            }
-
-                            .children {
-                                display: block;
-                            }
-                        }
-
-                        &:not(.open) {
-                            .pane-folder {
-                                .fa-folder-open {
+                    &.open {
+                        >.pane-item {
+                            .btn-children-toggle {
+                                .fa-caret-right {
                                     display: none;
                                 }
                             }
                         }
 
-                        .pane-folder {
-                            text-transform: capitalize;
+                        >.children {
+                            display: block;
+                        }
+                    }
+
+                    &:not(.open) {
+                        >.pane-item {
+                            .btn-children-toggle {
+                                .fa-caret-down {
+                                    display: none;
+                                }
+                            }
                         }
                         
-                        .children {
+                        >.children {
                             display: none;
                         }
                     }
@@ -129,6 +131,7 @@
                         padding: 0px 15px;
                         clear: both;
                         cursor: pointer;
+                        position: relative;
 
                         &, &:focus, &:hover, &:active {
                             text-decoration: none;
@@ -137,7 +140,28 @@
                         &:hover {
                             background-color: material-color('grey', '800');
                             border-right: 5px solid material-color('grey', '500');
+
+                            .btn-children-toggle {
+                                right: 0px;
+                            }
                         }
+
+                        .btn-children-toggle {
+                            position: absolute;
+                            top: 0px;
+                            right: 5px;
+                            height: 100%;
+                            width: 32px;
+                            padding: 0px;
+                            background-color: transparent;
+                            border: none;
+
+                            .fa {
+                                margin: 0px;
+                                display: block;
+                                width: 100%;
+                            }
+                        }   
 
                         span {
                             height: 60px;
