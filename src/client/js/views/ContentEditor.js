@@ -186,7 +186,7 @@ class ContentEditor extends View {
     renderContentObject(object, schema) {
         let view = this;
 
-        return _.div({class: 'object'}, [
+        return _.div({class: 'object'},
             _.ul({class: 'nav nav-tabs'}, 
                 _.each(schema.tabs, function(id, tab) {
                     return _.li({class: id == schema.defaultTabId ? 'active' : ''}, 
@@ -214,7 +214,7 @@ class ContentEditor extends View {
 
                     return _.div({id: 'tab-' + id, class: 'tab-pane' + (id == schema.defaultTabId ? ' active' : '')}, 
                         _.each(properties, function(key, value) {
-                            return _.div({class: 'field-container'}, [
+                            return _.div({class: 'field-container'},
                                 _.div({class: 'field-icon'},
                                     _.span({class: 'fa fa-' + value.icon})
                                 ),
@@ -231,12 +231,12 @@ class ContentEditor extends View {
                                         value.config
                                     )
                                 )
-                            ]);
+                            );
                         })
                     );
                 })
             )
-        ]);
+        );
     }
 
     render() {
@@ -248,18 +248,18 @@ class ContentEditor extends View {
             this.$element.html([
                 this.renderContentObject(this.model, contentSchema).append(
                     _.div({class: 'panel panel-default panel-buttons'}, 
-                        _.div({class: 'btn-group'}, [
+                        _.div({class: 'btn-group'},
                             _.button({class: 'btn btn-embedded'},
                                 'Advanced'
                             ).click(function() { view.onClickAdvanced(); }),
                             _.button({class: 'btn btn-danger btn-raised'},
                                 'Delete'
                             ).click(function() { view.onClickDelete(); }),
-                            view.$saveBtn = _.button({class: 'btn btn-success btn-raised btn-save'}, [
+                            view.$saveBtn = _.button({class: 'btn btn-success btn-raised btn-save'},
                                 _.span({class: 'text-default'}, 'Save '),
-                                _.span({class: 'text-saving'}, 'Saving '),
-                            ]).click(function() { view.onClickSave(); })
-                        ])
+                                _.span({class: 'text-saving'}, 'Saving ')
+                            ).click(function() { view.onClickSave(); })
+                        )
                     )
                 )
             ]);

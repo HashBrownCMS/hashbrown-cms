@@ -14,10 +14,10 @@ class JSONEditor extends View {
         super(params);
 
         this.$element = _.div({class: 'json-editor flex-vertical'});
-        this.$error = _.div({class: 'panel panel-danger'}, [
+        this.$error = _.div({class: 'panel panel-danger'},
             _.div({class: 'panel-heading'}),
             _.div({class: 'panel-body'})
-        ]).hide();
+        ).hide();
 
         this.fetch();
     }
@@ -132,7 +132,7 @@ class JSONEditor extends View {
             ).bind('keyup change propertychange paste', function() { view.onChangeText($(this)); }),
             this.$error,
             _.div({class: 'panel panel-default panel-buttons'}, 
-                _.div({class: 'btn-group'}, [
+                _.div({class: 'btn-group'},
                     _.button({class: 'btn btn-embedded'},
                         'Basic'
                     ).click(function() { view.onClickBasic(); }),
@@ -142,7 +142,7 @@ class JSONEditor extends View {
                     _.button({class: 'btn btn-raised btn-success'},
                         'Save '
                     ).click(function() { view.onClickSave(); })
-                ])
+                )
             )
         ]);
     }

@@ -58,7 +58,7 @@ Router.route('/test/', function() {
             },
             input: { type: 'text', value: 'dude',
                 events: {
-                    change: function() { console.log($(this).val()); }
+                    'keyup change': function() { console.log($(this).val()); }
                 }
             }
         })
@@ -70,10 +70,12 @@ Router.route('/content/', function() {
     ViewHelper.get('NavbarMain').showTab('/content/');
     
     $('.workspace').html(
-        _.div({class: 'dashboard-container'}, [
-            _.h1('Content dashboard'),
-            _.p('Please click on a content node to proceed')
-        ])
+        new Template({
+            div: { class: 'dashboard-container',
+                h1: 'Content dashboard',
+                p: 'Please click on a content node to proceed'
+            }
+        })
     );
 });
 
@@ -137,10 +139,12 @@ Router.route('/media/', function() {
     ViewHelper.get('NavbarMain').showTab('/media/');
     
     $('.workspace').html(
-        _.div({class: 'dashboard-container'}, [
-            _.h1('Media dashboard'),
-            _.p('Please click on a media object to proceed')
-        ])
+        new Template({
+            div: { class: 'dashboard-container',
+                h1: 'Media dashboard',
+                p: 'Please click on a media object to proceed'
+            }
+        })
     );
 });
 

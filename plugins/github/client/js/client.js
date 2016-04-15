@@ -45,31 +45,38 @@ function showLogin() {
             });
         }
 
+        let template = new Template({
+            divDashboardContainer: { class: 'dashboard-container',
+                divLoginContainer: { class: 'panel panel-login',
+                    divPanelHeading: { class: 'panel-heading',
+                        divIconContainer: { class: 'login-icon',
+                            spanIcon: { class: 'fa fa-github' }
+                        }
+                    },
+                    divPanelBody: { class: 'panel-body', 
+                        formLogin: {
+                            on: { 
+                                'submit': onSubmit
+                            },
+                            inputUsername: { type: 'text', name: 'usr', class: 'form-control', placeholder: 'Username' },
+                            inputPassword: { type: 'password', name: 'pwd', class: 'form-control', placeholder: 'Password' },
+                            inputButton: { type: 'submit', class: 'btn btn-primary', value: 'Log in' }
+                        }
+                    }
+                }
+            }
+        });
+
         $('.workspace').html(
-            _.div({class: 'dashboard-container'}, [
-                _.div({class: 'panel panel-login'}, [
-                    _.div({class: 'panel-heading'},
-                        _.div({class: 'login-icon'},
-                            _.span({class: 'fa fa-github'})
-                        )
-                    ),
-                    _.div({class: 'panel-body'}, 
-                        _.form([
-                            _.input({type: 'text', name: 'usr', class: 'form-control', placeholder: 'Username'}),
-                            _.input({type: 'password', name: 'pwd', class: 'form-control', placeholder: 'Password'}),
-                            _.input({type: 'submit', class: 'btn btn-primary', value: 'Log in'})
-                        ]).on('submit', onSubmit)
-                    )
-                ])
-            ])
+            template.html
         );
     });
 }
 
 function checkLogin() {
     $('.workspace').html(
-        _.div({class: 'dashboard-container'}, [
-            _.div({class: 'panel panel-login'}, [
+        _.div({class: 'dashboard-container'},
+            _.div({class: 'panel panel-login'},
                 _.div({class: 'panel-heading'},
                     _.div({class: 'login-icon'},
                         _.span({class: 'fa fa-github'})
@@ -80,8 +87,8 @@ function checkLogin() {
                         _.span({class: 'spinner fa fa-refresh'})
                     )
                 )
-            ])
-        ])
+            )
+        )
     );
     
     return new Promise(function(callback) {
@@ -108,10 +115,10 @@ Router.route('/github/', function() {
     checkLogin()
     .then(function() {
         $('.workspace').html(
-            _.div({class: 'dashboard-container'}, [
+            _.div({class: 'dashboard-container'},
                 _.h1('GitHub dashboard'),
                 _.p('Please pick a feature to proceed')
-            ])
+            )
         );
     });
 });
