@@ -39,7 +39,7 @@ class MediaViewer extends View {
     render() {
         let view = this;
 
-        this.$element = _.div({class: 'media-viewer panel panel-default'}, [ 
+        this.$element = _.div({class: 'media-viewer panel panel-default'},
             _.div({class: 'panel-heading'},
                 _.h4({class: 'panel-title'},
                     this.mediaId
@@ -51,13 +51,13 @@ class MediaViewer extends View {
                 }()
             ),
             _.div({class: 'panel-footer'},
-                _.div({class: 'btn-group'}, [
+                _.div({class: 'btn-group'},
                     _.button({class: 'btn btn-danger'},
                         _.span({class: 'fa fa-trash'})
                     ).click(this.onClickDelete)
-                ])
+                )
             )
-        ]);
+        );
     }
 }
 

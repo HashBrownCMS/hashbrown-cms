@@ -171,13 +171,13 @@ class SchemaEditor extends View {
 
             $tabs.append(
                 _.each(view.model.tabs, function(id, label) {
-                    return _.div({class: 'tab chip', 'data-id': id}, [
+                    return _.div({class: 'tab chip', 'data-id': id},
                         _.input({type: 'text', class: 'chip-label', value: label})
                             .bind('keyup change propertychange paste', onInputChange),
                         _.button({class: 'btn chip-remove'}, 
                             _.span({class: 'fa fa-remove'})
                         ).click(onClickRemove)
-                    ]);
+                    );
                 })
             );
 
@@ -220,20 +220,20 @@ class SchemaEditor extends View {
             }
         }
 
-        let $element = _.div({class: 'icon-editor'}, [
+        let $element = _.div({class: 'icon-editor'},
             _.button({class: 'btn btn-icon-browse btn-default'},
                 _.span({class: 'fa fa-' + this.model.icon})
             ).click(onClickBrowse),
             _.div({class: 'modal fade'},
                 _.div({class: 'modal-dialog'},
                     _.div({class: 'modal-content'},
-                        _.div({class: 'modal-body'}, [
-                            _.div({class: 'icon-search'}, [
+                        _.div({class: 'modal-body'},
+                            _.div({class: 'icon-search'},
                                 _.input({type: 'text', class: 'form-control', placeholder: 'Search for icons'})
                                     .on('change', function(e) {
                                         onSearch();
-                                    }),
-                            ]),
+                                    })
+                            ),
                             _.each(icons, function(i, icon) {
                                 function onClickButton() {
                                     view.model.icon = icon;
@@ -243,16 +243,16 @@ class SchemaEditor extends View {
                                     $element.find('.modal').modal('hide');
                                 }
                                 
-                                return _.button({class: 'btn btn-default btn-icon'}, [
+                                return _.button({class: 'btn btn-default btn-icon'},
                                     _.span({class: 'fa fa-' + icon}),
                                     _.span({class: 'icon-name'}, icon)
-                                ]).click(onClickButton);
+                                ).click(onClickButton);
                             })
-                        ])
+                        )
                     )
                 )
             )
-        ]);
+        );
         
         return $element;
     }
@@ -282,7 +282,7 @@ class SchemaEditor extends View {
             schemas[id] = resources.schemas[id];
         }
 
-        let $element = _.div({class: 'parent-editor input-group'}, [
+        let $element = _.div({class: 'parent-editor input-group'},
             _.select({class: 'form-control'}, 
                 _.each(schemas, function(id, schema) {
                     return _.option({value: id}, schema.name);
@@ -293,7 +293,7 @@ class SchemaEditor extends View {
                     'Clear'
                 ).click(onClear)
             )
-        ]);
+        );
         
         return $element;
     }
@@ -327,14 +327,14 @@ class SchemaEditor extends View {
      * @return {Object} element
      */
     renderField(label, $content) {
-        return _.div({class: 'field-container'}, [
+        return _.div({class: 'field-container'},
             _.div({class: 'field-key'},
                 label
             ),
             _.div({class: 'field-value'},
                 $content
             )
-        ]);
+        );
     }
 
     /**
@@ -393,18 +393,18 @@ class SchemaEditor extends View {
             this.$element.html([
                 this.renderFields(),
                 _.div({class: 'panel panel-default panel-buttons'}, 
-                    _.div({class: 'btn-group'}, [
+                    _.div({class: 'btn-group'},
                         _.button({class: 'btn btn-embedded'},
                             'Advanced'
                         ).click(function() { view.onClickAdvanced(); }),
                         _.button({class: 'btn btn-danger btn-raised'},
                             'Delete'
                         ).click(function() { view.onClickDelete(); }),
-                        view.$saveBtn = _.button({class: 'btn btn-success btn-raised btn-save'}, [
+                        view.$saveBtn = _.button({class: 'btn btn-success btn-raised btn-save'},
                             _.span({class: 'text-default'}, 'Save '),
-                            _.span({class: 'text-saving'}, 'Saving '),
-                        ]).click(function() { view.onClickSave(); })
-                    ])
+                            _.span({class: 'text-saving'}, 'Saving ')
+                        ).click(function() { view.onClickSave(); })
+                    )
                 )
             ]);
         }

@@ -263,18 +263,18 @@ class NavbarMain extends View {
 
         let $uploadModal = _.div({class: 'modal modal-upload-media fade'},
             _.div({class: 'modal-dialog'},
-                _.div({class: 'modal-content'}, [
+                _.div({class: 'modal-content'},
                     _.div({class: 'modal-header'},
                         _.h4({class: 'modal-title'}, 'Upload a file')
                     ),
-                    _.div({class: 'modal-body'}, [
+                    _.div({class: 'modal-body'},
                         _.div({class: 'spinner-container hidden'},
                             _.span({class: 'spinner fa fa-refresh'})
                         ),
                         _.div({class: 'media-preview'})
-                    ]),
-                    _.div({class: 'modal-footer'}, [
-                        _.div({class: 'input-group'}, [
+                    ),
+                    _.div({class: 'modal-footer'},
+                        _.div({class: 'input-group'},
                             _.form({class: 'form-control'},
                                 _.input({type: 'file', name: 'media'})
                                     .change(onChangeFile)
@@ -284,9 +284,9 @@ class NavbarMain extends View {
                                     'Upload'
                                 ).click(onClickUpload)
                             )
-                        ])
-                    ])
-                ])
+                        )
+                    )
+                )
             )
         );
 
@@ -312,10 +312,10 @@ class NavbarMain extends View {
             $icon = _.span({class: 'fa fa-' + params.icon});
         }
 
-        let $button = _.button({'data-route': params.route}, [
+        let $button = _.button({'data-route': params.route},
             $icon,
             _.span(params.label)
-        ]).click(function() {
+        ).click(function() {
             let $currentTab = view.$element.find('.pane-container.active');
 
             if(params.route == $currentTab.attr('data-route')) {
@@ -367,18 +367,18 @@ class NavbarMain extends View {
                 let $element = _.div({
                     class: 'pane-item-container',
                     'data-routing-path': routingPath
-                }, [
+                },
                     _.a({
                         'data-id': id,
                         'data-name': name,
                         href: '#' + params.route + routingPath,
                         class: 'pane-item'
-                    }, [
+                    },
                         $icon,
                         _.span(name)
-                    ]),
+                    ),
                     _.div({class: 'children'})
-                ]);
+                );
 
                 // Attach item context menu
                 if(params.itemContextMenu) {
@@ -421,15 +421,15 @@ class NavbarMain extends View {
                 
                 // Create parent item
                 } else if(queueItem.createDir) {
-                    $parentDir = _.div({class: 'pane-item-container'}, [
+                    $parentDir = _.div({class: 'pane-item-container'},
                         _.a({
                             class: 'pane-item'
-                        }, [
+                        },
                             _.span({class: 'fa fa-folder'}),
                             _.span(parentDirAttrValue)
-                        ]),
+                        ),
                         _.div({class: 'children'})
-                    ]);
+                    );
                     
                     $parentDir.attr(parentDirAttrKey, parentDirAttrValue);
 
@@ -443,10 +443,10 @@ class NavbarMain extends View {
                 let $childrenToggle = $paneItem.children('.btn-children-toggle');
                 
                 if($childrenToggle.length <= 0) {
-                    $childrenToggle = _.button({class: 'btn-children-toggle'}, [
+                    $childrenToggle = _.button({class: 'btn-children-toggle'},
                         _.span({class:'fa fa-caret-down'}),
                         _.span({class:'fa fa-caret-right'})
-                    ]);
+                    );
 
                     $paneItem.append($childrenToggle);
 
