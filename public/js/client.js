@@ -2959,17 +2959,30 @@ require('./helpers'); // -----------
 // Preload resources 
 // -----------
 window.resources={editors:{},content:[],schemas:[],media:[]};window.reloadAllResources().then(function(){triggerReady('resources');}); // -----------
-// Routes
+// CMS
 // -----------
-// Test
-Router.route('/test/',function(){$('.workspace').html(new Template({ul:{class:'list-group',each:[['one','two','three'],function(i,item){return {li:{class:'list-group-item',content:i+': '+item}};}]},div:{'data-something':'dude',p:'dude',span:{class:'fa fa-caret-down',content:'sweet'}},input:{type:'text',value:'dude',events:{'keyup change':function keyupChange(){console.log($(this).val());}}}}));}); // Content dashboard
-Router.route('/content/',function(){ViewHelper.get('NavbarMain').showTab('/content/');$('.workspace').html(new Template({div:{class:'dashboard-container',h1:'Content dashboard',p:'Please click on a content node to proceed'}}));}); // Content edit
-Router.route('/content/:id',function(){var contentEditor=new ContentEditor({modelUrl:'/api/content/'+this.id});ViewHelper.get('NavbarMain').highlightItem(this.id);$('.workspace').html(contentEditor.$element);}); // Content edit (JSON editor)
-Router.route('/content/json/:id',function(){var contentEditor=new JSONEditor({modelUrl:'/api/content/'+this.id});ViewHelper.get('NavbarMain').highlightItem(this.id);$('.workspace').html(contentEditor.$element);}); // Schema edit
-Router.route('/schemas/:id',function(){var schemaEditor=new SchemaEditor({modelUrl:'/api/schemas/'+this.id});ViewHelper.get('NavbarMain').highlightItem(this.id);$('.workspace').html(schemaEditor.$element);}); // Schema edit (JSON editor)
-Router.route('/schemas/json/:id',function(){var jsonEditor=new JSONEditor({modelUrl:'/api/schemas/'+this.id});ViewHelper.get('NavbarMain').highlightItem(this.id);$('.workspace').html(jsonEditor.$element);}); // Media preview
-Router.route('/media/:id',function(){var mediaViewer=new MediaViewer({mediaId:this.id});ViewHelper.get('NavbarMain').highlightItem(this.id);$('.workspace').html(mediaViewer.$element);}); // Media dashboard
-Router.route('/media/',function(){ViewHelper.get('NavbarMain').showTab('/media/');$('.workspace').html(new Template({div:{class:'dashboard-container',h1:'Media dashboard',p:'Please click on a media object to proceed'}}));}); // ----------
+// About
+Router.route('/about/',function(){ViewHelper.get('NavbarMain').highlightItem('about');$('.workspace').html(_.div({class:'dashboard-container'},_.h1('Endomon'),_.p('The pluggable CMS')));}); // ----------
+// Content
+// ----------
+// Dashboard
+Router.route('/content/',function(){ViewHelper.get('NavbarMain').showTab('/content/');$('.workspace').html(_.div({class:'dashboard-container'},_.h1('Content dashboard'),_.p('Please click on a content node to proceed')));}); // Edit
+Router.route('/content/:id',function(){var contentEditor=new ContentEditor({modelUrl:'/api/content/'+this.id});ViewHelper.get('NavbarMain').highlightItem(this.id);$('.workspace').html(contentEditor.$element);}); // Edit (JSON editor)
+Router.route('/content/json/:id',function(){var contentEditor=new JSONEditor({modelUrl:'/api/content/'+this.id});ViewHelper.get('NavbarMain').highlightItem(this.id);$('.workspace').html(contentEditor.$element);}); // ----------
+// Schemas
+// ----------
+// Dashboard
+Router.route('/schemas/',function(){ViewHelper.get('NavbarMain').showTab('/schemas/');$('.workspace').html(_.div({class:'dashboard-container'},_.h1('Schemas dashboard'),_.p('Please click on a schema to proceed')));}); // Edit
+Router.route('/schemas/:id',function(){var schemaEditor=new SchemaEditor({modelUrl:'/api/schemas/'+this.id});ViewHelper.get('NavbarMain').highlightItem(this.id);$('.workspace').html(schemaEditor.$element);}); // Edit (JSON editor)
+Router.route('/schemas/json/:id',function(){var jsonEditor=new JSONEditor({modelUrl:'/api/schemas/'+this.id});ViewHelper.get('NavbarMain').highlightItem(this.id);$('.workspace').html(jsonEditor.$element);}); // ----------
+// Schemas
+// ----------
+// Dashboard
+Router.route('/media/',function(){ViewHelper.get('NavbarMain').showTab('/media/');$('.workspace').html(_.div({class:'dashboard-container'},_.h1('Media dashboard'),_.p('Please click on a media object to proceed')));}); // Preview
+Router.route('/media/:id',function(){var mediaViewer=new MediaViewer({mediaId:this.id});ViewHelper.get('NavbarMain').highlightItem(this.id);$('.workspace').html(mediaViewer.$element);}); // ----------
+// Settings
+// ----------
+Router.route('/settings/',function(){ViewHelper.get('NavbarMain').showTab('/settings/');$('.workspace').html(_.div({class:'dashboard-container'},_.h1('Settings dashboard'),_.p('Please click on a settings item to proceed')));}); // ----------
 // Init
 // ----------
 onReady('resources',function(){new NavbarMain();Router.init();});},{"./helpers":52,"./views/ContentEditor":54,"./views/JSONEditor":55,"./views/MediaViewer":56,"./views/NavbarMain":58,"./views/SchemaEditor":59,"bluebird":4,"exomon":13,"jade":18}],52:[function(require,module,exports){var Promise=require('bluebird');var onReadyCallbacks={resources:[],navbar:[]};var isReady={}; /**

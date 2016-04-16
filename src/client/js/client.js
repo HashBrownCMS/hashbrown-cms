@@ -32,54 +32,36 @@ window.reloadAllResources()
 
 
 // -----------
-// Routes
+// CMS
 // -----------
-// Test
-Router.route('/test/', function() {
+// About
+Router.route('/about/', function() {
+    ViewHelper.get('NavbarMain').highlightItem('about');
+
     $('.workspace').html(
-        new Template({
-            ul: { class: 'list-group',
-                each: [
-                    ['one', 'two', 'three'],
-                    function(i, item) {
-                        return {
-                            li: { class: 'list-group-item',
-                                content: i + ': ' + item
-                            }
-                        };
-                    }
-                ]
-            },
-            div: { 'data-something': 'dude',
-                p: 'dude',
-                span: { class: 'fa fa-caret-down',
-                    content: 'sweet'
-                }
-            },
-            input: { type: 'text', value: 'dude',
-                events: {
-                    'keyup change': function() { console.log($(this).val()); }
-                }
-            }
-        })
+        _.div({class: 'dashboard-container'},
+            _.h1('Endomon'),
+            _.p('The pluggable CMS')
+        )
     );
 });
 
-// Content dashboard
+// ----------
+// Content
+// ----------
+// Dashboard
 Router.route('/content/', function() {
     ViewHelper.get('NavbarMain').showTab('/content/');
     
     $('.workspace').html(
-        new Template({
-            div: { class: 'dashboard-container',
-                h1: 'Content dashboard',
-                p: 'Please click on a content node to proceed'
-            }
-        })
+        _.div({class: 'dashboard-container'},
+            _.h1('Content dashboard'),
+            _.p('Please click on a content node to proceed')
+        )
     );
 });
 
-// Content edit
+// Edit
 Router.route('/content/:id', function() {
     let contentEditor = new ContentEditor({
         modelUrl: '/api/content/' + this.id
@@ -90,7 +72,7 @@ Router.route('/content/:id', function() {
     $('.workspace').html(contentEditor.$element);
 });
 
-// Content edit (JSON editor)
+// Edit (JSON editor)
 Router.route('/content/json/:id', function() {
     let contentEditor = new JSONEditor({
         modelUrl: '/api/content/' + this.id
@@ -101,7 +83,22 @@ Router.route('/content/json/:id', function() {
     $('.workspace').html(contentEditor.$element);
 });
 
-// Schema edit
+// ----------
+// Schemas
+// ----------
+// Dashboard
+Router.route('/schemas/', function() {
+    ViewHelper.get('NavbarMain').showTab('/schemas/');
+    
+    $('.workspace').html(
+        _.div({class: 'dashboard-container'},
+            _.h1('Schemas dashboard'),
+            _.p('Please click on a schema to proceed')
+        )
+    );
+});
+
+// Edit
 Router.route('/schemas/:id', function() {
     let schemaEditor = new SchemaEditor({
         modelUrl: '/api/schemas/' + this.id
@@ -112,7 +109,7 @@ Router.route('/schemas/:id', function() {
     $('.workspace').html(schemaEditor.$element);
 });
 
-// Schema edit (JSON editor)
+// Edit (JSON editor)
 Router.route('/schemas/json/:id', function() {
     let jsonEditor = new JSONEditor({
         modelUrl: '/api/schemas/' + this.id
@@ -123,7 +120,22 @@ Router.route('/schemas/json/:id', function() {
     $('.workspace').html(jsonEditor.$element);
 });
 
-// Media preview
+// ----------
+// Schemas
+// ----------
+// Dashboard
+Router.route('/media/', function() {
+    ViewHelper.get('NavbarMain').showTab('/media/');
+    
+    $('.workspace').html(
+        _.div({class: 'dashboard-container'},
+            _.h1('Media dashboard'),
+            _.p('Please click on a media object to proceed')
+        )
+    );
+});
+
+// Preview
 Router.route('/media/:id', function() {
     let mediaViewer = new MediaViewer({
         mediaId: this.id
@@ -134,17 +146,17 @@ Router.route('/media/:id', function() {
     $('.workspace').html(mediaViewer.$element);
 });
 
-// Media dashboard
-Router.route('/media/', function() {
-    ViewHelper.get('NavbarMain').showTab('/media/');
+// ----------
+// Settings
+// ----------
+Router.route('/settings/', function() {
+    ViewHelper.get('NavbarMain').showTab('/settings/');
     
     $('.workspace').html(
-        new Template({
-            div: { class: 'dashboard-container',
-                h1: 'Media dashboard',
-                p: 'Please click on a media object to proceed'
-            }
-        })
+        _.div({class: 'dashboard-container'},
+            _.h1('Settings dashboard'),
+            _.p('Please click on a settings item to proceed')
+        )
     );
 });
 
