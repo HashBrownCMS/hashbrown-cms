@@ -22,9 +22,10 @@ class BoardEditor extends View {
         
         this.$element.find('.issue').each(function(i) {
             let $issue = $(this);
-            let labels = $issue.data('labels');
+            let issue = $issue.data('model');
+            let labels = issue.labels;
 
-            let $column = view.$element.find('.column[data-name="backlog"]');
+            let $column;
 
             if(labels) {
                 for(let label of labels) {
@@ -34,6 +35,14 @@ class BoardEditor extends View {
                         $column = $foundColumn;
                         break;
                     }
+                }
+            }
+
+            if(!$column) {
+                if(issue.state == 'closed') {
+                    $column = view.$element.find('.column[data-name="closed"]');
+                } else {
+                    $column = view.$element.find('.column[data-name="backlog"]');
                 }
             }
 
@@ -117,7 +126,7 @@ class BoardEditor extends View {
                     ])
                 ]);
 
-                $issue.data('labels', issue.labels);
+                $issue.data('model', issue);
 
                 return $issue;
             })        

@@ -70,7 +70,7 @@ class GitHub {
      * Gets all issues
      */
     static getAllIssues(req, res) {
-        GitHub.apiCall('repos/' + config.org + '/' + config.repo + '/issues')
+        GitHub.apiCall('repos/' + config.org + '/' + config.repo + '/issues?state=all')
         .then(function(response) {
             res.send(response.body);
         }); 
