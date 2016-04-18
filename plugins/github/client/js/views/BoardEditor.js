@@ -27,6 +27,7 @@ class BoardEditor extends View {
 
             let $column;
 
+            // Look for columns matches any issue label
             if(labels) {
                 for(let label of labels) {
                     let $foundColumn = view.$element.find('.column[data-name="' + label.name + '"]');
@@ -38,6 +39,7 @@ class BoardEditor extends View {
                 }
             }
 
+            // If no matching column was found, put in either 'backlog' or 'closed' column
             if(!$column) {
                 if(issue.state == 'closed') {
                     $column = view.$element.find('.column[data-name="closed"]');
@@ -67,6 +69,54 @@ class BoardEditor extends View {
     }
 
     /**
+     * Renders an issue
+     */
+    renderIssue(issue) {
+        // assignee {String}
+        // body {String}
+        // closed_at {String}
+        // comments {Number}
+        // comments_url {String}
+        // created_at {String}
+        // events_url {String}
+        // html_url {String}
+        // id {Number}
+        // labels {Array}
+        // labels_url {String}
+        // locked {Boolean}
+        // milestone {Object}
+        // number {Number}
+        // repository_url {String}
+        // state {String} open closed
+        // title {String}
+        // updated_at {String}
+        // url {String}
+        // user {Object}
+
+        let $issue = _.div({
+            class: 'issue',
+            'data-id': issue.id,
+            'data-number': issue.number,
+            'data-milestone': issue.milestone ? issue.milestone.id : '',
+        }, [
+            _.div({class: 'panel panel-default'}, [
+                _.div({class: 'panel-heading'},
+                    _.h4({class: 'panel-title'},
+                        issue.title
+                    )
+                ),
+                _.div({class: 'panel-body issue-body'},
+                    markdownToHtml(issue.body)
+                )
+            ])
+        ]);
+
+        $issue.data('model', issue);
+
+        return $issue;
+    }
+
+    /**
      * Applies html5sortable plugin
      */
     applySortable() {
@@ -77,7 +127,27 @@ class BoardEditor extends View {
             forcePlaceholderSize: true,
             connectWith: '.board-editor .column-issues'
         }).on('sortstop', function(e, ui) {
-            alert(ui.data('id'));
+            let $issue = ui.item;
+            let issue = $issue.data('model');
+            let $column = $issue.parents('.column');
+            let columnName = $column.data('name');
+           
+            $issue.toggleClass('loading', true);
+
+            switch(columnName) {
+                case 'closed':
+                    console.log('TODO: Close issue and remove column labels');
+                    break;
+
+                case 'backlog':
+                    console.log('TODO: Open issue and remove column labels');
+                    break;
+
+                default:
+                    console.log('TODO: Remove column labels and add column label "' + columnName + '"');
+                    break;
+            }
+
         });
     }
 
@@ -87,48 +157,7 @@ class BoardEditor extends View {
         this.$element.empty();
         this.$element.append(
             _.each(this.model, function(i, issue) {
-                // assignee {String}
-                // body {String}
-                // closed_at {String}
-                // comments {Number}
-                // comments_url {String}
-                // created_at {String}
-                // events_url {String}
-                // html_url {String}
-                // id {Number}
-                // labels {Array}
-                // labels_url {String}
-                // locked {Boolean}
-                // milestone {Object}
-                // number {Number}
-                // repository_url {String}
-                // state {String} open closed
-                // title {String}
-                // updated_at {String}
-                // url {String}
-                // user {Object}
-
-                let $issue = _.div({
-                    class: 'issue',
-                    'data-id': issue.id,
-                    'data-number': issue.number,
-                    'data-milestone': issue.milestone ? issue.milestone.id : '',
-                }, [
-                    _.div({class: 'panel panel-default'}, [
-                        _.div({class: 'panel-heading'},
-                            _.h4({class: 'panel-title'},
-                                issue.title
-                            )
-                        ),
-                        _.div({class: 'panel-body issue-body'},
-                            markdownToHtml(issue.body)
-                        )
-                    ])
-                ]);
-
-                $issue.data('model', issue);
-
-                return $issue;
+                return view.renderIssue(issue);
             })        
         );
 
