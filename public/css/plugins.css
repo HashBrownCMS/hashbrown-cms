@@ -24,17 +24,12 @@
       .board-editor .column > .panel .column-issues {
         flex-grow: 1;
         overflow-y: auto; }
-        .board-editor .column > .panel .column-issues .issue.loading {
-          position: relative; }
-          .board-editor .column > .panel .column-issues .issue.loading:after {
-            content: 'LOADING';
-            position: absolute;
-            display: block;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 30px; }
-          .board-editor .column > .panel .column-issues .issue.loading .panel {
+        .board-editor .column > .panel .column-issues .issue:not(.spinner-container) .spinner {
+          display: none; }
+        .board-editor .column > .panel .column-issues .issue.spinner-container {
+          pointer-events: none;
+          cursor: not-allowed; }
+          .board-editor .column > .panel .column-issues .issue.spinner-container .panel {
             opacity: 0.5; }
 
 .issues-editor, .board-editor {

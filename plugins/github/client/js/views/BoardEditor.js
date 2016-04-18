@@ -98,8 +98,8 @@ class BoardEditor extends View {
             'data-id': issue.id,
             'data-number': issue.number,
             'data-milestone': issue.milestone ? issue.milestone.id : '',
-        }, [
-            _.div({class: 'panel panel-default'}, [
+        },
+            _.div({class: 'panel panel-default'},
                 _.div({class: 'panel-heading'},
                     _.h4({class: 'panel-title'},
                         issue.title
@@ -108,8 +108,11 @@ class BoardEditor extends View {
                 _.div({class: 'panel-body issue-body'},
                     markdownToHtml(issue.body)
                 )
-            ])
-        ]);
+            ),
+            _.div({class: 'spinner'},
+                _.span({class: 'fa fa-refresh'})
+            )
+        );
 
         $issue.data('model', issue);
 
@@ -117,9 +120,65 @@ class BoardEditor extends View {
     }
 
     /**
+     * Removes column labels from an issue
+     *
+     * @param {Object} issue
+     */
+    removeColumnLabels(issue) {
+        for(let columnName of config.board.columns) {
+            for(let i in issue.labels) {
+                let label = issue.labels[i];
+
+                if(label == columnName) {
+                    issue.labels.splice(i, 1);    
+                }
+            }
+        }
+    }
+
+    /**
+     * Updates an issue
+     *
+     * @param {Object} issue
+     */
+    updateIssueFromElement($issue) {
+        let issue = $issue.data('model');
+        let $column = $issue.parents('.column');
+        let columnName = $column.data('name');
+       
+        $issue.toggleClass('spinner-container', true);
+
+        switch(columnName) {
+            case 'closed':
+                issue.state = 'closed';
+                this.removeColumnLabels(issue);
+                break;
+
+            case 'backlog':
+                issue.state = 'open';
+                this.removeColumnLabels(issue);
+                break;
+
+            default:
+                this.removeColumnLabels(issue);
+                issue.labels[issue.labels.length] = columnName;
+                break;
+        }
+
+        console.log('TODO: Sync with GitHub backend');
+
+        setTimeout(function() {
+            $issue.toggleClass('spinner-container', false);
+        }, 1000);
+    }
+    
+
+    /**
      * Applies html5sortable plugin
      */
     applySortable() {
+        let view = this;
+
         $('.board-editor .column-issues').sortable('destroy');
 
         $('.board-editor .column-issues').sortable({
@@ -128,26 +187,8 @@ class BoardEditor extends View {
             connectWith: '.board-editor .column-issues'
         }).on('sortstop', function(e, ui) {
             let $issue = ui.item;
-            let issue = $issue.data('model');
-            let $column = $issue.parents('.column');
-            let columnName = $column.data('name');
-           
-            $issue.toggleClass('loading', true);
 
-            switch(columnName) {
-                case 'closed':
-                    console.log('TODO: Close issue and remove column labels');
-                    break;
-
-                case 'backlog':
-                    console.log('TODO: Open issue and remove column labels');
-                    break;
-
-                default:
-                    console.log('TODO: Remove column labels and add column label "' + columnName + '"');
-                    break;
-            }
-
+            view.updateIssueFromElement($issue);
         });
     }
 

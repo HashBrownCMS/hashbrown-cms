@@ -21,19 +21,16 @@
                 overflow-y: auto;
 
                 .issue {
-                    &.loading {
-                        position: relative;
-                                 
-                        &:after {
-                            content: 'LOADING';
-                            position: absolute;
-                            display: block;
-                            top: 50%;
-                            left: 50%;
-                            transform: translate(-50%, -50%);
-                            font-size: 30px;
+                    &:not(.spinner-container) {
+                        .spinner {
+                            display: none;
                         }
-                        
+                    }
+
+                    &.spinner-container {
+                        pointer-events: none;
+                        cursor: not-allowed;
+
                         .panel {
                             opacity: 0.5;
                         }
