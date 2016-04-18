@@ -133,6 +133,15 @@ class NavbarMain extends View {
     }
 
     /**
+     * Event: Click toggle fullscreen
+     */
+    onClickToggleFullscreen() {
+        console.log('dude');
+
+        $('.cms-container').toggleClass('fullscreen');
+    }
+
+    /**
      * Event: Click remove media
      */
     onClickRemoveMedia() {
@@ -539,6 +548,9 @@ class NavbarMain extends View {
         let view = this;
 
         this.$element.html([
+            _.button({class: 'btn fullscreen-toggle'},
+                _.span({class: 'fa fa-chevron-right'})
+            ).click(this.onClickToggleFullscreen),
             _.div({class: 'tab-buttons'}),
             _.div({class: 'tab-panes'})
         ]);

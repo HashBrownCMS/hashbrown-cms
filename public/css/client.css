@@ -308,10 +308,15 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
 .cms-container {
   display: flex;
   height: 100%; }
+  .cms-container.fullscreen .navspace {
+    width: 50px;
+    flex-basis: 50px; }
   .cms-container .navspace {
+    overflow: hidden;
     width: 500px;
     flex-basis: 500px;
-    height: 100%; }
+    height: 100%;
+    transition: width 0.5s, flex-basis 0.5s; }
   .cms-container .workspace {
     flex-grow: 1;
     height: 100%; }
@@ -434,10 +439,27 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
         font-size: 20px;
         margin-right: 15px; }
 
+.cms-container.fullscreen .navbar-main .fullscreen-toggle {
+  display: block;
+  border: 0px; }
+
+.cms-container.fullscreen .navbar-main .tab-panes, .cms-container.fullscreen .navbar-main .tab-buttons {
+  opacity: 0; }
+
 .navbar-main {
   display: flex;
   height: 100%;
-  width: 100%; }
+  width: 100%;
+  position: relative;
+  background-color: #222; }
+  .navbar-main .fullscreen-toggle {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 50px;
+    height: 50px; }
+  .navbar-main .tab-panes, .navbar-main .tab-buttons {
+    transition: opacity 0.5s; }
   .navbar-main .tab-buttons {
     width: 200px;
     height: 100%;

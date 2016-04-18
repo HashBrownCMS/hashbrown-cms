@@ -92,10 +92,19 @@
     display: flex;
     height: 100%;
     
+    &.fullscreen {
+        .navspace {
+            width: 50px;
+            flex-basis: 50px;
+        }
+    }
+
     .navspace {
+        overflow: hidden;
         width: 500px;
         flex-basis: 500px;
         height: 100%;
+        transition: width 0.5s, flex-basis 0.5s;
     }
     
     .workspace {
