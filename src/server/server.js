@@ -45,7 +45,9 @@ PluginWatcher.init();
 let ApiController = require(appRoot + '/src/server/controllers/ApiController');
 let PluginController = require(appRoot + '/src/server/controllers/PluginController');
 let MediaController = require(appRoot + '/src/server/controllers/MediaController');
+let AuthController = require(appRoot + '/src/server/controllers/AuthController');
 
+AuthController.init(app);
 MediaController.init(app);
 ApiController.init(app);
 PluginController.init(app)
@@ -55,6 +57,6 @@ PluginController.init(app)
 // View
 // ----------
 app.get('/', function(req, res) {
+//    res.render('login');
     res.render('index');
 });
-
