@@ -69,9 +69,51 @@ class BoardEditor extends View {
     }
 
     /**
+     * Open modal for issue editing
+     */
+    openModal(issue) {
+        function onClickApply() {
+            console.log('TODO: Sync with github');
+        }
+
+        let $modal = _.div({class: 'modal fade'},
+            _.div({class: 'modal-dialog'},
+                _.div({class: 'modal-content'},
+                    _.div({class: 'modal-header'},
+                        _.button({class: 'close', 'data-dismiss': 'modal'},
+                            _.span({class: 'fa fa-close'})
+                        ),
+                        _.h4({class: 'modal-title'}, 
+                            issue.title
+                        )
+                    ),
+                    _.div({class: 'modal-body'},
+                        ''
+                    ),
+                    _.div({class: 'modal-footer'},
+                        _.button({class: 'btn btn-success'},
+                            'OK'
+                        ).click(onClickApply)
+                    )
+                )
+            )
+        );
+
+        $modal.on('hidden.bs.modal', function() {
+            $modal.remove();
+        });
+
+        $('body').append($modal);
+
+        $modal.modal('show');
+    }
+
+    /**
      * Renders an issue
      */
     renderIssue(issue) {
+        let view = this;
+
         // assignee {String}
         // body {String}
         // closed_at {String}
@@ -93,6 +135,10 @@ class BoardEditor extends View {
         // url {String}
         // user {Object}
 
+        function onClickEdit() {
+            view.openModal(issue);
+        }
+
         let $issue = _.div({
             class: 'issue',
             'data-id': issue.id,
@@ -101,6 +147,9 @@ class BoardEditor extends View {
         },
             _.div({class: 'panel panel-default'},
                 _.div({class: 'panel-heading'},
+                    _.button({class: 'close pull-right'},
+                        _.span({class: 'fa fa-pencil'})
+                    ).click(onClickEdit),
                     _.h4({class: 'panel-title'},
                         issue.title
                     )

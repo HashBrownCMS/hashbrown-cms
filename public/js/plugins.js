@@ -335,8 +335,10 @@ if(labels){var _iteratorNormalCompletion=true;var _didIteratorError=false;var _i
 if(!$column){if(issue.state=='closed'){$column=view.$element.find('.column[data-name="closed"]');}else {$column=view.$element.find('.column[data-name="backlog"]');}}$column.find('.column-issues').append($issue);});} /**
      * Renders a column
      */},{key:"renderColumn",value:function renderColumn(name){var $column=_.div({class:'column','data-name':name},_.div({class:'panel panel-default'},[_.div({class:'panel-heading'},_.h4({class:'panel-title'},name)),_.div({class:'panel-body column-issues'})]));return $column;} /**
+     * Open modal for issue editing
+     */},{key:"openModal",value:function openModal(issue){function onClickApply(){console.log('TODO: Sync with github');}var $modal=_.div({class:'modal fade'},_.div({class:'modal-dialog'},_.div({class:'modal-content'},_.div({class:'modal-header'},_.button({class:'close','data-dismiss':'modal'},_.span({class:'fa fa-close'})),_.h4({class:'modal-title'},issue.title)),_.div({class:'modal-body'},''),_.div({class:'modal-footer'},_.button({class:'btn btn-success'},'OK').click(onClickApply)))));$modal.on('hidden.bs.modal',function(){$modal.remove();});$('body').append($modal);$modal.modal('show');} /**
      * Renders an issue
-     */},{key:"renderIssue",value:function renderIssue(issue){ // assignee {String}
+     */},{key:"renderIssue",value:function renderIssue(issue){var view=this; // assignee {String}
 // body {String}
 // closed_at {String}
 // comments {Number}
@@ -356,7 +358,7 @@ if(!$column){if(issue.state=='closed'){$column=view.$element.find('.column[data-
 // updated_at {String}
 // url {String}
 // user {Object}
-var $issue=_.div({class:'issue','data-id':issue.id,'data-number':issue.number,'data-milestone':issue.milestone?issue.milestone.id:''},_.div({class:'panel panel-default'},_.div({class:'panel-heading'},_.h4({class:'panel-title'},issue.title)),_.div({class:'panel-body issue-body'},markdownToHtml(issue.body))),_.div({class:'spinner'},_.span({class:'fa fa-refresh'})));$issue.data('model',issue);return $issue;} /**
+function onClickEdit(){view.openModal(issue);}var $issue=_.div({class:'issue','data-id':issue.id,'data-number':issue.number,'data-milestone':issue.milestone?issue.milestone.id:''},_.div({class:'panel panel-default'},_.div({class:'panel-heading'},_.button({class:'close pull-right'},_.span({class:'fa fa-pencil'})).click(onClickEdit),_.h4({class:'panel-title'},issue.title)),_.div({class:'panel-body issue-body'},markdownToHtml(issue.body))),_.div({class:'spinner'},_.span({class:'fa fa-refresh'})));$issue.data('model',issue);return $issue;} /**
      * Removes column labels from an issue
      *
      * @param {Object} issue
