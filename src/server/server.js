@@ -40,6 +40,11 @@ let PluginWatcher = require(appRoot + '/src/server/watchers/PluginWatcher');
 PluginWatcher.init();
 
 // ----------
+// Helpers
+// ----------
+let AuthHelper = require(appRoot + '/src/server/helpers/AuthHelper');
+
+// ----------
 // Controllers
 // ----------
 let ApiController = require(appRoot + '/src/server/controllers/ApiController');
