@@ -16,7 +16,7 @@
     "bootstrap-datepicker": "^1.6.0",
     "browserify": "^13.0.0",
     "event-stream": "^3.3.2",
-    "exomon": "^1.0.4",
+    "exomon": "^1.1.0",
     "express": "^4.13.3",
     "glob": "^7.0.3",
     "gulp": "^3.9.0",
