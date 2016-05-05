@@ -3,6 +3,7 @@
 let Promise = require('bluebird');
 let IssuesEditor = require('./views/IssuesEditor');
 let BoardEditor = require('./views/BoardEditor');
+let UploadEditor = require('./views/UploadEditor');
 
 onReady('navbar', function() {
     ViewHelper.get('NavbarMain').renderPane({
@@ -10,6 +11,11 @@ onReady('navbar', function() {
         route: '/github/',
         icon: 'github',
         items: [
+            {
+                name: 'Upload',
+                path: 'upload',
+                icon: 'cloud-upload'
+            },
             {
                 name: 'Issues',
                 path: 'issues',
@@ -120,6 +126,19 @@ Router.route('/github/', function() {
                 _.p('Please pick a feature to proceed')
             )
         );
+    });
+});
+
+Router.route('/github/upload/', function() {
+    ViewHelper.get('NavbarMain').highlightItem('upload');
+    
+    checkLogin()
+    .then(function() {
+        let uploadEditor = new UploadEditor({
+            modelUrl: '/api/github/upload'
+        });
+        
+        $('.workspace').html(uploadEditor.$element);
     });
 });
 

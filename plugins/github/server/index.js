@@ -13,6 +13,7 @@ class GitHub {
     static init(app) {
         app.post('/api/github/login', GitHub.postLogin);
         app.get('/api/github/issues', GitHub.getAllIssues);
+        app.get('/api/github/upload', GitHub.getUploadInfo);
     }
 
     /**
@@ -64,6 +65,14 @@ class GitHub {
                 callback(response);
             });
         });
+    }
+
+    /**
+     * Gets upload info
+     */
+    static getUploadInfo(req, res) {
+        // TODO: Send relevant info, probably commits
+        res.send({});
     }
 
     /**

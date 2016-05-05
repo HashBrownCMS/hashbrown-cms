@@ -185,7 +185,7 @@ class MongoDB {
      *
      * @return {Promise} promise
      */
-    static getAllContent() {
+    static getAllContents() {
         return MongoDB.find(
             'content',
             {}
@@ -270,7 +270,7 @@ class MongoDB {
         // TODO: Restructure this to use event handlers instead
         ContentHelper.createContent = MongoDB.createContent;
         ContentHelper.removeContentById = MongoDB.removeContentById;
-        ContentHelper.getAllContent = MongoDB.getAllContent;
+        ContentHelper.getAllContents = MongoDB.getAllContents;
         ContentHelper.getContentById = MongoDB.getContentById;
         ContentHelper.setContentById = MongoDB.setContentById;
     }

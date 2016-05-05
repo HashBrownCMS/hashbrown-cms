@@ -1,3 +1,5 @@
+'use strict';
+
 class AuthHelper {
     static getCurrentUser() {
 

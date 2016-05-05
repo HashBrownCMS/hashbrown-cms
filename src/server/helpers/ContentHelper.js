@@ -10,7 +10,7 @@ class ContentHelper {
      *
      * @return {Promise} promise
      */
-    static getAllContent() {
+    static getAllContents() {
         return new Promise(function(callback) {
             callback([]);   
         });

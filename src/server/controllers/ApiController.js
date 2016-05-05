@@ -42,7 +42,7 @@ class ApiController extends Controller {
      * Initialises this controller
      */
     static init(app) {
-        app.get('/api/content', ApiController.getAllContent);
+        app.get('/api/content', ApiController.getAllContents);
         app.get('/api/content/:id', ApiController.getContent);
         app.post('/api/content/new', ApiController.createContent);
         app.post('/api/content/:id', ApiController.postContent);
@@ -121,8 +121,8 @@ class ApiController extends Controller {
     /**
      * Gets a list of all Content objects
      */
-    static getAllContent(req, res) {
-        ContentHelper.getAllContent()
+    static getAllContents(req, res) {
+        ContentHelper.getAllContents()
         .then(function(nodes) {
             res.send(nodes);
         });
