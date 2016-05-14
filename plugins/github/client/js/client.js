@@ -5,35 +5,7 @@ let IssuesEditor = require('./views/IssuesEditor');
 let BoardEditor = require('./views/BoardEditor');
 let UploadEditor = require('./views/UploadEditor');
 
-onReady('navbar', function() {
-    ViewHelper.get('NavbarMain').renderPane({
-        label: 'GitHub',
-        route: '/github/',
-        icon: 'github',
-        items: [
-            {
-                name: 'Upload',
-                path: 'upload',
-                icon: 'cloud-upload'
-            },
-            {
-                name: 'Issues',
-                path: 'issues',
-                icon: 'exclamation-circle'
-            },
-            {
-                name: 'Board',
-                path: 'board',
-                icon: 'columns'
-            },
-            {
-                name: 'Wiki',
-                path: 'wiki',
-                icon: 'book'
-            }
-        ]
-    });
-});
+resources.connectionEditors.github = UploadEditor;
 
 function showLogin() {
     return new Promise(function(callback) {
@@ -114,62 +86,3 @@ function checkLogin() {
         });
     });
 }
-
-Router.route('/github/', function() {
-    ViewHelper.get('NavbarMain').showTab('/github/');
-    
-    checkLogin()
-    .then(function() {
-        $('.workspace').html(
-            _.div({class: 'dashboard-container'},
-                _.h1('GitHub dashboard'),
-                _.p('Please pick a feature to proceed')
-            )
-        );
-    });
-});
-
-Router.route('/github/upload/', function() {
-    ViewHelper.get('NavbarMain').highlightItem('upload');
-    
-    checkLogin()
-    .then(function() {
-        let uploadEditor = new UploadEditor({
-            modelUrl: '/api/github/upload'
-        });
-        
-        $('.workspace').html(uploadEditor.$element);
-    });
-});
-
-Router.route('/github/issues/', function() {
-    ViewHelper.get('NavbarMain').highlightItem('issues');
-    
-    checkLogin()
-    .then(function() {
-        let issuesEditor = new IssuesEditor({
-            modelUrl: '/api/github/issues'
-        });
-        
-        $('.workspace').html(issuesEditor.$element);
-    });
-});
-
-Router.route('/github/board/', function() {
-    ViewHelper.get('NavbarMain').highlightItem('board');
-    
-    checkLogin()
-    .then(function() {
-        let boardEditor = new BoardEditor({
-            modelUrl: '/api/github/issues'
-        });
-        
-        $('.workspace').html(boardEditor.$element);
-    });
-});
-
-Router.route('/github/wiki/', function() {
-    ViewHelper.get('NavbarMain').highlightItem('wiki');
-
-    $('.workspace').html('');
-});

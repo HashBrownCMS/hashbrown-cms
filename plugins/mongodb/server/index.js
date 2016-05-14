@@ -13,9 +13,11 @@ let config = require('./config.json');
 
 // Helpers
 let ContentHelper = require(appRoot + '/src/server/helpers/ContentHelper');
+let ConnectionHelper = require(appRoot + '/src/server/helpers/ConnectionHelper');
 
 // Models
 let Content = require(appRoot + '/src/server/models/Content');
+let Connection = require(appRoot + '/src/server/models/Connection');
 
 class MongoDB {
     /**
@@ -179,6 +181,84 @@ class MongoDB {
             });
         });
     }
+    
+    /**
+     * Gets all connections
+     *
+     * @return {Promise} promise
+     */
+    static getAllConnections() {
+        return MongoDB.find(
+            'connections',
+            {}
+        );
+    }
+    
+    /**
+     * Gets a connection by id
+     *
+     * @param {string} id
+     *
+     * @return {Promise} promise
+     */
+    static getConnectionById(id) {
+        return MongoDB.findOne(
+            'connections',
+            {
+                id: id
+            }
+        );
+    }
+    
+    /**
+     * Removes a connection by id
+     *
+     * @param {string} id
+     *
+     * @return {Promise} promise
+     */
+    static removeConnectionById(id) {
+        return MongoDB.removeOne(
+            'connections',
+            {
+                id: id
+            }
+        );
+    }
+
+    /**
+     * Sets a connection by id
+     *
+     * @param {string} id
+     * @param {Object} content
+     *
+     * @return {Promise} promise
+     */
+    static setConnectionById(id, content) {
+        return MongoDB.updateOne(
+            'connections',
+            {
+                id: id
+            },
+            content
+        );
+    }
+    
+    /**
+     * Creates a new connection
+     *
+     * @param {Object} data
+     *
+     * @return {Promise} promise
+     */
+    static createConnection(data) {
+        let connection = Connection.create(data);
+
+        return MongoDB.insertOne(
+            'connections',
+            connection.data
+        );
+    }
 
     /**
      * Gets all Content objects
@@ -266,8 +346,14 @@ class MongoDB {
     static init(app) {
         console.log('[MongoDB] Initialising MongoDB plugin');
 
+        // Override ConnectionHelper methods
+        ConnectionHelper.createConnection = MongoDB.createConnection;
+        ConnectionHelper.getConnectionById = MongoDB.getConnectionById;
+        ConnectionHelper.getAllConnections = MongoDB.getAllConnections;
+        ConnectionHelper.setConnectionById = MongoDB.setConnectionById;
+        ConnectionHelper.removeConnectionById = MongoDB.removeConnectionById;
+
         // Override ContentHelper methods
-        // TODO: Restructure this to use event handlers instead
         ContentHelper.createContent = MongoDB.createContent;
         ContentHelper.removeContentById = MongoDB.removeContentById;
         ContentHelper.getAllContents = MongoDB.getAllContents;

@@ -103,6 +103,7 @@
         overflow: hidden;
         width: 500px;
         flex-basis: 500px;
+        flex-shrink: 0;
         height: 100%;
         transition: width 0.5s, flex-basis 0.5s;
     }

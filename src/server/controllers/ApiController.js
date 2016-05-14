@@ -33,6 +33,7 @@ let SchemaHelper = require('../helpers/SchemaHelper');
 let ViewHelper = require('../helpers/ViewHelper');
 let PluginHelper = require('../helpers/PluginHelper');
 let MediaHelper = require('../helpers/MediaHelper');
+let ConnectionHelper = require('../helpers/ConnectionHelper');
 
 /**
  * The main API controller
@@ -42,24 +43,38 @@ class ApiController extends Controller {
      * Initialises this controller
      */
     static init(app) {
+        // Content
         app.get('/api/content', ApiController.getAllContents);
         app.get('/api/content/:id', ApiController.getContent);
         app.post('/api/content/new', ApiController.createContent);
         app.post('/api/content/:id', ApiController.postContent);
         app.delete('/api/content/:id', ApiController.deleteContent);
 
+        // Schemas
         app.get('/api/schemas', ApiController.getSchemas);
         app.get('/api/schemas/:id', ApiController.getSchema);
         app.post('/api/schemas/:id', ApiController.setSchema);
         
+        // Media
         app.get('/api/media', ApiController.getMedia);
         app.post('/api/media/new', uploadMedia.single('media'), ApiController.createMedia);
         app.post('/api/media/:id', uploadMedia.single('media'), ApiController.setMedia);
         app.delete('/api/media/:id', ApiController.deleteMedia);
         
+        // Connections
+        app.get('/api/connections', ApiController.getConnections);
+        app.get('/api/connections/:id', ApiController.getConnection);
+        app.post('/api/connections/new', ApiController.createConnection);
+        app.post('/api/connections/:id', ApiController.postConnection);
+        app.delete('/api/connection/:id', ApiController.deleteConnection);
+            
+        // Compiled editors script
         app.get('/scripts/editors.js', ApiController.getEditors);
     }
-   
+  
+    // ----------
+    // Media methods
+    // ---------- 
     /**
      * Gets a list of Media objects
      */
@@ -118,6 +133,9 @@ class ApiController extends Controller {
         }
     }
 
+    // ----------
+    // Content methods
+    // ---------- 
     /**
      * Gets a list of all Content objects
      */
@@ -184,7 +202,78 @@ class ApiController extends Controller {
             res.sendStatus(200);
         });
     }
+    
+    // ----------
+    // Connection methods
+    // ----------
+    /**
+     * Gets all connections
+     */
+    static getConnections(req, res) {
+        ConnectionHelper.getAllConnections()
+        .then(function(connections) {
+            res.send(connections);
+        });
+    }
 
+    /**
+     * Post connection by id
+     */
+    static postConnection(req, res) {
+        let id = req.params.id;
+        let content = req.body;
+
+        ConnectionHelper.setConnectionById(id, content)
+        .then(function(connections) {
+            res.sendStatus(200);
+        });
+    }
+    
+    /**
+     * Gets a connection by id
+     */
+    static getConnection(req, res) {
+        let id = req.params.id;
+   
+        if(id && id != 'undefined') {
+            ConnectionHelper.getConnectionById(id)
+            .then(function(node) {
+                res.send(node);
+            });
+        
+        } else {
+            throw '[Api] Connection id is undefined';
+        
+        }
+    }
+    
+    /**
+     * Creates a new connection
+     *
+     * @return {Object} Content
+     */
+    static createConnection(req, res) {
+        ConnectionHelper.createConnection(req.body)
+        .then(function(node) {
+            res.send(node);
+        });
+    }
+
+    /**
+     * Deletes a connection by id
+     */
+    static deleteConnection(req, res) {
+        let id = req.params.id;
+        
+        ConnectionHelper.removeConnectionById(id)
+        .then(function() {
+            res.sendStatus(200);
+        });
+    }
+    
+    // ----------
+    // Schema methods
+    // ---------- 
     /**
      * Get a list of all schema objects
      */
@@ -220,6 +309,9 @@ class ApiController extends Controller {
         });
     }
     
+    // ----------
+    // Plugin editors
+    // ---------- 
     /**
      * Get all editors
      */

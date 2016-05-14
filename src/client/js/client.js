@@ -9,6 +9,7 @@ let Promise = require('bluebird');
 let NavbarMain = require('./views/NavbarMain');
 let JSONEditor = require('./views/JSONEditor');
 let ContentEditor = require('./views/ContentEditor');
+let ConnectionEditor = require('./views/ConnectionEditor');
 let SchemaEditor = require('./views/SchemaEditor');
 let MediaViewer = require('./views/MediaViewer');
 
@@ -20,9 +21,11 @@ require('./helpers');
 // -----------
 window.resources = {
     editors: {},
+    connections: {},
+    connectionEditors: {},
     content: [],
     schemas: [],
-    media: []
+    media: [],
 };
 
 window.reloadAllResources()
@@ -84,6 +87,69 @@ Router.route('/content/json/:id', function() {
 });
 
 // ----------
+// Connections
+// ----------
+// Dashboard
+Router.route('/connections/', function() {
+    ViewHelper.get('NavbarMain').showTab('/connections/');
+    
+    $('.workspace').html(
+        _.div({class: 'dashboard-container'},
+            _.h1('Connections dashboard'),
+            _.p('Please click on a connection to proceed')
+        )
+    );
+});
+
+// Edit
+Router.route('/connections/:id', function() {
+    let connectionEditor = new ConnectionEditor({
+        modelUrl: '/api/connections/' + this.id
+    });
+   
+    ViewHelper.get('NavbarMain').highlightItem(this.id);
+    
+    $('.workspace').html(connectionEditor.$element);
+});
+
+// Edit (JSON editor)
+Router.route('/connections/json/:id', function() {
+    let connectionEditor = new JSONEditor({
+        modelUrl: '/api/connections/' + this.id
+    });
+     
+    ViewHelper.get('NavbarMain').highlightItem(this.id);
+    
+    $('.workspace').html(connectionEditor.$element);
+});
+
+// ----------
+// Media
+// ----------
+// Dashboard
+Router.route('/media/', function() {
+    ViewHelper.get('NavbarMain').showTab('/media/');
+    
+    $('.workspace').html(
+        _.div({class: 'dashboard-container'},
+            _.h1('Media dashboard'),
+            _.p('Please click on a media object to proceed')
+        )
+    );
+});
+
+// Preview
+Router.route('/media/:id', function() {
+    let mediaViewer = new MediaViewer({
+        mediaId: this.id
+    });
+    
+    ViewHelper.get('NavbarMain').highlightItem(this.id);
+    
+    $('.workspace').html(mediaViewer.$element);
+});
+
+// ----------
 // Schemas
 // ----------
 // Dashboard
@@ -118,32 +184,6 @@ Router.route('/schemas/json/:id', function() {
     ViewHelper.get('NavbarMain').highlightItem(this.id);
     
     $('.workspace').html(jsonEditor.$element);
-});
-
-// ----------
-// Schemas
-// ----------
-// Dashboard
-Router.route('/media/', function() {
-    ViewHelper.get('NavbarMain').showTab('/media/');
-    
-    $('.workspace').html(
-        _.div({class: 'dashboard-container'},
-            _.h1('Media dashboard'),
-            _.p('Please click on a media object to proceed')
-        )
-    );
-});
-
-// Preview
-Router.route('/media/:id', function() {
-    let mediaViewer = new MediaViewer({
-        mediaId: this.id
-    });
-    
-    ViewHelper.get('NavbarMain').highlightItem(this.id);
-    
-    $('.workspace').html(mediaViewer.$element);
 });
 
 // ----------

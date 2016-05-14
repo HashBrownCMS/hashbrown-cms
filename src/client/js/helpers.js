@@ -1,9 +1,6 @@
 let Promise = require('bluebird');
 
-let onReadyCallbacks = {
-    resources: [],
-    navbar: []
-};
+let onReadyCallbacks = {};
 
 let isReady = {};
 
@@ -64,7 +61,7 @@ window.reloadResource = function reloadResource(name) {
  */
 window.reloadAllResources = function reloadAllResources() {
     return new Promise(function(callback) {
-        let queue = ['content', 'schemas', 'media'];
+        let queue = ['content', 'schemas', 'media', 'connections'];
 
         function processQueue(name) {
             window.reloadResource(name)
@@ -91,6 +88,10 @@ window.onReady = function onReady(name, callback) {
         callback();
     
     } else {
+        if(!onReadyCallbacks[name]) {
+            onReadyCallbacks[name] = [];
+        }
+
         onReadyCallbacks[name].push(callback);
     
     }
@@ -100,7 +101,11 @@ window.onReady = function onReady(name, callback) {
  * Triggers a key
  */
 window.triggerReady = function triggerReady(name) {
-    for(let callback of onReadyCallbacks[name]) {
-        callback();
+    isReady[name] = true;
+
+    if(onReadyCallbacks[name]) {
+        for(let callback of onReadyCallbacks[name]) {
+            callback();
+        }
     }
 }

@@ -133,6 +133,69 @@ class NavbarMain extends View {
     }
 
     /**
+     * Event: Click new connection
+     */
+    onClickNewConnection() {
+        let view = this;
+
+        $.post('/api/connections/new/', function() {
+            reloadResource('connections')
+            .then(function() {
+                view.reload();
+            });
+        });
+    }
+
+    /**
+     * Event: On click remove connection
+     */
+    onClickRemoveConnection() {
+        let view = this;
+        let id = $('.context-menu-target-element').data('id');
+        let name = $('.context-menu-target-element').data('name');
+        
+        function onSuccess() {
+            console.log('[NavbarMain] Removed connection with alias "' + id + '"'); 
+        
+            reloadResource('content')
+            .then(function() {
+                view.reload();
+                
+                // Cancel the ConnectionEditor view if it was displaying the deleted connection
+                if(location.hash == '#/connections/' + id) {
+                    location.hash = '/connections/';
+                }
+            });
+        }
+
+        new MessageModal({
+            model: {
+                title: 'Delete content',
+                body: 'Are you sure you want to delete the connection "' + name + '"?'
+            },
+            buttons: [
+                {
+                    label: 'Cancel',
+                    class: 'btn-default',
+                    callback: function() {
+                    }
+                },
+                {
+                    label: 'OK',
+                    class: 'btn-danger',
+                    callback: function() {
+                        $.ajax({
+                            url: '/api/connections/' + id,
+                            type: 'DELETE',
+                            success: onSuccess
+                        });
+                    }
+                }
+            ]
+        });
+    }
+
+    /**
      * Event: Click toggle fullscreen
      */
     onClickToggleFullscreen() {
@@ -323,7 +386,8 @@ class NavbarMain extends View {
 
         let $button = _.button({'data-route': params.route},
             $icon,
-            _.span(params.label)
+            _.span({class: 'pane-label'}, params.label),
+            params.sublabel ? _.span({class: 'pane-sublabel'}, params.sublabel) : ''
         ).click(function() {
             let $currentTab = view.$element.find('.pane-container.active');
 
@@ -528,12 +592,14 @@ class NavbarMain extends View {
 
         this.$element.find('.pane-item-container').each(function(i) {
             let $item = $(this);
+            let id  = ($item.children('a').attr('data-id') || '').toLowerCase();
+            let routingPath = ($item.attr('data-routing-path') || '').toLowerCase();
 
             $item.toggleClass('active', false);
             
             if(
-                $item.attr('data-id') == route ||
-                $item.attr('data-routing-path') == route
+                id == route.toLowerCase() ||
+                routingPath == route.toLowerCase()
             ) {
                 $item.toggleClass('active', true);
 
@@ -610,6 +676,21 @@ class NavbarMain extends View {
             paneContextMenu: {
                 'General': '---',
                 'Upload new media': function() { view.onClickUploadMedia(); }
+            }
+        });
+        
+        this.renderPane({
+            label: 'Connections',
+            route: '/connections/',
+            icon: 'exchange',
+            items: resources.connections,
+            itemContextMenu: {
+                'This connection': '---',
+                'Remove': function() { view.onClickRemoveConnection(); }
+            },
+            paneContextMenu: {
+                'General': '---',
+                'New connection': function() { view.onClickNewConnection(); }
             }
         });
         
