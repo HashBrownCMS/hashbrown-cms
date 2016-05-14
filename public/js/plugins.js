@@ -327,74 +327,43 @@ this.$output.html(markdownToHtml(this.$textarea.val()));}}]);return RichTextEdit
  */var StringEditor=function(_View8){_inherits(StringEditor,_View8);function StringEditor(params){_classCallCheck(this,StringEditor);var _this8=_possibleConstructorReturn(this,Object.getPrototypeOf(StringEditor).call(this,params));_this8.init();return _this8;} /**
      * Event: Change
      */_createClass(StringEditor,[{key:"onChange",value:function onChange(){this.trigger('change',this.$input.val());}},{key:"render",value:function render(){var editor=this; // Main element
-this.$element=_.div({class:'field-editor string-editor'},this.$input=_.input({class:'form-control',value:this.value}).bind('change propertychange paste keyup',function(){editor.onChange();}));}}]);return StringEditor;}(View);resources.editors['20000']=StringEditor;},{}],20:[function(require,module,exports){'use strict';var UrlEditor=function(_View9){_inherits(UrlEditor,_View9);function UrlEditor(params){_classCallCheck(this,UrlEditor);var _this9=_possibleConstructorReturn(this,Object.getPrototypeOf(UrlEditor).call(this,params));_this9.init();return _this9;}_createClass(UrlEditor,[{key:"regenerate",value:function regenerate(){this.$input.val('/new-url/');this.trigger('change',this.$input.val());}},{key:"onChange",value:function onChange(){this.trigger('change',this.$input.val());}},{key:"render",value:function render(){var editor=this;this.$element=_.div({class:'field-editor url-editor input-group'},[this.$input=_.input({class:'form-control',value:this.value}).bind('change propertychange paste keyup',function(){this.onChange();}),_.div({class:'input-group-btn'},_.button({class:'btn btn-primary'},'Regenerate ').click(function(){editor.regenerate();}))]);}}]);return UrlEditor;}(View);resources.editors['20003']=UrlEditor;},{}],21:[function(require,module,exports){module.exports={"board":{"columns":["in progress"]}};},{}],22:[function(require,module,exports){'use strict';var Promise=require('bluebird');var IssuesEditor=require('./views/IssuesEditor');var BoardEditor=require('./views/BoardEditor');var UploadEditor=require('./views/UploadEditor');resources.connectionEditors.github=UploadEditor;function showLogin(){return new Promise(function(callback){function onSubmit(e){e.preventDefault();var $form=$(this);$.post('/api/github/login',$form.serialize(),function(data,textStatus){console.log('[GitHub] Log in '+textStatus);if(textStatus=='success'){callback();}});}var template=new Template({divDashboardContainer:{class:'dashboard-container',divLoginContainer:{class:'panel panel-login',divPanelHeading:{class:'panel-heading',divIconContainer:{class:'login-icon',spanIcon:{class:'fa fa-github'}}},divPanelBody:{class:'panel-body',formLogin:{on:{'submit':onSubmit},inputUsername:{type:'text',name:'usr',class:'form-control',placeholder:'Username'},inputPassword:{type:'password',name:'pwd',class:'form-control',placeholder:'Password'},inputButton:{type:'submit',class:'btn btn-primary',value:'Log in'}}}}}});$('.workspace').html(template.html);});}function checkLogin(){$('.workspace').html(_.div({class:'dashboard-container'},_.div({class:'panel panel-login'},_.div({class:'panel-heading'},_.div({class:'login-icon'},_.span({class:'fa fa-github'}))),_.div({class:'panel-body'},_.div({class:'spinner-container'},_.span({class:'spinner fa fa-refresh'}))))));return new Promise(function(callback){$.ajax({type:'post',data:{},url:'/api/github/login',success:function success(){callback();},error:function error(){showLogin().then(function(){callback();});}});});}},{"./views/BoardEditor":23,"./views/IssuesEditor":24,"./views/UploadEditor":25,"bluebird":2}],23:[function(require,module,exports){'use strict';var config=require('../../config.json'); // Lib
-var markdownToHtml=require('marked');var BoardEditor=function(_View10){_inherits(BoardEditor,_View10);function BoardEditor(params){_classCallCheck(this,BoardEditor);var _this10=_possibleConstructorReturn(this,Object.getPrototypeOf(BoardEditor).call(this,params));_this10.$element=_.div({class:'board-editor'});_this10.fetch();return _this10;} /**
-     * Sorts issues and places them in their appropriate parents
-     */_createClass(BoardEditor,[{key:"sortIssues",value:function sortIssues(){var view=this;this.$element.find('.issue').each(function(i){var $issue=$(this);var issue=$issue.data('model');var labels=issue.labels;var $column=undefined; // Look for columns matches any issue label
-if(labels){var _iteratorNormalCompletion=true;var _didIteratorError=false;var _iteratorError=undefined;try{for(var _iterator=labels[Symbol.iterator](),_step;!(_iteratorNormalCompletion=(_step=_iterator.next()).done);_iteratorNormalCompletion=true){var label=_step.value;var $foundColumn=view.$element.find('.column[data-name="'+label.name+'"]');if($foundColumn.length>0){$column=$foundColumn;break;}}}catch(err){_didIteratorError=true;_iteratorError=err;}finally {try{if(!_iteratorNormalCompletion&&_iterator.return){_iterator.return();}}finally {if(_didIteratorError){throw _iteratorError;}}}} // If no matching column was found, put in either 'backlog' or 'closed' column
-if(!$column){if(issue.state=='closed'){$column=view.$element.find('.column[data-name="closed"]');}else {$column=view.$element.find('.column[data-name="backlog"]');}}$column.find('.column-issues').append($issue);});} /**
-     * Renders a column
-     */},{key:"renderColumn",value:function renderColumn(name){var $column=_.div({class:'column','data-name':name},_.div({class:'panel panel-default'},[_.div({class:'panel-heading'},_.h4({class:'panel-title'},name)),_.div({class:'panel-body column-issues'})]));return $column;} /**
-     * Open modal for issue editing
-     */},{key:"openModal",value:function openModal(issue){function onClickApply(){console.log('TODO: Sync with github');}var $modal=_.div({class:'modal fade'},_.div({class:'modal-dialog'},_.div({class:'modal-content'},_.div({class:'modal-header'},_.button({class:'close','data-dismiss':'modal'},_.span({class:'fa fa-close'})),_.h4({class:'modal-title'},issue.title)),_.div({class:'modal-body'},''),_.div({class:'modal-footer'},_.button({class:'btn btn-success'},'OK').click(onClickApply)))));$modal.on('hidden.bs.modal',function(){$modal.remove();});$('body').append($modal);$modal.modal('show');} /**
-     * Renders an issue
-     */},{key:"renderIssue",value:function renderIssue(issue){var view=this; // assignee {String}
-// body {String}
-// closed_at {String}
-// comments {Number}
-// comments_url {String}
-// created_at {String}
-// events_url {String}
-// html_url {String}
-// id {Number}
-// labels {Array}
-// labels_url {String}
-// locked {Boolean}
-// milestone {Object}
-// number {Number}
-// repository_url {String}
-// state {String} open closed
-// title {String}
-// updated_at {String}
-// url {String}
-// user {Object}
-function onClickEdit(){view.openModal(issue);}var $issue=_.div({class:'issue','data-id':issue.id,'data-number':issue.number,'data-milestone':issue.milestone?issue.milestone.id:''},_.div({class:'panel panel-default'},_.div({class:'panel-heading'},_.button({class:'close pull-right'},_.span({class:'fa fa-pencil'})).click(onClickEdit),_.h4({class:'panel-title'},issue.title)),_.div({class:'panel-body issue-body'},markdownToHtml(issue.body))),_.div({class:'spinner'},_.span({class:'fa fa-refresh'})));$issue.data('model',issue);return $issue;} /**
-     * Removes column labels from an issue
+this.$element=_.div({class:'field-editor string-editor'},this.$input=_.input({class:'form-control',value:this.value}).bind('change propertychange paste keyup',function(){editor.onChange();}));}}]);return StringEditor;}(View);resources.editors['20000']=StringEditor;},{}],20:[function(require,module,exports){'use strict';var UrlEditor=function(_View9){_inherits(UrlEditor,_View9);function UrlEditor(params){_classCallCheck(this,UrlEditor);var _this9=_possibleConstructorReturn(this,Object.getPrototypeOf(UrlEditor).call(this,params));_this9.init();return _this9;}_createClass(UrlEditor,[{key:"regenerate",value:function regenerate(){this.$input.val('/new-url/');this.trigger('change',this.$input.val());}},{key:"onChange",value:function onChange(){this.trigger('change',this.$input.val());}},{key:"render",value:function render(){var editor=this;this.$element=_.div({class:'field-editor url-editor input-group'},[this.$input=_.input({class:'form-control',value:this.value}).bind('change propertychange paste keyup',function(){this.onChange();}),_.div({class:'input-group-btn'},_.button({class:'btn btn-primary'},'Regenerate ').click(function(){editor.regenerate();}))]);}}]);return UrlEditor;}(View);resources.editors['20003']=UrlEditor;},{}],21:[function(require,module,exports){'use strict';var Promise=require('bluebird'); /**
+ * The GitHub connection editor for Endomon CMS
+ */var GitHub=function(_View10){_inherits(GitHub,_View10);function GitHub(params){_classCallCheck(this,GitHub);var _this10=_possibleConstructorReturn(this,Object.getPrototypeOf(GitHub).call(this,params));_this10.$element=_.div({class:'github-editor'});_this10.fetch();return _this10;} /**
+     * Shows the login prompt
+     */_createClass(GitHub,[{key:"showLogin",value:function showLogin(){var view=this;return new Promise(function(callback){function onSubmit(e){e.preventDefault();var $form=$(this);$.post('/api/github/login',$form.serialize(),function(data,textStatus){console.log('[GitHub] Log in '+textStatus);if(textStatus=='success'){callback();}});}var template=new Template({divDashboardContainer:{class:'dashboard-container',divLoginContainer:{class:'panel panel-login',divPanelHeading:{class:'panel-heading',divIconContainer:{class:'login-icon',spanIcon:{class:'fa fa-github'}}},divPanelBody:{class:'panel-body',formLogin:{on:{'submit':onSubmit},inputUsername:{type:'text',name:'usr',class:'form-control',placeholder:'Username'},inputPassword:{type:'password',name:'pwd',class:'form-control',placeholder:'Password'},inputButton:{type:'submit',class:'btn btn-primary',value:'Log in'}}}}}});view.$element.html(template.html);});} /**
+     * Checks if user is logged in
+     */},{key:"checkLogin",value:function checkLogin(){var view=this;this.$element.html(_.div({class:'panel panel-login'},_.div({class:'panel-heading'},_.div({class:'login-icon'},_.span({class:'fa fa-github'}))),_.div({class:'panel-body'},_.div({class:'spinner-container'},_.span({class:'spinner fa fa-refresh'})))));return new Promise(function(callback){$.ajax({type:'post',data:{},url:'/api/github/login',success:function success(){callback();},error:function error(){view.showLogin().then(callback);}});});} /**
+     * Render organisation picker
+     */},{key:"renderOrgPicker",value:function renderOrgPicker(){var view=this;var $editor=_.div({class:'field-editor dropdown-editor'});function onChange(){var org=$(this).val();view.model.org=org;view.render();}$.ajax({type:'get',url:'/api/github/orgs',success:function success(orgs){$editor.html(_.select({class:'form-control'},_.each(orgs,function(i,org){return _.option({value:org.login},org.login);})).change(onChange));$editor.children('select').val(view.model.org);}});return $editor;} /**
+     * Render repository picker
+     */},{key:"renderRepoPicker",value:function renderRepoPicker(){var view=this;var $editor=_.div({class:'field-editor dropdown-editor'});function onChange(){var repo=$(this).val();view.model.repo=repo;view.render();}$.ajax({type:'get',url:'/api/github/'+view.model.org+'/repos',success:function success(orgs){$editor.html(_.select({class:'form-control'},_.each(repos,function(i,repos){return _.option({value:repo.name},repo.name);})).change(onChange));$editor.children('select').val(view.model.repo);}});return $editor;} /**
+     * Render directory picker
      *
-     * @param {Object} issue
-     */},{key:"removeColumnLabels",value:function removeColumnLabels(issue){var _iteratorNormalCompletion2=true;var _didIteratorError2=false;var _iteratorError2=undefined;try{for(var _iterator2=config.board.columns[Symbol.iterator](),_step2;!(_iteratorNormalCompletion2=(_step2=_iterator2.next()).done);_iteratorNormalCompletion2=true){var columnName=_step2.value;for(var i in issue.labels){var label=issue.labels[i];if(label==columnName){issue.labels.splice(i,1);}}}}catch(err){_didIteratorError2=true;_iteratorError2=err;}finally {try{if(!_iteratorNormalCompletion2&&_iterator2.return){_iterator2.return();}}finally {if(_didIteratorError2){throw _iteratorError2;}}}} /**
-     * Updates an issue
-     *
-     * @param {Object} issue
-     */},{key:"updateIssueFromElement",value:function updateIssueFromElement($issue){var issue=$issue.data('model');var $column=$issue.parents('.column');var columnName=$column.data('name');$issue.toggleClass('spinner-container',true);switch(columnName){case 'closed':issue.state='closed';this.removeColumnLabels(issue);break;case 'backlog':issue.state='open';this.removeColumnLabels(issue);break;default:this.removeColumnLabels(issue);issue.labels[issue.labels.length]=columnName;break;}console.log('TODO: Sync with GitHub backend');setTimeout(function(){$issue.toggleClass('spinner-container',false);},1000);} /**
-     * Applies html5sortable plugin
-     */},{key:"applySortable",value:function applySortable(){var view=this;$('.board-editor .column-issues').sortable('destroy');$('.board-editor .column-issues').sortable({items:'.issue',forcePlaceholderSize:true,connectWith:'.board-editor .column-issues'}).on('sortstop',function(e,ui){var $issue=ui.item;view.updateIssueFromElement($issue);});}},{key:"render",value:function render(){var view=this;this.$element.empty();this.$element.append(_.each(this.model,function(i,issue){return view.renderIssue(issue);}));this.$element.append(this.renderColumn('backlog'));var _iteratorNormalCompletion3=true;var _didIteratorError3=false;var _iteratorError3=undefined;try{for(var _iterator3=config.board.columns[Symbol.iterator](),_step3;!(_iteratorNormalCompletion3=(_step3=_iterator3.next()).done);_iteratorNormalCompletion3=true){var columnName=_step3.value;this.$element.append(this.renderColumn(columnName));}}catch(err){_didIteratorError3=true;_iteratorError3=err;}finally {try{if(!_iteratorNormalCompletion3&&_iterator3.return){_iterator3.return();}}finally {if(_didIteratorError3){throw _iteratorError3;}}}this.$element.append(this.renderColumn('closed'));this.sortIssues();this.applySortable();}}]);return BoardEditor;}(View);module.exports=BoardEditor;},{"../../config.json":21,"marked":5}],24:[function(require,module,exports){'use strict'; // Lib
-var markdownToHtml=require('marked');var IssuesEditor=function(_View11){_inherits(IssuesEditor,_View11);function IssuesEditor(params){_classCallCheck(this,IssuesEditor);var _this11=_possibleConstructorReturn(this,Object.getPrototypeOf(IssuesEditor).call(this,params));_this11.$element=_.div({class:'issues-editor'});_this11.fetch();return _this11;} /**
-     * Sorts issues and places them in their appropriate parents
-     */_createClass(IssuesEditor,[{key:"sortIssues",value:function sortIssues(){var view=this;this.$element.find('.issue').each(function(i){var $issue=$(this);var milestoneId=$issue.attr('data-milestone');var $milestone=view.$element.find('.milestone[data-id="'+milestoneId+'"]');var parentNumber=$issue.attr('data-parent');var $parentIssue=view.$element.find('.issue[data-number="'+parentNumber+'"]');if($milestone.length>0){$milestone.find('.milestone-issues').append($issue);$milestone.children('.panel').children('.panel-footer').children('a').children('.issue-count').html($milestone.find('.issue').length);}if($parentIssue.length>0){var $panel=$parentIssue.children('.panel');if($panel.find('.panel-footer').length<1){$panel.append(_.div({class:'panel-footer'},[_.a({'data-toggle':'collapse',href:'#collapse-'+parentNumber},[_.span({class:'issue-count'}),_.span({class:'fa fa-chevron-up'}),_.span({class:'fa fa-chevron-down'})]),_.div({id:'collapse-'+parentNumber,class:'collapse issue-children'})]));}$panel.children('.panel-footer').children('.issue-children').append($issue);$panel.children('.panel-footer').children('a').children('.issue-count').html($panel.find('.issue').length);}});} /**
-     * Gets parent issue
-     */},{key:"getParentIssue",value:function getParentIssue(issue){var pattern=/subtask of #[0-9]+ /;var matches=issue.body.toLowerCase().match(pattern);var parentNumber=-1;if(matches&&matches.length>0){matches=matches[0].match(/[0-9]+/);parentNumber=parseInt(matches[0]);}return parentNumber;} /**
-     * Render milestone
-     *
-     * @param {Object} milestone
-     */},{key:"renderMilestone",value:function renderMilestone(milestone){console.log(milestone);var $milestone=_.div({class:'milestone','data-id':milestone.id},_.div({class:'panel panel-default'},[_.div({class:'panel-heading'},_.h4({class:'panel-title'},milestone.title)),_.div({class:'panel-body'},milestone.description),_.div({class:'panel-footer'},[_.a({'data-toggle':'collapse',href:'#collapse-'+milestone.id,'aria-expanded':true},[_.span({class:'issue-count'}),_.span({class:'fa fa-chevron-up'}),_.span({class:'fa fa-chevron-down'})]),_.div({id:'collapse-'+milestone.id,class:'collapse in milestone-issues'})])]));return $milestone;}},{key:"render",value:function render(){var view=this;this.$element.empty();this.$element.append(_.each(this.model,function(i,issue){ // assignee {String}
-// body {String}
-// closed_at {String}
-// comments {Number}
-// comments_url {String}
-// created_at {String}
-// events_url {String}
-// html_url {String}
-// id {Number}
-// labels {Array}
-// labels_url {String}
-// locked {Boolean}
-// milestone {Object}
-// number {Number}
-// repository_url {String}
-// state {String} open closed
-// title {String}
-// updated_at {String}
-// url {String}
-// user {Object}
-if(issue.milestone&&view.$element.find('.milestone[data-id="'+issue.milestone.id+'"]').length<1){view.$element.append(view.renderMilestone(issue.milestone));}var body=issue.body.replace(/Subtask of #[0-9]+/,'');var $issue=_.div({class:'issue','data-number':issue.number,'data-parent':view.getParentIssue(issue),'data-milestone':issue.milestone?issue.milestone.id:''},[_.div({class:'panel panel-default'},[_.div({class:'panel-heading'},_.h4({class:'panel-title'},issue.title)),_.div({class:'panel-body issue-body'},markdownToHtml(body))])]);return $issue;}));this.sortIssues();}}]);return IssuesEditor;}(View);module.exports=IssuesEditor;},{"marked":5}],25:[function(require,module,exports){'use strict';var UploadEditor=function(_View12){_inherits(UploadEditor,_View12);function UploadEditor(params){_classCallCheck(this,UploadEditor);var _this12=_possibleConstructorReturn(this,Object.getPrototypeOf(UploadEditor).call(this,params));_this12.$element=_.div({class:'upload-editor'});_this12.fetch();return _this12;}_createClass(UploadEditor,[{key:"render",value:function render(){this.$element.html(_.h1('Upload'),_.p('Please pick a feature to proceed'));}}]);return UploadEditor;}(View);module.exports=UploadEditor;},{}]},{},[11,22]);
+     * @param {String} alias
+     */},{key:"renderDirPicker",value:function renderDirPicker(alias,defaultValue){var view=this;var $editor=_.div({class:'field-editor dropdown-editor'});function onChange(){var dir=$(this).val();view.model[alias]=dir;}$.ajax({type:'get',url:'/api/github/'+view.model.org+'/'+view.model.repo+'/dirs',success:function success(dirs){view.dirs=dirs; // Use alias as fallback dir name
+if(!view.model[alias]){var foundFallbackDir=false; // Look for fallback dir name in remote directories
+var _iteratorNormalCompletion=true;var _didIteratorError=false;var _iteratorError=undefined;try{for(var _iterator=view.dirs[Symbol.iterator](),_step;!(_iteratorNormalCompletion=(_step=_iterator.next()).done);_iteratorNormalCompletion=true){var dir=_step.value;if(dir==alias){foundFallbackDir=true;break;}} // If not found, add it
+}catch(err){_didIteratorError=true;_iteratorError=err;}finally {try{if(!_iteratorNormalCompletion&&_iterator.return){_iterator.return();}}finally {if(_didIteratorError){throw _iteratorError;}}}if(!foundFallbackDir){view.dirs.push(alias);}view.model[alias]=alias;}$editor.html(_.select({class:'form-control'},_.each(view.dirs,function(i,dir){return _.option({value:dir},'/'+dir);})).change(onChange));$editor.children('select').val(view.model[alias]);}});return $editor;}},{key:"render",value:function render(){var view=this;this.checkLogin().then(function(){view.$element.html([_.div({class:'field-container github-org'},_.div({class:'field-key'},'Organisation'),_.div({class:'field-value'},view.renderOrgPicker())) /*,
+                _.if(view.model.org,
+                    _.div({class: 'field-container github-repo'},
+                        _.div({class: 'field-key'}, 'Repository'),
+                        _.div({class: 'field-value'},
+                            view.renderRepoPicker()
+                        )
+                    )
+                ),
+                _.if(view.model.repo && view.model.org,
+                    _.div({class: 'field-container github-content-dir'},
+                        _.div({class: 'field-key'}, 'Content directory'),
+                        _.div({class: 'field-value'},
+                            view.renderDirPicker('content')
+                        )
+                    ),
+                    _.div({class: 'field-container github-media-dir'},
+                        _.div({class: 'field-key'}, 'Media directory'),
+                        _.div({class: 'field-value'},
+                            view.renderDirPicker('media')
+                        )
+                    )
+                )*/]);});}}]);return GitHub;}(View);resources.connectionEditors.github=GitHub;},{"bluebird":2}]},{},[11,21]);

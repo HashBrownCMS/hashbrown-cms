@@ -127,10 +127,13 @@ class ConnectionEditor extends View {
 
         this.model.settings = this.model.settings || {};
 
+
         if(editor) {
-            return new editor({
+            let $editor = new editor({
                 model: this.model.settings
             }).$element;
+
+            return $editor;
 
         } else {
             console.log('[ConnectionEditor] No connection editor found for type alias "' + this.model.type + '"');
@@ -145,7 +148,7 @@ class ConnectionEditor extends View {
         let view = this;
 
         function onChange() {
-            let type = $editor.children('select').val();
+            let type = $(this).val();
 
             view.model.type = type;
 
