@@ -4,42 +4,18 @@ let request = require('request');
 let config = require('./config.json');
 let Promise = require('bluebird');
 
-let credentials = {
-    usr: '',
-    pwd: ''
-};
+let ConnectionHelper = require(appRoot + '/src/server/helpers/ConnectionHelper');
+
+let connectionCache = '';
 
 class GitHub {
     static init(app) {
-        app.post('/api/github/login', GitHub.postLogin);
         app.get('/api/github/:org/:repo/publish', GitHub.publish);
         app.get('/api/github/:org/:repo/dirs', GitHub.getRootDirectories);
         app.get('/api/github/orgs', GitHub.getOrgs);
         app.get('/api/github/:org/repos', GitHub.getRepos);
-    }
-
-    /**
-     * Logs in the user
-     */
-    static postLogin(req, res) {
-        // In some cases we might just want to check whether or not we're logged in
-        if(req.body) {
-            let usr = req.body.usr;
-            let pwd = req.body.pwd;
-
-            if(usr) {
-                credentials.usr = usr;
-            }
-             
-            if(pwd) {   
-                credentials.pwd = pwd;
-            }
-        }
-
-        GitHub.apiCall('user')
-        .then(function(result) {
-            res.sendStatus(result.statusCode);
-        });
+        app.get('/api/github/oauth/:client/:connection', GitHub.startOAuthFlow);
+        app.get('/api/github/oauth/callback', GitHub.oAuthCallback);
     }
 
     /**
@@ -76,11 +52,33 @@ class GitHub {
     }
 
     /**
-     * Gets upload info
+     * Facilitates the GitHub OAuth web flow
      */
-    static getUploadInfo(req, res) {
-        // TODO: Send relevant info, probably commits
-        res.send({});
+    static startOAuthFlow(req, res) {
+        let clientId = req.params.client;
+        let url = 'https://github.com/login/oauth/authorize';
+        
+        url += '?client_id=' + req.params.client;
+        url += '&redirect_uri=http://' + req.headers.host + '/api/github/oauth/callback';
+        url += '&scope=repo read:org user';
+
+        connectionCache = req.params.connection;
+        
+        res.redirect(url);
+    }
+
+    /**
+     * GitHub OAuth callback
+     */
+    static oAuthCallback(req, res) {
+        let token = req.query.code;
+
+        ConnectionHelper.setConnectionSettingById(connectionCache, { token: token })
+        .then(function() {
+            res.redirect('/#/connections/' + connectionCache);
+
+            connectionCache = '';
+        });
     }
 
     /**

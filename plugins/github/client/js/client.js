@@ -69,34 +69,53 @@ class GitHub extends View {
     checkLogin() {
         let view = this;
 
-        this.$element.html(
-            _.div({class: 'panel panel-login'},
-                _.div({class: 'panel-heading'},
-                    _.div({class: 'login-icon'},
-                        _.span({class: 'fa fa-github'})
-                    )
-                ),
-                _.div({class: 'panel-body'}, 
-                    _.div({class: 'spinner-container'},
-                        _.span({class: 'spinner fa fa-refresh'})
-                    )
-                )
-            )
-        );
-        
         return new Promise(function(callback) {
-            $.ajax({
-                type: 'post',
-                data: {},
-                url: '/api/github/login',
-                success: function() {
-                    callback();
-                },
-                error: function() {
-                    view.showLogin().then(callback);
-                }
-            });
+            // TODO: Perform check
         });
+    }
+
+    /**
+     * Render OAuth editor
+     */
+    renderOAuthEditor() {
+        let view = this;
+        let $editor = _.div({class: 'field-editor input-group'});
+
+        function onChangeClientId() {
+            view.model.clientId = $(this).val();
+
+            render();
+        } 
+        
+        function onClickGenerateToken() {
+            location = '/api/github/oauth/' + view.model.clientId + '/' + Router.params.id;
+        }
+
+        function render() {
+            $editor.html(
+                _.input({class: 'form-control', value: view.model.clientId, placeholder: 'Client id'})
+                    .change(onChangeClientId)
+            );
+
+            if(view.model.clientId) {
+                $editor.append(
+                    _.div({class: 'input-group-addon'},
+                        _.button({class: 'btn btn-primary'}, 'Generate token')
+                            .click(onClickGenerateToken)
+                    )
+                );
+            }
+
+            if(view.model.token) {
+                $editor.append(
+                    _.p({class: 'greyed'}, view.model.token)
+                );
+            }
+        }
+
+        render();
+
+        return $editor;
     }
 
     /**
@@ -229,15 +248,24 @@ class GitHub extends View {
     render() {
         let view = this;
 
+        view.$element.html(
+            _.div({class: 'field-container github-credentials'},
+                _.div({class: 'field-key'}, 'OAuth credentials'),
+                _.div({class: 'field-value'},
+                    view.renderOAuthEditor()
+                )
+            )
+        );
+
         this.checkLogin()
         .then(() => {
-            view.$element.html([
+            view.$element.append([
                 _.div({class: 'field-container github-org'},
                     _.div({class: 'field-key'}, 'Organisation'),
                     _.div({class: 'field-value'},
                         view.renderOrgPicker()
                     )
-                )/*,
+                ),
                 _.if(view.model.org,
                     _.div({class: 'field-container github-repo'},
                         _.div({class: 'field-key'}, 'Repository'),
@@ -259,7 +287,7 @@ class GitHub extends View {
                             view.renderDirPicker('media')
                         )
                     )
-                )*/
+                )
             ]);
         });
     }

@@ -225,6 +225,49 @@ class MongoDB {
             }
         );
     }
+    
+    /**
+     * Sets a connection setting by id
+     *
+     * @param {string} id
+     * @param {Object} newSettings
+     *
+     * @return {Promise} promise
+     */
+    static setConnectionSettingById(id, newSettings) {
+        return new Promise(function(callback) {
+            // First find the connection
+            MongoDB.findOne(
+                'connections',
+                {
+                    id: id
+                }
+            )
+            .then(function(oldConnection) {
+                let newConnection = oldConnection;
+
+                // Make sure the settings object exists
+                if(!newConnection.settings) {
+                    newConnection.settings = {};
+                }
+
+                // Adopt values at top level
+                for(let k in newSettings) {
+                    newConnection.settings[k] = newSettings[k];
+                }
+
+                // Update the Mongo document
+                MongoDB.updateOne(
+                    'connections',
+                    {
+                        id: id
+                    },
+                    newConnection
+                )
+                .then(callback);
+            });
+        });
+    }
 
     /**
      * Sets a connection by id
@@ -351,6 +394,7 @@ class MongoDB {
         ConnectionHelper.getConnectionById = MongoDB.getConnectionById;
         ConnectionHelper.getAllConnections = MongoDB.getAllConnections;
         ConnectionHelper.setConnectionById = MongoDB.setConnectionById;
+        ConnectionHelper.setConnectionSettingById = MongoDB.setConnectionSettingById;
         ConnectionHelper.removeConnectionById = MongoDB.removeConnectionById;
 
         // Override ContentHelper methods

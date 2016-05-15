@@ -48,6 +48,21 @@ class ConnectionHelper {
     }
     
     /**
+     * Set a connection setting by id
+     * This method must be overridden by a plugin
+     *
+     * @param {String} id
+     * @param {Object} content
+     *
+     * @return {Promise} promise
+     */
+    static setConnectionSettingById(id, content) {
+        return new Promise(function(callback) {
+            callback([]);   
+        });
+    }
+
+    /**
      * Creates a new connection
      * This method must be overridden by a plugin
      *

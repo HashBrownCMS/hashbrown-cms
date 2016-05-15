@@ -112,8 +112,17 @@ class ConnectionEditor extends View {
      * Renders the title editor
      */
     renderTitleEditor() {
+        let view = this;
+
+        function onChange() {
+            let title = $(this).val();
+
+            view.model.title = title;
+        } 
+
         let $editor = _.div({class: 'field-editor string-editor'},
             _.input({class: 'form-control', value: this.model.title})
+                .change(onChange)
         );
 
         return $editor;
@@ -126,7 +135,6 @@ class ConnectionEditor extends View {
         let editor = resources.connectionEditors[this.model.type];
 
         this.model.settings = this.model.settings || {};
-
 
         if(editor) {
             let $editor = new editor({
@@ -188,12 +196,7 @@ class ConnectionEditor extends View {
                             this.renderTypeEditor()
                         )
                     ),
-                    _.div({class: 'field-container connection-settings'},
-                        _.div({class: 'field-key'}, 'Settings'),
-                        _.div({class: 'field-value'},
-                            this.renderSettingsEditor()
-                        )
-                    )
+                    this.renderSettingsEditor()
                 ),
                 _.div({class: 'panel panel-default panel-buttons'}, 
                     _.div({class: 'btn-group'},
