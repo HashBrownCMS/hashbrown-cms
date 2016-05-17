@@ -26,6 +26,10 @@ gulp.task('sass', function() {
  */
 gulp.task('js', function() {
     return browserify('./src/client/js/client.js')
+        .on('error', function(err) {
+            console.log(err);
+            this.emit('end');
+        })
         .bundle()
         .pipe(plumber())
         .pipe(source('client.js'))

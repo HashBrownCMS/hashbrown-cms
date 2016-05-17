@@ -1,88 +1,14 @@
 @import 'sass-material-colors';
 
-.board-editor {
-    display: flex;
-    overflow-y: initial;
-    
-    .column {
-        flex-grow: 1;
-        flex-basis: 50%;
-        padding: 0px 5px;
-        height: 100%;
-
-        >.panel {
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            margin: 0px;
-
-            .column-issues {
-                flex-grow: 1;
-                overflow-y: auto;
-
-                .issue {
-                    &:not(.spinner-container) {
-                        .spinner {
-                            display: none;
-                        }
-                    }
-
-                    &.spinner-container {
-                        pointer-events: none;
-                        cursor: not-allowed;
-
-                        .panel {
-                            opacity: 0.5;
-                        }
-                    }
-                }
-            }   
-        }
-    }
-}
-
-.issues-editor, .board-editor {
-    padding: 15px;
-    height: 100%;
-    overflow-y: auto;
-
-    a[data-toggle="collapse"] {
-        text-align: right;
-        display: block;
-
-        .issue-count {
-            margin-right: 5px;
-        }
-
-        .fa-chevron-up {
-            display: none;
-        }
-
-        &[aria-expanded="true"] {
-            margin-bottom: 10px;
-            
-            .fa-chevron-down {
-                display: none;
-            }
-            
-            .fa-chevron-up {
-                display: inline-block;
-            }
-        }
-    }
-
-    .panel {
-        .panel-footer {
-            padding: 10px;
-
-            .issue-children {
-                .issue {
-                    &:last-child {
-                        .panel {
-                            margin-bottom: 0px;
-                        }
-                    }
-                }   
+.connection-editor {
+    .github-editor {
+        .github-token {
+            label {
+                display: block;
+                float: left;
+                margin-right: 15px;
+                line-height: 30px;
+                font-weight: normal;
             }
         }
     }

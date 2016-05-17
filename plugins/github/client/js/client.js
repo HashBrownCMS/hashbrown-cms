@@ -15,116 +15,68 @@ class GitHub extends View {
     }
 
     /**
-     * Shows the login prompt
+     * Get organisations
      */
-    showLogin() {
+    getOrgs() {
         let view = this;
 
         return new Promise(function(callback) {
-            function onSubmit(e) {
-                e.preventDefault();
-
-                let $form = $(this);
-
-                $.post('/api/github/login', $form.serialize(), function(data, textStatus) {
-                    console.log('[GitHub] Log in ' + textStatus);
-
-                    if(textStatus == 'success') {
-                        callback();
-                    }
-                });
-            }
-
-            let template = new Template({
-                divDashboardContainer: { class: 'dashboard-container',
-                    divLoginContainer: { class: 'panel panel-login',
-                        divPanelHeading: { class: 'panel-heading',
-                            divIconContainer: { class: 'login-icon',
-                                spanIcon: { class: 'fa fa-github' }
-                            }
-                        },
-                        divPanelBody: { class: 'panel-body', 
-                            formLogin: {
-                                on: { 
-                                    'submit': onSubmit
-                                },
-                                inputUsername: { type: 'text', name: 'usr', class: 'form-control', placeholder: 'Username' },
-                                inputPassword: { type: 'password', name: 'pwd', class: 'form-control', placeholder: 'Password' },
-                                inputButton: { type: 'submit', class: 'btn btn-primary', value: 'Log in' }
-                            }
-                        }
-                    }
+            $.ajax({
+                type: 'get',
+                url: '/api/github/orgs/?token=' + view.model.token,
+                success: (orgs) => {
+                    callback(orgs);
                 }
             });
-
-            view.$element.html(
-                template.html
-            );
         });
     }
 
     /**
-     * Checks if user is logged in
+     * Render client editor
      */
-    checkLogin() {
+    renderClientEditor() {
         let view = this;
-
-        return new Promise(function(callback) {
-            // TODO: Perform check
-        });
-    }
-
-    /**
-     * Render OAuth editor
-     */
-    renderOAuthEditor() {
-        let view = this;
-        let $editor = _.div({class: 'field-editor input-group'});
 
         function onChangeClientId() {
             view.model.clientId = $(this).val();
-
-            render();
         } 
         
+        function onChangeClientSecret() {
+            view.model.clientSecret = $(this).val();
+        } 
+        
+        return _.div({class: 'field-editor input-group'},
+            _.input({class: 'form-control', value: this.model.clientId, placeholder: 'Client id'})
+                .change(onChangeClientId),
+            _.input({class: 'form-control', value: this.model.clientSecret, placeholder: 'Client secret'})
+                .change(onChangeClientSecret)
+        );
+    }
+
+    /**
+     * Render token editor
+     */
+    renderTokenEditor() {
+        let view = this;
+
         function onClickGenerateToken() {
-            location = '/api/github/oauth/' + view.model.clientId + '/' + Router.params.id;
+            location = '/api/github/oauth/' + view.model.clientId + '/' + view.model.clientSecret + '/' + Router.params.id;
         }
 
-        function render() {
-            $editor.html(
-                _.input({class: 'form-control', value: view.model.clientId, placeholder: 'Client id'})
-                    .change(onChangeClientId)
-            );
-
-            if(view.model.clientId) {
-                $editor.append(
-                    _.div({class: 'input-group-addon'},
-                        _.button({class: 'btn btn-primary'}, 'Generate token')
-                            .click(onClickGenerateToken)
-                    )
-                );
-            }
-
-            if(view.model.token) {
-                $editor.append(
-                    _.p({class: 'greyed'}, view.model.token)
-                );
-            }
-        }
-
-        render();
-
-        return $editor;
+        return _.div({class: 'field-editor'},
+            _.if(view.model.token,
+                _.label(view.model.token)
+            ),
+            _.button({class: 'btn btn-primary'}, 'Update token')
+                .click(onClickGenerateToken)
+        );
     }
 
     /**
      * Render organisation picker
      */
-    renderOrgPicker() {
+    renderOrgPicker(orgs) {
         let view = this;
-
-        let $editor = _.div({class: 'field-editor dropdown-editor'});
 
         function onChange() {
             let org = $(this).val();
@@ -134,23 +86,13 @@ class GitHub extends View {
             view.render();
         }
         
-        $.ajax({
-            type: 'get',
-            url: '/api/github/orgs',
-            success: function(orgs) {
-                $editor.html(
-                    _.select({class: 'form-control'},
-                        _.each(orgs, function(i, org) {
-                            return _.option({value: org.login}, org.login);
-                        })
-                    ).change(onChange)
-                );
-                
-                $editor.children('select').val(view.model.org);
-            }
-        });
-
-        return $editor;
+        return _.div({class: 'field-editor dropdown-editor'},
+            _.select({class: 'form-control'},
+                _.each(orgs, function(i, org) {
+                    return _.option({value: org.login}, org.login);
+                })
+            ).change(onChange).val(view.model.org)
+        );
     }
 
     /**
@@ -248,47 +190,63 @@ class GitHub extends View {
     render() {
         let view = this;
 
-        view.$element.html(
-            _.div({class: 'field-container github-credentials'},
-                _.div({class: 'field-key'}, 'OAuth credentials'),
+        view.$element.html([
+            _.div({class: 'field-container github-client'},
+                _.div({class: 'field-key'}, 'Client'),
                 _.div({class: 'field-value'},
-                    view.renderOAuthEditor()
+                    view.renderClientEditor()
+                )
+            ),
+            _.div({class: 'field-container github-token'},
+                _.div({class: 'field-key'}, 'Token'),
+                _.div({class: 'field-value'},
+                    view.renderTokenEditor()
                 )
             )
-        );
+        ]);
 
-        this.checkLogin()
-        .then(() => {
-            view.$element.append([
+        // Get organisations
+        view.getOrgs()
+        .then((orgs) => {
+            // Render organisation picker
+            view.$element.append(
                 _.div({class: 'field-container github-org'},
                     _.div({class: 'field-key'}, 'Organisation'),
                     _.div({class: 'field-value'},
-                        view.renderOrgPicker()
+                        view.renderOrgPicker(orgs)
                     )
-                ),
-                _.if(view.model.org,
+                )
+            );
+            
+            // Render repo picker if org has been picked
+            if(view.model.org) {
+                view.$element.append(
                     _.div({class: 'field-container github-repo'},
-                        _.div({class: 'field-key'}, 'Repository'),
+                        _.div({class: 'field-key'}, 'Content directory'),
                         _.div({class: 'field-value'},
                             view.renderRepoPicker()
                         )
                     )
-                ),
-                _.if(view.model.repo && view.model.org,
-                    _.div({class: 'field-container github-content-dir'},
-                        _.div({class: 'field-key'}, 'Content directory'),
-                        _.div({class: 'field-value'},
-                            view.renderDirPicker('content')
+                );
+
+                // Render directory pickers if repo is picked
+                if(view.model.repo) {
+                    view.$element.append([
+                        _.div({class: 'field-container github-content-dir'},
+                            _.div({class: 'field-key'}, 'Content directory'),
+                            _.div({class: 'field-value'},
+                                view.renderDirPicker('content')
+                            )
+                        ),
+                        _.div({class: 'field-container github-media-dir'},
+                            _.div({class: 'field-key'}, 'Media directory'),
+                            _.div({class: 'field-value'},
+                                view.renderDirPicker('media')
+                            )
                         )
-                    ),
-                    _.div({class: 'field-container github-media-dir'},
-                        _.div({class: 'field-key'}, 'Media directory'),
-                        _.div({class: 'field-value'},
-                            view.renderDirPicker('media')
-                        )
-                    )
-                )
-            ]);
+                    ]);
+                }
+            }
         });
     }
 }

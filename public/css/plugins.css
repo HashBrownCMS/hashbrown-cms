@@ -8,51 +8,12 @@
  * @param {string} [color-variant='500']  - quoted, lowercase color variant (e.g.
  *                                          '200', 'a100')
  */
-.board-editor {
-  display: flex;
-  overflow-y: initial; }
-  .board-editor .column {
-    flex-grow: 1;
-    flex-basis: 50%;
-    padding: 0px 5px;
-    height: 100%; }
-    .board-editor .column > .panel {
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      margin: 0px; }
-      .board-editor .column > .panel .column-issues {
-        flex-grow: 1;
-        overflow-y: auto; }
-        .board-editor .column > .panel .column-issues .issue:not(.spinner-container) .spinner {
-          display: none; }
-        .board-editor .column > .panel .column-issues .issue.spinner-container {
-          pointer-events: none;
-          cursor: not-allowed; }
-          .board-editor .column > .panel .column-issues .issue.spinner-container .panel {
-            opacity: 0.5; }
-
-.issues-editor, .board-editor {
-  padding: 15px;
-  height: 100%;
-  overflow-y: auto; }
-  .issues-editor a[data-toggle="collapse"], .board-editor a[data-toggle="collapse"] {
-    text-align: right;
-    display: block; }
-    .issues-editor a[data-toggle="collapse"] .issue-count, .board-editor a[data-toggle="collapse"] .issue-count {
-      margin-right: 5px; }
-    .issues-editor a[data-toggle="collapse"] .fa-chevron-up, .board-editor a[data-toggle="collapse"] .fa-chevron-up {
-      display: none; }
-    .issues-editor a[data-toggle="collapse"][aria-expanded="true"], .board-editor a[data-toggle="collapse"][aria-expanded="true"] {
-      margin-bottom: 10px; }
-      .issues-editor a[data-toggle="collapse"][aria-expanded="true"] .fa-chevron-down, .board-editor a[data-toggle="collapse"][aria-expanded="true"] .fa-chevron-down {
-        display: none; }
-      .issues-editor a[data-toggle="collapse"][aria-expanded="true"] .fa-chevron-up, .board-editor a[data-toggle="collapse"][aria-expanded="true"] .fa-chevron-up {
-        display: inline-block; }
-  .issues-editor .panel .panel-footer, .board-editor .panel .panel-footer {
-    padding: 10px; }
-    .issues-editor .panel .panel-footer .issue-children .issue:last-child .panel, .board-editor .panel .panel-footer .issue-children .issue:last-child .panel {
-      margin-bottom: 0px; }
+.connection-editor .github-editor .github-token label {
+  display: block;
+  float: left;
+  margin-right: 15px;
+  line-height: 30px;
+  font-weight: normal; }
 
 .media-reference-editor .list-group-item img {
   max-width: 60px;

@@ -6,7 +6,7 @@ let Promise = require('bluebird');
 
 let ConnectionHelper = require(appRoot + '/src/server/helpers/ConnectionHelper');
 
-let connectionCache = '';
+let oAuthCache = {};
 
 class GitHub {
     static init(app) {
@@ -14,8 +14,8 @@ class GitHub {
         app.get('/api/github/:org/:repo/dirs', GitHub.getRootDirectories);
         app.get('/api/github/orgs', GitHub.getOrgs);
         app.get('/api/github/:org/repos', GitHub.getRepos);
-        app.get('/api/github/oauth/:client/:connection', GitHub.startOAuthFlow);
-        app.get('/api/github/oauth/callback', GitHub.oAuthCallback);
+        app.get('/api/github/oauth/:clientId/:clientSecret/:connection', GitHub.startOAuthFlow);
+        app.get('/api/github/oauth/callback/code', GitHub.oAuthCodeCallback);
     }
 
     /**
@@ -25,29 +25,43 @@ class GitHub {
      *
      * @return {Promise} promise
      */
+    //static apiCall(path) {
+    //    console.log('[GitHub] Calling API endpoint "' + path + '"...');
+
+    //    return new Promise(function(callback) {
+    //        request({
+    //            url: 'https://api.github.com/' + path,
+    //            json: true,
+    //            headers: {
+    //                'User-Agent': 'Endomon-CMS',
+    //                'Host': 'api.github.com',
+    //                'Authorization': 'Basic ' + new Buffer(credentials.usr + ':' + credentials.pwd).toString('base64')
+    //            }
+    //        }, function(err, response, body) {
+    //            if(err) {
+    //                throw err;
+    //            }    
+
+    //            if(response.body && response.body.message) {
+    //                console.log('[GitHub] -> ' + response.body.message);
+    //            }
+
+    //            callback(response);
+    //        });
+    //    });
+    //}
+    
+    /**
+     * Api call
+     *
+     * @param {String} path
+     * @param {String} token
+     *
+     * @return {Promise} promise
+     */
     static apiCall(path) {
-        console.log('[GitHub] Calling API endpoint "' + path + '"...');
-
         return new Promise(function(callback) {
-            request({
-                url: 'https://api.github.com/' + path,
-                json: true,
-                headers: {
-                    'User-Agent': 'Endomon-CMS',
-                    'Host': 'api.github.com',
-                    'Authorization': 'Basic ' + new Buffer(credentials.usr + ':' + credentials.pwd).toString('base64')
-                }
-            }, function(err, response, body) {
-                if(err) {
-                    throw err;
-                }    
-
-                if(response.body && response.body.message) {
-                    console.log('[GitHub] -> ' + response.body.message);
-                }
-
-                callback(response);
-            });
+            
         });
     }
 
@@ -55,29 +69,56 @@ class GitHub {
      * Facilitates the GitHub OAuth web flow
      */
     static startOAuthFlow(req, res) {
-        let clientId = req.params.client;
+        oAuthCache = {
+            clientId: req.params.clientId,
+            clientSecret: req.params.clientSecret,
+            connection: req.params.connection
+        };
+        
         let url = 'https://github.com/login/oauth/authorize';
         
-        url += '?client_id=' + req.params.client;
-        url += '&redirect_uri=http://' + req.headers.host + '/api/github/oauth/callback';
+        url += '?client_id=' + req.params.clientId;
+        url += '&redirect_uri=http://' + req.headers.host + '/api/github/oauth/callback/code';
         url += '&scope=repo read:org user';
 
-        connectionCache = req.params.connection;
-        
         res.redirect(url);
     }
 
     /**
-     * GitHub OAuth callback
+     * GitHub OAuth code callback
      */
-    static oAuthCallback(req, res) {
-        let token = req.query.code;
+    static oAuthCodeCallback(req, res) {
+        let code = req.query.code;
+        
+        console.log('[GitHub] Requesting OAuth token with id "' + oAuthCache.clientId + '", secret "' + oAuthCache.clientSecret + '" and temporary code "' + code + '"');
+    
+        // Exchange the code for a token
+        request({
+            url: 'https://github.com/login/oauth/access_token',
+            type: 'post',
+            json: true,
+            data: {
+                client_id: oAuthCache.clientId,
+                client_secret: oAuthCache.clientSecret,
+                code: code
+            }
+        }, function(err, response, body) {
+            if(err) {
+                throw err;
+            }    
 
-        ConnectionHelper.setConnectionSettingById(connectionCache, { token: token })
-        .then(function() {
-            res.redirect('/#/connections/' + connectionCache);
+            if(response.body && response.body.message) {
+                console.log('[GitHub] -> ' + response.body.message);
+            }
 
-            connectionCache = '';
+            console.log('[GitHub] -> ', response.body);
+/*
+            ConnectionHelper.setConnectionSettingById(connectionCache, { token: token })
+            .then(function() {
+                res.redirect('/#/connections/' + oAuthCache.connection);
+
+                connectionCache = '';
+            });*/
         });
     }
 
@@ -104,7 +145,7 @@ class GitHub {
      * Gets all organisations
      */
     static getOrgs(req, res) {
-        GitHub.apiCall('user/orgs/')
+        GitHub.apiCall('user/orgs/', req.query.token)
         .then(function(response) {
             let orgs = response.body;
 
