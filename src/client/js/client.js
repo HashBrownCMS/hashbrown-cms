@@ -194,6 +194,7 @@ Router.route('/schemas/json/:id', function() {
 // ----------
 // Settings
 // ----------
+// Dashboard
 Router.route('/settings/', function() {
     ViewHelper.get('NavbarMain').showTab('/settings/');
     
@@ -205,6 +206,17 @@ Router.route('/settings/', function() {
     );
 });
 
+// Edit
+Router.route('/settings/languages/', function() {
+    ViewHelper.get('NavbarMain').highlightItem('languages');
+    
+    $('.workspace').html(
+        _.div({class: 'dashboard-container'},
+            _.h1('Language settings'),
+            _.p('Please click on a settings item to proceed')
+        )
+    );
+});
 // ----------
 // Init
 // ----------

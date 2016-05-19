@@ -718,8 +718,8 @@ class NavbarMain extends View {
             icon: 'wrench',
             items: [
                 {
-                    name: 'Something',
-                    path: 'something'
+                    name: 'Languages',
+                    path: 'languages'
                 }
             ]
         });
