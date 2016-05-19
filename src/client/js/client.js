@@ -35,6 +35,11 @@ window.reloadAllResources()
 
 
 // -----------
+// Language
+// -----------
+window.language = localStorage.getItem('language') || 'en';
+
+// -----------
 // CMS
 // -----------
 // About

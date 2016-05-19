@@ -107,6 +107,17 @@ class ContentEditor extends View {
     }
 
     /**
+     * Event: On change language
+     */
+    onChangeLanguage(e) {
+        e.preventDefault();
+
+        localStorage.setItem('language', $(this).text());
+
+        location.reload();
+    }
+
+    /**
      * Reload this view
      */
     reload() {
@@ -157,8 +168,7 @@ class ContentEditor extends View {
                 let fieldEditorInstance = new fieldEditor({
                     value: fieldValue,
                     disabled: schemaValue.disabled || false,
-                    config: config || {}
-                });
+                    config: config || {}                });
 
                 fieldEditorInstance.on('change', onChange);
 
@@ -187,6 +197,23 @@ class ContentEditor extends View {
         let view = this;
 
         return _.div({class: 'object'},
+            _.div({class: 'language-picker dropdown'},
+                _.button({class: 'btn btn-default dropdown-toggle', 'data-toggle': 'dropdown'},
+                    window.language
+                ),
+                _.ul({class: 'dropdown-menu'},
+                    _.each(
+                        ['en','da'].filter((language) => {
+                            return language != window.language;
+                        }), (i, language) => {
+                        return _.li({value: language},
+                            _.a({href: '#'},
+                                language
+                            ).click(view.onChangeLanguage)
+                        );
+                    })
+                )
+            ).change(this.onChangeLanguage),
             _.ul({class: 'nav nav-tabs'}, 
                 _.each(schema.tabs, function(id, tab) {
                     return _.li({class: id == schema.defaultTabId ? 'active' : ''}, 
@@ -214,6 +241,10 @@ class ContentEditor extends View {
 
                     return _.div({id: 'tab-' + id, class: 'tab-pane' + (id == schema.defaultTabId ? ' active' : '')}, 
                         _.each(properties, function(key, value) {
+                            if(value.multilingual && typeof object[key] !== 'object') {
+                                object[key] = {};
+                            }
+
                             return _.div({class: 'field-container'},
                                 _.div({class: 'field-icon'},
                                     _.span({class: 'fa fa-' + value.icon})
@@ -223,12 +254,18 @@ class ContentEditor extends View {
                                 ),
                                 _.div({class: 'field-value'},
                                     view.renderFieldView(
-                                        object[key],
+                                        value.multilingual ? object[key][window.language] : object[key],
                                         schema.properties[key],
                                         function(newValue) {
-                                            object[key] = newValue;
+                                            if(value.multilingual) {
+                                                object[key][window.language] = newValue;
+
+                                            } else {
+                                                object[key] = newValue;
+                                            }
                                         },
-                                        value.config
+                                        value.config,
+                                        value.multilingual
                                     )
                                 )
                             );

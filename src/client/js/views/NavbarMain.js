@@ -416,7 +416,7 @@ class NavbarMain extends View {
         $pane.append(
             _.each(items, function(i, item) {
                 let id = item.id || i;
-                let name = item.title || item.name || id;
+                let name = (item.title && item.title[window.language] ? item.title[window.language] : null) || item.title || item.name || id;
                 let routingPath = item.shortPath || item.path || id;
                 let queueItem = {};
                 let icon = item.icon;

@@ -21,7 +21,7 @@ class Content {
      *
      * @return {Object} content
      */
-    static create(data) {
+    static create(data, language = 'en') {
         let content = new Content(data || {});
         
         content.data.id = crypto.randomBytes(20).toString('hex');
@@ -29,7 +29,7 @@ class Content {
         content.data.updateDate = Date.now();
         content.data.schemaId = content.data.schemaId || '10000';
 
-        content.data.title = 'New content';
+        content.data[language].title = 'New content';
 
         return content;
     }

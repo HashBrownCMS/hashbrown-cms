@@ -1,6 +1,7 @@
 .content-editor {
     height: 100%;
 
+    // First level
     >.object {
         display: flex;
         flex-direction: column;
@@ -10,8 +11,42 @@
             flex-grow: 1;
             overflow-y: auto;
         }
+
+        // Language picker
+        .language-picker {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 200;
+            background-color: material-color('blue', '300');
+
+            .dropdown-menu {
+                width: 100%;
+                min-width: 0px;
+                margin-top: -1px;
+                border-radius: 0px;
+                padding: 0px;
+
+                li {
+                    a {
+                        text-transform: uppercase;
+                        font-weight: bold;
+                        text-align: center;
+                        font-size: 12px;
+                        padding: 5px 0px;
+                        display: block;
+
+                        &:hover {
+                            background-color: material-color('grey', '300');
+                        }
+                    }
+                }
+            }
+        }
+
     }
 
+    // Every subsequent level
     .object {
         .tab-content {
             padding: 15px;
