@@ -14,6 +14,7 @@ let config = require('./config.json');
 // Helpers
 let ContentHelper = require(appRoot + '/src/server/helpers/ContentHelper');
 let ConnectionHelper = require(appRoot + '/src/server/helpers/ConnectionHelper');
+let SettingsHelper = require(appRoot + '/src/server/helpers/SettingsHelper');
 
 // Models
 let Content = require(appRoot + '/src/server/models/Content');
@@ -352,7 +353,7 @@ class MongoDB {
     }
 
     /**
-     * Creates a new content
+     * Creates a new content object
      *
      * @param {Object} date
      *
@@ -368,7 +369,7 @@ class MongoDB {
     }
     
     /**
-     * Removes a content
+     * Removes a content object
      *
      * @param {Number} id
      *
@@ -383,6 +384,34 @@ class MongoDB {
         );
     }
     
+
+    /**
+     * Gets all settings
+     *
+     * @return {Promise} promise
+     */
+    static getSettings() {
+        return MongoDB.find(
+            'settings',
+            {}
+        );
+    }
+    
+    /**
+     * Sets all settings
+     *
+     * @param {Object} settings
+     *
+     * @return {Promise} promise
+     */
+    static setSettings(settings) {
+        return MongoDB.update(
+            'settings',
+            {},
+            settings
+        );
+    }
+
     /**
      * Initialises this plugin
      */
@@ -403,6 +432,10 @@ class MongoDB {
         ContentHelper.getAllContents = MongoDB.getAllContents;
         ContentHelper.getContentById = MongoDB.getContentById;
         ContentHelper.setContentById = MongoDB.setContentById;
+
+        // Override SettingsHelper methods
+        SettingsHelper.getSettings = MongoDB.getSettings;
+        SettingsHelper.setSettings = MongoDB.setSettings;
     }
 }
 

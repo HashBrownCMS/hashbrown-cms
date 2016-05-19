@@ -28,12 +28,15 @@ let Media = require('../models/Media');
 
 // Classes
 let Controller = require('./Controller');
+
+// Helpers
 let ContentHelper = require('../helpers/ContentHelper');
 let SchemaHelper = require('../helpers/SchemaHelper');
 let ViewHelper = require('../helpers/ViewHelper');
 let PluginHelper = require('../helpers/PluginHelper');
 let MediaHelper = require('../helpers/MediaHelper');
 let ConnectionHelper = require('../helpers/ConnectionHelper');
+let SettingsHelper = require('../helpers/SettingsHelper');
 
 /**
  * The main API controller
@@ -68,6 +71,10 @@ class ApiController extends Controller {
         app.post('/api/connections/:id', ApiController.postConnection);
         app.delete('/api/connection/:id', ApiController.deleteConnection);
             
+        // Settings
+        app.get('/api/settings', ApiController.getSettings);
+        app.post('/api/settings', ApiController.setSettings);
+
         // Compiled editors script
         app.get('/scripts/editors.js', ApiController.getEditors);
     }
@@ -309,6 +316,31 @@ class ApiController extends Controller {
         });
     }
     
+    // ----------
+    // Settings
+    // ----------
+    /**
+     * Get settings object
+     */
+    static getSettings(req, res) {
+        SettingsHelper.getSettings()
+        .then(function(settings) {
+            res.send(settings);
+        });
+    }
+    
+    /**
+     * Set settings object
+     */
+    static setSettings(req, res) {
+        let settings = req.body;
+
+        SettingsHelper.setSettings(settings)
+        .then(function() {
+            res.sendStatus(200);
+        });
+    }
+
     // ----------
     // Plugin editors
     // ---------- 

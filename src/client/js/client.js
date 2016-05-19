@@ -13,7 +13,7 @@ let ConnectionEditor = require('./views/ConnectionEditor');
 let SchemaEditor = require('./views/SchemaEditor');
 let MediaViewer = require('./views/MediaViewer');
 
-// Helper function
+// Helper functions
 require('./helpers');
 
 // -----------
@@ -26,9 +26,10 @@ window.resources = {
     content: [],
     schemas: [],
     media: [],
+    settings: {}
 };
 
-window.reloadAllResources()
+reloadAllResources()
 .then(function() {
     triggerReady('resources');
 });
