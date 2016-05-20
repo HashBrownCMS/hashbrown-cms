@@ -423,8 +423,8 @@ class NavbarMain extends View {
                 let $icon;
 
                 // Truncate long names
-                if(name.length > 18) {
-                    name = name.substring(0, 18) + '...';
+                if(name.length > 30) {
+                    name = name.substring(0, 30) + '...';
                 }
 
                 // If this item has a schema id, fetch the appropriate icon

@@ -5,6 +5,7 @@ let Promise = require('bluebird');
 
 let ConnectionHelper = require(appRoot + '/src/server/helpers/ConnectionHelper');
 
+let credentialCache = {};
 let oAuthCache = {};
 
 /**
@@ -12,8 +13,38 @@ let oAuthCache = {};
  */
 class NonWebFlowHelper {
     static init(app) {
-        app.get('/api/github/oauth/:username/:password/:clientId/:clientSecret/:connection', GitHub.startOAuthFlow);
-        app.get('/api/github/oauth/callback/code', GitHub.oAuthCodeCallback);
+        app.post('/api/github/login/', NonWebFlowHelper.login);
+        app.get('/api/github/oauth/:clientId/:clientSecret/:connection', NonWebFlowHelper.startOAuthFlow);
+        app.get('/api/github/oauth/callback', NonWebFlowHelper.oAuthCodeCallback);
+    }
+
+    /**
+     * Login
+     */
+    static login(req, res) {
+        let username = req.body.username;
+        let password = req.body.password;
+
+        console.log('[GitHub] Authorising user "' + username + '"...');
+
+        request({
+            url: 'https://api.github.com/user',
+            json: true,
+            method: 'POST',
+            headers: {
+                'Authorization': 'Basic ' + new Buffer(username + ':' + password).toString('base64')
+            }
+        }, function(err, response, body) {
+            if(err) {
+                throw err;
+            }    
+
+            if(response.body && response.body.message) {
+                console.log('[GitHub] -> ' + response.body.message);
+            }
+
+            res.sendStatus(200);
+        });
     }
 
     /**
@@ -21,8 +52,6 @@ class NonWebFlowHelper {
      */
     static startOAuthFlow(req, res) {
         oAuthCache = {
-            username: req.params.username,
-            password: req.params.password,
             clientId: req.params.clientId,
             clientSecret: req.params.clientSecret,
             connection: req.params.connection

@@ -6,6 +6,7 @@ let Promise = require('bluebird');
 
 let ConnectionHelper = require(appRoot + '/src/server/helpers/ConnectionHelper');
 let WebFlowHelper = require('./WebFlowHelper');
+let NonWebFlowHelper = require('./NonWebFlowHelper');
 
 let oAuthCache = {};
 
@@ -18,6 +19,7 @@ class GitHub {
         app.get('/api/github/:org/repos', GitHub.getRepos);
 
         WebFlowHelper.init(app);
+        NonWebFlowHelper.init(app);
     }
 
     /**
