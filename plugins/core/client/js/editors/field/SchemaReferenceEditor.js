@@ -41,4 +41,4 @@ class SchemaReferenceEditor extends View {
     }
 }
 
-resources.editors['20004'] = SchemaReferenceEditor;
+resources.editors.schemaReference = SchemaReferenceEditor;

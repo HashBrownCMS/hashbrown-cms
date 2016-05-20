@@ -35,4 +35,4 @@ class DateEditor extends View {
     }
 }
 
-resources.editors['20002'] = DateEditor;
+resources.editors.date = DateEditor;

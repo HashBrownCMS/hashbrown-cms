@@ -126,4 +126,4 @@ class MediaReferenceEditor extends View {
     }
 }
 
-resources.editors['20007'] = MediaReferenceEditor;
+resources.editors.mediaReference = MediaReferenceEditor;

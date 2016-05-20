@@ -65,4 +65,4 @@ class PeriodEditor extends View {
     }
 }
 
-resources.editors['20005'] = PeriodEditor;
+resources.editors.period = PeriodEditor;

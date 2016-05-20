@@ -175,7 +175,7 @@ class ContentEditor extends View {
                 return fieldEditorInstance.$element;
 
             } else {
-                console.log('[ContentEditor] No editor by id "' + fieldSchema.editorId + '" found for field schema id "' + fieldSchema.id + '"');
+                console.log('[ContentEditor] No editor by id "' + fieldSchema.editorId + '" found');
             
             }
         
@@ -226,7 +226,7 @@ class ContentEditor extends View {
             _.div({class: 'tab-content'},
                 _.each(schema.tabs, function(id, tab) {
                     let properties = {};
-                    
+                   
                     for(let alias in schema.properties) {
                         let property = schema.properties[alias];
 

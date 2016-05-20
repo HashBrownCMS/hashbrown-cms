@@ -35,11 +35,14 @@ class SchemaHelper {
 
                             let schema = JSON.parse(data);
                             let parentDirName = path.dirname(schemaPath).replace(appRoot + '/schemas/', '');
+                            let id = path.basename(schemaPath, '.schema');
 
+                            // Generated values, will be overwritten every time
+                            schema.id = id;
                             schema.schemaType = parentDirName;
 
                             // Add the loaded schema to the output array
-                            schemas[schema.id] = schema;
+                            schemas[id] = schema;
 
                             // Shift the queue (removes the first element of the array)
                             queue.shift();

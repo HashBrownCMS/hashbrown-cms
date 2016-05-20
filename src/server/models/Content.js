@@ -29,7 +29,7 @@ class Content {
         content.data.updateDate = Date.now();
         content.data.schemaId = content.data.schemaId || '10000';
 
-        content.data[(language || 'en')].title = 'New content';
+        content.data.title = 'New content';
 
         return content;
     }

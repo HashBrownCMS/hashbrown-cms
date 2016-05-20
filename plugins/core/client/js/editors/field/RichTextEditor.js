@@ -65,4 +65,4 @@ class RichTextEditor extends View {
     }
 }
 
-resources.editors['20001'] = RichTextEditor;
+resources.editors.richText = RichTextEditor;

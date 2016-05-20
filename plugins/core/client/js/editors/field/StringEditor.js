@@ -28,4 +28,4 @@ class StringEditor extends View {
     }
 }
 
-resources.editors['20000'] = StringEditor;
+resources.editors.string = StringEditor;

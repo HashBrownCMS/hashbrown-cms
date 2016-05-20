@@ -13,6 +13,7 @@ class GitHub {
     static init(app) {
         app.get('/api/github/:org/:repo/publish', GitHub.publish);
         app.get('/api/github/:org/:repo/dirs', GitHub.getRootDirectories);
+        app.get('/api/github/templates', GitHub.getAllTemplates);
         app.get('/api/github/orgs', GitHub.getOrgs);
         app.get('/api/github/:org/repos', GitHub.getRepos);
 
@@ -88,6 +89,27 @@ class GitHub {
         // TODO: Push media to repo if needed
 
         res.sendStatus(200);
+    }
+
+    /**
+     * Gets all templates
+     */
+    static getAllTemplates(req, res) {
+        res.send({ templates: ['test.html', 'test2.html'] });
+/*
+        GitHub.apiCall('repos/' + req.params.org + '/' + req.params.repo + '/contents/')
+        .then(function(response) {
+            let files = response.body;
+            let dirs = [];
+
+            for(let file of files) {
+                if(file.type == 'dir' && file.path.indexOf('_layouts') > -1) {
+                    dirs[dirs.length] = file.path;
+                }
+            }
+
+            res.send(dirs);
+        }); */
     }
 
     /**

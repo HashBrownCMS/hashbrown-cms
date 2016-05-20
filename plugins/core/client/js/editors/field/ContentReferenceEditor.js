@@ -37,4 +37,4 @@ class ContentReferenceEditor extends View {
     }
 }
 
-resources.editors['20006'] = ContentReferenceEditor;
+resources.editors.contentReference = ContentReferenceEditor;

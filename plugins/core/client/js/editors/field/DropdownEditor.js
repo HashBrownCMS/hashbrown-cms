@@ -30,4 +30,4 @@ class DropdownEditor extends View {
 }
 
 
-resources.editors['20008'] = DropdownEditor;
+resources.editors.dropdown = DropdownEditor;

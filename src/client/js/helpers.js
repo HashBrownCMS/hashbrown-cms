@@ -1,8 +1,25 @@
 let Promise = require('bluebird');
 
-let onReadyCallbacks = {};
+// Views
+let MessageModal = require('./views/MessageModal');
 
+let onReadyCallbacks = {};
 let isReady = {};
+
+/**
+ * Brings up a message modal
+ *
+ * @param {String} title
+ * @param {String} body
+ */
+window.messageModal = function messageModal(title, body) {
+    new MessageModal({
+        model: {
+            title: title,
+            body: body
+        }
+    });
+}
 
 /**
  * Gets a schema with parent included recursively

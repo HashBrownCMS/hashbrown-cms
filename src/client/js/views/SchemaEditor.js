@@ -20,7 +20,7 @@ class SchemaEditor extends View {
      * Event: Click advanced. Routes to the JSON editor
      */
     onClickAdvanced() {
-        location.hash = '/schemas/json/' + this.model.id;
+        location.hash = location.hash.replace('/schemas/', '/schemas/json/');
     }
 
     /**
