@@ -28,7 +28,7 @@ class Connection {
         connection.data.title = 'New connection';
         connection.data.settings = {};
 
-        return content;
+        return connection;
     }
 
     /**

@@ -3,6 +3,9 @@
 // Views
 let MessageModal = require('./MessageModal');
 
+// Models
+let Content = require('../../../server/models/Content');
+
 /**
  * The main navbar
  */
@@ -87,7 +90,39 @@ class NavbarMain extends View {
      * Event: Click content settings
      */
     onClickContentSettings() {
-        messageModal('Settings for [TITLE]', 'Test');
+        let id = $('.context-menu-target-element').data('id');
+        
+        Content.find(id)
+        .then((content) => {
+            if(!content) {
+                messageModal('Error', 'Couldn\'t find content with id "' + id + '"'); 
+
+            } else {
+                messageModal('Settings for "' + content.getPropertyValue('title', window.language) + '"', [
+                    _.h5('Connection'),
+                    _.each(window.resources.connections, (i, connection) => {
+                        return _.div({class: 'input-group'},      
+                            _.span(connection.title),
+                            _.div({class: 'input-group-addon'},
+                                _.div({class: 'switch'},
+                                    this.$toggle = _.input({id: 'switch-connection-' + i, class: 'form-control switch', type: 'checkbox'}),
+                                    _.label({for: 'switch-connection-' + i})
+                                )
+                            )
+                        );
+                    }),
+                    _.div({class: 'input-group'},      
+                        _.span('Apply to children'),
+                        _.div({class: 'input-group-addon'},
+                            _.div({class: 'switch'},
+                                this.$toggle = _.input({id: 'switch-apply-to-children', class: 'form-control switch', type: 'checkbox'}),
+                                _.label({for: 'switch-apply-to-children'})
+                            )
+                        )
+                    )
+                ]);
+            }
+        });
     }
 
     /**

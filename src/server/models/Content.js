@@ -35,6 +35,52 @@ class Content {
     }
 
     /**
+     * Finds a Content object
+     *
+     * @param {String} id
+     *
+     * @return {Content} content
+     */
+    static find(id) {
+        return new Promise((callback) => {
+            // We're in client mode
+            if(window && window.resources && window.resources.content) {
+                for(let node of window.resources.content) {
+                    if(node.id == id) {
+                        callback(new Content(node));
+                        return;
+                    }
+                }
+            
+            // We're in server mode
+            } else {
+                callback(null);
+                return;
+
+            }
+                
+            // No node found
+            callback(null);
+        });
+    }
+
+    /**
+     * Gets a property value
+     *
+     * @param {String} key
+     * @param {String} language
+     *
+     * @return {Object} value
+     */
+    getPropertyValue(key, language) {
+        if(language) {
+            return this.data[key] ? this.data[key][language] : null;
+        } else {
+            return this.data[key];
+        }
+    }
+
+    /**
      * Gets the content type
      *
      * @return {String} type

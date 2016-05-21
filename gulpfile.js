@@ -35,9 +35,9 @@ gulp.task('js', function() {
         .pipe(source('client.js'))
         .pipe(buffer())
         .pipe(sourcemaps.init({loadMaps: true}))
-            .pipe(babel({
-                presets: [ 'es2015' ]
-            }))
+        .pipe(babel({
+            presets: [ 'es2015' ]
+        }))
         .pipe(sourcemaps.write('./'))
         .pipe(gulp.dest('./public/js/'));
 });
