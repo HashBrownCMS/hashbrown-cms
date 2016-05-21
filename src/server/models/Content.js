@@ -78,11 +78,16 @@ class Content {
 
             function iterate(content) {
                 if(content.data.parentId) {
-                    Content.find(content.model.parentId)
+                    Content.find(content.data.parentId)
                     .then((parentContent) => {
-                        parents.push(parentContent);
+                        if(parentContent) {
+                            parents.push(parentContent);
+                            iterate(parentContent);
+                        } else {
+                            console.log('[Content] Parent content with id "' + content.data.parentId + '" was not found');
 
-                        iterate(parentContent);
+                            callback(parents);
+                        }
                     });
 
                 } else {
