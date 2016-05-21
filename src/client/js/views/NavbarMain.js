@@ -1,6 +1,6 @@
-    'use strict';
+'use strict';
 
-    // Views
+// Views
 let MessageModal = require('./MessageModal');
 
 /**
@@ -81,6 +81,13 @@ class NavbarMain extends View {
                 view.reload();
             });
         });
+    }
+
+    /**
+     * Event: Click content settings
+     */
+    onClickContentSettings() {
+        messageModal('Settings for [TITLE]', 'Test');
     }
 
     /**
@@ -646,7 +653,8 @@ class NavbarMain extends View {
                 'Copy': function() { view.onClickCopyContent(); },
                 'Cut': function() { view.onClickCutContent(); },
                 'Paste': function() { view.onClickPasteContent(); },
-                'Remove': function() { view.onClickRemoveContent(); }
+                'Remove': function() { view.onClickRemoveContent(); },
+                'Settings': function() { view.onClickContentSettings(); },
             },
             paneContextMenu: {
                 'General': '---',

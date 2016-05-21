@@ -14,25 +14,37 @@ class SchemaReferenceEditor extends View {
         this.trigger('change', this.$select.val());
     }
 
+    /**
+     * Gets schema types
+     */
+    getSchemaTypes() {
+        let allSchemas = window.resources.schemas;
+        let types = {};
+
+        for(let id in allSchemas) {
+            let schema = allSchemas[id];
+
+            if(!types[schema.schemaType]) {
+                types[schema.schemaType] = [];
+            }
+            
+            types[schema.schemaType].push(schema);
+        }
+
+        return types;
+    }
+
     render() {
         var editor = this;
         
         this.$element = _.div({class: 'field-editor schema-reference-editor'},
             this.$select = _.select({class: 'form-control'},
-                _.each(window.resources.schemas, function(id, schema) {
-                    if(editor.config) {
-                        var id = parseInt(schema.id);
-
-                        if(editor.config.min && id < editor.config.min) {
-                            return;
-                        }
-                        
-                        if(editor.config.max && id > editor.config.max) {
-                            return;
-                        }
-                    }
-
-                    return _.option({value: schema.id}, schema.name);
+                _.each(this.getSchemaTypes(), function(type, schemas) {
+                    return _.optgroup({label: type},
+                        _.each(schemas, function(i, schema) {
+                            return _.option({value: schema.id}, schema.name);
+                        })
+                    );
                 })
             ).change(function() { editor.onChange(); })
         );

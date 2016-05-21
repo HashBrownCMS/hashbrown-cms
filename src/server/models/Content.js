@@ -27,7 +27,7 @@ class Content {
         content.data.id = crypto.randomBytes(20).toString('hex');
         content.data.createDate = Date.now();
         content.data.updateDate = Date.now();
-        content.data.schemaId = content.data.schemaId || '10000';
+        content.data.schemaId = content.data.schemaId || 'contentBase';
 
         content.data.title = 'New content';
 
