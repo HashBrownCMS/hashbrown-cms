@@ -1,5 +1,7 @@
 'use strict';
 
+let Content = require('../../../../../../src/server/models/Content');
+
 class ContentReferenceEditor extends View {
     constructor(params) {
         super(params);
@@ -17,7 +19,9 @@ class ContentReferenceEditor extends View {
         this.$element = _.div({class: 'field-editor input-group content-reference-editor'}, [
             this.$select = _.select({class: 'form-control'},
                 _.each(window.resources.content, function(id, node) {
-                    return _.option({value: node.id}, node.title);
+                    let content = new Content(node);
+
+                    return _.option({value: content.getPropertyValue('id')}, content.getPropertyValue('title', window.language));
                 })
             ).change(function() { editor.onChange(); }),
             _.div({class: 'input-group-btn'}, 

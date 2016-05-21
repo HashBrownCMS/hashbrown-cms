@@ -54,13 +54,85 @@ class Content {
             
             // We're in server mode
             } else {
-                callback(null);
+                ContentHelper.getContentById(id)
+                .then((node) => {
+                    callback(new Content(node));
+                });
                 return;
 
             }
                 
             // No node found
             callback(null);
+        });
+    }
+
+    /**
+     * Gets all parents
+     *
+     * @return {Promise} parents
+     */
+    getParents() {
+        return new Promise((callback) => {
+            let parents = [];
+
+            function iterate(content) {
+                if(content.data.parentId) {
+                    Content.find(content.model.parentId)
+                    .then((parentContent) => {
+                        parents.push(parentContent);
+
+                        iterate(parentContent);
+                    });
+
+                } else {
+                    callback(parents);
+                }
+            }
+
+            iterate(this);
+        });
+    }
+
+    /**
+     * Gets a settings
+     *
+     * @param {String} key
+     *
+     * @return {Promise} settings
+     */
+    getSettings(key) {
+        let model = this;
+        
+        return new Promise((callback) => {
+            // Loop through all parent content to find a governing setting
+            model.getParents()
+            .then((parents) => {
+                for(let parentContent of parents) {
+                    if(
+                        parentContent.data.settings &&
+                        parentContent.data.settings[key] &&
+                        parentContent.data.settings[key].applyToChildren
+                    ) {
+                        let settings = parentContent.data.settings[key];
+                        settings.governedBy = parentContent;
+
+                        callback(settings);
+                        return;
+                    }
+                }
+
+                // No parent nodes with governing settings found, return own settings
+                if(!model.data.settings) {
+                    model.data.settings = {};
+                }
+
+                if(!model.data.settings[key]) {
+                    model.data.settings[key] = {};
+                }
+
+                callback(model.data.settings[key]);
+            });
         });
     }
 

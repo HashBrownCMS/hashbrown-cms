@@ -5241,14 +5241,23 @@ var Promise=require('bluebird');var ContentHelper=function(){function ContentHel
      * @param {Object} data
      *
      * @return {Object} content
-     */_createClass(Content,[{key:"getPropertyValue", /**
+     */_createClass(Content,[{key:"getParents", /**
+     * Gets all parents
+     *
+     * @return {Promise} parents
+     */value:function getParents(){var _this12=this;return new Promise(function(callback){var parents=[];function iterate(content){if(content.data.parentId){Content.find(content.model.parentId).then(function(parentContent){parents.push(parentContent);iterate(parentContent);});}else {callback(parents);}}iterate(_this12);});} /**
+     * Gets publishing settings
+     *
+     * @return {Promise} settings
+     */},{key:"getPublishingSettings",value:function getPublishingSettings(){var model=this;return new Promise(function(callback){model.getParents().then(function(parents){var _iteratorNormalCompletion7=true;var _didIteratorError7=false;var _iteratorError7=undefined;try{for(var _iterator7=parents[Symbol.iterator](),_step7;!(_iteratorNormalCompletion7=(_step7=_iterator7.next()).done);_iteratorNormalCompletion7=true){var parentContent=_step7.value;if(parentContent.data.settings&&parentContent.data.settings.publishing&&parentContent.data.settings.publishing.applyToChildren){var settings=parentContent.data.settings.publishing;settings.governedBy=parentContent;callback(settings);return;}} // No parent nodes with governing settings found, return own
+}catch(err){_didIteratorError7=true;_iteratorError7=err;}finally {try{if(!_iteratorNormalCompletion7&&_iterator7.return){_iterator7.return();}}finally {if(_didIteratorError7){throw _iteratorError7;}}}if(!model.data.settings){model.data.settings={};}if(!model.data.settings.publishing){model.data.settings.publishing={};}callback(model.data.settings.publishing);});});} /**
      * Gets a property value
      *
      * @param {String} key
      * @param {String} language
      *
      * @return {Object} value
-     */value:function getPropertyValue(key,language){if(language){return this.data[key]?this.data[key][language]:null;}else {return this.data[key];}} /**
+     */},{key:"getPropertyValue",value:function getPropertyValue(key,language){if(language){return this.data[key]?this.data[key][language]:null;}else {return this.data[key];}} /**
      * Gets the content type
      *
      * @return {String} type
@@ -5272,7 +5281,7 @@ return unpublishDateIsNull||unpublishDateHasPassed;} /**
      *
      * @return {Content} content
      */},{key:"find",value:function find(id){return new Promise(function(callback){ // We're in client mode
-if(window&&window.resources&&window.resources.content){var _iteratorNormalCompletion7=true;var _didIteratorError7=false;var _iteratorError7=undefined;try{for(var _iterator7=window.resources.content[Symbol.iterator](),_step7;!(_iteratorNormalCompletion7=(_step7=_iterator7.next()).done);_iteratorNormalCompletion7=true){var node=_step7.value;if(node.id==id){callback(new Content(node));return;}} // We're in server mode
-}catch(err){_didIteratorError7=true;_iteratorError7=err;}finally {try{if(!_iteratorNormalCompletion7&&_iterator7.return){_iterator7.return();}}finally {if(_didIteratorError7){throw _iteratorError7;}}}}else {callback(null);return;} // No node found
+if(window&&window.resources&&window.resources.content){var _iteratorNormalCompletion8=true;var _didIteratorError8=false;var _iteratorError8=undefined;try{for(var _iterator8=window.resources.content[Symbol.iterator](),_step8;!(_iteratorNormalCompletion8=(_step8=_iterator8.next()).done);_iteratorNormalCompletion8=true){var node=_step8.value;if(node.id==id){callback(new Content(node));return;}} // We're in server mode
+}catch(err){_didIteratorError8=true;_iteratorError8=err;}finally {try{if(!_iteratorNormalCompletion8&&_iterator8.return){_iterator8.return();}}finally {if(_didIteratorError8){throw _iteratorError8;}}}}else {ContentHelper.getContentById(id).then(function(node){callback(new Content(node));});return;} // No node found
 callback(null);});}}]);return Content;}();module.exports=Content;},{"../helpers/ContentHelper":203,"bluebird":19,"crypto":61,"jsonschema":139}]},{},[193]);
 //# sourceMappingURL=client.js.map

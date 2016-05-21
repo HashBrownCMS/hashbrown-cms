@@ -30,46 +30,6 @@ class Connection {
 
         return connection;
     }
-
-    /**
-     * Gets the schema information
-     *
-     * @return {Promise} promise
-     */
-    getSchema() {
-        let model = this;
-
-        return new Promise(function(callback) {
-            if(!view.schemaCache) {
-                ConnectionHelper.getSchema(view.getType(), model.data.schemaId)
-                .then(function(schema) {
-                    model.schemaCache = schema;
-
-                    callback(model.schemaCache);
-                });
-            } else {
-                callback(model.schemaCache);
-            }
-        });
-    }
-
-    /**
-     * Validates the model based on the schema
-     *
-     * @return {Promise} promise
-     */
-    validateModel() {
-        return new Promise(function(callback) {
-            this.getSchema()
-            .then(function(schema) {
-                let validator = new Validator();
-
-                let result = validator.validate(this.data, schema);
-
-                console.log(result);
-            });
-        });
-    }    
 }
 
 module.exports = Connection;
