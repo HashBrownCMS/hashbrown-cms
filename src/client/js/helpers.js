@@ -15,11 +15,12 @@ let isReady = {};
  * @param {String} title
  * @param {String} body
  */
-window.messageModal = function messageModal(title, body) {
-    new MessageModal({
+window.messageModal = function messageModal(title, body, onSubmit) {
+    return new MessageModal({
         model: {
             title: title,
-            body: body
+            body: body,
+            onSubmit: onSubmit
         }
     });
 }

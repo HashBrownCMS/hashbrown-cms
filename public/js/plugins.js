@@ -2430,7 +2430,7 @@ var Promise=require('bluebird');var ContentHelper=function(){function ContentHel
      * Gets all parents
      *
      * @return {Promise} parents
-     */value:function getParents(){var _this13=this;return new Promise(function(callback){var parents=[];function iterate(content){if(content.data.parentId){Content.find(content.data.parentId).then(function(parentContent){parents.push(parentContent);iterate(parentContent);});}else {callback(parents);}}iterate(_this13);});} /**
+     */value:function getParents(){var _this13=this;return new Promise(function(callback){var parents=[];function iterate(content){if(content.data.parentId){Content.find(content.data.parentId).then(function(parentContent){if(parentContent){parents.push(parentContent);iterate(parentContent);}else {console.log('[Content] Parent content with id "'+content.data.parentId+'" was not found');callback(parents);}});}else {callback(parents);}}iterate(_this13);});} /**
      * Gets a settings
      *
      * @param {String} key

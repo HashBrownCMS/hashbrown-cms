@@ -1,4 +1,5 @@
-'use strict';
+,
+        onSubmit: onSubmit'use strict';
 
 // Views
 let MessageModal = require('./MessageModal');
@@ -92,20 +93,44 @@ class NavbarMain extends View {
     onClickContentSettings() {
         let id = $('.context-menu-target-element').data('id');
         
+        function onSubmit() {
+            
+        }
+
         Content.find(id)
         .then((content) => {
             if(!content) {
                 messageModal('Error', 'Couldn\'t find content with id "' + id + '"'); 
 
             } else {
-                messageModal('Settings for "' + content.getPropertyValue('title', window.language) + '"', [
-                    _.h5('Connection'),
-                    _.each(window.resources.connections, (i, connection) => {
+                function onSubmit() {
+                    if(!content.data.settings) {
+                        content.data.settings = {};
+                    }
+                   
+                    // Publishing 
+                    if(!content.data.settings.publishing) {
+                        content.data.settings.publishing = {};
+                    }
+
+                    content.data.settings.publishing.connections = [];
+                    $('.switch-connection').each((i) => {
+                        if($(this)[0].checked) {
+                            content.data.settings.publishing.connections.push(
+                                $(this).attr('data-connection-id')
+                            );
+                        }
+                    });
+                }
+
+                let modal = messageModal('Settings for "' + content.getPropertyValue('title', window.language) + '"', [
+                    _.h5('Publishing'),
+                    _.each(window.resources.connections, (i, connection) => { 
                         return _.div({class: 'input-group'},      
                             _.span(connection.title),
                             _.div({class: 'input-group-addon'},
                                 _.div({class: 'switch'},
-                                    this.$toggle = _.input({id: 'switch-connection-' + i, class: 'form-control switch', type: 'checkbox'}),
+                                    _.input({id: 'switch-connection-' + i, 'data-connection-id': connection.id, class: 'form-control switch switch-connection', type: 'checkbox'}),
                                     _.label({for: 'switch-connection-' + i})
                                 )
                             )
@@ -115,12 +140,12 @@ class NavbarMain extends View {
                         _.span('Apply to children'),
                         _.div({class: 'input-group-addon'},
                             _.div({class: 'switch'},
-                                this.$toggle = _.input({id: 'switch-apply-to-children', class: 'form-control switch', type: 'checkbox'}),
+                                _.input({id: 'switch-apply-to-children', class: 'form-control switch', type: 'checkbox'}),
                                 _.label({for: 'switch-apply-to-children'})
                             )
                         )
                     )
-                ]);
+                ], onSubmit);
             }
         });
     }

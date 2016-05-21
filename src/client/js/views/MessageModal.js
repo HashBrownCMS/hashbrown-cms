@@ -26,6 +26,14 @@ class MessageModal extends View {
         this.$element.modal('show');
     }
 
+    onClickOK() {
+        if(this.model.onSubmit) {
+            this.model.onSubmit();
+        } else {
+            this.hide();
+        }
+    }
+
     render() {
         let view = this;
 
@@ -54,7 +62,7 @@ class MessageModal extends View {
                             } else {
                                 return _.button({class: 'btn btn-default'},
                                     'OK'
-                                ).click(function() { view.hide(); })
+                                ).click(function() { view.onClickOK(); })
                             }
                         }()
                     )
