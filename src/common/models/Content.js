@@ -27,6 +27,10 @@ class Content {
         if(!this.properties.settings.publishing) {
             this.properties.settings.publishing = {};
         }
+        
+        if(!this.properties.settings.publishing.connections) {        
+            this.properties.settings.publishing.connections = [];
+        }
     }
 
     /**

@@ -18,10 +18,10 @@ class Media {
     static create(file) {
         let content = Content.create({});
 
-        let media = new Media(content.data);
+        let media = new Media(content.properties);
     
-        media.data.id = crypto.randomBytes(20).toString('hex');
-        media.uploadPromise = MediaHelper.setMediaData(media.data.id, file);
+        media.properties.id = crypto.randomBytes(20).toString('hex');
+        media.uploadPromise = MediaHelper.setMediaData(media.propeties.id, file);
 
         return media;
     }

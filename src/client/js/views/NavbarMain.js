@@ -92,50 +92,100 @@ class NavbarMain extends View {
     onClickContentSettings() {
         let id = $('.context-menu-target-element').data('id');
         
-        function onSubmit() {
-            
-        }
-
         Content.find(id)
         .then((content) => {
             if(!content) {
                 messageModal('Error', 'Couldn\'t find content with id "' + id + '"'); 
 
             } else {
-                function onSubmit() {
-                    content.data.settings.publishing.connections = [];
-                    $('.switch-connection').each((i) => {
-                        if($(this)[0].checked) {
-                            content.data.settings.publishing.connections.push(
-                                $(this).attr('data-connection-id')
-                            );
-                        }
-                    });
-                }
+                // Get settings first
+                content.getSettings('publishing')
+                .then((publishing) => {
 
-                let modal = messageModal('Settings for "' + content.prop('title', window.language) + '"', [
-                    _.h5('Publishing'),
-                    _.each(window.resources.connections, (i, connection) => { 
-                        return _.div({class: 'input-group'},      
-                            _.span(connection.title),
-                            _.div({class: 'input-group-addon'},
-                                _.div({class: 'switch'},
-                                    _.input({id: 'switch-connection-' + i, 'data-connection-id': connection.id, class: 'form-control switch switch-connection', type: 'checkbox'}),
-                                    _.label({for: 'switch-connection-' + i})
+                    // Submit event
+                    function onSubmit(hide) {
+                        // Publishing
+                        if(!publishing.governedBy) {
+                            publishing.connections = [];
+                            
+                            $('.switch-connection').each(function(i) {
+                                if(this.checked) {
+                                    publishing.connections.push(
+                                        $(this).attr('data-connection-id')
+                                    );
+                                }
+                            });
+                            
+                            publishing.applyToChildren = $('#switch-publishing-apply-to-children')[0].checked;
+
+                            content.properties.settings.publishing = publishing;
+                        }
+                        
+                        // Save model
+                        $.ajax({
+                            type: 'post',
+                            url: '/api/content/' + content.properties.id,
+                            data: content.properties,
+                            success: function() {
+                                console.log('[ContentEditor] Saved model to /api/content/' + content.properties.id);
+                            },
+                            error: function(err) {
+                                new MessageModal({
+                                    model: {
+                                        title: 'Error',
+                                        body: err
+                                    }
+                                });
+                            }
+                        });
+                    }
+
+                    // Render modal 
+                    let modal = messageModal('Settings for "' + content.prop('title', window.language) + '"', [
+                        // Publishing
+                        _.h5('Publishing'),
+                        _.if(publishing.governedBy,
+                           _.p('(Settings inherited from <a href="#/content/' + publishing.governedBy.properties.id + '">' + publishing.governedBy.prop('title', window.language) + '</a>)')
+                        ),
+                        _.if(!publishing.governedBy,
+                            // Heading
+                            _.div({class: 'input-group'},      
+                                _.span('Apply to children'),
+                                _.div({class: 'input-group-addon'},
+                                    _.div({class: 'switch'},
+                                        _.input({
+                                            id: 'switch-publishing-apply-to-children',
+                                            class: 'form-control switch',
+                                            type: 'checkbox',
+                                            checked: publishing.applyToChildren == 'true'
+                                        }),
+                                        _.label({for: 'switch-publishing-apply-to-children'})
+                                    )
                                 )
-                            )
-                        );
-                    }),
-                    _.div({class: 'input-group'},      
-                        _.span('Apply to children'),
-                        _.div({class: 'input-group-addon'},
-                            _.div({class: 'switch'},
-                                _.input({id: 'switch-apply-to-children', class: 'form-control switch', type: 'checkbox'}),
-                                _.label({for: 'switch-apply-to-children'})
-                            )
+                            ),
+                            // Connections
+                            _.each(window.resources.connections, (i, connection) => { 
+                                return _.div({class: 'input-group'},      
+                                    _.span(connection.title),
+                                    _.div({class: 'input-group-addon'},
+                                        _.div({class: 'switch'},
+                                            _.input({
+                                                id: 'switch-connection-' + i,
+                                                'data-connection-id': connection.id,
+                                                class: 'form-control switch switch-connection',
+                                                type: 'checkbox',
+                                                checked: publishing.connections.indexOf(connection.id) > -1
+                                            }),
+                                            _.label({
+                                                for: 'switch-connection-' + i
+                                            })
+                                        )
+                                    )
+                                );
+                            })
                         )
-                    )
-                ], onSubmit);
+                    ], onSubmit);
+                });
             }
         });
     }

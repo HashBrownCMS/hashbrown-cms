@@ -132,7 +132,7 @@ class ApiController extends Controller {
             let media = Media.create(file);
 
             media.uploadPromise.then(function() {
-                res.send(media.data.id);
+                res.send(media.properties.id);
             });
 
         } else {

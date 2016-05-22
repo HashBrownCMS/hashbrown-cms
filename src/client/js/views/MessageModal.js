@@ -29,9 +29,9 @@ class MessageModal extends View {
     onClickOK() {
         if(this.model.onSubmit) {
             this.model.onSubmit();
-        } else {
-            this.hide();
         }
+        
+        this.hide();
     }
 
     render() {
@@ -71,6 +71,10 @@ class MessageModal extends View {
         );
 
         $('body').append(this.$element);
+
+        this.$element.find('a').click(function() {
+            view.hide();
+        });
 
         this.$element.modal('show');
     }
