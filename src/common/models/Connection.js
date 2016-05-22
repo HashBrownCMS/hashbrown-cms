@@ -3,30 +3,29 @@
 let crypto = require('crypto');
 
 let Promise = require('bluebird');
-let ConnectionHelper = require('../helpers/ConnectionHelper');
 let Validator = require('jsonschema').Validator;
 
 /**
  * The base class for all Connection types
  */
 class Connection {
-    constructor(data) {
-        this.data = data;
+    constructor(properties) {
+        this.properties = properties;
     }
 
     /**
      * Creates a new Connection object
      *
-     * @param {Object} data
+     * @param {Object} properties
      *
      * @return {Object} content
      */
-    static create(data) {
-        let connection = new Connection(data || {});
+    static create(properties) {
+        let connection = new Connection(properties || {});
         
-        connection.data.id = crypto.randomBytes(20).toString('hex');
-        connection.data.title = 'New connection';
-        connection.data.settings = {};
+        connection.properties.id = crypto.randomBytes(20).toString('hex');
+        connection.properties.title = 'New connection';
+        connection.properties.settings = {};
 
         return connection;
     }

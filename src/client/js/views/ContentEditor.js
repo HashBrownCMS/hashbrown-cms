@@ -188,12 +188,12 @@ class ContentEditor extends View {
     /**
      * Renders a Content object
      *
-     * @param {Object} data
+     * @param {Object} contentProperties
      * @param {Object} schema
      *
      * @return {Object} element
      */
-    renderContentObject(object, schema) {
+    renderContentObject(contentProperties, schema) {
         let view = this;
 
         return _.div({class: 'object'},
@@ -225,7 +225,7 @@ class ContentEditor extends View {
             ),
             _.div({class: 'tab-content'},
                 _.each(schema.tabs, function(id, tab) {
-                    let properties = {};
+                    let schemaProperties = {};
                    
                     for(let alias in schema.properties) {
                         let property = schema.properties[alias];
@@ -235,14 +235,14 @@ class ContentEditor extends View {
                         let thisTabAssigned = property.tabId == id;
 
                         if((noTabAssigned && isMetaTab) || thisTabAssigned) {
-                            properties[alias] = property;
+                            schemaProperties[alias] = property;
                         }
                     }
 
                     return _.div({id: 'tab-' + id, class: 'tab-pane' + (id == schema.defaultTabId ? ' active' : '')}, 
-                        _.each(properties, function(key, value) {
-                            if(value.multilingual && typeof object[key] !== 'object') {
-                                object[key] = {};
+                        _.each(schemaProperties, function(key, value) {
+                            if(value.multilingual && typeof contentProperties[key] !== 'object') {
+                                contentProperties[key] = {};
                             }
 
                             return _.div({class: 'field-container'},
@@ -254,14 +254,14 @@ class ContentEditor extends View {
                                 ),
                                 _.div({class: 'field-value'},
                                     view.renderFieldView(
-                                        value.multilingual ? object[key][window.language] : object[key],
+                                        value.multilingual ? contentProperties[key][window.language] : contentProperties[key],
                                         schema.properties[key],
                                         function(newValue) {
                                             if(value.multilingual) {
-                                                object[key][window.language] = newValue;
+                                                contentProperties[key][window.language] = newValue;
 
                                             } else {
-                                                object[key] = newValue;
+                                                contentProperties[key] = newValue;
                                             }
                                         },
                                         value.config,

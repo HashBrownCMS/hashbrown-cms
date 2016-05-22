@@ -1,11 +1,10 @@
-,
-        onSubmit: onSubmit'use strict';
+'use strict';
 
 // Views
 let MessageModal = require('./MessageModal');
 
 // Models
-let Content = require('../../../server/models/Content');
+let Content = require('../../../common/models/Content');
 
 /**
  * The main navbar
@@ -104,15 +103,6 @@ class NavbarMain extends View {
 
             } else {
                 function onSubmit() {
-                    if(!content.data.settings) {
-                        content.data.settings = {};
-                    }
-                   
-                    // Publishing 
-                    if(!content.data.settings.publishing) {
-                        content.data.settings.publishing = {};
-                    }
-
                     content.data.settings.publishing.connections = [];
                     $('.switch-connection').each((i) => {
                         if($(this)[0].checked) {
@@ -123,7 +113,7 @@ class NavbarMain extends View {
                     });
                 }
 
-                let modal = messageModal('Settings for "' + content.getPropertyValue('title', window.language) + '"', [
+                let modal = messageModal('Settings for "' + content.prop('title', window.language) + '"', [
                     _.h5('Publishing'),
                     _.each(window.resources.connections, (i, connection) => { 
                         return _.div({class: 'input-group'},      
@@ -238,7 +228,7 @@ class NavbarMain extends View {
         new MessageModal({
             model: {
                 title: 'Delete content',
-                body: 'Are you sure you want to delete the connection "' + name + '"?'
+                body: 'Are you sure you want to remove the connection "' + name + '"?'
             },
             buttons: [
                 {

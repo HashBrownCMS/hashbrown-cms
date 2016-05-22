@@ -24,7 +24,7 @@ let uploadMedia = multer({
 });
 
 // Models
-let Media = require('../models/Media');
+let Media = require('../../common/models/Media');
 
 // Classes
 let Controller = require('./Controller');
@@ -69,7 +69,7 @@ class ApiController extends Controller {
         app.get('/api/connections/:id', ApiController.getConnection);
         app.post('/api/connections/new', ApiController.createConnection);
         app.post('/api/connections/:id', ApiController.postConnection);
-        app.delete('/api/connection/:id', ApiController.deleteConnection);
+        app.delete('/api/connections/:id', ApiController.deleteConnection);
             
         // Settings
         app.get('/api/settings', ApiController.getSettings);

@@ -1,6 +1,6 @@
 'use strict';
 
-let Connection = require(appRoot + '/src/server/models/Connection');
+let Connection = require(appRoot + '/src/common/models/Connection');
 
 // Promise
 let Promise = require('bluebird');

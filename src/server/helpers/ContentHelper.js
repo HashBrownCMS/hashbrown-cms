@@ -71,7 +71,7 @@ class ContentHelper {
         let content = Content.create();
 
         return new Promise(function(callback) {
-            callback(content.data);   
+            callback(content);   
         });
     }
 }

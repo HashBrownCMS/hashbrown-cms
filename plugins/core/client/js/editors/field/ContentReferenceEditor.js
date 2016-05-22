@@ -1,6 +1,6 @@
 'use strict';
 
-let Content = require('../../../../../../src/server/models/Content');
+let Content = require('../../../../../../src/common/models/Content');
 
 class ContentReferenceEditor extends View {
     constructor(params) {

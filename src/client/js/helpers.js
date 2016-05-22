@@ -4,7 +4,7 @@ let Promise = require('bluebird');
 let MessageModal = require('./views/MessageModal');
 
 // Models
-window.Content = require('../../server/models/Content');
+window.Content = require('../../common/models/Content');
 
 let onReadyCallbacks = {};
 let isReady = {};

@@ -17,8 +17,8 @@ let ConnectionHelper = require(appRoot + '/src/server/helpers/ConnectionHelper')
 let SettingsHelper = require(appRoot + '/src/server/helpers/SettingsHelper');
 
 // Models
-let Content = require(appRoot + '/src/server/models/Content');
-let Connection = require(appRoot + '/src/server/models/Connection');
+let Content = require(appRoot + '/src/common/models/Content');
+let Connection = require(appRoot + '/src/common/models/Connection');
 
 class MongoDB {
     /**
@@ -291,16 +291,16 @@ class MongoDB {
     /**
      * Creates a new connection
      *
-     * @param {Object} data
+     * @param {Object} properties
      *
      * @return {Promise} promise
      */
-    static createConnection(data) {
-        let connection = Connection.create(data);
+    static createConnection(properties) {
+        let connection = Connection.create(properties);
 
         return MongoDB.insertOne(
             'connections',
-            connection.data
+            connection.properties
         );
     }
 
@@ -355,16 +355,16 @@ class MongoDB {
     /**
      * Creates a new content object
      *
-     * @param {Object} date
+     * @param {Object} properties
      *
      * @return {Promise} promise
      */
-    static createContent(data) {
-        let content = Content.create(data);
+    static createContent(properties) {
+        let content = Content.create(properties);
 
         return MongoDB.insertOne(
             'content',
-            content.data
+            content.properties
         );
     }
     

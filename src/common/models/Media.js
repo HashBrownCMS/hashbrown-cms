@@ -2,7 +2,7 @@
 
 let crypto = require('crypto');
 
-let MediaHelper = require('../helpers/MediaHelper');
+let MediaHelper = require('../../server/helpers/MediaHelper');
 
 /**
  * The base class for all Media objects

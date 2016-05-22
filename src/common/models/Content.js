@@ -3,15 +3,30 @@
 let crypto = require('crypto');
 
 let Promise = require('bluebird');
-let ContentHelper = require('../helpers/ContentHelper');
+let ContentHelper = require('../../server/helpers/ContentHelper');
 let Validator = require('jsonschema').Validator;
 
 /**
  * The base class for all Content types
  */
 class Content {
-    constructor(data) {
-        this.data = data;
+    constructor(properties) {
+        this.properties = properties;
+    
+        this.sanityCheck();
+    }
+
+    /**
+     * Performs a sanity check on the model data
+     */
+    sanityCheck() {
+        if(!this.properties.settings) {
+            this.properties.settings = {};
+        }
+        
+        if(!this.properties.settings.publishing) {
+            this.properties.settings.publishing = {};
+        }
     }
 
     /**
@@ -19,17 +34,17 @@ class Content {
      *
      * @param {Object} data
      *
-     * @return {Object} content
+     * @returns {Object} content
      */
     static create(data, language) {
         let content = new Content(data || {});
         
-        content.data.id = crypto.randomBytes(20).toString('hex');
-        content.data.createDate = Date.now();
-        content.data.updateDate = Date.now();
-        content.data.schemaId = content.data.schemaId || 'contentBase';
+        content.properties.id = crypto.randomBytes(20).toString('hex');
+        content.properties.createDate = Date.now();
+        content.properties.updateDate = Date.now();
+        content.properties.schemaId = content.properties.schemaId || 'contentBase';
 
-        content.data.title = 'New content';
+        content.properties.title = 'New content';
 
         return content;
     }
@@ -39,7 +54,7 @@ class Content {
      *
      * @param {String} id
      *
-     * @return {Content} content
+     * @returns {Content} content
      */
     static find(id) {
         return new Promise((callback) => {
@@ -70,21 +85,21 @@ class Content {
     /**
      * Gets all parents
      *
-     * @return {Promise} parents
+     * @returns {Promise} parents
      */
     getParents() {
         return new Promise((callback) => {
             let parents = [];
 
             function iterate(content) {
-                if(content.data.parentId) {
-                    Content.find(content.data.parentId)
+                if(content.properties.parentId) {
+                    Content.find(content.properties.parentId)
                     .then((parentContent) => {
                         if(parentContent) {
                             parents.push(parentContent);
                             iterate(parentContent);
                         } else {
-                            console.log('[Content] Parent content with id "' + content.data.parentId + '" was not found');
+                            console.log('[Content] Parent content with id "' + content.properties.parentId + '" was not found');
 
                             callback(parents);
                         }
@@ -104,7 +119,7 @@ class Content {
      *
      * @param {String} key
      *
-     * @return {Promise} settings
+     * @returns {Promise} settings
      */
     getSettings(key) {
         let model = this;
@@ -115,11 +130,11 @@ class Content {
             .then((parents) => {
                 for(let parentContent of parents) {
                     if(
-                        parentContent.data.settings &&
-                        parentContent.data.settings[key] &&
-                        parentContent.data.settings[key].applyToChildren
+                        parentContent.properties.settings &&
+                        parentContent.properties.settings[key] &&
+                        parentContent.properties.settings[key].applyToChildren
                     ) {
-                        let settings = parentContent.data.settings[key];
+                        let settings = parentContent.properties.settings[key];
                         settings.governedBy = parentContent;
 
                         callback(settings);
@@ -128,17 +143,29 @@ class Content {
                 }
 
                 // No parent nodes with governing settings found, return own settings
-                if(!model.data.settings) {
-                    model.data.settings = {};
+                if(!model.properties.settings) {
+                    model.properties.settings = {};
                 }
 
-                if(!model.data.settings[key]) {
-                    model.data.settings[key] = {};
+                if(!model.properties.settings[key]) {
+                    model.properties.settings[key] = {};
                 }
 
-                callback(model.data.settings[key]);
+                callback(model.properties.settings[key]);
             });
         });
+    }
+
+    /**
+     * Shorthand to get property value
+     *
+     * @param {String} key
+     * @param {String} language
+     *
+     * @returns {Object} value
+     */
+    prop(key, language) {
+        return this.getPropertyValue(key, language);
     }
 
     /**
@@ -147,20 +174,20 @@ class Content {
      * @param {String} key
      * @param {String} language
      *
-     * @return {Object} value
+     * @returns {Object} value
      */
     getPropertyValue(key, language) {
         if(language) {
-            return this.data[key] ? this.data[key][language] : null;
+            return this.properties[key] ? this.properties[key][language] : null;
         } else {
-            return this.data[key];
+            return this.properties[key];
         }
     }
 
     /**
      * Gets the content type
      *
-     * @return {String} type
+     * @returns {String} type
      */
     getType() {
         return this.constructor.name;
@@ -169,14 +196,14 @@ class Content {
     /**
      * Gets the schema information
      *
-     * @return {Promise} promise
+     * @returns {Promise} promise
      */
     getSchema() {
         let model = this;
 
         return new Promise(function(callback) {
             if(!view.schemaCache) {
-                ContentHelper.getSchema(view.getType(), model.data.schemaId)
+                ContentHelper.getSchema(view.getType(), model.properties.schemaId)
                 .then(function(schema) {
                     model.schemaCache = schema;
 
@@ -191,11 +218,11 @@ class Content {
     /**
      * Gets the published state
      *
-     * @return {Boolean} state
+     * @returns {Boolean} state
      */
     isPublished() {
-        let unpublishDateIsNull = this.data.unpublishDate == null || typeof this.data.unpublishDate == 'undefined';
-        let unpublishDateHasPassed = this.data.unpublishDate < Date.now()
+        let unpublishDateIsNull = this.properties.unpublishDate == null || typeof this.properties.unpublishDate == 'undefined';
+        let unpublishDateHasPassed = this.properties.unpublishDate < Date.now()
 
         // Get the state
         return unpublishDateIsNull || unpublishDateHasPassed;
@@ -204,7 +231,7 @@ class Content {
     /**
      * Validates the model based on the schema
      *
-     * @return {Promise} promise
+     * @returns {Promise} promise
      */
     validateModel() {
         return new Promise(function(callback) {
@@ -212,7 +239,7 @@ class Content {
             .then(function(schema) {
                 let validator = new Validator();
 
-                let result = validator.validate(this.data, schema);
+                let result = validator.validate(this.properties, schema);
 
                 console.log(result);
             });
