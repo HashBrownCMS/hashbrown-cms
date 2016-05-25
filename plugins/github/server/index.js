@@ -3,6 +3,7 @@
 let request = require('request');
 let config = require('./config.json');
 let Promise = require('bluebird');
+let yaml = require('../common/libs/yamljs');
 
 let ConnectionHelper = require(appRoot + '/src/server/helpers/ConnectionHelper');
 let WebFlowHelper = require('./WebFlowHelper');
@@ -17,6 +18,8 @@ class GitHub {
         app.get('/api/github/templates', GitHub.getAllTemplates);
         app.get('/api/github/orgs', GitHub.getOrgs);
         app.get('/api/github/:org/repos', GitHub.getRepos);
+
+        app.post('/api/github/publish', GitHub.publish);
 
         WebFlowHelper.init(app);
         NonWebFlowHelper.init(app);
@@ -83,13 +86,14 @@ class GitHub {
      * Publishes content
      */
     static publish(req, res) {
-        let content = req.body.content;        
+        let settings = req.body.settings;
+        let content = req.body.content;
         let media = req.body.media;
 
-        // TODO: Render content to YAML if needed
-        // TODO: Push content to repo if needed
-        // TODO: Push media to repo if needed
-
+        if(settings.compileForJekyll) {
+            let yamlString = yaml.stringify(content);    
+        }
+        
         res.sendStatus(200);
     }
 

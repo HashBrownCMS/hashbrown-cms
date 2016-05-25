@@ -101,7 +101,6 @@ class NavbarMain extends View {
                 // Get settings first
                 content.getSettings('publishing')
                 .then((publishing) => {
-
                     // Submit event
                     function onSubmit(hide) {
                         // Publishing
@@ -144,46 +143,49 @@ class NavbarMain extends View {
                     let modal = messageModal('Settings for "' + content.prop('title', window.language) + '"', [
                         // Publishing
                         _.h5('Publishing'),
-                        _.if(publishing.governedBy,
-                           _.p('(Settings inherited from <a href="#/content/' + publishing.governedBy.properties.id + '">' + publishing.governedBy.prop('title', window.language) + '</a>)')
-                        ),
-                        _.if(!publishing.governedBy,
-                            // Heading
-                            _.div({class: 'input-group'},      
-                                _.span('Apply to children'),
-                                _.div({class: 'input-group-addon'},
-                                    _.div({class: 'switch'},
-                                        _.input({
-                                            id: 'switch-publishing-apply-to-children',
-                                            class: 'form-control switch',
-                                            type: 'checkbox',
-                                            checked: publishing.applyToChildren == 'true'
-                                        }),
-                                        _.label({for: 'switch-publishing-apply-to-children'})
-                                    )
-                                )
-                            ),
-                            // Connections
-                            _.each(window.resources.connections, (i, connection) => { 
-                                return _.div({class: 'input-group'},      
-                                    _.span(connection.title),
-                                    _.div({class: 'input-group-addon'},
-                                        _.div({class: 'switch'},
-                                            _.input({
-                                                id: 'switch-connection-' + i,
-                                                'data-connection-id': connection.id,
-                                                class: 'form-control switch switch-connection',
-                                                type: 'checkbox',
-                                                checked: publishing.connections.indexOf(connection.id) > -1
-                                            }),
-                                            _.label({
-                                                for: 'switch-connection-' + i
-                                            })
+                        function() {
+                            if(publishing.governedBy) {
+                                return _.p('(Settings inherited from <a href="#/content/' + publishing.governedBy.properties.id + '">' + publishing.governedBy.prop('title', window.language) + '</a>)')
+                            } else {
+                                return [
+                                    // Heading
+                                    _.div({class: 'input-group'},      
+                                        _.span('Apply to children'),
+                                        _.div({class: 'input-group-addon'},
+                                            _.div({class: 'switch'},
+                                                _.input({
+                                                    id: 'switch-publishing-apply-to-children',
+                                                    class: 'form-control switch',
+                                                    type: 'checkbox',
+                                                    checked: publishing.applyToChildren == 'true'
+                                                }),
+                                                _.label({for: 'switch-publishing-apply-to-children'})
+                                            )
                                         )
-                                    )
-                                );
-                            })
-                        )
+                                    ),
+                                    // Connections
+                                    _.each(window.resources.connections, (i, connection) => { 
+                                        return _.div({class: 'input-group'},      
+                                            _.span(connection.title),
+                                            _.div({class: 'input-group-addon'},
+                                                _.div({class: 'switch'},
+                                                    _.input({
+                                                        id: 'switch-connection-' + i,
+                                                        'data-connection-id': connection.id,
+                                                        class: 'form-control switch switch-connection',
+                                                        type: 'checkbox',
+                                                        checked: publishing.connections.indexOf(connection.id) > -1
+                                                    }),
+                                                    _.label({
+                                                        for: 'switch-connection-' + i
+                                                    })
+                                                )
+                                            )
+                                        );
+                                    })
+                                ];
+                            }
+                        }()
                     ], onSubmit);
                 });
             }
@@ -306,8 +308,6 @@ class NavbarMain extends View {
      * Event: Click toggle fullscreen
      */
     onClickToggleFullscreen() {
-        console.log('dude');
-
         $('.cms-container').toggleClass('fullscreen');
     }
 

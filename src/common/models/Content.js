@@ -4,6 +4,7 @@ let crypto = require('crypto');
 
 let Promise = require('bluebird');
 let ContentHelper = require('../../server/helpers/ContentHelper');
+let Connection = require('./Connection');
 let Validator = require('jsonschema').Validator;
 
 /**

@@ -126,6 +126,7 @@
                 .field-key {
                     width: 200px;
                     line-height: 30px;
+                    flex-shrink: 0;
                 }
 
                 .field-value {

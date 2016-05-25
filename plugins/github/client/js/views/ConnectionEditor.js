@@ -26,6 +26,33 @@ class ConnectionEditor extends View {
             });
         });
     }
+    
+    /**
+     * Render compiling editor
+     */
+    renderCompilingEditor() {
+        let view = this;
+
+        view.model.compileForJekyll =
+            view.model.compileForJekyll == 'true' ||
+            view.model.compileForJekyll == true;
+
+        function onChange() {
+            view.model.compileForJekyll = this.checked;
+        } 
+        
+        return _.div({class: 'field-editor'},
+            _.div({class: 'switch'},
+                _.input({
+                    id: 'switch-github-compiling',
+                    class: 'form-control switch',
+                    type: 'checkbox',
+                    checked: view.model.compileForJekyll
+                }).change(onChange),
+                _.label({for: 'switch-github-compiling'})
+            )
+        );
+    }
 
     /**
      * Render client editor
@@ -185,21 +212,38 @@ class ConnectionEditor extends View {
 
     render() {
         let view = this;
+        
+        view.$element.empty();
 
-        view.$element.html([
+        // Compiling
+        view.$element.append(
+            _.div({class: 'field-container github-compiling'},
+                _.div({class: 'field-key'}, 'Compile for Jekyll'),
+                _.div({class: 'field-value'},
+                    view.renderCompilingEditor()
+                )
+            )
+        );
+
+        // Client
+        view.$element.append(
             _.div({class: 'field-container github-client'},
                 _.div({class: 'field-key'}, 'Client'),
                 _.div({class: 'field-value'},
                     view.renderClientEditor()
                 )
-            ),
+            )
+        );
+        
+        // Token
+        view.$element.append(
             _.div({class: 'field-container github-token'},
                 _.div({class: 'field-key'}, 'Token'),
                 _.div({class: 'field-value'},
                     view.renderTokenEditor()
                 )
             )
-        ]);
+        );
 
         // Get organisations
         view.getOrgs()

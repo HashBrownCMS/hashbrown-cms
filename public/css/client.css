@@ -330,7 +330,8 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
       margin-bottom: 15px; }
       .cms-container .workspace .editor .field-container .field-key {
         width: 200px;
-        line-height: 30px; }
+        line-height: 30px;
+        flex-shrink: 0; }
       .cms-container .workspace .editor .field-container .field-value {
         flex-grow: 1; }
         .cms-container .workspace .editor .field-container .field-value button {
