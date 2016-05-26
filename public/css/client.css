@@ -383,7 +383,7 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
           text-transform: uppercase;
           font-weight: bold;
           margin-right: 15px;
-          width: 110px; }
+          min-width: 110px; }
           .cms-container .workspace .panel-buttons .btn-group .btn:last-child {
             margin-right: 0px; }
           .cms-container .workspace .panel-buttons .btn-group .btn span {

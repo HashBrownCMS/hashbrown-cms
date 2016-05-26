@@ -182,11 +182,30 @@ class Content {
      * @returns {Object} value
      */
     getPropertyValue(key, language) {
-        if(language) {
-            return this.properties[key] ? this.properties[key][language] : null;
+        if(language && typeof this.properties[key] === 'object') {
+            return this.properties[key][language];
+        
         } else {
             return this.properties[key];
+        
         }
+    }
+
+    /**
+     * Returns all properties in a given language
+     *
+     * @param {String} language
+     *
+     * @returns {Object} properties
+     */
+    getProperties(language) {
+        let properties = {};
+
+        for(let key in this.properties) {
+            properties[key] = this.getPropertyValue(key, language);
+        }
+
+        return properties;
     }
 
     /**

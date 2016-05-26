@@ -3,6 +3,9 @@
 // Views
 let MessageModal = require('./MessageModal');
 
+// Helpers
+let LanguageHelper = require('../../../common/helpers/LanguageHelper');
+
 class ContentEditor extends View {
     constructor(params) {
         super(params);
@@ -21,36 +24,75 @@ class ContentEditor extends View {
 
     /**
      * Event: Click save. Posts the model to the modelUrl
+     *
+     * @param {Object} publishing
      */
-    onClickSave() {
+    onClickSave(publishing) {
         let view = this;
+
+        function publishConnections() {
+            let queueIndex = 0;
+            
+            function next() {
+                let connectionId = publishing.connections[queueIndex];
+                let connection = resources.connections.filter((c) => {
+                    return c.id == connectionId;
+                })[0];
+
+                queueIndex++;
+                
+                $.ajax({
+                    type: 'post',
+                    url: '/api/' + connection.type + '/publish/',
+                    data: {
+                        settings: connection.settings,
+                        content: view.model
+                    },
+                    success:
+                        queueIndex < publishing.connections.length - 1 ?
+                        next :
+                        onSuccess,
+                    error: onError
+                });
+            }
+            
+            next();
+        }
+
+        function onSuccess() {
+            console.log('[ContentEditor] Saved model to ' + view.modelUrl);
+            view.$saveBtn.toggleClass('saving', false);
+        
+            reloadResource('content')
+            .then(function() {
+                let navbar = ViewHelper.get('NavbarMain');
+
+                view.reload();
+                navbar.reload();
+            });
+        }
+
+        function onError(err) {
+            new MessageModal({
+                model: {
+                    title: 'Error',
+                    body: err
+                }
+            });
+        }
 
         view.$saveBtn.toggleClass('saving', true);
 
+        // Save content to database
         $.ajax({
             type: 'post',
             url: view.modelUrl,
             data: view.model,
-            success: function() {
-                console.log('[ContentEditor] Saved model to ' + view.modelUrl);
-                view.$saveBtn.toggleClass('saving', false);
-            
-                reloadResource('content')
-                .then(function() {
-                    let navbar = ViewHelper.get('NavbarMain');
-
-                    view.reload();
-                    navbar.reload();
-                });
-            },
-            error: function(err) {
-                new MessageModal({
-                    model: {
-                        title: 'Error',
-                        body: err
-                    }
-                });
-            }
+            success:
+                publishing.connections.length > 0 ?
+                publishConnections :
+                onSuccess,
+            error: onError
         });
     }
 
@@ -196,24 +238,32 @@ class ContentEditor extends View {
     renderContentObject(contentProperties, schema) {
         let view = this;
 
+        let $languageOptions = _.ul({class: 'dropdown-menu'});
+        let $languagePicker = _.div({class: 'language-picker dropdown'},
+            _.button({class: 'btn btn-default dropdown-toggle', 'data-toggle': 'dropdown'},
+                window.language
+            ),
+            $languageOptions
+        );
+
+        LanguageHelper.getLanguages()
+        .then((languages) => {
+            $languageOptions.html(
+                _.each(
+                    languages.filter((language) => {
+                        return language != window.language;
+                    }), (i, language) => {
+                    return _.li({value: language},
+                        _.a({href: '#'},
+                            language
+                        ).click(view.onChangeLanguage)
+                    );
+                })
+            );
+        });
+
         return _.div({class: 'object'},
-            _.div({class: 'language-picker dropdown'},
-                _.button({class: 'btn btn-default dropdown-toggle', 'data-toggle': 'dropdown'},
-                    window.language
-                ),
-                _.ul({class: 'dropdown-menu'},
-                    _.each(
-                        ['en','da'].filter((language) => {
-                            return language != window.language;
-                        }), (i, language) => {
-                        return _.li({value: language},
-                            _.a({href: '#'},
-                                language
-                            ).click(view.onChangeLanguage)
-                        );
-                    })
-                )
-            ).change(this.onChangeLanguage),
+            $languagePicker,
             _.ul({class: 'nav nav-tabs'}, 
                 _.each(schema.tabs, function(id, tab) {
                     return _.li({class: id == schema.defaultTabId ? 'active' : ''}, 
@@ -282,24 +332,29 @@ class ContentEditor extends View {
         let contentSchema = getSchemaWithParents(this.model.schemaId);
 
         if(contentSchema) {
-            this.$element.html([
-                this.renderContentObject(this.model, contentSchema).append(
-                    _.div({class: 'panel panel-default panel-buttons'}, 
-                        _.div({class: 'btn-group'},
-                            _.button({class: 'btn btn-embedded'},
-                                'Advanced'
-                            ).click(function() { view.onClickAdvanced(); }),
-                            _.button({class: 'btn btn-danger btn-raised'},
-                                'Delete'
-                            ).click(function() { view.onClickDelete(); }),
-                            view.$saveBtn = _.button({class: 'btn btn-success btn-raised btn-save'},
-                                _.span({class: 'text-default'}, 'Save '),
-                                _.span({class: 'text-saving'}, 'Saving ')
-                            ).click(function() { view.onClickSave(); })
+            let content = new Content(this.model);
+
+            content.getSettings('publishing')
+            .then((publishing) => {
+                view.$element.html([
+                    view.renderContentObject(view.model, contentSchema).append(
+                        _.div({class: 'panel panel-default panel-buttons'}, 
+                            _.div({class: 'btn-group'},
+                                _.button({class: 'btn btn-embedded'},
+                                    'Advanced'
+                                ).click(function() { view.onClickAdvanced(); }),
+                                _.button({class: 'btn btn-danger btn-raised'},
+                                    'Delete'
+                                ).click(function() { view.onClickDelete(); }),
+                                view.$saveBtn = _.button({class: 'btn btn-success btn-raised btn-save'},
+                                    _.span({class: 'text-default'}, 'Save' + (publishing.connections.length > 0 ? ' & publish' : '')),
+                                    _.span({class: 'text-saving'}, 'Saving')
+                                ).click(function() { view.onClickSave(publishing); })
+                            )
                         )
                     )
-                )
-            ]);
+                ]);
+            });
 
             this.onFieldEditorsReady();
         }

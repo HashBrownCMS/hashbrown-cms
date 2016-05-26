@@ -3,9 +3,12 @@
 let request = require('request');
 let config = require('./config.json');
 let Promise = require('bluebird');
-let yaml = require('../common/libs/yamljs');
+let yaml = require('../common/lib/yamljs/Yaml.js');
+
+let Content = require(appRoot + '/src/common/models/Content');
 
 let ConnectionHelper = require(appRoot + '/src/server/helpers/ConnectionHelper');
+let LanguageHelper = require(appRoot + '/src/common/helpers/LanguageHelper');
 let WebFlowHelper = require('./WebFlowHelper');
 let NonWebFlowHelper = require('./NonWebFlowHelper');
 
@@ -87,14 +90,68 @@ class GitHub {
      */
     static publish(req, res) {
         let settings = req.body.settings;
-        let content = req.body.content;
-        let media = req.body.media;
+        let contentProperties = req.body.content;
 
-        if(settings.compileForJekyll) {
-            let yamlString = yaml.stringify(content);    
+        if(contentProperties) {
+            let content = new Content(contentProperties);
+
+            let commitQueue = [];
+                
+            function commitNext() {
+                if(commitQueue.length > 0) {
+                    let queueItem = commitQueue.pop();
+                    let filePath = '/content' + queueItem.url.substring(0, queueItem.url.length - 1) + '.md';
+                    let data = queueItem.data;
+
+                    console.log('[GitHub] Committing data to "' + filePath + '"...');
+
+                    // TODO: Commit to GitHub using path and data
+
+                    commitNext();
+                
+                } else {
+                    console.log(' -> Success');
+                    res.sendStatus(200);
+                
+                }
+            }
+
+            LanguageHelper.getLanguages()
+            .then((languages) => {
+                for(let language of languages) {
+                    let properties = content.getProperties(language);
+
+                    // Compile for Jekyll
+                    if(settings.compileForJekyll) {
+                        console.log('[GitHub] Compiling node "' + properties.title + '" for Jekyll...');
+
+                        let frontMatter = '';
+
+                        frontMatter += '---\n';
+                        frontMatter += yaml.stringify(properties); 
+                        frontMatter += '\n---';
+
+                        commitQueue[commitQueue.length] = {
+                            url: properties.url,
+                            data: frontMatter
+                        };
+                        
+                        console.log(' -> Success');
+                    }
+                }
+
+                if(commitQueue.length <= 0) {
+                    console.log('[GitHub] WARNING: Nothing to commit');
+                }
+                
+                commitNext();
+            });
+
+        } else {
+            console.log('[GitHub] No content found in POST data');
+
+            res.sendStatus(400);
         }
-        
-        res.sendStatus(200);
     }
 
     /**
