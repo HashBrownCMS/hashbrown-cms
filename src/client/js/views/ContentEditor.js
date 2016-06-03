@@ -31,32 +31,13 @@ class ContentEditor extends View {
         let view = this;
 
         function publishConnections() {
-            let queueIndex = 0;
-            
-            function next() {
-                let connectionId = publishing.connections[queueIndex];
-                let connection = resources.connections.filter((c) => {
-                    return c.id == connectionId;
-                })[0];
-
-                queueIndex++;
-                
-                $.ajax({
-                    type: 'post',
-                    url: '/api/' + connection.type + '/publish/',
-                    data: {
-                        settings: connection.settings,
-                        content: view.model
-                    },
-                    success:
-                        queueIndex < publishing.connections.length - 1 ?
-                        next :
-                        onSuccess,
-                    error: onError
-                });
-            }
-            
-            next();
+            $.ajax({
+                type: 'post',
+                url: '/api/content/publish',
+                data: view.model,
+                success: onSuccess,
+                error: onError
+            });
         }
 
         function onSuccess() {

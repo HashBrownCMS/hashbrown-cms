@@ -51,6 +51,7 @@ class ApiController extends Controller {
         app.get('/api/content/:id', ApiController.getContent);
         app.post('/api/content/new', ApiController.createContent);
         app.post('/api/content/:id', ApiController.postContent);
+        app.post('/api/content/publish', ApiController.publishContent);
         app.delete('/api/content/:id', ApiController.deleteContent);
 
         // Schemas
@@ -74,6 +75,9 @@ class ApiController extends Controller {
         // Settings
         app.get('/api/settings', ApiController.getSettings);
         app.post('/api/settings', ApiController.setSettings);
+
+        // Templats
+        app.get('/api/templates', ApiController.getTemplates)
 
         // Compiled editors script
         app.get('/scripts/editors.js', ApiController.getEditors);
@@ -197,7 +201,19 @@ class ApiController extends Controller {
             res.sendStatus(200);
         });
     }
-    
+   
+    /**
+     * Publishes a Content node
+     */
+    static publishContent(req, res) {
+        let content = new Content(req.body);
+
+        ConnectionHelper.publishContent(node)
+        .then(function() {
+            res.sendStatus(200);
+        });
+    }
+
     /**
      * Deletes a Content object by id
      */
@@ -339,6 +355,16 @@ class ApiController extends Controller {
         .then(function() {
             res.sendStatus(200);
         });
+    }
+
+    // ----------
+    // Tenplates
+    // ----------
+    static getTemplates(req, res) {
+        res.send([
+            'one.html',
+            'two.html'
+        ]);
     }
 
     // ----------

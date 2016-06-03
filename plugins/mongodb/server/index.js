@@ -186,13 +186,25 @@ class MongoDB {
     /**
      * Gets all connections
      *
-     * @return {Promise} promise
+     * @return {Promise(Connection[])} promise
      */
     static getAllConnections() {
-        return MongoDB.find(
-            'connections',
-            {}
-        );
+        return new Promise((callback) => {
+            MongoDB.find(
+                'connections',
+                {}
+            ).then((array) => {
+                let connections = [];
+
+                for(let data of array) {
+                    let connection = ConnectionHelper.initConnection(data);
+
+                    connections.push(connection);
+                }
+
+                callback(connections);
+            });
+        });
     }
     
     /**
@@ -200,15 +212,21 @@ class MongoDB {
      *
      * @param {string} id
      *
-     * @return {Promise} promise
+     * @return {Promise(Connection)} promise
      */
     static getConnectionById(id) {
-        return MongoDB.findOne(
-            'connections',
-            {
-                id: id
-            }
-        );
+        return new Promise((callback) => {
+            MongoDB.findOne(
+                'connections',
+                {
+                    id: id
+                }
+            ).then((data) => {
+                let connection = ConnectionHelper.initConnection(data);
+
+                callback(connection);
+            });
+        });
     }
     
     /**

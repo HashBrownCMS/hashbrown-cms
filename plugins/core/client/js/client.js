@@ -7,3 +7,4 @@ require('./editors/field/RichTextEditor');
 require('./editors/field/SchemaReferenceEditor');
 require('./editors/field/StringEditor');
 require('./editors/field/UrlEditor');
+require('./editors/field/TemplateReferenceEditor');
