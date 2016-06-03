@@ -2,6 +2,7 @@
 
 let request = require('../lib/request');
 let yamljs = require('../lib/yamljs/Yaml');
+let Octokat = require('../lib/octokat');
 
 let Connection = require(appRoot + '/src/common/models/Connection');
 let Content = require(appRoot + '/src/common/models/Content');
@@ -9,156 +10,26 @@ let Content = require(appRoot + '/src/common/models/Content');
 let ConnectionHelper = require(appRoot + '/src/server/helpers/ConnectionHelper');
 let LanguageHelper = require(appRoot + '/src/common/helpers/LanguageHelper');
 
+let octo;
+
 class GitHubConnection extends Connection {
     constructor(data) {
         super(data);
-    }
-
-    // ----------
-    // Generic API methods
-    // ----------
-    /**
-     * GET method
-     *
-     * @param {String} url
-     *
-     * @returns {Promise} promise
-     */
-    get(url) {
-        return new Promise((callback) => {
-            request({
-                url: 'https://api.github.com' + url + '?access_token=' + this.data.settings.token + '&per_page=100',
-                method: 'GET',
-                success: (result) => {
-                    callback(result);
-                },
-                error: (e) => {
-                    this.error(e);
-                }
-            });
-        });
-    }
     
-    /**
-     * DELETE method
-     *
-     * @param {String} url
-     *
-     * @returns {Promise} promise
-     */
-    delete(url) {
-        return new Promise((callback) => {
-            request({
-                url: 'https://api.github.com' + url + '?access_token=' + this.data.settings.token,
-                method: 'DELETE',
-                success: (result) => {
-                    callback(result);
-                },
-                error: (e) => {
-                    this.error(e);
-                }
-            });
-        });
-    }
-
-    /**
-     * PATCH method
-     *
-     * @param {String} url
-     * @param {Object} data
-     *
-     * @returns {Promise} promise
-     */
-    patch(url, data) {
-        if(typeof data === 'object') {
-            data = JSON.stringify(data);
+        if(this.settings.token) {
+            octo = new Octokat({
+                token: this.settings.token
+            });  
         }
-
-        return new Promise((callback) => {
-            request({
-                url: 'https://api.github.com' + url + '?access_token=' + this.data.settings.token,
-                method: 'PATCH',
-                postData: data,
-                success: (result) => {
-                    callback(result);
-                },
-                error: (e) => {
-                    this.error(e);
-                }
-            });
-        });
     }
 
-    /**
-     * POST method
-     *
-     * @param {String} url
-     * @param {Object} data
-     *
-     * @returns {Promise} promise
-     */
-    post(url, data) {
-        if(typeof data === 'object') {
-            data = JSON.stringify(data);
-        }
-
-        return new Promise((callback) => {
-            request({
-                url: 'https://api.github.com' + url + '?access_token=' + this.data.settings.token,
-                method: 'POST',
-                postData: data,
-                success: (result) => {
-                    callback(result);
-                },
-                error: (e) => {
-                    this.error(e);
-                }
-            });
-        });
-    }
-    
-    /**
-     * PUT method
-     *
-     * @param {String} url
-     *
-     * @returns {Promise} promise
-     */
-    put(url) {
-        return new Promise((callback) => {
-            request({
-                url: 'https://api.github.com' + url + '?access_token=' + this.data.settings.token,
-                method: 'PUT',
-                success: (result) => {
-                    callback(result);
-                },
-                error: (e) => {
-                    this.error(e);
-                }
-            });
-        });
-    }
-
-    /**
-     * Error message
-     *
-     * @param {Object} error
-     */
-    error(error) {
-        console.log(error);
-    }
-
-    // ----------
-    // Publishing methods
-    // ----------
     /**
      * Gets all root directories
      */
     getRootDirectories() {
         return new Promise((callback) => {
-            this.get('repos/' + this.settings.org + '/' + this.settings.repo + '/contents/')
-            .then(function(response) {
-                let files = response.body;
+            octo.repos(this.settings.org, this.settings.repo).contents().fetch()
+            .then(function(files) {
                 let dirs = [];
 
                 for(let file of files) {
@@ -177,10 +48,8 @@ class GitHubConnection extends Connection {
      */
     getOrgs() {
         return new Promise((callback) => {
-            this.get('user/orgs')
-            .then(function(response) {
-                let orgs = response.body;
-
+            octo.me.orgs().fetch()
+            .then(function(orgs) {
                 callback(orgs);
             }); 
         }); 
@@ -191,10 +60,8 @@ class GitHubConnection extends Connection {
      */
     getRepos() {
         return new Promise((callback) => {
-            this.get('orgs/' + this.settings.org + '/repos')
-            .then(function(response) {
-                let repos = response.body;
-
+            octo.orgs(this.settings.org).repos().fetch()
+            .then(function(repos) {
                 callback(repos);
             }); 
         }); 
@@ -229,17 +96,39 @@ class GitHubConnection extends Connection {
      * @returns {Promise} promise
      */
     postContentProperties(properties) {
+        console.log('[GitHub] Uploading "' + properties.title + '"...');
+
         return new Promise((callback) => {
-            let data = properties;
+            let data;
+            let path = properties.url + '.md';
 
             // Compile for Jekyll
             if(this.settings.compileForJekyll) {
                 data = this.compileForJekyll(properties);
+            } else {
+                data = JSON.stringify(properties);
             }
 
-            this.post('/contents/' + properties.url + '.md', data)
-            .then(() => {
-                callback();
+            let repo = octo.repos(this.settings.org, this.settings.repo);
+
+            // Fetch first to get the SHA
+            console.log('[GitHub] Getting SHA...');
+            repo.contents(path).fetch()
+            .then((info) => {
+                let sha = info.sha;
+           
+                let config = {
+                    message: 'Commit from Endomon CMS',
+                    content: new Buffer(data).toString('base64'),
+                    sha: sha        
+                };
+
+                console.log('[GitHub] Committing data...');
+                repo.contents(path).add(config)
+                .then(() => {
+                    console.log('[GitHub] Uploaded file sucessfully!');
+                    callback();
+                });
             });
         });
     }

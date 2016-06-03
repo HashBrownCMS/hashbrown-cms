@@ -11,7 +11,9 @@ let LanguageHelper = require('../helpers/LanguageHelper');
  */
 class Connection {
     constructor(properties) {
-        this.properties = properties;
+        for(let k in properties) {
+            this[k] = properties[k];
+        }
     }
 
     /**
@@ -24,9 +26,9 @@ class Connection {
     static create(properties) {
         let connection = new Connection(properties || {});
         
-        connection.properties.id = crypto.randomBytes(20).toString('hex');
-        connection.properties.title = 'New connection';
-        connection.properties.settings = {};
+        connection.id = crypto.randomBytes(20).toString('hex');
+        connection.title = 'New connection';
+        connection.settings = {};
 
         return connection;
     }

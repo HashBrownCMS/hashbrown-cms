@@ -14,12 +14,10 @@ class ConnectionEditor extends View {
      * Get organisations
      */
     getOrgs() {
-        let view = this;
-
-        return new Promise(function(callback) {
+        return new Promise((callback) => {
             $.ajax({
                 type: 'get',
-                url: '/api/github/orgs/?token=' + view.model.token,
+                url: '/api/github/orgs/?connectionId=' + Router.params.id,
                 success: (orgs) => {
                     callback(orgs);
                 }
@@ -55,43 +53,18 @@ class ConnectionEditor extends View {
     }
 
     /**
-     * Render client editor
-     */
-    renderClientEditor() {
-        let view = this;
-
-        function onChangeClientId() {
-            view.model.clientId = $(this).val();
-        } 
-        
-        function onChangeClientSecret() {
-            view.model.clientSecret = $(this).val();
-        } 
-        
-        return _.div({class: 'field-editor input-group'},
-            _.input({class: 'form-control', value: this.model.clientId, placeholder: 'Client id'})
-                .change(onChangeClientId),
-            _.input({class: 'form-control', value: this.model.clientSecret, placeholder: 'Client secret'})
-                .change(onChangeClientSecret)
-        );
-    }
-
-    /**
      * Render token editor
      */
     renderTokenEditor() {
         let view = this;
-
-        function onClickGenerateToken() {
-            location = '/api/github/oauth/' + view.model.clientId + '/' + view.model.clientSecret + '/' + Router.params.id;
+        
+        function onChange() {
+            view.model.token = $(this).val();
         }
 
         return _.div({class: 'field-editor'},
-            _.if(view.model.token,
-                _.label(view.model.token)
-            ),
-            _.button({class: 'btn btn-primary'}, 'Update token')
-                .click(onClickGenerateToken)
+            _.input({class: 'form-control', type: 'text', value: this.model.token, placeholder: 'Input GitHub API token'})
+                .change(onChange)
         );
     }
 
@@ -225,16 +198,6 @@ class ConnectionEditor extends View {
             )
         );
 
-        // Client
-        view.$element.append(
-            _.div({class: 'field-container github-client'},
-                _.div({class: 'field-key'}, 'Client'),
-                _.div({class: 'field-value'},
-                    view.renderClientEditor()
-                )
-            )
-        );
-        
         // Token
         view.$element.append(
             _.div({class: 'field-container github-token'},

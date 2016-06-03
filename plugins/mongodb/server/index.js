@@ -222,9 +222,14 @@ class MongoDB {
                     id: id
                 }
             ).then((data) => {
-                let connection = ConnectionHelper.initConnection(data);
+                if(data) {
+                    let connection = ConnectionHelper.initConnection(data);
 
-                callback(connection);
+                    callback(connection);
+                } else {
+                    throw '[MongoDB] Found no connection with id "' + id + '"';
+
+                }
             });
         });
     }
@@ -318,7 +323,7 @@ class MongoDB {
 
         return MongoDB.insertOne(
             'connections',
-            connection.properties
+            connection
         );
     }
 
