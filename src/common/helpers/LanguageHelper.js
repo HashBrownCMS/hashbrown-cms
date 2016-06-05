@@ -7,11 +7,7 @@ class LanguageHelper {
      * @returns {String[]} languages
      */
     static getLanguages() {
-        return new Promise((callback) => {
-            let languages = require('../data/languages.json');
-
-            callback(languages);        
-        });
+        return require('../data/languages.json');
     }
 
     /**

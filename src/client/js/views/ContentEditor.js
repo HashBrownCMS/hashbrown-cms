@@ -41,7 +41,6 @@ class ContentEditor extends View {
         }
 
         function onSuccess() {
-            console.log('[ContentEditor] Saved model to ' + view.modelUrl);
             view.$saveBtn.toggleClass('saving', false);
         
             reloadResource('content')
@@ -127,17 +126,6 @@ class ContentEditor extends View {
                 }
             ]
         });
-    }
-
-    /**
-     * Event: On change language
-     */
-    onChangeLanguage(e) {
-        e.preventDefault();
-
-        localStorage.setItem('language', $(this).text());
-
-        location.reload();
     }
 
     /**
@@ -275,35 +263,9 @@ class ContentEditor extends View {
     renderEditor(content, schema) {
         let view = this;
 
-        // Render language picker
-        let $languageOptions = _.ul({class: 'dropdown-menu'});
-        let $languagePicker = _.div({class: 'language-picker dropdown'},
-            _.button({class: 'btn btn-default dropdown-toggle', 'data-toggle': 'dropdown'},
-                window.language
-            ),
-            $languageOptions
-        );
-
-        // Populate picker with language options
-        LanguageHelper.getSelectedLanguages()
-        .then((languages) => {
-            $languageOptions.html(
-                _.each(
-                    languages.filter((language) => {
-                        return language != window.language;
-                    }), (i, language) => {
-                    return _.li({value: language},
-                        _.a({href: '#'},
-                            language
-                        ).click(view.onChangeLanguage)
-                    );
-                })
-            );
-        });
-
         // Render editor
         return _.div({class: 'object'},
-            $languagePicker,
+            new LanguagePicker().$element,
             _.ul({class: 'nav nav-tabs'}, 
                 _.each(schema.tabs, (tabId, tab) => {
                     return _.li({class: tabId == schema.defaultTabId ? 'active' : ''}, 

@@ -1756,6 +1756,11 @@ if(view.model.repo){view.$element.append([_.div({class:'field-container github-c
      *
      * @returns {String[]} languages
      */value:function getLanguages(){return new Promise(function(callback){var languages=require('../data/languages.json');callback(languages);});} /**
+     * Gets all selected languages
+     * TODO: Fetch from backend
+     *
+     * @returns {String[]} languages
+     */},{key:"getSelectedLanguages",value:function getSelectedLanguages(){return new Promise(function(callback){var languages=['en','da'];callback(languages);});} /**
      * Gets localised sets of properties for a Content object
      *
      * @param {String} language
