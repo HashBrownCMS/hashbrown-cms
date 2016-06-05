@@ -29,12 +29,12 @@ class NavbarMain extends View {
         view.onClickPasteContent = function onClickPasteContent() {
             let parentId = $('.context-menu-target-element').data('id');
             
-            $.getJSON('/api/content/' + id, function(copiedContent) {
+            $.getJSON('/api/content/' + id + '?token=' + localStorage.getItem('token'), function(copiedContent) {
                 delete copiedContent['id'];
 
                 copiedContent.parentId = parentId;
                     
-                $.post('/api/content/new/', copiedContent, function() {
+                $.post('/api/content/new/?token=' + localStorage.getItem('token'), copiedContent, function() {
                     reloadResource('content')
                     .then(function() {
                         view.reload();
@@ -57,10 +57,10 @@ class NavbarMain extends View {
         view.onClickPasteContent = function onClickPasteContent() {
             let parentId = $('.context-menu-target-element').data('id');
             
-            $.getJSON('/api/content/' + id, function(cutContent) {
+            $.getJSON('/api/content/' + id + '?token=' + localStorage.getItem('token'), function(cutContent) {
                 cutContent.parentId = parentId;
                     
-                $.post('/api/content/' + id, cutContent, function() {
+                $.post('/api/content/' + id + '?token=' + localStorage.getItem('token'), cutContent, function() {
                     reloadResource('content')
                     .then(function() {
                         view.reload();
@@ -78,7 +78,7 @@ class NavbarMain extends View {
     onClickNewContent() {
         let view = this;
 
-        $.post('/api/content/new/', function() {
+        $.post('/api/content/new?token=' + localStorage.getItem('token'), function() {
             reloadResource('content')
             .then(function() {
                 view.reload();
@@ -123,7 +123,7 @@ class NavbarMain extends View {
                         // Save model
                         $.ajax({
                             type: 'post',
-                            url: '/api/content/' + content.id,
+                            url: '/api/content/' + content.id + '?token=' + localStorage.getItem('token'),
                             data: content,
                             success: function() {
                                 console.log('[ContentEditor] Saved model to /api/content/' + content.id);
@@ -231,7 +231,7 @@ class NavbarMain extends View {
                     class: 'btn-danger',
                     callback: function() {
                         $.ajax({
-                            url: '/api/content/' + id,
+                            url: '/api/content/' + id + '?token=' + localStorage.getItem('token'),
                             type: 'DELETE',
                             success: onSuccess
                         });
@@ -247,7 +247,7 @@ class NavbarMain extends View {
     onClickNewConnection() {
         let view = this;
 
-        $.post('/api/connections/new/', function() {
+        $.post('/api/connections/new/?token=' + localStorage.getItem('token'), function() {
             reloadResource('connections')
             .then(function() {
                 view.reload();
@@ -294,7 +294,7 @@ class NavbarMain extends View {
                     class: 'btn-danger',
                     callback: function() {
                         $.ajax({
-                            url: '/api/connections/' + id,
+                            url: '/api/connections/' + id + '?token=' + localStorage.getItem('token'),
                             type: 'DELETE',
                             success: onSuccess
                         });
@@ -350,7 +350,7 @@ class NavbarMain extends View {
                     class: 'btn-danger',
                     callback: function() {
                         $.ajax({
-                            url: '/api/media/' + id,
+                            url: '/api/media/' + id + '?token=' + localStorage.getItem('token'),
                             type: 'DELETE',
                             success: onSuccess
                         });
@@ -419,7 +419,7 @@ class NavbarMain extends View {
             $uploadModal.find('.spinner-container').toggleClass('hidden', false);
             
             $.ajax({
-                url: '/api/media/new',
+                url: '/api/media/new?token=' + localStorage.getItem('token'),
                 type: 'POST',
                 data: new FormData(this),
                 processData: false,
@@ -758,6 +758,10 @@ class NavbarMain extends View {
             route: '/',
             $icon: _.span({class: 'about-logo'}, 'E'),
             items: [
+                {
+                    name: 'Admins',
+                    path: 'admins'
+                },
                 {
                     name: 'About',
                     path: 'about'

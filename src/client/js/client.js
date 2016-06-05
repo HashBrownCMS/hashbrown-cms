@@ -43,6 +43,31 @@ window.language = localStorage.getItem('language') || 'en';
 // -----------
 // CMS
 // -----------
+// Admins
+Router.route('/admins/', function() {
+    ViewHelper.get('NavbarMain').highlightItem('admins');
+
+    $('.workspace').html(
+        _.div({class: 'dashboard-container'},
+            _.h1('Admins'),
+            _.p('Hi'),
+            _.button('Create').click(() => {
+                $.ajax({
+                    type: 'POST',
+                    url: '/api/admin/new?token=' + localStorage.getItem('token'),
+                    data: {
+                        username: 'hest',
+                        password: 'test'
+                    },
+                    success: function() {
+                        console.log('wooh!');
+                    }
+                });
+            })
+        )
+    );
+});
+
 // About
 Router.route('/about/', function() {
     ViewHelper.get('NavbarMain').highlightItem('about');
@@ -73,7 +98,7 @@ Router.route('/content/', function() {
 // Edit
 Router.route('/content/:id', function() {
     let contentEditor = new ContentEditor({
-        modelUrl: '/api/content/' + this.id
+        modelUrl: '/api/content/' + this.id + '?token=' + localStorage.getItem('token')
     });
    
     ViewHelper.get('NavbarMain').highlightItem(this.id);
@@ -84,7 +109,7 @@ Router.route('/content/:id', function() {
 // Edit (JSON editor)
 Router.route('/content/json/:id', function() {
     let contentEditor = new JSONEditor({
-        modelUrl: '/api/content/' + this.id
+        modelUrl: '/api/content/' + this.id + '?token=' + localStorage.getItem('token')
     });
      
     ViewHelper.get('NavbarMain').highlightItem(this.id);
@@ -110,7 +135,7 @@ Router.route('/connections/', function() {
 // Edit
 Router.route('/connections/:id', function() {
     let connectionEditor = new ConnectionEditor({
-        modelUrl: '/api/connections/' + this.id
+        modelUrl: '/api/connections/' + this.id + '?token=' + localStorage.getItem('token')
     });
    
     ViewHelper.get('NavbarMain').highlightItem(this.id);
@@ -121,7 +146,7 @@ Router.route('/connections/:id', function() {
 // Edit (JSON editor)
 Router.route('/connections/json/:id', function() {
     let connectionEditor = new JSONEditor({
-        modelUrl: '/api/connections/' + this.id
+        modelUrl: '/api/connections/' + this.id + '?token=' + localStorage.getItem('token')
     });
      
     ViewHelper.get('NavbarMain').highlightItem(this.id);
@@ -173,7 +198,7 @@ Router.route('/schemas/', function() {
 // Edit
 Router.route('/schemas/:id', function() {
     let schemaEditor = new SchemaEditor({
-        modelUrl: '/api/schemas/' + this.id
+        modelUrl: '/api/schemas/' + this.id + '?token=' + localStorage.getItem('token')
     });
     
     ViewHelper.get('NavbarMain').highlightItem(this.id);
@@ -184,7 +209,7 @@ Router.route('/schemas/:id', function() {
 // Edit (JSON editor)
 Router.route('/schemas/json/:id', function() {
     let jsonEditor = new JSONEditor({
-        modelUrl: '/api/schemas/' + this.id
+        modelUrl: '/api/schemas/' + this.id + '?token=' + localStorage.getItem('token')
     });
     
     ViewHelper.get('NavbarMain').highlightItem(this.id);
@@ -218,6 +243,7 @@ Router.route('/settings/languages/', function() {
         )
     );
 });
+
 // ----------
 // Init
 // ----------

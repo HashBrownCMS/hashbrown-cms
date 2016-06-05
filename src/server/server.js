@@ -40,19 +40,12 @@ let PluginWatcher = require(appRoot + '/src/server/watchers/PluginWatcher');
 PluginWatcher.init();
 
 // ----------
-// Helpers
-// ----------
-let AuthHelper = require(appRoot + '/src/server/helpers/AuthHelper');
-
-// ----------
 // Controllers
 // ----------
 let ApiController = require(appRoot + '/src/server/controllers/ApiController');
 let PluginController = require(appRoot + '/src/server/controllers/PluginController');
 let MediaController = require(appRoot + '/src/server/controllers/MediaController');
-let AuthController = require(appRoot + '/src/server/controllers/AuthController');
 
-AuthController.init(app);
 MediaController.init(app);
 ApiController.init(app);
 PluginController.init(app)
@@ -62,6 +55,9 @@ PluginController.init(app)
 // View
 // ----------
 app.get('/', function(req, res) {
-//    res.render('login');
     res.render('index');
+});
+
+app.get('/login/', function(req, res) {
+    res.render('login');
 });

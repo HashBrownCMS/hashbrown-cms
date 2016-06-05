@@ -37,6 +37,7 @@ let PluginHelper = require('../helpers/PluginHelper');
 let MediaHelper = require('../helpers/MediaHelper');
 let ConnectionHelper = require('../helpers/ConnectionHelper');
 let SettingsHelper = require('../helpers/SettingsHelper');
+let AdminHelper = require('../helpers/AdminHelper');
 
 /**
  * The main API controller
@@ -76,13 +77,18 @@ class ApiController extends Controller {
         app.get('/api/settings', ApiController.getSettings);
         app.post('/api/settings', ApiController.setSettings);
 
-        // Templats
+        // Admin
+        app.post('/api/admin/login', ApiController.login);
+        app.post('/api/admin/new', ApiController.createAdmin);
+        app.post('/api/admin/:id', ApiController.postAdmin);
+
+        // Templates
         app.get('/api/templates', ApiController.getTemplates)
 
         // Compiled editors script
         app.get('/scripts/editors.js', ApiController.getEditors);
     }
-  
+ 
     // ----------
     // Media methods
     // ---------- 
@@ -90,21 +96,25 @@ class ApiController extends Controller {
      * Gets a list of Media objects
      */
     static getMedia(req, res) {
-        MediaHelper.getAllMedia()
-        .then(function(paths) {
-            res.send(paths)
-        }); 
+        ApiController.authenticate(req, res, () => {
+            MediaHelper.getAllMedia()
+            .then(function(paths) {
+                res.send(paths)
+            }); 
+        });
     }
     
     /**
      * Deletes a Media object
      */
     static deleteMedia(req, res) {
-        let id = req.params.id;
+        ApiController.authenticate(req, res, () => {
+            let id = req.params.id;
 
-        MediaHelper.removeMedia(id)
-        .then(function() {
-            res.sendStatus(200);
+            MediaHelper.removeMedia(id)
+            .then(function() {
+                res.sendStatus(200);
+            });
         });
     }
 
@@ -112,37 +122,41 @@ class ApiController extends Controller {
      * Sets a Media object
      */
     static setMedia(req, res) {
-        let file = req.file;
-        let id = req.params.id;
+        ApiController.authenticate(req, res, () => {
+            let file = req.file;
+            let id = req.params.id;
 
-        if(file) {
-            MediaHelper.setMediaData(id, file)
-            .then(function() {
-                res.sendStatus(200);
-            });
-            
-        } else {
-            res.sendStatus(400);
-        }
+            if(file) {
+                MediaHelper.setMediaData(id, file)
+                .then(function() {
+                    res.sendStatus(200);
+                });
+                
+            } else {
+                res.sendStatus(400);
+            }
+        });
     }
 
     /**
      * Creates a Media object
      */
     static createMedia(req, res) {
-        let file = req.file;
+        ApiController.authenticate(req, res, () => {
+            let file = req.file;
 
-        if(file) {
-            let media = Media.create();
+            if(file) {
+                let media = Media.create();
 
-            MediaHelper.setMediaData(media.id)
-            .then(() => {
-                res.send(media.id);
-            });
+                MediaHelper.setMediaData(media.id)
+                .then(() => {
+                    res.send(media.id);
+                });
 
-        } else {
-            res.sendStatus(400);
-        }
+            } else {
+                res.sendStatus(400);
+            }
+        });
     }
 
     // ----------
@@ -152,9 +166,11 @@ class ApiController extends Controller {
      * Gets a list of all Content objects
      */
     static getAllContents(req, res) {
-        ContentHelper.getAllContents()
-        .then(function(nodes) {
-            res.send(nodes);
+        ApiController.authenticate(req, res, () => {
+            ContentHelper.getAllContents()
+            .then(function(nodes) {
+                res.send(nodes);
+            });
         });
     }
 
@@ -164,18 +180,20 @@ class ApiController extends Controller {
      * @return {Object} Content
      */
     static getContent(req, res) {
-        let id = req.params.id;
-   
-        if(id && id != 'undefined') {
-            ContentHelper.getContentById(id)
-            .then(function(node) {
-                res.send(node);
-            });
-        
-        } else {
-            throw '[Api] Content id is undefined';
-        
-        }
+        ApiController.authenticate(req, res, () => {
+            let id = req.params.id;
+       
+            if(id && id != 'undefined') {
+                ContentHelper.getContentById(id)
+                .then(function(node) {
+                    res.send(node);
+                });
+            
+            } else {
+                throw '[Api] Content id is undefined';
+            
+            }
+        });
     }
     
     /**
@@ -184,9 +202,11 @@ class ApiController extends Controller {
      * @return {Content} content
      */
     static createContent(req, res) {
-        ContentHelper.createContent()
-        .then(function(node) {
-            res.send(node);
+        ApiController.authenticate(req, res, () => {
+            ContentHelper.createContent()
+            .then(function(node) {
+                res.send(node);
+            });
         });
     }
 
@@ -194,12 +214,14 @@ class ApiController extends Controller {
      * Posts a Content object by id
      */
     static postContent(req, res) {
-        let id = req.params.id;
-        let node = req.body;
-        
-        ContentHelper.setContentById(id, node)
-        .then(function() {
-            res.sendStatus(200);
+        ApiController.authenticate(req, res, () => {
+            let id = req.params.id;
+            let node = req.body;
+            
+            ContentHelper.setContentById(id, node)
+            .then(function() {
+                res.sendStatus(200);
+            });
         });
     }
    
@@ -207,11 +229,13 @@ class ApiController extends Controller {
      * Publishes a Content node
      */
     static publishContent(req, res) {
-        let content = new Content(req.body);
+        ApiController.authenticate(req, res, () => {
+            let content = new Content(req.body);
 
-        ConnectionHelper.publishContent(node)
-        .then(function() {
-            res.sendStatus(200);
+            ConnectionHelper.publishContent(node)
+            .then(function() {
+                res.sendStatus(200);
+            });
         });
     }
 
@@ -219,11 +243,13 @@ class ApiController extends Controller {
      * Deletes a Content object by id
      */
     static deleteContent(req, res) {
-        let id = req.params.id;
-        
-        ContentHelper.removeContentById(id)
-        .then(function() {
-            res.sendStatus(200);
+        ApiController.authenticate(req, res, () => {
+            let id = req.params.id;
+            
+            ContentHelper.removeContentById(id)
+            .then(function() {
+                res.sendStatus(200);
+            });
         });
     }
     
@@ -234,9 +260,11 @@ class ApiController extends Controller {
      * Gets all connections
      */
     static getConnections(req, res) {
-        ConnectionHelper.getAllConnections()
-        .then(function(connections) {
-            res.send(connections);
+        ApiController.authenticate(req, res, () => {
+            ConnectionHelper.getAllConnections()
+            .then(function(connections) {
+                res.send(connections);
+            });
         });
     }
 
@@ -244,12 +272,14 @@ class ApiController extends Controller {
      * Post connection by id
      */
     static postConnection(req, res) {
-        let id = req.params.id;
-        let content = req.body;
+        ApiController.authenticate(req, res, () => {
+            let id = req.params.id;
+            let content = req.body;
 
-        ConnectionHelper.setConnectionById(id, content)
-        .then(function(connections) {
-            res.sendStatus(200);
+            ConnectionHelper.setConnectionById(id, content)
+            .then(function(connections) {
+                res.sendStatus(200);
+            });
         });
     }
     
@@ -257,18 +287,20 @@ class ApiController extends Controller {
      * Gets a connection by id
      */
     static getConnection(req, res) {
-        let id = req.params.id;
-   
-        if(id && id != 'undefined') {
-            ConnectionHelper.getConnectionById(id)
-            .then(function(node) {
-                res.send(node);
-            });
-        
-        } else {
-            throw '[Api] Connection id is undefined';
-        
-        }
+        ApiController.authenticate(req, res, () => {
+            let id = req.params.id;
+       
+            if(id && id != 'undefined') {
+                ConnectionHelper.getConnectionById(id)
+                .then(function(node) {
+                    res.send(node);
+                });
+            
+            } else {
+                throw '[Api] Connection id is undefined';
+            
+            }
+        });
     }
     
     /**
@@ -277,9 +309,11 @@ class ApiController extends Controller {
      * @return {Object} Content
      */
     static createConnection(req, res) {
-        ConnectionHelper.createConnection()
-        .then(function(node) {
-            res.send(node);
+        ApiController.authenticate(req, res, () => {
+            ConnectionHelper.createConnection()
+            .then(function(node) {
+                res.send(node);
+            });
         });
     }
 
@@ -287,11 +321,13 @@ class ApiController extends Controller {
      * Deletes a connection by id
      */
     static deleteConnection(req, res) {
-        let id = req.params.id;
-        
-        ConnectionHelper.removeConnectionById(id)
-        .then(function() {
-            res.sendStatus(200);
+        ApiController.authenticate(req, res, () => {
+            let id = req.params.id;
+            
+            ConnectionHelper.removeConnectionById(id)
+            .then(function() {
+                res.sendStatus(200);
+            });
         });
     }
     
@@ -302,9 +338,11 @@ class ApiController extends Controller {
      * Get a list of all schema objects
      */
     static getSchemas(req, res) {
-        SchemaHelper.getAllSchemas()
-        .then(function(schemas) {
-            res.send(schemas);
+        ApiController.authenticate(req, res, () => {
+            SchemaHelper.getAllSchemas()
+            .then(function(schemas) {
+                res.send(schemas);
+            });
         });
     }
     
@@ -312,11 +350,13 @@ class ApiController extends Controller {
      * Get a content schema object by id
      */
     static getSchema(req, res) {
-        let id = req.params.id;
+        ApiController.authenticate(req, res, () => {
+            let id = req.params.id;
 
-        SchemaHelper.getSchema(id)
-        .then(function(schema) {
-            res.send(schema);
+            SchemaHelper.getSchema(id)
+            .then(function(schema) {
+                res.send(schema);
+            });
         });
     }
     
@@ -324,12 +364,14 @@ class ApiController extends Controller {
      * Set a content schema object by id
      */
     static setSchema(req, res) {
-        let id = req.params.id;
-        let schema = req.body;
+        ApiController.authenticate(req, res, () => {
+            let id = req.params.id;
+            let schema = req.body;
 
-        SchemaHelper.setSchema(id, schema)
-        .then(function() {
-            res.sendStatus(200);
+            SchemaHelper.setSchema(id, schema)
+            .then(function() {
+                res.sendStatus(200);
+            });
         });
     }
     
@@ -340,9 +382,11 @@ class ApiController extends Controller {
      * Get settings object
      */
     static getSettings(req, res) {
-        SettingsHelper.getSettings()
-        .then(function(settings) {
-            res.send(settings);
+        ApiController.authenticate(req, res, () => {
+            SettingsHelper.getSettings()
+            .then(function(settings) {
+                res.send(settings);
+            });
         });
     }
     
@@ -350,22 +394,97 @@ class ApiController extends Controller {
      * Set settings object
      */
     static setSettings(req, res) {
-        let settings = req.body;
+        ApiController.authenticate(req, res, () => {
+            let settings = req.body;
 
-        SettingsHelper.setSettings(settings)
-        .then(function() {
-            res.sendStatus(200);
+            SettingsHelper.setSettings(settings)
+            .then(function() {
+                res.sendStatus(200);
+            });
         });
     }
 
     // ----------
-    // Tenplates
+    // Admin
+    // ----------
+    /**
+     * Authenticates an API call
+     */
+    static authenticate(req, res, onSuccess) {
+        let token = req.query.token;
+
+        AdminHelper.findToken(token)
+        .then((foundToken) => {
+            if(foundToken) {
+                onSuccess(req, res);
+            } else {
+                res.sendStatus(403);
+            }
+        });
+    }
+
+    /** 
+     * Logs in an admin
+     */
+    static login(req, res) {
+        let username = req.body.username;
+        let password = req.body.password;
+
+        AdminHelper.findAdmin(username)
+        .then((admin) => {
+            if(admin.validatePassword(password)) {
+                let token = admin.generateToken();
+                
+                AdminHelper.updateAdmin(username, admin.getFields())
+                .then(() => {
+                    res.send(token);
+                });
+            } else {
+                res.sendStatus(403);
+            }
+        });
+    }
+
+    /**
+     * Updates an admin
+     */
+    static postAdmin(req, res) {
+        ApiController.authenticate(req, res, () => {
+            let username = req.params.username;
+            let admin = req.body;
+
+            AdminHelper.updateAdmin(username, admin)
+            .then(() => {
+                res.sendStatus(200);
+            });
+        });
+    }
+    
+    /**
+     * Creates an admin
+     */
+    static createAdmin(req, res) {
+        ApiController.authenticate(req, res, () => {
+            let username = req.body.username;
+            let password = req.body.password;
+
+            AdminHelper.createAdmin(username, password)
+            .then(() => {
+                res.sendStatus(200);
+            });
+        });
+    }
+
+    // ----------
+    // Templates
     // ----------
     static getTemplates(req, res) {
-        res.send([
-            'one.html',
-            'two.html'
-        ]);
+        ApiController.authenticate(req, res, () => {
+            res.send([
+                'one.html',
+                'two.html'
+            ]);
+        });
     }
 
     // ----------

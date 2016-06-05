@@ -33,7 +33,7 @@ class ContentEditor extends View {
         function publishConnections() {
             $.ajax({
                 type: 'post',
-                url: '/api/content/publish',
+                url: '/api/content/publish?token=' + localStorage.getItem('token'),
                 data: view.model,
                 success: onSuccess,
                 error: onError
@@ -119,7 +119,7 @@ class ContentEditor extends View {
                     class: 'btn-danger',
                     callback: function() {
                         $.ajax({
-                            url: '/api/content/' + view.model.id,
+                            url: '/api/content/' + view.model.id + '?token=' + localStorage.getItem('token'),
                             type: 'DELETE',
                             success: onSuccess
                         });

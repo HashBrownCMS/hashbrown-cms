@@ -18,7 +18,7 @@ class TemplateReferenceEditor extends View {
 
         this.$element = _.div({class: 'field-editor template-reference-editor'});
 
-        $.getJSON('/api/templates/', function(templates) {
+        $.getJSON('/api/templates?token=' + localStorage.getItem('token'), function(templates) {
             editor.$select = _.select({class: 'form-control'},
                 _.each(templates, function(i, template) {
                     return _.option({

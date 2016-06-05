@@ -75,10 +75,17 @@ window.getSchemaWithParents = function getSchemaWithParents(id) {
  */
 window.reloadResource = function reloadResource(name) {
     return new Promise(function(callback) {
-        $.getJSON('/api/' + name, function(result) {
-            window.resources[name] = result;
+        $.ajax({
+            type: 'GET',
+            url: '/api/' + name + '?token=' + localStorage.getItem('token'),
+            success: function(result) {
+                window.resources[name] = result;
 
-            callback(result);
+                callback(result);
+            },
+            error: function() {
+                location = '/login/';
+            }
         });
     });
 };

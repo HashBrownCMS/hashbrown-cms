@@ -1,11 +1,16 @@
 html
-  body
-    form(action='/login', method='post')
-      div
-        label Username:
-        input(type='text', name='username')
-      div
-        label Password:
-        input(type='password', name='password')
-      div
-        input(type='submit', value='Log In')
+    head
+    body
+        .form
+            div
+                label Username:
+                input(type='text', name='username')
+            div
+                label Password:
+                input(type='password', name='password')
+            div
+                button
+                    | Log In
+    
+        script(src='/lib/jquery/jquery.min.js')
+        script(src='/js/login.js')
