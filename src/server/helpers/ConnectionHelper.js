@@ -29,8 +29,8 @@ class ConnectionHelper {
      */
     static initConnection(data) {
         let constructor = ConnectionHelper.connectionTypes[data.type];
-            
-        if(constructor) {
+           
+        if(typeof constructor === 'function') {
             return new constructor(data);
         } else {
             return new Connection(data);

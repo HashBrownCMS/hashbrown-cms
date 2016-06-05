@@ -26,12 +26,12 @@ class LanguageHelper {
         return new Promise((callback) => {
             LanguageHelper.getLanguages()
             .then((languages) => {
-                let sets = [];
+                let sets = {};
 
                 for(let language of languages) {
                     let properties = content.getProperties(language);
-                
-                    sets.push(properties);
+                    
+                    sets[language] = properties;
                 }
 
                 callback(sets);

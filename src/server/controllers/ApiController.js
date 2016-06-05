@@ -25,6 +25,7 @@ let uploadMedia = multer({
 
 // Models
 let Media = require('../../common/models/Media');
+let Content = require('../../common/models/Content');
 
 // Classes
 let Controller = require('./Controller');
@@ -51,8 +52,8 @@ class ApiController extends Controller {
         app.get('/api/content', ApiController.getAllContents);
         app.get('/api/content/:id', ApiController.getContent);
         app.post('/api/content/new', ApiController.createContent);
-        app.post('/api/content/:id', ApiController.postContent);
         app.post('/api/content/publish', ApiController.publishContent);
+        app.post('/api/content/:id', ApiController.postContent);
         app.delete('/api/content/:id', ApiController.deleteContent);
 
         // Schemas
@@ -232,7 +233,9 @@ class ApiController extends Controller {
         ApiController.authenticate(req, res, () => {
             let content = new Content(req.body);
 
-            ConnectionHelper.publishContent(node)
+            console.log('[ApiController] Publishing content "' + content.id + '"...');
+
+            ConnectionHelper.publishContent(content)
             .then(function() {
                 res.sendStatus(200);
             });
