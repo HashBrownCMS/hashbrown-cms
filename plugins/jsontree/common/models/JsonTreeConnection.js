@@ -23,7 +23,10 @@ class JsonTreeConnection extends Connection {
         let path = appRoot + '/public/json';
         
         if(!fs.existsSync(path + '/tree.json')){
-            fs.mkdirSync(path);
+            if(!fs.existsSynd(path)) {
+                fs.mkdirSync(path);
+            }
+            
             fs.writeFileSync(path + '/tree.json', '{}');
         }
     }
@@ -58,7 +61,7 @@ class JsonTreeConnection extends Connection {
         return new Promise((callback) => {
             this.ensureLocation();
 
-            fs.writeFile(appRoot + '/public/json/tree.json', JSON.stringify(json), (err, data) => {
+            fs.writeFile(appRoot + '/public/json/tree.json', JSON.stringify(json, null, 4), (err, data) => {
                 if(err) {
                     throw err;
                 }

@@ -417,7 +417,9 @@ class MongoDB {
     static getSettings(section) {
         return MongoDB.findOne(
             'settings',
-            { section: section }
+            {
+                section: section
+            }
         );
     }
     
@@ -432,7 +434,9 @@ class MongoDB {
     static setSettings(section, settings) {
         return MongoDB.updateOne(
             'settings',
-            { section: section },
+            { 
+                section: section
+            },
             settings,
             {
                 upsert: true

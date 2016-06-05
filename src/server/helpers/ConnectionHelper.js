@@ -56,7 +56,7 @@ class ConnectionHelper {
                     function nextConnection(i) {
                         ConnectionHelper.getConnectionById(settings.connections[i])
                         .then((connection) => {
-                            console.log(' -> Publishing through connection "' + settings.connections[i] + '" of type "' + connection.type + '"...');
+                            console.log('[ConnectionHelper] Publishing through connection "' + settings.connections[i] + '" of type "' + connection.type + '"...');
 
                             connection.publishContent(content)
                             .then(() => {

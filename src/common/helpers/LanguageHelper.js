@@ -1,5 +1,7 @@
 'use strict';
 
+let SettingsHelper = require('./SettingsHelper');
+
 class LanguageHelper {
     /**
      * Gets all languages
@@ -12,7 +14,6 @@ class LanguageHelper {
 
     /**
      * Gets all selected languages
-     * TODO: Fetch from backend
      *
      * @returns {String[]} languages
      */
@@ -23,7 +24,9 @@ class LanguageHelper {
                 if(!settings.selected || settings.selected.length < 1) {
                     settings.selected = ['en'];
                 }
-            
+          
+                settings.selected.sort();
+
                 callback(settings.selected);
             });  
         });
