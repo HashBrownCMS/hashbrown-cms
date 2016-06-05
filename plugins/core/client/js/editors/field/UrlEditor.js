@@ -77,7 +77,13 @@ class UrlEditor extends View {
         url += '/';
 
         for(let node of nodes) {
-            let title = (node.title && node.title[window.language] ? node.title[window.language] : null) || node.title;
+            let title = '';
+            
+            if(typeof node.title === 'string') {
+                title = node.title;
+            } else if(node.properties && node.properties.title && node.properties.title[window.language]) {
+                title = node.properties.title[window.language];
+            }
 
             url += UrlEditor.getSlug(title) + '/';
         }

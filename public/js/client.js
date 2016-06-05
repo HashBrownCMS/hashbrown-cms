@@ -4459,54 +4459,7 @@ var $languageOptions=_.ul({class:'dropdown-menu'});var $languagePicker=_.div({cl
 LanguageHelper.getLanguages().then(function(languages){$languageOptions.html(_.each(languages.filter(function(language){return language!=window.language;}),function(i,language){return _.li({value:language},_.a({href:'#'},language).click(view.onChangeLanguage));}));}); // Render editor
 var contentProperties=content.properties;return _.div({class:'object'},$languagePicker,_.ul({class:'nav nav-tabs'},_.each(schema.tabs,function(tabId,tab){return _.li({class:tabId==schema.defaultTabId?'active':''},_.a({'data-toggle':'tab',href:'#tab-'+tabId},tab));}),_.li({class:'meta'==schema.defaultTabId?'active':''},_.a({'data-toggle':'tab',href:'#tab-meta'},'meta'))),_.div({class:'tab-content'}, // Render content properties
 _.each(schema.tabs,function(tabId,tab){return _.div({id:'tab-'+tabId,class:'tab-pane'+(tabId==schema.defaultTabId?' active':'')},_this6.renderFields(tabId,schema.fields.properties,content.properties));}), // Render meta properties
-_.div({id:'tab-meta',class:'tab-pane'+('meta'==schema.defaultTabId?' active':'')},this.renderFields('meta',schema.fields,content)) /*_.each(schema.tabs, function(id, tab) {
-                    let schemaProperties = {};
-                   
-                    for(let alias in schema.fields) {
-                        let property = schema.fields[alias];
-
-                        let noTabAssigned = !property.tabId;
-                        let isMetaTab = tab == 'Meta';
-                        let thisTabAssigned = property.tabId == id;
-
-                        if((noTabAssigned && isMetaTab) || thisTabAssigned) {
-                            schemaProperties[alias] = property;
-                        }
-                    }
-
-                    return _.div({id: 'tab-' + id, class: 'tab-pane' + (id == schema.defaultTabId ? ' active' : '')}, 
-                        _.each(schemaProperties, function(key, value) {
-                            if(value.multilingual && typeof contentProperties[key] !== 'object') {
-                                contentProperties[key] = {};
-                            }
-
-                            return _.div({class: 'field-container'},
-                                _.div({class: 'field-icon'},
-                                    _.span({class: 'fa fa-' + value.icon})
-                                ),
-                                _.div({class: 'field-key'},
-                                    value.label || key
-                                ),
-                                _.div({class: 'field-value'},
-                                    view.renderFieldView(
-                                        value.multilingual ? contentProperties[key][window.language] : contentProperties[key],
-                                        schema.fields[key],
-                                        function(newValue) {
-                                            if(value.multilingual) {
-                                                contentProperties[key][window.language] = newValue;
-
-                                            } else {
-                                                contentProperties[key] = newValue;
-                                            }
-                                        },
-                                        value.config,
-                                        value.multilingual
-                                    )
-                                )
-                            );
-                        })
-                    );
-                })*/));}},{key:"render",value:function render(){var view=this;var contentSchema=getSchemaWithParents(this.model.schemaId);if(contentSchema){var content=new Content(this.model);content.getSettings('publishing').then(function(publishing){view.$element.html([view.renderEditor(view.model,contentSchema).append(_.div({class:'panel panel-default panel-buttons'},_.div({class:'btn-group'},_.button({class:'btn btn-embedded'},'Advanced').click(function(){view.onClickAdvanced();}),_.button({class:'btn btn-danger btn-raised'},'Delete').click(function(){view.onClickDelete();}),view.$saveBtn=_.button({class:'btn btn-success btn-raised btn-save'},_.span({class:'text-default'},'Save'+(publishing.connections&&publishing.connections.length>0?' & publish':'')),_.span({class:'text-saving'},'Saving')).click(function(){view.onClickSave(publishing);}))))]);});this.onFieldEditorsReady();}}}]);return ContentEditor;}(View);module.exports=ContentEditor;},{"../../../common/helpers/LanguageHelper":191,"./MessageModal":188}],186:[function(require,module,exports){'use strict'; // Lib
+_.div({id:'tab-meta',class:'tab-pane'+('meta'==schema.defaultTabId?' active':'')},this.renderFields('meta',schema.fields,content))));}},{key:"render",value:function render(){var view=this;var contentSchema=getSchemaWithParents(this.model.schemaId);if(contentSchema){var content=new Content(this.model);content.getSettings('publishing').then(function(publishing){view.$element.html([view.renderEditor(view.model,contentSchema).append(_.div({class:'panel panel-default panel-buttons'},_.div({class:'btn-group'},_.button({class:'btn btn-embedded'},'Advanced').click(function(){view.onClickAdvanced();}),_.button({class:'btn btn-danger btn-raised'},'Delete').click(function(){view.onClickDelete();}),view.$saveBtn=_.button({class:'btn btn-success btn-raised btn-save'},_.span({class:'text-default'},'Save'+(publishing.connections&&publishing.connections.length>0?' & publish':'')),_.span({class:'text-saving'},'Saving')).click(function(){view.onClickSave(publishing);}))))]);});this.onFieldEditorsReady();}}}]);return ContentEditor;}(View);module.exports=ContentEditor;},{"../../../common/helpers/LanguageHelper":191,"./MessageModal":188}],186:[function(require,module,exports){'use strict'; // Lib
 var beautify=require('js-beautify').js_beautify; // Views
 var MessageModal=require('./MessageModal'); /**
  * A basic JSON editor for any object

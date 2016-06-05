@@ -332,55 +332,6 @@ class ContentEditor extends View {
                 _.div({id: 'tab-meta', class: 'tab-pane' + ('meta' == schema.defaultTabId ? ' active' : '')},
                     this.renderFields('meta', schema.fields, content)
                 )
-
-                /*_.each(schema.tabs, function(id, tab) {
-                    let schemaProperties = {};
-                   
-                    for(let alias in schema.fields) {
-                        let property = schema.fields[alias];
-
-                        let noTabAssigned = !property.tabId;
-                        let isMetaTab = tab == 'Meta';
-                        let thisTabAssigned = property.tabId == id;
-
-                        if((noTabAssigned && isMetaTab) || thisTabAssigned) {
-                            schemaProperties[alias] = property;
-                        }
-                    }
-
-                    return _.div({id: 'tab-' + id, class: 'tab-pane' + (id == schema.defaultTabId ? ' active' : '')}, 
-                        _.each(schemaProperties, function(key, value) {
-                            if(value.multilingual && typeof contentProperties[key] !== 'object') {
-                                contentProperties[key] = {};
-                            }
-
-                            return _.div({class: 'field-container'},
-                                _.div({class: 'field-icon'},
-                                    _.span({class: 'fa fa-' + value.icon})
-                                ),
-                                _.div({class: 'field-key'},
-                                    value.label || key
-                                ),
-                                _.div({class: 'field-value'},
-                                    view.renderFieldView(
-                                        value.multilingual ? contentProperties[key][window.language] : contentProperties[key],
-                                        schema.fields[key],
-                                        function(newValue) {
-                                            if(value.multilingual) {
-                                                contentProperties[key][window.language] = newValue;
-
-                                            } else {
-                                                contentProperties[key] = newValue;
-                                            }
-                                        },
-                                        value.config,
-                                        value.multilingual
-                                    )
-                                )
-                            );
-                        })
-                    );
-                })*/
             )
         );
     }
