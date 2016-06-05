@@ -70,7 +70,7 @@ class ContentEditor extends View {
             url: view.modelUrl,
             data: view.model,
             success:
-                publishing.connections.length > 0 ?
+                publishing.connections && publishing.connections.length > 0 ?
                 publishConnections :
                 onSuccess,
             error: onError
@@ -105,7 +105,7 @@ class ContentEditor extends View {
         new MessageModal({
             model: {
                 title: 'Delete content',
-                body: 'Are you sure you want to delete the content "' + view.model.title + '"?'
+                body: 'Are you sure you want to delete the content "' + view.model.prop('title', window.language) + '"?'
             },
             buttons: [
                 {
@@ -209,16 +209,73 @@ class ContentEditor extends View {
     }
 
     /**
-     * Renders a Content object
+     * Renders fields
+     */
+    renderFields(tabId, schema, fields) {
+        let schemaFields = {};
+       
+        // Map out fields to render
+        for(let alias in schema) {
+            let property = schema[alias];
+
+            let noTabAssigned = !property.tabId;
+            let isMetaTab = tabId == 'meta';
+            let thisTabAssigned = property.tabId == tabId;
+
+            // Don't include "properties" field, if this is the meta tab
+            if(isMetaTab && alias == 'properties') {
+                continue;
+            }
+
+            if((noTabAssigned && isMetaTab) || thisTabAssigned) {
+                schemaFields[alias] = property;
+            }
+        }
+
+        return _.each(schemaFields, (key, value) => {
+            if(value.multilingual && typeof fields[key] !== 'object') {
+                fields[key] = {};
+            }
+
+            return _.div({class: 'field-container'},
+                _.div({class: 'field-icon'},
+                    _.span({class: 'fa fa-' + value.icon})
+                ),
+                _.div({class: 'field-key'},
+                    value.label || key
+                ),
+                _.div({class: 'field-value'},
+                    this.renderFieldView(
+                        value.multilingual ? fields[key][window.language] : fields[key],
+                        schema[key],
+                        function(newValue) {
+                            if(value.multilingual) {
+                                fields[key][window.language] = newValue;
+
+                            } else {
+                                fields[key] = newValue;
+                            }
+                        },
+                        value.config,
+                        value.multilingual
+                    )
+                )
+            );
+        });
+    }
+
+    /**
+     * Renders the editor
      *
-     * @param {Object} contentProperties
+     * @param {Content} content
      * @param {Object} schema
      *
      * @return {Object} element
      */
-    renderContentObject(contentProperties, schema) {
+    renderEditor(content, schema) {
         let view = this;
 
+        // Render language picker
         let $languageOptions = _.ul({class: 'dropdown-menu'});
         let $languagePicker = _.div({class: 'language-picker dropdown'},
             _.button({class: 'btn btn-default dropdown-toggle', 'data-toggle': 'dropdown'},
@@ -227,6 +284,7 @@ class ContentEditor extends View {
             $languageOptions
         );
 
+        // Populate picker with language options
         LanguageHelper.getLanguages()
         .then((languages) => {
             $languageOptions.html(
@@ -243,23 +301,43 @@ class ContentEditor extends View {
             );
         });
 
+        // Render editor
+        let contentProperties = content.properties;
+        
         return _.div({class: 'object'},
             $languagePicker,
             _.ul({class: 'nav nav-tabs'}, 
-                _.each(schema.tabs, function(id, tab) {
-                    return _.li({class: id == schema.defaultTabId ? 'active' : ''}, 
-                        _.a({'data-toggle': 'tab', href: '#tab-' + id},
+                _.each(schema.tabs, (tabId, tab) => {
+                    return _.li({class: tabId == schema.defaultTabId ? 'active' : ''}, 
+                        _.a({'data-toggle': 'tab', href: '#tab-' + tabId},
                             tab
                         )
                     );
-                })
+                }),
+                _.li({class: 'meta' == schema.defaultTabId ? 'active' : ''}, 
+                    _.a({'data-toggle': 'tab', href: '#tab-meta'},
+                        'meta'
+                    )
+                )
             ),
             _.div({class: 'tab-content'},
-                _.each(schema.tabs, function(id, tab) {
+                // Render content properties
+                _.each(schema.tabs, (tabId, tab) => {
+                    return _.div({id: 'tab-' + tabId, class: 'tab-pane' + (tabId == schema.defaultTabId ? ' active' : '')},
+                        this.renderFields(tabId, schema.fields.properties, content.properties)
+                    );
+                }),
+
+                // Render meta properties
+                _.div({id: 'tab-meta', class: 'tab-pane' + ('meta' == schema.defaultTabId ? ' active' : '')},
+                    this.renderFields('meta', schema.fields, content)
+                )
+
+                /*_.each(schema.tabs, function(id, tab) {
                     let schemaProperties = {};
                    
-                    for(let alias in schema.properties) {
-                        let property = schema.properties[alias];
+                    for(let alias in schema.fields) {
+                        let property = schema.fields[alias];
 
                         let noTabAssigned = !property.tabId;
                         let isMetaTab = tab == 'Meta';
@@ -286,7 +364,7 @@ class ContentEditor extends View {
                                 _.div({class: 'field-value'},
                                     view.renderFieldView(
                                         value.multilingual ? contentProperties[key][window.language] : contentProperties[key],
-                                        schema.properties[key],
+                                        schema.fields[key],
                                         function(newValue) {
                                             if(value.multilingual) {
                                                 contentProperties[key][window.language] = newValue;
@@ -302,7 +380,7 @@ class ContentEditor extends View {
                             );
                         })
                     );
-                })
+                })*/
             )
         );
     }
@@ -318,7 +396,7 @@ class ContentEditor extends View {
             content.getSettings('publishing')
             .then((publishing) => {
                 view.$element.html([
-                    view.renderContentObject(view.model, contentSchema).append(
+                    view.renderEditor(view.model, contentSchema).append(
                         _.div({class: 'panel panel-default panel-buttons'}, 
                             _.div({class: 'btn-group'},
                                 _.button({class: 'btn btn-embedded'},
@@ -328,7 +406,7 @@ class ContentEditor extends View {
                                     'Delete'
                                 ).click(function() { view.onClickDelete(); }),
                                 view.$saveBtn = _.button({class: 'btn btn-success btn-raised btn-save'},
-                                    _.span({class: 'text-default'}, 'Save' + (publishing.connections.length > 0 ? ' & publish' : '')),
+                                    _.span({class: 'text-default'}, 'Save' + (publishing.connections && publishing.connections.length > 0 ? ' & publish' : '')),
                                     _.span({class: 'text-saving'}, 'Saving')
                                 ).click(function() { view.onClickSave(publishing); })
                             )

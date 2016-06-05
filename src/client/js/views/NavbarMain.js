@@ -117,16 +117,16 @@ class NavbarMain extends View {
                             
                             publishing.applyToChildren = $('#switch-publishing-apply-to-children')[0].checked;
 
-                            content.properties.settings.publishing = publishing;
+                            content.settings.publishing = publishing;
                         }
                         
                         // Save model
                         $.ajax({
                             type: 'post',
-                            url: '/api/content/' + content.properties.id,
-                            data: content.properties,
+                            url: '/api/content/' + content.id,
+                            data: content,
                             success: function() {
-                                console.log('[ContentEditor] Saved model to /api/content/' + content.properties.id);
+                                console.log('[ContentEditor] Saved model to /api/content/' + content.id);
                             },
                             error: function(err) {
                                 new MessageModal({
@@ -145,7 +145,7 @@ class NavbarMain extends View {
                         _.h5('Publishing'),
                         function() {
                             if(publishing.governedBy) {
-                                return _.p('(Settings inherited from <a href="#/content/' + publishing.governedBy.properties.id + '">' + publishing.governedBy.prop('title', window.language) + '</a>)')
+                                return _.p('(Settings inherited from <a href="#/content/' + publishing.governedBy.id + '">' + publishing.governedBy.prop('title', window.language) + '</a>)')
                             } else {
                                 return [
                                     // Heading
@@ -523,7 +523,30 @@ class NavbarMain extends View {
         $pane.append(
             _.each(items, function(i, item) {
                 let id = item.id || i;
-                let name = (item.title && item.title[window.language] ? item.title[window.language] : null) || item.title || item.name || id;
+
+                // Get item name
+                let name = '';
+
+                if(item.properties && item.properties.title) {
+                    if(typeof item.properties.title === 'string') {
+                        name = item.properties.title;
+                    } else if(typeof item.properties.title === 'object' && item.properties.title[window.language]) {
+                        name = item.properties.title[window.language];
+                    } else {
+                        name = '(error)';
+                    }
+                
+                } else if(typeof item.title === 'string') {
+                    name = item.title;
+
+                } else if(typeof item.name === 'string') {
+                    name = item.name;
+
+                } else {
+                    name = id;
+
+                }
+
                 let routingPath = item.shortPath || item.path || id;
                 let queueItem = {};
                 let icon = item.icon;

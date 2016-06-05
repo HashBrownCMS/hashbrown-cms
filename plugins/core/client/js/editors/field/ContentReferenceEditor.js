@@ -21,7 +21,7 @@ class ContentReferenceEditor extends View {
                 _.each(window.resources.content, function(id, node) {
                     let content = new Content(node);
 
-                    return _.option({value: content.getPropertyValue('id')}, content.getPropertyValue('title', window.language));
+                    return _.option({value: content.getPropertyValue('id')}, content.prop('title', window.language));
                 })
             ).change(function() { editor.onChange(); }),
             _.div({class: 'input-group-btn'}, 

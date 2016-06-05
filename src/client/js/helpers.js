@@ -42,12 +42,18 @@ window.getSchemaWithParents = function getSchemaWithParents(id) {
         if(schema.parentSchemaId) {
             let parentSchema = window.getSchemaWithParents(schema.parentSchemaId);
 
-            for(let k in schema.properties) {
-               parentSchema.properties[k] = schema.properties[k];
+            for(let k in schema.fields) {
+               parentSchema.fields[k] = schema.fields[k];
             }
             
-            for(let k in schema.tabs) {
-               parentSchema.tabs[k] = schema.tabs[k];
+            if(!parentSchema.tabs) {
+                parentSchema.tabs = {};
+            }
+
+            if(schema.tabs) {
+                for(let k in schema.tabs) {
+                   parentSchema.tabs[k] = schema.tabs[k];
+                }
             }
 
             parentSchema.defaultTabId = schema.defaultTabId;

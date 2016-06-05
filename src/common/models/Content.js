@@ -4,52 +4,52 @@ let crypto = require('crypto');
 
 let Promise = require('bluebird');
 let ContentHelper = require('../../server/helpers/ContentHelper');
+
+let Entity = require('./Entity');
 let Connection = require('./Connection');
-let Validator = require('jsonschema').Validator;
 
 /**
  * The base class for all Content types
  */
-class Content {
+class Content extends Entity {
     constructor(properties) {
-        this.properties = properties;
-    
-        this.sanityCheck();
+        super(properties);
     }
 
-    /**
-     * Performs a sanity check on the model data
-     */
-    sanityCheck() {
-        if(!this.properties.settings) {
-            this.properties.settings = {};
-        }
-        
-        if(!this.properties.settings.publishing) {
-            this.properties.settings.publishing = {};
-        }
-        
-        if(!this.properties.settings.publishing.connections) {        
-            this.properties.settings.publishing.connections = [];
-        }
+    structure() {
+        // Fundamental fields
+        this.id = '';
+        this.parentId = '';
+        this.createDate = Date.now();
+        this.updateDate = Date.now();
+        this.schemaId = '';
+
+        // Extensible properties
+        this.properties = {};
+
+        // Settings
+        this.settings = {
+            publishing: {
+                connections: []
+            }
+        }  
     }
 
     /**
      * Creates a new Content object
      *
-     * @param {Object} data
+     * @param {Object} properties
      *
      * @returns {Object} content
      */
-    static create(data, language) {
-        let content = new Content(data || {});
-        
-        content.properties.id = crypto.randomBytes(20).toString('hex');
-        content.properties.createDate = Date.now();
-        content.properties.updateDate = Date.now();
-        content.properties.schemaId = content.properties.schemaId || 'contentBase';
-
-        content.properties.title = 'New content';
+    static create(properties) {
+        let content = new Content({
+            id: crypto.randomBytes(20).toString('hex'),
+            createDate: Date.now(),
+            updateDate: Date.now(),
+            schemaId: 'contentBase',
+            properties: properties
+        });
 
         return content;
     }
@@ -97,14 +97,14 @@ class Content {
             let parents = [];
 
             function iterate(content) {
-                if(content.properties.parentId) {
-                    Content.find(content.properties.parentId)
+                if(content.parentId) {
+                    Content.find(content.parentId)
                     .then((parentContent) => {
                         if(parentContent) {
                             parents.push(parentContent);
                             iterate(parentContent);
                         } else {
-                            console.log('[Content] Parent content with id "' + content.properties.parentId + '" was not found');
+                            console.log('[Content] Parent content with id "' + content.parentId + '" was not found');
 
                             callback(parents);
                         }
@@ -135,11 +135,11 @@ class Content {
             .then((parents) => {
                 for(let parentContent of parents) {
                     if(
-                        parentContent.properties.settings &&
-                        parentContent.properties.settings[key] &&
-                        parentContent.properties.settings[key].applyToChildren
+                        parentContent.settings &&
+                        parentContent.settings[key] &&
+                        parentContent.settings[key].applyToChildren
                     ) {
-                        let settings = parentContent.properties.settings[key];
+                        let settings = parentContent.settings[key];
                         settings.governedBy = parentContent;
 
                         callback(settings);
@@ -148,15 +148,15 @@ class Content {
                 }
 
                 // No parent nodes with governing settings found, return own settings
-                if(!model.properties.settings) {
-                    model.properties.settings = {};
+                if(!model.settings) {
+                    model.settings = {};
                 }
 
-                if(!model.properties.settings[key]) {
-                    model.properties.settings[key] = {};
+                if(!model.settings[key]) {
+                    model.settings[key] = {};
                 }
 
-                callback(model.properties.settings[key]);
+                callback(model.settings[key]);
             });
         });
     }
@@ -227,7 +227,7 @@ class Content {
 
         return new Promise(function(callback) {
             if(!view.schemaCache) {
-                ContentHelper.getSchema(view.getType(), model.properties.schemaId)
+                ContentHelper.getSchema(view.getType(), model.schemaId)
                 .then(function(schema) {
                     model.schemaCache = schema;
 
@@ -251,24 +251,6 @@ class Content {
         // Get the state
         return unpublishDateIsNull || unpublishDateHasPassed;
     }
-
-    /**
-     * Validates the model based on the schema
-     *
-     * @returns {Promise} promise
-     */
-    validateModel() {
-        return new Promise(function(callback) {
-            this.getSchema()
-            .then(function(schema) {
-                let validator = new Validator();
-
-                let result = validator.validate(this.properties, schema);
-
-                console.log(result);
-            });
-        });
-    }    
 }
 
 module.exports = Content;
