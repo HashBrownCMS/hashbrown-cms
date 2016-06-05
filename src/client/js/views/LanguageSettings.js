@@ -1,10 +1,30 @@
 'use strict';
 
+/**
+ * The language settings editor
+ *
+ * @class View LanguageSettings
+ */
 class LanguageSettings extends View {
     constructor(params) {
         super(params);
 
         this.fetch();
+    }
+
+    /**
+     * Event: Flipped a switch
+     *
+     * @param {Object} element
+     */
+    onClickSwitch(element) {
+        let checked = this.checked;
+        let language = this.getAttribute('data-language');
+            
+        LanguageHelper.toggleLanguage(language, checked)
+        .then(() => {
+            console.log('[LanguageSettings] Language "' + language + '" set to ' + checked);
+        });
     }
 
     render() {
@@ -20,10 +40,11 @@ class LanguageSettings extends View {
                             _.div({class: 'switch'},
                                 _.input({
                                     id: 'switch-' + language,
+                                    'data-language': language,
                                     class: 'form-control switch',
                                     type: 'checkbox',
                                     checked: selectedLanguages.indexOf(language) > -1
-                                }),
+                                }).change(this.onClickSwitch),
                                 _.label({for: 'switch-' + language})
                             )
                         )

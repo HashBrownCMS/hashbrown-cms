@@ -18,9 +18,47 @@ class LanguageHelper {
      */
     static getSelectedLanguages() {
         return new Promise((callback) => {
-            let languages = ['en', 'da'];
+            SettingsHelper.getSettings('language')
+            .then((settings) => {
+                if(!settings.selected || settings.selected.length < 1) {
+                    settings.selected = ['en'];
+                }
+            
+                callback(settings.selected);
+            });  
+        });
+    }
 
-            callback(languages);        
+    /**
+     * Toggle a language
+     *
+     * @param {String} language
+     * @param {Boolean} state
+     *
+     * @returns {Promise} promise
+     */
+    static toggleLanguage(language, state) {
+        return new Promise((callback) => {
+            SettingsHelper.getSettings('language')
+            .then((settings) => {
+                if(!settings.selected || settings.selected.length < 1) {
+                    settings.selected = ['en'];
+                }
+            
+                if(!state && settings.selected.indexOf(language) > -1) {
+                    settings.selected.splice(settings.selected.indexOf(language), 1);
+
+                } else if(state && settings.selected.indexOf(language) < 0) {
+                    settings.selected.push(language);
+                    settings.selected.sort();
+
+                }
+
+                SettingsHelper.setSettings('language', settings)
+                .then(() => {
+                    callback()
+                });
+            });  
         });
     }
 
@@ -34,7 +72,7 @@ class LanguageHelper {
      */
     static getAllLocalizedPropertySets(content) {
         return new Promise((callback) => {
-            LanguageHelper.getLanguages()
+            LanguageHelper.getSelectedLanguages()
             .then((languages) => {
                 let sets = {};
 

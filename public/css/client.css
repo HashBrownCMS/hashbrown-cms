@@ -619,3 +619,6 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%); }
+
+.language-settings .input-group {
+  width: 100px; }

@@ -37,7 +37,7 @@ let ViewHelper = require('../helpers/ViewHelper');
 let PluginHelper = require('../helpers/PluginHelper');
 let MediaHelper = require('../helpers/MediaHelper');
 let ConnectionHelper = require('../helpers/ConnectionHelper');
-let SettingsHelper = require('../helpers/SettingsHelper');
+let SettingsHelper = require('../../common/helpers/SettingsHelper');
 let AdminHelper = require('../helpers/AdminHelper');
 
 /**
@@ -75,8 +75,8 @@ class ApiController extends Controller {
         app.delete('/api/connections/:id', ApiController.deleteConnection);
             
         // Settings
-        app.get('/api/settings', ApiController.getSettings);
-        app.post('/api/settings', ApiController.setSettings);
+        app.get('/api/settings/:section', ApiController.getSettings);
+        app.post('/api/settings/:section', ApiController.setSettings);
 
         // Admin
         app.post('/api/admin/login', ApiController.login);
@@ -386,7 +386,7 @@ class ApiController extends Controller {
      */
     static getSettings(req, res) {
         ApiController.authenticate(req, res, () => {
-            SettingsHelper.getSettings()
+            SettingsHelper.getSettings(req.params.section)
             .then(function(settings) {
                 res.send(settings);
             });
@@ -400,7 +400,7 @@ class ApiController extends Controller {
         ApiController.authenticate(req, res, () => {
             let settings = req.body;
 
-            SettingsHelper.setSettings(settings)
+            SettingsHelper.setSettings(req.params.section, settings)
             .then(function() {
                 res.sendStatus(200);
             });

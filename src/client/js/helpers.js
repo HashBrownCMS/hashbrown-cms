@@ -18,6 +18,7 @@ window.Content = require('../../common/models/Content');
 
 // Helpers
 window.LanguageHelper = require('../../common/helpers/LanguageHelper')
+window.SettingsHelper = require('../../common/helpers/SettingsHelper')
 
 let onReadyCallbacks = {};
 let isReady = {};
@@ -96,8 +97,10 @@ window.reloadResource = function reloadResource(name) {
 
                 callback(result);
             },
-            error: function() {
-                location = '/login/';
+            error: function(e) {
+                if(e.status == 403) {
+                    location = '/login/';
+                }
             }
         });
     });
@@ -108,7 +111,7 @@ window.reloadResource = function reloadResource(name) {
  */
 window.reloadAllResources = function reloadAllResources() {
     return new Promise(function(callback) {
-        let queue = ['content', 'schemas', 'media', 'connections', 'settings'];
+        let queue = ['content', 'schemas', 'media', 'connections'];
 
         function processQueue(name) {
             window.reloadResource(name)

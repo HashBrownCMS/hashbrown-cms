@@ -14,7 +14,7 @@ let config = require('./config.json');
 // Helpers
 let ContentHelper = require(appRoot + '/src/server/helpers/ContentHelper');
 let ConnectionHelper = require(appRoot + '/src/server/helpers/ConnectionHelper');
-let SettingsHelper = require(appRoot + '/src/server/helpers/SettingsHelper');
+let SettingsHelper = require(appRoot + '/src/common/helpers/SettingsHelper');
 let AdminHelper = require(appRoot + '/src/server/helpers/AdminHelper');
 
 // Models
@@ -114,10 +114,11 @@ class MongoDB {
      *
      * @param {Object} query
      * @param {Object} doc
+     * @param {Object} options
      *
      * @return {Promise} promise
      */
-    static updateOne(collectionName, query, doc) {
+    static updateOne(collectionName, query, doc, options) {
         // Make sure the MongoId isn't included
         delete doc['_id'];
 
@@ -125,7 +126,7 @@ class MongoDB {
             console.log('[MongoDB] Updating document with query ' + JSON.stringify(query) + ' in collection "' + collectionName + '"...');
         
             MongoDB.getDatabase().then(function(db) {
-                db.collection(collectionName).updateOne(query, doc, function(findErr) {
+                db.collection(collectionName).updateOne(query, doc, options || {}, function(findErr) {
                     if(findErr) {
                         throw findErr;
                     }
@@ -409,27 +410,33 @@ class MongoDB {
     /**
      * Gets all settings
      *
+     * @param {String} section
+     *
      * @return {Promise} promise
      */
-    static getSettings() {
-        return MongoDB.find(
+    static getSettings(section) {
+        return MongoDB.findOne(
             'settings',
-            {}
+            { section: section }
         );
     }
     
     /**
      * Sets all settings
      *
+     * @param {String} section
      * @param {Object} settings
      *
      * @return {Promise} promise
      */
-    static setSettings(settings) {
-        return MongoDB.update(
+    static setSettings(section, settings) {
+        return MongoDB.updateOne(
             'settings',
-            {},
-            settings
+            { section: section },
+            settings,
+            {
+                upsert: true
+            }
         );
     }
 

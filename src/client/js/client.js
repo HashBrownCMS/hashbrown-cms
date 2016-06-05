@@ -12,8 +12,7 @@ window.resources = {
     connectionEditors: {},
     content: [],
     schemas: [],
-    media: [],
-    settings: {}
+    media: []
 };
 
 reloadAllResources()
