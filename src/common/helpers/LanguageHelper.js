@@ -8,6 +8,20 @@ class LanguageHelper {
      */
     static getLanguages() {
         return new Promise((callback) => {
+            let languages = require('../data/languages.json');
+
+            callback(languages);        
+        });
+    }
+
+    /**
+     * Gets all selected languages
+     * TODO: Fetch from backend
+     *
+     * @returns {String[]} languages
+     */
+    static getSelectedLanguages() {
+        return new Promise((callback) => {
             let languages = ['en', 'da'];
 
             callback(languages);        

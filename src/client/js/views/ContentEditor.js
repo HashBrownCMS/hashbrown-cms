@@ -285,7 +285,7 @@ class ContentEditor extends View {
         );
 
         // Populate picker with language options
-        LanguageHelper.getLanguages()
+        LanguageHelper.getSelectedLanguages()
         .then((languages) => {
             $languageOptions.html(
                 _.each(
