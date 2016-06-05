@@ -1738,15 +1738,15 @@ if(view.model.repo){view.$element.append([_.div({class:'field-container github-c
      * @param {Content} content
      *
      * @return {Promise(Object[])} properties
-     */},{key:"getAllLocalizedPropertySets",value:function getAllLocalizedPropertySets(content){return new Promise(function(callback){LanguageHelper.getLanguages().then(function(languages){var sets=[];var _iteratorNormalCompletion4=true;var _didIteratorError4=false;var _iteratorError4=undefined;try{for(var _iterator4=languages[Symbol.iterator](),_step4;!(_iteratorNormalCompletion4=(_step4=_iterator4.next()).done);_iteratorNormalCompletion4=true){var language=_step4.value;var properties=content.getProperties(language);sets.push(properties);}}catch(err){_didIteratorError4=true;_iteratorError4=err;}finally {try{if(!_iteratorNormalCompletion4&&_iterator4.return){_iterator4.return();}}finally {if(_didIteratorError4){throw _iteratorError4;}}}callback(sets);});});}}]);return LanguageHelper;}();module.exports=LanguageHelper;},{}],155:[function(require,module,exports){'use strict';var crypto=require('crypto');var Promise=require('bluebird');var LanguageHelper=require('../helpers/LanguageHelper'); /**
+     */},{key:"getAllLocalizedPropertySets",value:function getAllLocalizedPropertySets(content){return new Promise(function(callback){LanguageHelper.getLanguages().then(function(languages){var sets=[];var _iteratorNormalCompletion4=true;var _didIteratorError4=false;var _iteratorError4=undefined;try{for(var _iterator4=languages[Symbol.iterator](),_step4;!(_iteratorNormalCompletion4=(_step4=_iterator4.next()).done);_iteratorNormalCompletion4=true){var language=_step4.value;var properties=content.getProperties(language);sets.push(properties);}}catch(err){_didIteratorError4=true;_iteratorError4=err;}finally {try{if(!_iteratorNormalCompletion4&&_iterator4.return){_iterator4.return();}}finally {if(_didIteratorError4){throw _iteratorError4;}}}callback(sets);});});}}]);return LanguageHelper;}();module.exports=LanguageHelper;},{}],155:[function(require,module,exports){'use strict';var Promise=require('bluebird');var LanguageHelper=require('../helpers/LanguageHelper');var Entity=require('./Entity'); /**
  * The base class for all Connection types
- */var Connection=function(){function Connection(properties){_classCallCheck(this,Connection);for(var k in properties){this[k]=properties[k];}} /**
+ */var Connection=function(_Entity){_inherits(Connection,_Entity);function Connection(){_classCallCheck(this,Connection);return _possibleConstructorReturn(this,Object.getPrototypeOf(Connection).apply(this,arguments));}_createClass(Connection,[{key:"structure",value:function structure(){ // Fundamental fields
+this.id='';this.title='';this.type=''; // Extensible settings
+this.settings={};} /**
      * Creates a new Connection object
      *
-     * @param {Object} properties
-     *
-     * @return {Object} content
-     */_createClass(Connection,[{key:"publishContent", /**
+     * @return {Connection} connection
+     */},{key:"publishContent", /**
      * Publishes content
      *
      * @param {Content} content
@@ -1758,9 +1758,9 @@ if(view.model.repo){view.$element.append([_.div({class:'field-container github-c
      * @param {Object} properties
      *
      * @returns {Promise} promise
-     */},{key:"postContentProperties",value:function postContentProperties(properties){return new Promise(function(callback){callback();});}}],[{key:"create",value:function create(properties){var connection=new Connection(properties||{});connection.id=crypto.randomBytes(20).toString('hex');connection.title='New connection';connection.settings={};return connection;}}]);return Connection;}();module.exports=Connection;},{"../helpers/LanguageHelper":154,"bluebird":17,"crypto":56}],156:[function(require,module,exports){'use strict';var crypto=require('crypto');var Promise=require('bluebird');var ContentHelper=require('../../server/helpers/ContentHelper');var Entity=require('./Entity');var Connection=require('./Connection'); /**
+     */},{key:"postContentProperties",value:function postContentProperties(properties){return new Promise(function(callback){callback();});}}],[{key:"create",value:function create(){var connection=new Connection({id:Entity.createId(),title:'New connection',settings:{}});return connection;}}]);return Connection;}(Entity);module.exports=Connection;},{"../helpers/LanguageHelper":154,"./Entity":157,"bluebird":17}],156:[function(require,module,exports){'use strict';var Promise=require('bluebird');var ContentHelper=require('../../server/helpers/ContentHelper');var Entity=require('./Entity');var Connection=require('./Connection'); /**
  * The base class for all Content types
- */var Content=function(_Entity){_inherits(Content,_Entity);function Content(properties){_classCallCheck(this,Content);return _possibleConstructorReturn(this,Object.getPrototypeOf(Content).call(this,properties));}_createClass(Content,[{key:"structure",value:function structure(){ // Fundamental fields
+ */var Content=function(_Entity2){_inherits(Content,_Entity2);function Content(){_classCallCheck(this,Content);return _possibleConstructorReturn(this,Object.getPrototypeOf(Content).apply(this,arguments));}_createClass(Content,[{key:"structure",value:function structure(){ // Fundamental fields
 this.id='';this.parentId='';this.createDate=Date.now();this.updateDate=Date.now();this.schemaId=''; // Extensible properties
 this.properties={}; // Settings
 this.settings={publishing:{connections:[]}};} /**
@@ -1773,7 +1773,7 @@ this.settings={publishing:{connections:[]}};} /**
      * Gets all parents
      *
      * @returns {Promise} parents
-     */value:function getParents(){var _this14=this;return new Promise(function(callback){var parents=[];function iterate(content){if(content.parentId){Content.find(content.parentId).then(function(parentContent){if(parentContent){parents.push(parentContent);iterate(parentContent);}else {console.log('[Content] Parent content with id "'+content.parentId+'" was not found');callback(parents);}});}else {callback(parents);}}iterate(_this14);});} /**
+     */value:function getParents(){var _this15=this;return new Promise(function(callback){var parents=[];function iterate(content){if(content.parentId){Content.find(content.parentId).then(function(parentContent){if(parentContent){parents.push(parentContent);iterate(parentContent);}else {console.log('[Content] Parent content with id "'+content.parentId+'" was not found');callback(parents);}});}else {callback(parents);}}iterate(_this15);});} /**
      * Gets a settings
      *
      * @param {String} key
@@ -1795,7 +1795,7 @@ model.getParents().then(function(parents){var _iteratorNormalCompletion5=true;va
      * @param {String} language
      *
      * @returns {Object} value
-     */},{key:"getPropertyValue",value:function getPropertyValue(key,language){if(language&&_typeof(this.properties[key])==='object'){return this.properties[key][language];}else {return this.properties[key];}} /**
+     */},{key:"getPropertyValue",value:function getPropertyValue(key,language){if(!this.properties){this.properties={};}if(language&&_typeof(this.properties[key])==='object'){return this.properties[key][language];}else {return this.properties[key];}} /**
      * Returns all properties in a given language
      *
      * @param {String} language
@@ -1814,7 +1814,7 @@ model.getParents().then(function(parents){var _iteratorNormalCompletion5=true;va
      *
      * @returns {Boolean} state
      */},{key:"isPublished",value:function isPublished(){var unpublishDateIsNull=this.properties.unpublishDate==null||typeof this.properties.unpublishDate=='undefined';var unpublishDateHasPassed=this.properties.unpublishDate<Date.now(); // Get the state
-return unpublishDateIsNull||unpublishDateHasPassed;}}],[{key:"create",value:function create(properties){var content=new Content({id:crypto.randomBytes(20).toString('hex'),createDate:Date.now(),updateDate:Date.now(),schemaId:'contentBase',properties:properties});return content;} /**
+return unpublishDateIsNull||unpublishDateHasPassed;}}],[{key:"create",value:function create(properties){var content=new Content({id:Entity.createId(),createDate:Date.now(),updateDate:Date.now(),schemaId:'contentBase',properties:properties});return content;} /**
      * Finds a Content object
      *
      * @param {String} id
@@ -1823,15 +1823,21 @@ return unpublishDateIsNull||unpublishDateHasPassed;}}],[{key:"create",value:func
      */},{key:"find",value:function find(id){return new Promise(function(callback){ // We're in client mode
 if(window&&window.resources&&window.resources.content){var _iteratorNormalCompletion6=true;var _didIteratorError6=false;var _iteratorError6=undefined;try{for(var _iterator6=window.resources.content[Symbol.iterator](),_step6;!(_iteratorNormalCompletion6=(_step6=_iterator6.next()).done);_iteratorNormalCompletion6=true){var node=_step6.value;if(node.id==id){callback(new Content(node));return;}} // We're in server mode
 }catch(err){_didIteratorError6=true;_iteratorError6=err;}finally {try{if(!_iteratorNormalCompletion6&&_iterator6.return){_iterator6.return();}}finally {if(_didIteratorError6){throw _iteratorError6;}}}}else {ContentHelper.getContentById(id).then(function(node){callback(new Content(node));});return;} // No node found
-callback(null);});}}]);return Content;}(Entity);module.exports=Content;},{"../../server/helpers/ContentHelper":158,"./Connection":155,"./Entity":157,"bluebird":17,"crypto":56}],157:[function(require,module,exports){'use strict'; /**
+callback(null);});}}]);return Content;}(Entity);module.exports=Content;},{"../../server/helpers/ContentHelper":158,"./Connection":155,"./Entity":157,"bluebird":17}],157:[function(require,module,exports){'use strict';var crypto=require('crypto'); /**
  * The base class for everything
  */var Entity=function(){ /**
      * Constructs an entity
      *
      * @param {Object} properties
-     */function Entity(properties){_classCallCheck(this,Entity);this.structure();Object.seal(this);for(var k in properties){try{this[k]=properties[k];}catch(e){console.log(e);console.log(e.stack);}}} /**
+     */function Entity(properties){_classCallCheck(this,Entity);this.structure();Object.seal(this);for(var k in properties){try{this[k]=properties[k]||this[k];}catch(e){console.log(e);console.log(e.stack);}}} /**
      * Sets up a structure before sealing the object
-     */_createClass(Entity,[{key:"structure",value:function structure(){}}]);return Entity;}();module.exports=Entity;},{}],158:[function(require,module,exports){'use strict'; // Promise
+     */_createClass(Entity,[{key:"structure",value:function structure(){} /**
+     * Generates a new random id
+     *
+     * @returns {String} id
+     */},{key:"getFields", /**
+     * Gets a copy of every field in this object as a mutable object
+     */value:function getFields(){var fields={};for(var k in this){var v=this[k];if(typeof v!=='function'){fields[k]=v;}}return fields;}}],[{key:"createId",value:function createId(){return crypto.randomBytes(20).toString('hex');}}]);return Entity;}();module.exports=Entity;},{"crypto":56}],158:[function(require,module,exports){'use strict'; // Promise
 var Promise=require('bluebird');var ContentHelper=function(){function ContentHelper(){_classCallCheck(this,ContentHelper);}_createClass(ContentHelper,null,[{key:"getAllContents", /**
      * Gets all Content objects
      * This method must be overridden by a plugin

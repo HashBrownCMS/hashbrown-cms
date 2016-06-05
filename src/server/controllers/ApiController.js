@@ -133,10 +133,11 @@ class ApiController extends Controller {
         let file = req.file;
 
         if(file) {
-            let media = Media.create(file);
+            let media = Media.create();
 
-            media.uploadPromise.then(function() {
-                res.send(media.properties.id);
+            MediaHelper.setMediaData(media.id)
+            .then(() => {
+                res.send(media.id);
             });
 
         } else {
@@ -180,10 +181,10 @@ class ApiController extends Controller {
     /**
      * Creates a new Content object
      *
-     * @return {Object} Content
+     * @return {Content} content
      */
     static createContent(req, res) {
-        ContentHelper.createContent(req.body)
+        ContentHelper.createContent()
         .then(function(node) {
             res.send(node);
         });
@@ -276,7 +277,7 @@ class ApiController extends Controller {
      * @return {Object} Content
      */
     static createConnection(req, res) {
-        ConnectionHelper.createConnection(req.body)
+        ConnectionHelper.createConnection()
         .then(function(node) {
             res.send(node);
         });

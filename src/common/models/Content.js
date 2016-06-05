@@ -1,7 +1,5 @@
 'use strict';
 
-let crypto = require('crypto');
-
 let Promise = require('bluebird');
 let ContentHelper = require('../../server/helpers/ContentHelper');
 
@@ -12,10 +10,6 @@ let Connection = require('./Connection');
  * The base class for all Content types
  */
 class Content extends Entity {
-    constructor(properties) {
-        super(properties);
-    }
-
     structure() {
         // Fundamental fields
         this.id = '';
@@ -44,7 +38,7 @@ class Content extends Entity {
      */
     static create(properties) {
         let content = new Content({
-            id: crypto.randomBytes(20).toString('hex'),
+            id: Entity.createId(),
             createDate: Date.now(),
             updateDate: Date.now(),
             schemaId: 'contentBase',
@@ -182,6 +176,10 @@ class Content extends Entity {
      * @returns {Object} value
      */
     getPropertyValue(key, language) {
+        if(!this.properties) {
+            this.properties = {};
+        }
+
         if(language && typeof this.properties[key] === 'object') {
             return this.properties[key][language];
         

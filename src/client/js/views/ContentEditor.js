@@ -213,7 +213,7 @@ class ContentEditor extends View {
      */
     renderFields(tabId, schema, fields) {
         let schemaFields = {};
-       
+
         // Map out fields to render
         for(let alias in schema) {
             let property = schema[alias];
@@ -302,8 +302,6 @@ class ContentEditor extends View {
         });
 
         // Render editor
-        let contentProperties = content.properties;
-        
         return _.div({class: 'object'},
             $languagePicker,
             _.ul({class: 'nav nav-tabs'}, 
@@ -330,7 +328,8 @@ class ContentEditor extends View {
 
                 // Render meta properties
                 _.div({id: 'tab-meta', class: 'tab-pane' + ('meta' == schema.defaultTabId ? ' active' : '')},
-                    this.renderFields('meta', schema.fields, content)
+                    this.renderFields('meta', schema.fields, content),
+                    this.renderFields('meta', schema.fields.properties, content.properties)
                 )
             )
         );
@@ -342,12 +341,16 @@ class ContentEditor extends View {
         let contentSchema = getSchemaWithParents(this.model.schemaId);
 
         if(contentSchema) {
-            let content = new Content(this.model);
+            if(!this.model.properties) {
+                this.model.properties = {};
+            }
 
-            content.getSettings('publishing')
+            this.model = new Content(this.model);
+
+            this.model.getSettings('publishing')
             .then((publishing) => {
                 view.$element.html([
-                    view.renderEditor(view.model, contentSchema).append(
+                    view.renderEditor(this.model, contentSchema).append(
                         _.div({class: 'panel panel-default panel-buttons'}, 
                             _.div({class: 'btn-group'},
                                 _.button({class: 'btn btn-embedded'},

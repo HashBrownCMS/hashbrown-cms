@@ -1,5 +1,7 @@
 'use strict';
 
+let crypto = require('crypto');
+
 /**
  * The base class for everything
  */
@@ -16,7 +18,7 @@ class Entity {
 
         for(let k in properties) {
             try {
-                this[k] = properties[k];
+                this[k] = properties[k] || this[k];
             
             } catch(e) {
                 console.log(e);
@@ -30,6 +32,32 @@ class Entity {
      */
     structure() {
 
+    }
+
+    /**
+     * Generates a new random id
+     *
+     * @returns {String} id
+     */
+    static createId() {
+        return crypto.randomBytes(20).toString('hex');
+    }
+
+    /**
+     * Gets a copy of every field in this object as a mutable object
+     */
+    getFields() {
+        let fields = {};
+
+        for(let k in this) {
+            let v = this[k];
+
+            if(typeof v !== 'function') {
+                fields[k] = v;
+            }
+        }
+
+        return fields;
     }
 }
 

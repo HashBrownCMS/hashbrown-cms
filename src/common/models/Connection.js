@@ -1,35 +1,37 @@
 'use strict';
 
-let crypto = require('crypto');
-
 let Promise = require('bluebird');
 
 let LanguageHelper = require('../helpers/LanguageHelper');
 
+let Entity = require('./Entity');
+
 /**
  * The base class for all Connection types
  */
-class Connection {
-    constructor(properties) {
-        for(let k in properties) {
-            this[k] = properties[k];
-        }
+class Connection extends Entity {
+    structure() {
+        // Fundamental fields
+        this.id = '';
+        this.title = '';
+        this.type = '';
+        
+        // Extensible settings
+        this.settings = {};
     }
 
     /**
      * Creates a new Connection object
      *
-     * @param {Object} properties
-     *
-     * @return {Object} content
+     * @return {Connection} connection
      */
-    static create(properties) {
-        let connection = new Connection(properties || {});
+    static create() {
+        let connection = new Connection({
+            id: Entity.createId(),
+            title: 'New connection',
+            settings: {}
+        });
         
-        connection.id = crypto.randomBytes(20).toString('hex');
-        connection.title = 'New connection';
-        connection.settings = {};
-
         return connection;
     }
 

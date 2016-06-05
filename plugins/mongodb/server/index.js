@@ -314,16 +314,14 @@ class MongoDB {
     /**
      * Creates a new connection
      *
-     * @param {Object} properties
-     *
      * @return {Promise} promise
      */
-    static createConnection(properties) {
-        let connection = Connection.create(properties);
+    static createConnection() {
+        let connection = Connection.create();
 
         return MongoDB.insertOne(
             'connections',
-            connection
+            connection.getFields()
         );
     }
 
@@ -378,16 +376,14 @@ class MongoDB {
     /**
      * Creates a new content object
      *
-     * @param {Object} properties
-     *
      * @return {Promise} promise
      */
-    static createContent(properties) {
-        let content = Content.create(properties);
+    static createContent() {
+        let content = Content.create();
 
         return MongoDB.insertOne(
             'content',
-            content.properties
+            content.getFields()
         );
     }
     

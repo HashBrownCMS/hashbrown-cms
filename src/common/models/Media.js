@@ -1,13 +1,16 @@
 'use strict';
 
-let crypto = require('crypto');
-
-let MediaHelper = require('../../server/helpers/MediaHelper');
+let Entity = require('./Entity');
 
 /**
  * The base class for all Media objects
  */
-class Media {
+class Media extends Entity {
+    structure() {
+        this.id = '';
+        this.data = '';
+    }
+
     /**
      * Creates a new Media object
      *
@@ -16,13 +19,10 @@ class Media {
      * @return {Media} media
      */
     static create(file) {
-        let content = Content.create({});
-
-        let media = new Media(content.properties);
+        let media = new Media({
+            id: Entity.createId()
+        });
     
-        media.properties.id = crypto.randomBytes(20).toString('hex');
-        media.uploadPromise = MediaHelper.setMediaData(media.propeties.id, file);
-
         return media;
     }
 }
