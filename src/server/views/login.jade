@@ -1,16 +1,28 @@
 html
     head
+        meta(charset='utf-8')
+        meta(http-equiv='X-UA-Compatible', content='IE=edge')
+        meta(name='viewport', content='width=device-width initial-scale=1')
+        meta(name='description', content="The Putaitu CMS")
+        
+        link(href='/lib/bootstrap/css/bootstrap.min.css', rel='stylesheet')
+        link(href='/lib/font-awesome/css/font-awesome.min.css', rel='stylesheet')
+        link(href='/css/client.css', rel='stylesheet')
+        link(href='/css/login.css', rel='stylesheet')
+        
+        title Endomon CMS
     body
-        .form
-            div
-                label Username:
-                input(type='text', name='username')
-            div
-                label Password:
-                input(type='password', name='password')
-            div
-                button
-                    | Log In
+        .login-container
+            .panel-login.login.btn-raised
+                .panel-heading
+                    h2
+                        | Endomon CMS
+                .panel-body
+                        input(type='text', class='form-control', placeholder='Username')
+                        input(type='password', class='form-control', placeholder='Password')
+                .panel-footer
+                    button.btn.btn-primary
+                        | Login
     
         script(src='/lib/jquery/jquery.min.js')
         script(src='/js/login.js')

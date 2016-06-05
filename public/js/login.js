@@ -1,9 +1,17 @@
-$('.form').each(function() {
-    $(this).find('button').click(function(e) {
+$('.login').each(function() {
+    var $login = $(this);
+    
+    $(document).keyup(function(e) {
+        if(e.which == 13) {
+            $login.find('button').click();
+        }
+    });
+
+    $login.find('button').click(function(e) {
         e.preventDefault();
 
-        var username = $(this).parents('.form').find('input[type="text"]').val();
-        var password = $(this).parents('.form').find('input[type="password"]').val();
+        var username = $login.find('input[type="text"]').val();
+        var password = $login.find('input[type="password"]').val();
     
         $.ajax({
             type: 'POST',
@@ -15,7 +23,7 @@ $('.form').each(function() {
             success: function(token) {
                 localStorage.setItem('token', token);
 
-                location = '/';
+                location = '/#/content/';
             },
             error: function(e) {
                 alert('Bad credentials');
