@@ -50,14 +50,17 @@ class Connection extends Entity {
 
             LanguageHelper.getAllLocalizedPropertySets(content)
             .then((sets) => {
+                let keys = Object.keys(sets);
+                
                 function next(i) {
-                    let properties = sets[i];
+                    let key = keys[i];
+                    let properties = sets[key];
 
-                    connection.postContentProperties(properties)
+                    connection.postContentProperties(properties, content.id, key)
                     .then(() => {
                         i++;
 
-                        if(i < sets.length) {
+                        if(i < keys.length) {
                             next(i);
                         
                         } else {
@@ -78,10 +81,12 @@ class Connection extends Entity {
      * Posts content properties to the remote target
      *
      * @param {Object} properties
+     * @param {String} id
+     * @param {String} language
      *
      * @returns {Promise} promise
      */
-    postContentProperties(properties) {
+    postContentProperties(properties, id, language) {
         return new Promise((callback) => {
             callback();
         });

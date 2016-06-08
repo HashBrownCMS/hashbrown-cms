@@ -1,10 +1,24 @@
-let Promise = require('bluebird');
+// Libraries
+require('exomon');
+window.Promise = require('bluebird');
 
 // Views
-let MessageModal = require('./views/MessageModal');
+window.MessageModal = require('./views/MessageModal');
+window.NavbarMain = require('./views/NavbarMain');
+window.JSONEditor = require('./views/JSONEditor');
+window.ContentEditor = require('./views/ContentEditor');
+window.ConnectionEditor = require('./views/ConnectionEditor');
+window.SchemaEditor = require('./views/SchemaEditor');
+window.MediaViewer = require('./views/MediaViewer');
+window.LanguagePicker = require('./views/LanguagePicker');
+window.LanguageSettings = require('./views/LanguageSettings');
 
 // Models
 window.Content = require('../../common/models/Content');
+
+// Helpers
+window.LanguageHelper = require('../../common/helpers/LanguageHelper')
+window.SettingsHelper = require('../../common/helpers/SettingsHelper')
 
 let onReadyCallbacks = {};
 let isReady = {};
@@ -75,10 +89,19 @@ window.getSchemaWithParents = function getSchemaWithParents(id) {
  */
 window.reloadResource = function reloadResource(name) {
     return new Promise(function(callback) {
-        $.getJSON('/api/' + name, function(result) {
-            window.resources[name] = result;
+        $.ajax({
+            type: 'GET',
+            url: '/api/' + name + '?token=' + localStorage.getItem('token'),
+            success: function(result) {
+                window.resources[name] = result;
 
-            callback(result);
+                callback(result);
+            },
+            error: function(e) {
+                if(e.status == 403) {
+                    location = '/login/';
+                }
+            }
         });
     });
 };
@@ -88,7 +111,7 @@ window.reloadResource = function reloadResource(name) {
  */
 window.reloadAllResources = function reloadAllResources() {
     return new Promise(function(callback) {
-        let queue = ['content', 'schemas', 'media', 'connections', 'settings'];
+        let queue = ['content', 'schemas', 'media', 'connections'];
 
         function processQueue(name) {
             window.reloadResource(name)

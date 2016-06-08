@@ -4,6 +4,13 @@ class DateEditor extends View {
     constructor(params) {
         super(params);
 
+        // Ensure correct type
+        if(typeof params.value === 'string' && !isNaN(params.value)) {
+            params.value = new Date(parseInt(params.value));
+        } else {
+            params.value = new Date(params.value);
+        }
+
         this.init();
     }
 

@@ -1,5 +1,7 @@
 'use strict';
 
+let SettingsHelper = require('./SettingsHelper');
+
 class LanguageHelper {
     /**
      * Gets all languages
@@ -7,10 +9,59 @@ class LanguageHelper {
      * @returns {String[]} languages
      */
     static getLanguages() {
-        return new Promise((callback) => {
-            let languages = ['en', 'da'];
+        return require('../data/languages.json');
+    }
 
-            callback(languages);        
+    /**
+     * Gets all selected languages
+     *
+     * @returns {String[]} languages
+     */
+    static getSelectedLanguages() {
+        return new Promise((callback) => {
+            SettingsHelper.getSettings('language')
+            .then((settings) => {
+                if(!settings.selected || settings.selected.length < 1) {
+                    settings.selected = ['en'];
+                }
+          
+                settings.selected.sort();
+
+                callback(settings.selected);
+            });  
+        });
+    }
+
+    /**
+     * Toggle a language
+     *
+     * @param {String} language
+     * @param {Boolean} state
+     *
+     * @returns {Promise} promise
+     */
+    static toggleLanguage(language, state) {
+        return new Promise((callback) => {
+            SettingsHelper.getSettings('language')
+            .then((settings) => {
+                if(!settings.selected || settings.selected.length < 1) {
+                    settings.selected = ['en'];
+                }
+            
+                if(!state && settings.selected.indexOf(language) > -1) {
+                    settings.selected.splice(settings.selected.indexOf(language), 1);
+
+                } else if(state && settings.selected.indexOf(language) < 0) {
+                    settings.selected.push(language);
+                    settings.selected.sort();
+
+                }
+
+                SettingsHelper.setSettings('language', settings)
+                .then(() => {
+                    callback()
+                });
+            });  
         });
     }
 
@@ -24,14 +75,14 @@ class LanguageHelper {
      */
     static getAllLocalizedPropertySets(content) {
         return new Promise((callback) => {
-            LanguageHelper.getLanguages()
+            LanguageHelper.getSelectedLanguages()
             .then((languages) => {
-                let sets = [];
+                let sets = {};
 
                 for(let language of languages) {
                     let properties = content.getProperties(language);
-                
-                    sets.push(properties);
+                    
+                    sets[language] = properties;
                 }
 
                 callback(sets);

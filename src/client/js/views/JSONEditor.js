@@ -94,7 +94,7 @@ class JSONEditor extends View {
                     class: 'btn-danger',
                     callback: function() {
                         $.ajax({
-                            url: '/api/content/' + view.model.id,
+                            url: '/api/content/' + view.model.id + '?token=' + localStorage.getItem('token'),
                             type: 'DELETE',
                             success: onSuccess
                         });

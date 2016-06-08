@@ -55,18 +55,10 @@ class PluginWatcher {
 
         });
         
-        /**
-         * Watch plugin code
-         */
-        gulp.task('watch', function() {
-            gulp.watch(appRoot + '/plugins/*/client/js/**/*.js', [ 'js' ]);
-            gulp.watch(appRoot + '/plugins/*/client/sass/**/*.scss', [ 'sass' ]);
-        });
-        
         // ----------
         // Default tasks
         // ----------
-        gulp.task('default', [ 'sass', 'js', 'watch' ]);
+        gulp.task('default', [ 'sass', 'js' ]);
     }
 
     /**

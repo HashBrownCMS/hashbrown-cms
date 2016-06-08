@@ -29,8 +29,8 @@ class ConnectionHelper {
      */
     static initConnection(data) {
         let constructor = ConnectionHelper.connectionTypes[data.type];
-            
-        if(constructor) {
+           
+        if(typeof constructor === 'function') {
             return new constructor(data);
         } else {
             return new Connection(data);
@@ -56,7 +56,7 @@ class ConnectionHelper {
                     function nextConnection(i) {
                         ConnectionHelper.getConnectionById(settings.connections[i])
                         .then((connection) => {
-                            console.log(' -> Publishing through connection "' + settings.connections[i] + '" of type "' + connection.type + '"...');
+                            console.log('[ConnectionHelper] Publishing through connection "' + settings.connections[i] + '" of type "' + connection.type + '"...');
 
                             connection.publishContent(content)
                             .then(() => {

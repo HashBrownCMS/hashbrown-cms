@@ -1,6 +1,3 @@
-/**
- * The ConnectionEditor connection editor for Endomon CMS
- */
 class ConnectionEditor extends View {
     constructor(params) {
         super(params);

@@ -29,7 +29,7 @@ class ConnectionEditor extends View {
 
         $.ajax({
             type: 'post',
-            url: '/api/connections/' + view.model.id,
+            url: '/api/connections/' + view.model.id + '?token=' + localStorage.getItem('token'),
             data: view.model,
             success: function() {
                 console.log('[ConnectionEditor] Saved model to /api/connections/' + view.model.id);
@@ -89,7 +89,7 @@ class ConnectionEditor extends View {
                     class: 'btn-danger',
                     callback: function() {
                         $.ajax({
-                            url: '/api/connections/' + view.model.id,
+                            url: '/api/connections/' + view.model.id + '?token=' + localStorage.getItem('token'),
                             type: 'DELETE',
                             success: onSuccess
                         });
