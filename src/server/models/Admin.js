@@ -4,27 +4,40 @@ let crypto = require('crypto');
 
 let Entity = require('../../common/models/Entity');
 
-class Admin extends Entity {
+class Password extends Entity {
     structure() {
-        this.id = '';
-        this.username = '';
-        this.password = {
-            hash: '',
-            salt: ''   
-        };
-        this.tokens = [];
+        this.def(String, 'hash');
+        this.def(String, 'salt');
+    }
+}
+
+class Admin extends Entity {
+    constructor(params) {
+        if(params) {
+            // Ensure correct object type
+            params.password = new Password({
+                hash: params.password.hash,
+                salt: params.password.salt
+            });
+        }
+
+        super(params);
+    }
     
-        Object.seal(this.password);
+    structure() {
+        this.def(String, 'id');
+        this.def(String, 'username');
+        this.def(Password, 'password', new Password());
+        this.def(Array, 'tokens', []);
     }
 
     /**
      * Creates a new access token
      */
-    generateToken() {
+    generateToken(params) {
         let key = crypto.randomBytes(20).toString('hex');
         let validDuration =
-            1 * // Days
-            24 * // Hours
+            1 * // Hours
             60 * // Minutes
             60 * // Seconds
             1000; // Milliseconds

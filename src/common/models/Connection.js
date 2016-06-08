@@ -12,12 +12,12 @@ let Entity = require('./Entity');
 class Connection extends Entity {
     structure() {
         // Fundamental fields
-        this.id = '';
-        this.title = '';
-        this.type = '';
+        this.def(String, 'id');
+        this.def(String, 'title');
+        this.def(String, 'type');
         
         // Extensible settings
-        this.settings = {};
+        this.def(Object, 'settings', {});
     }
 
     /**

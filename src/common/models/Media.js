@@ -7,8 +7,8 @@ let Entity = require('./Entity');
  */
 class Media extends Entity {
     structure() {
-        this.id = '';
-        this.data = '';
+        this.def(String, 'id');
+        this.def(String, 'data');
     }
 
     /**

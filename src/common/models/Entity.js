@@ -69,11 +69,11 @@ class Entity {
      */
     def(type, name, defaultValue) {
         if(typeof type !== 'function') {
-            throw new TypeError('Parameter \'type\' cannot be of type \'' + (typeof type) + '\' ');
+            throw new TypeError('Parameter \'type\' cannot be of type \'' + (typeof type) + '\'.');
         }
         
         if(typeof name !== 'string') {
-            throw new TypeError('Parameter \'name\' cannot be of type \'' + (typeof name) + '\' ');
+            throw new TypeError('Parameter \'name\' cannot be of type \'' + (typeof name) + '\'.');
         }
 
         if(!defaultValue) {
@@ -100,17 +100,18 @@ class Entity {
         }
 
         let thisValue = defaultValue;
-        let thisType = typeof defaultValue;
+        let thisType = defaultValue.constructor;
 
         Object.defineProperty(this, name, {
+            enumerable: true,
             get: () => {
                 return thisValue;
             },
             set: (thatValue) => {
-                let thatType = typeof thatValue;
+                let thatType = thatValue.constructor;
 
                 if(thisType !== thatType) {
-                    throw new TypeError(this.constructor.name + '.' + name + ' is of type \'' + thisType + '\' and cannot implicitly be converted to \'' + thatType + '\'.');
+                    throw new TypeError(this.constructor.name + '.' + name + ' is of type \'' + thisType.name + '\' and cannot implicitly be converted to \'' + thatType.name + '\'.');
                 } else {
                     thisValue = thatValue; 
                 }
