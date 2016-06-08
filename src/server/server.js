@@ -27,9 +27,31 @@ app.use(express.static(appRoot + '/public'));
 // Ready callback
 // ----------
 function ready() {
+    // Start server
     let server = app.listen(8000);
 
     console.log('[Endomon CMS] Running on port 8000');
+    
+    // Startup arguments
+    for(let k in process.argv) {
+        let v = process.argv[k];
+
+        switch(v) {
+            case 'create-admin':
+                let username = process.argv[(parseInt(k) + 1).toString()];
+                let password = process.argv[(parseInt(k) + 2).toString()];
+
+                username = username.replace('u=', '');
+                password = password.replace('p=', '');
+
+                let AdminHelper = require(appRoot + '/src/server/helpers/AdminHelper');
+
+                console.log(username, password);
+
+                AdminHelper.createAdmin(username, password);
+                return;
+        }
+    }
 }
 
 // ----------

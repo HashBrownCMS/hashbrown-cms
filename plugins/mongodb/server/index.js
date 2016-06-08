@@ -503,11 +503,15 @@ class MongoDB {
     static createAdmin(username, password) {
         let admin = Admin.create(username, password);
 
+        console.log('[MongoDB] Creating admin "' + username + '"...');
+
         return new Promise((callback) => {
             MongoDB.insertOne(
                 'admins',
                 admin.getFields()
             ).then(() => {
+                console.log('[MongoDB] Created admin "' + username + '" successfully.');
+                
                 callback();
             });
         });
