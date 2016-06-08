@@ -90,6 +90,9 @@ class Entity {
                     defaultValue = new Date();
                     break;
 
+                case Boolean:
+                    defaultValue = false;
+
                 default:
                     defaultValue = null;
                     break;
