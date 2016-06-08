@@ -10,23 +10,43 @@ let Connection = require('./Connection');
  * The base class for all Content types
  */
 class Content extends Entity {
+    constructor(params) {
+        // Ensure correct type for dates
+        function parseDate(input) {
+            let result;
+
+            if(typeof input === 'string' && !isNaN(input)) {
+                result = new Date(parseInt(input));
+            } else {
+                result = new Date(input);
+            }
+
+            return result;
+        }
+
+        params.createDate = parseDate(params.createDate);
+        params.updateDate = parseDate(params.updateDate);
+
+        super(params); 
+    }
+    
     structure() {
         // Fundamental fields
-        this.id = '';
-        this.parentId = '';
-        this.createDate = Date.now();
-        this.updateDate = Date.now();
-        this.schemaId = '';
+        this.def(String, 'id');
+        this.def(String, 'parentId');
+        this.def(Date, 'createDate');
+        this.def(Date, 'updateDate');
+        this.def(String, 'schemaId');
 
         // Extensible properties
-        this.properties = {};
+        this.def(Object, 'properties', {});
 
         // Settings
-        this.settings = {
+        this.def(Object, 'settings', {
             publishing: {
                 connections: []
             }
-        }  
+        }); 
     }
 
     /**
@@ -39,8 +59,8 @@ class Content extends Entity {
     static create(properties) {
         let content = new Content({
             id: Entity.createId(),
-            createDate: Date.now(),
-            updateDate: Date.now(),
+            createDate: new Date(),
+            updateDate: new Date(),
             schemaId: 'contentBase',
             properties: properties
         });
@@ -235,19 +255,6 @@ class Content extends Entity {
                 callback(model.schemaCache);
             }
         });
-    }
-
-    /**
-     * Gets the published state
-     *
-     * @returns {Boolean} state
-     */
-    isPublished() {
-        let unpublishDateIsNull = this.properties.unpublishDate == null || typeof this.properties.unpublishDate == 'undefined';
-        let unpublishDateHasPassed = this.properties.unpublishDate < Date.now()
-
-        // Get the state
-        return unpublishDateIsNull || unpublishDateHasPassed;
     }
 }
 

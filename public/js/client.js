@@ -4621,10 +4621,11 @@ this.settings={};} /**
      * @returns {Promise} promise
      */},{key:"postContentProperties",value:function postContentProperties(properties){return new Promise(function(callback){callback();});}}],[{key:"create",value:function create(){var connection=new Connection({id:Entity.createId(),title:'New connection',settings:{}});return connection;}}]);return Connection;}(Entity);module.exports=Connection;},{"../helpers/LanguageHelper":191,"./Entity":194,"bluebird":19}],193:[function(require,module,exports){'use strict';var Promise=require('bluebird');var ContentHelper=require('../../server/helpers/ContentHelper');var Entity=require('./Entity');var Connection=require('./Connection'); /**
  * The base class for all Content types
- */var Content=function(_Entity2){_inherits(Content,_Entity2);function Content(){_classCallCheck2(this,Content);return _possibleConstructorReturn(this,Object.getPrototypeOf(Content).apply(this,arguments));}_createClass(Content,[{key:"structure",value:function structure(){ // Fundamental fields
-this.id='';this.parentId='';this.createDate=Date.now();this.updateDate=Date.now();this.schemaId=''; // Extensible properties
-this.properties={}; // Settings
-this.settings={publishing:{connections:[]}};} /**
+ */var Content=function(_Entity2){_inherits(Content,_Entity2);function Content(params){_classCallCheck2(this,Content); // Ensure correct type for dates
+function parseDate(input){var result=undefined;if(typeof input==='string'&&!isNaN(input)){result=new Date(parseInt(input));}else {result=new Date(input);}return result;}params.createDate=parseDate(params.createDate);params.updateDate=parseDate(params.updateDate);return _possibleConstructorReturn(this,Object.getPrototypeOf(Content).call(this,params));}_createClass(Content,[{key:"structure",value:function structure(){ // Fundamental fields
+this.def(String,'id');this.def(String,'parentId');this.def(Date,'createDate');this.def(Date,'updateDate');this.def(String,'schemaId'); // Extensible properties
+this.def(Object,'properties',{}); // Settings
+this.def(Object,'settings',{publishing:{connections:[]}});} /**
      * Creates a new Content object
      *
      * @param {Object} properties
@@ -4670,12 +4671,7 @@ model.getParents().then(function(parents){var _iteratorNormalCompletion8=true;va
      * Gets the schema information
      *
      * @returns {Promise} promise
-     */},{key:"getSchema",value:function getSchema(){var model=this;return new Promise(function(callback){if(!view.schemaCache){ContentHelper.getSchema(view.getType(),model.schemaId).then(function(schema){model.schemaCache=schema;callback(model.schemaCache);});}else {callback(model.schemaCache);}});} /**
-     * Gets the published state
-     *
-     * @returns {Boolean} state
-     */},{key:"isPublished",value:function isPublished(){var unpublishDateIsNull=this.properties.unpublishDate==null||typeof this.properties.unpublishDate=='undefined';var unpublishDateHasPassed=this.properties.unpublishDate<Date.now(); // Get the state
-return unpublishDateIsNull||unpublishDateHasPassed;}}],[{key:"create",value:function create(properties){var content=new Content({id:Entity.createId(),createDate:Date.now(),updateDate:Date.now(),schemaId:'contentBase',properties:properties});return content;} /**
+     */},{key:"getSchema",value:function getSchema(){var model=this;return new Promise(function(callback){if(!view.schemaCache){ContentHelper.getSchema(view.getType(),model.schemaId).then(function(schema){model.schemaCache=schema;callback(model.schemaCache);});}else {callback(model.schemaCache);}});}}],[{key:"create",value:function create(properties){var content=new Content({id:Entity.createId(),createDate:new Date(),updateDate:new Date(),schemaId:'contentBase',properties:properties});return content;} /**
      * Finds a Content object
      *
      * @param {String} id
@@ -4698,7 +4694,13 @@ callback(null);});}}]);return Content;}(Entity);module.exports=Content;},{"../..
      * @returns {String} id
      */},{key:"getFields", /**
      * Gets a copy of every field in this object as a mutable object
-     */value:function getFields(){var fields={};for(var k in this){var v=this[k];if(typeof v!=='function'){fields[k]=v;}}return fields;}}],[{key:"createId",value:function createId(){return crypto.randomBytes(20).toString('hex');}}]);return Entity;}();module.exports=Entity;},{"crypto":59}],195:[function(require,module,exports){'use strict'; // Promise
+     */value:function getFields(){var fields={};for(var k in this){var v=this[k];if(typeof v!=='function'){fields[k]=v;}}return fields;} /**
+     * Defines a type safe member variable
+     *
+     * @param {String} type
+     * @param {String} name
+     * @param {Anything} defaultValue
+     */},{key:"def",value:function def(type,name,defaultValue){var _this17=this;if(typeof type!=='function'){throw new TypeError('Parameter \'type\' cannot be of type \''+(typeof type==="undefined"?"undefined":_typeof(type))+'\' ');}if(typeof name!=='string'){throw new TypeError('Parameter \'name\' cannot be of type \''+(typeof name==="undefined"?"undefined":_typeof(name))+'\' ');}if(!defaultValue){switch(type){case String:defaultValue='';break;case Number:defaultValue=0;break;case Date:defaultValue=new Date();break;default:defaultValue=null;break;}}var thisValue=defaultValue;var thisType=typeof defaultValue==="undefined"?"undefined":_typeof(defaultValue);Object.defineProperty(this,name,{get:function get(){return thisValue;},set:function set(thatValue){var thatType=typeof thatValue==="undefined"?"undefined":_typeof(thatValue);if(thisType!==thatType){throw new TypeError(_this17.constructor.name+'.'+name+' is of type \''+thisType+'\' and cannot implicitly be converted to \''+thatType+'\'.');}else {thisValue=thatValue;}}});}}],[{key:"createId",value:function createId(){return crypto.randomBytes(20).toString('hex');}}]);return Entity;}();module.exports=Entity;},{"crypto":59}],195:[function(require,module,exports){'use strict'; // Promise
 var Promise=require('bluebird');var ContentHelper=function(){function ContentHelper(){_classCallCheck2(this,ContentHelper);}_createClass(ContentHelper,null,[{key:"getAllContents", /**
      * Gets all Content objects
      * This method must be overridden by a plugin

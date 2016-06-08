@@ -8,19 +8,15 @@ class DateEditor extends View {
     }
 
     onChange() {
-        this.trigger('change', this.$input.val());
+        this.trigger('change', new Date(this.$input.val()));
     }
 
     render() {
         var editor = this;
 
-        this.value = parseInt(this.value);
-
-        var date = new Date(this.value);
-
         this.$element = _.div({class: 'field-editor date-editor'},
             this.disabled ? 
-                _.p({}, date)
+                _.p({}, this.value)
             :
                 this.$input = _.input({class: 'form-control', type: 'text', value: this.value})
         );

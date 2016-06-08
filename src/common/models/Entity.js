@@ -59,6 +59,61 @@ class Entity {
 
         return fields;
     }
+
+    /**
+     * Defines a type safe member variable
+     *
+     * @param {String} type
+     * @param {String} name
+     * @param {Anything} defaultValue
+     */
+    def(type, name, defaultValue) {
+        if(typeof type !== 'function') {
+            throw new TypeError('Parameter \'type\' cannot be of type \'' + (typeof type) + '\' ');
+        }
+        
+        if(typeof name !== 'string') {
+            throw new TypeError('Parameter \'name\' cannot be of type \'' + (typeof name) + '\' ');
+        }
+
+        if(!defaultValue) {
+            switch(type) {
+                case String:
+                    defaultValue = '';
+                    break;
+
+                case Number:
+                    defaultValue = 0;
+                    break;
+
+                case Date:
+                    defaultValue = new Date();
+                    break;
+
+                default:
+                    defaultValue = null;
+                    break;
+            }
+        }
+
+        let thisValue = defaultValue;
+        let thisType = typeof defaultValue;
+
+        Object.defineProperty(this, name, {
+            get: () => {
+                return thisValue;
+            },
+            set: (thatValue) => {
+                let thatType = typeof thatValue;
+
+                if(thisType !== thatType) {
+                    throw new TypeError(this.constructor.name + '.' + name + ' is of type \'' + thisType + '\' and cannot implicitly be converted to \'' + thatType + '\'.');
+                } else {
+                    thisValue = thatValue; 
+                }
+            }
+        });
+    }
 }
 
 module.exports = Entity;
