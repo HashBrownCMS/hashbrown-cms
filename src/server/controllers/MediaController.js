@@ -8,7 +8,7 @@ class MediaController extends Controller {
      * Initiates this controller
      */
     static init(app) {
-        app.get('/media/:id', MediaController.getMedia);
+        app.get('/:project/:environment/media/:id', MediaController.getMedia);
     }
 
     /**

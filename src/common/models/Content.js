@@ -215,22 +215,11 @@ class Content extends Entity {
     /**
      * Gets the schema information
      *
-     * @returns {Promise} promise
+     * @returns {Promise(Schema)} promise
      */
     getSchema() {
-        let model = this;
-
-        return new Promise(function(callback) {
-            if(!view.schemaCache) {
-                ContentHelper.getSchema(view.getType(), model.schemaId)
-                .then(function(schema) {
-                    model.schemaCache = schema;
-
-                    callback(model.schemaCache);
-                });
-            } else {
-                callback(model.schemaCache);
-            }
+        return new Promise((callback) => {
+            callback(null);
         });
     }
 }

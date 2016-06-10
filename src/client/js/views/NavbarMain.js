@@ -29,20 +29,27 @@ class NavbarMain extends View {
         view.onClickPasteContent = function onClickPasteContent() {
             let parentId = $('.context-menu-target-element').data('id');
             
-            $.getJSON('/api/content/' + id + '?token=' + localStorage.getItem('token'), function(copiedContent) {
-                delete copiedContent['id'];
+            $.getJSON(
+                apiUrl('content/' + id),
+                function(copiedContent) {
+                    delete copiedContent['id'];
 
-                copiedContent.parentId = parentId;
-                    
-                $.post('/api/content/new/?token=' + localStorage.getItem('token'), copiedContent, function() {
-                    reloadResource('content')
-                    .then(function() {
-                        view.reload();
-                    });
+                    copiedContent.parentId = parentId;
+                        
+                    $.post(
+                        apiUrl('content/new'),
+                        copiedContent,
+                        function() {
+                            reloadResource('content')
+                            .then(function() {
+                                view.reload();
+                            });
 
-                    view.onClickPasteContent = null;
-                });
-            });
+                            view.onClickPasteContent = null;
+                        }
+                    );
+                }
+            );
         }
     }
 
@@ -57,18 +64,25 @@ class NavbarMain extends View {
         view.onClickPasteContent = function onClickPasteContent() {
             let parentId = $('.context-menu-target-element').data('id');
             
-            $.getJSON('/api/content/' + id + '?token=' + localStorage.getItem('token'), function(cutContent) {
-                cutContent.parentId = parentId;
-                    
-                $.post('/api/content/' + id + '?token=' + localStorage.getItem('token'), cutContent, function() {
-                    reloadResource('content')
-                    .then(function() {
-                        view.reload();
-                    });
+            $.getJSON(
+                apiUrl('content/' + id),
+                function(cutContent) {
+                    cutContent.parentId = parentId;
+                        
+                    $.post(
+                        apiUrl('content/' + id),
+                        cutContent,
+                        function() {
+                            reloadResource('content')
+                            .then(function() {
+                                view.reload();
+                            });
 
-                    view.onClickPasteContent = null;
-                });
-            });
+                            view.onClickPasteContent = null;
+                        }
+                    );
+                }
+            );
         }
     }
 
@@ -78,12 +92,15 @@ class NavbarMain extends View {
     onClickNewContent() {
         let view = this;
 
-        $.post('/api/content/new?token=' + localStorage.getItem('token'), function() {
-            reloadResource('content')
-            .then(function() {
-                view.reload();
-            });
-        });
+        $.post(
+            apiUrl('content/new'),
+            function() {
+                reloadResource('content')
+                .then(function() {
+                    view.reload();
+                });
+            }
+        );
     }
 
     /**
@@ -123,10 +140,10 @@ class NavbarMain extends View {
                         // Save model
                         $.ajax({
                             type: 'post',
-                            url: '/api/content/' + content.id + '?token=' + localStorage.getItem('token'),
+                            url: apiUrl('content/' + content.id),
                             data: content,
                             success: function() {
-                                console.log('[ContentEditor] Saved model to /api/content/' + content.id);
+                                // Saved
                             },
                             error: function(err) {
                                 new MessageModal({
@@ -231,7 +248,7 @@ class NavbarMain extends View {
                     class: 'btn-danger',
                     callback: function() {
                         $.ajax({
-                            url: '/api/content/' + id + '?token=' + localStorage.getItem('token'),
+                            url: apiUrl('content/' + id),
                             type: 'DELETE',
                             success: onSuccess
                         });
@@ -247,12 +264,15 @@ class NavbarMain extends View {
     onClickNewConnection() {
         let view = this;
 
-        $.post('/api/connections/new/?token=' + localStorage.getItem('token'), function() {
-            reloadResource('connections')
-            .then(function() {
-                view.reload();
-            });
-        });
+        $.post(
+            apiUrl('connections/new'),
+            function() {
+                reloadResource('connections')
+                .then(function() {
+                    view.reload();
+                });
+            }
+        );
     }
 
     /**
@@ -294,7 +314,7 @@ class NavbarMain extends View {
                     class: 'btn-danger',
                     callback: function() {
                         $.ajax({
-                            url: '/api/connections/' + id + '?token=' + localStorage.getItem('token'),
+                            url: apiUrl('connections/' + id),
                             type: 'DELETE',
                             success: onSuccess
                         });
@@ -350,7 +370,7 @@ class NavbarMain extends View {
                     class: 'btn-danger',
                     callback: function() {
                         $.ajax({
-                            url: '/api/media/' + id + '?token=' + localStorage.getItem('token'),
+                            url: apiUrl('media/' + id),
                             type: 'DELETE',
                             success: onSuccess
                         });
@@ -419,7 +439,7 @@ class NavbarMain extends View {
             $uploadModal.find('.spinner-container').toggleClass('hidden', false);
             
             $.ajax({
-                url: '/api/media/new?token=' + localStorage.getItem('token'),
+                url: apiUrl('media/new'),
                 type: 'POST',
                 data: new FormData(this),
                 processData: false,

@@ -15,7 +15,7 @@ Router.route('/content/', function() {
 // Edit
 Router.route('/content/:id', function() {
     let contentEditor = new ContentEditor({
-        modelUrl: '/api/content/' + this.id + '?token=' + localStorage.getItem('token')
+        modelUrl: apiUrl('content/' + this.id)
     });
    
     ViewHelper.get('NavbarMain').highlightItem(this.id);
@@ -26,7 +26,7 @@ Router.route('/content/:id', function() {
 // Edit (JSON editor)
 Router.route('/content/json/:id', function() {
     let contentEditor = new JSONEditor({
-        modelUrl: '/api/content/' + this.id + '?token=' + localStorage.getItem('token')
+        modelUrl: apiUrl('content/' + this.id)
     });
      
     ViewHelper.get('NavbarMain').highlightItem(this.id);

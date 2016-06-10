@@ -1662,8 +1662,8 @@ model.getParents().then(function(parents){var _iteratorNormalCompletion4=true;va
      */},{key:"getType",value:function getType(){return this.constructor.name;} /**
      * Gets the schema information
      *
-     * @returns {Promise} promise
-     */},{key:"getSchema",value:function getSchema(){var model=this;return new Promise(function(callback){if(!view.schemaCache){ContentHelper.getSchema(view.getType(),model.schemaId).then(function(schema){model.schemaCache=schema;callback(model.schemaCache);});}else {callback(model.schemaCache);}});}}],[{key:"create",value:function create(properties){var content=new Content({id:Entity.createId(),createDate:new Date(),updateDate:new Date(),schemaId:'contentBase',properties:properties});return content;} /**
+     * @returns {Promise(Schema)} promise
+     */},{key:"getSchema",value:function getSchema(){return new Promise(function(callback){callback(null);});}}],[{key:"create",value:function create(properties){var content=new Content({id:Entity.createId(),createDate:new Date(),updateDate:new Date(),schemaId:'contentBase',properties:properties});return content;} /**
      * Finds a Content object
      *
      * @param {String} id

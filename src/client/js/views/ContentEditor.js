@@ -33,7 +33,7 @@ class ContentEditor extends View {
         function publishConnections() {
             $.ajax({
                 type: 'post',
-                url: '/api/content/publish?token=' + localStorage.getItem('token'),
+                url: apiUrl('content/publish'),
                 data: view.model,
                 success: onSuccess,
                 error: onError
@@ -118,7 +118,7 @@ class ContentEditor extends View {
                     class: 'btn-danger',
                     callback: function() {
                         $.ajax({
-                            url: '/api/content/' + view.model.id + '?token=' + localStorage.getItem('token'),
+                            url: apiUrl('content/' + view.model.id),
                             type: 'DELETE',
                             success: onSuccess
                         });
@@ -173,7 +173,7 @@ class ContentEditor extends View {
         let fieldSchema = resources.schemas[schemaValue.schemaId];
 
         if(fieldSchema) {
-            let fieldEditor = resources.editors[fieldSchema.editorId];
+            let fieldEditor = resources.editors[fieldSchema.editorId || fieldSchema.id];
             
             if(fieldEditor) {
                 let fieldEditorInstance = new fieldEditor({

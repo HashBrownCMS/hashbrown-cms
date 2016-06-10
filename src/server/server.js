@@ -57,23 +57,32 @@ function ready() {
 // Controllers
 // ----------
 let ApiController = require(appRoot + '/src/server/controllers/ApiController');
-let PluginController = require(appRoot + '/src/server/controllers/PluginController');
 let MediaController = require(appRoot + '/src/server/controllers/MediaController');
 
 MediaController.init(app);
 ApiController.init(app);
-PluginController.init(app)
+
+// ----------
+// Helpers
+// ----------
+let PluginHelper = require(appRoot + '/src/server/helpers/PluginHelper');
+
+PluginHelper.init(app)
     .then(ready);
 
 // ----------
-// View
+// Views
 // ----------
 app.get('/:project/:environment/', function(req, res) {
     let ProjectHelper = require(appRoot + '/src/server/helpers/ProjectHelper');    
 
-    ProjectHelper.setCurrent(req.params.project, req.params.environment);
-
-    res.render('index');
+    ProjectHelper.setCurrent(req.params.project, req.params.environment)
+    .then(() => {
+        res.render('index', {
+            currentProject: ProjectHelper.currentProject,
+            currentEnvironment: ProjectHelper.currentEnvironment
+        });
+    });
 });
 
 app.get('/login/', function(req, res) {

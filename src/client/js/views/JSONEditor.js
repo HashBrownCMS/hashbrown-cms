@@ -45,7 +45,7 @@ class JSONEditor extends View {
             this.model = JSON.parse(this.value);
 
             $.post(this.modelUrl, this.model, function() {
-                console.log('[JSONEditor] Saved model to ' + view.modelUrl);
+                // Post successful
             });
 
         } catch(e) {
@@ -94,7 +94,7 @@ class JSONEditor extends View {
                     class: 'btn-danger',
                     callback: function() {
                         $.ajax({
-                            url: '/api/content/' + view.model.id + '?token=' + localStorage.getItem('token'),
+                            url: apiUrl('content/' + view.model.id),
                             type: 'DELETE',
                             success: onSuccess
                         });

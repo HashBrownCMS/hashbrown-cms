@@ -16,6 +16,10 @@ html
             .navspace
             .workspace
 
+        script.
+            window.currentProject = '#{currentProject}';
+            window.currentEnvironment = '#{currentEnvironment}';
+        
         script(src='/lib/jquery/jquery.min.js')
         script(src='/lib/html5sortable/html5sortable.min.js')
         script(src='/lib/bootstrap/js/bootstrap.min.js')

@@ -27,6 +27,18 @@ class Content extends ContentCommon {
             callback(null);
         });
     }
+
+    /**
+     * Gets the schema information
+     *
+     * @returns {Promise} promise
+     */
+    getSchema() {
+        ContentHelper.getSchema(view.getType(), model.schemaId)
+        .then(function(schema) {
+            callback(schema);
+        });
+    }
 }
 
 module.exports = Content;

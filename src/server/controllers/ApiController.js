@@ -1,6 +1,7 @@
 'use strict';
 
 // Libs
+// TODO: Deprecate this
 let multer = require('multer');
 let uploadMedia = multer({
     storage: multer.diskStorage({
@@ -24,8 +25,8 @@ let uploadMedia = multer({
 });
 
 // Models
-let Media = require('../../common/models/Media');
-let Content = require('../../common/models/Content');
+let Media = require('../models/Media');
+let Content = require('../models/Content');
 
 // Classes
 let Controller = require('./Controller');
@@ -39,6 +40,7 @@ let MediaHelper = require('../helpers/MediaHelper');
 let ConnectionHelper = require('../helpers/ConnectionHelper');
 let SettingsHelper = require('../../common/helpers/SettingsHelper');
 let AdminHelper = require('../helpers/AdminHelper');
+let ProjectHelper = require('../helpers/ProjectHelper');
 
 /**
  * The main API controller
@@ -49,34 +51,34 @@ class ApiController extends Controller {
      */
     static init(app) {
         // Content
-        app.get('/api/content', ApiController.getAllContents);
-        app.get('/api/content/:id', ApiController.getContent);
-        app.post('/api/content/new', ApiController.createContent);
-        app.post('/api/content/publish', ApiController.publishContent);
-        app.post('/api/content/:id', ApiController.postContent);
-        app.delete('/api/content/:id', ApiController.deleteContent);
+        app.get('/api/:project/:environment/content', ApiController.getAllContents);
+        app.get('/api/:project/:environment/content/:id', ApiController.getContent);
+        app.post('/api/:project/:environment/content/new', ApiController.createContent);
+        app.post('/api/:project/:environment/content/publish', ApiController.publishContent);
+        app.post('/api/:project/:environment/content/:id', ApiController.postContent);
+        app.delete('/api/:project/:environment/content/:id', ApiController.deleteContent);
 
         // Schemas
-        app.get('/api/schemas', ApiController.getSchemas);
-        app.get('/api/schemas/:id', ApiController.getSchema);
-        app.post('/api/schemas/:id', ApiController.setSchema);
+        app.get('/api/:project/:environment/schemas', ApiController.getSchemas);
+        app.get('/api/:project/:environment/schemas/:id', ApiController.getSchema);
+        app.post('/api/:project/:environment/schemas/:id', ApiController.setSchema);
         
         // Media
-        app.get('/api/media', ApiController.getMedia);
-        app.post('/api/media/new', uploadMedia.single('media'), ApiController.createMedia);
-        app.post('/api/media/:id', uploadMedia.single('media'), ApiController.setMedia);
-        app.delete('/api/media/:id', ApiController.deleteMedia);
+        app.get('/api/:project/:environment/media', ApiController.getMedia);
+        app.post('/api/:project/:environment/media/new', uploadMedia.single('media'), ApiController.createMedia);
+        app.post('/api/:project/:environment/media/:id', uploadMedia.single('media'), ApiController.setMedia);
+        app.delete('/api/:project/:environment/media/:id', ApiController.deleteMedia);
         
         // Connections
-        app.get('/api/connections', ApiController.getConnections);
-        app.get('/api/connections/:id', ApiController.getConnection);
-        app.post('/api/connections/new', ApiController.createConnection);
-        app.post('/api/connections/:id', ApiController.postConnection);
-        app.delete('/api/connections/:id', ApiController.deleteConnection);
+        app.get('/api/:project/:environment/connections', ApiController.getConnections);
+        app.get('/api/:project/:environment/connections/:id', ApiController.getConnection);
+        app.post('/api/:project/:environment/connections/new', ApiController.createConnection);
+        app.post('/api/:project/:environment/connections/:id', ApiController.postConnection);
+        app.delete('/api/:project/:environment/connections/:id', ApiController.deleteConnection);
             
         // Settings
-        app.get('/api/settings/:section', ApiController.getSettings);
-        app.post('/api/settings/:section', ApiController.setSettings);
+        app.get('/api/:project/:environment/settings/:section', ApiController.getSettings);
+        app.post('/api/:project/:environment/settings/:section', ApiController.setSettings);
 
         // Admin
         app.post('/api/admin/login', ApiController.login);
@@ -84,10 +86,7 @@ class ApiController extends Controller {
         app.post('/api/admin/:id', ApiController.postAdmin);
 
         // Templates
-        app.get('/api/templates', ApiController.getTemplates)
-
-        // Compiled editors script
-        app.get('/scripts/editors.js', ApiController.getEditors);
+        app.get('/api/:project/:environment/templates', ApiController.getTemplates)
     }
  
     // ----------
@@ -488,19 +487,6 @@ class ApiController extends Controller {
                 'two.html'
             ]);
         });
-    }
-
-    // ----------
-    // Plugin editors
-    // ---------- 
-    /**
-     * Get all editors
-     */
-    static getEditors(req, res) {
-        PluginHelper.getAllClientScripts('/editors/*/*.js')
-        .then(function(editors) {
-            res.send(editors);
-        });    
     }
 }
 

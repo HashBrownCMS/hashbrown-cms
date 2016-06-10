@@ -17,8 +17,9 @@ window.LanguageSettings = require('./views/LanguageSettings');
 window.Content = require('./models/Content');
 
 // Helpers
-window.LanguageHelper = require('../../common/helpers/LanguageHelper')
-window.SettingsHelper = require('./helpers/SettingsHelper')
+window.LanguageHelper = require('./helpers/LanguageHelper');
+window.SettingsHelper = require('./helpers/SettingsHelper');
+window.ProjectHelper = require('./helpers/ProjectHelper');
 
 let onReadyCallbacks = {};
 let isReady = {};
@@ -85,13 +86,29 @@ window.getSchemaWithParents = function getSchemaWithParents(id) {
 }
 
 /**
+ * Wraps an API call
+ *
+ * @param {String} url
+ */
+window.apiUrl = function apiUrl(url) {
+    let newUrl = 
+        '/api/' + 
+        window.currentProject + '/' +
+        window.currentEnvironment + '/' + 
+        url + 
+        '?token=' + localStorage.getItem('token');
+
+    return newUrl;
+};
+
+/**
  * Reloads a resource
  */
 window.reloadResource = function reloadResource(name) {
     return new Promise(function(callback) {
         $.ajax({
             type: 'GET',
-            url: '/api/' + name + '?token=' + localStorage.getItem('token'),
+            url: apiUrl(name),
             success: function(result) {
                 window.resources[name] = result;
 

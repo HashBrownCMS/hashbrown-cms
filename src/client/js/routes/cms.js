@@ -11,7 +11,7 @@ Router.route('/admins/', function() {
             _.button('Create').click(() => {
                 $.ajax({
                     type: 'POST',
-                    url: '/api/admin/new?token=' + localStorage.getItem('token'),
+                    url: apiUrl('admin/new'),
                     data: {
                         username: 'hest',
                         password: 'test'

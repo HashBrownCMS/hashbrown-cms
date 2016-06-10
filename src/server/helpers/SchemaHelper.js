@@ -1,5 +1,8 @@
 'use strict';
 
+// Models
+let Schema = require('../models/Schema');
+
 // Helpers
 let ProjectHelper = require('./ProjectHelper');
 let MongoHelper = require('./MongoHelper');
@@ -17,56 +20,65 @@ class SchemaHelper {
      */
     static getNativeSchemas() {
         return new Promise(function(callback) {
-            glob(appRoot + '/schemas/*/*.schema', function(err, paths) {
-                if(err) {
-                    throw err;
-                }
-
-                let queue = paths || [];
-                let schemas = {};
-
-                if(queue.length > 0) {
-                    function readNextSchema() {
-                        let schemaPath = queue[0];
-
-                        fs.readFile(schemaPath, function(err, data) {
-                            if(err) {
-                                throw err;
-                            }
-
-                            let schema = JSON.parse(data);
-                            let parentDirName = path.dirname(schemaPath).replace(appRoot + '/schemas/', '');
-                            let id = path.basename(schemaPath, '.schema');
-
-                            // Generated values, will be overwritten every time
-                            schema.id = id;
-                            schema.schemaType = parentDirName;
-
-                            // Add the loaded schema to the output array
-                            schemas[id] = schema;
-
-                            // Shift the queue (removes the first element of the array)
-                            queue.shift();
-
-                            // If the queue still has items in it, we should continue reading...
-                            if(queue.length > 0) {
-                                readNextSchema();
-
-                            // ...if not, we'll return all the loaded schemas
-                            } else {
-                                callback(schemas);
-                            
-                            }
-                        });
+            if(!SchemaHelper.nativeSchemas) {
+                glob(appRoot + '/src/common/schemas/*/*.schema', function(err, paths) {
+                    if(err) {
+                        throw err;
                     }
 
-                    readNextSchema();
+                    let queue = paths || [];
 
-                } else {
-                    callback([]);
+                    // Cache native schemas
+                    SchemaHelper.nativeSchemas = {};
 
-                }
-            }); 
+                    if(queue.length > 0) {
+                        function readNextSchema() {
+                            let schemaPath = queue[0];
+
+                            fs.readFile(schemaPath, function(err, data) {
+                                if(err) {
+                                    throw err;
+                                }
+
+                                let properties = JSON.parse(data);
+                                let parentDirName = path.dirname(schemaPath).replace(appRoot + '/schemas/', '');
+                                let id = path.basename(schemaPath, '.schema');
+
+                                // Generated values, will be overwritten every time
+                                properties.id = id;
+                                properties.schemaType = parentDirName;
+
+                                let schema = new Schema(properties);
+
+                                // Add the loaded schema to the output array
+                                SchemaHelper.nativeSchemas[schema.id] = schema;
+
+                                // Shift the queue (removes the first element of the array)
+                                queue.shift();
+
+                                // If the queue still has items in it, we should continue reading...
+                                if(queue.length > 0) {
+                                    readNextSchema();
+
+                                // ...if not, we'll return all the loaded schemas
+                                } else {
+                                    callback(SchemaHelper.nativeSchemas);
+                                
+                                }
+                            });
+                        }
+
+                        readNextSchema();
+
+                    } else {
+                        callback({});
+
+                    }
+                }); 
+            } else {
+                callback(SchemaHelper.nativeSchemas);
+
+            }
         });
     }
     
@@ -78,11 +90,23 @@ class SchemaHelper {
     static getCustomSchemas() {
         let collection = ProjectHelper.currentEnvironment + '.schemas';
         
-        return MongoHelper.find(
-            ProjectHelper.currentProject,
-            collection,
-            {}
-        );
+        return new Promise((callback) => {
+            MongoHelper.find(
+                ProjectHelper.currentProject,
+                collection,
+                {}
+            ).then((result) => {
+                let schemas = {};
+
+                for(let i in result) {
+                    let schema = new Schema(result[i]);
+
+                    schemas[schema.id] = schema;
+                }
+
+                callback(schemas);
+            });
+        });
     }
 
     /**
@@ -97,7 +121,7 @@ class SchemaHelper {
                 SchemaHelper.getCustomSchemas()
                 .then((customSchemas) => {
                     let allSchemas = nativeSchemas;
-
+                    
                     for(let id in customSchemas) {
                         allSchemas[id] = customSchemas[id];
                     }
@@ -148,7 +172,10 @@ class SchemaHelper {
             {
                 id: id
             },
-            schema
+            schema,
+            {
+                upsert: true
+            }
         );
     }
 }

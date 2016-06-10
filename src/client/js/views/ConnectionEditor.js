@@ -29,10 +29,9 @@ class ConnectionEditor extends View {
 
         $.ajax({
             type: 'post',
-            url: '/api/connections/' + view.model.id + '?token=' + localStorage.getItem('token'),
+            url: apiUrl('connections/' + view.model.id),
             data: view.model,
             success: function() {
-                console.log('[ConnectionEditor] Saved model to /api/connections/' + view.model.id);
                 view.$saveBtn.toggleClass('saving', false);
             
                 reloadResource('connections')
@@ -89,7 +88,7 @@ class ConnectionEditor extends View {
                     class: 'btn-danger',
                     callback: function() {
                         $.ajax({
-                            url: '/api/connections/' + view.model.id + '?token=' + localStorage.getItem('token'),
+                            url: apiUrl('connections/' + view.model.id),
                             type: 'DELETE',
                             success: onSuccess
                         });
