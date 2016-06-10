@@ -3,5 +3,5 @@
 *.swo
 node_modules/*
 
-# Site directories
-sites/*
+# Project directories
+projects/*
