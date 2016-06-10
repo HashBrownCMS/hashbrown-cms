@@ -28,9 +28,10 @@ app.use(express.static(appRoot + '/public'));
 // ----------
 function ready() {
     // Start server
-    let server = app.listen(8000);
+    let port = 80;
+    let server = app.listen(port);
 
-    console.log('[Endomon CMS] Running on port 8000');
+    console.log('[Endomon CMS] Running on port ' + port);
     
     // Startup arguments
     for(let k in process.argv) {
