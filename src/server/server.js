@@ -47,20 +47,11 @@ function ready() {
 
                 let AdminHelper = require(appRoot + '/src/server/helpers/AdminHelper');
 
-                console.log(username, password);
-
                 AdminHelper.createAdmin(username, password);
                 return;
         }
     }
 }
-
-// ----------
-// Watchers
-// ----------
-let PluginWatcher = require(appRoot + '/src/server/watchers/PluginWatcher');
-
-PluginWatcher.init();
 
 // ----------
 // Controllers
@@ -77,7 +68,11 @@ PluginController.init(app)
 // ----------
 // View
 // ----------
-app.get('/', function(req, res) {
+app.get('/:project/:environment/', function(req, res) {
+    let ProjectHelper = require(appRoot + '/src/server/helpers/ProjectHelper');    
+
+    ProjectHelper.setCurrent(req.params.project, req.params.environment);
+
     res.render('index');
 });
 

@@ -1,8 +1,5 @@
 'use strict';
 
-// Promse
-let Promise = require('bluebird');
-
 // Libs
 let glob = require('glob');
 let fs = require('fs');

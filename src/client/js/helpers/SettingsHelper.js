@@ -1,6 +1,8 @@
 'use strict';
 
-class SettingsHelper {
+let SettingsHelperCommon = require('../../../common/helpers/SettingsHelper');
+
+class SettingsHelper extends SettingsHelperCommon {
     /**
      * Gets all settings
      *

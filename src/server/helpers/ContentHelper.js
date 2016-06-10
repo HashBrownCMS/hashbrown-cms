@@ -1,38 +1,49 @@
 'use strict';
 
-// Promise
-let Promise = require('bluebird');
+// Models
+let Content = require('../models/Content');
+
+// Helpers
+let ProjectHelper = require('./ProjectHelper');
+let MongoHelper = require('./MongoHelper');
 
 class ContentHelper {
     /**
      * Gets all Content objects
-     * This method must be overridden by a plugin
      *
      * @return {Promise} promise
      */
     static getAllContents() {
-        return new Promise(function(callback) {
-            callback([]);   
-        });
+        let collection = ProjectHelper.currentEnvironment + '.content';
+        
+        return MongoHelper.find(
+            ProjectHelper.currentProject,
+            collection,
+            {}
+        );
     }
 
     /**
      * Gets a Content object by id
-     * This method must be overridden by a plugin
      *
      * @param {Number} id
      *
      * @return {Promise} promise
      */
     static getContentById(id) {
-        return new Promise(function(callback) {
-            callback({});   
-        });
+        let collection = ProjectHelper.currentEnvironment + '.content';
+        
+        return MongoHelper.findOne(
+            ProjectHelper.currentProject,
+            collection,
+            {
+                id: id
+            }
+        );
     }
     
     /**
      * Sets a Content object by id
-     * This method must be overridden by a plugin
      *
      * @param {Number} id
      * @param {Object} content
@@ -41,38 +52,51 @@ class ContentHelper {
      */
     static setContentById(id, content) {
         content.updateDate = Date.now();
+        let collection = ProjectHelper.currentEnvironment + '.content';
 
-        return new Promise(function(callback) {
-            callback();   
-        });
+        return MongoHelper.updateOne(
+            ProjectHelper.currentProject,
+            collection,
+            {
+                id: id
+            },
+            content
+        );
+    }
+
+    /**
+     * Creates a new content object
+     *
+     * @return {Promise} promise
+     */
+    static createContent() {
+        let content = Content.create();
+        let collection = ProjectHelper.currentEnvironment + '.content';
+
+        return MongoHelper.insertOne(
+            ProjectHelper.currentProject,
+            collection,
+            content.getFields()
+        );
     }
     
     /**
-     * Removes a Content object by id
-     * This method must be overridden by a plugin
+     * Removes a content object
      *
      * @param {Number} id
      *
      * @return {Promise} promise
      */
     static removeContentById(id) {
-        return new Promise(function(callback) {
-            callback();   
-        });
-    }
-
-    /**
-     * Creates a new content
-     * This method must be overridden by a plugin
-     *
-     * @return {Promise} promise
-     */
-    static createContent() {
-        let content = Content.create();
-
-        return new Promise(function(callback) {
-            callback(content);   
-        });
+        let collection = ProjectHelper.currentEnvironment + '.content';
+        
+        return MongoHelper.removeOne(
+            ProjectHelper.currentProject,
+            collection,
+            {
+                id: id
+            }
+        );
     }
 }
 

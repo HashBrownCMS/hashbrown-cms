@@ -1,7 +1,8 @@
 'use strict';
 
-// Promise
-let Promise = require('bluebird');
+// Helpers
+let ProjectHelper = require('./ProjectHelper');
+let MongoHelper = require('./MongoHelper');
 
 // Libs
 let fs = require('fs');
@@ -10,11 +11,11 @@ let glob = require('glob');
 
 class SchemaHelper {
     /**
-     * Gets a list of all schema objects
+     * Gets a list of native schema objects
      *
-     * @return {Promise} promise
+     * @returns {Promise(Schema[])} schemas
      */
-    static getAllSchemas() {
+    static getNativeSchemas() {
         return new Promise(function(callback) {
             glob(appRoot + '/schemas/*/*.schema', function(err, paths) {
                 if(err) {
@@ -68,6 +69,44 @@ class SchemaHelper {
             }); 
         });
     }
+    
+    /**
+     * Gets a list of all custom schema objects
+     *
+     * @returns {Promise(Schema[])} schemas
+     */
+    static getCustomSchemas() {
+        let collection = ProjectHelper.currentEnvironment + '.schemas';
+        
+        return MongoHelper.find(
+            ProjectHelper.currentProject,
+            collection,
+            {}
+        );
+    }
+
+    /**
+     * Gets a list of all schema objects
+     *
+     * @returns {Promise(Schema[])} schemas
+     */
+    static getAllSchemas() {
+        return new Promise((callback) => {
+            SchemaHelper.getNativeSchemas()
+            .then((nativeSchemas) => {
+                SchemaHelper.getCustomSchemas()
+                .then((customSchemas) => {
+                    let allSchemas = nativeSchemas;
+
+                    for(let id in customSchemas) {
+                        allSchemas[id] = customSchemas[id];
+                    }
+
+                    callback(allSchemas); 
+                });
+            });
+        });
+    }
 
     /**
      * Gets a schema object by id
@@ -78,34 +117,16 @@ class SchemaHelper {
      */
     static getSchema(id) {
         return new Promise(function(callback) {
-            glob(appRoot + '/schemas/*/' + id + '.schema', function(err, paths) {
-                if(err) {
-                    throw err;
+            SchemaHelper.getAllSchemas()
+            .then((schemas) => {
+                for(let schemaId in schemas) {
+                    if(schemaId == id) {
+                        callback(schemas[schemaId]);
+                        return;
+                    }
                 }
-                
-                if(paths.length == 0) {
-                    throw 'No schemas by id "' + id + '" found';
 
-                } else if (paths.length == 1) {
-                    let schemaPath = paths[0];
-
-                    fs.readFile(schemaPath, 'utf8', function(err, data) {
-                        if(err) {
-                            throw err;
-                        }
-
-                        let schema = JSON.parse(data);
-                        let parentDirName = path.dirname(schemaPath).replace(appRoot + '/schemas/', '');
-
-                        schema.schemaType = parentDirName;
-
-                        callback(schema);
-                    }); 
-
-                } else {
-                    throw 'More than one schema found with id "' + id + '": ' + paths.json(', ');
-
-                }
+                callback(null);
             });
         });
     }
@@ -119,30 +140,16 @@ class SchemaHelper {
      * @return {Promise} promise
      */
     static setSchema(id, schema) {
-        return new Promise(function(callback) {
-            glob(appRoot + '/schemas/*/' + id + '.schema', function(err, paths) {
-                if(err) {
-                    throw err;
-                }
-                
-                if(paths.length == 0) {
-                    throw 'No schemas by id "' + id + '" found';
-
-                } else if (paths.length == 1) {
-                    fs.writeFile(paths[0], JSON.stringify(schema), 'utf8', function(err, data) {
-                        if(err) {
-                            throw err;
-                        }
-
-                        callback();
-                    }); 
-
-                } else {
-                    throw 'More than one schema found with id "' + id + '": ' + paths.json(', ');
-
-                }
-            });
-        });
+        let collection = ProjectHelper.currentEnvironment + '.schemas';
+        
+        return MongoHelper.updateOne(
+            ProjectHelper.currentProject,
+            collection,
+            {
+                id: id
+            },
+            schema
+        );
     }
 }
 

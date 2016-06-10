@@ -1,4 +1,7 @@
+# Development files
 *.swp
 *.swo
 node_modules/*
-env.json
+
+# Site directories
+sites/*

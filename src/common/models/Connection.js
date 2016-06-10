@@ -1,7 +1,5 @@
 'use strict';
 
-let Promise = require('bluebird');
-
 let LanguageHelper = require('../helpers/LanguageHelper');
 
 let Entity = require('./Entity');

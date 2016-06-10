@@ -6,9 +6,6 @@ let path = require('path');
 let fs = require('fs');
 let rimraf = require('rimraf');
 
-// Promise
-let Promise = require('bluebird');
-
 class MediaHelper {
     /**
      * Gets all Media objects

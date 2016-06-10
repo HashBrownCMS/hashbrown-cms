@@ -1,9 +1,8 @@
 'use strict';
 
 let Connection = require(appRoot + '/src/common/models/Connection');
-
-// Promise
-let Promise = require('bluebird');
+let MongoHelper = require('./MongoHelper');
+let ProjectHelper = require('./ProjectHelper');
 
 class ConnectionHelper {
     /**
@@ -86,87 +85,164 @@ class ConnectionHelper {
 
     /**
      * Gets all connections
-     * This method must be overridden by a plugin
      *
-     * @return {Promise} promise
+     * @return {Promise(Connection[])} promise
      */
     static getAllConnections() {
-        return new Promise(function(callback) {
-            callback([]);   
+        let collection = ProjectHelper.currentEnvironment + '.connections';
+        
+        return new Promise((callback) => {
+            MongoHelper.find(
+                ProjectHelper.currentProject,
+                collection,
+                {}
+            ).then((array) => {
+                let connections = [];
+
+                for(let data of array) {
+                    let connection = ConnectionHelper.initConnection(data);
+
+                    connections.push(connection);
+                }
+
+                callback(connections);
+            });
         });
     }
     
     /**
-     * Get a connection by id
-     * This method must be overridden by a plugin
+     * Gets a connection by id
      *
-     * @param {String} id
+     * @param {string} id
      *
-     * @return {Promise} promise
+     * @return {Promise(Connection)} promise
      */
     static getConnectionById(id) {
-        return new Promise(function(callback) {
-            callback([]);   
-        });
-    }
+        let collection = ProjectHelper.currentEnvironment + '.connections';
+        
+        return new Promise((callback) => {
+            MongoHelper.findOne(
+                ProjectHelper.currentProject,
+                collection,
+                {
+                    id: id
+                }
+            ).then((data) => {
+                if(data) {
+                    let connection = ConnectionHelper.initConnection(data);
 
-    /**
-     * Set a connection by id
-     * This method must be overridden by a plugin
-     *
-     * @param {String} id
-     * @param {Object} content
-     *
-     * @return {Promise} promise
-     */
-    static setConnectionById(id, content) {
-        return new Promise(function(callback) {
-            callback([]);   
-        });
-    }
-    
-    /**
-     * Set a connection setting by id
-     * This method must be overridden by a plugin
-     *
-     * @param {String} id
-     * @param {Object} content
-     *
-     * @return {Promise} promise
-     */
-    static setConnectionSettingById(id, content) {
-        return new Promise(function(callback) {
-            callback([]);   
-        });
-    }
+                    callback(connection);
+                } else {
+                    throw '[MongoHelper] Found no connection with id "' + id + '"';
 
-    /**
-     * Creates a new connection
-     * This method must be overridden by a plugin
-     *
-     * @return {Promise} promise
-     */
-    static createConnection() {
-        let connection = Connection.create();
-
-        return new Promise(function(callback) {
-            callback(connection.data);   
+                }
+            });
         });
     }
     
     /**
      * Removes a connection by id
-     * This method must be overridden by a plugin
      *
-     * @param {String} id
+     * @param {string} id
      *
      * @return {Promise} promise
      */
     static removeConnectionById(id) {
+        let collection = ProjectHelper.currentEnvironment + '.connections';
+        
+        return MongoHelper.removeOne(
+            ProjectHelper.currentProject,
+            collection,
+            {
+                id: id
+            }
+        );
+    }
+    
+    /**
+     * Sets a connection setting by id
+     *
+     * @param {string} id
+     * @param {Object} newSettings
+     *
+     * @return {Promise} promise
+     */
+    static setConnectionSettingById(id, newSettings) {
+        let collection = ProjectHelper.currentEnvironment + '.connections';
+        
         return new Promise(function(callback) {
-            callback();   
+            // First find the connection
+            MongoHelper.findOne(
+                ProjectHelper.currentProject,
+                collection,
+                {
+                    id: id
+                }
+            )
+            .then(function(oldConnection) {
+                let newConnection = oldConnection;
+
+                // Make sure the settings object exists
+                if(!newConnection.settings) {
+                    newConnection.settings = {};
+                }
+
+                // Adopt values at top level
+                for(let k in newSettings) {
+                    newConnection.settings[k] = newSettings[k];
+                }
+
+                // Update the Mongo document
+                MongoHelper.updateOne(
+                    ProjectHelper.currentProject,
+                    'connections',
+                    {
+                        id: id
+                    },
+                    newConnection
+                )
+                .then(callback);
+            });
         });
     }
+
+    /**
+     * Sets a connection by id
+     *
+     * @param {string} id
+     * @param {Object} content
+     *
+     * @return {Promise} promise
+     */
+    static setConnectionById(id, content) {
+        let collection = ProjectHelper.currentEnvironment + '.connections';
+        
+        return MongoHelper.updateOne(
+            ProjectHelper.currentProject,
+            collection,
+            {
+                id: id
+            },
+            content
+        );
+    }
+    
+    /**
+     * Creates a new connection
+     *
+     * @return {Promise} promise
+     */
+    static createConnection() {
+        let connection = Connection.create();
+        let collection = ProjectHelper.currentEnvironment + '.connections';
+
+        return MongoHelper.insertOne(
+            ProjectHelper.currentProject,
+            collection,
+            connection.getFields()
+        );
+    }
+
 }
 
 module.exports = ConnectionHelper;

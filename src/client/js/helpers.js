@@ -14,11 +14,11 @@ window.LanguagePicker = require('./views/LanguagePicker');
 window.LanguageSettings = require('./views/LanguageSettings');
 
 // Models
-window.Content = require('../../common/models/Content');
+window.Content = require('./models/Content');
 
 // Helpers
 window.LanguageHelper = require('../../common/helpers/LanguageHelper')
-window.SettingsHelper = require('../../common/helpers/SettingsHelper')
+window.SettingsHelper = require('./helpers/SettingsHelper')
 
 let onReadyCallbacks = {};
 let isReady = {};

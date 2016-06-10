@@ -1,10 +1,6 @@
 'use strict';
 
-let Promise = require('bluebird');
-let ContentHelper = require('../../server/helpers/ContentHelper');
-
 let Entity = require('./Entity');
-let Connection = require('./Connection');
 
 /**
  * The base class for all Content types
@@ -77,25 +73,6 @@ class Content extends Entity {
      */
     static find(id) {
         return new Promise((callback) => {
-            // We're in client mode
-            if(window && window.resources && window.resources.content) {
-                for(let node of window.resources.content) {
-                    if(node.id == id) {
-                        callback(new Content(node));
-                        return;
-                    }
-                }
-            
-            // We're in server mode
-            } else {
-                ContentHelper.getContentById(id)
-                .then((node) => {
-                    callback(new Content(node));
-                });
-                return;
-
-            }
-                
             // No node found
             callback(null);
         });
