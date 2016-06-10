@@ -173,7 +173,7 @@ class ContentEditor extends View {
         let fieldSchema = resources.schemas[schemaValue.schemaId];
 
         if(fieldSchema) {
-            let fieldEditor = resources.editors[fieldSchema.editorId || fieldSchema.id];
+            let fieldEditor = resources.editors[fieldSchema.editorId];
             
             if(fieldEditor) {
                 let fieldEditorInstance = new fieldEditor({

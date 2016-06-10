@@ -8,6 +8,7 @@ let Entity = require('./Entity');
 class Schema extends Entity {
     structure() {
         this.def(String, 'id');
+        this.def(String, 'editorId');
         this.def(String, 'schemaType');
         this.def(String, 'parentSchemaId');
         this.def(String, 'defaultTabId');
