@@ -73,18 +73,30 @@ PluginHelper.init(app)
 // ----------
 // Views
 // ----------
+// Project list
+app.get('/', function(req, res) {
+    res.render('index');
+});
+
+// Login
+app.get('/login/', function(req, res) {
+    res.render('login');
+});
+
+// Project
+app.get('/:project', function(req, res) {
+    res.render('project');
+});
+
+// Environment
 app.get('/:project/:environment/', function(req, res) {
     let ProjectHelper = require(appRoot + '/src/server/helpers/ProjectHelper');    
 
     ProjectHelper.setCurrent(req.params.project, req.params.environment)
     .then(() => {
-        res.render('index', {
+        res.render('environment', {
             currentProject: ProjectHelper.currentProject,
             currentEnvironment: ProjectHelper.currentEnvironment
         });
     });
-});
-
-app.get('/login/', function(req, res) {
-    res.render('login');
 });
