@@ -1,0 +1,41 @@
+{
+    "defaultTabId": "meta",
+    "icon": "file",
+    "name": "Content Base",
+    "fields": {
+        "createDate": {
+            "disabled": "true",
+            "label": "Created at",
+            "schemaId": "date"
+        },
+        "parentId": {
+            "label": "Parent",
+            "schemaId": "contentReference"
+        },
+        "schemaId": {
+            "label": "Schema",
+            "schemaId": "contentSchemaReference"
+        },
+        "updateDate": {
+            "disabled": "true",
+            "label": "Updated at",
+            "schemaId": "date"
+        },
+        "properties": {
+            "description": {
+                "label": "Description",
+                "multilingual": "true",
+                "schemaId": "string"
+            },
+            "publication": {
+                "label": "Publication",
+                "schemaId": "period"
+            },
+            "title": {
+                "label": "Title",
+                "multilingual": "true",
+                "schemaId": "string"
+            }
+        }
+    }
+}

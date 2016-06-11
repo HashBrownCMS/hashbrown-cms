@@ -1,1 +1,5 @@
-{"name":"Media reference","icon":"file-image-o","type":"string","schemaType":"field","editorId":"mediaReference"}
+{
+    "editorId": "mediaReference",
+    "icon": "file-image-o",
+    "name": "Media reference"
+}

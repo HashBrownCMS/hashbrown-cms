@@ -1,7 +1,8 @@
 'use strict';
 
 // Models
-let Schema = require('../models/Schema');
+let FieldSchema = require('../models/FieldSchema');
+let ContentSchema = require('../models/ContentSchema');
 
 // Helpers
 let ProjectHelper = require('./ProjectHelper');
@@ -41,14 +42,22 @@ class SchemaHelper {
                                 }
 
                                 let properties = JSON.parse(data);
-                                let parentDirName = path.dirname(schemaPath).replace(appRoot + '/schemas/', '');
+                                let parentDirName = path.dirname(schemaPath).replace(appRoot + '/src/common/schemas/', '');
                                 let id = path.basename(schemaPath, '.schema');
 
                                 // Generated values, will be overwritten every time
                                 properties.id = id;
-                                properties.schemaType = parentDirName;
 
-                                let schema = new Schema(properties);
+                                let schema;
+                                
+                                switch(parentDirName) {
+                                    case 'content':
+                                        schema = new ContentSchema(properties);
+                                        break;
+                                    case 'field':
+                                        schema = new FieldSchema(properties);
+                                        break;
+                                }
 
                                 // Add the loaded schema to the output array
                                 SchemaHelper.nativeSchemas[schema.id] = schema;

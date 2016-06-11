@@ -1,1 +1,5 @@
-{"name":"Template Reference","icon":"code","type":"string","editorId":"templateReference","schemaType":"field"}
+{
+    "editorId": "templateReference",
+    "icon": "code",
+    "name": "Template Reference"
+}

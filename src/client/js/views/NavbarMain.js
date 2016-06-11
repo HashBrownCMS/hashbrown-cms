@@ -860,9 +860,9 @@ class NavbarMain extends View {
                 if(item.parentSchemaId) {
                     queueItem.parentDirAttr = {'data-schema-id': item.parentSchemaId };
 
-                } else if(item.schemaType) {
+                } else {
                     queueItem.createDir = true;
-                    queueItem.parentDirAttr = {'data-schema-type': item.schemaType};
+                    queueItem.parentDirAttr = {'data-schema-type': item.type};
                 }
             }
         });

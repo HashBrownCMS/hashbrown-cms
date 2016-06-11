@@ -1,1 +1,5 @@
-{"name":"Period","icon":"calendar","type":"period","schemaType":"field","editorId":"period"}
+{
+    "editorId": "period",
+    "icon": "calendar",
+    "name": "Period"
+}

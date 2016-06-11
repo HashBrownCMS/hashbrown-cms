@@ -1,1 +1,5 @@
-{"name":"Dropdown","icon":"list-alt","type":"string","schemaType":"field","editorId":"dropdown"}
+{
+    "editorId": "dropdown",
+    "icon": "list-alt",
+    "name": "Dropdown"
+}

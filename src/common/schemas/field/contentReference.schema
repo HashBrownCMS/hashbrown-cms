@@ -1,1 +1,5 @@
-{"name":"Content Reference","icon":"file","type":"string","schemaType":"field","editorId":"contentReference"}
+{
+    "editorId": "contentReference",
+    "icon": "file",
+    "name": "Content Reference"
+}

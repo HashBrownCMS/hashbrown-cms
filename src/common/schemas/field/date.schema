@@ -1,1 +1,5 @@
-{"icon":"calendar","name":"Date","type":"date","schemaType":"field","editorId":"date"}
+{
+    "editorId": "date",
+    "icon": "calendar",
+    "name": "Date"
+}

@@ -1,7 +1,7 @@
 'use strict';
 
 // Models
-let Content = require('../models/Content');
+let Content = require('../../common/models/Content');
 
 // Helpers
 let ProjectHelper = require('./ProjectHelper');

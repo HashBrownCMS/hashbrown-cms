@@ -1,1 +1,5 @@
-{"name":"Rich Text","icon":"font","type":"string","schemaType":"field","editorId":"richText"}
+{
+    "editorId": "richText",
+    "icon": "font",
+    "name": "Rich Text"
+}

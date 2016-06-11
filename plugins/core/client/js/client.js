@@ -4,7 +4,7 @@ require('./editors/field/DropdownEditor');
 require('./editors/field/MediaReferenceEditor');
 require('./editors/field/PeriodEditor');
 require('./editors/field/RichTextEditor');
-require('./editors/field/SchemaReferenceEditor');
+require('./editors/field/ContentSchemaReferenceEditor');
 require('./editors/field/StringEditor');
 require('./editors/field/UrlEditor');
 require('./editors/field/TemplateReferenceEditor');
