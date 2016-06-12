@@ -3,10 +3,6 @@
 // Models
 let Content = require('../../common/models/Content');
 
-// Helpers
-let ProjectHelper = require('./ProjectHelper');
-let MongoHelper = require('./MongoHelper');
-
 class ContentHelper {
     /**
      * Gets all Content objects

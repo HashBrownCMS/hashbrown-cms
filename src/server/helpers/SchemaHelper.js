@@ -6,15 +6,13 @@ let ContentSchema = require('../models/ContentSchema');
 
 // Helpers
 let SchemaHelperCommon = require('../../common/helpers/SchemaHelper');
-let ProjectHelper = require('./ProjectHelper');
-let MongoHelper = require('./MongoHelper');
 
 // Libs
 let fs = require('fs');
 let path = require('path');
 let glob = require('glob');
 
-class SchemaHelper {
+class SchemaHelper extends SchemaHelperCommon {
     /**
      * Gets a list of native schema objects
      *

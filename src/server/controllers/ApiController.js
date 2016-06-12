@@ -31,17 +31,6 @@ let Content = require('../models/Content');
 // Classes
 let Controller = require('./Controller');
 
-// Helpers
-let ContentHelper = require('../helpers/ContentHelper');
-let SchemaHelper = require('../helpers/SchemaHelper');
-let ViewHelper = require('../helpers/ViewHelper');
-let PluginHelper = require('../helpers/PluginHelper');
-let MediaHelper = require('../helpers/MediaHelper');
-let ConnectionHelper = require('../helpers/ConnectionHelper');
-let SettingsHelper = require('../../common/helpers/SettingsHelper');
-let AdminHelper = require('../helpers/AdminHelper');
-let ProjectHelper = require('../helpers/ProjectHelper');
-
 /**
  * The main API controller
  */

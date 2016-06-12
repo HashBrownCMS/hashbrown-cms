@@ -1,6 +1,5 @@
 'use strict';
 
-let MongoHelper = require('./MongoHelper');
 let Admin = require('../models/Admin');
 
 /**

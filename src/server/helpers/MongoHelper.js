@@ -5,9 +5,6 @@ let mongodb = require('mongodb');
 let mongoClient = mongodb.MongoClient;
 let mongoDatabase;
 
-// Helpers
-let ProjectHelper = require('./ProjectHelper');
-
 // Models
 let Content = require(appRoot + '/src/common/models/Content');
 let Connection = require(appRoot + '/src/common/models/Connection');

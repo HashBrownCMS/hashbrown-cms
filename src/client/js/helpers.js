@@ -17,10 +17,13 @@ window.LanguageSettings = require('./views/LanguageSettings');
 window.Content = require('./models/Content');
 
 // Helpers
+//window.ConnectionHelper = require('./helpers/ConnectionHelper');
+//window.ContentHelper = require('./helpers/ContentHelper');
+//window.MediaHelper = require('./helpers/MediaHelper');
 window.LanguageHelper = require('./helpers/LanguageHelper');
-window.SettingsHelper = require('./helpers/SettingsHelper');
 window.ProjectHelper = require('./helpers/ProjectHelper');
 window.SchemaHelper = require('./helpers/SchemaHelper');
+window.SettingsHelper = require('./helpers/SettingsHelper');
 
 let onReadyCallbacks = {};
 let isReady = {};
@@ -49,8 +52,8 @@ window.messageModal = function messageModal(title, body, onSubmit) {
 window.apiUrl = function apiUrl(url) {
     let newUrl = 
         '/api/' + 
-        window.currentProject + '/' +
-        window.currentEnvironment + '/' + 
+        ProjectHelper.currentProject + '/' +
+        ProjectHelper.currentEnvironment + '/' + 
         url + 
         '?token=' + localStorage.getItem('token');
 

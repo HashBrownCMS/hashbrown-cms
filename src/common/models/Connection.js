@@ -1,7 +1,5 @@
 'use strict';
 
-let LanguageHelper = require('../helpers/LanguageHelper');
-
 let Entity = require('./Entity');
 
 /**

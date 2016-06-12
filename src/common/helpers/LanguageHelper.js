@@ -1,7 +1,5 @@
 'use strict';
 
-let SettingsHelper = require('./SettingsHelper');
-
 class LanguageHelper {
     /**
      * Gets all languages

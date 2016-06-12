@@ -1,7 +1,5 @@
 'use strict';
 
-let ContentHelper = require('../helpers/ContentHelper');
-
 let ContentCommon = require('../../common/models/Content');
 
 /**

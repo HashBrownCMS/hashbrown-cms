@@ -15,9 +15,11 @@ window.resources = {
     media: []
 };
 
-reloadAllResources()
-.then(function() {
-    triggerReady('resources');
+$(document).ready(() => {
+    reloadAllResources()
+    .then(function() {
+        triggerReady('resources');
+    });
 });
 
 // -----------

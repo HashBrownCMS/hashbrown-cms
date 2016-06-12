@@ -45,8 +45,6 @@ function ready() {
                 username = username.replace('u=', '');
                 password = password.replace('p=', '');
 
-                let AdminHelper = require(appRoot + '/src/server/helpers/AdminHelper');
-
                 AdminHelper.createAdmin(username, password);
                 return;
         }
@@ -65,7 +63,16 @@ ApiController.init(app);
 // ----------
 // Helpers
 // ----------
-let PluginHelper = require(appRoot + '/src/server/helpers/PluginHelper');
+global.AdminHelper = require('./helpers/AdminHelper');
+global.ConnectionHelper = require('./helpers/ConnectionHelper');
+global.ContentHelper = require('./helpers/ContentHelper');
+global.LanguageHelper = require('./helpers/LanguageHelper');
+global.MediaHelper = require('./helpers/MediaHelper');
+global.MongoHelper = require('./helpers/MongoHelper');
+global.PluginHelper = require('./helpers/PluginHelper');
+global.ProjectHelper = require('./helpers/ProjectHelper');
+global.SchemaHelper = require('./helpers/SchemaHelper');
+global.SettingsHelper = require('./helpers/SettingsHelper');
 
 PluginHelper.init(app)
     .then(ready);
@@ -90,8 +97,6 @@ app.get('/:project', function(req, res) {
 
 // Environment
 app.get('/:project/:environment/', function(req, res) {
-    let ProjectHelper = require(appRoot + '/src/server/helpers/ProjectHelper');    
-
     ProjectHelper.setCurrent(req.params.project, req.params.environment)
     .then(() => {
         res.render('environment', {

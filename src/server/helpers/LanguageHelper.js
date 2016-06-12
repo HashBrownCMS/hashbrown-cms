@@ -1,9 +1,8 @@
 'use strict';
 
 let LanguageHelperCommon = require('../../common/helpers/LanguageHelper');
-let SettingsHelper = require('./SettingsHelper');
 
-class LanguageHelper {
+class LanguageHelper extends LanguageHelperCommon {
     /**
      * Gets all selected languages
      *

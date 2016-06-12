@@ -1,8 +1,6 @@
 'use strict';
 
 let Connection = require(appRoot + '/src/common/models/Connection');
-let MongoHelper = require('./MongoHelper');
-let ProjectHelper = require('./ProjectHelper');
 
 class ConnectionHelper {
     /**

@@ -1,7 +1,6 @@
 'use strict';
 
 let Controller = require('./Controller');
-let MediaHelper = require('../helpers/MediaHelper');
 
 class MediaController extends Controller {
     /**

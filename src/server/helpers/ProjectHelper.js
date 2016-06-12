@@ -1,9 +1,5 @@
 'use strict';
 
-// Helpers
-let MongoHelper = require('./MongoHelper');
-let SettingsHelper = require('./SettingsHelper');
-
 /**
  * A helper class for managing projects
  */
@@ -21,7 +17,7 @@ class ProjectHelper {
             this.currentProject = project;
         
             // First check if the environment is enabled
-            SettingsHelper.getSettings('environments', project)
+            SettingsHelper.getSettings('environments')
             .then((environments) => {
                 // There should always be at least one environment available
                 if(!environments) {

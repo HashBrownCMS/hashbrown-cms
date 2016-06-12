@@ -1,8 +1,5 @@
 'use strict';
 
-let MongoHelper = require('./MongoHelper');
-let ProjectHelper = require('./ProjectHelper');
-
 let SettingsHelperCommon = require('../../common/helpers/SettingsHelper');
 
 class SettingsHelper extends SettingsHelperCommon {
