@@ -20,6 +20,7 @@ window.Content = require('./models/Content');
 window.LanguageHelper = require('./helpers/LanguageHelper');
 window.SettingsHelper = require('./helpers/SettingsHelper');
 window.ProjectHelper = require('./helpers/ProjectHelper');
+window.SchemaHelper = require('./helpers/SchemaHelper');
 
 let onReadyCallbacks = {};
 let isReady = {};
@@ -38,51 +39,6 @@ window.messageModal = function messageModal(title, body, onSubmit) {
             onSubmit: onSubmit
         }
     });
-}
-
-/**
- * Gets a schema with parent included recursively
- *
- * @param {Number} id
- *
- * @return {Object} schema
- */
-window.getSchemaWithParents = function getSchemaWithParents(id) {
-    let schema = $.extend(true, {}, resources.schemas[id]);
-
-    if(schema) {
-        // Merge parent with current schema
-        // Since the child schema should override any duplicate content,
-        // the parent is transformed first, then returned as the resulting schema
-        if(schema.parentSchemaId) {
-            let parentSchema = window.getSchemaWithParents(schema.parentSchemaId);
-
-            for(let k in schema.fields) {
-               parentSchema.fields[k] = schema.fields[k];
-            }
-            
-            if(!parentSchema.tabs) {
-                parentSchema.tabs = {};
-            }
-
-            if(schema.tabs) {
-                for(let k in schema.tabs) {
-                   parentSchema.tabs[k] = schema.tabs[k];
-                }
-            }
-
-            parentSchema.defaultTabId = schema.defaultTabId;
-            parentSchema.icon = schema.icon;
-
-            schema = parentSchema;
-        }
-
-    } else {
-        console.log('No schema with id "' + id + '" available in resources');
-    
-    }
-
-    return schema;
 }
 
 /**
@@ -116,7 +72,7 @@ window.reloadResource = function reloadResource(name) {
             },
             error: function(e) {
                 if(e.status == 403) {
-                    location = '/login/';
+                    location = '/login/?path=' + location.pathname;
                 }
             }
         });

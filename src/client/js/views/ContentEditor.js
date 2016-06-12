@@ -300,39 +300,40 @@ class ContentEditor extends View {
     render() {
         let view = this;
 
-        let contentSchema = getSchemaWithParents(this.model.schemaId);
+        SchemaHelper.getSchemaWithParentValues(this.model.schemaId)
+        .then((contentSchema) => {
+            if(contentSchema) {
+                if(!this.model.properties) {
+                    this.model.properties = {};
+                }
 
-        if(contentSchema) {
-            if(!this.model.properties) {
-                this.model.properties = {};
-            }
+                this.model = new Content(this.model);
 
-            this.model = new Content(this.model);
-
-            this.model.getSettings('publishing')
-            .then((publishing) => {
-                view.$element.html([
-                    view.renderEditor(this.model, contentSchema).append(
-                        _.div({class: 'panel panel-default panel-buttons'}, 
-                            _.div({class: 'btn-group'},
-                                _.button({class: 'btn btn-embedded'},
-                                    'Advanced'
-                                ).click(function() { view.onClickAdvanced(); }),
-                                _.button({class: 'btn btn-danger btn-raised'},
-                                    'Delete'
-                                ).click(function() { view.onClickDelete(); }),
-                                view.$saveBtn = _.button({class: 'btn btn-success btn-raised btn-save'},
-                                    _.span({class: 'text-default'}, 'Save' + (publishing.connections && publishing.connections.length > 0 ? ' & publish' : '')),
-                                    _.span({class: 'text-saving'}, 'Saving')
-                                ).click(function() { view.onClickSave(publishing); })
+                this.model.getSettings('publishing')
+                .then((publishing) => {
+                    view.$element.html([
+                        view.renderEditor(this.model, contentSchema).append(
+                            _.div({class: 'panel panel-default panel-buttons'}, 
+                                _.div({class: 'btn-group'},
+                                    _.button({class: 'btn btn-embedded'},
+                                        'Advanced'
+                                    ).click(function() { view.onClickAdvanced(); }),
+                                    _.button({class: 'btn btn-danger btn-raised'},
+                                        'Delete'
+                                    ).click(function() { view.onClickDelete(); }),
+                                    view.$saveBtn = _.button({class: 'btn btn-success btn-raised btn-save'},
+                                        _.span({class: 'text-default'}, 'Save' + (publishing.connections && publishing.connections.length > 0 ? ' & publish' : '')),
+                                        _.span({class: 'text-saving'}, 'Saving')
+                                    ).click(function() { view.onClickSave(publishing); })
+                                )
                             )
                         )
-                    )
-                ]);
-            });
+                    ]);
+                });
 
-            this.onFieldEditorsReady();
-        }
+                this.onFieldEditorsReady();
+            }
+        });
     }
 }
 

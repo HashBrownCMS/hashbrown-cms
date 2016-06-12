@@ -5,6 +5,7 @@ let FieldSchema = require('../models/FieldSchema');
 let ContentSchema = require('../models/ContentSchema');
 
 // Helpers
+let SchemaHelperCommon = require('../../common/helpers/SchemaHelper');
 let ProjectHelper = require('./ProjectHelper');
 let MongoHelper = require('./MongoHelper');
 
@@ -174,7 +175,7 @@ class SchemaHelper {
      */
     static setSchema(id, schema) {
         let collection = ProjectHelper.currentEnvironment + '.schemas';
-        
+       
         return MongoHelper.updateOne(
             ProjectHelper.currentProject,
             collection,

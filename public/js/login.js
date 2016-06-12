@@ -23,7 +23,7 @@ $('.login').each(function() {
             success: function(token) {
                 localStorage.setItem('token', token);
 
-                location = '/#/content/';
+                location = location.search.replace('?path=', '') + '#/content/';
             },
             error: function(e) {
                 alert('Bad credentials');

@@ -12,7 +12,7 @@ class ContentSchema extends Schema {
         this.def(String, 'defaultTabId');
         this.def(Object, 'tabs', {});
         this.def(Object, 'fields', {});
-        
+
         this.type = 'content';
     }
 }

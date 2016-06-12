@@ -380,34 +380,41 @@ class SchemaEditor extends View {
     render() {
         let view = this;
 
-        this.parentSchema = getSchemaWithParents(this.model.parentSchemaId);
-        this.compiledSchema = getSchemaWithParents(this.model.id);
-
-        if(this.model.locked) {
-            this.$element.html(
-                _.div({class: 'schema'},
-                    _.p('This schema is locked')
-                )        
-            );
-        } else {
-            this.$element.html([
-                this.renderFields(),
-                _.div({class: 'panel panel-default panel-buttons'}, 
-                    _.div({class: 'btn-group'},
-                        _.button({class: 'btn btn-embedded'},
-                            'Advanced'
-                        ).click(function() { view.onClickAdvanced(); }),
-                        _.button({class: 'btn btn-danger btn-raised'},
-                            'Delete'
-                        ).click(function() { view.onClickDelete(); }),
-                        view.$saveBtn = _.button({class: 'btn btn-success btn-raised btn-save'},
-                            _.span({class: 'text-default'}, 'Save '),
-                            _.span({class: 'text-saving'}, 'Saving ')
-                        ).click(function() { view.onClickSave(); })
-                    )
-                )
-            ]);
-        }
+        SchemaHelper.getSchemaWithParentValues(this.model.parentSchemaId)
+        .then((parentSchema) => {
+            this.parentSchema = parentSchema;
+            
+            SchemaHelper.getSchemaWithParentValues(this.model.id)
+            .then((compiledSchema) => {
+                this.compiledSchema = compiledSchema;
+                
+                if(this.model.locked) {
+                    this.$element.html(
+                        _.div({class: 'schema'},
+                            _.p('This schema is locked')
+                        )        
+                    );
+                } else {
+                    this.$element.html([
+                        this.renderFields(),
+                        _.div({class: 'panel panel-default panel-buttons'}, 
+                            _.div({class: 'btn-group'},
+                                _.button({class: 'btn btn-embedded'},
+                                    'Advanced'
+                                ).click(function() { view.onClickAdvanced(); }),
+                                _.button({class: 'btn btn-danger btn-raised'},
+                                    'Delete'
+                                ).click(function() { view.onClickDelete(); }),
+                                view.$saveBtn = _.button({class: 'btn btn-success btn-raised btn-save'},
+                                    _.span({class: 'text-default'}, 'Save '),
+                                    _.span({class: 'text-saving'}, 'Saving ')
+                                ).click(function() { view.onClickSave(); })
+                            )
+                        )
+                    ]);
+                }
+            });
+        });
     }
 }
 
