@@ -13,8 +13,10 @@ class MediaHelper {
      * @return {Promise} promise
      */
     static getAllMedia() {
-        return new Promise(function(callback) {
-            glob(appRoot + '/storage/media/*/*', function(err, paths) {
+        return new Promise((callback) => {
+            let path = this.getMediaPath() + '/*/*';
+            
+            glob(path, function(err, paths) {
                 let list = [];
                 
                 for(let i in paths) {
@@ -47,10 +49,10 @@ class MediaHelper {
      * @return {Promise} promise
      */
     static setMediaData(id, file) {
-        return new Promise(function(callback) {
+        return new Promise((callback) => {
             let oldPath = file.path;
             let name = path.basename(oldPath);
-            let newDir = appRoot + '/storage/media/' + id;
+            let newDir = this.getMediaPath() + '/' + id;
             let newPath = newDir + '/' + name;
 
             console.log('[MediaHelper] Setting media data at "' + newPath + '" for id "' + id + '"...');
@@ -76,14 +78,16 @@ class MediaHelper {
      * @return {Promise} promise
      */
     static getMediaData(id) {
-        return new Promise(function(callback) {
-            fs.readdir(appRoot + '/storage/media/' + id, function(err, files) {
+        return new Promise((callback) => {
+            let path = this.getMediaPath() + '/' + id;
+            
+            fs.readdir(path, function(err, files) {
                 if(err) {
                     throw err;
                 }
 
                 if(files.length > 0) {
-                    fs.readFile(appRoot + '/storage/media/' + '/' + id + '/' + files[0], 'binary', function(err, data) {
+                    fs.readFile(path + '/' + files[0], 'binary', function(err, data) {
                         if(err) {
                             throw err;
                         }
@@ -106,8 +110,10 @@ class MediaHelper {
      * @return {Promise} promise
      */
     static removeMedia(id) {
-        return new Promise(function(callback) {
-            rimraf(appRoot + '/storage/media/' + id, function(err) {
+        return new Promise((callback) => {
+            let path = this.getMediaPath() + '/' + id;
+            
+            rimraf(path, function(err) {
                 if(err) {
                     throw err;
                 }
@@ -115,6 +121,34 @@ class MediaHelper {
                 callback();
             });
         });
+    }
+
+    /**
+     * Gets the media root path
+     *
+     * @returns {String} path
+     */
+    static getMediaPath() {
+        return
+            appRoot +
+            '/projects/' +
+            ProjectHelper.currentProject + 
+            '/storage/' +
+            ProjectHelper.currentEnvironment +
+            '/media/';
+    }
+    
+    /**
+     * Gets the medie temp path
+     *
+     * @returns {String} path
+     */
+    static getTempPath() {
+        return
+            appRoot +
+            '/projects/' +
+            ProjectHelper.currentProject +
+            '/storage/temp';
     }
 }
 

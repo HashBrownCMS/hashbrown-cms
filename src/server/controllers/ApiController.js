@@ -2,11 +2,18 @@
 
 // Libs
 // TODO: Deprecate this
+let fs = require('fs');
 let multer = require('multer');
 let uploadMedia = multer({
     storage: multer.diskStorage({
         destination: function(req, file, cb) {
-            cb(null, appRoot + '/storage/temp/');
+            let path = MediaHelper.getTempPath();
+            
+            if(!fs.existsSync(path)){
+                fs.mkdirSync(path);
+            }
+            
+            cb(null, appRoot + path);
         },
         filename: function(req, file, cb) {
             let split = file.originalname.split('.');
