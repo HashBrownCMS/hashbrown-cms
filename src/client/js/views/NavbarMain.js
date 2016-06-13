@@ -109,7 +109,7 @@ class NavbarMain extends View {
     onClickContentSettings() {
         let id = $('.context-menu-target-element').data('id');
         
-        Content.find(id)
+        ContentHelper.getContentById(id)
         .then((content) => {
             if(!content) {
                 messageModal('Error', 'Couldn\'t find content with id "' + id + '"'); 

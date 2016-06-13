@@ -18,8 +18,8 @@ window.Content = require('./models/Content');
 
 // Helpers
 //window.ConnectionHelper = require('./helpers/ConnectionHelper');
-//window.ContentHelper = require('./helpers/ContentHelper');
 //window.MediaHelper = require('./helpers/MediaHelper');
+window.ContentHelper = require('./helpers/ContentHelper');
 window.LanguageHelper = require('./helpers/LanguageHelper');
 window.ProjectHelper = require('./helpers/ProjectHelper');
 window.SchemaHelper = require('./helpers/SchemaHelper');
@@ -75,7 +75,7 @@ window.reloadResource = function reloadResource(name) {
             },
             error: function(e) {
                 if(e.status == 403) {
-                    location = '/login/?path=' + location.pathname;
+                    location = '/login/?path=' + location.pathname + location.hash;
                 }
             }
         });

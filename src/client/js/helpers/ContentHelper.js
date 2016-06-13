@@ -26,7 +26,7 @@ class ContentHelper extends ContentHelperCommon {
             if(result) { 
                 resolve(new Content(result)); 
             } else {
-                reject(new Error('Couldn\'t get Content by id "' + id + '"'));
+                resolve(null);
             }
         });
     }

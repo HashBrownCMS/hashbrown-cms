@@ -7,26 +7,6 @@ let ContentCommon = require('../../common/models/Content');
  */
 class Content extends ContentCommon {
     /**
-     * Finds a Content object
-     *
-     * @param {String} id
-     *
-     * @returns {Content} content
-     */
-    static find(id) {
-        return new Promise((callback) => {
-            ContentHelper.getContentById(id)
-            .then((node) => {
-                callback(new Content(node));
-            });
-            return;
-            
-            // No node found
-            callback(null);
-        });
-    }
-
-    /**
      * Gets the schema information
      *
      * @returns {Promise} promise

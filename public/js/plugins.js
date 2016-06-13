@@ -1627,15 +1627,15 @@ this.def(Object,'settings',{publishing:{connections:[]}});} /**
      * Gets all parents
      *
      * @returns {Promise} parents
-     */value:function getParents(){var _this16=this;return new Promise(function(callback){var parents=[];function iterate(content){if(content.parentId){Content.find(content.parentId).then(function(parentContent){if(parentContent){parents.push(parentContent);iterate(parentContent);}else {console.log('[Content] Parent content with id "'+content.parentId+'" was not found');callback(parents);}});}else {callback(parents);}}iterate(_this16);});} /**
+     */value:function getParents(){var _this16=this;return new Promise(function(resolve){var parents=[];function iterate(content){if(content.parentId){ContentHelper.getContentById(content.parentId).then(function(parentContent){if(parentContent){parents.push(parentContent);iterate(parentContent);}else {reject(new Error('[Content] Parent content with id "'+content.parentId+'" was not found'));}});}else {resolve(parents);}}iterate(_this16);});} /**
      * Gets a settings
      *
      * @param {String} key
      *
      * @returns {Promise} settings
-     */},{key:"getSettings",value:function getSettings(key){var model=this;return new Promise(function(callback){ // Loop through all parent content to find a governing setting
-model.getParents().then(function(parents){var _iteratorNormalCompletion4=true;var _didIteratorError4=false;var _iteratorError4=undefined;try{for(var _iterator4=parents[Symbol.iterator](),_step4;!(_iteratorNormalCompletion4=(_step4=_iterator4.next()).done);_iteratorNormalCompletion4=true){var parentContent=_step4.value;if(parentContent.settings&&parentContent.settings[key]&&parentContent.settings[key].applyToChildren){var settings=parentContent.settings[key];settings.governedBy=parentContent;callback(settings);return;}} // No parent nodes with governing settings found, return own settings
-}catch(err){_didIteratorError4=true;_iteratorError4=err;}finally {try{if(!_iteratorNormalCompletion4&&_iterator4.return){_iterator4.return();}}finally {if(_didIteratorError4){throw _iteratorError4;}}}if(!model.settings){model.settings={};}if(!model.settings[key]){model.settings[key]={};}callback(model.settings[key]);});});} /**
+     */},{key:"getSettings",value:function getSettings(key){var model=this;return new Promise(function(resolve){ // Loop through all parent content to find a governing setting
+model.getParents().then(function(parents){var _iteratorNormalCompletion4=true;var _didIteratorError4=false;var _iteratorError4=undefined;try{for(var _iterator4=parents[Symbol.iterator](),_step4;!(_iteratorNormalCompletion4=(_step4=_iterator4.next()).done);_iteratorNormalCompletion4=true){var parentContent=_step4.value;if(parentContent.settings&&parentContent.settings[key]&&parentContent.settings[key].applyToChildren){var settings=parentContent.settings[key];settings.governedBy=parentContent;resolve(settings);return;}} // No parent nodes with governing settings found, return own settings
+}catch(err){_didIteratorError4=true;_iteratorError4=err;}finally {try{if(!_iteratorNormalCompletion4&&_iterator4.return){_iterator4.return();}}finally {if(_didIteratorError4){throw _iteratorError4;}}}if(!model.settings){model.settings={};}if(!model.settings[key]){model.settings[key]={};}resolve(model.settings[key]);});});} /**
      * Shorthand to get property value
      *
      * @param {String} key
@@ -1663,14 +1663,7 @@ model.getParents().then(function(parents){var _iteratorNormalCompletion4=true;va
      * Gets the schema information
      *
      * @returns {Promise(Schema)} promise
-     */},{key:"getSchema",value:function getSchema(){return new Promise(function(callback){callback(null);});}}],[{key:"create",value:function create(properties){var content=new Content({id:Entity.createId(),createDate:new Date(),updateDate:new Date(),schemaId:'contentBase',properties:properties});return content;} /**
-     * Finds a Content object
-     *
-     * @param {String} id
-     *
-     * @returns {Content} content
-     */},{key:"find",value:function find(id){return new Promise(function(callback){ // No node found
-callback(null);});}}]);return Content;}(Entity);module.exports=Content;},{"./Entity":156}],156:[function(require,module,exports){'use strict';var crypto=require('crypto'); /**
+     */},{key:"getSchema",value:function getSchema(){return new Promise(function(callback){callback(null);});}}],[{key:"create",value:function create(properties){var content=new Content({id:Entity.createId(),createDate:new Date(),updateDate:new Date(),schemaId:'contentBase',properties:properties});return content;}}]);return Content;}(Entity);module.exports=Content;},{"./Entity":156}],156:[function(require,module,exports){'use strict';var crypto=require('crypto'); /**
  * The base class for everything
  */var Entity=function(){ /**
      * Constructs an entity

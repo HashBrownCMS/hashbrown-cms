@@ -65,44 +65,28 @@ class Content extends Entity {
     }
 
     /**
-     * Finds a Content object
-     *
-     * @param {String} id
-     *
-     * @returns {Content} content
-     */
-    static find(id) {
-        return new Promise((callback) => {
-            // No node found
-            callback(null);
-        });
-    }
-
-    /**
      * Gets all parents
      *
      * @returns {Promise} parents
      */
     getParents() {
-        return new Promise((callback) => {
+        return new Promise((resolve) => {
             let parents = [];
 
             function iterate(content) {
                 if(content.parentId) {
-                    Content.find(content.parentId)
+                    ContentHelper.getContentById(content.parentId)
                     .then((parentContent) => {
                         if(parentContent) {
                             parents.push(parentContent);
                             iterate(parentContent);
                         } else {
-                            console.log('[Content] Parent content with id "' + content.parentId + '" was not found');
-
-                            callback(parents);
+                            reject(new Error('[Content] Parent content with id "' + content.parentId + '" was not found'));
                         }
                     });
 
                 } else {
-                    callback(parents);
+                    resolve(parents);
                 }
             }
 
@@ -120,7 +104,7 @@ class Content extends Entity {
     getSettings(key) {
         let model = this;
         
-        return new Promise((callback) => {
+        return new Promise((resolve) => {
             // Loop through all parent content to find a governing setting
             model.getParents()
             .then((parents) => {
@@ -133,7 +117,7 @@ class Content extends Entity {
                         let settings = parentContent.settings[key];
                         settings.governedBy = parentContent;
 
-                        callback(settings);
+                        resolve(settings);
                         return;
                     }
                 }
@@ -147,7 +131,7 @@ class Content extends Entity {
                     model.settings[key] = {};
                 }
 
-                callback(model.settings[key]);
+                resolve(model.settings[key]);
             });
         });
     }
