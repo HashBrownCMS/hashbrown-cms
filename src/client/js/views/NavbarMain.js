@@ -425,7 +425,7 @@ class NavbarMain extends View {
                 $uploadModal.find('.spinner-container').toggleClass('hidden', false);
 
                 reader.readAsDataURL(file);
-                console.log('Reading data of file type ' + file.type + '...');
+                console.log('[NavbarMain] Reading data of file type ' + file.type + '...');
             }
         }
         

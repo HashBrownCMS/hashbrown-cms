@@ -27,20 +27,18 @@ class SchemaEditor extends View {
      * Event: Click save. Posts the model to the modelUrl
      */
     onClickSave() {
-        let view = this;
-
         view.$saveBtn.toggleClass('saving', true);
 
         $.ajax({
             type: 'post',
             url: view.modelUrl,
             data: view.model,
-            success: function() {
+            success: () => {
                 console.log('[SchemaEditor] Saved model to ' + view.modelUrl);
-                view.$saveBtn.toggleClass('saving', false);
+                this.$saveBtn.toggleClass('saving', false);
             
                 reloadResource('schemas')
-                .then(function() {
+                .then(() => {
                     let navbar = ViewHelper.get('NavbarMain');
                     
                     navbar.reload();
@@ -310,9 +308,17 @@ class SchemaEditor extends View {
             view.model.defaultTabId = $element.find('select').val();
         }
 
+        let tabs = {};
+        
+        tabs['meta'] = 'Meta';
+
+        for(let k in view.compiledSchema.tabs) {
+            tabs[k] = view.compiledSchema.tabs[k];
+        }
+
         let $element = _.div({class: 'default-tab-editor'},
             _.select({class: 'form-control'}, 
-                _.each(this.compiledSchema.tabs, function(id, label) {
+                _.each(tabs, function(id, label) {
                     return _.option({value: id}, label);
                 })
             ).val(this.model.defaultTabId).change(onChange)
@@ -378,16 +384,16 @@ class SchemaEditor extends View {
     }
 
     render() {
-        let view = this;
-
         SchemaHelper.getSchemaWithParentValues(this.model.parentSchemaId)
         .then((parentSchema) => {
             this.parentSchema = parentSchema;
-            
+
+            console.log(this.parentSchema.tabs);
+
             SchemaHelper.getSchemaWithParentValues(this.model.id)
             .then((compiledSchema) => {
                 this.compiledSchema = compiledSchema;
-                
+
                 if(this.model.locked) {
                     this.$element.html(
                         _.div({class: 'schema'},
@@ -401,18 +407,19 @@ class SchemaEditor extends View {
                             _.div({class: 'btn-group'},
                                 _.button({class: 'btn btn-embedded'},
                                     'Advanced'
-                                ).click(function() { view.onClickAdvanced(); }),
+                                ).click(() => { this.onClickAdvanced(); }),
                                 _.button({class: 'btn btn-danger btn-raised'},
                                     'Delete'
-                                ).click(function() { view.onClickDelete(); }),
-                                view.$saveBtn = _.button({class: 'btn btn-success btn-raised btn-save'},
+                                ).click(() => { this.onClickDelete(); }),
+                                this.$saveBtn = _.button({class: 'btn btn-success btn-raised btn-save'},
                                     _.span({class: 'text-default'}, 'Save '),
                                     _.span({class: 'text-saving'}, 'Saving ')
-                                ).click(function() { view.onClickSave(); })
+                                ).click(() => { this.onClickSave(); })
                             )
                         )
                     ]);
                 }
+            console.log(this.parentSchema.tabs);
             });
         });
     }

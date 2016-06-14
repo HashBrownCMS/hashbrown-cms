@@ -6,8 +6,10 @@ let MessageModal = require('./MessageModal');
 class MediaViewer extends View {
     constructor(params) {
         super(params);
+        
+        this.$element = _.div({class: 'media-viewer panel panel-default'});
 
-        this.init();
+        this.fetch();
     }
 
     /**
@@ -17,7 +19,7 @@ class MediaViewer extends View {
         new MessageModal({
             model: {
                 title: 'Delete content',
-                body: 'Are you sure you want to delete this?'
+                body: 'Are you sure you want to delete "' + this.model.name + '"?'
             },
             buttons: [
                 {
@@ -39,16 +41,14 @@ class MediaViewer extends View {
     render() {
         let view = this;
 
-        this.$element = _.div({class: 'media-viewer panel panel-default'},
+        this.$element.empty().append(
             _.div({class: 'panel-heading'},
                 _.h4({class: 'panel-title'},
-                    this.mediaId
+                    this.model.name
                 )
             ),
             _.div({class: 'panel-body'},
-                function() {
-                    return _.img({class: 'img-responsive', src: '/media/' + view.mediaId})                    
-                }()
+                _.img({class: 'img-responsive', src: this.model.url})                    
             ),
             _.div({class: 'panel-footer'},
                 _.div({class: 'btn-group'},

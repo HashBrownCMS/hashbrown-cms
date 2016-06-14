@@ -12,7 +12,7 @@ class SchemaHelper extends SchemaHelperCommon {
      * @returns {Promise(Schema)} schema
      */
     static getSchemaWithParentValues(id) {
-        return new Promise((callback) => {
+        return new Promise((resolve, reject) => {
             let properties = resources.schemas[id];
 
             if(properties) {
@@ -23,38 +23,42 @@ class SchemaHelper extends SchemaHelperCommon {
                     SchemaHelper.getSchemaWithParentValues(properties.parentSchemaId).
                     then((parentSchema) => {
                         let parentProperties = parentSchema.getFields();
+                        let mergedProperties = parentProperties;
 
                         for(let k in properties.fields) {
-                           parentProperties.fields[k] = properties.fields[k];
+                           mergedProperties.fields[k] = properties.fields[k];
                         }
                         
-                        if(!parentProperties.tabs) {
-                            parentProperties.tabs = {};
+                        if(!mergedProperties.tabs) {
+                            mergedProperties.tabs = {};
                         }
 
                         if(properties.tabs) {
                             for(let k in properties.tabs) {
-                               parentProperties.tabs[k] = properties.tabs[k];
+                               mergedProperties.tabs[k] = properties.tabs[k];
                             }
                         }
 
-                        parentProperties.defaultTabId = properties.defaultTabId;
-                        parentProperties.icon = properties.icon;
+                        mergedProperties.defaultTabId = properties.defaultTabId || mergedProperties.defaultTabId;
+                        mergedProperties.icon = properties.icon || mergedProperties.icon;
 
-                        properties = parentProperties;
-
-                        callback(SchemaHelper.getModel(properties));
+                        resolve(SchemaHelper.getModel(mergedProperties));
                     });
                 
                 // If no parent was specified, return the current schema
                 } else {
-                    callback(SchemaHelper.getModel(properties));
+                    resolve(SchemaHelper.getModel(properties));
                 
                 }
 
-            } else {
-                throw 'No schema with id "' + id + '" available in resources';
+            // If id was specified, but no Schema was found, return error
+            } else if(id) {
+                reject(new Error('No schema with id "' + id + '" available in resources'));
             
+            // If no schema was found, return with null
+            } else {
+                resolve();
+
             }
         });
     }

@@ -15,7 +15,7 @@ Router.route('/media/', function() {
 // Preview
 Router.route('/media/:id', function() {
     let mediaViewer = new MediaViewer({
-        mediaId: this.id
+        modelUrl: apiUrl('media/' + this.id)
     });
     
     ViewHelper.get('NavbarMain').highlightItem(this.id);

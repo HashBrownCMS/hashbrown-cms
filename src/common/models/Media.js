@@ -1,5 +1,8 @@
 'use strict';
 
+// Libs
+let path = require('path');
+
 let Entity = require('./Entity');
 
 /**
@@ -8,7 +11,29 @@ let Entity = require('./Entity');
 class Media extends Entity {
     structure() {
         this.def(String, 'id');
-        this.def(String, 'data');
+        this.def(String, 'name');
+        this.def(String, 'url');
+    }
+
+    /**
+     * Read from file path
+     *
+     * @param {String} filePath
+     */
+    readFromFilePath(filePath) {
+        let name = path.basename(filePath);
+        let id = filePath;
+       
+        // Trim file path for id 
+        id = id.replace('/' + name, '');
+        id = id.substring(id.lastIndexOf('/') + 1);
+        
+        // Remove file extension
+        name = name.replace(/\.[^/.]+$/, '');
+     
+        this.id = id;
+        this.name = name;
+        this.url = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + id;
     }
 
     /**

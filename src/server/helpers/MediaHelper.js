@@ -6,6 +6,9 @@ let path = require('path');
 let fs = require('fs');
 let rimraf = require('rimraf');
 
+// Models
+let Media = require('../models/Media');
+
 class MediaHelper {
     /**
      * Gets all Media objects
@@ -14,9 +17,9 @@ class MediaHelper {
      */
     static getAllMedia() {
         return new Promise((callback) => {
-            let path = this.getMediaPath() + '/*/*';
+            let mediaPath = this.getMediaPath() + '/*/*';
             
-            glob(path, function(err, paths) {
+            glob(mediaPath, function(err, paths) {
                 let list = [];
                 
                 for(let i in paths) {
@@ -71,11 +74,39 @@ class MediaHelper {
     }
 
     /**
+     * Gets a Media object
+     *
+     * @param {String} id
+     *
+     * @returns {Promise(Media)} media
+     */
+    static getMedia(id) {
+        return new Promise((resolve) => {
+            let mediaPath = this.getMediaPath() + '/' + id + '/*';
+            
+            glob(mediaPath, function(err, paths) {
+                if(paths && paths.length > 0) {
+                    let filePath = paths[0];
+                    let media = new Media();
+                    
+                    media.readFromFilePath(filePath);
+                    
+                    resolve(media);
+
+                } else {
+                    resolve(null);
+
+                }
+            });
+        });
+    }
+
+    /**
      * Gets data of a Media object
      *
      * @param {Number} id
      *
-     * @return {Promise} promise
+     * @return {Promise} data
      */
     static getMediaData(id) {
         return new Promise((callback) => {
@@ -83,10 +114,10 @@ class MediaHelper {
             
             fs.readdir(path, function(err, files) {
                 if(err) {
-                    throw err;
+                    console.log('[MediaHelper]', err);
                 }
 
-                if(files.length > 0) {
+                if(files && files.length > 0) {
                     fs.readFile(path + '/' + files[0], 'binary', function(err, data) {
                         if(err) {
                             throw err;
@@ -129,13 +160,15 @@ class MediaHelper {
      * @returns {String} path
      */
     static getMediaPath() {
-        return
+        let path = 
             appRoot +
             '/projects/' +
             ProjectHelper.currentProject + 
             '/storage/' +
             ProjectHelper.currentEnvironment +
             '/media/';
+
+        return path;
     }
     
     /**
@@ -144,11 +177,15 @@ class MediaHelper {
      * @returns {String} path
      */
     static getTempPath() {
-        return
+        let path = 
             appRoot +
             '/projects/' +
             ProjectHelper.currentProject +
             '/storage/temp';
+
+        console.log('TEMP', path);
+
+        return path;
     }
 }
 

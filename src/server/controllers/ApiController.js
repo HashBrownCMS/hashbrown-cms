@@ -60,10 +60,11 @@ class ApiController extends Controller {
         app.post('/api/:project/:environment/schemas/:id', ApiController.setSchema);
         
         // Media
-        app.get('/api/:project/:environment/media', ApiController.getMedia);
         app.post('/api/:project/:environment/media/new', uploadMedia.single('media'), ApiController.createMedia);
+        app.get('/api/:project/:environment/media/:id', ApiController.getSingleMedia);
         app.post('/api/:project/:environment/media/:id', uploadMedia.single('media'), ApiController.setMedia);
         app.delete('/api/:project/:environment/media/:id', ApiController.deleteMedia);
+        app.get('/api/:project/:environment/media', ApiController.getMedia);
         
         // Connections
         app.get('/api/:project/:environment/connections', ApiController.getConnections);
@@ -96,6 +97,20 @@ class ApiController extends Controller {
             MediaHelper.getAllMedia()
             .then(function(paths) {
                 res.send(paths)
+            }); 
+        });
+    }
+    
+    /**
+     * Gets a single Media object
+     */
+    static getSingleMedia(req, res) {
+        ApiController.authenticate(req, res, () => {
+            let id = req.params.id;
+
+            MediaHelper.getMedia(id)
+            .then(function(media) {
+                res.send(media)
             }); 
         });
     }
