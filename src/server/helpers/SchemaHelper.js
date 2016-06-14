@@ -1,6 +1,7 @@
 'use strict';
 
 // Models
+let Schema = require('../models/Schema');
 let FieldSchema = require('../models/FieldSchema');
 let ContentSchema = require('../models/ContentSchema');
 
@@ -107,7 +108,7 @@ class SchemaHelper extends SchemaHelperCommon {
                 let schemas = {};
 
                 for(let i in result) {
-                    let schema = new Schema(result[i]);
+                    let schema = SchemaHelper.getModel(result[i]);
 
                     schemas[schema.id] = schema;
                 }
@@ -185,6 +186,26 @@ class SchemaHelper extends SchemaHelperCommon {
                 upsert: true
             }
         );
+    }
+
+    /**
+     * Creates a new Schema
+     *
+     * @param {Schema} parentSchema
+     *
+     * @returns {Promise(Schema}) schema
+     */
+    static createSchema(parentSchema) {
+        let collection = ProjectHelper.currentEnvironment + '.schemas';
+        let newSchema = Schema.create(parentSchema);
+
+        return new Promise((resolve) => {
+            MongoHelper.insertOne(
+                ProjectHelper.currentProject,
+                collection,
+                newSchema.getFields() 
+            )
+        });
     }
 }
 

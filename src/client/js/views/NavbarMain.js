@@ -325,6 +325,26 @@ class NavbarMain extends View {
     }
 
     /**
+     * Event: Click new schema
+     */
+    onClickNewSchema() {
+        let parentId = $('.context-menu-target-element').data('id');
+        let parentSchema = window.resources.schemas[parentId];
+
+        $.ajax({
+            type: 'POST',
+            url: apiUrl('schemas/new'),
+            data: parentSchema,
+            success: () => {
+                reloadResource('schemas')
+                .then(function() {
+                    this.reload();
+                });
+            }
+        });
+    }
+
+    /**
      * Event: Click toggle fullscreen
      */
     onClickToggleFullscreen() {
@@ -854,6 +874,10 @@ class NavbarMain extends View {
             route: '/schemas/',
             icon: 'gears',
             items: resources.schemas,
+            itemContextMenu: {
+                'This schema': '---',
+                'New child schema': function() { view.onClickNewSchema(); }
+            },
             sort: function(item, queueItem) {
                 queueItem.$element.attr('data-schema-id', item.id);
                

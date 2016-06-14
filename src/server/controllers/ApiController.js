@@ -24,9 +24,11 @@ class ApiController extends Controller {
         app.delete('/api/:project/:environment/content/:id', ApiController.deleteContent);
 
         // Schemas
+        app.post('/api/:project/:environment/schemas/new', ApiController.createSchema);
         app.get('/api/:project/:environment/schemas', ApiController.getSchemas);
         app.get('/api/:project/:environment/schemas/:id', ApiController.getSchema);
         app.post('/api/:project/:environment/schemas/:id', ApiController.setSchema);
+        app.delete('/api/:project/:environment/schemas:id', ApiController.deleteSchema);
         
         // Media
         app.post('/api/:project/:environment/media/new', MediaHelper.getUploadHandler(), ApiController.createMedia);
@@ -315,7 +317,7 @@ class ApiController extends Controller {
     // Schema methods
     // ---------- 
     /**
-     * Get a list of all schema objects
+     * Get a list of all Schemas
      */
     static getSchemas(req, res) {
         ApiController.authenticate(req, res, () => {
@@ -327,7 +329,7 @@ class ApiController extends Controller {
     }
     
     /**
-     * Get a content schema object by id
+     * Get a Schema by id
      */
     static getSchema(req, res) {
         ApiController.authenticate(req, res, () => {
@@ -341,7 +343,7 @@ class ApiController extends Controller {
     }
     
     /**
-     * Set a content schema object by id
+     * Set a Schema by id
      */
     static setSchema(req, res) {
         ApiController.authenticate(req, res, () => {
@@ -349,6 +351,34 @@ class ApiController extends Controller {
             let schema = req.body;
 
             SchemaHelper.setSchema(id, schema)
+            .then(function() {
+                res.sendStatus(200);
+            });
+        });
+    }
+    
+    /**
+     * Creates a new Schema
+     */
+    static createSchema(req, res) {
+        let parentSchema = req.body;
+
+        ApiController.authenticate(req, res, () => {
+            SchemaHelper.createSchema(parentSchema)
+            .then(function(schema) {
+                res.send(schema);
+            });
+        });
+    }
+    
+    /**
+     * Deletes a Schema by id
+     */
+    static deleteSchema(req, res) {
+        ApiController.authenticate(req, res, () => {
+            let id = req.params.id;
+            
+            SchemaHelper.removeSchemaById(id)
             .then(function() {
                 res.sendStatus(200);
             });

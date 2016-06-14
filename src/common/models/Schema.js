@@ -12,6 +12,23 @@ class Schema extends Entity {
         this.def(String, 'icon');
         this.def(String, 'parentSchemaId');
     }
+
+    /**
+     * Creates a new schema
+     *
+     * @param {Schema} parentSchema
+     *
+     * @returns {Schema} schema
+     */
+    static create(parentSchema) {
+        return SchemaHelper.getModel({
+            id: Entity.createId(),
+            name: 'New schema',
+            icon: 'file',
+            type: parentSchema.type,
+            parentSchemaId: parentSchema.id
+        });
+    }
 }
 
 module.exports = Schema;
