@@ -21,8 +21,7 @@ class Entity {
                 this[k] = properties[k] || this[k];
             
             } catch(e) {
-                console.log(e);
-                console.log(e.stack);
+                debug.warning(e, this);
             }
         }
     }

@@ -243,8 +243,6 @@ class ApiController extends Controller {
         ApiController.authenticate(req, res, () => {
             let content = new Content(req.body);
 
-            console.log('[ApiController] Publishing content "' + content.id + '"...');
-
             ConnectionHelper.publishContent(content)
             .then(function() {
                 res.sendStatus(200);

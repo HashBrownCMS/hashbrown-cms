@@ -31,7 +31,7 @@ function ready() {
     let port = 80;
     let server = app.listen(port);
 
-    console.log('[Endomon CMS] Running on port ' + port);
+    console.log('Endomon CMS ::: Running on port ' + port);
     
     // Startup arguments
     for(let k in process.argv) {
@@ -73,6 +73,9 @@ global.PluginHelper = require('./helpers/PluginHelper');
 global.ProjectHelper = require('./helpers/ProjectHelper');
 global.SchemaHelper = require('./helpers/SchemaHelper');
 global.SettingsHelper = require('./helpers/SettingsHelper');
+
+global.debug = require('../common/helpers/DebugHelper');
+global.debug.verbosity = 3;
 
 PluginHelper.init(app)
     .then(ready);

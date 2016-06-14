@@ -25,6 +25,9 @@ window.ProjectHelper = require('./helpers/ProjectHelper');
 window.SchemaHelper = require('./helpers/SchemaHelper');
 window.SettingsHelper = require('./helpers/SettingsHelper');
 
+window.debug = require('../../common/helpers/DebugHelper');
+window.debug.verbosity = 3;
+
 let onReadyCallbacks = {};
 let isReady = {};
 

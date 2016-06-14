@@ -19,12 +19,12 @@ class MongoHelper {
      * @return {Promise} promise
      */
     static getDatabase(databaseName) {
-        return new Promise(function(callback) {
+        return new Promise((callback) => {
             let connectionString = 'mongodb://localhost/' + databaseName;
 
-            mongoClient.connect(connectionString, function(connectErr, db) {
+            mongoClient.connect(connectionString, (connectErr, db) => {
                 if(connectErr) {
-                    throw connectErr;
+                    debug.error(connectErr, this);
                 }
                 
                 if(db) {
@@ -32,7 +32,7 @@ class MongoHelper {
                     callback(mongoDatabase);
 
                 } else {
-                    throw 'Couldn\'t connect to MongoDB using the connection string "' + connectionString + '".';
+                    debug.error('Couldn\'t connect to MongoDB using the connection string "' + connectionString + '".', this);
                 
                 }
             });
@@ -49,8 +49,8 @@ class MongoHelper {
      * @return {Promise} promise
      */
     static findOne(databaseName, collectionName, query) {
-        return new Promise(function(callback) {
-            console.log('[MongoHelper] Finding document with query ' + JSON.stringify(query) + ' in collection "' + collectionName + '" in database "' + databaseName + '"...');
+        return new Promise((callback) => {
+            debug.log(databaseName + '/' + collectionName + '::findOne ' + JSON.stringify(query) + '...', this);
 
             let pattern = {
                 _id: 0
@@ -78,8 +78,8 @@ class MongoHelper {
      * @return {Promise} promise
      */
     static find(databaseName, collectionName, query) {
-        return new Promise(function(callback) {
-            console.log('[MongoHelper] Finding documents with query ' + JSON.stringify(query) + ' in collection "' + collectionName + '" in database "' + databaseName + '"...');
+        return new Promise((callback) => {
+            debug.log(databaseName + '/' + collectionName + '::find ' + JSON.stringify(query) + '...', this);
 
             let pattern = {
                 _id: 0
@@ -112,8 +112,8 @@ class MongoHelper {
         // Make sure the MongoId isn't included
         delete doc['_id'];
 
-        return new Promise(function(callback) {
-            console.log('[MongoHelper] Updating document with query ' + JSON.stringify(query) + ' in collection "' + collectionName + '" in database "' + databaseName + '"...');
+        return new Promise((callback) => {
+            debug.log(databaseName + '/' + collectionName + '::updateOne ' + JSON.stringify(query) + '...', this);
         
             MongoHelper.getDatabase(databaseName).then(function(db) {
                 db.collection(collectionName).updateOne(query, doc, options || {}, function(findErr) {
@@ -140,8 +140,8 @@ class MongoHelper {
         // Make sure the MongoId isn't included
         delete doc['_id'];
 
-        return new Promise(function(callback) {
-            console.log('[MongoHelper] Inserting new document into collection "' + collectionName + '" in database "' + databaseName + '"...');
+        return new Promise((callback) => {
+            debug.log(databaseName + '/' + collectionName + '::insertOne ' + JSON.stringify(doc) + '...', this);
         
             MongoHelper.getDatabase(databaseName).then(function(db) {
                 db.collection(collectionName).insertOne(doc, function(insertErr) {
@@ -165,8 +165,8 @@ class MongoHelper {
      * @return {Promise} promise
      */
     static removeOne(databaseName, collectionName, query) {
-        return new Promise(function(callback) {
-            console.log('[MongoHelper] Removing document with query ' + JSON.stringify(query) + ' in collection "' + collectionName + '" in database "' + databaseName + '"...');
+        return new Promise((callback) => {
+            debug.log(databaseName + '/' + collectionName + '::removeOne ' + JSON.stringify(query) + '...', this);
         
             MongoHelper.getDatabase(databaseName).then(function(db) {
                 db.collection(collectionName).remove(query, true, function(findErr) {

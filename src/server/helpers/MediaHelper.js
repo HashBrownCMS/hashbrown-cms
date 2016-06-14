@@ -58,7 +58,7 @@ class MediaHelper {
             let newDir = this.getMediaPath() + '/' + id;
             let newPath = newDir + '/' + name;
 
-            console.log('[MediaHelper] Setting media data at "' + newPath + '" for id "' + id + '"...');
+            debug.log('Setting media data at "' + newPath + '" for id "' + id + '"...', this);
 
             if(!fs.existsSync(newDir)){
                 fs.mkdirSync(newDir);
@@ -112,9 +112,9 @@ class MediaHelper {
         return new Promise((callback) => {
             let path = this.getMediaPath() + '/' + id;
             
-            fs.readdir(path, function(err, files) {
+            fs.readdir(path, (err, files) => {
                 if(err) {
-                    console.log('[MediaHelper]', err);
+                    debug.error(err, this);
                 }
 
                 if(files && files.length > 0) {
@@ -182,8 +182,6 @@ class MediaHelper {
             '/projects/' +
             ProjectHelper.currentProject +
             '/storage/temp';
-
-        console.log('TEMP', path);
 
         return path;
     }

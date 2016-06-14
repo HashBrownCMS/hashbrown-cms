@@ -218,7 +218,7 @@ class NavbarMain extends View {
         let name = $('.context-menu-target-element').data('name');
         
         function onSuccess() {
-            console.log('[NavbarMain] Removed content with id "' + id + '"'); 
+            debug.log('Removed content with id "' + id + '"', view); 
         
             reloadResource('content')
             .then(function() {
@@ -284,7 +284,7 @@ class NavbarMain extends View {
         let name = $('.context-menu-target-element').data('name');
         
         function onSuccess() {
-            console.log('[NavbarMain] Removed connection with alias "' + id + '"'); 
+            debug.log('Removed connection with alias "' + id + '"', view); 
         
             reloadResource('content')
             .then(function() {
@@ -340,7 +340,7 @@ class NavbarMain extends View {
         let name = $('.context-menu-target-element').data('name');
         
         function onSuccess() {
-            console.log('[NavbarMain] Removed media with id "' + id + '"'); 
+            debug.log('Removed media with id "' + id + '"', view); 
         
             reloadResource('media')
             .then(function() {
@@ -425,7 +425,7 @@ class NavbarMain extends View {
                 $uploadModal.find('.spinner-container').toggleClass('hidden', false);
 
                 reader.readAsDataURL(file);
-                console.log('[NavbarMain] Reading data of file type ' + file.type + '...');
+                debug.log('Reading data of file type ' + file.type + '...', view);
             }
         }
         

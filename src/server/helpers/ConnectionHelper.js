@@ -42,18 +42,20 @@ class ConnectionHelper {
      * @returns {Promise} promise
      */
     static publishContent(content) {
+        let helper = this;
+
         return new Promise((callback) => {
-            console.log('[ConnectionHelper] Publishing content "' + content.id + '"...');
+            debug.log('Publishing content "' + content.id + '"...', this);
             
             content.getSettings('publishing')
             .then((settings) => {
                 if(settings.connections && settings.connections.length > 0) {
-                    console.log('[ConnectionHelper] Looping through ' + settings.connections.length + ' connections...');
+                    debug.log('Looping through ' + settings.connections.length + ' connections...', this);
                     
                     function nextConnection(i) {
                         ConnectionHelper.getConnectionById(settings.connections[i])
                         .then((connection) => {
-                            console.log('[ConnectionHelper] Publishing through connection "' + settings.connections[i] + '" of type "' + connection.type + '"...');
+                            debug.log('Publishing through connection "' + settings.connections[i] + '" of type "' + connection.type + '"...', helper);
 
                             connection.publishContent(content)
                             .then(() => {
@@ -63,7 +65,7 @@ class ConnectionHelper {
                                     nextConnection(i);
                                 
                                 } else {
-                                    console.log('[ConnectionHelper] Published content "' + content.id + '" successfully!');
+                                    debug.log('Published content "' + content.id + '" successfully!', helper);
 
                                     callback();
                                 

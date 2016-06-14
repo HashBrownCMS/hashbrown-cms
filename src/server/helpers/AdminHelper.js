@@ -67,7 +67,7 @@ class AdminHelper {
     static createAdmin(username, password) {
         let admin = Admin.create(username, password);
 
-        console.log('[AdminHelper] Creating admin "' + username + '"...');
+        debug.log('Creating admin "' + username + '"...', this);
 
         return new Promise((callback) => {
             MongoHelper.insertOne(
@@ -75,7 +75,7 @@ class AdminHelper {
                 'admins',
                 admin.getFields()
             ).then(() => {
-                console.log('[AdminHelper] Created admin "' + username + '" successfully.');
+                debug.log('[AdminHelper] Created admin "' + username + '" successfully.', this);
                 
                 callback();
             });

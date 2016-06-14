@@ -60,7 +60,7 @@ class ConnectionEditor extends View {
         let view = this;
 
         function onSuccess() {
-            console.log('[ConnectionEditor] Removed connection with id "' + view.model.id + '"'); 
+            debug.log('Removed connection with id "' + view.model.id + '"', this); 
         
             reloadResource('connection')
             .then(function() {
@@ -143,7 +143,7 @@ class ConnectionEditor extends View {
             return $editor;
 
         } else {
-            console.log('[ConnectionEditor] No connection editor found for type alias "' + this.model.type + '"');
+            debug.log('No connection editor found for type alias "' + this.model.type + '"', this);
 
         }
     }

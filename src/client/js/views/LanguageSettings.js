@@ -23,7 +23,7 @@ class LanguageSettings extends View {
             
         LanguageHelper.toggleLanguage(language, checked)
         .then(() => {
-            console.log('[LanguageSettings] Language "' + language + '" set to ' + checked);
+            debug.log('Language "' + language + '" set to ' + checked, this);
         });
     }
 

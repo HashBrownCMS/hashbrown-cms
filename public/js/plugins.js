@@ -1669,7 +1669,7 @@ model.getParents().then(function(parents){var _iteratorNormalCompletion4=true;va
      * Constructs an entity
      *
      * @param {Object} properties
-     */function Entity(properties){_classCallCheck(this,Entity);this.structure();Object.seal(this);for(var k in properties){try{this[k]=properties[k]||this[k];}catch(e){console.log(e);console.log(e.stack);}}} /**
+     */function Entity(properties){_classCallCheck(this,Entity);this.structure();Object.seal(this);for(var k in properties){try{this[k]=properties[k]||this[k];}catch(e){debug.warning(e,this);}}} /**
      * Sets up a structure before sealing the object
      */_createClass(Entity,[{key:"structure",value:function structure(){} /**
      * Generates a new random id

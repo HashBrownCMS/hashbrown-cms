@@ -90,7 +90,7 @@ class ContentEditor extends View {
         let view = this;
 
         function onSuccess() {
-            console.log('[ContentEditor] Removed content with id "' + view.model.id + '"'); 
+            debug.log('Removed content with id "' + view.model.id + '"', this); 
         
             reloadResource('content')
             .then(function() {
@@ -186,12 +186,12 @@ class ContentEditor extends View {
                 return fieldEditorInstance.$element;
 
             } else {
-                console.log('[ContentEditor] No editor by id "' + fieldSchema.editorId + '" found');
+                debug.log('No editor by id "' + fieldSchema.editorId + '" found', this);
             
             }
         
         } else {
-            console.log('[ContentEditor] No field schema found for schema id "' + schemaValue.schemaId + '"');
+            debug.log('No field schema found for schema id "' + schemaValue.schemaId + '"', this);
 
         }
     }

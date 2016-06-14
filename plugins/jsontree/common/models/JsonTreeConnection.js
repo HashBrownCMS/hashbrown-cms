@@ -15,15 +15,24 @@ class JsonTreeConnection extends Connection {
         this.type = 'jsontree';
         this.tree = {};
     } 
-    
+   
+    /**
+     * Gets the json dir path
+     *
+     * @return {String} path
+     */
+    getPath() {
+        return appRoot + '/projects/' + ProjectHelper.currentProject + '/storage/' + ProjectHelper.currentEnvironment + '/json';
+    }
+
     /**
      * Ensures the JSON tree location
      */
     ensureLocation() {
-        let path = appRoot + '/public/json';
+        let path = this.getPath();
         
         if(!fs.existsSync(path + '/tree.json')){
-            if(!fs.existsSynd(path)) {
+            if(!fs.existsSync(path)) {
                 fs.mkdirSync(path);
             }
             
@@ -37,15 +46,19 @@ class JsonTreeConnection extends Connection {
      * @returns {Promise(Object)} tree
      */
     getTree() {
-        return new Promise((callback) => {
+        return new Promise((resolve, reject) => {
             this.ensureLocation();
-            
-            fs.readFile(appRoot + '/public/json/tree.json', 'binary', (err, data) => {
-                if(err) {
-                    throw err;
-                }
                 
-                callback(JSON.parse(data));
+            let path = this.getPath();
+
+            fs.readFile(path + '/tree.json', 'binary', (err, data) => {
+                if(err) {
+                    reject(new Error(err));
+                
+                } else {
+                    resolve(JSON.parse(data));
+                
+                }
             });
         });
     }
@@ -58,15 +71,19 @@ class JsonTreeConnection extends Connection {
      * @returns {Promise} promise
      */
     setTree(json) {
-        return new Promise((callback) => {
+        return new Promise((resolve) => {
             this.ensureLocation();
 
-            fs.writeFile(appRoot + '/public/json/tree.json', JSON.stringify(json, null, 4), (err, data) => {
+            let path = this.getPath();
+            
+            fs.writeFile(path + '/tree.json', JSON.stringify(json, null, 4), (err, data) => {
                 if(err) {
-                    throw err;
-                }
+                    reject(new Error(err));
                 
-                callback();
+                } else {
+                    resolve();
+                
+                }
             });
         });
     }
@@ -81,7 +98,7 @@ class JsonTreeConnection extends Connection {
      * @returns {Promise} promise
      */
     postContentProperties(properties, id, language) {
-        console.log('[JSON Tree] Processing "' + properties.title + '"...');
+        debug.log('Processing "' + properties.title + '"...', this);
 
         return new Promise((callback) => {
             this.getTree()

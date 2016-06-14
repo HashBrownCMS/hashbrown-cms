@@ -42,7 +42,7 @@ class Connection extends Entity {
         let connection = this;
 
         return new Promise((callback) => {
-            console.log('[Connection] Publishing all localised property sets...');
+            debug.log('Publishing all localised property sets...', this);
 
             LanguageHelper.getAllLocalizedPropertySets(content)
             .then((sets) => {
@@ -60,7 +60,7 @@ class Connection extends Entity {
                             next(i);
                         
                         } else {
-                            console.log('[Connection] Published all localised property sets successfully!');
+                            debug.log('Published all localised property sets successfully!', connection);
                                 
                             callback();
                         

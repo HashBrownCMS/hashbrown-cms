@@ -31,7 +31,7 @@ class JSONEditor extends View {
         if(url) {
             location = url;
         } else {
-            console.log('[JSONEditor] Invalid url "' + url + '"');
+            debug.log('Invalid url "' + url + '"', this);
         }
     }
 
@@ -66,7 +66,7 @@ class JSONEditor extends View {
         let view = this;
 
         function onSuccess() {
-            console.log('[JsonEditor] Removed content with id "' + view.model.id + '"'); 
+            debug.log('Removed content with id "' + view.model.id + '"', view); 
         
             reloadResource('content')
             .then(function() {

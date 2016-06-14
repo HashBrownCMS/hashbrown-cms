@@ -16,10 +16,6 @@ Router.route('/settings/', function() {
 Router.route('/settings/languages/', function() {
     ViewHelper.get('NavbarMain').highlightItem('languages');
     
-    function onChange() {
-        console.log($(this).parent().text());
-    }
-
     $('.workspace').html(
         _.div({class: 'dashboard-container'},
             new LanguageSettings().$element

@@ -17,7 +17,7 @@ Router.route('/admins/', function() {
                         password: 'test'
                     },
                     success: function() {
-                        console.log('wooh!');
+                        debug.log('wooh!', this);
                     }
                 });
             })

@@ -34,7 +34,7 @@ class SchemaEditor extends View {
             url: view.modelUrl,
             data: view.model,
             success: () => {
-                console.log('[SchemaEditor] Saved model to ' + view.modelUrl);
+                debug.log('Saved model to ' + view.modelUrl, this);
                 this.$saveBtn.toggleClass('saving', false);
             
                 reloadResource('schemas')
@@ -388,8 +388,6 @@ class SchemaEditor extends View {
         .then((parentSchema) => {
             this.parentSchema = parentSchema;
 
-            console.log(this.parentSchema.tabs);
-
             SchemaHelper.getSchemaWithParentValues(this.model.id)
             .then((compiledSchema) => {
                 this.compiledSchema = compiledSchema;
@@ -419,7 +417,6 @@ class SchemaEditor extends View {
                         )
                     ]);
                 }
-            console.log(this.parentSchema.tabs);
             });
         });
     }
