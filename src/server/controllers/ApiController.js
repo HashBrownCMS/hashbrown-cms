@@ -365,8 +365,8 @@ class ApiController extends Controller {
 
         ApiController.authenticate(req, res, () => {
             SchemaHelper.createSchema(parentSchema)
-            .then(function(schema) {
-                res.send(schema);
+            .then(function(newSchema) {
+                res.send(newSchema.getFields());
             });
         });
     }

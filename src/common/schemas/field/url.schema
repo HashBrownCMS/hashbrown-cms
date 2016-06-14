@@ -1,4 +1,5 @@
 {
+    "parentSchemaId": "fieldBase",
     "editorId": "url",
     "icon": "link",
     "name": "Url"

@@ -13,6 +13,7 @@ class ContentSchema extends Schema {
         this.def(Object, 'tabs', {});
         this.def(Object, 'fields', {});
 
+        this.name = 'New content schema';
         this.type = 'content';
     }
 }

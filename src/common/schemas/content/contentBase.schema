@@ -1,6 +1,6 @@
 {
     "defaultTabId": "meta",
-    "icon": "file",
+    "icon": "cogs",
     "name": "Content Base",
     "fields": {
         "createDate": {

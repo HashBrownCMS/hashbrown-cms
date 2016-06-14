@@ -10,7 +10,8 @@ class FieldSchema extends Schema {
         super.structure();
 
         this.def(String, 'editorId');
-        
+
+        this.name = 'New field schema';        
         this.type = 'field';
     }
 }

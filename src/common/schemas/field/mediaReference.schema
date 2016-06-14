@@ -1,4 +1,5 @@
 {
+    "parentSchemaId": "fieldBase",
     "editorId": "mediaReference",
     "icon": "file-image-o",
     "name": "Media reference"

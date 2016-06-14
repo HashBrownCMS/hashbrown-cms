@@ -1,4 +1,5 @@
 {
+    "parentSchemaId": "fieldBase",
     "editorId": "templateReference",
     "icon": "code",
     "name": "Template Reference"

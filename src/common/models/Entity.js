@@ -99,7 +99,7 @@ class Entity {
         }
 
         let thisValue = defaultValue;
-        let thisType = defaultValue.constructor;
+        let thisType = type;
 
         Object.defineProperty(this, name, {
             enumerable: true,
@@ -107,12 +107,18 @@ class Entity {
                 return thisValue;
             },
             set: (thatValue) => {
-                let thatType = thatValue.constructor;
+                if(thatValue) {
+                    let thatType = thatValue.constructor;
 
-                if(thisType !== thatType) {
-                    throw new TypeError(this.constructor.name + '.' + name + ' is of type \'' + thisType.name + '\' and cannot implicitly be converted to \'' + thatType.name + '\'.');
+                    if(thisType !== thatType) {
+                        throw new TypeError(this.constructor.name + '.' + name + ' is of type \'' + thisType.name + '\' and cannot implicitly be converted to \'' + thatType.name + '\'.');
+                    } else {
+                        thisValue = thatValue; 
+                    }
+                
                 } else {
-                    thisValue = thatValue; 
+                    thisValue = defaultValue;
+                
                 }
             }
         });

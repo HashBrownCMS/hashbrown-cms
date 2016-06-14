@@ -335,10 +335,12 @@ class NavbarMain extends View {
             type: 'POST',
             url: apiUrl('schemas/new'),
             data: parentSchema,
-            success: () => {
+            success: (newSchema) => {
                 reloadResource('schemas')
-                .then(function() {
+                .then(() => {
                     this.reload();
+
+                    location.hash = '/schemas/' + newSchema.id;
                 });
             }
         });
@@ -885,7 +887,6 @@ class NavbarMain extends View {
                     queueItem.parentDirAttr = {'data-schema-id': item.parentSchemaId };
 
                 } else {
-                    queueItem.createDir = true;
                     queueItem.parentDirAttr = {'data-schema-type': item.type};
                 }
             }

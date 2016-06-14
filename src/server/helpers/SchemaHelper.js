@@ -59,6 +59,9 @@ class SchemaHelper extends SchemaHelperCommon {
                                         break;
                                 }
 
+                                // Make sure the 'locked' flag is true
+                                schema.locked = true;
+
                                 // Add the loaded schema to the output array
                                 SchemaHelper.nativeSchemas[schema.id] = schema;
 
@@ -204,7 +207,9 @@ class SchemaHelper extends SchemaHelperCommon {
                 ProjectHelper.currentProject,
                 collection,
                 newSchema.getFields() 
-            )
+            ).then(() => {
+                resolve(newSchema);
+            });
         });
     }
 }

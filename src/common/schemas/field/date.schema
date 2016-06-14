@@ -1,4 +1,5 @@
 {
+    "parentSchemaId": "fieldBase",
     "editorId": "date",
     "icon": "calendar",
     "name": "Date"
