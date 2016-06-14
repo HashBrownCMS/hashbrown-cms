@@ -28,39 +28,6 @@ let Media = require('../models/Media');
 
 class MediaHelper {
     /**
-     * Gets all Media objects
-     *
-     * @return {Promise} promise
-     */
-    static getAllMedia() {
-        return new Promise((callback) => {
-            let mediaPath = this.getMediaPath() + '/*/*';
-            
-            glob(mediaPath, function(err, paths) {
-                let list = [];
-                
-                for(let i in paths) {
-                    let name = path.basename(paths[i]);
-                    let id = paths[i];
-                    
-                    id = id.replace('/' + name, '');
-                    id = id.substring(id.lastIndexOf('/') + 1);
-
-                    // Remove file extension
-                    name = name.replace(/\.[^/.]+$/, '');
-
-                    list[list.length] = {
-                        id: id,
-                        name: name
-                    };
-                }
-                                       
-                callback(list);
-            });
-        });
-    }
-
-    /**
      * Gets the upload handler
      *
      * @return {Function} handler
@@ -106,6 +73,38 @@ class MediaHelper {
         }
     }
 
+    /**
+     * Gets all Media objects
+     *
+     * @return {Promise} promise
+     */
+    static getAllMedia() {
+        return new Promise((callback) => {
+            let mediaPath = this.getMediaPath() + '*/*';
+            
+            glob(mediaPath, function(err, paths) {
+                let list = [];
+                
+                for(let i in paths) {
+                    let name = path.basename(paths[i]);
+                    let id = paths[i];
+                    
+                    id = id.replace('/' + name, '');
+                    id = id.substring(id.lastIndexOf('/') + 1);
+
+                    // Remove file extension
+                    name = name.replace(/\.[^/.]+$/, '');
+
+                    list[list.length] = {
+                        id: id,
+                        name: name
+                    };
+                }
+                                       
+                callback(list);
+            });
+        });
+    }
 
     /**
      * Sets a Media object
@@ -117,11 +116,9 @@ class MediaHelper {
      */
     static setMediaData(id, file) {
         return new Promise((callback) => {
-            console.log(file);
-
             let oldPath = file.path;
             let name = path.basename(oldPath);
-            let newDir = this.getMediaPath() + '/' + id;
+            let newDir = this.getMediaPath() + id;
             let newPath = newDir + '/' + name;
 
             debug.log('Setting media data at "' + newPath + '" for id "' + id + '"...', this);
@@ -157,7 +154,7 @@ class MediaHelper {
      */
     static getMedia(id) {
         return new Promise((resolve) => {
-            let mediaPath = this.getMediaPath() + '/' + id + '/*';
+            let mediaPath = this.getMediaPath() + id + '/*';
             
             glob(mediaPath, function(err, paths) {
                 if(paths && paths.length > 0) {
@@ -185,7 +182,7 @@ class MediaHelper {
      */
     static getMediaData(id) {
         return new Promise((callback) => {
-            let path = this.getMediaPath() + '/' + id;
+            let path = this.getMediaPath() + id;
             
             fs.readdir(path, (err, files) => {
                 if(err) {
@@ -217,7 +214,7 @@ class MediaHelper {
      */
     static removeMedia(id) {
         return new Promise((callback) => {
-            let path = this.getMediaPath() + '/' + id;
+            let path = this.getMediaPath() + id;
             
             rimraf(path, function(err) {
                 if(err) {

@@ -31,7 +31,7 @@ function ready() {
     let port = 80;
     let server = app.listen(port);
 
-    console.log('Endomon CMS ::: Running on port ' + port);
+    console.log('Endomon\n----------\nRunning on port ' + port);
     
     // Startup arguments
     for(let k in process.argv) {
