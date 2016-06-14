@@ -6,11 +6,11 @@ class SettingsHelper {
      *
      * @param {String} section
      *
-     * @return {Promise} promise
+     * @return {Promise(Object)}  settings
      */
     static getSettings(section) {
-        return new Promise((callback) => {
-            callback({});
+        return new Promise((resolve, reject) => {
+            reject();
         });
     }
     
@@ -23,8 +23,8 @@ class SettingsHelper {
      * @return {Promise} promise
      */
     static setSettings(section, settings) {
-        return new Promise((callback) => {
-            callback({});
+        return new Promise((resolve, reject) => {
+            reject();
         });
     }
 }

@@ -11,10 +11,14 @@ class SettingsHelper extends SettingsHelperCommon {
      * @return {Promise} promise
      */
     static getSettings(section) {
-        return new Promise((callback) => {
-            $.getJSON(apiUrl('settings/' + section), (settings) => {
-                callback(settings);
-            });
+        return new Promise((resolve) => {
+            $.ajax({
+                url: apiUrl('settings/' + section),
+                type: 'GET',
+                success: (settings) => {
+                    resolve(settings || {});
+                }
+            }); 
         });
     }
     
@@ -27,10 +31,15 @@ class SettingsHelper extends SettingsHelperCommon {
      * @return {Promise} promise
      */
     static setSettings(section, settings) {
-        return new Promise((callback) => {
-            $.post(apiUrl('settings/' + section), settings, () => {
-                callback();
-            });
+        return new Promise((resolve) => {
+            $.ajax({
+                url: apiUrl('settings/' + section),
+                type: 'POST',
+                data: settings,
+                success: () => {
+                    resolve();
+                }
+            }); 
         });
     }
 }
