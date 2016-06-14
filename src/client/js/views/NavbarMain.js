@@ -90,17 +90,18 @@ class NavbarMain extends View {
      * Event: Click new content
      */
     onClickNewContent() {
-        let view = this;
-
-        $.post(
-            apiUrl('content/new'),
-            function() {
+        $.ajax({
+            type: 'POST',
+            url: apiUrl('content/new'),
+            success: (newContent) => {
                 reloadResource('content')
-                .then(function() {
-                    view.reload();
+                .then(() => {
+                    this.reload();
+                    
+                    location.hash = '/content/' + newContent.id;
                 });
             }
-        );
+        });
     }
 
     /**
@@ -262,17 +263,18 @@ class NavbarMain extends View {
      * Event: Click new connection
      */
     onClickNewConnection() {
-        let view = this;
-
-        $.post(
-            apiUrl('connections/new'),
-            function() {
+        $.ajax({
+            type: 'POST',
+            url: apiUrl('connections/new'),
+            success: (newConnection) => {
                 reloadResource('connections')
-                .then(function() {
-                    view.reload();
+                .then(() => {
+                    this.reload();
+
+                    location.hash = '/connections/' + newConnection.id;
                 });
             }
-        );
+        });
     }
 
     /**
@@ -286,7 +288,7 @@ class NavbarMain extends View {
         function onSuccess() {
             debug.log('Removed connection with alias "' + id + '"', view); 
         
-            reloadResource('content')
+            reloadResource('connections')
             .then(function() {
                 view.reload();
                 
