@@ -168,6 +168,25 @@ class SchemaHelper extends SchemaHelperCommon {
     }
     
     /**
+     * Removes a schema object by id
+     *
+     * @param {Number} id
+     *
+     * @return {Promise} promise
+     */
+    static removeSchema(id) {
+        let collection = ProjectHelper.currentEnvironment + '.schemas';
+       
+        return MongoHelper.removeOne(
+            ProjectHelper.currentProject,
+            collection,
+            {
+                id: id
+            }
+        );
+    }
+    
+    /**
      * Sets a schema object by id
      *
      * @param {Number} id

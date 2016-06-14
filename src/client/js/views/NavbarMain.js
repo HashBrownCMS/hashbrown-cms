@@ -347,6 +347,73 @@ class NavbarMain extends View {
             }
         });
     }
+    
+    /**
+     * Event: Click remove schema
+     */
+    onClickRemoveSchema() {
+        let view = this;
+        let id = $('.context-menu-target-element').data('id');
+        let schema = window.resources.schemas[id];
+        
+        function onSuccess() {
+            debug.log('Removed schema with id "' + id + '"', view); 
+        
+            reloadResource('schemas')
+            .then(function() {
+                view.reload();
+                
+                // Cancel the SchemaEditor view if it was displaying the deleted content
+                if(location.hash == '#/schemas/' + id) {
+                    location.hash = '/schemas/';
+                }
+            });
+        }
+
+        if(!schema.locked) {
+            new MessageModal({
+                model: {
+                    title: 'Delete schema',
+                    body: 'Are you sure you want to delete the schema "' + schema.name + '"?'
+                },
+                buttons: [
+                    {
+                        label: 'Cancel',
+                        class: 'btn-default',
+                        callback: function() {
+                        }
+                    },
+                    {
+                        label: 'OK',
+                        class: 'btn-danger',
+                        callback: function() {
+                            $.ajax({
+                                url: apiUrl('schemas/' + id),
+                                type: 'DELETE',
+                                success: onSuccess
+                            });
+                        }
+                    }
+                ]
+            });
+        } else {
+            new MessageModal({
+                model: {
+                    title: 'Delete schema',
+                    body: 'The schema "' + schema.name + '" is locked and cannot be removed'
+                },
+                buttons: [
+                    {
+                        label: 'OK',
+                        class: 'btn-default',
+                        callback: function() {
+                        }
+                    }
+                ]
+            });
+        }
+    }
+
 
     /**
      * Event: Click toggle fullscreen
@@ -880,7 +947,8 @@ class NavbarMain extends View {
             items: resources.schemas,
             itemContextMenu: {
                 'This schema': '---',
-                'New child schema': function() { view.onClickNewSchema(); }
+                'New child schema': function() { view.onClickNewSchema(); },
+                'Remove': function() { view.onClickRemoveSchema(); }
             },
             sort: function(item, queueItem) {
                 queueItem.$element.attr('data-schema-id', item.id);

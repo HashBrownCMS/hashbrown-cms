@@ -28,7 +28,7 @@ class ApiController extends Controller {
         app.get('/api/:project/:environment/schemas', ApiController.getSchemas);
         app.get('/api/:project/:environment/schemas/:id', ApiController.getSchema);
         app.post('/api/:project/:environment/schemas/:id', ApiController.setSchema);
-        app.delete('/api/:project/:environment/schemas:id', ApiController.deleteSchema);
+        app.delete('/api/:project/:environment/schemas/:id', ApiController.deleteSchema);
         
         // Media
         app.post('/api/:project/:environment/media/new', MediaHelper.getUploadHandler(), ApiController.createMedia);
@@ -378,7 +378,7 @@ class ApiController extends Controller {
         ApiController.authenticate(req, res, () => {
             let id = req.params.id;
             
-            SchemaHelper.removeSchemaById(id)
+            SchemaHelper.removeSchema(id)
             .then(function() {
                 res.sendStatus(200);
             });
