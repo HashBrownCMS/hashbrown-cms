@@ -52,15 +52,6 @@ function ready() {
 }
 
 // ----------
-// Controllers
-// ----------
-let ApiController = require(appRoot + '/src/server/controllers/ApiController');
-let MediaController = require(appRoot + '/src/server/controllers/MediaController');
-
-MediaController.init(app);
-ApiController.init(app);
-
-// ----------
 // Helpers
 // ----------
 global.AdminHelper = require('./helpers/AdminHelper');
@@ -79,6 +70,15 @@ global.debug.verbosity = 3;
 
 PluginHelper.init(app)
     .then(ready);
+
+// ----------
+// Controllers
+// ----------
+let ApiController = require(appRoot + '/src/server/controllers/ApiController');
+let MediaController = require(appRoot + '/src/server/controllers/MediaController');
+
+MediaController.init(app);
+ApiController.init(app);
 
 // ----------
 // Views

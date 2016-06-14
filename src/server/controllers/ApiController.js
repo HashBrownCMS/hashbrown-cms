@@ -1,36 +1,5 @@
 'use strict';
 
-// Libs
-// TODO: Deprecate this
-let fs = require('fs');
-let multer = require('multer');
-let uploadMedia = multer({
-    storage: multer.diskStorage({
-        destination: function(req, file, cb) {
-            let path = MediaHelper.getTempPath();
-            
-            if(!fs.existsSync(path)){
-                fs.mkdirSync(path);
-            }
-            
-            cb(null, appRoot + path);
-        },
-        filename: function(req, file, cb) {
-            let split = file.originalname.split('.');
-            let name = split[0];
-            let extension = split[1];
-
-            name = name.replace(/\W+/g, '-').toLowerCase();
-           
-            if(extension) {
-                name += '.' + extension;
-            }
-
-            cb(null, name);
-        }
-    })
-});
-
 // Models
 let Media = require('../models/Media');
 let Content = require('../models/Content');
@@ -60,9 +29,9 @@ class ApiController extends Controller {
         app.post('/api/:project/:environment/schemas/:id', ApiController.setSchema);
         
         // Media
-        app.post('/api/:project/:environment/media/new', uploadMedia.single('media'), ApiController.createMedia);
+        app.post('/api/:project/:environment/media/new', MediaHelper.getUploadHandler(), ApiController.createMedia);
         app.get('/api/:project/:environment/media/:id', ApiController.getSingleMedia);
-        app.post('/api/:project/:environment/media/:id', uploadMedia.single('media'), ApiController.setMedia);
+        app.post('/api/:project/:environment/media/:id', MediaHelper.getUploadHandler(), ApiController.setMedia);
         app.delete('/api/:project/:environment/media/:id', ApiController.deleteMedia);
         app.get('/api/:project/:environment/media', ApiController.getMedia);
         
@@ -159,7 +128,7 @@ class ApiController extends Controller {
             if(file) {
                 let media = Media.create();
 
-                MediaHelper.setMediaData(media.id)
+                MediaHelper.setMediaData(media.id, file)
                 .then(() => {
                     res.send(media.id);
                 });

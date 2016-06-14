@@ -5,6 +5,23 @@ let glob = require('glob');
 let path = require('path');
 let fs = require('fs');
 let rimraf = require('rimraf');
+let multer = require('multer');
+
+// Extend fs
+fs.mkdirParent = function(dirPath, mode, callback) {
+    //Call the standard fs.mkdir
+    fs.mkdir(dirPath, mode, function(error) {
+        //When it fail in this way, do the custom steps
+        if (error && error.errno === 34) {
+            //Create all the parents recursively
+            fs.mkdirParent(path.dirname(dirPath), mode, callback);
+            //And then the directory
+            fs.mkdirParent(dirPath, mode, callback);
+        }
+        //Manually run the callback since we used our own callback to do all these
+        callback && callback(error);
+    });
+};
 
 // Models
 let Media = require('../models/Media');
@@ -44,6 +61,53 @@ class MediaHelper {
     }
 
     /**
+     * Gets the upload handler
+     *
+     * @return {Function} handler
+     */
+    static getUploadHandler(mode) {
+        let handler = multer({
+            storage: multer.diskStorage({
+                destination: (req, file, resolve) => {
+                    let path = MediaHelper.getTempPath();
+                   
+                    debug.log('Handling file upload...', this);
+
+                    if(!fs.existsSync(path)){
+                        fs.mkdirParent(path, null, () => {
+                            resolve(null, path);
+                        });
+                    
+                    } else {
+                        resolve(null, path);
+
+                    }
+                },
+                filename: (req, file, cb) => {
+                    let split = file.originalname.split('.');
+                    let name = split[0];
+                    let extension = split[1];
+
+                    name = name.replace(/\W+/g, '-').toLowerCase();
+                   
+                    if(extension) {
+                        name += '.' + extension;
+                    }
+
+                    cb(null, name);
+                }
+            })
+        })
+        
+        if(mode == 'array') {
+            return handler.array('media', 100);
+        } else {
+            return handler.single('media');
+        }
+    }
+
+
+    /**
      * Sets a Media object
      *
      * @param {Number} id
@@ -53,6 +117,8 @@ class MediaHelper {
      */
     static setMediaData(id, file) {
         return new Promise((callback) => {
+            console.log(file);
+
             let oldPath = file.path;
             let name = path.basename(oldPath);
             let newDir = this.getMediaPath() + '/' + id;
@@ -61,15 +127,24 @@ class MediaHelper {
             debug.log('Setting media data at "' + newPath + '" for id "' + id + '"...', this);
 
             if(!fs.existsSync(newDir)){
-                fs.mkdirSync(newDir);
-            } else {
-                // TODO: Remove old content
+                fs.mkdirParent(newDir, null, function() {
+                    fs.rename(oldPath, newPath, function() {
+                        callback();
+                    });
+                });
 
+            } else {
+                rimraf(newDir, function(err) {
+                    if(err) {
+                        throw err;
+                    }
+
+                    fs.rename(oldPath, newPath, function() {
+                        callback();
+                    });
+                });
             }
 
-            fs.rename(oldPath, newPath, function() {
-                callback();
-            });
         });
     }
 
