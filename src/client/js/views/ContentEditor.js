@@ -200,6 +200,7 @@ class ContentEditor extends View {
      * Renders fields
      */
     renderFields(tabId, schema, fields) {
+        let view = this;
         let schemaFields = {};
 
         // Map out fields to render
@@ -220,32 +221,100 @@ class ContentEditor extends View {
             }
         }
 
-        return _.each(schemaFields, (key, value) => {
-            if(value.multilingual && typeof fields[key] !== 'object') {
-                fields[key] = {};
+        return _.each(schemaFields, (key, schemaValue) => {
+            let isArray = schemaValue.isArray == true || schemaValue.isArray == 'true';
+            let defaultValue = '';
+
+
+            if(schemaValue.multilingual) {
+                defaultValue = {};
+
+                if(typeof fields[key] !== 'object') {
+                    fields[key] = defaultValue;
+                }
             }
 
             return _.div({class: 'field-container', 'data-key': key},
                 _.div({class: 'field-icon'},
-                    _.span({class: 'fa fa-' + value.icon})
+                    _.span({class: 'fa fa-' + schemaValue.icon})
                 ),
                 _.div({class: 'field-key'},
-                    value.label || key
+                    schemaValue.label || key
                 ),
                 _.div({class: 'field-value'},
-                    this.renderField(
-                        value.multilingual ? fields[key][window.language] : fields[key],
-                        schema[key],
-                        function(newValue) {
-                            if(value.multilingual) {
-                                fields[key][window.language] = newValue;
+                    function() {
+                        // Check if this field is an array
+                        if(isArray) {
+                            // If the value of the field is not an array, make it so
+                            if(!Array.isArray(fields[key])) {
+                                // If the field already has a value, assume it's the first item in the array
+                                if(fields[key]) {
+                                    fields[key] = [fields[key]];
 
-                            } else {
-                                fields[key] = newValue;
+                                // If not, just init an array with a single null item as the field value
+                                } else {
+                                    fields[key] = [ defaultValue ];
+                                
+                                }
                             }
-                        },
-                        value.config
-                    )
+
+                            // Render the value array
+                            let $array = _.div({class: 'array'});
+
+                            function renderFieldArray() {
+                                $array.empty();
+
+                                for(let i in fields[key]) {
+                                    $array.append(
+                                        view.renderField(
+                                            schemaValue.multilingual ? fields[key][i][window.language] : fields[key][i],
+                                            schema[key],
+                                            function(newValue) {
+                                                if(schemaValue.multilingual) {
+                                                    fields[key][i][window.language] = newValue;
+
+                                                } else {
+                                                    fields[key][i] = newValue;
+                                                }
+                                            },
+                                            schemaValue.config
+                                        )
+                                    );
+                                }
+                                
+                                $array.append(
+                                    _.button({class: 'btn btn-primary btn-add-item'},
+                                        _.span({class: 'fa fa-plus'})
+                                    ).click(() => {
+                                        fields[key].push(defaultValue);
+
+                                        renderFieldArray();
+                                    })
+                                );
+                            }
+
+                            renderFieldArray();
+
+                            // Return the array
+                            return $array;
+
+                        // If field is not an array, proceed as usual
+                        } else {
+                            return view.renderField(
+                                schemaValue.multilingual ? fields[key][window.language] : fields[key],
+                                schema[key],
+                                function(newValue) {
+                                    if(schemaValue.multilingual) {
+                                        fields[key][window.language] = newValue;
+
+                                    } else {
+                                        fields[key] = newValue;
+                                    }
+                                },
+                                schemaValue.config
+                            );
+                        }
+                    }()
                 )
             );
         });
