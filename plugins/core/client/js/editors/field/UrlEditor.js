@@ -88,14 +88,21 @@ class UrlEditor extends View {
             url += UrlEditor.getSlug(title) + '/';
         }
 
-        for(let node of window.resources.content) {
-            let nodeUrl = (node.url && node.url[window.language] ? node.url[window.language] : null) || node.url;
+        let sameUrls = 0;
 
-            if(nodeUrl == url) {
-                messageModal('URL error', 'Node of same URL "' + url + '" already exists');
-                url = '';
+        for(let contentData of window.resources.content) {
+            let content = new Content(contentData);
+
+            if(content.prop('url', window.language) == url) {
+                sameUrls++;
             }
         }
+
+        if(sameUrls > 0) {
+            messageModal('Duplicate URLs', sameUrls + ' content nodes have the same URL "' + url + '". Appending "-' + sameUrls + '".');
+        }
+
+        url = url.replace(/\/$/, '-' + sameUrls + '/');
 
         return url;
     }

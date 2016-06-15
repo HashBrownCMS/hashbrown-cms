@@ -37,7 +37,7 @@ class Admin extends Entity {
     generateToken(params) {
         let key = crypto.randomBytes(20).toString('hex');
         let validDuration =
-            1 * // Hours
+            8 * // Hours
             60 * // Minutes
             60 * // Seconds
             1000; // Milliseconds
