@@ -46,17 +46,17 @@ class Connection extends Entity {
 
             LanguageHelper.getAllLocalizedPropertySets(content)
             .then((sets) => {
-                let keys = Object.keys(sets);
+                let languages = Object.keys(sets);
                 
                 function next(i) {
-                    let key = keys[i];
-                    let properties = sets[key];
+                    let language = languages[i];
+                    let properties = sets[language];
 
-                    connection.postContentProperties(properties, content.id, key)
+                    connection.postContentProperties(properties, content.id, language, content.getMeta())
                     .then(() => {
                         i++;
 
-                        if(i < keys.length) {
+                        if(i < languages.length) {
                             next(i);
                         
                         } else {

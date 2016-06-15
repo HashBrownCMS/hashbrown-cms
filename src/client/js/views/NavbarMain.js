@@ -57,32 +57,32 @@ class NavbarMain extends View {
      * Event: Click cut content
      */
     onClickCutContent() {
-        let view = this;
-        let id = $('.context-menu-target-element').data('id');
+        let cutId = $('.context-menu-target-element').data('id');
 
         // This function should only exist if an item has been cut
-        view.onClickPasteContent = function onClickPasteContent() {
+        this.onClickPasteContent = function onClickPasteContent() {
             let parentId = $('.context-menu-target-element').data('id');
-            
-            $.getJSON(
-                apiUrl('content/' + id),
-                function(cutContent) {
-                    cutContent.parentId = parentId;
-                        
-                    $.post(
-                        apiUrl('content/' + id),
-                        cutContent,
-                        function() {
-                            reloadResource('content')
-                            .then(function() {
-                                view.reload();
-                            });
+           
+            ContentHelper.getContentById(cutId)
+            .then((cutContent) => {
+                cutContent.parentId = parentId;
+                
+                $.ajax({
+                    type: 'POST',
+                    url: apiUrl('content/' + cutId),
+                    data: cutContent,
+                    success: () => {
+                        reloadResource('content')
+                        .then(() => {
+                            this.reload();
 
-                            view.onClickPasteContent = null;
-                        }
-                    );
-                }
-            );
+                            location.hash = '/content/' + cutId;
+                        });
+
+                        this.onClickPasteContent = null;
+                    }
+                });
+            }); 
         }
     }
 

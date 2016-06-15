@@ -94,10 +94,11 @@ class JsonTreeConnection extends Connection {
      * @param {Object} properties
      * @param {String} id
      * @param {String} language
+     * @param {Object} meta
      *
      * @returns {Promise} promise
      */
-    postContentProperties(properties, id, language) {
+    postContentProperties(properties, id, language, meta) {
         debug.log('Processing "' + properties.title + '"...', this);
 
         return new Promise((callback) => {
@@ -107,7 +108,17 @@ class JsonTreeConnection extends Connection {
                     tree[id] = {};
                 }
 
-                tree[id][language] = properties;
+                if(!tree[id].properties) {
+                    tree[id].properties = {};
+                }
+
+                tree[id].properties[language] = properties;
+
+                if(meta) {
+                    for(let k in meta) {
+                        tree[id][k] = meta[k];
+                    }
+                }
 
                 this.setTree(tree)
                 .then(() => {

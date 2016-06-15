@@ -70,7 +70,7 @@ class Content extends Entity {
      * @returns {Promise} parents
      */
     getParents() {
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             let parents = [];
 
             function iterate(content) {
@@ -80,8 +80,10 @@ class Content extends Entity {
                         if(parentContent) {
                             parents.push(parentContent);
                             iterate(parentContent);
+                        
                         } else {
-                            reject(new Error('[Content] Parent content with id "' + content.parentId + '" was not found'));
+                            reject(new Error('Parent content with id "' + content.parentId + '" was not found'));
+                        
                         }
                     });
 
@@ -134,6 +136,19 @@ class Content extends Entity {
                 resolve(model.settings[key]);
             });
         });
+    }
+
+    /**
+     * Gets all meta fields
+     *
+     * @returns {Object} meta
+     */
+    getMeta() {
+        return {
+            parentId: this.parentId,
+            createDate: this.createDate,
+            updateDate: this.updateDate
+        };
     }
 
     /**

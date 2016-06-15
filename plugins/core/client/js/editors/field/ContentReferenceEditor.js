@@ -14,16 +14,20 @@ class ContentReferenceEditor extends View {
     }
 
     render() {
-        let editor = this;
-
         this.$element = _.div({class: 'field-editor input-group content-reference-editor'}, [
             this.$select = _.select({class: 'form-control'},
-                _.each(window.resources.content, function(id, node) {
+                _.each(window.resources.content, (id, node) => {
                     let content = new Content(node);
 
-                    return _.option({value: content.getPropertyValue('id')}, content.prop('title', window.language));
+                    return _.option(
+                        {
+                            value: content.id,
+                            selected: this.value == content.id
+                        },
+                        content.prop('title', window.language)
+                    );
                 })
-            ).change(function() { editor.onChange(); }),
+            ).change(() => { this.onChange(); }),
             _.div({class: 'input-group-btn'}, 
                 this.$clearBtn = _.button({class: 'btn btn-primary'},
                     'Clear'
@@ -31,12 +35,12 @@ class ContentReferenceEditor extends View {
             )
         ]);
 
-        this.$select.val(editor.value);
+        this.$select.val(this.value);
 
-        this.$clearBtn.click(function() {
-            editor.$select.val(null);
+        this.$clearBtn.click(() => {
+            this.$select.val(null);
             
-            editor.onChange();
+            this.onChange();
         });
     }
 }
