@@ -70,14 +70,23 @@ class SchemaEditor extends View {
         let $select;
 
         let $element = _.div({class: 'editor-picker'},
-            $select = _.select({class: 'form-control' + (this.model.locked ? ' disabled' : '')},
-                _.each(resources.editors, function(id, view) {
-                    return _.option({value: id}, view.name);
-                })
-            ).change(onChange)
+            _.if(!this.model.locked,
+                $select = _.select({class: 'form-control'},
+                    _.each(resources.editors, function(id, view) {
+                        return _.option({value: id}, view.name);
+                    })
+                ).change(onChange)
+            ),
+            _.if(this.model.locked,
+                _.p({class: 'read-only'},
+                    _.if(this.model.editorId,
+                        resources.editors[this.model.editorId].name
+                    )
+                )
+            )
         );
 
-        if(view.model.editorId) {
+        if(!this.model.locked && this.model.editorId) {
             $select.val(view.model.editorId);
         }
 
@@ -97,8 +106,15 @@ class SchemaEditor extends View {
         }
 
         let $element = _.div({class: 'name-editor'},
-            _.input({class: 'form-control' + (this.model.locked ? ' disabled' : ''), type: 'text', value: view.model.name, placholder: 'Write the schema name here'})
-                .on('change', onInputChange)
+            _.if(!this.model.locked,
+                _.input({class: 'form-control', type: 'text', value: view.model.name, placholder: 'Write the schema name here'})
+                    .on('change', onInputChange)
+            ),
+            _.if(this.model.locked,
+                _.p({class: 'read-only'},
+                    view.model.name
+                )
+            )
         );
 
         return $element;
@@ -223,9 +239,14 @@ class SchemaEditor extends View {
         }
 
         let $element = _.div({class: 'icon-editor'},
-            _.button({class: 'btn btn-icon-browse btn-default' + (this.model.locked ? ' disabled' : '')},
+            _.if(!this.model.locked,
+                _.button({class: 'btn btn-icon-browse btn-default' + (this.model.locked ? ' disabled' : '')},
+                    _.span({class: 'fa fa-' + this.model.icon})
+                ).click(onClickBrowse)
+            ),
+            _.if(this.model.locked,
                 _.span({class: 'fa fa-' + this.model.icon})
-            ).click(onClickBrowse),
+            ),
             _.div({class: 'modal fade'},
                 _.div({class: 'modal-dialog'},
                     _.div({class: 'modal-content'},
@@ -285,16 +306,25 @@ class SchemaEditor extends View {
         }
 
         let $element = _.div({class: 'parent-editor input-group'},
-            _.select({class: 'form-control' + (this.model.locked ? ' disabled' : '')}, 
-                _.each(schemas, function(id, schema) {
-                    return _.option({value: id}, schema.name);
-                })
-            ).val(this.model.parentSchemaId).change(onChange),
             _.if(!this.model.locked,
-                _.div({class: 'input-group-btn'},
-                    _.button({class: 'btn btn-primary'},
-                        'Clear'
-                    ).click(onClear)
+                _.select({class: 'form-control'}, 
+                    _.each(schemas, function(id, schema) {
+                        return _.option({value: id}, schema.name);
+                    })
+                ).val(this.model.parentSchemaId).change(onChange),
+                _.if(!this.model.locked,
+                    _.div({class: 'input-group-btn'},
+                        _.button({class: 'btn btn-primary'},
+                            'Clear'
+                        ).click(onClear)
+                    )
+                )
+            ),
+            _.if(this.model.locked,
+                _.p({class: 'read-only'},
+                    _.if(schemas[this.model.parentSchemaId],
+                        schemas[this.model.parentSchemaId].name
+                    )
                 )
             )
         );
@@ -314,20 +344,27 @@ class SchemaEditor extends View {
             view.model.defaultTabId = $element.find('select').val();
         }
 
-        let tabs = {};
+        let tabs = {
+            meta: 'Meta'
+        };
         
-        tabs['meta'] = 'Meta';
-
         for(let k in view.compiledSchema.tabs) {
             tabs[k] = view.compiledSchema.tabs[k];
         }
 
         let $element = _.div({class: 'default-tab-editor'},
-            _.select({class: 'form-control' + (this.model.locked ? ' disabled' : '')}, 
-                _.each(tabs, function(id, label) {
-                    return _.option({value: id}, label);
-                })
-            ).val(this.model.defaultTabId).change(onChange)
+            _.if(!this.model.locked,
+                _.select({class: 'form-control'}, 
+                    _.each(tabs, function(id, label) {
+                        return _.option({value: id}, label);
+                    })
+                ).val(this.model.defaultTabId).change(onChange)
+            ),
+            _.if(this.model.locked,
+                _.p({class: 'read-only'},
+                    tabs[this.model.defaultTabId]
+                )
+            )
         );
         
         return $element;
@@ -398,26 +435,21 @@ class SchemaEditor extends View {
             .then((compiledSchema) => {
                 this.compiledSchema = compiledSchema;
                 
-                this.$element.html(
-                    _.div({class: 'schema'},
-                        _.if(this.model.locked,
-                            _.p('This schema is locked')
-                        ),
-                        this.renderFields(),
-                        _.if(!this.model.locked,
-                            _.div({class: 'panel panel-default panel-buttons'}, 
-                                _.div({class: 'btn-group'},
-                                    _.button({class: 'btn btn-embedded'},
-                                        'Advanced'
-                                    ).click(() => { this.onClickAdvanced(); }),
-                                    _.button({class: 'btn btn-danger btn-raised'},
-                                        'Delete'
-                                    ).click(() => { this.onClickDelete(); }),
-                                    this.$saveBtn = _.button({class: 'btn btn-success btn-raised btn-save'},
-                                        _.span({class: 'text-default'}, 'Save '),
-                                        _.span({class: 'text-saving'}, 'Saving ')
-                                    ).click(() => { this.onClickSave(); })
-                                )
+                _.append(this.$element,
+                    this.renderFields(),
+                    _.div({class: 'panel panel-default panel-buttons'}, 
+                        _.div({class: 'btn-group'},
+                            _.button({class: 'btn btn-embedded'},
+                                'Advanced'
+                            ).click(() => { this.onClickAdvanced(); }),
+                            _.if(!this.model.locked,
+                                _.button({class: 'btn btn-danger btn-raised'},
+                                    'Delete'
+                                ).click(() => { this.onClickDelete(); }),
+                                this.$saveBtn = _.button({class: 'btn btn-success btn-raised btn-save'},
+                                    _.span({class: 'text-default'}, 'Save '),
+                                    _.span({class: 'text-saving'}, 'Saving ')
+                                ).click(() => { this.onClickSave(); })
                             )
                         )
                     )

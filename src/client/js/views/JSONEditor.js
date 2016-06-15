@@ -122,26 +122,26 @@ class JSONEditor extends View {
     }
 
     render() {
-        let view = this;
-
         this.value = beautify(JSON.stringify(this.model));
 
         this.$element.html([
-            _.textarea({class: 'flex-expand'},
+            _.textarea({class: 'flex-expand', disabled: this.model.locked},
                 this.value
-            ).bind('keyup change propertychange paste', function() { view.onChangeText($(this)); }),
+            ).bind('keyup change propertychange paste', () => { view.onChangeText($(this)); }),
             this.$error,
             _.div({class: 'panel panel-default panel-buttons'}, 
                 _.div({class: 'btn-group'},
                     _.button({class: 'btn btn-embedded'},
                         'Basic'
-                    ).click(function() { view.onClickBasic(); }),
-                    _.button({class: 'btn btn-danger btn-raised'},
-                        'Delete'
-                    ).click(function() { view.onClickDelete(); }),
-                    _.button({class: 'btn btn-raised btn-success'},
-                        'Save '
-                    ).click(function() { view.onClickSave(); })
+                    ).click(() => { this.onClickBasic(); }),
+                    _.if(!this.model.locked,
+                        _.button({class: 'btn btn-danger btn-raised'},
+                            'Delete'
+                        ).click(() => { this.onClickDelete(); }),
+                        _.button({class: 'btn btn-raised btn-success'},
+                            'Save '
+                        ).click(() => { this.onClickSave(); })
+                    )
                 )
             )
         ]);

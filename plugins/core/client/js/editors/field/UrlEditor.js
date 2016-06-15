@@ -17,6 +17,11 @@ class UrlEditor extends View {
     static getSlug(string) {
         return string
             .toLowerCase()
+            .replace(/[æ|ä]/g, 'ae')
+            .replace(/[ø|ö]/g, 'oe')
+            .replace(/å/g, 'aa')
+            .replace(/ü/g, 'ue')
+            .replace(/ß/g, 'ss')
             .replace(/[^\w ]+/g, '')
             .replace(/ +/g, '-')
             ;
@@ -91,46 +96,77 @@ class UrlEditor extends View {
         let sameUrls = 0;
 
         for(let contentData of window.resources.content) {
-            let content = new Content(contentData);
+            if(contentData.id != contentId) {
+                let content = new Content(contentData);
 
-            if(content.prop('url', window.language) == url) {
-                sameUrls++;
+                if(content.prop('url', window.language) == url) {
+                    sameUrls++;
+                }
             }
         }
 
         if(sameUrls > 0) {
-            messageModal('Duplicate URLs', sameUrls + ' content nodes have the same URL "' + url + '". Appending "-' + sameUrls + '".');
-        }
+            let message = sameUrls;
+           
+            if(sameUrls == 1) {
+                message += ' content node has ';
+            } else {
+                message += ' content nodes have ';
+            }
 
-        url = url.replace(/\/$/, '-' + sameUrls + '/');
+            message += 'the same URL "' + url + '". Appending "-' + sameUrls + '".';
+
+            messageModal('Duplicate URLs', message);
+
+            url = url.replace(/\/$/, '-' + sameUrls + '/');
+        }
 
         return url;
     }
 
     regenerate() {
-        let newUrl = UrlEditor.generateUrl(location.hash.replace('#', '').replace('/content/', ''));
+        let newUrl = UrlEditor.generateUrl(Router.params.id);
 
         this.$input.val(newUrl);
 
         this.trigger('change', this.$input.val());
     };
 
+    fetchFromTitle() {
+        this.value = this.$titleField.val();
+
+        this.regenerate();
+    }
+
     onChange() {
         this.trigger('change', this.$input.val());
     };
 
     render() {
-        var editor = this;
-
         this.$element = _.div({class: 'field-editor url-editor input-group'},
             this.$input = _.input({class: 'form-control', value: this.value})
-                .on('change propertychange paste keyup', function() { editor.onChange(); }),
+                .on('change propertychange paste keyup', () => { this.onChange(); }),
             _.div({class: 'input-group-btn'},
                 _.button({class: 'btn btn-primary'},
                     'Regenerate '
-                ).click(function() { editor.regenerate(); })
+                ).click(() => { this.regenerate(); })
             )
         );
+
+        //  Wait for next CPU cycle to check for title field
+        setTimeout(() => {
+            this.$titleField = $('.field-container[data-key="title"]').eq(0);
+
+            if(this.$titleField.length == 1) {
+                this.$titleField.change(() => {
+                    this.fetchFromTitle();   
+                });
+            }
+
+            if(!this.value) {
+                this.fetchFromTitle();
+            }
+        }, 1);
     }
 }
 

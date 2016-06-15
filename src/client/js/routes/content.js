@@ -12,6 +12,17 @@ Router.route('/content/', function() {
     );
 });
 
+// Edit (JSON editor)
+Router.route('/content/json/:id', function() {
+    let contentEditor = new JSONEditor({
+        modelUrl: apiUrl('content/' + this.id)
+    });
+     
+    ViewHelper.get('NavbarMain').highlightItem(this.id);
+    
+    $('.workspace').html(contentEditor.$element);
+});
+
 // Edit
 Router.route('/content/:id', function() {
     let contentEditor = new ContentEditor({
@@ -23,13 +34,18 @@ Router.route('/content/:id', function() {
     $('.workspace').html(contentEditor.$element);
 });
 
-// Edit (JSON editor)
-Router.route('/content/json/:id', function() {
-    let contentEditor = new JSONEditor({
-        modelUrl: apiUrl('content/' + this.id)
-    });
-     
-    ViewHelper.get('NavbarMain').highlightItem(this.id);
+// Edit (with tab specified)
+Router.route('/content/:id/:tab', function() {
+    let contentEditor = ViewHelper.get('ContentEditor');
+   
+    if(!contentEditor) {
+        contentEditor = new ContentEditor({
+            modelUrl: apiUrl('content/' + this.id)
+        });
+   
+        ViewHelper.get('NavbarMain').highlightItem(this.id);
     
-    $('.workspace').html(contentEditor.$element);
+        $('.workspace').html(contentEditor.$element);
+    }
 });
+

@@ -627,7 +627,7 @@ class NavbarMain extends View {
 
         // Attach item context menu
         if(params.paneContextMenu) {
-            $pane.context(params.paneContextMenu);
+            $pane.exocontext(params.paneContextMenu);
         }
 
         // Items
@@ -696,7 +696,7 @@ class NavbarMain extends View {
 
                 // Attach item context menu
                 if(params.itemContextMenu) {
-                    $element.find('a').context(params.itemContextMenu);
+                    $element.find('a').exocontext(params.itemContextMenu);
                 }
                 
                 // Add element to queue item

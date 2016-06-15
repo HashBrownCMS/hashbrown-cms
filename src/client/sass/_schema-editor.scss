@@ -3,12 +3,27 @@
     display: flex;
     flex-direction: column;
 
+    .locked-message {
+        margin: 30px auto 15px auto;
+    }
+
     >.schema {
         flex-grow: 1;
         overflow-y: auto;
         padding: 15px;
-    
+   
+        .field-value {
+            .read-only {
+                line-height: 30px;
+                margin: 0px;
+            }
+        }
+
         .icon-editor {
+            >.fa {
+                line-height: 30px;
+            }
+
             .modal {
                 .modal-dialog {
                     width: 900px;

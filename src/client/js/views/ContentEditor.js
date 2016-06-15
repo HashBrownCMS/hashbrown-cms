@@ -169,7 +169,7 @@ class ContentEditor extends View {
      *
      * @return {Object} element
      */
-    renderFieldView(fieldValue, schemaValue, onChange, config) {
+    renderField(fieldValue, schemaValue, onChange, config) {
         let fieldSchema = resources.schemas[schemaValue.schemaId];
 
         if(fieldSchema) {
@@ -204,11 +204,11 @@ class ContentEditor extends View {
 
         // Map out fields to render
         for(let alias in schema) {
-            let property = schema[alias];
+            let field = schema[alias];
 
-            let noTabAssigned = !property.tabId;
+            let noTabAssigned = !field.tabId;
             let isMetaTab = tabId == 'meta';
-            let thisTabAssigned = property.tabId == tabId;
+            let thisTabAssigned = field.tabId == tabId;
 
             // Don't include "properties" field, if this is the meta tab
             if(isMetaTab && alias == 'properties') {
@@ -216,7 +216,7 @@ class ContentEditor extends View {
             }
 
             if((noTabAssigned && isMetaTab) || thisTabAssigned) {
-                schemaFields[alias] = property;
+                schemaFields[alias] = field;
             }
         }
 
@@ -225,7 +225,7 @@ class ContentEditor extends View {
                 fields[key] = {};
             }
 
-            return _.div({class: 'field-container'},
+            return _.div({class: 'field-container', 'data-key': key},
                 _.div({class: 'field-icon'},
                     _.span({class: 'fa fa-' + value.icon})
                 ),
@@ -233,7 +233,7 @@ class ContentEditor extends View {
                     value.label || key
                 ),
                 _.div({class: 'field-value'},
-                    this.renderFieldView(
+                    this.renderField(
                         value.multilingual ? fields[key][window.language] : fields[key],
                         schema[key],
                         function(newValue) {
@@ -244,12 +244,20 @@ class ContentEditor extends View {
                                 fields[key] = newValue;
                             }
                         },
-                        value.config,
-                        value.multilingual
+                        value.config
                     )
                 )
             );
         });
+    }
+
+    /**
+     * Event: Click tab
+     *
+     * @param {String} tab
+     */
+    onClickTab(tab) {
+        location.hash = '/content/' + Router.params.id + '/' + tab;
     }
 
     /**
@@ -263,21 +271,28 @@ class ContentEditor extends View {
     renderEditor(content, schema) {
         let view = this;
 
+        // Check for active tab
+        function isTabActive(tabId) {
+            let targetTab = Router.params.tab || schema.defaultTabId;
+
+            return tabId == targetTab;
+        }
+
         // Render editor
         return _.div({class: 'object'},
             new LanguagePicker().$element,
             _.ul({class: 'nav nav-tabs'}, 
                 _.each(schema.tabs, (tabId, tab) => {
-                    return _.li({class: tabId == schema.defaultTabId ? 'active' : ''}, 
+                    return _.li({class: isTabActive(tabId) ? 'active' : ''}, 
                         _.a({'data-toggle': 'tab', href: '#tab-' + tabId},
                             tab
-                        )
+                        ).click(() => { this.onClickTab(tabId); })
                     );
                 }),
-                _.li({class: 'meta' == schema.defaultTabId ? 'active' : ''}, 
+                _.li({class: isTabActive('meta') ? 'active' : ''}, 
                     _.a({'data-toggle': 'tab', href: '#tab-meta'},
                         'meta'
-                    )
+                    ).click(() => { this.onClickTab('meta'); })
                 )
             ),
             _.div({class: 'tab-content'},
