@@ -29,17 +29,22 @@ class SchemaHelper extends SchemaHelperCommon {
                            mergedProperties.fields[k] = properties.fields[k];
                         }
                         
-                        if(!mergedProperties.tabs) {
-                            mergedProperties.tabs = {};
-                        }
+                        switch(mergedProperties.type) {
+                            case 'content':
+                                if(!mergedProperties.tabs) {
+                                    mergedProperties.tabs = {};
+                                }
 
-                        if(properties.tabs) {
-                            for(let k in properties.tabs) {
-                               mergedProperties.tabs[k] = properties.tabs[k];
-                            }
-                        }
+                                if(properties.tabs) {
+                                    for(let k in properties.tabs) {
+                                       mergedProperties.tabs[k] = properties.tabs[k];
+                                    }
+                                }
 
-                        mergedProperties.defaultTabId = properties.defaultTabId || mergedProperties.defaultTabId;
+                                mergedProperties.defaultTabId = properties.defaultTabId || mergedProperties.defaultTabId;
+                                break;
+                        }
+                        
                         mergedProperties.icon = properties.icon || mergedProperties.icon;
 
                         resolve(SchemaHelper.getModel(mergedProperties));

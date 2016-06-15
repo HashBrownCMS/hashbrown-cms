@@ -127,7 +127,7 @@ class JSONEditor extends View {
         this.$element.html([
             _.textarea({class: 'flex-expand', disabled: this.model.locked},
                 this.value
-            ).bind('keyup change propertychange paste', () => { view.onChangeText($(this)); }),
+            ).on('keyup change propertychange paste', (e) => { this.onChangeText(this.$element.find('textarea')); }),
             this.$error,
             _.div({class: 'panel panel-default panel-buttons'}, 
                 _.div({class: 'btn-group'},

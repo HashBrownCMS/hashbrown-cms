@@ -27,14 +27,14 @@ class SchemaEditor extends View {
      * Event: Click save. Posts the model to the modelUrl
      */
     onClickSave() {
-        view.$saveBtn.toggleClass('saving', true);
+        this.$saveBtn.toggleClass('saving', true);
 
         $.ajax({
             type: 'post',
-            url: view.modelUrl,
-            data: view.model,
+            url: this.modelUrl,
+            data: this.model,
             success: () => {
-                debug.log('Saved model to ' + view.modelUrl, this);
+                debug.log('Saved model to ' + this.modelUrl, this);
                 this.$saveBtn.toggleClass('saving', false);
             
                 reloadResource('schemas')
@@ -69,6 +69,12 @@ class SchemaEditor extends View {
 
         let $select;
 
+        let editorName = '(none)';
+        
+        if(resources.editors[this.model.editorId]) {
+            editorName = resources.editors[this.model.editorId].name;
+        }
+
         let $element = _.div({class: 'editor-picker'},
             _.if(!this.model.locked,
                 $select = _.select({class: 'form-control'},
@@ -79,9 +85,7 @@ class SchemaEditor extends View {
             ),
             _.if(this.model.locked,
                 _.p({class: 'read-only'},
-                    _.if(this.model.editorId,
-                        resources.editors[this.model.editorId].name
-                    )
+                    editorName
                 )
             )
         );
@@ -305,6 +309,12 @@ class SchemaEditor extends View {
             schemas[id] = resources.schemas[id];
         }
 
+        let parentName = '(none)';
+
+        if(schemas[this.model.parentSchemaId]) {
+            parentName = schemas[this.model.parentSchemaId].name;
+        }
+
         let $element = _.div({class: 'parent-editor input-group'},
             _.if(!this.model.locked,
                 _.select({class: 'form-control'}, 
@@ -322,9 +332,7 @@ class SchemaEditor extends View {
             ),
             _.if(this.model.locked,
                 _.p({class: 'read-only'},
-                    _.if(schemas[this.model.parentSchemaId],
-                        schemas[this.model.parentSchemaId].name
-                    )
+                    parentName
                 )
             )
         );
@@ -399,28 +407,19 @@ class SchemaEditor extends View {
         // Content type
         $element.empty();
 
-        if(this.model.name) {
-            $element.append(this.renderField('Name', this.renderNameEditor())); 
-        }
-        
-        if(this.model.icon) {
-            $element.append(this.renderField('Icon', this.renderIconEditor()));   
-        }
+        $element.append(this.renderField('Name', this.renderNameEditor())); 
+        $element.append(this.renderField('Icon', this.renderIconEditor()));   
+        $element.append(this.renderField('Parent', this.renderParentEditor()));
 
-        if(this.model.editorId) {
-            $element.append(this.renderField('Field editor', this.renderEditorPicker()));
-        }
+        switch(this.model.type) {
+            case 'content':
+                $element.append(this.renderField('Default tab', this.renderDefaultTabEditor()));
+                $element.append(this.renderField('Tabs', this.renderTabsEditor()));
+                break;
 
-        if(this.model.parentSchemaId) {
-            $element.append(this.renderField('Parent', this.renderParentEditor()));
-        }
-
-        if(this.model.defaultTabId) {
-            $element.append(this.renderField('Default tab', this.renderDefaultTabEditor()));
-        }
-
-        if(this.model.tabs) {
-            $element.append(this.renderField('Tabs', this.renderTabsEditor()));
+            case 'field':
+                $element.append(this.renderField('Field editor', this.renderEditorPicker()));
+                break;
         }
 
         return $element;
