@@ -1,3 +1,4 @@
+require('./editors/field/ArrayEditor');
 require('./editors/field/ContentReferenceEditor');
 require('./editors/field/DateEditor');
 require('./editors/field/DropdownEditor');

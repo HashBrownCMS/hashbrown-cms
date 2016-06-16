@@ -222,13 +222,7 @@ class ContentEditor extends View {
         }
 
         return _.each(schemaFields, (key, schemaValue) => {
-            let isArray = schemaValue.isArray == true || schemaValue.isArray == 'true';
-            let defaultValue = '';
-
-
             if(schemaValue.multilingual) {
-                defaultValue = {};
-
                 if(typeof fields[key] !== 'object') {
                     fields[key] = defaultValue;
                 }
@@ -242,79 +236,19 @@ class ContentEditor extends View {
                     schemaValue.label || key
                 ),
                 _.div({class: 'field-value'},
-                    function() {
-                        // Check if this field is an array
-                        if(isArray) {
-                            // If the value of the field is not an array, make it so
-                            if(!Array.isArray(fields[key])) {
-                                // If the field already has a value, assume it's the first item in the array
-                                if(fields[key]) {
-                                    fields[key] = [fields[key]];
+                    view.renderField(
+                        schemaValue.multilingual ? fields[key][window.language] : fields[key],
+                        schema[key],
+                        function(newValue) {
+                            if(schemaValue.multilingual) {
+                                fields[key][window.language] = newValue;
 
-                                // If not, just init an array with a single null item as the field value
-                                } else {
-                                    fields[key] = [ defaultValue ];
-                                
-                                }
+                            } else {
+                                fields[key] = newValue;
                             }
-
-                            // Render the value array
-                            let $array = _.div({class: 'array'});
-
-                            function renderFieldArray() {
-                                $array.empty();
-
-                                for(let i in fields[key]) {
-                                    $array.append(
-                                        view.renderField(
-                                            schemaValue.multilingual ? fields[key][i][window.language] : fields[key][i],
-                                            schema[key],
-                                            function(newValue) {
-                                                if(schemaValue.multilingual) {
-                                                    fields[key][i][window.language] = newValue;
-
-                                                } else {
-                                                    fields[key][i] = newValue;
-                                                }
-                                            },
-                                            schemaValue.config
-                                        )
-                                    );
-                                }
-                                
-                                $array.append(
-                                    _.button({class: 'btn btn-primary btn-add-item'},
-                                        _.span({class: 'fa fa-plus'})
-                                    ).click(() => {
-                                        fields[key].push(defaultValue);
-
-                                        renderFieldArray();
-                                    })
-                                );
-                            }
-
-                            renderFieldArray();
-
-                            // Return the array
-                            return $array;
-
-                        // If field is not an array, proceed as usual
-                        } else {
-                            return view.renderField(
-                                schemaValue.multilingual ? fields[key][window.language] : fields[key],
-                                schema[key],
-                                function(newValue) {
-                                    if(schemaValue.multilingual) {
-                                        fields[key][window.language] = newValue;
-
-                                    } else {
-                                        fields[key] = newValue;
-                                    }
-                                },
-                                schemaValue.config
-                            );
-                        }
-                    }()
+                        },
+                        schemaValue.config
+                    )
                 )
             );
         });
