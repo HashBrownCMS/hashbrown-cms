@@ -15,6 +15,18 @@
   line-height: 30px;
   font-weight: normal; }
 
+.array-editor .items .item {
+  position: relative; }
+  .array-editor .items .item .btn-remove {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    z-index: 10;
+    padding: 10px !important; }
+
+.array-editor .btn-add {
+  margin-top: 10px; }
+
 .media-reference-editor .list-group-item img {
   max-width: 60px;
   max-height: 60px; }

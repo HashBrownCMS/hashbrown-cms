@@ -179,7 +179,8 @@ class ContentEditor extends View {
                 let fieldEditorInstance = new fieldEditor({
                     value: fieldValue,
                     disabled: schemaValue.disabled || false,
-                    config: config || {}                });
+                    config: config || {}
+                });
 
                 fieldEditorInstance.on('change', onChange);
 
@@ -224,7 +225,7 @@ class ContentEditor extends View {
         return _.each(schemaFields, (key, schemaValue) => {
             if(schemaValue.multilingual) {
                 if(typeof fields[key] !== 'object') {
-                    fields[key] = defaultValue;
+                    fields[key] = {};
                 }
             }
 

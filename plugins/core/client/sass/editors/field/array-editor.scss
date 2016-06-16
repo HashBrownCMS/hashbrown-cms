@@ -1,0 +1,19 @@
+.array-editor {
+    .items {
+        .item {
+            position: relative;
+
+            .btn-remove {
+                position: absolute;
+                top: 0px;
+                right: 0px;
+                z-index: 10;
+                padding: 10px !important;
+            }
+        }
+    }
+
+    .btn-add {
+        margin-top: 10px;
+    }
+}
