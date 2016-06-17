@@ -2708,7 +2708,7 @@ location.hash='/content/';});}new MessageModal({model:{title:'Delete content',bo
      * Renders fields
      */},{key:"renderFields",value:function renderFields(tabId,schema,fields){var view=this;var schemaFields={}; // Map out fields to render
 for(var alias in schema){var field=schema[alias];var noTabAssigned=!field.tabId;var isMetaTab=tabId=='meta';var thisTabAssigned=field.tabId==tabId; // Don't include "properties" field, if this is the meta tab
-if(isMetaTab&&alias=='properties'){continue;}if(noTabAssigned&&isMetaTab||thisTabAssigned){schemaFields[alias]=field;}}return _.each(schemaFields,function(key,schemaValue){var fieldSchema=resources.schemas[schemaValue.schemaId];if(schemaValue.multilingual){if(!fields[key]||_typeof(fields[key])!=='object'){fields[key]={};}}return _.div({class:'field-container','data-key':key},_.div({class:'field-icon'},_.span({class:'fa fa-'+fieldSchema.icon})),_.div({class:'field-key'},schemaValue.label||key),_.div({class:'field-value'},view.renderField(schemaValue.multilingual?fields[key][window.language]:fields[key],schema[key],function(newValue){if(schemaValue.multilingual){fields[key][window.language]=newValue;}else {fields[key]=newValue;}},schemaValue.config)));});} /**
+if(isMetaTab&&alias=='properties'){continue;}if(noTabAssigned&&isMetaTab||thisTabAssigned){schemaFields[alias]=field;}}return _.each(schemaFields,function(key,schemaValue){var fieldSchema=resources.schemas[schemaValue.schemaId];if(schemaValue.multilingual){if(!fields[key]||_typeof(fields[key])!=='object'){fields[key]={};}}return _.div({class:'field-container','data-key':key},_.div({class:'field-icon'},_.span({class:'fa fa-'+fieldSchema.icon})),_.div({class:'field-key'},schemaValue.label||key),_.div({class:'field-value'},view.renderField(schemaValue.multilingual?fields[key][window.language]:fields[key],schema[key],function(newValue){if(schemaValue.multilingual){fields[key].multilingual=true;fields[key][window.language]=newValue;}else {fields[key]=newValue;}},schemaValue.config)));});} /**
      * Event: Click tab
      *
      * @param {String} tab
@@ -2883,7 +2883,7 @@ $element.empty();$element.append(this.renderField('Name',this.renderNameEditor()
      * @param {Object} newValue
      * @param {Number} index
      */},{key:"onChange",value:function onChange(newValue,i){if(this.config.item.multilingual){ // Sanity check to make sure multilingual fields are accomodated for
-if(!this.value[i]||_typeof(this.value[i])!=='object'){this.value[i]={};}this.value[i][window.language]=newValue;}else {this.value[i]=newValue;}this.trigger('change',this.value);}},{key:"render",value:function render(){var _this33=this; // Make sure we have the item schema and the editor we need for each array item
+if(!this.value[i]||_typeof(this.value[i])!=='object'){this.value[i]={};}this.value[i].multilingual=true;this.value[i][window.language]=newValue;}else {this.value[i]=newValue;}this.trigger('change',this.value);}},{key:"render",value:function render(){var _this33=this; // Make sure we have the item schema and the editor we need for each array item
 var itemSchema=resources.schemas[this.config.item.schemaId];var fieldEditor=resources.editors[itemSchema.editorId]; // A sanity check to make sure we're working with an array
 if(!Array.isArray(this.value)){this.value=[];} // Render editor
 _.append(this.$element.empty(),_.div({class:'items'}, // Loop through each array item
@@ -2962,7 +2962,7 @@ this.$element=_.div({class:'field-editor string-editor'},this.$input=_.input({cl
      * @param {String} key
      * @param {Object} keySchema
      */_createClass(StructEditor,[{key:"onChange",value:function onChange(newValue,key,schemaValue){if(schemaValue.multilingual){ // Sanity check to make sure multilingual fields are accomodated for
-if(!this.value[key]||_typeof(this.value[key])!=='object'){this.value[key]={};}this.value[key][window.language]=newValue;}else {this.value[key]=newValue;}this.trigger('change',this.value);}},{key:"render",value:function render(){var _this48=this; // A sanity check to make sure we're working with an object
+if(!this.value[key]||_typeof(this.value[key])!=='object'){this.value[key]={};}this.value[key].multilingual=true;this.value[key][window.language]=newValue;}else {this.value[key]=newValue;}this.trigger('change',this.value);}},{key:"render",value:function render(){var _this48=this; // A sanity check to make sure we're working with an object
 if(!this.value||_typeof(this.value)!=='object'){this.value={};} // Render editor
 _.append(this.$element.empty(), // Loop through each key in the struct
 _.each(this.schema.config.struct,function(k,schemaValue){var value=_this48.value[k];var fieldSchema=resources.schemas[schemaValue.schemaId];var fieldEditor=resources.editors[fieldSchema.editorId]; // Sanity check to make sure multilingual fields are accomodated for
@@ -3072,7 +3072,7 @@ setTimeout(function(){_this51.$titleField=$('.field-container[data-key="title"]'
      * @param {Content} content
      *
      * @return {Promise(Object[])} properties
-     */},{key:"getAllLocalizedPropertySets",value:function getAllLocalizedPropertySets(content){return new Promise(function(callback){LanguageHelper.getSelectedLanguages().then(function(languages){var sets={};var _iteratorNormalCompletion12=true;var _didIteratorError12=false;var _iteratorError12=undefined;try{for(var _iterator12=languages[Symbol.iterator](),_step12;!(_iteratorNormalCompletion12=(_step12=_iterator12.next()).done);_iteratorNormalCompletion12=true){var language=_step12.value;var properties=content.getProperties(language);sets[language]=properties;}}catch(err){_didIteratorError12=true;_iteratorError12=err;}finally {try{if(!_iteratorNormalCompletion12&&_iterator12.return){_iterator12.return();}}finally {if(_didIteratorError12){throw _iteratorError12;}}}callback(sets);});});}}]);return LanguageHelper;}();module.exports=LanguageHelper;},{"../data/languages.json":192}],196:[function(require,module,exports){'use strict'; // Models
+     */},{key:"getAllLocalizedPropertySets",value:function getAllLocalizedPropertySets(content){return new Promise(function(callback){LanguageHelper.getSelectedLanguages().then(function(languages){var sets={};var _iteratorNormalCompletion12=true;var _didIteratorError12=false;var _iteratorError12=undefined;try{for(var _iterator12=languages[Symbol.iterator](),_step12;!(_iteratorNormalCompletion12=(_step12=_iterator12.next()).done);_iteratorNormalCompletion12=true){var language=_step12.value;var properties=content.getLocalizedProperties(language);sets[language]=properties;}}catch(err){_didIteratorError12=true;_iteratorError12=err;}finally {try{if(!_iteratorNormalCompletion12&&_iterator12.return){_iterator12.return();}}finally {if(_didIteratorError12){throw _iteratorError12;}}}callback(sets);});});}}]);return LanguageHelper;}();module.exports=LanguageHelper;},{"../data/languages.json":192}],196:[function(require,module,exports){'use strict'; // Models
 var FieldSchema=require('../models/FieldSchema');var ContentSchema=require('../models/ContentSchema'); /**
  * The common base for SchemaHelper
  */var SchemaHelper=function(){function SchemaHelper(){_classCallCheck(this,SchemaHelper);}_createClass(SchemaHelper,null,[{key:"getSchemaWithParentValues", /**
@@ -3148,7 +3148,7 @@ model.getParents().then(function(parents){var _iteratorNormalCompletion13=true;v
      * @param {String} language
      *
      * @returns {Object} properties
-     */},{key:"getProperties",value:function getProperties(language){var properties={};for(var key in this.properties){properties[key]=this.getPropertyValue(key,language);}return properties;} /**
+     */},{key:"getLocalizedProperties",value:function getLocalizedProperties(language){var properties={};function flattenRecursively(source,target){for(var key in source){var value=source[key];if(value&&(typeof value==="undefined"?"undefined":_typeof(value))==='object'){if(value.multilingual){if(typeof value[language]==='undefined'){value[language]=null;}target[key]=value[language];}else {if(Array.isArray(value)){target[key]=[];}else {target[key]={};}flattenRecursively(value,target[key]);}}else {target[key]=value;}}}flattenRecursively(this.properties,properties);return properties;} /**
      * Gets the content type
      *
      * @returns {String} type

@@ -45,6 +45,7 @@ class ArrayEditor extends View {
                 this.value[i] = {};
             }
             
+            this.value[i].multilingual = true;
             this.value[i][window.language] = newValue;
 
         } else {

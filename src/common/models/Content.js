@@ -192,12 +192,40 @@ class Content extends Entity {
      *
      * @returns {Object} properties
      */
-    getProperties(language) {
+    getLocalizedProperties(language) {
         let properties = {};
 
-        for(let key in this.properties) {
-            properties[key] = this.getPropertyValue(key, language);
+        function flattenRecursively(source, target) {
+            for(let key in source) {
+                let value = source[key];
+
+                if(value && typeof value === 'object') {
+                    if(value.multilingual) {
+                        if(typeof value[language] === 'undefined') {
+                            value[language] = null;
+                        }
+
+                        target[key] = value[language];
+
+                    } else {
+                        if(Array.isArray(value)) {
+                            target[key] = [];
+                        } else {
+                            target[key] = {};
+                        }
+
+                        flattenRecursively(value, target[key]);
+
+                    }
+                
+                } else {
+                    target[key] = value;
+
+                }
+            }
         }
+
+        flattenRecursively(this.properties, properties);
 
         return properties;
     }

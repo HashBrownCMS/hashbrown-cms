@@ -149,7 +149,7 @@ class SchemaHelper extends SchemaHelperCommon {
      *
      * @param {Number} id
      *
-     * @return {Promise} promise
+     * @return {Promise(Schema)} schema
      */
     static getSchema(id) {
         return new Promise(function(callback) {
@@ -157,7 +157,9 @@ class SchemaHelper extends SchemaHelperCommon {
             .then((schemas) => {
                 for(let schemaId in schemas) {
                     if(schemaId == id) {
-                        callback(schemas[schemaId]);
+                        let schema = SchemaHelper.getModel(schemas[schemaId]);
+
+                        callback(schema);
                         return;
                     }
                 }

@@ -51,7 +51,7 @@ class JsonTreeConnection extends Connection {
                 
             let path = this.getPath();
 
-            fs.readFile(path + '/tree.json', 'binary', (err, data) => {
+            fs.readFile(path + '/tree.json', 'utf8', (err, data) => {
                 if(err) {
                     reject(new Error(err));
                 
@@ -76,7 +76,7 @@ class JsonTreeConnection extends Connection {
 
             let path = this.getPath();
             
-            fs.writeFile(path + '/tree.json', JSON.stringify(json, null, 4), (err, data) => {
+            fs.writeFile(path + '/tree.json', JSON.stringify(json, null, 4), 'utf8', (err, data) => {
                 if(err) {
                     reject(new Error(err));
                 

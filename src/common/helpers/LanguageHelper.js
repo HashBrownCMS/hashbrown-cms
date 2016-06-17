@@ -78,7 +78,7 @@ class LanguageHelper {
                 let sets = {};
 
                 for(let language of languages) {
-                    let properties = content.getProperties(language);
+                    let properties = content.getLocalizedProperties(language);
                     
                     sets[language] = properties;
                 }

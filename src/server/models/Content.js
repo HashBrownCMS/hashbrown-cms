@@ -9,12 +9,14 @@ class Content extends ContentCommon {
     /**
      * Gets the schema information
      *
-     * @returns {Promise} promise
+     * @returns {Promise(ContentSchema)} promise
      */
     getSchema() {
-        ContentHelper.getSchema(view.getType(), model.schemaId)
-        .then(function(schema) {
-            callback(schema);
+        return new Promise((resolve, reject) => {
+            SchemaHelper.getSchema(this.schemaId)
+            .then((schema) => {
+                resolve(schema);
+            });
         });
     }
 }
