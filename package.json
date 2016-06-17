@@ -41,8 +41,5 @@
     "to-markdown": "^2.0.1",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0"
-  },
-  "devDependencies": {
-    "gulp-babel": "^6.1.2"
   }
 }

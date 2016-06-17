@@ -5,7 +5,7 @@ let ConnectionHelper = require(appRoot + '/src/server/helpers/ConnectionHelper')
 
 class JsonTree {
     static init(app) {
-        ConnectionHelper.registerConnectionType('jsontree', JsonTreeConnection);
+        ConnectionHelper.registerConnectionType('JSON Tree', JsonTreeConnection);
 
         app.get('/api/:project/:environment/json/tree', this.getTree);
     }
