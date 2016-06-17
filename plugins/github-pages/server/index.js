@@ -4,14 +4,19 @@ let GitHubConnection = require('../common/models/GitHubConnection');
 let ConnectionHelper = require(appRoot + '/src/server/helpers/ConnectionHelper');
 
 let restler = require('restler');
+let fs = require('fs');
 
 let config = require('../config.json');
+
+let route = '';
 
 class GitHubPages {
     static init(app) {
         ConnectionHelper.registerConnectionType('GitHub Pages', GitHubConnection);
 
         app.get('/api/github/oauth/start', (req, res) => {
+            route = req.query.route;
+
             res.redirect('https://github.com/login/oauth/authorize?client_id=' + config.client.id);
         });
 
@@ -31,12 +36,13 @@ class GitHubPages {
                 headers: headers    
             })
             .on('complete', (data, response) => {
-                res.sendStatus(200);
-                //res.send(data);
+                let token = data.access_token;
+
+                res.redirect(appRoot + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + route + '?token=' + token);
             });
         });
 
-        app.get('/api/github/orgs/', (req, res) => {
+        app.get('/api/github/repos/', (req, res) => {
             let connectionId = req.query.connectionId;
 
             if(connectionId) {
