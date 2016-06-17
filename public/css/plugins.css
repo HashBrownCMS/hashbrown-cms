@@ -16,7 +16,14 @@
   font-weight: normal; }
 
 .array-editor .items .item {
-  position: relative; }
+  position: relative;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 30px;
+  margin-top: 30px; }
+  .array-editor .items .item:first-child {
+    margin-top: 0px; }
+  .array-editor .items .item:last-child {
+    border-bottom: 0px; }
   .array-editor .items .item .btn-remove {
     position: absolute;
     top: 0px;
@@ -34,3 +41,13 @@
 .media-reference-editor .list-group-item.btn {
   color: #fff;
   text-align: center; }
+
+.struct-editor .kvp {
+  display: flex;
+  margin-bottom: 10px; }
+  .struct-editor .kvp .key {
+    width: 100px;
+    flex-shrink: 0;
+    line-height: 34px; }
+  .struct-editor .kvp .value {
+    flex-grow: 1; }

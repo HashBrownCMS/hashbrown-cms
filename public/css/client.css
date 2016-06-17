@@ -328,6 +328,11 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
     .cms-container .workspace .editor .field-container {
       display: flex;
       margin-bottom: 15px; }
+      .cms-container .workspace .editor .field-container .field-icon {
+        width: 20px;
+        flex-shrink: 0; }
+        .cms-container .workspace .editor .field-container .field-icon .fa {
+          line-height: 30px; }
       .cms-container .workspace .editor .field-container .field-key {
         width: 200px;
         line-height: 30px;

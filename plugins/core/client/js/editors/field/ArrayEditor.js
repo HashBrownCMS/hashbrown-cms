@@ -71,7 +71,7 @@ class ArrayEditor extends View {
                 // Loop through each array item
                 _.each(this.value, (i, item) => {
                     // Sanity check to make sure multilingual fields are accomodated for
-                    if(this.config.item.multilingual && !item || typeof item !== 'object') {
+                    if(this.config.item.multilingual && (!item || typeof item !== 'object')) {
                         item = {};
                     }
 
@@ -79,7 +79,8 @@ class ArrayEditor extends View {
                     let fieldEditorInstance = new fieldEditor({
                         value: this.config.item.multilingual ? item[window.language] : item,
                         disabled: itemSchema.disabled || false,
-                        config: itemSchema.config || {}
+                        config: itemSchema.config || {},
+                        schema: itemSchema
                     });
 
                     // Hook up the change event

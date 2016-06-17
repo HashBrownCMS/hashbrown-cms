@@ -226,7 +226,7 @@ class NavbarMain extends View {
                 view.reload();
                 
                 // Cancel the ContentEditor view if it was displaying the deleted content
-                if(location.hash == '#/content/' + id) {
+                if(location.hash.indexOf('#/content/' + id) > -1) {
                     location.hash = '/content/';
                 }
             });

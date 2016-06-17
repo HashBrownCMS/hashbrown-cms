@@ -2,6 +2,17 @@
     .items {
         .item {
             position: relative;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 30px;
+            margin-top: 30px;
+
+            &:first-child {
+                margin-top: 0px;
+            }
+
+            &:last-child {
+                border-bottom: 0px;
+            }
 
             .btn-remove {
                 position: absolute;

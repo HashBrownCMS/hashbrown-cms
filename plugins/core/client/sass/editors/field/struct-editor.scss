@@ -1,0 +1,16 @@
+.struct-editor {
+    .kvp {
+        display: flex;
+        margin-bottom: 10px;
+
+        .key {
+            width: 100px;
+            flex-shrink: 0;
+            line-height: 34px;
+        }
+
+        .value {
+            flex-grow: 1;
+        }
+    }
+}
