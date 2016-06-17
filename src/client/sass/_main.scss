@@ -94,13 +94,12 @@
     
     &.fullscreen {
         .navspace {
-            width: 50px;
-            flex-basis: 50px;
+            width: 0px;
+            flex-basis: 0px;
         }
     }
 
     .navspace {
-        overflow: hidden;
         width: 500px;
         flex-basis: 500px;
         flex-shrink: 0;

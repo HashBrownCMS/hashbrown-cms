@@ -855,11 +855,14 @@ class NavbarMain extends View {
         let view = this;
 
         this.$element.html([
-            _.button({class: 'btn fullscreen-toggle'},
-                _.span({class: 'fa fa-chevron-right'})
-            ).click(this.onClickToggleFullscreen),
             _.div({class: 'tab-buttons'}),
-            _.div({class: 'tab-panes'})
+            _.div({class: 'tab-panes'}),
+            _.div({class: 'fullscreen-toggle'},
+                _.button({class: 'btn'},
+                    _.span({class: 'fa fa-chevron-right'}),
+                    _.span({class: 'fa fa-chevron-left'})
+                ).click(this.onClickToggleFullscreen)
+            )
         ]);
 
         $('.navspace').html(this.$element);
