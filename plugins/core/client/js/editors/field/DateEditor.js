@@ -1,5 +1,8 @@
 'use strict';
 
+/**
+ * An editor for date values
+ */
 class DateEditor extends View {
     constructor(params) {
         super(params);
@@ -14,13 +17,16 @@ class DateEditor extends View {
         this.init();
     }
 
+    /**
+     * Event: Change value
+     */
     onChange() {
-        this.trigger('change', new Date(this.$input.val()));
+        this.value = new Date(this.$input.val());
+
+        this.trigger('change', this.value);
     }
 
     render() {
-        var editor = this;
-
         this.$element = _.div({class: 'field-editor date-editor'},
             this.disabled ? 
                 _.p({}, this.value)
@@ -31,11 +37,11 @@ class DateEditor extends View {
         if(this.$input) {
             this.$input.datepicker();
 
-            this.$input.on('changeDate', function() {
+            this.$input.on('changeDate', () => {
                 editor.onChange();
             })
         }
     }
 }
 
-resources.editors.date = DateEditor;
+module.exports = DateEditor;

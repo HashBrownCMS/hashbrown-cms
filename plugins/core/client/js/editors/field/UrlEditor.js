@@ -1,5 +1,8 @@
 'use strict';
 
+/**
+ * An editor for content URLs
+ */
 class UrlEditor extends View {
     constructor(params) {
         super(params);
@@ -124,6 +127,9 @@ class UrlEditor extends View {
         return url;
     }
 
+    /**
+     * Regenerates the URL
+     */
     regenerate() {
         let newUrl = UrlEditor.generateUrl(Router.params.id);
 
@@ -132,14 +138,22 @@ class UrlEditor extends View {
         this.trigger('change', this.$input.val());
     };
 
+    /**
+     * Fetch the URL from the Content title
+     */
     fetchFromTitle() {
         this.value = this.$titleField.val();
 
         this.regenerate();
     }
 
+    /**
+     * Event: Change value
+     */
     onChange() {
-        this.trigger('change', this.$input.val());
+        this.value = this.$input.val();
+
+        this.trigger('change', this.value);
     };
 
     render() {
@@ -170,4 +184,4 @@ class UrlEditor extends View {
     }
 }
 
-resources.editors.url = UrlEditor;
+module.exports = UrlEditor;

@@ -1,5 +1,8 @@
 'use strict';
 
+/**
+ * An editor for editing periods
+ */
 class PeriodEditor extends View {
     constructor(params) {
         super(params);
@@ -7,13 +10,18 @@ class PeriodEditor extends View {
         this.init();
     }
 
+    /**
+     * Event: Change value
+     */
     onChange() {
         var newValue = {
             enabled: this.$toggle[0].checked,
             from: this.$from.val(),
             to: this.$to.val()
         };
-        
+       
+        this.value = newValue;
+
         this.trigger('change', newValue);
     }
 
@@ -65,4 +73,4 @@ class PeriodEditor extends View {
     }
 }
 
-resources.editors.period = PeriodEditor;
+module.exports = PeriodEditor;

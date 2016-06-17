@@ -1,7 +1,11 @@
 'use strict';
 
+// Models
 let Content = require('../../../../../../src/common/models/Content');
 
+/**
+ * An editor for referring to other Content
+ */
 class ContentReferenceEditor extends View {
     constructor(params) {
         super(params);
@@ -9,12 +13,20 @@ class ContentReferenceEditor extends View {
         this.init();
     }
 
+    /**
+     * Event: Change value
+     */
     onChange() {
-        this.trigger('change', this.$select.val());
+        this.value = this.$select.val();
+
+        this.trigger('change', this.value);
     }
 
     render() {
+        // Render main element
         this.$element = _.div({class: 'field-editor input-group content-reference-editor'}, [
+
+            // Render picker
             this.$select = _.select({class: 'form-control'},
                 _.each(window.resources.content, (id, node) => {
                     let content = new Content(node);
@@ -28,6 +40,8 @@ class ContentReferenceEditor extends View {
                     );
                 })
             ).change(() => { this.onChange(); }),
+
+            // Render clear button
             _.div({class: 'input-group-btn'}, 
                 this.$clearBtn = _.button({class: 'btn btn-primary'},
                     'Clear'
@@ -35,8 +49,10 @@ class ContentReferenceEditor extends View {
             )
         ]);
 
+        // Set the initial value
         this.$select.val(this.value);
 
+        // Hook up the change event to the clear button
         this.$clearBtn.click(() => {
             this.$select.val(null);
             
@@ -45,4 +61,4 @@ class ContentReferenceEditor extends View {
     }
 }
 
-resources.editors.contentReference = ContentReferenceEditor;
+module.exports = ContentReferenceEditor;

@@ -28,4 +28,4 @@ class StringEditor extends View {
     }
 }
 
-resources.editors.string = StringEditor;
+module.exports = StringEditor;

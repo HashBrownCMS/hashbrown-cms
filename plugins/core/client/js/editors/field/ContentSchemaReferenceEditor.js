@@ -1,5 +1,8 @@
 'use strict';
 
+/**
+ * An editor for referencing content schemas
+ */
 class ContentSchemaReferenceEditor extends View {
     constructor(params) {
         super(params);
@@ -44,4 +47,4 @@ class ContentSchemaReferenceEditor extends View {
     }
 }
 
-resources.editors.contentSchemaReference = ContentSchemaReferenceEditor;
+module.exports = ContentSchemaReferenceEditor;

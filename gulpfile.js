@@ -36,6 +36,7 @@ gulp.task('plugins-js', function() {
 
         return browserify(files)
             .bundle()
+            .pipe(plumber())
             .pipe(source('client.js'))
             .pipe(buffer())
             .pipe(sourcemaps.init({loadMaps: true}))

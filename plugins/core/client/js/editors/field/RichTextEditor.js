@@ -65,4 +65,4 @@ class RichTextEditor extends View {
     }
 }
 
-resources.editors.richText = RichTextEditor;
+module.exports = RichTextEditor;

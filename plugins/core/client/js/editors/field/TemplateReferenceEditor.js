@@ -1,12 +1,18 @@
 'use strict';
 
+/**
+ * An editor for referencing templates
+ */
 class TemplateReferenceEditor extends View {
     constructor(params) {
         super(params);
 
         this.init();
     }
-    
+   
+    /**
+     * Event: Change value
+     */ 
     onChange() {
         this.value = this.$select.val();
 
@@ -33,4 +39,4 @@ class TemplateReferenceEditor extends View {
     }
 }
 
-resources.editors.templateReference = TemplateReferenceEditor;
+module.exports = TemplateReferenceEditor;

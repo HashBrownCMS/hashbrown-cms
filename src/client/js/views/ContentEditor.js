@@ -302,13 +302,13 @@ class ContentEditor extends View {
             _.div({class: 'tab-content'},
                 // Render content properties
                 _.each(schema.tabs, (tabId, tab) => {
-                    return _.div({id: 'tab-' + tabId, class: 'tab-pane' + (tabId == schema.defaultTabId ? ' active' : '')},
+                    return _.div({id: 'tab-' + tabId, class: 'tab-pane' + (isTabActive(tabId) ? ' active' : '')},
                         this.renderFields(tabId, schema.fields.properties, content.properties)
                     );
                 }),
 
                 // Render meta properties
-                _.div({id: 'tab-meta', class: 'tab-pane' + ('meta' == schema.defaultTabId ? ' active' : '')},
+                _.div({id: 'tab-meta', class: 'tab-pane' + (isTabActive('meta') ? ' active' : '')},
                     this.renderFields('meta', schema.fields, content),
                     this.renderFields('meta', schema.fields.properties, content.properties)
                 )
