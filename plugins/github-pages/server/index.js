@@ -31,7 +31,8 @@ class GitHubPages {
                 headers: headers    
             })
             .on('complete', (data, response) => {
-                res.send(data);
+                res.sendStatus(200);
+                //res.send(data);
             });
         });
 
