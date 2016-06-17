@@ -27,7 +27,7 @@ class GitHubPages {
             };
 
             restler.post('https://github.com/login/oauth/access_token', {
-                data: JSON.stringify(data),
+                data: data,
                 headers: headers    
             })
             .on('complete', (data, response) => {
