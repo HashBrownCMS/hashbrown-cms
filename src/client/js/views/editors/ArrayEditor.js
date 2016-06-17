@@ -7,7 +7,7 @@ class ArrayEditor extends View {
     constructor(params) {
         super(params);
 
-        this.$element = _.div({class: 'array-editor'});
+        this.$element = _.div({class: 'array-editor field-editor'});
 
         this.fetch();
     }

@@ -7,7 +7,7 @@ class StructEditor extends View {
     constructor(params) {
         super(params);
 
-        this.$element = _.div({class: 'struct-editor'});
+        this.$element = _.div({class: 'struct-editor field-editor'});
 
         this.fetch();
     }

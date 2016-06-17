@@ -1,0 +1,39 @@
+.array-editor {
+    .items {
+        .item {
+            display: flex;
+            position: relative;
+            border-bottom: 1px solid material-color('grey', '300');
+            padding-bottom: 30px;
+            margin-top: 30px;
+
+            &:first-child {
+                margin-top: 0px;
+            }
+
+            &:last-child {
+                border-bottom: 0px;
+            }
+
+            >.field-editor {
+                flex-grow: 1;
+            }
+
+            >.btn-remove {
+                flex-shrink: 0;
+                height: 34px;
+                width: 34px;
+                padding: 0px !important;
+
+                .fa {
+                    color: material-color('red', '500');
+                    line-height: 34px;
+                }
+            }
+        }
+    }
+
+    .btn-add {
+        margin-top: 10px;
+    }
+}

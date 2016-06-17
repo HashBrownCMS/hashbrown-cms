@@ -1,16 +1,29 @@
+// Resource cache
+window.resources = {
+    editors: {},
+    connections: {},
+    connectionEditors: {},
+    content: [],
+    schemas: [],
+    media: []
+};
+
 // Libraries
 require('exomon');
 window.Promise = require('bluebird');
 
-// Views
+// Main views
 window.MessageModal = require('./views/MessageModal');
 window.NavbarMain = require('./views/NavbarMain');
+window.MediaViewer = require('./views/MediaViewer');
+window.LanguagePicker = require('./views/LanguagePicker');
+
+// Editor views
+require('./views/editors');
 window.JSONEditor = require('./views/JSONEditor');
 window.ContentEditor = require('./views/ContentEditor');
 window.ConnectionEditor = require('./views/ConnectionEditor');
 window.SchemaEditor = require('./views/SchemaEditor');
-window.MediaViewer = require('./views/MediaViewer');
-window.LanguagePicker = require('./views/LanguagePicker');
 window.LanguageSettings = require('./views/LanguageSettings');
 
 // Models

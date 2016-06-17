@@ -16,12 +16,12 @@ var eventstream = require('event-stream');
 gulp.task('plugins-sass', function() {
     gulp.src('./plugins/*/client/sass/**/*.scss')
         .pipe(plumber())
+        .pipe(concat('plugins.css'))
         .pipe(sass({
             includePaths: [
                './node_modules/sass-material-colors/sass/'
             ]
         }))
-        .pipe(concat('plugins.css'))
         .pipe(gulp.dest('./public/css/'));
 });
 

@@ -6,15 +6,6 @@ require('./helpers');
 // -----------
 // Preload resources 
 // -----------
-window.resources = {
-    editors: {},
-    connections: {},
-    connectionEditors: {},
-    content: [],
-    schemas: [],
-    media: []
-};
-
 $(document).ready(() => {
     reloadAllResources()
     .then(function() {

@@ -1,8 +1,5 @@
 'use strict';
 
-// Models
-let Content = require('../../../../../../src/common/models/Content');
-
 /**
  * An editor for referring to other Content
  */

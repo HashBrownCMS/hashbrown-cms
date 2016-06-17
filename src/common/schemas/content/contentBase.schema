@@ -8,6 +8,11 @@
             "label": "Created at",
             "schemaId": "date"
         },
+        "updateDate": {
+            "disabled": "true",
+            "label": "Updated at",
+            "schemaId": "date"
+        },
         "parentId": {
             "label": "Parent",
             "schemaId": "contentReference"
@@ -16,24 +21,10 @@
             "label": "Schema",
             "schemaId": "contentSchemaReference"
         },
-        "updateDate": {
-            "disabled": "true",
-            "label": "Updated at",
-            "schemaId": "date"
-        },
         "properties": {
-            "description": {
-                "label": "Description",
-                "multilingual": "true",
-                "schemaId": "string"
-            },
-            "publication": {
-                "label": "Publication",
-                "schemaId": "period"
-            },
             "title": {
                 "label": "Title",
-                "multilingual": "true",
+                "multilingual": true,
                 "schemaId": "string"
             }
         }

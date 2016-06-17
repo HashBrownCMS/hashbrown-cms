@@ -13,46 +13,57 @@ class SchemaHelper extends SchemaHelperCommon {
      */
     static getSchemaWithParentValues(id) {
         return new Promise((resolve, reject) => {
-            let properties = resources.schemas[id];
+            let schema = resources.schemas[id];
 
-            if(properties) {
+            if(schema) {
                 // Merge parent with current schema
                 // Since the child schema should override any duplicate content,
                 // the parent is transformed first, then returned as the resulting schema
-                if(properties.parentSchemaId) {
-                    SchemaHelper.getSchemaWithParentValues(properties.parentSchemaId).
+                if(schema.parentSchemaId) {
+                    SchemaHelper.getSchemaWithParentValues(schema.parentSchemaId).
                     then((parentSchema) => {
-                        let parentProperties = parentSchema.getFields();
-                        let mergedProperties = parentProperties;
+                        let mergedSchema = parentSchema.getFields();
 
-                        for(let k in properties.fields) {
-                           mergedProperties.fields[k] = properties.fields[k];
+                        // Recursive merge
+                        function merge(parentValues, childValues) {
+                            for(let k in childValues) {
+                                if(typeof parentValues[k] === 'object' && typeof childValues[k] === 'object') {
+                                    merge(parentValues[k], childValues[k]);
+                                
+                                } else {
+                                    parentValues[k] = childValues[k];
+                                
+                                }
+                            }
                         }
+
+                        merge(mergedSchema.fields, schema.fields);
                         
-                        switch(mergedProperties.type) {
+                        mergedSchema.icon = schema.icon || mergedSchema.icon;
+                        
+                        switch(mergedSchema.type) {
                             case 'content':
-                                if(!mergedProperties.tabs) {
-                                    mergedProperties.tabs = {};
+                                if(!mergedSchema.tabs) {
+                                    mergedSchema.tabs = {};
                                 }
 
-                                if(properties.tabs) {
-                                    for(let k in properties.tabs) {
-                                       mergedProperties.tabs[k] = properties.tabs[k];
+                                // Merge tabs
+                                if(schema.tabs) {
+                                    for(let k in schema.tabs) {
+                                       mergedSchema.tabs[k] = schema.tabs[k];
                                     }
                                 }
 
-                                mergedProperties.defaultTabId = properties.defaultTabId || mergedProperties.defaultTabId;
+                                mergedSchema.defaultTabId = schema.defaultTabId || mergedSchema.defaultTabId;
                                 break;
                         }
-                        
-                        mergedProperties.icon = properties.icon || mergedProperties.icon;
-
-                        resolve(SchemaHelper.getModel(mergedProperties));
+                     
+                        resolve(SchemaHelper.getModel(mergedSchema));
                     });
                 
                 // If no parent was specified, return the current schema
                 } else {
-                    resolve(SchemaHelper.getModel(properties));
+                    resolve(SchemaHelper.getModel(schema));
                 
                 }
 
