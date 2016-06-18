@@ -36,8 +36,10 @@ class ConnectionEditor extends View {
             location = '/api/github/oauth/start?route=' + Router.url;
         }
 
+        this.model.token = this.model.token || Router.query('token'); 
+
         return _.div({class: 'input-group field-editor'},
-            _.input({class: 'form-control', type: 'text', value: Router.query('token') || this.model.token, placeholder: 'Input GitHub API token'})
+            _.input({class: 'form-control', type: 'text', value: this.model.token, placeholder: 'Input GitHub API token'})
                 .change(onChange),
             _.div({class: 'input-group-btn'},
                 _.button({class: 'btn btn-primary'},
