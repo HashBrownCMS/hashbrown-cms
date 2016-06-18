@@ -42,31 +42,17 @@ class GitHubConnection extends Connection {
      */
     postContentProperties(properties, id, language, meta) {
         return new Promise((resolve, reject) => {
-            let path = properties.url || '/' + language + '/' + ContentHelper.getSlug(properties.title);
+            let path = this.settings.content + '/' + language + '/' + id + '.md';
 
-            // Add the id to the properties
-            properties.id = id;
+            // Add meta data to the properties
+            properties._id = id;
+            properties._language = language;
 
             // Remap "url" to "permalink"
             if(properties.url) {
                 properties.permalink = properties.url;
                 delete properties.url;
             }
-
-            // Remove first and last slash
-            if(path[0] == '/') {
-                path = path.substring(1);
-            }
-
-            if(path[path.length - 1] == '/') {
-                path = path.substring(0, path.length - 1);
-            }
-
-            // Add the markdown extension
-            path += '.md';
-            
-            // Add the root directory
-            path = this.settings.content + '/' + path;
 
             let apiPath = 'https://api.github.com/repos/' + this.settings.repo + '/contents/' + path + '?access_token=' + this.settings.token;
             let fileContent = this.compileForJekyll(properties);
