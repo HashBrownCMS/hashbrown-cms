@@ -24,8 +24,8 @@ class GitHubConnection extends Connection {
         let frontMatter = '';
 
         frontMatter += '---\n';
-        frontMatter += yamljs.stringify(properties); 
-        frontMatter += '\n---';
+        frontMatter += yamljs.stringify(properties, 10); 
+        frontMatter += '---';
 
         return frontMatter;
     }
@@ -34,12 +34,24 @@ class GitHubConnection extends Connection {
      * Posts content properties to the remote target
      *
      * @param {Object} properties
+     * @param {String} id
+     * @param {String} language
+     * @param {Object} meta
      *
      * @returns {Promise} promise
      */
-    postContentProperties(properties) {
+    postContentProperties(properties, id, language, meta) {
         return new Promise((resolve, reject) => {
-            let path = properties.url || ContentHelper.getSlug(properties.title);
+            let path = properties.url || '/' + language + '/' + ContentHelper.getSlug(properties.title);
+
+            // Add the id to the properties
+            properties.id = id;
+
+            // Remap "url" to "permalink"
+            if(properties.url) {
+                properties.permalink = properties.url;
+                delete properties.url;
+            }
 
             // Remove first and last slash
             if(path[0] == '/') {

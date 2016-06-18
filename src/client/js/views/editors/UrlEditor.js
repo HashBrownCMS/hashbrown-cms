@@ -40,7 +40,7 @@ class UrlEditor extends View {
                 }
 
             } else {
-                console.log('[Helper] Content not found: "' + id + '"');
+                debug.log('Content not found: "' + id + '"', this);
             }
         }
 
@@ -60,9 +60,7 @@ class UrlEditor extends View {
      */
     static generateUrl(contentId) {
         let nodes = UrlEditor.getAllParents(contentId);
-        let url = '';
-
-        url += '/';
+        let url = '/' + window.language + '/';
 
         for(let node of nodes) {
             let title = '';
