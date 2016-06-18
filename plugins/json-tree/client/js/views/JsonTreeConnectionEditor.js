@@ -11,4 +11,4 @@ class JsonTreeConnectionEditor extends View {
     }
 }
 
-resources.connectionEditors.jsontree = JsonTreeConnectionEditor;
+resources.connectionEditors['JSON Tree'] = JsonTreeConnectionEditor;

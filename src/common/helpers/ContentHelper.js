@@ -13,6 +13,26 @@ class ContentHelper {
     }
 
     /**
+     * Gets a URL-friendly version of a string
+     *
+     * @param {String} string
+     *
+     * @param {String} slug
+     */
+    static getSlug(string) {
+        return string
+            .toLowerCase()
+            .replace(/[æ|ä]/g, 'ae')
+            .replace(/[ø|ö]/g, 'oe')
+            .replace(/å/g, 'aa')
+            .replace(/ü/g, 'ue')
+            .replace(/ß/g, 'ss')
+            .replace(/[^\w ]+/g, '')
+            .replace(/ +/g, '-')
+            ;
+    }
+
+    /**
      * Gets a Content object by id
      *
      * @param {Number} id

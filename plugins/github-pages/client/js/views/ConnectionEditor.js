@@ -36,7 +36,7 @@ class ConnectionEditor extends View {
             location = '/api/github/oauth/start?route=' + Router.url;
         }
 
-        this.model.token = this.model.token || Router.query('token'); 
+        this.model.token = Router.query('token') || this.model.token; 
 
         return _.div({class: 'input-group field-editor'},
             _.input({class: 'form-control', type: 'text', value: this.model.token, placeholder: 'Input GitHub API token'})
@@ -55,7 +55,11 @@ class ConnectionEditor extends View {
     renderRepoPicker() {
         let view = this;
         
-        let $editor = _.div({class: 'field-editor dropdown-editor'});
+        let $editor = _.div({class: 'field-editor dropdown-editor'},
+            _.select({class: 'form-control'},
+                _.option({value: this.model.repo}, this.model.repo)
+            ).change(onChange)
+        );
         
         function onChange() {
             let repo = $(this).val();
@@ -65,16 +69,16 @@ class ConnectionEditor extends View {
             view.render();
         }
         
+        $editor.children('select').val(view.model.repo);
+
         $.ajax({
             type: 'get',
-            url: '/api/github/' + view.model.org + '/repos',
-            success: function(orgs) {
-                $editor.html(
-                    _.select({class: 'form-control'},
-                        _.each(repos, function(i, repos) {
-                            return _.option({value: repo.name}, repo.name);
-                        })
-                    ).change(onChange)
+            url: '/api/github/repos?token=' + this.model.token,
+            success: (repos) => {
+                $editor.children('select').html(
+                    _.each(repos, function(i, repo) {
+                        return _.option({value: repo.full_name}, repo.full_name);
+                    })
                 );
                 
                 $editor.children('select').val(view.model.repo);
@@ -92,7 +96,11 @@ class ConnectionEditor extends View {
     renderDirPicker(alias, defaultValue) {
         let view = this;
 
-        let $editor = _.div({class: 'field-editor dropdown-editor'});
+        let $editor = _.div({class: 'field-editor dropdown-editor'},
+            _.select({class: 'form-control'},
+                _.option({value: this.model[alias]}, this.model[alias])
+            ).change(onChange)
+        );
 
         function onChange() {
             let dir = $(this).val();
@@ -100,9 +108,11 @@ class ConnectionEditor extends View {
             view.model[alias] = dir;
         }
         
+        $editor.children('select').val(this.model[alias]);
+
         $.ajax({
             type: 'get',
-            url: '/api/github/' + view.model.org + '/' + view.model.repo + '/dirs',
+            url: '/api/github/' + this.model.repo + '/dirs?token=' + this.model.token,
             success: function(dirs) {
                 view.dirs = dirs;
 
@@ -126,12 +136,10 @@ class ConnectionEditor extends View {
                     view.model[alias] = alias;
                 }
 
-                $editor.html(
-                    _.select({class: 'form-control'},
-                        _.each(view.dirs, function(i, dir) {
-                            return _.option({value: dir}, '/' + dir);
-                        })
-                    ).change(onChange)
+                $editor.children('select').html(
+                    _.each(view.dirs, function(i, dir) {
+                        return _.option({value: dir}, dir);
+                    })
                 );
                 
                 $editor.children('select').val(view.model[alias]);
@@ -144,43 +152,40 @@ class ConnectionEditor extends View {
     render() {
         this.$element.empty();
 
-        // Token
         _.append(this.$element,
+            // Token
             _.div({class: 'field-container github-token'},
                 _.div({class: 'field-key'}, 'Token'),
                 _.div({class: 'field-value'},
                     this.renderTokenEditor()
                 )
-            )
-        );
-/*
-        this.$element.append(
+            ),
+            
+            // Repo picker
             _.div({class: 'field-container github-repo'},
-                _.div({class: 'field-key'}, 'Content directory'),
+                _.div({class: 'field-key'}, 'Repository'),
                 _.div({class: 'field-value'},
                     this.renderRepoPicker()
                 )
+            ),
+            
+            // Content dir picker
+            _.div({class: 'field-container github-content-dir'},
+                _.div({class: 'field-key'}, 'Content directory'),
+                _.div({class: 'field-value'},
+                    this.renderDirPicker('content')
+                )
+            ),
+
+            // Media dir picker
+            _.div({class: 'field-container github-media-dir'},
+                _.div({class: 'field-key'}, 'Media directory'),
+                _.div({class: 'field-value'},
+                    this.renderDirPicker('media')
+                )
             )
         );
-
-        // Render directory pickers if repo is picked
-        if(this.model.repo) {
-            this.$element.append([
-                _.div({class: 'field-container github-content-dir'},
-                    _.div({class: 'field-key'}, 'Content directory'),
-                    _.div({class: 'field-value'},
-                        this.renderDirPicker('content')
-                    )
-                ),
-                _.div({class: 'field-container github-media-dir'},
-                    _.div({class: 'field-key'}, 'Media directory'),
-                    _.div({class: 'field-value'},
-                        this.renderDirPicker('media')
-                    )
-                )
-            ]);
-        }*/
     }
 }
 
-resources.connectionEditors.github = ConnectionEditor;
+resources.connectionEditors['GitHub Pages'] = ConnectionEditor;

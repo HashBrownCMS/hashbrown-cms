@@ -75,7 +75,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                         location = '/api/github/oauth/start?route=' + Router.url;
                     }
 
-                    this.model.token = this.model.token || Router.query('token');
+                    this.model.token = Router.query('token') || this.model.token;
 
                     return _.div({ class: 'input-group field-editor' }, _.input({ class: 'form-control', type: 'text', value: this.model.token, placeholder: 'Input GitHub API token' }).change(onChange), _.div({ class: 'input-group-btn' }, _.button({ class: 'btn btn-primary' }, 'Renew').click(onClickRenew)));
                 }
@@ -89,7 +89,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 value: function renderRepoPicker() {
                     var view = this;
 
-                    var $editor = _.div({ class: 'field-editor dropdown-editor' });
+                    var $editor = _.div({ class: 'field-editor dropdown-editor' }, _.select({ class: 'form-control' }, _.option({ value: this.model.repo }, this.model.repo)).change(onChange));
 
                     function onChange() {
                         var repo = $(this).val();
@@ -99,13 +99,15 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                         view.render();
                     }
 
+                    $editor.children('select').val(view.model.repo);
+
                     $.ajax({
                         type: 'get',
-                        url: '/api/github/' + view.model.org + '/repos',
-                        success: function success(orgs) {
-                            $editor.html(_.select({ class: 'form-control' }, _.each(repos, function (i, repos) {
-                                return _.option({ value: repo.name }, repo.name);
-                            })).change(onChange));
+                        url: '/api/github/repos?token=' + this.model.token,
+                        success: function success(repos) {
+                            $editor.children('select').html(_.each(repos, function (i, repo) {
+                                return _.option({ value: repo.full_name }, repo.full_name);
+                            }));
 
                             $editor.children('select').val(view.model.repo);
                         }
@@ -125,7 +127,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 value: function renderDirPicker(alias, defaultValue) {
                     var view = this;
 
-                    var $editor = _.div({ class: 'field-editor dropdown-editor' });
+                    var $editor = _.div({ class: 'field-editor dropdown-editor' }, _.select({ class: 'form-control' }, _.option({ value: this.model[alias] }, this.model[alias])).change(onChange));
 
                     function onChange() {
                         var dir = $(this).val();
@@ -133,9 +135,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                         view.model[alias] = dir;
                     }
 
+                    $editor.children('select').val(this.model[alias]);
+
                     $.ajax({
                         type: 'get',
-                        url: '/api/github/' + view.model.org + '/' + view.model.repo + '/dirs',
+                        url: '/api/github/' + this.model.repo + '/dirs?token=' + this.model.token,
                         success: function success(dirs) {
                             view.dirs = dirs;
 
@@ -181,9 +185,9 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                                 view.model[alias] = alias;
                             }
 
-                            $editor.html(_.select({ class: 'form-control' }, _.each(view.dirs, function (i, dir) {
-                                return _.option({ value: dir }, '/' + dir);
-                            })).change(onChange));
+                            $editor.children('select').html(_.each(view.dirs, function (i, dir) {
+                                return _.option({ value: dir }, dir);
+                            }));
 
                             $editor.children('select').val(view.model[alias]);
                         }
@@ -196,42 +200,25 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 value: function render() {
                     this.$element.empty();
 
+                    _.append(this.$element,
                     // Token
-                    _.append(this.$element, _.div({ class: 'field-container github-token' }, _.div({ class: 'field-key' }, 'Token'), _.div({ class: 'field-value' }, this.renderTokenEditor())));
-                    /*
-                            this.$element.append(
-                                _.div({class: 'field-container github-repo'},
-                                    _.div({class: 'field-key'}, 'Content directory'),
-                                    _.div({class: 'field-value'},
-                                        this.renderRepoPicker()
-                                    )
-                                )
-                            );
-                    
-                            // Render directory pickers if repo is picked
-                            if(this.model.repo) {
-                                this.$element.append([
-                                    _.div({class: 'field-container github-content-dir'},
-                                        _.div({class: 'field-key'}, 'Content directory'),
-                                        _.div({class: 'field-value'},
-                                            this.renderDirPicker('content')
-                                        )
-                                    ),
-                                    _.div({class: 'field-container github-media-dir'},
-                                        _.div({class: 'field-key'}, 'Media directory'),
-                                        _.div({class: 'field-value'},
-                                            this.renderDirPicker('media')
-                                        )
-                                    )
-                                ]);
-                            }*/
+                    _.div({ class: 'field-container github-token' }, _.div({ class: 'field-key' }, 'Token'), _.div({ class: 'field-value' }, this.renderTokenEditor())),
+
+                    // Repo picker
+                    _.div({ class: 'field-container github-repo' }, _.div({ class: 'field-key' }, 'Repository'), _.div({ class: 'field-value' }, this.renderRepoPicker())),
+
+                    // Content dir picker
+                    _.div({ class: 'field-container github-content-dir' }, _.div({ class: 'field-key' }, 'Content directory'), _.div({ class: 'field-value' }, this.renderDirPicker('content'))),
+
+                    // Media dir picker
+                    _.div({ class: 'field-container github-media-dir' }, _.div({ class: 'field-key' }, 'Media directory'), _.div({ class: 'field-value' }, this.renderDirPicker('media'))));
                 }
             }]);
 
             return ConnectionEditor;
         }(View);
 
-        resources.connectionEditors.github = ConnectionEditor;
+        resources.connectionEditors['GitHub Pages'] = ConnectionEditor;
     }, {}], 3: [function (require, module, exports) {
         'use strict';
 
@@ -259,5 +246,5 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
             return JsonTreeConnectionEditor;
         }(View);
 
-        resources.connectionEditors.jsontree = JsonTreeConnectionEditor;
+        resources.connectionEditors['JSON Tree'] = JsonTreeConnectionEditor;
     }, {}] }, {}, [1, 3]);

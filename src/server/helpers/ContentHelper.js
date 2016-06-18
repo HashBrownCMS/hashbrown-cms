@@ -1,9 +1,12 @@
 'use strict';
 
+// Helpers
+let ContentHelperCommon = require('../../common/helpers/ContentHelper');
+
 // Models
 let Content = require('../../common/models/Content');
 
-class ContentHelper {
+class ContentHelper extends ContentHelperCommon {
     /**
      * Gets all Content objects
      *

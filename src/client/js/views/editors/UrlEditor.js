@@ -11,26 +11,6 @@ class UrlEditor extends View {
     }
 
     /**
-     * Gets url-friendly name of string
-     *
-     * @param {String} string
-     *
-     * @return {String} slug
-     */
-    static getSlug(string) {
-        return string
-            .toLowerCase()
-            .replace(/[æ|ä]/g, 'ae')
-            .replace(/[ø|ö]/g, 'oe')
-            .replace(/å/g, 'aa')
-            .replace(/ü/g, 'ue')
-            .replace(/ß/g, 'ss')
-            .replace(/[^\w ]+/g, '')
-            .replace(/ +/g, '-')
-            ;
-    }
-
-    /**
      * Get all parent content nodes
      *
      * @param {String} contentId
@@ -93,7 +73,7 @@ class UrlEditor extends View {
                 title = node.properties.title[window.language];
             }
 
-            url += UrlEditor.getSlug(title) + '/';
+            url += ContentHelper.getSlug(title) + '/';
         }
 
         let sameUrls = 0;

@@ -1,70 +1,14 @@
 'use strict';
 
-let request = require('../lib/request');
 let yamljs = require('../lib/yamljs/Yaml');
-let Octokat = require('../lib/octokat');
+let restler = require('restler');
 
 let Connection = require(appRoot + '/src/common/models/Connection');
 let Content = require(appRoot + '/src/common/models/Content');
 
-let ConnectionHelper = require(appRoot + '/src/server/helpers/ConnectionHelper');
-let LanguageHelper = require(appRoot + '/src/common/helpers/LanguageHelper');
-
-let octo;
-
 class GitHubConnection extends Connection {
     constructor(data) {
         super(data);
-    
-        if(this.settings.token) {
-            octo = new Octokat({
-                token: this.settings.token
-            });  
-        }
-    }
-
-    /**
-     * Gets all root directories
-     */
-    getRootDirectories() {
-        return new Promise((callback) => {
-            octo.repos(this.settings.org, this.settings.repo).contents().fetch()
-            .then(function(files) {
-                let dirs = [];
-
-                for(let file of files) {
-                    if(file.type == 'dir') {
-                        dirs[dirs.length] = file.path;
-                    }
-                }
-
-                res.send(dirs);
-            }); 
-        }); 
-    }
-
-    /**
-     * Gets all organisations
-     */
-    getOrgs() {
-        return new Promise((callback) => {
-            octo.me.orgs().fetch()
-            .then(function(orgs) {
-                callback(orgs);
-            }); 
-        }); 
-    }
-    
-    /**
-     * Gets all repositories
-     */
-    getRepos() {
-        return new Promise((callback) => {
-            octo.orgs(this.settings.org).repos().fetch()
-            .then(function(repos) {
-                callback(repos);
-            }); 
-        }); 
     }
 
     /**
@@ -75,15 +19,13 @@ class GitHubConnection extends Connection {
      * @returns {Promise} promise
      */
     compileForJekyll(properties) {
-        console.log('[GitHub] Compiling "' + properties.title + '" for Jekyll...');
+        debug.log('Compiling "' + properties.title + '" for Jekyll...', this);
 
         let frontMatter = '';
 
         frontMatter += '---\n';
         frontMatter += yamljs.stringify(properties); 
         frontMatter += '\n---';
-
-        console.log(' -> Success!');
 
         return frontMatter;
     }
@@ -96,62 +38,65 @@ class GitHubConnection extends Connection {
      * @returns {Promise} promise
      */
     postContentProperties(properties) {
-        console.log('[GitHub] Uploading "' + properties.title + '"...');
+        return new Promise((resolve, reject) => {
+            let path = properties.url || ContentHelper.getSlug(properties.title);
 
-        return new Promise((callback) => {
-            let data;
-            let path = properties.url + '.md';
-
-            // Compile for Jekyll
-            if(this.settings.compileForJekyll) {
-                data = this.compileForJekyll(properties);
-            } else {
-                data = JSON.stringify(properties);
+            // Remove first and last slash
+            if(path[0] == '/') {
+                path = path.substring(1);
             }
 
-            let repo = octo.repos(this.settings.org, this.settings.repo);
+            if(path[path.length - 1] == '/') {
+                path = path.substring(0, path.length - 1);
+            }
+
+            // Add the markdown extension
+            path += '.md';
+
+            let apiPath = 'https://api.github.com/repos/' + this.settings.repo + '/contents/' + path + '?access_token=' + this.settings.token;
+            let fileContent = this.compileForJekyll(properties);
+            let fileObject = JSON.stringify({ content: fileContent });
+            let headers = {
+                'Accept': 'application/json'
+            };
+
+            debug.log('Uploading "' + path + '"...', this);
 
             // Fetch first to get the SHA
-            console.log('[GitHub] Getting SHA...');
-            repo.contents(path).fetch()
-            .then((info) => {
-                let sha = info.sha;
-           
-                let config = {
+            debug.log('Getting SHA...', this);
+            
+            restler.get(apiPath, {
+                headers: headers
+            }).on('complete', (data, response) => {
+                let postData = {
+                    sha: data.sha,
+                    path: path,
                     message: 'Commit from Endomon CMS',
-                    content: new Buffer(data).toString('base64'),
-                    sha: sha        
+                    content: new Buffer(fileObject).toString('base64')
                 };
 
-                console.log('[GitHub] Committing data...');
-                repo.contents(path).add(config)
-                .then(() => {
-                    console.log('[GitHub] Uploaded file sucessfully!');
-                    callback();
+                // Commit the file
+                debug.log('Committing data...', this);
+
+                restler.put(apiPath, {
+                    headers: headers,
+                    data: postData
+                }).on('complete', (data, response) => {
+                    if(data.message) {
+                        debug.log('GitHub response: ' + JSON.stringify(data), this);
+                        debug.log('URL: ' + apiPath, this);
+                        debug.log('Data: ' + JSON.stringify(postData), this);
+                    
+                    } else {
+                        debug.log('Committed file successfully!', this);
+
+                    }
+
+                    resolve();
+
                 });
             });
         });
-    }
-
-    /**
-     * Gets all templates
-     */
-    getTemplates() {
-        return new Promise((callback) => {
-            this.get('repos/' + this.settings.org + '/' + this.settings.repo + '/contents/')
-            .then(function(response) {
-                let files = response.body;
-                let dirs = [];
-
-                for(let file of files) {
-                    if(file.type == 'dir' && file.path.indexOf('_layouts') > -1) {
-                        dirs[dirs.length] = file.path;
-                    }
-                }
-
-                callback(dirs);
-            }); 
-        }); 
     }
 }
 
