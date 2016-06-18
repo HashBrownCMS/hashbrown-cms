@@ -52,10 +52,12 @@ class GitHubConnection extends Connection {
 
             // Add the markdown extension
             path += '.md';
+            
+            // Add the root directory
+            path = this.settings.content + '/' + path;
 
             let apiPath = 'https://api.github.com/repos/' + this.settings.repo + '/contents/' + path + '?access_token=' + this.settings.token;
             let fileContent = this.compileForJekyll(properties);
-            let fileObject = JSON.stringify({ content: fileContent });
             let headers = {
                 'Accept': 'application/json'
             };
@@ -72,7 +74,7 @@ class GitHubConnection extends Connection {
                     sha: data.sha,
                     path: path,
                     message: 'Commit from Endomon CMS',
-                    content: new Buffer(fileObject).toString('base64')
+                    content: new Buffer(fileContent).toString('base64')
                 };
 
                 // Commit the file
@@ -80,12 +82,11 @@ class GitHubConnection extends Connection {
 
                 restler.put(apiPath, {
                     headers: headers,
-                    data: postData
+                    data: JSON.stringify(postData)
                 }).on('complete', (data, response) => {
                     if(data.message) {
+                        debug.log('Committing file failed', this);
                         debug.log('GitHub response: ' + JSON.stringify(data), this);
-                        debug.log('URL: ' + apiPath, this);
-                        debug.log('Data: ' + JSON.stringify(postData), this);
                     
                     } else {
                         debug.log('Committed file successfully!', this);
