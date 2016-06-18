@@ -200,7 +200,7 @@ class Content extends Entity {
                 let value = source[key];
 
                 if(value && typeof value === 'object') {
-                    if(value.multilingual) {
+                    if(value._multilingual) {
                         if(typeof value[language] === 'undefined') {
                             value[language] = null;
                         }

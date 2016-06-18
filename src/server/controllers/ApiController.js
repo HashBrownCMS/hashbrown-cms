@@ -440,18 +440,12 @@ class ApiController extends Controller {
         let username = req.body.username;
         let password = req.body.password;
 
-        AdminHelper.findAdmin(username)
-        .then((admin) => {
-            if(admin.validatePassword(password)) {
-                let token = admin.generateToken();
-                
-                AdminHelper.updateAdmin(username, admin.getFields())
-                .then(() => {
-                    res.send(token);
-                });
-            } else {
-                res.sendStatus(403);
-            }
+        AdminHelper.loginAdmin(username, password)
+        .then((token) => {
+            res.send(token);
+        })
+        .catch((e) => {
+            res.sendStatus(403);   
         });
     }
 

@@ -45,7 +45,7 @@ class ArrayEditor extends View {
                 this.value[i] = {};
             }
             
-            this.value[i].multilingual = true;
+            this.value[i]._multilingual = true;
             this.value[i][window.language] = newValue;
 
         } else {
@@ -103,7 +103,7 @@ class ArrayEditor extends View {
             _.button({class: 'btn btn-primary btn-add'},
                 _.span({class: 'fa fa-plus'})
             ).click(() => { this.onClickAddItem(); })
-        )
+        );
     }    
 }
 

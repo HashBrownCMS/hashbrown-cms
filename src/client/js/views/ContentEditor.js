@@ -245,7 +245,7 @@ class ContentEditor extends View {
                         schema[key],
                         function(newValue) {
                             if(schemaValue.multilingual) {
-                                fields[key].multilingual = true;
+                                fields[key]._multilingual = true;
                                 fields[key][window.language] = newValue;
 
                             } else {

@@ -11,7 +11,7 @@ class AdminHelper {
      *  
      * @param {String} username
      *
-     * @returns {Promise(Admin)} promise
+     * @returns {Promise(Admin)} admin
      */
     static findAdmin(username) {
         return new Promise((callback) => {
@@ -26,7 +26,36 @@ class AdminHelper {
             });       
         });
     }
-    
+
+    /**
+     * Logs in an Admin
+     *
+     * @param {String} username
+     * @param {String} password
+     *
+     * @returns {Promise(String)} token
+     */
+    static loginAdmin(username, password) {
+        return new Promise((resolve, reject) => {
+            AdminHelper.findAdmin(username)
+            .then((admin) => {
+                if(admin.validatePassword(password)) {
+                    let token = admin.generateToken();
+                    
+                    AdminHelper.updateAdmin(username, admin.getFields())
+                    .then(() => {
+                        resolve(token);
+                    });
+                } else {
+                    reject();
+                }
+            })
+            .catch((error) => {
+                reject(error);        
+            });
+        });
+    }
+
     /**
      * Finds a token
      *  

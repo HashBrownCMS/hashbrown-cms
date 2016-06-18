@@ -38,26 +38,8 @@ class GitHubPages {
             .on('complete', (data, response) => {
                 let token = data.access_token;
 
-                res.redirect(appRoot + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + route + '?token=' + token);
+                res.redirect(appRoot + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/#/' + route + '?token=' + token);
             });
-        });
-
-        app.get('/api/github/repos/', (req, res) => {
-            let connectionId = req.query.connectionId;
-
-            if(connectionId) {
-                ConnectionHelper.getConnectionById(connectionId)
-                .then((connection) => {
-                    connection.getOrgs()
-                    .then((orgs) => {
-                        res.send(orgs);
-                    });
-                });
-
-            } else {
-                res.send(400);
-            
-            }
         });
     }
 }

@@ -59,29 +59,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 }
 
                 /**
-                 * Render compiling editor
-                 */
-
-            }, {
-                key: "renderCompilingEditor",
-                value: function renderCompilingEditor() {
-                    var view = this;
-
-                    view.model.compileForJekyll = view.model.compileForJekyll == 'true' || view.model.compileForJekyll == true;
-
-                    function onChange() {
-                        view.model.compileForJekyll = this.checked;
-                    }
-
-                    return _.div({ class: 'field-editor' }, _.div({ class: 'switch' }, _.input({
-                        id: 'switch-github-compiling',
-                        class: 'form-control switch',
-                        type: 'checkbox',
-                        checked: view.model.compileForJekyll
-                    }).change(onChange), _.label({ for: 'switch-github-compiling' })));
-                }
-
-                /**
                  * Render token editor
                  */
 
@@ -94,29 +71,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                         view.model.token = $(this).val();
                     }
 
-                    return _.div({ class: 'field-editor' }, _.input({ class: 'form-control', type: 'text', value: this.model.token, placeholder: 'Input GitHub API token' }).change(onChange));
-                }
-
-                /**
-                 * Render organisation picker
-                 */
-
-            }, {
-                key: "renderOrgPicker",
-                value: function renderOrgPicker(orgs) {
-                    var view = this;
-
-                    function onChange() {
-                        var org = $(this).val();
-
-                        view.model.org = org;
-
-                        view.render();
+                    function onClickRenew() {
+                        location = '/api/github/oauth/start?route=' + Router.url;
                     }
 
-                    return _.div({ class: 'field-editor dropdown-editor' }, _.select({ class: 'form-control' }, _.each(orgs, function (i, org) {
-                        return _.option({ value: org.login }, org.login);
-                    })).change(onChange).val(view.model.org));
+                    return _.div({ class: 'input-group field-editor' }, _.input({ class: 'form-control', type: 'text', value: Router.query('token') || this.model.token, placeholder: 'Input GitHub API token' }).change(onChange), _.div({ class: 'input-group-btn' }, _.button({ class: 'btn btn-primary' }, 'Renew').click(onClickRenew)));
                 }
 
                 /**
@@ -233,31 +192,37 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
             }, {
                 key: "render",
                 value: function render() {
-                    var view = this;
-
-                    view.$element.empty();
-
-                    // Compiling
-                    view.$element.append(_.div({ class: 'field-container github-compiling' }, _.div({ class: 'field-key' }, 'Compile for Jekyll'), _.div({ class: 'field-value' }, view.renderCompilingEditor())));
+                    this.$element.empty();
 
                     // Token
-                    view.$element.append(_.div({ class: 'field-container github-token' }, _.div({ class: 'field-key' }, 'Token'), _.div({ class: 'field-value' }, view.renderTokenEditor())));
-
-                    // Get organisations
-                    view.getOrgs().then(function (orgs) {
-                        // Render organisation picker
-                        view.$element.append(_.div({ class: 'field-container github-org' }, _.div({ class: 'field-key' }, 'Organisation'), _.div({ class: 'field-value' }, view.renderOrgPicker(orgs))));
-
-                        // Render repo picker if org has been picked
-                        if (view.model.org) {
-                            view.$element.append(_.div({ class: 'field-container github-repo' }, _.div({ class: 'field-key' }, 'Content directory'), _.div({ class: 'field-value' }, view.renderRepoPicker())));
-
+                    _.append(this.$element, _.div({ class: 'field-container github-token' }, _.div({ class: 'field-key' }, 'Token'), _.div({ class: 'field-value' }, this.renderTokenEditor())));
+                    /*
+                            this.$element.append(
+                                _.div({class: 'field-container github-repo'},
+                                    _.div({class: 'field-key'}, 'Content directory'),
+                                    _.div({class: 'field-value'},
+                                        this.renderRepoPicker()
+                                    )
+                                )
+                            );
+                    
                             // Render directory pickers if repo is picked
-                            if (view.model.repo) {
-                                view.$element.append([_.div({ class: 'field-container github-content-dir' }, _.div({ class: 'field-key' }, 'Content directory'), _.div({ class: 'field-value' }, view.renderDirPicker('content'))), _.div({ class: 'field-container github-media-dir' }, _.div({ class: 'field-key' }, 'Media directory'), _.div({ class: 'field-value' }, view.renderDirPicker('media')))]);
-                            }
-                        }
-                    });
+                            if(this.model.repo) {
+                                this.$element.append([
+                                    _.div({class: 'field-container github-content-dir'},
+                                        _.div({class: 'field-key'}, 'Content directory'),
+                                        _.div({class: 'field-value'},
+                                            this.renderDirPicker('content')
+                                        )
+                                    ),
+                                    _.div({class: 'field-container github-media-dir'},
+                                        _.div({class: 'field-key'}, 'Media directory'),
+                                        _.div({class: 'field-value'},
+                                            this.renderDirPicker('media')
+                                        )
+                                    )
+                                ]);
+                            }*/
                 }
             }]);
 

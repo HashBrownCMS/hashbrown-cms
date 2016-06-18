@@ -27,7 +27,7 @@ class StructEditor extends View {
                 this.value[key] = {};
             }
             
-            this.value[key].multilingual = true;
+            this.value[key]._multilingual = true;
             this.value[key][window.language] = newValue;
 
         } else {
