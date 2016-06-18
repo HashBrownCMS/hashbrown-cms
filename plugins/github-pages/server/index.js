@@ -38,7 +38,7 @@ class GitHubPages {
             .on('complete', (data, response) => {
                 let token = data.access_token;
 
-                res.redirect(appRoot + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/#/' + route + '?token=' + token);
+                res.redirect(ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/#' + route + '?token=' + token);
             });
         });
     }
