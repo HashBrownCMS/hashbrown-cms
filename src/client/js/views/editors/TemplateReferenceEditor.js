@@ -14,22 +14,36 @@ class TemplateReferenceEditor extends View {
      * Event: Change value
      */ 
     onChange() {
-        this.value = this.$select.val();
+        this.value = this.$element.find('select').val();
 
         this.trigger('change', this.value);
     }
     
     render() {
+        let resource = window.resources[this.config.resource || 'templates'];
+
         this.$element = _.div({class: 'field-editor template-reference-editor'},
             _.select({class: 'form-control'},
-                _.each(window.resources[this.config.resource || 'templates'], (i, template) => {
+                _.each(resource, (i, template) => {
                     return _.option({
-                        value: template,
-                        selected: this.value == template
+                        value: template
                     }, template);
                 })
-            ).change(function() { this.onChange(); })
+            ).change(() => { this.onChange(); })
         );
+
+        if(!this.value) {
+            if(resource.length > 0) {
+                this.value = resource[0];
+
+                this.$element.find('select').val(this.value);
+            
+                this.trigger('change', this.value);
+            }
+
+        } else {
+            this.$element.find('select').val(this.value);
+        }
     }
 }
 

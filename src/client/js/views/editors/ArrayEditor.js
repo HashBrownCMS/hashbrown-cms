@@ -37,9 +37,10 @@ class ArrayEditor extends View {
      *
      * @param {Object} newValue
      * @param {Number} index
+     * @param {Schema} itemSchema
      */
-    onChange(newValue, i) {
-        if(this.config.item.multilingual) {
+    onChange(newValue, i, itemSchema) {
+        if(itemSchema.multilingual) {
             // Sanity check to make sure multilingual fields are accomodated for
             if(!this.value[i] || typeof this.value[i] !== 'object') {
                 this.value[i] = {};
@@ -56,10 +57,6 @@ class ArrayEditor extends View {
     }
 
     render() {
-        // Make sure we have the item schema and the editor we need for each array item
-        let itemSchema = resources.schemas[this.config.item.schemaId];
-        let fieldEditor = resources.editors[itemSchema.editorId];
-
         // A sanity check to make sure we're working with an array
         if(!Array.isArray(this.value)) {
             this.value = [];
@@ -68,17 +65,51 @@ class ArrayEditor extends View {
         // Render editor
         _.append(this.$element.empty(),
             _.div({class: 'items'},
-
                 // Loop through each array item
                 _.each(this.value, (i, item) => {
+                    // Sanity check for item schema
+                    if(
+                        this.config.allowedSchemas &&
+                        this.config.allowedSchemas.length > 0 &&
+                        this.config.allowedSchemas.indexOf(item.schemaId) < 0
+                    ) {
+                        item.schemaId = this.config.allowedSchemas[0];                    
+                    }
+
+                    // Make sure we have the item schema and the editor we need for each array item
+                    let itemSchema = resources.schemas[item.schemaId];
+                    let fieldEditor = resources.editors[itemSchema.editorId];
+
                     // Sanity check to make sure multilingual fields are accomodated for
-                    if(this.config.item.multilingual && (!item || typeof item !== 'object')) {
+                    if(itemSchema.multilingual && (!item || typeof item !== 'object')) {
                         item = {};
                     }
 
+                    // Init the schema selector
+                    let $schemaSelector = _.div({class: 'item-schema-selector kvp'},
+                        _.div({class: 'key'},
+                            'Schema'
+                        ),
+                        _.div({class: 'value'},
+                            _.select({class: 'form-control'},
+                                _.each(this.config.allowedSchemas, (i, allowedSchemaId) => {
+                                    let allowedSchema = resources.schemas[allowedSchemaId];
+
+                                    return _.option({ value: allowedSchemaId },
+                                        allowedSchema.name
+                                    );
+                                })
+                            ).on('change', () => {
+                                item.schemaId = $schemaSelector.find('select').val();
+
+                                this.trigger('change', this.value);
+                            })
+                        )
+                    );
+
                     // Init the field editor
                     let fieldEditorInstance = new fieldEditor({
-                        value: this.config.item.multilingual ? item[window.language] : item,
+                        value: itemSchema.multilingual ? item[window.language] : item,
                         disabled: itemSchema.disabled || false,
                         config: itemSchema.config || {},
                         schema: itemSchema
@@ -86,15 +117,16 @@ class ArrayEditor extends View {
 
                     // Hook up the change event
                     fieldEditorInstance.on('change', (newValue) => {
-                        this.onChange(newValue, i);
+                        this.onChange(newValue, i, itemSchema);
                     });
 
                     // Return the DOM element
                     return _.div({class: 'item'},
-                        fieldEditorInstance.$element,
                         _.button({class: 'btn btn-embedded btn-remove'},
                             _.span({class: 'fa fa-remove'})
-                        ).click(() => { this.onClickRemoveItem(i); })
+                        ).click(() => { this.onClickRemoveItem(i); }),
+                        $schemaSelector,
+                        fieldEditorInstance.$element
                     );
                 })    
             ),

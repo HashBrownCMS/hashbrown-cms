@@ -422,7 +422,6 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
     flex-grow: 1; }
 
 .array-editor .items .item {
-  display: flex;
   position: relative;
   border-bottom: 1px solid #e0e0e0;
   padding-bottom: 30px;
@@ -431,10 +430,23 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
     margin-top: 0px; }
   .array-editor .items .item:last-child {
     border-bottom: 0px; }
+  .array-editor .items .item > .item-schema-selector {
+    clear: both;
+    display: flex;
+    margin-bottom: 10px;
+    width: calc(100% - 34px); }
+    .array-editor .items .item > .item-schema-selector .key {
+      width: 100px;
+      flex-shrink: 0;
+      line-height: 34px; }
+    .array-editor .items .item > .item-schema-selector .value {
+      flex-grow: 1; }
   .array-editor .items .item > .field-editor {
-    flex-grow: 1; }
+    width: calc(100% - 34px); }
   .array-editor .items .item > .btn-remove {
-    flex-shrink: 0;
+    position: absolute;
+    right: 0px;
+    top: 0px;
     height: 34px;
     width: 34px;
     padding: 0px !important; }

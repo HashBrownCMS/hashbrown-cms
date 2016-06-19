@@ -1039,10 +1039,10 @@ var shorthands=['blur','change','click','focus','hover','keydown','keypress','ke
  * @returns {HTMLElement} element
  */function create(tag,attr,contents){var element=document.createElement(tag.toUpperCase()); // jQuery logic
 if(typeof jQuery!=='undefined'){element=$(element); // If the attribute parameter is a jQuery instance, just reassign the parameter values
-if(attr instanceof jQuery||typeof attr==='string'){contents=attr;}else {for(var k in attr){element.attr(k,attr[k]);}} // Native JavaScript logic
+if(attr instanceof jQuery||typeof attr==='string'||Array.isArray(attr)){contents=attr;}else {for(var k in attr){element.attr(k,attr[k]);}} // Native JavaScript logic
 }else { // Assign custom event functions to element instead of extending the prototype
 assignEvents(element); // If the attribute parameter is a HTMLElement instance, just reassign the parameter values
-if(attr instanceof HTMLElement||typeof attr==='string'){contents=attr;}else {for(var k in attr){element.setAttribute(k,attr[k]);}}}append(element,contents);return element;} /**
+if(attr instanceof HTMLElement||typeof attr==='string'||Array.isArray(attr)){contents=attr;}else {for(var k in attr){element.setAttribute(k,attr[k]);}}}append(element,contents);return element;} /**
  * Declares a rendering method
  *
  * @param {String} tag
@@ -2959,16 +2959,19 @@ $element.empty();$element.append(this.renderField('Name',this.renderNameEditor()
      *
      * @param {Object} newValue
      * @param {Number} index
-     */},{key:"onChange",value:function onChange(newValue,i){if(this.config.item.multilingual){ // Sanity check to make sure multilingual fields are accomodated for
-if(!this.value[i]||_typeof(this.value[i])!=='object'){this.value[i]={};}this.value[i]._multilingual=true;this.value[i][window.language]=newValue;}else {this.value[i]=newValue;}this.trigger('change',this.value);}},{key:"render",value:function render(){var _this33=this; // Make sure we have the item schema and the editor we need for each array item
-var itemSchema=resources.schemas[this.config.item.schemaId];var fieldEditor=resources.editors[itemSchema.editorId]; // A sanity check to make sure we're working with an array
+     * @param {Schema} itemSchema
+     */},{key:"onChange",value:function onChange(newValue,i,itemSchema){if(itemSchema.multilingual){ // Sanity check to make sure multilingual fields are accomodated for
+if(!this.value[i]||_typeof(this.value[i])!=='object'){this.value[i]={};}this.value[i]._multilingual=true;this.value[i][window.language]=newValue;}else {this.value[i]=newValue;}this.trigger('change',this.value);}},{key:"render",value:function render(){var _this33=this; // A sanity check to make sure we're working with an array
 if(!Array.isArray(this.value)){this.value=[];} // Render editor
 _.append(this.$element.empty(),_.div({class:'items'}, // Loop through each array item
-_.each(this.value,function(i,item){ // Sanity check to make sure multilingual fields are accomodated for
-if(_this33.config.item.multilingual&&(!item||(typeof item==="undefined"?"undefined":_typeof(item))!=='object')){item={};} // Init the field editor
-var fieldEditorInstance=new fieldEditor({value:_this33.config.item.multilingual?item[window.language]:item,disabled:itemSchema.disabled||false,config:itemSchema.config||{},schema:itemSchema}); // Hook up the change event
-fieldEditorInstance.on('change',function(newValue){_this33.onChange(newValue,i);}); // Return the DOM element
-return _.div({class:'item'},fieldEditorInstance.$element,_.button({class:'btn btn-embedded btn-remove'},_.span({class:'fa fa-remove'})).click(function(){_this33.onClickRemoveItem(i);}));})), // Render the add item button
+_.each(this.value,function(i,item){ // Sanity check for item schema
+if(_this33.config.allowedSchemas&&_this33.config.allowedSchemas.length>0&&_this33.config.allowedSchemas.indexOf(item.schemaId)<0){item.schemaId=_this33.config.allowedSchemas[0];} // Make sure we have the item schema and the editor we need for each array item
+var itemSchema=resources.schemas[item.schemaId];var fieldEditor=resources.editors[itemSchema.editorId]; // Sanity check to make sure multilingual fields are accomodated for
+if(itemSchema.multilingual&&(!item||(typeof item==="undefined"?"undefined":_typeof(item))!=='object')){item={};} // Init the schema selector
+var $schemaSelector=_.div({class:'item-schema-selector kvp'},_.div({class:'key'},'Schema'),_.div({class:'value'},_.select({class:'form-control'},_.each(_this33.config.allowedSchemas,function(i,allowedSchemaId){var allowedSchema=resources.schemas[allowedSchemaId];return _.option({value:allowedSchemaId},allowedSchema.name);})).on('change',function(){item.schemaId=$schemaSelector.find('select').val();_this33.trigger('change',_this33.value);}))); // Init the field editor
+var fieldEditorInstance=new fieldEditor({value:itemSchema.multilingual?item[window.language]:item,disabled:itemSchema.disabled||false,config:itemSchema.config||{},schema:itemSchema}); // Hook up the change event
+fieldEditorInstance.on('change',function(newValue){_this33.onChange(newValue,i,itemSchema);}); // Return the DOM element
+return _.div({class:'item'},_.button({class:'btn btn-embedded btn-remove'},_.span({class:'fa fa-remove'})).click(function(){_this33.onClickRemoveItem(i);}),$schemaSelector,fieldEditorInstance.$element);})), // Render the add item button
 _.button({class:'btn btn-primary btn-add'},_.span({class:'fa fa-plus'})).click(function(){_this33.onClickAddItem();}));}}]);return ArrayEditor;}(View);module.exports=ArrayEditor;},{}],180:[function(require,module,exports){'use strict'; /**
  * An editor for referring to other Content
  */var ContentReferenceEditor=function(_View12){_inherits(ContentReferenceEditor,_View12);function ContentReferenceEditor(params){_classCallCheck(this,ContentReferenceEditor);var _this34=_possibleConstructorReturn(this,Object.getPrototypeOf(ContentReferenceEditor).call(this,params));_this34.init();return _this34;} /**
@@ -3050,7 +3053,7 @@ return _.div({class:'kvp'},_.div({class:'key'},schemaValue.label),_.div({class:'
  * An editor for referencing templates
  */var TemplateReferenceEditor=function(_View22){_inherits(TemplateReferenceEditor,_View22);function TemplateReferenceEditor(params){_classCallCheck(this,TemplateReferenceEditor);var _this49=_possibleConstructorReturn(this,Object.getPrototypeOf(TemplateReferenceEditor).call(this,params));_this49.init();return _this49;} /**
      * Event: Change value
-     */_createClass(TemplateReferenceEditor,[{key:"onChange",value:function onChange(){this.value=this.$select.val();this.trigger('change',this.value);}},{key:"render",value:function render(){var _this50=this;this.$element=_.div({class:'field-editor template-reference-editor'},_.select({class:'form-control'},_.each(window.resources[this.config.resource||'templates'],function(i,template){return _.option({value:template,selected:_this50.value==template},template);})).change(function(){this.onChange();}));}}]);return TemplateReferenceEditor;}(View);module.exports=TemplateReferenceEditor;},{}],191:[function(require,module,exports){'use strict'; /**
+     */_createClass(TemplateReferenceEditor,[{key:"onChange",value:function onChange(){this.value=this.$element.find('select').val();this.trigger('change',this.value);}},{key:"render",value:function render(){var _this50=this;var resource=window.resources[this.config.resource||'templates'];this.$element=_.div({class:'field-editor template-reference-editor'},_.select({class:'form-control'},_.each(resource,function(i,template){return _.option({value:template},template);})).change(function(){_this50.onChange();}));if(!this.value){if(resource.length>0){this.value=resource[0];this.$element.find('select').val(this.value);this.trigger('change',this.value);}}else {this.$element.find('select').val(this.value);}}}]);return TemplateReferenceEditor;}(View);module.exports=TemplateReferenceEditor;},{}],191:[function(require,module,exports){'use strict'; /**
  * An editor for content URLs
  */var UrlEditor=function(_View23){_inherits(UrlEditor,_View23);function UrlEditor(params){_classCallCheck(this,UrlEditor);var _this51=_possibleConstructorReturn(this,Object.getPrototypeOf(UrlEditor).call(this,params));_this51.init();return _this51;} /**
      * Get all parent content nodes

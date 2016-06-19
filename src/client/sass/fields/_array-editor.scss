@@ -1,7 +1,6 @@
 .array-editor {
     .items {
         .item {
-            display: flex;
             position: relative;
             border-bottom: 1px solid material-color('grey', '300');
             padding-bottom: 30px;
@@ -15,12 +14,31 @@
                 border-bottom: 0px;
             }
 
+            >.item-schema-selector {
+                clear: both;
+                display: flex;
+                margin-bottom: 10px;
+                width: calc(100% - 34px);
+
+                .key {
+                    width: 100px;
+                    flex-shrink: 0;
+                    line-height: 34px;
+                }
+
+                .value {
+                    flex-grow: 1;
+                }
+            }            
+
             >.field-editor {
-                flex-grow: 1;
+                width: calc(100% - 34px);
             }
 
             >.btn-remove {
-                flex-shrink: 0;
+                position: absolute;
+                right: 0px;
+                top: 0px;
                 height: 34px;
                 width: 34px;
                 padding: 0px !important;
