@@ -81,6 +81,42 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                 }
 
                 /**
+                 * Render organisation picker
+                 */
+
+            }, {
+                key: "renderOrgPicker",
+                value: function renderOrgPicker() {
+                    var view = this;
+
+                    var $editor = _.div({ class: 'field-editor dropdown-editor' }, _.select({ class: 'form-control' }, _.option({ value: this.model.org }, this.model.org)).change(onChange));
+
+                    function onChange() {
+                        var org = $(this).val();
+
+                        view.model.org = org;
+
+                        view.render();
+                    }
+
+                    $editor.children('select').val(view.model.org);
+
+                    $.ajax({
+                        type: 'get',
+                        url: '/api/github/orgs?token=' + this.model.token,
+                        success: function success(orgs) {
+                            _.append($editor.children('select').empty(), _.option({ value: '' }, '(none)'), _.each(orgs, function (i, org) {
+                                return _.option({ value: org.login }, org.login);
+                            }));
+
+                            $editor.children('select').val(view.model.org);
+                        }
+                    });
+
+                    return $editor;
+                }
+
+                /**
                  * Render repository picker
                  */
 
@@ -103,93 +139,13 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
                     $.ajax({
                         type: 'get',
-                        url: '/api/github/repos?token=' + this.model.token,
+                        url: '/api/github/repos?token=' + this.model.token + '&org=' + this.model.org,
                         success: function success(repos) {
                             $editor.children('select').html(_.each(repos, function (i, repo) {
                                 return _.option({ value: repo.full_name }, repo.full_name);
                             }));
 
                             $editor.children('select').val(view.model.repo);
-                        }
-                    });
-
-                    return $editor;
-                }
-
-                /**
-                 * Render directory picker
-                 *
-                 * @param {String} alias
-                 */
-
-            }, {
-                key: "renderDirPicker",
-                value: function renderDirPicker(alias, defaultValue) {
-                    var view = this;
-
-                    var $editor = _.div({ class: 'field-editor dropdown-editor' }, _.select({ class: 'form-control' }, _.option({ value: this.model[alias] }, this.model[alias])).change(onChange));
-
-                    function onChange() {
-                        var dir = $(this).val();
-
-                        view.model[alias] = dir;
-                    }
-
-                    $editor.children('select').val(this.model[alias]);
-
-                    $.ajax({
-                        type: 'get',
-                        url: '/api/github/' + this.model.repo + '/dirs?token=' + this.model.token,
-                        success: function success(dirs) {
-                            view.dirs = dirs;
-
-                            // Use alias as fallback dir name
-                            if (!view.model[alias]) {
-                                var foundFallbackDir = false;
-
-                                // Look for fallback dir name in remote directories
-                                var _iteratorNormalCompletion = true;
-                                var _didIteratorError = false;
-                                var _iteratorError = undefined;
-
-                                try {
-                                    for (var _iterator = view.dirs[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                                        var dir = _step.value;
-
-                                        if (dir == alias) {
-                                            foundFallbackDir = true;
-                                            break;
-                                        }
-                                    }
-
-                                    // If not found, add it
-                                } catch (err) {
-                                    _didIteratorError = true;
-                                    _iteratorError = err;
-                                } finally {
-                                    try {
-                                        if (!_iteratorNormalCompletion && _iterator.return) {
-                                            _iterator.return();
-                                        }
-                                    } finally {
-                                        if (_didIteratorError) {
-                                            throw _iteratorError;
-                                        }
-                                    }
-                                }
-
-                                if (!foundFallbackDir) {
-                                    view.dirs.push(alias);
-                                }
-
-                                view.model[alias] = alias;
-                            }
-
-                            $editor.children('select').html(_.each(view.dirs, function (i, dir) {
-                                return _.option({ value: dir }, dir);
-                            }));
-
-                            $editor.children('select').val(view.model[alias]);
                         }
                     });
 
@@ -204,14 +160,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                     // Token
                     _.div({ class: 'field-container github-token' }, _.div({ class: 'field-key' }, 'Token'), _.div({ class: 'field-value' }, this.renderTokenEditor())),
 
+                    // Org picker
+                    _.div({ class: 'field-container github-org' }, _.div({ class: 'field-key' }, 'Organisation'), _.div({ class: 'field-value' }, this.renderOrgPicker())),
+
                     // Repo picker
-                    _.div({ class: 'field-container github-repo' }, _.div({ class: 'field-key' }, 'Repository'), _.div({ class: 'field-value' }, this.renderRepoPicker())),
-
-                    // Content dir picker
-                    _.div({ class: 'field-container github-content-dir' }, _.div({ class: 'field-key' }, 'Content directory'), _.div({ class: 'field-value' }, this.renderDirPicker('content'))),
-
-                    // Media dir picker
-                    _.div({ class: 'field-container github-media-dir' }, _.div({ class: 'field-key' }, 'Media directory'), _.div({ class: 'field-value' }, this.renderDirPicker('media'))));
+                    _.div({ class: 'field-container github-repo' }, _.div({ class: 'field-key' }, 'Repository'), _.div({ class: 'field-value' }, this.renderRepoPicker())));
                 }
             }]);
 

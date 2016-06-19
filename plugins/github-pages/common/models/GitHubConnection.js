@@ -42,7 +42,7 @@ class GitHubConnection extends Connection {
      */
     postContentProperties(properties, id, language, meta) {
         return new Promise((resolve, reject) => {
-            let path = this.settings.content + '/' + language + '/' + id + '.md';
+            let path = 'content/' + language + '/' + id + '.md';
 
             // Add meta data to the properties
             properties._id = id;
@@ -52,6 +52,12 @@ class GitHubConnection extends Connection {
             if(properties.url) {
                 properties.permalink = properties.url;
                 delete properties.url;
+            }
+
+            // Remap "template" to "layout"
+            if(properties.template) {
+                properties.layout = properties.template;
+                delete properties.template;
             }
 
             let apiPath = 'https://api.github.com/repos/' + this.settings.repo + '/contents/' + path + '?access_token=' + this.settings.token;

@@ -14,12 +14,18 @@ class GitHubPages {
     static init(app) {
         ConnectionHelper.registerConnectionType('GitHub Pages', GitHubConnection);
 
+        /**
+         * Starts the oAuth flow
+         */
         app.get('/api/github/oauth/start', (req, res) => {
             route = req.query.route;
 
-            res.redirect('https://github.com/login/oauth/authorize?client_id=' + config.client.id + '&scope=repo');
+            res.redirect('https://github.com/login/oauth/authorize?client_id=' + config.client.id + '&scope=repo read:org');
         });
 
+        /**
+         * The callback for the oAuth flow
+         */
         app.get('/api/github/oauth/callback', (req, res) => {
             let code = req.query.code;
             let data = {
@@ -42,18 +48,47 @@ class GitHubPages {
             });
         });
 
-        app.get('/api/github/repos', (req, res) => {
+        /**
+         * Lists all user orgs
+         */
+        app.get('/api/github/orgs', (req, res) => {
             let headers = {
                 'Accept': 'application/json'
             };
-            
-            restler.get('https://api.github.com/user/repos?access_token=' + req.query.token, {
+           
+            restler.get('https://api.github.com/user/orgs?access_token=' + req.query.token, {
                 headers: headers
             }).on('complete', (data, response) => {
                 res.send(data);
             });
         });
 
+        /**
+         * Lists all user repos
+         */
+        app.get('/api/github/repos', (req, res) => {
+            let headers = {
+                'Accept': 'application/json'
+            };
+            
+            let apiUrl = '';
+            
+            if(req.query.org && req.query.org != 'undefined') {
+                apiUrl = 'https://api.github.com/users/' + req.query.org + '/repos';
+            } else {
+                apiUrl = 'https://api.github.com/user/repos';
+            }
+            
+            restler.get(apiUrl + '?access_token=' + req.query.token, {
+                headers: headers
+            }).on('complete', (data, response) => {
+                res.send(data);
+            });
+        });
+
+        /**
+         * Lists all root directories
+         */
         app.get('/api/github/:owner/:repo/dirs', (req, res) => {
             let headers = {
                 'Accept': 'application/json'
@@ -78,6 +113,9 @@ class GitHubPages {
             });
         });
 
+        /**
+         * Lists all templates
+         */
         app.get('/api/github/:owner/:repo/templates', (req, res) => {
             let headers = {
                 'Accept': 'application/json'

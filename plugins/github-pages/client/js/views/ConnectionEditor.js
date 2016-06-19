@@ -48,6 +48,47 @@ class ConnectionEditor extends View {
             )
         );
     }
+    
+    /**
+     * Render organisation picker
+     */
+    renderOrgPicker() {
+        let view = this;
+        
+        let $editor = _.div({class: 'field-editor dropdown-editor'},
+            _.select({class: 'form-control'},
+                _.option({value: this.model.org}, this.model.org)
+            ).change(onChange)
+        );
+        
+        function onChange() {
+            let org = $(this).val();
+
+            view.model.org = org;
+
+            view.render();
+        }
+        
+        $editor.children('select').val(view.model.org);
+
+        $.ajax({
+            type: 'get',
+            url: '/api/github/orgs?token=' + this.model.token,
+            success: (orgs) => {
+                _.append($editor.children('select').empty(),
+                    _.option({value: ''}, '(none)'),
+                    _.each(orgs, function(i, org) {
+                        return _.option({value: org.login}, org.login);
+                    })
+                );
+                
+                $editor.children('select').val(view.model.org);
+            }
+        });
+
+        return $editor;
+    }
+
 
     /**
      * Render repository picker
@@ -73,7 +114,7 @@ class ConnectionEditor extends View {
 
         $.ajax({
             type: 'get',
-            url: '/api/github/repos?token=' + this.model.token,
+            url: '/api/github/repos?token=' + this.model.token + '&org=' + this.model.org,
             success: (repos) => {
                 $editor.children('select').html(
                     _.each(repos, function(i, repo) {
@@ -82,67 +123,6 @@ class ConnectionEditor extends View {
                 );
                 
                 $editor.children('select').val(view.model.repo);
-            }
-        });
-
-        return $editor;
-    }
-
-    /**
-     * Render directory picker
-     *
-     * @param {String} alias
-     */
-    renderDirPicker(alias, defaultValue) {
-        let view = this;
-
-        let $editor = _.div({class: 'field-editor dropdown-editor'},
-            _.select({class: 'form-control'},
-                _.option({value: this.model[alias]}, this.model[alias])
-            ).change(onChange)
-        );
-
-        function onChange() {
-            let dir = $(this).val();
-
-            view.model[alias] = dir;
-        }
-        
-        $editor.children('select').val(this.model[alias]);
-
-        $.ajax({
-            type: 'get',
-            url: '/api/github/' + this.model.repo + '/dirs?token=' + this.model.token,
-            success: function(dirs) {
-                view.dirs = dirs;
-
-                // Use alias as fallback dir name
-                if(!view.model[alias]) {
-                    let foundFallbackDir = false;
-
-                    // Look for fallback dir name in remote directories
-                    for(let dir of view.dirs) {
-                        if(dir == alias) {
-                            foundFallbackDir = true;
-                            break;
-                        }
-                    }
-
-                    // If not found, add it
-                    if(!foundFallbackDir) {
-                        view.dirs.push(alias);
-                    }
-
-                    view.model[alias] = alias;
-                }
-
-                $editor.children('select').html(
-                    _.each(view.dirs, function(i, dir) {
-                        return _.option({value: dir}, dir);
-                    })
-                );
-                
-                $editor.children('select').val(view.model[alias]);
             }
         });
 
@@ -161,27 +141,19 @@ class ConnectionEditor extends View {
                 )
             ),
             
+            // Org picker
+            _.div({class: 'field-container github-org'},
+                _.div({class: 'field-key'}, 'Organisation'),
+                _.div({class: 'field-value'},
+                    this.renderOrgPicker()
+                )
+            ),
+            
             // Repo picker
             _.div({class: 'field-container github-repo'},
                 _.div({class: 'field-key'}, 'Repository'),
                 _.div({class: 'field-value'},
                     this.renderRepoPicker()
-                )
-            ),
-            
-            // Content dir picker
-            _.div({class: 'field-container github-content-dir'},
-                _.div({class: 'field-key'}, 'Content directory'),
-                _.div({class: 'field-value'},
-                    this.renderDirPicker('content')
-                )
-            ),
-
-            // Media dir picker
-            _.div({class: 'field-container github-media-dir'},
-                _.div({class: 'field-key'}, 'Media directory'),
-                _.div({class: 'field-value'},
-                    this.renderDirPicker('media')
                 )
             )
         );
