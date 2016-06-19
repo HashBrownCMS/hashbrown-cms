@@ -103,7 +103,9 @@ class ArrayEditor extends View {
                                 item.schemaId = $schemaSelector.find('select').val();
 
                                 this.trigger('change', this.value);
-                            })
+
+                                this.render();
+                            }).val(item.schemaId)
                         )
                     );
 

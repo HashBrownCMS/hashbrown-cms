@@ -23,7 +23,10 @@
             "template": {
                 "label": "Template",
                 "schemaId": "templateReference",
-                "tabId": "content"
+                "tabId": "content",
+                "config": {
+                    "allowedTemplates": []
+                }
             },
             "url": {
                 "label": "URL",
