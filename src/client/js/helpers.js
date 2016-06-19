@@ -5,7 +5,9 @@ window.resources = {
     connectionEditors: {},
     content: [],
     schemas: [],
-    media: []
+    media: [],
+    templates: [],
+    sectionTemplates: []
 };
 
 // Libraries
@@ -103,7 +105,14 @@ window.reloadResource = function reloadResource(name) {
  */
 window.reloadAllResources = function reloadAllResources() {
     return new Promise(function(callback) {
-        let queue = ['content', 'schemas', 'media', 'connections'];
+        let queue = [
+            'content',
+            'schemas',
+            'media',
+            'connections',
+            'templates',
+            'sectionTemplates'
+        ];
 
         function processQueue(name) {
             window.reloadResource(name)

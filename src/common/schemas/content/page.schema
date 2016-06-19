@@ -20,7 +20,7 @@
                 "schemaId": "string",
                 "tabId": "content"
             },
-            "templateId": {
+            "template": {
                 "label": "Template",
                 "schemaId": "templateReference",
                 "tabId": "content"

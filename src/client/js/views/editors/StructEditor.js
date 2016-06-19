@@ -42,11 +42,11 @@ class StructEditor extends View {
         if(!this.value || typeof this.value !== 'object') {
             this.value = {};
         }
-
+    
         // Render editor
         _.append(this.$element.empty(),
             // Loop through each key in the struct
-            _.each(this.schema.config.struct, (k, schemaValue) => {
+            _.each(this.config.struct, (k, schemaValue) => {
                 let value = this.value[k];
                 let fieldSchema = resources.schemas[schemaValue.schemaId];
                 let fieldEditor = resources.editors[fieldSchema.editorId];
@@ -60,7 +60,7 @@ class StructEditor extends View {
                 let fieldEditorInstance = new fieldEditor({
                     value: schemaValue.multilingual ? value[window.language] : value,
                     disabled: schemaValue.disabled || false,
-                    config: schemaValue.config || {},
+                    config: schemaValue.config || fieldSchema.config || {},
                     schema: schemaValue
                 });
 

@@ -6,11 +6,18 @@ let Entity = require('./Entity');
  * The base class for all Connection types
  */
 class Connection extends Entity {
+    constructor(params) {
+        params.provideTemplates = params.provideTemplates == 'true' || params.provideTemplates == true || false;
+
+        super(params);
+    }
+
     structure() {
         // Fundamental fields
         this.def(String, 'id');
         this.def(String, 'title');
         this.def(String, 'type');
+        this.def(Boolean, 'provideTemplates');
         
         // Extensible settings
         this.def(Object, 'settings', {});
@@ -29,6 +36,28 @@ class Connection extends Entity {
         });
         
         return connection;
+    }
+
+    /**
+     * Gets templates
+     *
+     * @returns {Promise(Array)} templates
+     */
+    getTemplates() {
+        return new Promise((resolve, reject) => {
+            resolve([]);
+        });
+    }
+    
+    /**
+     * Gets section templates
+     *
+     * @returns {Promise(Array)} sectionTemplates
+     */
+    getSectionTemplates() {
+        return new Promise((resolve, reject) => {
+            resolve([]);
+        });
     }
 
     /**

@@ -112,31 +112,6 @@ class GitHubPages {
                 res.send(dirs);
             });
         });
-
-        /**
-         * Lists all templates
-         */
-        app.get('/api/github/:owner/:repo/templates', (req, res) => {
-            let headers = {
-                'Accept': 'application/json'
-            };
-            
-            restler.get('https://api.github.com/repos/' + req.params.owner + '/' + req.params.repo + '/contents/_layouts?access_token=' + req.query.token, {
-                headers: headers
-            }).on('complete', (data, response) => {
-                let templates = [];
-
-                if(data) {
-                    for(let i in data) {
-                        let file = data[i];
-
-                        templates[templates.length] = file.path.replace('_layouts', '');
-                    }
-                }
-
-                res.send(templates);
-            });
-        });
     }
 }
 

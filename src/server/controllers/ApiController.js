@@ -55,6 +55,7 @@ class ApiController extends Controller {
 
         // Templates
         app.get('/api/:project/:environment/templates', ApiController.getTemplates)
+        app.get('/api/:project/:environment/sectionTemplates', ApiController.getSectionTemplates)
     }
  
     // ----------
@@ -423,6 +424,11 @@ class ApiController extends Controller {
     static authenticate(req, res, onSuccess) {
         let token = req.query.token;
 
+        if(req.params.project && req.params.environment) {
+            ProjectHelper.currentProject = req.params.project;
+            ProjectHelper.currentEnvironment = req.params.environment;
+        }
+
         AdminHelper.findToken(token)
         .then((foundToken) => {
             if(foundToken) {
@@ -482,12 +488,61 @@ class ApiController extends Controller {
     // ----------
     // Templates
     // ----------
+    /**
+     * Gets an array of all templates
+     */
     static getTemplates(req, res) {
         ApiController.authenticate(req, res, () => {
-            res.send([
-                'one.html',
-                'two.html'
-            ]);
+            ConnectionHelper.getAllConnections()
+            .then((connections) => {
+                let foundProvider = false;
+
+                for(let i in connections) {
+                    if(connections[i].provideTemplates) {
+                        foundProvider = true;
+
+                        connections[i].getTemplates()
+                        .then((templates) => {
+                            res.send(templates);
+                        });
+
+                        break;
+                    }
+                }
+
+                if(!foundProvider) {
+                    res.send([]);
+                }
+            });            
+        });
+    }
+    
+    /**
+     * Gets an array of all section templates
+     */
+    static getSectionTemplates(req, res) {
+        ApiController.authenticate(req, res, () => {
+            ConnectionHelper.getAllConnections()
+            .then((connections) => {
+                let foundProvider = false;
+
+                for(let i in connections) {
+                    if(connections[i].provideTemplates) {
+                        foundProvider = true;
+
+                        connections[i].getSectionTemplates()
+                        .then((templates) => {
+                            res.send(templates);
+                        });
+
+                        break;
+                    }
+                }
+
+                if(!foundProvider) {
+                    res.send([]);
+                }
+            });            
         });
     }
 }

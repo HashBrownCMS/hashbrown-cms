@@ -128,6 +128,29 @@ class ConnectionEditor extends View {
     }
     
     /**
+     * Renders the template provider editor
+     */
+    renderTemplateProviderEditor() {
+        let view = this;
+
+        function onChange() {
+            view.model.provideTemplates = this.checked;
+        } 
+
+        let switchId = 'switch-' + $('.switch').length;
+
+        let $editor = _.div({class: 'field-editor switch-editor'},
+            _.div({class: 'switch'},
+                _.input({id: switchId, class: 'form-control switch', type: 'checkbox', checked: this.model.provideTemplates})
+                    .change(onChange),
+                _.label({for: switchId})
+            )
+        );
+
+        return $editor;
+    }
+    
+    /**
      * Renders the settings editor
      */
     renderSettingsEditor() {
@@ -193,6 +216,12 @@ class ConnectionEditor extends View {
                         _.div({class: 'field-key'}, 'Type'),
                         _.div({class: 'field-value'},
                             this.renderTypeEditor()
+                        )
+                    ),
+                    _.div({class: 'field-container template-provider'},
+                        _.div({class: 'field-key'}, 'Provide templates'),
+                        _.div({class: 'field-value'},
+                            this.renderTemplateProviderEditor()
                         )
                     ),
                     this.renderSettingsEditor()

@@ -20,22 +20,16 @@ class TemplateReferenceEditor extends View {
     }
     
     render() {
-        let editor = this;
-
-        this.$element = _.div({class: 'field-editor template-reference-editor'});
-
-        $.getJSON('/api/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/templates?token=' + localStorage.getItem('token'), function(templates) {
-            editor.$select = _.select({class: 'form-control'},
-                _.each(templates, function(i, template) {
+        this.$element = _.div({class: 'field-editor template-reference-editor'},
+            _.select({class: 'form-control'},
+                _.each(window.resources[this.config.resource || 'templates'], (i, template) => {
                     return _.option({
                         value: template,
-                        selected: editor.value == template
+                        selected: this.value == template
                     }, template);
                 })
-            ).change(function() { editor.onChange(); })
-
-            editor.$element.html(editor.$select);
-        });
+            ).change(function() { this.onChange(); })
+        );
     }
 }
 
