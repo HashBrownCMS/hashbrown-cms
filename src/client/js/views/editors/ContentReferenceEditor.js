@@ -30,8 +30,7 @@ class ContentReferenceEditor extends View {
 
                     return _.option(
                         {
-                            value: content.id,
-                            selected: this.value == content.id
+                            value: content.id
                         },
                         content.prop('title', window.language)
                     );

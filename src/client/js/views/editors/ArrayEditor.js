@@ -18,7 +18,8 @@ class ArrayEditor extends View {
      * @param {Number} index
      */
     onClickRemoveItem(i) {
-        this.value.splice(i,1);
+        this.value.schemaBindings.splice(i,1);
+        this.value.items.splice(i,1);
 
         this.render();
     }
@@ -27,7 +28,7 @@ class ArrayEditor extends View {
      * Event: Click add item
      */
     onClickAddItem() {
-        this.value.push(null);
+        this.value.items.push(null);
 
         this.render();
     }
@@ -42,15 +43,15 @@ class ArrayEditor extends View {
     onChange(newValue, i, itemSchema) {
         if(itemSchema.multilingual) {
             // Sanity check to make sure multilingual fields are accomodated for
-            if(!this.value[i] || typeof this.value[i] !== 'object') {
-                this.value[i] = {};
+            if(!this.value.items[i] || typeof this.value.items[i] !== 'object') {
+                this.value.items[i] = {};
             }
             
-            this.value[i]._multilingual = true;
-            this.value[i][window.language] = newValue;
+            this.value.items[i]._multilingual = true;
+            this.value.items[i][window.language] = newValue;
 
         } else {
-            this.value[i] = newValue;
+            this.value.items[i] = newValue;
         }
 
         this.trigger('change', this.value);
@@ -58,26 +59,57 @@ class ArrayEditor extends View {
 
     render() {
         // A sanity check to make sure we're working with an array
-        if(!Array.isArray(this.value)) {
-            this.value = [];
+        if(
+            !this.value ||
+            typeof this.value !== 'object'
+        ) {
+            this.value = {
+                items: [],
+                schemaBindings: []
+            };
+        
+        }
+        
+        if(Array.isArray(this.value)) {
+            this.value = {
+                items: this.value,
+                schemaBindings: []
+            };
+        }
+
+        if(!this.value.items) {
+            this.value.items = [];
+        }
+
+        if(!this.value.schemaBindings) {
+            this.value.schemaBindings = [];
         }
 
         // Render editor
         _.append(this.$element.empty(),
             _.div({class: 'items'},
                 // Loop through each array item
-                _.each(this.value, (i, item) => {
+                _.each(this.value.items, (i, item) => {
                     // Sanity check for item schema
+                    if(!this.config.allowedSchemas) {
+                        this.config.allowedSchemas = []
+                    }
+                    
+                    let itemSchemaId = this.value.schemaBindings[i];
+
                     if(
-                        this.config.allowedSchemas &&
                         this.config.allowedSchemas.length > 0 &&
-                        this.config.allowedSchemas.indexOf(item.schemaId) < 0
+                        (
+                            !itemSchemaId ||
+                            this.config.allowedSchemas.indexOf(itemSchemaId) < 0
+                        )
                     ) {
-                        item.schemaId = this.config.allowedSchemas[0];                    
+                        itemSchemaId = this.config.allowedSchemas[0];                    
+                        this.value.schemaBindings[i] = itemSchemaId;
                     }
 
                     // Make sure we have the item schema and the editor we need for each array item
-                    let itemSchema = resources.schemas[item.schemaId];
+                    let itemSchema = resources.schemas[itemSchemaId];
                     let fieldEditor = resources.editors[itemSchema.editorId];
 
                     // Sanity check to make sure multilingual fields are accomodated for
@@ -100,12 +132,14 @@ class ArrayEditor extends View {
                                     );
                                 })
                             ).on('change', () => {
-                                item.schemaId = $schemaSelector.find('select').val();
+                                itemSchemaId = $schemaSelector.find('select').val();
+
+                                this.value.schemaBindings[i] = itemSchemaId;
 
                                 this.trigger('change', this.value);
 
                                 this.render();
-                            }).val(item.schemaId)
+                            }).val(itemSchemaId)
                         )
                     );
 
@@ -127,7 +161,7 @@ class ArrayEditor extends View {
                         _.button({class: 'btn btn-embedded btn-remove'},
                             _.span({class: 'fa fa-remove'})
                         ).click(() => { this.onClickRemoveItem(i); }),
-                        $schemaSelector,
+                        this.config.allowedSchemas.length > 1 ? $schemaSelector : null,
                         fieldEditorInstance.$element
                     );
                 })    

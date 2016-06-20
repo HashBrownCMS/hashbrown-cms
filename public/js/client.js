@@ -2952,33 +2952,33 @@ $element.empty();$element.append(this.renderField('Name',this.renderNameEditor()
      * Event: Click remove item
      *
      * @param {Number} index
-     */_createClass(ArrayEditor,[{key:"onClickRemoveItem",value:function onClickRemoveItem(i){this.value.splice(i,1);this.render();} /**
+     */_createClass(ArrayEditor,[{key:"onClickRemoveItem",value:function onClickRemoveItem(i){this.value.schemaBindings.splice(i,1);this.value.items.splice(i,1);this.render();} /**
      * Event: Click add item
-     */},{key:"onClickAddItem",value:function onClickAddItem(){this.value.push(null);this.render();} /**
+     */},{key:"onClickAddItem",value:function onClickAddItem(){this.value.items.push(null);this.render();} /**
      * Event: Change value
      *
      * @param {Object} newValue
      * @param {Number} index
      * @param {Schema} itemSchema
      */},{key:"onChange",value:function onChange(newValue,i,itemSchema){if(itemSchema.multilingual){ // Sanity check to make sure multilingual fields are accomodated for
-if(!this.value[i]||_typeof(this.value[i])!=='object'){this.value[i]={};}this.value[i]._multilingual=true;this.value[i][window.language]=newValue;}else {this.value[i]=newValue;}this.trigger('change',this.value);}},{key:"render",value:function render(){var _this33=this; // A sanity check to make sure we're working with an array
-if(!Array.isArray(this.value)){this.value=[];} // Render editor
+if(!this.value.items[i]||_typeof(this.value.items[i])!=='object'){this.value.items[i]={};}this.value.items[i]._multilingual=true;this.value.items[i][window.language]=newValue;}else {this.value.items[i]=newValue;}this.trigger('change',this.value);}},{key:"render",value:function render(){var _this33=this; // A sanity check to make sure we're working with an array
+if(!this.value||_typeof(this.value)!=='object'){this.value={items:[],schemaBindings:[]};}if(Array.isArray(this.value)){this.value={items:this.value,schemaBindings:[]};}if(!this.value.items){this.value.items=[];}if(!this.value.schemaBindings){this.value.schemaBindings=[];} // Render editor
 _.append(this.$element.empty(),_.div({class:'items'}, // Loop through each array item
-_.each(this.value,function(i,item){ // Sanity check for item schema
-if(_this33.config.allowedSchemas&&_this33.config.allowedSchemas.length>0&&_this33.config.allowedSchemas.indexOf(item.schemaId)<0){item.schemaId=_this33.config.allowedSchemas[0];} // Make sure we have the item schema and the editor we need for each array item
-var itemSchema=resources.schemas[item.schemaId];var fieldEditor=resources.editors[itemSchema.editorId]; // Sanity check to make sure multilingual fields are accomodated for
+_.each(this.value.items,function(i,item){ // Sanity check for item schema
+if(!_this33.config.allowedSchemas){_this33.config.allowedSchemas=[];}var itemSchemaId=_this33.value.schemaBindings[i];if(_this33.config.allowedSchemas.length>0&&(!itemSchemaId||_this33.config.allowedSchemas.indexOf(itemSchemaId)<0)){itemSchemaId=_this33.config.allowedSchemas[0];_this33.value.schemaBindings[i]=itemSchemaId;} // Make sure we have the item schema and the editor we need for each array item
+var itemSchema=resources.schemas[itemSchemaId];var fieldEditor=resources.editors[itemSchema.editorId]; // Sanity check to make sure multilingual fields are accomodated for
 if(itemSchema.multilingual&&(!item||(typeof item==="undefined"?"undefined":_typeof(item))!=='object')){item={};} // Init the schema selector
-var $schemaSelector=_.div({class:'item-schema-selector kvp'},_.div({class:'key'},'Schema'),_.div({class:'value'},_.select({class:'form-control'},_.each(_this33.config.allowedSchemas,function(i,allowedSchemaId){var allowedSchema=resources.schemas[allowedSchemaId];return _.option({value:allowedSchemaId},allowedSchema.name);})).on('change',function(){item.schemaId=$schemaSelector.find('select').val();_this33.trigger('change',_this33.value);_this33.render();}).val(item.schemaId))); // Init the field editor
+var $schemaSelector=_.div({class:'item-schema-selector kvp'},_.div({class:'key'},'Schema'),_.div({class:'value'},_.select({class:'form-control'},_.each(_this33.config.allowedSchemas,function(i,allowedSchemaId){var allowedSchema=resources.schemas[allowedSchemaId];return _.option({value:allowedSchemaId},allowedSchema.name);})).on('change',function(){itemSchemaId=$schemaSelector.find('select').val();_this33.value.schemaBindings[i]=itemSchemaId;_this33.trigger('change',_this33.value);_this33.render();}).val(itemSchemaId))); // Init the field editor
 var fieldEditorInstance=new fieldEditor({value:itemSchema.multilingual?item[window.language]:item,disabled:itemSchema.disabled||false,config:itemSchema.config||{},schema:itemSchema}); // Hook up the change event
 fieldEditorInstance.on('change',function(newValue){_this33.onChange(newValue,i,itemSchema);}); // Return the DOM element
-return _.div({class:'item'},_.button({class:'btn btn-embedded btn-remove'},_.span({class:'fa fa-remove'})).click(function(){_this33.onClickRemoveItem(i);}),$schemaSelector,fieldEditorInstance.$element);})), // Render the add item button
+return _.div({class:'item'},_.button({class:'btn btn-embedded btn-remove'},_.span({class:'fa fa-remove'})).click(function(){_this33.onClickRemoveItem(i);}),_this33.config.allowedSchemas.length>1?$schemaSelector:null,fieldEditorInstance.$element);})), // Render the add item button
 _.button({class:'btn btn-primary btn-add'},_.span({class:'fa fa-plus'})).click(function(){_this33.onClickAddItem();}));}}]);return ArrayEditor;}(View);module.exports=ArrayEditor;},{}],180:[function(require,module,exports){'use strict'; /**
  * An editor for referring to other Content
  */var ContentReferenceEditor=function(_View12){_inherits(ContentReferenceEditor,_View12);function ContentReferenceEditor(params){_classCallCheck(this,ContentReferenceEditor);var _this34=_possibleConstructorReturn(this,Object.getPrototypeOf(ContentReferenceEditor).call(this,params));_this34.init();return _this34;} /**
      * Event: Change value
      */_createClass(ContentReferenceEditor,[{key:"onChange",value:function onChange(){this.value=this.$select.val();this.trigger('change',this.value);}},{key:"render",value:function render(){var _this35=this; // Render main element
 this.$element=_.div({class:'field-editor input-group content-reference-editor'},[ // Render picker
-this.$select=_.select({class:'form-control'},_.each(window.resources.content,function(id,node){var content=new Content(node);return _.option({value:content.id,selected:_this35.value==content.id},content.prop('title',window.language));})).change(function(){_this35.onChange();}), // Render clear button
+this.$select=_.select({class:'form-control'},_.each(window.resources.content,function(id,node){var content=new Content(node);return _.option({value:content.id},content.prop('title',window.language));})).change(function(){_this35.onChange();}), // Render clear button
 _.div({class:'input-group-btn'},this.$clearBtn=_.button({class:'btn btn-primary'},'Clear'))]); // Set the initial value
 this.$select.val(this.value); // Hook up the change event to the clear button
 this.$clearBtn.click(function(){_this35.$select.val(null);_this35.onChange();});}}]);return ContentReferenceEditor;}(View);module.exports=ContentReferenceEditor;},{}],181:[function(require,module,exports){'use strict'; /**

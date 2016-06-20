@@ -24,7 +24,7 @@ class GitHubConnection extends Connection {
         let frontMatter = '';
 
         frontMatter += '---\n';
-        frontMatter += yamljs.stringify(properties, 10); 
+        frontMatter += yamljs.stringify(properties, 50); 
         frontMatter += '---';
 
         return frontMatter;
@@ -113,8 +113,10 @@ class GitHubConnection extends Connection {
             let path = 'content/' + language + '/' + id + '.md';
 
             // Add meta data to the properties
-            properties._id = id;
-            properties._language = language;
+            properties.meta = {
+                id: id,
+                language: language
+            };
 
             // Remap "url" to "permalink"
             if(properties.url) {
