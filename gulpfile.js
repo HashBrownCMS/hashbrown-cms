@@ -36,6 +36,10 @@ gulp.task('plugins-js', function() {
 
         return browserify(files)
             .bundle()
+            .on('error', function(err) {
+                console.log(err.toString());
+                this.emit('end');
+            })
             .pipe(plumber())
             .pipe(source('client.js'))
             .pipe(buffer())
