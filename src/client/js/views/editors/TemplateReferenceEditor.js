@@ -42,13 +42,21 @@ class TemplateReferenceEditor extends View {
             ).change(() => { this.onChange(); })
         );
 
+        // If no value is set, apply the first of the allowed templates
         if(!this.value || resource.indexOf(this.value) < 0) {
             if(resource.length > 0) {
                 this.value = resource[0];
 
                 this.$element.find('select').val(this.value);
+          
+                // Apply changes on next CPU cycle
+                setTimeout(() => {
+                    this.trigger('change', this.value);
+                }, 1);
             
-                this.trigger('change', this.value);
+            } else {
+                debug.log('No allowed templates configured', this);
+
             }
 
         } else {

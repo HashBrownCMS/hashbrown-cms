@@ -21,14 +21,7 @@ class LanguageEditor extends View {
     
     render() {
         this.$element = _.div({class: 'field-editor dropdown-editor'},
-            this.$select = _.select({class: 'form-control'},
-                _.each(this.config.options, (i, option) => {
-                    return _.option({
-                        value: option.value,
-                        selected: this.value == option.value
-                    }, option.label);
-                })
-            ).change(() => { this.onChange(); })
+            this.$select = _.select({class: 'form-control'}).change(() => { this.onChange(); })
         );
 
         LanguageHelper.getSelectedLanguages()
@@ -38,6 +31,22 @@ class LanguageEditor extends View {
                     return _.option({value: language}, language);
                 })
             );
+
+            // Null check
+            if(!this.value) {
+                if(languages.length > 0) {
+                    this.value = languages[0];
+
+                    // Apply changes on next CPU cycle
+                    setTimeout(() => {
+                        this.trigger('change', this.value);
+                    }, 1);
+                
+                } else {
+                    debug.warning('No selected languages were found', this);
+
+                }
+            }
 
             this.$select.val(this.value);
         });

@@ -16,13 +16,14 @@ class SchemaHelper extends SchemaHelperCommon {
             let schema = resources.schemas[id];
 
             if(schema) {
-                // Merge parent with current schema
-                // Since the child schema should override any duplicate content,
-                // the parent is transformed first, then returned as the resulting schema
+                // Create a clone of this Schema to avoid confusion
+                schema = SchemaHelper.getModel(schema).getFields();
+
+                // If this Schema has a parent, merge values with it
                 if(schema.parentSchemaId) {
-                    SchemaHelper.getSchemaWithParentValues(schema.parentSchemaId).
-                    then((parentSchema) => {
-                        let mergedSchema = parentSchema.getFields();
+                    SchemaHelper.getSchemaWithParentValues(schema.parentSchemaId)
+                    .then((parentSchema) => {
+                        let mergedSchema = parentSchema.getObject();
 
                         // Recursive merge
                         function merge(parentValues, childValues) {
@@ -38,33 +39,52 @@ class SchemaHelper extends SchemaHelperCommon {
                         }
 
                         merge(mergedSchema.fields, schema.fields);
-                        
+                       
+                        // Overwrite native values 
+                        mergedSchema.id = schema.id;
+                        mergedSchema.name = schema.name;
+                        mergedSchema.parentSchemaId = schema.parentSchemaId;
                         mergedSchema.icon = schema.icon || mergedSchema.icon;
                         
+                        // Specific values for schema types
                         switch(mergedSchema.type) {
                             case 'content':
+                                let mergedTabs = {};
+                                
                                 if(!mergedSchema.tabs) {
                                     mergedSchema.tabs = {};
                                 }
 
-                                // Merge tabs
-                                if(schema.tabs) {
-                                    for(let k in schema.tabs) {
-                                       mergedSchema.tabs[k] = schema.tabs[k];
-                                    }
+                                if(!schema.tabs) {
+                                    schema.tabs = {};
                                 }
+                                
+                                // Merge tabs
+                                for(let k in mergedSchema.tabs) {
+                                   mergedTabs[k] = mergedSchema.tabs[k];
+                                }
+
+                                for(let k in schema.tabs) {
+                                   mergedTabs[k] = schema.tabs[k];
+                                }
+
+                                mergedSchema.tabs = mergedTabs;
 
                                 mergedSchema.defaultTabId = schema.defaultTabId || mergedSchema.defaultTabId;
                                 break;
                         }
-                     
-                        resolve(SchemaHelper.getModel(mergedSchema));
+                    
+                        let model = SchemaHelper.getModel(mergedSchema);
+
+                        resolve(model);
                     });
-                
-                // If no parent was specified, return the current schema
+
+                // If this Schema doesn't have a parent, return this Schema
                 } else {
-                    resolve(SchemaHelper.getModel(schema));
-                
+                    let model = SchemaHelper.getModel(schema);
+
+                    resolve(model);
+
                 }
 
             // If id was specified, but no Schema was found, return error
@@ -73,9 +93,11 @@ class SchemaHelper extends SchemaHelperCommon {
             
             // If no schema was found, return with null
             } else {
+                debug.log('Returning null schema since no id was specified', this);
                 resolve();
 
             }
+
         });
     }
 }

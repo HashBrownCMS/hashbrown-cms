@@ -43,9 +43,18 @@ class Entity {
     }
 
     /**
-     * Gets a copy of every field in this object as a mutable object
+     * TODO: Deprecate this method
      */
     getFields() {
+        return this.getObject();
+    }
+
+    /**
+     * Gets a copy of every field in this object as a mutable object
+     *
+     * @returns {Object} object
+     */
+    getObject() {
         let fields = {};
 
         for(let k in this) {
