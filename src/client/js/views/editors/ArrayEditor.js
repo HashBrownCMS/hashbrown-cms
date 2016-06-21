@@ -110,60 +110,67 @@ class ArrayEditor extends View {
 
                     // Make sure we have the item schema and the editor we need for each array item
                     let itemSchema = resources.schemas[itemSchemaId];
-                    let fieldEditor = resources.editors[itemSchema.editorId];
 
-                    // Sanity check to make sure multilingual fields are accomodated for
-                    if(itemSchema.multilingual && (!item || typeof item !== 'object')) {
-                        item = {};
+                    if(itemSchema) {
+                        let fieldEditor = resources.editors[itemSchema.editorId];
+
+                        // Sanity check to make sure multilingual fields are accomodated for
+                        if(itemSchema.multilingual && (!item || typeof item !== 'object')) {
+                            item = {};
+                        }
+
+                        // Init the schema selector
+                        let $schemaSelector = _.div({class: 'item-schema-selector kvp'},
+                            _.div({class: 'key'},
+                                'Schema'
+                            ),
+                            _.div({class: 'value'},
+                                _.select({class: 'form-control'},
+                                    _.each(this.config.allowedSchemas, (i, allowedSchemaId) => {
+                                        let allowedSchema = resources.schemas[allowedSchemaId];
+
+                                        return _.option({ value: allowedSchemaId },
+                                            allowedSchema.name
+                                        );
+                                    })
+                                ).on('change', () => {
+                                    itemSchemaId = $schemaSelector.find('select').val();
+
+                                    this.value.schemaBindings[i] = itemSchemaId;
+
+                                    this.trigger('change', this.value);
+
+                                    this.render();
+                                }).val(itemSchemaId)
+                            )
+                        );
+
+                        // Init the field editor
+                        let fieldEditorInstance = new fieldEditor({
+                            value: itemSchema.multilingual ? item[window.language] : item,
+                            disabled: itemSchema.disabled || false,
+                            config: itemSchema.config || {},
+                            schema: itemSchema
+                        });
+
+                        // Hook up the change event
+                        fieldEditorInstance.on('change', (newValue) => {
+                            this.onChange(newValue, i, itemSchema);
+                        });
+
+                        // Return the DOM element
+                        return _.div({class: 'item'},
+                            _.button({class: 'btn btn-embedded btn-remove'},
+                                _.span({class: 'fa fa-remove'})
+                            ).click(() => { this.onClickRemoveItem(i); }),
+                            this.config.allowedSchemas.length > 1 ? $schemaSelector : null,
+                            fieldEditorInstance.$element
+                        );
+                    
+                    } else {
+                        debug.warning('Schema by id "' + itemSchemaId + '" not found', this);
+
                     }
-
-                    // Init the schema selector
-                    let $schemaSelector = _.div({class: 'item-schema-selector kvp'},
-                        _.div({class: 'key'},
-                            'Schema'
-                        ),
-                        _.div({class: 'value'},
-                            _.select({class: 'form-control'},
-                                _.each(this.config.allowedSchemas, (i, allowedSchemaId) => {
-                                    let allowedSchema = resources.schemas[allowedSchemaId];
-
-                                    return _.option({ value: allowedSchemaId },
-                                        allowedSchema.name
-                                    );
-                                })
-                            ).on('change', () => {
-                                itemSchemaId = $schemaSelector.find('select').val();
-
-                                this.value.schemaBindings[i] = itemSchemaId;
-
-                                this.trigger('change', this.value);
-
-                                this.render();
-                            }).val(itemSchemaId)
-                        )
-                    );
-
-                    // Init the field editor
-                    let fieldEditorInstance = new fieldEditor({
-                        value: itemSchema.multilingual ? item[window.language] : item,
-                        disabled: itemSchema.disabled || false,
-                        config: itemSchema.config || {},
-                        schema: itemSchema
-                    });
-
-                    // Hook up the change event
-                    fieldEditorInstance.on('change', (newValue) => {
-                        this.onChange(newValue, i, itemSchema);
-                    });
-
-                    // Return the DOM element
-                    return _.div({class: 'item'},
-                        _.button({class: 'btn btn-embedded btn-remove'},
-                            _.span({class: 'fa fa-remove'})
-                        ).click(() => { this.onClickRemoveItem(i); }),
-                        this.config.allowedSchemas.length > 1 ? $schemaSelector : null,
-                        fieldEditorInstance.$element
-                    );
                 })    
             ),
 

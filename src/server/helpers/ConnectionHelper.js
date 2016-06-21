@@ -77,7 +77,56 @@ class ConnectionHelper {
                     nextConnection(0);
                 
                 } else {
-                    throw '[ConnectionHelper] No connections defined for content "' + content.id + '"';
+                    debug.error('No connections defined for content "' + content.id + '"', this);
+                }
+            });
+        }); 
+    }
+    
+    /**
+     * Unpublishes content
+     *
+     * @param {Content} content
+     *
+     * @returns {Promise} promise
+     */
+    static unpublishContent(content) {
+        let helper = this;
+
+        return new Promise((callback) => {
+            debug.log('Unpublishing content "' + content.id + '"...', this);
+            
+            content.getSettings('publishing')
+            .then((settings) => {
+                if(settings.connections && settings.connections.length > 0) {
+                    debug.log('Looping through ' + settings.connections.length + ' connections...', this);
+                    
+                    function nextConnection(i) {
+                        ConnectionHelper.getConnectionById(settings.connections[i])
+                        .then((connection) => {
+                            debug.log('Unpublishing through connection "' + settings.connections[i] + '" of type "' + connection.type + '"...', helper);
+
+                            connection.unpublishContent(content.id)
+                            .then(() => {
+                                i++;
+
+                                if(i < settings.connections.length) {
+                                    nextConnection(i);
+                                
+                                } else {
+                                    debug.log('Unpublished content "' + content.id + '" successfully!', helper);
+
+                                    callback();
+                                
+                                }
+                            });
+                        });
+                    }
+
+                    nextConnection(0);
+                
+                } else {
+                    debug.error('No connections defined for content "' + content.id + '"', this);
                 }
             });
         }); 

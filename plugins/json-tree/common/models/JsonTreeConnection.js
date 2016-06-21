@@ -87,6 +87,31 @@ class JsonTreeConnection extends Connection {
             });
         });
     }
+    
+    /**
+     * Deletes content properties from JSON tree
+     *
+     * @param {String} id
+     * @param {String} language
+     *
+     * @returns {Promise} promise
+     */
+    deleteContentProperties(id, language) {
+        debug.log('Processing "' + id + '"...', this);
+
+        return new Promise((callback) => {
+            this.getTree()
+            .then((tree) => {
+                tree[id] = null;
+                delete tree[id];
+                
+                this.setTree(tree)
+                .then(() => {
+                    callback();
+                });
+            });
+        });
+    }
 
     /**
      * Posts content properties to JSON tree

@@ -20,6 +20,7 @@ class ApiController extends Controller {
         app.get('/api/:project/:environment/content/:id', ApiController.getContent);
         app.post('/api/:project/:environment/content/new', ApiController.createContent);
         app.post('/api/:project/:environment/content/publish', ApiController.publishContent);
+        app.post('/api/:project/:environment/content/unpublish', ApiController.unpublishContent);
         app.post('/api/:project/:environment/content/:id', ApiController.postContent);
         app.delete('/api/:project/:environment/content/:id', ApiController.deleteContent);
 
@@ -216,6 +217,20 @@ class ApiController extends Controller {
             let content = new Content(req.body);
 
             ConnectionHelper.publishContent(content)
+            .then(function() {
+                res.sendStatus(200);
+            });
+        });
+    }
+    
+    /**
+     * Unpublishes a Content node
+     */
+    static unpublishContent(req, res) {
+        ApiController.authenticate(req, res, () => {
+            let content = new Content(req.body);
+
+            ConnectionHelper.unpublishContent(content)
             .then(function() {
                 res.sendStatus(200);
             });

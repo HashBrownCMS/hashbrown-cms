@@ -132,17 +132,16 @@ class SchemaEditor extends View {
     renderTabsEditor() {
         let view = this;
         
-        function onInputChange() {
-            let $group = $(this).parents('.input-group');
-            let id = $group.attr('data-id');
+        function onInputChange(id, element) {
+            let newLabel = $(element).val();
+            let newId = ContentHelper.getSlug(newLabel);
 
-            view.model.tabs[id] = $(this).val();
+            delete view.model.tabs[id];
+
+            view.model.tabs[newId] = newLabel;
         }
 
-        function onClickRemove() {
-            let $group = $(this).parents('.input-group');
-            let id = $group.attr('data-id');
-            
+        function onClickRemove(id) {
             delete view.model.tabs[id];
 
             render();
@@ -182,11 +181,15 @@ class SchemaEditor extends View {
                 _.each(view.model.tabs, (id, label) => {
                     return _.div({class: 'tab chip', 'data-id': id},
                         _.input({type: 'text', class: 'chip-label' + (view.model.locked ? ' disabled' : ''), value: label})
-                            .bind('keyup change propertychange paste', onInputChange),
+                            .change(function(e) {
+                                onInputChange(id, $(this));
+                            }),
                         _.if(!view.model.locked,
                             _.button({class: 'btn chip-remove'}, 
                                 _.span({class: 'fa fa-remove'})
-                            ).click(onClickRemove)
+                            ).click(() => {
+                                onClickRemove(id);
+                            })
                         )
                     );
                 })

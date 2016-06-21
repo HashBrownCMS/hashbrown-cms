@@ -61,6 +61,43 @@ class Connection extends Entity {
     }
 
     /**
+     *  Unpublishes content
+     *
+     * @param {String} id
+     */
+    unpublishContent(id) {
+        let connection = this;
+
+        return new Promise((callback) => {
+            debug.log('Unpublishing all localised property sets...', this);
+
+            LanguageHelper.getSelectedLanguages()
+            .then((languages) => {
+                function next(i) {
+                    let language = languages[i];
+
+                    connection.deleteContentProperties(id, language)
+                    .then(() => {
+                        i++;
+
+                        if(i < languages.length) {
+                            next(i);
+                        
+                        } else {
+                            debug.log('Unpublished all localised property sets successfully!', connection);
+                                
+                            callback();
+                        
+                        }
+                    });
+                }
+
+                next(0);
+            });
+        });
+    }
+
+    /**
      * Publishes content
      *
      * @param {Content} content
@@ -99,6 +136,20 @@ class Connection extends Entity {
 
                 next(0);
             });
+        });
+    }
+    
+    /**
+     * Deletes content properties from the remote target
+     *
+     * @param {String} id
+     * @param {String} language
+     *
+     * @returns {Promise} promise
+     */
+    deleteContentProperties(id, language) {
+        return new Promise((callback) => {
+            callback();
         });
     }
 

@@ -85,10 +85,22 @@ class ContentEditor extends View {
 
     /**
      * Event: On click remove
+     *
+     * @param {Object} publishing
      */
-    onClickDelete() {
+    onClickDelete(publishing) {
         let view = this;
 
+        function unpublishConnections() {
+            $.ajax({
+                type: 'post',
+                url: apiUrl('content/unpublish'),
+                data: view.model,
+                success: onSuccess,
+                error: onError
+            });
+        }
+        
         function onSuccess() {
             debug.log('Removed content with id "' + view.model.id + '"', this); 
         
@@ -98,6 +110,15 @@ class ContentEditor extends View {
                 
                 // Cancel the ContentEditor view
                 location.hash = '/content/';
+            });
+        }
+
+        function onError(err) {
+            new MessageModal({
+                model: {
+                    title: 'Error',
+                    body: err
+                }
             });
         }
 
@@ -120,7 +141,11 @@ class ContentEditor extends View {
                         $.ajax({
                             url: apiUrl('content/' + view.model.id),
                             type: 'DELETE',
-                            success: onSuccess
+                            success: 
+                                publishing.connections && publishing.connections.length > 0 ?
+                                unpublishConnections :
+                                onSuccess,
+                            error: onError
                         });
                     }
                 }
@@ -343,7 +368,7 @@ class ContentEditor extends View {
                                     ).click(function() { view.onClickAdvanced(); }),
                                     _.button({class: 'btn btn-danger btn-raised'},
                                         'Delete'
-                                    ).click(function() { view.onClickDelete(); }),
+                                    ).click(function() { view.onClickDelete(publishing); }),
                                     view.$saveBtn = _.button({class: 'btn btn-success btn-raised btn-save'},
                                         _.span({class: 'text-default'}, 'Save' + (publishing.connections && publishing.connections.length > 0 ? ' & publish' : '')),
                                         _.span({class: 'text-saving'}, 'Saving')
