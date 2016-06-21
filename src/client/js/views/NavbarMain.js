@@ -217,45 +217,74 @@ class NavbarMain extends View {
         let view = this;
         let id = $('.context-menu-target-element').data('id');
         let name = $('.context-menu-target-element').data('name');
-        
-        function onSuccess() {
-            debug.log('Removed content with id "' + id + '"', view); 
-        
-            reloadResource('content')
-            .then(function() {
-                view.reload();
+       
+        ContentHelper.getContentById(id)
+        .then((content) => {
+            content.getSettings('publishing')
+            .then((publishing) => {
+                function unpublishConnections() {
+                    $.ajax({
+                        type: 'post',
+                        url: apiUrl('content/unpublish'),
+                        data: content,
+                        success: onSuccess,
+                        error: onError
+                    });
+                }
                 
-                // Cancel the ContentEditor view if it was displaying the deleted content
-                if(location.hash.indexOf('#/content/' + id) > -1) {
-                    location.hash = '/content/';
+                function onSuccess() {
+                    debug.log('Removed content with id "' + id + '"', view); 
+                
+                    reloadResource('content')
+                    .then(function() {
+                        view.reload();
+                        
+                        // Cancel the ContentEditor view if it was displaying the deleted content
+                        if(location.hash.indexOf('#/content/' + id) > -1) {
+                            location.hash = '/content/';
+                        }
+                    });
                 }
-            });
-        }
 
-        new MessageModal({
-            model: {
-                title: 'Delete content',
-                body: 'Are you sure you want to delete the content "' + name + '"?'
-            },
-            buttons: [
-                {
-                    label: 'Cancel',
-                    class: 'btn-default',
-                    callback: function() {
-                    }
-                },
-                {
-                    label: 'OK',
-                    class: 'btn-danger',
-                    callback: function() {
-                        $.ajax({
-                            url: apiUrl('content/' + id),
-                            type: 'DELETE',
-                            success: onSuccess
-                        });
-                    }
+                function onError(err) {
+                    new MessageModal({
+                        model: {
+                            title: 'Error',
+                            body: err
+                        }
+                    });
                 }
-            ]
+
+                new MessageModal({
+                    model: {
+                        title: 'Delete content',
+                        body: 'Are you sure you want to delete the content "' + name + '"?'
+                    },
+                    buttons: [
+                        {
+                            label: 'Cancel',
+                            class: 'btn-default',
+                            callback: function() {
+                            }
+                        },
+                        {
+                            label: 'OK',
+                            class: 'btn-danger',
+                            callback: function() {
+                                $.ajax({
+                                    url: apiUrl('content/' + id),
+                                    type: 'DELETE',
+                                    success: 
+                                        publishing.connections && publishing.connections.length > 0 ?
+                                        unpublishConnections :
+                                        onSuccess,
+                                    error: onError
+                                });
+                            }
+                        }
+                    ]
+                });
+            });
         });
     }
 
