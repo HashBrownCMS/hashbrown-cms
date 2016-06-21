@@ -149,19 +149,10 @@ class SchemaEditor extends View {
         }
         
         function onClickAdd() {
-            let currentId = 90000;
-            let newId = -1;
+            let name = 'New tab';
+            let id = 'new-tab';
 
-            while(newId == -1) {
-                // If the id already exists, increment                
-                if(view.compiledSchema.tabs[currentId.toString()]) {
-                    currentId++;
-                } else {
-                    newId = currentId;
-                }
-            }
-
-            view.model.tabs[newId] = 'New tab';
+            view.model.tabs[id] = name;
 
             render();
         }
