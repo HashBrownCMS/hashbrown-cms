@@ -58,6 +58,8 @@ class ArrayEditor extends View {
     }
 
     render() {
+        let view = this;
+
         // A sanity check to make sure we're working with an array
         if(
             !this.value ||
@@ -93,11 +95,20 @@ class ArrayEditor extends View {
             ).click(() => {
                 this.$element.toggleClass('sorting');
 
-                this.$element.find('.item').each(function() {
-                    $(this).exodragdrop({
-                        lockX: true
+                if(this.$element.hasClass('sorting')) {
+                    this.$element.find('.item').each(function() {
+                        $(this).exodragdrop({
+                            lockX: true,
+                            dropContainers: view.$element[0].querySelectorAll('.items')
+                        });
                     });
-                });
+                
+                } else {
+                    this.$element.find('.item').each(function() {
+                        $(this).exodragdrop('destroy');
+                    });
+                
+                }
             }),
             _.div({class: 'items'},
                 // Loop through each array item

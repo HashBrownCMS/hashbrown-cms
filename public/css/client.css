@@ -258,8 +258,8 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
   .flex-horizontal .flex-expand {
     flex-grow: 1; }
 
-.sortable-placeholder {
-  border: 2px dashed #f5f5f5; }
+#dragdrop-placeholder {
+  border: 2px dashed #2196f3; }
 
 .about-logo {
   color: #4caf50; }
