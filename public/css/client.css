@@ -394,12 +394,12 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
             line-height: 20px; }
             .cms-container .workspace .panel-buttons .btn-group .btn span.fa {
               font-size: 18px; }
-      .cms-container .workspace .panel-buttons .btn-save .text-saving {
-        display: none; }
-      .cms-container .workspace .panel-buttons .btn-save.saving .text-default {
-        display: none; }
-      .cms-container .workspace .panel-buttons .btn-save.saving .text-saving {
-        display: inline; }
+          .cms-container .workspace .panel-buttons .btn-group .btn .text-working {
+            display: none; }
+          .cms-container .workspace .panel-buttons .btn-group .btn.working .text-default {
+            display: none; }
+          .cms-container .workspace .panel-buttons .btn-group .btn.working .text-working {
+            display: inline; }
 
 .json-editor {
   width: 100%;

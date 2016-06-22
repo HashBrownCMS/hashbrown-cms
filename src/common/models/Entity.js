@@ -84,7 +84,7 @@ class Entity {
             throw new TypeError('Parameter \'name\' cannot be of type \'' + (typeof name) + '\'.');
         }
 
-        if(!defaultValue) {
+        if(!defaultValue || typeof defaultValue === 'undefined') {
             switch(type) {
                 case String:
                     defaultValue = '';
@@ -100,6 +100,7 @@ class Entity {
 
                 case Boolean:
                     defaultValue = false;
+                    break;
 
                 default:
                     defaultValue = null;
@@ -116,6 +117,21 @@ class Entity {
                 return thisValue;
             },
             set: (thatValue) => {
+                // Special case for Booleans
+                // This exists because of MongoDB data tends to come back as strings instead of booleans
+                if(thisType == Boolean) {
+                    if(!thatValue) {
+                        thatValue = false;
+
+                    } else if(thatValue.constructor == String) {
+                        if(thatValue === 'false') {
+                            thatValue = false;
+                        } else if(thatValue === 'true') {
+                            thatValue = true;
+                        }
+                    }
+                }
+
                 if(thatValue) {
                     let thatType = thatValue.constructor;
 

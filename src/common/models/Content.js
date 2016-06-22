@@ -33,6 +33,7 @@ class Content extends Entity {
         this.def(Date, 'createDate');
         this.def(Date, 'updateDate');
         this.def(String, 'schemaId');
+        this.def(Boolean, 'unpublished');
 
         // Extensible properties
         this.def(Object, 'properties', {});
@@ -131,6 +132,13 @@ class Content extends Entity {
 
                 if(!model.settings[key]) {
                     model.settings[key] = {};
+                }
+
+                // Special cases
+                switch(key) {
+                    case 'publishing':
+                        model.settings.publishing.connections = model.settings.publishing.connections || [];
+                        break;
                 }
 
                 resolve(model.settings[key]);

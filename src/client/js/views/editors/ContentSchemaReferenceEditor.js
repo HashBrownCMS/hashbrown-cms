@@ -15,6 +15,8 @@ class ContentSchemaReferenceEditor extends View {
      */
     onChange() {
         this.trigger('change', this.$select.val());
+
+        ViewHelper.get('ContentEditor').render();
     }
 
     /**

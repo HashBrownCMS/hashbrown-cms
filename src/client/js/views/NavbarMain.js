@@ -109,7 +109,8 @@ class NavbarMain extends View {
      */
     onClickContentSettings() {
         let id = $('.context-menu-target-element').data('id');
-        
+        let view = this;
+
         ContentHelper.getContentById(id)
         .then((content) => {
             if(!content) {
@@ -119,9 +120,28 @@ class NavbarMain extends View {
                 // Get settings first
                 content.getSettings('publishing')
                 .then((publishing) => {
+                    // Error event
+                    function onError(err) {
+                        new MessageModal({
+                            model: {
+                                title: 'Error',
+                                body: err
+                            }
+                        });
+                    }
+
+                    // Success event
+                    function onSuccess() {
+                        view.reload();
+
+                        if(Router.params.id == content.id) {
+                            ViewHelper.get('ContentEditor').model = content.getObject();
+                            ViewHelper.get('ContentEditor').render();
+                        }
+                    }
+                    
                     // Submit event
-                    function onSubmit(hide) {
-                        // Publishing
+                    function onSubmit() {
                         if(!publishing.governedBy) {
                             publishing.connections = [];
                             
@@ -136,25 +156,16 @@ class NavbarMain extends View {
                             publishing.applyToChildren = $('#switch-publishing-apply-to-children')[0].checked;
 
                             content.settings.publishing = publishing;
+                    
+                            // Save model
+                            $.ajax({
+                                type: 'post',
+                                url: apiUrl('content/' + content.id),
+                                data: content,
+                                success: onSuccess,
+                                error: onError
+                            });
                         }
-                        
-                        // Save model
-                        $.ajax({
-                            type: 'post',
-                            url: apiUrl('content/' + content.id),
-                            data: content,
-                            success: function() {
-                                // Saved
-                            },
-                            error: function(err) {
-                                new MessageModal({
-                                    model: {
-                                        title: 'Error',
-                                        body: err
-                                    }
-                                });
-                            }
-                        });
                     }
 
                     // Render modal 

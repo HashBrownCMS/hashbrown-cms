@@ -23,12 +23,65 @@ class ContentEditor extends View {
     }
 
     /**
+     * Event: Click unpublish. Removes remove content and sets "unpublished" flag
+     *
+     * @param {Object} publishing
+     */
+    onClickUnpublish(publishing) {
+        let view = this;
+
+        function unpublishConnections() {
+            $.ajax({
+                type: 'post',
+                url: apiUrl('content/unpublish'),
+                data: view.model,
+                success: onSuccess,
+                error: onError
+            });
+        }
+        
+        function onSuccess() {
+            debug.log('Unpublished content with id "' + view.model.id + '"', this); 
+        
+            reloadResource('content')
+            .then(function() {
+                view.render();
+            });
+        }
+
+        function onError(err) {
+            new MessageModal({
+                model: {
+                    title: 'Error',
+                    body: err
+                }
+            });
+        }
+
+        view.$unpublishBtn.toggleClass('working', true);
+
+        // Set unpublished flag
+        view.model.unpublished = true;
+
+        // Save content to database
+        $.ajax({
+            type: 'post',
+            url: view.modelUrl,
+            data: view.model,
+            success: unpublishConnections,
+            error: onError
+        });
+    }
+    
+    /**
      * Event: Click save. Posts the model to the modelUrl
      *
      * @param {Object} publishing
      */
     onClickSave(publishing) {
         let view = this;
+
+        view.model.unpublished = false;
 
         function publishConnections() {
             $.ajax({
@@ -61,7 +114,7 @@ class ContentEditor extends View {
             });
         }
 
-        view.$saveBtn.toggleClass('saving', true);
+        view.$saveBtn.toggleClass('working', true);
 
         // Save content to database
         $.ajax({
@@ -306,7 +359,7 @@ class ContentEditor extends View {
 
         // Check for active tab
         function isTabActive(tabId) {
-            let targetTab = Router.params.tab || schema.defaultTabId;
+            let targetTab = Router.params.tab || schema.defaultTabId || 'meta';
 
             return tabId == targetTab;
         }
@@ -346,8 +399,6 @@ class ContentEditor extends View {
     }
 
     render() {
-        let view = this;
-
         SchemaHelper.getSchemaWithParentValues(this.model.schemaId)
         .then((contentSchema) => {
             if(contentSchema) {
@@ -359,20 +410,36 @@ class ContentEditor extends View {
 
                 this.model.getSettings('publishing')
                 .then((publishing) => {
-                    view.$element.html([
-                        view.renderEditor(this.model, contentSchema).append(
+                    this.$element.html([
+                        this.renderEditor(this.model, contentSchema).append(
+
+                            // Buttons 
                             _.div({class: 'panel panel-default panel-buttons'}, 
                                 _.div({class: 'btn-group'},
+
+                                    // JSON editor
                                     _.button({class: 'btn btn-embedded'},
                                         'Advanced'
-                                    ).click(function() { view.onClickAdvanced(); }),
+                                    ).click(() => { this.onClickAdvanced(); }),
+
+                                    // Delete
                                     _.button({class: 'btn btn-danger btn-raised'},
                                         'Delete'
-                                    ).click(function() { view.onClickDelete(publishing); }),
-                                    view.$saveBtn = _.button({class: 'btn btn-success btn-raised btn-save'},
+                                    ).click(() => { this.onClickDelete(publishing); }),
+
+                                    // Unpublish
+                                    _.if(publishing.connections && publishing.connections.length > 0 && !this.model.unpublished,
+                                        this.$unpublishBtn = _.button({class: 'btn btn-primary btn-raised btn-save'},
+                                            _.span({class: 'text-default'}, 'Unpublish'),
+                                            _.span({class: 'text-working'}, 'Unpublishing')
+                                        ).click(() => { this.onClickUnpublish(publishing); })
+                                    ),
+
+                                    // Save & publish
+                                    this.$saveBtn = _.button({class: 'btn btn-success btn-raised btn-save'},
                                         _.span({class: 'text-default'}, 'Save' + (publishing.connections && publishing.connections.length > 0 ? ' & publish' : '')),
-                                        _.span({class: 'text-saving'}, 'Saving')
-                                    ).click(function() { view.onClickSave(publishing); })
+                                        _.span({class: 'text-working'}, 'Saving')
+                                    ).click(() => { this.onClickSave(publishing); })
                                 )
                             )
                         )

@@ -241,21 +241,19 @@
                             font-size: 18px;
                         }
                     }
-                }
-            }
-
-            .btn-save {
-                .text-saving {
-                    display: none;
-                }
-
-                &.saving {
-                    .text-default {
+                    
+                    .text-working {
                         display: none;
                     }
 
-                    .text-saving {
-                        display: inline;
+                    &.working {
+                        .text-default {
+                            display: none;
+                        }
+
+                        .text-working {
+                            display: inline;
+                        }
                     }
                 }
             }

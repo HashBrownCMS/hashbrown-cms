@@ -99,6 +99,60 @@ class GitHubConnection extends Connection {
     }
 
     /**
+     * Deletes content properties from the remote target
+     *
+     * @param {String} id
+     * @param {String} language
+     *
+     * @returns {Promise} promise
+     */
+    deleteContentProperties(id, language) {
+        return new Promise((resolve, reject) => {
+            let path = 'content/' + language + '/' + id + '.md';
+
+            let apiPath = 'https://api.github.com/repos/' + this.settings.repo + '/contents/' + path + '?access_token=' + this.settings.token;
+            let headers = {
+                'Accept': 'application/json'
+            };
+
+            debug.log('Removing "' + path + '"...', this);
+
+            // Fetch first to get the SHA
+            debug.log('Getting SHA...', this);
+            
+            restler.get(apiPath, {
+                headers: headers
+            }).on('complete', (data, response) => {
+                let postData = {
+                    sha: data.sha,
+                    path: path,
+                    message: 'Removed by Endomon CMS',
+                };
+
+                // Remove the file
+                debug.log('Removing data...', this);
+
+                restler.del(apiPath, {
+                    headers: headers,
+                    data: JSON.stringify(postData)
+                }).on('complete', (data, response) => {
+                    if(data.message) {
+                        debug.log('Removing file failed', this);
+                        debug.log('GitHub response: ' + JSON.stringify(data), this);
+                    
+                    } else {
+                        debug.log('Removed file successfully!', this);
+
+                    }
+
+                    resolve();
+
+                });
+            });
+        });
+    }
+
+    /**
      * Posts content properties to the remote target
      *
      * @param {Object} properties
