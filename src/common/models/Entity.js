@@ -117,8 +117,7 @@ class Entity {
                 return thisValue;
             },
             set: (thatValue) => {
-                // Special case for Booleans
-                // This exists because of MongoDB data tends to come back as strings instead of booleans
+                // Auto cast for Booleans
                 if(thisType == Boolean) {
                     if(!thatValue) {
                         thatValue = false;
@@ -129,6 +128,17 @@ class Entity {
                         } else if(thatValue === 'true') {
                             thatValue = true;
                         }
+                    }
+                }
+
+                // Auto cast for numbers
+                if(thisType == Number) {
+                    if(!thatValue) {
+                        thatValue = 0;
+                    
+                    } else if(thatValue.constructor == String && !isNaN(thatValue)) {
+                        thatValue = parseFloat(thatValue);
+
                     }
                 }
 

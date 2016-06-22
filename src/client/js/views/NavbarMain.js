@@ -750,6 +750,12 @@ class NavbarMain extends View {
                 // Add queue item to sorting queue
                 sortingQueue.push(queueItem);
 
+                // Add drag/drop event
+                $element.exodragdrop({
+                    lockX: true,
+                    onEndDrag: params.onEndDrag
+                });
+
                 return $element;
             })
         );
@@ -813,8 +819,8 @@ class NavbarMain extends View {
             $pane
         );
 
-        if(params.sortable) {
-            // TODO: Handle sortable logic
+        if(params.postSort) {
+            params.postSort($paneContainer.find('>.pane, .pane-item-container>.children'));
         }
 
         if(this.$element.find('.tab-panes .pane-container').length < 1) {
@@ -894,6 +900,9 @@ class NavbarMain extends View {
     render() {
         let view = this;
 
+        // ----------
+        // Render main content
+        // ----------
         this.$element.html([
             _.div({class: 'tab-buttons'}),
             _.div({class: 'tab-panes'}),
@@ -905,8 +914,12 @@ class NavbarMain extends View {
             )
         ]);
 
+        // Insert into DOM
         $('.navspace').html(this.$element);
         
+        // ----------
+        // Render the "about" pane
+        // ----------
         this.renderPane({
             label: 'Endomon CMS',
             route: '/',
@@ -923,11 +936,17 @@ class NavbarMain extends View {
             ]
         });
 
+        // ----------
+        // Render the "content" pane
+        // This is the only pane that offers manual sorting, so it has more logic than other panes
+        // ----------
         this.renderPane({
             label: 'Content',
             route: '/content/',
             icon: 'file',
             items: resources.content,
+
+            // Set item context menu
             itemContextMenu: {
                 'This content': '---',
                 'Rename': function() { view.onClickRenameContent(); },
@@ -937,62 +956,209 @@ class NavbarMain extends View {
                 'Remove': function() { view.onClickRemoveContent(); },
                 'Settings': function() { view.onClickContentSettings(); },
             },
+
+            // Set general context menu items
             paneContextMenu: {
                 'General': '---',
                 'Create new': function() { view.onClickNewContent(); }
             },
+
+            // Sorting logic
             sort: function(item, queueItem) {
+                // Set id data attributes
                 queueItem.$element.attr('data-content-id', item.id);
                 queueItem.parentDirAttr = {'data-content-id': item.parentId };
-            },
-            sortable: {
-                onEnd: function(e) {
-                    // e.oldIndex;
-                    // e.newIndex;
+
+               /* function onSuccess() {
+
                 }
+
+                function onError(err) {
+                    new MessageModal({
+                        model: {
+                            title: 'Error',
+                            body: err
+                        }
+                    });
+                }
+
+                // Get the Content node and check if it has a sort index
+                let thisContent = resources.content.filter((content) => {
+                    return content.id = item.id;
+                })[0];
+
+                // ...if it doesn't, assign one based on the DOM
+                if(thisContent.sort < 0) {
+                    thisContent.sort = queueItem.$element.parent().index() * 10000;
+                    
+                    // Save the Content model with the new sort index
+                    $.ajax({
+                        type: 'post',
+                        url: apiUrl('content/' + thisContent.id),
+                        data: thisContent.getObject(),
+                        success: onSuccess,
+                        error: onError
+                    });
+                }
+                
+                // Assign the sort index to the DOM element
+                queueItem.$element.attr('data-sort', thisContent.sort);*/
+            },
+
+            // After sorting logic
+            postSort: function($parentElements) {
+                // Sort elements
+                /*$parentElements.each((i, parentElement) => {
+                    $(parentElement).children().sort((a, b) => {
+                        let aSort = a.getAttribute('data-sort');
+                        let bSort = b.getAttribute('data-sort');
+
+                        if(aSort > bSort) {
+                            return 1;
+                        } else if(aSort < bSort) {
+                            return -1;
+                        } else {
+                            return 0;
+                        }
+                    });
+                });*/
+            },
+
+            // End dragging logic
+            onEndDrag: function(dragdropItem) {
+                let thisId = dragdropItem.element.dataset.contentId;
+                
+                function onSuccess() {
+
+                }
+
+                function onError(err) {
+                    new MessageModal({
+                        model: {
+                            title: 'Error',
+                            body: err
+                        }
+                    });
+                }
+
+                // Get Content node and set new sorting value
+                ContentHelper.getContentById(thisId)
+                .then((thisContent) => {
+                    // If this element has a previous sibling, base the sorting index on that
+                    if(dragdropItem.element.previousSibling) {
+                        let prevId = dragdropItem.element.previousSibling.dataset.contentId;
+
+                        ContentHelper.getContentById(prevId)
+                        .then((prevContent) => {
+                            thisContent.sort = prevContent.sort + 1;
+
+                            // Save model
+                            $.ajax({
+                                type: 'post',
+                                url: apiUrl('content/' + thisContent.id),
+                                data: thisContent.getObject(),
+                                success: onSuccess,
+                                error: onError
+                            });
+                        });
+
+                    // If this element has a next sibling, base the sorting index on that
+                    } else if (dragdropItem.element.nextSibling) {
+                        let nextId = dragdropItem.element.nextiousSibling.dataset.contentId;
+
+                        ContentHelper.getContentById(nextId)
+                        .then((nextContent) => {
+                            thisContent.sort = nextContent.sort - 1;
+
+                            // Save model
+                            $.ajax({
+                                type: 'post',
+                                url: apiUrl('content/' + thisContent.id),
+                                data: thisContent.getObject(),
+                                success: onSuccess,
+                                error: onError
+                            });
+                        });
+
+
+                    // If it has neither, just assign the lowest possible one
+                    } else {
+                        thisContent.sort = 10000;
+                       
+                        // Save model
+                        $.ajax({
+                            type: 'post',
+                            url: apiUrl('content/' + thisContent.id),
+                            data: thisContent.getObject(),
+                            success: onSuccess,
+                            error: onError
+                        });
+                    }
+                });
             }
         });
 
+        // ----------
+        // Render the "media" pane
+        // ----------
         this.renderPane({
             label: 'Media',
             route: '/media/',
             icon: 'file-image-o',
             items: resources.media,
+
+            // Item context menu
             itemContextMenu: {
                 'This media': '---',
                 'Remove': function() { view.onClickRemoveMedia(); }
             },
+
+            // General context menu
             paneContextMenu: {
                 'General': '---',
                 'Upload new media': function() { view.onClickUploadMedia(); }
             }
         });
         
+        // ----------
+        // Render the "connections" pane
+        // ----------
         this.renderPane({
             label: 'Connections',
             route: '/connections/',
             icon: 'exchange',
             items: resources.connections,
+
+            // Item context menu
             itemContextMenu: {
                 'This connection': '---',
                 'Remove': function() { view.onClickRemoveConnection(); }
             },
+
+            // General context menu
             paneContextMenu: {
                 'General': '---',
                 'New connection': function() { view.onClickNewConnection(); }
             }
         });
         
+        // ----------
+        // Render the "schemas" pane
+        // ----------
         this.renderPane({
             label: 'Schemas',
             route: '/schemas/',
             icon: 'gears',
             items: resources.schemas,
+
+            // Item context menu
             itemContextMenu: {
                 'This schema': '---',
                 'New child schema': function() { view.onClickNewSchema(); },
                 'Remove': function() { view.onClickRemoveSchema(); }
             },
+
+            // Sorting logic
             sort: function(item, queueItem) {
                 queueItem.$element.attr('data-schema-id', item.id);
                
@@ -1005,6 +1171,9 @@ class NavbarMain extends View {
             }
         });
 
+        // ----------
+        // Render the "settings" pane
+        // ----------
         this.renderPane({
             label: 'Settings',
             route: '/settings/',

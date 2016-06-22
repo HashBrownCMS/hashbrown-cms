@@ -421,6 +421,32 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
   .struct-editor .kvp .value {
     flex-grow: 1; }
 
+.array-editor.sorting .btn-sort-items .text-default {
+  display: none; }
+
+.array-editor.sorting .btn-sort-items .text-sorting {
+  display: inline; }
+
+.array-editor.sorting .items .item {
+  overflow-y: hidden;
+  height: 80px;
+  position: relative; }
+  .array-editor.sorting .items .item:after {
+    pointer-events: none;
+    content: '';
+    position: absolute;
+    bottom: 0px;
+    width: 100%;
+    left: 0px;
+    height: 80px;
+    background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0), white); }
+
+.array-editor .btn-sort-items .text-default {
+  display: inline; }
+
+.array-editor .btn-sort-items .text-sorting {
+  display: none; }
+
 .array-editor .items .item {
   position: relative;
   border-bottom: 1px solid #e0e0e0;

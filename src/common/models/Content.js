@@ -34,6 +34,7 @@ class Content extends Entity {
         this.def(Date, 'updateDate');
         this.def(String, 'schemaId');
         this.def(Boolean, 'unpublished');
+        this.def(Number, 'sort', -1);
 
         // Extensible properties
         this.def(Object, 'properties', {});

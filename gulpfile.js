@@ -103,6 +103,7 @@ gulp.task('js', function() {
  */
 gulp.task('watch', function() {
     gulp.watch('./src/client/js/**/*.js', [ 'js' ]);
+    gulp.watch('./node_modules/exomon/**/*.js', [ 'js' ]);
     gulp.watch('./src/common/**/*.js', [ 'js' ]);
     gulp.watch('./src/client/sass/**/*.scss', [ 'sass' ]);
 });

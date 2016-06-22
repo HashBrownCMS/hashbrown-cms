@@ -87,6 +87,18 @@ class ArrayEditor extends View {
 
         // Render editor
         _.append(this.$element.empty(),
+            _.button({class: 'btn btn-primary btn-sort-items'},
+                _.span({class: 'text-default'}, 'Sort'),
+                _.span({class: 'text-sorting'}, 'Done')
+            ).click(() => {
+                this.$element.toggleClass('sorting');
+
+                this.$element.find('.item').each(function() {
+                    $(this).exodragdrop({
+                        lockX: true
+                    });
+                });
+            }),
             _.div({class: 'items'},
                 // Loop through each array item
                 _.each(this.value.items, (i, item) => {
@@ -159,13 +171,15 @@ class ArrayEditor extends View {
                         });
 
                         // Return the DOM element
-                        return _.div({class: 'item'},
+                        let $element = _.div({class: 'item'},
                             _.button({class: 'btn btn-embedded btn-remove'},
                                 _.span({class: 'fa fa-remove'})
                             ).click(() => { this.onClickRemoveItem(i); }),
                             this.config.allowedSchemas.length > 1 ? $schemaSelector : null,
                             fieldEditorInstance.$element
                         );
+
+                        return $element;
                     
                     } else {
                         debug.warning('Schema by id "' + itemSchemaId + '" not found', this);
