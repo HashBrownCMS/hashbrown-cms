@@ -57,8 +57,49 @@ class ArrayEditor extends View {
         this.trigger('change', this.value);
     }
 
+    /**
+     * Event: Click sort
+     */
+    onClickSort() {
+        this.$element.toggleClass('sorting');
+
+        if(this.$element.hasClass('sorting')) {
+            this.$element.find('.item').each((oldIndex, item) => {
+                $(item).exodragdrop({
+                    lockX: true,
+                    dropContainers: this.$element[0].querySelectorAll('.items'),
+                    scrollContainer: document.querySelector('.content-editor .nav-tabs'),
+                    onEndDrag: (instance) => {
+                        let newIndex = $(instance.element).index();
+
+                        // Change the index in the items array
+                        let value = this.value.items[oldIndex];
+                        let itemsClone = this.value.items.slice();
+                        itemsClone.splice(oldIndex, 1);
+                        itemsClone.splice(newIndex, 0, value);
+                        this.value.items = itemsClone;
+                        
+                        // Change the index in the schema bindings array
+                        let schema = this.value.schemaBindings[oldIndex];
+                        let bindingsClone = this.value.schemaBindings.slice();
+                        bindingsClone.splice(oldIndex, 1);
+                        bindingsClone.splice(newIndex, 0, schema);
+                        this.value.schemaBindings = bindingsClone;
+
+                        oldIndex = newIndex;
+                    }
+                });
+            });
+        
+        } else {
+            this.$element.find('.item').each(function() {
+                $(this).exodragdrop('destroy');
+            });
+        
+        }
+    }
+
     render() {
-        let view = this;
 
         // A sanity check to make sure we're working with an array
         if(
@@ -89,47 +130,14 @@ class ArrayEditor extends View {
 
         // Render editor
         _.append(this.$element.empty(),
-            _.button({class: 'btn btn-primary btn-sort-items'},
-                _.span({class: 'text-default'}, 'Sort'),
-                _.span({class: 'text-sorting'}, 'Done')
-            ).click(() => {
-                this.$element.toggleClass('sorting');
-
-                if(this.$element.hasClass('sorting')) {
-                    this.$element.find('.item').each((oldIndex, item) => {
-                        $(item).exodragdrop({
-                            lockX: true,
-                            dropContainers: view.$element[0].querySelectorAll('.items'),
-                            scrollContainer: document.querySelector('.content-editor .nav-tabs'),
-                            onEndDrag: (instance) => {
-                                let newIndex = $(instance.element).index();
-
-                                // Change the index in the items array
-                                let value = this.value.items[oldIndex];
-                                let itemsClone = this.value.items.slice();
-                                itemsClone.splice(oldIndex, 1);
-                                itemsClone.splice(newIndex, 0, value);
-                                this.value.items = itemsClone;
-                                
-                                // Change the index in the schema bindings array
-                                let schema = this.value.schemaBindings[oldIndex];
-                                let bindingsClone = this.value.schemaBindings.slice();
-                                bindingsClone.splice(oldIndex, 1);
-                                bindingsClone.splice(newIndex, 0, schema);
-                                this.value.schemaBindings = bindingsClone;
-
-                                oldIndex = newIndex;
-                            }
-                        });
-                    });
-                
-                } else {
-                    this.$element.find('.item').each(function() {
-                        $(this).exodragdrop('destroy');
-                    });
-                
-                }
-            }),
+            _.if(this.value.items.length > 1,
+                _.button({class: 'btn btn-primary btn-sort-items'},
+                    _.span({class: 'text-default'}, 'Sort'),
+                    _.span({class: 'text-sorting'}, 'Done')
+                ).click(() => {
+                    this.onClickSort();
+                })
+            ),
             _.div({class: 'items'},
                 // Loop through each array item
                 _.each(this.value.items, (i, item) => {

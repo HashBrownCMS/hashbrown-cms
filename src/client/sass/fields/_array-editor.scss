@@ -17,6 +17,10 @@
                 position: relative;
                 outline: 2px dashed material-color('grey', '300');
                 border: 0px;
+                
+                .btn-remove {
+                    display: none;
+                }
 
                 &:after {
                     pointer-events: none;

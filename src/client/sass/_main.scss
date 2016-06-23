@@ -31,14 +31,18 @@ body {
 }
 
 *[data-dragdrop-enabled="true"] {
-    cursor: -webkit-grab;
-    cursor: -moz-grab;
-    cursor: grab;
+    &, * {
+        cursor: -webkit-grab !important;
+        cursor: -moz-grab !important;
+        cursor: grab !important;
+    }
 
     &[data-dragdrop-dragging="true"] {
-        cursor: -webkit-grabbing;
-        cursor: -moz-grabbing;
-        cursor: grabbing;
+        &, * {
+            cursor: -webkit-grabbing !important;
+            cursor: -moz-grabbing !important;
+            cursor: grabbing !important;
+        }
     }
 }
 
