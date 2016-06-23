@@ -258,8 +258,20 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
   .flex-horizontal .flex-expand {
     flex-grow: 1; }
 
+body {
+  overflow: hidden; }
+
 #dragdrop-placeholder {
   border: 2px dashed #2196f3; }
+
+*[data-dragdrop-enabled="true"] {
+  cursor: -webkit-grab;
+  cursor: -moz-grab;
+  cursor: grab; }
+  *[data-dragdrop-enabled="true"][data-dragdrop-dragging="true"] {
+    cursor: -webkit-grabbing;
+    cursor: -moz-grabbing;
+    cursor: grabbing; }
 
 .about-logo {
   color: #4caf50; }
@@ -430,7 +442,9 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
 .array-editor.sorting .items .item {
   overflow-y: hidden;
   height: 80px;
-  position: relative; }
+  position: relative;
+  outline: 2px dashed #e0e0e0;
+  border: 0px; }
   .array-editor.sorting .items .item:after {
     pointer-events: none;
     content: '';
@@ -441,44 +455,49 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
     height: 80px;
     background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0), white); }
 
+.array-editor.sorting .btn-add {
+  display: none; }
+
 .array-editor .btn-sort-items .text-default {
   display: inline; }
 
 .array-editor .btn-sort-items .text-sorting {
   display: none; }
 
-.array-editor .items .item {
-  position: relative;
-  border-bottom: 1px solid #e0e0e0;
-  padding-bottom: 30px;
-  margin-top: 30px; }
-  .array-editor .items .item:first-child {
-    margin-top: 0px; }
-  .array-editor .items .item:last-child {
-    border-bottom: 0px; }
-  .array-editor .items .item > .item-schema-selector {
-    clear: both;
-    display: flex;
-    margin-bottom: 10px;
-    width: calc(100% - 34px); }
-    .array-editor .items .item > .item-schema-selector .key {
-      width: 100px;
-      flex-shrink: 0;
-      line-height: 34px; }
-    .array-editor .items .item > .item-schema-selector .value {
-      flex-grow: 1; }
-  .array-editor .items .item > .field-editor {
-    width: calc(100% - 34px); }
-  .array-editor .items .item > .btn-remove {
-    position: absolute;
-    right: 0px;
-    top: 0px;
-    height: 34px;
-    width: 34px;
-    padding: 0px !important; }
-    .array-editor .items .item > .btn-remove .fa {
-      color: #f44336;
-      line-height: 34px; }
+.array-editor .items {
+  padding-top: 30px; }
+  .array-editor .items .item {
+    position: relative;
+    border-bottom: 1px solid #e0e0e0;
+    margin-bottom: 30px;
+    margin-top: 30px; }
+    .array-editor .items .item:first-of-type {
+      margin-top: 0px; }
+    .array-editor .items .item:last-of-type {
+      border-bottom: 0px; }
+    .array-editor .items .item > .item-schema-selector {
+      clear: both;
+      display: flex;
+      margin-bottom: 10px;
+      width: calc(100% - 34px); }
+      .array-editor .items .item > .item-schema-selector .key {
+        width: 100px;
+        flex-shrink: 0;
+        line-height: 34px; }
+      .array-editor .items .item > .item-schema-selector .value {
+        flex-grow: 1; }
+    .array-editor .items .item > .field-editor {
+      width: calc(100% - 34px); }
+    .array-editor .items .item > .btn-remove {
+      position: absolute;
+      right: 0px;
+      top: 0px;
+      height: 34px;
+      width: 34px;
+      padding: 0px !important; }
+      .array-editor .items .item > .btn-remove .fa {
+        color: #f44336;
+        line-height: 34px; }
 
 .array-editor .btn-add {
   margin-top: 10px; }
@@ -497,6 +516,8 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
     display: flex;
     flex-direction: column;
     height: 100%; }
+    .content-editor > .object > .nav-tabs, .content-editor > .object > .panel-buttons {
+      flex-shrink: 0; }
     .content-editor > .object > .tab-content {
       flex-grow: 1;
       overflow-y: auto; }

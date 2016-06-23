@@ -11,6 +11,10 @@
         flex-direction: column;
         height: 100%;
 
+        >.nav-tabs, >.panel-buttons {
+            flex-shrink: 0;
+        }
+
         >.tab-content {
             flex-grow: 1;
             overflow-y: auto;

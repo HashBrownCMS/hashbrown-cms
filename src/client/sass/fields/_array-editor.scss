@@ -15,6 +15,8 @@
                 overflow-y: hidden;
                 height: 80px;
                 position: relative;
+                outline: 2px dashed material-color('grey', '300');
+                border: 0px;
 
                 &:after {
                     pointer-events: none;
@@ -27,6 +29,10 @@
                     background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1));
                 }
             }
+        }
+
+        .btn-add {
+            display: none;
         }
     }
 
@@ -41,17 +47,19 @@
     }
 
     .items {
+        padding-top: 30px;
+
         .item {
             position: relative;
             border-bottom: 1px solid material-color('grey', '300');
-            padding-bottom: 30px;
+            margin-bottom: 30px;
             margin-top: 30px;
 
-            &:first-child {
+            &:first-of-type {
                 margin-top: 0px;
             }
 
-            &:last-child {
+            &:last-of-type {
                 border-bottom: 0px;
             }
 

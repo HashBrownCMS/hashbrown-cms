@@ -96,10 +96,30 @@ class ArrayEditor extends View {
                 this.$element.toggleClass('sorting');
 
                 if(this.$element.hasClass('sorting')) {
-                    this.$element.find('.item').each(function() {
-                        $(this).exodragdrop({
+                    this.$element.find('.item').each((oldIndex, item) => {
+                        $(item).exodragdrop({
                             lockX: true,
-                            dropContainers: view.$element[0].querySelectorAll('.items')
+                            dropContainers: view.$element[0].querySelectorAll('.items'),
+                            scrollContainer: document.querySelector('.content-editor .nav-tabs'),
+                            onEndDrag: (instance) => {
+                                let newIndex = $(instance.element).index();
+
+                                // Change the index in the items array
+                                let value = this.value.items[oldIndex];
+                                let itemsClone = this.value.items.slice();
+                                itemsClone.splice(oldIndex, 1);
+                                itemsClone.splice(newIndex, 0, value);
+                                this.value.items = itemsClone;
+                                
+                                // Change the index in the schema bindings array
+                                let schema = this.value.schemaBindings[oldIndex];
+                                let bindingsClone = this.value.schemaBindings.slice();
+                                bindingsClone.splice(oldIndex, 1);
+                                bindingsClone.splice(newIndex, 0, schema);
+                                this.value.schemaBindings = bindingsClone;
+
+                                oldIndex = newIndex;
+                            }
                         });
                     });
                 
@@ -182,7 +202,7 @@ class ArrayEditor extends View {
                         });
 
                         // Return the DOM element
-                        let $element = _.div({class: 'item'},
+                        let $element = _.div({class: 'item', 'data-array-index': i},
                             _.button({class: 'btn btn-embedded btn-remove'},
                                 _.span({class: 'fa fa-remove'})
                             ).click(() => { this.onClickRemoveItem(i); }),

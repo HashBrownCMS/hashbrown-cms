@@ -27,7 +27,7 @@ class SchemaEditor extends View {
      * Event: Click save. Posts the model to the modelUrl
      */
     onClickSave() {
-        this.$saveBtn.toggleClass('saving', true);
+        this.$saveBtn.toggleClass('working', true);
 
         $.ajax({
             type: 'post',
@@ -35,7 +35,7 @@ class SchemaEditor extends View {
             data: this.model,
             success: () => {
                 debug.log('Saved model to ' + this.modelUrl, this);
-                this.$saveBtn.toggleClass('saving', false);
+                this.$saveBtn.toggleClass('working', false);
             
                 reloadResource('schemas')
                 .then(() => {
@@ -441,7 +441,7 @@ class SchemaEditor extends View {
                                 ).click(() => { this.onClickDelete(); }),
                                 this.$saveBtn = _.button({class: 'btn btn-success btn-raised btn-save'},
                                     _.span({class: 'text-default'}, 'Save '),
-                                    _.span({class: 'text-saving'}, 'Saving ')
+                                    _.span({class: 'text-working'}, 'Saving ')
                                 ).click(() => { this.onClickSave(); })
                             )
                         )

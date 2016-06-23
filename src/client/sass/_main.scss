@@ -20,9 +20,26 @@
     }
 }
 
+// Body
+body {
+    overflow: hidden;
+}
+
 // Dragdrop
 #dragdrop-placeholder {
     border: 2px dashed material-color('blue', '500');
+}
+
+*[data-dragdrop-enabled="true"] {
+    cursor: -webkit-grab;
+    cursor: -moz-grab;
+    cursor: grab;
+
+    &[data-dragdrop-dragging="true"] {
+        cursor: -webkit-grabbing;
+        cursor: -moz-grabbing;
+        cursor: grabbing;
+    }
 }
 
 // About logo
