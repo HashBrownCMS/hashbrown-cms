@@ -17,11 +17,11 @@ It's really just another CMS, but with a clean slate, without all the patches, u
 Unlike most CMS'es, Endomon does not require a lot of resources to run. Instead of user sessions, it uses tokens. Instead of monitoring cronjobs for cache generation, it uses event triggers. Most importantly, instead of .NET, it uses node.js.
 
 ### Connects to anywhere
-Using a backend system called "connections", developers can create publishing logic connecting the CMS to other endpoints. A bundled exmaple of such a connection is the GitHub pages connection, rendering published content as YAML front matter and fetching liquid templates from the connected repo.
+Using a backend system called "connections", developers can create publishing logic connecting the CMS to other endpoints. A bundled example of such a connection is the GitHub pages connection, rendering published content as YAML front matter and fetching liquid templates from the connected repo.
 
 ### Multilingual
 A core mechanic of all content properties is that they can be configured to be multilingual using a single boolean value. This doesn't even need to be taken into account when making new field editors, the content editor handles it before field editors are rendered.
 
 ### Pluggable
-Only a solid core using node.js and MongoDB in the backend is set in stone, everything else can be overridden usng plugins. A plugin could be anything from a tiny field editor to a full-on publishing connection. 
+Only a solid core using node.js and MongoDB in the backend is set in stone, everything that happens on the front-end and after the editor clicks "publish" can be overridden using plugins.
 
