@@ -147,15 +147,17 @@ body {
                     width: 20px;
                     flex-shrink: 0;
 
-                    .fa {
-                        line-height: 30px;
-                    }
                 }
 
                 .field-key {
                     width: 200px;
                     line-height: 30px;
                     flex-shrink: 0;
+                    
+                    .fa {
+                        line-height: 30px;
+                        margin-right: 10px;
+                    }
                 }
 
                 .field-value {

@@ -79,8 +79,11 @@ class UrlEditor extends View {
         for(let contentData of window.resources.content) {
             if(contentData.id != contentId) {
                 let content = new Content(contentData);
+                let thatUrl = content.prop('url', window.language);
+                let isMatchWithNumber = new RegExp(url.substring(0, url.lastIndexOf('/')) + '-[0-9]+/').test(thatUrl);
+                let isSameUrl = url == thatUrl || isMatchWithNumber;
 
-                if(content.prop('url', window.language) == url) {
+                if(isSameUrl) {
                     sameUrls++;
                 }
             }
@@ -131,13 +134,27 @@ class UrlEditor extends View {
     onChange() {
         this.value = this.$input.val();
 
+        if(this.value.length > 1) {
+            if(this.value[0] != '/') {
+                this.value = '/' + this.value;
+                this.$input.val(this.value);
+            }
+            
+            if(this.value[this.value.length - 1] != '/') {
+                this.value = this.value + '/';
+                this.$input.val(this.value);
+            }
+        } else {
+            fetchFromTitle();
+        }
+
         this.trigger('change', this.value);
     };
 
     render() {
         this.$element = _.div({class: 'field-editor url-editor input-group'},
             this.$input = _.input({class: 'form-control', value: this.value})
-                .on('change propertychange paste keyup', () => { this.onChange(); }),
+                .on('change', () => { this.onChange(); }),
             _.div({class: 'input-group-btn'},
                 _.button({class: 'btn btn-primary'},
                     'Regenerate '
@@ -147,7 +164,7 @@ class UrlEditor extends View {
 
         //  Wait for next CPU cycle to check for title field
         setTimeout(() => {
-            this.$titleField = $('.field-container[data-key="title"]').eq(0);
+            this.$titleField = this.$element.parents('.tab-pane').find('.field-container[data-key="title"]').eq(0);
 
             if(this.$titleField.length == 1) {
                 this.$titleField.change(() => {
@@ -158,7 +175,7 @@ class UrlEditor extends View {
             if(!this.value) {
                 this.fetchFromTitle();
             }
-        }, 1);
+        }, 2);
     }
 }
 

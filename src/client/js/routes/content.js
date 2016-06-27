@@ -14,13 +14,16 @@ Router.route('/content/', function() {
 
 // Edit (JSON editor)
 Router.route('/content/json/:id', function() {
-    let contentEditor = new JSONEditor({
-        modelUrl: apiUrl('content/' + this.id)
+    ContentHelper.getContentByid(this.id)
+    .then((content) => {
+        let contentEditor = new JSONEditor({
+            model: content
+        });
+
+        ViewHelper.get('NavbarMain').highlightItem(this.id);
+        
+        $('.workspace').html(contentEditor.$element);
     });
-     
-    ViewHelper.get('NavbarMain').highlightItem(this.id);
-    
-    $('.workspace').html(contentEditor.$element);
 });
 
 // Edit

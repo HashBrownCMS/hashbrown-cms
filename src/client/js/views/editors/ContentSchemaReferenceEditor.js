@@ -27,8 +27,10 @@ class ContentSchemaReferenceEditor extends View {
 
         for(let id in window.resources.schemas) {
             let schema = window.resources.schemas[id];
+            let isNative = schema.id == 'page' || schema.id == 'contentBase';
+        
 
-            if(schema.type == 'content') {
+            if(schema.type == 'content' && !isNative) {
                 contentSchemas[contentSchemas.length] = schema;
             }
         }

@@ -311,11 +311,9 @@ class ContentEditor extends View {
             }
 
             return _.div({class: 'field-container', 'data-key': key},
-                _.div({class: 'field-icon'},
-                    _.span({class: 'fa fa-' + fieldSchema.icon})
-                ),
                 _.div({class: 'field-key'},
-                    schemaValue.label || key
+                    _.span({class: 'field-key-icon fa fa-' + fieldSchema.icon}),
+                    _.span({class: 'field-key-label'}, schemaValue.label || key)
                 ),
                 _.div({class: 'field-value'},
                     view.renderField(
