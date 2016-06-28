@@ -132,28 +132,83 @@ class SchemaEditor extends View {
     renderTabsEditor() {
         let view = this;
         
-        function onInputChange(id, element) {
-            let newLabel = $(element).val();
+        function onInputChange($input) {
+            let $chip = $input.parents('.chip');
+            let oldId = $chip.attr('data-id');
+            let newLabel = $input.val();
             let newId = ContentHelper.getSlug(newLabel);
+            let $defaultTabSelect = view.$element.find('.default-tab-editor select');
 
-            delete view.model.tabs[id];
+            // Assign new id to data attribute
+            $chip.attr('data-id', newId);
 
+            // Remove old id from model
+            delete view.model.tabs[oldId];
+
+            // Add new id and label to model
             view.model.tabs[newId] = newLabel;
+
+            // Remove old tab from select element
+            $defaultTabSelect.children().each((i, option) => {
+                if($(option).attr('value') == oldId) {
+                    $(option).remove();
+                }
+            });
+
+            // Append the new tab to the select element
+            $defaultTabSelect.append(
+                _.option({value: newId}, newLabel)
+            );
+
+            // If the default tab id was the old id, update the select element
+            if(view.model.defaultTabId == oldId) {
+                view.model.defaultTabId = newId;
+
+                $defaultTabSelect.val(newId);
+            }
         }
 
-        function onClickRemove(id) {
+        function onClickRemove($btn) {
+            let $chip = $btn.parents('.chip');
+            let id = $chip.attr('data-id');
+            let $defaultTabSelect = view.$element.find('.default-tab-editor select');
+
+            // Remove the id from the tabs list
             delete view.model.tabs[id];
 
-            render();
+            // Remove the chip element
+            $chip.remove();
+            
+            // Remove the tab from select element
+            $defaultTabSelect.children().each((i, option) => {
+                if($(option).attr('value') == id) {
+                    $(option).remove();
+                }
+            });
+            
+            // If default tab id was this tab, revert to 'meta'
+            if(view.model.defaultTabId == id) {
+                view.model.defaultTabId = 'meta';
+
+                $defaultTabSelect.val('meta');
+            }
         }
         
         function onClickAdd() {
             let name = 'New tab';
             let id = 'new-tab';
+            let $defaultTabSelect = view.$element.find('.default-tab-editor select');
 
+            // Add new tab to model
             view.model.tabs[id] = name;
 
+            // Redraw the tab editor
             render();
+
+            // Add new tab to default tab select element
+            $defaultTabSelect.append(
+                _.option({value: id}, name)
+            );
         }
 
         function render() {
@@ -182,13 +237,13 @@ class SchemaEditor extends View {
                     return _.div({class: 'tab chip', 'data-id': id},
                         _.input({type: 'text', class: 'chip-label' + (view.model.locked ? ' disabled' : ''), value: label})
                             .change(function(e) {
-                                onInputChange(id, $(this));
+                                onInputChange($(this));
                             }),
                         _.if(!view.model.locked,
                             _.button({class: 'btn chip-remove'}, 
                                 _.span({class: 'fa fa-remove'})
-                            ).click(() => {
-                                onClickRemove(id);
+                            ).click(function(e) {
+                                onClickRemove($(this));
                             })
                         )
                     );
@@ -428,7 +483,7 @@ class SchemaEditor extends View {
             .then((compiledSchema) => {
                 this.compiledSchema = compiledSchema;
                 
-                _.append(this.$element,
+                _.append(this.$element.empty(),
                     this.renderFields(),
                     _.div({class: 'panel panel-default panel-buttons'}, 
                         _.div({class: 'btn-group'},
