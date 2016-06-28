@@ -96,17 +96,30 @@ class UserHelper {
     static createUser(username, password) {
         let user = User.create(username, password);
 
-        debug.log('Creating user "' + username + '"...', this);
+        return new Promise((resolve, reject) => {
+            MongoHelper.findOne(
+                'users',
+                'users',
+                {
+                    username: username
+                }
+            ).then((found) => {
+                if(!found) {
+                    debug.log('Creating user "' + username + '"...', this);
+                    
+                    MongoHelper.insertOne(
+                        'users',
+                        'users',
+                        user.getFields()
+                    ).then(() => {
+                        debug.log('Created user "' + username + '" successfully.', this);
+                        
+                        resolve();
+                    });
+                } else {
+                    reject(new Error('User with username "' + username + '" already exists'))
 
-        return new Promise((callback) => {
-            MongoHelper.insertOne(
-                'users',
-                'users',
-                user.getFields()
-            ).then(() => {
-                debug.log('Created user "' + username + '" successfully.', this);
-                
-                callback();
+                }
             });
         });
     }
