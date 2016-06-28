@@ -34,27 +34,48 @@ function ready() {
     console.log('Endomon\n----------\nRunning on port ' + port);
     
     // Startup arguments
+    let cmd;
+    let args = {};
+
     for(let k in process.argv) {
         let v = process.argv[k];
 
-        switch(v) {
-            case 'create-admin':
-                let username = process.argv[(parseInt(k) + 1).toString()];
-                let password = process.argv[(parseInt(k) + 2).toString()];
-
-                username = username.replace('u=', '');
-                password = password.replace('p=', '');
-
-                AdminHelper.createAdmin(username, password);
-                return;
+        if(/--\w+/.test(v)) {
+           cmd = v.replace('--', '');
+        
+        } else if(/\w=\w+/.test(v)) {
+            args[v.substring(0, 1)] = v.substring(2);
+        
         }
+    }
+
+    switch(cmd) {
+        case 'create-user':
+            UserHelper.createUser(args.u, args.p);
+            return;
+        
+        case 'set-user-scopes':
+            UserHelper.findUser(args.u)
+            .then((user) => {
+                let obj = user.getObject();
+                
+                if(!obj.scopes[args.p]) {
+                    obj.scopes[args.p] = [];
+                }
+
+                obj.scopes[args.p] = args.s.split(',');
+
+                UserHelper.updateUser(args.u, obj);
+            });
+
+            return;
     }
 }
 
 // ----------
 // Helpers
 // ----------
-global.AdminHelper = require('./helpers/AdminHelper');
+global.UserHelper = require('./helpers/UserHelper');
 global.ConnectionHelper = require('./helpers/ConnectionHelper');
 global.ContentHelper = require('./helpers/ContentHelper');
 global.LanguageHelper = require('./helpers/LanguageHelper');

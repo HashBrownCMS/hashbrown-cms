@@ -49,10 +49,12 @@ class ApiController extends Controller {
         app.get('/api/:project/:environment/settings/:section', ApiController.getSettings);
         app.post('/api/:project/:environment/settings/:section', ApiController.setSettings);
 
-        // Admin
-        app.post('/api/admin/login', ApiController.login);
-        app.post('/api/admin/new', ApiController.createAdmin);
-        app.post('/api/admin/:id', ApiController.postAdmin);
+        // User
+        app.post('/api/user/login', ApiController.login);
+        app.get('/api/user/scopes', ApiController.getScopes);
+        app.get('/api/users', ApiController.getUsers);
+        app.post('/api/user/new', ApiController.createUser);
+        app.post('/api/user/:id', ApiController.postUser);
 
         // Templates
         app.get('/api/:project/:environment/templates', ApiController.getTemplates)
@@ -66,7 +68,8 @@ class ApiController extends Controller {
      * Gets a list of Media objects
      */
     static getMedia(req, res) {
-        ApiController.authenticate(req, res, () => {
+        ApiController.authenticate(req, res)
+        .then(() => {
             MediaHelper.getAllMedia()
             .then(function(paths) {
                 res.send(paths)
@@ -78,7 +81,8 @@ class ApiController extends Controller {
      * Gets a single Media object
      */
     static getSingleMedia(req, res) {
-        ApiController.authenticate(req, res, () => {
+        ApiController.authenticate(req, res)
+        .then(() => {
             let id = req.params.id;
 
             MediaHelper.getMedia(id)
@@ -92,7 +96,8 @@ class ApiController extends Controller {
      * Deletes a Media object
      */
     static deleteMedia(req, res) {
-        ApiController.authenticate(req, res, () => {
+        ApiController.authenticate(req, res)
+        .then(() => {
             let id = req.params.id;
 
             MediaHelper.removeMedia(id)
@@ -106,7 +111,8 @@ class ApiController extends Controller {
      * Sets a Media object
      */
     static setMedia(req, res) {
-        ApiController.authenticate(req, res, () => {
+        ApiController.authenticate(req, res)
+        .then(() => {
             let file = req.file;
             let id = req.params.id;
 
@@ -126,7 +132,8 @@ class ApiController extends Controller {
      * Creates a Media object
      */
     static createMedia(req, res) {
-        ApiController.authenticate(req, res, () => {
+        ApiController.authenticate(req, res)
+        .then(() => {
             let file = req.file;
 
             if(file) {
@@ -150,7 +157,8 @@ class ApiController extends Controller {
      * Gets a list of all Content objects
      */
     static getAllContents(req, res) {
-        ApiController.authenticate(req, res, () => {
+        ApiController.authenticate(req, res)
+        .then(() => {
             ContentHelper.getAllContents()
             .then(function(nodes) {
                 res.send(nodes);
@@ -164,7 +172,8 @@ class ApiController extends Controller {
      * @return {Object} Content
      */
     static getContent(req, res) {
-        ApiController.authenticate(req, res, () => {
+        ApiController.authenticate(req, res)
+        .then(() => {
             let id = req.params.id;
        
             if(id && id != 'undefined') {
@@ -186,7 +195,8 @@ class ApiController extends Controller {
      * @return {Content} content
      */
     static createContent(req, res) {
-        ApiController.authenticate(req, res, () => {
+        ApiController.authenticate(req, res)
+        .then(() => {
             ContentHelper.createContent()
             .then(function(node) {
                 res.send(node);
@@ -198,7 +208,8 @@ class ApiController extends Controller {
      * Posts a Content object by id
      */
     static postContent(req, res) {
-        ApiController.authenticate(req, res, () => {
+        ApiController.authenticate(req, res)
+        .then(() => {
             let id = req.params.id;
             let node = req.body;
             
@@ -213,7 +224,8 @@ class ApiController extends Controller {
      * Publishes a Content node
      */
     static publishContent(req, res) {
-        ApiController.authenticate(req, res, () => {
+        ApiController.authenticate(req, res)
+        .then(() => {
             let content = new Content(req.body);
 
             ConnectionHelper.publishContent(content)
@@ -227,7 +239,8 @@ class ApiController extends Controller {
      * Unpublishes a Content node
      */
     static unpublishContent(req, res) {
-        ApiController.authenticate(req, res, () => {
+        ApiController.authenticate(req, res)
+        .then(() => {
             let content = new Content(req.body);
 
             ConnectionHelper.unpublishContent(content)
@@ -241,7 +254,8 @@ class ApiController extends Controller {
      * Deletes a Content object by id
      */
     static deleteContent(req, res) {
-        ApiController.authenticate(req, res, () => {
+        ApiController.authenticate(req, res)
+        .then(() => {
             let id = req.params.id;
             
             ContentHelper.removeContentById(id)
@@ -258,7 +272,8 @@ class ApiController extends Controller {
      * Gets all connections
      */
     static getConnections(req, res) {
-        ApiController.authenticate(req, res, () => {
+        ApiController.authenticate(req, res)
+        .then(() => {
             ConnectionHelper.getAllConnections()
             .then(function(connections) {
                 res.send(connections);
@@ -270,7 +285,8 @@ class ApiController extends Controller {
      * Post connection by id
      */
     static postConnection(req, res) {
-        ApiController.authenticate(req, res, () => {
+        ApiController.authenticate(req, res, 'connections')
+        .then(() => {
             let id = req.params.id;
             let content = req.body;
 
@@ -285,7 +301,8 @@ class ApiController extends Controller {
      * Gets a connection by id
      */
     static getConnection(req, res) {
-        ApiController.authenticate(req, res, () => {
+        ApiController.authenticate(req, res)
+        .then(() => {
             let id = req.params.id;
        
             if(id && id != 'undefined') {
@@ -307,7 +324,8 @@ class ApiController extends Controller {
      * @return {Object} Content
      */
     static createConnection(req, res) {
-        ApiController.authenticate(req, res, () => {
+        ApiController.authenticate(req, res, 'connections')
+        .then(() => {
             ConnectionHelper.createConnection()
             .then(function(node) {
                 res.send(node);
@@ -319,7 +337,8 @@ class ApiController extends Controller {
      * Deletes a connection by id
      */
     static deleteConnection(req, res) {
-        ApiController.authenticate(req, res, () => {
+        ApiController.authenticate(req, res, 'connections')
+        .then(() => {
             let id = req.params.id;
             
             ConnectionHelper.removeConnectionById(id)
@@ -336,7 +355,8 @@ class ApiController extends Controller {
      * Get a list of all Schemas
      */
     static getSchemas(req, res) {
-        ApiController.authenticate(req, res, () => {
+        ApiController.authenticate(req, res)
+        .then(() => {
             SchemaHelper.getAllSchemas()
             .then(function(schemas) {
                 res.send(schemas);
@@ -348,7 +368,8 @@ class ApiController extends Controller {
      * Get a Schema by id
      */
     static getSchema(req, res) {
-        ApiController.authenticate(req, res, () => {
+        ApiController.authenticate(req, res)
+        .then(() => {
             let id = req.params.id;
 
             SchemaHelper.getSchema(id)
@@ -362,7 +383,8 @@ class ApiController extends Controller {
      * Set a Schema by id
      */
     static setSchema(req, res) {
-        ApiController.authenticate(req, res, () => {
+        ApiController.authenticate(req, res, 'schemas')
+        .then(() => {
             let id = req.params.id;
             let schema = req.body;
 
@@ -379,7 +401,8 @@ class ApiController extends Controller {
     static createSchema(req, res) {
         let parentSchema = req.body;
 
-        ApiController.authenticate(req, res, () => {
+        ApiController.authenticate(req, res, 'schemas')
+        .then(() => {
             SchemaHelper.createSchema(parentSchema)
             .then(function(newSchema) {
                 res.send(newSchema.getFields());
@@ -391,7 +414,8 @@ class ApiController extends Controller {
      * Deletes a Schema by id
      */
     static deleteSchema(req, res) {
-        ApiController.authenticate(req, res, () => {
+        ApiController.authenticate(req, res, 'schemas')
+        .then(() => {
             let id = req.params.id;
             
             SchemaHelper.removeSchema(id)
@@ -408,7 +432,8 @@ class ApiController extends Controller {
      * Get settings object
      */
     static getSettings(req, res) {
-        ApiController.authenticate(req, res, () => {
+        ApiController.authenticate(req, res)
+        .then(() => {
             SettingsHelper.getSettings(req.params.section)
             .then(function(settings) {
                 res.send(settings);
@@ -420,7 +445,8 @@ class ApiController extends Controller {
      * Set settings object
      */
     static setSettings(req, res) {
-        ApiController.authenticate(req, res, () => {
+        ApiController.authenticate(req, res, 'settings')
+        .then(() => {
             let settings = req.body;
 
             SettingsHelper.setSettings(req.params.section, settings)
@@ -431,37 +457,60 @@ class ApiController extends Controller {
     }
 
     // ----------
-    // Admin
+    // User
     // ----------
     /**
      * Authenticates an API call
+     *
+     * @param {Request} req
+     * @param {Response} res
+     * @param {String} scope
      */
-    static authenticate(req, res, onSuccess) {
-        let token = req.query.token;
+    static authenticate(req, res, scope) {
+        return new Promise((resolve, reject) => {
+            let token = req.query.token;
 
-        if(req.params.project && req.params.environment) {
-            ProjectHelper.currentProject = req.params.project;
-            ProjectHelper.currentEnvironment = req.params.environment;
-        }
-
-        AdminHelper.findToken(token)
-        .then((foundToken) => {
-            if(foundToken) {
-                onSuccess(req, res);
-            } else {
-                res.sendStatus(403);
+            if(req.params.project && req.params.environment) {
+                ProjectHelper.currentProject = req.params.project;
+                ProjectHelper.currentEnvironment = req.params.environment;
             }
+
+            UserHelper.findToken(token)
+            .then((user) => {
+                if(user) {
+                    // If a scope is defined, check for it
+                    if(scope) {
+                        if(user.hasScope(ProjectHelper.currentProject, scope)) {
+                            resolve(user);
+                
+                        } else {
+                            res.sendStatus(403);
+                            reject(new Error('User with token "' + token + '" doesn\'t have scope "' + scope + '"'));
+
+                        }
+                   
+                    // If no scope is required, return as normal 
+                    } else {
+                        resolve(user);
+
+                    }
+
+                } else {
+                    res.sendStatus(403);
+                    reject(new Error('Found no user with token "' + token + '"'));
+                }
+            });
         });
     }
 
     /** 
-     * Logs in an admin
+     * Logs in a user
      */
     static login(req, res) {
         let username = req.body.username;
         let password = req.body.password;
 
-        AdminHelper.loginAdmin(username, password)
+        UserHelper.loginUser(username, password)
         .then((token) => {
             res.send(token);
         })
@@ -471,14 +520,44 @@ class ApiController extends Controller {
     }
 
     /**
-     * Updates an admin
+     * Get current scopes
      */
-    static postAdmin(req, res) {
-        ApiController.authenticate(req, res, () => {
-            let username = req.params.username;
-            let admin = req.body;
+    static getScopes(req, res) {
+        ApiController.authenticate(req, res)
+        .then((user) => {
+            res.send(user.scopes);
+        })
+        .catch((e) => {
+            debug.log(e, this);
+        });
+    }
+    
+    /**
+     * Get all users
+     */
+    static getUsers(req, res) {
+        ApiController.authenticate(req, res, 'users')
+        .then((user) => {
+            UserHelper.getAllUsers()
+            .then((users) => {
+                res.send(users);
+            });
+        })
+        .catch((e) => {
+            debug.log(e, this);
+        });
+    }
 
-            AdminHelper.updateAdmin(username, admin)
+    /**
+     * Updates a user
+     */
+    static postUser(req, res) {
+        ApiController.authenticate(req, res, 'users')
+        .then(() => {
+            let username = req.params.username;
+            let user = req.body;
+
+            UserHelper.updateUser(username, user)
             .then(() => {
                 res.sendStatus(200);
             });
@@ -486,14 +565,15 @@ class ApiController extends Controller {
     }
     
     /**
-     * Creates an admin
+     * Creates a user
      */
-    static createAdmin(req, res) {
-        ApiController.authenticate(req, res, () => {
+    static createUser(req, res) {
+        ApiController.authenticate(req, res, 'users')
+        .then(() => {
             let username = req.body.username;
             let password = req.body.password;
 
-            AdminHelper.createAdmin(username, password)
+            UserHelper.createUser(username, password)
             .then(() => {
                 res.sendStatus(200);
             });
@@ -507,7 +587,8 @@ class ApiController extends Controller {
      * Gets an array of all templates
      */
     static getTemplates(req, res) {
-        ApiController.authenticate(req, res, () => {
+        ApiController.authenticate(req, res)
+        .then(() => {
             ConnectionHelper.getAllConnections()
             .then((connections) => {
                 let foundProvider = false;
@@ -536,7 +617,8 @@ class ApiController extends Controller {
      * Gets an array of all section templates
      */
     static getSectionTemplates(req, res) {
-        ApiController.authenticate(req, res, () => {
+        ApiController.authenticate(req, res)
+        .then(() => {
             ConnectionHelper.getAllConnections()
             .then((connections) => {
                 let foundProvider = false;

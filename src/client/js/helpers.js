@@ -93,8 +93,11 @@ window.reloadResource = function reloadResource(name) {
             },
             error: function(e) {
                 if(e.status == 403) {
-                    location = '/login/?path=' + location.pathname + location.hash;
+                    debug.log('Permission denied for resource "' + name + '"', this);
+                    //location = '/login/?path=' + location.pathname + location.hash;
                 }
+                
+                callback(null);
             }
         });
     });
@@ -104,7 +107,7 @@ window.reloadResource = function reloadResource(name) {
  * Reloads all resources
  */
 window.reloadAllResources = function reloadAllResources() {
-    return new Promise(function(callback) {
+    return new Promise(function(resolve) {
         let queue = [
             'content',
             'schemas',
@@ -120,7 +123,7 @@ window.reloadAllResources = function reloadAllResources() {
                 queue.pop();
 
                 if(queue.length < 1) {
-                    callback();
+                    resolve();
                 }
             });
         }

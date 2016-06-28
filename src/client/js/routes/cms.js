@@ -1,17 +1,17 @@
 'use strict';
 
-// Admins
-Router.route('/admins/', function() {
-    ViewHelper.get('NavbarMain').highlightItem('admins');
+// Users
+Router.route('/users/', function() {
+    ViewHelper.get('NavbarMain').highlightItem('users');
 
     $('.workspace').html(
         _.div({class: 'dashboard-container'},
-            _.h1('Admins'),
+            _.h1('Users'),
             _.p('Hi'),
             _.button('Create').click(() => {
                 $.ajax({
                     type: 'POST',
-                    url: apiUrl('admin/new'),
+                    url: apiUrl('user/new'),
                     data: {
                         username: 'hest',
                         password: 'test'

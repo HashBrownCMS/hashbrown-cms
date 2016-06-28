@@ -11,7 +11,7 @@ class Password extends Entity {
     }
 }
 
-class Admin extends Entity {
+class User extends Entity {
     constructor(params) {
         if(params) {
             // Ensure correct object type
@@ -29,6 +29,52 @@ class Admin extends Entity {
         this.def(String, 'username');
         this.def(Password, 'password', new Password());
         this.def(Array, 'tokens', []);
+        this.def(Object, 'scopes', {});
+    }
+    
+    /**
+     * Sets all project scopes
+     *
+     * @param {String} project
+     * @param {Array} scopes
+     */
+    setScopes(project, scopes) {
+        if(!this.scopes[project]) {
+            this.scopes[project] = [];
+        }
+
+        this.scopes[project] = scopes;
+    }
+    
+    /**
+     * Gets all project scopes
+     *
+     * @param {String} project
+     *
+     * @returns {Array} scopes
+     */
+    getScopes(project) {
+        if(!this.scopes[project]) {
+            this.scopes[project] = [];
+        }
+
+        return this.scopes[project];
+    }
+
+    /**
+     * Checks if a user has a project scope
+     *
+     * @param {String} project
+     * @param {String} scope
+     *
+     * @returns {Boolean} hasScope
+     */
+    hasScope(project, scope) {
+        if(!this.scopes[project]) {
+            this.scopes[project] = [];
+        }
+
+        return this.scopes[project].indexOf(scope) > -1;
     }
 
     /**
@@ -84,7 +130,7 @@ class Admin extends Entity {
      * @returns {Boolean} valid
      */
     validatePassword(password) {
-        let hashedPassword = Admin.sha512(password, this.password.salt);
+        let hashedPassword = User.sha512(password, this.password.salt);
 
         return this.password.hash == hashedPassword;
     }
@@ -108,18 +154,18 @@ class Admin extends Entity {
     }
 
     /**
-     * Creates a new admin object
+     * Creates a new user object
      *
      * @param {String} username
      * @param {String} password
      *
-     * @returns {Admin} admin
+     * @returns {User} user
      */
     static create(username, password) {
         let salt = crypto.randomBytes(128).toString('hex');
-        let hashedPassword = Admin.sha512(password, salt);
+        let hashedPassword = User.sha512(password, salt);
         
-        let admin = new Admin({
+        let user = new User({
             id: Entity.createId(),
             username: username,
             password: {
@@ -128,8 +174,8 @@ class Admin extends Entity {
             }
         });
 
-        return admin;
+        return user;
     }
 }
 
-module.exports = Admin;
+module.exports = User;

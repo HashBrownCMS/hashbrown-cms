@@ -8,7 +8,7 @@ let mongoDatabase;
 // Models
 let Content = require(appRoot + '/src/common/models/Content');
 let Connection = require(appRoot + '/src/common/models/Connection');
-let Admin = require(appRoot + '/src/server/models/Admin');
+let User = require(appRoot + '/src/server/models/User');
 
 class MongoHelper {
     /**
@@ -113,7 +113,7 @@ class MongoHelper {
         delete doc['_id'];
 
         return new Promise((callback) => {
-            debug.log(databaseName + '/' + collectionName + '::updateOne ' + JSON.stringify(query) + '...', this);
+            debug.log(databaseName + '/' + collectionName + '::updateOne ' + JSON.stringify(query) + ' with options ' + JSON.stringify(options || {}) + '...', this);
         
             MongoHelper.getDatabase(databaseName).then(function(db) {
                 db.collection(collectionName).updateOne(query, doc, options || {}, function(findErr) {

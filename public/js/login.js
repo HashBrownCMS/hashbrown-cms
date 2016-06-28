@@ -15,7 +15,7 @@ $('.login').each(function() {
     
         $.ajax({
             type: 'POST',
-            url: '/api/admin/login',
+            url: '/api/user/login',
             data: {
                 username: username,
                 password: password

@@ -838,12 +838,14 @@ class NavbarMain extends View {
      * @param {String} tabName
      */
     showTab(tabRoute) {
-        this.$element.find('.tab-panes .pane-container').each(function(i) {
-            $(this).toggleClass('active', $(this).attr('data-route') == tabRoute);
-        });
-        
-        this.$element.find('.tab-buttons button').each(function(i) {
-            $(this).toggleClass('active', $(this).attr('data-route') == tabRoute);
+        onReady('navbar', () => {
+            this.$element.find('.tab-panes .pane-container').each(function(i) {
+                $(this).toggleClass('active', $(this).attr('data-route') == tabRoute);
+            });
+            
+            this.$element.find('.tab-buttons button').each(function(i) {
+                $(this).toggleClass('active', $(this).attr('data-route') == tabRoute);
+            });
         });
     }
 
@@ -914,145 +916,84 @@ class NavbarMain extends View {
             )
         ]);
 
-        // Insert into DOM
-        $('.navspace').html(this.$element);
-        
-        // ----------
-        // Render the "about" pane
-        // ----------
-        this.renderPane({
-            label: 'Endomon CMS',
-            route: '/',
-            $icon: _.span({class: 'about-logo'}, 'E'),
-            items: [
-                {
-                    name: 'Admins',
-                    path: 'admins'
-                },
-                {
-                    name: 'About',
-                    path: 'about'
-                }
-            ]
-        });
+        // Get user scopes
+        $.ajax({
+            type: 'GET',
+            url: '/api/user/scopes?token=' + localStorage.getItem('token'),
+            success: (allScopes) => {
+                let scopes = allScopes[ProjectHelper.currentProject] || [];
 
-        // ----------
-        // Render the "content" pane
-        // This is the only pane that offers manual sorting, so it has more logic than other panes
-        // ----------
-        this.renderPane({
-            label: 'Content',
-            route: '/content/',
-            icon: 'file',
-            items: resources.content,
-
-            // Set item context menu
-            itemContextMenu: {
-                'This content': '---',
-                'Rename': function() { view.onClickRenameContent(); },
-                'Copy': function() { view.onClickCopyContent(); },
-                'Cut': function() { view.onClickCutContent(); },
-                'Paste': function() { view.onClickPasteContent(); },
-                'Remove': function() { view.onClickRemoveContent(); },
-                'Settings': function() { view.onClickContentSettings(); },
-            },
-
-            // Set general context menu items
-            paneContextMenu: {
-                'General': '---',
-                'Create new': function() { view.onClickNewContent(); }
-            },
-
-            // Sorting logic
-            sort: function(item, queueItem) {
-                // Set id data attributes
-                queueItem.$element.attr('data-content-id', item.id);
-                queueItem.parentDirAttr = {'data-content-id': item.parentId };
-
-               /* function onSuccess() {
-
-                }
-
-                function onError(err) {
-                    new MessageModal({
-                        model: {
-                            title: 'Error',
-                            body: err
+                // ----------
+                // Render the "about" pane
+                // ----------
+                this.renderPane({
+                    label: 'Endomon CMS',
+                    route: '/',
+                    $icon: _.span({class: 'about-logo'}, 'E'),
+                    items: [
+                        {
+                            name: 'About',
+                            path: 'about'
                         }
-                    });
-                }
+                    ]
+                });
 
-                // Get the Content node and check if it has a sort index
-                let thisContent = resources.content.filter((content) => {
-                    return content.id = item.id;
-                })[0];
+                // ----------
+                // Render the "content" pane
+                // This is the only pane that offers manual sorting, so it has more logic than other panes
+                // ----------
+                this.renderPane({
+                    label: 'Content',
+                    route: '/content/',
+                    icon: 'file',
+                    items: resources.content,
 
-                // ...if it doesn't, assign one based on the DOM
-                if(thisContent.sort < 0) {
-                    thisContent.sort = queueItem.$element.parent().index() * 10000;
-                    
-                    // Save the Content model with the new sort index
-                    $.ajax({
-                        type: 'post',
-                        url: apiUrl('content/' + thisContent.id),
-                        data: thisContent.getObject(),
-                        success: onSuccess,
-                        error: onError
-                    });
-                }
-                
-                // Assign the sort index to the DOM element
-                queueItem.$element.attr('data-sort', thisContent.sort);*/
-            },
+                    // Set item context menu
+                    itemContextMenu: {
+                        'This content': '---',
+                        'Rename': function() { view.onClickRenameContent(); },
+                        'Copy': function() { view.onClickCopyContent(); },
+                        'Cut': function() { view.onClickCutContent(); },
+                        'Paste': function() { view.onClickPasteContent(); },
+                        'Remove': function() { view.onClickRemoveContent(); },
+                        'Settings': function() { view.onClickContentSettings(); },
+                    },
 
-            // After sorting logic
-            postSort: function($parentElements) {
-                // Sort elements
-                /*$parentElements.each((i, parentElement) => {
-                    $(parentElement).children().sort((a, b) => {
-                        let aSort = a.getAttribute('data-sort');
-                        let bSort = b.getAttribute('data-sort');
+                    // Set general context menu items
+                    paneContextMenu: {
+                        'General': '---',
+                        'Create new': function() { view.onClickNewContent(); }
+                    },
 
-                        if(aSort > bSort) {
-                            return 1;
-                        } else if(aSort < bSort) {
-                            return -1;
-                        } else {
-                            return 0;
+                    // Sorting logic
+                    sort: function(item, queueItem) {
+                        // Set id data attributes
+                        queueItem.$element.attr('data-content-id', item.id);
+                        queueItem.parentDirAttr = {'data-content-id': item.parentId };
+
+                       /* function onSuccess() {
+
                         }
-                    });
-                });*/
-            },
 
-            // End dragging logic
-            onEndDrag: function(dragdropItem) {
-                let thisId = dragdropItem.element.dataset.contentId;
-                
-                function onSuccess() {
-
-                }
-
-                function onError(err) {
-                    new MessageModal({
-                        model: {
-                            title: 'Error',
-                            body: err
+                        function onError(err) {
+                            new MessageModal({
+                                model: {
+                                    title: 'Error',
+                                    body: err
+                                }
+                            });
                         }
-                    });
-                }
 
-                // Get Content node and set new sorting value
-                ContentHelper.getContentById(thisId)
-                .then((thisContent) => {
-                    // If this element has a previous sibling, base the sorting index on that
-                    if(dragdropItem.element.previousSibling) {
-                        let prevId = dragdropItem.element.previousSibling.dataset.contentId;
+                        // Get the Content node and check if it has a sort index
+                        let thisContent = resources.content.filter((content) => {
+                            return content.id = item.id;
+                        })[0];
 
-                        ContentHelper.getContentById(prevId)
-                        .then((prevContent) => {
-                            thisContent.sort = prevContent.sort + 1;
-
-                            // Save model
+                        // ...if it doesn't, assign one based on the DOM
+                        if(thisContent.sort < 0) {
+                            thisContent.sort = queueItem.$element.parent().index() * 10000;
+                            
+                            // Save the Content model with the new sort index
                             $.ajax({
                                 type: 'post',
                                 url: apiUrl('content/' + thisContent.id),
@@ -1060,133 +1001,220 @@ class NavbarMain extends View {
                                 success: onSuccess,
                                 error: onError
                             });
-                        });
+                        }
+                        
+                        // Assign the sort index to the DOM element
+                        queueItem.$element.attr('data-sort', thisContent.sort);*/
+                    },
 
-                    // If this element has a next sibling, base the sorting index on that
-                    } else if (dragdropItem.element.nextSibling) {
-                        let nextId = dragdropItem.element.nextiousSibling.dataset.contentId;
+                    // After sorting logic
+                    postSort: function($parentElements) {
+                        // Sort elements
+                        /*$parentElements.each((i, parentElement) => {
+                            $(parentElement).children().sort((a, b) => {
+                                let aSort = a.getAttribute('data-sort');
+                                let bSort = b.getAttribute('data-sort');
 
-                        ContentHelper.getContentById(nextId)
-                        .then((nextContent) => {
-                            thisContent.sort = nextContent.sort - 1;
-
-                            // Save model
-                            $.ajax({
-                                type: 'post',
-                                url: apiUrl('content/' + thisContent.id),
-                                data: thisContent.getObject(),
-                                success: onSuccess,
-                                error: onError
+                                if(aSort > bSort) {
+                                    return 1;
+                                } else if(aSort < bSort) {
+                                    return -1;
+                                } else {
+                                    return 0;
+                                }
                             });
-                        });
+                        });*/
+                    },
+
+                    // End dragging logic
+                    onEndDrag: function(dragdropItem) {
+                        let thisId = dragdropItem.element.dataset.contentId;
+                        
+                        function onSuccess() {
+
+                        }
+
+                        function onError(err) {
+                            new MessageModal({
+                                model: {
+                                    title: 'Error',
+                                    body: err
+                                }
+                            });
+                        }
+
+                        // Get Content node and set new sorting value
+                        ContentHelper.getContentById(thisId)
+                        .then((thisContent) => {
+                            // If this element has a previous sibling, base the sorting index on that
+                            if(dragdropItem.element.previousSibling) {
+                                let prevId = dragdropItem.element.previousSibling.dataset.contentId;
+
+                                ContentHelper.getContentById(prevId)
+                                .then((prevContent) => {
+                                    thisContent.sort = prevContent.sort + 1;
+
+                                    // Save model
+                                    $.ajax({
+                                        type: 'post',
+                                        url: apiUrl('content/' + thisContent.id),
+                                        data: thisContent.getObject(),
+                                        success: onSuccess,
+                                        error: onError
+                                    });
+                                });
+
+                            // If this element has a next sibling, base the sorting index on that
+                            } else if (dragdropItem.element.nextSibling) {
+                                let nextId = dragdropItem.element.nextiousSibling.dataset.contentId;
+
+                                ContentHelper.getContentById(nextId)
+                                .then((nextContent) => {
+                                    thisContent.sort = nextContent.sort - 1;
+
+                                    // Save model
+                                    $.ajax({
+                                        type: 'post',
+                                        url: apiUrl('content/' + thisContent.id),
+                                        data: thisContent.getObject(),
+                                        success: onSuccess,
+                                        error: onError
+                                    });
+                                });
 
 
-                    // If it has neither, just assign the lowest possible one
-                    } else {
-                        thisContent.sort = 10000;
-                       
-                        // Save model
-                        $.ajax({
-                            type: 'post',
-                            url: apiUrl('content/' + thisContent.id),
-                            data: thisContent.getObject(),
-                            success: onSuccess,
-                            error: onError
+                            // If it has neither, just assign the lowest possible one
+                            } else {
+                                thisContent.sort = 10000;
+                               
+                                // Save model
+                                $.ajax({
+                                    type: 'post',
+                                    url: apiUrl('content/' + thisContent.id),
+                                    data: thisContent.getObject(),
+                                    success: onSuccess,
+                                    error: onError
+                                });
+                            }
                         });
                     }
                 });
-            }
-        });
 
-        // ----------
-        // Render the "media" pane
-        // ----------
-        this.renderPane({
-            label: 'Media',
-            route: '/media/',
-            icon: 'file-image-o',
-            items: resources.media,
+                // ----------
+                // Render the "media" pane
+                // ----------
+                this.renderPane({
+                    label: 'Media',
+                    route: '/media/',
+                    icon: 'file-image-o',
+                    items: resources.media,
 
-            // Item context menu
-            itemContextMenu: {
-                'This media': '---',
-                'Remove': function() { view.onClickRemoveMedia(); }
-            },
+                    // Item context menu
+                    itemContextMenu: {
+                        'This media': '---',
+                        'Remove': function() { view.onClickRemoveMedia(); }
+                    },
 
-            // General context menu
-            paneContextMenu: {
-                'General': '---',
-                'Upload new media': function() { view.onClickUploadMedia(); }
-            }
-        });
-        
-        // ----------
-        // Render the "connections" pane
-        // ----------
-        this.renderPane({
-            label: 'Connections',
-            route: '/connections/',
-            icon: 'exchange',
-            items: resources.connections,
+                    // General context menu
+                    paneContextMenu: {
+                        'General': '---',
+                        'Upload new media': function() { view.onClickUploadMedia(); }
+                    }
+                });
+                
+                // ----------
+                // Render the "connections" pane
+                // ----------
+                if(scopes.indexOf('connections') > -1) {
+                    this.renderPane({
+                        label: 'Connections',
+                        route: '/connections/',
+                        icon: 'exchange',
+                        items: resources.connections,
 
-            // Item context menu
-            itemContextMenu: {
-                'This connection': '---',
-                'Remove': function() { view.onClickRemoveConnection(); }
-            },
+                        // Item context menu
+                        itemContextMenu: {
+                            'This connection': '---',
+                            'Remove': function() { view.onClickRemoveConnection(); }
+                        },
 
-            // General context menu
-            paneContextMenu: {
-                'General': '---',
-                'New connection': function() { view.onClickNewConnection(); }
-            }
-        });
-        
-        // ----------
-        // Render the "schemas" pane
-        // ----------
-        this.renderPane({
-            label: 'Schemas',
-            route: '/schemas/',
-            icon: 'gears',
-            items: resources.schemas,
-
-            // Item context menu
-            itemContextMenu: {
-                'This schema': '---',
-                'New child schema': function() { view.onClickNewSchema(); },
-                'Remove': function() { view.onClickRemoveSchema(); }
-            },
-
-            // Sorting logic
-            sort: function(item, queueItem) {
-                queueItem.$element.attr('data-schema-id', item.id);
-               
-                if(item.parentSchemaId) {
-                    queueItem.parentDirAttr = {'data-schema-id': item.parentSchemaId };
-
-                } else {
-                    queueItem.parentDirAttr = {'data-schema-type': item.type};
+                        // General context menu
+                        paneContextMenu: {
+                            'General': '---',
+                            'New connection': function() { view.onClickNewConnection(); }
+                        }
+                    });
                 }
+                
+                // ----------
+                // Render the "schemas" pane
+                // ----------
+                if(scopes.indexOf('schemas') > -1) {
+                    this.renderPane({
+                        label: 'Schemas',
+                        route: '/schemas/',
+                        icon: 'gears',
+                        items: resources.schemas,
+
+                        // Item context menu
+                        itemContextMenu: {
+                            'This schema': '---',
+                            'New child schema': function() { view.onClickNewSchema(); },
+                            'Remove': function() { view.onClickRemoveSchema(); }
+                        },
+
+                        // Sorting logic
+                        sort: function(item, queueItem) {
+                            queueItem.$element.attr('data-schema-id', item.id);
+                           
+                            if(item.parentSchemaId) {
+                                queueItem.parentDirAttr = {'data-schema-id': item.parentSchemaId };
+
+                            } else {
+                                queueItem.parentDirAttr = {'data-schema-type': item.type};
+                            }
+                        }
+                    });
+                }
+
+                // ----------
+                // Render the "settings" pane
+                // ----------
+                if(scopes.indexOf('settings') > -1) {
+                    this.renderPane({
+                        label: 'Settings',
+                        route: '/settings/',
+                        icon: 'wrench',
+                        items: [
+                            {
+                                name: 'Languages',
+                                path: 'languages'
+                            }
+                        ]
+                    });
+                }
+                
+                // ----------
+                // Render the "settings" pane
+                // ----------
+                if(scopes.indexOf('users') > -1) {
+                    this.renderPane({
+                        label: 'Users',
+                        route: '/users/',
+                        icon: 'user',
+                        items: []
+                    });
+                }
+
+                triggerReady('navbar');
+            },
+            error: () => {
+
             }
         });
 
-        // ----------
-        // Render the "settings" pane
-        // ----------
-        this.renderPane({
-            label: 'Settings',
-            route: '/settings/',
-            icon: 'wrench',
-            items: [
-                {
-                    name: 'Languages',
-                    path: 'languages'
-                }
-            ]
-        });
-
-        triggerReady('navbar');
+        // Insert into DOM
+        $('.navspace').html(this.$element);
     }
 }
 
