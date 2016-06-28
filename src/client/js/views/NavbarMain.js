@@ -879,23 +879,25 @@ class NavbarMain extends View {
     highlightItem(route) {
         let view = this;
 
-        this.$element.find('.pane-item-container').each(function(i) {
-            let $item = $(this);
-            let id  = ($item.children('a').attr('data-id') || '').toLowerCase();
-            let routingPath = ($item.attr('data-routing-path') || '').toLowerCase();
+        onReady('navbar', () => {
+            this.$element.find('.pane-item-container').each(function(i) {
+                let $item = $(this);
+                let id  = ($item.children('a').attr('data-id') || '').toLowerCase();
+                let routingPath = ($item.attr('data-routing-path') || '').toLowerCase();
 
-            $item.toggleClass('active', false);
-            
-            if(
-                id == route.toLowerCase() ||
-                routingPath == route.toLowerCase()
-            ) {
-                $item.toggleClass('active', true);
+                $item.toggleClass('active', false);
+                
+                if(
+                    id == route.toLowerCase() ||
+                    routingPath == route.toLowerCase()
+                ) {
+                    $item.toggleClass('active', true);
 
-                $item.parents('.pane-item-container').toggleClass('open', true);
+                    $item.parents('.pane-item-container').toggleClass('open', true);
 
-                view.showTab($item.parents('.pane-container').attr('data-route'));
-            }
+                    view.showTab($item.parents('.pane-container').attr('data-route'));
+                }
+            });
         });
     }
 

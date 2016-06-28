@@ -7,22 +7,6 @@ let fs = require('fs');
 let rimraf = require('rimraf');
 let multer = require('multer');
 
-// Extend fs
-fs.mkdirParent = function(dirPath, mode, callback) {
-    //Call the standard fs.mkdir
-    fs.mkdir(dirPath, mode, function(error) {
-        //When it fail in this way, do the custom steps
-        if (error && error.errno === 34) {
-            //Create all the parents recursively
-            fs.mkdirParent(path.dirname(dirPath), mode, callback);
-            //And then the directory
-            fs.mkdirParent(dirPath, mode, callback);
-        }
-        //Manually run the callback since we used our own callback to do all these
-        callback && callback(error);
-    });
-};
-
 // Models
 let Media = require('../models/Media');
 
@@ -41,7 +25,7 @@ class MediaHelper {
                     debug.log('Handling file upload...', this);
 
                     if(!fs.existsSync(path)){
-                        fs.mkdirParent(path, null, () => {
+                        this.mkdirRecursively(path, () => {
                             resolve(null, path);
                         });
                     
@@ -71,6 +55,34 @@ class MediaHelper {
         } else {
             return handler.single('media');
         }
+    }
+
+    /**
+     * Makes a directory recursively
+     *
+     * @param {String} dirPath
+     * @param {Function} callback
+     */
+    static mkdirRecursively(dirPath, callback) {
+        return new Promise((resolve, reject) => {
+            let parents = dirPath.split('/');
+            let finalPath = '/';
+
+            for(let i in parents) {
+                finalPath += parents[i];
+
+                if(!fs.existsSync(finalPath)) {
+                    console.log('Creating parent ' + finalPath);
+                    fs.mkdirSync(finalPath);
+                }
+
+                if(i < parents.length - 1) {
+                    finalPath += '/';
+                }
+            }
+            
+            callback();
+        });
     }
 
     /**
@@ -115,30 +127,55 @@ class MediaHelper {
      * @return {Promise} promise
      */
     static setMediaData(id, file) {
-        return new Promise((callback) => {
+        return new Promise((resolve, reject) => {
             let oldPath = file.path;
             let name = path.basename(oldPath);
             let newDir = this.getMediaPath() + id;
             let newPath = newDir + '/' + name;
 
-            debug.log('Setting media data at "' + newPath + '" for id "' + id + '"...', this);
+            debug.log('Setting media data at "' + newPath + '"...', this);
 
+            // First check if the given directory exists
+            // If it doesn't, create it with parents recursively
             if(!fs.existsSync(newDir)){
-                fs.mkdirParent(newDir, null, function() {
-                    fs.rename(oldPath, newPath, function() {
-                        callback();
-                    });
+                this.mkdirRecursively(newDir, (err) => {
+                    if(err) {
+                        reject(new Error(err));
+                    
+                    } else {
+                        // Move the temp file to the new path
+                        fs.rename(oldPath, newPath, function(err) {
+                            if(err) {
+                                reject(new Error(err));
+                            
+                            } else {
+                                resolve();
+
+                            }
+                        });
+                    
+                    }
                 });
 
+            // If it does exist, remove the directory
             } else {
                 rimraf(newDir, function(err) {
                     if(err) {
-                        throw err;
-                    }
+                        reject(new Error(err));
+                    
+                    } else {
+                        // Move the temp file to the new path
+                        fs.rename(oldPath, newPath, function(err) {
+                            if(err) {
+                                reject(new Error(err));
+                            
+                            } else {
+                                resolve();
 
-                    fs.rename(oldPath, newPath, function() {
-                        callback();
-                    });
+                            }
+                        });
+                    
+                    }
                 });
             }
 
