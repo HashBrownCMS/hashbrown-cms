@@ -14,7 +14,7 @@ Router.route('/content/', function() {
 
 // Edit (JSON editor)
 Router.route('/content/json/:id', function() {
-    ContentHelper.getContentByid(this.id)
+    ContentHelper.getContentById(this.id)
     .then((content) => {
         let contentEditor = new JSONEditor({
             model: content

@@ -102,13 +102,13 @@ class MediaReferenceEditor extends View {
     render() {
         let $images;
 
-        if(!editor.config.multiple) {
+        if(!this.config.multiple) {
             $images = _.div({
                 class: 'thumbnail thumbnail-sm',
-                style: 'background-image: url(\'/media/' + editor.value + '\')'
+                style: 'background-image: url(\'/media/' + this.value + '\')'
             });
         } else {
-            $images = _.each(editor.value, (i, val) => {
+            $images = _.each(this.value, (i, val) => {
                 return _.div({
                     class: 'thumbnail thumbnail-sm',
                     style: 'background-image: url(\'/media/' + val + '\')'
@@ -123,7 +123,7 @@ class MediaReferenceEditor extends View {
         this.$footer.html(
             this.$button = _.button({class: 'btn btn-primary'},
                 'Add media'
-            ).click(() => { editor.onClickBrowse(); })
+            ).click(() => { this.onClickBrowse(); })
         );
     }
 }
