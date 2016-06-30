@@ -5,6 +5,7 @@ let restler = require('restler');
 
 let Connection = require(appRoot + '/src/common/models/Connection');
 let Content = require(appRoot + '/src/common/models/Content');
+let Media = require(appRoot + '/src/common/models/Media');
 
 class GitHubConnection extends Connection {
     constructor(data) {
@@ -48,7 +49,8 @@ class GitHubConnection extends Connection {
 
                 if(data) {
                     if(data.message) {
-                        //debug.log('Couldn't find templates. GitHub response: ' + JSON.stringify(data.message), this);
+                        debug.log('Couldn\'t find templates. GitHub response: ' + JSON.stringify(data.message), this);
+                        reject();
                     
                     } else {
                         for(let i in data) {
@@ -82,7 +84,8 @@ class GitHubConnection extends Connection {
 
                 if(data) {
                     if(data.message) {
-                        //debug.log('Couldn't find section templates. GitHub response: ' + JSON.stringify(data.message), this);
+                        debug.log('Couldn\'t find section templates. GitHub response: ' + JSON.stringify(data.message), this);
+                        reject();
 
                     } else {
                         for(let i in data) {
@@ -94,6 +97,168 @@ class GitHubConnection extends Connection {
                 }
 
                 resolve(templates);
+            });
+        });
+    }
+
+    /**
+     * Gets all Media objects
+     *
+     * @returns {Promise(Array)} media
+     */
+    getAllMedia() {
+        return new Promise((resolve, reject) => {
+            let headers = {
+                'Accept': 'application/json'
+            };
+            
+            restler.get('https://api.github.com/repos/' + this.settings.repo + '/contents/media?access_token=' + this.settings.token, {
+                headers: headers
+            }).on('complete', (data, response) => {
+                let media = [];
+
+                if(data) {
+                    if(data.message) {
+                        debug.log('Couldn\'t find media. GitHub response: ' + JSON.stringify(data.message), this);
+                        reject();
+
+                    } else {
+                        for(let i in data) {
+                            let file = data[i];
+                            
+                            media[media.length] = new Media({
+                                name: file.name,
+                                id: file.path.replace('media/', ''),
+                                url: file.download_url
+                            });
+                        }
+                    }
+                }
+
+                resolve(media);
+            });
+        });
+    }
+    
+    /**
+     * Gets a Media object
+     *
+     * @param {String} id
+     *
+     * @returns {Promise(Media)} media
+     */
+    getMedia(id) {
+        return new Promise((resolve, reject) => {
+            let headers = {
+                'Accept': 'application/json'
+            };
+            
+            restler.get('https://api.github.com/repos/' + this.settings.repo + '/contents/media/' + id + '?access_token=' + this.settings.token, {
+                headers: headers
+            }).on('complete', (data, response) => {
+                if(data) {
+                    if(data.message) {
+                        debug.log('Couldn\'t find media. GitHub response: ' + JSON.stringify(data.message), this);
+                        reject();
+
+                    } else {
+                        if(data.length > 0) {
+                            let file = data[0];
+                            
+                            resolve(new Media({
+                                name: file.name,
+                                id: file.path.replace('media/', ''),
+                                url: file.download_url
+                            }));
+
+                        } else {
+                            debug.log('Media folder "' + id + '" was present, but had no content.', this);
+                            reject();
+                
+                        }
+                    }
+                }
+            });
+        });
+    }
+    
+    /**
+     * Sets media
+     *
+     * @param {String} id
+     * @param {Object} file
+     *
+     * @returns {Promise(Array)} media
+     */
+    setMedia(id, file) {
+        return new Promise((resolve, reject) => {
+            let path = 'media/' + id + '/' + file.name;
+
+            let apiPath = 'https://api.github.com/repos/' + this.settings.repo + '/contents/' + path + '?access_token=' + this.settings.token;
+            let headers = {
+                'Accept': 'application/json'
+            };
+
+            debug.log('Uploading "' + path + '"...', this);
+
+            // Fetch first to get the SHA
+            debug.log('Getting SHA...', this);
+            
+            restler.get(apiPath, {
+                headers: headers
+            }).on('complete', (data, response) => {
+                let postData = {
+                    sha: data.sha,
+                    path: path,
+                    message: 'Commit from Endomon CMS',
+                    content: file
+                };
+
+                // Commit the file
+                debug.log('Committing data...', this);
+
+                restler.put(apiPath, {
+                    headers: headers,
+                    data: JSON.stringify(postData)
+                }).on('complete', (data, response) => {
+                    if(data.message) {
+                        debug.log('Committing file failed', this);
+                        debug.log('GitHub response: ' + JSON.stringify(data), this);
+                    
+                    } else {
+                        debug.log('Committed file successfully!', this);
+
+                    }
+
+                    resolve();
+                });
+            });
+        });
+    }
+    
+    /**
+     * Removes media
+     *
+     * @param {String} id
+     *
+     * @returns {Promise(Array)} media
+     */
+    removeMedia(id) {
+        return new Promise((resolve, reject) => {
+            let headers = {
+                'Accept': 'application/json'
+            };
+            
+            restler.del('https://api.github.com/repos/' + this.settings.repo + '/contents/media/' + id + '?access_token=' + this.settings.token, {
+                headers: headers
+            }).on('complete', (data, response) => {
+                if(data.message) {
+                    debug.log('Couldn\'t find media. GitHub response: ' + JSON.stringify(data.message), this);
+                    reject();
+
+                } else {
+                    resolve();
+                }
             });
         });
     }

@@ -18,6 +18,7 @@ class Connection extends Entity {
         this.def(String, 'title');
         this.def(String, 'type');
         this.def(Boolean, 'provideTemplates');
+        this.def(Boolean, 'provideMedia');
         
         // Extensible settings
         this.def(Object, 'settings', {});
@@ -48,7 +49,7 @@ class Connection extends Entity {
             resolve([]);
         });
     }
-    
+
     /**
      * Gets section templates
      *
@@ -60,6 +61,57 @@ class Connection extends Entity {
         });
     }
 
+    /**
+     * Gets all Media objects
+     *
+     * @returns {Promise(Array)} media
+     */
+    getAllMedia() {
+        return new Promise((resolve, reject) => {
+            resolve([]);
+        });
+    }
+    
+    /**
+     * Gets a Media object
+     *
+     * @param {String} id
+     *
+     * @returns {Promise(Media)} media
+     */
+    getMedia(id) {
+        return new Promise((resolve, reject) => {
+            resolve(null);
+        });
+    }
+    
+    /**
+     * Sets media
+     *
+     * @param {String} id
+     * @param {Object} file
+     *
+     * @returns {Promise(Array)} media
+     */
+    setMedia(id, file) {
+        return new Promise((resolve, reject) => {
+            resolve();
+        });
+    }
+    
+    /**
+     * Removes media
+     *
+     * @param {String} id
+     *
+     * @returns {Promise(Array)} media
+     */
+    removeMedia(id) {
+        return new Promise((resolve, reject) => {
+            resolve();
+        });
+    }
+    
     /**
      *  Unpublishes content
      *

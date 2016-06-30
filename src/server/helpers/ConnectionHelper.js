@@ -291,7 +291,62 @@ class ConnectionHelper {
             connection.getFields()
         );
     }
+    
+    /**
+     * Gets the Template provider
+     *
+     * @return {Promise(Connection)} provider
+     */
+    static getTemplateProvider() {
+        return new Promise((resolve, reject) => {
+            ConnectionHelper.getAllConnections()
+            .then((connections) => {
+                let foundProvider = false;
 
+                for(let i in connections) {
+                    if(connections[i].provideTemplates) {
+                        foundProvider = true;
+
+                        resolve(connections[i]);
+                        break;
+                    }
+                }
+
+                if(!foundProvider) {
+                    reject();
+                    debug.error('Found no connection with "provideTemplates" switched on', this);
+                }
+            });            
+        });
+    }
+
+    /**
+     * Gets the Media provider
+     *
+     * @return {Promise(Connection)} provider
+     */
+    static getMediaProvider() {
+        return new Promise((resolve, reject) => {
+            ConnectionHelper.getAllConnections()
+            .then((connections) => {
+                let foundProvider = false;
+
+                for(let i in connections) {
+                    if(connections[i].provideMedia) {
+                        foundProvider = true;
+
+                        resolve(connections[i]);
+                        break;
+                    }
+                }
+
+                if(!foundProvider) {
+                    reject();
+                    debug.error('Found no connection with "provideMedia" switched on', this);
+                }
+            });            
+        });
+    }
 }
 
 module.exports = ConnectionHelper;

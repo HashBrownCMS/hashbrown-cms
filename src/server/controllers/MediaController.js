@@ -16,9 +16,12 @@ class MediaController extends Controller {
     static getMedia(req, res) {
         let id = req.params.id;
 
-        MediaHelper.getMediaData(id)
-        .then(function(data) {
-            res.end(data, 'binary');
+        ConnectionHelper.getMediaProvider()
+        .then((connection) => {
+            connection.getMedia(id)
+            .then((media) => {
+                res.redirect(media.url);
+            });
         });
     }
 }

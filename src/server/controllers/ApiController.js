@@ -31,13 +31,6 @@ class ApiController extends Controller {
         app.post('/api/:project/:environment/schemas/:id', ApiController.setSchema);
         app.delete('/api/:project/:environment/schemas/:id', ApiController.deleteSchema);
         
-        // Media
-        app.post('/api/:project/:environment/media/new', MediaHelper.getUploadHandler(), ApiController.createMedia);
-        app.get('/api/:project/:environment/media/:id', ApiController.getSingleMedia);
-        app.post('/api/:project/:environment/media/:id', MediaHelper.getUploadHandler(), ApiController.setMedia);
-        app.delete('/api/:project/:environment/media/:id', ApiController.deleteMedia);
-        app.get('/api/:project/:environment/media', ApiController.getMedia);
-        
         // Connections
         app.get('/api/:project/:environment/connections', ApiController.getConnections);
         app.get('/api/:project/:environment/connections/:id', ApiController.getConnection);
@@ -59,97 +52,15 @@ class ApiController extends Controller {
         // Templates
         app.get('/api/:project/:environment/templates', ApiController.getTemplates)
         app.get('/api/:project/:environment/sectionTemplates', ApiController.getSectionTemplates)
+        
+        // Media
+        app.post('/api/:project/:environment/media/new', MediaHelper.getUploadHandler(), ApiController.createMedia);
+        app.get('/api/:project/:environment/media/:id', ApiController.getSingleMedia);
+        app.post('/api/:project/:environment/media/:id', MediaHelper.getUploadHandler(), ApiController.setMedia);
+        app.delete('/api/:project/:environment/media/:id', ApiController.deleteMedia);
+        app.get('/api/:project/:environment/media', ApiController.getMedia);
     }
  
-    // ----------
-    // Media methods
-    // ---------- 
-    /**
-     * Gets a list of Media objects
-     */
-    static getMedia(req, res) {
-        ApiController.authenticate(req, res)
-        .then(() => {
-            MediaHelper.getAllMedia()
-            .then(function(paths) {
-                res.send(paths)
-            }); 
-        });
-    }
-    
-    /**
-     * Gets a single Media object
-     */
-    static getSingleMedia(req, res) {
-        ApiController.authenticate(req, res)
-        .then(() => {
-            let id = req.params.id;
-
-            MediaHelper.getMedia(id)
-            .then(function(media) {
-                res.send(media)
-            }); 
-        });
-    }
-    
-    /**
-     * Deletes a Media object
-     */
-    static deleteMedia(req, res) {
-        ApiController.authenticate(req, res)
-        .then(() => {
-            let id = req.params.id;
-
-            MediaHelper.removeMedia(id)
-            .then(function() {
-                res.sendStatus(200);
-            });
-        });
-    }
-
-    /**
-     * Sets a Media object
-     */
-    static setMedia(req, res) {
-        ApiController.authenticate(req, res)
-        .then(() => {
-            let file = req.file;
-            let id = req.params.id;
-
-            if(file) {
-                MediaHelper.setMediaData(id, file)
-                .then(function() {
-                    res.sendStatus(200);
-                });
-                
-            } else {
-                res.sendStatus(400);
-            }
-        });
-    }
-
-    /**
-     * Creates a Media object
-     */
-    static createMedia(req, res) {
-        ApiController.authenticate(req, res)
-        .then(() => {
-            let file = req.file;
-
-            if(file) {
-                let media = Media.create();
-
-                MediaHelper.setMediaData(media.id, file)
-                .then(() => {
-                    res.send(media.id);
-                });
-
-            } else {
-                res.sendStatus(400);
-            }
-        });
-    }
-
     // ----------
     // Content methods
     // ---------- 
@@ -640,6 +551,110 @@ class ApiController extends Controller {
                     res.send([]);
                 }
             });            
+        });
+    }
+    
+    // ----------
+    // Media methods
+    // ---------- 
+    /**
+     * Gets a list of Media objects
+     */
+    static getMedia(req, res) {
+        ApiController.authenticate(req, res)
+        .then(() => {
+            ConnectionHelper.getMediaProvider()
+            .then((connection) => {
+                connection.getAllMedia()
+                .then((media) => {
+                    res.send(media);
+                });
+            });            
+        });
+    }
+    
+    /**
+     * Gets a single Media object
+     */
+    static getSingleMedia(req, res) {
+        ApiController.authenticate(req, res)
+        .then(() => {
+            let id = req.params.id;
+
+            ConnectionHelper.getMediaProvider()
+            .then((connection) => {
+                connection.getMedia(id)
+                .then((media) => {
+                    res.send(media);
+                });
+            });            
+        });
+    }
+    
+    /**
+     * Deletes a Media object
+     */
+    static deleteMedia(req, res) {
+        ApiController.authenticate(req, res)
+        .then(() => {
+            let id = req.params.id;
+
+            ConnectionHelper.getMediaProvider()
+            .then((connection) => {
+                connection.removeMedia(id)
+                .then(() => {
+                    res.sendStatus(200);
+                });
+            });            
+        });
+    }
+
+    /**
+     * Sets a Media object
+     */
+    static setMedia(req, res) {
+        ApiController.authenticate(req, res)
+        .then(() => {
+            let file = req.file;
+            let id = req.params.id;
+
+            if(file) {
+                ConnectionHelper.getMediaProvider()
+                .then((connection) => {
+                    connection.setMedia(id, file)
+                    .then(() => {
+                        res.sendStatus(200);
+                    });
+                });            
+                
+            } else {
+                res.sendStatus(400);
+            }
+        });
+    }
+
+    /**
+     * Creates a Media object
+     */
+    static createMedia(req, res) {
+        ApiController.authenticate(req, res)
+        .then(() => {
+            let file = req.file;
+
+            if(file) {
+                let media = Media.create();
+
+                ConnectionHelper.getMediaProvider()
+                .then((connection) => {
+                    connection.setMedia(media.id, file)
+                    .then(() => {
+                        res.sendStatus(200);
+                    });
+                });            
+
+            } else {
+                res.sendStatus(400);
+            }
         });
     }
 }

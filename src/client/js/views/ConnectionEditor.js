@@ -137,7 +137,7 @@ class ConnectionEditor extends View {
             view.model.provideTemplates = this.checked;
         } 
 
-        let switchId = 'switch-' + $('.switch').length;
+        let switchId = 'switch-provide-templates';
 
         let $editor = _.div({class: 'field-editor switch-editor'},
             _.div({class: 'switch'},
@@ -151,20 +151,20 @@ class ConnectionEditor extends View {
     }
     
     /**
-     * Renders the media publish editor
+     * Renders the media provider editor
      */
-    renderPublishMediaEditor() {
+    renderMediaProviderEditor() {
         let view = this;
 
         function onChange() {
-            view.model.publishMedia = this.checked;
+            view.model.provideMedia = this.checked;
         } 
 
-        let switchId = 'switch-' + $('.switch').length;
+        let switchId = 'switch-provide-media';
 
         let $editor = _.div({class: 'field-editor switch-editor'},
             _.div({class: 'switch'},
-                _.input({id: switchId, class: 'form-control switch', type: 'checkbox', checked: this.model.publishMedia})
+                _.input({id: switchId, class: 'form-control switch', type: 'checkbox', checked: this.model.provideMedia})
                     .change(onChange),
                 _.label({for: switchId})
             )
@@ -247,10 +247,10 @@ class ConnectionEditor extends View {
                             this.renderTemplateProviderEditor()
                         )
                     ),
-                    _.div({class: 'field-container template-provider'},
-                        _.div({class: 'field-key'}, 'Publish media'),
+                    _.div({class: 'field-container media-provider'},
+                        _.div({class: 'field-key'}, 'Provide media'),
                         _.div({class: 'field-value'},
-                            this.renderPublishMediaEditor()
+                            this.renderMediaProviderEditor()
                         )
                     ),
                     this.renderSettingsEditor()
@@ -265,7 +265,7 @@ class ConnectionEditor extends View {
                         ).click(function() { view.onClickDelete(); }),
                         view.$saveBtn = _.button({class: 'btn btn-success btn-raised btn-save'},
                             _.span({class: 'text-default'}, 'Save '),
-                            _.span({class: 'text-saving'}, 'Saving ')
+                            _.span({class: 'text-working'}, 'Saving ')
                         ).click(function() { view.onClickSave(); })
                     )
                 )
