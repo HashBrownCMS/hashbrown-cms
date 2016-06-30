@@ -150,38 +150,6 @@ class GitHubConnection extends Connection {
                     reject();
                 }
             });
-
-            /* 
-            restler.get('https://api.github.com/repos/' + this.settings.repo + '/contents/media?access_token=' + this.settings.token, {
-                headers: headers
-            }).on('complete', (data, response) => {
-                if(data) {
-                    if(data.message) {
-                        debug.log('Couldn\'t find media. GitHub response: ' + JSON.stringify(data.message), this);
-                        reject();
-
-                    } else {
-                        let media = [];
-
-                        for(let i in data) {
-                            let file = data[i];
-                            
-                            media[media.length] = new Media({
-                                name: file.name,
-                                id: file.path.replace('media/', ''),
-                                url: file.download_url
-                            });
-                        }
-
-                        resolve(media);
-                    }
-
-                } else {
-                    debug.log('No data in GitHub response', this);
-                    reject();
-                }
-            });
-            */
         });
     }
     
@@ -299,19 +267,57 @@ class GitHubConnection extends Connection {
      */
     removeMedia(id) {
         return new Promise((resolve, reject) => {
+            let apiPath = 'https://api.github.com/repos/' + this.settings.repo + '/contents/';
+            let dirApiPath = apiPath + 'media/' + id + '?access_token=' + this.settings.token;
             let headers = {
                 'Accept': 'application/json'
             };
             
-            restler.del('https://api.github.com/repos/' + this.settings.repo + '/contents/media/' + id + '?access_token=' + this.settings.token, {
+            // Fetch first to get the SHA
+            debug.log('Getting SHA...', this);
+            
+            restler.get(dirApiPath, {
                 headers: headers
             }).on('complete', (data, response) => {
                 if(data.message) {
-                    debug.log('Couldn\'t find media. GitHub response: ' + JSON.stringify(data.message), this);
-                    reject();
+                    debug.log('Getting SHA failed', this);
+                    debug.log('GitHub response: ' + JSON.stringify(data), this);
 
                 } else {
-                    resolve();
+                    let sha;
+                    let fileApiPath;
+
+                    if(data.length > 0) {
+                        sha = data[0].sha;
+                        fileApiPath = apiPath + 'media/' + id + '/' + data[0].name + '?access_token=' + this.settings.token;
+                    }
+
+                    let postData = {
+                        sha: sha,
+                        path: 'media/' + id,
+                        message: 'Removed by Endomon CMS',
+                    };
+
+                    // Remove the file
+                    debug.log('Removing data...', this);
+
+                    restler.del(fileApiPath, {
+                        headers: headers,
+                        data: JSON.stringify(postData)
+                    }).on('complete', (data, response) => {
+                        if(data.message) {
+                            debug.log('Removing file failed', this);
+                            debug.log('Api path: ' + fileApiPath, this);
+                            debug.log('GitHub response: ' + JSON.stringify(data), this);
+                        
+                        } else {
+                            debug.log('Removed file successfully!', this);
+
+                        }
+
+                        resolve();
+
+                    });
                 }
             });
         });
