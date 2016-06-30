@@ -3,6 +3,7 @@
 let yamljs = require('../lib/yamljs/Yaml');
 let restler = require('restler');
 let fs = require('fs');
+let path = require('path');
 
 let Connection = require(appRoot + '/src/common/models/Connection');
 let Content = require(appRoot + '/src/common/models/Content');
@@ -112,7 +113,45 @@ class GitHubConnection extends Connection {
             let headers = {
                 'Accept': 'application/json'
             };
-            
+           
+            // Grab SHA first
+            restler.get('https://api.github.com/repos/' + this.settings.repo + '/commits/HEAD?access_token=' + this.settings.token, {
+                headers: headers
+            }).on('complete', (data, response) => {
+                if(data) {
+                    let sha = data.sha;
+
+                    restler.get('https://api.github.com/repos/' + this.settings.repo + '/git/trees/' + sha + '?recursive=1&access_token=' + this.settings.token, {
+                        headers: headers
+                    }).on('complete', (data, response) => {
+                        if(data) {
+                            let media = [];
+
+                            for(let node of data.tree) {
+                                if(node.path.indexOf('media/') == 0 && node.mode == '100644') {
+                                    media[media.length] = new Media({
+                                        name: path.basename(node.path),
+                                        id: path.dirname(node.path).replace('media/', ''),
+                                        url: node.path
+                                    });
+                                }
+                            }
+
+                            resolve(media);    
+                        
+                        } else {
+                            debug.log('No data in GitHub response', this);
+                            reject();
+                        }
+                    });
+
+                } else {
+                    debug.log('No data in GitHub response', this);
+                    reject();
+                }
+            });
+
+            /* 
             restler.get('https://api.github.com/repos/' + this.settings.repo + '/contents/media?access_token=' + this.settings.token, {
                 headers: headers
             }).on('complete', (data, response) => {
@@ -142,6 +181,7 @@ class GitHubConnection extends Connection {
                     reject();
                 }
             });
+            */
         });
     }
     
