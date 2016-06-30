@@ -32,11 +32,11 @@ window.LanguageSettings = require('./views/LanguageSettings');
 window.Content = require('./models/Content');
 
 // Helpers
-//window.ConnectionHelper = require('./helpers/ConnectionHelper');
-//window.MediaHelper = require('./helpers/MediaHelper');
+window.ProjectHelper = require('./helpers/ProjectHelper');
+window.MediaHelper = require('./helpers/MediaHelper');
+window.ConnectionHelper = require('./helpers/ConnectionHelper');
 window.ContentHelper = require('./helpers/ContentHelper');
 window.LanguageHelper = require('./helpers/LanguageHelper');
-window.ProjectHelper = require('./helpers/ProjectHelper');
 window.SchemaHelper = require('./helpers/SchemaHelper');
 window.SettingsHelper = require('./helpers/SettingsHelper');
 

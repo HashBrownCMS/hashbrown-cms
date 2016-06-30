@@ -20,7 +20,11 @@ class MediaController extends Controller {
         .then((connection) => {
             connection.getMedia(id)
             .then((media) => {
-                res.redirect(media.url);
+                if(media) {
+                    res.redirect(media.url);
+                } else {
+                    res.sendStatus(404);
+                }
             });
         });
     }

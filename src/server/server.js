@@ -3,12 +3,12 @@
 // ----------
 // Libs
 // ----------
-let Promise = require('bluebird');
 let express = require('express');
 let bodyparser = require('body-parser');
 let exec = require('child_process').exec;
 
-Promise.onPossiblyUnhandledRejection(function(error){
+Promise.onPossiblyUnhandledRejection((error, promise) => {
+//    debug.warning(error, Promise);
     throw error;
 });
 

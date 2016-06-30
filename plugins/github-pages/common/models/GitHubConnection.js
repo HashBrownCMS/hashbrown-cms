@@ -162,39 +162,55 @@ class GitHubConnection extends Connection {
      */
     getMedia(id) {
         return new Promise((resolve, reject) => {
-            let headers = {
-                'Accept': 'application/json'
-            };
-            
-            restler.get('https://api.github.com/repos/' + this.settings.repo + '/contents/media/' + id + '?access_token=' + this.settings.token, {
-                headers: headers
-            }).on('complete', (data, response) => {
-                if(data) {
-                    if(data.message) {
-                        debug.log('Couldn\'t find media. GitHub response: ' + JSON.stringify(data.message), this);
-                        reject();
-
-                    } else {
-                        if(data.length > 0) {
-                            let file = data[0];
-                            
-                            resolve(new Media({
-                                name: file.name,
-                                id: file.path.replace('media/', ''),
-                                url: file.download_url
-                            }));
+            if(id && id != 'undefined' && id != 'null') {
+                let headers = {
+                    'Accept': 'application/json'
+                };
+                
+                restler.get('https://api.github.com/repos/' + this.settings.repo + '/contents/media/' + id + '?access_token=' + this.settings.token, {
+                    headers: headers
+                }).on('complete', (data, response) => {
+                    if(data) {
+                        if(data.message) {
+                            debug.log('Couldn\'t find media. GitHub response: ' + JSON.stringify(data.message), this);
+                            resolve(null);
 
                         } else {
-                            debug.log('Media folder "' + id + '" was present, but had no content.', this);
-                            reject();
-                
+                            if(data.length > 0) {
+                                let file = data[0];
+                                
+                                resolve(new Media({
+                                    name: file.name,
+                                    id: file.path.replace('media/', ''),
+                                    url: file.download_url
+                                }));
+
+                            } else {
+                                debug.log('Media folder "' + id + '" was present, but had no content.', this);
+                                resolve(null);
+                    
+                            }
                         }
+                    } else {
+                        debug.log('No data in GitHub response', this);
+                        resolve();
                     }
-                }
-            });
+                });
+            } else {
+                resolve(null);
+            }
         });
     }
-    
+   
+    /**
+     * Gets the media path
+     *
+     * @returns {String} path
+     */
+    getMediaPath() {
+        return 'https://raw.githubusercontent.com/' + this.settings.repo + '/master/media/';
+    }
+
     /**
      * Sets media
      *

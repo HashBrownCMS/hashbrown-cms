@@ -10,7 +10,9 @@ let multer = require('multer');
 // Models
 let Media = require('../models/Media');
 
-class MediaHelper {
+let MediaHelperCommon = require('../../common/helpers/MediaHelper');
+
+class MediaHelper extends MediaHelperCommon {
     /**
      * Gets the upload handler
      *
@@ -148,18 +150,18 @@ class MediaHelper {
 
         });
     }
-
+    
     /**
-     * Gets the medie temp path
+     * Gets the media temp path
      *
      * @returns {String} path
      */
     static getTempPath() {
         let path = 
             appRoot +
-            '/projects/' +
+            '/storage/' +
             ProjectHelper.currentProject +
-            '/storage/temp';
+            '/temp';
 
         return path;
     }

@@ -69,7 +69,7 @@ class MediaReferenceEditor extends View {
                                     {
                                         class: 'thumbnail thumbnail-sm',
                                         'data-id': media.id,
-                                        style: 'background-image: url(\'/media/' + media.id + '\')'
+                                        style: 'background-image: url(\'/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + media.id + '\')'
                                     },
                                     _.label(media.name)  
                                 ).click(onClick);
@@ -105,13 +105,13 @@ class MediaReferenceEditor extends View {
         if(!this.config.multiple) {
             $images = _.div({
                 class: 'thumbnail thumbnail-sm',
-                style: 'background-image: url(\'/media/' + this.value + '\')'
+                style: 'background-image: url(\'/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + this.value + '\')'
             });
         } else {
             $images = _.each(this.value, (i, val) => {
                 return _.div({
                     class: 'thumbnail thumbnail-sm',
-                    style: 'background-image: url(\'/media/' + val + '\')'
+                    style: 'background-image: url(\'/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + val + '\')'
                 });
             });
         }

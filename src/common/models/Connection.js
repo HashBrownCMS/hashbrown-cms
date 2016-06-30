@@ -62,6 +62,15 @@ class Connection extends Entity {
     }
 
     /**
+     * Gets the media path
+     *
+     * @returns {String} path
+     */
+    getMediaPath() {
+        return '';
+    }
+
+    /**
      * Gets all Media objects
      *
      * @returns {Promise(Array)} media
