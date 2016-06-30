@@ -22,7 +22,7 @@ class MediaHelper {
                 destination: (req, file, resolve) => {
                     let path = MediaHelper.getTempPath();
                    
-                    debug.log('Handling file upload...', this);
+                    debug.log('Handling file upload to temp storage...', this);
 
                     if(!fs.existsSync(path)){
                         this.mkdirRecursively(path, () => {
@@ -34,7 +34,7 @@ class MediaHelper {
 
                     }
                 },
-                filename: (req, file, cb) => {
+                filename: (req, file, resolve) => {
                     let split = file.originalname.split('.');
                     let name = split[0];
                     let extension = split[1];
@@ -45,7 +45,7 @@ class MediaHelper {
                         name += '.' + extension;
                     }
 
-                    cb(null, name);
+                    resolve(null, name);
                 }
             })
         })
@@ -82,39 +82,6 @@ class MediaHelper {
             }
             
             callback();
-        });
-    }
-
-    /**
-     * Gets all Media objects
-     *
-     * @return {Promise} promise
-     */
-    static getAllMedia() {
-        return new Promise((callback) => {
-            let mediaPath = this.getMediaPath() + '*/*';
-            
-            glob(mediaPath, function(err, paths) {
-                let list = [];
-                
-                for(let i in paths) {
-                    let name = path.basename(paths[i]);
-                    let id = paths[i];
-                    
-                    id = id.replace('/' + name, '');
-                    id = id.substring(id.lastIndexOf('/') + 1);
-
-                    // Remove file extension
-                    name = name.replace(/\.[^/.]+$/, '');
-
-                    list[list.length] = {
-                        id: id,
-                        name: name
-                    };
-                }
-                                       
-                callback(list);
-            });
         });
     }
 
@@ -182,104 +149,6 @@ class MediaHelper {
         });
     }
 
-    /**
-     * Gets a Media object
-     *
-     * @param {String} id
-     *
-     * @returns {Promise(Media)} media
-     */
-    static getMedia(id) {
-        return new Promise((resolve) => {
-            let mediaPath = this.getMediaPath() + id + '/*';
-            
-            glob(mediaPath, function(err, paths) {
-                if(paths && paths.length > 0) {
-                    let filePath = paths[0];
-                    let media = new Media();
-                    
-                    media.readFromFilePath(filePath);
-                    
-                    resolve(media);
-
-                } else {
-                    resolve(null);
-
-                }
-            });
-        });
-    }
-
-    /**
-     * Gets data of a Media object
-     *
-     * @param {Number} id
-     *
-     * @return {Promise} data
-     */
-    static getMediaData(id) {
-        return new Promise((callback) => {
-            let path = this.getMediaPath() + id;
-            
-            fs.readdir(path, (err, files) => {
-                if(err) {
-                    debug.error(err, this);
-                }
-
-                if(files && files.length > 0) {
-                    fs.readFile(path + '/' + files[0], 'binary', function(err, data) {
-                        if(err) {
-                            throw err;
-                        }
-
-                        callback(data);
-                    });
-                } else {
-                    callback(null);
-                
-                }
-            });
-        });
-    }
-
-    /**
-     * Removes a Media object
-     *
-     * @param {Number} id
-     *
-     * @return {Promise} promise
-     */
-    static removeMedia(id) {
-        return new Promise((callback) => {
-            let path = this.getMediaPath() + id;
-            
-            rimraf(path, function(err) {
-                if(err) {
-                    throw err;
-                }
-
-                callback();
-            });
-        });
-    }
-
-    /**
-     * Gets the media root path
-     *
-     * @returns {String} path
-     */
-    static getMediaPath() {
-        let path = 
-            appRoot +
-            '/projects/' +
-            ProjectHelper.currentProject + 
-            '/storage/' +
-            ProjectHelper.currentEnvironment +
-            '/media/';
-
-        return path;
-    }
-    
     /**
      * Gets the medie temp path
      *

@@ -1,5 +1,8 @@
 'use strict';
 
+// Libs
+let fs = require('fs');
+
 // Models
 let Media = require('../models/Media');
 let Content = require('../models/Content');
@@ -500,26 +503,15 @@ class ApiController extends Controller {
     static getTemplates(req, res) {
         ApiController.authenticate(req, res)
         .then(() => {
-            ConnectionHelper.getAllConnections()
-            .then((connections) => {
-                let foundProvider = false;
-
-                for(let i in connections) {
-                    if(connections[i].provideTemplates) {
-                        foundProvider = true;
-
-                        connections[i].getTemplates()
-                        .then((templates) => {
-                            res.send(templates);
-                        });
-
-                        break;
-                    }
-                }
-
-                if(!foundProvider) {
-                    res.send([]);
-                }
+            ConnectionHelper.getTemplateProvider()
+            .then((connection) => {
+                connection.getTemplates()
+                .then((templates) => {
+                    res.send(templates);
+                });
+            })
+            .catch(() => {
+                res.send([]);
             });            
         });
     }
@@ -530,26 +522,15 @@ class ApiController extends Controller {
     static getSectionTemplates(req, res) {
         ApiController.authenticate(req, res)
         .then(() => {
-            ConnectionHelper.getAllConnections()
-            .then((connections) => {
-                let foundProvider = false;
-
-                for(let i in connections) {
-                    if(connections[i].provideTemplates) {
-                        foundProvider = true;
-
-                        connections[i].getSectionTemplates()
-                        .then((templates) => {
-                            res.send(templates);
-                        });
-
-                        break;
-                    }
-                }
-
-                if(!foundProvider) {
-                    res.send([]);
-                }
+            ConnectionHelper.getTemplateProvider()
+            .then((connection) => {
+                connection.getSectionTemplates()
+                .then((templates) => {
+                    res.send(templates);
+                });
+            })
+            .catch(() => {
+                res.send([]);
             });            
         });
     }
@@ -568,7 +549,13 @@ class ApiController extends Controller {
                 connection.getAllMedia()
                 .then((media) => {
                     res.send(media);
-                });
+                })
+                .catch(() => {
+                    res.send([]);    
+                });            
+            })
+            .catch(() => {
+                res.send([]);    
             });            
         });
     }
@@ -586,7 +573,13 @@ class ApiController extends Controller {
                 connection.getMedia(id)
                 .then((media) => {
                     res.send(media);
-                });
+                })
+                .catch(() => {
+                    res.send(null);    
+                });            
+            })            
+            .catch(() => {
+                res.send(null);    
             });            
         });
     }
@@ -604,7 +597,13 @@ class ApiController extends Controller {
                 connection.removeMedia(id)
                 .then(() => {
                     res.sendStatus(200);
-                });
+                })
+                .catch(() => {
+                    res.sendStatus(404);    
+                });            
+            })            
+            .catch(() => {
+                res.sendStatusi(400);    
             });            
         });
     }
@@ -623,8 +622,16 @@ class ApiController extends Controller {
                 .then((connection) => {
                     connection.setMedia(id, file)
                     .then(() => {
+                        fs.unlinkSync(file.path);
+                        
                         res.sendStatus(200);
-                    });
+                    })
+                    .catch(() => {
+                        res.sendStatusi(400);    
+                    });            
+                })            
+                .catch(() => {
+                    res.sendStatusi(400);    
                 });            
                 
             } else {
@@ -648,9 +655,17 @@ class ApiController extends Controller {
                 .then((connection) => {
                     connection.setMedia(media.id, file)
                     .then(() => {
-                        res.sendStatus(200);
+                        fs.unlinkSync(file.path);
+
+                        res.send(media.id);
+                    })
+                    .catch(() => {
+                        res.sendStatusi(400);    
                     });
-                });            
+                })            
+                .catch(() => {
+                    res.sendStatusi(400);    
+                });
 
             } else {
                 res.sendStatus(400);

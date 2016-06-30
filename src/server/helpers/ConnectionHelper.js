@@ -182,7 +182,7 @@ class ConnectionHelper {
 
                     callback(connection);
                 } else {
-                    throw '[MongoHelper] Found no connection with id "' + id + '"';
+                    debug.error('Found no connection with id "' + id + '"', this);
 
                 }
             });
@@ -314,7 +314,7 @@ class ConnectionHelper {
 
                 if(!foundProvider) {
                     reject();
-                    debug.error('Found no connection with "provideTemplates" switched on', this);
+                    debug.log('Found no connection with "provideTemplates" switched on', this);
                 }
             });            
         });
@@ -342,7 +342,7 @@ class ConnectionHelper {
 
                 if(!foundProvider) {
                     reject();
-                    debug.error('Found no connection with "provideMedia" switched on', this);
+                    debug.log('Found no connection with "provideMedia" switched on', this);
                 }
             });            
         });

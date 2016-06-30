@@ -2,6 +2,7 @@
 
 let yamljs = require('../lib/yamljs/Yaml');
 let restler = require('restler');
+let fs = require('fs');
 
 let Connection = require(appRoot + '/src/common/models/Connection');
 let Content = require(appRoot + '/src/common/models/Content');
@@ -115,14 +116,14 @@ class GitHubConnection extends Connection {
             restler.get('https://api.github.com/repos/' + this.settings.repo + '/contents/media?access_token=' + this.settings.token, {
                 headers: headers
             }).on('complete', (data, response) => {
-                let media = [];
-
                 if(data) {
                     if(data.message) {
                         debug.log('Couldn\'t find media. GitHub response: ' + JSON.stringify(data.message), this);
                         reject();
 
                     } else {
+                        let media = [];
+
                         for(let i in data) {
                             let file = data[i];
                             
@@ -132,10 +133,14 @@ class GitHubConnection extends Connection {
                                 url: file.download_url
                             });
                         }
-                    }
-                }
 
-                resolve(media);
+                        resolve(media);
+                    }
+
+                } else {
+                    debug.log('No data in GitHub response', this);
+                    reject();
+                }
             });
         });
     }
@@ -192,46 +197,55 @@ class GitHubConnection extends Connection {
      */
     setMedia(id, file) {
         return new Promise((resolve, reject) => {
-            let path = 'media/' + id + '/' + file.name;
+            let tempPath = file.path;
+            let newPath = 'media/' + id + '/' + file.filename;
 
-            let apiPath = 'https://api.github.com/repos/' + this.settings.repo + '/contents/' + path + '?access_token=' + this.settings.token;
+            let apiPath = 'https://api.github.com/repos/' + this.settings.repo + '/contents/' + newPath + '?access_token=' + this.settings.token;
             let headers = {
                 'Accept': 'application/json'
             };
 
-            debug.log('Uploading "' + path + '"...', this);
+            debug.log('Uploading media "' + id + '"...', this);
 
-            // Fetch first to get the SHA
-            debug.log('Getting SHA...', this);
-            
-            restler.get(apiPath, {
-                headers: headers
-            }).on('complete', (data, response) => {
-                let postData = {
-                    sha: data.sha,
-                    path: path,
-                    message: 'Commit from Endomon CMS',
-                    content: file
-                };
-
-                // Commit the file
-                debug.log('Committing data...', this);
-
-                restler.put(apiPath, {
-                    headers: headers,
-                    data: JSON.stringify(postData)
-                }).on('complete', (data, response) => {
-                    if(data.message) {
-                        debug.log('Committing file failed', this);
-                        debug.log('GitHub response: ' + JSON.stringify(data), this);
+            fs.readFile(tempPath, (err, fileData) => {
+                if(err) {
+                    reject();
+                    debug.error(err);
+                
+                } else {
+                    // Fetch first to get the SHA
+                    debug.log('Getting SHA...', this);
                     
-                    } else {
-                        debug.log('Committed file successfully!', this);
+                    restler.get(apiPath, {
+                        headers: headers
+                    }).on('complete', (data, response) => {
+                        let postData = {
+                            sha: data.sha,
+                            path: newPath,
+                            message: 'Commit from Endomon CMS',
+                            content: new Buffer(fileData).toString('base64')
+                        };
 
-                    }
+                        // Commit the file
+                        debug.log('Committing media data...', this);
 
-                    resolve();
-                });
+                        restler.put(apiPath, {
+                            headers: headers,
+                            data: JSON.stringify(postData)
+                        }).on('complete', (data, response) => {
+                            if(data.message) {
+                                debug.log('Committing file failed', this);
+                                debug.log('GitHub response: ' + JSON.stringify(data), this);
+                            
+                            } else {
+                                debug.log('Committed file successfully!', this);
+
+                            }
+
+                            resolve();
+                        });
+                    });
+                }
             });
         });
     }
