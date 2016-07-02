@@ -512,9 +512,18 @@ class NavbarMain extends View {
     }
 
     /**
+     * Event: Click replace media
+     */
+    onClickReplaceMedia() {
+        let id = $('.context-menu-target-element').data('id');
+
+        onClickUploadMedia(id);
+    }
+
+    /**
      * Event: Click upload media
      */
-    onClickUploadMedia() {
+    onClickUploadMedia(replaceId) {
         let view = this;
 
         function onChangeFile() {
@@ -569,8 +578,10 @@ class NavbarMain extends View {
 
             $uploadModal.find('.spinner-container').toggleClass('hidden', false);
             
+            let apiPath = 'media/' + replaceId ? replaceId : 'new';
+
             $.ajax({
-                url: apiUrl('media/new'),
+                url: apiUrl(apiPath),
                 type: 'POST',
                 data: new FormData(this),
                 processData: false,
@@ -1114,7 +1125,8 @@ class NavbarMain extends View {
                     // Item context menu
                     itemContextMenu: {
                         'This media': '---',
-                        'Remove': function() { view.onClickRemoveMedia(); }
+                        'Remove': function() { view.onClickRemoveMedia(); },
+                        'Replace': function() { view.onClickReplaceMedia(); }
                     },
 
                     // General context menu
