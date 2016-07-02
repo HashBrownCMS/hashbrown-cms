@@ -517,7 +517,7 @@ class NavbarMain extends View {
     onClickReplaceMedia() {
         let id = $('.context-menu-target-element').data('id');
 
-        onClickUploadMedia(id);
+        this.onClickUploadMedia(id);
     }
 
     /**
@@ -578,7 +578,7 @@ class NavbarMain extends View {
 
             $uploadModal.find('.spinner-container').toggleClass('hidden', false);
             
-            let apiPath = 'media/' + replaceId ? replaceId : 'new';
+            let apiPath = 'media/' + (replaceId ? replaceId : 'new');
 
             $.ajax({
                 url: apiUrl(apiPath),

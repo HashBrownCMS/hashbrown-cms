@@ -222,38 +222,40 @@ class GitHubConnection extends Connection {
     setMedia(id, file) {
         return new Promise((resolve, reject) => {
             let tempPath = file.path;
-            let newPath = 'media/' + id + '/' + file.filename;
-
-            let apiPath = 'https://api.github.com/repos/' + this.settings.repo + '/contents/' + newPath + '?access_token=' + this.settings.token;
+            let apiUrl = 'https://api.github.com/repos/' + this.settings.repo + '/contents/media/' + id;
+            let dirApiPath = apiUrl + '?access_token=' + this.settings.token;
+            let fileApiPath = apiUrl + '/' + file.filename + '?access_token=' + this.settings.token;
             let headers = {
                 'Accept': 'application/json'
             };
 
             debug.log('Uploading media "' + id + '"...', this);
 
+            // Read the file from the temporary storage
             fs.readFile(tempPath, (err, fileData) => {
                 if(err) {
-                    reject();
-                    debug.error(err);
+                    // We couldn't read the temp file, rejecting
+                    reject(new Error(err));
                 
                 } else {
-                    // Fetch first to get the SHA
-                    debug.log('Getting SHA...', this);
+                    // Remove whatever media already exists in the folder
+                    debug.log('Removing existing content if any...', this);
                     
-                    restler.get(apiPath, {
-                        headers: headers
-                    }).on('complete', (data, response) => {
+                    this.removeMedia(id)
+                    .then(() => {
+                        // Define the POST data
+                        // SHA is not needed, since we emptied the folder first
                         let postData = {
-                            sha: data.sha,
-                            path: newPath,
+                            path: 'media/' + id + '/' + file.filename,
                             message: 'Commit from Endomon CMS',
                             content: new Buffer(fileData).toString('base64')
                         };
 
                         // Commit the file
-                        debug.log('Committing media data...', this);
+                        debug.log('Committing media data to ' + postData.path + '...', this);
 
-                        restler.put(apiPath, {
+                        // PUT the content
+                        restler.put(fileApiPath, {
                             headers: headers,
                             data: JSON.stringify(postData)
                         }).on('complete', (data, response) => {
@@ -290,50 +292,67 @@ class GitHubConnection extends Connection {
             };
             
             // Fetch first to get the SHA
-            debug.log('Getting SHA...', this);
+            debug.log('Getting existing files...', this);
             
             restler.get(dirApiPath, {
                 headers: headers
             }).on('complete', (data, response) => {
-                if(data.message) {
-                    debug.log('Getting SHA failed', this);
-                    debug.log('GitHub response: ' + JSON.stringify(data), this);
+                let removeNext = (i) => {
+                    // Check if data object is empty
+                    if(data[i] && typeof data[i] !== 'undefined') {
+                        let sha = data[i].sha;
+                        let fileApiPath = apiPath + 'media/' + id + '/' + data[i].name + '?access_token=' + this.settings.token;
+                        let postData = {
+                            sha: sha,
+                            path: 'media/' + id,
+                            message: 'Removed by Endomon CMS',
+                        };
 
-                } else {
-                    let sha;
-                    let fileApiPath;
+                        // Remove the file
+                        debug.log('Removing data...', this);
 
-                    if(data.length > 0) {
-                        sha = data[0].sha;
-                        fileApiPath = apiPath + 'media/' + id + '/' + data[0].name + '?access_token=' + this.settings.token;
-                    }
+                        restler.del(fileApiPath, {
+                            headers: headers,
+                            data: JSON.stringify(postData)
+                        }).on('complete', (data, response) => {
+                            if(data.message) {
+                                debug.log('Removing file failed', this);
+                                debug.log('Api path: ' + fileApiPath, this);
+                                debug.log('GitHub response: ' + JSON.stringify(data), this);
+                            
+                            } else {
+                                debug.log('Removed file successfully!', this);
 
-                    let postData = {
-                        sha: sha,
-                        path: 'media/' + id,
-                        message: 'Removed by Endomon CMS',
-                    };
+                            }
 
-                    // Remove the file
-                    debug.log('Removing data...', this);
+                            // Increment index and check if any more files are queued
+                            i++;
 
-                    restler.del(fileApiPath, {
-                        headers: headers,
-                        data: JSON.stringify(postData)
-                    }).on('complete', (data, response) => {
-                        if(data.message) {
-                            debug.log('Removing file failed', this);
-                            debug.log('Api path: ' + fileApiPath, this);
-                            debug.log('GitHub response: ' + JSON.stringify(data), this);
-                        
-                        } else {
-                            debug.log('Removed file successfully!', this);
+                            // If not, resolve the promise
+                            if(i >= data.length) {
+                                resolve();
 
-                        }
+                            // If there are, process next file
+                            } else {
+                                removeNext(i);
+                            }
+                        });
 
+                    // If we got an empty object, resolve
+                    } else {
                         resolve();
+                    }
+                }
 
-                    });
+                // The response contains 1 or more files, delete them one by one
+                if(data && data.length > 0) {
+                    removeNext(0);
+
+                // If it doesn't, just return
+                } else {
+                    debug.log('Found no files to remove in media/' + id, this);
+                    resolve();
+                
                 }
             });
         });

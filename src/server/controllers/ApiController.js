@@ -510,7 +510,7 @@ class ApiController extends Controller {
                     res.send(templates);
                 });
             })
-            .catch(() => {
+            .catch((e) => {
                 res.send([]);
             });            
         });
@@ -529,7 +529,7 @@ class ApiController extends Controller {
                     res.send(templates);
                 });
             })
-            .catch(() => {
+            .catch((e) => {
                 res.send([]);
             });            
         });
@@ -550,11 +550,11 @@ class ApiController extends Controller {
                 .then((media) => {
                     res.send(media);
                 })
-                .catch(() => {
+                .catch((e) => {
                     res.send([]);    
                 });            
             })
-            .catch(() => {
+            .catch((e) => {
                 res.send([]);    
             });            
         });
@@ -574,11 +574,11 @@ class ApiController extends Controller {
                 .then((media) => {
                     res.send(media);
                 })
-                .catch(() => {
+                .catch((e) => {
                     res.send(null);    
                 });            
             })            
-            .catch(() => {
+            .catch((e) => {
                 res.send(null);    
             });            
         });
@@ -598,12 +598,13 @@ class ApiController extends Controller {
                 .then(() => {
                     res.sendStatus(200);
                 })
-                .catch(() => {
+                .catch((e) => {
                     res.sendStatus(404);    
                 });            
             })            
-            .catch(() => {
-                res.sendStatusi(400);    
+            .catch((e) => {
+                debug.warning(e);
+                res.sendStatus(400);    
             });            
         });
     }
@@ -622,19 +623,24 @@ class ApiController extends Controller {
                 .then((connection) => {
                     connection.setMedia(id, file)
                     .then(() => {
+                        // Remove temp file
                         fs.unlinkSync(file.path);
-                        
-                        res.sendStatus(200);
+
+                        // Return the id
+                        res.send(id);
                     })
-                    .catch(() => {
-                        res.sendStatusi(400);    
+                    .catch((e) => {
+                        debug.warning(e);
+                        res.sendStatus(400);    
                     });            
                 })            
-                .catch(() => {
-                    res.sendStatusi(400);    
+                .catch((e) => {
+                    debug.warning(e);
+                    res.sendStatus(400);    
                 });            
-                
+
             } else {
+                debug.warning(e);
                 res.sendStatus(400);
             }
         });
@@ -645,30 +651,33 @@ class ApiController extends Controller {
      */
     static createMedia(req, res) {
         ApiController.authenticate(req, res)
-        .then(() => {
-            let file = req.file;
+            .then(() => {
+                let file = req.file;
 
-            if(file) {
-                let media = Media.create();
+                if(file) {
+                    let media = Media.create();
 
-                ConnectionHelper.getMediaProvider()
-                .then((connection) => {
-                    connection.setMedia(media.id, file)
-                    .then(() => {
-                        fs.unlinkSync(file.path);
+                    ConnectionHelper.getMediaProvider()
+                        .then((connection) => {
+                            connection.setMedia(media.id, file)
+                                .then(() => {
+                                    fs.unlinkSync(file.path);
 
-                        res.send(media.id);
-                    })
-                    .catch(() => {
-                        res.sendStatusi(400);    
+                                    res.send(media.id);
+                                })
+                            .catch((e) => {
+                                debug.warning(e);
+                                res.sendStatus(400);    
+                            });
+                        })            
+                    .catch((e) => {
+                        debug.warning(e);
+                        res.sendStatus(400);    
                     });
-                })            
-                .catch(() => {
-                    res.sendStatusi(400);    
-                });
 
-            } else {
-                res.sendStatus(400);
+                } else {
+                    debug.warning(e);
+                    res.sendStatus(400);    
             }
         });
     }
