@@ -88,10 +88,18 @@ class MediaViewer extends View {
 
         this.$element.empty().append(
             _.div({class: 'media-heading'},
-                _.h4(this.model.name)
+                _.h4({class: 'media-title'}, this.model.name),
+                _.p({class: 'media-data'})
             ),
             _.div({class: 'media-preview'},
-                _.img({class: 'img-responsive', src: this.model.url})                    
+                _.img({class: 'img-responsive', src: this.model.url}).on('load', function() {
+                    let img = new Image();
+                    img.src = view.model.url;
+
+                    view.$element.find('.media-data').html(
+                        '(' + img.width + 'x' + img.height + ')'
+                    );
+                })
             ),
             _.div({class: 'panel panel-default panel-buttons'}, 
                 _.input({class: 'form-control', value: this.model.folder, placeholder: 'Type folder path here'})
