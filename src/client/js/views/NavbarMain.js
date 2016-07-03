@@ -463,6 +463,46 @@ class NavbarMain extends View {
     }
 
     /**
+     * Event: Click new Media directory
+     */
+    onClickNewMediaDirectory() {
+        let parentFolder = $('.context-menu-target-element').data('media-folder');
+       
+        // TODO: Find some temporary rendering method for new directories 
+    }
+
+    /**
+     * Event: Click cut Media
+     */
+    onClickCutMedia() {
+        let cutId = $('.context-menu-target-element').data('id');
+
+        // This function should only exist if an item has been cut
+        this.onClickPasteMedia = function onClickPasteMedia() {
+            let parentFolder = $('.context-menu-target-element').data('media-folder');
+          
+            $.ajax({
+                type: 'POST',
+                url: apiUrl('media/tree/' + cutId),
+                data: parentFolder ? {
+                    id: cutId,
+                    folder: parentFolder
+                } : null,
+                success: () => {
+                    reloadResource('media')
+                    .then(() => {
+                        this.reload();
+
+                        location.hash = '/media/' + cutId;
+                    });
+
+                    this.onClickPasteMedia = null;
+                }
+            });
+        }
+    }
+
+    /**
      * Event: Click remove media
      */
     onClickRemoveMedia() {
@@ -829,6 +869,11 @@ class NavbarMain extends View {
                             }
                         }
                        
+                        // Attach item context menu
+                        if(params.dirContextMenu) {
+                            $dir.exocontext(params.dirContextMenu);
+                        }
+                        
                         // Only append the queue item to the final parent element
                         if(i >= dirNames.length - 1) {
                             $parentDir = $dir;
@@ -1163,13 +1208,25 @@ class NavbarMain extends View {
                     // Item context menu
                     itemContextMenu: {
                         'This media': '---',
+                        'Cut': function() { view.onClickCutMedia(); },
                         'Remove': function() { view.onClickRemoveMedia(); },
                         'Replace': function() { view.onClickReplaceMedia(); }
+                    },
+
+                    // Dir context menu
+                    dirContextMenu: {
+                        'Directory': '---',
+                        'Paste': function() { view.onClickPasteMedia(); },
+                        'New folder': function() { view.onClickNewMediaDirectory(); },
+                        'Upload new media': function() { view.onClickUploadMedia(); },
+                        'Remove': function() { view.onClickRemoveMediaDirectory(); }
                     },
 
                     // General context menu
                     paneContextMenu: {
                         'General': '---',
+                        'Paste': function() { view.onClickPasteMedia(); },
+                        'New folder': function() { view.onClickNewMediaDirectory(); },
                         'Upload new media': function() { view.onClickUploadMedia(); }
                     }
                 });

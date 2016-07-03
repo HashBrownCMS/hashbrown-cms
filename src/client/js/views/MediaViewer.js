@@ -61,6 +61,28 @@ class MediaViewer extends View {
         });
     }
 
+    /**
+     * Event: On change folder path
+     *
+     * @param {String} newFolder
+     */
+    onChangeFolder(newFolder) {
+        $.ajax({
+            type: 'POST',
+            url: apiUrl('media/tree/' + this.model.id),
+            data: newFolder ? {
+                id: this.model.id,
+                folder: newFolder
+            } : null,
+            success: () => {
+                reloadResource('media')
+                .then(() => {
+                    ViewHelper.get('NavbarMain').reload();
+                });
+            }
+        });
+    }
+
     render() {
         let view = this;
 
@@ -72,6 +94,8 @@ class MediaViewer extends View {
                 _.img({class: 'img-responsive', src: this.model.url})                    
             ),
             _.div({class: 'panel panel-default panel-buttons'}, 
+                _.input({class: 'form-control', value: this.model.folder, placeholder: 'Type folder path here'})
+                    .change(function() { view.onChangeFolder($(this).val()); }),
                 _.div({class: 'btn-group'},
                     _.button({class: 'btn btn-danger btn-raised'},
                         'Delete'

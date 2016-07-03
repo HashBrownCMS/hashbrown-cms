@@ -20,4 +20,11 @@
             max-width: 90%;
         }
     }
+
+    .panel-buttons {
+        input.form-control {
+            float: left;
+            width: 50%;
+        }
+    }
 }

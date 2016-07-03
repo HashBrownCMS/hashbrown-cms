@@ -728,7 +728,15 @@ class ApiController extends Controller {
             .then((connection) => {
                 connection.getMedia(id)
                 .then((media) => {
-                    res.send(media);
+                    MediaHelper.getTree()
+                    .then((tree) => {
+                        media.applyFolderFromTree(tree);
+
+                        res.send(media);
+                    })
+                    .catch((e) => {
+                        res.send(null);    
+                    });            
                 })
                 .catch((e) => {
                     res.send(null);    

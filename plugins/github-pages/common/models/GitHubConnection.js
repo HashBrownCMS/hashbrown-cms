@@ -181,7 +181,7 @@ class GitHubConnection extends Connection {
                                 
                                 resolve(new Media({
                                     name: file.name,
-                                    id: file.path.replace('media/', ''),
+                                    id: path.dirname(file.path).replace('media/', ''),
                                     url: file.download_url
                                 }));
 
