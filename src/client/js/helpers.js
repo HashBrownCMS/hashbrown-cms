@@ -93,8 +93,7 @@ window.reloadResource = function reloadResource(name) {
             },
             error: function(e) {
                 if(e.status == 403) {
-                    debug.log('Permission denied for resource "' + name + '"', this);
-                    //location = '/login/?path=' + location.pathname + location.hash;
+                    location = '/login/?path=' + location.pathname + location.hash;
                 }
                 
                 callback(null);

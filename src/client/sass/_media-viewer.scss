@@ -4,15 +4,20 @@
     margin: 0px;
     height: 100%;
 
-    .panel-body {
+    .media-heading {
+        padding: 0px 15px;
+    }
+
+    .media-preview {
         flex-grow: 1;
         position: relative;
     
-        >* {
+        img {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
+            max-width: 90%;
         }
     }
 }

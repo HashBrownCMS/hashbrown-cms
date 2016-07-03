@@ -58,6 +58,8 @@ class ApiController extends Controller {
         
         // Media
         app.post('/api/:project/:environment/media/new', MediaHelper.getUploadHandler(), ApiController.createMedia);
+        app.get('/api/:project/:environment/media/tree', ApiController.getMediaTree);
+        app.post('/api/:project/:environment/media/tree/:id', ApiController.setMediaTreeItem);
         app.get('/api/:project/:environment/media/:id', ApiController.getSingleMedia);
         app.post('/api/:project/:environment/media/:id', MediaHelper.getUploadHandler(), ApiController.setMedia);
         app.delete('/api/:project/:environment/media/:id', ApiController.deleteMedia);
@@ -77,6 +79,10 @@ class ApiController extends Controller {
             .then(function(nodes) {
                 res.send(nodes);
             });
+        })
+        .catch((e) => {
+            res.sendStatus(403);   
+            debug.log(e, ApiController);
         });
     }
 
@@ -100,6 +106,10 @@ class ApiController extends Controller {
                 throw '[Api] Content id is undefined';
             
             }
+        })
+        .catch((e) => {
+            res.sendStatus(403);   
+            debug.log(e, ApiController);
         });
     }
     
@@ -115,6 +125,10 @@ class ApiController extends Controller {
             .then(function(node) {
                 res.send(node);
             });
+        })
+        .catch((e) => {
+            res.sendStatus(403);   
+            debug.log(e, ApiController);
         });
     }
 
@@ -131,6 +145,10 @@ class ApiController extends Controller {
             .then(function() {
                 res.sendStatus(200);
             });
+        })
+        .catch((e) => {
+            res.sendStatus(403);   
+            debug.log(e, ApiController);
         });
     }
    
@@ -146,6 +164,10 @@ class ApiController extends Controller {
             .then(function() {
                 res.sendStatus(200);
             });
+        })
+        .catch((e) => {
+            res.sendStatus(403);   
+            debug.log(e, ApiController);
         });
     }
     
@@ -161,6 +183,10 @@ class ApiController extends Controller {
             .then(function() {
                 res.sendStatus(200);
             });
+        })
+        .catch((e) => {
+            res.sendStatus(403);   
+            debug.log(e, ApiController);
         });
     }
 
@@ -176,6 +202,10 @@ class ApiController extends Controller {
             .then(function() {
                 res.sendStatus(200);
             });
+        })
+        .catch((e) => {
+            res.sendStatus(403);   
+            debug.log(e, ApiController);
         });
     }
     
@@ -192,6 +222,10 @@ class ApiController extends Controller {
             .then(function(connections) {
                 res.send(connections);
             });
+        })
+        .catch((e) => {
+            res.sendStatus(403);   
+            debug.log(e, ApiController);
         });
     }
 
@@ -208,6 +242,10 @@ class ApiController extends Controller {
             .then(function(connections) {
                 res.sendStatus(200);
             });
+        })
+        .catch((e) => {
+            res.sendStatus(403);   
+            debug.log(e, ApiController);
         });
     }
     
@@ -229,6 +267,10 @@ class ApiController extends Controller {
                 throw '[Api] Connection id is undefined';
             
             }
+        })
+        .catch((e) => {
+            res.sendStatus(403);   
+            debug.log(e, ApiController);
         });
     }
     
@@ -244,6 +286,10 @@ class ApiController extends Controller {
             .then(function(node) {
                 res.send(node);
             });
+        })
+        .catch((e) => {
+            res.sendStatus(403);   
+            debug.log(e, ApiController);
         });
     }
 
@@ -259,6 +305,10 @@ class ApiController extends Controller {
             .then(function() {
                 res.sendStatus(200);
             });
+        })
+        .catch((e) => {
+            res.sendStatus(403);   
+            debug.log(e, ApiController);
         });
     }
     
@@ -275,6 +325,10 @@ class ApiController extends Controller {
             .then(function(schemas) {
                 res.send(schemas);
             });
+        })
+        .catch((e) => {
+            res.sendStatus(403);   
+            debug.log(e, ApiController);
         });
     }
     
@@ -290,6 +344,10 @@ class ApiController extends Controller {
             .then(function(schema) {
                 res.send(schema);
             });
+        })
+        .catch((e) => {
+            res.sendStatus(403);   
+            debug.log(e, ApiController);
         });
     }
     
@@ -306,6 +364,10 @@ class ApiController extends Controller {
             .then(function() {
                 res.sendStatus(200);
             });
+        })
+        .catch((e) => {
+            res.sendStatus(403);   
+            debug.log(e, ApiController);
         });
     }
     
@@ -321,6 +383,10 @@ class ApiController extends Controller {
             .then(function(newSchema) {
                 res.send(newSchema.getFields());
             });
+        })
+        .catch((e) => {
+            res.sendStatus(403);   
+            debug.log(e, ApiController);
         });
     }
     
@@ -336,6 +402,10 @@ class ApiController extends Controller {
             .then(function() {
                 res.sendStatus(200);
             });
+        })
+        .catch((e) => {
+            res.sendStatus(403);   
+            debug.log(e, ApiController);
         });
     }
     
@@ -352,6 +422,10 @@ class ApiController extends Controller {
             .then(function(settings) {
                 res.send(settings);
             });
+        })
+        .catch((e) => {
+            res.sendStatus(403);   
+            debug.log(e, ApiController);
         });
     }
     
@@ -367,6 +441,10 @@ class ApiController extends Controller {
             .then(function() {
                 res.sendStatus(200);
             });
+        })
+        .catch((e) => {
+            res.sendStatus(403);   
+            debug.log(e, ApiController);
         });
     }
 
@@ -398,7 +476,6 @@ class ApiController extends Controller {
                             resolve(user);
                 
                         } else {
-                            res.sendStatus(403);
                             reject(new Error('User with token "' + token + '" doesn\'t have scope "' + scope + '"'));
 
                         }
@@ -410,7 +487,6 @@ class ApiController extends Controller {
                     }
 
                 } else {
-                    res.sendStatus(403);
                     reject(new Error('Found no user with token "' + token + '"'));
                 }
             });
@@ -442,7 +518,8 @@ class ApiController extends Controller {
             res.send(user.scopes);
         })
         .catch((e) => {
-            debug.log(e, this);
+            res.sendStatus(403);   
+            debug.log(e, ApiController);
         });
     }
     
@@ -458,7 +535,8 @@ class ApiController extends Controller {
             });
         })
         .catch((e) => {
-            debug.log(e, this);
+            res.sendStatus(403);   
+            debug.log(e, ApiController);
         });
     }
 
@@ -475,6 +553,10 @@ class ApiController extends Controller {
             .then(() => {
                 res.sendStatus(200);
             });
+        })
+        .catch((e) => {
+            res.sendStatus(403);   
+            debug.log(e, ApiController);
         });
     }
     
@@ -491,6 +573,10 @@ class ApiController extends Controller {
             .then(() => {
                 res.sendStatus(200);
             });
+        })
+        .catch((e) => {
+            res.sendStatus(403);   
+            debug.log(e, ApiController);
         });
     }
 
@@ -513,6 +599,10 @@ class ApiController extends Controller {
             .catch((e) => {
                 res.send([]);
             });            
+        })
+        .catch((e) => {
+            res.sendStatus(403);   
+            debug.log(e, ApiController);
         });
     }
     
@@ -532,12 +622,61 @@ class ApiController extends Controller {
             .catch((e) => {
                 res.send([]);
             });            
+        })
+        .catch((e) => {
+            res.sendStatus(403);   
+            debug.log(e, ApiController);
         });
     }
     
     // ----------
     // Media methods
     // ---------- 
+    /**
+     * Gets the Media tree
+     */
+    static getMediaTree(req, res) {
+        ApiController.authenticate(req, res)
+        .then(() => {
+            MediaHelper.getTree()
+            .then((tree) => {
+                res.send(tree);
+            })
+            .catch((e) => {
+                res.send([]);
+                debug.log(e, ApiController);
+            });            
+        })
+        .catch((e) => {
+            res.sendStatus(403);   
+            debug.log(e, ApiController);
+        });
+    }
+    
+    /**
+     * Sets a Media tree item
+     */
+    static setMediaTreeItem(req, res) {
+        let id = req.params.id;
+        let item = req.body;
+
+        ApiController.authenticate(req, res)
+        .then(() => {
+            MediaHelper.setTreeItem(id, item)
+            .then(() => {
+                res.sendStatus(200);
+            })
+            .catch((e) => {
+                res.sendStatus(400);
+                debug.log(e, ApiController);
+            });            
+        })
+        .catch((e) => {
+            res.sendStatus(403);   
+            debug.log(e, ApiController);
+        });
+    }
+    
     /**
      * Gets a list of Media objects
      */
@@ -557,6 +696,10 @@ class ApiController extends Controller {
             .catch((e) => {
                 res.send([]);    
             });            
+        })
+        .catch((e) => {
+            res.sendStatus(403);   
+            debug.log(e, ApiController);
         });
     }
     
@@ -581,6 +724,10 @@ class ApiController extends Controller {
             .catch((e) => {
                 res.send(null);    
             });            
+        })
+        .catch((e) => {
+            res.sendStatus(403);   
+            debug.log(e, ApiController);
         });
     }
     
@@ -606,6 +753,10 @@ class ApiController extends Controller {
                 debug.warning(e);
                 res.sendStatus(400);    
             });            
+        })
+        .catch((e) => {
+            res.sendStatus(403);   
+            debug.log(e, ApiController);
         });
     }
 
@@ -643,6 +794,10 @@ class ApiController extends Controller {
                 debug.warning(e);
                 res.sendStatus(400);
             }
+        })
+        .catch((e) => {
+            res.sendStatus(403);   
+            debug.log(e, ApiController);
         });
     }
 
@@ -679,6 +834,10 @@ class ApiController extends Controller {
                     debug.warning(e);
                     res.sendStatus(400);    
             }
+        })
+        .catch((e) => {
+            res.sendStatus(403);   
+            debug.log(e, ApiController);
         });
     }
 }

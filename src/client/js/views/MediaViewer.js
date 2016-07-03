@@ -65,19 +65,17 @@ class MediaViewer extends View {
         let view = this;
 
         this.$element.empty().append(
-            _.div({class: 'panel-heading'},
-                _.h4({class: 'panel-title'},
-                    this.model.name
-                )
+            _.div({class: 'media-heading'},
+                _.h4(this.model.name)
             ),
-            _.div({class: 'panel-body'},
+            _.div({class: 'media-preview'},
                 _.img({class: 'img-responsive', src: this.model.url})                    
             ),
-            _.div({class: 'panel-footer'},
+            _.div({class: 'panel panel-default panel-buttons'}, 
                 _.div({class: 'btn-group'},
-                    _.button({class: 'btn btn-danger'},
-                        _.span({class: 'fa fa-trash'})
-                    ).click(() => { this.onClickDelete(); })
+                    _.button({class: 'btn btn-danger btn-raised'},
+                        'Delete'
+                    ).click(function() { view.onClickDelete(); })
                 )
             )
         );

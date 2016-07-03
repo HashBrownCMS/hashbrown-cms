@@ -759,14 +759,17 @@ body {
   flex-direction: column;
   margin: 0px;
   height: 100%; }
-  .media-viewer .panel-body {
+  .media-viewer .media-heading {
+    padding: 0px 15px; }
+  .media-viewer .media-preview {
     flex-grow: 1;
     position: relative; }
-    .media-viewer .panel-body > * {
+    .media-viewer .media-preview img {
       position: absolute;
       top: 50%;
       left: 50%;
-      transform: translate(-50%, -50%); }
+      transform: translate(-50%, -50%);
+      max-width: 90%; }
 
 .language-settings .input-group {
   width: 100px; }

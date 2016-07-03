@@ -152,6 +152,58 @@ class MediaHelper extends MediaHelperCommon {
     }
     
     /**
+     * Gets the Media tree
+     *
+     * @return {Promise(Object)} tree
+     */
+    static getTree() {
+        let collection = ProjectHelper.currentEnvironment + '.media';
+        
+        return MongoHelper.find(
+            ProjectHelper.currentProject,
+            collection,
+            {}
+        );
+    }
+    
+    /**
+     * Sets a Media tree parent
+     *
+     * @param {String} id
+     * @param {Object} item
+     *
+     * @return {Promise} promise
+     */
+    static setTreeItem(id, item) {
+        let collection = ProjectHelper.currentEnvironment + '.media';
+
+        // Remove the item if  its' null
+        if(!item) {
+            return MongoHelper.removeOne(
+                ProjectHelper.currentProject,
+                collection,
+                {
+                    id: id
+                }
+            );
+
+        // If it's not, update the database document
+        } else {
+            return MongoHelper.updateOne(
+                ProjectHelper.currentProject,
+                collection,
+                {
+                    id: id
+                },
+                item,
+                {
+                    upsert: true
+                }
+            );
+        }
+    }
+    
+    /**
      * Gets the media temp path
      *
      * @returns {String} path

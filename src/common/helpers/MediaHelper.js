@@ -22,6 +22,31 @@ class MediaHelper {
     }
 
     /**
+     * Gets the Media tree
+     *
+     * @returns {Promise(Object)} tree
+     */
+    static getTree() {
+        return new Promise((resolve, reject) => {
+            resolve({});
+        });
+    }
+    
+    /**
+     * Sets a Media tree item
+     *
+     * @param {String} id
+     * @param {Object} item
+     *
+     * @returns {Promise} promise
+     */
+    static setTreeItem(id, item) {
+        return new Promise((resolve, reject) => {
+            resolve();
+        });
+    }
+
+    /**
      * Gets the media temp path
      *
      * @returns {String} path
