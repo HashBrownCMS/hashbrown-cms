@@ -177,7 +177,7 @@ class MediaHelper extends MediaHelperCommon {
     static setTreeItem(id, item) {
         let collection = ProjectHelper.currentEnvironment + '.media';
 
-        // Remove the item if  its' null
+        // Remove the item if it's null
         if(!item) {
             return MongoHelper.removeOne(
                 ProjectHelper.currentProject,
@@ -189,6 +189,8 @@ class MediaHelper extends MediaHelperCommon {
 
         // If it's not, update the database document
         } else {
+            item.id = id;
+
             return MongoHelper.updateOne(
                 ProjectHelper.currentProject,
                 collection,

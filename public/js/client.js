@@ -2997,10 +2997,13 @@ queueItem.$element=$element; // Use specific sorting behaviours
 if(params.sort){params.sort(item,queueItem);} // Add queue item to sorting queue
 sortingQueue.push(queueItem); // Add drag/drop event
 $element.exodragdrop({lockX:true,onEndDrag:params.onEndDrag});return $element;})); // Sort items into hierarchy
-var _iteratorNormalCompletion9=true;var _didIteratorError9=false;var _iteratorError9=undefined;try{for(var _iterator9=sortingQueue[Symbol.iterator](),_step9;!(_iteratorNormalCompletion9=(_step9=_iterator9.next()).done);_iteratorNormalCompletion9=true){var queueItem=_step9.value;if(queueItem.parentDirAttr){(function(){var onClickChildrenToggle=function onClickChildrenToggle(e){e.preventDefault();e.stopPropagation();$parentDir.toggleClass('open');}; // Find parent item
-var parentDirAttrKey=Object.keys(queueItem.parentDirAttr)[0];var parentDirAttrValue=queueItem.parentDirAttr[parentDirAttrKey];var parentDirSelector='.pane-item-container['+parentDirAttrKey+'="'+parentDirAttrValue+'"]';var $parentDir=$pane.find(parentDirSelector);if($parentDir.length>0){$parentDir.children('.children').append(queueItem.$element); // Create parent item
-}else if(queueItem.createDir){$parentDir=_.div({class:'pane-item-container'},_.a({class:'pane-item'},_.span({class:'fa fa-folder'}),_.span(parentDirAttrValue)),_.div({class:'children'}));$parentDir.attr(parentDirAttrKey,parentDirAttrValue); // TODO: Append to correct parent
-$pane.append($parentDir);$parentDir.children('.children').append(queueItem.$element);}var $paneItem=$parentDir.children('.pane-item');var $childrenToggle=$paneItem.children('.btn-children-toggle');if($childrenToggle.length<=0){$childrenToggle=_.button({class:'btn-children-toggle'},_.span({class:'fa fa-caret-down'}),_.span({class:'fa fa-caret-right'}));$paneItem.append($childrenToggle);$childrenToggle.click(onClickChildrenToggle);}})();}}}catch(err){_didIteratorError9=true;_iteratorError9=err;}finally {try{if(!_iteratorNormalCompletion9&&_iterator9.return){_iterator9.return();}}finally {if(_didIteratorError9){throw _iteratorError9;}}}var $paneContainer=_.div({class:'pane-container','data-route':params.route},$pane);if(params.postSort){params.postSort($paneContainer.find('>.pane, .pane-item-container>.children'));}if(this.$element.find('.tab-panes .pane-container').length<1){$paneContainer.addClass('active');$button.addClass('active');}this.$element.find('.tab-panes').append($paneContainer);this.$element.find('.tab-buttons').append($button);} /**
+var _iteratorNormalCompletion9=true;var _didIteratorError9=false;var _iteratorError9=undefined;try{for(var _iterator9=sortingQueue[Symbol.iterator](),_step9;!(_iteratorNormalCompletion9=(_step9=_iterator9.next()).done);_iteratorNormalCompletion9=true){var queueItem=_step9.value;if(queueItem.parentDirAttr){(function(){var onClickChildrenToggle=function onClickChildrenToggle(e){e.preventDefault();e.stopPropagation();$parentDir.toggleClass('open');}; // If parent element already exists, just append the queue item element
+// Find parent item
+var parentDirAttrKey=Object.keys(queueItem.parentDirAttr)[0];var parentDirAttrValue=queueItem.parentDirAttr[parentDirAttrKey];var parentDirSelector='.pane-item-container['+parentDirAttrKey+'="'+parentDirAttrValue+'"]';var $parentDir=$pane.find(parentDirSelector);if($parentDir.length>0){$parentDir.children('.children').append(queueItem.$element); // If not, create parent elements if specified
+}else if(queueItem.createDir){var dirNames=parentDirAttrValue.split('/').filter(function(item){return item!='';});var finalDirName='/';for(var i in dirNames){var dirName=dirNames[i];var prevFinalDirName=finalDirName;finalDirName+=dirName+'/';var $dir=$pane.find('['+parentDirAttrKey+'="'+finalDirName+'"]');if($dir.length<1){$dir=_.div({class:'pane-item-container'},_.a({class:'pane-item'},_.span({class:'fa fa-folder'}),_.span(dirName)),_.div({class:'children'}));$dir.attr(parentDirAttrKey,finalDirName); // Append to previous dir 
+var $prevDir=$pane.find('['+parentDirAttrKey+'="'+prevFinalDirName+'"]');if($prevDir.length>0){$prevDir.children('.children').append($dir); // If no previous dir was found, append directly to pane
+}else {$pane.append($dir);}} // Only append the queue item to the final parent element
+if(i>=dirNames.length-1){$parentDir=$dir;}}$parentDir.children('.children').append(queueItem.$element);}var $paneItem=$parentDir.children('.pane-item');var $childrenToggle=$paneItem.children('.btn-children-toggle');if($childrenToggle.length<=0){$childrenToggle=_.button({class:'btn-children-toggle'},_.span({class:'fa fa-caret-down'}),_.span({class:'fa fa-caret-right'}));$paneItem.append($childrenToggle);$childrenToggle.click(onClickChildrenToggle);}})();}}}catch(err){_didIteratorError9=true;_iteratorError9=err;}finally {try{if(!_iteratorNormalCompletion9&&_iterator9.return){_iterator9.return();}}finally {if(_didIteratorError9){throw _iteratorError9;}}}var $paneContainer=_.div({class:'pane-container','data-route':params.route},$pane);if(params.postSort){params.postSort($paneContainer.find('>.pane, .pane-item-container>.children'));}if(this.$element.find('.tab-panes .pane-container').length<1){$paneContainer.addClass('active');$button.addClass('active');}this.$element.find('.tab-panes').append($paneContainer);this.$element.find('.tab-buttons').append($button);} /**
      * Shows a tab
      *
      * @param {String} tabName
@@ -3082,7 +3085,8 @@ $.ajax({type:'post',url:apiUrl('content/'+thisContent.id),data:thisContent.getOb
 $.ajax({type:'post',url:apiUrl('content/'+thisContent.id),data:thisContent.getObject(),success:onSuccess,error:onError});}});}}); // ----------
 // Render the "media" pane
 // ----------
-_this35.renderPane({label:'Media',route:'/media/',icon:'file-image-o',items:resources.media, // Item context menu
+_this35.renderPane({label:'Media',route:'/media/',icon:'file-image-o',items:resources.media, // Sorting logic
+sort:function sort(item,queueItem){queueItem.$element.attr('data-media-id',item.id);if(item.folder){queueItem.createDir=true;queueItem.parentDirAttr={'data-media-folder':item.folder};}}, // Item context menu
 itemContextMenu:{'This media':'---','Remove':function Remove(){view.onClickRemoveMedia();},'Replace':function Replace(){view.onClickReplaceMedia();}}, // General context menu
 paneContextMenu:{'General':'---','Upload new media':function UploadNewMedia(){view.onClickUploadMedia();}}}); // ----------
 // Render the "connections" pane
@@ -3592,13 +3596,17 @@ if(thisType==Number){if(!thatValue){thatValue=0;}else if(thatValue.constructor==
  */var FieldSchema=function(_Schema2){_inherits(FieldSchema,_Schema2);function FieldSchema(){_classCallCheck(this,FieldSchema);return _possibleConstructorReturn(this,Object.getPrototypeOf(FieldSchema).apply(this,arguments));}_createClass(FieldSchema,[{key:"structure",value:function structure(){_get(Object.getPrototypeOf(FieldSchema.prototype),"structure",this).call(this);this.def(String,'editorId');this.def(Object,'config',{});this.name='New field schema';this.type='field';}}]);return FieldSchema;}(Schema);module.exports=FieldSchema;},{"./Schema":210}],209:[function(require,module,exports){'use strict'; // Libs
 var path=require('path');var Entity=require('./Entity'); /**
  * The base class for all Media objects
- */var Media=function(_Entity3){_inherits(Media,_Entity3);function Media(){_classCallCheck(this,Media);return _possibleConstructorReturn(this,Object.getPrototypeOf(Media).apply(this,arguments));}_createClass(Media,[{key:"structure",value:function structure(){this.def(String,'id');this.def(String,'name');this.def(String,'url');} /**
+ */var Media=function(_Entity3){_inherits(Media,_Entity3);function Media(){_classCallCheck(this,Media);return _possibleConstructorReturn(this,Object.getPrototypeOf(Media).apply(this,arguments));}_createClass(Media,[{key:"structure",value:function structure(){this.def(String,'id');this.def(String,'name');this.def(String,'url');this.def(String,'folder');} /**
      * Read from file path
      *
      * @param {String} filePath
      */},{key:"readFromFilePath",value:function readFromFilePath(filePath){var name=path.basename(filePath);var id=filePath; // Trim file path for id 
 id=id.replace('/'+name,'');id=id.substring(id.lastIndexOf('/')+1); // Remove file extension
 name=name.replace(/\.[^/.]+$/,'');this.id=id;this.name=name;this.url='/media/'+ProjectHelper.currentProject+'/'+ProjectHelper.currentEnvironment+'/'+id;} /**
+     * Applies folder string from tree
+     *
+     * @param {Object} tree
+     */},{key:"applyFolderFromTree",value:function applyFolderFromTree(tree){if(tree){for(var i in tree){var item=tree[i];if(item.id==this.id){this.folder=item.folder;break;}}}} /**
      * Creates a new Media object
      *
      * @param {Object} file

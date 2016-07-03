@@ -687,19 +687,32 @@ class ApiController extends Controller {
             .then((connection) => {
                 connection.getAllMedia()
                 .then((media) => {
-                    res.send(media);
+                    MediaHelper.getTree()
+                    .then((tree) => {
+                        for(let i in media) {
+                            media[i].applyFolderFromTree(tree);  
+                        }
+
+                        res.send(media);
+                    })
+                    .catch((e) => {
+                        debug.log(e, ApiController);
+                        res.send([]);
+                    });
                 })
                 .catch((e) => {
+                    debug.log(e, ApiController);
                     res.send([]);    
                 });            
             })
             .catch((e) => {
+                debug.log(e, ApiController);
                 res.send([]);    
             });            
         })
         .catch((e) => {
-            res.sendStatus(403);   
             debug.log(e, ApiController);
+            res.sendStatus(403);   
         });
     }
     

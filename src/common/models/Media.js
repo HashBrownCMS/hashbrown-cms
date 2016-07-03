@@ -13,6 +13,7 @@ class Media extends Entity {
         this.def(String, 'id');
         this.def(String, 'name');
         this.def(String, 'url');
+        this.def(String, 'folder');
     }
 
     /**
@@ -34,6 +35,24 @@ class Media extends Entity {
         this.id = id;
         this.name = name;
         this.url = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + id;
+    }
+
+    /**
+     * Applies folder string from tree
+     *
+     * @param {Object} tree
+     */
+    applyFolderFromTree(tree) {
+        if(tree) {
+            for(let i in tree) {
+                let item = tree[i];
+
+                if(item.id == this.id) {
+                    this.folder = item.folder;
+                    break;
+                }
+            }
+        }
     }
 
     /**

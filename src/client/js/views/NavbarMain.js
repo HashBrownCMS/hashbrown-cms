@@ -787,26 +787,54 @@ class NavbarMain extends View {
                     $parentDir.toggleClass('open');
                 }
 
+                // If parent element already exists, just append the queue item element
                 if($parentDir.length > 0) {
                     $parentDir.children('.children').append(queueItem.$element);
                 
-                // Create parent item
+                // If not, create parent elements if specified
                 } else if(queueItem.createDir) {
-                    $parentDir = _.div({class: 'pane-item-container'},
-                        _.a({
-                            class: 'pane-item'
-                        },
-                            _.span({class: 'fa fa-folder'}),
-                            _.span(parentDirAttrValue)
-                        ),
-                        _.div({class: 'children'})
-                    );
-                    
-                    $parentDir.attr(parentDirAttrKey, parentDirAttrValue);
+                    let dirNames = parentDirAttrValue.split('/').filter((item) => { return item != ''; });
+                    let finalDirName = '/';
 
-                    // TODO: Append to correct parent
-                    $pane.append($parentDir); 
-                    
+                    for(let i in dirNames) {
+                        let dirName = dirNames[i];
+
+                        let prevFinalDirName = finalDirName;
+                        finalDirName += dirName + '/';
+
+                        let $dir = $pane.find('[' + parentDirAttrKey + '="' + finalDirName + '"]');
+
+                        if($dir.length < 1) {
+                            $dir = _.div({class: 'pane-item-container'},
+                                _.a({
+                                    class: 'pane-item'
+                                },
+                                    _.span({class: 'fa fa-folder'}),
+                                    _.span(dirName)
+                                ),
+                                _.div({class: 'children'})
+                            );
+                            
+                            $dir.attr(parentDirAttrKey, finalDirName);
+                   
+                            // Append to previous dir 
+                            let $prevDir = $pane.find('[' + parentDirAttrKey + '="' + prevFinalDirName + '"]');
+                            
+                            if($prevDir.length > 0) {
+                                $prevDir.children('.children').append($dir);
+
+                            // If no previous dir was found, append directly to pane
+                            } else {
+                                $pane.append($dir); 
+                            }
+                        }
+                       
+                        // Only append the queue item to the final parent element
+                        if(i >= dirNames.length - 1) {
+                            $parentDir = $dir;
+                        } 
+                    }
+
                     $parentDir.children('.children').append(queueItem.$element);
                 }
 
@@ -1122,6 +1150,16 @@ class NavbarMain extends View {
                     icon: 'file-image-o',
                     items: resources.media,
 
+                    // Sorting logic
+                    sort: function(item, queueItem) {
+                        queueItem.$element.attr('data-media-id', item.id);
+                       
+                        if(item.folder) {
+                            queueItem.createDir = true;
+                            queueItem.parentDirAttr = {'data-media-folder': item.folder };
+                        }
+                    },
+                    
                     // Item context menu
                     itemContextMenu: {
                         'This media': '---',
