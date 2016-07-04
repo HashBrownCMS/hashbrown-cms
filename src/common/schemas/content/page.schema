@@ -30,7 +30,6 @@
             },
             "url": {
                 "label": "URL",
-                "multilingual": true,
                 "schemaId": "url",
                 "tabId": "content"
             },
