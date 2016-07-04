@@ -3345,7 +3345,7 @@ this.$output.html(markdownToHtml(this.$textarea.val()));}}]);return RichTextEdit
  */var StringEditor=function(_View20){_inherits(StringEditor,_View20);function StringEditor(params){_classCallCheck(this,StringEditor);var _this56=_possibleConstructorReturn(this,Object.getPrototypeOf(StringEditor).call(this,params));_this56.init();return _this56;} /**
      * Event: Change
      */_createClass(StringEditor,[{key:"onChange",value:function onChange(){this.trigger('change',this.$input.val());}},{key:"render",value:function render(){var editor=this; // Main element
-this.$element=_.div({class:'field-editor string-editor'},this.$input=_.input({class:'form-control',value:this.value}).on('change propertychange paste keyup',function(){editor.onChange();}));}}]);return StringEditor;}(View);module.exports=StringEditor;},{}],193:[function(require,module,exports){'use strict'; /**
+this.$element=_.div({class:'field-editor string-editor'},this.$input=_.input({class:'form-control',value:this.value,type:this.config.type||'text'}).on('change propertychange paste keyup',function(){editor.onChange();}));}}]);return StringEditor;}(View);module.exports=StringEditor;},{}],193:[function(require,module,exports){'use strict'; /**
  * A struct editor for editing any arbitrary object value
  */var StructEditor=function(_View21){_inherits(StructEditor,_View21);function StructEditor(params){_classCallCheck(this,StructEditor);var _this57=_possibleConstructorReturn(this,Object.getPrototypeOf(StructEditor).call(this,params));_this57.$element=_.div({class:'struct-editor field-editor'});_this57.fetch();return _this57;} /**
      * Event: Change value

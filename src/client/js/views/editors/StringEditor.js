@@ -22,7 +22,7 @@ class StringEditor extends View {
 
         // Main element
         this.$element = _.div({class: 'field-editor string-editor'},
-            this.$input = _.input({class: 'form-control', value: this.value})
+            this.$input = _.input({class: 'form-control', value: this.value, type: this.config.type || 'text'})
                 .on('change propertychange paste keyup', function() { editor.onChange(); })
         );
     }
