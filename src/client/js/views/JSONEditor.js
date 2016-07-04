@@ -105,6 +105,22 @@ class JSONEditor extends View {
     }
 
     /**
+     * Event: Click beautify button
+     */
+    onClickBeautify() {
+        try {
+            this.value = beautify(this.value);
+            this.$element.find('textarea').val(this.value);
+        
+        } catch(e) {
+            this.$error.children('.panel-heading').html('JSON error');
+            this.$error.children('.panel-body').html(e);
+            this.$error.show();
+
+        }
+    }
+
+    /**
      * Event: Change text. Make sure the value is up to date
      */
     onChangeText($textarea) {
@@ -130,6 +146,9 @@ class JSONEditor extends View {
             ).on('keyup change propertychange paste', (e) => { this.onChangeText(this.$element.find('textarea')); }),
             this.$error,
             _.div({class: 'panel panel-default panel-buttons'}, 
+                _.button({class: 'btn btn-default btn-raised'},
+                    _.span('{ }')
+                ).click(() => { this.onClickBeautify(); }),
                 _.div({class: 'btn-group'},
                     _.button({class: 'btn btn-embedded'},
                         'Basic'
