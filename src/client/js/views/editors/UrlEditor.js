@@ -58,9 +58,13 @@ class UrlEditor extends View {
      *
      * @return {String} url
      */
-    static generateUrl(contentId) {
+    generateUrl(contentId) {
         let nodes = UrlEditor.getAllParents(contentId);
-        let url = '/' + window.language + '/';
+        let url = '/';
+       
+        if(this.config.multilingual) {
+            url += window.language + '/';
+        }
 
         for(let node of nodes) {
             let title = '';
@@ -112,7 +116,7 @@ class UrlEditor extends View {
      * Regenerates the URL
      */
     regenerate() {
-        let newUrl = UrlEditor.generateUrl(Router.params.id);
+        let newUrl = this.generateUrl(Router.params.id);
 
         this.$input.val(newUrl);
 
@@ -134,18 +138,18 @@ class UrlEditor extends View {
     onChange() {
         this.value = this.$input.val();
 
-        if(this.value.length > 1) {
+        if(this.value.length > 0) {
             if(this.value[0] != '/') {
                 this.value = '/' + this.value;
                 this.$input.val(this.value);
             }
             
-            if(this.value[this.value.length - 1] != '/') {
+            if(this.value.length > 1 && this.value[this.value.length - 1] != '/') {
                 this.value = this.value + '/';
                 this.$input.val(this.value);
             }
         } else {
-            fetchFromTitle();
+            this.fetchFromTitle();
         }
 
         this.trigger('change', this.value);

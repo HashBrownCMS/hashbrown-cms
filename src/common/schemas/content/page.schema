@@ -10,13 +10,11 @@
         "properties": {
             "title": {
                 "label": "Title",
-                "multilingual": true,
                 "schemaId": "string",
                 "tabId": "content"
             },
             "description": {
                 "label": "Description",
-                "multilingual": true,
                 "schemaId": "string",
                 "tabId": "content"
             },
