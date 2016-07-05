@@ -62,7 +62,7 @@ class UrlEditor extends View {
         let nodes = UrlEditor.getAllParents(contentId);
         let url = '/';
        
-        if(this.config.multilingual) {
+        if(this.multilingual) {
             url += window.language + '/';
         }
 

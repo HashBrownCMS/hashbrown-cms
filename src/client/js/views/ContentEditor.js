@@ -258,7 +258,8 @@ class ContentEditor extends View {
                     value: fieldValue,
                     disabled: schemaValue.disabled || false,
                     config: config || {},
-                    schema: fieldSchema
+                    schema: fieldSchema,
+                    multilingual: schemaValue.multilingual
                 });
 
                 fieldEditorInstance.on('change', onChange);
