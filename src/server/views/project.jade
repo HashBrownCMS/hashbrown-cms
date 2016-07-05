@@ -3,15 +3,24 @@ html
         meta(charset='utf-8')
         meta(http-equiv='X-UA-Compatible', content='IE=edge')
         meta(name='viewport', content='width=device-width initial-scale=1')
-        meta(name='description', content="The Putaitu CMS")
+        meta(name='description', content="The pluggable CMS")
         
         link(href='/lib/bootstrap/css/bootstrap.min.css', rel='stylesheet')
         link(href='/lib/font-awesome/css/font-awesome.min.css', rel='stylesheet')
         link(href='/css/client.css', rel='stylesheet')
+        link(href='/css/login.css', rel='stylesheet')
 
         title Endomon CMS
     body
-        h1 Select environment
+        .login-container
+            .panel-login.login.btn-raised
+                .panel-heading
+                    h2 Select environment
+                .panel-body
+                    select(class="form-control select-environment")
+                        option(value=putaitu_com) live
+                .panel-footer
+                    button.btn.btn-primary(onclick="location = location.pathname + $('.select-environment').val() + '/';") OK
 
         script(src='/lib/jquery/jquery.min.js')
         script(src='/lib/bootstrap/js/bootstrap.min.js')

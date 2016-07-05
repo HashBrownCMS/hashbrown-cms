@@ -8,10 +8,19 @@ html
         link(href='/lib/bootstrap/css/bootstrap.min.css', rel='stylesheet')
         link(href='/lib/font-awesome/css/font-awesome.min.css', rel='stylesheet')
         link(href='/css/client.css', rel='stylesheet')
+        link(href='/css/login.css', rel='stylesheet')
 
         title Endomon CMS
     body
-        h1 Select project
+        .login-container
+            .panel-login.login.btn-raised
+                .panel-heading
+                    h2 Select project
+                .panel-body
+                    select(class="form-control select-project")
+                        option(value=putaitu_com) putaitu_com
+                .panel-footer
+                    button.btn.btn-primary(onclick="location = $('.select-project').val() + '/';") OK
 
         script(src='/lib/jquery/jquery.min.js')
         script(src='/lib/bootstrap/js/bootstrap.min.js')
