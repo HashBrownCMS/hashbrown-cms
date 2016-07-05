@@ -17,10 +17,10 @@ html
                 .panel-heading
                     h2 Select project
                 .panel-body
-                    select(class="form-control select-project")
-                        option(value=putaitu_com) putaitu_com
+                    select(class="form-control select-project", data-api="/api/server/projects/")
                 .panel-footer
                     button.btn.btn-primary(onclick="location = $('.select-project').val() + '/';") OK
 
         script(src='/lib/jquery/jquery.min.js')
         script(src='/lib/bootstrap/js/bootstrap.min.js')
+        script(src='/js/selector.js')

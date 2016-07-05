@@ -19,21 +19,63 @@ class MongoHelper {
      * @return {Promise} promise
      */
     static getDatabase(databaseName) {
-        return new Promise((callback) => {
+        return new Promise((resolve, reject) => {
             let connectionString = 'mongodb://localhost/' + databaseName;
 
-            mongoClient.connect(connectionString, (connectErr, db) => {
-                if(connectErr) {
-                    debug.error(connectErr, this);
-                }
+            mongoClient.connect(connectionString, (err, db) => {
+                if(err) {
+                    reject(new Error(err));
                 
-                if(db) {
-                    mongoDatabase = db;
-                    callback(mongoDatabase);
-
                 } else {
-                    debug.error('Couldn\'t connect to MongoDB using the connection string "' + connectionString + '".', this);
+                    if(db) {
+                        mongoDatabase = db;
+                        resolve(mongoDatabase);
+
+                    } else {
+                        debug.error('Couldn\'t connect to MongoDB using the connection string "' + connectionString + '".', this);
+                    
+                    }
+                }
+            });
+        });
+    }
+
+    /**
+     * Lists all databases
+     *
+     * @returns {Promise(Array)} databases
+     */
+    static listDatabases() {
+        return new Promise((resolve, reject) => {
+            debug.log('Listing all databases...', this);
+
+            let connectionString = 'mongodb://localhost/';
+            
+            mongoClient.connect(connectionString, (err, db) => {
+                if(err) {
+                    reject(new Error(err));
                 
+                } else {
+                    if(db) {
+                        db.admin().listDatabases()
+                        .then((result) => {
+                            let databases = [];
+
+                            for(let i = 0; i < result.databases.length; i++) {
+                                let database = result.databases[i];
+
+                                if(!database.empty && database.name != 'local' && database.name != 'users') {
+                                    databases[databases.length] = database.name;
+                                }
+                            }
+
+                            resolve(databases);
+                        });
+
+                    } else {
+                        debug.error('Couldn\'t connect to MongoDB using the connection string "' + connectionString + '".', this);
+                    
+                    }
                 }
             });
         });

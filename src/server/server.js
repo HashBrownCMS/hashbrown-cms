@@ -104,19 +104,19 @@ ApiController.init(app);
 // ----------
 // Views
 // ----------
-// Project list
-app.get('/', function(req, res) {
-    res.render('index');
-});
-
 // Login
 app.get('/login/', function(req, res) {
     res.render('login');
 });
 
+// Project list
+app.get('/', function(req, res) {
+    res.render('select-project');
+});
+
 // Project
 app.get('/:project', function(req, res) {
-    res.render('project');
+    res.render('select-environment', { project: req.params.project });
 });
 
 // Environment
@@ -127,5 +127,8 @@ app.get('/:project/:environment/', function(req, res) {
             currentProject: ProjectHelper.currentProject,
             currentEnvironment: ProjectHelper.currentEnvironment
         });
+    })
+    .catch(() => {
+        res.sendStatus(404);  
     });
 });
