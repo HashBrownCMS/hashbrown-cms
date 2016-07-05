@@ -18,7 +18,8 @@ class ArrayEditor extends View {
      * @param {Number} index
      */
     onClickRemoveItem(i) {
-        this.value.splice(i,1);
+        this.value.schemaBindings.splice(i,1);
+        this.value.items.splice(i,1);
 
         this.render();
     }
@@ -27,7 +28,7 @@ class ArrayEditor extends View {
      * Event: Click add item
      */
     onClickAddItem() {
-        this.value.push(null);
+        this.value.items.push(null);
 
         this.render();
     }
@@ -42,15 +43,15 @@ class ArrayEditor extends View {
     onChange(newValue, i, itemSchema) {
         if(itemSchema.multilingual) {
             // Sanity check to make sure multilingual fields are accomodated for
-            if(!this.value[i] || typeof this.value[i] !== 'object') {
-                this.value[i] = {};
+            if(!this.value.items[i] || typeof this.value.items[i] !== 'object') {
+                this.value.items[i] = {};
             }
             
-            this.value[i]._multilingual = true;
-            this.value[i][window.language] = newValue;
+            this.value.items[i]._multilingual = true;
+            this.value.items[i][window.language] = newValue;
 
         } else {
-            this.value[i] = newValue;
+            this.value.items[i] = newValue;
         }
 
         this.trigger('change', this.value);
@@ -72,12 +73,19 @@ class ArrayEditor extends View {
                         let newIndex = $(instance.element).index();
 
                         // Change the index in the items array
-                        let value = this.value[oldIndex];
-                        let itemsClone = this.value.slice();
+                        let value = this.value.items[oldIndex];
+                        let itemsClone = this.value.items.slice();
                         itemsClone.splice(oldIndex, 1);
                         itemsClone.splice(newIndex, 0, value);
-                        this.value = itemsClone;
+                        this.value.items = itemsClone;
                         
+                        // Change the index in the schema bindings array
+                        let schema = this.value.schemaBindings[oldIndex];
+                        let bindingsClone = this.value.schemaBindings.slice();
+                        bindingsClone.splice(oldIndex, 1);
+                        bindingsClone.splice(newIndex, 0, schema);
+                        this.value.schemaBindings = bindingsClone;
+
                         oldIndex = newIndex;
                     }
                 });
@@ -92,34 +100,62 @@ class ArrayEditor extends View {
     }
 
     render() {
-        // Recover old array types
-        if(this.value && Array.isArray(this.value.items)) {
-            let recoveredItems = [];
+        // Recover flat arrays
+        if(Array.isArray(this.value)) {
+            let recoveredArray = {
+                items: [],
+                schemaBindings: []
+            };
+            
+            for(let item of this.value) {
+                let schemaId = item._schemaId;
 
-            for(let i = 0; i < this.value.items.length; i++) {
-                let schemaId = this.value.schemaBindings[i];
-                let item = this.value.items[i];
+                delete item._schemaId;
 
-                item._schemaId = schemaId;
-
-                recoveredItems.push(item);
+                recoveredArray.items.push(item);
+                recoveredArray.schemaBindings.push(schemaId);
             }
 
-            this.value = recoveredItems;
-           
-            setTimeout(() => { 
-                this.trigger('change', this.value);
-            }, 10);
-        }
+            this.value = recoveredArray;
 
-        // A sanity check to make sure we're working with an array
-        if(!this.value || !Array.isArray(this.value)) {
-            this.value = [];
+            setTimeout(() => {
+                this.trigger('change', this.value);
+            }, 20);
         }
         
+        // NOTE: The reason for having a separate array with schema ids is simply
+        // that there is no way to associate a value with a schema id if it's not an Object type
+
+        // A sanity check to make sure we're working with an array
+        if(
+            !this.value ||
+            typeof this.value !== 'object'
+        ) {
+            this.value = {
+                items: [],
+                schemaBindings: []
+            };
+        
+        }
+        
+        if(Array.isArray(this.value)) {
+            this.value = {
+                items: this.value,
+                schemaBindings: []
+            };
+        }
+
+        if(!this.value.items) {
+            this.value.items = [];
+        }
+
+        if(!this.value.schemaBindings) {
+            this.value.schemaBindings = [];
+        }
+
         // Render editor
         _.append(this.$element.empty(),
-            _.if(this.value.length > 1,
+            _.if(this.value.items.length > 1,
                 _.button({class: 'btn btn-primary btn-sort-items'},
                     _.span({class: 'text-default'}, 'Sort'),
                     _.span({class: 'text-sorting'}, 'Done')
@@ -129,13 +165,13 @@ class ArrayEditor extends View {
             ),
             _.div({class: 'items'},
                 // Loop through each array item
-                _.each(this.value, (i, item) => {
+                _.each(this.value.items, (i, item) => {
                     // Sanity check for item schema
                     if(!this.config.allowedSchemas) {
                         this.config.allowedSchemas = []
                     }
                     
-                    let itemSchemaId = this.value[i]._schemaId;
+                    let itemSchemaId = this.value.schemaBindings[i];
 
                     if(
                         this.config.allowedSchemas.length > 0 &&
@@ -145,7 +181,7 @@ class ArrayEditor extends View {
                         )
                     ) {
                         itemSchemaId = this.config.allowedSchemas[0];                    
-                        this.value[i]._schemaId = itemSchemaId;
+                        this.value.schemaBindings[i] = itemSchemaId;
                     }
 
                     // Make sure we have the item schema and the editor we need for each array item
@@ -176,7 +212,7 @@ class ArrayEditor extends View {
                                 ).on('change', () => {
                                     itemSchemaId = $schemaSelector.find('select').val();
 
-                                    this.value._schemaId = itemSchemaId;
+                                    this.value.schemaBindings[i] = itemSchemaId;
 
                                     this.trigger('change', this.value);
 
