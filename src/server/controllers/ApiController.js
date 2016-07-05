@@ -18,6 +18,10 @@ class ApiController extends Controller {
      * Initialises this controller
      */
     static init(app) {
+        // Server
+        app.get('/api/server/projects', ApiController.getAllProjects);
+        app.get('/api/server/:project/environments', ApiController.getAllEnvironments);
+        
         // Content
         app.get('/api/:project/:environment/content', ApiController.getAllContents);
         app.get('/api/:project/:environment/content/:id', ApiController.getContent);
@@ -66,6 +70,46 @@ class ApiController extends Controller {
         app.get('/api/:project/:environment/media', ApiController.getMedia);
     }
  
+    // ----------
+    // Server methods
+    // ---------- 
+    /**
+     * Gets a list of all projects
+     */
+    static getAllProjects(req, res) {
+        ApiController.authenticate(req, res)
+        .then(() => {
+            ProjectHelper.getAllProjects()
+            .then((projects) => {
+                res.send(projects);
+            });
+        })
+        .catch((e) => {
+            res.sendStatus(403);   
+            debug.log(e, ApiController);
+        });
+    }
+    
+    /**
+     * Gets a list of all environments
+     */
+    static getAllEnvironments(req, res) {
+        ApiController.authenticate(req, res)
+        .then(() => {
+            let project = req.params.project;
+
+            ProjectHelper.getAllEnvironments(project)
+            .then((environments) => {
+                res.send(environments);
+            });
+        })
+        .catch((e) => {
+            res.sendStatus(403);   
+            debug.log(e, ApiController);
+        });
+    }
+    
+    
     // ----------
     // Content methods
     // ---------- 
