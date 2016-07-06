@@ -18,7 +18,7 @@ Router.route('/content/json/:id', function() {
     .then((content) => {
         let contentEditor = new JSONEditor({
             model: content,
-            modelUrl: apiUrl('content/' + this.id)
+            apiPath: 'content/' + this.id
         });
 
         ViewHelper.get('NavbarMain').highlightItem(this.id);

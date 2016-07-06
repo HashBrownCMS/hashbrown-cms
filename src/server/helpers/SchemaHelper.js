@@ -102,7 +102,7 @@ class SchemaHelper extends SchemaHelperCommon {
     static getCustomSchemas() {
         let collection = ProjectHelper.currentEnvironment + '.schemas';
         
-        return new Promise((callback) => {
+        return new Promise((resolve, reject) => {
             MongoHelper.find(
                 ProjectHelper.currentProject,
                 collection,
@@ -113,10 +113,16 @@ class SchemaHelper extends SchemaHelperCommon {
                 for(let i in result) {
                     let schema = SchemaHelper.getModel(result[i]);
 
-                    schemas[schema.id] = schema;
+                    if(schema) {
+                        schemas[schema.id] = schema;
+                    
+                    } else {
+                        debug.warning('Schema data from DB is incorrect format: ' + JSON.stringify(result[i]), SchemaHelper);
+
+                    }
                 }
 
-                callback(schemas);
+                resolve(schemas);
             });
         });
     }

@@ -23,6 +23,20 @@ class JSONEditor extends View {
     }
 
     /**
+     * Event: Successful API call
+     */
+    onSuccess() {
+    
+    }
+
+    /**
+     * Event: Failed API call
+     */
+    onError(e) {
+        alert(e);
+    }
+
+    /**
      * Event: Click basic. Returns to the regular editor
      */
     onClickBasic() {
@@ -36,7 +50,7 @@ class JSONEditor extends View {
     }
 
     /**
-     * Event: Click save. Posts the model to the modelUrl
+     * Event: Click save. Posts the model to the apiPath
      */
     onClickSave() {
         let view = this;
@@ -44,9 +58,9 @@ class JSONEditor extends View {
         try {
             this.model = JSON.parse(this.value);
 
-            $.post(this.modelUrl, this.model, function() {
-                // Post successful
-            });
+            apiCall('post', this.apiPath, this.model)
+            .then(this.onSuccess)
+            .catch(this.onError);
 
         } catch(e) {
             new MessageModal({
@@ -57,51 +71,6 @@ class JSONEditor extends View {
             });
 
         }
-    }
-
-    /**
-     * Event: On click remove
-     */
-    onClickDelete() {
-        let view = this;
-
-        function onSuccess() {
-            debug.log('Removed content with id "' + view.model.id + '"', view); 
-        
-            reloadResource('content')
-            .then(function() {
-                ViewHelper.get('NavbarMain').reload();
-                
-                // Cancel the JSONEditor view
-                location.hash = '/content/';
-            });
-        }
-
-        new MessageModal({
-            model: {
-                title: 'Delete item',
-                body: 'Are you sure you want to delete the item "' + (view.model.title || view.model.name || view.model.id) + '"?'
-            },
-            buttons: [
-                {
-                    label: 'Cancel',
-                    class: 'btn-default',
-                    callback: function() {
-                    }
-                },
-                {
-                    label: 'OK',
-                    class: 'btn-danger',
-                    callback: function() {
-                        $.ajax({
-                            url: apiUrl('content/' + view.model.id),
-                            type: 'DELETE',
-                            success: onSuccess
-                        });
-                    }
-                }
-            ]
-        });
     }
 
     /**
@@ -154,9 +123,6 @@ class JSONEditor extends View {
                         'Basic'
                     ).click(() => { this.onClickBasic(); }),
                     _.if(!this.model.locked,
-                        _.button({class: 'btn btn-danger btn-raised'},
-                            'Delete'
-                        ).click(() => { this.onClickDelete(); }),
                         _.button({class: 'btn btn-raised btn-success'},
                             'Save '
                         ).click(() => { this.onClickSave(); })

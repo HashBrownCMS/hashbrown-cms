@@ -15,7 +15,7 @@ Router.route('/schemas/', function() {
 // Edit
 Router.route('/schemas/:id', function() {
     let schemaEditor = new SchemaEditor({
-        modelUrl: apiUrl('schemas/' + this.id)
+        model: resources.schemas[this.id]
     });
     
     ViewHelper.get('NavbarMain').highlightItem(this.id);
@@ -26,7 +26,8 @@ Router.route('/schemas/:id', function() {
 // Edit (JSON editor)
 Router.route('/schemas/json/:id', function() {
     let jsonEditor = new JSONEditor({
-        modelUrl: apiUrl('schemas/' + this.id)
+        model: resources.schemas[this.id],
+        apiPath: 'schemas/' + this.id
     });
     
     ViewHelper.get('NavbarMain').highlightItem(this.id);
