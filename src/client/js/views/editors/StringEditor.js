@@ -14,7 +14,9 @@ class StringEditor extends View {
      * Event: Change
      */
     onChange() {
-        this.trigger('change', this.$input.val());
+        this.value = this.$input.val();
+
+        this.trigger('change', this.value);
     }
     
     render() {

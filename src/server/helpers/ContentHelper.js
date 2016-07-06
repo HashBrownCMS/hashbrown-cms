@@ -50,17 +50,23 @@ class ContentHelper extends ContentHelperCommon {
      * @return {Promise} promise
      */
     static setContentById(id, content) {
-        content.updateDate = Date.now();
-        let collection = ProjectHelper.currentEnvironment + '.content';
+        if(!content || Object.keys(content).length < 1) {
+            return new Promise((resolve, reject) => {
+                reject(new Error('Posted content with id "' + id + '" is empty'));
+            });
+        } else {
+            content.updateDate = Date.now();
+            let collection = ProjectHelper.currentEnvironment + '.content';
 
-        return MongoHelper.updateOne(
-            ProjectHelper.currentProject,
-            collection,
-            {
-                id: id
-            },
-            content
-        );
+            return MongoHelper.updateOne(
+                ProjectHelper.currentProject,
+                collection,
+                {
+                    id: id
+                },
+                content
+            );
+        }
     }
 
     /**

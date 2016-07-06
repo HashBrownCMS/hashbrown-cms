@@ -2,6 +2,7 @@
 
 // Libs
 let fs = require('fs');
+let bodyparser = require('body-parser');
 
 // Models
 let Media = require('../models/Media');
@@ -143,11 +144,11 @@ class ApiController extends Controller {
             if(id && id != 'undefined') {
                 ContentHelper.getContentById(id)
                 .then(function(node) {
-                    res.send(node);
+                    res.status(200).send(node);
                 });
             
             } else {
-                throw '[Api] Content id is undefined';
+                debug.error('Content id is undefined', ApiController);
             
             }
         })
@@ -188,6 +189,10 @@ class ApiController extends Controller {
             ContentHelper.setContentById(id, node)
             .then(function() {
                 res.sendStatus(200);
+            })
+            .catch((e) => {
+                res.sendStatus(400);   
+                debug.log(e, ApiController);
             });
         })
         .catch((e) => {

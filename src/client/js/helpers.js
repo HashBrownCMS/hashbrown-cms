@@ -63,7 +63,7 @@ window.messageModal = function messageModal(title, body, onSubmit) {
 }
 
 /**
- * Wraps an API call
+ * Wraps an API URL
  *
  * @param {String} url
  */
@@ -76,6 +76,62 @@ window.apiUrl = function apiUrl(url) {
         '?token=' + localStorage.getItem('token');
 
     return newUrl;
+};
+
+/**
+ * Wraps an API call
+ *
+ * @param {String} method
+ *
+ * @returns {Promise(Object)} response
+ */
+window.apiCall = function apiCall(method, url, data) {
+    return new Promise((resolve, reject) => {
+        var xhr = new XMLHttpRequest();
+        xhr.open(method.toUpperCase(), apiUrl(url));
+        xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
+
+        if(data) {
+            if(typeof data === 'object') {
+                data = JSON.stringify(data);
+            }
+            
+            xhr.send(data);
+
+        } else {
+            xhr.send();
+        
+        }
+
+        xhr.onreadystatechange = () => {
+            let DONE = 4;
+            let OK = 200;
+            let NOT_MODIFIED = 304;
+            
+            if (xhr.readyState === DONE) {
+                if(xhr.status == OK || xhr.status == NOT_MODIFIED) {
+                    let response = xhr.responseText;
+
+                    if(response && response != 'OK') {
+                        try {
+                            response = JSON.parse(response);
+                        
+                        } catch(e) {
+                            debug.log('Response: ' + response, this)
+                            debug.warning(e, this)
+
+                        }
+                    }
+
+                    resolve(response);
+
+                } else {
+                    reject(new Error(xhr.responseText));
+                
+                }
+            }
+        }
+    });
 };
 
 /**

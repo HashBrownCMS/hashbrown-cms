@@ -1,5 +1,6 @@
 window.resources.editors = {
     array: require('./ArrayEditor'),
+    boolean: require('./BooleanEditor'),
     contentReference: require('./ContentReferenceEditor'),
     contentSchemaReference: require('./ContentSchemaReferenceEditor'),
     date: require('./DateEditor'),

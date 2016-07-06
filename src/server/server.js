@@ -20,7 +20,7 @@ let app = express();
 app.set('view engine', 'jade');
 app.set('views', appRoot + '/src/server/views');
 
-app.use(bodyparser.urlencoded({ extended: true }))
+app.use(bodyparser.json());
 app.use(express.static(appRoot + '/public'));
 
 // ----------

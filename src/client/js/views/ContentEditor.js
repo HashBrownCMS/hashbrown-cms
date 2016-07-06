@@ -31,13 +31,9 @@ class ContentEditor extends View {
         let view = this;
 
         function unpublishConnections() {
-            $.ajax({
-                type: 'post',
-                url: apiUrl('content/unpublish'),
-                data: view.model,
-                success: onSuccess,
-                error: onError
-            });
+            apiCall('post', 'content/unpublish', view.model)
+            .then(onSuccess)
+            .catch(onError);
         }
         
         function onSuccess() {
@@ -64,13 +60,9 @@ class ContentEditor extends View {
         view.model.unpublished = true;
 
         // Save content to database
-        $.ajax({
-            type: 'post',
-            url: view.modelUrl,
-            data: view.model,
-            success: unpublishConnections,
-            error: onError
-        });
+        apiCall('post', 'content/' + view.model.id, view.model)
+        .then(unpublishConnections)
+        .catch(onError);
     }
     
     /**
@@ -84,13 +76,9 @@ class ContentEditor extends View {
         view.model.unpublished = false;
 
         function publishConnections() {
-            $.ajax({
-                type: 'post',
-                url: apiUrl('content/publish'),
-                data: view.model,
-                success: onSuccess,
-                error: onError
-            });
+            apiCall('post', 'content/publish', view.model)
+            .then(onSuccess)
+            .catch(onError);
         }
 
         function onSuccess() {
@@ -117,16 +105,17 @@ class ContentEditor extends View {
         view.$saveBtn.toggleClass('working', true);
 
         // Save content to database
-        $.ajax({
-            type: 'post',
-            url: view.modelUrl,
-            data: view.model,
-            success:
-                publishing.connections && publishing.connections.length > 0 ?
-                publishConnections :
-                onSuccess,
-            error: onError
-        });
+        apiCall('post', 'content/' + view.model.id, view.model)
+        .then((response) => {
+            if(publishing.connections && publishing.connections.length > 0) {
+                publishConnections();
+            
+            } else {
+                onSuccess();
+
+            }
+        }).
+        catch(onError);
     }
 
     /**
@@ -145,13 +134,9 @@ class ContentEditor extends View {
         let view = this;
 
         function unpublishConnections() {
-            $.ajax({
-                type: 'post',
-                url: apiUrl('content/unpublish'),
-                data: view.model,
-                success: onSuccess,
-                error: onError
-            });
+            apiCall('post', 'content/unpublish', view.model)
+            .then(onSuccess)
+            .catch(onError);
         }
         
         function onSuccess() {
@@ -191,15 +176,16 @@ class ContentEditor extends View {
                     label: 'OK',
                     class: 'btn-danger',
                     callback: function() {
-                        $.ajax({
-                            url: apiUrl('content/' + view.model.id),
-                            type: 'DELETE',
-                            success: 
-                                publishing.connections && publishing.connections.length > 0 ?
-                                unpublishConnections :
-                                onSuccess,
-                            error: onError
-                        });
+                        apiCall('delete', 'content/' + view.model.id)
+                        .then(() => {
+                            if(publishing.connections && publishing.connections.length > 0) {
+                                unpublishConnections();
+                            
+                            } else {
+                                onSuccess();
+                            }
+                        })
+                        .catch(onError);
                     }
                 }
             ]

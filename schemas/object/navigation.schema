@@ -1,1 +1,0 @@
-{"schemaType":"object","name":"Navigation","type":"object","parentSchemaId":"contentBase","defaultTabId":"pages","icon":"list","tabs":{"content":"Content"},"fields":{"properties":{"title":{"schemaId":"string","label":"Title","tabId":"content"},"pages":{"schemaId":"contentReference","label":"Pages","multiple":"true"}}}}

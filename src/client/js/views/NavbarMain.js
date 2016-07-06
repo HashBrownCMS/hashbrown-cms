@@ -17,7 +17,19 @@ class NavbarMain extends View {
 
         this.fetch();
     }
-
+    
+    /**
+     * Event: Error was returned
+     */
+    onError(err) {
+        new MessageModal({
+            model: {
+                title: 'Error',
+                body: err
+            }
+        });
+    }
+    
     /**
      * Event: Click copy content
      */
@@ -28,28 +40,25 @@ class NavbarMain extends View {
         // This function should only exist if an item has been copied
         view.onClickPasteContent = function onClickPasteContent() {
             let parentId = $('.context-menu-target-element').data('id');
-            
-            $.getJSON(
-                apiUrl('content/' + id),
-                function(copiedContent) {
-                    delete copiedContent['id'];
+           
+            apiCall('get', 'content/' + id)
+            .then((copiedContent) => {
+                delete copiedContent['id'];
 
-                    copiedContent.parentId = parentId;
-                        
-                    $.post(
-                        apiUrl('content/new'),
-                        copiedContent,
-                        function() {
-                            reloadResource('content')
-                            .then(function() {
-                                view.reload();
-                            });
+                copiedContent.parentId = parentId;
+                
+                apiCall('post', 'content/new', copiedContent)
+                .then(() => {
+                    reloadResource('content')
+                    .then(function() {
+                        view.reload();
+                    });
 
-                            view.onClickPasteContent = null;
-                        }
-                    );
-                }
-            );
+                    view.onClickPasteContent = null;
+                })
+                .catch(this.onError);
+            })
+            .catch(this.onError);
         }
     }
 
@@ -66,22 +75,19 @@ class NavbarMain extends View {
             ContentHelper.getContentById(cutId)
             .then((cutContent) => {
                 cutContent.parentId = parentId;
-                
-                $.ajax({
-                    type: 'POST',
-                    url: apiUrl('content/' + cutId),
-                    data: cutContent,
-                    success: () => {
-                        reloadResource('content')
-                        .then(() => {
-                            this.reload();
+               
+                apiCall('post', 'content/' + cutId, cutContent)
+                .then(() => {
+                    reloadResource('content')
+                    .then(() => {
+                        this.reload();
 
-                            location.hash = '/content/' + cutId;
-                        });
+                        location.hash = '/content/' + cutId;
+                    });
 
-                        this.onClickPasteContent = null;
-                    }
-                });
+                    this.onClickPasteContent = null;
+                })
+                .catch(this.onError);
             }); 
         }
     }
@@ -90,18 +96,16 @@ class NavbarMain extends View {
      * Event: Click new content
      */
     onClickNewContent() {
-        $.ajax({
-            type: 'POST',
-            url: apiUrl('content/new'),
-            success: (newContent) => {
-                reloadResource('content')
-                .then(() => {
-                    this.reload();
-                    
-                    location.hash = '/content/' + newContent.id;
-                });
-            }
-        });
+        apiCall('post', 'content/new')
+        .then((newContent) => {
+            reloadResource('content')
+            .then(() => {
+                this.reload();
+                
+                location.hash = '/content/' + newContent.id;
+            });
+        })
+        .catch(this.onError);
     }
 
     /**
@@ -120,16 +124,6 @@ class NavbarMain extends View {
                 // Get settings first
                 content.getSettings('publishing')
                 .then((publishing) => {
-                    // Error event
-                    function onError(err) {
-                        new MessageModal({
-                            model: {
-                                title: 'Error',
-                                body: err
-                            }
-                        });
-                    }
-
                     // Success event
                     function onSuccess() {
                         view.reload();
@@ -158,13 +152,9 @@ class NavbarMain extends View {
                             content.settings.publishing = publishing;
                     
                             // Save model
-                            $.ajax({
-                                type: 'post',
-                                url: apiUrl('content/' + content.id),
-                                data: content,
-                                success: onSuccess,
-                                error: onError
-                            });
+                            apiCall('post', 'content/' + content.id, content)
+                            .then(onSuccess)
+                            .catch(this.onError);
                         }
                     }
 
@@ -176,6 +166,8 @@ class NavbarMain extends View {
                             if(publishing.governedBy) {
                                 return _.p('(Settings inherited from <a href="#/content/' + publishing.governedBy.id + '">' + publishing.governedBy.prop('title', window.language) + '</a>)')
                             } else {
+                                publishing.applyToChildren = publishing.applyToChildren == true || publishing.applyToChildren == 'true';
+
                                 return [
                                     // Heading
                                     _.div({class: 'input-group'},      
@@ -186,7 +178,7 @@ class NavbarMain extends View {
                                                     id: 'switch-publishing-apply-to-children',
                                                     class: 'form-control switch',
                                                     type: 'checkbox',
-                                                    checked: publishing.applyToChildren == 'true'
+                                                    checked: publishing.applyToChildren == true
                                                 }),
                                                 _.label({for: 'switch-publishing-apply-to-children'})
                                             )
@@ -234,13 +226,9 @@ class NavbarMain extends View {
             content.getSettings('publishing')
             .then((publishing) => {
                 function unpublishConnections() {
-                    $.ajax({
-                        type: 'post',
-                        url: apiUrl('content/unpublish'),
-                        data: content,
-                        success: onSuccess,
-                        error: onError
-                    });
+                    apiCall('post', 'content/unpublish', content)
+                    .then(onSuccess)
+                    .catch(this.onError);
                 }
                 
                 function onSuccess() {
@@ -253,15 +241,6 @@ class NavbarMain extends View {
                         // Cancel the ContentEditor view if it was displaying the deleted content
                         if(location.hash.indexOf('#/content/' + id) > -1) {
                             location.hash = '/content/';
-                        }
-                    });
-                }
-
-                function onError(err) {
-                    new MessageModal({
-                        model: {
-                            title: 'Error',
-                            body: err
                         }
                     });
                 }
@@ -282,15 +261,15 @@ class NavbarMain extends View {
                             label: 'OK',
                             class: 'btn-danger',
                             callback: function() {
-                                $.ajax({
-                                    url: apiUrl('content/' + id),
-                                    type: 'DELETE',
-                                    success: 
-                                        publishing.connections && publishing.connections.length > 0 ?
-                                        unpublishConnections :
-                                        onSuccess,
-                                    error: onError
-                                });
+                                apiCall('delete', 'content/' + id)
+                                .then(() => {
+                                    if(publishing.connections && publishing.connections.length > 0) {
+                                        unpublishConnections();
+                                    } else {
+                                        onSuccess();
+                                    }
+                                })
+                                .catch(this.onError);
                             }
                         }
                     ]
@@ -303,18 +282,25 @@ class NavbarMain extends View {
      * Event: Click new connection
      */
     onClickNewConnection() {
-        $.ajax({
-            type: 'POST',
-            url: apiUrl('connections/new'),
-            success: (newConnection) => {
-                reloadResource('connections')
-                .then(() => {
-                    this.reload();
+        function onError(err) {
+            new MessageModal({
+                model: {
+                    title: 'Error',
+                    body: err
+                }
+            });
+        }
+        
+        apiCall('post', 'connections/new')
+        .then((newConnection) => {
+            reloadResource('connections')
+            .then(() => {
+                this.reload();
 
-                    location.hash = '/connections/' + newConnection.id;
-                });
-            }
-        });
+                location.hash = '/connections/' + newConnection.id;
+            });
+        })
+        .catch(this.onError);
     }
 
     /**
@@ -324,6 +310,15 @@ class NavbarMain extends View {
         let view = this;
         let id = $('.context-menu-target-element').data('id');
         let name = $('.context-menu-target-element').data('name');
+        
+        function onError(err) {
+            new MessageModal({
+                model: {
+                    title: 'Error',
+                    body: err
+                }
+            });
+        }
         
         function onSuccess() {
             debug.log('Removed connection with alias "' + id + '"', view); 
@@ -355,11 +350,9 @@ class NavbarMain extends View {
                     label: 'OK',
                     class: 'btn-danger',
                     callback: function() {
-                        $.ajax({
-                            url: apiUrl('connections/' + id),
-                            type: 'DELETE',
-                            success: onSuccess
-                        });
+                        apiCall('delete', 'connections/' + id)
+                        .then(onSuccess)
+                        .catch(this.onError);
                     }
                 }
             ]
@@ -373,19 +366,25 @@ class NavbarMain extends View {
         let parentId = $('.context-menu-target-element').data('id');
         let parentSchema = window.resources.schemas[parentId];
 
-        $.ajax({
-            type: 'POST',
-            url: apiUrl('schemas/new'),
-            data: parentSchema,
-            success: (newSchema) => {
-                reloadResource('schemas')
-                .then(() => {
-                    this.reload();
+        function onError(err) {
+            new MessageModal({
+                model: {
+                    title: 'Error',
+                    body: err
+                }
+            });
+        }
+        
+        apiCall('post', 'schemas/new', parentSchema)
+        .then((newSchema) => {
+            reloadResource('schemas')
+            .then(() => {
+                this.reload();
 
-                    location.hash = '/schemas/' + newSchema.id;
-                });
-            }
-        });
+                location.hash = '/schemas/' + newSchema.id;
+            });
+        })
+        .catch(this.onError);
     }
     
     /**
@@ -427,11 +426,9 @@ class NavbarMain extends View {
                         label: 'OK',
                         class: 'btn-danger',
                         callback: function() {
-                            $.ajax({
-                                url: apiUrl('schemas/' + id),
-                                type: 'DELETE',
-                                success: onSuccess
-                            });
+                            apiCall('delete', 'schemas/' + id)
+                            .then(onSuccess)
+                            .catch(this.onError);
                         }
                     }
                 ]
@@ -480,25 +477,26 @@ class NavbarMain extends View {
         // This function should only exist if an item has been cut
         this.onClickPasteMedia = function onClickPasteMedia() {
             let parentFolder = $('.context-menu-target-element').data('media-folder');
-          
-            $.ajax({
-                type: 'POST',
-                url: apiUrl('media/tree/' + cutId),
-                data: parentFolder ? {
+         
+            apiCall(
+                'post',
+                'media/tree/' + cutId,
+                parentFolder ? {
                     id: cutId,
                     folder: parentFolder
-                } : null,
-                success: () => {
-                    reloadResource('media')
-                    .then(() => {
-                        this.reload();
+                } : null
+            )
+            .then(() => {
+                reloadResource('media')
+                .then(() => {
+                    this.reload();
 
-                        location.hash = '/media/' + cutId;
-                    });
+                    location.hash = '/media/' + cutId;
+                });
 
-                    this.onClickPasteMedia = null;
-                }
-            });
+                this.onClickPasteMedia = null;
+            })
+            .catch(this.onError);
         }
     }
 
@@ -540,11 +538,9 @@ class NavbarMain extends View {
                     label: 'OK',
                     class: 'btn-danger',
                     callback: function() {
-                        $.ajax({
-                            url: apiUrl('media/' + id),
-                            type: 'DELETE',
-                            success: onSuccess
-                        });
+                        apiCall('delete', 'media/' + id)
+                        .then(onSuccess)
+                        .catch(this.onError);
                     }
                 }
             ]
@@ -1141,13 +1137,9 @@ class NavbarMain extends View {
                                     thisContent.sort = prevContent.sort + 1;
 
                                     // Save model
-                                    $.ajax({
-                                        type: 'post',
-                                        url: apiUrl('content/' + thisContent.id),
-                                        data: thisContent.getObject(),
-                                        success: onSuccess,
-                                        error: onError
-                                    });
+                                    apiCall('post', 'content/' + thisContent.id, thisContent.getObject())
+                                    .then(onSuccess)
+                                    .catch(onError);
                                 });
 
                             // If this element has a next sibling, base the sorting index on that
@@ -1159,13 +1151,9 @@ class NavbarMain extends View {
                                     thisContent.sort = nextContent.sort - 1;
 
                                     // Save model
-                                    $.ajax({
-                                        type: 'post',
-                                        url: apiUrl('content/' + thisContent.id),
-                                        data: thisContent.getObject(),
-                                        success: onSuccess,
-                                        error: onError
-                                    });
+                                    apiCall('post', 'content/' + thisContent.id, thisContent.getObject())
+                                    .then(onSuccess)
+                                    .catch(onError);
                                 });
 
 
@@ -1174,13 +1162,9 @@ class NavbarMain extends View {
                                 thisContent.sort = 10000;
                                
                                 // Save model
-                                $.ajax({
-                                    type: 'post',
-                                    url: apiUrl('content/' + thisContent.id),
-                                    data: thisContent.getObject(),
-                                    success: onSuccess,
-                                    error: onError
-                                });
+                                apiCall('post', 'content/' + thisContent.id, thisContent.getObject())
+                                .then(onSuccess)
+                                .catch(onError);
                             }
                         });
                     }
