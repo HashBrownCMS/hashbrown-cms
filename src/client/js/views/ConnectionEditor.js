@@ -13,6 +13,18 @@ class ConnectionEditor extends View {
     }
 
     /**
+     * Event: Failed API call
+     */
+    onError(err) {
+        new MessageModal({
+            model: {
+                title: 'Error',
+                body: err
+            }
+        });
+    }
+
+    /**
      * Event: Click advanced. Routes to the JSON editor
      */
     onClickAdvanced() {
@@ -27,30 +39,19 @@ class ConnectionEditor extends View {
 
         view.$saveBtn.toggleClass('saving', true);
 
-        $.ajax({
-            type: 'post',
-            url: apiUrl('connections/' + view.model.id),
-            data: view.model,
-            success: function() {
-                view.$saveBtn.toggleClass('saving', false);
-            
-                reloadResource('connections')
-                .then(function() {
-                    let navbar = ViewHelper.get('NavbarMain');
+        apiCall('post', 'connections/' + view.model.id, view.model)
+        .then(() => {
+            view.$saveBtn.toggleClass('saving', false);
+        
+            reloadResource('connections')
+            .then(function() {
+                let navbar = ViewHelper.get('NavbarMain');
 
-                    view.reload();
-                    navbar.reload();
-                });
-            },
-            error: function(err) {
-                new MessageModal({
-                    model: {
-                        title: 'Error',
-                        body: err
-                    }
-                });
-            }
-        });
+                view.reload();
+                navbar.reload();
+            });
+        })
+        .catch(this.onError);
     }
 
     /**
@@ -87,11 +88,9 @@ class ConnectionEditor extends View {
                     label: 'OK',
                     class: 'btn-danger',
                     callback: function() {
-                        $.ajax({
-                            url: apiUrl('connections/' + view.model.id),
-                            type: 'DELETE',
-                            success: onSuccess
-                        });
+                        apiCall('delete', 'connections/' + view.model.id)
+                        .then(onSuccess)
+                        .catch(this.onError);
                     }
                 }
             ]

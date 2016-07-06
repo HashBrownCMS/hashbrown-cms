@@ -2909,13 +2909,15 @@ Router.route('/schemas/json/:id',function(){var jsonEditor=new JSONEditor({model
 Router.route('/settings/',function(){ViewHelper.get('NavbarMain').showTab('/settings/');$('.workspace').html(_.div({class:'dashboard-container'},_.h1('Settings dashboard'),_.p('Please click on a settings item to proceed')));}); // Edit
 Router.route('/settings/languages/',function(){ViewHelper.get('NavbarMain').highlightItem('languages');$('.workspace').html(_.div({class:'dashboard-container'},new LanguageSettings().$element));});},{}],174:[function(require,module,exports){'use strict'; // Views
 var MessageModal=require('./MessageModal');var ConnectionEditor=function(_View2){_inherits(ConnectionEditor,_View2);function ConnectionEditor(params){_classCallCheck(this,ConnectionEditor);var _this15=_possibleConstructorReturn(this,Object.getPrototypeOf(ConnectionEditor).call(this,params));_this15.$element=_.div({class:'editor connection-editor content-editor'});_this15.fetch();return _this15;} /**
+     * Event: Failed API call
+     */_createClass(ConnectionEditor,[{key:"onError",value:function onError(err){new MessageModal({model:{title:'Error',body:err}});} /**
      * Event: Click advanced. Routes to the JSON editor
-     */_createClass(ConnectionEditor,[{key:"onClickAdvanced",value:function onClickAdvanced(){location.hash='/connections/json/'+this.model.id;} /**
+     */},{key:"onClickAdvanced",value:function onClickAdvanced(){location.hash='/connections/json/'+this.model.id;} /**
      * Event: Click save. Posts the model to the modelUrl
-     */},{key:"onClickSave",value:function onClickSave(){var view=this;view.$saveBtn.toggleClass('saving',true);$.ajax({type:'post',url:apiUrl('connections/'+view.model.id),data:view.model,success:function success(){view.$saveBtn.toggleClass('saving',false);reloadResource('connections').then(function(){var navbar=ViewHelper.get('NavbarMain');view.reload();navbar.reload();});},error:function error(err){new MessageModal({model:{title:'Error',body:err}});}});} /**
+     */},{key:"onClickSave",value:function onClickSave(){var view=this;view.$saveBtn.toggleClass('saving',true);apiCall('post','connections/'+view.model.id,view.model).then(function(){view.$saveBtn.toggleClass('saving',false);reloadResource('connections').then(function(){var navbar=ViewHelper.get('NavbarMain');view.reload();navbar.reload();});}).catch(this.onError);} /**
      * Event: On click remove
      */},{key:"onClickDelete",value:function onClickDelete(){var view=this;function onSuccess(){debug.log('Removed connection with id "'+view.model.id+'"',this);reloadResource('connection').then(function(){ViewHelper.get('NavbarMain').reload(); // Cancel the ConnectionEditor view
-location.hash='/connections/';});}new MessageModal({model:{title:'Delete connection',body:'Are you sure you want to delete the connection "'+view.model.title+'"?'},buttons:[{label:'Cancel',class:'btn-default',callback:function callback(){}},{label:'OK',class:'btn-danger',callback:function callback(){$.ajax({url:apiUrl('connections/'+view.model.id),type:'DELETE',success:onSuccess});}}]});} /**
+location.hash='/connections/';});}new MessageModal({model:{title:'Delete connection',body:'Are you sure you want to delete the connection "'+view.model.title+'"?'},buttons:[{label:'Cancel',class:'btn-default',callback:function callback(){}},{label:'OK',class:'btn-danger',callback:function callback(){apiCall('delete','connections/'+view.model.id).then(onSuccess).catch(this.onError);}}]});} /**
      * Reload this view
      */},{key:"reload",value:function reload(){this.model=null;this.fetch();} /**
      * Renders the title editor
@@ -3212,7 +3214,7 @@ var icons=require('../icons.json').icons; /**
      * Event: Click advanced. Routes to the JSON editor
      */_createClass(SchemaEditor,[{key:"onClickAdvanced",value:function onClickAdvanced(){location.hash=location.hash.replace('/schemas/','/schemas/json/');} /**
      * Event: Click save. Posts the model to the modelUrl
-     */},{key:"onClickSave",value:function onClickSave(){var _this40=this;this.$saveBtn.toggleClass('working',true);$.ajax({type:'post',url:this.modelUrl,data:this.model,success:function success(){debug.log('Saved model to '+_this40.modelUrl,_this40);_this40.$saveBtn.toggleClass('working',false);reloadResource('schemas').then(function(){var navbar=ViewHelper.get('NavbarMain');navbar.reload();});},error:function error(err){new MessageModal({model:{title:'Error',body:err}});}});} /**
+     */},{key:"onClickSave",value:function onClickSave(){var _this40=this;this.$saveBtn.toggleClass('working',true);apiCall('post','schemas/'+this.model.id,this.model).then(function(){debug.log('Saved model to',_this40);_this40.$saveBtn.toggleClass('working',false);reloadResource('schemas').then(function(){var navbar=ViewHelper.get('NavbarMain');navbar.reload();});}).catch(function(err){new MessageModal({model:{title:'Error',body:err}});});} /**
      * Renders the editor picker
      *
      * @return {Object} element

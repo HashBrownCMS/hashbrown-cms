@@ -51,8 +51,7 @@ class GitHubConnection extends Connection {
 
                 if(data) {
                     if(data.message) {
-                        debug.log('Couldn\'t find templates. GitHub response: ' + JSON.stringify(data.message), this);
-                        reject();
+                        reject(new Error('Couldn\'t find templates. GitHub response: ' + JSON.stringify(data.message)));
                     
                     } else {
                         for(let i in data) {
@@ -86,8 +85,7 @@ class GitHubConnection extends Connection {
 
                 if(data) {
                     if(data.message) {
-                        debug.log('Couldn\'t find section templates. GitHub response: ' + JSON.stringify(data.message), this);
-                        reject();
+                        reject(new Error('Couldn\'t find section templates. GitHub response: ' + JSON.stringify(data.message)));
 
                     } else {
                         for(let i in data) {

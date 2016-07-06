@@ -29,29 +29,25 @@ class SchemaEditor extends View {
     onClickSave() {
         this.$saveBtn.toggleClass('working', true);
 
-        $.ajax({
-            type: 'post',
-            url: this.modelUrl,
-            data: this.model,
-            success: () => {
-                debug.log('Saved model to ' + this.modelUrl, this);
-                this.$saveBtn.toggleClass('working', false);
-            
-                reloadResource('schemas')
-                .then(() => {
-                    let navbar = ViewHelper.get('NavbarMain');
-                    
-                    navbar.reload();
-                });
-            },
-            error: function(err) {
-                new MessageModal({
-                    model: {
-                        title: 'Error',
-                        body: err
-                    }
-                });
-            }
+        apiCall('post', 'schemas/' + this.model.id, this.model)
+        .then(() => {
+            debug.log('Saved model to', this);
+            this.$saveBtn.toggleClass('working', false);
+        
+            reloadResource('schemas')
+            .then(() => {
+                let navbar = ViewHelper.get('NavbarMain');
+                
+                navbar.reload();
+            });
+        })
+        .catch((err) => {
+            new MessageModal({
+                model: {
+                    title: 'Error',
+                    body: err
+                }
+            });
         });
     }
 

@@ -643,9 +643,14 @@ class ApiController extends Controller {
                 connection.getTemplates()
                 .then((templates) => {
                     res.send(templates);
-                });
+                })
+                .catch((e) => {
+                    debug.log(e, ApiController)
+                    res.send([]);
+                });            
             })
             .catch((e) => {
+                debug.log(e, ApiController)
                 res.send([]);
             });            
         })
@@ -666,9 +671,14 @@ class ApiController extends Controller {
                 connection.getSectionTemplates()
                 .then((templates) => {
                     res.send(templates);
-                });
+                })
+                .catch((e) => {
+                    debug.log(e, ApiController)
+                    res.send([]);
+                });            
             })
             .catch((e) => {
+                debug.log(e, ApiController)
                 res.send([]);
             });            
         })
