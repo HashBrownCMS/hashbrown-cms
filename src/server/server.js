@@ -54,6 +54,9 @@ function ready() {
             UserHelper.createUser(args.u, args.p);
             return;
         
+        case 'revoke-tokens':
+            UserHelper.revokeTokens(args.u, args.p);
+    
         case 'set-user-scopes':
             UserHelper.findUser(args.u)
             .then((user) => {

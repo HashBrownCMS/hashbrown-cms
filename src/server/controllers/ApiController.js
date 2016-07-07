@@ -549,12 +549,14 @@ class ApiController extends Controller {
         let username = req.body.username;
         let password = req.body.password;
 
+        debug.log('Attempting login for user "' + username + '"...', UserHelper);
+
         UserHelper.loginUser(username, password)
         .then((token) => {
             res.send(token);
         })
         .catch((e) => {
-            res.sendStatus(403);   
+            res.status(403).send(e);   
         });
     }
 

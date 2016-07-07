@@ -14,7 +14,7 @@ class UserHelper {
      * @returns {Promise(User)} user
      */
     static findUser(username) {
-        return new Promise((callback) => {
+        return new Promise((resolve, reject) => {
             MongoHelper.findOne(
                 'users',
                 'users',
@@ -22,8 +22,28 @@ class UserHelper {
                     username: username
                 }
             ).then((user) => {
-                callback(new User(user));
-            });       
+                resolve(new User(user));
+            })
+            .catch(reject);       
+        });
+    }
+
+    /**
+     * Revokes all User tokens
+     *
+     * @returns {Promise} promise
+     */
+    static revokeTokens(username) {
+        return new Promise((resolve, reject) => {
+            findUser(username)
+            .then((user) => {
+                user.tokens = [];
+
+                UserHelper.updateUser(username, user.getObject())
+                .then(resolve)
+                .catch(reject); 
+            })
+            .catch(reject);
         });
     }
 
@@ -45,14 +65,13 @@ class UserHelper {
                     UserHelper.updateUser(username, user.getFields())
                     .then(() => {
                         resolve(token);
-                    });
+                    })
+                    .catch(reject);
                 } else {
-                    reject();
+                    reject(new Error('Invalid password'));
                 }
             })
-            .catch((error) => {
-                reject(error);        
-            });
+            .catch(reject);
         });
     }
 
@@ -64,25 +83,27 @@ class UserHelper {
      * @returns {Promise(User)} user
      */
     static findToken(token) {
-        return new Promise((callback) => {
+        return new Promise((resolve, reject) => {
             MongoHelper.find(
                 'users',
                 'users',
                 {}
-            ).then((users) => {
+            )
+            .then((users) => {
                 for(let u of users) {
                     let user = new User(u);
                     
                     let valid = user.validateToken(token);
 
                     if(valid) {
-                        callback(user);
+                        resolve(user);
                         return;
                     }
                 }
 
-                callback(null);
-            });       
+                resolve(null);
+            })
+            .catch(reject);
         });
     }
     
