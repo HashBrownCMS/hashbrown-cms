@@ -427,6 +427,7 @@ class GitHubConnection extends Connection {
             // Add meta data to the properties
             properties.meta = {
                 id: id,
+                parentId: meta.parentId,
                 language: language
             };
 

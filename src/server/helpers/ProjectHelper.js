@@ -27,7 +27,8 @@ class ProjectHelper {
                     reject(new Error('Environment "' + environment + '" is not enabled'));
 
                 }
-            });
+            })
+            .catch(reject);
         });
     }
 

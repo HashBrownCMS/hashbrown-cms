@@ -3,6 +3,7 @@
 // Libs
 let fs = require('fs');
 let bodyparser = require('body-parser');
+let pathToRegexp = require('path-to-regexp');
 
 // Models
 let Media = require('../models/Media');
@@ -15,6 +16,54 @@ let Controller = require('./Controller');
  * The main API controller
  */
 class ApiController extends Controller {
+    /**
+     * Middleware
+     *
+     * @param {Object} req
+     * @param {Object} res
+     * @param {Function} next
+     */
+    static middleware(req, res, next) {
+        let keys = [];
+        let re = pathToRegexp('/api/:project/:environment/*', keys);
+        let values = re.exec(req.originalUrl);
+        let project;
+        let environment;
+
+        if(values) {
+            // The first array item is the entire url, so remove it
+            values.shift();
+
+            for(let i in keys) {
+                let key = keys[i];
+
+                switch(key.name) {
+                    case 'project':
+                        project = values[i];
+                        break;
+
+                    case 'environment':
+                        environment = values[i];
+                        break;
+                }
+            }
+        }
+
+        // We have both project and environment, we'll set them as current
+        if(project && environment) {
+            ProjectHelper.setCurrent(project, environment)
+            .then(next)
+            .catch((err) => {
+                res.status(502).send(err);
+            });
+        
+        // The parameters weren't provided, so just move on
+        } else {
+            next();
+
+        }
+    }
+
     /**
      * Initialises this controller
      */

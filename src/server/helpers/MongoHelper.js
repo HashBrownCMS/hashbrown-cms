@@ -120,7 +120,7 @@ class MongoHelper {
      * @return {Promise} promise
      */
     static find(databaseName, collectionName, query) {
-        return new Promise((callback) => {
+        return new Promise((resolve, reject) => {
             debug.log(databaseName + '/' + collectionName + '::find ' + JSON.stringify(query) + '...', this);
 
             let pattern = {
@@ -130,12 +130,15 @@ class MongoHelper {
             MongoHelper.getDatabase(databaseName).then(function(db) {
                 db.collection(collectionName).find(query, pattern).toArray(function(findErr, docs) {
                     if(findErr) {
-                        throw findErr;
-                    }
+                        reject(new Error(findErr));
 
-                    callback(docs);
+                    } else {
+                        resolve(docs);
+                    
+                    }
                 });
-            });
+            })
+            .catch(reject);
         });
     }
     
@@ -154,18 +157,21 @@ class MongoHelper {
         // Make sure the MongoId isn't included
         delete doc['_id'];
 
-        return new Promise((callback) => {
+        return new Promise((resolve, reject) => {
             debug.log(databaseName + '/' + collectionName + '::updateOne ' + JSON.stringify(query) + ' with options ' + JSON.stringify(options || {}) + '...', this);
         
             MongoHelper.getDatabase(databaseName).then(function(db) {
                 db.collection(collectionName).updateOne(query, doc, options || {}, function(findErr) {
                     if(findErr) {
-                        throw findErr;
-                    }
+                        reject(new Error(findErr));
+                    
+                    } else {
+                        resolve();
 
-                    callback();
+                    }
                 });
-            });
+            })
+            .catch(reject);
         });
     }
     

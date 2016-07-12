@@ -20,8 +20,48 @@ let app = express();
 app.set('view engine', 'jade');
 app.set('views', appRoot + '/src/server/views');
 
+// ----------
+// Helpers
+// ----------
+global.UserHelper = require('./helpers/UserHelper');
+global.ConnectionHelper = require('./helpers/ConnectionHelper');
+global.ContentHelper = require('./helpers/ContentHelper');
+global.LanguageHelper = require('./helpers/LanguageHelper');
+global.MediaHelper = require('./helpers/MediaHelper');
+global.FormHelper = require('./helpers/FormHelper');
+global.MongoHelper = require('./helpers/MongoHelper');
+global.PluginHelper = require('./helpers/PluginHelper');
+global.ProjectHelper = require('./helpers/ProjectHelper');
+global.SchemaHelper = require('./helpers/SchemaHelper');
+global.SettingsHelper = require('./helpers/SettingsHelper');
+
+global.debug = require('../common/helpers/DebugHelper');
+global.debug.verbosity = 3;
+
+PluginHelper.init(app)
+    .then(ready);
+
+// ----------
+// Controllers
+// ----------
+let FormController = require(appRoot + '/src/server/controllers/FormController');
+let ApiController = require(appRoot + '/src/server/controllers/ApiController');
+let MediaController = require(appRoot + '/src/server/controllers/MediaController');
+
+// ----------
+// App middlewares
+// ----------
 app.use(bodyparser.json());
+app.use(bodyparser.urlencoded({ extended: true }));
 app.use(express.static(appRoot + '/public'));
+app.use(ApiController.middleware);
+
+// ----------
+// Init controllers
+// ----------
+FormController.init(app);
+MediaController.init(app);
+ApiController.init(app);
 
 // ----------
 // Ready callback
@@ -31,7 +71,7 @@ function ready() {
     let port = 80;
     let server = app.listen(port);
 
-    console.log('Endomon\n----------\nRunning on port ' + port);
+    debug.log('RESTART');
     
     // Startup arguments
     let cmd;
@@ -74,35 +114,6 @@ function ready() {
             return;
     }
 }
-
-// ----------
-// Helpers
-// ----------
-global.UserHelper = require('./helpers/UserHelper');
-global.ConnectionHelper = require('./helpers/ConnectionHelper');
-global.ContentHelper = require('./helpers/ContentHelper');
-global.LanguageHelper = require('./helpers/LanguageHelper');
-global.MediaHelper = require('./helpers/MediaHelper');
-global.MongoHelper = require('./helpers/MongoHelper');
-global.PluginHelper = require('./helpers/PluginHelper');
-global.ProjectHelper = require('./helpers/ProjectHelper');
-global.SchemaHelper = require('./helpers/SchemaHelper');
-global.SettingsHelper = require('./helpers/SettingsHelper');
-
-global.debug = require('../common/helpers/DebugHelper');
-global.debug.verbosity = 3;
-
-PluginHelper.init(app)
-    .then(ready);
-
-// ----------
-// Controllers
-// ----------
-let ApiController = require(appRoot + '/src/server/controllers/ApiController');
-let MediaController = require(appRoot + '/src/server/controllers/MediaController');
-
-MediaController.init(app);
-ApiController.init(app);
 
 // ----------
 // Views
