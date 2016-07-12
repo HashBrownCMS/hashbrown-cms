@@ -258,15 +258,14 @@ class GitHubConnection extends Connection {
                             data: JSON.stringify(postData)
                         }).on('complete', (data, response) => {
                             if(data.message) {
-                                debug.log('Committing file failed', this);
-                                debug.log('GitHub response: ' + JSON.stringify(data), this);
+                                debug.log('Committing file failed: ' + data.message, this);
+                                reject(new Error(data.message));
                             
                             } else {
                                 debug.log('Committed file successfully!', this);
-
+                                resolve();
+                            
                             }
-
-                            resolve();
                         });
                     });
                 }
@@ -314,9 +313,9 @@ class GitHubConnection extends Connection {
                             data: JSON.stringify(postData)
                         }).on('complete', (data, response) => {
                             if(data.message) {
-                                debug.log('Removing file failed', this);
-                                debug.log('Api path: ' + fileApiPath, this);
-                                debug.log('GitHub response: ' + JSON.stringify(data), this);
+                                debug.log('Removing file failed: ' + data.message, this);
+                                reject(new Error(data.message));
+                                return;
                             
                             } else {
                                 debug.log('Removed file successfully!', this);
@@ -395,16 +394,14 @@ class GitHubConnection extends Connection {
                     data: JSON.stringify(postData)
                 }).on('complete', (data, response) => {
                     if(data.message) {
-                        debug.log('Removing file failed', this);
-                        debug.log('GitHub response: ' + JSON.stringify(data), this);
-                    
+                        debug.log('Removing file failed: ' + data.message, this);
+                        reject(new Error(data.message));    
+
                     } else {
                         debug.log('Removed file successfully!', this);
+                        resolve();
 
                     }
-
-                    resolve();
-
                 });
             });
         });
@@ -472,16 +469,14 @@ class GitHubConnection extends Connection {
                     data: JSON.stringify(postData)
                 }).on('complete', (data, response) => {
                     if(data.message) {
-                        debug.log('Committing file failed', this);
-                        debug.log('GitHub response: ' + JSON.stringify(data), this);
+                        debug.log('Committing file failed: ' + data.message, this);
+                        reject(newError(data.message));
                     
                     } else {
                         debug.log('Committed file successfully!', this);
+                        resolve();
 
                     }
-
-                    resolve();
-
                 });
             });
         });

@@ -52,9 +52,7 @@ let MediaController = require(appRoot + '/src/server/controllers/MediaController
 // App middlewares
 // ----------
 app.use(bodyparser.json());
-app.use(bodyparser.urlencoded({ extended: true }));
 app.use(express.static(appRoot + '/public'));
-app.use(ApiController.middleware);
 
 // ----------
 // Init controllers

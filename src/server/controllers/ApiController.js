@@ -72,52 +72,52 @@ class ApiController extends Controller {
         app.get('/api/server/projects', ApiController.getAllProjects);
         app.get('/api/server/:project/environments', ApiController.getAllEnvironments);
         
-        // Content
-        app.get('/api/:project/:environment/content', ApiController.getAllContents);
-        app.get('/api/:project/:environment/content/:id', ApiController.getContent);
-        app.post('/api/:project/:environment/content/new', ApiController.createContent);
-        app.post('/api/:project/:environment/content/publish', ApiController.publishContent);
-        app.post('/api/:project/:environment/content/unpublish', ApiController.unpublishContent);
-        app.post('/api/:project/:environment/content/:id', ApiController.postContent);
-        app.delete('/api/:project/:environment/content/:id', ApiController.deleteContent);
-
-        // Schemas
-        app.post('/api/:project/:environment/schemas/new', ApiController.createSchema);
-        app.get('/api/:project/:environment/schemas', ApiController.getSchemas);
-        app.get('/api/:project/:environment/schemas/:id', ApiController.getSchema);
-        app.post('/api/:project/:environment/schemas/:id', ApiController.setSchema);
-        app.delete('/api/:project/:environment/schemas/:id', ApiController.deleteSchema);
-        
-        // Connections
-        app.get('/api/:project/:environment/connections', ApiController.getConnections);
-        app.get('/api/:project/:environment/connections/:id', ApiController.getConnection);
-        app.post('/api/:project/:environment/connections/new', ApiController.createConnection);
-        app.post('/api/:project/:environment/connections/:id', ApiController.postConnection);
-        app.delete('/api/:project/:environment/connections/:id', ApiController.deleteConnection);
-            
-        // Settings
-        app.get('/api/:project/:environment/settings/:section', ApiController.getSettings);
-        app.post('/api/:project/:environment/settings/:section', ApiController.setSettings);
-
         // User
         app.post('/api/user/login', ApiController.login);
         app.get('/api/user/scopes', ApiController.getScopes);
         app.get('/api/users', ApiController.getUsers);
         app.post('/api/user/new', ApiController.createUser);
         app.post('/api/user/:id', ApiController.postUser);
+        
+        // Content
+        app.get('/api/:project/:environment/content', ApiController.middleware, ApiController.getAllContents);
+        app.get('/api/:project/:environment/content/:id', ApiController.middleware, ApiController.getContent);
+        app.post('/api/:project/:environment/content/new', ApiController.middleware, ApiController.createContent);
+        app.post('/api/:project/:environment/content/publish', ApiController.middleware, ApiController.publishContent);
+        app.post('/api/:project/:environment/content/unpublish', ApiController.middleware, ApiController.unpublishContent);
+        app.post('/api/:project/:environment/content/:id', ApiController.middleware, ApiController.postContent);
+        app.delete('/api/:project/:environment/content/:id', ApiController.middleware, ApiController.deleteContent);
+
+        // Schemas
+        app.post('/api/:project/:environment/schemas/new', ApiController.middleware, ApiController.createSchema);
+        app.get('/api/:project/:environment/schemas', ApiController.middleware, ApiController.getSchemas);
+        app.get('/api/:project/:environment/schemas/:id', ApiController.middleware, ApiController.getSchema);
+        app.post('/api/:project/:environment/schemas/:id', ApiController.middleware, ApiController.setSchema);
+        app.delete('/api/:project/:environment/schemas/:id', ApiController.middleware, ApiController.deleteSchema);
+        
+        // Connections
+        app.get('/api/:project/:environment/connections', ApiController.middleware, ApiController.getConnections);
+        app.get('/api/:project/:environment/connections/:id', ApiController.middleware, ApiController.getConnection);
+        app.post('/api/:project/:environment/connections/new', ApiController.middleware, ApiController.createConnection);
+        app.post('/api/:project/:environment/connections/:id', ApiController.middleware, ApiController.postConnection);
+        app.delete('/api/:project/:environment/connections/:id', ApiController.middleware, ApiController.deleteConnection);
+            
+        // Settings
+        app.get('/api/:project/:environment/settings/:section', ApiController.middleware, ApiController.getSettings);
+        app.post('/api/:project/:environment/settings/:section', ApiController.middleware, ApiController.setSettings);
 
         // Templates
-        app.get('/api/:project/:environment/templates', ApiController.getTemplates)
-        app.get('/api/:project/:environment/sectionTemplates', ApiController.getSectionTemplates)
+        app.get('/api/:project/:environment/templates', ApiController.middleware, ApiController.getTemplates)
+        app.get('/api/:project/:environment/sectionTemplates', ApiController.middleware, ApiController.getSectionTemplates)
         
         // Media
-        app.post('/api/:project/:environment/media/new', MediaHelper.getUploadHandler(), ApiController.createMedia);
-        app.get('/api/:project/:environment/media/tree', ApiController.getMediaTree);
-        app.post('/api/:project/:environment/media/tree/:id', ApiController.setMediaTreeItem);
-        app.get('/api/:project/:environment/media/:id', ApiController.getSingleMedia);
-        app.post('/api/:project/:environment/media/:id', MediaHelper.getUploadHandler(), ApiController.setMedia);
-        app.delete('/api/:project/:environment/media/:id', ApiController.deleteMedia);
-        app.get('/api/:project/:environment/media', ApiController.getMedia);
+        app.post('/api/:project/:environment/media/new', MediaHelper.getUploadHandler(), ApiController.middleware, ApiController.createMedia);
+        app.get('/api/:project/:environment/media/tree', ApiController.middleware, ApiController.getMediaTree);
+        app.post('/api/:project/:environment/media/tree/:id', ApiController.middleware, ApiController.setMediaTreeItem);
+        app.get('/api/:project/:environment/media/:id', ApiController.middleware, ApiController.getSingleMedia);
+        app.post('/api/:project/:environment/media/:id', MediaHelper.getUploadHandler(), ApiController.middleware, ApiController.setMedia);
+        app.delete('/api/:project/:environment/media/:id', ApiController.middleware, ApiController.deleteMedia);
+        app.get('/api/:project/:environment/media', ApiController.middleware, ApiController.getMedia);
     }
  
     // ----------
@@ -877,16 +877,16 @@ class ApiController extends Controller {
                     res.sendStatus(200);
                 })
                 .catch((e) => {
-                    res.sendStatus(404);    
+                    res.status(404).send(e);    
                 });            
             })            
             .catch((e) => {
                 debug.warning(e);
-                res.sendStatus(400);    
+                res.status(400).send(e);
             });            
         })
         .catch((e) => {
-            res.sendStatus(403);   
+            res.status(403).send(e);
             debug.log(e, ApiController);
         });
     }
@@ -923,11 +923,11 @@ class ApiController extends Controller {
 
             } else {
                 debug.warning(e);
-                res.sendStatus(400);
+                res.status(400).send(e);
             }
         })
         .catch((e) => {
-            res.sendStatus(403);   
+            res.status(403).send(e);
             debug.log(e, ApiController);
         });
     }
@@ -949,25 +949,25 @@ class ApiController extends Controller {
                                 .then(() => {
                                     fs.unlinkSync(file.path);
 
-                                    res.send(media.id);
+                                    res.status(200).send(media.id);
                                 })
                             .catch((e) => {
                                 debug.warning(e);
-                                res.sendStatus(400);    
+                                res.status(400).send(e);    
                             });
                         })            
                     .catch((e) => {
                         debug.warning(e);
-                        res.sendStatus(400);    
+                        res.status(400).send(e);    
                     });
 
                 } else {
                     debug.warning(e);
-                    res.sendStatus(400);    
+                    res.status(400).send(e);    
             }
         })
         .catch((e) => {
-            res.sendStatus(403);   
+            res.status(403).send(e);
             debug.log(e, ApiController);
         });
     }

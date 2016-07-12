@@ -1,5 +1,8 @@
 'use strict';
 
+// Libs
+let bodyparser = require('body-parser');
+
 // Classes
 let Controller = require('./Controller');
 
@@ -11,7 +14,7 @@ class FormController extends Controller {
      * Initialises this controller
      */
     static init(app) {
-        app.post('/api/:project/:environment/form/:id/submit', this.postSubmit);
+        app.post('/api/:project/:environment/form/:id/submit', bodyparser.urlencoded({extended: true}), this.postSubmit);
 
         // Init spam prevention timer
         FormController.lastSubmission = Date.now();
@@ -24,7 +27,7 @@ class FormController extends Controller {
         if(Date.now() - FormController.lastSubmission >= SUBMISSION_MIN_TIMER_MS) {
             FormController.lastSubmission = Date.now();
 
-            FormHelper.addEntry(req.params.id, req.body)
+            FormHelper.setEntry(req.params.id, req.body)
             .then((form) => {
                 res.status(200).send(form);
             })
