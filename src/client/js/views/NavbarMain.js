@@ -816,7 +816,7 @@ class NavbarMain extends View {
             })
         );
 
-        // Sort items into hierarchy
+        // Place items into hierarchy
         for(let queueItem of sortingQueue) {
             if(queueItem.parentDirAttr) { 
                 // Find parent item
@@ -825,13 +825,6 @@ class NavbarMain extends View {
                 let parentDirSelector = '.pane-item-container[' + parentDirAttrKey + '="' + parentDirAttrValue + '"]';
                 let $parentDir = $pane.find(parentDirSelector);
           
-                function onClickChildrenToggle(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-
-                    $parentDir.toggleClass('open');
-                }
-
                 // If parent element already exists, just append the queue item element
                 if($parentDir.length > 0) {
                     $parentDir.children('.children').append(queueItem.$element);
@@ -888,19 +881,6 @@ class NavbarMain extends View {
                     $parentDir.children('.children').append(queueItem.$element);
                 }
 
-                let $paneItem = $parentDir.children('.pane-item');
-                let $childrenToggle = $paneItem.children('.btn-children-toggle');
-                
-                if($childrenToggle.length <= 0) {
-                    $childrenToggle = _.button({class: 'btn-children-toggle'},
-                        _.span({class:'fa fa-caret-down'}),
-                        _.span({class:'fa fa-caret-right'})
-                    );
-
-                    $paneItem.append($childrenToggle);
-
-                    $childrenToggle.click(onClickChildrenToggle);
-                }
             }
         }
 
@@ -908,6 +888,31 @@ class NavbarMain extends View {
             $pane
         );
 
+        // Add expand/collapse buttons to items if needed
+        $paneContainer.find('.pane-item-container').each((i, element) => {
+            let $paneItemContainer = $(element);
+            let $paneItem = $paneItemContainer.children('.pane-item');;
+            let $children = $paneItemContainer.children('.children');
+            
+            if($children.children().length > 0) {
+                let $childrenToggle = _.button({class: 'btn-children-toggle'},
+                    _.span({class:'fa fa-caret-down'}),
+                    _.span({class:'fa fa-caret-right'})
+                );
+
+                $paneItem.append($childrenToggle);
+
+                function onClickChildrenToggle(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    $paneItemContainer.toggleClass('open');
+                }
+
+                $childrenToggle.click(onClickChildrenToggle);
+            }
+        });
+        
         if(params.postSort) {
             params.postSort($paneContainer.find('>.pane, .pane-item-container>.children'));
         }
