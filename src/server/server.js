@@ -50,13 +50,27 @@ PluginHelper.init(app)
 // ----------
 // Controllers
 // ----------
-let FormsController = require(appRoot + '/src/server/controllers/FormsController');
 let ApiController = require(appRoot + '/src/server/controllers/ApiController');
+let ConnectionController = require(appRoot + '/src/server/controllers/ConnectionController');
+let ContentController = require(appRoot + '/src/server/controllers/ContentController');
+let FormsController = require(appRoot + '/src/server/controllers/FormsController');
 let MediaController = require(appRoot + '/src/server/controllers/MediaController');
+let ServerController = require(appRoot + '/src/server/controllers/ServerController');
+let SettingsController = require(appRoot + '/src/server/controllers/SettingsController');
+let SchemaController = require(appRoot + '/src/server/controllers/SchemaController');
+let TemplateController = require(appRoot + '/src/server/controllers/TemplateController');
+let UserController = require(appRoot + '/src/server/controllers/UserController');
 
+ApiController.init(app);
+ConnectionController.init(app);
+ContentController.init(app);
 FormsController.init(app);
 MediaController.init(app);
-ApiController.init(app);
+SchemaController.init(app);
+ServerController.init(app);
+SettingsController.init(app);
+TemplateController.init(app);
+UserController.init(app);
 
 // ----------
 // Ready callback

@@ -4,22 +4,24 @@
 let bodyparser = require('body-parser');
 
 // Classes
-let Controller = require('./Controller');
 let ApiController = require('./ApiController');
 
 // Constants
-const SUBMISSION_MIN_TIMER_MS = 500;
+const SUBMISSION_TIMEOUT_MS = 500;
 
-class FormsController extends Controller {
+// Private vars
+let lastSubmission = Date.now();
+
+class FormsController extends ApiController {
     /**
      * Initialises this controller
      */
     static init(app) {
-        app.get('/api/:project/:environment/forms/', ApiController.middleware(), this.getAllForms);
+        app.get('/api/:project/:environment/forms/', this.middleware(), this.getAllForms);
         app.post('/api/:project/:environment/forms/:id/submit', bodyparser.urlencoded({extended: true}), this.postSubmit);
 
         // Init spam prevention timer
-        FormsController.lastSubmission = Date.now();
+        lastSubmission = Date.now();
     }
         
     /**
@@ -39,8 +41,8 @@ class FormsController extends Controller {
      * Submits a form
      */
     static postSubmit(req, res) {
-        if(Date.now() - FormsController.lastSubmission >= SUBMISSION_MIN_TIMER_MS) {
-            FormsController.lastSubmission = Date.now();
+        if(Date.now() - lastSubmission >= SUBMISSION_TIMEOUT_MS) {
+            lastSubmission = Date.now();
 
             FormHelper.setEntry(req.params.id, req.body)
             .then((form) => {
