@@ -2825,7 +2825,7 @@ for(var k in mergedSchema.tabs){mergedTabs[k]=mergedSchema.tabs[k];}for(var k in
  * The client-side content model
  */var Content=function(_ContentCommon){_inherits(Content,_ContentCommon);function Content(){_classCallCheck(this,Content);return _possibleConstructorReturn(this,Object.getPrototypeOf(Content).apply(this,arguments));}return Content;}(ContentCommon);module.exports=Content;},{"../../../common/models/Content":212}],166:[function(require,module,exports){'use strict'; // Users
 Router.route('/users/',function(){ViewHelper.get('NavbarMain').highlightItem('users');$('.workspace').html(_.div({class:'dashboard-container'},_.h1('Users'),_.p('Hi'),_.button('Create').click(function(){$.ajax({type:'POST',url:apiUrl('user/new'),data:{username:'hest',password:'test'},success:function success(){debug.log('wooh!',this);}});})));}); // About
-Router.route('/about/',function(){ViewHelper.get('NavbarMain').highlightItem('about');$('.workspace').html(_.div({class:'dashboard-container'},_.h1('Endomon'),_.p('The pluggable CMS')));});},{}],167:[function(require,module,exports){'use strict'; // Dashboard
+Router.route('/about/',function(){ViewHelper.get('NavbarMain').highlightItem('about');$('.workspace').html(_.div({class:'dashboard-container'},_.h1('Hashbrown'),_.p('The pluggable CMS')));});},{}],167:[function(require,module,exports){'use strict'; // Dashboard
 Router.route('/connections/',function(){ViewHelper.get('NavbarMain').showTab('/connections/');$('.workspace').html(_.div({class:'dashboard-container'},_.h1('Connections dashboard'),_.p('Please click on a connection to proceed')));}); // Edit
 Router.route('/connections/:id',function(){var connectionEditor=new ConnectionEditor({modelUrl:apiUrl('connections/'+this.id)});ViewHelper.get('NavbarMain').highlightItem(this.id);$('.workspace').html(connectionEditor.$element);}); // Edit (JSON editor)
 Router.route('/connections/json/:id',function(){var connectionEditor=new JSONEditor({modelUrl:apiUrl('connections/'+this.id)});ViewHelper.get('NavbarMain').highlightItem(this.id);$('.workspace').html(connectionEditor.$element);});},{}],168:[function(require,module,exports){'use strict'; // Dashboard
@@ -3333,7 +3333,7 @@ this.$element.html([_.div({class:'tab-buttons'}),_.div({class:'tab-panes'}),_.di
 $.ajax({type:'GET',url:'/api/user/scopes?token='+localStorage.getItem('token'),success:function success(allScopes){var scopes=allScopes[ProjectHelper.currentProject]||[]; // ----------
 // Render the "about" pane
 // ----------
-_this68.renderPane({label:'Endomon CMS',route:'/',$icon:_.span({class:'about-logo'},'E'),items:[{name:'About',path:'about'}]}); // Render the "content" pane
+_this68.renderPane({label:'Hashbrown CMS',route:'/',$icon:_.span({class:'about-logo'},'E'),items:[{name:'About',path:'about'}]}); // Render the "content" pane
 _this68.renderPane(ContentPane.getRenderSettings()); // Render the "media" pane
 _this68.renderPane(MediaPane.getRenderSettings()); // Render the "forms" pane
 _this68.renderPane(FormsPane.getRenderSettings()); // Render the "connections" pane

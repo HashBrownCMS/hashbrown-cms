@@ -31,7 +31,7 @@ Router.route('/about/', function() {
 
     $('.workspace').html(
         _.div({class: 'dashboard-container'},
-            _.h1('Endomon'),
+            _.h1('Hashbrown'),
             _.p('The pluggable CMS')
         )
     );

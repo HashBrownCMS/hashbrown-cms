@@ -393,7 +393,7 @@ class NavbarMain extends View {
                 // Render the "about" pane
                 // ----------
                 this.renderPane({
-                    label: 'Endomon CMS',
+                    label: 'Hashbrown CMS',
                     route: '/',
                     $icon: _.span({class: 'about-logo'}, 'E'),
                     items: [
