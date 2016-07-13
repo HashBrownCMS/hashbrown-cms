@@ -388,6 +388,15 @@ class NavbarMain extends View {
     }
     
     /**
+     * Event: Click copy item id
+     */
+    onClickCopyItemId() {
+        let id = $('.context-menu-target-element').data('id');
+
+        copyToClipboard(id);
+    }
+
+    /**
      * Event: Click remove schema
      */
     onClickRemoveSchema() {
@@ -1037,6 +1046,7 @@ class NavbarMain extends View {
                         'Copy': function() { view.onClickCopyContent(); },
                         'Cut': function() { view.onClickCutContent(); },
                         'Paste': function() { view.onClickPasteContent(); },
+                        'Copy id': function() { view.onClickCopyItemId(); },
                         'Remove': function() { view.onClickRemoveContent(); },
                         'Settings': function() { view.onClickContentSettings(); },
                     },
@@ -1192,6 +1202,7 @@ class NavbarMain extends View {
                     // Item context menu
                     itemContextMenu: {
                         'This media': '---',
+                        'Copy id': function() { view.onClickCopyItemId(); },
                         'Cut': function() { view.onClickCutMedia(); },
                         'Remove': function() { view.onClickRemoveMedia(); },
                         'Replace': function() { view.onClickReplaceMedia(); }
@@ -1228,6 +1239,7 @@ class NavbarMain extends View {
                         // Item context menu
                         itemContextMenu: {
                             'This connection': '---',
+                            'Copy id': function() { view.onClickCopyItemId(); },
                             'Remove': function() { view.onClickRemoveConnection(); }
                         },
 
@@ -1253,6 +1265,7 @@ class NavbarMain extends View {
                         itemContextMenu: {
                             'This schema': '---',
                             'New child schema': function() { view.onClickNewSchema(); },
+                            'Copy id': function() { view.onClickCopyItemId(); },
                             'Remove': function() { view.onClickRemoveSchema(); }
                         },
 

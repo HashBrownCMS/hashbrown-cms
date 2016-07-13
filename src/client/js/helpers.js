@@ -63,6 +63,42 @@ window.messageModal = function messageModal(title, body, onSubmit) {
 }
 
 /**
+ * Brings up an error modal
+ *
+ * @param {String} message
+ */
+window.errorModal = function errorModal(message) {
+    messageModal('Error', message);
+}
+
+/**
+ * Copies string to the clipboard
+ *
+ * @param {String} string
+ */
+window.copyToClipboard = function copyToClipboard(string) {
+    let text = document.createElement('TEXTAREA');
+
+    text.innerHTML = string;
+
+    document.body.appendChild(text);
+
+    text.select();
+
+    try {
+        let success = document.execCommand('copy');
+
+        if(!success) {
+            errorModal('Your browser does not yet support copying to clipboard');
+        }
+    } catch(e) {
+            errorModal(e.toString());
+    }
+
+    document.body.removeChild(text);
+}
+
+/**
  * Wraps an API URL
  *
  * @param {String} url
