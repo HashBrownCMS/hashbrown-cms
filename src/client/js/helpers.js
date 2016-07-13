@@ -17,7 +17,7 @@ window.Promise = require('bluebird');
 
 // Main views
 window.MessageModal = require('./views/MessageModal');
-window.NavbarMain = require('./views/NavbarMain');
+window.NavbarMain = require('./views/navbar/NavbarMain');
 window.MediaViewer = require('./views/MediaViewer');
 window.LanguagePicker = require('./views/LanguagePicker');
 
