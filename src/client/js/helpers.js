@@ -7,7 +7,8 @@ window.resources = {
     schemas: [],
     media: [],
     templates: [],
-    sectionTemplates: []
+    sectionTemplates: [],
+    forms: []
 };
 
 // Libraries
@@ -205,7 +206,8 @@ window.reloadAllResources = function reloadAllResources() {
             'media',
             'connections',
             'templates',
-            'sectionTemplates'
+            'sectionTemplates',
+            'forms'
         ];
 
         function processQueue(name) {

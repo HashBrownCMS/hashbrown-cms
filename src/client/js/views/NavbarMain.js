@@ -1184,6 +1184,51 @@ class NavbarMain extends View {
                         });
                     }
                 });
+                
+                // ----------
+                // Render the "forms" pane
+                // ----------
+                this.renderPane({
+                    label: 'Forms',
+                    route: '/forms/',
+                    icon: 'wpforms',
+                    items: resources.forms,
+
+                    // Sorting logic
+                    sort: function(item, queueItem) {
+                        queueItem.$element.attr('data-form-id', item.id);
+                       
+                        if(item.folder) {
+                            queueItem.createDir = true;
+                            queueItem.parentDirAttr = {'data-form-folder': item.folder };
+                        }
+                    },
+                    
+                    // Item context menu
+                    itemContextMenu: {
+                        'This form': '---',
+                        'Copy id': function() { view.onClickCopyItemId(); },
+                        'Cut': function() { view.onClickCutForm(); },
+                        'Remove': function() { view.onClickRemoveForm(); }
+                    },
+
+                    // Dir context menu
+                    dirContextMenu: {
+                        'Directory': '---',
+                        'Paste': function() { view.onClickPasteForm(); },
+                        'New folder': function() { view.onClickNewFormDirectory(); },
+                        'New form': function() { view.onClickNewForm(); },
+                        'Remove': function() { view.onClickRemoveFormDirectory(); }
+                    },
+
+                    // General context menu
+                    paneContextMenu: {
+                        'General': '---',
+                        'Paste': function() { view.onClickPasteForm(); },
+                        'New folder': function() { view.onClickNewFormDirectory(); },
+                        'New form': function() { view.onClickNewForm(); }
+                    }
+                });
 
                 // ----------
                 // Render the "media" pane

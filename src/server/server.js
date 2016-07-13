@@ -21,6 +21,12 @@ app.set('view engine', 'jade');
 app.set('views', appRoot + '/src/server/views');
 
 // ----------
+// App middlewares
+// ----------
+app.use(bodyparser.json());
+app.use(express.static(appRoot + '/public'));
+
+// ----------
 // Helpers
 // ----------
 global.UserHelper = require('./helpers/UserHelper');
@@ -44,20 +50,11 @@ PluginHelper.init(app)
 // ----------
 // Controllers
 // ----------
-let FormController = require(appRoot + '/src/server/controllers/FormController');
+let FormsController = require(appRoot + '/src/server/controllers/FormsController');
 let ApiController = require(appRoot + '/src/server/controllers/ApiController');
 let MediaController = require(appRoot + '/src/server/controllers/MediaController');
 
-// ----------
-// App middlewares
-// ----------
-app.use(bodyparser.json());
-app.use(express.static(appRoot + '/public'));
-
-// ----------
-// Init controllers
-// ----------
-FormController.init(app);
+FormsController.init(app);
 MediaController.init(app);
 ApiController.init(app);
 

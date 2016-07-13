@@ -21,6 +21,21 @@ class FormHelper {
     }
 
     /**
+     * Gets all forms
+     *
+     * @returns {Promise(Array)} forms
+     */
+    static getAllForms() {
+        let collection = ProjectHelper.currentEnvironment + '.forms';
+        
+        return MongoHelper.find(
+            ProjectHelper.currentProject,
+            collection,
+            {}
+        );
+    }
+
+    /**
      * Adds an entry by to a form by id
      *
      * @param {String} id

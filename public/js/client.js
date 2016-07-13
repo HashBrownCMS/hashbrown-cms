@@ -2727,7 +2727,7 @@ window.language=localStorage.getItem('language')||'en'; // -----------
 // Get routes
 require('./routes/index'); // Init
 onReady('resources',function(){new NavbarMain();Router.init();});},{"./helpers":156,"./routes/index":169}],156:[function(require,module,exports){ // Resource cache
-window.resources={editors:{},connections:{},connectionEditors:{},content:[],schemas:[],media:[],templates:[],sectionTemplates:[]}; // Libraries
+window.resources={editors:{},connections:{},connectionEditors:{},content:[],schemas:[],media:[],templates:[],sectionTemplates:[],forms:[]}; // Libraries
 require('exomon');window.Promise=require('bluebird'); // Main views
 window.MessageModal=require('./views/MessageModal');window.NavbarMain=require('./views/NavbarMain');window.MediaViewer=require('./views/MediaViewer');window.LanguagePicker=require('./views/LanguagePicker'); // Editor views
 require('./views/editors');window.JSONEditor=require('./views/JSONEditor');window.ContentEditor=require('./views/ContentEditor');window.ConnectionEditor=require('./views/ConnectionEditor');window.SchemaEditor=require('./views/SchemaEditor');window.LanguageSettings=require('./views/LanguageSettings'); // Models
@@ -2759,7 +2759,7 @@ window.ProjectHelper=require('./helpers/ProjectHelper');window.MediaHelper=requi
  * Reloads a resource
  */window.reloadResource=function reloadResource(name){return new Promise(function(callback){$.ajax({type:'GET',url:apiUrl(name),success:function success(result){window.resources[name]=result;callback(result);},error:function error(e){if(e.status==403){location='/login/?path='+location.pathname+location.hash;}callback(null);}});});}; /**
  * Reloads all resources
- */window.reloadAllResources=function reloadAllResources(){return new Promise(function(resolve){var queue=['content','schemas','media','connections','templates','sectionTemplates'];function processQueue(name){window.reloadResource(name).then(function(){queue.pop();if(queue.length<1){resolve();}});}var _iteratorNormalCompletion5=true;var _didIteratorError5=false;var _iteratorError5=undefined;try{for(var _iterator5=queue[Symbol.iterator](),_step5;!(_iteratorNormalCompletion5=(_step5=_iterator5.next()).done);_iteratorNormalCompletion5=true){var name=_step5.value;processQueue(name);}}catch(err){_didIteratorError5=true;_iteratorError5=err;}finally {try{if(!_iteratorNormalCompletion5&&_iterator5.return){_iterator5.return();}}finally {if(_didIteratorError5){throw _iteratorError5;}}}});}; /**
+ */window.reloadAllResources=function reloadAllResources(){return new Promise(function(resolve){var queue=['content','schemas','media','connections','templates','sectionTemplates','forms'];function processQueue(name){window.reloadResource(name).then(function(){queue.pop();if(queue.length<1){resolve();}});}var _iteratorNormalCompletion5=true;var _didIteratorError5=false;var _iteratorError5=undefined;try{for(var _iterator5=queue[Symbol.iterator](),_step5;!(_iteratorNormalCompletion5=(_step5=_iterator5.next()).done);_iteratorNormalCompletion5=true){var name=_step5.value;processQueue(name);}}catch(err){_didIteratorError5=true;_iteratorError5=err;}finally {try{if(!_iteratorNormalCompletion5&&_iterator5.return){_iterator5.return();}}finally {if(_didIteratorError5){throw _iteratorError5;}}}});}; /**
  * Adds a ready callback to the queue or executes it if given key is already triggered
  */window.onReady=function onReady(name,callback){if(isReady[name]){callback();}else {if(!onReadyCallbacks[name]){onReadyCallbacks[name]=[];}onReadyCallbacks[name].push(callback);}}; /**
  * Triggers a key
@@ -3116,6 +3116,13 @@ apiCall('post','content/'+thisContent.id,thisContent.getObject()).then(onSuccess
 apiCall('post','content/'+thisContent.id,thisContent.getObject()).then(onSuccess).catch(onError);}); // If it has neither, just assign the lowest possible one
 }else {thisContent.sort=10000; // Save model
 apiCall('post','content/'+thisContent.id,thisContent.getObject()).then(onSuccess).catch(onError);}});}}); // ----------
+// Render the "forms" pane
+// ----------
+_this38.renderPane({label:'Forms',route:'/forms/',icon:'wpforms',items:resources.forms, // Sorting logic
+sort:function sort(item,queueItem){queueItem.$element.attr('data-form-id',item.id);if(item.folder){queueItem.createDir=true;queueItem.parentDirAttr={'data-form-folder':item.folder};}}, // Item context menu
+itemContextMenu:{'This form':'---','Copy id':function CopyId(){view.onClickCopyItemId();},'Cut':function Cut(){view.onClickCutForm();},'Remove':function Remove(){view.onClickRemoveForm();}}, // Dir context menu
+dirContextMenu:{'Directory':'---','Paste':function Paste(){view.onClickPasteForm();},'New folder':function NewFolder(){view.onClickNewFormDirectory();},'New form':function NewForm(){view.onClickNewForm();},'Remove':function Remove(){view.onClickRemoveFormDirectory();}}, // General context menu
+paneContextMenu:{'General':'---','Paste':function Paste(){view.onClickPasteForm();},'New folder':function NewFolder(){view.onClickNewFormDirectory();},'New form':function NewForm(){view.onClickNewForm();}}}); // ----------
 // Render the "media" pane
 // ----------
 _this38.renderPane({label:'Media',route:'/media/',icon:'file-image-o',items:resources.media, // Sorting logic
