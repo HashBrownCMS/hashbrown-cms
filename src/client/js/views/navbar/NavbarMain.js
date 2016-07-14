@@ -346,11 +346,14 @@ class NavbarMain extends View {
         onReady('navbar', () => {
             this.$element.find('.pane-item-container').each(function(i) {
                 let $item = $(this);
-                let id  = ($item.children('a').attr('data-id') || '').toLowerCase();
+                let id = ($item.children('a').attr('data-id') || '').toLowerCase();
                 let routingPath = ($item.attr('data-routing-path') || '').toLowerCase();
 
                 $item.toggleClass('active', false);
                 
+                console.log('--------');
+                console.log(id, routingPath, route);
+
                 if(
                     id == route.toLowerCase() ||
                     routingPath == route.toLowerCase()
@@ -367,6 +370,8 @@ class NavbarMain extends View {
 
     render() {
         let view = this;
+
+        resetReady('navbar');
 
         // ----------
         // Render main content

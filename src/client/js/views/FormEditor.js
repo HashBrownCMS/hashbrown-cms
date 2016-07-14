@@ -235,7 +235,7 @@ class FormEditor extends View {
             messageModal(
                 'Entries',
                 _.div({class: 'form-entries-list'},
-                    _.each(view.model.entries, (i, entry) => {
+                    _.each(view.model.entries.reverse(), (i, entry) => {
                         return _.div({class: 'entry'},
                             _.each(entry, (key, value) => {
                                 return _.div({class: 'kvp'},

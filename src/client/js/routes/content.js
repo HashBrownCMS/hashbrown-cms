@@ -32,7 +32,7 @@ Router.route('/content/:id', function() {
     let contentEditor = new ContentEditor({
         modelUrl: apiUrl('content/' + this.id)
     });
-   
+
     ViewHelper.get('NavbarMain').highlightItem(this.id);
     
     $('.workspace').html(contentEditor.$element);
@@ -42,12 +42,12 @@ Router.route('/content/:id', function() {
 Router.route('/content/:id/:tab', function() {
     let contentEditor = ViewHelper.get('ContentEditor');
    
+    ViewHelper.get('NavbarMain').highlightItem(this.id);
+   
     if(!contentEditor) {
         contentEditor = new ContentEditor({
             modelUrl: apiUrl('content/' + this.id)
         });
-   
-        ViewHelper.get('NavbarMain').highlightItem(this.id);
     
         $('.workspace').html(contentEditor.$element);
     }

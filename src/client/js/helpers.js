@@ -246,6 +246,13 @@ window.onReady = function onReady(name, callback) {
 }
 
 /**
+ * Resets a key
+ */
+window.resetReady = function resetReady(name) {
+    delete isReady[name];
+}
+
+/**
  * Triggers a key
  */
 window.triggerReady = function triggerReady(name) {
