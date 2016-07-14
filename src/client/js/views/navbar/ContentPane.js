@@ -39,6 +39,7 @@ class ContentPane extends Pane {
      * Event: Click cut content
      */
     static onClickCutContent() {
+        let navbar = ViewHelper.get('NavbarMain');
         let cutId = $('.context-menu-target-element').data('id');
 
         // This function should only exist if an item has been cut
@@ -69,6 +70,8 @@ class ContentPane extends Pane {
      * Event: Click new content
      */
     static onClickNewContent() {
+        let navbar = ViewHelper.get('NavbarMain');
+        
         apiCall('post', 'content/new')
         .then((newContent) => {
             reloadResource('content')
@@ -257,6 +260,8 @@ class ContentPane extends Pane {
      * @returns {Object} settings
      */
     static getRenderSettings() {
+        let navbar = ViewHelper.get('NavbarMain');
+        
         return {
             label: 'Content',
             route: '/content/',
@@ -314,7 +319,7 @@ class ContentPane extends Pane {
                         url: apiUrl('content/' + thisContent.id),
                         data: thisContent.getObject(),
                         success: onSuccess,
-                        error: onError
+                        error: navbar.onError
                     });
                 }
                 
@@ -349,15 +354,6 @@ class ContentPane extends Pane {
 
                 }
 
-                function onError(err) {
-                    new MessageModal({
-                        model: {
-                            title: 'Error',
-                            body: err
-                        }
-                    });
-                }
-
                 // Get Content node and set new sorting value
                 ContentHelper.getContentById(thisId)
                 .then((thisContent) => {
@@ -372,7 +368,7 @@ class ContentPane extends Pane {
                             // Save model
                             apiCall('post', 'content/' + thisContent.id, thisContent.getObject())
                             .then(onSuccess)
-                            .catch(onError);
+                            .catch(navbar.onError);
                         });
 
                     // If this element has a next sibling, base the sorting index on that
@@ -386,7 +382,7 @@ class ContentPane extends Pane {
                             // Save model
                             apiCall('post', 'content/' + thisContent.id, thisContent.getObject())
                             .then(onSuccess)
-                            .catch(onError);
+                            .catch(navbar.onError);
                         });
 
 
@@ -397,7 +393,7 @@ class ContentPane extends Pane {
                         // Save model
                         apiCall('post', 'content/' + thisContent.id, thisContent.getObject())
                         .then(onSuccess)
-                        .catch(onError);
+                        .catch(navbar.onError);
                     }
                 });
             }

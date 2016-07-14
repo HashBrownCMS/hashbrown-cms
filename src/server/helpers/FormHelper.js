@@ -1,23 +1,31 @@
 'use strict';
 
+let Form = require(appRoot + '/src/common/models/Form');
+
 class FormHelper {
     /**
-     * Gets form data by id
+     * Gets form by id
      *
      * @param {String} id
      *
-     * @returns {Promise(Object)} formData
+     * @returns {Promise(Form)} form
      */
-    static getFormData(id) {
-        let collection = ProjectHelper.currentEnvironment + '.forms';
+    static getForm(id) {
+        return new Promise((resolve, reject) => {
+            let collection = ProjectHelper.currentEnvironment + '.forms';
         
-        return MongoHelper.find(
-            ProjectHelper.currentProject,
-            collection,
-            {
-                id: id
-            }
-        );
+            MongoHelper.findOne(
+                ProjectHelper.currentProject,
+                collection,
+                {
+                    id: id
+                }
+            )
+            .then((formData) => {
+                resolve(new Form(formData));
+            })
+            .catch(reject);
+        });
     }
 
     /**
@@ -34,6 +42,58 @@ class FormHelper {
             {}
         );
     }
+    
+    /**
+     * Sets a Form by id
+     *
+     * @param {String} id
+     * @param {Object} properties
+     *
+     * @returns {Promise(Form)}
+     */
+    static setForm(id, properties) {
+        return new Promise((resolve, reject) => {
+            let collection = ProjectHelper.currentEnvironment + '.forms';
+
+            MongoHelper.updateOne(
+                ProjectHelper.currentProject,
+                collection,
+                {
+                    id: id
+                },
+                properties,
+                {
+                    upsert: true
+                }
+            )
+            .then(() => {
+                resolve(new Form(properties));
+            })
+            .catch(reject);
+        });
+    }
+
+    /**
+     * Creates a new form
+     *
+     * @returns {Promise(Form)}
+     */
+    static createForm() {
+        return new Promise((resolve, reject) => {
+            let form = Form.create();
+            let collection = ProjectHelper.currentEnvironment + '.forms';
+
+            MongoHelper.insertOne(
+                ProjectHelper.currentProject,
+                collection,
+                form.getObject()
+            )
+            .then(() => {
+                resolve(form);
+            })
+            .catch(reject);
+        });
+    }
 
     /**
      * Adds an entry by to a form by id
@@ -45,38 +105,15 @@ class FormHelper {
      */
     static addEntry(id, entry) {
         return new Promise((resolve, reject) => {
-            let collection = ProjectHelper.currentEnvironment + '.forms';
-
-            FormHelper.getFormData(id)
+            this.getForm(id)
             .then((form) => {
-                if(!form) {
-                    form  = {};
-                }
+                form.addEntry(entry);
 
-                form.id = id;
-
-                if(!form.entries) {
-                    form.entries = [];
-                }
-
-                form.entries[form.entries.length] = entry;
-                
-                MongoHelper.updateOne(
-                    ProjectHelper.currentProject,
-                    collection,
-                    {
-                        id: id
-                    },
-                    form,
-                    {
-                        upsert: true
-                    }
-                )
+                this.setForm(id, form.getObject())
                 .then(resolve)
                 .catch(reject);
             })
             .catch(reject);
-
         });
     }
 }

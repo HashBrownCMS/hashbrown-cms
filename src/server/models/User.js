@@ -123,6 +123,20 @@ class User extends Entity {
     }
 
     /**
+     * Cleans up expired tokens
+     */
+    cleanUpTokens() {
+        for(let i = this.tokens.length - 1; i >= 0; i--) {
+            let existingToken = this.tokens[i];
+            let isExpired = existingToken.expires < Date.now();
+            
+            if(isExpired) {
+                this.tokens.splice(i, 1);
+            }
+        }
+    }
+
+    /**
      * Validate password
      *
      * @param {String} password

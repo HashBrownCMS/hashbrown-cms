@@ -99,8 +99,26 @@ class ApiController extends Controller {
         settings = settings || {};
 
         return function middleware(req, res, next) {
-            ApiController.authenticate(req.query.token, settings.scope)
-            .then(() => {
+            if(settings.authenticate != false) {
+                ApiController.authenticate(req.query.token, settings.scope)
+                .then(() => {
+                    if(settings.setProject != false) {
+                        ApiController.setProjectVariables(req.originalUrl)
+                        .then(next)
+                        .catch((e) => {
+                            res.status(400).send(e);
+                            debug.log(e, ApiController);
+                        });
+                    } else {
+                        next();
+                    }
+                })
+                .catch((e) => {
+                    res.status(403).send(e);   
+                    debug.log(e, ApiController);
+                });    
+            
+            } else {
                 if(settings.setProject != false) {
                     ApiController.setProjectVariables(req.originalUrl)
                     .then(next)
@@ -111,11 +129,7 @@ class ApiController extends Controller {
                 } else {
                     next();
                 }
-            })
-            .catch((e) => {
-                res.status(403).send(e);   
-                debug.log(e, ApiController);
-            });    
+            }
         }
     }
 }

@@ -22,7 +22,11 @@ class UserHelper {
                     username: username
                 }
             ).then((user) => {
-                resolve(new User(user));
+                if(Object.keys(user).length < 1) {
+                    reject(new Error('No user "' + username + '" found'));
+                } else {
+                    resolve(new User(user));
+                }
             })
             .catch(reject);       
         });
@@ -57,11 +61,15 @@ class UserHelper {
      */
     static loginUser(username, password) {
         return new Promise((resolve, reject) => {
+            debug.log('Attempting login for user "' + username + '"...', this);
+
             UserHelper.findUser(username)
             .then((user) => {
                 if(user.validatePassword(password)) {
                     let token = user.generateToken();
-                    
+                   
+                    user.cleanUpTokens();
+
                     UserHelper.updateUser(username, user.getFields())
                     .then(() => {
                         resolve(token);
@@ -164,6 +172,32 @@ class UserHelper {
         });
     }
 
+    /**
+     * Cleans up expired tokens
+     *
+     * @returns {Promise} promise
+     */
+    static cleanUpTokens(username) {
+        return new Promise((resolve, reject) => {
+            this.findUser(username)
+            .then((user) => {
+                if(user) {
+                    user.cleanUpTokens();
+
+                    this.updateUser(username, user.getObject())
+                    .then(() => {
+                        resolve();
+                    })
+                    .catch(reject);
+
+                } else {
+                    reject(new Error('No user by username "' + username + '"'))
+                
+                }
+            })
+            .catch(reject);
+        });
+    }
 
     /**
      * Updates a User

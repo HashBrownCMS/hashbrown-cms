@@ -3,6 +3,24 @@
 let Pane = require('./Pane');
 
 class FormsPane extends Pane {
+    /**
+     * Event: Click create new form
+     */
+    static onClickNewForm() {
+        let navbar = ViewHelper.get('NavbarMain');
+
+        apiCall('post', 'forms/new')
+        .then((newContent) => {
+            reloadResource('forms')
+            .then(() => {
+                navbar.reload();
+                
+                location.hash = '/forms/' + newForm.id;
+            });
+        })
+        .catch(navbar.onError);
+    }
+
     static getRenderSettings() {
         return {
             label: 'Forms',

@@ -6,3 +6,4 @@ require('./connections');
 require('./media');
 require('./schemas');
 require('./settings');
+require('./forms');

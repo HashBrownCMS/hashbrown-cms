@@ -18,7 +18,10 @@ class FormsController extends ApiController {
      */
     static init(app) {
         app.get('/api/:project/:environment/forms/', this.middleware(), this.getAllForms);
-        app.post('/api/:project/:environment/forms/:id/submit', bodyparser.urlencoded({extended: true}), this.postSubmit);
+        app.post('/api/:project/:environment/forms/new', this.middleware(), this.postNew);
+        app.get('/api/:project/:environment/forms/:id', this.middleware(), this.getForm);
+        app.post('/api/:project/:environment/forms/:id', this.middleware(), this.postForm);
+        app.post('/api/:project/:environment/forms/:id/submit', this.middleware({ authenticate: false }), bodyparser.urlencoded({extended: true}), this.postSubmit);
 
         // Init spam prevention timer
         lastSubmission = Date.now();
@@ -33,7 +36,46 @@ class FormsController extends ApiController {
             res.status(200).send(forms);
         })
         .catch((e) => {
-            res.status(502).send(e);
+            res.status(502).send(e.message);
+        });
+    }
+
+    /**
+     * Gets a single form by id
+     */
+    static getForm(req, res) {
+        FormHelper.getForm(req.params.id)
+        .then((form) => {
+            res.status(200).send(form.getObject());
+        })
+        .catch((e) => {
+            res.status(502).send(e.message);
+        });
+    }
+    
+    /**
+     * Sets a single form by id
+     */
+    static postForm(req, res) {
+        FormHelper.setForm(req.params.id, req.body)
+        .then((form) => {
+            res.status(200).send(form.getObject());
+        })
+        .catch((e) => {
+            res.status(502).send(e.message);
+        });
+    }
+
+    /**
+     * Creates a form
+     */
+    static postNew(req, res) {
+        FormHelper.createForm()
+        .then((form) => {
+            res.status(200).send(form.id);
+        })
+        .catch((e) => {
+            res.status(502).send(e.message);
         });
     }
 
@@ -44,12 +86,12 @@ class FormsController extends ApiController {
         if(Date.now() - lastSubmission >= SUBMISSION_TIMEOUT_MS) {
             lastSubmission = Date.now();
 
-            FormHelper.setEntry(req.params.id, req.body)
+            FormHelper.addEntry(req.params.id, req.body)
             .then((form) => {
                 res.status(200).send(form);
             })
-            .catch((err) => {
-                res.status(502).send(err);
+            .catch((e) => {
+                res.status(400).send(e.message);
             });
         } else {
             res.sendStatus(403);

@@ -21,14 +21,12 @@ class UserController extends ApiController {
         let username = req.body.username;
         let password = req.body.password;
 
-        debug.log('Attempting login for user "' + username + '"...', UserHelper);
-
         UserHelper.loginUser(username, password)
         .then((token) => {
             res.status(200).send(token);
         })
         .catch((e) => {
-            res.status(403).send(e);   
+            res.status(403).send(e.message);   
         });
     }
 
