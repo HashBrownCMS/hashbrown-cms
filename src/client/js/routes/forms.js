@@ -13,24 +13,24 @@ Router.route('/forms/', function() {
 });
 
 // Edit
-Router.route('/connections/:id', function() {
+Router.route('/forms/:id', function() {
     ViewHelper.get('NavbarMain').highlightItem(this.id);
     
-    /*let connectionEditor = new ConnectionEditor({
-        modelUrl: apiUrl('connections/' + this.id)
+    let formEditor = new FormEditor({
+        modelUrl: apiUrl('forms/' + this.id)
     });
    
-    $('.workspace').html(connectionEditor.$element);*/
+    $('.workspace').html(formEditor.$element);
 });
 
 // Edit (JSON editor)
 Router.route('/forms/json/:id', function() {
-    let formsEditor = new JSONEditor({
+    let formEditor = new JSONEditor({
         modelUrl: apiUrl('forms/' + this.id),
         apiPath: 'forms/' + this.id
     });
      
     ViewHelper.get('NavbarMain').highlightItem(this.id);
     
-    $('.workspace').html(formsEditor.$element);
+    $('.workspace').html(formEditor.$element);
 });

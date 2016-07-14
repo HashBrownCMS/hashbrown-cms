@@ -107,7 +107,7 @@ class SchemaEditor extends View {
 
         let $element = _.div({class: 'name-editor'},
             _.if(!this.model.locked,
-                _.input({class: 'form-control', type: 'text', value: view.model.name, placholder: 'Write the schema name here'})
+                _.input({class: 'form-control', type: 'text', value: view.model.name, placeholder: 'Write the schema name here'})
                     .on('change', onInputChange)
             ),
             _.if(this.model.locked,

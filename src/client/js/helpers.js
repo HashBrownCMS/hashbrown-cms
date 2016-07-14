@@ -25,6 +25,7 @@ window.LanguagePicker = require('./views/LanguagePicker');
 require('./views/editors');
 window.JSONEditor = require('./views/JSONEditor');
 window.ContentEditor = require('./views/ContentEditor');
+window.FormEditor = require('./views/FormEditor');
 window.ConnectionEditor = require('./views/ConnectionEditor');
 window.SchemaEditor = require('./views/SchemaEditor');
 window.LanguageSettings = require('./views/LanguageSettings');
