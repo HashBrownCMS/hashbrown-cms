@@ -141,10 +141,10 @@ class FormEditor extends View {
                     } else {
                         if(this.dataset.key == 'required') {
                             input.required = this.checked;
-
+                        } else if(this.dataset.key == 'options') {
+                            input.options = $(this).val().replace(/, /g, ',').split(',');
                         } else {
                             input[this.dataset.key] = $(this).val();
-
                         }
 
                         view.render();
@@ -153,7 +153,7 @@ class FormEditor extends View {
 
                 var switchId = 'switch-' + key;
 
-                return _.div({class: 'input'},
+                return _.div({class: 'input raised'},
                     _.button({class: 'btn btn-embedded btn-remove'},
                         _.span({class: 'fa fa-remove'})
                     ).click(() => { this.onClickRemoveInput(key); }),
@@ -170,6 +170,13 @@ class FormEditor extends View {
                             })
                         ).val(input.type).on('change', onChange)
                     ),
+                    _.if(input.type == 'select',
+                        this.renderField(
+                            'Select options (CSV)',
+                            _.input({class: 'form-control', 'data-key': 'options', type: 'text', value: (input.options || []).join(','), placeholder: 'Type the select options here, separated by comma'})
+                                .on('change', onChange)
+                        )
+                    ),
                     this.renderField(
                         'Required',
                         _.div({class: 'switch'},
@@ -185,11 +192,64 @@ class FormEditor extends View {
                     )
                 );
             }),
-            _.button({class: 'btn btn-primary'}, 'Add input')
+            _.button({class: 'btn btn-primary btn-round'}, _.span({class: 'fa fa-plus'}))
                 .on('click', () => { this.onClickAddInput(); })
         );
 
         return $element;
+    }
+
+    /**
+     * Renders a preview
+     *
+     * @return {Object} element
+     */
+    renderPreview() {
+        return _.form({class: 'preview raised', onsubmit: 'return false;'},
+            _.each(this.model.inputs, (key, input) => {
+                if(input.type == 'textarea') {
+                    return _.textarea({class: 'form-control', placeholder: key, name: key, pattern: input.pattern, required: input.required == true});
+                } else if(input.type == 'select') {
+                    return _.select({class: 'form-control', name: key, required: input.required == true},
+                        _.each(input.options || [], (i, option) => {
+                            return _.option({value: option}, option);
+                        })
+                    );
+                } else {
+                    return _.input({class: 'form-control', placeholder: key, type: input.type, name: key, pattern: input.pattern, required: input.required == true});
+                }
+            }),
+            _.input({class: 'btn btn-primary', type: 'submit', value: 'Test'})
+        )
+    }
+
+    /**
+     * Renders all entries
+     *
+     * @return {Object} element
+     */
+    renderEntries() {
+        let view = this;
+        
+        function onClick() {
+            messageModal(
+                'Entries',
+                _.div({class: 'form-entries-list'},
+                    _.each(view.model.entries, (i, entry) => {
+                        return _.div({class: 'entry'},
+                            _.each(entry, (key, value) => {
+                                return _.div({class: 'kvp'},
+                                    _.div({class: 'key'}, key),
+                                    _.div({class: 'value'}, value)
+                                );
+                            })
+                        );
+                    })  
+                )
+            ).$element.addClass('large');
+        }
+
+        return _.button({class: 'btn btn-primary'}, 'View entries').click(onClick);
     }
 
     /**
@@ -208,26 +268,6 @@ class FormEditor extends View {
         );
     }
 
-    /**
-     * Renders a preview
-     *
-     * @return {Object} element
-     */
-    renderPreview() {
-        return _.form({class: 'preview', onsubmit: 'return false;'},
-            _.each(this.model.inputs, (key, input) => {
-                if(input.type == 'textarea') {
-                    return _.textarea({placeholder: key, name: key, pattern: input.pattern, required: input.required == true});
-                } else if(input.type == 'select') {
-                    return _.select({name: key, required: input.required == true});
-                } else {
-                    return _.input({placeholder: key, type: input.type, name: key, pattern: input.pattern, required: input.required == true});
-                }
-            }),
-            _.input({class: 'btn btn-primary', type: 'submit', value: 'Submit'})
-        )
-    }
-
         
     /**
      * Renders all fields
@@ -243,9 +283,10 @@ class FormEditor extends View {
         // Content type
         $element.empty();
 
+        $element.append(this.renderField('Entries', this.renderEntries())); 
+        $element.append(this.renderField('POST URL', _.input({readonly: 'readonly', class: 'form-control', type: 'text', value: postUrl})));
         $element.append(this.renderField('Title', this.renderTitleEditor())); 
         $element.append(this.renderField('Inputs', this.renderInputsEditor())); 
-        $element.append(this.renderField('POST', _.input({readonly: 'readonly', class: 'form-control', type: 'text', value: postUrl})));
         $element.append(this.renderField('Test', this.renderPreview()));
 
         return $element;

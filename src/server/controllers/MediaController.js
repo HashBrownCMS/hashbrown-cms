@@ -9,7 +9,7 @@ class MediaController extends ApiController {
      * Initiates this controller
      */
     static init(app) {
-        app.get('/media/:project/:environment/:id', this.getMedia);
+        app.get('/media/:project/:environment/:id', this.middleware({ authenticate: false }), this.serveMedia);
         
         app.post('/api/:project/:environment/media/new', this.middleware(), MediaHelper.getUploadHandler(), this.createMedia);
         app.get('/api/:project/:environment/media/tree', this.middleware(), this.getMediaTree);
@@ -23,7 +23,7 @@ class MediaController extends ApiController {
     /**
      * Gets a Media object by id
      */
-    static getMedia(req, res) {
+    static serveMedia(req, res) {
         let id = req.params.id;
 
         ConnectionHelper.getMediaProvider()
@@ -33,9 +33,12 @@ class MediaController extends ApiController {
                 if(media) {
                     res.redirect(media.url);
                 } else {
-                    res.sendStatus(404);
+                    res.status(404).send('Not found');
                 }
             });
+        })
+        .catch((e) => {
+            res.status(400).end(e.message);  
         });
     }
     

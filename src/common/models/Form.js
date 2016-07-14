@@ -55,6 +55,10 @@ class Form extends Entity {
                 }
             }
             
+            if(this.inputs[k].required == true && !entry[k]) {
+                throw new Error('Field "' + k + '" is required');
+            }
+
             filteredEntry[k] = entry[k];
 
         }

@@ -99,6 +99,22 @@ button, a {
     }
 }
 
+// Containers
+.raised {
+    box-shadow: 0px 2px 3px 1px rgba(0, 0, 0, 0.2);
+    background-color: #fff;
+    padding: 30px;
+
+    .raised {
+        padding: 0px;
+        box-shadow: none;
+    }
+}
+
+.workspace {
+    background-color: material-color('grey', '300');
+}
+
 // Thumbnails
 .thumbnail {
     background-position: center;
@@ -170,16 +186,34 @@ button, a {
 
 // Modal
 .modal {
+    &.large {
+        .modal-dialog {
+            width: 80%;
+            height: 80%;
+            max-width: 600px;
+
+            .modal-content {
+                min-height: 100%;
+            }
+        }
+    }
+
     .modal-dialog {
         max-width: 500px;
 
         .modal-content {
             border-radius: 0px;
+            display: flex;
+            flex-direction: column;
 
             .modal-header {
                 border-bottom: 0px;
             }
             
+            .modal-body {
+                flex-grow: 1;
+            }
+
             .modal-footer {
                 border-top: 0px;
             
@@ -193,7 +227,7 @@ button, a {
 
 // Input
 .form-control {
-    &, &:active, &:focus {
+    &, &:active, &:focus, &[readonly] {
         background-color: transparent;
         border-radius: 0px;
         box-shadow: none;
@@ -201,6 +235,10 @@ button, a {
         border-bottom: 2px solid material-color('blue', '500');
         padding-left: 0px;
         padding-right: 0px;
+
+        &[readonly] {
+            border-bottom: 0px;
+        }
     }
 }
 
@@ -236,6 +274,24 @@ button, a {
 
     &:active {
         box-shadow: none;
+    }
+
+    &.btn-right {
+        display: block;
+        margin-left: auto;
+    }
+    
+    &.btn-left {
+        display: block;
+        margin-right: auto;
+    }
+
+    &.btn-round {
+        padding: 0px !important;
+        width: 34px;
+        height: 34px;
+        line-height: 34px;
+        border-radius: 50%;
     }
 
     &.btn-raised {
@@ -288,18 +344,24 @@ button, a {
     font-weight: bold;
     text-transform: uppercase;
 
-    li:not(.active) {
-        a {
-            color: material-color('blue', '50');
-            
-            &, &:hover, &:focus {
-                background-color: transparent;
-                border: 0px;
+    li {
+        &.active {
+            a, a:focus {
+                background-color: material-color('grey', '300');
             }
         }
-    }
-    
-    li {
+
+        &:not(.active) {
+            a, a:focus {
+                color: material-color('blue', '50');
+                
+                &, &:hover, &:focus {
+                    background-color: transparent;
+                    border: 0px;
+                }
+            }
+        }
+
         a {
             border-radius: 0px;
         }

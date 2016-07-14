@@ -52,7 +52,7 @@ class ApiController extends Controller {
     static setProjectVariables(url) {
         return new Promise((resolve, reject) => {
             let keys = [];
-            let re = pathToRegexp('/api/:project/:environment/*', keys);
+            let re = pathToRegexp('/:root/:project/:environment/*', keys);
             let values = re.exec(url);
             let project;
             let environment;

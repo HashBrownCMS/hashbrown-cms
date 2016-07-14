@@ -235,7 +235,7 @@ class ArrayEditor extends View {
                         });
 
                         // Return the DOM element
-                        let $element = _.div({class: 'item', 'data-array-index': i},
+                        let $element = _.div({class: 'item raised', 'data-array-index': i},
                             _.button({class: 'btn btn-embedded btn-remove'},
                                 _.span({class: 'fa fa-remove'})
                             ).click(() => { this.onClickRemoveItem(i); }),
@@ -253,7 +253,7 @@ class ArrayEditor extends View {
             ),
 
             // Render the add item button
-            _.button({class: 'btn btn-primary btn-add'},
+            _.button({class: 'btn btn-primary btn-round'},
                 _.span({class: 'fa fa-plus'})
             ).click(() => { this.onClickAddItem(); })
         );

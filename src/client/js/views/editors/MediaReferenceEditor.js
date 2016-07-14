@@ -100,29 +100,20 @@ class MediaReferenceEditor extends View {
     }
 
     render() {
-        let $images;
+        let $images = _.div({
+            class: 'thumbnail thumbnail-sm',
+            style: 'background-image: url(\'/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + this.value + '\')'
+        });
 
-        if(!this.config.multiple) {
-            $images = _.div({
-                class: 'thumbnail thumbnail-sm',
-                style: 'background-image: url(\'/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + this.value + '\')'
-            });
-        } else {
-            $images = _.each(this.value, (i, val) => {
-                return _.div({
-                    class: 'thumbnail thumbnail-sm',
-                    style: 'background-image: url(\'/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + val + '\')'
-                });
-            });
+        if(this.value) {
+            this.$body.html(
+                $images
+            );
         }
 
-        this.$body.html(
-            $images
-        );
-
         this.$footer.html(
-            this.$button = _.button({class: 'btn btn-primary'},
-                'Add media'
+            this.$button = _.button({class: 'btn btn-raised btn-default'},
+                'BROWSE'
             ).click(() => { this.onClickBrowse(); })
         );
     }

@@ -141,7 +141,7 @@ body {
         .editor {
             .field-container {
                 display: flex;
-                margin-bottom: 15px;
+                margin-bottom: 30px;
                 
                 .field-icon {
                     width: 20px;
@@ -237,6 +237,7 @@ body {
         }
 
         .panel-buttons {
+            flex-shrink: 0;
             padding: 15px;
             margin: 0px;
             border-width: 0px;

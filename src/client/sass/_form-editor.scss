@@ -1,3 +1,31 @@
+.modal {
+    .form-entries-list {
+        height: 100%;
+        overflow-y: scroll;
+
+        .entry {
+            padding: 15px 0px;
+            border-bottom: 1px solid material-color('grey', '500');
+
+            .kvp {
+                display: flex;
+               
+                .key {
+                    flex-basis: 30%;
+                }
+                
+                .value {
+                    flex-basis: 70%;
+                }
+
+                .key, .value {
+                    flex-grow: 1;
+                }
+            }
+        }
+    }
+}
+
 .form-editor {
     height: 100%;
     display: flex;
@@ -11,15 +39,9 @@
         form.preview {
             display: block;
             padding: 15px;
-            box-shadow: 0px 2px 3px 1px rgba(0, 0, 0, 0.2);
-            background-color: #f5f5f5; 
             max-width: 500px;
 
             input:not(.btn), select, textarea {
-                padding: 0px 10px;
-                line-height: 30px;
-                border-radius: 5px;
-                border: 1px solid material-color('grey', '500');
                 display: block;
                 margin-bottom: 15px;
                 width: 100%;
@@ -43,10 +65,9 @@
 
         .inputs-editor {
             .input {
-                border-bottom: 1px solid #e0e0e0;
                 margin-bottom: 30px;
                 position: relative;
-                padding-right: 34px;
+                padding: 30px 34px 30px 30px;
                
                 .switch {
                     margin-top: 10px;
