@@ -21,7 +21,7 @@ class FormsController extends ApiController {
         app.post('/api/:project/:environment/forms/new', this.middleware(), this.postNew);
         app.get('/api/:project/:environment/forms/:id', this.middleware(), this.getForm);
         app.post('/api/:project/:environment/forms/:id', this.middleware(), this.postForm);
-        app.post('/api/:project/:environment/forms/:id/submit', this.middleware({ authenticate: false }), bodyparser.urlencoded({extended: true}), this.postSubmit);
+        app.post('/api/:project/:environment/forms/:id/submit', this.middleware({ authenticate: false, allowCORS: true }), bodyparser.urlencoded({extended: true}), this.postSubmit);
 
         // Init spam prevention timer
         lastSubmission = Date.now();

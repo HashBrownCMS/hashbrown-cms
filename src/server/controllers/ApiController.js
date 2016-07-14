@@ -99,6 +99,11 @@ class ApiController extends Controller {
         settings = settings || {};
 
         return function middleware(req, res, next) {
+            if(settings.allowCORS == true) {
+                res.header('Access-Control-Allow-Origin', '*');
+                res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+            }
+
             if(settings.authenticate != false) {
                 ApiController.authenticate(req.query.token, settings.scope)
                 .then(() => {
