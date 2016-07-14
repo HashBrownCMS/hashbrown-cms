@@ -102,6 +102,8 @@ class ApiController extends Controller {
             if(settings.allowCORS == true) {
                 res.header('Access-Control-Allow-Origin', '*');
                 res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+            
+                debug.log('Allowing CORS for API call "' + req.originalUrl + '"', this);
             }
 
             if(settings.authenticate != false) {

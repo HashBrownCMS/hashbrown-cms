@@ -83,18 +83,23 @@ class FormsController extends ApiController {
      * Submits a form
      */
     static postSubmit(req, res) {
+        // Prevent spam
         if(Date.now() - lastSubmission >= SUBMISSION_TIMEOUT_MS) {
             lastSubmission = Date.now();
 
             FormHelper.addEntry(req.params.id, req.body)
             .then((form) => {
-                res.status(200).send(form);
+                if(!form.redirect) {
+                    res.status(200).redirect(req.headers.referer);
+                } else {
+                    res.status(200).redirect(form.redirect);
+                }
             })
             .catch((e) => {
                 res.status(400).send(e.message);
             });
         } else {
-            res.sendStatus(403);
+            res.status(400).send('Submission spam prevention timeout not yet passed');
         }
     }
 }
