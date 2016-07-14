@@ -123,29 +123,33 @@ class GitHubConnection extends Connection {
                         headers: headers
                     }).on('complete', (data, response) => {
                         if(data) {
-                            let media = [];
+                            if(data.tree) {
+                                let media = [];
 
-                            for(let node of data.tree) {
-                                if(node.path.indexOf('media/') == 0 && node.mode == '100644') {
-                                    media[media.length] = new Media({
-                                        name: path.basename(node.path),
-                                        id: path.dirname(node.path).replace('media/', ''),
-                                        url: node.path
-                                    });
+                                for(let node of data.tree) {
+                                    if(node.path.indexOf('media/') == 0 && node.mode == '100644') {
+                                        media[media.length] = new Media({
+                                            name: path.basename(node.path),
+                                            id: path.dirname(node.path).replace('media/', ''),
+                                            url: node.path
+                                        });
+                                    }
                                 }
+
+                                resolve(media);    
+                            
+                            } else {
+                                reject(new Error('No tree in GitHub response'));
+
                             }
 
-                            resolve(media);    
-                        
                         } else {
-                            debug.log('No data in GitHub response', this);
-                            reject();
+                            reject(new Error('No data in GitHub response'));
                         }
                     });
 
                 } else {
-                    debug.log('No data in GitHub response', this);
-                    reject();
+                    reject(new Error('No data in GitHub response'));
                 }
             });
         });

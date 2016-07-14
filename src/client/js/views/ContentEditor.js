@@ -397,7 +397,6 @@ class ContentEditor extends View {
                 .then((publishing) => {
                     this.$element.html([
                         this.renderEditor(this.model, contentSchema).append(
-
                             // Buttons 
                             _.div({class: 'panel panel-default panel-buttons'}, 
                                 _.div({class: 'btn-group'},

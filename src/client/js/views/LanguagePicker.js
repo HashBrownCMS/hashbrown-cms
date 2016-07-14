@@ -19,27 +19,33 @@ class LanguagePicker extends View {
     }
 
     render() {
-        this.$element = _.div({class: 'language-picker dropdown'},
-            _.button({class: 'btn btn-default dropdown-toggle', 'data-toggle': 'dropdown'},
-                window.language
-            ),
-            _.ul({class: 'dropdown-menu'})
-        );
+        this.$element = _.div({class: 'language-picker dropdown'});
 
         LanguageHelper.getSelectedLanguages()
         .then((languages) => {
-            this.$element.find('.dropdown-menu').html(
-                _.each(
-                    languages.filter((language) => {
-                        return language != window.language;
-                    }), (i, language) => {
-                    return _.li({value: language},
-                        _.a({href: '#'},
-                            language
-                        ).click(this.onChangeLanguage)
-                    );
-                })
-            );
+            if(Array.isArray(languages) && languages.length > 1) {
+                this.$element.append(
+                    _.button({class: 'btn btn-default dropdown-toggle', 'data-toggle': 'dropdown'},
+                        window.language
+                    ),
+                    _.ul({class: 'dropdown-menu'},
+                        _.each(
+                            languages.filter((language) => {
+                                return language != window.language;
+                            }), (i, language) => {
+                            return _.li({value: language},
+                                _.a({href: '#'},
+                                    language
+                                ).click(this.onChangeLanguage)
+                            );
+                        })
+                    )
+                );
+            
+            } else {
+                this.$element.remove();
+            
+            }
         });
     }
 }
