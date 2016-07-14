@@ -7,8 +7,8 @@ class ServerController extends ApiController {
      * Initialises this controller
      */
     static init(app) {
-        app.get('/api/server/projects', this.getAllProjects);
-        app.get('/api/server/:project/environments', this.getAllEnvironments);
+        app.get('/api/server/projects', this.middleware({ setProjects: false }), this.getAllProjects);
+        app.get('/api/server/:project/environments', this.middleware({ setProjects: false }), this.getAllEnvironments);
     }
     
     /**
