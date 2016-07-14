@@ -25,13 +25,14 @@ class ContentReferenceEditor extends View {
 
             // Render picker
             this.$select = _.select({class: 'form-control'},
-                _.each(window.resources.content, (id, node) => {
+                _.each(window.resources.content, (i, node) => {
                     let content = new Content(node);
 
-                    return _.option(
-                        {
-                            value: content.id
-                        },
+                    if(content.id == Router.params.id) {
+                        return;
+                    }
+
+                    return _.option({ value: content.id },
                         content.prop('title', window.language)
                     );
                 })

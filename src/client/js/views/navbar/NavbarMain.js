@@ -351,9 +351,6 @@ class NavbarMain extends View {
 
                 $item.toggleClass('active', false);
                 
-                console.log('--------');
-                console.log(id, routingPath, route);
-
                 if(
                     id == route.toLowerCase() ||
                     routingPath == route.toLowerCase()
