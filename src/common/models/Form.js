@@ -14,6 +14,7 @@ class Form extends Entity {
         // Fundamental fields
         this.def(String, 'id');
         this.def(String, 'title');
+        this.def(String, 'redirect');
         
         // Mutable fields
         this.def(Object, 'inputs', {});
