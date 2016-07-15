@@ -395,9 +395,9 @@ class NavbarMain extends View {
                 // Render the "about" pane
                 // ----------
                 this.renderPane({
-                    label: 'Hashbrown CMS',
+                    label: 'HashBrown',
                     route: '/',
-                    $icon: _.span({class: 'about-logo'}, 'E'),
+                    $icon: _.img({src: '/svg/logo.svg', class: 'about-logo'}),
                     items: [
                         {
                             name: 'About',

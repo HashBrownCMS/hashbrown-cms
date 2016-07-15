@@ -729,7 +729,7 @@ body {
     transition: opacity 0.5s, width 0.5s;
     overflow-x: hidden; }
   .navbar-main .tab-buttons {
-    width: 200px;
+    width: 160px;
     height: 100%;
     background-color: #222;
     position: relative;
@@ -750,6 +750,11 @@ body {
         font-weight: bold; }
       .navbar-main .tab-buttons button.active, .navbar-main .tab-buttons button:hover {
         background-color: #333; }
+      .navbar-main .tab-buttons button .about-logo {
+        width: 30px;
+        height: 30px;
+        float: left;
+        margin-left: 15px; }
       .navbar-main .tab-buttons button span {
         margin: 0px;
         height: 60px;
@@ -757,7 +762,7 @@ body {
         display: block;
         position: absolute;
         top: 0px; }
-        .navbar-main .tab-buttons button span.fa, .navbar-main .tab-buttons button span.about-logo {
+        .navbar-main .tab-buttons button span.fa {
           text-align: center;
           font-size: 20px;
           width: 60px;

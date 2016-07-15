@@ -127,6 +127,7 @@ class FormEditor extends View {
         let $element = _.div({class: 'inputs-editor'},
             _.each(this.model.inputs, (key, input) => {
                 let view = this;
+                let $input = _.div({class: 'input raised'});
                 
                 function onChange() {
                     if(this.dataset.key == 'name') {
@@ -136,7 +137,10 @@ class FormEditor extends View {
 
                         view.model.inputs[key] = input;
                         
-                        view.render();
+                        render();
+                        let $newPreview = view.renderPreview();
+                        view.$preview.replaceWith($newPreview);
+                        view.$preview = $newPreview;
 
                     } else {
                         if(this.dataset.key == 'required') {
@@ -147,50 +151,59 @@ class FormEditor extends View {
                             input[this.dataset.key] = $(this).val();
                         }
 
-                        view.render();
+                        render();
+                        let $newPreview = view.renderPreview();
+                        view.$preview.replaceWith($newPreview);
+                        view.$preview = $newPreview;
                     }
                 };
 
-                var switchId = 'switch-' + key;
+                function render() {
+                    let switchId = 'switch-' + key;
 
-                return _.div({class: 'input raised'},
-                    _.button({class: 'btn btn-embedded btn-remove'},
-                        _.span({class: 'fa fa-remove'})
-                    ).click(() => { this.onClickRemoveInput(key); }),
-                    this.renderField(
-                        'Name',
-                        _.input({class: 'form-control', 'data-key': 'name', type: 'text', value: key, placeholder: 'Type the input name here'})
-                            .on('change', onChange)
-                    ),
-                    this.renderField(
-                        'Type',
-                        _.select({class: 'form-control', 'data-key': 'type'},
-                            _.each(types, (i, option) => {
-                                return _.option({value: option}, option);
-                            })
-                        ).val(input.type).on('change', onChange)
-                    ),
-                    _.if(input.type == 'select',
-                        this.renderField(
-                            'Select options (CSV)',
-                            _.input({class: 'form-control', 'data-key': 'options', type: 'text', value: (input.options || []).join(','), placeholder: 'Type the select options here, separated by comma'})
+                    _.append($input.empty(),
+                        _.button({class: 'btn btn-embedded btn-remove'},
+                            _.span({class: 'fa fa-remove'})
+                        ).click(() => { view.onClickRemoveInput(key); }),
+                        view.renderField(
+                            'Name',
+                            _.input({class: 'form-control', 'data-key': 'name', type: 'text', value: key, placeholder: 'Type the input name here'})
+                                .on('change', onChange)
+                        ),
+                        view.renderField(
+                            'Type',
+                            _.select({class: 'form-control', 'data-key': 'type'},
+                                _.each(types, (i, option) => {
+                                    return _.option({value: option}, option);
+                                })
+                            ).val(input.type).on('change', onChange)
+                        ),
+                        _.if(input.type == 'select',
+                            view.renderField(
+                                'Select options (CSV)',
+                                _.input({class: 'form-control', 'data-key': 'options', type: 'text', value: (input.options || []).join(','), placeholder: 'Type the select options here, separated by comma'})
+                                    .on('change', onChange)
+                            )
+                        ),
+                        view.renderField(
+                            'Required',
+                            _.div({class: 'switch'},
+                                _.input({'data-key': 'required', id: switchId, class: 'form-control switch', type: 'checkbox', checked: input.required == true})
+                                .on('change', onChange),
+                                _.label({for: switchId})
+                            )
+                        ),
+                        view.renderField(
+                            'Pattern',
+                            _.input({class: 'form-control', 'data-key': 'pattern', type: 'text', value: input.pattern, placeholder: 'Type a RegEx pattern here'})
                                 .on('change', onChange)
                         )
-                    ),
-                    this.renderField(
-                        'Required',
-                        _.div({class: 'switch'},
-                            _.input({'data-key': 'required', id: switchId, class: 'form-control switch', type: 'checkbox', checked: input.required == true})
-                            .on('change', onChange),
-                            _.label({for: switchId})
-                        )
-                    ),
-                    this.renderField(
-                        'Pattern',
-                        _.input({class: 'form-control', 'data-key': 'pattern', type: 'text', value: input.pattern, placeholder: 'Type a RegEx pattern here'})
-                            .on('change', onChange)
-                    )
-                );
+                    );
+                }
+                
+                render();
+
+                return $input;
             }),
             _.button({class: 'btn btn-primary btn-round'}, _.span({class: 'fa fa-plus'}))
                 .on('click', () => { this.onClickAddInput(); })
@@ -220,7 +233,7 @@ class FormEditor extends View {
                 }
             }),
             _.input({class: 'btn btn-primary', type: 'submit', value: 'Test'})
-        )
+        );
     }
 
     /**
@@ -283,11 +296,13 @@ class FormEditor extends View {
         // Content type
         $element.empty();
 
+        this.$preview = this.renderPreview();
+
         $element.append(this.renderField('Entries', this.renderEntries())); 
         $element.append(this.renderField('POST URL', _.input({readonly: 'readonly', class: 'form-control', type: 'text', value: postUrl})));
         $element.append(this.renderField('Title', this.renderTitleEditor())); 
         $element.append(this.renderField('Inputs', this.renderInputsEditor())); 
-        $element.append(this.renderField('Test', this.renderPreview()));
+        $element.append(this.renderField('Test', this.$preview));
 
         return $element;
     }

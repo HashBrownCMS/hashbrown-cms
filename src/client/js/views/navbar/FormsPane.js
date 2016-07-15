@@ -46,21 +46,11 @@ class FormsPane extends Pane {
                 'Remove': () => { this.onClickRemoveForm(); }
             },
 
-            // Dir context menu
-            dirContextMenu: {
-                'Directory': '---',
-                'Paste': () => { this.onClickPasteForm(); },
-                'New folder': () => { this.onClickNewFormDirectory(); },
-                'New form': () => { this.onClickNewForm(); },
-                'Remove': () => { this.onClickRemoveFormDirectory(); }
-            },
-
             // General context menu
             paneContextMenu: {
-                'General': '---',
-                'Paste': () => { this.onClickPasteForm(); },
-                'New folder': () => { this.onClickNewFormDirectory(); },
-                'New form': () => { this.onClickNewForm(); }
+                'Forms': '---',
+                'New form': () => { this.onClickNewForm(); },
+                'Paste': () => { this.onClickPasteForm(); }
             }
         };
     }
