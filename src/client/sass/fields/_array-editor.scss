@@ -59,7 +59,7 @@
                 clear: both;
                 display: flex;
                 margin-bottom: 10px;
-                width: calc(100% - 34px);
+                width: 100%;
 
                 .key {
                     width: 100px;
@@ -73,7 +73,7 @@
             }            
 
             >.field-editor {
-                width: calc(100% - 34px);
+                width: 100%;
             }
 
             >.btn-remove {

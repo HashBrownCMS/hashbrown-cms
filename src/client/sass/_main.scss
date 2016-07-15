@@ -133,7 +133,7 @@ body {
         height: 100%;
 
         .dashboard-container {
-            padding: 30px;
+            padding: 15px 30px;
             height: 100%;
             overflow-y: auto;
         }
@@ -143,6 +143,12 @@ body {
                 display: flex;
                 margin-bottom: 30px;
                 
+                div >.field-container {
+                    &:last-child {
+                        margin-bottom: 0px;
+                    }
+                }
+
                 .field-icon {
                     width: 20px;
                     flex-shrink: 0;

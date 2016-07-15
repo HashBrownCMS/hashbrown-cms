@@ -190,10 +190,9 @@ class ArrayEditor extends View {
                     if(itemSchema) {
                         let fieldEditor = resources.editors[itemSchema.editorId];
 
-                        // Sanity check to make sure multilingual fields are accomodated for
-                        if(itemSchema.multilingual && (!item || typeof item !== 'object')) {
-                            item = {};
-                        }
+                        // Sanity check
+                        item = ContentHelper.fieldSanityCheck(item, itemSchema);
+                        this.value.items[i] = item;
 
                         // Init the schema selector
                         let $schemaSelector = _.div({class: 'item-schema-selector kvp'},

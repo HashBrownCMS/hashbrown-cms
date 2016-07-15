@@ -24,7 +24,6 @@
         "properties": {
             "title": {
                 "label": "Title",
-                "multilingual": true,
                 "schemaId": "string"
             }
         }

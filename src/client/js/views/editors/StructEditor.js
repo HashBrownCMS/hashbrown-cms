@@ -51,10 +51,9 @@ class StructEditor extends View {
                 let fieldSchema = resources.schemas[schemaValue.schemaId];
                 let fieldEditor = resources.editors[fieldSchema.editorId];
 
-                // Sanity check to make sure multilingual fields are accomodated for
-                if(schemaValue.multilingual && (!value || typeof value !== 'object')) {
-                    value = {};
-                }
+                // Sanity check
+                value = ContentHelper.fieldSanityCheck(value, schemaValue);
+                this.value[k] = value;
 
                 // Init the field editor
                 let fieldEditorInstance = new fieldEditor({

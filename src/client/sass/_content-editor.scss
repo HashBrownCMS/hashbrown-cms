@@ -18,6 +18,10 @@
         >.tab-content {
             flex-grow: 1;
             overflow-y: auto;
+
+            >.tab-pane {
+                max-width: 1200px;
+            }
         }
 
         // Language picker

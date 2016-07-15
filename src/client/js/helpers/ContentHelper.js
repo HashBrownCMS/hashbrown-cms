@@ -30,6 +30,30 @@ class ContentHelper extends ContentHelperCommon {
             }
         });
     }
+
+    /**
+     * A sanity check for fields
+     *
+     * @param {Object} value
+     * @param {Schema} schema
+     */
+    static fieldSanityCheck(value, schema) {
+        // If the schema value is set to multilingual, but the value isn't an object, convert it
+        if(schema.multilingual && (!value || typeof value !== 'object')) {
+            let oldValue = value;
+
+            value = {};
+            value[window.language] = oldValue;
+        }
+
+        // If the schema value is not set to multilingual, but the value is an object
+        // containing the _multilingual flag, convert it
+        if(!schema.multilingual && typeof value === 'object' && value._multilingual) {
+            value = value[window.language];
+        }
+
+        return value;
+    }
 }
 
 module.exports = ContentHelper;

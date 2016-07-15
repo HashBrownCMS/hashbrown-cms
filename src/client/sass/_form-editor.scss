@@ -35,6 +35,10 @@
         flex-grow: 1;
         overflow-y: auto;
         padding: 15px;
+        
+        >.field-container {
+            max-width: 800px;
+        }
 
         form.preview {
             display: block;
@@ -67,7 +71,7 @@
             .input {
                 margin-bottom: 30px;
                 position: relative;
-                padding: 30px 34px 30px 30px;
+                padding: 15px 30px;
                
                 .switch {
                     margin-top: 10px;

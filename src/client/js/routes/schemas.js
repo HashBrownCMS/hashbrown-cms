@@ -27,9 +27,17 @@ Router.route('/schemas/:id', function() {
 Router.route('/schemas/json/:id', function() {
     let jsonEditor = new JSONEditor({
         model: resources.schemas[this.id],
-        apiPath: 'schemas/' + this.id
+        apiPath: 'schemas/' + this.id,
+        onSuccess: () => {
+            reloadResource('schemas')
+            .then(() => {
+                let navbar = ViewHelper.get('NavbarMain');
+                
+                navbar.reload();
+            });
+        }
     });
-    
+
     ViewHelper.get('NavbarMain').highlightItem(this.id);
     
     $('.workspace').html(jsonEditor.$element);

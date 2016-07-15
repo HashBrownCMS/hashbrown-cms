@@ -103,7 +103,7 @@ button, a {
 .raised {
     box-shadow: 0px 2px 3px 1px rgba(0, 0, 0, 0.2);
     background-color: #fff;
-    padding: 30px;
+    padding: 15px 30px;
 
     .raised {
         padding: 0px;
@@ -124,7 +124,7 @@ button, a {
     border-radius: 0px;
 
     &.active {
-        outline: 5px solid material-color('blue', '500') !important;
+        outline: 5px solid material-color('blue', '600') !important;
     }
 
     &.thumbnail-sm {
@@ -164,7 +164,7 @@ button, a {
             .fa {
                 line-height: 80px;
                 font-size: 48px;
-                color: material-color('blue', '500');
+                color: material-color('blue', '600');
              }
         }
     }
@@ -232,7 +232,7 @@ button, a {
         border-radius: 0px;
         box-shadow: none;
         border: 0px;
-        border-bottom: 2px solid material-color('blue', '500');
+        border-bottom: 2px solid material-color('blue', '600');
         padding-left: 0px;
         padding-right: 0px;
 
@@ -276,6 +276,11 @@ button, a {
         box-shadow: none;
     }
 
+    &.btn-primary {
+        background-color: material-color('blue', '600');
+        border-color: material-color('blue', '600');
+    }
+
     &.btn-right {
         display: block;
         margin-left: auto;
@@ -308,7 +313,7 @@ button, a {
     &.btn-embedded {
         background-color: transparent;
         border: 0px;
-        color: material-color('blue', '500');
+        color: material-color('blue', '600');
     }
 }
 
@@ -338,7 +343,7 @@ button, a {
 // Tabs
 .nav-tabs {
     padding: 18px 0px 0px 15px;
-    background-color: material-color('blue', '500');
+    background-color: material-color('blue', '600');
     font-size: 14px;
     position: relative;
     font-weight: bold;
@@ -353,7 +358,7 @@ button, a {
 
         &:not(.active) {
             a, a:focus {
-                color: material-color('blue', '50');
+                color: material-color('grey', '300');
                 
                 &, &:hover, &:focus {
                     background-color: transparent;
@@ -397,7 +402,7 @@ button, a {
         &:checked {
             & + label {
                 left: 90%;
-                background-color: material-color('blue', '500');
+                background-color: material-color('blue', '600');
             }  
         }  
     }

@@ -291,11 +291,8 @@ class ContentEditor extends View {
         return _.each(schemaFields, (key, schemaValue) => {
             let fieldSchema = resources.schemas[schemaValue.schemaId];
 
-            if(schemaValue.multilingual) {
-                if(!fields[key] || typeof fields[key] !== 'object') {
-                    fields[key] = {};
-                }
-            }
+            // Sanity check
+            fields[key] = ContentHelper.fieldSanityCheck(fields[key], schemaValue);
 
             return _.div({class: 'field-container', 'data-key': key},
                 _.div({class: 'field-key'},
