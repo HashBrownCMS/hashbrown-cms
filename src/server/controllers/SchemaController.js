@@ -27,7 +27,7 @@ class SchemaController extends ApiController {
             res.status(200).send(schemas);
         })
         .catch((e) => {
-            res.status(502).send(e);
+            res.status(502).send(e.message);
         });
     }
     
@@ -42,7 +42,7 @@ class SchemaController extends ApiController {
             res.status(200).send(schema);
         })
         .catch((e) => {
-            res.status(502).send(e);
+            res.status(502).send(e.message);
         });
     }
     
@@ -58,7 +58,7 @@ class SchemaController extends ApiController {
             res.status(200).send(schema);
         })
         .catch((e) => {
-            res.status(502).send(e);
+            res.status(502).send(e.message);
         });
     }
     
@@ -73,7 +73,7 @@ class SchemaController extends ApiController {
             res.status(200).send(newSchema.getObject());
         })
         .catch((e) => {
-            res.status(502).send(e);
+            res.status(502).send(e.message);
         });
     }
     
@@ -85,10 +85,10 @@ class SchemaController extends ApiController {
         
         SchemaHelper.removeSchema(id)
         .then(() => {
-            res.status(200).send(id);
+            res.status(200).send('Schema with id "' + id + '" deleted successfully');
         })
         .catch((e) => {
-            res.status(502).send(e);
+            res.status(502).send(e.message);
         });
     }
 }

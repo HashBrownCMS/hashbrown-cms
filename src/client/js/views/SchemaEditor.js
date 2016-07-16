@@ -386,6 +386,58 @@ class SchemaEditor extends View {
     }
 
     /**
+     * Event: On click remove
+     */
+    onClickDelete() {
+        let view = this;
+
+        function onSuccess() {
+            debug.log('Removed Schema with id "' + view.model.id + '"', view); 
+        
+            reloadResource('schemas')
+            .then(function() {
+                ViewHelper.get('NavbarMain').reload();
+                
+                // Cancel the SchemaEditor view
+                location.hash = '/schemas/';
+            });
+        }
+
+        function onError(err) {
+            new MessageModal({
+                model: {
+                    title: 'Error',
+                    body: err.message
+                }
+            });
+        }
+
+        new MessageModal({
+            model: {
+                title: 'Delete schema',
+                body: 'Are you sure you want to delete the schema "' + view.model.name + '"?'
+            },
+            buttons: [
+                {
+                    label: 'Cancel',
+                    class: 'btn-default',
+                    callback: () => {
+                    }
+                },
+                {
+                    label: 'OK',
+                    class: 'btn-danger',
+                    callback: () => {
+                        apiCall('delete', 'schemas/' + view.model.id)
+                        .then(onSuccess)
+                        .catch(onError);
+                    }
+                }
+            ]
+        });
+    }
+
+    /**
      * Renders the default tab editor
      *  
      * @return {Object} element

@@ -3,12 +3,11 @@
 // MongoHelper client
 let mongodb = require('mongodb');
 let mongoClient = mongodb.MongoClient;
-let mongoDatabase;
 
 // Models
-let Content = require(appRoot + '/src/common/models/Content');
-let Connection = require(appRoot + '/src/common/models/Connection');
-let User = require(appRoot + '/src/server/models/User');
+let Content = require('../models/Content');
+let Connection = require('../../common/models/Connection');
+let User = require('../models/User');
 
 class MongoHelper {
     /**
@@ -28,11 +27,10 @@ class MongoHelper {
                 
                 } else {
                     if(db) {
-                        mongoDatabase = db;
-                        resolve(mongoDatabase);
+                        resolve(db);
 
                     } else {
-                        debug.error('Couldn\'t connect to MongoDB using the connection string "' + connectionString + '".', this);
+                        reject(new Error('Couldn\'t connect to MongoDB using the connection string "' + connectionString + '".'));
                     
                     }
                 }
@@ -73,7 +71,7 @@ class MongoHelper {
                         });
 
                     } else {
-                        debug.error('Couldn\'t connect to MongoDB using the connection string "' + connectionString + '".', this);
+                        reject(new Error('Couldn\'t connect to MongoDB using the connection string "' + connectionString + '".'));
                     
                     }
                 }
@@ -91,7 +89,7 @@ class MongoHelper {
      * @return {Promise} promise
      */
     static findOne(databaseName, collectionName, query) {
-        return new Promise((callback) => {
+        return new Promise((resolve, reject) => {
             debug.log(databaseName + '/' + collectionName + '::findOne ' + JSON.stringify(query) + '...', this);
 
             let pattern = {
@@ -101,10 +99,10 @@ class MongoHelper {
             MongoHelper.getDatabase(databaseName).then(function(db) {
                 db.collection(collectionName).findOne(query, pattern, function(findErr, doc) {
                     if(findErr) {
-                        throw findErr;
+                        reject(new Error(findErr));
+                    } else {
+                        resolve(doc);
                     }
-
-                    callback(doc);
                 });
             });
         });

@@ -155,8 +155,7 @@ window.apiCall = function apiCall(method, url, data) {
                             response = JSON.parse(response);
                         
                         } catch(e) {
-                            debug.log('Response: ' + response, this)
-                            debug.warning(e, this)
+                            // If the response isn't JSON, then so be it
 
                         }
                     }
