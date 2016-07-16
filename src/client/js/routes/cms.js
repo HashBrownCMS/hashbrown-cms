@@ -25,14 +25,36 @@ Router.route('/users/', function() {
     );
 });
 
-// About
-Router.route('/about/', function() {
-    ViewHelper.get('NavbarMain').highlightItem('about');
+// Readme
+Router.route('/readme/', function() {
+    ViewHelper.get('NavbarMain').highlightItem('readme');
 
-    $('.workspace').html(
-        _.div({class: 'dashboard-container'},
-            _.h1('HashBrown'),
-            _.p('The pluggable CMS')
-        )
-    );
+    $.ajax({
+        type: 'GET',
+        url: '/readme',
+        success: (html) => {
+            $('.workspace').html(
+                _.div({class: 'dashboard-container readme'},
+                    html
+                )
+            );
+        }
+    });
+});
+
+// License
+Router.route('/license/', function() {
+    ViewHelper.get('NavbarMain').highlightItem('license');
+
+    $.ajax({
+        type: 'GET',
+        url: '/license',
+        success: (html) => {
+            $('.workspace').html(
+                _.div({class: 'dashboard-container license'},
+                    html
+                )
+            );
+        }
+    });
 });

@@ -177,10 +177,12 @@ class NavbarMain extends View {
                 sortingQueue.push(queueItem);
 
                 // Add drag/drop event
-                $element.exodragdrop({
-                    lockX: true,
-                    onEndDrag: params.onEndDrag
-                });
+                if(typeof params.onEndDrag === 'function') {
+                    $element.exodragdrop({
+                        lockX: true,
+                        onEndDrag: params.onEndDrag
+                    });
+                }
 
                 return $element;
             })
@@ -400,8 +402,12 @@ class NavbarMain extends View {
                     $icon: _.img({src: '/svg/logo.svg', class: 'about-logo'}),
                     items: [
                         {
-                            name: 'About',
-                            path: 'about'
+                            name: 'Readme',
+                            path: 'readme'
+                        },
+                        {
+                            name: 'License',
+                            path: 'license'
                         }
                     ]
                 });

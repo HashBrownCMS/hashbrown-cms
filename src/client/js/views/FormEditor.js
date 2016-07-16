@@ -299,7 +299,18 @@ class FormEditor extends View {
         this.$preview = this.renderPreview();
 
         $element.append(this.renderField('Entries', this.renderEntries())); 
-        $element.append(this.renderField('POST URL', _.input({readonly: 'readonly', class: 'form-control', type: 'text', value: postUrl})));
+        $element.append(this.renderField('POST URL',
+            _.div({class: 'input-group'},
+                _.input({readonly: 'readonly', class: 'form-control post-url', type: 'text', value: postUrl}),
+                _.div({class: 'input-group-btn'},
+                    _.button({class: 'btn btn-primary'},
+                        'Copy'
+                    ).click(() => {
+                        copyToClipboard($('.post-url').val());
+                    })
+                )
+            )
+        ));
         $element.append(this.renderField('Title', this.renderTitleEditor())); 
         $element.append(this.renderField('Inputs', this.renderInputsEditor())); 
         $element.append(this.renderField('Test', this.$preview));

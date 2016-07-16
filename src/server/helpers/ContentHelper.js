@@ -18,7 +18,10 @@ class ContentHelper extends ContentHelperCommon {
         return MongoHelper.find(
             ProjectHelper.currentProject,
             collection,
-            {}
+            {},
+            {
+                sort: 1
+            }
         );
     }
 

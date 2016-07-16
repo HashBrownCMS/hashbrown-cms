@@ -291,40 +291,8 @@ class ContentPane extends Pane {
                 queueItem.$element.attr('data-content-id', item.id);
                 queueItem.parentDirAttr = {'data-content-id': item.parentId };
 
-               /* function onSuccess() {
-
-                }
-
-                function onError(err) {
-                    new MessageModal({
-                        model: {
-                            title: 'Error',
-                            body: err
-                        }
-                    });
-                }
-
-                // Get the Content node and check if it has a sort index
-                let thisContent = resources.content.filter((content) => {
-                    return content.id = item.id;
-                })[0];
-
-                // ...if it doesn't, assign one based on the DOM
-                if(thisContent.sort < 0) {
-                    thisContent.sort = queueItem.$element.parent().index() * 10000;
-                    
-                    // Save the Content model with the new sort index
-                    $.ajax({
-                        type: 'post',
-                        url: apiUrl('content/' + thisContent.id),
-                        data: thisContent.getObject(),
-                        success: onSuccess,
-                        error: navbar.onError
-                    });
-                }
-                
                 // Assign the sort index to the DOM element
-                queueItem.$element.attr('data-sort', thisContent.sort);*/
+                queueItem.$element.attr('data-sort', item.sort);
             },
 
             // After sorting logic
@@ -350,51 +318,53 @@ class ContentPane extends Pane {
             onEndDrag: function(dragdropItem) {
                 let thisId = dragdropItem.element.dataset.contentId;
                 
-                function onSuccess() {
-
-                }
-
                 // Get Content node and set new sorting value
                 ContentHelper.getContentById(thisId)
                 .then((thisContent) => {
+                    let thisPrevSort = thisContent.sort;
+                    let newSortBasedOn = '';
+
+                    function onSuccess() {
+                        debug.log('Changed sorting index of Content "' + thisContent.id + '" from ' + thisPrevSort + ' to ' + thisContent.sort + ' based on ' + newSortBasedOn, navbar);
+                    }
+
                     // If this element has a previous sibling, base the sorting index on that
-                    if(dragdropItem.element.previousSibling) {
-                        let prevId = dragdropItem.element.previousSibling.dataset.contentId;
+                    if($(dragdropItem.element).prev('.pane-item-container').length > 0) {
+                        let prevSort = parseInt(dragdropItem.element.previousSibling.dataset.sort);
 
-                        ContentHelper.getContentById(prevId)
-                        .then((prevContent) => {
-                            thisContent.sort = prevContent.sort + 1;
-
-                            // Save model
-                            apiCall('post', 'content/' + thisContent.id, thisContent.getObject())
-                            .then(onSuccess)
-                            .catch(navbar.onError);
-                        });
+                        thisContent.sort = prevSort + 1;
+                        newSortBasedOn = 'previous sibling';
+            
+                        // Save model
+                        apiCall('post', 'content/' + thisContent.id, thisContent.getObject())
+                        .then(onSuccess)
+                        .catch(navbar.onError);
 
                     // If this element has a next sibling, base the sorting index on that
-                    } else if (dragdropItem.element.nextSibling) {
-                        let nextId = dragdropItem.element.nextiousSibling.dataset.contentId;
+                    } else if($(dragdropItem.element).next('.pane-item-container').length > 0) {
+                        let nextSort = parseInt(dragdropItem.element.nextSibling.dataset.sort);
 
-                        ContentHelper.getContentById(nextId)
-                        .then((nextContent) => {
-                            thisContent.sort = nextContent.sort - 1;
+                        thisContent.sort = nextSort - 1;
+                        newSortBasedOn = 'next sibling';
 
-                            // Save model
-                            apiCall('post', 'content/' + thisContent.id, thisContent.getObject())
-                            .then(onSuccess)
-                            .catch(navbar.onError);
-                        });
+                        // Save model
+                        apiCall('post', 'content/' + thisContent.id, thisContent.getObject())
+                        .then(onSuccess)
+                        .catch(navbar.onError);
 
 
                     // If it has neither, just assign the lowest possible one
                     } else {
                         thisContent.sort = 10000;
+                        newSortBasedOn = 'lowest possible index';
                        
                         // Save model
                         apiCall('post', 'content/' + thisContent.id, thisContent.getObject())
                         .then(onSuccess)
                         .catch(navbar.onError);
                     }
+
+                    dragdropItem.element.dataset.sort = thisContent.sort;
                 });
             }
         }

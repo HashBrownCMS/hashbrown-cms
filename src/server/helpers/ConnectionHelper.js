@@ -46,7 +46,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
     static publishContent(content) {
         let helper = this;
 
-        return new Promise((callback) => {
+        return new Promise((resolve, reject) => {
             debug.log('Publishing content "' + content.id + '"...', this);
             
             content.getSettings('publishing')
@@ -69,19 +69,22 @@ class ConnectionHelper extends ConnectionHelperCommon {
                                 } else {
                                     debug.log('Published content "' + content.id + '" successfully!', helper);
 
-                                    callback();
+                                    resolve();
                                 
                                 }
-                            });
-                        });
+                            })
+                            .catch(reject);
+                        })
+                        .catch(reject);
                     }
 
                     nextConnection(0);
                 
                 } else {
-                    debug.error('No connections defined for content "' + content.id + '"', this);
+                    reject(new Error('No connections defined for content "' + content.id + '"'));
                 }
-            });
+            })
+            .catch(reject);
         }); 
     }
     

@@ -3,6 +3,8 @@
 // ----------
 // Libs
 // ----------
+let fs = require('fs');
+let markdownToHtml = require('marked');
 let express = require('express');
 let bodyparser = require('body-parser');
 let exec = require('child_process').exec;
@@ -127,6 +129,28 @@ function ready() {
 // ----------
 // Views
 // ----------
+// Readme
+app.get('/readme', function(req, res) {
+    fs.readFile(appRoot + '/README.md', (err, file) => {
+        if(err) {
+            res.status(502).send(e.message);
+        } else {
+            res.status(200).send(markdownToHtml(file.toString()));        
+        }
+    });
+});
+
+// License
+app.get('/license', function(req, res) {
+    fs.readFile(appRoot + '/LICENSE', (err, file) => {
+        if(err) {
+            res.status(502).send(e.message);
+        } else {
+            res.status(200).send(file.toString().replace(/\n/g, '<br />'));        
+        }
+    });
+});
+
 // Login
 app.get('/login/', function(req, res) {
     res.render('login');

@@ -116,10 +116,11 @@ class MongoHelper {
      * @param {String} databaseName
      * @param {String} collectionName
      * @param {Object} query
+     * @param {Object} sort
      *
      * @return {Promise} promise
      */
-    static find(databaseName, collectionName, query) {
+    static find(databaseName, collectionName, query, sort) {
         return new Promise((resolve, reject) => {
             debug.log(databaseName + '/' + collectionName + '::find ' + JSON.stringify(query) + '...', this);
 
@@ -128,7 +129,7 @@ class MongoHelper {
             };
 
             MongoHelper.getDatabase(databaseName).then(function(db) {
-                db.collection(collectionName).find(query, pattern).toArray(function(findErr, docs) {
+                db.collection(collectionName).find(query, pattern).sort(sort).toArray(function(findErr, docs) {
                     if(findErr) {
                         reject(new Error(findErr));
 

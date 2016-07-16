@@ -1,4 +1,6 @@
-# Endomon CMS
+<img src="https://cdn.rawgit.com/Putaitu/hashbrown-cms/master/public/svg/logo.svg" width="128"/>
+
+# HashBrown CMS
 
 ## Purpose
 Endomon aims to be a CMS for managing the content of multiple sites/apps.
