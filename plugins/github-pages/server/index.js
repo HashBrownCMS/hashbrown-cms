@@ -6,8 +6,6 @@ let ConnectionHelper = require(appRoot + '/src/server/helpers/ConnectionHelper')
 let restler = require('restler');
 let fs = require('fs');
 
-let config = require('../config.json');
-
 let route = '';
 
 class GitHubPages {
@@ -17,36 +15,36 @@ class GitHubPages {
         /**
          * Starts the oAuth flow
          */
-        app.get('/api/github/oauth/start', (req, res) => {
-            route = req.query.route;
+       // app.get('/api/github/oauth/start', (req, res) => {
+       //     route = req.query.route;
 
-            res.redirect('https://github.com/login/oauth/authorize?client_id=' + config.client.id + '&scope=repo read:org');
-        });
+       //     res.redirect('https://github.com/login/oauth/authorize?client_id=' + config.client.id + '&scope=repo read:org');
+       // });
 
-        /**
-         * The callback for the oAuth flow
-         */
-        app.get('/api/github/oauth/callback', (req, res) => {
-            let code = req.query.code;
-            let data = {
-                code: code,
-                client_id: config.client.id,
-                client_secret: config.client.secret
-            };
-            let headers = {
-                'Accept': 'application/json'
-            };
+       // /**
+       //  * The callback for the oAuth flow
+       //  */
+       // app.get('/api/github/oauth/callback', (req, res) => {
+       //     let code = req.query.code;
+       //     let data = {
+       //         code: code,
+       //         client_id: config.client.id,
+       //         client_secret: config.client.secret
+       //     };
+       //     let headers = {
+       //         'Accept': 'application/json'
+       //     };
 
-            restler.post('https://github.com/login/oauth/access_token', {
-                data: data,
-                headers: headers    
-            })
-            .on('complete', (data, response) => {
-                let token = data.access_token;
+       //     restler.post('https://github.com/login/oauth/access_token', {
+       //         data: data,
+       //         headers: headers    
+       //     })
+       //     .on('complete', (data, response) => {
+       //         let token = data.access_token;
 
-                res.redirect('/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/#' + route + '?token=' + token);
-            });
-        });
+       //         res.redirect('/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/#' + route + '?token=' + token);
+       //     });
+       // });
 
         /**
          * Lists all user orgs

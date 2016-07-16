@@ -3,8 +3,5 @@
 *.swo
 node_modules/*
 
-# Project directories
-projects/*
-
-# Plugin configs
-plugins/*/config.json
+# Storage directories
+storage/*

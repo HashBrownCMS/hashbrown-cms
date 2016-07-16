@@ -19,8 +19,23 @@ class DebugHelper {
         }
 
         if(this.verbosity >= verbosity) {
-            console.log(this.parseSender(sender), this.getDateString(), message);
+            let senderString = this.parseSender(sender);
+            let dateString = this.getDateString();
+            
+            console.log(senderString, dateString, message);
+            this.onLog(senderString, dateString, message);
         }
+    }
+
+    /**
+     * Event: Log
+     *
+     * @param {String} senderString
+     * @param {String} dateString
+     * @param {String} message
+     */
+    static onLog(senderString, dateString, message) {
+    
     }
 
     /**
@@ -51,7 +66,7 @@ class DebugHelper {
      *
      * @returns {String} name
      */
-    static parseSender(sender) {
+    static parseSender(sender, ignoreLast) {
         let senderName = '';
 
         if(sender) {

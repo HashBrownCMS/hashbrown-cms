@@ -42,8 +42,9 @@ global.PluginHelper = require('./helpers/PluginHelper');
 global.ProjectHelper = require('./helpers/ProjectHelper');
 global.SchemaHelper = require('./helpers/SchemaHelper');
 global.SettingsHelper = require('./helpers/SettingsHelper');
+global.LogHelper = require('./helpers/LogHelper');
 
-global.debug = require('../common/helpers/DebugHelper');
+global.debug = require('./helpers/DebugHelper');
 global.debug.verbosity = 3;
 
 PluginHelper.init(app)
@@ -82,7 +83,7 @@ function ready() {
     let port = 80;
     let server = app.listen(port);
 
-    debug.log('RESTART');
+    console.log('RESTART');
     
     // Startup arguments
     let cmd;

@@ -18,6 +18,7 @@ class ApiController extends Controller {
      */
     static authenticate(token, scope) {
         return new Promise((resolve, reject) => {
+            
             UserHelper.findToken(token)
             .then((user) => {
                 if(user) {
@@ -40,7 +41,8 @@ class ApiController extends Controller {
                 } else {
                     reject(new Error('Found no user with token "' + token + '"'));
                 }
-            });
+            })
+            .catch(reject);
         });
     }
 
@@ -106,36 +108,38 @@ class ApiController extends Controller {
                 debug.log('Allowing CORS for API call "' + req.originalUrl + '"', this);
             }
 
-            if(settings.authenticate != false) {
-                ApiController.authenticate(req.query.token, settings.scope)
+            if(settings.setProject != false) {
+                ApiController.setProjectVariables(req.originalUrl)
                 .then(() => {
-                    if(settings.setProject != false) {
-                        ApiController.setProjectVariables(req.originalUrl)
-                        .then(next)
+                    if(settings.authenticate != false) {
+                        ApiController.authenticate(req.query.token, settings.scope)
+                        .then(() => {
+                            next();
+                        })
                         .catch((e) => {
-                            res.status(400).send(e);
-                            debug.log(e, ApiController);
-                        });
-                    } else {
-                        next();
+                            res.status(403).send(e.message);   
+                            debug.log(e.message, ApiController);
+                        });    
+                    
                     }
                 })
                 .catch((e) => {
-                    res.status(403).send(e);   
-                    debug.log(e, ApiController);
-                });    
+                    res.status(400).send(e.message);
+                    debug.log(e.message, ApiController);
+                });
             
-            } else {
-                if(settings.setProject != false) {
-                    ApiController.setProjectVariables(req.originalUrl)
-                    .then(next)
-                    .catch((e) => {
-                        res.status(400).send(e);
-                        debug.log(e, ApiController);
-                    });
-                } else {
+            } else if(settings.authenticate != false) {
+                ApiController.authenticate(req.query.token, settings.scope)
+                .then(() => {
                     next();
-                }
+                })
+                .catch((e) => {
+                    res.status(403).send(e.message);   
+                    debug.log(e.message, ApiController);
+                });    
+            } else {
+                next();
+            
             }
         }
     }

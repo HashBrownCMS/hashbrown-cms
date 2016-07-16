@@ -22,7 +22,7 @@ class JsonTreeConnection extends Connection {
      * @return {String} path
      */
     getPath() {
-        return appRoot + '/projects/' + ProjectHelper.currentProject + '/storage/' + ProjectHelper.currentEnvironment + '/json';
+        return appRoot + '/storage/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/json';
     }
 
     /**

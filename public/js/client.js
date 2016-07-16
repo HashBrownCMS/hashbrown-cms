@@ -3438,7 +3438,13 @@ sort:function sort(item,queueItem){queueItem.$element.attr('data-schema-id',item
      * @param {String} message
      * @param {Object} sender
      * @param {Number} verbosity
-     */value:function log(message,sender,verbosity){if(verbosity==0){this.error('Verbosity cannot be set to 0',this);}else if(!verbosity){verbosity=1;}if(this.verbosity>=verbosity){console.log(this.parseSender(sender),this.getDateString(),message);}} /**
+     */value:function log(message,sender,verbosity){if(verbosity==0){this.error('Verbosity cannot be set to 0',this);}else if(!verbosity){verbosity=1;}if(this.verbosity>=verbosity){var senderString=this.parseSender(sender);var dateString=this.getDateString();console.log(senderString,dateString,message);this.onLog(senderString,dateString,message);}} /**
+     * Event: Log
+     *
+     * @param {String} senderString
+     * @param {String} dateString
+     * @param {String} message
+     */},{key:"onLog",value:function onLog(senderString,dateString,message){} /**
      * Gets the date string
      *
      * @returns {String} date
@@ -3448,7 +3454,7 @@ sort:function sort(item,queueItem){queueItem.$element.attr('data-schema-id',item
      * @param {Object} sender
      *
      * @returns {String} name
-     */},{key:"parseSender",value:function parseSender(sender){var senderName='';if(sender){if(typeof sender==='function'){senderName+=sender.name;}else if(sender.constructor){senderName+=sender.constructor.name;}else {senderName+=sender.toString();}senderName;}if(senderName==lastSenderName){senderName='';}else {lastSenderName=senderName;senderName='\n'+senderName+'\n----------\n';}return senderName;} /**
+     */},{key:"parseSender",value:function parseSender(sender,ignoreLast){var senderName='';if(sender){if(typeof sender==='function'){senderName+=sender.name;}else if(sender.constructor){senderName+=sender.constructor.name;}else {senderName+=sender.toString();}senderName;}if(senderName==lastSenderName){senderName='';}else {lastSenderName=senderName;senderName='\n'+senderName+'\n----------\n';}return senderName;} /**
      * Throws an error
      *
      * @param {String} message

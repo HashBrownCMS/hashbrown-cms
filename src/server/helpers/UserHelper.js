@@ -144,12 +144,14 @@ class UserHelper {
                         debug.log('Created user "' + username + '" successfully.', this);
                         
                         resolve();
-                    });
+                    })
+                    .catch(reject);
                 } else {
                     reject(new Error('User with username "' + username + '" already exists'))
 
                 }
-            });
+            })
+            .catch(reject);
         });
     }
 
