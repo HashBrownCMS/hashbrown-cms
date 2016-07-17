@@ -75,11 +75,17 @@ class ContentHelper extends ContentHelperCommon {
     /**
      * Creates a new content object
      *
+     * @param {String} parentId
+     *
      * @return {Promise} promise
      */
-    static createContent() {
+    static createContent(parentId) {
         let content = Content.create();
         let collection = ProjectHelper.currentEnvironment + '.content';
+
+        if(parentId) {
+            content.parentId = parentId;
+        }
 
         return MongoHelper.insertOne(
             ProjectHelper.currentProject,

@@ -63,7 +63,9 @@ class ContentController extends ApiController {
      * @return {Content} content
      */
     static createContent(req, res) {
-        ContentHelper.createContent()
+        let parentId = req.query.parent;
+        
+        ContentHelper.createContent(parentId)
         .then((node) => {
             res.status(200).send(node);
         })

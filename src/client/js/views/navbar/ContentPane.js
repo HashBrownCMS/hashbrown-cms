@@ -68,11 +68,18 @@ class ContentPane extends Pane {
 
     /**
      * Event: Click new content
+     *
+     * @param {String} parentId
      */
-    static onClickNewContent() {
+    static onClickNewContent(parentId) {
         let navbar = ViewHelper.get('NavbarMain');
+        let apiUrl = 'content/new';
         
-        apiCall('post', 'content/new')
+        if(parentId) {
+            apiUrl += '?parent=' + parentId;
+        }
+
+        apiCall('post', apiUrl)
         .then((newContent) => {
             reloadResource('content')
             .then(() => {
@@ -271,6 +278,7 @@ class ContentPane extends Pane {
             // Set item context menu
             itemContextMenu: {
                 'This content': '---',
+                'Create new': () => { this.onClickNewContent($('.context-menu-target-element').data('id')); },
                 'Copy': () => { this.onClickCopyContent(); },
                 'Copy id': () => { this.onClickCopyItemId(); },
                 'Cut': () => { this.onClickCutContent(); },

@@ -110,8 +110,13 @@ window.apiUrl = function apiUrl(url) {
         '/api/' + 
         ProjectHelper.currentProject + '/' +
         ProjectHelper.currentEnvironment + '/' + 
-        url + 
-        '?token=' + localStorage.getItem('token');
+        url;
+   
+        if(url.indexOf('?') > -1) {
+            newUrl += '&token=' + localStorage.getItem('token');
+        } else {
+            newUrl += '?token=' + localStorage.getItem('token');
+        }
 
     return newUrl;
 };

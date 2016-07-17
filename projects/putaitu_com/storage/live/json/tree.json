@@ -1,0 +1,79 @@
+{
+    "93afb0e4cd9e7545c589a084079e340e66f94bb1": {
+        "da": {
+            "title": "Navigation",
+            "url": "/navigation/"
+        },
+        "en": {
+            "title": "Navigation",
+            "url": "/navigation/"
+        },
+        "properties": {
+            "da": {
+                "title": "Navigation",
+                "pageLinks": [
+                    {
+                        "target": "_self",
+                        "text": "Hjem"
+                    },
+                    {
+                        "target": "_self",
+                        "text": "Showcase"
+                    },
+                    {
+                        "target": "_self",
+                        "text": "Services"
+                    },
+                    {
+                        "target": "_self",
+                        "text": "Om os"
+                    }
+                ],
+                "languageLinks": [
+                    {
+                        "text": "Dansk",
+                        "code": "da"
+                    },
+                    {
+                        "text": "English",
+                        "code": "en"
+                    }
+                ]
+            },
+            "en": {
+                "title": "Navigation",
+                "pageLinks": [
+                    {
+                        "target": "_self",
+                        "text": "Home"
+                    },
+                    {
+                        "target": "_self",
+                        "text": "Showcase"
+                    },
+                    {
+                        "target": "_self",
+                        "text": "Services"
+                    },
+                    {
+                        "target": "_self",
+                        "text": "About"
+                    }
+                ],
+                "languageLinks": [
+                    {
+                        "text": "Dansk",
+                        "code": "da"
+                    },
+                    {
+                        "text": "English",
+                        "code": "en"
+                    }
+                ]
+            }
+        },
+        "parentId": "",
+        "createDate": "2016-06-14T14:31:36.000Z",
+        "updateDate": "2016-06-17T15:08:05.000Z"
+    }
+}
