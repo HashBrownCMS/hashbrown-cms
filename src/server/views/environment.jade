@@ -12,9 +12,15 @@ html
 
         title HashBrown CMS
     body
-        .cms-container
+        .cms-container.faded
             .navspace
             .workspace
+        
+        .spinner-obscure
+            .spinner-container.inline
+                img.spinner(src='/svg/logo.svg')
+                span.spinner-text
+                    | HashBrown
 
         script(src='/lib/jquery/jquery.min.js')
         script(src='/lib/html5sortable/html5sortable.min.js')

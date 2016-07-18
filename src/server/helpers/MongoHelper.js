@@ -45,7 +45,7 @@ class MongoHelper {
      */
     static listDatabases() {
         return new Promise((resolve, reject) => {
-            debug.log('Listing all databases...', this);
+            debug.log('Listing all databases...', this, 3);
 
             let connectionString = 'mongodb://localhost/';
             
@@ -90,13 +90,14 @@ class MongoHelper {
      */
     static findOne(databaseName, collectionName, query) {
         return new Promise((resolve, reject) => {
-            debug.log(databaseName + '/' + collectionName + '::findOne ' + JSON.stringify(query) + '...', this);
+            debug.log(databaseName + '/' + collectionName + '::findOne ' + JSON.stringify(query) + '...', this, 3);
 
             let pattern = {
                 _id: 0
             };
 
-            MongoHelper.getDatabase(databaseName).then(function(db) {
+            MongoHelper.getDatabase(databaseName)
+            .then(function(db) {
                 db.collection(collectionName).findOne(query, pattern, function(findErr, doc) {
                     if(findErr) {
                         reject(new Error(findErr));
@@ -104,7 +105,8 @@ class MongoHelper {
                         resolve(doc);
                     }
                 });
-            });
+            })
+            .catch(reject);
         });
     }
     
@@ -120,13 +122,14 @@ class MongoHelper {
      */
     static find(databaseName, collectionName, query, sort) {
         return new Promise((resolve, reject) => {
-            debug.log(databaseName + '/' + collectionName + '::find ' + JSON.stringify(query) + '...', this);
+            debug.log(databaseName + '/' + collectionName + '::find ' + JSON.stringify(query) + '...', this, 3);
 
             let pattern = {
                 _id: 0
             };
 
-            MongoHelper.getDatabase(databaseName).then(function(db) {
+            MongoHelper.getDatabase(databaseName)
+            .then(function(db) {
                 db.collection(collectionName).find(query, pattern).sort(sort).toArray(function(findErr, docs) {
                     if(findErr) {
                         reject(new Error(findErr));
@@ -157,9 +160,10 @@ class MongoHelper {
         delete doc['_id'];
 
         return new Promise((resolve, reject) => {
-            debug.log(databaseName + '/' + collectionName + '::updateOne ' + JSON.stringify(query) + ' with options ' + JSON.stringify(options || {}) + '...', this);
+            debug.log(databaseName + '/' + collectionName + '::updateOne ' + JSON.stringify(query) + ' with options ' + JSON.stringify(options || {}) + '...', this, 3);
         
-            MongoHelper.getDatabase(databaseName).then(function(db) {
+            MongoHelper.getDatabase(databaseName)
+            .then(function(db) {
                 db.collection(collectionName).updateOne(query, doc, options || {}, function(findErr) {
                     if(findErr) {
                         reject(new Error(findErr));
@@ -187,18 +191,20 @@ class MongoHelper {
         // Make sure the MongoId isn't included
         delete doc['_id'];
 
-        return new Promise((callback) => {
-            debug.log(databaseName + '/' + collectionName + '::insertOne ' + JSON.stringify(doc) + '...', this);
+        return new Promise((resolve, reject) => {
+            debug.log(databaseName + '/' + collectionName + '::insertOne ' + JSON.stringify(doc) + '...', this, 3);
         
-            MongoHelper.getDatabase(databaseName).then(function(db) {
+            MongoHelper.getDatabase(databaseName)
+            .then(function(db) {
                 db.collection(collectionName).insertOne(doc, function(insertErr) {
                     if(insertErr) {
-                        throw insertErr;
+                        reject(new Error(insertErr));
                     }
 
-                    callback(doc);
+                   resolve(doc);
                 });
-            });
+            })
+            .catch(reject);
         });
     }
     
@@ -212,18 +218,20 @@ class MongoHelper {
      * @return {Promise} promise
      */
     static removeOne(databaseName, collectionName, query) {
-        return new Promise((callback) => {
-            debug.log(databaseName + '/' + collectionName + '::removeOne ' + JSON.stringify(query) + '...', this);
+        return new Promise((resolve, reject) => {
+            debug.log(databaseName + '/' + collectionName + '::removeOne ' + JSON.stringify(query) + '...', this, 3);
         
-            MongoHelper.getDatabase(databaseName).then(function(db) {
+            MongoHelper.getDatabase(databaseName)
+            .then(function(db) {
                 db.collection(collectionName).remove(query, true, function(findErr) {
                     if(findErr) {
-                        throw findErr;
+                        reject(new Error(findErr));
                     }
 
-                    callback();
+                    resolve();
                 });
-            });
+            })
+            .catch(reject);
         });
     }    
 }

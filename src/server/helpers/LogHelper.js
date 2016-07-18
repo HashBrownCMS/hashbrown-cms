@@ -25,20 +25,22 @@ class LogHelper {
      * Initialises this helper
      */
     static init() {
-        this.wstreamDate = this.getDateString();
-        let path = this.getPath() + '/' + this.wstreamDate + '.log';
+        if(ProjectHelper.currentProject && ProjectHelper.currentEnvironment) {
+            this.wstreamDate = this.getDateString();
+            let path = this.getPath() + '/' + this.wstreamDate + '.log';
 
-        if(!fs.existsSync(path)) {
-            fs.writeFileSync(path, '');
+            if(!fs.existsSync(path)) {
+                fs.writeFileSync(path, '');
+            }
+
+            this.wstream = fs.createWriteStream(path, {
+                flags: 'a',
+                defaultEncoding: 'utf8',
+                fd: null,
+                mode: 0o666,
+                autoClose: true
+            });
         }
-
-        this.wstream = fs.createWriteStream(path, {
-            flags: 'a',
-            defaultEncoding: 'utf8',
-            fd: null,
-            mode: 0o666,
-            autoClose: true
-        });
     }
 
     /**
@@ -56,7 +58,31 @@ class LogHelper {
             this.init();
         }
 
-        this.wstream.write(line + '\n');
+        if(this.wstream) {
+            this.wstream.write(line + '\n');
+        }
+    }
+    
+    /**
+     * Makes a directory recursively
+     *
+     * @param {String} dirPath
+     */
+    static mkdirRecursively(dirPath) {
+        let parents = dirPath.split('/');
+        let finalPath = '/';
+
+        for(let i in parents) {
+            finalPath += parents[i];
+
+            if(!fs.existsSync(finalPath)) {
+                fs.mkdirSync(finalPath);
+            }
+
+            if(i < parents.length - 1) {
+                finalPath += '/';
+            }
+        }
     }
     
     /**
@@ -68,11 +94,12 @@ class LogHelper {
         let path = 
             appRoot + 
             '/storage/' +
-            ProjectHelper.currentProject +
-            '/logs';
+            ProjectHelper.currentProject + '/' +
+            ProjectHelper.currentEnvironment + '/' +
+            'logs';
 
         if(!fs.existsSync(path)) {
-            fs.mkdirSync(path);
+            this.mkdirRecursively(path);
         }
 
         return path;

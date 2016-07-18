@@ -392,7 +392,7 @@ class ContentEditor extends View {
 
                 this.model.getSettings('publishing')
                 .then((publishing) => {
-                    this.$element.html([
+                    this.$element.html(
                         this.renderEditor(this.model, contentSchema).append(
                             // Buttons 
                             _.div({class: 'panel panel-default panel-buttons'}, 
@@ -424,7 +424,7 @@ class ContentEditor extends View {
                                 )
                             )
                         )
-                    ]);
+                    );
                 });
 
                 this.onFieldEditorsReady();

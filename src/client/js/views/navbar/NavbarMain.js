@@ -180,7 +180,8 @@ class NavbarMain extends View {
                 if(typeof params.onEndDrag === 'function') {
                     $element.exodragdrop({
                         lockX: true,
-                        onEndDrag: params.onEndDrag
+                        onEndDrag: params.onEndDrag,
+                        dropContainerSelector: '.pane-container.active, .pane-container.active .pane-item-container .children' 
                     });
                 }
 
@@ -461,6 +462,8 @@ class NavbarMain extends View {
                 }
 
                 triggerReady('navbar');
+
+                $('.cms-container').removeClass('faded');
             },
             error: () => {
 

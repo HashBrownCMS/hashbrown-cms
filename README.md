@@ -1,9 +1,26 @@
 <img src="https://cdn.rawgit.com/Putaitu/hashbrown-cms/master/public/svg/logo.svg" width="128"/>
 
 # HashBrown CMS
+A free and open-source CMS built with Node.js and MongoDB
 
-## Purpose
-Endomon aims to be a CMS for managing the content of multiple sites/apps.
+## Made for developers and users alike
+Two painful problems have until now persisted in the world of content management systems:
+- If it has a rock-solid backend, it's dreadful to use
+- If it's pretty and easy to use, the backend is a house of cards
+
+HashBrown is built from the ground up to tackle this problem by applying industry-standard UI design principles and a modularised separation-of-concerns mentality in the backend. As such, it tackles complex scenarios easily, responds well to user interactions and even looks good doing it.
+
+## Who should use HashBrown?
+If any of these points sound interesting, HashBrown might be for you.
+
+### Remote management
+This is where HashBrown is very different from other CMS'es. Instead of hosting your site, taking up valuable server power caching and crunching numbers for every visitor, it connects to your site remotely, and updates a content cache on your site, only when changes are made to the site's content. This means you can build your site in whatever language and framework you like, you can even use a static site generator service like [GitHub Pages](http://github.com/pages) and host your content managed site for free.
+
+### Multiple projects at once
+One instance of HashBrown can manage the content of several sites/apps. How many it can manage is determined by the capacity of the server it's running on.
+
+### Several environments for each project
+Every project has it's own unlimited amount of environments. This is very useful if you want testing content separated from live content, or if your for any other reason want to branch your managed content into subsets.
 
 ## Why?
 "Modern" CMS'es that aim to be flexible and open source are living in the past. It still takes one CMS per site, they're not geared to manage app content unless a developer makes an API, and almost all of them have spiraled into a hell of unmaintained plugins, corrupting the structure of the data they manage.

@@ -56,7 +56,7 @@ $('.login').each(function() {
         }
     });
 
-    $login.find('button').click(function(e) {
+    $login.submit(function(e) {
         e.preventDefault();
 
         var username = $login.find('input[type="text"]').val();

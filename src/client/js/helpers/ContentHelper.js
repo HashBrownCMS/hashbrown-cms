@@ -14,19 +14,25 @@ class ContentHelper extends ContentHelperCommon {
      */
     static getContentById(id) {
         return new Promise((resolve, reject) => {
-            let result;
+            if(id) {
+                let result;
 
-            for(let content of resources.content) {
-                if(content.id == id) {
-                    result = content;
-                    break;
+                for(let content of resources.content) {
+                    if(content.id == id) {
+                        result = content;
+                        break;
+                    }
                 }
-            }
-           
-            if(result) { 
-                resolve(new Content(result)); 
+               
+                if(result) { 
+                    resolve(new Content(result)); 
+                } else {
+                    reject(new Error('Content with id "' + id + '" doesn\'t exist'));
+                }
+            
             } else {
-                resolve(null);
+                reject(new Error('Content id was not provided'));
+
             }
         });
     }

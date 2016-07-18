@@ -70,6 +70,10 @@ window.messageModal = function messageModal(title, body, onSubmit) {
  * @param {String} message
  */
 window.errorModal = function errorModal(message) {
+    if(message instanceof Error) {
+        message = message.message;
+    }
+
     messageModal('Error', message);
 }
 

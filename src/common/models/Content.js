@@ -55,12 +55,16 @@ class Content extends Entity {
      * @returns {Object} content
      */
     static create(properties) {
+        let defaultProperties = {
+            title: 'New content'
+        };
+
         let content = new Content({
             id: Entity.createId(),
             createDate: new Date(),
             updateDate: new Date(),
             schemaId: 'contentBase',
-            properties: properties
+            properties: properties || defaultProperties
         });
 
         return content;

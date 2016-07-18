@@ -24,32 +24,33 @@ Router.route('/content/json/:id', function() {
         ViewHelper.get('NavbarMain').highlightItem(this.id);
         
         $('.workspace').html(contentEditor.$element);
-    });
+    })
+    .catch(errorModal);
 });
 
-// Edit
+// Edit (redirect to meta tab)
 Router.route('/content/:id', function() {
-    let contentEditor = new ContentEditor({
-        modelUrl: apiUrl('content/' + this.id)
-    });
-
-    ViewHelper.get('NavbarMain').highlightItem(this.id);
-    
-    $('.workspace').html(contentEditor.$element);
+    location.hash = '/content/' + this.id + '/meta';
 });
 
 // Edit (with tab specified)
 Router.route('/content/:id/:tab', function() {
     let contentEditor = ViewHelper.get('ContentEditor');
-   
-    ViewHelper.get('NavbarMain').highlightItem(this.id);
-   
-    if(!contentEditor) {
-        contentEditor = new ContentEditor({
-            modelUrl: apiUrl('content/' + this.id)
-        });
-    
-        $('.workspace').html(contentEditor.$element);
+  
+    if(!contentEditor || contentEditor.model.id != this.id) {
+        ViewHelper.removeAll('ContentEditor');
+
+        ContentHelper.getContentById(this.id)
+        .then((content) => { 
+            ViewHelper.get('NavbarMain').highlightItem(this.id);
+       
+            contentEditor = new ContentEditor({
+                model: content
+            });
+
+            $('.workspace').html(contentEditor.$element);
+        })
+        .catch(errorModal);
     }
 });
 

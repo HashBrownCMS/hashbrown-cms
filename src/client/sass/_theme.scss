@@ -5,6 +5,7 @@ html, body {
     height: 100%;
     font-family: 'Roboto';
     font-size: 12px;
+    background-color: material-color('grey', '300');
 }
 
 // Bootstrap fixes
@@ -109,10 +110,6 @@ button, a {
         padding: 0px;
         box-shadow: none;
     }
-}
-
-.workspace {
-    background-color: material-color('grey', '300');
 }
 
 // Thumbnails

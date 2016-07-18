@@ -14,9 +14,12 @@ class ContentSchemaReferenceEditor extends View {
      * Event: Change input
      */
     onChange() {
-        this.trigger('change', this.$select.val());
+        this.value = this.$select.val();
+        this.trigger('change', this.value);
 
-        ViewHelper.get('ContentEditor').render();
+        let contentEditor = ViewHelper.get('ContentEditor');
+
+        contentEditor.render();
     }
 
     /**
@@ -28,7 +31,6 @@ class ContentSchemaReferenceEditor extends View {
         for(let id in window.resources.schemas) {
             let schema = window.resources.schemas[id];
             let isNative = schema.id == 'page' || schema.id == 'contentBase';
-        
 
             if(schema.type == 'content' && !isNative) {
                 contentSchemas[contentSchemas.length] = schema;
