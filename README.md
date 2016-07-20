@@ -8,7 +8,7 @@ Two painful problems have until now persisted in the world of content management
 - If it has a rock-solid backend, it's dreadful to use
 - If it's pretty and easy to use, the backend is a house of cards
 
-HashBrown is built from the ground up to take on this problem by applying industry-standard UI design principles in the frontend and a modularised separation-of-concerns mentality in the backend. As such, it tackles complex scenarios easily, responds well to user interactions and even looks good doing it.
+HashBrown is built from the ground up to take this problem on by applying industry-standard UI design principles in the frontend and a modularised separation-of-concerns mentality in the backend. As such, it tackles complex scenarios easily, responds well to user interactions and even looks good doing it.
 
 ## Get started
 Tutorials and API reference coming soon.

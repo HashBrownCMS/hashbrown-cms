@@ -976,7 +976,7 @@ var _this2=_possibleConstructorReturn(this,Object.getPrototypeOf(ContextMenu).ca
 $('body').click(function(e){if($(e.target).parents('.context-menu').length<1){$('.context-menu-target-element').removeClass('context-menu-target-element');ViewHelper.removeAll('ContextMenu');}});}},{}],87:[function(require,module,exports){'use strict'; // ----------
 // Event handlers
 // ----------
-function hoverDropContainerHandler(e){DragDrop.current.onHoverDropContainer(this,e);}function leaveDropContainerHandler(e){DragDrop.current.onLeaveDropContainer(this,e);}function dragHandler(e){DragDrop.current.onDrag(e);}function releaseHandler(e){DragDrop.current.onReleaseDragHandle(e);} // ----------
+function dragHandler(e){DragDrop.current.onDrag(e);}function releaseHandler(e){DragDrop.current.onReleaseDragHandle(e);} // ----------
 // Registered DragDrop instances
 // ----------
 var instances=[]; /**
@@ -1045,7 +1045,7 @@ this.on(this.element,'mousedown',downHandler);} /**
      */},{key:"updateDropContainers",value:function updateDropContainers(){var _this3=this;DragDrop.currentDropContainers=[]; // An array of elements are specified
 if(this.config.dropContainers&&this.config.dropContainers.length>0){DragDrop.currentDropContainers=this.config.dropContainers; // A selector is specified
 }else if(this.config.dropContainerSelector){DragDrop.currentDropContainers=[].slice.call(document.querySelectorAll(this.config.dropContainerSelector)); // If the element itself was found, filter it out
-DragDrop.currentDropContainers=DragDrop.currentDropContainers.filter(function(dropContainer){var isSelf=dropContainer==_this3.element;if(isSelf){return false;}else {dropContainer.dataset.dragdropDropContainer=true;return true;}});}} /**
+DragDrop.currentDropContainers=DragDrop.currentDropContainers.filter(function(dropContainer){var isSelf=dropContainer==_this3.element||dropContainer.parentElement==_this3.element;if(isSelf){return false;}else {dropContainer.dataset.dragdropDropContainer=true;return true;}});}} /**
      * Event: Move drag handle
      *
      * @param {Event} e
@@ -1059,13 +1059,7 @@ var pointerOffset={top:elementOffset.top-e.pageY,left:elementOffset.left-e.pageX
 this.pointerOffset=pointerOffset; // Cache the previous parent element
 this.previousParent=this.element.parentElement; // Set temporary styling
 this.element.style.position='absolute';this.element.style.top=elementOffset.top;this.element.style.left=elementOffset.left;this.element.style.width=elementRect.width;this.element.style.height=elementRect.height;this.element.style.zIndex=999; // Cache drop containers
-this.updateDropContainers(); // Add events on drop containers
-//for(let i = 0; i < DragDrop.currentDropContainers.length; i++) {
-//    let dropContainer = DragDrop.currentDropContainers[i];
-//    this.on(dropContainer, 'mousemove', hoverDropContainerHandler);
-//    this.on(dropContainer, 'mouseleave', leaveDropContainerHandler);
-//}
-// Insert placeholder
+this.updateDropContainers(); // Insert placeholder
 var placeholder=document.createElement('DIV');placeholder.id='dragdrop-placeholder';placeholder.style.height=computedStyle.height;placeholder.style.width=computedStyle.width;this.element.parentElement.insertBefore(placeholder,this.element); // Add pointer movement logic
 this.on(document,'mousemove',dragHandler); // Add pointer release logic
 this.on(document,'mouseup',releaseHandler); // Fire begin drag event
@@ -1088,9 +1082,7 @@ var elementRect=this.element.getBoundingClientRect();var hoveredContainers=DragD
      */},{key:"onReleaseDragHandle",value:function onReleaseDragHandle(e){e.preventDefault();e.stopPropagation();DragDrop.current=null; // Remove pointer events
 this.off(document,'mousemove',dragHandler);this.off(document,'mouseup',releaseHandler); // Grab hovered drop container
 var hoveredDropContainer=document.querySelector('*[data-dragdrop-drop-container="true"][data-dragdrop-hovering="true"]'); // Remove drop container events
-for(var i=0;i<DragDrop.currentDropContainers.length;i++){var dropContainer=DragDrop.currentDropContainers[i];delete dropContainer.dataset.dragdropDropContainer;delete dropContainer.dataset.dragdropHovering; //this.off(dropContainer, 'mousemove', hoverDropContainerHandler);
-//this.off(dropContainer, 'mouseleave', leaveDropContainerHandler);;
-} // Get placeholder
+for(var i=0;i<DragDrop.currentDropContainers.length;i++){var dropContainer=DragDrop.currentDropContainers[i];delete dropContainer.dataset.dragdropDropContainer;delete dropContainer.dataset.dragdropHovering;} // Get placeholder
 var placeholder=document.getElementById('dragdrop-placeholder'); // Set new parent
 placeholder.parentElement.insertBefore(this.element,placeholder); // Remove placeholder
 placeholder.parentElement.removeChild(placeholder); // Remove temporary styling
@@ -3299,30 +3291,15 @@ itemContextMenu:{'This content':'---','Create new':function CreateNew(){_this64.
 paneContextMenu:{'General':'---','Create new':function CreateNew(){_this64.onClickNewContent();}}, // Sorting logic
 sort:function sort(item,queueItem){ // Set id data attributes
 queueItem.$element.attr('data-content-id',item.id);queueItem.parentDirAttr={'data-content-id':item.parentId}; // Assign the sort index to the DOM element
-queueItem.$element.attr('data-sort',item.sort);}, // After sorting logic
-postSort:function postSort($parentElements){ // Sort elements
-/*$parentElements.each((i, parentElement) => {
-                    $(parentElement).children().sort((a, b) => {
-                        let aSort = a.getAttribute('data-sort');
-                        let bSort = b.getAttribute('data-sort');
-
-                        if(aSort > bSort) {
-                            return 1;
-                        } else if(aSort < bSort) {
-                            return -1;
-                        } else {
-                            return 0;
-                        }
-                    });
-                });*/}, // End dragging logic
+queueItem.$element.attr('data-sort',item.sort);}, // End dragging logic
 onEndDrag:function onEndDrag(dragdropItem,dropContainer){var thisId=dragdropItem.element.dataset.contentId; // Get Content node first
-ContentHelper.getContentById(thisId).then(function(thisContent){console.log(dropContainer); // Check if this element was dropped onto an unsorted container, assigning a new parent
-if(dropContainer&&dropContainer.dataset.dragdropUnsorted){console.log(dropContainer.dataset.contentId); // If not, just change sorting value
-}else {(function(){var onSuccess=function onSuccess(){debug.log('Changed sorting index of Content "'+thisContent.id+'" from '+thisPrevSort+' to '+thisContent.sort+' based on '+newSortBasedOn,navbar);}; // If this element has a previous sibling, base the sorting index on that
-var thisPrevSort=thisContent.sort;var newSortBasedOn='';var newSort=undefined;if($(dragdropItem.element).prev('.pane-item-container').length>0){var prevSort=parseInt(dragdropItem.element.previousSibling.dataset.sort);newSort=prevSort+1;newSortBasedOn='previous sibling'; // If this element has a next sibling, base the sorting index on that
+ContentHelper.getContentById(thisId).then(function(thisContent){ // Then change the sorting value
+var thisPrevParent=thisContent.parentId;var newParent=dropContainer.parentElement.dataset.contentId;var thisPrevSort=thisContent.sort;var newSortBasedOn='';var newSort=undefined; // Feed back a success message in the console
+function onSuccess(){debug.log('Changes to Content "'+thisContent.id+'":'+'\n- sort from '+thisPrevSort+' to '+thisContent.sort+' based on '+newSortBasedOn+'\n- parent from "'+thisPrevParent+'" to "'+newParent+'"',navbar);} // If this element has a previous sibling, base the sorting index on that
+if($(dragdropItem.element).prev('.pane-item-container').length>0){var prevSort=parseInt(dragdropItem.element.previousSibling.dataset.sort);newSort=prevSort+1;newSortBasedOn='previous sibling'; // If this element has a next sibling, base the sorting index on that
 }else if($(dragdropItem.element).next('.pane-item-container').length>0){var nextSort=parseInt(dragdropItem.element.nextSibling.dataset.sort);newSort=nextSort-1;newSortBasedOn='next sibling'; // If it has neither, just assign the lowest possible one
-}else {newSort=10000;newSortBasedOn='lowest possible index';}if(newSort!=thisContent.sort){thisContent.sort=newSort; // Save model
-apiCall('post','content/'+thisContent.id,thisContent.getObject()).then(onSuccess).catch(navbar.onError);dragdropItem.element.dataset.sort=thisContent.sort;}})();}});}};}}]);return ContentPane;}(Pane);module.exports=ContentPane;},{"./Pane":203}],200:[function(require,module,exports){'use strict';var Pane=require('./Pane');var FormsPane=function(_Pane3){_inherits(FormsPane,_Pane3);function FormsPane(){_classCallCheck(this,FormsPane);return _possibleConstructorReturn(this,Object.getPrototypeOf(FormsPane).apply(this,arguments));}_createClass(FormsPane,null,[{key:"onClickNewForm", /**
+}else {newSort=10000;newSortBasedOn='lowest possible index';}if(newSort!=thisContent.sort||newParent!=thisContent.parentId){thisContent.sort=newSort;thisContent.parentId=newParent; // Save model
+apiCall('post','content/'+thisContent.id,thisContent.getObject()).then(onSuccess).catch(navbar.onError);dragdropItem.element.dataset.sort=thisContent.sort;}});}};}}]);return ContentPane;}(Pane);module.exports=ContentPane;},{"./Pane":203}],200:[function(require,module,exports){'use strict';var Pane=require('./Pane');var FormsPane=function(_Pane3){_inherits(FormsPane,_Pane3);function FormsPane(){_classCallCheck(this,FormsPane);return _possibleConstructorReturn(this,Object.getPrototypeOf(FormsPane).apply(this,arguments));}_createClass(FormsPane,null,[{key:"onClickNewForm", /**
      * Event: Click create new form
      */value:function onClickNewForm(){var navbar=ViewHelper.get('NavbarMain');apiCall('post','forms/new').then(function(newContent){reloadResource('forms').then(function(){navbar.reload();location.hash='/forms/'+newForm.id;});}).catch(navbar.onError);}},{key:"getRenderSettings",value:function getRenderSettings(){var _this66=this;return {label:'Forms',route:'/forms/',icon:'wpforms',items:resources.forms, // Sorting logic
 sort:function sort(item,queueItem){queueItem.$element.attr('data-form-id',item.id);if(item.folder){queueItem.createDir=true;queueItem.parentDirAttr={'data-form-folder':item.folder};}}, // Item context menu
@@ -3374,7 +3351,7 @@ if(params.itemContextMenu){$element.find('a').exocontext(params.itemContextMenu)
 queueItem.$element=$element; // Use specific sorting behaviours
 if(params.sort){params.sort(item,queueItem);} // Add queue item to sorting queue
 sortingQueue.push(queueItem); // Add drag/drop event
-if(typeof params.onEndDrag==='function'){$element.exodragdrop({lockX:true,onEndDrag:params.onEndDrag,dropContainerSelector:'.pane-container.active, .pane-container.active .pane-item-container'});}return $element;})); // Place items into hierarchy
+if(typeof params.onEndDrag==='function'){$element.exodragdrop({lockX:true,onEndDrag:params.onEndDrag,dropContainerSelector:'.pane-container.active, .pane-container.active .pane-item-container > .children'});}return $element;})); // Place items into hierarchy
 var _iteratorNormalCompletion12=true;var _didIteratorError12=false;var _iteratorError12=undefined;try{for(var _iterator12=sortingQueue[Symbol.iterator](),_step12;!(_iteratorNormalCompletion12=(_step12=_iterator12.next()).done);_iteratorNormalCompletion12=true){var queueItem=_step12.value;if(queueItem.parentDirAttr){ // Find parent item
 var parentDirAttrKey=Object.keys(queueItem.parentDirAttr)[0];var parentDirAttrValue=queueItem.parentDirAttr[parentDirAttrKey];var parentDirSelector='.pane-item-container['+parentDirAttrKey+'="'+parentDirAttrValue+'"]';var $parentDir=$pane.find(parentDirSelector); // If parent element already exists, just append the queue item element
 if($parentDir.length>0){$parentDir.children('.children').append(queueItem.$element); // If not, create parent elements if specified

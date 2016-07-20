@@ -182,7 +182,7 @@ class NavbarMain extends View {
                     $element.exodragdrop({
                         lockX: true,
                         onEndDrag: params.onEndDrag,
-                        dropContainerSelector: '.pane-container.active, .pane-container.active .pane-item-container'
+                        dropContainerSelector: '.pane-container.active, .pane-container.active .pane-item-container > .children'
                     });
                 }
 

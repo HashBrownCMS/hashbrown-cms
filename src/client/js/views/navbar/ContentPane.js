@@ -303,25 +303,6 @@ class ContentPane extends Pane {
                 queueItem.$element.attr('data-sort', item.sort);
             },
 
-            // After sorting logic
-            postSort: function($parentElements) {
-                // Sort elements
-                /*$parentElements.each((i, parentElement) => {
-                    $(parentElement).children().sort((a, b) => {
-                        let aSort = a.getAttribute('data-sort');
-                        let bSort = b.getAttribute('data-sort');
-
-                        if(aSort > bSort) {
-                            return 1;
-                        } else if(aSort < bSort) {
-                            return -1;
-                        } else {
-                            return 0;
-                        }
-                    });
-                });*/
-            },
-
             // End dragging logic
             onEndDrag: function(dragdropItem, dropContainer) {
                 let thisId = dragdropItem.element.dataset.contentId;
@@ -329,52 +310,53 @@ class ContentPane extends Pane {
                 // Get Content node first
                 ContentHelper.getContentById(thisId)
                 .then((thisContent) => {
-                    console.log(dropContainer);
+                    // Then change the sorting value
+                    let thisPrevParent = thisContent.parentId;
+                    let newParent = dropContainer.parentElement.dataset.contentId;
+                    let thisPrevSort = thisContent.sort;
+                    let newSortBasedOn = '';
+                    let newSort;
 
-                    // Check if this element was dropped onto an unsorted container, assigning a new parent
-                    if(dropContainer && dropContainer.dataset.dragdropUnsorted) {
-                        console.log(dropContainer.dataset.contentId);
+                    // Feed back a success message in the console
+                    function onSuccess() {
+                        debug.log(
+                            'Changes to Content "' + thisContent.id + '":' + 
+                            '\n- sort from ' + thisPrevSort + ' to ' + thisContent.sort + ' based on ' + newSortBasedOn + 
+                            '\n- parent from "' + thisPrevParent + '" to "' + newParent + '"',
+                            navbar
+                        );
+                    }
 
-                    // If not, just change sorting value
+                    // If this element has a previous sibling, base the sorting index on that
+                    if($(dragdropItem.element).prev('.pane-item-container').length > 0) {
+                        let prevSort = parseInt(dragdropItem.element.previousSibling.dataset.sort);
+
+                        newSort = prevSort + 1;
+                        newSortBasedOn = 'previous sibling';
+            
+                    // If this element has a next sibling, base the sorting index on that
+                    } else if($(dragdropItem.element).next('.pane-item-container').length > 0) {
+                        let nextSort = parseInt(dragdropItem.element.nextSibling.dataset.sort);
+
+                        newSort = nextSort - 1;
+                        newSortBasedOn = 'next sibling';
+
+                    // If it has neither, just assign the lowest possible one
                     } else {
-                        let thisPrevSort = thisContent.sort;
-                        let newSortBasedOn = '';
-                        let newSort;
+                        newSort = 10000;
+                        newSortBasedOn = 'lowest possible index';
+                    }
 
-                        function onSuccess() {
-                            debug.log('Changed sorting index of Content "' + thisContent.id + '" from ' + thisPrevSort + ' to ' + thisContent.sort + ' based on ' + newSortBasedOn, navbar);
-                        }
+                    if(newSort != thisContent.sort || newParent != thisContent.parentId) {
+                        thisContent.sort = newSort;
+                        thisContent.parentId = newParent;
 
-                        // If this element has a previous sibling, base the sorting index on that
-                        if($(dragdropItem.element).prev('.pane-item-container').length > 0) {
-                            let prevSort = parseInt(dragdropItem.element.previousSibling.dataset.sort);
-
-                            newSort = prevSort + 1;
-                            newSortBasedOn = 'previous sibling';
-                
-                        // If this element has a next sibling, base the sorting index on that
-                        } else if($(dragdropItem.element).next('.pane-item-container').length > 0) {
-                            let nextSort = parseInt(dragdropItem.element.nextSibling.dataset.sort);
-
-                            newSort = nextSort - 1;
-                            newSortBasedOn = 'next sibling';
-
-                        // If it has neither, just assign the lowest possible one
-                        } else {
-                            newSort = 10000;
-                            newSortBasedOn = 'lowest possible index';
-                        }
-
-                        if(newSort != thisContent.sort) {                        
-                            thisContent.sort = newSort;
-
-                            // Save model
-                            apiCall('post', 'content/' + thisContent.id, thisContent.getObject())
-                            .then(onSuccess)
-                            .catch(navbar.onError);
-                            
-                            dragdropItem.element.dataset.sort = thisContent.sort;
-                        }
+                        // Save model
+                        apiCall('post', 'content/' + thisContent.id, thisContent.getObject())
+                        .then(onSuccess)
+                        .catch(navbar.onError);
+                        
+                        dragdropItem.element.dataset.sort = thisContent.sort;
                     }
                 });
             }
