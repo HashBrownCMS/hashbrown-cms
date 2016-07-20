@@ -26,8 +26,12 @@ body {
 }
 
 // Dragdrop
-#dragdrop-placeholder {
+#dragdrop-placeholder, *[data-dragdrop-unsorted="true"][data-dragdrop-hovering="true"] {
     border: 2px dashed material-color('blue', '500');
+}
+
+*[data-dragdrop-drop-container="true"] {
+    border: 2px dashed red;
 }
 
 *[data-dragdrop-enabled="true"] {

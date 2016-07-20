@@ -146,7 +146,8 @@ class NavbarMain extends View {
                 // Item element
                 let $element = _.div({
                     class: 'pane-item-container',
-                    'data-routing-path': routingPath
+                    'data-routing-path': routingPath,
+                    'data-dragdrop-unsorted': true
                 },
                     _.a({
                         'data-id': id,
@@ -181,7 +182,7 @@ class NavbarMain extends View {
                     $element.exodragdrop({
                         lockX: true,
                         onEndDrag: params.onEndDrag,
-                        dropContainerSelector: '.pane-container.active, .pane-container.active .pane-item-container .children' 
+                        dropContainerSelector: '.pane-container.active, .pane-container.active .pane-item-container'
                     });
                 }
 
@@ -216,7 +217,7 @@ class NavbarMain extends View {
                         let $dir = $pane.find('[' + parentDirAttrKey + '="' + finalDirName + '"]');
 
                         if($dir.length < 1) {
-                            $dir = _.div({class: 'pane-item-container'},
+                            $dir = _.div({class: 'pane-item-container', 'data-dragdrop-unsorted': true},
                                 _.a({
                                     class: 'pane-item'
                                 },
