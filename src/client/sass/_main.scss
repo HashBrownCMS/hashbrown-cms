@@ -30,10 +30,6 @@ body {
     border: 2px dashed material-color('blue', '500');
 }
 
-*[data-dragdrop-drop-container="true"] {
-    border: 2px dashed red;
-}
-
 *[data-dragdrop-enabled="true"] {
     &, * {
         cursor: -webkit-grab !important;

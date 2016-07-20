@@ -84,9 +84,7 @@ class NavbarMain extends View {
             }
         });
         
-        let $pane = _.div({class: 'pane'},
-            _.div({class: 'pane-content'})
-        );
+        let $pane = _.div({class: 'pane'});
 
         let items = params.items;
         let sortingQueue = [];
@@ -146,8 +144,7 @@ class NavbarMain extends View {
                 // Item element
                 let $element = _.div({
                     class: 'pane-item-container',
-                    'data-routing-path': routingPath,
-                    'data-dragdrop-unsorted': true
+                    'data-routing-path': routingPath
                 },
                     _.a({
                         'data-id': id,
@@ -182,7 +179,7 @@ class NavbarMain extends View {
                     $element.exodragdrop({
                         lockX: true,
                         onEndDrag: params.onEndDrag,
-                        dropContainerSelector: '.pane-container.active, .pane-container.active .pane-item-container > .children'
+                        dropContainerSelector: '.pane-container.active .pane, .pane-container.active .pane .pane-item-container > .children'
                     });
                 }
 
@@ -217,7 +214,7 @@ class NavbarMain extends View {
                         let $dir = $pane.find('[' + parentDirAttrKey + '="' + finalDirName + '"]');
 
                         if($dir.length < 1) {
-                            $dir = _.div({class: 'pane-item-container', 'data-dragdrop-unsorted': true},
+                            $dir = _.div({class: 'pane-item-container'},
                                 _.a({
                                     class: 'pane-item'
                                 },
