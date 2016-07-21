@@ -69,9 +69,13 @@ class NavbarMain extends View {
         }
 
         let $button = _.button({'data-route': params.route},
-            $icon,
-            _.span({class: 'pane-label'}, params.label),
-            params.sublabel ? _.span({class: 'pane-sublabel'}, params.sublabel) : ''
+            _.div({class: 'pane-icon'},
+                $icon
+            ),
+            _.div({class: 'pane-text'},
+                _.span({class: 'pane-label'}, params.label),
+                params.sublabel ? _.span({class: 'pane-sublabel'}, params.sublabel) : ''
+            )
         ).click(function() {
             let $currentTab = view.$element.find('.pane-container.active');
 
@@ -397,6 +401,7 @@ class NavbarMain extends View {
                 // ----------
                 this.renderPane({
                     label: 'HashBrown',
+                    sublabel: 'v' + app.version,
                     route: '/',
                     $icon: _.img({src: '/svg/logo.svg', class: 'about-logo'}),
                     items: [

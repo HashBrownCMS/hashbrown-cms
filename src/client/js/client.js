@@ -3,9 +3,12 @@
 // Helper functions
 require('./helpers');
 
-// -----------
+// Get package file
+window.app = {
+    version: require('../../../package.json').version
+};
+
 // Preload resources 
-// -----------
 $(document).ready(() => {
     reloadAllResources()
     .then(function() {
@@ -13,14 +16,9 @@ $(document).ready(() => {
     });
 });
 
-// -----------
 // Language
-// -----------
 window.language = localStorage.getItem('language') || 'en';
 
-// -----------
-// Routes
-// -----------
 // Get routes
 require('./routes/index');
 

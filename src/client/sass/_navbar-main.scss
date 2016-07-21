@@ -86,7 +86,6 @@
         z-index: 10;
 
         button {
-            display: block;
             width: 100%;
             height: 60px;
             background-color: $darkest-grey;
@@ -106,40 +105,44 @@
                 background-color: $darker-grey;
             }
             
-            .about-logo {
-                width: 30px;
-                height: 30px;
-                float: left;
-                margin-left: 15px;
-            }
-
-            span {
-                margin: 0px;
+            .pane-icon {
+                width: 60px;
                 height: 60px;
-                line-height: 60px;
-                display: block;
-                position: absolute;
-                top: 0px;
+                float: left;
 
-                &.fa {
+                .about-logo {
+                    width: 30px;
+                    height: 30px;
+                    margin-top: 15px;
+                }
+
+                .fa {
+                    margin: 0px;
+                    height: 60px;
+                    line-height: 60px;
                     text-align: center;
                     font-size: 20px;
                     width: 60px;
                     display: block;
-                    left: 0px;
+                }
+            }
+
+            .pane-text {
+                height: 60px;
+                width: 100px;
+                display: flex;
+                float: left;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                text-align: left;
+
+                .pane-label, .pane-sublabel {
+                    display: block;
+                    width: 100%;
                 }
 
-                &:not(.fa) {
-                    flex-grow: 1;
-                }
-
-                &.pane-label {
-                    left: 60px;
-                }
-
-                &.pane-sublabel {
-                    left: 60px;
-                    top: 40px;
+                .pane-sublabel {
                     line-height: 10px;
                     height: 10px;
                     opacity: 0.5;
