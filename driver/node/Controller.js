@@ -1,10 +1,17 @@
 'use strict';
 
-let HashBrown = require('./HashBrown');
-
 let config = require('./config.json');
 
 class Controller {
+    /**
+     * Inits the driver
+     *
+     * @param {Object} app Express.js app object
+     */
+    static init(app) {
+        app.get('/hashbrown/content/tree', this.getTree);
+    }
+
     /**
      * Authorise a call
      */
@@ -46,3 +53,5 @@ class Controller {
 }
 
 module.exports = Controller;
+
+let HashBrown = require('./HashBrown');

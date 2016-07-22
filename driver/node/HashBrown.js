@@ -2,8 +2,6 @@
 
 let fs = require('fs');
 
-let Controller = require('./Controller');
-
 let config = require('./config.json');
 
 class HashBrown {
@@ -13,7 +11,7 @@ class HashBrown {
      * @param {Object} app Express.js app object
      */
     static init(app) {
-        app.get('/hashbrown/content/tree', this.getTree);
+        Controller.init(app);
     }
 
     /**
@@ -22,7 +20,7 @@ class HashBrown {
      * @return {String} path
      */
     static getPath() {
-        return this.config.root + '/hashbrown/json';
+        return __dirname + '/storage/json';
     }
 
     /**
@@ -33,10 +31,32 @@ class HashBrown {
         
         if(!fs.existsSync(path + '/tree.json')){
             if(!fs.existsSync(path)) {
-                fs.mkdirSync(path);
+                this.mkdirRecursively(path);
             }
             
             fs.writeFileSync(path + '/tree.json', '{}');
+        }
+    }
+    
+    /**
+     * Makes a directory recursively
+     *
+     * @param {String} dirPath
+     */
+    static mkdirRecursively(dirPath) {
+        let parents = dirPath.split('/');
+        let finalPath = '/';
+
+        for(let i in parents) {
+            finalPath += parents[i];
+
+            if(!fs.existsSync(finalPath)) {
+                fs.mkdirSync(finalPath);
+            }
+
+            if(i < parents.length - 1) {
+                finalPath += '/';
+            }
         }
     }
     
@@ -65,3 +85,6 @@ class HashBrown {
 }
 
 module.exports = HashBrown;
+
+let Controller = require('./Controller');
+
