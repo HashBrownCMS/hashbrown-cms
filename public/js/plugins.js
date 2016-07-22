@@ -175,20 +175,89 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
     }, {}], 3: [function (require, module, exports) {
         'use strict';
 
+        require('./views/HashBrownDriverConnectionEditor');
+    }, { "./views/HashBrownDriverConnectionEditor": 4 }], 4: [function (require, module, exports) {
+        var HashBrownDriverConnectionEditor = function (_View2) {
+            _inherits(HashBrownDriverConnectionEditor, _View2);
+
+            function HashBrownDriverConnectionEditor(params) {
+                _classCallCheck(this, HashBrownDriverConnectionEditor);
+
+                var _this2 = _possibleConstructorReturn(this, Object.getPrototypeOf(HashBrownDriverConnectionEditor).call(this, params));
+
+                _this2.$element = _.div({ class: 'hashbrown-driver-editor' });
+
+                _this2.fetch();
+                return _this2;
+            }
+
+            /**
+             * Render URL editor
+             */
+
+
+            _createClass(HashBrownDriverConnectionEditor, [{
+                key: "renderURLEditor",
+                value: function renderURLEditor() {
+                    var view = this;
+
+                    function onChange() {
+                        view.model.url = $(this).val();
+                    }
+
+                    return _.div({ class: 'field-editor' }, _.input({ class: 'form-control', type: 'text', value: this.model.url, placeholder: 'Input HashBrown Driver URL' }).change(onChange));
+                }
+
+                /**
+                 * Render token editor
+                 */
+
+            }, {
+                key: "renderTokenEditor",
+                value: function renderTokenEditor() {
+                    var view = this;
+
+                    function onChange() {
+                        view.model.token = $(this).val();
+                    }
+
+                    return _.div({ class: 'field-editor' }, _.input({ class: 'form-control', type: 'text', value: this.model.token, placeholder: 'Input HashBrown Driver token' }).change(onChange));
+                }
+            }, {
+                key: "render",
+                value: function render() {
+                    this.$element.empty();
+
+                    _.append(this.$element,
+                    // URL
+                    _.div({ class: 'field-container hashbrown-url' }, _.div({ class: 'field-key' }, 'URL'), _.div({ class: 'field-value' }, this.renderURLEditor())),
+
+                    // Token
+                    _.div({ class: 'field-container hashbrown-token' }, _.div({ class: 'field-key' }, 'Token'), _.div({ class: 'field-value' }, this.renderTokenEditor())));
+                }
+            }]);
+
+            return HashBrownDriverConnectionEditor;
+        }(View);
+
+        resources.connectionEditors['HashBrown Driver'] = HashBrownDriverConnectionEditor;
+    }, {}], 5: [function (require, module, exports) {
+        'use strict';
+
         require('./views/JsonTreeConnectionEditor');
-    }, { "./views/JsonTreeConnectionEditor": 4 }], 4: [function (require, module, exports) {
-        var JsonTreeConnectionEditor = function (_View2) {
-            _inherits(JsonTreeConnectionEditor, _View2);
+    }, { "./views/JsonTreeConnectionEditor": 6 }], 6: [function (require, module, exports) {
+        var JsonTreeConnectionEditor = function (_View3) {
+            _inherits(JsonTreeConnectionEditor, _View3);
 
             function JsonTreeConnectionEditor(params) {
                 _classCallCheck(this, JsonTreeConnectionEditor);
 
-                var _this2 = _possibleConstructorReturn(this, Object.getPrototypeOf(JsonTreeConnectionEditor).call(this, params));
+                var _this3 = _possibleConstructorReturn(this, Object.getPrototypeOf(JsonTreeConnectionEditor).call(this, params));
 
-                _this2.$element = _.div({ class: 'github-editor' });
+                _this3.$element = _.div({ class: 'github-editor' });
 
-                _this2.fetch();
-                return _this2;
+                _this3.fetch();
+                return _this3;
             }
 
             _createClass(JsonTreeConnectionEditor, [{
@@ -200,4 +269,4 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         }(View);
 
         resources.connectionEditors['JSON Tree'] = JsonTreeConnectionEditor;
-    }, {}] }, {}, [1, 3]);
+    }, {}] }, {}, [1, 3, 5]);

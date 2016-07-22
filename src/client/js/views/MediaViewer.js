@@ -7,7 +7,7 @@ class MediaViewer extends View {
     constructor(params) {
         super(params);
         
-        this.$element = _.div({class: 'media-viewer panel panel-default'});
+        this.$element = _.div({class: 'media-viewer'});
 
         this.fetch();
     }
