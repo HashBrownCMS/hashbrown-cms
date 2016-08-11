@@ -1,6 +1,6 @@
 {
-  "name": "HashBrown CMS",
-  "version": "0.2.0",
+  "name": "hashbrown-cms",
+  "version": "0.2.1",
   "description": "The pluggable CMS",
   "main": "hashbrown.js",
   "scripts": {

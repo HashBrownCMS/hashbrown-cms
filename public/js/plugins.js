@@ -254,15 +254,56 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
                 var _this3 = _possibleConstructorReturn(this, Object.getPrototypeOf(JsonTreeConnectionEditor).call(this, params));
 
-                _this3.$element = _.div({ class: 'github-editor' });
+                _this3.$element = _.div({ class: 'json-tree-editor' });
 
                 _this3.fetch();
                 return _this3;
             }
 
+            /**
+             * Render remote editor
+             */
+
+
             _createClass(JsonTreeConnectionEditor, [{
+                key: "renderRemoteEditor",
+                value: function renderRemoteEditor() {
+                    var view = this;
+
+                    function onChange() {
+                        view.model.remote = $(this).val();
+                    }
+
+                    return _.div({ class: 'field-editor' }, _.input({ class: 'form-control', type: 'text', value: this.model.remote, placeholder: 'Input remote URL' }).change(onChange));
+                }
+
+                /**
+                 * Render token editor
+                 */
+
+            }, {
+                key: "renderTokenEditor",
+                value: function renderTokenEditor() {
+                    var view = this;
+
+                    function onChange() {
+                        view.model.token = $(this).val();
+                    }
+
+                    return _.div({ class: 'field-editor' }, _.input({ class: 'form-control', type: 'text', value: this.model.token, placeholder: 'Input token' }).change(onChange));
+                }
+            }, {
                 key: "render",
-                value: function render() {}
+                value: function render() {
+                    this.$element.empty();
+
+                    _.append(this.$element,
+                    // Remote
+                    _.div({ class: 'field-container json-tree-remote' }, _.div({ class: 'field-key' }, 'Remote'), _.div({ class: 'field-value' }, this.renderRemoteEditor())),
+
+                    // Token
+                    _.div({ class: 'field-container json-tree-token' }, _.div({ class: 'field-key' }, 'Token'), _.div({ class: 'field-value' }, this.renderTokenEditor())));
+                }
             }]);
 
             return JsonTreeConnectionEditor;
