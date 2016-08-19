@@ -129,7 +129,7 @@ class Connection extends Entity {
     unpublishContent(id) {
         let connection = this;
 
-        return new Promise((callback) => {
+        return new Promise((resolve, reject) => {
             debug.log('Unpublishing all localised property sets...', this);
 
             LanguageHelper.getSelectedLanguages()
@@ -147,14 +147,16 @@ class Connection extends Entity {
                         } else {
                             debug.log('Unpublished all localised property sets successfully!', connection);
                                 
-                            callback();
+                            resolve();
                         
                         }
-                    });
+                    })
+                    .catch(reject);
                 }
 
                 next(0);
-            });
+            })
+            .catch(reject);
         });
     }
 
@@ -168,7 +170,7 @@ class Connection extends Entity {
     publishContent(content) {
         let connection = this;
 
-        return new Promise((callback) => {
+        return new Promise((resolve, reject) => {
             debug.log('Publishing all localised property sets...', this);
 
             LanguageHelper.getAllLocalizedPropertySets(content)
@@ -189,14 +191,15 @@ class Connection extends Entity {
                         } else {
                             debug.log('Published all localised property sets successfully!', connection);
                                 
-                            callback();
+                            resolve();
                         
                         }
                     });
                 }
 
                 next(0);
-            });
+            })
+            .catch(reject);
         });
     }
     

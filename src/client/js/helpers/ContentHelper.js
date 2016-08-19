@@ -54,7 +54,7 @@ class ContentHelper extends ContentHelperCommon {
 
         // If the schema value is not set to multilingual, but the value is an object
         // containing the _multilingual flag, convert it
-        if(!schema.multilingual && typeof value === 'object' && value._multilingual) {
+        if(!schema.multilingual && value && typeof value === 'object' && value._multilingual) {
             value = value[window.language];
         }
 

@@ -15,7 +15,7 @@ class JsonTree {
      */
     static getTree(req, res) {
         let options = {
-            root: appRoot + '/projects/' + req.params.project + '/storage/' + req.params.environment + '/json/',
+            root: appRoot + '/storage/' + req.params.project + '/' + req.params.environment + '/json/',
             dotFiles: 'deny',
             headers: {
                 'x-timestamp': Date.now(),

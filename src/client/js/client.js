@@ -4,9 +4,7 @@
 require('./helpers');
 
 // Get package file
-window.app = {
-    version: require('../../../package.json').version
-};
+window.app = require('../../../package.json');
 
 // Preload resources 
 $(document).ready(() => {

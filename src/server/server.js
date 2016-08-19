@@ -25,7 +25,7 @@ app.set('views', appRoot + '/src/server/views');
 // ----------
 // App middlewares
 // ----------
-app.use(bodyparser.json());
+app.use(bodyparser.json({limit: '50mb'}));
 app.use(express.static(appRoot + '/public'));
 
 // ----------
@@ -130,6 +130,11 @@ function ready() {
 // ----------
 // Views
 // ----------
+// Catch
+app.get([ '/wp-admin', '/wp-admin/', '/umbraco', '/umbraco/' ], (req, res) => {
+    res.status(200).send('Nice try, but wrong CMS ;) This incident will be reported.');
+});
+
 // Readme
 app.get('/readme', function(req, res) {
     fs.readFile(appRoot + '/README.md', (err, file) => {
@@ -180,3 +185,8 @@ app.get('/:project/:environment/', function(req, res) {
         res.sendStatus(404);  
     });
 });
+
+// ----------
+// HashBrown driver
+// ----------
+require(appRoot + '/driver/node/HashBrown').init(app);

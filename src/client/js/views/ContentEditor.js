@@ -196,8 +196,6 @@ class ContentEditor extends View {
      * Reload this view
      */
     reload() {
-        this.model = null;
-        
         this.fetch();
     }
 

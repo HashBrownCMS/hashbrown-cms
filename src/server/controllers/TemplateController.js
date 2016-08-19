@@ -27,7 +27,7 @@ class TemplateController extends ApiController {
             });            
         })
         .catch((e) => {
-            debug.log(e, ApiController)
+            // No template provider was found
             res.status(404).send([]);
         });            
     }
@@ -48,7 +48,7 @@ class TemplateController extends ApiController {
             });            
         })
         .catch((e) => {
-            debug.log(e, ApiController)
+            // No template provider was found
             res.status(404).send([]);
         });            
     }
