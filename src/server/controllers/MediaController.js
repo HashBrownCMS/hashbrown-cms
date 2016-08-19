@@ -35,6 +35,9 @@ class MediaController extends ApiController {
                 } else {
                     res.status(404).send('Not found');
                 }
+            })
+            .catch((e) => {
+                res.status(400).end(e.message);  
             });
         })
         .catch((e) => {
@@ -123,17 +126,17 @@ class MediaController extends ApiController {
                 })
                 .catch((e) => {
                     debug.log(e, ApiController);
-                    res.status(404).send(null);    
+                    res.status(404).send(e.message);    
                 });            
             })
             .catch((e) => {
                 debug.log(e, ApiController);
-                res.status(404).send(null);    
+                res.status(404).send(e.message);    
             });            
         })            
         .catch((e) => {
-            res.status(404).send(e);    
-            debug.warning(e, ApiController);
+            debug.log(e, ApiController);
+            res.status(404).send(e.message);    
         });            
     }
     
@@ -206,8 +209,6 @@ class MediaController extends ApiController {
                 .then((connection) => {
                     connection.setMedia(media.id, file)
                         .then(() => {
-                            fs.unlinkSync(file.path);
-
                             res.status(200).send(media.id);
                         })
                     .catch((e) => {
