@@ -122,21 +122,9 @@ button, a {
 
     &.active {
         outline: 5px solid material-color('blue', '600') !important;
-    }
-
-    &.thumbnail-sm {
-        height: 100px;
-        width: 100px;
+        z-index: 2;
     }
 }
-
-.thumbnail-container {
-    .thumbnail {
-        display: inline-block;
-        margin: 0px 5px 5px 0px;
-    }
-}
-
 
 // Login panel
 .panel-login {

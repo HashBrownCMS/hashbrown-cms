@@ -87,14 +87,8 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
   outline: 5px solid #fff;
   border-radius: 0px; }
   .thumbnail.active {
-    outline: 5px solid #1e88e5 !important; }
-  .thumbnail.thumbnail-sm {
-    height: 100px;
-    width: 100px; }
-
-.thumbnail-container .thumbnail {
-  display: inline-block;
-  margin: 0px 5px 5px 0px; }
+    outline: 5px solid #1e88e5 !important;
+    z-index: 2; }
 
 .panel-login {
   margin: 0px auto;
@@ -600,6 +594,31 @@ body {
 .media-reference-editor .list-group-item.btn {
   color: #fff;
   text-align: center; }
+
+.media-modal .modal-dialog {
+  width: calc(100% - 30px);
+  max-width: 1040px; }
+  .media-modal .modal-dialog .thumbnail-container {
+    display: flex;
+    flex-wrap: wrap;
+    position: relative; }
+    .media-modal .modal-dialog .thumbnail-container .thumbnail {
+      position: relative;
+      min-width: 100px;
+      height: 100px;
+      margin: 0.1em; }
+      .media-modal .modal-dialog .thumbnail-container .thumbnail.active label {
+        display: block; }
+      .media-modal .modal-dialog .thumbnail-container .thumbnail label {
+        display: none;
+        position: absolute;
+        left: 0px;
+        bottom: 0px;
+        right: 0px;
+        background-color: #1e88e5;
+        color: #fff;
+        margin: 0px;
+        padding: 0.4em 0.1em 0.1em 0.1em; }
 
 .content-editor {
   height: 100%; }

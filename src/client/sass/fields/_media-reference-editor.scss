@@ -11,3 +11,41 @@
         }
     }
 }
+
+.media-modal {
+    .modal-dialog {
+        width: calc(100% - 30px);
+        max-width: 1040px;
+
+        .thumbnail-container {
+            display: flex;
+            flex-wrap: wrap;
+            position: relative;
+
+            .thumbnail {
+                position: relative;
+                min-width: 100px;
+                height: 100px;
+                margin: 0.1em;
+
+                &.active {
+                    label {
+                        display: block;
+                    }
+                }
+
+                label {
+                    display: none;
+                    position: absolute;
+                    left: 0px;
+                    bottom: 0px;
+                    right: 0px;
+                    background-color: material-color('blue', '600');
+                    color: #fff;
+                    margin: 0px;
+                    padding: 0.4em 0.1em 0.1em 0.1em;
+                }
+            }
+        }
+    }
+}

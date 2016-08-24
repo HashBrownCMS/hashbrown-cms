@@ -67,7 +67,7 @@ class MediaReferenceEditor extends View {
                                 
                                 return _.button(
                                     {
-                                        class: 'thumbnail thumbnail-sm',
+                                        class: 'thumbnail',
                                         'data-id': media.id,
                                         style: 'background-image: url(\'/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + media.id + '\')'
                                     },
