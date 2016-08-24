@@ -31,6 +31,8 @@ class SettingsHelper extends SettingsHelperCommon {
     static setSettings(section, settings) {
         let newSettings = { section: section };
 
+        debug.log('Setting "' + section + '" to ' + JSON.stringify(settings), this);
+
         for(let k in settings) {
             newSettings[k] = settings[k];
         }
