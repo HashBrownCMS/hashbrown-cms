@@ -181,6 +181,13 @@ window.apiCall = function apiCall(method, url, data) {
 };
 
 /**
+ * Clears the workspace
+ */
+window.clearWorkspace = function clearWorkspace() {
+    $('.workspace > div').remove();
+};
+
+/**
  * Reloads a resource
  */
 window.reloadResource = function reloadResource(name) {
