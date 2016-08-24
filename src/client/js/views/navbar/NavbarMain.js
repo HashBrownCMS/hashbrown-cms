@@ -20,6 +20,12 @@ class NavbarMain extends View {
     constructor(params) {
         super(params);
 
+        this.connectionPane = ConnectionPane;
+        this.contentPane = ContentPane;
+        this.formsPane = FormsPane;
+        this.mediaPane = MediaPane;
+        this.schemaPane = SchemaPane;
+
         this.$element = _.nav({class: 'navbar-main'});
 
         this.fetch();
