@@ -67,20 +67,21 @@ class MediaViewer extends View {
      * @param {String} newFolder
      */
     onChangeFolder(newFolder) {
-        $.ajax({
-            type: 'POST',
-            url: apiUrl('media/tree/' + this.model.id),
-            data: newFolder ? {
+        apiCall(
+            'post',
+            'media/tree/' + this.model.id,
+            newFolder ? {
                 id: this.model.id,
                 folder: newFolder
-            } : null,
-            success: () => {
-                reloadResource('media')
-                .then(() => {
-                    ViewHelper.get('NavbarMain').reload();
-                });
-            }
-        });
+            } : null
+        ).then(() => {
+            reloadResource('media')
+            .then(() => {
+                ViewHelper.get('NavbarMain').reload();
+            })
+            .catch(errorModal);
+        })
+        .catch(errorModal);
     }
 
     render() {

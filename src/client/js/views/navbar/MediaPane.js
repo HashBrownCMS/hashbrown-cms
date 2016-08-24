@@ -247,7 +247,9 @@ class MediaPane extends Pane {
                 'Copy id': () => { this.onClickCopyItemId(); },
                 'Cut': () => { this.onClickCutMedia(); },
                 'Remove': () => { this.onClickRemoveMedia(); },
-                'Replace': () => { this.onClickReplaceMedia(); }
+                'Replace': () => { this.onClickReplaceMedia(); },
+                'Directory': '---',
+                'Upload new media': () => { this.onClickUploadMedia(); }
             },
 
             // Dir context menu

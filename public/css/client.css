@@ -495,6 +495,23 @@ body {
           .cms-container .workspace .panel-buttons .btn-group .btn.working .text-working {
             display: inline; }
 
+.modal.modal-icon-picker .modal-dialog {
+  width: calc(100% - 30px);
+  max-width: 900px; }
+
+.modal.modal-icon-picker .icon-search {
+  margin-bottom: 15px; }
+
+.modal.modal-icon-picker .btn-icon {
+  text-align: left;
+  padding: 10px 15px !important;
+  width: 25%;
+  overflow: hidden;
+  text-overflow: ellipsis; }
+  .modal.modal-icon-picker .btn-icon .fa {
+    font-size: 20px;
+    margin-right: 15px; }
+
 .json-editor {
   width: 100%;
   height: 100%; }
@@ -636,20 +653,6 @@ body {
       margin: 0px; }
     .schema-editor > .schema .icon-editor > .fa {
       line-height: 30px; }
-    .schema-editor > .schema .icon-editor .modal .modal-dialog {
-      width: 900px;
-      max-width: calc(100% - 30px); }
-    .schema-editor > .schema .icon-editor .modal .icon-search {
-      margin-bottom: 15px; }
-    .schema-editor > .schema .icon-editor .modal .btn-icon {
-      text-align: left;
-      padding: 10px 15px !important;
-      width: 25%;
-      overflow: hidden;
-      text-overflow: ellipsis; }
-      .schema-editor > .schema .icon-editor .modal .btn-icon .fa {
-        font-size: 20px;
-        margin-right: 15px; }
 
 .modal .form-entries-list {
   height: 100%;
