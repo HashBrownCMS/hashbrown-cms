@@ -8,7 +8,7 @@ class MediaReferenceEditor extends View {
         super(params);
 
         this.$element = _.div({class: 'field-editor media-reference-editor'}, [
-            this.$body = _.div({class: 'thumbnail-container'}),
+            this.$body = _.div({class: 'thumbnail'}),
             this.$footer = _.div()
         ]);
 
@@ -67,7 +67,7 @@ class MediaReferenceEditor extends View {
                                 
                                 return _.button(
                                     {
-                                        class: 'thumbnail',
+                                        class: 'thumbnail raised',
                                         'data-id': media.id,
                                         style: 'background-image: url(\'/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + media.id + '\')'
                                     },
@@ -100,15 +100,18 @@ class MediaReferenceEditor extends View {
     }
 
     render() {
-        let $images = _.div({
-            class: 'thumbnail thumbnail-sm',
-            style: 'background-image: url(\'/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + this.value + '\')'
-        });
-
         if(this.value) {
-            this.$body.html(
-                $images
-            );
+            let mediaObject = (resources.media || []).filter((m) => {
+                return m.id == this.value;
+            })[0];
+
+            if(mediaObject) {
+                this.$body
+                    .attr('style', 'background-image: url(\'/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + this.value + '\')')
+                    .html(
+                        _.label(mediaObject.name)
+                    );
+            }
         }
 
         this.$footer.html(

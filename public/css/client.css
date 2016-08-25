@@ -85,7 +85,23 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
   background-size: cover;
   border: 0px;
   outline: 5px solid #fff;
-  border-radius: 0px; }
+  border-radius: 0px;
+  position: relative;
+  min-width: 200px;
+  height: 200px;
+  margin: 1em;
+  background-color: #eeeeee;
+  flex-grow: 1; }
+  .thumbnail label {
+    pointer-events: none;
+    position: absolute;
+    left: 0px;
+    bottom: 0px;
+    right: 0px;
+    background-color: #fff;
+    color: #424242;
+    margin: 0px;
+    padding: 1em 0.5em; }
   .thumbnail.active {
     outline: 5px solid #1e88e5 !important;
     z-index: 2; }
@@ -168,6 +184,8 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
   font-weight: bold;
   text-transform: uppercase;
   font-size: 12px; }
+  .btn.btn-primary, .btn.btn-default, .btn.btn-danger, .btn.btn-success {
+    min-width: 110px; }
   .btn.btn-primary {
     background-color: #2196f3;
     border-color: #2196f3; }
@@ -219,7 +237,7 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
     .btn.btn-raised:active {
       top: 0px;
       box-shadow: 0px 0px 1px 1px rgba(0, 0, 0, 0.2); }
-  .btn.btn-embedded, .modal .modal-dialog .modal-content .modal-footer .btn {
+  .btn.btn-embedded {
     background-color: transparent;
     border: 0px;
     color: #1e88e5; }
@@ -591,6 +609,9 @@ body {
   max-width: 60px;
   max-height: 60px; }
 
+.media-reference-editor .list-group-item .thumbnmail {
+  width: 200px; }
+
 .media-reference-editor .list-group-item.btn {
   color: #fff;
   text-align: center; }
@@ -601,24 +622,8 @@ body {
   .media-modal .modal-dialog .thumbnail-container {
     display: flex;
     flex-wrap: wrap;
-    position: relative; }
-    .media-modal .modal-dialog .thumbnail-container .thumbnail {
-      position: relative;
-      min-width: 100px;
-      height: 100px;
-      margin: 0.1em; }
-      .media-modal .modal-dialog .thumbnail-container .thumbnail.active label {
-        display: block; }
-      .media-modal .modal-dialog .thumbnail-container .thumbnail label {
-        display: none;
-        position: absolute;
-        left: 0px;
-        bottom: 0px;
-        right: 0px;
-        background-color: #1e88e5;
-        color: #fff;
-        margin: 0px;
-        padding: 0.4em 0.1em 0.1em 0.1em; }
+    overflow-y: auto;
+    max-height: 550px; }
 
 .content-editor {
   height: 100%; }
