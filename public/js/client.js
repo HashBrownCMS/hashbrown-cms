@@ -1243,7 +1243,8 @@ route.url=url;var counter=1;var _iteratorNormalCompletion3=true;var _didIterator
      * Gets the name of this View
      */_createClass(View,[{key:"getName",value:function getName(){var name=this.constructor.toString();name=name.substring('function '.length);name=name.substring(0,name.indexOf('('));return name;} /**
      * Init
-     */},{key:"init",value:function init(){var _this4=this;this.prerender();this.render();this.postrender();var element=this.element||this.$element[0];element.addEventListener('DOMNodeRemovedFromDocument',function(){_this4.remove();});this.trigger('ready',this);this.isReady=true;} /**
+     */},{key:"init",value:function init(){var _this4=this;this.prerender();this.render();this.postrender();var element=this.element||this.$element[0];element.addEventListener('DOMNodeRemovedFromDocument',function(){ // Wait a few cycles before removing, as the element might just have been relocated
+setTimeout(function(){var element=_this4.element||_this4.$element[0];if(!element||!element.parentNode){_this4.remove();}},10);});this.trigger('ready',this);this.isReady=true;} /**
      * Shorthand for .on('ready')
      */},{key:"ready",value:function ready(callback){if(this.isReady){callback(this);}else {this.on('ready',callback);}} /**
      * Adopts values
@@ -3138,7 +3139,7 @@ var $schemaSelector=_.div({class:'item-schema-selector kvp'},_.div({class:'key'}
 var fieldEditorInstance=new fieldEditor({value:itemSchema.multilingual?item[window.language]:item,disabled:itemSchema.disabled||false,config:itemSchema.config||{},schema:itemSchema}); // Hook up the change event
 fieldEditorInstance.on('change',function(newValue){_this38.onChange(newValue,i,itemSchema);}); // Return the DOM element
 var $element=_.div({class:'item raised','data-array-index':i},_.button({class:'btn btn-embedded btn-remove'},_.span({class:'fa fa-remove'})).click(function(){_this38.onClickRemoveItem(i);}),_this38.config.allowedSchemas.length>1?$schemaSelector:null,fieldEditorInstance.$element);return {v:$element};}();if((typeof _ret3==="undefined"?"undefined":_typeof(_ret3))==="object")return _ret3.v;}else {debug.warning('Schema by id "'+itemSchemaId+'" not found',_this38);}})), // Render the add item button
-_.button({class:'btn btn-primary btn-raised btn-round'},'+').click(function(){_this38.onClickAddItem();}));}}]);return ArrayEditor;}(View);module.exports=ArrayEditor;},{}],185:[function(require,module,exports){'use strict'; /**
+_.button({class:'btn btn-primary btn-raised btn-add-item btn-round'},'+').click(function(){_this38.onClickAddItem();}));}}]);return ArrayEditor;}(View);module.exports=ArrayEditor;},{}],185:[function(require,module,exports){'use strict'; /**
  * A simple boolean editor
  */var BooleanEditor=function(_View12){_inherits(BooleanEditor,_View12);function BooleanEditor(params){_classCallCheck(this,BooleanEditor);var _this39=_possibleConstructorReturn(this,Object.getPrototypeOf(BooleanEditor).call(this,params));_this39.init();return _this39;} /**
      * Event: Change

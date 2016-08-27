@@ -230,7 +230,7 @@ class ArrayEditor extends View {
             ),
 
             // Render the add item button
-            _.button({class: 'btn btn-primary btn-raised btn-round'},
+            _.button({class: 'btn btn-primary btn-raised btn-add-item btn-round'},
                 '+'
             ).click(() => { this.onClickAddItem(); })
         );

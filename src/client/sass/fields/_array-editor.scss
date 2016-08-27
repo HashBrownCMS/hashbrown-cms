@@ -17,6 +17,10 @@
             }
         }
 
+        .btn-add-item {
+            display: none;
+        }
+
         .items {
             .item {
                 overflow-y: hidden;
@@ -60,10 +64,10 @@
 
     .items {
         padding-top: 30px;
-
+        padding-bottom: 30px;
+        
         .item {
             position: relative;
-            border-bottom: 1px solid material-color('grey', '300');
             margin-bottom: 30px;
             margin-top: 30px;
 
@@ -72,7 +76,7 @@
             }
 
             &:last-of-type {
-                border-bottom: 0px;
+                margin-bottom: 30px;
             }
 
             >.item-schema-selector {
@@ -112,7 +116,7 @@
         }
     }
 
-    .btn-round {
+    .btn-add-item {
         float: right;
 
         &:after {
