@@ -58,6 +58,15 @@ class ContentHelper extends ContentHelperCommon {
             value = value[window.language];
         }
 
+        // Update the _multilingual flag
+        if(schema.multilingual && value && !value._multilingual) {
+            value._multilingual = true;    
+        
+        } else if(!schema.multilingual && value && value._multilingual) {
+            delete value._multilingual;
+
+        }
+
         return value;
     }
 }
