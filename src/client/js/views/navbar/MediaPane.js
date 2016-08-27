@@ -4,12 +4,63 @@ let Pane = require('./Pane');
 
 class MediaPane extends Pane {
     /**
-     * Event: Click new Media directory
+     * Event: On change folder path
+     *
+     * @param {String} newFolder
      */
-    static onClickNewMediaDirectory() {
-        let parentFolder = $('.context-menu-target-element').data('media-folder');
-       
-        // TODO: Find some temporary rendering method for new directories 
+    static onChangeFolder(id, newFolder) {
+        apiCall(
+            'post',
+            'media/tree/' + id,
+            newFolder ? {
+                id: id,
+                folder: newFolder
+            } : null
+        ).then(() => {
+            reloadResource('media')
+            .then(() => {
+                ViewHelper.get('NavbarMain').reload();
+            })
+            .catch(errorModal);
+        })
+        .catch(errorModal);
+    }
+
+    /**
+     * Event: Click move Media
+     */
+    static onClickMoveMedia() {
+        let id = $('.context-menu-target-element').data('id');
+        
+        MediaHelper.getMediaById(id)
+        .then((media) => {
+            let messageModal = new MessageModal({
+                model: {
+                    title: 'Move media',
+                    body: _.div({},
+                        'Move the media object "' + media.name + '"',
+                        _.input({class: 'form-control', value: media.folder, placeholder: 'Type folder path here'})
+                    )
+                },
+                buttons: [
+                    {
+                        label: 'Cancel',
+                        class: 'btn-default',
+                        callback: () => {
+                        }
+                    },
+                    {
+                        label: 'OK',
+                        class: 'btn-danger',
+                        callback: () => {
+                            let newPath = messageModal.$element.find('input.form-control').val();
+                            
+                            this.onChangeFolder(media.id, newPath);
+                        }
+                    }
+                ]
+            });
+        });
     }
 
     /**
@@ -246,6 +297,7 @@ class MediaPane extends Pane {
                 'This media': '---',
                 'Copy id': () => { this.onClickCopyItemId(); },
                 'Cut': () => { this.onClickCutMedia(); },
+                'Move': () => { this.onClickMoveMedia(); },
                 'Remove': () => { this.onClickRemoveMedia(); },
                 'Replace': () => { this.onClickReplaceMedia(); },
                 'Directory': '---',

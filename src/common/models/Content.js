@@ -226,10 +226,13 @@ class Content extends Entity {
         let properties = {};
 
         function flattenRecursively(source, target) {
+            // Loop through all keys
             for(let key in source) {
                 let value = source[key];
 
+                // If the value is an object type, examine it further
                 if(value && typeof value === 'object') {
+                    // If multilingual flag is set, assign value directly
                     if(value._multilingual) {
                         if(typeof value[language] === 'undefined') {
                             value[language] = null;
@@ -237,7 +240,19 @@ class Content extends Entity {
 
                         target[key] = value[language];
 
+                    // If not, recurse into the object
                     } else {
+                        // If this value was created with the ArrayEditor, filter out schema
+                        // bindings by assigning the "items" value to the value variable
+                        if(
+                            value instanceof Object &&
+                            value.items && Array.isArray(value.items) &&
+                            value.schemaBindings && Array.isArray(value.schemaBindings)
+                        ) {
+                            value = value.items;
+                        }
+
+                        // Prepare target data type for either Object or Array
                         if(Array.isArray(value)) {
                             target[key] = [];
                         } else {
@@ -248,6 +263,7 @@ class Content extends Entity {
 
                     }
                 
+                // If not, just return the localised value
                 } else {
                     target[key] = value;
 

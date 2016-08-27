@@ -24,6 +24,28 @@ class MediaHelper extends MediaHelperCommon {
     }
 
     /**
+     * Gets Media object by id
+     *
+     * @param {String} id
+     *
+     * @return {Promise(Media)}
+     */
+    static getMediaById(id) {
+        return new Promise((resolve, reject) => {
+            for(let i = 0; i < resources.media.length; i++) {
+                let media = resources.media[i];
+
+                if(media.id == id) {
+                    resolve(media);
+                    return;
+                }
+            }
+
+            reject(new Error('Media with id "' + id + '" not found'));
+        });
+    }
+
+    /**
      * Sets a Media tree item
      *
      * @param {String} id
