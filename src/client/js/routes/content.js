@@ -38,8 +38,6 @@ Router.route('/content/:id/:tab', function() {
     let contentEditor = ViewHelper.get('ContentEditor');
   
     if(!contentEditor || contentEditor.model.id != this.id) {
-        ViewHelper.removeAll('ContentEditor');
-
         ContentHelper.getContentById(this.id)
         .then((content) => { 
             ViewHelper.get('NavbarMain').highlightItem(this.id);

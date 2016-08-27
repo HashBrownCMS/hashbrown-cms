@@ -23,30 +23,6 @@
             >.fa {
                 line-height: 30px;
             }
-
-            .modal {
-                .modal-dialog {
-                    width: 900px;
-                    max-width: calc(100% - 30px);
-                }
-                
-                .icon-search {
-                    margin-bottom: 15px;
-                }
-
-                .btn-icon {
-                    text-align: left;
-                    padding: 10px 15px !important;
-                    width: 25%;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-
-                    .fa {
-                        font-size: 20px;
-                        margin-right: 15px;
-                    }
-                }
-            }
         }
     }
 }

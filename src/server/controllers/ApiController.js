@@ -121,6 +121,8 @@ class ApiController extends Controller {
                             debug.log(e.message, ApiController);
                         });    
                     
+                    } else {
+                        next();
                     }
                 })
                 .catch((e) => {

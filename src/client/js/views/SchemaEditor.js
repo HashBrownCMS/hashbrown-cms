@@ -271,32 +271,20 @@ class SchemaEditor extends View {
         let view = this;
 
         function onClickBrowse() {
-            $element.find('.modal').modal('show');
-        }
+            function onSearch() {
+                let query = $element.find('.icon-search input').val().toLowerCase();
 
-        function onSearch() {
-            let query = $element.find('.icon-search input').val().toLowerCase();
+                if(query.length > 2 || query.length == 0) {
+                    view.$element.find('.btn-icon').each(function(i) {
+                        let $btn = $(this);
+                        let name = $btn.children('.icon-name').html();
 
-            if(query.length > 2 || query.length == 0) {
-                view.$element.find('.btn-icon').each(function(i) {
-                    let $btn = $(this);
-                    let name = $btn.children('.icon-name').html();
-
-                    $btn.toggle(name.indexOf(query) > -1);
-                });
+                        $btn.toggle(name.indexOf(query) > -1);
+                    });
+                }
             }
-        }
 
-        let $element = _.div({class: 'icon-editor'},
-            _.if(!this.model.locked,
-                _.button({class: 'btn btn-icon-browse btn-default' + (this.model.locked ? ' disabled' : '')},
-                    _.span({class: 'fa fa-' + this.model.icon})
-                ).click(onClickBrowse)
-            ),
-            _.if(this.model.locked,
-                _.span({class: 'fa fa-' + this.model.icon})
-            ),
-            _.div({class: 'modal fade'},
+            let $modal = _.div({class: 'modal modal-icon-picker fade'},
                 _.div({class: 'modal-dialog'},
                     _.div({class: 'modal-content'},
                         _.div({class: 'modal-body'},
@@ -323,6 +311,25 @@ class SchemaEditor extends View {
                         )
                     )
                 )
+            );
+            
+            $modal.on('hidden.bs.modal', function() {
+                $modal.remove();
+            });
+
+            $('body').append($modal);
+
+            $modal.modal('show');
+        }
+
+        let $element = _.div({class: 'icon-editor'},
+            _.if(!this.model.locked,
+                _.button({class: 'btn btn-icon-browse btn-default' + (this.model.locked ? ' disabled' : '')},
+                    _.span({class: 'fa fa-' + this.model.icon})
+                ).click(onClickBrowse)
+            ),
+            _.if(this.model.locked,
+                _.span({class: 'fa fa-' + this.model.icon})
             )
         );
         

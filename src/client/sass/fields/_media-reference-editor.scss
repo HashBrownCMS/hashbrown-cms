@@ -5,9 +5,27 @@
             max-height: 60px;
         }
 
+        .thumbnmail {
+            width: 200px;
+        }
+
         &.btn {
             color: #fff;
             text-align: center;
+        }
+    }
+}
+
+.media-modal {
+    .modal-dialog {
+        width: calc(100% - 30px);
+        max-width: 1040px;
+
+        .thumbnail-container {
+            display: flex;
+            flex-wrap: wrap;
+            overflow-y: auto;
+            max-height: 550px;
         }
     }
 }

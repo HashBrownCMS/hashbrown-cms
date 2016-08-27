@@ -25,7 +25,7 @@ app.set('views', appRoot + '/src/server/views');
 // ----------
 // App middlewares
 // ----------
-app.use(bodyparser.json());
+app.use(bodyparser.json({limit: '50mb'}));
 app.use(express.static(appRoot + '/public'));
 
 // ----------

@@ -1,5 +1,6 @@
 'use strict';
 
+let restler = require('restler');
 let fs = require('fs');
 let Promise = require('bluebird');
 
@@ -47,19 +48,48 @@ class JsonTreeConnection extends Connection {
      */
     getTree() {
         return new Promise((resolve, reject) => {
-            this.ensureLocation();
+            // Read from remote
+            if(this.settings.remote && this.settings.token) {
+                let headers = {
+                    'Accept': 'application/json'
+                };
                 
-            let path = this.getPath();
+                restler.get(this.settings.remote + '/hashbrown/api/tree?token=' + this.settings.token, {
+                    headers: headers
+                }).on('complete', (data, response) => {
+                    try {
+                        if(typeof data === 'string') {
+                            data = JSON.parse(data);
+                        }
 
-            fs.readFile(path + '/tree.json', 'utf8', (err, data) => {
-                if(err) {
-                    reject(new Error(err));
-                
-                } else {
-                    resolve(JSON.parse(data));
-                
-                }
-            });
+                        resolve(data);
+                    } catch(e) {
+                        reject(e);
+                    }
+                });
+
+            // Read from local
+            } else {
+                this.ensureLocation();
+                    
+                let path = this.getPath();
+
+                fs.readFile(path + '/tree.json', 'utf8', (err, data) => {
+                    if(err) {
+                        reject(new Error(err));
+                    
+                    } else {
+                        try {
+                            let parsed = JSON.parse(data);
+
+                            resolve(parsed);
+                        } catch(e) {
+                            reject(e);
+                        }
+                    
+                    }
+                });
+            }
         });
     }
 
@@ -72,19 +102,41 @@ class JsonTreeConnection extends Connection {
      */
     setTree(json) {
         return new Promise((resolve) => {
-            this.ensureLocation();
+            debug.log('Writing remote content tree...', this)
 
-            let path = this.getPath();
-            
-            fs.writeFile(path + '/tree.json', JSON.stringify(json, null, 4), 'utf8', (err, data) => {
-                if(err) {
-                    reject(new Error(err));
-                
-                } else {
+            // Write to remote
+            if(this.settings.remote && this.settings.token) {
+                let headers = {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                };
+
+                restler.post(this.settings.remote + '/hashbrown/api/tree?token=' + this.settings.token, {
+                    headers: headers,
+                    data: JSON.stringify(json, null, 4)
+                }).on('complete', (data, response) => {
+                    console.log(data);
+
+                    debug.log('Wrote remote content tree successfully!', this);
                     resolve();
+                });
+
+            // Write to local
+            } else {
+                this.ensureLocation();
+
+                let path = this.getPath();
                 
-                }
-            });
+                fs.writeFile(path + '/tree.json', JSON.stringify(json, null, 4), 'utf8', (err, data) => {
+                    if(err) {
+                        reject(new Error(err));
+                    
+                    } else {
+                        resolve();
+                    
+                    }
+                });
+            }
         });
     }
     
@@ -99,7 +151,7 @@ class JsonTreeConnection extends Connection {
     deleteContentProperties(id, language) {
         debug.log('Processing "' + id + '"...', this);
 
-        return new Promise((callback) => {
+        return new Promise((resolve, reject) => {
             this.getTree()
             .then((tree) => {
                 tree[id] = null;
@@ -107,9 +159,11 @@ class JsonTreeConnection extends Connection {
                 
                 this.setTree(tree)
                 .then(() => {
-                    callback();
-                });
-            });
+                    resolve();
+                })
+                .catch(reject);
+            })
+            .catch(reject);
         });
     }
 
@@ -126,7 +180,7 @@ class JsonTreeConnection extends Connection {
     postContentProperties(properties, id, language, meta) {
         debug.log('Processing "' + properties.title + '"...', this);
 
-        return new Promise((callback) => {
+        return new Promise((resolve, reject) => {
             this.getTree()
             .then((tree) => {
                 if(!tree[id]) {
@@ -147,9 +201,11 @@ class JsonTreeConnection extends Connection {
 
                 this.setTree(tree)
                 .then(() => {
-                    callback();
-                });
-            });
+                    resolve();
+                })
+                .catch(reject);
+            })
+            .catch(reject);
         });
     }
 }

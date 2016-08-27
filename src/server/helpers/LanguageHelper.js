@@ -12,6 +12,10 @@ class LanguageHelper extends LanguageHelperCommon {
         return new Promise((callback) => {
             SettingsHelper.getSettings('language')
             .then((settings) => {
+                if(!settings) {
+                    settings = {};
+                }
+                
                 if(!settings.selected || settings.selected.length < 1) {
                     settings.selected = ['en'];
                 }
@@ -35,6 +39,10 @@ class LanguageHelper extends LanguageHelperCommon {
         return new Promise((callback) => {
             SettingsHelper.getSettings('language')
             .then((settings) => {
+                if(!settings) {
+                    settings = {};
+                }
+                
                 if(!settings.selected || settings.selected.length < 1) {
                     settings.selected = ['en'];
                 }
