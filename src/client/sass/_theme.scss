@@ -105,11 +105,6 @@ button, a {
     box-shadow: 0px 2px 3px 1px rgba(0, 0, 0, 0.2);
     background-color: #fff;
     padding: 15px 30px;
-
-    .raised {
-        padding: 0px;
-        box-shadow: none;
-    }
 }
 
 // Thumbnails
@@ -117,16 +112,30 @@ button, a {
     background-position: center;
     background-size: cover;
     border: 0px;
-    outline: 5px solid #fff;
+    outline: 5px solid transparent;
     border-radius: 0px;
     position: relative;
-    min-width: 200px;
+    width: 200px;
     height: 200px;
-    margin: 1em;
-    background-color: material-color('grey', '200');
-    flex-grow: 1;
+    background-color: material-color('grey', '300');
+    position: relative;
+
+    &:not([style]), &[style=""] {
+        &:before {
+            content: '\f1c5';
+            transform: translate(-50%, -50%);
+            display: block;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            font-family: 'FontAwesome';
+            font-size: 60px;
+            color: material-color('grey', '500');
+        }
+    }
 
     label {
+        min-height: 41.5px;
         pointer-events: none;
         position: absolute;
         left: 0px;
@@ -135,7 +144,7 @@ button, a {
         background-color: #fff;
         color: material-color('grey', '800');
         margin: 0px;
-        padding: 1em 0.5em;
+        padding: 1em 0.8em;
     }
 
     &.active {
@@ -296,10 +305,14 @@ button, a {
 
     &.btn-round {
         padding: 0px !important;
-        width: 34px;
-        height: 34px;
-        line-height: 34px;
+        width: 56px;
+        height: 56px;
+        min-width: auto;
+        min-height: auto;
+        line-height: 56px;
         border-radius: 50%;
+        font-size: 30px;
+        font-weight: 100;
     }
 
     &.btn-raised {

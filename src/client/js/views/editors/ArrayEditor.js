@@ -102,34 +102,19 @@ class ArrayEditor extends View {
     render() {
         // Recover flat arrays
         if(Array.isArray(this.value)) {
-            let recoveredArray = {
-                items: [],
+            this.value = {
+                items: this.value,
                 schemaBindings: []
             };
-            
-            for(let item of this.value) {
-                let schemaId = item._schemaId;
-
-                delete item._schemaId;
-
-                recoveredArray.items.push(item);
-                recoveredArray.schemaBindings.push(schemaId);
-            }
-
-            this.value = recoveredArray;
-
-            setTimeout(() => {
-                this.trigger('change', this.value);
-            }, 20);
         }
         
-        // NOTE: The reason for having a separate array with schema ids is simply
-        // that there is no way to associate a value with a schema id if it's not an Object type
+        // NOTE: The reason for having a separate array with schema ids is that there is no way
+        // to associate a value with a schema id if it's not an Object type, like a String
 
-        // A sanity check to make sure we're working with an array
+        // A sanity check to make sure we're working with an object
         if(
             !this.value ||
-            typeof this.value !== 'object'
+            !(this.value instanceof Object)
         ) {
             this.value = {
                 items: [],
@@ -138,13 +123,6 @@ class ArrayEditor extends View {
         
         }
         
-        if(Array.isArray(this.value)) {
-            this.value = {
-                items: this.value,
-                schemaBindings: []
-            };
-        }
-
         if(!this.value.items) {
             this.value.items = [];
         }
@@ -252,8 +230,8 @@ class ArrayEditor extends View {
             ),
 
             // Render the add item button
-            _.button({class: 'btn btn-primary btn-round'},
-                _.span({class: 'fa fa-plus'})
+            _.button({class: 'btn btn-primary btn-raised btn-round'},
+                '+'
             ).click(() => { this.onClickAddItem(); })
         );
     }    

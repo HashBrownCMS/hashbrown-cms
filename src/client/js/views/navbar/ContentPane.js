@@ -311,8 +311,6 @@ class ContentPane extends Pane {
                 ContentHelper.getContentById(thisId)
                 .then((thisContent) => {
                     // Then change the sorting value
-                    let thisPrevParent = thisContent.parentId;
-                    let newParent = dropContainer.parentElement.dataset.contentId;
                     let thisPrevSort = thisContent.sort;
                     let newSortBasedOn = '';
                     let newSort;
@@ -322,7 +320,6 @@ class ContentPane extends Pane {
                         debug.log(
                             'Changes to Content "' + thisContent.id + '":' + 
                             '\n- sort from ' + thisPrevSort + ' to ' + thisContent.sort + ' based on ' + newSortBasedOn + 
-                            '\n- parent from "' + thisPrevParent + '" to "' + newParent + '"',
                             navbar
                         );
                     }
@@ -347,9 +344,8 @@ class ContentPane extends Pane {
                         newSortBasedOn = 'lowest possible index';
                     }
 
-                    if(newSort != thisContent.sort || newParent != thisContent.parentId) {
+                    if(newSort != thisContent.sort) {
                         thisContent.sort = newSort;
-                        thisContent.parentId = newParent;
 
                         // Save model
                         apiCall('post', 'content/' + thisContent.id, thisContent.getObject())

@@ -104,6 +104,8 @@ class MongoHelper {
                     } else {
                         resolve(doc);
                     }
+
+                    db.close();
                 });
             })
             .catch(reject);
@@ -138,6 +140,8 @@ class MongoHelper {
                         resolve(docs);
                     
                     }
+
+                    db.close();
                 });
             })
             .catch(reject);
@@ -172,6 +176,8 @@ class MongoHelper {
                         resolve();
 
                     }
+
+                    db.close();
                 });
             })
             .catch(reject);
@@ -201,7 +207,9 @@ class MongoHelper {
                         reject(new Error(insertErr));
                     }
 
-                   resolve(doc);
+                    resolve(doc);
+
+                    db.close();
                 });
             })
             .catch(reject);
@@ -229,6 +237,8 @@ class MongoHelper {
                     }
 
                     resolve();
+
+                    db.close();
                 });
             })
             .catch(reject);

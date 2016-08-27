@@ -8,7 +8,7 @@ class MediaReferenceEditor extends View {
         super(params);
 
         this.$element = _.div({class: 'field-editor media-reference-editor'}, [
-            this.$body = _.div({class: 'thumbnail'}),
+            this.$body = _.div({class: 'thumbnail raised'}),
             this.$footer = _.div()
         ]);
 
@@ -115,8 +115,8 @@ class MediaReferenceEditor extends View {
         }
 
         this.$footer.html(
-            this.$button = _.button({class: 'btn btn-raised btn-default'},
-                'BROWSE'
+            this.$button = _.button({class: 'btn btn-primary'},
+                'Browse'
             ).click(() => { this.onClickBrowse(); })
         );
     }

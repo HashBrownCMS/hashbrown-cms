@@ -26,7 +26,20 @@ class NavbarMain extends View {
         this.mediaPane = MediaPane;
         this.schemaPane = SchemaPane;
 
-        this.$element = _.nav({class: 'navbar-main'});
+        this.$element = _.nav({class: 'navbar-main'},
+            _.div({class: 'tab-buttons'}),
+            _.div({class: 'tab-panes'}),
+            _.div({class: 'fullscreen-toggle'},
+                _.button({class: 'btn'},
+                    _.span({class: 'fa fa-chevron-right'}),
+                    _.span({class: 'fa fa-chevron-left'})
+                ).click(() => {
+                    this.onClickToggleFullscreen();
+                })
+            )
+        );
+        
+        $('.navspace').html(this.$element);
 
         this.fetch();
     }
@@ -188,8 +201,7 @@ class NavbarMain extends View {
                 if(typeof params.onEndDrag === 'function') {
                     $element.exodragdrop({
                         lockX: true,
-                        onEndDrag: params.onEndDrag,
-                        dropContainerSelector: '.pane-container.active .pane, .pane-container.active .pane .pane-item-container > .children'
+                        onEndDrag: params.onEndDrag
                     });
                 }
 
@@ -376,25 +388,21 @@ class NavbarMain extends View {
         });
     }
 
+    clear() {
+        this.$element.find('.tab-buttons').empty();
+        this.$element.find('.tab-panes').empty();
+    }
+
     render() {
         let view = this;
 
         resetReady('navbar');
 
+        this.clear();
+
         // ----------
         // Render main content
         // ----------
-        this.$element.html([
-            _.div({class: 'tab-buttons'}),
-            _.div({class: 'tab-panes'}),
-            _.div({class: 'fullscreen-toggle'},
-                _.button({class: 'btn'},
-                    _.span({class: 'fa fa-chevron-right'}),
-                    _.span({class: 'fa fa-chevron-left'})
-                ).click(this.onClickToggleFullscreen)
-            )
-        ]);
-
         // Get user scopes
         $.ajax({
             type: 'GET',
@@ -478,9 +486,6 @@ class NavbarMain extends View {
 
             }
         });
-
-        // Insert into DOM
-        $('.navspace').html(this.$element);
     }
 }
 

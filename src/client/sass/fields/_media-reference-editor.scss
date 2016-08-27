@@ -1,19 +1,4 @@
 .media-reference-editor {
-    .list-group-item {
-        img {
-            max-width: 60px;
-            max-height: 60px;
-        }
-
-        .thumbnmail {
-            width: 200px;
-        }
-
-        &.btn {
-            color: #fff;
-            text-align: center;
-        }
-    }
 }
 
 .media-modal {
@@ -26,6 +11,13 @@
             flex-wrap: wrap;
             overflow-y: auto;
             max-height: 550px;
+
+            .thumbnail {
+                min-width: 200px;
+                width: auto;
+                flex-grow: 1;
+                margin: 1em;
+            }
         }
     }
 }

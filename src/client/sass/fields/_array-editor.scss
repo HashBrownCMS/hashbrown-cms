@@ -1,4 +1,11 @@
 .array-editor {
+    .array-editor {
+        .item.raised {
+            padding: 0px;
+            box-shadow: none;
+        }
+    }
+
     &.sorting {
         .btn-sort-items {
             .text-default {
@@ -17,6 +24,19 @@
                 position: relative;
                 border: 0px;
                 
+                &:after {
+                    content: '';
+                    display: block;
+                    position: absolute;
+                    height: 30px;
+                    background-image: linear-gradient(to top, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0));
+                    bottom: 0px;
+                    left: 0px;
+                    width: 100%;
+                    z-index: 20;
+                    pointer-events: none;
+                }
+
                 .btn-remove {
                     display: none;
                 }
@@ -92,7 +112,13 @@
         }
     }
 
-    .btn-add {
-        margin-top: 10px;
+    .btn-round {
+        float: right;
+
+        &:after {
+            content: '';
+            clear: both;
+            display: block;
+        }
     }
 }

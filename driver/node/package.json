@@ -1,0 +1,11 @@
+{
+  "name": "hashbrown-driver",
+  "version": "0.1.0",
+  "description": "The node.js driver for HashBrown CMS",
+  "main": "HashBrown.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Putaitu Productions",
+  "license": "ISC"
+}
