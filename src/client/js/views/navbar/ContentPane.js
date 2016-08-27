@@ -228,10 +228,26 @@ class ContentPane extends Pane {
                     });
                 }
 
-                new MessageModal({
+                let messageModal = new MessageModal({
                     model: {
-                        title: 'Delete content',
-                        body: 'Are you sure you want to delete the content "' + name + '"?'
+                        title: 'Remove content',
+                        body: _.div({},
+                            _.p('Are you sure you want to remove the content "' + name + '"?'),
+                            _.div({class: 'input-group'},      
+                                _.span('Remove child content too'),
+                                _.div({class: 'input-group-addon'},
+                                    _.div({class: 'switch'},
+                                        _.input({
+                                            id: 'switch-content-delete-children',
+                                            class: 'form-control switch',
+                                            type: 'checkbox',
+                                            checked: true
+                                        }),
+                                        _.label({for: 'switch-content-delete-children'})
+                                    )
+                                )
+                            )
+                        )
                     },
                     buttons: [
                         {
@@ -244,7 +260,7 @@ class ContentPane extends Pane {
                             label: 'OK',
                             class: 'btn-danger',
                             callback: function() {
-                                apiCall('delete', 'content/' + id)
+                                apiCall('delete', 'content/' + id + '?removeChildren=' + messageModal.$element.find('.switch input')[0].checked)
                                 .then(() => {
                                     if(publishing.connections && publishing.connections.length > 0) {
                                         unpublishConnections();

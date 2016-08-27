@@ -97,20 +97,43 @@ class ContentHelper extends ContentHelperCommon {
     /**
      * Removes a content object
      *
-     * @param {Number} id
+     * @param {String} id
+     * @param {Boolean} removeChildren
      *
      * @return {Promise} promise
      */
-    static removeContentById(id) {
+    static removeContentById(id, removeChildren) {
         let collection = ProjectHelper.currentEnvironment + '.content';
         
-        return MongoHelper.removeOne(
-            ProjectHelper.currentProject,
-            collection,
-            {
-                id: id
-            }
-        );
+        return new Promise((resolve, reject) => {
+            MongoHelper.removeOne(
+                ProjectHelper.currentProject,
+                collection,
+                {
+                    id: id
+                }
+            )
+            .then(() => {
+                if(removeChildren) {
+                    MongoHelper.remove(
+                        ProjectHelper.currentProject,
+                        collection,
+                        {
+                            parentId: id
+                        }
+                    )
+                    .then(() => {
+                        resolve();
+                    })
+                    .catch(reject);
+                
+                } else {
+                    resolve();
+
+                }
+            })
+            .catch(reject);
+        });
     }
 }
 

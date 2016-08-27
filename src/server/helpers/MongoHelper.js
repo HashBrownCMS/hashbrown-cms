@@ -185,7 +185,7 @@ class MongoHelper {
     }
     
     /**
-     * Inserts a single MongoHelper document
+     * Inserts a single Mongo document
      *
      * @param {String} databaseName
      * @param {String} collectionName
@@ -217,7 +217,36 @@ class MongoHelper {
     }
     
     /**
-     * Removes a single MongoHelper document
+     * Removes a Mongo document
+     *
+     * @param {String} databaseName
+     * @param {String} collectionName
+     * @param {Object} query
+     *
+     * @return {Promise} promise
+     */
+    static remove(databaseName, collectionName, query) {
+        return new Promise((resolve, reject) => {
+            debug.log(databaseName + '/' + collectionName + '::remove ' + JSON.stringify(query) + '...', this, 3);
+        
+            MongoHelper.getDatabase(databaseName)
+            .then(function(db) {
+                db.collection(collectionName).remove(query, true, function(findErr) {
+                    if(findErr) {
+                        reject(new Error(findErr));
+                    }
+
+                    resolve();
+
+                    db.close();
+                });
+            })
+            .catch(reject);
+        });
+    }    
+    
+    /**
+     * Removes a single Mongo document
      *
      * @param {String} databaseName
      * @param {String} collectionName

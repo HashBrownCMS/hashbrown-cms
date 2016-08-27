@@ -125,8 +125,9 @@ class ContentController extends ApiController {
      */
     static deleteContent(req, res) {
         let id = req.params.id;
-        
-        ContentHelper.removeContentById(id)
+        let removeChildren = req.query.removeChildren == true || req.query.removeChildren == 'true';
+
+        ContentHelper.removeContentById(id, removeChildren)
         .then(() => {
             res.status(200).send(id);
         })
