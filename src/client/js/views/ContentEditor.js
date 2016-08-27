@@ -423,10 +423,16 @@ class ContentEditor extends View {
                             )
                         )
                     );
+                })
+                .catch((e) => {
+                    errorModal(e);
                 });
 
                 this.onFieldEditorsReady();
             }
+        })
+        .catch((e) => {
+            errorModal(e);
         });
     }
 }

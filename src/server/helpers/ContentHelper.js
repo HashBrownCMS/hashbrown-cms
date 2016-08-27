@@ -128,7 +128,20 @@ class ContentHelper extends ContentHelperCommon {
                     .catch(reject);
                 
                 } else {
-                    resolve();
+                    MongoHelper.update(
+                        ProjectHelper.currentProject,
+                        collection,
+                        {
+                            parentId: id
+                        },
+                        {
+                            parentId: null
+                        }
+                    )
+                    .then(() => {
+                        resolve();
+                    })
+                    .catch(reject);
 
                 }
             })

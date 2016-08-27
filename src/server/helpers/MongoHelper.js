@@ -80,7 +80,7 @@ class MongoHelper {
     }
 
     /**
-     * Finds a single MongoHelper document
+     * Finds a single Mongo document
      *
      * @param {String} databaseName
      * @param {String} collectionName
@@ -113,7 +113,7 @@ class MongoHelper {
     }
     
     /**
-     * Finds MongoHelper documents
+     * Finds Mongo documents
      *
      * @param {String} databaseName
      * @param {String} collectionName
@@ -149,7 +149,7 @@ class MongoHelper {
     }
     
     /**
-     * Updates a single MongoHelper document
+     * Updates a single Mongo document
      *
      * @param {String} databaseName
      * @param {String} collectionName
@@ -169,6 +169,42 @@ class MongoHelper {
             MongoHelper.getDatabase(databaseName)
             .then(function(db) {
                 db.collection(collectionName).updateOne(query, doc, options || {}, function(findErr) {
+                    if(findErr) {
+                        reject(new Error(findErr));
+                    
+                    } else {
+                        resolve();
+
+                    }
+
+                    db.close();
+                });
+            })
+            .catch(reject);
+        });
+    }
+    
+    /**
+     * Updates Mongo documents
+     *
+     * @param {String} databaseName
+     * @param {String} collectionName
+     * @param {Object} query
+     * @param {Object} doc
+     * @param {Object} options
+     *
+     * @return {Promise} promise
+     */
+    static update(databaseName, collectionName, query, doc, options) {
+        // Make sure the MongoId isn't included
+        delete doc['_id'];
+
+        return new Promise((resolve, reject) => {
+            debug.log(databaseName + '/' + collectionName + '::updateOne ' + JSON.stringify(query) + ' with options ' + JSON.stringify(options || {}) + '...', this, 3);
+        
+            MongoHelper.getDatabase(databaseName)
+            .then(function(db) {
+                db.collection(collectionName).update(query, { $set: doc }, options || {}, function(findErr) {
                     if(findErr) {
                         reject(new Error(findErr));
                     

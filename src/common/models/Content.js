@@ -91,7 +91,8 @@ class Content extends Entity {
                             reject(new Error('Parent content with id "' + content.parentId + '" was not found'));
                         
                         }
-                    });
+                    })
+                    .catch(reject);
 
                 } else {
                     resolve(parents);
@@ -112,7 +113,7 @@ class Content extends Entity {
     getSettings(key) {
         let model = this;
         
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             // Loop through all parent content to find a governing setting
             model.getParents()
             .then((parents) => {
@@ -147,6 +148,22 @@ class Content extends Entity {
                 }
 
                 resolve(model.settings[key]);
+            })
+            .catch((e) => {
+                // Parent id was specified, but node did not exist
+                // This error is not fatal, but should be reported
+                debug.warning(e.message, this);
+                
+                // Return own settings
+                if(!model.settings) {
+                    model.settings = {};
+                }
+
+                if(!model.settings[key]) {
+                    model.settings[key] = {};
+                }
+
+                resolve(model.settings);
             });
         });
     }
