@@ -1,5 +1,7 @@
 'use strict';
 
+require('exomon');
+
 // Helper functions
 require('./helpers');
 
