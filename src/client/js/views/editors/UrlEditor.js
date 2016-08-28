@@ -19,18 +19,14 @@ class UrlEditor extends View {
      */
     static getAllParents(contentId) {
         let nodes = [];    
+        let contentEditor = ViewHelper.get('ContentEditor');
 
         function iterate(id) {
             let node;
-            let contentEditor = ViewHelper.get('ContentEditor');
         
-            if(contentEditor && contentEditor.model && contentEditor.model.id == id) {
-                node = contentEditor.model;
-            } else {
-                node = window.resources.content.filter((node) => {
-                    return node.id == id;
-                })[0];
-            }
+            node = window.resources.content.filter((node) => {
+                return node.id == id;
+            })[0];
 
             if(node) {
                 nodes.push(node);
@@ -68,11 +64,16 @@ class UrlEditor extends View {
 
         for(let node of nodes) {
             let title = '';
-            
-            if(typeof node.title === 'string') {
-                title = node.title;
-            } else if(node.properties && node.properties.title && node.properties.title[window.language]) {
-                title = node.properties.title[window.language];
+       
+            if(node.id == Router.params.id) {
+                title = $('.field-container[data-key="title"] .field-editor input').val();
+
+            } else {
+                if(typeof node.title === 'string') {
+                    title = node.title;
+                } else if(node.properties && node.properties.title && node.properties.title[window.language]) {
+                    title = node.properties.title[window.language];
+                }
             }
 
             url += ContentHelper.getSlug(title) + '/';
