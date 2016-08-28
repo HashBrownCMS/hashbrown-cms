@@ -55,18 +55,16 @@ class JSONEditor extends View {
     onClickSave() {
         let view = this;
 
-        try {
-            this.model = JSON.parse(this.value);
-
+        if(this.debug()) {
             apiCall('post', this.apiPath, this.model)
             .then(this.onSuccess)
             .catch(this.onError);
-
-        } catch(e) {
+       
+        } else {
             new MessageModal({
                 model: {
-                    title: 'Invalid JSON',
-                    body: e
+                    title: 'Unable to save',
+                    body: 'Please refer to the error prompt for details'
                 }
             });
 
@@ -90,20 +88,73 @@ class JSONEditor extends View {
     }
 
     /**
-     * Event: Change text. Make sure the value is up to date
+     * Debug the JSON string
      */
-    onChangeText($textarea, e) {
-        this.value = $textarea.val();
+    debug() {
+        // Function for recursing through object
+        let recurse = (obj, check) => {
+            if(obj instanceof Object) {
+                for(let k in obj) {
+                    let v = obj[k];
 
+                    let failMessage = check(k, v);
+                    
+                    if(failMessage != true) {
+                        this.$error.children('.panel-heading').html('Schema error');
+                        this.$error.children('.panel-body').html(failMessage);
+                        this.$error.show();
+                    
+                        return false;
+                    };
+
+                    recurse(v, check);
+                }
+
+                return false;
+            }
+
+            return true;
+        }
+        
+        // Hide error message initially
+        this.$error.hide();
+
+        // Syntax check
         try {
             this.model = JSON.parse(this.value);
-            this.$error.hide();
 
         } catch(e) {
             this.$error.children('.panel-heading').html('JSON error');
             this.$error.children('.panel-body').html(e);
             this.$error.show();
+
+            return false;
         }
+
+        // Schema check
+        return recurse(this.model, (k, v) => {
+            switch(k) {
+                case 'schemaId': case 'parentSchemaId':
+                    for(let id in resources.schemas) {
+                        if(id == v) {
+                            return true;
+                        }
+                    }   
+
+                    return 'Schema "' + v + '" not found';
+            }
+
+            return true;
+        });
+    }
+
+    /**
+     * Event: Change text. Make sure the value is up to date
+     */
+    onChangeText($textarea, e) {
+        this.value = $textarea.val();
+
+        this.debug();
     }
 
     render() {
