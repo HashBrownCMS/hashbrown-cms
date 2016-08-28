@@ -36384,7 +36384,7 @@ class JSONEditor extends View {
     /**
      * Event: Change text. Make sure the value is up to date
      */
-    onChangeText($textarea) {
+    onChangeText($textarea, e) {
         this.value = $textarea.val();
 
         try {
@@ -36400,8 +36400,12 @@ class JSONEditor extends View {
     render() {
         this.value = beautify(JSON.stringify(this.model));
 
-        this.$element.html([_.textarea({ class: 'flex-expand', disabled: this.model.locked }, this.value).on('keyup change propertychange paste', e => {
-            this.onChangeText(this.$element.find('textarea'));
+        this.$element.html([_.textarea({ class: 'flex-expand', disabled: this.model.locked }, this.value).on('keydown', e => {
+            if (e.which == 9) {
+                e.preventDefault();return false;
+            }
+        }).on('keyup change propertychange paste', e => {
+            return this.onChangeText(this.$element.find('textarea'), e);
         }), this.$error, _.div({ class: 'panel panel-default panel-buttons' }, _.button({ class: 'btn btn-default btn-raised' }, _.span('{ }')).click(() => {
             this.onClickBeautify();
         }), _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-embedded' }, 'Basic').click(() => {
@@ -37086,10 +37090,10 @@ class SchemaEditor extends View {
     }
 
     render() {
-        SchemaHelper.getSchemaWithParentValues(this.model.parentSchemaId).then(parentSchema => {
+        SchemaHelper.getSchemaWithParentFields(this.model.parentSchemaId).then(parentSchema => {
             this.parentSchema = parentSchema;
 
-            SchemaHelper.getSchemaWithParentValues(this.model.id).then(compiledSchema => {
+            SchemaHelper.getSchemaWithParentFields(this.model.id).then(compiledSchema => {
                 this.compiledSchema = compiledSchema;
 
                 _.append(this.$element.empty(), this.renderFields(), _.div({ class: 'panel panel-default panel-buttons' }, _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-embedded' }, 'Advanced').click(() => {
@@ -40188,13 +40192,13 @@ let ContentSchema = require('../models/ContentSchema');
  */
 class SchemaHelper {
     /**
-     * Gets all parent values
+     * Gets all parent fields
      *
      * @param {String} id
      *
      * @returns {Promise(Schema)} schema
      */
-    static getSchemaWithParentValues(id) {
+    static getSchemaWithParentFields(id) {
         return new Promise(callback => {
             callback();
         });

@@ -92,7 +92,7 @@ class JSONEditor extends View {
     /**
      * Event: Change text. Make sure the value is up to date
      */
-    onChangeText($textarea) {
+    onChangeText($textarea, e) {
         this.value = $textarea.val();
 
         try {
@@ -112,7 +112,9 @@ class JSONEditor extends View {
         this.$element.html([
             _.textarea({class: 'flex-expand', disabled: this.model.locked},
                 this.value
-            ).on('keyup change propertychange paste', (e) => { this.onChangeText(this.$element.find('textarea')); }),
+            )
+            .on('keydown', (e) => { if(e.which == 9) { e.preventDefault(); return false; } })
+            .on('keyup change propertychange paste', (e) => { return this.onChangeText(this.$element.find('textarea'), e); }),
             this.$error,
             _.div({class: 'panel panel-default panel-buttons'}, 
                 _.button({class: 'btn btn-default btn-raised'},

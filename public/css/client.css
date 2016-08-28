@@ -533,6 +533,8 @@ body {
   width: 100%;
   height: 100%; }
   .json-editor textarea {
+    color: #eeeeee;
+    background-color: #212121;
     font-family: 'Roboto Mono';
     overflow: auto;
     display: block;

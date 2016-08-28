@@ -3,6 +3,8 @@
     height: 100%;
 
     textarea {
+        color: material-color('grey', '200');        
+        background-color: material-color('grey', '900');        
         font-family: 'Roboto Mono';
         overflow: auto;
         display: block;

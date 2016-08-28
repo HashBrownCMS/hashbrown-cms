@@ -9,13 +9,13 @@ let ContentSchema = require('../models/ContentSchema');
  */
 class SchemaHelper {
     /**
-     * Gets all parent values
+     * Gets all parent fields
      *
      * @param {String} id
      *
      * @returns {Promise(Schema)} schema
      */
-    static getSchemaWithParentValues(id) {
+    static getSchemaWithParentFields(id) {
         return new Promise((callback) => {
             callback();
         });

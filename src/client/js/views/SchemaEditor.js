@@ -530,11 +530,11 @@ class SchemaEditor extends View {
     }
 
     render() {
-        SchemaHelper.getSchemaWithParentValues(this.model.parentSchemaId)
+        SchemaHelper.getSchemaWithParentFields(this.model.parentSchemaId)
         .then((parentSchema) => {
             this.parentSchema = parentSchema;
 
-            SchemaHelper.getSchemaWithParentValues(this.model.id)
+            SchemaHelper.getSchemaWithParentFields(this.model.id)
             .then((compiledSchema) => {
                 this.compiledSchema = compiledSchema;
                 
