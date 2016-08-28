@@ -379,7 +379,7 @@ class ContentEditor extends View {
     }
 
     render() {
-        SchemaHelper.getSchemaWithParentValues(this.model.schemaId)
+        SchemaHelper.getSchemaWithParentFields(this.model.schemaId)
         .then((contentSchema) => {
             if(contentSchema) {
                 if(!this.model.properties) {

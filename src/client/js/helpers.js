@@ -134,6 +134,7 @@ window.apiUrl = function apiUrl(url) {
  */
 window.apiCall = function apiCall(method, url, data) {
     return new Promise((resolve, reject) => {
+
         var xhr = new XMLHttpRequest();
         xhr.open(method.toUpperCase(), apiUrl(url));
         xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');

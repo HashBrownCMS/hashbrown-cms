@@ -36,8 +36,11 @@ class SchemaController extends ApiController {
      */
     static getSchema(req, res) {
         let id = req.params.id;
+        let getter = req.query.withParentFields ? 
+            SchemaHelper.getSchemaWithParentFields :
+            SchemaHelper.getSchema;
 
-        SchemaHelper.getSchema(id)
+        getter(id)    
         .then((schema) => {
             res.status(200).send(schema);
         })

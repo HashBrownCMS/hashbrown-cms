@@ -17,7 +17,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
     }
     
     /**
-     * Gets a connection by id
+     * Gets a Connection by id
      *
      * @param {string} id
      *
@@ -34,7 +34,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
                 }
             }
 
-            reject(new Error('No connection by id "' + id + '" was found'));
+            reject(new Error('No Connection by id "' + id + '" was found'));
         });
     }
 }
