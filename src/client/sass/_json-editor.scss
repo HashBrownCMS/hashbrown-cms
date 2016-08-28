@@ -1,14 +1,56 @@
 .json-editor {
     width: 100%;
     height: 100%;
+    position: relative;
+    
+    .editor-container {
+        flex-grow: 1;
+        display: flex;
 
-    textarea {
-        color: material-color('grey', '200');        
-        background-color: material-color('grey', '900');        
-        font-family: 'Roboto Mono';
-        overflow: auto;
-        display: block;
+        .line-numbers, textarea {
+            line-height: 1.25em;  
+            font-family: monospace;
+            padding: 0px;
+        }
+
+        .line-numbers {
+            flex-shrink: 0;
+            color: material-color('grey', '300');        
+            background-color: material-color('grey', '800');        
+            padding: 0px 10px;
+        }
+
+        textarea {
+            color: material-color('grey', '200');        
+            background-color: material-color('grey', '900');        
+            font-family: 'Roboto Mono';
+            overflow: auto;
+            display: block;
+            border: 0px;
+            resize: none;
+            flex-grow: 1;
+        }
+    }
+
+    .panel-danger {
+        position: absolute;
+        bottom: 5rem;
+        width: calc(100% - 2rem);
+        left: 1rem;
+        border-radius: 0px;
         border: 0px;
-        resize: none;
+
+        .panel-heading {
+            border-radius: 0px;
+            border: 0px;
+            background-color: material-color('red', '500');
+            color: #fff;
+            font-weight: 700;
+        }
+
+        .panel-body {
+            border-radius: 0px;
+            border: 0px;
+        }
     }
 }

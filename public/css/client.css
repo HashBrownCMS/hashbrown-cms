@@ -482,8 +482,6 @@ body {
             height: 200px;
             resize: none;
             overflow: hidden; }
-    .cms-container .workspace .panel-danger {
-      margin: 0px; }
     .cms-container .workspace .panel-buttons {
       flex-shrink: 0;
       padding: 15px;
@@ -531,15 +529,45 @@ body {
 
 .json-editor {
   width: 100%;
-  height: 100%; }
-  .json-editor textarea {
-    color: #eeeeee;
-    background-color: #212121;
-    font-family: 'Roboto Mono';
-    overflow: auto;
-    display: block;
-    border: 0px;
-    resize: none; }
+  height: 100%;
+  position: relative; }
+  .json-editor .editor-container {
+    flex-grow: 1;
+    display: flex; }
+    .json-editor .editor-container .line-numbers, .json-editor .editor-container textarea {
+      line-height: 1.25em;
+      font-family: monospace;
+      padding: 0px; }
+    .json-editor .editor-container .line-numbers {
+      flex-shrink: 0;
+      color: #e0e0e0;
+      background-color: #424242;
+      padding: 0px 10px; }
+    .json-editor .editor-container textarea {
+      color: #eeeeee;
+      background-color: #212121;
+      font-family: 'Roboto Mono';
+      overflow: auto;
+      display: block;
+      border: 0px;
+      resize: none;
+      flex-grow: 1; }
+  .json-editor .panel-danger {
+    position: absolute;
+    bottom: 5rem;
+    width: calc(100% - 2rem);
+    left: 1rem;
+    border-radius: 0px;
+    border: 0px; }
+    .json-editor .panel-danger .panel-heading {
+      border-radius: 0px;
+      border: 0px;
+      background-color: #f44336;
+      color: #fff;
+      font-weight: 700; }
+    .json-editor .panel-danger .panel-body {
+      border-radius: 0px;
+      border: 0px; }
 
 .struct-editor .kvp {
   display: flex;

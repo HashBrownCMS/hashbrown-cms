@@ -151,8 +151,16 @@ class JSONEditor extends View {
     /**
      * Event: Change text. Make sure the value is up to date
      */
-    onChangeText($textarea, e) {
-        this.value = $textarea.val();
+    onChangeText() {
+        this.value = this.$element.find('textarea').val();
+
+        let $lineNumbers = this.$element.find('.line-numbers');
+
+        $lineNumbers.empty();
+
+        for(let i = 0; i < this.value.split(/\r\n|\r|\n/).length; i++) {
+            $lineNumbers.append(i + '<br />');
+        }
 
         this.debug();
     }
@@ -161,12 +169,15 @@ class JSONEditor extends View {
         this.value = beautify(JSON.stringify(this.model));
 
         this.$element.html([
-            _.textarea({class: 'flex-expand', disabled: this.model.locked},
-                this.value
-            )
-            .on('keydown', (e) => { if(e.which == 9) { e.preventDefault(); return false; } })
-            .on('keyup change propertychange paste', (e) => { return this.onChangeText(this.$element.find('textarea'), e); }),
-            this.$error,
+            _.div({class: 'editor-container'},
+                _.div({class: 'line-numbers'}),
+                _.textarea({class: 'flex-expand', disabled: this.model.locked},
+                    this.value
+                )
+                .on('keydown', (e) => { if(e.which == 9) { e.preventDefault(); return false; } })
+                .on('keyup change propertychange paste', (e) => { return this.onChangeText(); }),
+                this.$error
+            ),
             _.div({class: 'panel panel-default panel-buttons'}, 
                 _.button({class: 'btn btn-default btn-raised'},
                     _.span('{ }')
@@ -183,6 +194,8 @@ class JSONEditor extends View {
                 )
             )
         ]);
+
+        this.onChangeText();
     }
 }
 
