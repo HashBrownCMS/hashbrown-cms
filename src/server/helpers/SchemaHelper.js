@@ -17,7 +17,7 @@ class SchemaHelper extends SchemaHelperCommon {
     /**
      * Gets a list of native schema objects
      *
-     * @returns {Promise(Schema[])} schemas
+     * @returns {Promise} Array of Schemas
      */
     static getNativeSchemas() {
         return new Promise(function(resolve, reject) {
@@ -98,7 +98,7 @@ class SchemaHelper extends SchemaHelperCommon {
     /**
      * Gets a list of all custom schema objects
      *
-     * @returns {Promise(Schema[])} schemas
+     * @returns {Promise} Array of Schemas
      */
     static getCustomSchemas() {
         let collection = ProjectHelper.currentEnvironment + '.schemas';
@@ -131,7 +131,7 @@ class SchemaHelper extends SchemaHelperCommon {
     /**
      * Gets a list of all schema objects
      *
-     * @returns {Promise(Schema[])} schemas
+     * @returns {Promise} Array of Schemas
      */
     static getAllSchemas() {
         return new Promise((callback) => {
@@ -187,7 +187,7 @@ class SchemaHelper extends SchemaHelperCommon {
      *
      * @param {String} id
      *
-     * @returns {Promise(Schema)} schema
+     * @returns {Promise} Schema
      */
     static getNativeSchema(id) {
         return new Promise((resolve, reject) => {
@@ -224,7 +224,7 @@ class SchemaHelper extends SchemaHelperCommon {
      *
      * @param {Number} id
      *
-     * @return {Promise(Schema)} schema
+     * @return {Promise} Schema
      */
     static getSchema(id) {
         let collection = ProjectHelper.currentEnvironment + '.schemas';
@@ -264,6 +264,8 @@ class SchemaHelper extends SchemaHelperCommon {
      *
      * @param Schema childSchema
      * @param Schema parentSchema
+     *
+     * @returns {Schema} Merged Schema
      */
     static mergeSchemas(childSchema, parentSchema) {
         let mergedSchema = parentSchema;
@@ -325,7 +327,7 @@ class SchemaHelper extends SchemaHelperCommon {
      *
      * @param {String} id
      *
-     * @returns {Promise(Schema)} schema
+     * @returns {Promise} Schema with all aprent fields
      */
     static getSchemaWithParentFields(id) {
         return new Promise((resolve, reject) => {
@@ -360,7 +362,7 @@ class SchemaHelper extends SchemaHelperCommon {
      *
      * @param {Number} id
      *
-     * @return {Promise} promise
+     * @return {Promise} Promise
      */
     static removeSchema(id) {
         let collection = ProjectHelper.currentEnvironment + '.schemas';
@@ -380,7 +382,7 @@ class SchemaHelper extends SchemaHelperCommon {
      * @param {Number} id
      * @param {Object} schema
      *
-     * @return {Promise} promise
+     * @return {Promise} Promise
      */
     static setSchema(id, schema) {
         let collection = ProjectHelper.currentEnvironment + '.schemas';
@@ -403,7 +405,7 @@ class SchemaHelper extends SchemaHelperCommon {
      *
      * @param {Schema} parentSchema
      *
-     * @returns {Promise(Schema}) schema
+     * @returns {Promise} Created Schema
      */
     static createSchema(parentSchema) {
         let collection = ProjectHelper.currentEnvironment + '.schemas';
