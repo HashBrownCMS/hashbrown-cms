@@ -79,6 +79,13 @@
                 margin-bottom: 30px;
             }
 
+            .kvp {
+                .key {
+                    padding: 1em 1em 0em 0em;
+                    line-height: 1.25em;
+                }
+            }
+
             >.item-schema-selector {
                 clear: both;
                 display: flex;
@@ -88,7 +95,6 @@
                 .key {
                     width: 100px;
                     flex-shrink: 0;
-                    line-height: 34px;
                 }
 
                 .value {

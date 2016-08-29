@@ -533,7 +533,8 @@ body {
   position: relative; }
   .json-editor .editor-container {
     flex-grow: 1;
-    display: flex; }
+    display: flex;
+    position: relative; }
     .json-editor .editor-container .line-numbers, .json-editor .editor-container textarea {
       line-height: 1.25em;
       font-family: monospace;
@@ -552,13 +553,19 @@ body {
       border: 0px;
       resize: none;
       flex-grow: 1; }
+    .json-editor .editor-container .btn-prettify {
+      position: absolute;
+      top: calc(100% - 1em);
+      right: 1em;
+      transform: translateY(-100%); }
   .json-editor .panel-danger {
     position: absolute;
-    bottom: 5rem;
+    bottom: 0rem;
     width: calc(100% - 2rem);
     left: 1rem;
     border-radius: 0px;
-    border: 0px; }
+    border: 0px;
+    z-index: 20; }
     .json-editor .panel-danger .panel-heading {
       border-radius: 0px;
       border: 0px;
@@ -631,6 +638,9 @@ body {
       margin-top: 0px; }
     .array-editor .items .item:last-of-type {
       margin-bottom: 30px; }
+    .array-editor .items .item .kvp .key {
+      padding: 1em 1em 0em 0em;
+      line-height: 1.25em; }
     .array-editor .items .item > .item-schema-selector {
       clear: both;
       display: flex;
@@ -638,8 +648,7 @@ body {
       width: 100%; }
       .array-editor .items .item > .item-schema-selector .key {
         width: 100px;
-        flex-shrink: 0;
-        line-height: 34px; }
+        flex-shrink: 0; }
       .array-editor .items .item > .item-schema-selector .value {
         flex-grow: 1; }
     .array-editor .items .item > .field-editor {

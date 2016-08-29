@@ -36347,29 +36347,132 @@ class JSONEditor extends View {
      * Debug the JSON string
      */
     debug() {
+        let isValid = true;
+
+        // Function for checking model integrity
+        let check = (k, v) => {
+            switch (k) {
+                case 'schemaId':case 'parentSchemaId':
+                    for (let id in resources.schemas) {
+                        if (id == v) {
+                            return;
+                        }
+                    }
+
+                    return 'Schema "' + v + '" not found';
+
+                case 'schemaBindings':
+                    let invalidSchemas = v.slice(0);
+
+                    for (let r in resources.schemas) {
+                        let schema = resources.schemas[r];
+
+                        for (let b = invalidSchemas.length - 1; b >= 0; b--) {
+                            if (schema.id == invalidSchemas[b]) {
+                                invalidSchemas.splice(b, 1);
+                            }
+                        }
+                    }
+
+                    if (invalidSchemas.length > 0) {
+                        if (invalidSchemas.length == 1) {
+                            return 'Schema "' + invalidSchemas[0] + '" not found';
+                        } else {
+                            return 'Schemas "' + invalidSchemas.join(', ') + '" not found';
+                        }
+                    }
+
+                    break;
+
+                case 'connections':
+                    let invalidConnections = v.slice(0);
+
+                    for (let r in resources.connections) {
+                        let connection = resources.connections[r];
+
+                        for (let c = invalidConnections.length - 1; c >= 0; c--) {
+                            if (connection.id == invalidConnections[c]) {
+                                invalidConnections.splice(c, 1);
+                            }
+                        }
+                    }
+
+                    if (invalidConnections.length > 0) {
+                        if (invalidConnections.length == 1) {
+                            return 'Connection "' + invalidConnections[0] + '" not found';
+                        } else {
+                            return 'Connections "' + invalidConnections.join(', ') + '" not found';
+                        }
+                    }
+
+                    break;
+
+                case 'template':
+                    if (typeof v === 'string') {
+                        for (let id of resources.templates) {
+                            if (id == v) {
+                                return;
+                            }
+                        }
+
+                        for (let id of resources.sectionTemplates) {
+                            if (id == v) {
+                                return;
+                            }
+                        }
+
+                        return 'Template "' + v + '" not found';
+                    }
+
+                    break;
+
+                case 'config':
+                    if (v.allowedTemplates) {
+                        let invalidTemplates = v.allowedTemplates.slice(0);
+                        let resource = resources[v.resource || 'templates'];
+
+                        for (let r in resource) {
+                            for (let a = invalidTemplates.length - 1; a >= 0; a--) {
+                                if (resource[r] == invalidTemplates[a]) {
+                                    invalidTemplates.splice(a, 1);
+                                }
+                            }
+                        }
+
+                        if (invalidTemplates.length > 0) {
+                            if (invalidTemplates.length == 1) {
+                                return 'Template "' + invalidTemplates[0] + '" not found';
+                            } else {
+                                return 'Templates "' + invalidTemplates.join(', ') + '" not found';
+                            }
+                        }
+                    }
+
+                    break;
+            }
+
+            return;
+        };
+
         // Function for recursing through object
-        let recurse = (obj, check) => {
+        let recurse = obj => {
             if (obj instanceof Object) {
                 for (let k in obj) {
                     let v = obj[k];
 
                     let failMessage = check(k, v);
 
-                    if (failMessage != true) {
+                    if (failMessage) {
                         this.$error.children('.panel-heading').html('Schema error');
                         this.$error.children('.panel-body').html(failMessage);
                         this.$error.show();
 
-                        return false;
+                        isValid = false;
                     };
 
-                    recurse(v, check);
+                    recurse(v);
                 }
-
-                return false;
             }
-
-            return true;
         };
 
         // Hide error message initially
@@ -36383,24 +36486,13 @@ class JSONEditor extends View {
             this.$error.children('.panel-body').html(e);
             this.$error.show();
 
-            return false;
+            isValid = false;
         }
 
-        // Schema check
-        return recurse(this.model, (k, v) => {
-            switch (k) {
-                case 'schemaId':case 'parentSchemaId':
-                    for (let id in resources.schemas) {
-                        if (id == v) {
-                            return true;
-                        }
-                    }
+        // Integrity check
+        recurse(this.model);
 
-                    return 'Schema "' + v + '" not found';
-            }
-
-            return true;
-        });
+        return isValid;
     }
 
     /**
@@ -36429,9 +36521,9 @@ class JSONEditor extends View {
             }
         }).on('keyup change propertychange paste', e => {
             return this.onChangeText();
-        }), this.$error), _.div({ class: 'panel panel-default panel-buttons' }, _.button({ class: 'btn btn-default btn-raised' }, _.span('{ }')).click(() => {
+        }), this.$error, _.button({ class: 'btn btn-round btn-raised btn-prettify' }, '{ }').click(() => {
             this.onClickBeautify();
-        }), _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-embedded' }, 'Basic').click(() => {
+        })), _.div({ class: 'panel panel-default panel-buttons' }, _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-embedded' }, 'Basic').click(() => {
             this.onClickBasic();
         }), _.if(!this.model.locked, _.button({ class: 'btn btn-raised btn-success' }, 'Save ').click(() => {
             this.onClickSave();

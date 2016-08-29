@@ -6,6 +6,7 @@
     .editor-container {
         flex-grow: 1;
         display: flex;
+        position: relative;
 
         .line-numbers, textarea {
             line-height: 1.25em;  
@@ -30,15 +31,23 @@
             resize: none;
             flex-grow: 1;
         }
+
+        .btn-prettify {
+            position: absolute;
+            top: calc(100% - 1em);
+            right: 1em;
+            transform: translateY(-100%)
+        }
     }
 
     .panel-danger {
         position: absolute;
-        bottom: 5rem;
+        bottom: 0rem;
         width: calc(100% - 2rem);
         left: 1rem;
         border-radius: 0px;
         border: 0px;
+        z-index: 20;
 
         .panel-heading {
             border-radius: 0px;
