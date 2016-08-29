@@ -60,6 +60,37 @@ class ContentHelper {
     }
 
     /**
+     * Checks if a Schema type is allowed as a child of a Content object
+     *
+     * @param {String} parentId
+     * @param {String} childSchemaId
+     *
+     * @returns {Promise} Is the Content node allowed as a child
+     */
+    static isSchemaAllowedAsChild(parentId, childSchemaId) {
+        return new Promise((resolve, reject) => {
+            this.getContentById(parentId)
+            .then((parentContent) => {
+                SchemaHelper.getSchemaById(parentContent.schemaId)
+                .then((parentSchema) => {
+                    if(
+                        parentSchema.allowedChildSchemas.length > 0 &&
+                        parentSchema.allowedChildSchemas.indexOf(childSchemaId) < 0
+                    ) {
+                        reject(new Error('Content with Schema "' + childSchemaId + '" is not an allowed child of Content with Schema "' + parentSchema.id + '"'));
+                    
+                    } else {
+                        resolve();
+
+                    }
+                })
+                .catch(reject);
+            })
+            .catch(reject);
+        });
+    }
+
+    /**
      * Creates a new content object
      *
      * @return {Promise} promise

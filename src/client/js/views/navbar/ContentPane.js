@@ -11,7 +11,7 @@ class ContentPane extends Pane {
         let id = $('.context-menu-target-element').data('id');
 
         // This function should only exist if an item has been copied
-        navbar.onClickPasteContent = function onClickPasteContent() {
+        this.onClickPasteContent = function onClickPasteContent() {
             let parentId = $('.context-menu-target-element').data('id');
            
             apiCall('get', 'content/' + id)
@@ -49,7 +49,7 @@ class ContentPane extends Pane {
             ContentHelper.getContentById(cutId)
             .then((cutContent) => {
                 cutContent.parentId = parentId;
-               
+              
                 apiCall('post', 'content/' + cutId, cutContent)
                 .then(() => {
                     reloadResource('content')

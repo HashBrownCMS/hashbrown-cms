@@ -30,7 +30,7 @@ class ContentController extends ApiController {
             res.send(nodes);
         })
         .catch((e) => {
-            res.status(502).send(e.message);
+            res.status(502).send(ApiController.error(e));
         });
     }
 
@@ -48,7 +48,7 @@ class ContentController extends ApiController {
                 res.status(200).send(node);
             })
             .catch((e) => {
-                res.status(502).send(e.message);
+                res.status(502).send(ApiController.error(e));
             });
         
         } else {
@@ -64,13 +64,13 @@ class ContentController extends ApiController {
      */
     static createContent(req, res) {
         let parentId = req.query.parent;
-        
+
         ContentHelper.createContent(parentId)
         .then((node) => {
             res.status(200).send(node);
         })
         .catch((e) => {
-            res.status(502).send(e.message);
+            res.status(502).send(ApiController.error(e));
         });
     }
 
@@ -86,7 +86,7 @@ class ContentController extends ApiController {
             res.status(200).send(node);
         })
         .catch((e) => {
-            res.status(502).send(e.message);   
+            res.status(502).send(ApiController.error(e));   
         });
     }
    
@@ -101,7 +101,7 @@ class ContentController extends ApiController {
             res.status(200).send(req.body);
         })
         .catch((e) => {
-            res.status(502).send(e.message);   
+            res.status(502).send(ApiController.error(e));   
         });
     }
     
@@ -116,7 +116,7 @@ class ContentController extends ApiController {
             res.status(200).send(content);
         })
         .catch((e) => {
-            res.status(502).send(e.message);
+            res.status(502).send(ApiController.error(e));
         });
     }
 
@@ -132,7 +132,7 @@ class ContentController extends ApiController {
             res.status(200).send(id);
         })
         .catch((e) => {
-            res.status(502).send(e.message);
+            res.status(502).send(ApiController.error(e));
         });
     }
 }

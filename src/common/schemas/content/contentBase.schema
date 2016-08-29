@@ -13,10 +13,6 @@
             "label": "Updated at",
             "schemaId": "date"
         },
-        "parentId": {
-            "label": "Parent",
-            "schemaId": "contentReference"
-        },
         "schemaId": {
             "label": "Schema",
             "schemaId": "contentSchemaReference"

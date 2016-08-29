@@ -12,6 +12,7 @@ class ContentSchema extends Schema {
         this.def(String, 'defaultTabId');
         this.def(Object, 'tabs', {});
         this.def(Object, 'fields', {});
+        this.def(Array, 'allowedChildSchemas', []);
 
         this.name = 'New content schema';
         this.type = 'content';

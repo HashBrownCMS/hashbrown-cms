@@ -49,6 +49,7 @@ Entity.prototype._createNamed = function createNamed(base) {
 };
 
 Entity.prototype._getDecoder = function _getDecoder(enc) {
+  enc = enc || 'der';
   // Lazily create decoder
   if (!this.decoders.hasOwnProperty(enc))
     this.decoders[enc] = this._createNamed(asn1.decoders[enc]);
@@ -60,6 +61,7 @@ Entity.prototype.decode = function decode(data, enc, options) {
 };
 
 Entity.prototype._getEncoder = function _getEncoder(enc) {
+  enc = enc || 'der';
   // Lazily create encoder
   if (!this.encoders.hasOwnProperty(enc))
     this.encoders[enc] = this._createNamed(asn1.encoders[enc]);
@@ -70,7 +72,7 @@ Entity.prototype.encode = function encode(data, enc, /* internal */ reporter) {
   return this._getEncoder(enc).encode(data, reporter);
 };
 
-},{"../asn1":1,"inherits":101,"vm":153}],3:[function(require,module,exports){
+},{"../asn1":1,"inherits":101,"vm":155}],3:[function(require,module,exports){
 var inherits = require('inherits');
 var Reporter = require('../base').Reporter;
 var Buffer = require('buffer').Buffer;
@@ -188,7 +190,7 @@ EncoderBuffer.prototype.join = function join(out, offset) {
   return out;
 };
 
-},{"../base":4,"buffer":46,"inherits":101}],4:[function(require,module,exports){
+},{"../base":4,"buffer":47,"inherits":101}],4:[function(require,module,exports){
 var base = exports;
 
 base.Reporter = require('./reporter').Reporter;
@@ -262,7 +264,7 @@ module.exports = Node;
 var stateProps = [
   'enc', 'parent', 'children', 'tag', 'args', 'reverseArgs', 'choice',
   'optional', 'any', 'obj', 'use', 'alteredUse', 'key', 'default', 'explicit',
-  'implicit'
+  'implicit', 'contains'
 ];
 
 Node.prototype.clone = function clone() {
@@ -467,17 +469,17 @@ Node.prototype.contains = function contains(item) {
 // Decoding
 //
 
-Node.prototype._decode = function decode(input) {
+Node.prototype._decode = function decode(input, options) {
   var state = this._baseState;
 
   // Decode root node
   if (state.parent === null)
-    return input.wrapResult(state.children[0]._decode(input));
+    return input.wrapResult(state.children[0]._decode(input, options));
 
   var result = state['default'];
   var present = true;
 
-  var prevKey;
+  var prevKey = null;
   if (state.key !== null)
     prevKey = input.enterKey(state.key);
 
@@ -496,9 +498,9 @@ Node.prototype._decode = function decode(input) {
       var save = input.save();
       try {
         if (state.choice === null)
-          this._decodeGeneric(state.tag, input);
+          this._decodeGeneric(state.tag, input, options);
         else
-          this._decodeChoice(input);
+          this._decodeChoice(input, options);
         present = true;
       } catch (e) {
         present = false;
@@ -526,6 +528,8 @@ Node.prototype._decode = function decode(input) {
       input = explicit;
     }
 
+    var start = input.offset;
+
     // Unwrap implicit and normal values
     if (state.use === null && state.choice === null) {
       if (state.any)
@@ -544,13 +548,19 @@ Node.prototype._decode = function decode(input) {
         input = body;
     }
 
+    if (options && options.track && state.tag !== null)
+      options.track(input.path(), start, input.length, 'tagged');
+
+    if (options && options.track && state.tag !== null)
+      options.track(input.path(), input.offset, input.length, 'content');
+
     // Select proper method for tag
     if (state.any)
       result = result;
     else if (state.choice === null)
-      result = this._decodeGeneric(state.tag, input);
+      result = this._decodeGeneric(state.tag, input, options);
     else
-      result = this._decodeChoice(input);
+      result = this._decodeChoice(input, options);
 
     if (input.isError(result))
       return result;
@@ -560,14 +570,15 @@ Node.prototype._decode = function decode(input) {
       state.children.forEach(function decodeChildren(child) {
         // NOTE: We are ignoring errors here, to let parser continue with other
         // parts of encoded data
-        child._decode(input);
+        child._decode(input, options);
       });
     }
 
     // Decode contained/encoded by schema, only in bit or octet strings
     if (state.contains && (state.tag === 'octstr' || state.tag === 'bitstr')) {
       var data = new DecoderBuffer(result);
-      result = this._getUse(state.contains, input._reporterState.obj)._decode(data);
+      result = this._getUse(state.contains, input._reporterState.obj)
+          ._decode(data, options);
     }
   }
 
@@ -578,37 +589,40 @@ Node.prototype._decode = function decode(input) {
   // Set key
   if (state.key !== null && (result !== null || present === true))
     input.leaveKey(prevKey, state.key, result);
+  else if (prevKey !== null)
+    input.exitKey(prevKey);
 
   return result;
 };
 
-Node.prototype._decodeGeneric = function decodeGeneric(tag, input) {
+Node.prototype._decodeGeneric = function decodeGeneric(tag, input, options) {
   var state = this._baseState;
 
   if (tag === 'seq' || tag === 'set')
     return null;
   if (tag === 'seqof' || tag === 'setof')
-    return this._decodeList(input, tag, state.args[0]);
+    return this._decodeList(input, tag, state.args[0], options);
   else if (/str$/.test(tag))
-    return this._decodeStr(input, tag);
+    return this._decodeStr(input, tag, options);
   else if (tag === 'objid' && state.args)
-    return this._decodeObjid(input, state.args[0], state.args[1]);
+    return this._decodeObjid(input, state.args[0], state.args[1], options);
   else if (tag === 'objid')
-    return this._decodeObjid(input, null, null);
+    return this._decodeObjid(input, null, null, options);
   else if (tag === 'gentime' || tag === 'utctime')
-    return this._decodeTime(input, tag);
+    return this._decodeTime(input, tag, options);
   else if (tag === 'null_')
-    return this._decodeNull(input);
+    return this._decodeNull(input, options);
   else if (tag === 'bool')
-    return this._decodeBool(input);
+    return this._decodeBool(input, options);
   else if (tag === 'int' || tag === 'enum')
-    return this._decodeInt(input, state.args && state.args[0]);
-  else if (state.use !== null)
-    return this._getUse(state.use, input._reporterState.obj)._decode(input);
-  else
-    return input.error('unknown tag: ' + tag);
+    return this._decodeInt(input, state.args && state.args[0], options);
 
-  return null;
+  if (state.use !== null) {
+    return this._getUse(state.use, input._reporterState.obj)
+        ._decode(input, options);
+  } else {
+    return input.error('unknown tag: ' + tag);
+  }
 };
 
 Node.prototype._getUse = function _getUse(entity, obj) {
@@ -625,7 +639,7 @@ Node.prototype._getUse = function _getUse(entity, obj) {
   return state.useDecoder;
 };
 
-Node.prototype._decodeChoice = function decodeChoice(input) {
+Node.prototype._decodeChoice = function decodeChoice(input, options) {
   var state = this._baseState;
   var result = null;
   var match = false;
@@ -634,7 +648,7 @@ Node.prototype._decodeChoice = function decodeChoice(input) {
     var save = input.save();
     var node = state.choice[key];
     try {
-      var value = node._decode(input);
+      var value = node._decode(input, options);
       if (input.isError(value))
         return false;
 
@@ -684,7 +698,6 @@ Node.prototype._encodeValue = function encode(data, reporter, parent) {
     return state.children[0]._encode(data, reporter || new Reporter());
 
   var result = null;
-  var present = true;
 
   // Set reporter to share it with a child class
   this.reporter = reporter;
@@ -696,9 +709,6 @@ Node.prototype._encodeValue = function encode(data, reporter, parent) {
     else
       return;
   }
-
-  // For error reporting
-  var prevKey;
 
   // Encode children first
   var content = null;
@@ -853,12 +863,22 @@ Reporter.prototype.enterKey = function enterKey(key) {
   return this._reporterState.path.push(key);
 };
 
-Reporter.prototype.leaveKey = function leaveKey(index, key, value) {
+Reporter.prototype.exitKey = function exitKey(index) {
   var state = this._reporterState;
 
   state.path = state.path.slice(0, index - 1);
+};
+
+Reporter.prototype.leaveKey = function leaveKey(index, key, value) {
+  var state = this._reporterState;
+
+  this.exitKey(index);
   if (state.obj !== null)
     state.obj[key] = value;
+};
+
+Reporter.prototype.path = function path() {
+  return this._reporterState.path.join('/');
 };
 
 Reporter.prototype.enterObject = function enterObject() {
@@ -918,8 +938,17 @@ inherits(ReporterError, Error);
 
 ReporterError.prototype.rethrow = function rethrow(msg) {
   this.message = msg + ' at: ' + (this.path || '(shallow)');
-  Error.captureStackTrace(this, ReporterError);
+  if (Error.captureStackTrace)
+    Error.captureStackTrace(this, ReporterError);
 
+  if (!this.stack) {
+    try {
+      // IE only adds stack when thrown
+      throw new Error(this.message);
+    } catch (e) {
+      this.stack = e.stack;
+    }
+  }
   return this;
 };
 
@@ -1099,14 +1128,15 @@ DERNode.prototype._skipUntilEnd = function skipUntilEnd(buffer, fail) {
   }
 };
 
-DERNode.prototype._decodeList = function decodeList(buffer, tag, decoder) {
+DERNode.prototype._decodeList = function decodeList(buffer, tag, decoder,
+                                                    options) {
   var result = [];
   while (!buffer.isEmpty()) {
     var possibleEnd = this._peekTag(buffer, 'end');
     if (buffer.isError(possibleEnd))
       return possibleEnd;
 
-    var res = decoder.decode(buffer, 'der');
+    var res = decoder.decode(buffer, 'der', options);
     if (buffer.isError(res) && possibleEnd)
       break;
     result.push(res);
@@ -1321,7 +1351,6 @@ decoders.pem = require('./pem');
 var inherits = require('inherits');
 var Buffer = require('buffer').Buffer;
 
-var asn1 = require('../../asn1');
 var DERDecoder = require('./der');
 
 function PEMDecoder(entity) {
@@ -1369,13 +1398,12 @@ PEMDecoder.prototype.decode = function decode(data, options) {
   return DERDecoder.prototype.decode.call(this, input, options);
 };
 
-},{"../../asn1":1,"./der":9,"buffer":46,"inherits":101}],12:[function(require,module,exports){
+},{"./der":9,"buffer":47,"inherits":101}],12:[function(require,module,exports){
 var inherits = require('inherits');
 var Buffer = require('buffer').Buffer;
 
 var asn1 = require('../../asn1');
 var base = asn1.base;
-var bignum = asn1.bignum;
 
 // Import DER constants
 var der = asn1.constants.der;
@@ -1665,7 +1693,7 @@ function encodeTag(tag, primitive, cls, reporter) {
   return res;
 }
 
-},{"../../asn1":1,"buffer":46,"inherits":101}],13:[function(require,module,exports){
+},{"../../asn1":1,"buffer":47,"inherits":101}],13:[function(require,module,exports){
 var encoders = exports;
 
 encoders.der = require('./der');
@@ -1673,9 +1701,7 @@ encoders.pem = require('./pem');
 
 },{"./der":12,"./pem":14}],14:[function(require,module,exports){
 var inherits = require('inherits');
-var Buffer = require('buffer').Buffer;
 
-var asn1 = require('../../asn1');
 var DEREncoder = require('./der');
 
 function PEMEncoder(entity) {
@@ -1696,7 +1722,7 @@ PEMEncoder.prototype.encode = function encode(data, options) {
   return out.join('\n');
 };
 
-},{"../../asn1":1,"./der":12,"buffer":46,"inherits":101}],15:[function(require,module,exports){
+},{"./der":12,"inherits":101}],15:[function(require,module,exports){
 'use strict'
 
 exports.toByteArray = toByteArray
@@ -1878,7 +1904,7 @@ module.exports = [
  * 
  */
 /**
- * bluebird build version 3.3.3
+ * bluebird build version 3.4.3
  * Features enabled: core, race, call_get, generators, map, nodeify, promisify, props, reduce, settle, some, using, timers, filter, any, each
 */
 !function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.Promise=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof _dereq_=="function"&&_dereq_;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof _dereq_=="function"&&_dereq_;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
@@ -1913,6 +1939,7 @@ var Queue = _dereq_("./queue");
 var util = _dereq_("./util");
 
 function Async() {
+    this._customScheduler = false;
     this._isTickUsed = false;
     this._lateQueue = new Queue(16);
     this._normalQueue = new Queue(16);
@@ -1924,6 +1951,17 @@ function Async() {
     };
     this._schedule = schedule;
 }
+
+Async.prototype.setScheduler = function(fn) {
+    var prev = this._schedule;
+    this._schedule = fn;
+    this._customScheduler = true;
+    return prev;
+};
+
+Async.prototype.hasCustomScheduler = function() {
+    return this._customScheduler;
+};
 
 Async.prototype.enableTrampoline = function() {
     this._trampolineEnabled = true;
@@ -2280,7 +2318,7 @@ Promise.prototype["break"] = Promise.prototype.cancel = function() {
 
     var promise = this;
     var child = promise;
-    while (promise.isCancellable()) {
+    while (promise._isCancellable()) {
         if (!promise._cancelBy(child)) {
             if (child._isFollowing()) {
                 child._followee().cancel();
@@ -2291,7 +2329,7 @@ Promise.prototype["break"] = Promise.prototype.cancel = function() {
         }
 
         var parent = promise._cancellationParent;
-        if (parent == null || !parent.isCancellable()) {
+        if (parent == null || !parent._isCancellable()) {
             if (promise._isFollowing()) {
                 promise._followee().cancel();
             } else {
@@ -2300,6 +2338,7 @@ Promise.prototype["break"] = Promise.prototype.cancel = function() {
             break;
         } else {
             if (promise._isFollowing()) promise._followee().cancel();
+            promise._setWillBeCancelled();
             child = promise;
             promise = parent;
         }
@@ -2337,8 +2376,7 @@ Promise.prototype._cancelBranched = function() {
 };
 
 Promise.prototype._cancel = function() {
-    if (!this.isCancellable()) return;
-
+    if (!this._isCancellable()) return;
     this._setCancelled();
     async.invoke(this._cancelPromises, this, undefined);
 };
@@ -2349,6 +2387,10 @@ Promise.prototype._cancelPromises = function() {
 
 Promise.prototype._unsetOnCancel = function() {
     this._onCancelField = undefined;
+};
+
+Promise.prototype._isCancellable = function() {
+    return this.isPending() && !this._isCancelled();
 };
 
 Promise.prototype.isCancellable = function() {
@@ -2382,7 +2424,7 @@ Promise.prototype._invokeOnCancel = function() {
 };
 
 Promise.prototype._invokeInternalOnCancel = function() {
-    if (this.isCancellable()) {
+    if (this._isCancellable()) {
         this._doInvokeOnCancel(this._onCancel(), true);
         this._unsetOnCancel();
     }
@@ -2521,6 +2563,8 @@ var unhandledRejectionHandled;
 var possiblyUnhandledRejection;
 var bluebirdFramePattern =
     /[\\\/]bluebird[\\\/]js[\\\/](release|debug|instrumented)/;
+var nodeFramePattern = /\((?:timers\.js):\d+:\d+\)/;
+var parseLinePattern = /[\/<\(](.+?):(\d+):(\d+)\)?\s*$/;
 var stackFramePattern = null;
 var formatStack = null;
 var indentStackFrames = false;
@@ -2651,14 +2695,24 @@ Promise.hasLongStackTraces = function () {
 
 var fireDomEvent = (function() {
     try {
-        var event = document.createEvent("CustomEvent");
-        event.initCustomEvent("testingtheevent", false, true, {});
-        util.global.dispatchEvent(event);
-        return function(name, event) {
-            var domEvent = document.createEvent("CustomEvent");
-            domEvent.initCustomEvent(name.toLowerCase(), false, true, event);
-            return !util.global.dispatchEvent(domEvent);
-        };
+        if (typeof CustomEvent === "function") {
+            var event = new CustomEvent("CustomEvent");
+            util.global.dispatchEvent(event);
+            return function(name, event) {
+                var domEvent = new CustomEvent(name.toLowerCase(), event);
+                return !util.global.dispatchEvent(domEvent);
+            };
+        } else {
+            var event = document.createEvent("CustomEvent");
+            event.initCustomEvent("testingtheevent", false, true, {});
+            util.global.dispatchEvent(event);
+            return function(name, event) {
+                var domEvent = document.createEvent("CustomEvent");
+                domEvent.initCustomEvent(name.toLowerCase(), false, true,
+                    event);
+                return !util.global.dispatchEvent(domEvent);
+            };
+        }
     } catch (e) {}
     return function() {
         return false;
@@ -2815,7 +2869,7 @@ function cancellationExecute(executor, resolve, reject) {
 }
 
 function cancellationAttachCancellationCallback(onCancel) {
-    if (!this.isCancellable()) return this;
+    if (!this._isCancellable()) return this;
 
     var previousOnCancel = this._onCancel();
     if (previousOnCancel !== undefined) {
@@ -2903,10 +2957,44 @@ function checkForgottenReturns(returnValue, promiseCreated, name, promise,
     if (returnValue === undefined && promiseCreated !== null &&
         wForgottenReturn) {
         if (parent !== undefined && parent._returnedNonUndefined()) return;
+        if ((promise._bitField & 65535) === 0) return;
 
         if (name) name = name + " ";
+        var handlerLine = "";
+        var creatorLine = "";
+        if (promiseCreated._trace) {
+            var traceLines = promiseCreated._trace.stack.split("\n");
+            var stack = cleanStack(traceLines);
+            for (var i = stack.length - 1; i >= 0; --i) {
+                var line = stack[i];
+                if (!nodeFramePattern.test(line)) {
+                    var lineMatches = line.match(parseLinePattern);
+                    if (lineMatches) {
+                        handlerLine  = "at " + lineMatches[1] +
+                            ":" + lineMatches[2] + ":" + lineMatches[3] + " ";
+                    }
+                    break;
+                }
+            }
+
+            if (stack.length > 0) {
+                var firstUserLine = stack[0];
+                for (var i = 0; i < traceLines.length; ++i) {
+
+                    if (traceLines[i] === firstUserLine) {
+                        if (i > 0) {
+                            creatorLine = "\n" + traceLines[i - 1];
+                        }
+                        break;
+                    }
+                }
+
+            }
+        }
         var msg = "a promise was created in a " + name +
-            "handler but was not returned from it";
+            "handler " + handlerLine + "but was not returned from it, " +
+            "see http://goo.gl/rRqMUw" +
+            creatorLine;
         promise._warn(msg, true, promiseCreated);
     }
 }
@@ -3367,7 +3455,7 @@ return {
 
 },{"./errors":12,"./util":36}],10:[function(_dereq_,module,exports){
 "use strict";
-module.exports = function(Promise) {
+module.exports = function(Promise, tryConvertToPromise) {
 function returner() {
     return this.value;
 }
@@ -3377,6 +3465,7 @@ function thrower() {
 
 Promise.prototype["return"] =
 Promise.prototype.thenReturn = function (value) {
+    value = tryConvertToPromise(value);
     if (value instanceof Promise) value.suppressUnhandledRejections();
     return this._then(
         returner, undefined, undefined, {value: value}, undefined);
@@ -3401,11 +3490,13 @@ Promise.prototype.catchThrow = function (reason) {
 
 Promise.prototype.catchReturn = function (value) {
     if (arguments.length <= 1) {
+        value = tryConvertToPromise(value);
         if (value instanceof Promise) value.suppressUnhandledRejections();
         return this._then(
             undefined, returner, undefined, {value: value}, undefined);
     } else {
         var _value = arguments[1];
+        _value = tryConvertToPromise(_value);
         if (_value instanceof Promise) _value.suppressUnhandledRejections();
         var handler = function() {return _value;};
         return this.caught(value, handler);
@@ -3720,7 +3811,7 @@ function finallyHandler(reasonOrValue) {
             var maybePromise = tryConvertToPromise(ret, promise);
             if (maybePromise instanceof Promise) {
                 if (this.cancelPromise != null) {
-                    if (maybePromise.isCancelled()) {
+                    if (maybePromise._isCancelled()) {
                         var reason =
                             new CancellationError("late cancellation observer");
                         promise._attachExtraTrace(reason);
@@ -3804,9 +3895,18 @@ function promiseFromYieldHandler(value, yieldHandlers, traceParent) {
 }
 
 function PromiseSpawn(generatorFunction, receiver, yieldHandler, stack) {
-    var promise = this._promise = new Promise(INTERNAL);
-    promise._captureStackTrace();
-    promise._setOnCancel(this);
+    if (debug.cancellation()) {
+        var internal = new Promise(INTERNAL);
+        var _finallyPromise = this._finallyPromise = new Promise(INTERNAL);
+        this._promise = internal.lastly(function() {
+            return _finallyPromise;
+        });
+        internal._captureStackTrace();
+        internal._setOnCancel(this);
+    } else {
+        var promise = this._promise = new Promise(INTERNAL);
+        promise._captureStackTrace();
+    }
     this._stack = stack;
     this._generatorFunction = generatorFunction;
     this._receiver = receiver;
@@ -3815,6 +3915,7 @@ function PromiseSpawn(generatorFunction, receiver, yieldHandler, stack) {
         ? [yieldHandler].concat(yieldHandlers)
         : yieldHandlers;
     this._yieldedPromise = null;
+    this._cancellationPhase = false;
 }
 util.inherits(PromiseSpawn, Proxyable);
 
@@ -3824,6 +3925,10 @@ PromiseSpawn.prototype._isResolved = function() {
 
 PromiseSpawn.prototype._cleanup = function() {
     this._promise = this._generator = null;
+    if (debug.cancellation() && this._finallyPromise !== null) {
+        this._finallyPromise._fulfill();
+        this._finallyPromise = null;
+    }
 };
 
 PromiseSpawn.prototype._promiseCancelled = function() {
@@ -3840,22 +3945,15 @@ PromiseSpawn.prototype._promiseCancelled = function() {
         result = tryCatch(this._generator["throw"]).call(this._generator,
                                                          reason);
         this._promise._popContext();
-        if (result === errorObj && result.e === reason) {
-            result = null;
-        }
     } else {
         this._promise._pushContext();
         result = tryCatch(this._generator["return"]).call(this._generator,
                                                           undefined);
         this._promise._popContext();
     }
-    var promise = this._promise;
-    this._cleanup();
-    if (result === errorObj) {
-        promise._rejectCallback(result.e, false);
-    } else {
-        promise.cancel();
-    }
+    this._cancellationPhase = true;
+    this._yieldedPromise = null;
+    this._continue(result);
 };
 
 PromiseSpawn.prototype._promiseFulfilled = function(value) {
@@ -3899,13 +3997,21 @@ PromiseSpawn.prototype._continue = function (result) {
     var promise = this._promise;
     if (result === errorObj) {
         this._cleanup();
-        return promise._rejectCallback(result.e, false);
+        if (this._cancellationPhase) {
+            return promise.cancel();
+        } else {
+            return promise._rejectCallback(result.e, false);
+        }
     }
 
     var value = result.value;
     if (result.done === true) {
         this._cleanup();
-        return promise._resolveCallback(value);
+        if (this._cancellationPhase) {
+            return promise.cancel();
+        } else {
+            return promise._resolveCallback(value);
+        }
     } else {
         var maybePromise = tryConvertToPromise(value, this._promise);
         if (!(maybePromise instanceof Promise)) {
@@ -3931,9 +4037,13 @@ PromiseSpawn.prototype._continue = function (result) {
             this._yieldedPromise = maybePromise;
             maybePromise._proxy(this, null);
         } else if (((bitField & 33554432) !== 0)) {
-            this._promiseFulfilled(maybePromise._value());
+            Promise._async.invoke(
+                this._promiseFulfilled, this, maybePromise._value()
+            );
         } else if (((bitField & 16777216) !== 0)) {
-            this._promiseRejected(maybePromise._reason());
+            Promise._async.invoke(
+                this._promiseRejected, this, maybePromise._reason()
+            );
         } else {
             this._promiseCancelled();
         }
@@ -4262,9 +4372,22 @@ function map(promises, fn, options, _filter) {
     if (typeof fn !== "function") {
         return apiRejection("expecting a function but got " + util.classString(fn));
     }
-    var limit = typeof options === "object" && options !== null
-        ? options.concurrency
-        : 0;
+
+    var limit = 0;
+    if (options !== undefined) {
+        if (typeof options === "object" && options !== null) {
+            if (typeof options.concurrency !== "number") {
+                return Promise.reject(
+                    new TypeError("'concurrency' must be a number but it is " +
+                                    util.classString(options.concurrency)));
+            }
+            limit = options.concurrency;
+        } else {
+            return Promise.reject(new TypeError(
+                            "options argument must be an object but it is " +
+                             util.classString(options)));
+        }
+    }
     limit = typeof limit === "number" &&
         isFinite(limit) && limit >= 1 ? limit : 0;
     return new MappingPromiseArray(promises, fn, limit, _filter).promise();
@@ -4548,7 +4671,8 @@ Promise.prototype.caught = Promise.prototype["catch"] = function (fn) {
             if (util.isObject(item)) {
                 catchInstances[j++] = item;
             } else {
-                return apiRejection("expecting an object but got " + util.classString(item));
+                return apiRejection("expecting an object but got " +
+                    "A catch statement predicate " + util.classString(item));
             }
         }
         catchInstances.length = j;
@@ -4618,6 +4742,8 @@ Promise.prototype.error = function (fn) {
     return this.caught(util.originatesFromRejection, fn);
 };
 
+Promise.getNewLibraryCopy = module.exports;
+
 Promise.is = function (val) {
     return val instanceof Promise;
 };
@@ -4663,9 +4789,7 @@ Promise.setScheduler = function(fn) {
     if (typeof fn !== "function") {
         throw new TypeError("expecting a function but got " + util.classString(fn));
     }
-    var prev = async._schedule;
-    async._schedule = fn;
-    return prev;
+    return async.setScheduler(fn);
 };
 
 Promise.prototype._then = function (
@@ -4773,7 +4897,12 @@ Promise.prototype._setCancelled = function() {
     this._fireEvent("promiseCancelled", this);
 };
 
+Promise.prototype._setWillBeCancelled = function() {
+    this._bitField = this._bitField | 8388608;
+};
+
 Promise.prototype._setAsyncGuaranteed = function() {
+    if (async.hasCustomScheduler()) return;
     this._bitField = this._bitField | 134217728;
 };
 
@@ -5173,26 +5302,27 @@ _dereq_("./method")(Promise, INTERNAL, tryConvertToPromise, apiRejection,
     debug);
 _dereq_("./bind")(Promise, INTERNAL, tryConvertToPromise, debug);
 _dereq_("./cancel")(Promise, PromiseArray, apiRejection, debug);
-_dereq_("./direct_resolve")(Promise);
+_dereq_("./direct_resolve")(Promise, tryConvertToPromise);
 _dereq_("./synchronous_inspection")(Promise);
 _dereq_("./join")(
     Promise, PromiseArray, tryConvertToPromise, INTERNAL, debug);
 Promise.Promise = Promise;
+Promise.version = "3.4.3";
 _dereq_('./map.js')(Promise, PromiseArray, apiRejection, tryConvertToPromise, INTERNAL, debug);
+_dereq_('./call_get.js')(Promise);
 _dereq_('./using.js')(Promise, apiRejection, tryConvertToPromise, createContext, INTERNAL, debug);
 _dereq_('./timers.js')(Promise, INTERNAL, debug);
 _dereq_('./generators.js')(Promise, apiRejection, INTERNAL, tryConvertToPromise, Proxyable, debug);
 _dereq_('./nodeify.js')(Promise);
-_dereq_('./call_get.js')(Promise);
+_dereq_('./promisify.js')(Promise, INTERNAL);
 _dereq_('./props.js')(Promise, PromiseArray, tryConvertToPromise, apiRejection);
 _dereq_('./race.js')(Promise, INTERNAL, tryConvertToPromise, apiRejection);
 _dereq_('./reduce.js')(Promise, PromiseArray, apiRejection, tryConvertToPromise, INTERNAL, debug);
 _dereq_('./settle.js')(Promise, PromiseArray, debug);
 _dereq_('./some.js')(Promise, PromiseArray, apiRejection);
-_dereq_('./promisify.js')(Promise, INTERNAL);
-_dereq_('./any.js')(Promise);
-_dereq_('./each.js')(Promise, INTERNAL);
 _dereq_('./filter.js')(Promise, INTERNAL);
+_dereq_('./each.js')(Promise, INTERNAL);
+_dereq_('./any.js')(Promise);
                                                          
     util.toFastProperties(Promise);                                          
     util.toFastProperties(Promise.prototype);                                
@@ -5347,7 +5477,7 @@ PromiseArray.prototype._resolve = function (value) {
 };
 
 PromiseArray.prototype._cancel = function() {
-    if (this._isResolved() || !this._promise.isCancellable()) return;
+    if (this._isResolved() || !this._promise._isCancellable()) return;
     this._values = null;
     this._promise._cancel();
 };
@@ -6154,12 +6284,19 @@ var schedule;
 var noAsyncScheduler = function() {
     throw new Error("No async scheduler available\u000a\u000a    See http://goo.gl/MqrFmX\u000a");
 };
+var NativePromise = util.getNativePromise();
 if (util.isNode && typeof MutationObserver === "undefined") {
     var GlobalSetImmediate = global.setImmediate;
     var ProcessNextTick = process.nextTick;
     schedule = util.isRecentNode
                 ? function(fn) { GlobalSetImmediate.call(global, fn); }
                 : function(fn) { ProcessNextTick.call(process, fn); };
+} else if (typeof NativePromise === "function" &&
+           typeof NativePromise.resolve === "function") {
+    var nativePromise = NativePromise.resolve();
+    schedule = function(fn) {
+        nativePromise.then(fn);
+    };
 } else if ((typeof MutationObserver !== "undefined") &&
           !(typeof window !== "undefined" &&
             window.navigator &&
@@ -6171,23 +6308,23 @@ if (util.isNode && typeof MutationObserver === "undefined") {
         var div2 = document.createElement("div");
         var o2 = new MutationObserver(function() {
             div.classList.toggle("foo");
-          toggleScheduled = false;
+            toggleScheduled = false;
         });
         o2.observe(div2, opts);
 
         var scheduleToggle = function() {
             if (toggleScheduled) return;
-          toggleScheduled = true;
-          div2.classList.toggle("foo");
-        };
+                toggleScheduled = true;
+                div2.classList.toggle("foo");
+            };
 
-        return function schedule(fn) {
-          var o = new MutationObserver(function() {
-            o.disconnect();
-            fn();
-          });
-          o.observe(div, opts);
-          scheduleToggle();
+            return function schedule(fn) {
+            var o = new MutationObserver(function() {
+                o.disconnect();
+                fn();
+            });
+            o.observe(div, opts);
+            scheduleToggle();
         };
     })();
 } else if (typeof setImmediate !== "undefined") {
@@ -6449,13 +6586,20 @@ var isResolved = PromiseInspection.prototype.isResolved = function () {
     return (this._bitField & 50331648) !== 0;
 };
 
-PromiseInspection.prototype.isCancelled =
-Promise.prototype._isCancelled = function() {
+PromiseInspection.prototype.isCancelled = function() {
+    return (this._bitField & 8454144) !== 0;
+};
+
+Promise.prototype.__isCancelled = function() {
     return (this._bitField & 65536) === 65536;
 };
 
+Promise.prototype._isCancelled = function() {
+    return this._target().__isCancelled();
+};
+
 Promise.prototype.isCancelled = function() {
-    return this._target()._isCancelled();
+    return (this._target()._bitField & 8454144) !== 0;
 };
 
 Promise.prototype.isPending = function() {
@@ -6545,7 +6689,11 @@ function getThen(obj) {
 
 var hasProp = {}.hasOwnProperty;
 function isAnyBluebirdPromise(obj) {
-    return hasProp.call(obj, "_promise0");
+    try {
+        return hasProp.call(obj, "_promise0");
+    } catch (e) {
+        return false;
+    }
 }
 
 function doThenable(x, then, context) {
@@ -6610,6 +6758,7 @@ var delay = Promise.delay = function (ms, value) {
         if (debug.cancellation()) {
             ret._setOnCancel(new HandleWrapper(handle));
         }
+        ret._captureStackTrace();
     }
     ret._setAsyncGuaranteed();
     return ret;
@@ -6683,6 +6832,7 @@ module.exports = function (Promise, apiRejection, tryConvertToPromise,
     var inherits = _dereq_("./util").inherits;
     var errorObj = util.errorObj;
     var tryCatch = util.tryCatch;
+    var NULL = {};
 
     function thrower(e) {
         setTimeout(function(){throw e;}, 0);
@@ -6743,14 +6893,14 @@ module.exports = function (Promise, apiRejection, tryConvertToPromise,
         if (this.promise().isFulfilled()) {
             return this.promise().value();
         }
-        return null;
+        return NULL;
     };
 
     Disposer.prototype.tryDispose = function(inspection) {
         var resource = this.resource();
         var context = this._context;
         if (context !== undefined) context._pushContext();
-        var ret = resource !== null
+        var ret = resource !== NULL
             ? this.doDispose(resource, inspection) : null;
         if (context !== undefined) context._popContext();
         this._promise._unsetDisposable();
@@ -7218,6 +7368,17 @@ function env(key, def) {
     return isNode ? process.env[key] : def;
 }
 
+function getNativePromise() {
+    if (typeof Promise === "function") {
+        try {
+            var promise = new Promise(function(){});
+            if ({}.toString.call(promise) === "[object Promise]") {
+                return Promise;
+            }
+        } catch (e) {}
+    }
+}
+
 var ret = {
     isClass: isClass,
     isIdentifier: isIdentifier,
@@ -7249,7 +7410,8 @@ var ret = {
                  typeof chrome.loadTimes === "function",
     isNode: isNode,
     env: env,
-    global: globalObject
+    global: globalObject,
+    getNativePromise: getNativePromise
 };
 ret.isRecentNode = ret.isNode && (function() {
     var version = process.versions.node.split(".").map(Number);
@@ -7265,7 +7427,7 @@ module.exports = ret;
 });                    ;if (typeof window !== 'undefined' && window !== null) {                               window.P = window.Promise;                                                     } else if (typeof self !== 'undefined' && self !== null) {                             self.P = self.Promise;                                                         }
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{"_process":119}],18:[function(require,module,exports){
+},{"_process":120}],18:[function(require,module,exports){
 (function (module, exports) {
   'use strict';
 
@@ -7323,8 +7485,12 @@ module.exports = ret;
   }
 
   BN.isBN = function isBN (num) {
+    if (num instanceof BN) {
+      return true;
+    }
+
     return num !== null && typeof num === 'object' &&
-      num.constructor.name === 'BN' && Array.isArray(num.words);
+      num.constructor.wordSize === BN.wordSize && Array.isArray(num.words);
   };
 
   BN.max = function max (left, right) {
@@ -7485,6 +7651,7 @@ module.exports = ret;
     for (i = number.length - 6, j = 0; i >= start; i -= 6) {
       w = parseHex(number, i, i + 6);
       this.words[j] |= (w << off) & 0x3ffffff;
+      // NOTE: `0x3fffff` is intentional here, 26bits max shift + 24bit hex limb
       this.words[j + 1] |= w >>> (26 - off) & 0x3fffff;
       off += 24;
       if (off >= 26) {
@@ -7759,16 +7926,13 @@ module.exports = ret;
   };
 
   BN.prototype.toNumber = function toNumber () {
-    var length = this.bitLength();
-    var ret;
-    if (length <= 26) {
-      ret = this.words[0];
-    } else if (length <= 52) {
-      ret = (this.words[1] * 0x4000000) + this.words[0];
-    } else if (length === 53) {
+    var ret = this.words[0];
+    if (this.length === 2) {
+      ret += this.words[1] * 0x4000000;
+    } else if (this.length === 3 && this.words[2] === 0x01) {
       // NOTE: at this stage it is known that the top bit is set
-      ret = 0x10000000000000 + (this.words[1] * 0x4000000) + this.words[0];
-    } else {
+      ret += 0x10000000000000 + (this.words[1] * 0x4000000);
+    } else if (this.length > 2) {
       assert(false, 'Number can only safely store up to 53 bits');
     }
     return (this.negative !== 0) ? -ret : ret;
@@ -8373,478 +8537,478 @@ module.exports = ret;
     /* k = 0 */
     lo = Math.imul(al0, bl0);
     mid = Math.imul(al0, bh0);
-    mid += Math.imul(ah0, bl0);
+    mid = (mid + Math.imul(ah0, bl0)) | 0;
     hi = Math.imul(ah0, bh0);
-    var w0 = c + lo + ((mid & 0x1fff) << 13);
-    c = hi + (mid >>> 13) + (w0 >>> 26);
+    var w0 = (((c + lo) | 0) + ((mid & 0x1fff) << 13)) | 0;
+    c = (((hi + (mid >>> 13)) | 0) + (w0 >>> 26)) | 0;
     w0 &= 0x3ffffff;
     /* k = 1 */
     lo = Math.imul(al1, bl0);
     mid = Math.imul(al1, bh0);
-    mid += Math.imul(ah1, bl0);
+    mid = (mid + Math.imul(ah1, bl0)) | 0;
     hi = Math.imul(ah1, bh0);
-    lo += Math.imul(al0, bl1);
-    mid += Math.imul(al0, bh1);
-    mid += Math.imul(ah0, bl1);
-    hi += Math.imul(ah0, bh1);
-    var w1 = c + lo + ((mid & 0x1fff) << 13);
-    c = hi + (mid >>> 13) + (w1 >>> 26);
+    lo = (lo + Math.imul(al0, bl1)) | 0;
+    mid = (mid + Math.imul(al0, bh1)) | 0;
+    mid = (mid + Math.imul(ah0, bl1)) | 0;
+    hi = (hi + Math.imul(ah0, bh1)) | 0;
+    var w1 = (((c + lo) | 0) + ((mid & 0x1fff) << 13)) | 0;
+    c = (((hi + (mid >>> 13)) | 0) + (w1 >>> 26)) | 0;
     w1 &= 0x3ffffff;
     /* k = 2 */
     lo = Math.imul(al2, bl0);
     mid = Math.imul(al2, bh0);
-    mid += Math.imul(ah2, bl0);
+    mid = (mid + Math.imul(ah2, bl0)) | 0;
     hi = Math.imul(ah2, bh0);
-    lo += Math.imul(al1, bl1);
-    mid += Math.imul(al1, bh1);
-    mid += Math.imul(ah1, bl1);
-    hi += Math.imul(ah1, bh1);
-    lo += Math.imul(al0, bl2);
-    mid += Math.imul(al0, bh2);
-    mid += Math.imul(ah0, bl2);
-    hi += Math.imul(ah0, bh2);
-    var w2 = c + lo + ((mid & 0x1fff) << 13);
-    c = hi + (mid >>> 13) + (w2 >>> 26);
+    lo = (lo + Math.imul(al1, bl1)) | 0;
+    mid = (mid + Math.imul(al1, bh1)) | 0;
+    mid = (mid + Math.imul(ah1, bl1)) | 0;
+    hi = (hi + Math.imul(ah1, bh1)) | 0;
+    lo = (lo + Math.imul(al0, bl2)) | 0;
+    mid = (mid + Math.imul(al0, bh2)) | 0;
+    mid = (mid + Math.imul(ah0, bl2)) | 0;
+    hi = (hi + Math.imul(ah0, bh2)) | 0;
+    var w2 = (((c + lo) | 0) + ((mid & 0x1fff) << 13)) | 0;
+    c = (((hi + (mid >>> 13)) | 0) + (w2 >>> 26)) | 0;
     w2 &= 0x3ffffff;
     /* k = 3 */
     lo = Math.imul(al3, bl0);
     mid = Math.imul(al3, bh0);
-    mid += Math.imul(ah3, bl0);
+    mid = (mid + Math.imul(ah3, bl0)) | 0;
     hi = Math.imul(ah3, bh0);
-    lo += Math.imul(al2, bl1);
-    mid += Math.imul(al2, bh1);
-    mid += Math.imul(ah2, bl1);
-    hi += Math.imul(ah2, bh1);
-    lo += Math.imul(al1, bl2);
-    mid += Math.imul(al1, bh2);
-    mid += Math.imul(ah1, bl2);
-    hi += Math.imul(ah1, bh2);
-    lo += Math.imul(al0, bl3);
-    mid += Math.imul(al0, bh3);
-    mid += Math.imul(ah0, bl3);
-    hi += Math.imul(ah0, bh3);
-    var w3 = c + lo + ((mid & 0x1fff) << 13);
-    c = hi + (mid >>> 13) + (w3 >>> 26);
+    lo = (lo + Math.imul(al2, bl1)) | 0;
+    mid = (mid + Math.imul(al2, bh1)) | 0;
+    mid = (mid + Math.imul(ah2, bl1)) | 0;
+    hi = (hi + Math.imul(ah2, bh1)) | 0;
+    lo = (lo + Math.imul(al1, bl2)) | 0;
+    mid = (mid + Math.imul(al1, bh2)) | 0;
+    mid = (mid + Math.imul(ah1, bl2)) | 0;
+    hi = (hi + Math.imul(ah1, bh2)) | 0;
+    lo = (lo + Math.imul(al0, bl3)) | 0;
+    mid = (mid + Math.imul(al0, bh3)) | 0;
+    mid = (mid + Math.imul(ah0, bl3)) | 0;
+    hi = (hi + Math.imul(ah0, bh3)) | 0;
+    var w3 = (((c + lo) | 0) + ((mid & 0x1fff) << 13)) | 0;
+    c = (((hi + (mid >>> 13)) | 0) + (w3 >>> 26)) | 0;
     w3 &= 0x3ffffff;
     /* k = 4 */
     lo = Math.imul(al4, bl0);
     mid = Math.imul(al4, bh0);
-    mid += Math.imul(ah4, bl0);
+    mid = (mid + Math.imul(ah4, bl0)) | 0;
     hi = Math.imul(ah4, bh0);
-    lo += Math.imul(al3, bl1);
-    mid += Math.imul(al3, bh1);
-    mid += Math.imul(ah3, bl1);
-    hi += Math.imul(ah3, bh1);
-    lo += Math.imul(al2, bl2);
-    mid += Math.imul(al2, bh2);
-    mid += Math.imul(ah2, bl2);
-    hi += Math.imul(ah2, bh2);
-    lo += Math.imul(al1, bl3);
-    mid += Math.imul(al1, bh3);
-    mid += Math.imul(ah1, bl3);
-    hi += Math.imul(ah1, bh3);
-    lo += Math.imul(al0, bl4);
-    mid += Math.imul(al0, bh4);
-    mid += Math.imul(ah0, bl4);
-    hi += Math.imul(ah0, bh4);
-    var w4 = c + lo + ((mid & 0x1fff) << 13);
-    c = hi + (mid >>> 13) + (w4 >>> 26);
+    lo = (lo + Math.imul(al3, bl1)) | 0;
+    mid = (mid + Math.imul(al3, bh1)) | 0;
+    mid = (mid + Math.imul(ah3, bl1)) | 0;
+    hi = (hi + Math.imul(ah3, bh1)) | 0;
+    lo = (lo + Math.imul(al2, bl2)) | 0;
+    mid = (mid + Math.imul(al2, bh2)) | 0;
+    mid = (mid + Math.imul(ah2, bl2)) | 0;
+    hi = (hi + Math.imul(ah2, bh2)) | 0;
+    lo = (lo + Math.imul(al1, bl3)) | 0;
+    mid = (mid + Math.imul(al1, bh3)) | 0;
+    mid = (mid + Math.imul(ah1, bl3)) | 0;
+    hi = (hi + Math.imul(ah1, bh3)) | 0;
+    lo = (lo + Math.imul(al0, bl4)) | 0;
+    mid = (mid + Math.imul(al0, bh4)) | 0;
+    mid = (mid + Math.imul(ah0, bl4)) | 0;
+    hi = (hi + Math.imul(ah0, bh4)) | 0;
+    var w4 = (((c + lo) | 0) + ((mid & 0x1fff) << 13)) | 0;
+    c = (((hi + (mid >>> 13)) | 0) + (w4 >>> 26)) | 0;
     w4 &= 0x3ffffff;
     /* k = 5 */
     lo = Math.imul(al5, bl0);
     mid = Math.imul(al5, bh0);
-    mid += Math.imul(ah5, bl0);
+    mid = (mid + Math.imul(ah5, bl0)) | 0;
     hi = Math.imul(ah5, bh0);
-    lo += Math.imul(al4, bl1);
-    mid += Math.imul(al4, bh1);
-    mid += Math.imul(ah4, bl1);
-    hi += Math.imul(ah4, bh1);
-    lo += Math.imul(al3, bl2);
-    mid += Math.imul(al3, bh2);
-    mid += Math.imul(ah3, bl2);
-    hi += Math.imul(ah3, bh2);
-    lo += Math.imul(al2, bl3);
-    mid += Math.imul(al2, bh3);
-    mid += Math.imul(ah2, bl3);
-    hi += Math.imul(ah2, bh3);
-    lo += Math.imul(al1, bl4);
-    mid += Math.imul(al1, bh4);
-    mid += Math.imul(ah1, bl4);
-    hi += Math.imul(ah1, bh4);
-    lo += Math.imul(al0, bl5);
-    mid += Math.imul(al0, bh5);
-    mid += Math.imul(ah0, bl5);
-    hi += Math.imul(ah0, bh5);
-    var w5 = c + lo + ((mid & 0x1fff) << 13);
-    c = hi + (mid >>> 13) + (w5 >>> 26);
+    lo = (lo + Math.imul(al4, bl1)) | 0;
+    mid = (mid + Math.imul(al4, bh1)) | 0;
+    mid = (mid + Math.imul(ah4, bl1)) | 0;
+    hi = (hi + Math.imul(ah4, bh1)) | 0;
+    lo = (lo + Math.imul(al3, bl2)) | 0;
+    mid = (mid + Math.imul(al3, bh2)) | 0;
+    mid = (mid + Math.imul(ah3, bl2)) | 0;
+    hi = (hi + Math.imul(ah3, bh2)) | 0;
+    lo = (lo + Math.imul(al2, bl3)) | 0;
+    mid = (mid + Math.imul(al2, bh3)) | 0;
+    mid = (mid + Math.imul(ah2, bl3)) | 0;
+    hi = (hi + Math.imul(ah2, bh3)) | 0;
+    lo = (lo + Math.imul(al1, bl4)) | 0;
+    mid = (mid + Math.imul(al1, bh4)) | 0;
+    mid = (mid + Math.imul(ah1, bl4)) | 0;
+    hi = (hi + Math.imul(ah1, bh4)) | 0;
+    lo = (lo + Math.imul(al0, bl5)) | 0;
+    mid = (mid + Math.imul(al0, bh5)) | 0;
+    mid = (mid + Math.imul(ah0, bl5)) | 0;
+    hi = (hi + Math.imul(ah0, bh5)) | 0;
+    var w5 = (((c + lo) | 0) + ((mid & 0x1fff) << 13)) | 0;
+    c = (((hi + (mid >>> 13)) | 0) + (w5 >>> 26)) | 0;
     w5 &= 0x3ffffff;
     /* k = 6 */
     lo = Math.imul(al6, bl0);
     mid = Math.imul(al6, bh0);
-    mid += Math.imul(ah6, bl0);
+    mid = (mid + Math.imul(ah6, bl0)) | 0;
     hi = Math.imul(ah6, bh0);
-    lo += Math.imul(al5, bl1);
-    mid += Math.imul(al5, bh1);
-    mid += Math.imul(ah5, bl1);
-    hi += Math.imul(ah5, bh1);
-    lo += Math.imul(al4, bl2);
-    mid += Math.imul(al4, bh2);
-    mid += Math.imul(ah4, bl2);
-    hi += Math.imul(ah4, bh2);
-    lo += Math.imul(al3, bl3);
-    mid += Math.imul(al3, bh3);
-    mid += Math.imul(ah3, bl3);
-    hi += Math.imul(ah3, bh3);
-    lo += Math.imul(al2, bl4);
-    mid += Math.imul(al2, bh4);
-    mid += Math.imul(ah2, bl4);
-    hi += Math.imul(ah2, bh4);
-    lo += Math.imul(al1, bl5);
-    mid += Math.imul(al1, bh5);
-    mid += Math.imul(ah1, bl5);
-    hi += Math.imul(ah1, bh5);
-    lo += Math.imul(al0, bl6);
-    mid += Math.imul(al0, bh6);
-    mid += Math.imul(ah0, bl6);
-    hi += Math.imul(ah0, bh6);
-    var w6 = c + lo + ((mid & 0x1fff) << 13);
-    c = hi + (mid >>> 13) + (w6 >>> 26);
+    lo = (lo + Math.imul(al5, bl1)) | 0;
+    mid = (mid + Math.imul(al5, bh1)) | 0;
+    mid = (mid + Math.imul(ah5, bl1)) | 0;
+    hi = (hi + Math.imul(ah5, bh1)) | 0;
+    lo = (lo + Math.imul(al4, bl2)) | 0;
+    mid = (mid + Math.imul(al4, bh2)) | 0;
+    mid = (mid + Math.imul(ah4, bl2)) | 0;
+    hi = (hi + Math.imul(ah4, bh2)) | 0;
+    lo = (lo + Math.imul(al3, bl3)) | 0;
+    mid = (mid + Math.imul(al3, bh3)) | 0;
+    mid = (mid + Math.imul(ah3, bl3)) | 0;
+    hi = (hi + Math.imul(ah3, bh3)) | 0;
+    lo = (lo + Math.imul(al2, bl4)) | 0;
+    mid = (mid + Math.imul(al2, bh4)) | 0;
+    mid = (mid + Math.imul(ah2, bl4)) | 0;
+    hi = (hi + Math.imul(ah2, bh4)) | 0;
+    lo = (lo + Math.imul(al1, bl5)) | 0;
+    mid = (mid + Math.imul(al1, bh5)) | 0;
+    mid = (mid + Math.imul(ah1, bl5)) | 0;
+    hi = (hi + Math.imul(ah1, bh5)) | 0;
+    lo = (lo + Math.imul(al0, bl6)) | 0;
+    mid = (mid + Math.imul(al0, bh6)) | 0;
+    mid = (mid + Math.imul(ah0, bl6)) | 0;
+    hi = (hi + Math.imul(ah0, bh6)) | 0;
+    var w6 = (((c + lo) | 0) + ((mid & 0x1fff) << 13)) | 0;
+    c = (((hi + (mid >>> 13)) | 0) + (w6 >>> 26)) | 0;
     w6 &= 0x3ffffff;
     /* k = 7 */
     lo = Math.imul(al7, bl0);
     mid = Math.imul(al7, bh0);
-    mid += Math.imul(ah7, bl0);
+    mid = (mid + Math.imul(ah7, bl0)) | 0;
     hi = Math.imul(ah7, bh0);
-    lo += Math.imul(al6, bl1);
-    mid += Math.imul(al6, bh1);
-    mid += Math.imul(ah6, bl1);
-    hi += Math.imul(ah6, bh1);
-    lo += Math.imul(al5, bl2);
-    mid += Math.imul(al5, bh2);
-    mid += Math.imul(ah5, bl2);
-    hi += Math.imul(ah5, bh2);
-    lo += Math.imul(al4, bl3);
-    mid += Math.imul(al4, bh3);
-    mid += Math.imul(ah4, bl3);
-    hi += Math.imul(ah4, bh3);
-    lo += Math.imul(al3, bl4);
-    mid += Math.imul(al3, bh4);
-    mid += Math.imul(ah3, bl4);
-    hi += Math.imul(ah3, bh4);
-    lo += Math.imul(al2, bl5);
-    mid += Math.imul(al2, bh5);
-    mid += Math.imul(ah2, bl5);
-    hi += Math.imul(ah2, bh5);
-    lo += Math.imul(al1, bl6);
-    mid += Math.imul(al1, bh6);
-    mid += Math.imul(ah1, bl6);
-    hi += Math.imul(ah1, bh6);
-    lo += Math.imul(al0, bl7);
-    mid += Math.imul(al0, bh7);
-    mid += Math.imul(ah0, bl7);
-    hi += Math.imul(ah0, bh7);
-    var w7 = c + lo + ((mid & 0x1fff) << 13);
-    c = hi + (mid >>> 13) + (w7 >>> 26);
+    lo = (lo + Math.imul(al6, bl1)) | 0;
+    mid = (mid + Math.imul(al6, bh1)) | 0;
+    mid = (mid + Math.imul(ah6, bl1)) | 0;
+    hi = (hi + Math.imul(ah6, bh1)) | 0;
+    lo = (lo + Math.imul(al5, bl2)) | 0;
+    mid = (mid + Math.imul(al5, bh2)) | 0;
+    mid = (mid + Math.imul(ah5, bl2)) | 0;
+    hi = (hi + Math.imul(ah5, bh2)) | 0;
+    lo = (lo + Math.imul(al4, bl3)) | 0;
+    mid = (mid + Math.imul(al4, bh3)) | 0;
+    mid = (mid + Math.imul(ah4, bl3)) | 0;
+    hi = (hi + Math.imul(ah4, bh3)) | 0;
+    lo = (lo + Math.imul(al3, bl4)) | 0;
+    mid = (mid + Math.imul(al3, bh4)) | 0;
+    mid = (mid + Math.imul(ah3, bl4)) | 0;
+    hi = (hi + Math.imul(ah3, bh4)) | 0;
+    lo = (lo + Math.imul(al2, bl5)) | 0;
+    mid = (mid + Math.imul(al2, bh5)) | 0;
+    mid = (mid + Math.imul(ah2, bl5)) | 0;
+    hi = (hi + Math.imul(ah2, bh5)) | 0;
+    lo = (lo + Math.imul(al1, bl6)) | 0;
+    mid = (mid + Math.imul(al1, bh6)) | 0;
+    mid = (mid + Math.imul(ah1, bl6)) | 0;
+    hi = (hi + Math.imul(ah1, bh6)) | 0;
+    lo = (lo + Math.imul(al0, bl7)) | 0;
+    mid = (mid + Math.imul(al0, bh7)) | 0;
+    mid = (mid + Math.imul(ah0, bl7)) | 0;
+    hi = (hi + Math.imul(ah0, bh7)) | 0;
+    var w7 = (((c + lo) | 0) + ((mid & 0x1fff) << 13)) | 0;
+    c = (((hi + (mid >>> 13)) | 0) + (w7 >>> 26)) | 0;
     w7 &= 0x3ffffff;
     /* k = 8 */
     lo = Math.imul(al8, bl0);
     mid = Math.imul(al8, bh0);
-    mid += Math.imul(ah8, bl0);
+    mid = (mid + Math.imul(ah8, bl0)) | 0;
     hi = Math.imul(ah8, bh0);
-    lo += Math.imul(al7, bl1);
-    mid += Math.imul(al7, bh1);
-    mid += Math.imul(ah7, bl1);
-    hi += Math.imul(ah7, bh1);
-    lo += Math.imul(al6, bl2);
-    mid += Math.imul(al6, bh2);
-    mid += Math.imul(ah6, bl2);
-    hi += Math.imul(ah6, bh2);
-    lo += Math.imul(al5, bl3);
-    mid += Math.imul(al5, bh3);
-    mid += Math.imul(ah5, bl3);
-    hi += Math.imul(ah5, bh3);
-    lo += Math.imul(al4, bl4);
-    mid += Math.imul(al4, bh4);
-    mid += Math.imul(ah4, bl4);
-    hi += Math.imul(ah4, bh4);
-    lo += Math.imul(al3, bl5);
-    mid += Math.imul(al3, bh5);
-    mid += Math.imul(ah3, bl5);
-    hi += Math.imul(ah3, bh5);
-    lo += Math.imul(al2, bl6);
-    mid += Math.imul(al2, bh6);
-    mid += Math.imul(ah2, bl6);
-    hi += Math.imul(ah2, bh6);
-    lo += Math.imul(al1, bl7);
-    mid += Math.imul(al1, bh7);
-    mid += Math.imul(ah1, bl7);
-    hi += Math.imul(ah1, bh7);
-    lo += Math.imul(al0, bl8);
-    mid += Math.imul(al0, bh8);
-    mid += Math.imul(ah0, bl8);
-    hi += Math.imul(ah0, bh8);
-    var w8 = c + lo + ((mid & 0x1fff) << 13);
-    c = hi + (mid >>> 13) + (w8 >>> 26);
+    lo = (lo + Math.imul(al7, bl1)) | 0;
+    mid = (mid + Math.imul(al7, bh1)) | 0;
+    mid = (mid + Math.imul(ah7, bl1)) | 0;
+    hi = (hi + Math.imul(ah7, bh1)) | 0;
+    lo = (lo + Math.imul(al6, bl2)) | 0;
+    mid = (mid + Math.imul(al6, bh2)) | 0;
+    mid = (mid + Math.imul(ah6, bl2)) | 0;
+    hi = (hi + Math.imul(ah6, bh2)) | 0;
+    lo = (lo + Math.imul(al5, bl3)) | 0;
+    mid = (mid + Math.imul(al5, bh3)) | 0;
+    mid = (mid + Math.imul(ah5, bl3)) | 0;
+    hi = (hi + Math.imul(ah5, bh3)) | 0;
+    lo = (lo + Math.imul(al4, bl4)) | 0;
+    mid = (mid + Math.imul(al4, bh4)) | 0;
+    mid = (mid + Math.imul(ah4, bl4)) | 0;
+    hi = (hi + Math.imul(ah4, bh4)) | 0;
+    lo = (lo + Math.imul(al3, bl5)) | 0;
+    mid = (mid + Math.imul(al3, bh5)) | 0;
+    mid = (mid + Math.imul(ah3, bl5)) | 0;
+    hi = (hi + Math.imul(ah3, bh5)) | 0;
+    lo = (lo + Math.imul(al2, bl6)) | 0;
+    mid = (mid + Math.imul(al2, bh6)) | 0;
+    mid = (mid + Math.imul(ah2, bl6)) | 0;
+    hi = (hi + Math.imul(ah2, bh6)) | 0;
+    lo = (lo + Math.imul(al1, bl7)) | 0;
+    mid = (mid + Math.imul(al1, bh7)) | 0;
+    mid = (mid + Math.imul(ah1, bl7)) | 0;
+    hi = (hi + Math.imul(ah1, bh7)) | 0;
+    lo = (lo + Math.imul(al0, bl8)) | 0;
+    mid = (mid + Math.imul(al0, bh8)) | 0;
+    mid = (mid + Math.imul(ah0, bl8)) | 0;
+    hi = (hi + Math.imul(ah0, bh8)) | 0;
+    var w8 = (((c + lo) | 0) + ((mid & 0x1fff) << 13)) | 0;
+    c = (((hi + (mid >>> 13)) | 0) + (w8 >>> 26)) | 0;
     w8 &= 0x3ffffff;
     /* k = 9 */
     lo = Math.imul(al9, bl0);
     mid = Math.imul(al9, bh0);
-    mid += Math.imul(ah9, bl0);
+    mid = (mid + Math.imul(ah9, bl0)) | 0;
     hi = Math.imul(ah9, bh0);
-    lo += Math.imul(al8, bl1);
-    mid += Math.imul(al8, bh1);
-    mid += Math.imul(ah8, bl1);
-    hi += Math.imul(ah8, bh1);
-    lo += Math.imul(al7, bl2);
-    mid += Math.imul(al7, bh2);
-    mid += Math.imul(ah7, bl2);
-    hi += Math.imul(ah7, bh2);
-    lo += Math.imul(al6, bl3);
-    mid += Math.imul(al6, bh3);
-    mid += Math.imul(ah6, bl3);
-    hi += Math.imul(ah6, bh3);
-    lo += Math.imul(al5, bl4);
-    mid += Math.imul(al5, bh4);
-    mid += Math.imul(ah5, bl4);
-    hi += Math.imul(ah5, bh4);
-    lo += Math.imul(al4, bl5);
-    mid += Math.imul(al4, bh5);
-    mid += Math.imul(ah4, bl5);
-    hi += Math.imul(ah4, bh5);
-    lo += Math.imul(al3, bl6);
-    mid += Math.imul(al3, bh6);
-    mid += Math.imul(ah3, bl6);
-    hi += Math.imul(ah3, bh6);
-    lo += Math.imul(al2, bl7);
-    mid += Math.imul(al2, bh7);
-    mid += Math.imul(ah2, bl7);
-    hi += Math.imul(ah2, bh7);
-    lo += Math.imul(al1, bl8);
-    mid += Math.imul(al1, bh8);
-    mid += Math.imul(ah1, bl8);
-    hi += Math.imul(ah1, bh8);
-    lo += Math.imul(al0, bl9);
-    mid += Math.imul(al0, bh9);
-    mid += Math.imul(ah0, bl9);
-    hi += Math.imul(ah0, bh9);
-    var w9 = c + lo + ((mid & 0x1fff) << 13);
-    c = hi + (mid >>> 13) + (w9 >>> 26);
+    lo = (lo + Math.imul(al8, bl1)) | 0;
+    mid = (mid + Math.imul(al8, bh1)) | 0;
+    mid = (mid + Math.imul(ah8, bl1)) | 0;
+    hi = (hi + Math.imul(ah8, bh1)) | 0;
+    lo = (lo + Math.imul(al7, bl2)) | 0;
+    mid = (mid + Math.imul(al7, bh2)) | 0;
+    mid = (mid + Math.imul(ah7, bl2)) | 0;
+    hi = (hi + Math.imul(ah7, bh2)) | 0;
+    lo = (lo + Math.imul(al6, bl3)) | 0;
+    mid = (mid + Math.imul(al6, bh3)) | 0;
+    mid = (mid + Math.imul(ah6, bl3)) | 0;
+    hi = (hi + Math.imul(ah6, bh3)) | 0;
+    lo = (lo + Math.imul(al5, bl4)) | 0;
+    mid = (mid + Math.imul(al5, bh4)) | 0;
+    mid = (mid + Math.imul(ah5, bl4)) | 0;
+    hi = (hi + Math.imul(ah5, bh4)) | 0;
+    lo = (lo + Math.imul(al4, bl5)) | 0;
+    mid = (mid + Math.imul(al4, bh5)) | 0;
+    mid = (mid + Math.imul(ah4, bl5)) | 0;
+    hi = (hi + Math.imul(ah4, bh5)) | 0;
+    lo = (lo + Math.imul(al3, bl6)) | 0;
+    mid = (mid + Math.imul(al3, bh6)) | 0;
+    mid = (mid + Math.imul(ah3, bl6)) | 0;
+    hi = (hi + Math.imul(ah3, bh6)) | 0;
+    lo = (lo + Math.imul(al2, bl7)) | 0;
+    mid = (mid + Math.imul(al2, bh7)) | 0;
+    mid = (mid + Math.imul(ah2, bl7)) | 0;
+    hi = (hi + Math.imul(ah2, bh7)) | 0;
+    lo = (lo + Math.imul(al1, bl8)) | 0;
+    mid = (mid + Math.imul(al1, bh8)) | 0;
+    mid = (mid + Math.imul(ah1, bl8)) | 0;
+    hi = (hi + Math.imul(ah1, bh8)) | 0;
+    lo = (lo + Math.imul(al0, bl9)) | 0;
+    mid = (mid + Math.imul(al0, bh9)) | 0;
+    mid = (mid + Math.imul(ah0, bl9)) | 0;
+    hi = (hi + Math.imul(ah0, bh9)) | 0;
+    var w9 = (((c + lo) | 0) + ((mid & 0x1fff) << 13)) | 0;
+    c = (((hi + (mid >>> 13)) | 0) + (w9 >>> 26)) | 0;
     w9 &= 0x3ffffff;
     /* k = 10 */
     lo = Math.imul(al9, bl1);
     mid = Math.imul(al9, bh1);
-    mid += Math.imul(ah9, bl1);
+    mid = (mid + Math.imul(ah9, bl1)) | 0;
     hi = Math.imul(ah9, bh1);
-    lo += Math.imul(al8, bl2);
-    mid += Math.imul(al8, bh2);
-    mid += Math.imul(ah8, bl2);
-    hi += Math.imul(ah8, bh2);
-    lo += Math.imul(al7, bl3);
-    mid += Math.imul(al7, bh3);
-    mid += Math.imul(ah7, bl3);
-    hi += Math.imul(ah7, bh3);
-    lo += Math.imul(al6, bl4);
-    mid += Math.imul(al6, bh4);
-    mid += Math.imul(ah6, bl4);
-    hi += Math.imul(ah6, bh4);
-    lo += Math.imul(al5, bl5);
-    mid += Math.imul(al5, bh5);
-    mid += Math.imul(ah5, bl5);
-    hi += Math.imul(ah5, bh5);
-    lo += Math.imul(al4, bl6);
-    mid += Math.imul(al4, bh6);
-    mid += Math.imul(ah4, bl6);
-    hi += Math.imul(ah4, bh6);
-    lo += Math.imul(al3, bl7);
-    mid += Math.imul(al3, bh7);
-    mid += Math.imul(ah3, bl7);
-    hi += Math.imul(ah3, bh7);
-    lo += Math.imul(al2, bl8);
-    mid += Math.imul(al2, bh8);
-    mid += Math.imul(ah2, bl8);
-    hi += Math.imul(ah2, bh8);
-    lo += Math.imul(al1, bl9);
-    mid += Math.imul(al1, bh9);
-    mid += Math.imul(ah1, bl9);
-    hi += Math.imul(ah1, bh9);
-    var w10 = c + lo + ((mid & 0x1fff) << 13);
-    c = hi + (mid >>> 13) + (w10 >>> 26);
+    lo = (lo + Math.imul(al8, bl2)) | 0;
+    mid = (mid + Math.imul(al8, bh2)) | 0;
+    mid = (mid + Math.imul(ah8, bl2)) | 0;
+    hi = (hi + Math.imul(ah8, bh2)) | 0;
+    lo = (lo + Math.imul(al7, bl3)) | 0;
+    mid = (mid + Math.imul(al7, bh3)) | 0;
+    mid = (mid + Math.imul(ah7, bl3)) | 0;
+    hi = (hi + Math.imul(ah7, bh3)) | 0;
+    lo = (lo + Math.imul(al6, bl4)) | 0;
+    mid = (mid + Math.imul(al6, bh4)) | 0;
+    mid = (mid + Math.imul(ah6, bl4)) | 0;
+    hi = (hi + Math.imul(ah6, bh4)) | 0;
+    lo = (lo + Math.imul(al5, bl5)) | 0;
+    mid = (mid + Math.imul(al5, bh5)) | 0;
+    mid = (mid + Math.imul(ah5, bl5)) | 0;
+    hi = (hi + Math.imul(ah5, bh5)) | 0;
+    lo = (lo + Math.imul(al4, bl6)) | 0;
+    mid = (mid + Math.imul(al4, bh6)) | 0;
+    mid = (mid + Math.imul(ah4, bl6)) | 0;
+    hi = (hi + Math.imul(ah4, bh6)) | 0;
+    lo = (lo + Math.imul(al3, bl7)) | 0;
+    mid = (mid + Math.imul(al3, bh7)) | 0;
+    mid = (mid + Math.imul(ah3, bl7)) | 0;
+    hi = (hi + Math.imul(ah3, bh7)) | 0;
+    lo = (lo + Math.imul(al2, bl8)) | 0;
+    mid = (mid + Math.imul(al2, bh8)) | 0;
+    mid = (mid + Math.imul(ah2, bl8)) | 0;
+    hi = (hi + Math.imul(ah2, bh8)) | 0;
+    lo = (lo + Math.imul(al1, bl9)) | 0;
+    mid = (mid + Math.imul(al1, bh9)) | 0;
+    mid = (mid + Math.imul(ah1, bl9)) | 0;
+    hi = (hi + Math.imul(ah1, bh9)) | 0;
+    var w10 = (((c + lo) | 0) + ((mid & 0x1fff) << 13)) | 0;
+    c = (((hi + (mid >>> 13)) | 0) + (w10 >>> 26)) | 0;
     w10 &= 0x3ffffff;
     /* k = 11 */
     lo = Math.imul(al9, bl2);
     mid = Math.imul(al9, bh2);
-    mid += Math.imul(ah9, bl2);
+    mid = (mid + Math.imul(ah9, bl2)) | 0;
     hi = Math.imul(ah9, bh2);
-    lo += Math.imul(al8, bl3);
-    mid += Math.imul(al8, bh3);
-    mid += Math.imul(ah8, bl3);
-    hi += Math.imul(ah8, bh3);
-    lo += Math.imul(al7, bl4);
-    mid += Math.imul(al7, bh4);
-    mid += Math.imul(ah7, bl4);
-    hi += Math.imul(ah7, bh4);
-    lo += Math.imul(al6, bl5);
-    mid += Math.imul(al6, bh5);
-    mid += Math.imul(ah6, bl5);
-    hi += Math.imul(ah6, bh5);
-    lo += Math.imul(al5, bl6);
-    mid += Math.imul(al5, bh6);
-    mid += Math.imul(ah5, bl6);
-    hi += Math.imul(ah5, bh6);
-    lo += Math.imul(al4, bl7);
-    mid += Math.imul(al4, bh7);
-    mid += Math.imul(ah4, bl7);
-    hi += Math.imul(ah4, bh7);
-    lo += Math.imul(al3, bl8);
-    mid += Math.imul(al3, bh8);
-    mid += Math.imul(ah3, bl8);
-    hi += Math.imul(ah3, bh8);
-    lo += Math.imul(al2, bl9);
-    mid += Math.imul(al2, bh9);
-    mid += Math.imul(ah2, bl9);
-    hi += Math.imul(ah2, bh9);
-    var w11 = c + lo + ((mid & 0x1fff) << 13);
-    c = hi + (mid >>> 13) + (w11 >>> 26);
+    lo = (lo + Math.imul(al8, bl3)) | 0;
+    mid = (mid + Math.imul(al8, bh3)) | 0;
+    mid = (mid + Math.imul(ah8, bl3)) | 0;
+    hi = (hi + Math.imul(ah8, bh3)) | 0;
+    lo = (lo + Math.imul(al7, bl4)) | 0;
+    mid = (mid + Math.imul(al7, bh4)) | 0;
+    mid = (mid + Math.imul(ah7, bl4)) | 0;
+    hi = (hi + Math.imul(ah7, bh4)) | 0;
+    lo = (lo + Math.imul(al6, bl5)) | 0;
+    mid = (mid + Math.imul(al6, bh5)) | 0;
+    mid = (mid + Math.imul(ah6, bl5)) | 0;
+    hi = (hi + Math.imul(ah6, bh5)) | 0;
+    lo = (lo + Math.imul(al5, bl6)) | 0;
+    mid = (mid + Math.imul(al5, bh6)) | 0;
+    mid = (mid + Math.imul(ah5, bl6)) | 0;
+    hi = (hi + Math.imul(ah5, bh6)) | 0;
+    lo = (lo + Math.imul(al4, bl7)) | 0;
+    mid = (mid + Math.imul(al4, bh7)) | 0;
+    mid = (mid + Math.imul(ah4, bl7)) | 0;
+    hi = (hi + Math.imul(ah4, bh7)) | 0;
+    lo = (lo + Math.imul(al3, bl8)) | 0;
+    mid = (mid + Math.imul(al3, bh8)) | 0;
+    mid = (mid + Math.imul(ah3, bl8)) | 0;
+    hi = (hi + Math.imul(ah3, bh8)) | 0;
+    lo = (lo + Math.imul(al2, bl9)) | 0;
+    mid = (mid + Math.imul(al2, bh9)) | 0;
+    mid = (mid + Math.imul(ah2, bl9)) | 0;
+    hi = (hi + Math.imul(ah2, bh9)) | 0;
+    var w11 = (((c + lo) | 0) + ((mid & 0x1fff) << 13)) | 0;
+    c = (((hi + (mid >>> 13)) | 0) + (w11 >>> 26)) | 0;
     w11 &= 0x3ffffff;
     /* k = 12 */
     lo = Math.imul(al9, bl3);
     mid = Math.imul(al9, bh3);
-    mid += Math.imul(ah9, bl3);
+    mid = (mid + Math.imul(ah9, bl3)) | 0;
     hi = Math.imul(ah9, bh3);
-    lo += Math.imul(al8, bl4);
-    mid += Math.imul(al8, bh4);
-    mid += Math.imul(ah8, bl4);
-    hi += Math.imul(ah8, bh4);
-    lo += Math.imul(al7, bl5);
-    mid += Math.imul(al7, bh5);
-    mid += Math.imul(ah7, bl5);
-    hi += Math.imul(ah7, bh5);
-    lo += Math.imul(al6, bl6);
-    mid += Math.imul(al6, bh6);
-    mid += Math.imul(ah6, bl6);
-    hi += Math.imul(ah6, bh6);
-    lo += Math.imul(al5, bl7);
-    mid += Math.imul(al5, bh7);
-    mid += Math.imul(ah5, bl7);
-    hi += Math.imul(ah5, bh7);
-    lo += Math.imul(al4, bl8);
-    mid += Math.imul(al4, bh8);
-    mid += Math.imul(ah4, bl8);
-    hi += Math.imul(ah4, bh8);
-    lo += Math.imul(al3, bl9);
-    mid += Math.imul(al3, bh9);
-    mid += Math.imul(ah3, bl9);
-    hi += Math.imul(ah3, bh9);
-    var w12 = c + lo + ((mid & 0x1fff) << 13);
-    c = hi + (mid >>> 13) + (w12 >>> 26);
+    lo = (lo + Math.imul(al8, bl4)) | 0;
+    mid = (mid + Math.imul(al8, bh4)) | 0;
+    mid = (mid + Math.imul(ah8, bl4)) | 0;
+    hi = (hi + Math.imul(ah8, bh4)) | 0;
+    lo = (lo + Math.imul(al7, bl5)) | 0;
+    mid = (mid + Math.imul(al7, bh5)) | 0;
+    mid = (mid + Math.imul(ah7, bl5)) | 0;
+    hi = (hi + Math.imul(ah7, bh5)) | 0;
+    lo = (lo + Math.imul(al6, bl6)) | 0;
+    mid = (mid + Math.imul(al6, bh6)) | 0;
+    mid = (mid + Math.imul(ah6, bl6)) | 0;
+    hi = (hi + Math.imul(ah6, bh6)) | 0;
+    lo = (lo + Math.imul(al5, bl7)) | 0;
+    mid = (mid + Math.imul(al5, bh7)) | 0;
+    mid = (mid + Math.imul(ah5, bl7)) | 0;
+    hi = (hi + Math.imul(ah5, bh7)) | 0;
+    lo = (lo + Math.imul(al4, bl8)) | 0;
+    mid = (mid + Math.imul(al4, bh8)) | 0;
+    mid = (mid + Math.imul(ah4, bl8)) | 0;
+    hi = (hi + Math.imul(ah4, bh8)) | 0;
+    lo = (lo + Math.imul(al3, bl9)) | 0;
+    mid = (mid + Math.imul(al3, bh9)) | 0;
+    mid = (mid + Math.imul(ah3, bl9)) | 0;
+    hi = (hi + Math.imul(ah3, bh9)) | 0;
+    var w12 = (((c + lo) | 0) + ((mid & 0x1fff) << 13)) | 0;
+    c = (((hi + (mid >>> 13)) | 0) + (w12 >>> 26)) | 0;
     w12 &= 0x3ffffff;
     /* k = 13 */
     lo = Math.imul(al9, bl4);
     mid = Math.imul(al9, bh4);
-    mid += Math.imul(ah9, bl4);
+    mid = (mid + Math.imul(ah9, bl4)) | 0;
     hi = Math.imul(ah9, bh4);
-    lo += Math.imul(al8, bl5);
-    mid += Math.imul(al8, bh5);
-    mid += Math.imul(ah8, bl5);
-    hi += Math.imul(ah8, bh5);
-    lo += Math.imul(al7, bl6);
-    mid += Math.imul(al7, bh6);
-    mid += Math.imul(ah7, bl6);
-    hi += Math.imul(ah7, bh6);
-    lo += Math.imul(al6, bl7);
-    mid += Math.imul(al6, bh7);
-    mid += Math.imul(ah6, bl7);
-    hi += Math.imul(ah6, bh7);
-    lo += Math.imul(al5, bl8);
-    mid += Math.imul(al5, bh8);
-    mid += Math.imul(ah5, bl8);
-    hi += Math.imul(ah5, bh8);
-    lo += Math.imul(al4, bl9);
-    mid += Math.imul(al4, bh9);
-    mid += Math.imul(ah4, bl9);
-    hi += Math.imul(ah4, bh9);
-    var w13 = c + lo + ((mid & 0x1fff) << 13);
-    c = hi + (mid >>> 13) + (w13 >>> 26);
+    lo = (lo + Math.imul(al8, bl5)) | 0;
+    mid = (mid + Math.imul(al8, bh5)) | 0;
+    mid = (mid + Math.imul(ah8, bl5)) | 0;
+    hi = (hi + Math.imul(ah8, bh5)) | 0;
+    lo = (lo + Math.imul(al7, bl6)) | 0;
+    mid = (mid + Math.imul(al7, bh6)) | 0;
+    mid = (mid + Math.imul(ah7, bl6)) | 0;
+    hi = (hi + Math.imul(ah7, bh6)) | 0;
+    lo = (lo + Math.imul(al6, bl7)) | 0;
+    mid = (mid + Math.imul(al6, bh7)) | 0;
+    mid = (mid + Math.imul(ah6, bl7)) | 0;
+    hi = (hi + Math.imul(ah6, bh7)) | 0;
+    lo = (lo + Math.imul(al5, bl8)) | 0;
+    mid = (mid + Math.imul(al5, bh8)) | 0;
+    mid = (mid + Math.imul(ah5, bl8)) | 0;
+    hi = (hi + Math.imul(ah5, bh8)) | 0;
+    lo = (lo + Math.imul(al4, bl9)) | 0;
+    mid = (mid + Math.imul(al4, bh9)) | 0;
+    mid = (mid + Math.imul(ah4, bl9)) | 0;
+    hi = (hi + Math.imul(ah4, bh9)) | 0;
+    var w13 = (((c + lo) | 0) + ((mid & 0x1fff) << 13)) | 0;
+    c = (((hi + (mid >>> 13)) | 0) + (w13 >>> 26)) | 0;
     w13 &= 0x3ffffff;
     /* k = 14 */
     lo = Math.imul(al9, bl5);
     mid = Math.imul(al9, bh5);
-    mid += Math.imul(ah9, bl5);
+    mid = (mid + Math.imul(ah9, bl5)) | 0;
     hi = Math.imul(ah9, bh5);
-    lo += Math.imul(al8, bl6);
-    mid += Math.imul(al8, bh6);
-    mid += Math.imul(ah8, bl6);
-    hi += Math.imul(ah8, bh6);
-    lo += Math.imul(al7, bl7);
-    mid += Math.imul(al7, bh7);
-    mid += Math.imul(ah7, bl7);
-    hi += Math.imul(ah7, bh7);
-    lo += Math.imul(al6, bl8);
-    mid += Math.imul(al6, bh8);
-    mid += Math.imul(ah6, bl8);
-    hi += Math.imul(ah6, bh8);
-    lo += Math.imul(al5, bl9);
-    mid += Math.imul(al5, bh9);
-    mid += Math.imul(ah5, bl9);
-    hi += Math.imul(ah5, bh9);
-    var w14 = c + lo + ((mid & 0x1fff) << 13);
-    c = hi + (mid >>> 13) + (w14 >>> 26);
+    lo = (lo + Math.imul(al8, bl6)) | 0;
+    mid = (mid + Math.imul(al8, bh6)) | 0;
+    mid = (mid + Math.imul(ah8, bl6)) | 0;
+    hi = (hi + Math.imul(ah8, bh6)) | 0;
+    lo = (lo + Math.imul(al7, bl7)) | 0;
+    mid = (mid + Math.imul(al7, bh7)) | 0;
+    mid = (mid + Math.imul(ah7, bl7)) | 0;
+    hi = (hi + Math.imul(ah7, bh7)) | 0;
+    lo = (lo + Math.imul(al6, bl8)) | 0;
+    mid = (mid + Math.imul(al6, bh8)) | 0;
+    mid = (mid + Math.imul(ah6, bl8)) | 0;
+    hi = (hi + Math.imul(ah6, bh8)) | 0;
+    lo = (lo + Math.imul(al5, bl9)) | 0;
+    mid = (mid + Math.imul(al5, bh9)) | 0;
+    mid = (mid + Math.imul(ah5, bl9)) | 0;
+    hi = (hi + Math.imul(ah5, bh9)) | 0;
+    var w14 = (((c + lo) | 0) + ((mid & 0x1fff) << 13)) | 0;
+    c = (((hi + (mid >>> 13)) | 0) + (w14 >>> 26)) | 0;
     w14 &= 0x3ffffff;
     /* k = 15 */
     lo = Math.imul(al9, bl6);
     mid = Math.imul(al9, bh6);
-    mid += Math.imul(ah9, bl6);
+    mid = (mid + Math.imul(ah9, bl6)) | 0;
     hi = Math.imul(ah9, bh6);
-    lo += Math.imul(al8, bl7);
-    mid += Math.imul(al8, bh7);
-    mid += Math.imul(ah8, bl7);
-    hi += Math.imul(ah8, bh7);
-    lo += Math.imul(al7, bl8);
-    mid += Math.imul(al7, bh8);
-    mid += Math.imul(ah7, bl8);
-    hi += Math.imul(ah7, bh8);
-    lo += Math.imul(al6, bl9);
-    mid += Math.imul(al6, bh9);
-    mid += Math.imul(ah6, bl9);
-    hi += Math.imul(ah6, bh9);
-    var w15 = c + lo + ((mid & 0x1fff) << 13);
-    c = hi + (mid >>> 13) + (w15 >>> 26);
+    lo = (lo + Math.imul(al8, bl7)) | 0;
+    mid = (mid + Math.imul(al8, bh7)) | 0;
+    mid = (mid + Math.imul(ah8, bl7)) | 0;
+    hi = (hi + Math.imul(ah8, bh7)) | 0;
+    lo = (lo + Math.imul(al7, bl8)) | 0;
+    mid = (mid + Math.imul(al7, bh8)) | 0;
+    mid = (mid + Math.imul(ah7, bl8)) | 0;
+    hi = (hi + Math.imul(ah7, bh8)) | 0;
+    lo = (lo + Math.imul(al6, bl9)) | 0;
+    mid = (mid + Math.imul(al6, bh9)) | 0;
+    mid = (mid + Math.imul(ah6, bl9)) | 0;
+    hi = (hi + Math.imul(ah6, bh9)) | 0;
+    var w15 = (((c + lo) | 0) + ((mid & 0x1fff) << 13)) | 0;
+    c = (((hi + (mid >>> 13)) | 0) + (w15 >>> 26)) | 0;
     w15 &= 0x3ffffff;
     /* k = 16 */
     lo = Math.imul(al9, bl7);
     mid = Math.imul(al9, bh7);
-    mid += Math.imul(ah9, bl7);
+    mid = (mid + Math.imul(ah9, bl7)) | 0;
     hi = Math.imul(ah9, bh7);
-    lo += Math.imul(al8, bl8);
-    mid += Math.imul(al8, bh8);
-    mid += Math.imul(ah8, bl8);
-    hi += Math.imul(ah8, bh8);
-    lo += Math.imul(al7, bl9);
-    mid += Math.imul(al7, bh9);
-    mid += Math.imul(ah7, bl9);
-    hi += Math.imul(ah7, bh9);
-    var w16 = c + lo + ((mid & 0x1fff) << 13);
-    c = hi + (mid >>> 13) + (w16 >>> 26);
+    lo = (lo + Math.imul(al8, bl8)) | 0;
+    mid = (mid + Math.imul(al8, bh8)) | 0;
+    mid = (mid + Math.imul(ah8, bl8)) | 0;
+    hi = (hi + Math.imul(ah8, bh8)) | 0;
+    lo = (lo + Math.imul(al7, bl9)) | 0;
+    mid = (mid + Math.imul(al7, bh9)) | 0;
+    mid = (mid + Math.imul(ah7, bl9)) | 0;
+    hi = (hi + Math.imul(ah7, bh9)) | 0;
+    var w16 = (((c + lo) | 0) + ((mid & 0x1fff) << 13)) | 0;
+    c = (((hi + (mid >>> 13)) | 0) + (w16 >>> 26)) | 0;
     w16 &= 0x3ffffff;
     /* k = 17 */
     lo = Math.imul(al9, bl8);
     mid = Math.imul(al9, bh8);
-    mid += Math.imul(ah9, bl8);
+    mid = (mid + Math.imul(ah9, bl8)) | 0;
     hi = Math.imul(ah9, bh8);
-    lo += Math.imul(al8, bl9);
-    mid += Math.imul(al8, bh9);
-    mid += Math.imul(ah8, bl9);
-    hi += Math.imul(ah8, bh9);
-    var w17 = c + lo + ((mid & 0x1fff) << 13);
-    c = hi + (mid >>> 13) + (w17 >>> 26);
+    lo = (lo + Math.imul(al8, bl9)) | 0;
+    mid = (mid + Math.imul(al8, bh9)) | 0;
+    mid = (mid + Math.imul(ah8, bl9)) | 0;
+    hi = (hi + Math.imul(ah8, bh9)) | 0;
+    var w17 = (((c + lo) | 0) + ((mid & 0x1fff) << 13)) | 0;
+    c = (((hi + (mid >>> 13)) | 0) + (w17 >>> 26)) | 0;
     w17 &= 0x3ffffff;
     /* k = 18 */
     lo = Math.imul(al9, bl9);
     mid = Math.imul(al9, bh9);
-    mid += Math.imul(ah9, bl9);
+    mid = (mid + Math.imul(ah9, bl9)) | 0;
     hi = Math.imul(ah9, bh9);
-    var w18 = c + lo + ((mid & 0x1fff) << 13);
-    c = hi + (mid >>> 13) + (w18 >>> 26);
+    var w18 = (((c + lo) | 0) + ((mid & 0x1fff) << 13)) | 0;
+    c = (((hi + (mid >>> 13)) | 0) + (w18 >>> 26)) | 0;
     w18 &= 0x3ffffff;
     o[0] = w0;
     o[1] = w1;
@@ -9366,6 +9530,10 @@ module.exports = ret;
     var s = (bits - r) / 26;
 
     assert(this.negative === 0, 'imaskn works only with positive numbers');
+
+    if (this.length <= s) {
+      return this;
+    }
 
     if (r !== 0) {
       s++;
@@ -10388,6 +10556,7 @@ module.exports = ret;
       this.m = prime.p;
       this.prime = prime;
     } else {
+      assert(m.gtn(1), 'modulus must be greater than 1');
       this.m = m;
       this.prime = null;
     }
@@ -10930,7 +11099,7 @@ exports.AES = AES
 
 }).call(this,require("buffer").Buffer)
 
-},{"buffer":46}],22:[function(require,module,exports){
+},{"buffer":47}],22:[function(require,module,exports){
 (function (Buffer){
 var aes = require('./aes')
 var Transform = require('cipher-base')
@@ -11032,7 +11201,7 @@ function xorTest (a, b) {
 
 }).call(this,require("buffer").Buffer)
 
-},{"./aes":21,"./ghash":26,"buffer":46,"buffer-xor":45,"cipher-base":48,"inherits":101}],23:[function(require,module,exports){
+},{"./aes":21,"./ghash":26,"buffer":47,"buffer-xor":46,"cipher-base":48,"inherits":101}],23:[function(require,module,exports){
 var ciphers = require('./encrypter')
 exports.createCipher = exports.Cipher = ciphers.createCipher
 exports.createCipheriv = exports.Cipheriv = ciphers.createCipheriv
@@ -11187,7 +11356,7 @@ exports.createDecipheriv = createDecipheriv
 
 }).call(this,require("buffer").Buffer)
 
-},{"./aes":21,"./authCipher":22,"./modes":27,"./modes/cbc":28,"./modes/cfb":29,"./modes/cfb1":30,"./modes/cfb8":31,"./modes/ctr":32,"./modes/ecb":33,"./modes/ofb":34,"./streamCipher":35,"buffer":46,"cipher-base":48,"evp_bytestokey":85,"inherits":101}],25:[function(require,module,exports){
+},{"./aes":21,"./authCipher":22,"./modes":27,"./modes/cbc":28,"./modes/cfb":29,"./modes/cfb1":30,"./modes/cfb8":31,"./modes/ctr":32,"./modes/ecb":33,"./modes/ofb":34,"./streamCipher":35,"buffer":47,"cipher-base":48,"evp_bytestokey":85,"inherits":101}],25:[function(require,module,exports){
 (function (Buffer){
 var aes = require('./aes')
 var Transform = require('cipher-base')
@@ -11314,7 +11483,7 @@ exports.createCipher = createCipher
 
 }).call(this,require("buffer").Buffer)
 
-},{"./aes":21,"./authCipher":22,"./modes":27,"./modes/cbc":28,"./modes/cfb":29,"./modes/cfb1":30,"./modes/cfb8":31,"./modes/ctr":32,"./modes/ecb":33,"./modes/ofb":34,"./streamCipher":35,"buffer":46,"cipher-base":48,"evp_bytestokey":85,"inherits":101}],26:[function(require,module,exports){
+},{"./aes":21,"./authCipher":22,"./modes":27,"./modes/cbc":28,"./modes/cfb":29,"./modes/cfb1":30,"./modes/cfb8":31,"./modes/ctr":32,"./modes/ecb":33,"./modes/ofb":34,"./streamCipher":35,"buffer":47,"cipher-base":48,"evp_bytestokey":85,"inherits":101}],26:[function(require,module,exports){
 (function (Buffer){
 var zeros = new Buffer(16)
 zeros.fill(0)
@@ -11417,7 +11586,7 @@ function xor (a, b) {
 
 }).call(this,require("buffer").Buffer)
 
-},{"buffer":46}],27:[function(require,module,exports){
+},{"buffer":47}],27:[function(require,module,exports){
 exports['aes-128-ecb'] = {
   cipher: 'AES',
   key: 128,
@@ -11609,7 +11778,7 @@ exports.decrypt = function (self, block) {
   return xor(out, pad)
 }
 
-},{"buffer-xor":45}],29:[function(require,module,exports){
+},{"buffer-xor":46}],29:[function(require,module,exports){
 (function (Buffer){
 var xor = require('buffer-xor')
 
@@ -11645,7 +11814,7 @@ function encryptStart (self, data, decrypt) {
 
 }).call(this,require("buffer").Buffer)
 
-},{"buffer":46,"buffer-xor":45}],30:[function(require,module,exports){
+},{"buffer":47,"buffer-xor":46}],30:[function(require,module,exports){
 (function (Buffer){
 function encryptByte (self, byteParam, decrypt) {
   var pad
@@ -11684,7 +11853,7 @@ function shiftIn (buffer, value) {
 
 }).call(this,require("buffer").Buffer)
 
-},{"buffer":46}],31:[function(require,module,exports){
+},{"buffer":47}],31:[function(require,module,exports){
 (function (Buffer){
 function encryptByte (self, byteParam, decrypt) {
   var pad = self._cipher.encryptBlock(self._prev)
@@ -11704,7 +11873,7 @@ exports.encrypt = function (self, chunk, decrypt) {
 
 }).call(this,require("buffer").Buffer)
 
-},{"buffer":46}],32:[function(require,module,exports){
+},{"buffer":47}],32:[function(require,module,exports){
 (function (Buffer){
 var xor = require('buffer-xor')
 
@@ -11740,7 +11909,7 @@ exports.encrypt = function (self, chunk) {
 
 }).call(this,require("buffer").Buffer)
 
-},{"buffer":46,"buffer-xor":45}],33:[function(require,module,exports){
+},{"buffer":47,"buffer-xor":46}],33:[function(require,module,exports){
 exports.encrypt = function (self, block) {
   return self._cipher.encryptBlock(block)
 }
@@ -11769,7 +11938,7 @@ exports.encrypt = function (self, chunk) {
 
 }).call(this,require("buffer").Buffer)
 
-},{"buffer":46,"buffer-xor":45}],35:[function(require,module,exports){
+},{"buffer":47,"buffer-xor":46}],35:[function(require,module,exports){
 (function (Buffer){
 var aes = require('./aes')
 var Transform = require('cipher-base')
@@ -11799,7 +11968,7 @@ StreamCipher.prototype._final = function () {
 
 }).call(this,require("buffer").Buffer)
 
-},{"./aes":21,"buffer":46,"cipher-base":48,"inherits":101}],36:[function(require,module,exports){
+},{"./aes":21,"buffer":47,"cipher-base":48,"inherits":101}],36:[function(require,module,exports){
 var ebtk = require('evp_bytestokey')
 var aes = require('browserify-aes/browser')
 var DES = require('browserify-des')
@@ -11922,7 +12091,7 @@ DES.prototype._final = function () {
 
 }).call(this,require("buffer").Buffer)
 
-},{"buffer":46,"cipher-base":48,"des.js":57,"inherits":101}],38:[function(require,module,exports){
+},{"buffer":47,"cipher-base":48,"des.js":57,"inherits":101}],38:[function(require,module,exports){
 exports['des-ecb'] = {
   key: 8,
   iv: 0
@@ -11993,7 +12162,7 @@ function getr(priv) {
 
 }).call(this,require("buffer").Buffer)
 
-},{"bn.js":18,"buffer":46,"randombytes":126}],40:[function(require,module,exports){
+},{"bn.js":18,"buffer":47,"randombytes":127}],40:[function(require,module,exports){
 (function (Buffer){
 'use strict'
 exports['RSA-SHA224'] = exports.sha224WithRSAEncryption = {
@@ -12070,7 +12239,7 @@ exports['RSA-MD5'] = exports.md5WithRSAEncryption = {
 
 }).call(this,require("buffer").Buffer)
 
-},{"buffer":46}],41:[function(require,module,exports){
+},{"buffer":47}],41:[function(require,module,exports){
 (function (Buffer){
 var _algos = require('./algos')
 var createHash = require('create-hash')
@@ -12178,7 +12347,7 @@ module.exports = {
 
 }).call(this,require("buffer").Buffer)
 
-},{"./algos":40,"./sign":43,"./verify":44,"buffer":46,"create-hash":52,"inherits":101,"stream":136}],42:[function(require,module,exports){
+},{"./algos":40,"./sign":43,"./verify":44,"buffer":47,"create-hash":52,"inherits":101,"stream":148}],42:[function(require,module,exports){
 'use strict'
 exports['1.3.132.0.10'] = 'secp256k1'
 
@@ -12382,7 +12551,7 @@ module.exports.makeKey = makeKey
 
 }).call(this,require("buffer").Buffer)
 
-},{"./curves":42,"bn.js":18,"browserify-rsa":39,"buffer":46,"create-hmac":55,"elliptic":67,"parse-asn1":114}],44:[function(require,module,exports){
+},{"./curves":42,"bn.js":18,"browserify-rsa":39,"buffer":47,"create-hmac":55,"elliptic":67,"parse-asn1":114}],44:[function(require,module,exports){
 (function (Buffer){
 // much of this based on https://github.com/indutny/self-signed/blob/gh-pages/lib/rsa.js
 var curves = require('./curves')
@@ -12490,7 +12659,120 @@ module.exports = verify
 
 }).call(this,require("buffer").Buffer)
 
-},{"./curves":42,"bn.js":18,"buffer":46,"elliptic":67,"parse-asn1":114}],45:[function(require,module,exports){
+},{"./curves":42,"bn.js":18,"buffer":47,"elliptic":67,"parse-asn1":114}],45:[function(require,module,exports){
+(function (global){
+'use strict';
+
+var buffer = require('buffer');
+var Buffer = buffer.Buffer;
+var SlowBuffer = buffer.SlowBuffer;
+var MAX_LEN = buffer.kMaxLength || 2147483647;
+exports.alloc = function alloc(size, fill, encoding) {
+  if (typeof Buffer.alloc === 'function') {
+    return Buffer.alloc(size, fill, encoding);
+  }
+  if (typeof encoding === 'number') {
+    throw new TypeError('encoding must not be number');
+  }
+  if (typeof size !== 'number') {
+    throw new TypeError('size must be a number');
+  }
+  if (size > MAX_LEN) {
+    throw new RangeError('size is too large');
+  }
+  var enc = encoding;
+  var _fill = fill;
+  if (_fill === undefined) {
+    enc = undefined;
+    _fill = 0;
+  }
+  var buf = new Buffer(size);
+  if (typeof _fill === 'string') {
+    var fillBuf = new Buffer(_fill, enc);
+    var flen = fillBuf.length;
+    var i = -1;
+    while (++i < size) {
+      buf[i] = fillBuf[i % flen];
+    }
+  } else {
+    buf.fill(_fill);
+  }
+  return buf;
+}
+exports.allocUnsafe = function allocUnsafe(size) {
+  if (typeof Buffer.allocUnsafe === 'function') {
+    return Buffer.allocUnsafe(size);
+  }
+  if (typeof size !== 'number') {
+    throw new TypeError('size must be a number');
+  }
+  if (size > MAX_LEN) {
+    throw new RangeError('size is too large');
+  }
+  return new Buffer(size);
+}
+exports.from = function from(value, encodingOrOffset, length) {
+  if (typeof Buffer.from === 'function' && (!global.Uint8Array || Uint8Array.from !== Buffer.from)) {
+    return Buffer.from(value, encodingOrOffset, length);
+  }
+  if (typeof value === 'number') {
+    throw new TypeError('"value" argument must not be a number');
+  }
+  if (typeof value === 'string') {
+    return new Buffer(value, encodingOrOffset);
+  }
+  if (typeof ArrayBuffer !== 'undefined' && value instanceof ArrayBuffer) {
+    var offset = encodingOrOffset;
+    if (arguments.length === 1) {
+      return new Buffer(value);
+    }
+    if (typeof offset === 'undefined') {
+      offset = 0;
+    }
+    var len = length;
+    if (typeof len === 'undefined') {
+      len = value.byteLength - offset;
+    }
+    if (offset >= value.byteLength) {
+      throw new RangeError('\'offset\' is out of bounds');
+    }
+    if (len > value.byteLength - offset) {
+      throw new RangeError('\'length\' is out of bounds');
+    }
+    return new Buffer(value.slice(offset, offset + len));
+  }
+  if (Buffer.isBuffer(value)) {
+    var out = new Buffer(value.length);
+    value.copy(out, 0, 0, value.length);
+    return out;
+  }
+  if (value) {
+    if (Array.isArray(value) || (typeof ArrayBuffer !== 'undefined' && value.buffer instanceof ArrayBuffer) || 'length' in value) {
+      return new Buffer(value);
+    }
+    if (value.type === 'Buffer' && Array.isArray(value.data)) {
+      return new Buffer(value.data);
+    }
+  }
+
+  throw new TypeError('First argument must be a string, Buffer, ' + 'ArrayBuffer, Array, or array-like object.');
+}
+exports.allocUnsafeSlow = function allocUnsafeSlow(size) {
+  if (typeof Buffer.allocUnsafeSlow === 'function') {
+    return Buffer.allocUnsafeSlow(size);
+  }
+  if (typeof size !== 'number') {
+    throw new TypeError('size must be a number');
+  }
+  if (size >= MAX_LEN) {
+    throw new RangeError('size is too large');
+  }
+  return new SlowBuffer(size);
+}
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+
+},{"buffer":47}],46:[function(require,module,exports){
 (function (Buffer){
 module.exports = function xor (a, b) {
   var length = Math.min(a.length, b.length)
@@ -12505,7 +12787,7 @@ module.exports = function xor (a, b) {
 
 }).call(this,require("buffer").Buffer)
 
-},{"buffer":46}],46:[function(require,module,exports){
+},{"buffer":47}],47:[function(require,module,exports){
 (function (global){
 /*!
  * The buffer module from node.js, for the browser.
@@ -12524,9 +12806,6 @@ var isArray = require('isarray')
 exports.Buffer = Buffer
 exports.SlowBuffer = SlowBuffer
 exports.INSPECT_MAX_BYTES = 50
-Buffer.poolSize = 8192 // not used by this implementation
-
-var rootParent = {}
 
 /**
  * If `Buffer.TYPED_ARRAY_SUPPORT`:
@@ -12556,10 +12835,15 @@ Buffer.TYPED_ARRAY_SUPPORT = global.TYPED_ARRAY_SUPPORT !== undefined
   ? global.TYPED_ARRAY_SUPPORT
   : typedArraySupport()
 
+/*
+ * Export kMaxLength after typed array support is determined.
+ */
+exports.kMaxLength = kMaxLength()
+
 function typedArraySupport () {
   try {
     var arr = new Uint8Array(1)
-    arr.foo = function () { return 42 }
+    arr.__proto__ = {__proto__: Uint8Array.prototype, foo: function () { return 42 }}
     return arr.foo() === 42 && // typed array instances can be augmented
         typeof arr.subarray === 'function' && // chrome 9-10 lack `subarray`
         arr.subarray(1, 1).byteLength === 0 // ie10 has broken `subarray`
@@ -12574,6 +12858,25 @@ function kMaxLength () {
     : 0x3fffffff
 }
 
+function createBuffer (that, length) {
+  if (kMaxLength() < length) {
+    throw new RangeError('Invalid typed array length')
+  }
+  if (Buffer.TYPED_ARRAY_SUPPORT) {
+    // Return an augmented `Uint8Array` instance, for best performance
+    that = new Uint8Array(length)
+    that.__proto__ = Buffer.prototype
+  } else {
+    // Fallback: Return an object instance of the Buffer class
+    if (that === null) {
+      that = new Buffer(length)
+    }
+    that.length = length
+  }
+
+  return that
+}
+
 /**
  * The Buffer constructor returns instances of `Uint8Array` that have their
  * prototype changed to `Buffer.prototype`. Furthermore, `Buffer` is a subclass of
@@ -12583,31 +12886,25 @@ function kMaxLength () {
  *
  * The `Uint8Array` prototype remains unmodified.
  */
-function Buffer (arg) {
-  if (!(this instanceof Buffer)) {
-    // Avoid going through an ArgumentsAdaptorTrampoline in the common case.
-    if (arguments.length > 1) return new Buffer(arg, arguments[1])
-    return new Buffer(arg)
-  }
 
-  if (!Buffer.TYPED_ARRAY_SUPPORT) {
-    this.length = 0
-    this.parent = undefined
+function Buffer (arg, encodingOrOffset, length) {
+  if (!Buffer.TYPED_ARRAY_SUPPORT && !(this instanceof Buffer)) {
+    return new Buffer(arg, encodingOrOffset, length)
   }
 
   // Common case.
   if (typeof arg === 'number') {
-    return fromNumber(this, arg)
+    if (typeof encodingOrOffset === 'string') {
+      throw new Error(
+        'If encoding is specified then the first argument must be a string'
+      )
+    }
+    return allocUnsafe(this, arg)
   }
-
-  // Slightly less common case.
-  if (typeof arg === 'string') {
-    return fromString(this, arg, arguments.length > 1 ? arguments[1] : 'utf8')
-  }
-
-  // Unusual.
-  return fromObject(this, arg)
+  return from(this, arg, encodingOrOffset, length)
 }
+
+Buffer.poolSize = 8192 // not used by this implementation
 
 // TODO: Legacy, not needed anymore. Remove in next major version.
 Buffer._augment = function (arr) {
@@ -12615,118 +12912,32 @@ Buffer._augment = function (arr) {
   return arr
 }
 
-function fromNumber (that, length) {
-  that = allocate(that, length < 0 ? 0 : checked(length) | 0)
-  if (!Buffer.TYPED_ARRAY_SUPPORT) {
-    for (var i = 0; i < length; i++) {
-      that[i] = 0
-    }
+function from (that, value, encodingOrOffset, length) {
+  if (typeof value === 'number') {
+    throw new TypeError('"value" argument must not be a number')
   }
-  return that
+
+  if (typeof ArrayBuffer !== 'undefined' && value instanceof ArrayBuffer) {
+    return fromArrayBuffer(that, value, encodingOrOffset, length)
+  }
+
+  if (typeof value === 'string') {
+    return fromString(that, value, encodingOrOffset)
+  }
+
+  return fromObject(that, value)
 }
 
-function fromString (that, string, encoding) {
-  if (typeof encoding !== 'string' || encoding === '') encoding = 'utf8'
-
-  // Assumption: byteLength() return value is always < kMaxLength.
-  var length = byteLength(string, encoding) | 0
-  that = allocate(that, length)
-
-  that.write(string, encoding)
-  return that
-}
-
-function fromObject (that, object) {
-  if (Buffer.isBuffer(object)) return fromBuffer(that, object)
-
-  if (isArray(object)) return fromArray(that, object)
-
-  if (object == null) {
-    throw new TypeError('must start with number, buffer, array or string')
-  }
-
-  if (typeof ArrayBuffer !== 'undefined') {
-    if (object.buffer instanceof ArrayBuffer) {
-      return fromTypedArray(that, object)
-    }
-    if (object instanceof ArrayBuffer) {
-      return fromArrayBuffer(that, object)
-    }
-  }
-
-  if (object.length) return fromArrayLike(that, object)
-
-  return fromJsonObject(that, object)
-}
-
-function fromBuffer (that, buffer) {
-  var length = checked(buffer.length) | 0
-  that = allocate(that, length)
-  buffer.copy(that, 0, 0, length)
-  return that
-}
-
-function fromArray (that, array) {
-  var length = checked(array.length) | 0
-  that = allocate(that, length)
-  for (var i = 0; i < length; i += 1) {
-    that[i] = array[i] & 255
-  }
-  return that
-}
-
-// Duplicate of fromArray() to keep fromArray() monomorphic.
-function fromTypedArray (that, array) {
-  var length = checked(array.length) | 0
-  that = allocate(that, length)
-  // Truncating the elements is probably not what people expect from typed
-  // arrays with BYTES_PER_ELEMENT > 1 but it's compatible with the behavior
-  // of the old Buffer constructor.
-  for (var i = 0; i < length; i += 1) {
-    that[i] = array[i] & 255
-  }
-  return that
-}
-
-function fromArrayBuffer (that, array) {
-  array.byteLength // this throws if `array` is not a valid ArrayBuffer
-
-  if (Buffer.TYPED_ARRAY_SUPPORT) {
-    // Return an augmented `Uint8Array` instance, for best performance
-    that = new Uint8Array(array)
-    that.__proto__ = Buffer.prototype
-  } else {
-    // Fallback: Return an object instance of the Buffer class
-    that = fromTypedArray(that, new Uint8Array(array))
-  }
-  return that
-}
-
-function fromArrayLike (that, array) {
-  var length = checked(array.length) | 0
-  that = allocate(that, length)
-  for (var i = 0; i < length; i += 1) {
-    that[i] = array[i] & 255
-  }
-  return that
-}
-
-// Deserialize { type: 'Buffer', data: [1,2,3,...] } into a Buffer object.
-// Returns a zero-length buffer for inputs that don't conform to the spec.
-function fromJsonObject (that, object) {
-  var array
-  var length = 0
-
-  if (object.type === 'Buffer' && isArray(object.data)) {
-    array = object.data
-    length = checked(array.length) | 0
-  }
-  that = allocate(that, length)
-
-  for (var i = 0; i < length; i += 1) {
-    that[i] = array[i] & 255
-  }
-  return that
+/**
+ * Functionally equivalent to Buffer(arg, encoding) but throws a TypeError
+ * if value is a number.
+ * Buffer.from(str[, encoding])
+ * Buffer.from(array)
+ * Buffer.from(buffer)
+ * Buffer.from(arrayBuffer[, byteOffset[, length]])
+ **/
+Buffer.from = function (value, encodingOrOffset, length) {
+  return from(null, value, encodingOrOffset, length)
 }
 
 if (Buffer.TYPED_ARRAY_SUPPORT) {
@@ -12740,30 +12951,159 @@ if (Buffer.TYPED_ARRAY_SUPPORT) {
       configurable: true
     })
   }
-} else {
-  // pre-set for values that may exist in the future
-  Buffer.prototype.length = undefined
-  Buffer.prototype.parent = undefined
 }
 
-function allocate (that, length) {
-  if (Buffer.TYPED_ARRAY_SUPPORT) {
-    // Return an augmented `Uint8Array` instance, for best performance
-    that = new Uint8Array(length)
-    that.__proto__ = Buffer.prototype
-  } else {
-    // Fallback: Return an object instance of the Buffer class
-    that.length = length
+function assertSize (size) {
+  if (typeof size !== 'number') {
+    throw new TypeError('"size" argument must be a number')
+  } else if (size < 0) {
+    throw new RangeError('"size" argument must not be negative')
+  }
+}
+
+function alloc (that, size, fill, encoding) {
+  assertSize(size)
+  if (size <= 0) {
+    return createBuffer(that, size)
+  }
+  if (fill !== undefined) {
+    // Only pay attention to encoding if it's a string. This
+    // prevents accidentally sending in a number that would
+    // be interpretted as a start offset.
+    return typeof encoding === 'string'
+      ? createBuffer(that, size).fill(fill, encoding)
+      : createBuffer(that, size).fill(fill)
+  }
+  return createBuffer(that, size)
+}
+
+/**
+ * Creates a new filled Buffer instance.
+ * alloc(size[, fill[, encoding]])
+ **/
+Buffer.alloc = function (size, fill, encoding) {
+  return alloc(null, size, fill, encoding)
+}
+
+function allocUnsafe (that, size) {
+  assertSize(size)
+  that = createBuffer(that, size < 0 ? 0 : checked(size) | 0)
+  if (!Buffer.TYPED_ARRAY_SUPPORT) {
+    for (var i = 0; i < size; ++i) {
+      that[i] = 0
+    }
+  }
+  return that
+}
+
+/**
+ * Equivalent to Buffer(num), by default creates a non-zero-filled Buffer instance.
+ * */
+Buffer.allocUnsafe = function (size) {
+  return allocUnsafe(null, size)
+}
+/**
+ * Equivalent to SlowBuffer(num), by default creates a non-zero-filled Buffer instance.
+ */
+Buffer.allocUnsafeSlow = function (size) {
+  return allocUnsafe(null, size)
+}
+
+function fromString (that, string, encoding) {
+  if (typeof encoding !== 'string' || encoding === '') {
+    encoding = 'utf8'
   }
 
-  var fromPool = length !== 0 && length <= Buffer.poolSize >>> 1
-  if (fromPool) that.parent = rootParent
+  if (!Buffer.isEncoding(encoding)) {
+    throw new TypeError('"encoding" must be a valid string encoding')
+  }
+
+  var length = byteLength(string, encoding) | 0
+  that = createBuffer(that, length)
+
+  var actual = that.write(string, encoding)
+
+  if (actual !== length) {
+    // Writing a hex string, for example, that contains invalid characters will
+    // cause everything after the first invalid character to be ignored. (e.g.
+    // 'abxxcd' will be treated as 'ab')
+    that = that.slice(0, actual)
+  }
 
   return that
 }
 
+function fromArrayLike (that, array) {
+  var length = array.length < 0 ? 0 : checked(array.length) | 0
+  that = createBuffer(that, length)
+  for (var i = 0; i < length; i += 1) {
+    that[i] = array[i] & 255
+  }
+  return that
+}
+
+function fromArrayBuffer (that, array, byteOffset, length) {
+  array.byteLength // this throws if `array` is not a valid ArrayBuffer
+
+  if (byteOffset < 0 || array.byteLength < byteOffset) {
+    throw new RangeError('\'offset\' is out of bounds')
+  }
+
+  if (array.byteLength < byteOffset + (length || 0)) {
+    throw new RangeError('\'length\' is out of bounds')
+  }
+
+  if (byteOffset === undefined && length === undefined) {
+    array = new Uint8Array(array)
+  } else if (length === undefined) {
+    array = new Uint8Array(array, byteOffset)
+  } else {
+    array = new Uint8Array(array, byteOffset, length)
+  }
+
+  if (Buffer.TYPED_ARRAY_SUPPORT) {
+    // Return an augmented `Uint8Array` instance, for best performance
+    that = array
+    that.__proto__ = Buffer.prototype
+  } else {
+    // Fallback: Return an object instance of the Buffer class
+    that = fromArrayLike(that, array)
+  }
+  return that
+}
+
+function fromObject (that, obj) {
+  if (Buffer.isBuffer(obj)) {
+    var len = checked(obj.length) | 0
+    that = createBuffer(that, len)
+
+    if (that.length === 0) {
+      return that
+    }
+
+    obj.copy(that, 0, 0, len)
+    return that
+  }
+
+  if (obj) {
+    if ((typeof ArrayBuffer !== 'undefined' &&
+        obj.buffer instanceof ArrayBuffer) || 'length' in obj) {
+      if (typeof obj.length !== 'number' || isnan(obj.length)) {
+        return createBuffer(that, 0)
+      }
+      return fromArrayLike(that, obj)
+    }
+
+    if (obj.type === 'Buffer' && isArray(obj.data)) {
+      return fromArrayLike(that, obj.data)
+    }
+  }
+
+  throw new TypeError('First argument must be a string, Buffer, ArrayBuffer, Array, or array-like object.')
+}
+
 function checked (length) {
-  // Note: cannot use `length < kMaxLength` here because that fails when
+  // Note: cannot use `length < kMaxLength()` here because that fails when
   // length is NaN (which is otherwise coerced to zero.)
   if (length >= kMaxLength()) {
     throw new RangeError('Attempt to allocate Buffer larger than maximum ' +
@@ -12772,12 +13112,11 @@ function checked (length) {
   return length | 0
 }
 
-function SlowBuffer (subject, encoding) {
-  if (!(this instanceof SlowBuffer)) return new SlowBuffer(subject, encoding)
-
-  var buf = new Buffer(subject, encoding)
-  delete buf.parent
-  return buf
+function SlowBuffer (length) {
+  if (+length != length) { // eslint-disable-line eqeqeq
+    length = 0
+  }
+  return Buffer.alloc(+length)
 }
 
 Buffer.isBuffer = function isBuffer (b) {
@@ -12813,9 +13152,9 @@ Buffer.isEncoding = function isEncoding (encoding) {
     case 'utf8':
     case 'utf-8':
     case 'ascii':
+    case 'latin1':
     case 'binary':
     case 'base64':
-    case 'raw':
     case 'ucs2':
     case 'ucs-2':
     case 'utf16le':
@@ -12827,32 +13166,46 @@ Buffer.isEncoding = function isEncoding (encoding) {
 }
 
 Buffer.concat = function concat (list, length) {
-  if (!isArray(list)) throw new TypeError('list argument must be an Array of Buffers.')
+  if (!isArray(list)) {
+    throw new TypeError('"list" argument must be an Array of Buffers')
+  }
 
   if (list.length === 0) {
-    return new Buffer(0)
+    return Buffer.alloc(0)
   }
 
   var i
   if (length === undefined) {
     length = 0
-    for (i = 0; i < list.length; i++) {
+    for (i = 0; i < list.length; ++i) {
       length += list[i].length
     }
   }
 
-  var buf = new Buffer(length)
+  var buffer = Buffer.allocUnsafe(length)
   var pos = 0
-  for (i = 0; i < list.length; i++) {
-    var item = list[i]
-    item.copy(buf, pos)
-    pos += item.length
+  for (i = 0; i < list.length; ++i) {
+    var buf = list[i]
+    if (!Buffer.isBuffer(buf)) {
+      throw new TypeError('"list" argument must be an Array of Buffers')
+    }
+    buf.copy(buffer, pos)
+    pos += buf.length
   }
-  return buf
+  return buffer
 }
 
 function byteLength (string, encoding) {
-  if (typeof string !== 'string') string = '' + string
+  if (Buffer.isBuffer(string)) {
+    return string.length
+  }
+  if (typeof ArrayBuffer !== 'undefined' && typeof ArrayBuffer.isView === 'function' &&
+      (ArrayBuffer.isView(string) || string instanceof ArrayBuffer)) {
+    return string.byteLength
+  }
+  if (typeof string !== 'string') {
+    string = '' + string
+  }
 
   var len = string.length
   if (len === 0) return 0
@@ -12862,13 +13215,12 @@ function byteLength (string, encoding) {
   for (;;) {
     switch (encoding) {
       case 'ascii':
+      case 'latin1':
       case 'binary':
-      // Deprecated
-      case 'raw':
-      case 'raws':
         return len
       case 'utf8':
       case 'utf-8':
+      case undefined:
         return utf8ToBytes(string).length
       case 'ucs2':
       case 'ucs-2':
@@ -12891,13 +13243,39 @@ Buffer.byteLength = byteLength
 function slowToString (encoding, start, end) {
   var loweredCase = false
 
-  start = start | 0
-  end = end === undefined || end === Infinity ? this.length : end | 0
+  // No need to verify that "this.length <= MAX_UINT32" since it's a read-only
+  // property of a typed array.
+
+  // This behaves neither like String nor Uint8Array in that we set start/end
+  // to their upper/lower bounds if the value passed is out of range.
+  // undefined is handled specially as per ECMA-262 6th Edition,
+  // Section 13.3.3.7 Runtime Semantics: KeyedBindingInitialization.
+  if (start === undefined || start < 0) {
+    start = 0
+  }
+  // Return early if start > this.length. Done here to prevent potential uint32
+  // coercion fail below.
+  if (start > this.length) {
+    return ''
+  }
+
+  if (end === undefined || end > this.length) {
+    end = this.length
+  }
+
+  if (end <= 0) {
+    return ''
+  }
+
+  // Force coersion to uint32. This will also coerce falsey/NaN values to 0.
+  end >>>= 0
+  start >>>= 0
+
+  if (end <= start) {
+    return ''
+  }
 
   if (!encoding) encoding = 'utf8'
-  if (start < 0) start = 0
-  if (end > this.length) end = this.length
-  if (end <= start) return ''
 
   while (true) {
     switch (encoding) {
@@ -12911,8 +13289,9 @@ function slowToString (encoding, start, end) {
       case 'ascii':
         return asciiSlice(this, start, end)
 
+      case 'latin1':
       case 'binary':
-        return binarySlice(this, start, end)
+        return latin1Slice(this, start, end)
 
       case 'base64':
         return base64Slice(this, start, end)
@@ -12934,6 +13313,49 @@ function slowToString (encoding, start, end) {
 // The property is used by `Buffer.isBuffer` and `is-buffer` (in Safari 5-7) to detect
 // Buffer instances.
 Buffer.prototype._isBuffer = true
+
+function swap (b, n, m) {
+  var i = b[n]
+  b[n] = b[m]
+  b[m] = i
+}
+
+Buffer.prototype.swap16 = function swap16 () {
+  var len = this.length
+  if (len % 2 !== 0) {
+    throw new RangeError('Buffer size must be a multiple of 16-bits')
+  }
+  for (var i = 0; i < len; i += 2) {
+    swap(this, i, i + 1)
+  }
+  return this
+}
+
+Buffer.prototype.swap32 = function swap32 () {
+  var len = this.length
+  if (len % 4 !== 0) {
+    throw new RangeError('Buffer size must be a multiple of 32-bits')
+  }
+  for (var i = 0; i < len; i += 4) {
+    swap(this, i, i + 3)
+    swap(this, i + 1, i + 2)
+  }
+  return this
+}
+
+Buffer.prototype.swap64 = function swap64 () {
+  var len = this.length
+  if (len % 8 !== 0) {
+    throw new RangeError('Buffer size must be a multiple of 64-bits')
+  }
+  for (var i = 0; i < len; i += 8) {
+    swap(this, i, i + 7)
+    swap(this, i + 1, i + 6)
+    swap(this, i + 2, i + 5)
+    swap(this, i + 3, i + 4)
+  }
+  return this
+}
 
 Buffer.prototype.toString = function toString () {
   var length = this.length | 0
@@ -12958,50 +13380,197 @@ Buffer.prototype.inspect = function inspect () {
   return '<Buffer ' + str + '>'
 }
 
-Buffer.prototype.compare = function compare (b) {
-  if (!Buffer.isBuffer(b)) throw new TypeError('Argument must be a Buffer')
-  return Buffer.compare(this, b)
+Buffer.prototype.compare = function compare (target, start, end, thisStart, thisEnd) {
+  if (!Buffer.isBuffer(target)) {
+    throw new TypeError('Argument must be a Buffer')
+  }
+
+  if (start === undefined) {
+    start = 0
+  }
+  if (end === undefined) {
+    end = target ? target.length : 0
+  }
+  if (thisStart === undefined) {
+    thisStart = 0
+  }
+  if (thisEnd === undefined) {
+    thisEnd = this.length
+  }
+
+  if (start < 0 || end > target.length || thisStart < 0 || thisEnd > this.length) {
+    throw new RangeError('out of range index')
+  }
+
+  if (thisStart >= thisEnd && start >= end) {
+    return 0
+  }
+  if (thisStart >= thisEnd) {
+    return -1
+  }
+  if (start >= end) {
+    return 1
+  }
+
+  start >>>= 0
+  end >>>= 0
+  thisStart >>>= 0
+  thisEnd >>>= 0
+
+  if (this === target) return 0
+
+  var x = thisEnd - thisStart
+  var y = end - start
+  var len = Math.min(x, y)
+
+  var thisCopy = this.slice(thisStart, thisEnd)
+  var targetCopy = target.slice(start, end)
+
+  for (var i = 0; i < len; ++i) {
+    if (thisCopy[i] !== targetCopy[i]) {
+      x = thisCopy[i]
+      y = targetCopy[i]
+      break
+    }
+  }
+
+  if (x < y) return -1
+  if (y < x) return 1
+  return 0
 }
 
-Buffer.prototype.indexOf = function indexOf (val, byteOffset) {
-  if (byteOffset > 0x7fffffff) byteOffset = 0x7fffffff
-  else if (byteOffset < -0x80000000) byteOffset = -0x80000000
-  byteOffset >>= 0
+// Finds either the first index of `val` in `buffer` at offset >= `byteOffset`,
+// OR the last index of `val` in `buffer` at offset <= `byteOffset`.
+//
+// Arguments:
+// - buffer - a Buffer to search
+// - val - a string, Buffer, or number
+// - byteOffset - an index into `buffer`; will be clamped to an int32
+// - encoding - an optional encoding, relevant is val is a string
+// - dir - true for indexOf, false for lastIndexOf
+function bidirectionalIndexOf (buffer, val, byteOffset, encoding, dir) {
+  // Empty buffer means no match
+  if (buffer.length === 0) return -1
 
-  if (this.length === 0) return -1
-  if (byteOffset >= this.length) return -1
+  // Normalize byteOffset
+  if (typeof byteOffset === 'string') {
+    encoding = byteOffset
+    byteOffset = 0
+  } else if (byteOffset > 0x7fffffff) {
+    byteOffset = 0x7fffffff
+  } else if (byteOffset < -0x80000000) {
+    byteOffset = -0x80000000
+  }
+  byteOffset = +byteOffset  // Coerce to Number.
+  if (isNaN(byteOffset)) {
+    // byteOffset: it it's undefined, null, NaN, "foo", etc, search whole buffer
+    byteOffset = dir ? 0 : (buffer.length - 1)
+  }
 
-  // Negative offsets start from the end of the buffer
-  if (byteOffset < 0) byteOffset = Math.max(this.length + byteOffset, 0)
+  // Normalize byteOffset: negative offsets start from the end of the buffer
+  if (byteOffset < 0) byteOffset = buffer.length + byteOffset
+  if (byteOffset >= buffer.length) {
+    if (dir) return -1
+    else byteOffset = buffer.length - 1
+  } else if (byteOffset < 0) {
+    if (dir) byteOffset = 0
+    else return -1
+  }
 
+  // Normalize val
   if (typeof val === 'string') {
-    if (val.length === 0) return -1 // special case: looking for empty string always fails
-    return String.prototype.indexOf.call(this, val, byteOffset)
-  }
-  if (Buffer.isBuffer(val)) {
-    return arrayIndexOf(this, val, byteOffset)
-  }
-  if (typeof val === 'number') {
-    if (Buffer.TYPED_ARRAY_SUPPORT && Uint8Array.prototype.indexOf === 'function') {
-      return Uint8Array.prototype.indexOf.call(this, val, byteOffset)
-    }
-    return arrayIndexOf(this, [ val ], byteOffset)
+    val = Buffer.from(val, encoding)
   }
 
-  function arrayIndexOf (arr, val, byteOffset) {
-    var foundIndex = -1
-    for (var i = 0; byteOffset + i < arr.length; i++) {
-      if (arr[byteOffset + i] === val[foundIndex === -1 ? 0 : i - foundIndex]) {
-        if (foundIndex === -1) foundIndex = i
-        if (i - foundIndex + 1 === val.length) return byteOffset + foundIndex
+  // Finally, search either indexOf (if dir is true) or lastIndexOf
+  if (Buffer.isBuffer(val)) {
+    // Special case: looking for empty string/buffer always fails
+    if (val.length === 0) {
+      return -1
+    }
+    return arrayIndexOf(buffer, val, byteOffset, encoding, dir)
+  } else if (typeof val === 'number') {
+    val = val & 0xFF // Search for a byte value [0-255]
+    if (Buffer.TYPED_ARRAY_SUPPORT &&
+        typeof Uint8Array.prototype.indexOf === 'function') {
+      if (dir) {
+        return Uint8Array.prototype.indexOf.call(buffer, val, byteOffset)
       } else {
-        foundIndex = -1
+        return Uint8Array.prototype.lastIndexOf.call(buffer, val, byteOffset)
       }
     }
-    return -1
+    return arrayIndexOf(buffer, [ val ], byteOffset, encoding, dir)
   }
 
   throw new TypeError('val must be string, number or Buffer')
+}
+
+function arrayIndexOf (arr, val, byteOffset, encoding, dir) {
+  var indexSize = 1
+  var arrLength = arr.length
+  var valLength = val.length
+
+  if (encoding !== undefined) {
+    encoding = String(encoding).toLowerCase()
+    if (encoding === 'ucs2' || encoding === 'ucs-2' ||
+        encoding === 'utf16le' || encoding === 'utf-16le') {
+      if (arr.length < 2 || val.length < 2) {
+        return -1
+      }
+      indexSize = 2
+      arrLength /= 2
+      valLength /= 2
+      byteOffset /= 2
+    }
+  }
+
+  function read (buf, i) {
+    if (indexSize === 1) {
+      return buf[i]
+    } else {
+      return buf.readUInt16BE(i * indexSize)
+    }
+  }
+
+  var i
+  if (dir) {
+    var foundIndex = -1
+    for (i = byteOffset; i < arrLength; i++) {
+      if (read(arr, i) === read(val, foundIndex === -1 ? 0 : i - foundIndex)) {
+        if (foundIndex === -1) foundIndex = i
+        if (i - foundIndex + 1 === valLength) return foundIndex * indexSize
+      } else {
+        if (foundIndex !== -1) i -= i - foundIndex
+        foundIndex = -1
+      }
+    }
+  } else {
+    if (byteOffset + valLength > arrLength) byteOffset = arrLength - valLength
+    for (i = byteOffset; i >= 0; i--) {
+      var found = true
+      for (var j = 0; j < valLength; j++) {
+        if (read(arr, i + j) !== read(val, j)) {
+          found = false
+          break
+        }
+      }
+      if (found) return i
+    }
+  }
+
+  return -1
+}
+
+Buffer.prototype.includes = function includes (val, byteOffset, encoding) {
+  return this.indexOf(val, byteOffset, encoding) !== -1
+}
+
+Buffer.prototype.indexOf = function indexOf (val, byteOffset, encoding) {
+  return bidirectionalIndexOf(this, val, byteOffset, encoding, true)
+}
+
+Buffer.prototype.lastIndexOf = function lastIndexOf (val, byteOffset, encoding) {
+  return bidirectionalIndexOf(this, val, byteOffset, encoding, false)
 }
 
 function hexWrite (buf, string, offset, length) {
@@ -13018,14 +13587,14 @@ function hexWrite (buf, string, offset, length) {
 
   // must be an even number of digits
   var strLen = string.length
-  if (strLen % 2 !== 0) throw new Error('Invalid hex string')
+  if (strLen % 2 !== 0) throw new TypeError('Invalid hex string')
 
   if (length > strLen / 2) {
     length = strLen / 2
   }
-  for (var i = 0; i < length; i++) {
+  for (var i = 0; i < length; ++i) {
     var parsed = parseInt(string.substr(i * 2, 2), 16)
-    if (isNaN(parsed)) throw new Error('Invalid hex string')
+    if (isNaN(parsed)) return i
     buf[offset + i] = parsed
   }
   return i
@@ -13039,7 +13608,7 @@ function asciiWrite (buf, string, offset, length) {
   return blitBuffer(asciiToBytes(string), buf, offset, length)
 }
 
-function binaryWrite (buf, string, offset, length) {
+function latin1Write (buf, string, offset, length) {
   return asciiWrite(buf, string, offset, length)
 }
 
@@ -13074,17 +13643,16 @@ Buffer.prototype.write = function write (string, offset, length, encoding) {
     }
   // legacy write(string, encoding, offset, length) - remove in v0.13
   } else {
-    var swap = encoding
-    encoding = offset
-    offset = length | 0
-    length = swap
+    throw new Error(
+      'Buffer.write(string, encoding, offset[, length]) is no longer supported'
+    )
   }
 
   var remaining = this.length - offset
   if (length === undefined || length > remaining) length = remaining
 
   if ((string.length > 0 && (length < 0 || offset < 0)) || offset > this.length) {
-    throw new RangeError('attempt to write outside buffer bounds')
+    throw new RangeError('Attempt to write outside buffer bounds')
   }
 
   if (!encoding) encoding = 'utf8'
@@ -13102,8 +13670,9 @@ Buffer.prototype.write = function write (string, offset, length, encoding) {
       case 'ascii':
         return asciiWrite(this, string, offset, length)
 
+      case 'latin1':
       case 'binary':
-        return binaryWrite(this, string, offset, length)
+        return latin1Write(this, string, offset, length)
 
       case 'base64':
         // Warning: maxLength not taken into account in base64Write
@@ -13238,17 +13807,17 @@ function asciiSlice (buf, start, end) {
   var ret = ''
   end = Math.min(buf.length, end)
 
-  for (var i = start; i < end; i++) {
+  for (var i = start; i < end; ++i) {
     ret += String.fromCharCode(buf[i] & 0x7F)
   }
   return ret
 }
 
-function binarySlice (buf, start, end) {
+function latin1Slice (buf, start, end) {
   var ret = ''
   end = Math.min(buf.length, end)
 
-  for (var i = start; i < end; i++) {
+  for (var i = start; i < end; ++i) {
     ret += String.fromCharCode(buf[i])
   }
   return ret
@@ -13261,7 +13830,7 @@ function hexSlice (buf, start, end) {
   if (!end || end < 0 || end > len) end = len
 
   var out = ''
-  for (var i = start; i < end; i++) {
+  for (var i = start; i < end; ++i) {
     out += toHex(buf[i])
   }
   return out
@@ -13304,12 +13873,10 @@ Buffer.prototype.slice = function slice (start, end) {
   } else {
     var sliceLen = end - start
     newBuf = new Buffer(sliceLen, undefined)
-    for (var i = 0; i < sliceLen; i++) {
+    for (var i = 0; i < sliceLen; ++i) {
       newBuf[i] = this[i + start]
     }
   }
-
-  if (newBuf.length) newBuf.parent = this.parent || this
 
   return newBuf
 }
@@ -13479,16 +14046,19 @@ Buffer.prototype.readDoubleBE = function readDoubleBE (offset, noAssert) {
 }
 
 function checkInt (buf, value, offset, ext, max, min) {
-  if (!Buffer.isBuffer(buf)) throw new TypeError('buffer must be a Buffer instance')
-  if (value > max || value < min) throw new RangeError('value is out of bounds')
-  if (offset + ext > buf.length) throw new RangeError('index out of range')
+  if (!Buffer.isBuffer(buf)) throw new TypeError('"buffer" argument must be a Buffer instance')
+  if (value > max || value < min) throw new RangeError('"value" argument is out of bounds')
+  if (offset + ext > buf.length) throw new RangeError('Index out of range')
 }
 
 Buffer.prototype.writeUIntLE = function writeUIntLE (value, offset, byteLength, noAssert) {
   value = +value
   offset = offset | 0
   byteLength = byteLength | 0
-  if (!noAssert) checkInt(this, value, offset, byteLength, Math.pow(2, 8 * byteLength), 0)
+  if (!noAssert) {
+    var maxBytes = Math.pow(2, 8 * byteLength) - 1
+    checkInt(this, value, offset, byteLength, maxBytes, 0)
+  }
 
   var mul = 1
   var i = 0
@@ -13504,7 +14074,10 @@ Buffer.prototype.writeUIntBE = function writeUIntBE (value, offset, byteLength, 
   value = +value
   offset = offset | 0
   byteLength = byteLength | 0
-  if (!noAssert) checkInt(this, value, offset, byteLength, Math.pow(2, 8 * byteLength), 0)
+  if (!noAssert) {
+    var maxBytes = Math.pow(2, 8 * byteLength) - 1
+    checkInt(this, value, offset, byteLength, maxBytes, 0)
+  }
 
   var i = byteLength - 1
   var mul = 1
@@ -13527,7 +14100,7 @@ Buffer.prototype.writeUInt8 = function writeUInt8 (value, offset, noAssert) {
 
 function objectWriteUInt16 (buf, value, offset, littleEndian) {
   if (value < 0) value = 0xffff + value + 1
-  for (var i = 0, j = Math.min(buf.length - offset, 2); i < j; i++) {
+  for (var i = 0, j = Math.min(buf.length - offset, 2); i < j; ++i) {
     buf[offset + i] = (value & (0xff << (8 * (littleEndian ? i : 1 - i)))) >>>
       (littleEndian ? i : 1 - i) * 8
   }
@@ -13561,7 +14134,7 @@ Buffer.prototype.writeUInt16BE = function writeUInt16BE (value, offset, noAssert
 
 function objectWriteUInt32 (buf, value, offset, littleEndian) {
   if (value < 0) value = 0xffffffff + value + 1
-  for (var i = 0, j = Math.min(buf.length - offset, 4); i < j; i++) {
+  for (var i = 0, j = Math.min(buf.length - offset, 4); i < j; ++i) {
     buf[offset + i] = (value >>> (littleEndian ? i : 3 - i) * 8) & 0xff
   }
 }
@@ -13607,9 +14180,12 @@ Buffer.prototype.writeIntLE = function writeIntLE (value, offset, byteLength, no
 
   var i = 0
   var mul = 1
-  var sub = value < 0 ? 1 : 0
+  var sub = 0
   this[offset] = value & 0xFF
   while (++i < byteLength && (mul *= 0x100)) {
+    if (value < 0 && sub === 0 && this[offset + i - 1] !== 0) {
+      sub = 1
+    }
     this[offset + i] = ((value / mul) >> 0) - sub & 0xFF
   }
 
@@ -13627,9 +14203,12 @@ Buffer.prototype.writeIntBE = function writeIntBE (value, offset, byteLength, no
 
   var i = byteLength - 1
   var mul = 1
-  var sub = value < 0 ? 1 : 0
+  var sub = 0
   this[offset + i] = value & 0xFF
   while (--i >= 0 && (mul *= 0x100)) {
+    if (value < 0 && sub === 0 && this[offset + i + 1] !== 0) {
+      sub = 1
+    }
     this[offset + i] = ((value / mul) >> 0) - sub & 0xFF
   }
 
@@ -13704,8 +14283,8 @@ Buffer.prototype.writeInt32BE = function writeInt32BE (value, offset, noAssert) 
 }
 
 function checkIEEE754 (buf, value, offset, ext, max, min) {
-  if (offset + ext > buf.length) throw new RangeError('index out of range')
-  if (offset < 0) throw new RangeError('index out of range')
+  if (offset + ext > buf.length) throw new RangeError('Index out of range')
+  if (offset < 0) throw new RangeError('Index out of range')
 }
 
 function writeFloat (buf, value, offset, littleEndian, noAssert) {
@@ -13770,12 +14349,12 @@ Buffer.prototype.copy = function copy (target, targetStart, start, end) {
 
   if (this === target && start < targetStart && targetStart < end) {
     // descending copy from end
-    for (i = len - 1; i >= 0; i--) {
+    for (i = len - 1; i >= 0; --i) {
       target[i + targetStart] = this[i + start]
     }
   } else if (len < 1000 || !Buffer.TYPED_ARRAY_SUPPORT) {
     // ascending copy from start
-    for (i = 0; i < len; i++) {
+    for (i = 0; i < len; ++i) {
       target[i + targetStart] = this[i + start]
     }
   } else {
@@ -13789,31 +14368,63 @@ Buffer.prototype.copy = function copy (target, targetStart, start, end) {
   return len
 }
 
-// fill(value, start=0, end=buffer.length)
-Buffer.prototype.fill = function fill (value, start, end) {
-  if (!value) value = 0
-  if (!start) start = 0
-  if (!end) end = this.length
+// Usage:
+//    buffer.fill(number[, offset[, end]])
+//    buffer.fill(buffer[, offset[, end]])
+//    buffer.fill(string[, offset[, end]][, encoding])
+Buffer.prototype.fill = function fill (val, start, end, encoding) {
+  // Handle string cases:
+  if (typeof val === 'string') {
+    if (typeof start === 'string') {
+      encoding = start
+      start = 0
+      end = this.length
+    } else if (typeof end === 'string') {
+      encoding = end
+      end = this.length
+    }
+    if (val.length === 1) {
+      var code = val.charCodeAt(0)
+      if (code < 256) {
+        val = code
+      }
+    }
+    if (encoding !== undefined && typeof encoding !== 'string') {
+      throw new TypeError('encoding must be a string')
+    }
+    if (typeof encoding === 'string' && !Buffer.isEncoding(encoding)) {
+      throw new TypeError('Unknown encoding: ' + encoding)
+    }
+  } else if (typeof val === 'number') {
+    val = val & 255
+  }
 
-  if (end < start) throw new RangeError('end < start')
+  // Invalid ranges are not set to a default, so can range check early.
+  if (start < 0 || this.length < start || this.length < end) {
+    throw new RangeError('Out of range index')
+  }
 
-  // Fill 0 bytes; we're done
-  if (end === start) return
-  if (this.length === 0) return
+  if (end <= start) {
+    return this
+  }
 
-  if (start < 0 || start >= this.length) throw new RangeError('start out of bounds')
-  if (end < 0 || end > this.length) throw new RangeError('end out of bounds')
+  start = start >>> 0
+  end = end === undefined ? this.length : end >>> 0
+
+  if (!val) val = 0
 
   var i
-  if (typeof value === 'number') {
-    for (i = start; i < end; i++) {
-      this[i] = value
+  if (typeof val === 'number') {
+    for (i = start; i < end; ++i) {
+      this[i] = val
     }
   } else {
-    var bytes = utf8ToBytes(value.toString())
+    var bytes = Buffer.isBuffer(val)
+      ? val
+      : utf8ToBytes(new Buffer(val, encoding).toString())
     var len = bytes.length
-    for (i = start; i < end; i++) {
-      this[i] = bytes[i % len]
+    for (i = 0; i < end - start; ++i) {
+      this[i + start] = bytes[i % len]
     }
   }
 
@@ -13854,7 +14465,7 @@ function utf8ToBytes (string, units) {
   var leadSurrogate = null
   var bytes = []
 
-  for (var i = 0; i < length; i++) {
+  for (var i = 0; i < length; ++i) {
     codePoint = string.charCodeAt(i)
 
     // is surrogate component
@@ -13929,7 +14540,7 @@ function utf8ToBytes (string, units) {
 
 function asciiToBytes (str) {
   var byteArray = []
-  for (var i = 0; i < str.length; i++) {
+  for (var i = 0; i < str.length; ++i) {
     // Node's code seems to be doing this and not & 0x7F..
     byteArray.push(str.charCodeAt(i) & 0xFF)
   }
@@ -13939,7 +14550,7 @@ function asciiToBytes (str) {
 function utf16leToBytes (str, units) {
   var c, hi, lo
   var byteArray = []
-  for (var i = 0; i < str.length; i++) {
+  for (var i = 0; i < str.length; ++i) {
     if ((units -= 2) < 0) break
 
     c = str.charCodeAt(i)
@@ -13957,23 +14568,20 @@ function base64ToBytes (str) {
 }
 
 function blitBuffer (src, dst, offset, length) {
-  for (var i = 0; i < length; i++) {
+  for (var i = 0; i < length; ++i) {
     if ((i + offset >= dst.length) || (i >= src.length)) break
     dst[i + offset] = src[i]
   }
   return i
 }
 
+function isnan (val) {
+  return val !== val // eslint-disable-line no-self-compare
+}
+
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{"base64-js":15,"ieee754":99,"isarray":47}],47:[function(require,module,exports){
-var toString = {}.toString;
-
-module.exports = Array.isArray || function (arr) {
-  return toString.call(arr) == '[object Array]';
-};
-
-},{}],48:[function(require,module,exports){
+},{"base64-js":15,"ieee754":99,"isarray":103}],48:[function(require,module,exports){
 (function (Buffer){
 var Transform = require('stream').Transform
 var inherits = require('inherits')
@@ -14068,7 +14676,7 @@ CipherBase.prototype._toString = function (value, enc, final) {
 
 }).call(this,require("buffer").Buffer)
 
-},{"buffer":46,"inherits":101,"stream":136,"string_decoder":148}],49:[function(require,module,exports){
+},{"buffer":47,"inherits":101,"stream":148,"string_decoder":149}],49:[function(require,module,exports){
 'use strict';
 
 var voidElements = require('void-elements');
@@ -14206,7 +14814,7 @@ function next(prev, current) {
 
 module.exports = collapseWhitespace;
 
-},{"block-elements":16,"void-elements":154}],50:[function(require,module,exports){
+},{"block-elements":16,"void-elements":156}],50:[function(require,module,exports){
 (function (Buffer){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -14445,7 +15053,7 @@ function formatReturnValue(bn, enc, len) {
 
 }).call(this,require("buffer").Buffer)
 
-},{"bn.js":18,"buffer":46,"elliptic":67}],52:[function(require,module,exports){
+},{"bn.js":18,"buffer":47,"elliptic":67}],52:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 var inherits = require('inherits')
@@ -14502,7 +15110,7 @@ module.exports = function createHash (alg) {
 
 }).call(this,require("buffer").Buffer)
 
-},{"./md5":54,"buffer":46,"cipher-base":48,"inherits":101,"ripemd160":127,"sha.js":129}],53:[function(require,module,exports){
+},{"./md5":54,"buffer":47,"cipher-base":48,"inherits":101,"ripemd160":139,"sha.js":141}],53:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 var intSize = 4;
@@ -14540,7 +15148,7 @@ function hash(buf, fn, hashSize, bigEndian) {
 exports.hash = hash;
 }).call(this,require("buffer").Buffer)
 
-},{"buffer":46}],54:[function(require,module,exports){
+},{"buffer":47}],54:[function(require,module,exports){
 'use strict';
 /*
  * A JavaScript implementation of the RSA Data Security, Inc. MD5 Message
@@ -14770,7 +15378,7 @@ module.exports = function createHmac(alg, key) {
 
 }).call(this,require("buffer").Buffer)
 
-},{"buffer":46,"create-hash/browser":52,"inherits":101,"stream":136}],56:[function(require,module,exports){
+},{"buffer":47,"create-hash/browser":52,"inherits":101,"stream":148}],56:[function(require,module,exports){
 'use strict'
 
 exports.randomBytes = exports.rng = exports.pseudoRandomBytes = exports.prng = require('randombytes')
@@ -14849,7 +15457,7 @@ var publicEncrypt = require('public-encrypt')
   }
 })
 
-},{"browserify-cipher":36,"browserify-sign":41,"browserify-sign/algos":40,"create-ecdh":51,"create-hash":52,"create-hmac":55,"diffie-hellman":63,"pbkdf2":117,"public-encrypt":120,"randombytes":126}],57:[function(require,module,exports){
+},{"browserify-cipher":36,"browserify-sign":41,"browserify-sign/algos":40,"create-ecdh":51,"create-hash":52,"create-hmac":55,"diffie-hellman":63,"pbkdf2":118,"public-encrypt":121,"randombytes":127}],57:[function(require,module,exports){
 'use strict';
 
 exports.utils = require('./des/utils');
@@ -15575,7 +16183,7 @@ exports.createDiffieHellman = exports.DiffieHellman = createDiffieHellman
 
 }).call(this,require("buffer").Buffer)
 
-},{"./lib/dh":64,"./lib/generatePrime":65,"./lib/primes.json":66,"buffer":46}],64:[function(require,module,exports){
+},{"./lib/dh":64,"./lib/generatePrime":65,"./lib/primes.json":66,"buffer":47}],64:[function(require,module,exports){
 (function (Buffer){
 var BN = require('bn.js');
 var MillerRabin = require('miller-rabin');
@@ -15744,7 +16352,7 @@ function formatReturnValue(bn, enc) {
 
 }).call(this,require("buffer").Buffer)
 
-},{"./generatePrime":65,"bn.js":18,"buffer":46,"miller-rabin":109,"randombytes":126}],65:[function(require,module,exports){
+},{"./generatePrime":65,"bn.js":18,"buffer":47,"miller-rabin":109,"randombytes":127}],65:[function(require,module,exports){
 var randomBytes = require('randombytes');
 module.exports = findPrime;
 findPrime.simpleSieve = simpleSieve;
@@ -15851,7 +16459,7 @@ function findPrime(bits, gen) {
 
 }
 
-},{"bn.js":18,"miller-rabin":109,"randombytes":126}],66:[function(require,module,exports){
+},{"bn.js":18,"miller-rabin":109,"randombytes":127}],66:[function(require,module,exports){
 module.exports={
     "modp1": {
         "gen": "02",
@@ -15933,6 +16541,15 @@ function BaseCurve(type, conf) {
   this._wnafT2 = new Array(4);
   this._wnafT3 = new Array(4);
   this._wnafT4 = new Array(4);
+
+  // Generalized Greg Maxwell's trick
+  var adjustCount = this.n && this.p.div(this.n);
+  if (!adjustCount || adjustCount.cmpn(100) > 0) {
+    this.redN = null;
+  } else {
+    this._maxwellTrick = true;
+    this.redN = this.n.toRed(this.red);
+  }
 }
 module.exports = BaseCurve;
 
@@ -16021,7 +16638,8 @@ BaseCurve.prototype._wnafMul = function _wnafMul(p, k) {
 BaseCurve.prototype._wnafMulAdd = function _wnafMulAdd(defW,
                                                        points,
                                                        coeffs,
-                                                       len) {
+                                                       len,
+                                                       jacobianResult) {
   var wndWidth = this._wnafT1;
   var wnd = this._wnafT2;
   var naf = this._wnafT3;
@@ -16134,7 +16752,11 @@ BaseCurve.prototype._wnafMulAdd = function _wnafMulAdd(defW,
   // Zeroify references
   for (var i = 0; i < len; i++)
     wnd[i] = null;
-  return acc.toP();
+
+  if (jacobianResult)
+    return acc;
+  else
+    return acc.toP();
 };
 
 function BasePoint(curve, type) {
@@ -16156,9 +16778,19 @@ BaseCurve.prototype.decodePoint = function decodePoint(bytes, enc) {
   bytes = utils.toArray(bytes, enc);
 
   var len = this.p.byteLength();
-  if (bytes[0] === 0x04 && bytes.length - 1 === 2 * len) {
-    return this.point(bytes.slice(1, 1 + len),
-                      bytes.slice(1 + len, 1 + 2 * len));
+
+  // uncompressed, hybrid-odd, hybrid-even
+  if ((bytes[0] === 0x04 || bytes[0] === 0x06 || bytes[0] === 0x07) &&
+      bytes.length - 1 === 2 * len) {
+    if (bytes[0] === 0x06)
+      assert(bytes[bytes.length - 1] % 2 === 0);
+    else if (bytes[0] === 0x07)
+      assert(bytes[bytes.length - 1] % 2 === 1);
+
+    var res =  this.point(bytes.slice(1, 1 + len),
+                          bytes.slice(1 + len, 1 + 2 * len));
+
+    return res;
   } else if ((bytes[0] === 0x02 || bytes[0] === 0x03) &&
               bytes.length - 1 === len) {
     return this.pointFromX(bytes.slice(1, 1 + len), bytes[0] === 0x03);
@@ -16622,7 +17254,11 @@ Point.prototype.mul = function mul(k) {
 };
 
 Point.prototype.mulAdd = function mulAdd(k1, p, k2) {
-  return this.curve._wnafMulAdd(1, [ this, p ], [ k1, k2 ], 2);
+  return this.curve._wnafMulAdd(1, [ this, p ], [ k1, k2 ], 2, false);
+};
+
+Point.prototype.jmulAdd = function jmulAdd(k1, p, k2) {
+  return this.curve._wnafMulAdd(1, [ this, p ], [ k1, k2 ], 2, true);
 };
 
 Point.prototype.normalize = function normalize() {
@@ -16661,6 +17297,25 @@ Point.prototype.eq = function eq(other) {
   return this === other ||
          this.getX().cmp(other.getX()) === 0 &&
          this.getY().cmp(other.getY()) === 0;
+};
+
+Point.prototype.eqXToP = function eqXToP(x) {
+  var rx = x.toRed(this.curve.red).redMul(this.z);
+  if (this.x.cmp(rx) === 0)
+    return true;
+
+  var xc = x.clone();
+  var t = this.curve.redN.redMul(this.z);
+  for (;;) {
+    xc.iadd(this.curve.n);
+    if (xc.cmp(this.curve.p) >= 0)
+      return false;
+
+    rx.redIAdd(t);
+    if (this.x.cmp(rx) === 0)
+      return true;
+  }
+  return false;
 };
 
 // Compatibility with BaseCurve
@@ -16835,6 +17490,10 @@ Point.prototype.mul = function mul(k) {
 };
 
 Point.prototype.mulAdd = function mulAdd() {
+  throw new Error('Not supported on Montgomery curve');
+};
+
+Point.prototype.jumlAdd = function jumlAdd() {
   throw new Error('Not supported on Montgomery curve');
 };
 
@@ -17075,7 +17734,7 @@ ShortCurve.prototype.validate = function validate(point) {
 };
 
 ShortCurve.prototype._endoWnafMulAdd =
-    function _endoWnafMulAdd(points, coeffs) {
+    function _endoWnafMulAdd(points, coeffs, jacobianResult) {
   var npoints = this._endoWnafT1;
   var ncoeffs = this._endoWnafT2;
   for (var i = 0; i < points.length; i++) {
@@ -17097,7 +17756,7 @@ ShortCurve.prototype._endoWnafMulAdd =
     ncoeffs[i * 2] = split.k1;
     ncoeffs[i * 2 + 1] = split.k2;
   }
-  var res = this._wnafMulAdd(1, npoints, ncoeffs, i * 2);
+  var res = this._wnafMulAdd(1, npoints, ncoeffs, i * 2, jacobianResult);
 
   // Clean-up references to points and coefficients
   for (var j = 0; j < i * 2; j++) {
@@ -17296,6 +17955,15 @@ Point.prototype.mulAdd = function mulAdd(k1, p2, k2) {
     return this.curve._endoWnafMulAdd(points, coeffs);
   else
     return this.curve._wnafMulAdd(1, points, coeffs, 2);
+};
+
+Point.prototype.jmulAdd = function jmulAdd(k1, p2, k2) {
+  var points = [ this, p2 ];
+  var coeffs = [ k1, k2 ];
+  if (this.curve.endo)
+    return this.curve._endoWnafMulAdd(points, coeffs, true);
+  else
+    return this.curve._wnafMulAdd(1, points, coeffs, 2, true);
 };
 
 Point.prototype.eq = function eq(p) {
@@ -17753,6 +18421,26 @@ JPoint.prototype.eq = function eq(p) {
   return this.y.redMul(pz3).redISub(p.y.redMul(z3)).cmpn(0) === 0;
 };
 
+JPoint.prototype.eqXToP = function eqXToP(x) {
+  var zs = this.z.redSqr();
+  var rx = x.toRed(this.curve.red).redMul(zs);
+  if (this.x.cmp(rx) === 0)
+    return true;
+
+  var xc = x.clone();
+  var t = this.curve.redN.redMul(zs);
+  for (;;) {
+    xc.iadd(this.curve.n);
+    if (xc.cmp(this.curve.p) >= 0)
+      return false;
+
+    rx.redIAdd(t);
+    if (this.x.cmp(rx) === 0)
+      return true;
+  }
+  return false;
+};
+
 JPoint.prototype.inspect = function inspect() {
   if (this.isInfinity())
     return '<EC JPoint Infinity>';
@@ -18142,11 +18830,25 @@ EC.prototype.verify = function verify(msg, signature, key, enc) {
   var u1 = sinv.mul(msg).umod(this.n);
   var u2 = sinv.mul(r).umod(this.n);
 
-  var p = this.g.mulAdd(u1, key.getPublic(), u2);
+  if (!this.curve._maxwellTrick) {
+    var p = this.g.mulAdd(u1, key.getPublic(), u2);
+    if (p.isInfinity())
+      return false;
+
+    return p.getX().umod(this.n).cmp(r) === 0;
+  }
+
+  // NOTE: Greg Maxwell's trick, inspired by:
+  // https://git.io/vad3K
+
+  var p = this.g.jmulAdd(u1, key.getPublic(), u2);
   if (p.isInfinity())
     return false;
 
-  return p.getX().umod(this.n).cmp(r) === 0;
+  // Compare `p.x` of Jacobian point with `r`,
+  // this will do `p.x == r * p.z^2` instead of multiplying `p.x` by the
+  // inverse of `p.z^2`
+  return p.eqXToP(r);
 };
 
 EC.prototype.recoverPubKey = function(msg, signature, j, enc) {
@@ -18606,17 +19308,17 @@ KeyPair.prototype.secret = function secret() {
   return this._secret;
 };
 
-cachedProperty(KeyPair, function pubBytes() {
+cachedProperty(KeyPair, 'pubBytes', function pubBytes() {
   return this.eddsa.encodePoint(this.pub());
 });
 
-cachedProperty(KeyPair, function pub() {
+cachedProperty(KeyPair, 'pub', function pub() {
   if (this._pubBytes)
     return this.eddsa.decodePoint(this._pubBytes);
   return this.eddsa.g.mul(this.priv());
 });
 
-cachedProperty(KeyPair, function privBytes() {
+cachedProperty(KeyPair, 'privBytes', function privBytes() {
   var eddsa = this.eddsa;
   var hash = this.hash();
   var lastIx = eddsa.encodingLength - 1;
@@ -18629,15 +19331,15 @@ cachedProperty(KeyPair, function privBytes() {
   return a;
 });
 
-cachedProperty(KeyPair, function priv() {
+cachedProperty(KeyPair, 'priv', function priv() {
   return this.eddsa.decodeInt(this.privBytes());
 });
 
-cachedProperty(KeyPair, function hash() {
+cachedProperty(KeyPair, 'hash', function hash() {
   return this.eddsa.hash().update(this.secret()).digest();
 });
 
-cachedProperty(KeyPair, function messagePrefix() {
+cachedProperty(KeyPair, 'messagePrefix', function messagePrefix() {
   return this.hash().slice(this.eddsa.encodingLength);
 });
 
@@ -18703,19 +19405,19 @@ function Signature(eddsa, sig) {
   this._Sencoded = Array.isArray(sig.S) ? sig.S : sig.Sencoded;
 }
 
-cachedProperty(Signature, function S() {
+cachedProperty(Signature, 'S', function S() {
   return this.eddsa.decodeInt(this.Sencoded());
 });
 
-cachedProperty(Signature, function R() {
+cachedProperty(Signature, 'R', function R() {
   return this.eddsa.decodePoint(this.Rencoded());
 });
 
-cachedProperty(Signature, function Rencoded() {
+cachedProperty(Signature, 'Rencoded', function Rencoded() {
   return this.eddsa.encodePoint(this.R());
 });
 
-cachedProperty(Signature, function Sencoded() {
+cachedProperty(Signature, 'Sencoded', function Sencoded() {
   return this.eddsa.encodeInt(this.S());
 });
 
@@ -19780,8 +20482,7 @@ function getJSF(k1, k2) {
 }
 utils.getJSF = getJSF;
 
-function cachedProperty(obj, computer) {
-  var name = computer.name;
+function cachedProperty(obj, name, computer) {
   var key = '_' + name;
   obj.prototype[name] = function cachedProperty() {
     return this[key] !== undefined ? this[key] :
@@ -19807,20 +20508,24 @@ module.exports={
   "_args": [
     [
       "elliptic@^6.0.0",
-      "/home/mrzapp/Development/Web/node/endomon-cms/node_modules/browserify-sign"
+      "/home/mrzapp/Development/Web/hashbrown-cms/node_modules/browserify-sign"
     ]
   ],
   "_from": "elliptic@>=6.0.0 <7.0.0",
-  "_id": "elliptic@6.2.3",
+  "_id": "elliptic@6.3.1",
   "_inCache": true,
   "_installable": true,
   "_location": "/elliptic",
-  "_nodeVersion": "5.4.1",
+  "_nodeVersion": "6.0.0",
+  "_npmOperationalInternal": {
+    "host": "packages-16-east.internal.npmjs.com",
+    "tmp": "tmp/elliptic-6.3.1.tgz_1465921413402_0.5202967382501811"
+  },
   "_npmUser": {
     "email": "fedor@indutny.com",
     "name": "indutny"
   },
-  "_npmVersion": "3.3.12",
+  "_npmVersion": "3.8.6",
   "_phantomChildren": {},
   "_requested": {
     "name": "elliptic",
@@ -19834,11 +20539,11 @@ module.exports={
     "/browserify-sign",
     "/create-ecdh"
   ],
-  "_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-6.2.3.tgz",
-  "_shasum": "18e46d7306b0951275a2d42063270a14b74ebe99",
+  "_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-6.3.1.tgz",
+  "_shasum": "17781f2109ab0ec686b146bdcff5d2e8c6aeceda",
   "_shrinkwrap": null,
   "_spec": "elliptic@^6.0.0",
-  "_where": "/home/mrzapp/Development/Web/node/endomon-cms/node_modules/browserify-sign",
+  "_where": "/home/mrzapp/Development/Web/hashbrown-cms/node_modules/browserify-sign",
   "author": {
     "email": "fedor@indutny.com",
     "name": "Fedor Indutny"
@@ -19847,14 +20552,22 @@ module.exports={
     "url": "https://github.com/indutny/elliptic/issues"
   },
   "dependencies": {
-    "bn.js": "^4.0.0",
+    "bn.js": "^4.4.0",
     "brorand": "^1.0.1",
     "hash.js": "^1.0.0",
     "inherits": "^2.0.1"
   },
   "description": "EC cryptography",
   "devDependencies": {
+    "brfs": "^1.4.3",
     "coveralls": "^2.11.3",
+    "grunt": "^0.4.5",
+    "grunt-browserify": "^5.0.0",
+    "grunt-contrib-connect": "^1.0.0",
+    "grunt-contrib-copy": "^1.0.0",
+    "grunt-contrib-uglify": "^1.0.1",
+    "grunt-mocha-istanbul": "^3.0.1",
+    "grunt-saucelabs": "^8.6.2",
     "istanbul": "^0.4.2",
     "jscs": "^2.9.0",
     "jshint": "^2.6.0",
@@ -19862,26 +20575,26 @@ module.exports={
   },
   "directories": {},
   "dist": {
-    "shasum": "18e46d7306b0951275a2d42063270a14b74ebe99",
-    "tarball": "https://registry.npmjs.org/elliptic/-/elliptic-6.2.3.tgz"
+    "shasum": "17781f2109ab0ec686b146bdcff5d2e8c6aeceda",
+    "tarball": "https://registry.npmjs.org/elliptic/-/elliptic-6.3.1.tgz"
   },
   "files": [
     "lib"
   ],
-  "gitHead": "c32f20b22b420eb6af3c6dda28963deb7facf823",
+  "gitHead": "c53f5cf3d832c0073eb4a4ed423a464cbce68f3e",
   "homepage": "https://github.com/indutny/elliptic",
   "keywords": [
-    "Cryptography",
     "EC",
     "Elliptic",
-    "curve"
+    "curve",
+    "Cryptography"
   ],
   "license": "MIT",
   "main": "lib/elliptic.js",
   "maintainers": [
     {
-      "name": "indutny",
-      "email": "fedor@indutny.com"
+      "email": "fedor@indutny.com",
+      "name": "indutny"
     }
   ],
   "name": "elliptic",
@@ -19892,15 +20605,14 @@ module.exports={
     "url": "git+ssh://git@github.com/indutny/elliptic.git"
   },
   "scripts": {
-    "coverage": "npm run unit --coverage",
-    "coveralls": "npm run coverage && cat ./coverage/lcov.info | coveralls",
-    "jscs": "jscs benchmarks/*.js lib/*.js lib/**/*.js lib/**/**/*.js test/*.js",
-    "jshint": "jscs benchmarks/*.js lib/*.js lib/**/*.js lib/**/**/*.js test/*.js",
+    "jscs": "jscs benchmarks/*.js lib/*.js lib/**/*.js lib/**/**/*.js test/index.js",
+    "jshint": "jscs benchmarks/*.js lib/*.js lib/**/*.js lib/**/**/*.js test/index.js",
     "lint": "npm run jscs && npm run jshint",
     "test": "npm run lint && npm run unit",
-    "unit": "istanbul test _mocha --reporter=spec test/*-test.js"
+    "unit": "istanbul test _mocha --reporter=spec test/index.js",
+    "version": "grunt dist && git add dist/"
   },
-  "version": "6.2.3"
+  "version": "6.3.1"
 }
 
 },{}],84:[function(require,module,exports){
@@ -19963,8 +20675,12 @@ EventEmitter.prototype.emit = function(type) {
       er = arguments[1];
       if (er instanceof Error) {
         throw er; // Unhandled 'error' event
+      } else {
+        // At least give some kind of context to the user
+        var err = new Error('Uncaught, unspecified "error" event. (' + er + ')');
+        err.context = er;
+        throw err;
       }
-      throw TypeError('Uncaught, unspecified "error" event.');
     }
   }
 
@@ -20276,7 +20992,7 @@ function EVP_BytesToKey (password, salt, keyLen, ivLen) {
 
 }).call(this,require("buffer").Buffer)
 
-},{"buffer":46,"create-hash/md5":54}],86:[function(require,module,exports){
+},{"buffer":47,"create-hash/md5":54}],86:[function(require,module,exports){
 'use strict';
 
 class ContextMenu extends View {
@@ -23129,27 +23845,33 @@ if (typeof Object.create === 'function') {
 }
 
 },{}],102:[function(require,module,exports){
-/**
- * Determine if an object is Buffer
+/*!
+ * Determine if an object is a Buffer
  *
- * Author:   Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
- * License:  MIT
- *
- * `npm install is-buffer`
+ * @author   Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
+ * @license  MIT
  */
 
+// The _isBuffer check is for Safari 5-7 support, because it's missing
+// Object.prototype.constructor. Remove this eventually
 module.exports = function (obj) {
-  return !!(obj != null &&
-    (obj._isBuffer || // For Safari 5-7 (missing Object.prototype.constructor)
-      (obj.constructor &&
-      typeof obj.constructor.isBuffer === 'function' &&
-      obj.constructor.isBuffer(obj))
-    ))
+  return obj != null && (isBuffer(obj) || isSlowBuffer(obj) || !!obj._isBuffer)
+}
+
+function isBuffer (obj) {
+  return !!obj.constructor && typeof obj.constructor.isBuffer === 'function' && obj.constructor.isBuffer(obj)
+}
+
+// For Node v0.10 support. Remove this eventually.
+function isSlowBuffer (obj) {
+  return typeof obj.readFloatLE === 'function' && typeof obj.slice === 'function' && isBuffer(obj.slice(0, 0))
 }
 
 },{}],103:[function(require,module,exports){
+var toString = {}.toString;
+
 module.exports = Array.isArray || function (arr) {
-  return Object.prototype.toString.call(arr) == '[object Array]';
+  return toString.call(arr) == '[object Array]';
 };
 
 },{}],104:[function(require,module,exports){
@@ -23171,18 +23893,18 @@ All methods returned accept two arguments, the source string and an options obje
 
 function get_beautify(js_beautify, css_beautify, html_beautify) {
     // the default is js
-    var beautify = function (src, config) {
+    var beautify = function(src, config) {
         return js_beautify.js_beautify(src, config);
     };
 
     // short aliases
-    beautify.js   = js_beautify.js_beautify;
-    beautify.css  = css_beautify.css_beautify;
+    beautify.js = js_beautify.js_beautify;
+    beautify.css = css_beautify.css_beautify;
     beautify.html = html_beautify.html_beautify;
 
     // legacy aliases
-    beautify.js_beautify   = js_beautify.js_beautify;
-    beautify.css_beautify  = css_beautify.css_beautify;
+    beautify.js_beautify = js_beautify.js_beautify;
+    beautify.css_beautify = css_beautify.css_beautify;
     beautify.html_beautify = html_beautify.html_beautify;
 
     return beautify;
@@ -23207,8 +23929,6 @@ if (typeof define === "function" && define.amd) {
 
     })(module);
 }
-
-
 },{"./lib/beautify":107,"./lib/beautify-css":105,"./lib/beautify-html":106}],105:[function(require,module,exports){
 (function (global){
 /*jshint curly:true, eqeqeq:true, laxbreak:true, noempty:false */
@@ -23252,13 +23972,14 @@ if (typeof define === "function" && define.amd) {
         css_beautify(source_text, options);
 
     The options are (default in brackets):
-        indent_size (4)                   — indentation size,
-        indent_char (space)               — character to indent with,
-        selector_separator_newline (true) - separate selectors with newline or
-                                            not (e.g. "a,\nbr" or "a, br")
-        end_with_newline (false)          - end with a newline
-        newline_between_rules (true)      - add a new line after every css rule
-
+        indent_size (4)                         — indentation size,
+        indent_char (space)                     — character to indent with,
+        selector_separator_newline (true)       - separate selectors with newline or
+                                                  not (e.g. "a,\nbr" or "a, br")
+        end_with_newline (false)                - end with a newline
+        newline_between_rules (true)            - add a new line after every css rule
+        space_around_selector_separator (false) - ensure space around selector separators:
+                                                  '>', '+', '~' (e.g. "a>b" -> "a > b")
     e.g
 
     css_beautify(css_source_text, {
@@ -23266,7 +23987,8 @@ if (typeof define === "function" && define.amd) {
       'indent_char': '\t',
       'selector_separator': ' ',
       'end_with_newline': false,
-      'newline_between_rules': true
+      'newline_between_rules': true,
+      'space_around_selector_separator': true
     });
 */
 
@@ -23278,13 +24000,14 @@ if (typeof define === "function" && define.amd) {
         options = options || {};
         source_text = source_text || '';
         // HACK: newline parsing inconsistent. This brute force normalizes the input.
-        source_text = source_text.replace(/\r\n|[\r\u2028\u2029]/g, '\n')
+        source_text = source_text.replace(/\r\n|[\r\u2028\u2029]/g, '\n');
 
         var indentSize = options.indent_size || 4;
         var indentCharacter = options.indent_char || ' ';
         var selectorSeparatorNewline = (options.selector_separator_newline === undefined) ? true : options.selector_separator_newline;
         var end_with_newline = (options.end_with_newline === undefined) ? false : options.end_with_newline;
         var newline_between_rules = (options.newline_between_rules === undefined) ? true : options.newline_between_rules;
+        var spaceAroundSelectorSeparator = (options.space_around_selector_separator === undefined) ? false : options.space_around_selector_separator;
         var eol = options.eol ? options.eol : '\n';
 
         // compatibility
@@ -23292,17 +24015,16 @@ if (typeof define === "function" && define.amd) {
             indentSize = parseInt(indentSize, 10);
         }
 
-        if(options.indent_with_tabs){
+        if (options.indent_with_tabs) {
             indentCharacter = '\t';
             indentSize = 1;
         }
 
-        eol = eol.replace(/\\r/, '\r').replace(/\\n/, '\n')
+        eol = eol.replace(/\\r/, '\r').replace(/\\n/, '\n');
 
 
         // tokenizer
         var whiteRe = /^\s+$/;
-        var wordRe = /[\w$\-_]/;
 
         var pos = -1,
             ch;
@@ -23402,7 +24124,7 @@ if (typeof define === "function" && define.amd) {
                     // pseudoclasses can contain ()
                     openParen += 1;
                 } else if (ch === ')') {
-                    if (openParen == 0) {
+                    if (openParen === 0) {
                         return false;
                     }
                     openParen -= 1;
@@ -23508,7 +24230,7 @@ if (typeof define === "function" && define.amd) {
                     print.newLine(true);
                 }
             } else if (ch === '/' && peek() === '/') { // single line comment
-                if (!isAfterNewline && last_top_ch !== '{' ) {
+                if (!isAfterNewline && last_top_ch !== '{') {
                     print.trim();
                 }
                 print.singleSpace();
@@ -23516,31 +24238,37 @@ if (typeof define === "function" && define.amd) {
                 print.newLine();
             } else if (ch === '@') {
                 print.preserveSingleSpace();
-                output.push(ch);
 
-                // strip trailing space, if present, for hash property checks
-                var variableOrRule = peekString(": ,;{}()[]/='\"");
+                // deal with less propery mixins @{...}
+                if (peek() === '{') {
+                    output.push(eatString('}'));
+                } else {
+                    output.push(ch);
 
-                if (variableOrRule.match(/[ :]$/)) {
-                    // we have a variable or pseudo-class, add it and insert one space before continuing
-                    next();
-                    variableOrRule = eatString(": ").replace(/\s$/, '');
-                    output.push(variableOrRule);
-                    print.singleSpace();
-                }
+                    // strip trailing space, if present, for hash property checks
+                    var variableOrRule = peekString(": ,;{}()[]/='\"");
 
-                variableOrRule = variableOrRule.replace(/\s$/, '')
+                    if (variableOrRule.match(/[ :]$/)) {
+                        // we have a variable or pseudo-class, add it and insert one space before continuing
+                        next();
+                        variableOrRule = eatString(": ").replace(/\s$/, '');
+                        output.push(variableOrRule);
+                        print.singleSpace();
+                    }
 
-                // might be a nesting at-rule
-                if (variableOrRule in css_beautify.NESTED_AT_RULE) {
-                    nestedLevel += 1;
-                    if (variableOrRule in css_beautify.CONDITIONAL_GROUP_RULE) {
-                        enteringConditionalGroup = true;
+                    variableOrRule = variableOrRule.replace(/\s$/, '');
+
+                    // might be a nesting at-rule
+                    if (variableOrRule in css_beautify.NESTED_AT_RULE) {
+                        nestedLevel += 1;
+                        if (variableOrRule in css_beautify.CONDITIONAL_GROUP_RULE) {
+                            enteringConditionalGroup = true;
+                        }
                     }
                 }
             } else if (ch === '#' && peek() === '{') {
-              print.preserveSingleSpace();
-              output.push(eatString('}'));
+                print.preserveSingleSpace();
+                output.push(eatString('}'));
             } else if (ch === '{') {
                 if (peek(true) === '}') {
                     eatWhitespace();
@@ -23630,13 +24358,22 @@ if (typeof define === "function" && define.amd) {
                 } else {
                     print.singleSpace();
                 }
+            } else if (ch === '>' || ch === '+' || ch === '~') {
+                //handl selector separator spacing
+                if (spaceAroundSelectorSeparator && !insidePropertyValue && parenLevel < 1) {
+                    print.singleSpace();
+                    output.push(ch);
+                    print.singleSpace();
+                } else {
+                    output.push(ch);
+                }
             } else if (ch === ']') {
                 output.push(ch);
             } else if (ch === '[') {
                 print.preserveSingleSpace();
                 output.push(ch);
             } else if (ch === '=') { // no whitespace before or after
-                eatWhitespace()
+                eatWhitespace();
                 ch = '=';
                 output.push(ch);
             } else {
@@ -23658,7 +24395,7 @@ if (typeof define === "function" && define.amd) {
             sweetCode += '\n';
         }
 
-        if (eol != '\n') {
+        if (eol !== '\n') {
             sweetCode = sweetCode.replace(/[\n]/g, eol);
         }
 
@@ -23702,7 +24439,6 @@ if (typeof define === "function" && define.amd) {
     }
 
 }());
-
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
 },{}],106:[function(require,module,exports){
@@ -23781,16 +24517,16 @@ if (typeof define === "function" && define.amd) {
 
 (function() {
 
-    function trim(s) {
-        return s.replace(/^\s+|\s+$/g, '');
-    }
+    // function trim(s) {
+    //     return s.replace(/^\s+|\s+$/g, '');
+    // }
 
     function ltrim(s) {
         return s.replace(/^\s+/g, '');
     }
 
     function rtrim(s) {
-        return s.replace(/\s+$/g,'');
+        return s.replace(/\s+$/g, '');
     }
 
     function style_html(html_source, options, js_beautify, css_beautify) {
@@ -23816,7 +24552,7 @@ if (typeof define === "function" && define.amd) {
 
         // backwards compatibility to 1.3.4
         if ((options.wrap_line_length === undefined || parseInt(options.wrap_line_length, 10) === 0) &&
-                (options.max_char !== undefined && parseInt(options.max_char, 10) !== 0)) {
+            (options.max_char !== undefined && parseInt(options.max_char, 10) !== 0)) {
             options.wrap_line_length = options.max_char;
         }
 
@@ -23824,7 +24560,7 @@ if (typeof define === "function" && define.amd) {
         indent_size = (options.indent_size === undefined) ? 4 : parseInt(options.indent_size, 10);
         indent_character = (options.indent_char === undefined) ? ' ' : options.indent_char;
         brace_style = (options.brace_style === undefined) ? 'collapse' : options.brace_style;
-        wrap_line_length =  parseInt(options.wrap_line_length, 10) === 0 ? 32786 : parseInt(options.wrap_line_length || 250, 10);
+        wrap_line_length = parseInt(options.wrap_line_length, 10) === 0 ? 32786 : parseInt(options.wrap_line_length || 250, 10);
         unformatted = options.unformatted || [
             // https://www.w3.org/TR/html5/dom.html#phrasing-content
             'a', 'abbr', 'area', 'audio', 'b', 'bdi', 'bdo', 'br', 'button', 'canvas', 'cite',
@@ -23840,23 +24576,23 @@ if (typeof define === "function" && define.amd) {
         ];
         preserve_newlines = (options.preserve_newlines === undefined) ? true : options.preserve_newlines;
         max_preserve_newlines = preserve_newlines ?
-            (isNaN(parseInt(options.max_preserve_newlines, 10)) ? 32786 : parseInt(options.max_preserve_newlines, 10))
-            : 0;
+            (isNaN(parseInt(options.max_preserve_newlines, 10)) ? 32786 : parseInt(options.max_preserve_newlines, 10)) :
+            0;
         indent_handlebars = (options.indent_handlebars === undefined) ? false : options.indent_handlebars;
         wrap_attributes = (options.wrap_attributes === undefined) ? 'auto' : options.wrap_attributes;
         wrap_attributes_indent_size = (isNaN(parseInt(options.wrap_attributes_indent_size, 10))) ? indent_size : parseInt(options.wrap_attributes_indent_size, 10);
         end_with_newline = (options.end_with_newline === undefined) ? false : options.end_with_newline;
-        extra_liners = (typeof options.extra_liners == 'object') && options.extra_liners ?
+        extra_liners = (typeof options.extra_liners === 'object') && options.extra_liners ?
             options.extra_liners.concat() : (typeof options.extra_liners === 'string') ?
             options.extra_liners.split(',') : 'head,body,/html'.split(',');
         eol = options.eol ? options.eol : '\n';
 
-        if(options.indent_with_tabs){
+        if (options.indent_with_tabs) {
             indent_character = '\t';
             indent_size = 1;
         }
 
-        eol = eol.replace(/\\r/, '\r').replace(/\\n/, '\n')
+        eol = eol.replace(/\\r/, '\r').replace(/\\n/, '\n');
 
         function Parser() {
 
@@ -23951,8 +24687,7 @@ if (typeof define === "function" && define.amd) {
 
             this.get_content = function() { //function to capture regular content between tags
                 var input_char = '',
-                    content = [],
-                    space = false; //if a space is needed
+                    content = [];
 
                 while (this.input.charAt(this.pos) !== '<') {
                     if (this.pos >= this.input.length) {
@@ -23994,7 +24729,6 @@ if (typeof define === "function" && define.amd) {
                 if (this.pos === this.input.length) {
                     return ['', 'TK_EOF'];
                 }
-                var input_char = '';
                 var content = '';
                 var reg_match = new RegExp('</' + name + '\\s*>', 'igm');
                 reg_match.lastIndex = this.pos;
@@ -24104,7 +24838,7 @@ if (typeof define === "function" && define.amd) {
                         var wrapped = this.space_or_wrap(content);
                         var indentAttrs = wrapped && input_char !== '/' && wrap_attributes !== 'force';
                         space = false;
-                        if (!first_attr && wrap_attributes === 'force' &&  input_char !== '/') {
+                        if (!first_attr && wrap_attributes === 'force' && input_char !== '/') {
                             this.print_newline(false, content);
                             this.print_indentation(content);
                             indentAttrs = true;
@@ -24116,10 +24850,10 @@ if (typeof define === "function" && define.amd) {
                             }
                         }
                         for (var i = 0; i < content.length; i++) {
-                          if (content[i] === ' ') {
-                            first_attr = false;
-                            break;
-                          }
+                            if (content[i] === ' ') {
+                                first_attr = false;
+                                break;
+                            }
                         }
                     }
 
@@ -24209,15 +24943,15 @@ if (typeof define === "function" && define.amd) {
                     this.tag_type = 'SINGLE';
                 } else if (tag_check === 'script' &&
                     (tag_complete.search('type') === -1 ||
-                    (tag_complete.search('type') > -1 &&
-                    tag_complete.search(/\b(text|application)\/(x-)?(javascript|ecmascript|jscript|livescript|(ld\+)?json)/) > -1))) {
+                        (tag_complete.search('type') > -1 &&
+                            tag_complete.search(/\b(text|application)\/(x-)?(javascript|ecmascript|jscript|livescript|(ld\+)?json)/) > -1))) {
                     if (!peek) {
                         this.record_tag(tag_check);
                         this.tag_type = 'SCRIPT';
                     }
                 } else if (tag_check === 'style' &&
                     (tag_complete.search('type') === -1 ||
-                    (tag_complete.search('type') > -1 && tag_complete.search('text/css') > -1))) {
+                        (tag_complete.search('type') > -1 && tag_complete.search('text/css') > -1))) {
                     if (!peek) {
                         this.record_tag(tag_check);
                         this.tag_type = 'STYLE';
@@ -24314,21 +25048,21 @@ if (typeof define === "function" && define.amd) {
             };
 
             function tokenMatcher(delimiter) {
-              var token = '';
+                var token = '';
 
-              var add = function (str) {
-                var newToken = token + str.toLowerCase();
-                token = newToken.length <= delimiter.length ? newToken : newToken.substr(newToken.length - delimiter.length, delimiter.length);
-              };
+                var add = function(str) {
+                    var newToken = token + str.toLowerCase();
+                    token = newToken.length <= delimiter.length ? newToken : newToken.substr(newToken.length - delimiter.length, delimiter.length);
+                };
 
-              var doesNotMatch = function () {
-                return token.indexOf(delimiter) === -1;
-              };
+                var doesNotMatch = function() {
+                    return token.indexOf(delimiter) === -1;
+                };
 
-              return {
-                add: add,
-                doesNotMatch: doesNotMatch
-              };
+                return {
+                    add: add,
+                    doesNotMatch: doesNotMatch
+                };
             }
 
             this.get_unformatted = function(delimiter, orig_tag) { //function to return unformatted content in its entirety
@@ -24454,7 +25188,7 @@ if (typeof define === "function" && define.amd) {
                 this.input = js_source || ''; //gets the input for the Parser
 
                 // HACK: newline parsing inconsistent. This brute force normalizes the input.
-                this.input = this.input.replace(/\r\n|[\r\u2028\u2029]/g, '\n')
+                this.input = this.input.replace(/\r\n|[\r\u2028\u2029]/g, '\n');
 
                 this.output = [];
                 this.indent_character = indent_character;
@@ -24597,9 +25331,9 @@ if (typeof define === "function" && define.amd) {
                 case 'TK_TAG_HANDLEBARS_ELSE':
                     // Don't add a newline if opening {{#if}} tag is on the current line
                     var foundIfOnCurrentLine = false;
-                    for (var lastCheckedOutput=multi_parser.output.length-1; lastCheckedOutput>=0; lastCheckedOutput--) {
-		        if (multi_parser.output[lastCheckedOutput] === '\n') {
-		            break;
+                    for (var lastCheckedOutput = multi_parser.output.length - 1; lastCheckedOutput >= 0; lastCheckedOutput--) {
+                        if (multi_parser.output[lastCheckedOutput] === '\n') {
+                            break;
                         } else {
                             if (multi_parser.output[lastCheckedOutput].match(/{{#if/)) {
                                 foundIfOnCurrentLine = true;
@@ -24688,7 +25422,7 @@ if (typeof define === "function" && define.amd) {
             sweet_code += '\n';
         }
 
-        if (eol != '\n') {
+        if (eol !== '\n') {
             sweet_code = sweet_code.replace(/[\n]/g, eol);
         }
 
@@ -24698,13 +25432,13 @@ if (typeof define === "function" && define.amd) {
     if (typeof define === "function" && define.amd) {
         // Add support for AMD ( https://github.com/amdjs/amdjs-api/wiki/AMD#defineamd-property- )
         define(["require", "./beautify", "./beautify-css"], function(requireamd) {
-            var js_beautify =  requireamd("./beautify");
-            var css_beautify =  requireamd("./beautify-css");
+            var js_beautify = requireamd("./beautify");
+            var css_beautify = requireamd("./beautify-css");
 
             return {
-              html_beautify: function(html_source, options) {
-                return style_html(html_source, options, js_beautify.js_beautify, css_beautify.css_beautify);
-              }
+                html_beautify: function(html_source, options) {
+                    return style_html(html_source, options, js_beautify.js_beautify, css_beautify.css_beautify);
+                }
             };
         });
     } else if (typeof exports !== "undefined") {
@@ -24729,7 +25463,6 @@ if (typeof define === "function" && define.amd) {
     }
 
 }());
-
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
 },{"./beautify-css.js":105,"./beautify.js":107}],107:[function(require,module,exports){
@@ -24820,102 +25553,140 @@ if (typeof define === "function" && define.amd) {
 
 */
 
-(function() {
-
-    var acorn = {};
-    (function (exports) {
-      // This section of code is taken from acorn.
-      //
-      // Acorn was written by Marijn Haverbeke and released under an MIT
-      // license. The Unicode regexps (for identifiers and whitespace) were
-      // taken from [Esprima](http://esprima.org) by Ariya Hidayat.
-      //
-      // Git repositories for Acorn are available at
-      //
-      //     http://marijnhaverbeke.nl/git/acorn
-      //     https://github.com/marijnh/acorn.git
-
-      // ## Character categories
-
-      // Big ugly regular expressions that match characters in the
-      // whitespace, identifier, and identifier-start categories. These
-      // are only applied when a character is found to actually have a
-      // code point above 128.
-
-      var nonASCIIwhitespace = /[\u1680\u180e\u2000-\u200a\u202f\u205f\u3000\ufeff]/;
-      var nonASCIIidentifierStartChars = "\xaa\xb5\xba\xc0-\xd6\xd8-\xf6\xf8-\u02c1\u02c6-\u02d1\u02e0-\u02e4\u02ec\u02ee\u0370-\u0374\u0376\u0377\u037a-\u037d\u0386\u0388-\u038a\u038c\u038e-\u03a1\u03a3-\u03f5\u03f7-\u0481\u048a-\u0527\u0531-\u0556\u0559\u0561-\u0587\u05d0-\u05ea\u05f0-\u05f2\u0620-\u064a\u066e\u066f\u0671-\u06d3\u06d5\u06e5\u06e6\u06ee\u06ef\u06fa-\u06fc\u06ff\u0710\u0712-\u072f\u074d-\u07a5\u07b1\u07ca-\u07ea\u07f4\u07f5\u07fa\u0800-\u0815\u081a\u0824\u0828\u0840-\u0858\u08a0\u08a2-\u08ac\u0904-\u0939\u093d\u0950\u0958-\u0961\u0971-\u0977\u0979-\u097f\u0985-\u098c\u098f\u0990\u0993-\u09a8\u09aa-\u09b0\u09b2\u09b6-\u09b9\u09bd\u09ce\u09dc\u09dd\u09df-\u09e1\u09f0\u09f1\u0a05-\u0a0a\u0a0f\u0a10\u0a13-\u0a28\u0a2a-\u0a30\u0a32\u0a33\u0a35\u0a36\u0a38\u0a39\u0a59-\u0a5c\u0a5e\u0a72-\u0a74\u0a85-\u0a8d\u0a8f-\u0a91\u0a93-\u0aa8\u0aaa-\u0ab0\u0ab2\u0ab3\u0ab5-\u0ab9\u0abd\u0ad0\u0ae0\u0ae1\u0b05-\u0b0c\u0b0f\u0b10\u0b13-\u0b28\u0b2a-\u0b30\u0b32\u0b33\u0b35-\u0b39\u0b3d\u0b5c\u0b5d\u0b5f-\u0b61\u0b71\u0b83\u0b85-\u0b8a\u0b8e-\u0b90\u0b92-\u0b95\u0b99\u0b9a\u0b9c\u0b9e\u0b9f\u0ba3\u0ba4\u0ba8-\u0baa\u0bae-\u0bb9\u0bd0\u0c05-\u0c0c\u0c0e-\u0c10\u0c12-\u0c28\u0c2a-\u0c33\u0c35-\u0c39\u0c3d\u0c58\u0c59\u0c60\u0c61\u0c85-\u0c8c\u0c8e-\u0c90\u0c92-\u0ca8\u0caa-\u0cb3\u0cb5-\u0cb9\u0cbd\u0cde\u0ce0\u0ce1\u0cf1\u0cf2\u0d05-\u0d0c\u0d0e-\u0d10\u0d12-\u0d3a\u0d3d\u0d4e\u0d60\u0d61\u0d7a-\u0d7f\u0d85-\u0d96\u0d9a-\u0db1\u0db3-\u0dbb\u0dbd\u0dc0-\u0dc6\u0e01-\u0e30\u0e32\u0e33\u0e40-\u0e46\u0e81\u0e82\u0e84\u0e87\u0e88\u0e8a\u0e8d\u0e94-\u0e97\u0e99-\u0e9f\u0ea1-\u0ea3\u0ea5\u0ea7\u0eaa\u0eab\u0ead-\u0eb0\u0eb2\u0eb3\u0ebd\u0ec0-\u0ec4\u0ec6\u0edc-\u0edf\u0f00\u0f40-\u0f47\u0f49-\u0f6c\u0f88-\u0f8c\u1000-\u102a\u103f\u1050-\u1055\u105a-\u105d\u1061\u1065\u1066\u106e-\u1070\u1075-\u1081\u108e\u10a0-\u10c5\u10c7\u10cd\u10d0-\u10fa\u10fc-\u1248\u124a-\u124d\u1250-\u1256\u1258\u125a-\u125d\u1260-\u1288\u128a-\u128d\u1290-\u12b0\u12b2-\u12b5\u12b8-\u12be\u12c0\u12c2-\u12c5\u12c8-\u12d6\u12d8-\u1310\u1312-\u1315\u1318-\u135a\u1380-\u138f\u13a0-\u13f4\u1401-\u166c\u166f-\u167f\u1681-\u169a\u16a0-\u16ea\u16ee-\u16f0\u1700-\u170c\u170e-\u1711\u1720-\u1731\u1740-\u1751\u1760-\u176c\u176e-\u1770\u1780-\u17b3\u17d7\u17dc\u1820-\u1877\u1880-\u18a8\u18aa\u18b0-\u18f5\u1900-\u191c\u1950-\u196d\u1970-\u1974\u1980-\u19ab\u19c1-\u19c7\u1a00-\u1a16\u1a20-\u1a54\u1aa7\u1b05-\u1b33\u1b45-\u1b4b\u1b83-\u1ba0\u1bae\u1baf\u1bba-\u1be5\u1c00-\u1c23\u1c4d-\u1c4f\u1c5a-\u1c7d\u1ce9-\u1cec\u1cee-\u1cf1\u1cf5\u1cf6\u1d00-\u1dbf\u1e00-\u1f15\u1f18-\u1f1d\u1f20-\u1f45\u1f48-\u1f4d\u1f50-\u1f57\u1f59\u1f5b\u1f5d\u1f5f-\u1f7d\u1f80-\u1fb4\u1fb6-\u1fbc\u1fbe\u1fc2-\u1fc4\u1fc6-\u1fcc\u1fd0-\u1fd3\u1fd6-\u1fdb\u1fe0-\u1fec\u1ff2-\u1ff4\u1ff6-\u1ffc\u2071\u207f\u2090-\u209c\u2102\u2107\u210a-\u2113\u2115\u2119-\u211d\u2124\u2126\u2128\u212a-\u212d\u212f-\u2139\u213c-\u213f\u2145-\u2149\u214e\u2160-\u2188\u2c00-\u2c2e\u2c30-\u2c5e\u2c60-\u2ce4\u2ceb-\u2cee\u2cf2\u2cf3\u2d00-\u2d25\u2d27\u2d2d\u2d30-\u2d67\u2d6f\u2d80-\u2d96\u2da0-\u2da6\u2da8-\u2dae\u2db0-\u2db6\u2db8-\u2dbe\u2dc0-\u2dc6\u2dc8-\u2dce\u2dd0-\u2dd6\u2dd8-\u2dde\u2e2f\u3005-\u3007\u3021-\u3029\u3031-\u3035\u3038-\u303c\u3041-\u3096\u309d-\u309f\u30a1-\u30fa\u30fc-\u30ff\u3105-\u312d\u3131-\u318e\u31a0-\u31ba\u31f0-\u31ff\u3400-\u4db5\u4e00-\u9fcc\ua000-\ua48c\ua4d0-\ua4fd\ua500-\ua60c\ua610-\ua61f\ua62a\ua62b\ua640-\ua66e\ua67f-\ua697\ua6a0-\ua6ef\ua717-\ua71f\ua722-\ua788\ua78b-\ua78e\ua790-\ua793\ua7a0-\ua7aa\ua7f8-\ua801\ua803-\ua805\ua807-\ua80a\ua80c-\ua822\ua840-\ua873\ua882-\ua8b3\ua8f2-\ua8f7\ua8fb\ua90a-\ua925\ua930-\ua946\ua960-\ua97c\ua984-\ua9b2\ua9cf\uaa00-\uaa28\uaa40-\uaa42\uaa44-\uaa4b\uaa60-\uaa76\uaa7a\uaa80-\uaaaf\uaab1\uaab5\uaab6\uaab9-\uaabd\uaac0\uaac2\uaadb-\uaadd\uaae0-\uaaea\uaaf2-\uaaf4\uab01-\uab06\uab09-\uab0e\uab11-\uab16\uab20-\uab26\uab28-\uab2e\uabc0-\uabe2\uac00-\ud7a3\ud7b0-\ud7c6\ud7cb-\ud7fb\uf900-\ufa6d\ufa70-\ufad9\ufb00-\ufb06\ufb13-\ufb17\ufb1d\ufb1f-\ufb28\ufb2a-\ufb36\ufb38-\ufb3c\ufb3e\ufb40\ufb41\ufb43\ufb44\ufb46-\ufbb1\ufbd3-\ufd3d\ufd50-\ufd8f\ufd92-\ufdc7\ufdf0-\ufdfb\ufe70-\ufe74\ufe76-\ufefc\uff21-\uff3a\uff41-\uff5a\uff66-\uffbe\uffc2-\uffc7\uffca-\uffcf\uffd2-\uffd7\uffda-\uffdc";
-      var nonASCIIidentifierChars = "\u0300-\u036f\u0483-\u0487\u0591-\u05bd\u05bf\u05c1\u05c2\u05c4\u05c5\u05c7\u0610-\u061a\u0620-\u0649\u0672-\u06d3\u06e7-\u06e8\u06fb-\u06fc\u0730-\u074a\u0800-\u0814\u081b-\u0823\u0825-\u0827\u0829-\u082d\u0840-\u0857\u08e4-\u08fe\u0900-\u0903\u093a-\u093c\u093e-\u094f\u0951-\u0957\u0962-\u0963\u0966-\u096f\u0981-\u0983\u09bc\u09be-\u09c4\u09c7\u09c8\u09d7\u09df-\u09e0\u0a01-\u0a03\u0a3c\u0a3e-\u0a42\u0a47\u0a48\u0a4b-\u0a4d\u0a51\u0a66-\u0a71\u0a75\u0a81-\u0a83\u0abc\u0abe-\u0ac5\u0ac7-\u0ac9\u0acb-\u0acd\u0ae2-\u0ae3\u0ae6-\u0aef\u0b01-\u0b03\u0b3c\u0b3e-\u0b44\u0b47\u0b48\u0b4b-\u0b4d\u0b56\u0b57\u0b5f-\u0b60\u0b66-\u0b6f\u0b82\u0bbe-\u0bc2\u0bc6-\u0bc8\u0bca-\u0bcd\u0bd7\u0be6-\u0bef\u0c01-\u0c03\u0c46-\u0c48\u0c4a-\u0c4d\u0c55\u0c56\u0c62-\u0c63\u0c66-\u0c6f\u0c82\u0c83\u0cbc\u0cbe-\u0cc4\u0cc6-\u0cc8\u0cca-\u0ccd\u0cd5\u0cd6\u0ce2-\u0ce3\u0ce6-\u0cef\u0d02\u0d03\u0d46-\u0d48\u0d57\u0d62-\u0d63\u0d66-\u0d6f\u0d82\u0d83\u0dca\u0dcf-\u0dd4\u0dd6\u0dd8-\u0ddf\u0df2\u0df3\u0e34-\u0e3a\u0e40-\u0e45\u0e50-\u0e59\u0eb4-\u0eb9\u0ec8-\u0ecd\u0ed0-\u0ed9\u0f18\u0f19\u0f20-\u0f29\u0f35\u0f37\u0f39\u0f41-\u0f47\u0f71-\u0f84\u0f86-\u0f87\u0f8d-\u0f97\u0f99-\u0fbc\u0fc6\u1000-\u1029\u1040-\u1049\u1067-\u106d\u1071-\u1074\u1082-\u108d\u108f-\u109d\u135d-\u135f\u170e-\u1710\u1720-\u1730\u1740-\u1750\u1772\u1773\u1780-\u17b2\u17dd\u17e0-\u17e9\u180b-\u180d\u1810-\u1819\u1920-\u192b\u1930-\u193b\u1951-\u196d\u19b0-\u19c0\u19c8-\u19c9\u19d0-\u19d9\u1a00-\u1a15\u1a20-\u1a53\u1a60-\u1a7c\u1a7f-\u1a89\u1a90-\u1a99\u1b46-\u1b4b\u1b50-\u1b59\u1b6b-\u1b73\u1bb0-\u1bb9\u1be6-\u1bf3\u1c00-\u1c22\u1c40-\u1c49\u1c5b-\u1c7d\u1cd0-\u1cd2\u1d00-\u1dbe\u1e01-\u1f15\u200c\u200d\u203f\u2040\u2054\u20d0-\u20dc\u20e1\u20e5-\u20f0\u2d81-\u2d96\u2de0-\u2dff\u3021-\u3028\u3099\u309a\ua640-\ua66d\ua674-\ua67d\ua69f\ua6f0-\ua6f1\ua7f8-\ua800\ua806\ua80b\ua823-\ua827\ua880-\ua881\ua8b4-\ua8c4\ua8d0-\ua8d9\ua8f3-\ua8f7\ua900-\ua909\ua926-\ua92d\ua930-\ua945\ua980-\ua983\ua9b3-\ua9c0\uaa00-\uaa27\uaa40-\uaa41\uaa4c-\uaa4d\uaa50-\uaa59\uaa7b\uaae0-\uaae9\uaaf2-\uaaf3\uabc0-\uabe1\uabec\uabed\uabf0-\uabf9\ufb20-\ufb28\ufe00-\ufe0f\ufe20-\ufe26\ufe33\ufe34\ufe4d-\ufe4f\uff10-\uff19\uff3f";
-      var nonASCIIidentifierStart = new RegExp("[" + nonASCIIidentifierStartChars + "]");
-      var nonASCIIidentifier = new RegExp("[" + nonASCIIidentifierStartChars + nonASCIIidentifierChars + "]");
-
-      // Whether a single character denotes a newline.
-
-      var newline = exports.newline = /[\n\r\u2028\u2029]/;
-
-      // Matches a whole line break (where CRLF is considered a single
-      // line break). Used to count lines.
-
-      // in javascript, these two differ
-      // in python they are the same, different methods are called on them
-      var lineBreak = exports.lineBreak = /\r\n|[\n\r\u2028\u2029]/;
-      var allLineBreaks = exports.allLineBreaks = new RegExp(lineBreak.source, 'g');
-
-
-      // Test whether a given character code starts an identifier.
-
-      var isIdentifierStart = exports.isIdentifierStart = function(code) {
-        // permit $ (36) and @ (64). @ is used in ES7 decorators.
-        if (code < 65) return code === 36 || code === 64;
-        // 65 through 91 are uppercase letters.
-        if (code < 91) return true;
-        // permit _ (95).
-        if (code < 97) return code === 95;
-        // 97 through 123 are lowercase letters.
-        if (code < 123)return true;
-        return code >= 0xaa && nonASCIIidentifierStart.test(String.fromCharCode(code));
-      };
-
-      // Test whether a given character is part of an identifier.
-
-      var isIdentifierChar = exports.isIdentifierChar = function(code) {
-        if (code < 48) return code === 36;
-        if (code < 58) return true;
-        if (code < 65) return false;
-        if (code < 91) return true;
-        if (code < 97) return code === 95;
-        if (code < 123)return true;
-        return code >= 0xaa && nonASCIIidentifier.test(String.fromCharCode(code));
-      };
-    })(acorn);
-
-    function in_array(what, arr) {
-        for (var i = 0; i < arr.length; i += 1) {
-            if (arr[i] === what) {
-                return true;
+// Object.values polyfill found here:
+// http://tokenposts.blogspot.com.au/2012/04/javascript-objectkeys-browser.html
+if (!Object.values) {
+    Object.values = function(o) {
+        if (o !== Object(o)) {
+            throw new TypeError('Object.values called on a non-object');
+        }
+        var k = [],
+            p;
+        for (p in o) {
+            if (Object.prototype.hasOwnProperty.call(o, p)) {
+                k.push(o[p]);
             }
         }
-        return false;
-    }
+        return k;
+    };
+}
 
-    function trim(s) {
-        return s.replace(/^\s+|\s+$/g, '');
-    }
-
-    function ltrim(s) {
-        return s.replace(/^\s+/g, '');
-    }
-
-    function rtrim(s) {
-        return s.replace(/\s+$/g, '');
-    }
+(function() {
 
     function js_beautify(js_source_text, options) {
-        "use strict";
-        var beautifier = new Beautifier(js_source_text, options);
-        return beautifier.beautify();
-    }
 
-    var MODE = {
+        var acorn = {};
+        (function(exports) {
+            /* jshint curly: false */
+            // This section of code is taken from acorn.
+            //
+            // Acorn was written by Marijn Haverbeke and released under an MIT
+            // license. The Unicode regexps (for identifiers and whitespace) were
+            // taken from [Esprima](http://esprima.org) by Ariya Hidayat.
+            //
+            // Git repositories for Acorn are available at
+            //
+            //     http://marijnhaverbeke.nl/git/acorn
+            //     https://github.com/marijnh/acorn.git
+
+            // ## Character categories
+
+            // Big ugly regular expressions that match characters in the
+            // whitespace, identifier, and identifier-start categories. These
+            // are only applied when a character is found to actually have a
+            // code point above 128.
+
+            var nonASCIIwhitespace = /[\u1680\u180e\u2000-\u200a\u202f\u205f\u3000\ufeff]/; // jshint ignore:line
+            var nonASCIIidentifierStartChars = "\xaa\xb5\xba\xc0-\xd6\xd8-\xf6\xf8-\u02c1\u02c6-\u02d1\u02e0-\u02e4\u02ec\u02ee\u0370-\u0374\u0376\u0377\u037a-\u037d\u0386\u0388-\u038a\u038c\u038e-\u03a1\u03a3-\u03f5\u03f7-\u0481\u048a-\u0527\u0531-\u0556\u0559\u0561-\u0587\u05d0-\u05ea\u05f0-\u05f2\u0620-\u064a\u066e\u066f\u0671-\u06d3\u06d5\u06e5\u06e6\u06ee\u06ef\u06fa-\u06fc\u06ff\u0710\u0712-\u072f\u074d-\u07a5\u07b1\u07ca-\u07ea\u07f4\u07f5\u07fa\u0800-\u0815\u081a\u0824\u0828\u0840-\u0858\u08a0\u08a2-\u08ac\u0904-\u0939\u093d\u0950\u0958-\u0961\u0971-\u0977\u0979-\u097f\u0985-\u098c\u098f\u0990\u0993-\u09a8\u09aa-\u09b0\u09b2\u09b6-\u09b9\u09bd\u09ce\u09dc\u09dd\u09df-\u09e1\u09f0\u09f1\u0a05-\u0a0a\u0a0f\u0a10\u0a13-\u0a28\u0a2a-\u0a30\u0a32\u0a33\u0a35\u0a36\u0a38\u0a39\u0a59-\u0a5c\u0a5e\u0a72-\u0a74\u0a85-\u0a8d\u0a8f-\u0a91\u0a93-\u0aa8\u0aaa-\u0ab0\u0ab2\u0ab3\u0ab5-\u0ab9\u0abd\u0ad0\u0ae0\u0ae1\u0b05-\u0b0c\u0b0f\u0b10\u0b13-\u0b28\u0b2a-\u0b30\u0b32\u0b33\u0b35-\u0b39\u0b3d\u0b5c\u0b5d\u0b5f-\u0b61\u0b71\u0b83\u0b85-\u0b8a\u0b8e-\u0b90\u0b92-\u0b95\u0b99\u0b9a\u0b9c\u0b9e\u0b9f\u0ba3\u0ba4\u0ba8-\u0baa\u0bae-\u0bb9\u0bd0\u0c05-\u0c0c\u0c0e-\u0c10\u0c12-\u0c28\u0c2a-\u0c33\u0c35-\u0c39\u0c3d\u0c58\u0c59\u0c60\u0c61\u0c85-\u0c8c\u0c8e-\u0c90\u0c92-\u0ca8\u0caa-\u0cb3\u0cb5-\u0cb9\u0cbd\u0cde\u0ce0\u0ce1\u0cf1\u0cf2\u0d05-\u0d0c\u0d0e-\u0d10\u0d12-\u0d3a\u0d3d\u0d4e\u0d60\u0d61\u0d7a-\u0d7f\u0d85-\u0d96\u0d9a-\u0db1\u0db3-\u0dbb\u0dbd\u0dc0-\u0dc6\u0e01-\u0e30\u0e32\u0e33\u0e40-\u0e46\u0e81\u0e82\u0e84\u0e87\u0e88\u0e8a\u0e8d\u0e94-\u0e97\u0e99-\u0e9f\u0ea1-\u0ea3\u0ea5\u0ea7\u0eaa\u0eab\u0ead-\u0eb0\u0eb2\u0eb3\u0ebd\u0ec0-\u0ec4\u0ec6\u0edc-\u0edf\u0f00\u0f40-\u0f47\u0f49-\u0f6c\u0f88-\u0f8c\u1000-\u102a\u103f\u1050-\u1055\u105a-\u105d\u1061\u1065\u1066\u106e-\u1070\u1075-\u1081\u108e\u10a0-\u10c5\u10c7\u10cd\u10d0-\u10fa\u10fc-\u1248\u124a-\u124d\u1250-\u1256\u1258\u125a-\u125d\u1260-\u1288\u128a-\u128d\u1290-\u12b0\u12b2-\u12b5\u12b8-\u12be\u12c0\u12c2-\u12c5\u12c8-\u12d6\u12d8-\u1310\u1312-\u1315\u1318-\u135a\u1380-\u138f\u13a0-\u13f4\u1401-\u166c\u166f-\u167f\u1681-\u169a\u16a0-\u16ea\u16ee-\u16f0\u1700-\u170c\u170e-\u1711\u1720-\u1731\u1740-\u1751\u1760-\u176c\u176e-\u1770\u1780-\u17b3\u17d7\u17dc\u1820-\u1877\u1880-\u18a8\u18aa\u18b0-\u18f5\u1900-\u191c\u1950-\u196d\u1970-\u1974\u1980-\u19ab\u19c1-\u19c7\u1a00-\u1a16\u1a20-\u1a54\u1aa7\u1b05-\u1b33\u1b45-\u1b4b\u1b83-\u1ba0\u1bae\u1baf\u1bba-\u1be5\u1c00-\u1c23\u1c4d-\u1c4f\u1c5a-\u1c7d\u1ce9-\u1cec\u1cee-\u1cf1\u1cf5\u1cf6\u1d00-\u1dbf\u1e00-\u1f15\u1f18-\u1f1d\u1f20-\u1f45\u1f48-\u1f4d\u1f50-\u1f57\u1f59\u1f5b\u1f5d\u1f5f-\u1f7d\u1f80-\u1fb4\u1fb6-\u1fbc\u1fbe\u1fc2-\u1fc4\u1fc6-\u1fcc\u1fd0-\u1fd3\u1fd6-\u1fdb\u1fe0-\u1fec\u1ff2-\u1ff4\u1ff6-\u1ffc\u2071\u207f\u2090-\u209c\u2102\u2107\u210a-\u2113\u2115\u2119-\u211d\u2124\u2126\u2128\u212a-\u212d\u212f-\u2139\u213c-\u213f\u2145-\u2149\u214e\u2160-\u2188\u2c00-\u2c2e\u2c30-\u2c5e\u2c60-\u2ce4\u2ceb-\u2cee\u2cf2\u2cf3\u2d00-\u2d25\u2d27\u2d2d\u2d30-\u2d67\u2d6f\u2d80-\u2d96\u2da0-\u2da6\u2da8-\u2dae\u2db0-\u2db6\u2db8-\u2dbe\u2dc0-\u2dc6\u2dc8-\u2dce\u2dd0-\u2dd6\u2dd8-\u2dde\u2e2f\u3005-\u3007\u3021-\u3029\u3031-\u3035\u3038-\u303c\u3041-\u3096\u309d-\u309f\u30a1-\u30fa\u30fc-\u30ff\u3105-\u312d\u3131-\u318e\u31a0-\u31ba\u31f0-\u31ff\u3400-\u4db5\u4e00-\u9fcc\ua000-\ua48c\ua4d0-\ua4fd\ua500-\ua60c\ua610-\ua61f\ua62a\ua62b\ua640-\ua66e\ua67f-\ua697\ua6a0-\ua6ef\ua717-\ua71f\ua722-\ua788\ua78b-\ua78e\ua790-\ua793\ua7a0-\ua7aa\ua7f8-\ua801\ua803-\ua805\ua807-\ua80a\ua80c-\ua822\ua840-\ua873\ua882-\ua8b3\ua8f2-\ua8f7\ua8fb\ua90a-\ua925\ua930-\ua946\ua960-\ua97c\ua984-\ua9b2\ua9cf\uaa00-\uaa28\uaa40-\uaa42\uaa44-\uaa4b\uaa60-\uaa76\uaa7a\uaa80-\uaaaf\uaab1\uaab5\uaab6\uaab9-\uaabd\uaac0\uaac2\uaadb-\uaadd\uaae0-\uaaea\uaaf2-\uaaf4\uab01-\uab06\uab09-\uab0e\uab11-\uab16\uab20-\uab26\uab28-\uab2e\uabc0-\uabe2\uac00-\ud7a3\ud7b0-\ud7c6\ud7cb-\ud7fb\uf900-\ufa6d\ufa70-\ufad9\ufb00-\ufb06\ufb13-\ufb17\ufb1d\ufb1f-\ufb28\ufb2a-\ufb36\ufb38-\ufb3c\ufb3e\ufb40\ufb41\ufb43\ufb44\ufb46-\ufbb1\ufbd3-\ufd3d\ufd50-\ufd8f\ufd92-\ufdc7\ufdf0-\ufdfb\ufe70-\ufe74\ufe76-\ufefc\uff21-\uff3a\uff41-\uff5a\uff66-\uffbe\uffc2-\uffc7\uffca-\uffcf\uffd2-\uffd7\uffda-\uffdc";
+            var nonASCIIidentifierChars = "\u0300-\u036f\u0483-\u0487\u0591-\u05bd\u05bf\u05c1\u05c2\u05c4\u05c5\u05c7\u0610-\u061a\u0620-\u0649\u0672-\u06d3\u06e7-\u06e8\u06fb-\u06fc\u0730-\u074a\u0800-\u0814\u081b-\u0823\u0825-\u0827\u0829-\u082d\u0840-\u0857\u08e4-\u08fe\u0900-\u0903\u093a-\u093c\u093e-\u094f\u0951-\u0957\u0962-\u0963\u0966-\u096f\u0981-\u0983\u09bc\u09be-\u09c4\u09c7\u09c8\u09d7\u09df-\u09e0\u0a01-\u0a03\u0a3c\u0a3e-\u0a42\u0a47\u0a48\u0a4b-\u0a4d\u0a51\u0a66-\u0a71\u0a75\u0a81-\u0a83\u0abc\u0abe-\u0ac5\u0ac7-\u0ac9\u0acb-\u0acd\u0ae2-\u0ae3\u0ae6-\u0aef\u0b01-\u0b03\u0b3c\u0b3e-\u0b44\u0b47\u0b48\u0b4b-\u0b4d\u0b56\u0b57\u0b5f-\u0b60\u0b66-\u0b6f\u0b82\u0bbe-\u0bc2\u0bc6-\u0bc8\u0bca-\u0bcd\u0bd7\u0be6-\u0bef\u0c01-\u0c03\u0c46-\u0c48\u0c4a-\u0c4d\u0c55\u0c56\u0c62-\u0c63\u0c66-\u0c6f\u0c82\u0c83\u0cbc\u0cbe-\u0cc4\u0cc6-\u0cc8\u0cca-\u0ccd\u0cd5\u0cd6\u0ce2-\u0ce3\u0ce6-\u0cef\u0d02\u0d03\u0d46-\u0d48\u0d57\u0d62-\u0d63\u0d66-\u0d6f\u0d82\u0d83\u0dca\u0dcf-\u0dd4\u0dd6\u0dd8-\u0ddf\u0df2\u0df3\u0e34-\u0e3a\u0e40-\u0e45\u0e50-\u0e59\u0eb4-\u0eb9\u0ec8-\u0ecd\u0ed0-\u0ed9\u0f18\u0f19\u0f20-\u0f29\u0f35\u0f37\u0f39\u0f41-\u0f47\u0f71-\u0f84\u0f86-\u0f87\u0f8d-\u0f97\u0f99-\u0fbc\u0fc6\u1000-\u1029\u1040-\u1049\u1067-\u106d\u1071-\u1074\u1082-\u108d\u108f-\u109d\u135d-\u135f\u170e-\u1710\u1720-\u1730\u1740-\u1750\u1772\u1773\u1780-\u17b2\u17dd\u17e0-\u17e9\u180b-\u180d\u1810-\u1819\u1920-\u192b\u1930-\u193b\u1951-\u196d\u19b0-\u19c0\u19c8-\u19c9\u19d0-\u19d9\u1a00-\u1a15\u1a20-\u1a53\u1a60-\u1a7c\u1a7f-\u1a89\u1a90-\u1a99\u1b46-\u1b4b\u1b50-\u1b59\u1b6b-\u1b73\u1bb0-\u1bb9\u1be6-\u1bf3\u1c00-\u1c22\u1c40-\u1c49\u1c5b-\u1c7d\u1cd0-\u1cd2\u1d00-\u1dbe\u1e01-\u1f15\u200c\u200d\u203f\u2040\u2054\u20d0-\u20dc\u20e1\u20e5-\u20f0\u2d81-\u2d96\u2de0-\u2dff\u3021-\u3028\u3099\u309a\ua640-\ua66d\ua674-\ua67d\ua69f\ua6f0-\ua6f1\ua7f8-\ua800\ua806\ua80b\ua823-\ua827\ua880-\ua881\ua8b4-\ua8c4\ua8d0-\ua8d9\ua8f3-\ua8f7\ua900-\ua909\ua926-\ua92d\ua930-\ua945\ua980-\ua983\ua9b3-\ua9c0\uaa00-\uaa27\uaa40-\uaa41\uaa4c-\uaa4d\uaa50-\uaa59\uaa7b\uaae0-\uaae9\uaaf2-\uaaf3\uabc0-\uabe1\uabec\uabed\uabf0-\uabf9\ufb20-\ufb28\ufe00-\ufe0f\ufe20-\ufe26\ufe33\ufe34\ufe4d-\ufe4f\uff10-\uff19\uff3f";
+            var nonASCIIidentifierStart = new RegExp("[" + nonASCIIidentifierStartChars + "]");
+            var nonASCIIidentifier = new RegExp("[" + nonASCIIidentifierStartChars + nonASCIIidentifierChars + "]");
+
+            // Whether a single character denotes a newline.
+
+            exports.newline = /[\n\r\u2028\u2029]/;
+
+            // Matches a whole line break (where CRLF is considered a single
+            // line break). Used to count lines.
+
+            // in javascript, these two differ
+            // in python they are the same, different methods are called on them
+            exports.lineBreak = new RegExp('\r\n|' + exports.newline.source);
+            exports.allLineBreaks = new RegExp(exports.lineBreak.source, 'g');
+
+
+            // Test whether a given character code starts an identifier.
+
+            exports.isIdentifierStart = function(code) {
+                // permit $ (36) and @ (64). @ is used in ES7 decorators.
+                if (code < 65) return code === 36 || code === 64;
+                // 65 through 91 are uppercase letters.
+                if (code < 91) return true;
+                // permit _ (95).
+                if (code < 97) return code === 95;
+                // 97 through 123 are lowercase letters.
+                if (code < 123) return true;
+                return code >= 0xaa && nonASCIIidentifierStart.test(String.fromCharCode(code));
+            };
+
+            // Test whether a given character is part of an identifier.
+
+            exports.isIdentifierChar = function(code) {
+                if (code < 48) return code === 36;
+                if (code < 58) return true;
+                if (code < 65) return false;
+                if (code < 91) return true;
+                if (code < 97) return code === 95;
+                if (code < 123) return true;
+                return code >= 0xaa && nonASCIIidentifier.test(String.fromCharCode(code));
+            };
+        })(acorn);
+        /* jshint curly: true */
+
+        function in_array(what, arr) {
+            for (var i = 0; i < arr.length; i += 1) {
+                if (arr[i] === what) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function trim(s) {
+            return s.replace(/^\s+|\s+$/g, '');
+        }
+
+        function ltrim(s) {
+            return s.replace(/^\s+/g, '');
+        }
+
+        // function rtrim(s) {
+        //     return s.replace(/\s+$/g, '');
+        // }
+
+        function sanitizeOperatorPosition(opPosition) {
+            opPosition = opPosition || OPERATOR_POSITION.before_newline;
+
+            var validPositionValues = Object.values(OPERATOR_POSITION);
+
+            if (!in_array(opPosition, validPositionValues)) {
+                throw new Error("Invalid Option Value: The option 'operator_position' must be one of the following values\n" +
+                    validPositionValues +
+                    "\nYou passed in: '" + opPosition + "'");
+            }
+
+            return opPosition;
+        }
+
+        var OPERATOR_POSITION = {
+            before_newline: 'before-newline',
+            after_newline: 'after-newline',
+            preserve_newline: 'preserve-newline',
+        };
+
+        var OPERATOR_POSITION_BEFORE_OR_PRESERVE = [OPERATOR_POSITION.before_newline, OPERATOR_POSITION.preserve_newline];
+
+        var MODE = {
             BlockStatement: 'BlockStatement', // 'BLOCK'
             Statement: 'Statement', // 'STATEMENT'
             ObjectLiteral: 'ObjectLiteral', // 'OBJECT',
@@ -24925,1997 +25696,2091 @@ if (typeof define === "function" && define.amd) {
             Expression: 'Expression' //'(EXPRESSION)'
         };
 
-    function Beautifier(js_source_text, options) {
-        "use strict";
-        var output
-        var tokens = [], token_pos;
-        var Tokenizer;
-        var current_token;
-        var last_type, last_last_text, indent_string;
-        var flags, previous_flags, flag_store;
-        var prefix;
+        function Beautifier(js_source_text, options) {
+            "use strict";
+            var output;
+            var tokens = [],
+                token_pos;
+            var Tokenizer;
+            var current_token;
+            var last_type, last_last_text, indent_string;
+            var flags, previous_flags, flag_store;
+            var prefix;
 
-        var handlers, opt;
-        var baseIndentString = '';
+            var handlers, opt;
+            var baseIndentString = '';
 
-        handlers = {
-            'TK_START_EXPR': handle_start_expr,
-            'TK_END_EXPR': handle_end_expr,
-            'TK_START_BLOCK': handle_start_block,
-            'TK_END_BLOCK': handle_end_block,
-            'TK_WORD': handle_word,
-            'TK_RESERVED': handle_word,
-            'TK_SEMICOLON': handle_semicolon,
-            'TK_STRING': handle_string,
-            'TK_EQUALS': handle_equals,
-            'TK_OPERATOR': handle_operator,
-            'TK_COMMA': handle_comma,
-            'TK_BLOCK_COMMENT': handle_block_comment,
-            'TK_COMMENT': handle_comment,
-            'TK_DOT': handle_dot,
-            'TK_UNKNOWN': handle_unknown,
-            'TK_EOF': handle_eof
-        };
-
-        function create_flags(flags_base, mode) {
-            var next_indent_level = 0;
-            if (flags_base) {
-                next_indent_level = flags_base.indentation_level;
-                if (!output.just_added_newline() &&
-                    flags_base.line_indent_level > next_indent_level) {
-                    next_indent_level = flags_base.line_indent_level;
-                }
-            }
-
-            var next_flags = {
-                mode: mode,
-                parent: flags_base,
-                last_text: flags_base ? flags_base.last_text : '', // last token text
-                last_word: flags_base ? flags_base.last_word : '', // last 'TK_WORD' passed
-                declaration_statement: false,
-                declaration_assignment: false,
-                multiline_frame: false,
-                inline_frame: false,
-                if_block: false,
-                else_block: false,
-                do_block: false,
-                do_while: false,
-                import_block: false,
-                in_case_statement: false, // switch(..){ INSIDE HERE }
-                in_case: false, // we're on the exact line with "case 0:"
-                case_body: false, // the indented case-action block
-                indentation_level: next_indent_level,
-                line_indent_level: flags_base ? flags_base.line_indent_level : next_indent_level,
-                start_line_index: output.get_line_number(),
-                ternary_depth: 0
+            handlers = {
+                'TK_START_EXPR': handle_start_expr,
+                'TK_END_EXPR': handle_end_expr,
+                'TK_START_BLOCK': handle_start_block,
+                'TK_END_BLOCK': handle_end_block,
+                'TK_WORD': handle_word,
+                'TK_RESERVED': handle_word,
+                'TK_SEMICOLON': handle_semicolon,
+                'TK_STRING': handle_string,
+                'TK_EQUALS': handle_equals,
+                'TK_OPERATOR': handle_operator,
+                'TK_COMMA': handle_comma,
+                'TK_BLOCK_COMMENT': handle_block_comment,
+                'TK_COMMENT': handle_comment,
+                'TK_DOT': handle_dot,
+                'TK_UNKNOWN': handle_unknown,
+                'TK_EOF': handle_eof
             };
-            return next_flags;
-        }
 
-        // Some interpreters have unexpected results with foo = baz || bar;
-        options = options ? options : {};
-        opt = {};
-
-        // compatibility
-        if (options.braces_on_own_line !== undefined) { //graceful handling of deprecated option
-            opt.brace_style = options.braces_on_own_line ? "expand" : "collapse";
-        }
-        opt.brace_style = options.brace_style ? options.brace_style : (opt.brace_style ? opt.brace_style : "collapse");
-
-        // graceful handling of deprecated option
-        if (opt.brace_style === "expand-strict") {
-            opt.brace_style = "expand";
-        }
-
-        opt.indent_size = options.indent_size ? parseInt(options.indent_size, 10) : 4;
-        opt.indent_char = options.indent_char ? options.indent_char : ' ';
-        opt.eol = options.eol ? options.eol : 'auto';
-        opt.preserve_newlines = (options.preserve_newlines === undefined) ? true : options.preserve_newlines;
-        opt.break_chained_methods = (options.break_chained_methods === undefined) ? false : options.break_chained_methods;
-        opt.max_preserve_newlines = (options.max_preserve_newlines === undefined) ? 0 : parseInt(options.max_preserve_newlines, 10);
-        opt.space_in_paren = (options.space_in_paren === undefined) ? false : options.space_in_paren;
-        opt.space_in_empty_paren = (options.space_in_empty_paren === undefined) ? false : options.space_in_empty_paren;
-        opt.jslint_happy = (options.jslint_happy === undefined) ? false : options.jslint_happy;
-        opt.space_after_anon_function = (options.space_after_anon_function === undefined) ? false : options.space_after_anon_function;
-        opt.keep_array_indentation = (options.keep_array_indentation === undefined) ? false : options.keep_array_indentation;
-        opt.space_before_conditional = (options.space_before_conditional === undefined) ? true : options.space_before_conditional;
-        opt.unescape_strings = (options.unescape_strings === undefined) ? false : options.unescape_strings;
-        opt.wrap_line_length = (options.wrap_line_length === undefined) ? 0 : parseInt(options.wrap_line_length, 10);
-        opt.e4x = (options.e4x === undefined) ? false : options.e4x;
-        opt.end_with_newline = (options.end_with_newline === undefined) ? false : options.end_with_newline;
-        opt.comma_first = (options.comma_first === undefined) ? false : options.comma_first;
-
-        // For testing of beautify ignore:start directive
-        opt.test_output_raw = (options.test_output_raw === undefined) ? false : options.test_output_raw;
-
-        // force opt.space_after_anon_function to true if opt.jslint_happy
-        if(opt.jslint_happy) {
-            opt.space_after_anon_function = true;
-        }
-
-        if(options.indent_with_tabs){
-            opt.indent_char = '\t';
-            opt.indent_size = 1;
-        }
-
-        if (opt.eol === 'auto') {
-            opt.eol = '\n';
-            if (js_source_text && acorn.lineBreak.test(js_source_text || '')) {
-                opt.eol = js_source_text.match(acorn.lineBreak)[0];
-            }
-        }
-
-        opt.eol = opt.eol.replace(/\\r/, '\r').replace(/\\n/, '\n')
-
-        //----------------------------------
-        indent_string = '';
-        while (opt.indent_size > 0) {
-            indent_string += opt.indent_char;
-            opt.indent_size -= 1;
-        }
-
-        var preindent_index = 0;
-        if(js_source_text && js_source_text.length) {
-            while ( (js_source_text.charAt(preindent_index) === ' ' ||
-                    js_source_text.charAt(preindent_index) === '\t')) {
-                baseIndentString += js_source_text.charAt(preindent_index);
-                preindent_index += 1;
-            }
-            js_source_text = js_source_text.substring(preindent_index);
-        }
-
-        last_type = 'TK_START_BLOCK'; // last token type
-        last_last_text = ''; // pre-last token text
-        output = new Output(indent_string, baseIndentString);
-
-        // If testing the ignore directive, start with output disable set to true
-        output.raw = opt.test_output_raw;
-
-
-        // Stack of parsing/formatting states, including MODE.
-        // We tokenize, parse, and output in an almost purely a forward-only stream of token input
-        // and formatted output.  This makes the beautifier less accurate than full parsers
-        // but also far more tolerant of syntax errors.
-        //
-        // For example, the default mode is MODE.BlockStatement. If we see a '{' we push a new frame of type
-        // MODE.BlockStatement on the the stack, even though it could be object literal.  If we later
-        // encounter a ":", we'll switch to to MODE.ObjectLiteral.  If we then see a ";",
-        // most full parsers would die, but the beautifier gracefully falls back to
-        // MODE.BlockStatement and continues on.
-        flag_store = [];
-        set_mode(MODE.BlockStatement);
-
-        this.beautify = function() {
-
-            /*jshint onevar:true */
-            var local_token, sweet_code;
-            Tokenizer = new tokenizer(js_source_text, opt, indent_string);
-            tokens = Tokenizer.tokenize();
-            token_pos = 0;
-
-            while (local_token = get_token()) {
-                for(var i = 0; i < local_token.comments_before.length; i++) {
-                    // The cleanest handling of inline comments is to treat them as though they aren't there.
-                    // Just continue formatting and the behavior should be logical.
-                    // Also ignore unknown tokens.  Again, this should result in better behavior.
-                    handle_token(local_token.comments_before[i]);
-                }
-                handle_token(local_token);
-
-                last_last_text = flags.last_text;
-                last_type = local_token.type;
-                flags.last_text = local_token.text;
-
-                token_pos += 1;
-            }
-
-            sweet_code = output.get_code();
-            if (opt.end_with_newline) {
-                sweet_code += '\n';
-            }
-
-            if (opt.eol != '\n') {
-                sweet_code = sweet_code.replace(/[\n]/g, opt.eol);
-            }
-
-            return sweet_code;
-        };
-
-        function handle_token(local_token) {
-            var newlines = local_token.newlines;
-            var keep_whitespace = opt.keep_array_indentation && is_array(flags.mode);
-
-            if (keep_whitespace) {
-                for (i = 0; i < newlines; i += 1) {
-                    print_newline(i > 0);
-                }
-            } else {
-                if (opt.max_preserve_newlines && newlines > opt.max_preserve_newlines) {
-                    newlines = opt.max_preserve_newlines;
+            function create_flags(flags_base, mode) {
+                var next_indent_level = 0;
+                if (flags_base) {
+                    next_indent_level = flags_base.indentation_level;
+                    if (!output.just_added_newline() &&
+                        flags_base.line_indent_level > next_indent_level) {
+                        next_indent_level = flags_base.line_indent_level;
+                    }
                 }
 
-                if (opt.preserve_newlines) {
-                    if (local_token.newlines > 1) {
-                        print_newline();
-                        for (var i = 1; i < newlines; i += 1) {
-                            print_newline(true);
+                var next_flags = {
+                    mode: mode,
+                    parent: flags_base,
+                    last_text: flags_base ? flags_base.last_text : '', // last token text
+                    last_word: flags_base ? flags_base.last_word : '', // last 'TK_WORD' passed
+                    declaration_statement: false,
+                    declaration_assignment: false,
+                    multiline_frame: false,
+                    inline_frame: false,
+                    if_block: false,
+                    else_block: false,
+                    do_block: false,
+                    do_while: false,
+                    import_block: false,
+                    in_case_statement: false, // switch(..){ INSIDE HERE }
+                    in_case: false, // we're on the exact line with "case 0:"
+                    case_body: false, // the indented case-action block
+                    indentation_level: next_indent_level,
+                    line_indent_level: flags_base ? flags_base.line_indent_level : next_indent_level,
+                    start_line_index: output.get_line_number(),
+                    ternary_depth: 0
+                };
+                return next_flags;
+            }
+
+            // Some interpreters have unexpected results with foo = baz || bar;
+            options = options ? options : {};
+            opt = {};
+
+            // compatibility
+            if (options.braces_on_own_line !== undefined) { //graceful handling of deprecated option
+                opt.brace_style = options.braces_on_own_line ? "expand" : "collapse";
+            }
+            opt.brace_style = options.brace_style ? options.brace_style : (opt.brace_style ? opt.brace_style : "collapse");
+
+            // graceful handling of deprecated option
+            if (opt.brace_style === "expand-strict") {
+                opt.brace_style = "expand";
+            }
+
+            opt.indent_size = options.indent_size ? parseInt(options.indent_size, 10) : 4;
+            opt.indent_char = options.indent_char ? options.indent_char : ' ';
+            opt.eol = options.eol ? options.eol : 'auto';
+            opt.preserve_newlines = (options.preserve_newlines === undefined) ? true : options.preserve_newlines;
+            opt.break_chained_methods = (options.break_chained_methods === undefined) ? false : options.break_chained_methods;
+            opt.max_preserve_newlines = (options.max_preserve_newlines === undefined) ? 0 : parseInt(options.max_preserve_newlines, 10);
+            opt.space_in_paren = (options.space_in_paren === undefined) ? false : options.space_in_paren;
+            opt.space_in_empty_paren = (options.space_in_empty_paren === undefined) ? false : options.space_in_empty_paren;
+            opt.jslint_happy = (options.jslint_happy === undefined) ? false : options.jslint_happy;
+            opt.space_after_anon_function = (options.space_after_anon_function === undefined) ? false : options.space_after_anon_function;
+            opt.keep_array_indentation = (options.keep_array_indentation === undefined) ? false : options.keep_array_indentation;
+            opt.space_before_conditional = (options.space_before_conditional === undefined) ? true : options.space_before_conditional;
+            opt.unescape_strings = (options.unescape_strings === undefined) ? false : options.unescape_strings;
+            opt.wrap_line_length = (options.wrap_line_length === undefined) ? 0 : parseInt(options.wrap_line_length, 10);
+            opt.e4x = (options.e4x === undefined) ? false : options.e4x;
+            opt.end_with_newline = (options.end_with_newline === undefined) ? false : options.end_with_newline;
+            opt.comma_first = (options.comma_first === undefined) ? false : options.comma_first;
+            opt.operator_position = sanitizeOperatorPosition(options.operator_position);
+
+            // For testing of beautify ignore:start directive
+            opt.test_output_raw = (options.test_output_raw === undefined) ? false : options.test_output_raw;
+
+            // force opt.space_after_anon_function to true if opt.jslint_happy
+            if (opt.jslint_happy) {
+                opt.space_after_anon_function = true;
+            }
+
+            if (options.indent_with_tabs) {
+                opt.indent_char = '\t';
+                opt.indent_size = 1;
+            }
+
+            if (opt.eol === 'auto') {
+                opt.eol = '\n';
+                if (js_source_text && acorn.lineBreak.test(js_source_text || '')) {
+                    opt.eol = js_source_text.match(acorn.lineBreak)[0];
+                }
+            }
+
+            opt.eol = opt.eol.replace(/\\r/, '\r').replace(/\\n/, '\n');
+
+            //----------------------------------
+            indent_string = '';
+            while (opt.indent_size > 0) {
+                indent_string += opt.indent_char;
+                opt.indent_size -= 1;
+            }
+
+            var preindent_index = 0;
+            if (js_source_text && js_source_text.length) {
+                while ((js_source_text.charAt(preindent_index) === ' ' ||
+                        js_source_text.charAt(preindent_index) === '\t')) {
+                    baseIndentString += js_source_text.charAt(preindent_index);
+                    preindent_index += 1;
+                }
+                js_source_text = js_source_text.substring(preindent_index);
+            }
+
+            last_type = 'TK_START_BLOCK'; // last token type
+            last_last_text = ''; // pre-last token text
+            output = new Output(indent_string, baseIndentString);
+
+            // If testing the ignore directive, start with output disable set to true
+            output.raw = opt.test_output_raw;
+
+
+            // Stack of parsing/formatting states, including MODE.
+            // We tokenize, parse, and output in an almost purely a forward-only stream of token input
+            // and formatted output.  This makes the beautifier less accurate than full parsers
+            // but also far more tolerant of syntax errors.
+            //
+            // For example, the default mode is MODE.BlockStatement. If we see a '{' we push a new frame of type
+            // MODE.BlockStatement on the the stack, even though it could be object literal.  If we later
+            // encounter a ":", we'll switch to to MODE.ObjectLiteral.  If we then see a ";",
+            // most full parsers would die, but the beautifier gracefully falls back to
+            // MODE.BlockStatement and continues on.
+            flag_store = [];
+            set_mode(MODE.BlockStatement);
+
+            this.beautify = function() {
+
+                /*jshint onevar:true */
+                var local_token, sweet_code;
+                Tokenizer = new tokenizer(js_source_text, opt, indent_string);
+                tokens = Tokenizer.tokenize();
+                token_pos = 0;
+
+                function get_local_token() {
+                    local_token = get_token();
+                    return local_token;
+                }
+
+                while (get_local_token()) {
+                    for (var i = 0; i < local_token.comments_before.length; i++) {
+                        // The cleanest handling of inline comments is to treat them as though they aren't there.
+                        // Just continue formatting and the behavior should be logical.
+                        // Also ignore unknown tokens.  Again, this should result in better behavior.
+                        handle_token(local_token.comments_before[i]);
+                    }
+                    handle_token(local_token);
+
+                    last_last_text = flags.last_text;
+                    last_type = local_token.type;
+                    flags.last_text = local_token.text;
+
+                    token_pos += 1;
+                }
+
+                sweet_code = output.get_code();
+                if (opt.end_with_newline) {
+                    sweet_code += '\n';
+                }
+
+                if (opt.eol !== '\n') {
+                    sweet_code = sweet_code.replace(/[\n]/g, opt.eol);
+                }
+
+                return sweet_code;
+            };
+
+            function handle_token(local_token) {
+                var newlines = local_token.newlines;
+                var keep_whitespace = opt.keep_array_indentation && is_array(flags.mode);
+
+                if (keep_whitespace) {
+                    for (var i = 0; i < newlines; i += 1) {
+                        print_newline(i > 0);
+                    }
+                } else {
+                    if (opt.max_preserve_newlines && newlines > opt.max_preserve_newlines) {
+                        newlines = opt.max_preserve_newlines;
+                    }
+
+                    if (opt.preserve_newlines) {
+                        if (local_token.newlines > 1) {
+                            print_newline();
+                            for (var j = 1; j < newlines; j += 1) {
+                                print_newline(true);
+                            }
                         }
                     }
                 }
+
+                current_token = local_token;
+                handlers[current_token.type]();
             }
 
-            current_token = local_token;
-            handlers[current_token.type]();
-        }
+            // we could use just string.split, but
+            // IE doesn't like returning empty strings
+            function split_linebreaks(s) {
+                //return s.split(/\x0d\x0a|\x0a/);
 
-        // we could use just string.split, but
-        // IE doesn't like returning empty strings
-        function split_linebreaks(s) {
-            //return s.split(/\x0d\x0a|\x0a/);
-
-            s = s.replace(acorn.allLineBreaks, '\n');
-            var out = [],
-                idx = s.indexOf("\n");
-            while (idx !== -1) {
-                out.push(s.substring(0, idx));
-                s = s.substring(idx + 1);
-                idx = s.indexOf("\n");
-            }
-            if (s.length) {
-                out.push(s);
-            }
-            return out;
-        }
-
-        var newline_restricted_tokens = ['break','contiue','return', 'throw'];
-        function allow_wrap_or_preserved_newline(force_linewrap) {
-            force_linewrap = (force_linewrap === undefined) ? false : force_linewrap;
-
-            // Never wrap the first token on a line
-            if (output.just_added_newline()) {
-                return
-            }
-
-            if ((opt.preserve_newlines && current_token.wanted_newline) || force_linewrap) {
-                print_newline(false, true);
-            } else if (opt.wrap_line_length) {
-                if (last_type === 'TK_RESERVED' && in_array(flags.last_text, newline_restricted_tokens)) {
-                    // These tokens should never have a newline inserted
-                    // between them and the following expression.
-                    return
+                s = s.replace(acorn.allLineBreaks, '\n');
+                var out = [],
+                    idx = s.indexOf("\n");
+                while (idx !== -1) {
+                    out.push(s.substring(0, idx));
+                    s = s.substring(idx + 1);
+                    idx = s.indexOf("\n");
                 }
-                var proposed_line_length = output.current_line.get_character_count() + current_token.text.length +
-                    (output.space_before_token ? 1 : 0);
-                if (proposed_line_length >= opt.wrap_line_length) {
+                if (s.length) {
+                    out.push(s);
+                }
+                return out;
+            }
+
+            var newline_restricted_tokens = ['break', 'contiue', 'return', 'throw'];
+
+            function allow_wrap_or_preserved_newline(force_linewrap) {
+                force_linewrap = (force_linewrap === undefined) ? false : force_linewrap;
+
+                // Never wrap the first token on a line
+                if (output.just_added_newline()) {
+                    return;
+                }
+
+                var shouldPreserveOrForce = (opt.preserve_newlines && current_token.wanted_newline) || force_linewrap;
+                var operatorLogicApplies = in_array(flags.last_text, Tokenizer.positionable_operators) || in_array(current_token.text, Tokenizer.positionable_operators);
+
+                if (operatorLogicApplies) {
+                    var shouldPrintOperatorNewline = (
+                            in_array(flags.last_text, Tokenizer.positionable_operators) &&
+                            in_array(opt.operator_position, OPERATOR_POSITION_BEFORE_OR_PRESERVE)
+                        ) ||
+                        in_array(current_token.text, Tokenizer.positionable_operators);
+                    shouldPreserveOrForce = shouldPreserveOrForce && shouldPrintOperatorNewline;
+                }
+
+                if (shouldPreserveOrForce) {
                     print_newline(false, true);
-                }
-            }
-        }
-
-        function print_newline(force_newline, preserve_statement_flags) {
-            if (!preserve_statement_flags) {
-                if (flags.last_text !== ';' && flags.last_text !== ',' && flags.last_text !== '=' && last_type !== 'TK_OPERATOR') {
-                    while (flags.mode === MODE.Statement && !flags.if_block && !flags.do_block) {
-                        restore_mode();
+                } else if (opt.wrap_line_length) {
+                    if (last_type === 'TK_RESERVED' && in_array(flags.last_text, newline_restricted_tokens)) {
+                        // These tokens should never have a newline inserted
+                        // between them and the following expression.
+                        return;
+                    }
+                    var proposed_line_length = output.current_line.get_character_count() + current_token.text.length +
+                        (output.space_before_token ? 1 : 0);
+                    if (proposed_line_length >= opt.wrap_line_length) {
+                        print_newline(false, true);
                     }
                 }
             }
 
-            if (output.add_new_line(force_newline)) {
-                flags.multiline_frame = true;
-            }
-        }
-
-        function print_token_line_indentation() {
-            if (output.just_added_newline()) {
-                if (opt.keep_array_indentation && is_array(flags.mode) && current_token.wanted_newline) {
-                    output.current_line.push(current_token.whitespace_before);
-                    output.space_before_token = false;
-                } else if (output.set_indent(flags.indentation_level)) {
-                    flags.line_indent_level = flags.indentation_level;
-                }
-            }
-        }
-
-        function print_token(printable_token) {
-            if (output.raw) {
-                output.add_raw_token(current_token)
-                return;
-            }
-
-            if (opt.comma_first && last_type === 'TK_COMMA'
-                && output.just_added_newline()) {
-                if(output.previous_line.last() === ',') {
-                    var popped = output.previous_line.pop();
-                    // if the comma was already at the start of the line,
-                    // pull back onto that line and reprint the indentation
-                    if(output.previous_line.is_empty()) {
-                         output.previous_line.push(popped);
-                         output.trim(true);
-                         output.current_line.pop();
-                         output.trim();
+            function print_newline(force_newline, preserve_statement_flags) {
+                if (!preserve_statement_flags) {
+                    if (flags.last_text !== ';' && flags.last_text !== ',' && flags.last_text !== '=' && last_type !== 'TK_OPERATOR') {
+                        while (flags.mode === MODE.Statement && !flags.if_block && !flags.do_block) {
+                            restore_mode();
+                        }
                     }
+                }
 
-                    // add the comma in front of the next token
-                    print_token_line_indentation();
-                    output.add_token(',');
-                    output.space_before_token = true;
+                if (output.add_new_line(force_newline)) {
+                    flags.multiline_frame = true;
                 }
             }
 
-            printable_token = printable_token || current_token.text;
-            print_token_line_indentation();
-            output.add_token(printable_token);
-        }
-
-        function indent() {
-            flags.indentation_level += 1;
-        }
-
-        function deindent() {
-            if (flags.indentation_level > 0 &&
-                ((!flags.parent) || flags.indentation_level > flags.parent.indentation_level))
-                flags.indentation_level -= 1;
-        }
-
-        function set_mode(mode) {
-            if (flags) {
-                flag_store.push(flags);
-                previous_flags = flags;
-            } else {
-                previous_flags = create_flags(null, mode);
-            }
-
-            flags = create_flags(previous_flags, mode);
-        }
-
-        function is_array(mode) {
-            return mode === MODE.ArrayLiteral;
-        }
-
-        function is_expression(mode) {
-            return in_array(mode, [MODE.Expression, MODE.ForInitializer, MODE.Conditional]);
-        }
-
-        function restore_mode() {
-            if (flag_store.length > 0) {
-                previous_flags = flags;
-                flags = flag_store.pop();
-                if (previous_flags.mode === MODE.Statement) {
-                    output.remove_redundant_indentation(previous_flags);
+            function print_token_line_indentation() {
+                if (output.just_added_newline()) {
+                    if (opt.keep_array_indentation && is_array(flags.mode) && current_token.wanted_newline) {
+                        output.current_line.push(current_token.whitespace_before);
+                        output.space_before_token = false;
+                    } else if (output.set_indent(flags.indentation_level)) {
+                        flags.line_indent_level = flags.indentation_level;
+                    }
                 }
             }
-        }
 
-        function start_of_object_property() {
-            return flags.parent.mode === MODE.ObjectLiteral && flags.mode === MODE.Statement && (
-                (flags.last_text === ':' && flags.ternary_depth === 0) || (last_type === 'TK_RESERVED' && in_array(flags.last_text, ['get', 'set'])));
-        }
+            function print_token(printable_token) {
+                if (output.raw) {
+                    output.add_raw_token(current_token);
+                    return;
+                }
 
-        function start_of_statement() {
-            if (
+                if (opt.comma_first && last_type === 'TK_COMMA' &&
+                    output.just_added_newline()) {
+                    if (output.previous_line.last() === ',') {
+                        var popped = output.previous_line.pop();
+                        // if the comma was already at the start of the line,
+                        // pull back onto that line and reprint the indentation
+                        if (output.previous_line.is_empty()) {
+                            output.previous_line.push(popped);
+                            output.trim(true);
+                            output.current_line.pop();
+                            output.trim();
+                        }
+
+                        // add the comma in front of the next token
+                        print_token_line_indentation();
+                        output.add_token(',');
+                        output.space_before_token = true;
+                    }
+                }
+
+                printable_token = printable_token || current_token.text;
+                print_token_line_indentation();
+                output.add_token(printable_token);
+            }
+
+            function indent() {
+                flags.indentation_level += 1;
+            }
+
+            function deindent() {
+                if (flags.indentation_level > 0 &&
+                    ((!flags.parent) || flags.indentation_level > flags.parent.indentation_level)) {
+                    flags.indentation_level -= 1;
+
+                }
+            }
+
+            function set_mode(mode) {
+                if (flags) {
+                    flag_store.push(flags);
+                    previous_flags = flags;
+                } else {
+                    previous_flags = create_flags(null, mode);
+                }
+
+                flags = create_flags(previous_flags, mode);
+            }
+
+            function is_array(mode) {
+                return mode === MODE.ArrayLiteral;
+            }
+
+            function is_expression(mode) {
+                return in_array(mode, [MODE.Expression, MODE.ForInitializer, MODE.Conditional]);
+            }
+
+            function restore_mode() {
+                if (flag_store.length > 0) {
+                    previous_flags = flags;
+                    flags = flag_store.pop();
+                    if (previous_flags.mode === MODE.Statement) {
+                        output.remove_redundant_indentation(previous_flags);
+                    }
+                }
+            }
+
+            function start_of_object_property() {
+                return flags.parent.mode === MODE.ObjectLiteral && flags.mode === MODE.Statement && (
+                    (flags.last_text === ':' && flags.ternary_depth === 0) || (last_type === 'TK_RESERVED' && in_array(flags.last_text, ['get', 'set'])));
+            }
+
+            function start_of_statement() {
+                if (
                     (last_type === 'TK_RESERVED' && in_array(flags.last_text, ['var', 'let', 'const']) && current_token.type === 'TK_WORD') ||
                     (last_type === 'TK_RESERVED' && flags.last_text === 'do') ||
                     (last_type === 'TK_RESERVED' && in_array(flags.last_text, ['return', 'throw']) && !current_token.wanted_newline) ||
                     (last_type === 'TK_RESERVED' && flags.last_text === 'else' && !(current_token.type === 'TK_RESERVED' && current_token.text === 'if')) ||
                     (last_type === 'TK_END_EXPR' && (previous_flags.mode === MODE.ForInitializer || previous_flags.mode === MODE.Conditional)) ||
-                    (last_type === 'TK_WORD' && flags.mode === MODE.BlockStatement
-                        && !flags.in_case
-                        && !(current_token.text === '--' || current_token.text === '++')
-                        && last_last_text !== 'function'
-                        && current_token.type !== 'TK_WORD' && current_token.type !== 'TK_RESERVED') ||
+                    (last_type === 'TK_WORD' && flags.mode === MODE.BlockStatement &&
+                        !flags.in_case &&
+                        !(current_token.text === '--' || current_token.text === '++') &&
+                        last_last_text !== 'function' &&
+                        current_token.type !== 'TK_WORD' && current_token.type !== 'TK_RESERVED') ||
                     (flags.mode === MODE.ObjectLiteral && (
                         (flags.last_text === ':' && flags.ternary_depth === 0) || (last_type === 'TK_RESERVED' && in_array(flags.last_text, ['get', 'set']))))
                 ) {
 
-                set_mode(MODE.Statement);
-                indent();
+                    set_mode(MODE.Statement);
+                    indent();
 
-                if (last_type === 'TK_RESERVED' && in_array(flags.last_text, ['var', 'let', 'const']) && current_token.type === 'TK_WORD') {
-                    flags.declaration_statement = true;
+                    if (last_type === 'TK_RESERVED' && in_array(flags.last_text, ['var', 'let', 'const']) && current_token.type === 'TK_WORD') {
+                        flags.declaration_statement = true;
+                    }
+
+                    // Issue #276:
+                    // If starting a new statement with [if, for, while, do], push to a new line.
+                    // if (a) if (b) if(c) d(); else e(); else f();
+                    if (!start_of_object_property()) {
+                        allow_wrap_or_preserved_newline(
+                            current_token.type === 'TK_RESERVED' && in_array(current_token.text, ['do', 'for', 'if', 'while']));
+                    }
+
+                    return true;
                 }
+                return false;
+            }
 
-                // Issue #276:
-                // If starting a new statement with [if, for, while, do], push to a new line.
-                // if (a) if (b) if(c) d(); else e(); else f();
-                if (!start_of_object_property()) {
-                    allow_wrap_or_preserved_newline(
-                        current_token.type === 'TK_RESERVED' && in_array(current_token.text, ['do', 'for', 'if', 'while']));
+            function all_lines_start_with(lines, c) {
+                for (var i = 0; i < lines.length; i++) {
+                    var line = trim(lines[i]);
+                    if (line.charAt(0) !== c) {
+                        return false;
+                    }
                 }
-
                 return true;
             }
-            return false;
-        }
 
-        function all_lines_start_with(lines, c) {
-            for (var i = 0; i < lines.length; i++) {
-                var line = trim(lines[i]);
-                if (line.charAt(0) !== c) {
-                    return false;
+            function each_line_matches_indent(lines, indent) {
+                var i = 0,
+                    len = lines.length,
+                    line;
+                for (; i < len; i++) {
+                    line = lines[i];
+                    // allow empty lines to pass through
+                    if (line && line.indexOf(indent) !== 0) {
+                        return false;
+                    }
                 }
+                return true;
             }
-            return true;
-        }
 
-        function each_line_matches_indent(lines, indent) {
-            var i = 0,
-                len = lines.length,
-                line;
-            for (; i < len; i++) {
-                line = lines[i];
-                // allow empty lines to pass through
-                if (line && line.indexOf(indent) !== 0) {
-                    return false;
+            function is_special_word(word) {
+                return in_array(word, ['case', 'return', 'do', 'if', 'throw', 'else']);
+            }
+
+            function get_token(offset) {
+                var index = token_pos + (offset || 0);
+                return (index < 0 || index >= tokens.length) ? null : tokens[index];
+            }
+
+            function handle_start_expr() {
+                if (start_of_statement()) {
+                    // The conditional starts the statement if appropriate.
                 }
-            }
-            return true;
-        }
 
-        function is_special_word(word) {
-            return in_array(word, ['case', 'return', 'do', 'if', 'throw', 'else']);
-        }
+                var next_mode = MODE.Expression;
+                if (current_token.text === '[') {
 
-        function get_token(offset) {
-            var index = token_pos + (offset || 0);
-            return (index < 0 || index >= tokens.length) ? null : tokens[index];
-        }
+                    if (last_type === 'TK_WORD' || flags.last_text === ')') {
+                        // this is array index specifier, break immediately
+                        // a[x], fn()[x]
+                        if (last_type === 'TK_RESERVED' && in_array(flags.last_text, Tokenizer.line_starters)) {
+                            output.space_before_token = true;
+                        }
+                        set_mode(next_mode);
+                        print_token();
+                        indent();
+                        if (opt.space_in_paren) {
+                            output.space_before_token = true;
+                        }
+                        return;
+                    }
 
-        function handle_start_expr() {
-            if (start_of_statement()) {
-                // The conditional starts the statement if appropriate.
-            }
+                    next_mode = MODE.ArrayLiteral;
+                    if (is_array(flags.mode)) {
+                        if (flags.last_text === '[' ||
+                            (flags.last_text === ',' && (last_last_text === ']' || last_last_text === '}'))) {
+                            // ], [ goes to new line
+                            // }, [ goes to new line
+                            if (!opt.keep_array_indentation) {
+                                print_newline();
+                            }
+                        }
+                    }
 
-            var next_mode = MODE.Expression;
-            if (current_token.text === '[') {
+                } else {
+                    if (last_type === 'TK_RESERVED' && flags.last_text === 'for') {
+                        next_mode = MODE.ForInitializer;
+                    } else if (last_type === 'TK_RESERVED' && in_array(flags.last_text, ['if', 'while'])) {
+                        next_mode = MODE.Conditional;
+                    } else {
+                        // next_mode = MODE.Expression;
+                    }
+                }
 
-                if (last_type === 'TK_WORD' || flags.last_text === ')') {
-                    // this is array index specifier, break immediately
-                    // a[x], fn()[x]
-                    if (last_type === 'TK_RESERVED' && in_array(flags.last_text, Tokenizer.line_starters)) {
+                if (flags.last_text === ';' || last_type === 'TK_START_BLOCK') {
+                    print_newline();
+                } else if (last_type === 'TK_END_EXPR' || last_type === 'TK_START_EXPR' || last_type === 'TK_END_BLOCK' || flags.last_text === '.') {
+                    // TODO: Consider whether forcing this is required.  Review failing tests when removed.
+                    allow_wrap_or_preserved_newline(current_token.wanted_newline);
+                    // do nothing on (( and )( and ][ and ]( and .(
+                } else if (!(last_type === 'TK_RESERVED' && current_token.text === '(') && last_type !== 'TK_WORD' && last_type !== 'TK_OPERATOR') {
+                    output.space_before_token = true;
+                } else if ((last_type === 'TK_RESERVED' && (flags.last_word === 'function' || flags.last_word === 'typeof')) ||
+                    (flags.last_text === '*' && last_last_text === 'function')) {
+                    // function() vs function ()
+                    if (opt.space_after_anon_function) {
                         output.space_before_token = true;
                     }
-                    set_mode(next_mode);
-                    print_token();
-                    indent();
-                    if (opt.space_in_paren) {
+                } else if (last_type === 'TK_RESERVED' && (in_array(flags.last_text, Tokenizer.line_starters) || flags.last_text === 'catch')) {
+                    if (opt.space_before_conditional) {
                         output.space_before_token = true;
                     }
-                    return;
                 }
 
-                next_mode = MODE.ArrayLiteral;
-                if (is_array(flags.mode)) {
-                    if (flags.last_text === '[' ||
-                        (flags.last_text === ',' && (last_last_text === ']' || last_last_text === '}'))) {
-                        // ], [ goes to new line
-                        // }, [ goes to new line
-                        if (!opt.keep_array_indentation) {
-                            print_newline();
+                // Should be a space between await and an IIFE
+                if (current_token.text === '(' && last_type === 'TK_RESERVED' && flags.last_word === 'await') {
+                    output.space_before_token = true;
+                }
+
+                // Support of this kind of newline preservation.
+                // a = (b &&
+                //     (c || d));
+                if (current_token.text === '(') {
+                    if (last_type === 'TK_EQUALS' || last_type === 'TK_OPERATOR') {
+                        if (!start_of_object_property()) {
+                            allow_wrap_or_preserved_newline();
                         }
                     }
                 }
 
-            } else {
-                if (last_type === 'TK_RESERVED' && flags.last_text === 'for') {
-                    next_mode = MODE.ForInitializer;
-                } else if (last_type === 'TK_RESERVED' && in_array(flags.last_text, ['if', 'while'])) {
-                    next_mode = MODE.Conditional;
-                } else {
-                    // next_mode = MODE.Expression;
+                // Support preserving wrapped arrow function expressions
+                // a.b('c',
+                //     () => d.e
+                // )
+                if (current_token.text === '(' && last_type !== 'TK_WORD' && last_type !== 'TK_RESERVED') {
+                    allow_wrap_or_preserved_newline();
                 }
-            }
 
-            if (flags.last_text === ';' || last_type === 'TK_START_BLOCK') {
-                print_newline();
-            } else if (last_type === 'TK_END_EXPR' || last_type === 'TK_START_EXPR' || last_type === 'TK_END_BLOCK' || flags.last_text === '.') {
-                // TODO: Consider whether forcing this is required.  Review failing tests when removed.
-                allow_wrap_or_preserved_newline(current_token.wanted_newline);
-                // do nothing on (( and )( and ][ and ]( and .(
-            } else if (!(last_type === 'TK_RESERVED' && current_token.text === '(') && last_type !== 'TK_WORD' && last_type !== 'TK_OPERATOR') {
-                output.space_before_token = true;
-            } else if ((last_type === 'TK_RESERVED' && (flags.last_word === 'function' || flags.last_word === 'typeof')) ||
-                (flags.last_text === '*' && last_last_text === 'function')) {
-                // function() vs function ()
-                if (opt.space_after_anon_function) {
+                set_mode(next_mode);
+                print_token();
+                if (opt.space_in_paren) {
                     output.space_before_token = true;
                 }
-            } else if (last_type === 'TK_RESERVED' && (in_array(flags.last_text, Tokenizer.line_starters) || flags.last_text === 'catch')) {
-                if (opt.space_before_conditional) {
-                    output.space_before_token = true;
+
+                // In all cases, if we newline while inside an expression it should be indented.
+                indent();
+            }
+
+            function handle_end_expr() {
+                // statements inside expressions are not valid syntax, but...
+                // statements must all be closed when their container closes
+                while (flags.mode === MODE.Statement) {
+                    restore_mode();
                 }
-            }
 
-            // Should be a space between await and an IIFE
-            if(current_token.text === '(' && last_type === 'TK_RESERVED' && flags.last_word === 'await'){
-                output.space_before_token = true;
-            }
+                if (flags.multiline_frame) {
+                    allow_wrap_or_preserved_newline(current_token.text === ']' && is_array(flags.mode) && !opt.keep_array_indentation);
+                }
 
-            // Support of this kind of newline preservation.
-            // a = (b &&
-            //     (c || d));
-            if (current_token.text === '(') {
-                if (last_type === 'TK_EQUALS' || last_type === 'TK_OPERATOR') {
-                    if (!start_of_object_property()) {
-                        allow_wrap_or_preserved_newline();
+                if (opt.space_in_paren) {
+                    if (last_type === 'TK_START_EXPR' && !opt.space_in_empty_paren) {
+                        // () [] no inner space in empty parens like these, ever, ref #320
+                        output.trim();
+                        output.space_before_token = false;
+                    } else {
+                        output.space_before_token = true;
                     }
                 }
-            }
-
-            // Support preserving wrapped arrow function expressions
-            // a.b('c',
-            //     () => d.e
-            // )
-            if (current_token.text === '(' && last_type !== 'TK_WORD' && last_type !== 'TK_RESERVED') {
-                allow_wrap_or_preserved_newline();
-            }
-
-            set_mode(next_mode);
-            print_token();
-            if (opt.space_in_paren) {
-                output.space_before_token = true;
-            }
-
-            // In all cases, if we newline while inside an expression it should be indented.
-            indent();
-        }
-
-        function handle_end_expr() {
-            // statements inside expressions are not valid syntax, but...
-            // statements must all be closed when their container closes
-            while (flags.mode === MODE.Statement) {
-                restore_mode();
-            }
-
-            if (flags.multiline_frame) {
-                allow_wrap_or_preserved_newline(current_token.text === ']' && is_array(flags.mode) && !opt.keep_array_indentation);
-            }
-
-            if (opt.space_in_paren) {
-                if (last_type === 'TK_START_EXPR' && ! opt.space_in_empty_paren) {
-                    // () [] no inner space in empty parens like these, ever, ref #320
-                    output.trim();
-                    output.space_before_token = false;
+                if (current_token.text === ']' && opt.keep_array_indentation) {
+                    print_token();
+                    restore_mode();
                 } else {
-                    output.space_before_token = true;
+                    restore_mode();
+                    print_token();
+                }
+                output.remove_redundant_indentation(previous_flags);
+
+                // do {} while () // no statement required after
+                if (flags.do_while && previous_flags.mode === MODE.Conditional) {
+                    previous_flags.mode = MODE.Expression;
+                    flags.do_block = false;
+                    flags.do_while = false;
+
                 }
             }
-            if (current_token.text === ']' && opt.keep_array_indentation) {
-                print_token();
-                restore_mode();
-            } else {
-                restore_mode();
-                print_token();
-            }
-            output.remove_redundant_indentation(previous_flags);
 
-            // do {} while () // no statement required after
-            if (flags.do_while && previous_flags.mode === MODE.Conditional) {
-                previous_flags.mode = MODE.Expression;
-                flags.do_block = false;
-                flags.do_while = false;
-
-            }
-        }
-
-        function handle_start_block() {
-            // Check if this is should be treated as a ObjectLiteral
-            var next_token = get_token(1)
-            var second_token = get_token(2)
-            if (second_token && (
-                    (in_array(second_token.text, [':', ',']) && in_array(next_token.type, ['TK_STRING', 'TK_WORD', 'TK_RESERVED']))
-                    || (in_array(next_token.text, ['get', 'set']) && in_array(second_token.type, ['TK_WORD', 'TK_RESERVED']))
-                )) {
-                // We don't support TypeScript,but we didn't break it for a very long time.
-                // We'll try to keep not breaking it.
-                if (!in_array(last_last_text, ['class','interface'])) {
+            function handle_start_block() {
+                // Check if this is should be treated as a ObjectLiteral
+                var next_token = get_token(1);
+                var second_token = get_token(2);
+                if (second_token && (
+                        (in_array(second_token.text, [':', ',']) && in_array(next_token.type, ['TK_STRING', 'TK_WORD', 'TK_RESERVED'])) ||
+                        (in_array(next_token.text, ['get', 'set']) && in_array(second_token.type, ['TK_WORD', 'TK_RESERVED']))
+                    )) {
+                    // We don't support TypeScript,but we didn't break it for a very long time.
+                    // We'll try to keep not breaking it.
+                    if (!in_array(last_last_text, ['class', 'interface'])) {
+                        set_mode(MODE.ObjectLiteral);
+                    } else {
+                        set_mode(MODE.BlockStatement);
+                    }
+                } else if (last_type === 'TK_OPERATOR' && flags.last_text === '=>') {
+                    // arrow function: (param1, paramN) => { statements }
+                    set_mode(MODE.BlockStatement);
+                } else if (in_array(last_type, ['TK_EQUALS', 'TK_START_EXPR', 'TK_COMMA', 'TK_OPERATOR']) ||
+                    (last_type === 'TK_RESERVED' && in_array(flags.last_text, ['return', 'throw', 'import']))
+                ) {
+                    // Detecting shorthand function syntax is difficult by scanning forward,
+                    //     so check the surrounding context.
+                    // If the block is being returned, imported, passed as arg,
+                    //     assigned with = or assigned in a nested object, treat as an ObjectLiteral.
                     set_mode(MODE.ObjectLiteral);
                 } else {
                     set_mode(MODE.BlockStatement);
                 }
-            } else if (last_type === 'TK_OPERATOR' && flags.last_text === '=>') {
-                // arrow function: (param1, paramN) => { statements }
-                set_mode(MODE.BlockStatement);
-            } else if (in_array(last_type, ['TK_EQUALS', 'TK_START_EXPR', 'TK_COMMA', 'TK_OPERATOR']) ||
-                (last_type === 'TK_RESERVED' && in_array(flags.last_text, ['return', 'throw', 'import']))
-                ) {
-                // Detecting shorthand function syntax is difficult by scanning forward,
-                //     so check the surrounding context.
-                // If the block is being returned, imported, passed as arg,
-                //     assigned with = or assigned in a nested object, treat as an ObjectLiteral.
-                set_mode(MODE.ObjectLiteral);
-            } else {
-                set_mode(MODE.BlockStatement);
-            }
 
-            var empty_braces = !next_token.comments_before.length &&  next_token.text === '}';
-            var empty_anonymous_function = empty_braces && flags.last_word === 'function' &&
-                last_type === 'TK_END_EXPR';
+                var empty_braces = !next_token.comments_before.length && next_token.text === '}';
+                var empty_anonymous_function = empty_braces && flags.last_word === 'function' &&
+                    last_type === 'TK_END_EXPR';
 
 
-            if (opt.brace_style === "expand" ||
-                (opt.brace_style === "none" && current_token.wanted_newline)) {
-                if (last_type !== 'TK_OPERATOR' &&
-                    (empty_anonymous_function ||
-                        last_type === 'TK_EQUALS' ||
-                        (last_type === 'TK_RESERVED' && is_special_word(flags.last_text) && flags.last_text !== 'else'))) {
-                    output.space_before_token = true;
-                } else {
-                    print_newline(false, true);
-                }
-            } else { // collapse
-                if (opt.brace_style === 'collapse-preserve-inline') {
-                    // search forward for a newline wanted inside this block
-                    var index = 0;
-                    var check_token = null;
-                    flags.inline_frame = true;
-                    do {
-                        index += 1;
-                        check_token = get_token(index);
-                        if (check_token.wanted_newline) {
-                            flags.inline_frame = false;
-                            break;
-                        }
-                    } while (check_token.type !== 'TK_EOF' &&
-                          !(check_token.type === 'TK_END_BLOCK' && check_token.opened === current_token))
-                }
-
-                if (is_array(previous_flags.mode) && (last_type === 'TK_START_EXPR' || last_type === 'TK_COMMA')) {
-                    // if we're preserving inline,
-                    // allow newline between comma and next brace.
-                    if (flags.inline_frame) {
-                        allow_wrap_or_preserved_newline();
-                        flags.inline_frame = true;
-                        previous_flags.multiline_frame = previous_flags.multiline_frame || flags.multiline_frame;
-                        flags.multiline_frame = false;
-                    } else if (last_type === 'TK_COMMA') {
-                        output.space_before_token = true;
-                    }
-                } else if (last_type !== 'TK_OPERATOR' && last_type !== 'TK_START_EXPR') {
-                    if (last_type === 'TK_START_BLOCK') {
-                        print_newline();
-                    } else {
-                        output.space_before_token = true;
-                    }
-                }
-            }
-            print_token();
-            indent();
-        }
-
-        function handle_end_block() {
-            // statements must all be closed when their container closes
-            while (flags.mode === MODE.Statement) {
-                restore_mode();
-            }
-            var empty_braces = last_type === 'TK_START_BLOCK';
-
-            if (opt.brace_style === "expand") {
-                if (!empty_braces) {
-                    print_newline();
-                }
-            } else {
-                // skip {}
-                if (!empty_braces) {
-                    if (flags.inline_frame) {
-                        output.space_before_token = true;
-                    } else if (is_array(flags.mode) && opt.keep_array_indentation) {
-                        // we REALLY need a newline here, but newliner would skip that
-                        opt.keep_array_indentation = false;
-                        print_newline();
-                        opt.keep_array_indentation = true;
-
-                    } else {
-                        print_newline();
-                    }
-                }
-            }
-            restore_mode();
-            print_token();
-        }
-
-        function handle_word() {
-            if (current_token.type === 'TK_RESERVED') {
-                if (in_array(current_token.text, ['set', 'get']) && flags.mode !== MODE.ObjectLiteral) {
-                    current_token.type = 'TK_WORD';
-                } else if (in_array(current_token.text, ['as', 'from']) && !flags.import_block) {
-                    current_token.type = 'TK_WORD';
-                } else if (flags.mode === MODE.ObjectLiteral) {
-                    var next_token = get_token(1);
-                    if (next_token.text == ':') {
-                        current_token.type = 'TK_WORD';
-                    }
-                }
-            }
-
-            if (start_of_statement()) {
-                // The conditional starts the statement if appropriate.
-            } else if (current_token.wanted_newline && !is_expression(flags.mode) &&
-                (last_type !== 'TK_OPERATOR' || (flags.last_text === '--' || flags.last_text === '++')) &&
-                last_type !== 'TK_EQUALS' &&
-                (opt.preserve_newlines || !(last_type === 'TK_RESERVED' && in_array(flags.last_text, ['var', 'let', 'const', 'set', 'get'])))) {
-
-                print_newline();
-            }
-
-            if (flags.do_block && !flags.do_while) {
-                if (current_token.type === 'TK_RESERVED' && current_token.text === 'while') {
-                    // do {} ## while ()
-                    output.space_before_token = true;
-                    print_token();
-                    output.space_before_token = true;
-                    flags.do_while = true;
-                    return;
-                } else {
-                    // do {} should always have while as the next word.
-                    // if we don't see the expected while, recover
-                    print_newline();
-                    flags.do_block = false;
-                }
-            }
-
-            // if may be followed by else, or not
-            // Bare/inline ifs are tricky
-            // Need to unwind the modes correctly: if (a) if (b) c(); else d(); else e();
-            if (flags.if_block) {
-                if (!flags.else_block && (current_token.type === 'TK_RESERVED' && current_token.text === 'else')) {
-                    flags.else_block = true;
-                } else {
-                    while (flags.mode === MODE.Statement) {
-                        restore_mode();
-                    }
-                    flags.if_block = false;
-                    flags.else_block = false;
-                }
-            }
-
-            if (current_token.type === 'TK_RESERVED' && (current_token.text === 'case' || (current_token.text === 'default' && flags.in_case_statement))) {
-                print_newline();
-                if (flags.case_body || opt.jslint_happy) {
-                    // switch cases following one another
-                    deindent();
-                    flags.case_body = false;
-                }
-                print_token();
-                flags.in_case = true;
-                flags.in_case_statement = true;
-                return;
-            }
-
-            if (current_token.type === 'TK_RESERVED' && current_token.text === 'function') {
-                if (in_array(flags.last_text, ['}', ';']) || (output.just_added_newline() && ! in_array(flags.last_text, ['[', '{', ':', '=', ',']))) {
-                    // make sure there is a nice clean space of at least one blank line
-                    // before a new function definition
-                    if ( !output.just_added_blankline() && !current_token.comments_before.length) {
-                        print_newline();
-                        print_newline(true);
-                    }
-                }
-                if (last_type === 'TK_RESERVED' || last_type === 'TK_WORD') {
-                    if (last_type === 'TK_RESERVED' && in_array(flags.last_text, ['get', 'set', 'new', 'return', 'export', 'async'])) {
-                        output.space_before_token = true;
-                    } else if (last_type === 'TK_RESERVED' && flags.last_text === 'default' && last_last_text === 'export') {
-                        output.space_before_token = true;
-                    } else {
-                        print_newline();
-                    }
-                } else if (last_type === 'TK_OPERATOR' || flags.last_text === '=') {
-                    // foo = function
-                    output.space_before_token = true;
-                } else if (!flags.multiline_frame && (is_expression(flags.mode) || is_array(flags.mode))) {
-                    // (function
-                } else {
-                    print_newline();
-                }
-            }
-
-            if (last_type === 'TK_COMMA' || last_type === 'TK_START_EXPR' || last_type === 'TK_EQUALS' || last_type === 'TK_OPERATOR') {
-                if (!start_of_object_property()) {
-                    allow_wrap_or_preserved_newline();
-                }
-            }
-
-            if (current_token.type === 'TK_RESERVED' &&  in_array(current_token.text, ['function', 'get', 'set'])) {
-                print_token();
-                flags.last_word = current_token.text;
-                return;
-            }
-
-            prefix = 'NONE';
-
-            if (last_type === 'TK_END_BLOCK') {
-
-                if (!(current_token.type === 'TK_RESERVED' && in_array(current_token.text, ['else', 'catch', 'finally', 'from']))) {
-                    prefix = 'NEWLINE';
-                } else {
-                    if (opt.brace_style === "expand" ||
-                        opt.brace_style === "end-expand" ||
-                        (opt.brace_style === "none" && current_token.wanted_newline)) {
-                        prefix = 'NEWLINE';
-                    } else {
-                        prefix = 'SPACE';
-                        output.space_before_token = true;
-                    }
-                }
-            } else if (last_type === 'TK_SEMICOLON' && flags.mode === MODE.BlockStatement) {
-                // TODO: Should this be for STATEMENT as well?
-                prefix = 'NEWLINE';
-            } else if (last_type === 'TK_SEMICOLON' && is_expression(flags.mode)) {
-                prefix = 'SPACE';
-            } else if (last_type === 'TK_STRING') {
-                prefix = 'NEWLINE';
-            } else if (last_type === 'TK_RESERVED' || last_type === 'TK_WORD' ||
-                (flags.last_text === '*' && last_last_text === 'function')) {
-                prefix = 'SPACE';
-            } else if (last_type === 'TK_START_BLOCK') {
-                if (flags.inline_frame) {
-                    prefix = 'SPACE';
-                } else {
-                    prefix = 'NEWLINE';
-                }
-            } else if (last_type === 'TK_END_EXPR') {
-                output.space_before_token = true;
-                prefix = 'NEWLINE';
-            }
-
-            if (current_token.type === 'TK_RESERVED' && in_array(current_token.text, Tokenizer.line_starters) && flags.last_text !== ')') {
-                if (flags.last_text === 'else' || flags.last_text === 'export') {
-                    prefix = 'SPACE';
-                } else {
-                    prefix = 'NEWLINE';
-                }
-
-            }
-
-            if (current_token.type === 'TK_RESERVED' && in_array(current_token.text, ['else', 'catch', 'finally'])) {
-                if (!(last_type === 'TK_END_BLOCK' && previous_flags.mode === MODE.BlockStatement) ||
-                    opt.brace_style === "expand" ||
-                    opt.brace_style === "end-expand" ||
+                if (opt.brace_style === "expand" ||
                     (opt.brace_style === "none" && current_token.wanted_newline)) {
-                    print_newline();
-                } else {
-                    output.trim(true);
-                    var line = output.current_line;
-                    // If we trimmed and there's something other than a close block before us
-                    // put a newline back in.  Handles '} // comment' scenario.
-                    if (line.last() !== '}') {
+                    if (last_type !== 'TK_OPERATOR' &&
+                        (empty_anonymous_function ||
+                            last_type === 'TK_EQUALS' ||
+                            (last_type === 'TK_RESERVED' && is_special_word(flags.last_text) && flags.last_text !== 'else'))) {
+                        output.space_before_token = true;
+                    } else {
+                        print_newline(false, true);
+                    }
+                } else { // collapse
+                    if (opt.brace_style === 'collapse-preserve-inline') {
+                        // search forward for a newline wanted inside this block
+                        var index = 0;
+                        var check_token = null;
+                        flags.inline_frame = true;
+                        do {
+                            index += 1;
+                            check_token = get_token(index);
+                            if (check_token.wanted_newline) {
+                                flags.inline_frame = false;
+                                break;
+                            }
+                        } while (check_token.type !== 'TK_EOF' &&
+                            !(check_token.type === 'TK_END_BLOCK' && check_token.opened === current_token));
+                    }
+
+                    if (is_array(previous_flags.mode) && (last_type === 'TK_START_EXPR' || last_type === 'TK_COMMA')) {
+                        // if we're preserving inline,
+                        // allow newline between comma and next brace.
+                        if (last_type === 'TK_COMMA' || opt.space_in_paren) {
+                            output.space_before_token = true;
+                        }
+
+                        if (opt.brace_style === 'collapse-preserve-inline' &&
+                            (last_type === 'TK_COMMA' || (last_type === 'TK_START_EXPR' && flags.inline_frame))) {
+                            allow_wrap_or_preserved_newline();
+                            previous_flags.multiline_frame = previous_flags.multiline_frame || flags.multiline_frame;
+                            flags.multiline_frame = false;
+                        }
+                    } else if (last_type !== 'TK_OPERATOR' && last_type !== 'TK_START_EXPR') {
+                        if (last_type === 'TK_START_BLOCK') {
+                            print_newline();
+                        } else {
+                            output.space_before_token = true;
+                        }
+                    }
+                }
+                print_token();
+                indent();
+            }
+
+            function handle_end_block() {
+                // statements must all be closed when their container closes
+                while (flags.mode === MODE.Statement) {
+                    restore_mode();
+                }
+                var empty_braces = last_type === 'TK_START_BLOCK';
+
+                if (opt.brace_style === "expand") {
+                    if (!empty_braces) {
                         print_newline();
                     }
-                    output.space_before_token = true;
-                }
-            } else if (prefix === 'NEWLINE') {
-                if (last_type === 'TK_RESERVED' && is_special_word(flags.last_text)) {
-                    // no newline between 'return nnn'
-                    output.space_before_token = true;
-                } else if (last_type !== 'TK_END_EXPR') {
-                    if ((last_type !== 'TK_START_EXPR' || !(current_token.type === 'TK_RESERVED' && in_array(current_token.text, ['var', 'let', 'const']))) && flags.last_text !== ':') {
-                        // no need to force newline on 'var': for (var x = 0...)
-                        if (current_token.type === 'TK_RESERVED' && current_token.text === 'if' && flags.last_text === 'else') {
-                            // no newline for } else if {
+                } else {
+                    // skip {}
+                    if (!empty_braces) {
+                        if (flags.inline_frame) {
                             output.space_before_token = true;
+                        } else if (is_array(flags.mode) && opt.keep_array_indentation) {
+                            // we REALLY need a newline here, but newliner would skip that
+                            opt.keep_array_indentation = false;
+                            print_newline();
+                            opt.keep_array_indentation = true;
+
                         } else {
                             print_newline();
                         }
                     }
-                } else if (current_token.type === 'TK_RESERVED' && in_array(current_token.text, Tokenizer.line_starters) && flags.last_text !== ')') {
+                }
+                restore_mode();
+                print_token();
+            }
+
+            function handle_word() {
+                if (current_token.type === 'TK_RESERVED') {
+                    if (in_array(current_token.text, ['set', 'get']) && flags.mode !== MODE.ObjectLiteral) {
+                        current_token.type = 'TK_WORD';
+                    } else if (in_array(current_token.text, ['as', 'from']) && !flags.import_block) {
+                        current_token.type = 'TK_WORD';
+                    } else if (flags.mode === MODE.ObjectLiteral) {
+                        var next_token = get_token(1);
+                        if (next_token.text === ':') {
+                            current_token.type = 'TK_WORD';
+                        }
+                    }
+                }
+
+                if (start_of_statement()) {
+                    // The conditional starts the statement if appropriate.
+                } else if (current_token.wanted_newline && !is_expression(flags.mode) &&
+                    (last_type !== 'TK_OPERATOR' || (flags.last_text === '--' || flags.last_text === '++')) &&
+                    last_type !== 'TK_EQUALS' &&
+                    (opt.preserve_newlines || !(last_type === 'TK_RESERVED' && in_array(flags.last_text, ['var', 'let', 'const', 'set', 'get'])))) {
+
                     print_newline();
                 }
-            } else if (flags.multiline_frame && is_array(flags.mode) && flags.last_text === ',' && last_last_text === '}') {
-                print_newline(); // }, in lists get a newline treatment
-            } else if (prefix === 'SPACE') {
-                output.space_before_token = true;
-            }
-            print_token();
-            flags.last_word = current_token.text;
 
-            if (current_token.type === 'TK_RESERVED') {
-                if (current_token.text === 'do') {
-                    flags.do_block = true;
-                } else if (current_token.text === 'if') {
-                    flags.if_block = true;
-                } else if (current_token.text === 'import') {
-                    flags.import_block = true;
-                } else if (flags.import_block && current_token.type === 'TK_RESERVED' && current_token.text === 'from') {
+                if (flags.do_block && !flags.do_while) {
+                    if (current_token.type === 'TK_RESERVED' && current_token.text === 'while') {
+                        // do {} ## while ()
+                        output.space_before_token = true;
+                        print_token();
+                        output.space_before_token = true;
+                        flags.do_while = true;
+                        return;
+                    } else {
+                        // do {} should always have while as the next word.
+                        // if we don't see the expected while, recover
+                        print_newline();
+                        flags.do_block = false;
+                    }
+                }
+
+                // if may be followed by else, or not
+                // Bare/inline ifs are tricky
+                // Need to unwind the modes correctly: if (a) if (b) c(); else d(); else e();
+                if (flags.if_block) {
+                    if (!flags.else_block && (current_token.type === 'TK_RESERVED' && current_token.text === 'else')) {
+                        flags.else_block = true;
+                    } else {
+                        while (flags.mode === MODE.Statement) {
+                            restore_mode();
+                        }
+                        flags.if_block = false;
+                        flags.else_block = false;
+                    }
+                }
+
+                if (current_token.type === 'TK_RESERVED' && (current_token.text === 'case' || (current_token.text === 'default' && flags.in_case_statement))) {
+                    print_newline();
+                    if (flags.case_body || opt.jslint_happy) {
+                        // switch cases following one another
+                        deindent();
+                        flags.case_body = false;
+                    }
+                    print_token();
+                    flags.in_case = true;
+                    flags.in_case_statement = true;
+                    return;
+                }
+
+                if (current_token.type === 'TK_RESERVED' && current_token.text === 'function') {
+                    if (in_array(flags.last_text, ['}', ';']) || (output.just_added_newline() && !in_array(flags.last_text, ['[', '{', ':', '=', ',']))) {
+                        // make sure there is a nice clean space of at least one blank line
+                        // before a new function definition
+                        if (!output.just_added_blankline() && !current_token.comments_before.length) {
+                            print_newline();
+                            print_newline(true);
+                        }
+                    }
+                    if (last_type === 'TK_RESERVED' || last_type === 'TK_WORD') {
+                        if (last_type === 'TK_RESERVED' && in_array(flags.last_text, ['get', 'set', 'new', 'return', 'export', 'async'])) {
+                            output.space_before_token = true;
+                        } else if (last_type === 'TK_RESERVED' && flags.last_text === 'default' && last_last_text === 'export') {
+                            output.space_before_token = true;
+                        } else {
+                            print_newline();
+                        }
+                    } else if (last_type === 'TK_OPERATOR' || flags.last_text === '=') {
+                        // foo = function
+                        output.space_before_token = true;
+                    } else if (!flags.multiline_frame && (is_expression(flags.mode) || is_array(flags.mode))) {
+                        // (function
+                    } else {
+                        print_newline();
+                    }
+                }
+
+                if (last_type === 'TK_COMMA' || last_type === 'TK_START_EXPR' || last_type === 'TK_EQUALS' || last_type === 'TK_OPERATOR') {
+                    if (!start_of_object_property()) {
+                        allow_wrap_or_preserved_newline();
+                    }
+                }
+
+                if (current_token.type === 'TK_RESERVED' && in_array(current_token.text, ['function', 'get', 'set'])) {
+                    print_token();
+                    flags.last_word = current_token.text;
+                    return;
+                }
+
+                prefix = 'NONE';
+
+                if (last_type === 'TK_END_BLOCK') {
+
+                    if (!(current_token.type === 'TK_RESERVED' && in_array(current_token.text, ['else', 'catch', 'finally', 'from']))) {
+                        prefix = 'NEWLINE';
+                    } else {
+                        if (opt.brace_style === "expand" ||
+                            opt.brace_style === "end-expand" ||
+                            (opt.brace_style === "none" && current_token.wanted_newline)) {
+                            prefix = 'NEWLINE';
+                        } else {
+                            prefix = 'SPACE';
+                            output.space_before_token = true;
+                        }
+                    }
+                } else if (last_type === 'TK_SEMICOLON' && flags.mode === MODE.BlockStatement) {
+                    // TODO: Should this be for STATEMENT as well?
+                    prefix = 'NEWLINE';
+                } else if (last_type === 'TK_SEMICOLON' && is_expression(flags.mode)) {
+                    prefix = 'SPACE';
+                } else if (last_type === 'TK_STRING') {
+                    prefix = 'NEWLINE';
+                } else if (last_type === 'TK_RESERVED' || last_type === 'TK_WORD' ||
+                    (flags.last_text === '*' && last_last_text === 'function')) {
+                    prefix = 'SPACE';
+                } else if (last_type === 'TK_START_BLOCK') {
+                    if (flags.inline_frame) {
+                        prefix = 'SPACE';
+                    } else {
+                        prefix = 'NEWLINE';
+                    }
+                } else if (last_type === 'TK_END_EXPR') {
+                    output.space_before_token = true;
+                    prefix = 'NEWLINE';
+                }
+
+                if (current_token.type === 'TK_RESERVED' && in_array(current_token.text, Tokenizer.line_starters) && flags.last_text !== ')') {
+                    if (flags.last_text === 'else' || flags.last_text === 'export') {
+                        prefix = 'SPACE';
+                    } else {
+                        prefix = 'NEWLINE';
+                    }
+
+                }
+
+                if (current_token.type === 'TK_RESERVED' && in_array(current_token.text, ['else', 'catch', 'finally'])) {
+                    if (!(last_type === 'TK_END_BLOCK' && previous_flags.mode === MODE.BlockStatement) ||
+                        opt.brace_style === "expand" ||
+                        opt.brace_style === "end-expand" ||
+                        (opt.brace_style === "none" && current_token.wanted_newline)) {
+                        print_newline();
+                    } else {
+                        output.trim(true);
+                        var line = output.current_line;
+                        // If we trimmed and there's something other than a close block before us
+                        // put a newline back in.  Handles '} // comment' scenario.
+                        if (line.last() !== '}') {
+                            print_newline();
+                        }
+                        output.space_before_token = true;
+                    }
+                } else if (prefix === 'NEWLINE') {
+                    if (last_type === 'TK_RESERVED' && is_special_word(flags.last_text)) {
+                        // no newline between 'return nnn'
+                        output.space_before_token = true;
+                    } else if (last_type !== 'TK_END_EXPR') {
+                        if ((last_type !== 'TK_START_EXPR' || !(current_token.type === 'TK_RESERVED' && in_array(current_token.text, ['var', 'let', 'const']))) && flags.last_text !== ':') {
+                            // no need to force newline on 'var': for (var x = 0...)
+                            if (current_token.type === 'TK_RESERVED' && current_token.text === 'if' && flags.last_text === 'else') {
+                                // no newline for } else if {
+                                output.space_before_token = true;
+                            } else {
+                                print_newline();
+                            }
+                        }
+                    } else if (current_token.type === 'TK_RESERVED' && in_array(current_token.text, Tokenizer.line_starters) && flags.last_text !== ')') {
+                        print_newline();
+                    }
+                } else if (flags.multiline_frame && is_array(flags.mode) && flags.last_text === ',' && last_last_text === '}') {
+                    print_newline(); // }, in lists get a newline treatment
+                } else if (prefix === 'SPACE') {
+                    output.space_before_token = true;
+                }
+                print_token();
+                flags.last_word = current_token.text;
+
+                if (current_token.type === 'TK_RESERVED') {
+                    if (current_token.text === 'do') {
+                        flags.do_block = true;
+                    } else if (current_token.text === 'if') {
+                        flags.if_block = true;
+                    } else if (current_token.text === 'import') {
+                        flags.import_block = true;
+                    } else if (flags.import_block && current_token.type === 'TK_RESERVED' && current_token.text === 'from') {
+                        flags.import_block = false;
+                    }
+                }
+            }
+
+            function handle_semicolon() {
+                if (start_of_statement()) {
+                    // The conditional starts the statement if appropriate.
+                    // Semicolon can be the start (and end) of a statement
+                    output.space_before_token = false;
+                }
+                while (flags.mode === MODE.Statement && !flags.if_block && !flags.do_block) {
+                    restore_mode();
+                }
+
+                // hacky but effective for the moment
+                if (flags.import_block) {
                     flags.import_block = false;
                 }
-            }
-        }
-
-        function handle_semicolon() {
-            if (start_of_statement()) {
-                // The conditional starts the statement if appropriate.
-                // Semicolon can be the start (and end) of a statement
-                output.space_before_token = false;
-            }
-            while (flags.mode === MODE.Statement && !flags.if_block && !flags.do_block) {
-                restore_mode();
+                print_token();
             }
 
-            // hacky but effective for the moment
-            if (flags.import_block) {
-                flags.import_block = false;
-            }
-            print_token();
-        }
-
-        function handle_string() {
-            if (start_of_statement()) {
-                // The conditional starts the statement if appropriate.
-                // One difference - strings want at least a space before
-                output.space_before_token = true;
-            } else if (last_type === 'TK_RESERVED' || last_type === 'TK_WORD' || flags.inline_frame) {
-                output.space_before_token = true;
-            } else if (last_type === 'TK_COMMA' || last_type === 'TK_START_EXPR' || last_type === 'TK_EQUALS' || last_type === 'TK_OPERATOR') {
-                if (!start_of_object_property()) {
-                    allow_wrap_or_preserved_newline();
+            function handle_string() {
+                if (start_of_statement()) {
+                    // The conditional starts the statement if appropriate.
+                    // One difference - strings want at least a space before
+                    output.space_before_token = true;
+                } else if (last_type === 'TK_RESERVED' || last_type === 'TK_WORD' || flags.inline_frame) {
+                    output.space_before_token = true;
+                } else if (last_type === 'TK_COMMA' || last_type === 'TK_START_EXPR' || last_type === 'TK_EQUALS' || last_type === 'TK_OPERATOR') {
+                    if (!start_of_object_property()) {
+                        allow_wrap_or_preserved_newline();
+                    }
+                } else {
+                    print_newline();
                 }
-            } else {
-                print_newline();
-            }
-            print_token();
-        }
-
-        function handle_equals() {
-            if (start_of_statement()) {
-                // The conditional starts the statement if appropriate.
+                print_token();
             }
 
-            if (flags.declaration_statement) {
-                // just got an '=' in a var-line, different formatting/line-breaking, etc will now be done
-                flags.declaration_assignment = true;
-            }
-            output.space_before_token = true;
-            print_token();
-            output.space_before_token = true;
-        }
-
-        function handle_comma() {
-            print_token();
-            output.space_before_token = true;
-            if (flags.declaration_statement) {
-                if (is_expression(flags.parent.mode)) {
-                    // do not break on comma, for(var a = 1, b = 2)
-                    flags.declaration_assignment = false;
+            function handle_equals() {
+                if (start_of_statement()) {
+                    // The conditional starts the statement if appropriate.
                 }
 
-                if (flags.declaration_assignment) {
-                    flags.declaration_assignment = false;
-                    print_newline(false, true);
+                if (flags.declaration_statement) {
+                    // just got an '=' in a var-line, different formatting/line-breaking, etc will now be done
+                    flags.declaration_assignment = true;
+                }
+                output.space_before_token = true;
+                print_token();
+                output.space_before_token = true;
+            }
+
+            function handle_comma() {
+                print_token();
+                output.space_before_token = true;
+                if (flags.declaration_statement) {
+                    if (is_expression(flags.parent.mode)) {
+                        // do not break on comma, for(var a = 1, b = 2)
+                        flags.declaration_assignment = false;
+                    }
+
+                    if (flags.declaration_assignment) {
+                        flags.declaration_assignment = false;
+                        print_newline(false, true);
+                    } else if (opt.comma_first) {
+                        // for comma-first, we want to allow a newline before the comma
+                        // to turn into a newline after the comma, which we will fixup later
+                        allow_wrap_or_preserved_newline();
+                    }
+                } else if (flags.mode === MODE.ObjectLiteral ||
+                    (flags.mode === MODE.Statement && flags.parent.mode === MODE.ObjectLiteral)) {
+                    if (flags.mode === MODE.Statement) {
+                        restore_mode();
+                    }
+
+                    if (!flags.inline_frame) {
+                        print_newline();
+                    }
                 } else if (opt.comma_first) {
+                    // EXPR or DO_BLOCK
                     // for comma-first, we want to allow a newline before the comma
                     // to turn into a newline after the comma, which we will fixup later
                     allow_wrap_or_preserved_newline();
                 }
-            } else if (flags.mode === MODE.ObjectLiteral ||
-                (flags.mode === MODE.Statement && flags.parent.mode === MODE.ObjectLiteral)) {
-                if (flags.mode === MODE.Statement) {
+            }
+
+            function handle_operator() {
+                if (start_of_statement()) {
+                    // The conditional starts the statement if appropriate.
+                }
+
+                if (last_type === 'TK_RESERVED' && is_special_word(flags.last_text)) {
+                    // "return" had a special handling in TK_WORD. Now we need to return the favor
+                    output.space_before_token = true;
+                    print_token();
+                    return;
+                }
+
+                // hack for actionscript's import .*;
+                if (current_token.text === '*' && last_type === 'TK_DOT') {
+                    print_token();
+                    return;
+                }
+
+                if (current_token.text === '::') {
+                    // no spaces around exotic namespacing syntax operator
+                    print_token();
+                    return;
+                }
+
+                // Allow line wrapping between operators when operator_position is
+                //   set to before or preserve
+                if (last_type === 'TK_OPERATOR' && in_array(opt.operator_position, OPERATOR_POSITION_BEFORE_OR_PRESERVE)) {
+                    allow_wrap_or_preserved_newline();
+                }
+
+                if (current_token.text === ':' && flags.in_case) {
+                    flags.case_body = true;
+                    indent();
+                    print_token();
+                    print_newline();
+                    flags.in_case = false;
+                    return;
+                }
+
+                var space_before = true;
+                var space_after = true;
+                var in_ternary = false;
+                var isGeneratorAsterisk = current_token.text === '*' && last_type === 'TK_RESERVED' && flags.last_text === 'function';
+                var isUnary = in_array(current_token.text, ['-', '+']) && (
+                    in_array(last_type, ['TK_START_BLOCK', 'TK_START_EXPR', 'TK_EQUALS', 'TK_OPERATOR']) ||
+                    in_array(flags.last_text, Tokenizer.line_starters) ||
+                    flags.last_text === ','
+                );
+
+                if (current_token.text === ':') {
+                    if (flags.ternary_depth === 0) {
+                        // Colon is invalid javascript outside of ternary and object, but do our best to guess what was meant.
+                        space_before = false;
+                    } else {
+                        flags.ternary_depth -= 1;
+                        in_ternary = true;
+                    }
+                } else if (current_token.text === '?') {
+                    flags.ternary_depth += 1;
+                }
+
+                // let's handle the operator_position option prior to any conflicting logic
+                if (!isUnary && !isGeneratorAsterisk && opt.preserve_newlines && in_array(current_token.text, Tokenizer.positionable_operators)) {
+                    var isColon = current_token.text === ':';
+                    var isTernaryColon = (isColon && in_ternary);
+                    var isOtherColon = (isColon && !in_ternary);
+
+                    switch (opt.operator_position) {
+                        case OPERATOR_POSITION.before_newline:
+                            // if the current token is : and it's not a ternary statement then we set space_before to false
+                            output.space_before_token = !isOtherColon;
+
+                            print_token();
+
+                            if (!isColon || isTernaryColon) {
+                                allow_wrap_or_preserved_newline();
+                            }
+
+                            output.space_before_token = true;
+                            return;
+
+                        case OPERATOR_POSITION.after_newline:
+                            // if the current token is anything but colon, or (via deduction) it's a colon and in a ternary statement,
+                            //   then print a newline.
+
+                            output.space_before_token = true;
+
+                            if (!isColon || isTernaryColon) {
+                                if (get_token(1).wanted_newline) {
+                                    print_newline(false, true);
+                                } else {
+                                    allow_wrap_or_preserved_newline();
+                                }
+                            } else {
+                                output.space_before_token = false;
+                            }
+
+                            print_token();
+
+                            output.space_before_token = true;
+                            return;
+
+                        case OPERATOR_POSITION.preserve_newline:
+                            if (!isOtherColon) {
+                                allow_wrap_or_preserved_newline();
+                            }
+
+                            // if we just added a newline, or the current token is : and it's not a ternary statement,
+                            //   then we set space_before to false
+                            space_before = !(output.just_added_newline() || isOtherColon);
+
+                            output.space_before_token = space_before;
+                            print_token();
+                            output.space_before_token = true;
+                            return;
+                    }
+                }
+
+                if (in_array(current_token.text, ['--', '++', '!', '~']) || isUnary) {
+                    // unary operators (and binary +/- pretending to be unary) special cases
+
+                    space_before = false;
+                    space_after = false;
+
+                    // http://www.ecma-international.org/ecma-262/5.1/#sec-7.9.1
+                    // if there is a newline between -- or ++ and anything else we should preserve it.
+                    if (current_token.wanted_newline && (current_token.text === '--' || current_token.text === '++')) {
+                        print_newline(false, true);
+                    }
+
+                    if (flags.last_text === ';' && is_expression(flags.mode)) {
+                        // for (;; ++i)
+                        //        ^^^
+                        space_before = true;
+                    }
+
+                    if (last_type === 'TK_RESERVED') {
+                        space_before = true;
+                    } else if (last_type === 'TK_END_EXPR') {
+                        space_before = !(flags.last_text === ']' && (current_token.text === '--' || current_token.text === '++'));
+                    } else if (last_type === 'TK_OPERATOR') {
+                        // a++ + ++b;
+                        // a - -b
+                        space_before = in_array(current_token.text, ['--', '-', '++', '+']) && in_array(flags.last_text, ['--', '-', '++', '+']);
+                        // + and - are not unary when preceeded by -- or ++ operator
+                        // a-- + b
+                        // a * +b
+                        // a - -b
+                        if (in_array(current_token.text, ['+', '-']) && in_array(flags.last_text, ['--', '++'])) {
+                            space_after = true;
+                        }
+                    }
+
+
+                    if (((flags.mode === MODE.BlockStatement && !flags.inline_frame) || flags.mode === MODE.Statement) &&
+                        (flags.last_text === '{' || flags.last_text === ';')) {
+                        // { foo; --i }
+                        // foo(); --bar;
+                        print_newline();
+                    }
+                } else if (isGeneratorAsterisk) {
+                    space_before = false;
+                    space_after = false;
+                }
+                output.space_before_token = output.space_before_token || space_before;
+                print_token();
+                output.space_before_token = space_after;
+            }
+
+            function handle_block_comment() {
+                if (output.raw) {
+                    output.add_raw_token(current_token);
+                    if (current_token.directives && current_token.directives.preserve === 'end') {
+                        // If we're testing the raw output behavior, do not allow a directive to turn it off.
+                        output.raw = opt.test_output_raw;
+                    }
+                    return;
+                }
+
+                if (current_token.directives) {
+                    print_newline(false, true);
+                    print_token();
+                    if (current_token.directives.preserve === 'start') {
+                        output.raw = true;
+                    }
+                    print_newline(false, true);
+                    return;
+                }
+
+                // inline block
+                if (!acorn.newline.test(current_token.text) && !current_token.wanted_newline) {
+                    output.space_before_token = true;
+                    print_token();
+                    output.space_before_token = true;
+                    return;
+                }
+
+                var lines = split_linebreaks(current_token.text);
+                var j; // iterator for this case
+                var javadoc = false;
+                var starless = false;
+                var lastIndent = current_token.whitespace_before;
+                var lastIndentLength = lastIndent.length;
+
+                // block comment starts with a new line
+                print_newline(false, true);
+                if (lines.length > 1) {
+                    javadoc = all_lines_start_with(lines.slice(1), '*');
+                    starless = each_line_matches_indent(lines.slice(1), lastIndent);
+                }
+
+                // first line always indented
+                print_token(lines[0]);
+                for (j = 1; j < lines.length; j++) {
+                    print_newline(false, true);
+                    if (javadoc) {
+                        // javadoc: reformat and re-indent
+                        print_token(' ' + ltrim(lines[j]));
+                    } else if (starless && lines[j].length > lastIndentLength) {
+                        // starless: re-indent non-empty content, avoiding trim
+                        print_token(lines[j].substring(lastIndentLength));
+                    } else {
+                        // normal comments output raw
+                        output.add_token(lines[j]);
+                    }
+                }
+
+                // for comments of more than one line, make sure there's a new line after
+                print_newline(false, true);
+            }
+
+            function handle_comment() {
+                if (current_token.wanted_newline) {
+                    print_newline(false, true);
+                } else {
+                    output.trim(true);
+                }
+
+                output.space_before_token = true;
+                print_token();
+                print_newline(false, true);
+            }
+
+            function handle_dot() {
+                if (start_of_statement()) {
+                    // The conditional starts the statement if appropriate.
+                }
+
+                if (last_type === 'TK_RESERVED' && is_special_word(flags.last_text)) {
+                    output.space_before_token = true;
+                } else {
+                    // allow preserved newlines before dots in general
+                    // force newlines on dots after close paren when break_chained - for bar().baz()
+                    allow_wrap_or_preserved_newline(flags.last_text === ')' && opt.break_chained_methods);
+                }
+
+                print_token();
+            }
+
+            function handle_unknown() {
+                print_token();
+
+                if (current_token.text[current_token.text.length - 1] === '\n') {
+                    print_newline();
+                }
+            }
+
+            function handle_eof() {
+                // Unwind any open statements
+                while (flags.mode === MODE.Statement) {
                     restore_mode();
                 }
-
-                if (!flags.inline_frame) {
-                    print_newline();
-                }
-            } else if (opt.comma_first) {
-                // EXPR or DO_BLOCK
-                // for comma-first, we want to allow a newline before the comma
-                // to turn into a newline after the comma, which we will fixup later
-                allow_wrap_or_preserved_newline();
             }
         }
 
-        function handle_operator() {
-            if (start_of_statement()) {
-                // The conditional starts the statement if appropriate.
-            }
 
-            if (last_type === 'TK_RESERVED' && is_special_word(flags.last_text)) {
-                // "return" had a special handling in TK_WORD. Now we need to return the favor
-                output.space_before_token = true;
-                print_token();
-                return;
-            }
+        function OutputLine(parent) {
+            var _character_count = 0;
+            // use indent_count as a marker for lines that have preserved indentation
+            var _indent_count = -1;
 
-            // hack for actionscript's import .*;
-            if (current_token.text === '*' && last_type === 'TK_DOT') {
-                print_token();
-                return;
-            }
+            var _items = [];
+            var _empty = true;
 
-            if (current_token.text === ':' && flags.in_case) {
-                flags.case_body = true;
-                indent();
-                print_token();
-                print_newline();
-                flags.in_case = false;
-                return;
-            }
+            this.set_indent = function(level) {
+                _character_count = parent.baseIndentLength + level * parent.indent_length;
+                _indent_count = level;
+            };
 
-            if (current_token.text === '::') {
-                // no spaces around exotic namespacing syntax operator
-                print_token();
-                return;
-            }
+            this.get_character_count = function() {
+                return _character_count;
+            };
 
-            // Allow line wrapping between operators
-            if (last_type === 'TK_OPERATOR') {
-                allow_wrap_or_preserved_newline();
-            }
+            this.is_empty = function() {
+                return _empty;
+            };
 
-            var space_before = true;
-            var space_after = true;
-
-            if (in_array(current_token.text, ['--', '++', '!', '~']) || (in_array(current_token.text, ['-', '+']) && (in_array(last_type, ['TK_START_BLOCK', 'TK_START_EXPR', 'TK_EQUALS', 'TK_OPERATOR']) || in_array(flags.last_text, Tokenizer.line_starters) || flags.last_text === ','))) {
-                // unary operators (and binary +/- pretending to be unary) special cases
-
-                space_before = false;
-                space_after = false;
-
-                // http://www.ecma-international.org/ecma-262/5.1/#sec-7.9.1
-                // if there is a newline between -- or ++ and anything else we should preserve it.
-                if (current_token.wanted_newline && (current_token.text === '--' || current_token.text === '++')) {
-                    print_newline(false, true);
-                }
-
-                if (flags.last_text === ';' && is_expression(flags.mode)) {
-                    // for (;; ++i)
-                    //        ^^^
-                    space_before = true;
-                }
-
-                if (last_type === 'TK_RESERVED') {
-                    space_before = true;
-                } else if (last_type === 'TK_END_EXPR') {
-                    space_before = !(flags.last_text === ']' && (current_token.text === '--' || current_token.text === '++'));
-                } else if (last_type === 'TK_OPERATOR') {
-                    // a++ + ++b;
-                    // a - -b
-                    space_before = in_array(current_token.text, ['--', '-', '++', '+']) && in_array(flags.last_text, ['--', '-', '++', '+']);
-                    // + and - are not unary when preceeded by -- or ++ operator
-                    // a-- + b
-                    // a * +b
-                    // a - -b
-                    if (in_array(current_token.text, ['+', '-']) && in_array(flags.last_text, ['--', '++'])) {
-                        space_after = true;
-                    }
-                }
-
-
-                if (((flags.mode === MODE.BlockStatement && !flags.inline_frame) || flags.mode === MODE.Statement)
-                    && (flags.last_text === '{' || flags.last_text === ';')) {
-                    // { foo; --i }
-                    // foo(); --bar;
-                    print_newline();
-                }
-            } else if (current_token.text === ':') {
-                if (flags.ternary_depth === 0) {
-                    // Colon is invalid javascript outside of ternary and object, but do our best to guess what was meant.
-                    space_before = false;
+            this.last = function() {
+                if (!this._empty) {
+                    return _items[_items.length - 1];
                 } else {
-                    flags.ternary_depth -= 1;
+                    return null;
                 }
-            } else if (current_token.text === '?') {
-                flags.ternary_depth += 1;
-            } else if (current_token.text === '*' && last_type === 'TK_RESERVED' && flags.last_text === 'function') {
-                space_before = false;
-                space_after = false;
-            }
-            output.space_before_token = output.space_before_token || space_before;
-            print_token();
-            output.space_before_token = space_after;
-        }
+            };
 
-        function handle_block_comment() {
-            if (output.raw) {
-                output.add_raw_token(current_token)
-                if (current_token.directives && current_token.directives['preserve'] === 'end') {
-                    // If we're testing the raw output behavior, do not allow a directive to turn it off.
-                    if (!opt.test_output_raw) {
-                        output.raw = false;
-                    }
+            this.push = function(input) {
+                _items.push(input);
+                _character_count += input.length;
+                _empty = false;
+            };
+
+            this.pop = function() {
+                var item = null;
+                if (!_empty) {
+                    item = _items.pop();
+                    _character_count -= item.length;
+                    _empty = _items.length === 0;
                 }
-                return;
-            }
+                return item;
+            };
 
-            if (current_token.directives) {
-                print_newline(false, true);
-                print_token();
-                if (current_token.directives['preserve'] === 'start') {
-                    output.raw = true;
+            this.remove_indent = function() {
+                if (_indent_count > 0) {
+                    _indent_count -= 1;
+                    _character_count -= parent.indent_length;
                 }
-                print_newline(false, true);
-                return;
-            }
+            };
 
-            // inline block
-            if (!acorn.newline.test(current_token.text) && !current_token.wanted_newline) {
-                output.space_before_token = true;
-                print_token();
-                output.space_before_token = true;
-                return;
-            }
-
-            var lines = split_linebreaks(current_token.text);
-            var j; // iterator for this case
-            var javadoc = false;
-            var starless = false;
-            var lastIndent = current_token.whitespace_before;
-            var lastIndentLength = lastIndent.length;
-
-            // block comment starts with a new line
-            print_newline(false, true);
-            if (lines.length > 1) {
-                if (all_lines_start_with(lines.slice(1), '*')) {
-                    javadoc = true;
+            this.trim = function() {
+                while (this.last() === ' ') {
+                    _items.pop();
+                    _character_count -= 1;
                 }
-                else if (each_line_matches_indent(lines.slice(1), lastIndent)) {
-                    starless = true;
-                }
-            }
-
-            // first line always indented
-            print_token(lines[0]);
-            for (j = 1; j < lines.length; j++) {
-                print_newline(false, true);
-                if (javadoc) {
-                    // javadoc: reformat and re-indent
-                    print_token(' ' + ltrim(lines[j]));
-                } else if (starless && lines[j].length > lastIndentLength) {
-                    // starless: re-indent non-empty content, avoiding trim
-                    print_token(lines[j].substring(lastIndentLength));
-                } else {
-                    // normal comments output raw
-                    output.add_token(lines[j]);
-                }
-            }
-
-            // for comments of more than one line, make sure there's a new line after
-            print_newline(false, true);
-        }
-
-        function handle_comment() {
-            if (current_token.wanted_newline) {
-                print_newline(false, true);
-            } else {
-                output.trim(true);
-            }
-
-            output.space_before_token = true;
-            print_token();
-            print_newline(false, true);
-        }
-
-        function handle_dot() {
-            if (start_of_statement()) {
-                // The conditional starts the statement if appropriate.
-            }
-
-            if (last_type === 'TK_RESERVED' && is_special_word(flags.last_text)) {
-                output.space_before_token = true;
-            } else {
-                // allow preserved newlines before dots in general
-                // force newlines on dots after close paren when break_chained - for bar().baz()
-                allow_wrap_or_preserved_newline(flags.last_text === ')' && opt.break_chained_methods);
-            }
-
-            print_token();
-        }
-
-        function handle_unknown() {
-            print_token();
-
-            if (current_token.text[current_token.text.length - 1] === '\n') {
-                print_newline();
-            }
-        }
-
-        function handle_eof() {
-            // Unwind any open statements
-            while (flags.mode === MODE.Statement) {
-                restore_mode();
-            }
-        }
-    }
-
-
-    function OutputLine(parent) {
-        var _character_count = 0;
-        // use indent_count as a marker for lines that have preserved indentation
-        var _indent_count = -1;
-
-        var _items = [];
-        var _empty = true;
-
-        this.set_indent = function(level) {
-            _character_count = parent.baseIndentLength + level * parent.indent_length
-            _indent_count = level;
-        }
-
-        this.get_character_count = function() {
-            return _character_count;
-        }
-
-        this.is_empty = function() {
-            return _empty;
-        }
-
-        this.last = function() {
-            if (!this._empty) {
-              return _items[_items.length - 1];
-            } else {
-              return null;
-            }
-        }
-
-        this.push = function(input) {
-            _items.push(input);
-            _character_count += input.length;
-            _empty = false;
-        }
-
-        this.pop = function() {
-            var item = null;
-            if (!_empty) {
-                item = _items.pop();
-                _character_count -= item.length;
                 _empty = _items.length === 0;
-            }
-            return item;
-        }
+            };
 
-        this.remove_indent = function() {
-            if (_indent_count > 0) {
-                _indent_count -= 1;
-                _character_count -= parent.indent_length
-            }
-        }
-
-        this.trim = function() {
-            while (this.last() === ' ') {
-                var item = _items.pop();
-                _character_count -= 1;
-            }
-            _empty = _items.length === 0;
-        }
-
-        this.toString = function() {
-            var result = '';
-            if (!this._empty) {
-                if (_indent_count >= 0) {
-                    result = parent.indent_cache[_indent_count];
+            this.toString = function() {
+                var result = '';
+                if (!this._empty) {
+                    if (_indent_count >= 0) {
+                        result = parent.indent_cache[_indent_count];
+                    }
+                    result += _items.join('');
                 }
-                result += _items.join('')
-            }
-            return result;
-        }
-    }
-
-    function Output(indent_string, baseIndentString) {
-        baseIndentString = baseIndentString || '';
-        this.indent_cache = [ baseIndentString ];
-        this.baseIndentLength = baseIndentString.length;
-        this.indent_length = indent_string.length;
-        this.raw = false;
-
-        var lines =[];
-        this.baseIndentString = baseIndentString;
-        this.indent_string = indent_string;
-        this.previous_line = null;
-        this.current_line = null;
-        this.space_before_token = false;
-
-        this.add_outputline = function() {
-            this.previous_line = this.current_line;
-            this.current_line = new OutputLine(this);
-            lines.push(this.current_line);
+                return result;
+            };
         }
 
-        // initialize
-        this.add_outputline();
+        function Output(indent_string, baseIndentString) {
+            baseIndentString = baseIndentString || '';
+            this.indent_cache = [baseIndentString];
+            this.baseIndentLength = baseIndentString.length;
+            this.indent_length = indent_string.length;
+            this.raw = false;
+
+            var lines = [];
+            this.baseIndentString = baseIndentString;
+            this.indent_string = indent_string;
+            this.previous_line = null;
+            this.current_line = null;
+            this.space_before_token = false;
+
+            this.add_outputline = function() {
+                this.previous_line = this.current_line;
+                this.current_line = new OutputLine(this);
+                lines.push(this.current_line);
+            };
+
+            // initialize
+            this.add_outputline();
 
 
-        this.get_line_number = function() {
-            return lines.length;
-        }
+            this.get_line_number = function() {
+                return lines.length;
+            };
 
-        // Using object instead of string to allow for later expansion of info about each line
-        this.add_new_line = function(force_newline) {
-            if (this.get_line_number() === 1 && this.just_added_newline()) {
-                return false; // no newline on start of file
-            }
+            // Using object instead of string to allow for later expansion of info about each line
+            this.add_new_line = function(force_newline) {
+                if (this.get_line_number() === 1 && this.just_added_newline()) {
+                    return false; // no newline on start of file
+                }
 
-            if (force_newline || !this.just_added_newline()) {
-                if (!this.raw) {
+                if (force_newline || !this.just_added_newline()) {
+                    if (!this.raw) {
+                        this.add_outputline();
+                    }
+                    return true;
+                }
+
+                return false;
+            };
+
+            this.get_code = function() {
+                var sweet_code = lines.join('\n').replace(/[\r\n\t ]+$/, '');
+                return sweet_code;
+            };
+
+            this.set_indent = function(level) {
+                // Never indent your first output indent at the start of the file
+                if (lines.length > 1) {
+                    while (level >= this.indent_cache.length) {
+                        this.indent_cache.push(this.indent_cache[this.indent_cache.length - 1] + this.indent_string);
+                    }
+
+                    this.current_line.set_indent(level);
+                    return true;
+                }
+                this.current_line.set_indent(0);
+                return false;
+            };
+
+            this.add_raw_token = function(token) {
+                for (var x = 0; x < token.newlines; x++) {
                     this.add_outputline();
                 }
-                return true;
-            }
+                this.current_line.push(token.whitespace_before);
+                this.current_line.push(token.text);
+                this.space_before_token = false;
+            };
 
-            return false;
-        }
+            this.add_token = function(printable_token) {
+                this.add_space_before_token();
+                this.current_line.push(printable_token);
+            };
 
-        this.get_code = function() {
-            var sweet_code = lines.join('\n').replace(/[\r\n\t ]+$/, '');
-            return sweet_code;
-        }
+            this.add_space_before_token = function() {
+                if (this.space_before_token && !this.just_added_newline()) {
+                    this.current_line.push(' ');
+                }
+                this.space_before_token = false;
+            };
 
-        this.set_indent = function(level) {
-            // Never indent your first output indent at the start of the file
-            if (lines.length > 1) {
-                while(level >= this.indent_cache.length) {
-                    this.indent_cache.push(this.indent_cache[this.indent_cache.length - 1] + this.indent_string);
+            this.remove_redundant_indentation = function(frame) {
+                // This implementation is effective but has some issues:
+                //     - can cause line wrap to happen too soon due to indent removal
+                //           after wrap points are calculated
+                // These issues are minor compared to ugly indentation.
+
+                if (frame.multiline_frame ||
+                    frame.mode === MODE.ForInitializer ||
+                    frame.mode === MODE.Conditional) {
+                    return;
                 }
 
-                this.current_line.set_indent(level);
-                return true;
-            }
-            this.current_line.set_indent(0);
-            return false;
-        }
+                // remove one indent from each line inside this section
+                var index = frame.start_line_index;
 
-        this.add_raw_token = function(token) {
-            for (var x = 0; x < token.newlines; x++) {
-                this.add_outputline();
-            }
-            this.current_line.push(token.whitespace_before);
-            this.current_line.push(token.text);
-            this.space_before_token = false;
-        }
+                var output_length = lines.length;
+                while (index < output_length) {
+                    lines[index].remove_indent();
+                    index++;
+                }
+            };
 
-        this.add_token = function(printable_token) {
-            this.add_space_before_token();
-            this.current_line.push(printable_token);
-        }
+            this.trim = function(eat_newlines) {
+                eat_newlines = (eat_newlines === undefined) ? false : eat_newlines;
 
-        this.add_space_before_token = function() {
-            if (this.space_before_token && !this.just_added_newline()) {
-                this.current_line.push(' ');
-            }
-            this.space_before_token = false;
-        }
+                this.current_line.trim(indent_string, baseIndentString);
 
-        this.remove_redundant_indentation = function (frame) {
-            // This implementation is effective but has some issues:
-            //     - can cause line wrap to happen too soon due to indent removal
-            //           after wrap points are calculated
-            // These issues are minor compared to ugly indentation.
-
-            if (frame.multiline_frame ||
-                frame.mode === MODE.ForInitializer ||
-                frame.mode === MODE.Conditional) {
-                return;
-            }
-
-            // remove one indent from each line inside this section
-            var index = frame.start_line_index;
-            var line;
-
-            var output_length = lines.length;
-            while (index < output_length) {
-                lines[index].remove_indent();
-                index++;
-            }
-        }
-
-        this.trim = function(eat_newlines) {
-            eat_newlines = (eat_newlines === undefined) ? false : eat_newlines;
-
-            this.current_line.trim(indent_string, baseIndentString);
-
-            while (eat_newlines && lines.length > 1 &&
-                this.current_line.is_empty()) {
-                lines.pop();
-                this.current_line = lines[lines.length - 1]
-                this.current_line.trim();
-            }
-
-            this.previous_line = lines.length > 1 ? lines[lines.length - 2] : null;
-        }
-
-        this.just_added_newline = function() {
-            return this.current_line.is_empty();
-        }
-
-        this.just_added_blankline = function() {
-            if (this.just_added_newline()) {
-                if (lines.length === 1) {
-                    return true; // start of the file and newline = blank
+                while (eat_newlines && lines.length > 1 &&
+                    this.current_line.is_empty()) {
+                    lines.pop();
+                    this.current_line = lines[lines.length - 1];
+                    this.current_line.trim();
                 }
 
-                var line = lines[lines.length - 2];
-                return line.is_empty();
-            }
-            return false;
-        }
-    }
+                this.previous_line = lines.length > 1 ? lines[lines.length - 2] : null;
+            };
 
+            this.just_added_newline = function() {
+                return this.current_line.is_empty();
+            };
 
-    var Token = function(type, text, newlines, whitespace_before, mode, parent) {
-        this.type = type;
-        this.text = text;
-        this.comments_before = [];
-        this.newlines = newlines || 0;
-        this.wanted_newline = newlines > 0;
-        this.whitespace_before = whitespace_before || '';
-        this.parent = null;
-        this.opened = null;
-        this.directives = null;
-    }
-
-    function tokenizer(input, opts, indent_string) {
-
-        var whitespace = "\n\r\t ".split('');
-        var digit = /[0-9]/;
-        var digit_bin = /[01]/;
-        var digit_oct = /[01234567]/;
-        var digit_hex = /[0123456789abcdefABCDEF]/;
-
-        var punct = ('+ - * / % & ++ -- = += -= *= /= %= == === != !== > < >= <= >> << >>> >>>= >>= <<= && &= | || ! ~ , : ? ^ ^= |= :: => **').split(' ');
-        // words which should always start on new line.
-        this.line_starters = 'continue,try,throw,return,var,let,const,if,switch,case,default,for,while,break,function,import,export'.split(',');
-        var reserved_words = this.line_starters.concat(['do', 'in', 'else', 'get', 'set', 'new', 'catch', 'finally', 'typeof', 'yield', 'async', 'await', 'from', 'as']);
-
-        //  /* ... */ comment ends with nearest */ or end of file
-        var block_comment_pattern = /([\s\S]*?)((?:\*\/)|$)/g;
-
-        // comment ends just before nearest linefeed or end of file
-        var comment_pattern = /([^\n\r\u2028\u2029]*)/g;
-
-        var directives_block_pattern = /\/\* beautify( \w+[:]\w+)+ \*\//g;
-        var directive_pattern = / (\w+)[:](\w+)/g;
-        var directives_end_ignore_pattern = /([\s\S]*?)((?:\/\*\sbeautify\signore:end\s\*\/)|$)/g;
-
-        var template_pattern = /((<\?php|<\?=)[\s\S]*?\?>)|(<%[\s\S]*?%>)/g
-
-        var n_newlines, whitespace_before_token, in_html_comment, tokens, parser_pos;
-        var input_length;
-
-        this.tokenize = function() {
-            // cache the source's length.
-            input_length = input.length
-            parser_pos = 0;
-            in_html_comment = false
-            tokens = [];
-
-            var next, last;
-            var token_values;
-            var open = null;
-            var open_stack = [];
-            var comments = [];
-
-            while (!(last && last.type === 'TK_EOF')) {
-                token_values = tokenize_next();
-                next = new Token(token_values[1], token_values[0], n_newlines, whitespace_before_token);
-                while(next.type === 'TK_COMMENT' || next.type === 'TK_BLOCK_COMMENT' || next.type === 'TK_UNKNOWN') {
-                    if (next.type === 'TK_BLOCK_COMMENT') {
-                        next.directives = token_values[2];
+            this.just_added_blankline = function() {
+                if (this.just_added_newline()) {
+                    if (lines.length === 1) {
+                        return true; // start of the file and newline = blank
                     }
-                    comments.push(next);
+
+                    var line = lines[lines.length - 2];
+                    return line.is_empty();
+                }
+                return false;
+            };
+        }
+
+
+        var Token = function(type, text, newlines, whitespace_before, parent) {
+            this.type = type;
+            this.text = text;
+            this.comments_before = [];
+            this.newlines = newlines || 0;
+            this.wanted_newline = newlines > 0;
+            this.whitespace_before = whitespace_before || '';
+            this.parent = parent || null;
+            this.opened = null;
+            this.directives = null;
+        };
+
+        function tokenizer(input, opts) {
+
+            var whitespace = "\n\r\t ".split('');
+            var digit = /[0-9]/;
+            var digit_bin = /[01]/;
+            var digit_oct = /[01234567]/;
+            var digit_hex = /[0123456789abcdefABCDEF]/;
+
+            this.positionable_operators = '!= !== % & && * ** + - / : < << <= == === > >= >> >>> ? ^ | ||'.split(' ');
+            var punct = this.positionable_operators.concat(
+                // non-positionable operators - these do not follow operator position settings
+                '! %= &= *= **= ++ += , -- -= /= :: <<= = => >>= >>>= ^= |= ~'.split(' '));
+
+            // words which should always start on new line.
+            this.line_starters = 'continue,try,throw,return,var,let,const,if,switch,case,default,for,while,break,function,import,export'.split(',');
+            var reserved_words = this.line_starters.concat(['do', 'in', 'else', 'get', 'set', 'new', 'catch', 'finally', 'typeof', 'yield', 'async', 'await', 'from', 'as']);
+
+            //  /* ... */ comment ends with nearest */ or end of file
+            var block_comment_pattern = /([\s\S]*?)((?:\*\/)|$)/g;
+
+            // comment ends just before nearest linefeed or end of file
+            var comment_pattern = /([^\n\r\u2028\u2029]*)/g;
+
+            var directives_block_pattern = /\/\* beautify( \w+[:]\w+)+ \*\//g;
+            var directive_pattern = / (\w+)[:](\w+)/g;
+            var directives_end_ignore_pattern = /([\s\S]*?)((?:\/\*\sbeautify\signore:end\s\*\/)|$)/g;
+
+            var template_pattern = /((<\?php|<\?=)[\s\S]*?\?>)|(<%[\s\S]*?%>)/g;
+
+            var n_newlines, whitespace_before_token, in_html_comment, tokens, parser_pos;
+            var input_length;
+
+            this.tokenize = function() {
+                // cache the source's length.
+                input_length = input.length;
+                parser_pos = 0;
+                in_html_comment = false;
+                tokens = [];
+
+                var next, last;
+                var token_values;
+                var open = null;
+                var open_stack = [];
+                var comments = [];
+
+                while (!(last && last.type === 'TK_EOF')) {
                     token_values = tokenize_next();
                     next = new Token(token_values[1], token_values[0], n_newlines, whitespace_before_token);
-                }
-
-                if (comments.length) {
-                    next.comments_before = comments;
-                    comments = [];
-                }
-
-                if (next.type === 'TK_START_BLOCK' || next.type === 'TK_START_EXPR') {
-                    next.parent = last;
-                    open_stack.push(open);
-                    open = next;
-                }  else if ((next.type === 'TK_END_BLOCK' || next.type === 'TK_END_EXPR') &&
-                    (open && (
-                        (next.text === ']' && open.text === '[') ||
-                        (next.text === ')' && open.text === '(') ||
-                        (next.text === '}' && open.text === '{')))) {
-                    next.parent = open.parent;
-                    next.opened = open
-
-                    open = open_stack.pop();
-                }
-
-                tokens.push(next);
-                last = next;
-            }
-
-            return tokens;
-        }
-
-        function get_directives (text) {
-            if (!text.match(directives_block_pattern)) {
-                return null;
-            }
-
-            var directives = {};
-            directive_pattern.lastIndex = 0;
-            var directive_match = directive_pattern.exec(text);
-
-            while (directive_match) {
-                directives[directive_match[1]] = directive_match[2];
-                directive_match = directive_pattern.exec(text);
-            }
-
-            return directives;
-        }
-
-        function tokenize_next() {
-            var i, resulting_string;
-            var whitespace_on_this_line = [];
-
-            n_newlines = 0;
-            whitespace_before_token = '';
-
-            if (parser_pos >= input_length) {
-                return ['', 'TK_EOF'];
-            }
-
-            var last_token;
-            if (tokens.length) {
-                last_token = tokens[tokens.length-1];
-            } else {
-                // For the sake of tokenizing we can pretend that there was on open brace to start
-                last_token = new Token('TK_START_BLOCK', '{');
-            }
-
-
-            var c = input.charAt(parser_pos);
-            parser_pos += 1;
-
-            while (in_array(c, whitespace)) {
-
-                if (acorn.newline.test(c)) {
-                    if (!(c === '\n' && input.charAt(parser_pos-2) === '\r')) {
-                        n_newlines += 1;
-                        whitespace_on_this_line = [];
+                    while (next.type === 'TK_COMMENT' || next.type === 'TK_BLOCK_COMMENT' || next.type === 'TK_UNKNOWN') {
+                        if (next.type === 'TK_BLOCK_COMMENT') {
+                            next.directives = token_values[2];
+                        }
+                        comments.push(next);
+                        token_values = tokenize_next();
+                        next = new Token(token_values[1], token_values[0], n_newlines, whitespace_before_token);
                     }
-                } else {
-                    whitespace_on_this_line.push(c);
+
+                    if (comments.length) {
+                        next.comments_before = comments;
+                        comments = [];
+                    }
+
+                    if (next.type === 'TK_START_BLOCK' || next.type === 'TK_START_EXPR') {
+                        next.parent = last;
+                        open_stack.push(open);
+                        open = next;
+                    } else if ((next.type === 'TK_END_BLOCK' || next.type === 'TK_END_EXPR') &&
+                        (open && (
+                            (next.text === ']' && open.text === '[') ||
+                            (next.text === ')' && open.text === '(') ||
+                            (next.text === '}' && open.text === '{')))) {
+                        next.parent = open.parent;
+                        next.opened = open;
+
+                        open = open_stack.pop();
+                    }
+
+                    tokens.push(next);
+                    last = next;
                 }
+
+                return tokens;
+            };
+
+            function get_directives(text) {
+                if (!text.match(directives_block_pattern)) {
+                    return null;
+                }
+
+                var directives = {};
+                directive_pattern.lastIndex = 0;
+                var directive_match = directive_pattern.exec(text);
+
+                while (directive_match) {
+                    directives[directive_match[1]] = directive_match[2];
+                    directive_match = directive_pattern.exec(text);
+                }
+
+                return directives;
+            }
+
+            function tokenize_next() {
+                var resulting_string;
+                var whitespace_on_this_line = [];
+
+                n_newlines = 0;
+                whitespace_before_token = '';
 
                 if (parser_pos >= input_length) {
                     return ['', 'TK_EOF'];
                 }
 
-                c = input.charAt(parser_pos);
-                parser_pos += 1;
-            }
-
-            if(whitespace_on_this_line.length) {
-                whitespace_before_token = whitespace_on_this_line.join('');
-            }
-
-            if (digit.test(c) || (c === '.' && digit.test(input.charAt(parser_pos)))) {
-                var allow_decimal = true;
-                var allow_e = true;
-                var local_digit = digit;
-
-                if (c === '0' && parser_pos < input_length && /[XxOoBb]/.test(input.charAt(parser_pos))) {
-                    // switch to hex/oct/bin number, no decimal or e, just hex/oct/bin digits
-                    allow_decimal = false;
-                    allow_e = false;
-                    if ( /[Bb]/.test(input.charAt(parser_pos)) ) {
-                        local_digit = digit_bin;
-                    } else if ( /[Oo]/.test(input.charAt(parser_pos)) ) {
-                        local_digit = digit_oct;
-                    } else {
-                        local_digit = digit_hex;
-                    }
-                    c += input.charAt(parser_pos);
-                    parser_pos += 1;
-                } else if (c === '.') {
-                    // Already have a decimal for this literal, don't allow another
-                    allow_decimal = false;
+                var last_token;
+                if (tokens.length) {
+                    last_token = tokens[tokens.length - 1];
                 } else {
-                    // we know this first loop will run.  It keeps the logic simpler.
-                    c = '';
-                    parser_pos -= 1;
+                    // For the sake of tokenizing we can pretend that there was on open brace to start
+                    last_token = new Token('TK_START_BLOCK', '{');
                 }
 
-                // Add the digits
-                while (parser_pos < input_length && local_digit.test(input.charAt(parser_pos))) {
-                    c += input.charAt(parser_pos);
+
+                var c = input.charAt(parser_pos);
+                parser_pos += 1;
+
+                while (in_array(c, whitespace)) {
+
+                    if (acorn.newline.test(c)) {
+                        if (!(c === '\n' && input.charAt(parser_pos - 2) === '\r')) {
+                            n_newlines += 1;
+                            whitespace_on_this_line = [];
+                        }
+                    } else {
+                        whitespace_on_this_line.push(c);
+                    }
+
+                    if (parser_pos >= input_length) {
+                        return ['', 'TK_EOF'];
+                    }
+
+                    c = input.charAt(parser_pos);
                     parser_pos += 1;
+                }
 
-                    if (allow_decimal && parser_pos < input_length && input.charAt(parser_pos) === '.') {
-                        c += input.charAt(parser_pos);
-                        parser_pos += 1;
+                if (whitespace_on_this_line.length) {
+                    whitespace_before_token = whitespace_on_this_line.join('');
+                }
+
+                if (digit.test(c) || (c === '.' && digit.test(input.charAt(parser_pos)))) {
+                    var allow_decimal = true;
+                    var allow_e = true;
+                    var local_digit = digit;
+
+                    if (c === '0' && parser_pos < input_length && /[XxOoBb]/.test(input.charAt(parser_pos))) {
+                        // switch to hex/oct/bin number, no decimal or e, just hex/oct/bin digits
                         allow_decimal = false;
-                    } else if (allow_e && parser_pos < input_length && /[Ee]/.test(input.charAt(parser_pos))) {
+                        allow_e = false;
+                        if (/[Bb]/.test(input.charAt(parser_pos))) {
+                            local_digit = digit_bin;
+                        } else if (/[Oo]/.test(input.charAt(parser_pos))) {
+                            local_digit = digit_oct;
+                        } else {
+                            local_digit = digit_hex;
+                        }
+                        c += input.charAt(parser_pos);
+                        parser_pos += 1;
+                    } else if (c === '.') {
+                        // Already have a decimal for this literal, don't allow another
+                        allow_decimal = false;
+                    } else {
+                        // we know this first loop will run.  It keeps the logic simpler.
+                        c = '';
+                        parser_pos -= 1;
+                    }
+
+                    // Add the digits
+                    while (parser_pos < input_length && local_digit.test(input.charAt(parser_pos))) {
                         c += input.charAt(parser_pos);
                         parser_pos += 1;
 
-                        if (parser_pos < input_length && /[+-]/.test(input.charAt(parser_pos))) {
+                        if (allow_decimal && parser_pos < input_length && input.charAt(parser_pos) === '.') {
                             c += input.charAt(parser_pos);
                             parser_pos += 1;
-                        }
+                            allow_decimal = false;
+                        } else if (allow_e && parser_pos < input_length && /[Ee]/.test(input.charAt(parser_pos))) {
+                            c += input.charAt(parser_pos);
+                            parser_pos += 1;
 
-                        allow_e = false;
-                        allow_decimal = false;
+                            if (parser_pos < input_length && /[+-]/.test(input.charAt(parser_pos))) {
+                                c += input.charAt(parser_pos);
+                                parser_pos += 1;
+                            }
+
+                            allow_e = false;
+                            allow_decimal = false;
+                        }
+                    }
+
+                    return [c, 'TK_WORD'];
+                }
+
+                if (acorn.isIdentifierStart(input.charCodeAt(parser_pos - 1))) {
+                    if (parser_pos < input_length) {
+                        while (acorn.isIdentifierChar(input.charCodeAt(parser_pos))) {
+                            c += input.charAt(parser_pos);
+                            parser_pos += 1;
+                            if (parser_pos === input_length) {
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!(last_token.type === 'TK_DOT' ||
+                            (last_token.type === 'TK_RESERVED' && in_array(last_token.text, ['set', 'get']))) &&
+                        in_array(c, reserved_words)) {
+                        if (c === 'in') { // hack for 'in' operator
+                            return [c, 'TK_OPERATOR'];
+                        }
+                        return [c, 'TK_RESERVED'];
+                    }
+
+                    return [c, 'TK_WORD'];
+                }
+
+                if (c === '(' || c === '[') {
+                    return [c, 'TK_START_EXPR'];
+                }
+
+                if (c === ')' || c === ']') {
+                    return [c, 'TK_END_EXPR'];
+                }
+
+                if (c === '{') {
+                    return [c, 'TK_START_BLOCK'];
+                }
+
+                if (c === '}') {
+                    return [c, 'TK_END_BLOCK'];
+                }
+
+                if (c === ';') {
+                    return [c, 'TK_SEMICOLON'];
+                }
+
+                if (c === '/') {
+                    var comment = '';
+                    var comment_match;
+                    // peek for comment /* ... */
+                    if (input.charAt(parser_pos) === '*') {
+                        parser_pos += 1;
+                        block_comment_pattern.lastIndex = parser_pos;
+                        comment_match = block_comment_pattern.exec(input);
+                        comment = '/*' + comment_match[0];
+                        parser_pos += comment_match[0].length;
+                        var directives = get_directives(comment);
+                        if (directives && directives.ignore === 'start') {
+                            directives_end_ignore_pattern.lastIndex = parser_pos;
+                            comment_match = directives_end_ignore_pattern.exec(input);
+                            comment += comment_match[0];
+                            parser_pos += comment_match[0].length;
+                        }
+                        comment = comment.replace(acorn.allLineBreaks, '\n');
+                        return [comment, 'TK_BLOCK_COMMENT', directives];
+                    }
+                    // peek for comment // ...
+                    if (input.charAt(parser_pos) === '/') {
+                        parser_pos += 1;
+                        comment_pattern.lastIndex = parser_pos;
+                        comment_match = comment_pattern.exec(input);
+                        comment = '//' + comment_match[0];
+                        parser_pos += comment_match[0].length;
+                        return [comment, 'TK_COMMENT'];
+                    }
+
+                }
+
+                var startXmlRegExp = /^<([-a-zA-Z:0-9_.]+|{.+?}|!\[CDATA\[[\s\S]*?\]\])(\s+{.+?}|\s+[-a-zA-Z:0-9_.]+|\s+[-a-zA-Z:0-9_.]+\s*=\s*('[^']*'|"[^"]*"|{.+?}))*\s*(\/?)\s*>/;
+
+                if (c === '`' || c === "'" || c === '"' || // string
+                    (
+                        (c === '/') || // regexp
+                        (opts.e4x && c === "<" && input.slice(parser_pos - 1).match(startXmlRegExp)) // xml
+                    ) && ( // regex and xml can only appear in specific locations during parsing
+                        (last_token.type === 'TK_RESERVED' && in_array(last_token.text, ['return', 'case', 'throw', 'else', 'do', 'typeof', 'yield'])) ||
+                        (last_token.type === 'TK_END_EXPR' && last_token.text === ')' &&
+                            last_token.parent && last_token.parent.type === 'TK_RESERVED' && in_array(last_token.parent.text, ['if', 'while', 'for'])) ||
+                        (in_array(last_token.type, ['TK_COMMENT', 'TK_START_EXPR', 'TK_START_BLOCK',
+                            'TK_END_BLOCK', 'TK_OPERATOR', 'TK_EQUALS', 'TK_EOF', 'TK_SEMICOLON', 'TK_COMMA'
+                        ]))
+                    )) {
+
+                    var sep = c,
+                        esc = false,
+                        has_char_escapes = false;
+
+                    resulting_string = c;
+
+                    if (sep === '/') {
+                        //
+                        // handle regexp
+                        //
+                        var in_char_class = false;
+                        while (parser_pos < input_length &&
+                            ((esc || in_char_class || input.charAt(parser_pos) !== sep) &&
+                                !acorn.newline.test(input.charAt(parser_pos)))) {
+                            resulting_string += input.charAt(parser_pos);
+                            if (!esc) {
+                                esc = input.charAt(parser_pos) === '\\';
+                                if (input.charAt(parser_pos) === '[') {
+                                    in_char_class = true;
+                                } else if (input.charAt(parser_pos) === ']') {
+                                    in_char_class = false;
+                                }
+                            } else {
+                                esc = false;
+                            }
+                            parser_pos += 1;
+                        }
+                    } else if (opts.e4x && sep === '<') {
+                        //
+                        // handle e4x xml literals
+                        //
+
+                        var xmlRegExp = /<(\/?)([-a-zA-Z:0-9_.]+|{.+?}|!\[CDATA\[[\s\S]*?\]\])(\s+{.+?}|\s+[-a-zA-Z:0-9_.]+|\s+[-a-zA-Z:0-9_.]+\s*=\s*('[^']*'|"[^"]*"|{.+?}))*\s*(\/?)\s*>/g;
+                        var xmlStr = input.slice(parser_pos - 1);
+                        var match = xmlRegExp.exec(xmlStr);
+                        if (match && match.index === 0) {
+                            var rootTag = match[2];
+                            var depth = 0;
+                            while (match) {
+                                var isEndTag = !!match[1];
+                                var tagName = match[2];
+                                var isSingletonTag = (!!match[match.length - 1]) || (tagName.slice(0, 8) === "![CDATA[");
+                                if (tagName === rootTag && !isSingletonTag) {
+                                    if (isEndTag) {
+                                        --depth;
+                                    } else {
+                                        ++depth;
+                                    }
+                                }
+                                if (depth <= 0) {
+                                    break;
+                                }
+                                match = xmlRegExp.exec(xmlStr);
+                            }
+                            var xmlLength = match ? match.index + match[0].length : xmlStr.length;
+                            xmlStr = xmlStr.slice(0, xmlLength);
+                            parser_pos += xmlLength - 1;
+                            xmlStr = xmlStr.replace(acorn.allLineBreaks, '\n');
+                            return [xmlStr, "TK_STRING"];
+                        }
+                    } else {
+                        //
+                        // handle string
+                        //
+                        var parse_string = function(delimiter, allow_unescaped_newlines, start_sub) {
+                            // Template strings can travers lines without escape characters.
+                            // Other strings cannot
+                            var current_char;
+                            while (parser_pos < input_length) {
+                                current_char = input.charAt(parser_pos);
+                                if (!(esc || (current_char !== delimiter &&
+                                        (allow_unescaped_newlines || !acorn.newline.test(current_char))))) {
+                                    break;
+                                }
+
+                                // Handle \r\n linebreaks after escapes or in template strings
+                                if ((esc || allow_unescaped_newlines) && acorn.newline.test(current_char)) {
+                                    if (current_char === '\r' && input.charAt(parser_pos + 1) === '\n') {
+                                        parser_pos += 1;
+                                        current_char = input.charAt(parser_pos);
+                                    }
+                                    resulting_string += '\n';
+                                } else {
+                                    resulting_string += current_char;
+                                }
+                                if (esc) {
+                                    if (current_char === 'x' || current_char === 'u') {
+                                        has_char_escapes = true;
+                                    }
+                                    esc = false;
+                                } else {
+                                    esc = current_char === '\\';
+                                }
+
+                                parser_pos += 1;
+
+                                if (start_sub && resulting_string.indexOf(start_sub, resulting_string.length - start_sub.length) !== -1) {
+                                    if (delimiter === '`') {
+                                        parse_string('}', allow_unescaped_newlines, '`');
+                                    } else {
+                                        parse_string('`', allow_unescaped_newlines, '${');
+                                    }
+                                }
+                            }
+                        };
+
+                        if (sep === '`') {
+                            parse_string('`', true, '${');
+                        } else {
+                            parse_string(sep);
+                        }
+                    }
+
+                    if (has_char_escapes && opts.unescape_strings) {
+                        resulting_string = unescape_string(resulting_string);
+                    }
+
+                    if (parser_pos < input_length && input.charAt(parser_pos) === sep) {
+                        resulting_string += sep;
+                        parser_pos += 1;
+
+                        if (sep === '/') {
+                            // regexps may have modifiers /regexp/MOD , so fetch those, too
+                            // Only [gim] are valid, but if the user puts in garbage, do what we can to take it.
+                            while (parser_pos < input_length && acorn.isIdentifierStart(input.charCodeAt(parser_pos))) {
+                                resulting_string += input.charAt(parser_pos);
+                                parser_pos += 1;
+                            }
+                        }
+                    }
+                    return [resulting_string, 'TK_STRING'];
+                }
+
+                if (c === '#') {
+
+                    if (tokens.length === 0 && input.charAt(parser_pos) === '!') {
+                        // shebang
+                        resulting_string = c;
+                        while (parser_pos < input_length && c !== '\n') {
+                            c = input.charAt(parser_pos);
+                            resulting_string += c;
+                            parser_pos += 1;
+                        }
+                        return [trim(resulting_string) + '\n', 'TK_UNKNOWN'];
+                    }
+
+
+
+                    // Spidermonkey-specific sharp variables for circular references
+                    // https://developer.mozilla.org/En/Sharp_variables_in_JavaScript
+                    // http://mxr.mozilla.org/mozilla-central/source/js/src/jsscan.cpp around line 1935
+                    var sharp = '#';
+                    if (parser_pos < input_length && digit.test(input.charAt(parser_pos))) {
+                        do {
+                            c = input.charAt(parser_pos);
+                            sharp += c;
+                            parser_pos += 1;
+                        } while (parser_pos < input_length && c !== '#' && c !== '=');
+                        if (c === '#') {
+                            //
+                        } else if (input.charAt(parser_pos) === '[' && input.charAt(parser_pos + 1) === ']') {
+                            sharp += '[]';
+                            parser_pos += 2;
+                        } else if (input.charAt(parser_pos) === '{' && input.charAt(parser_pos + 1) === '}') {
+                            sharp += '{}';
+                            parser_pos += 2;
+                        }
+                        return [sharp, 'TK_WORD'];
                     }
                 }
 
-                return [c, 'TK_WORD'];
-            }
+                if (c === '<' && (input.charAt(parser_pos) === '?' || input.charAt(parser_pos) === '%')) {
+                    template_pattern.lastIndex = parser_pos - 1;
+                    var template_match = template_pattern.exec(input);
+                    if (template_match) {
+                        c = template_match[0];
+                        parser_pos += c.length - 1;
+                        c = c.replace(acorn.allLineBreaks, '\n');
+                        return [c, 'TK_STRING'];
+                    }
+                }
 
-            if (acorn.isIdentifierStart(input.charCodeAt(parser_pos-1))) {
-                if (parser_pos < input_length) {
-                    while (acorn.isIdentifierChar(input.charCodeAt(parser_pos))) {
+                if (c === '<' && input.substring(parser_pos - 1, parser_pos + 3) === '<!--') {
+                    parser_pos += 3;
+                    c = '<!--';
+                    while (!acorn.newline.test(input.charAt(parser_pos)) && parser_pos < input_length) {
+                        c += input.charAt(parser_pos);
+                        parser_pos++;
+                    }
+                    in_html_comment = true;
+                    return [c, 'TK_COMMENT'];
+                }
+
+                if (c === '-' && in_html_comment && input.substring(parser_pos - 1, parser_pos + 2) === '-->') {
+                    in_html_comment = false;
+                    parser_pos += 2;
+                    return ['-->', 'TK_COMMENT'];
+                }
+
+                if (c === '.') {
+                    return [c, 'TK_DOT'];
+                }
+
+                if (in_array(c, punct)) {
+                    while (parser_pos < input_length && in_array(c + input.charAt(parser_pos), punct)) {
                         c += input.charAt(parser_pos);
                         parser_pos += 1;
-                        if (parser_pos === input_length) {
+                        if (parser_pos >= input_length) {
                             break;
                         }
                     }
-                }
 
-                if (!(last_token.type === 'TK_DOT' ||
-                        (last_token.type === 'TK_RESERVED' && in_array(last_token.text, ['set', 'get'])))
-                    && in_array(c, reserved_words)) {
-                    if (c === 'in') { // hack for 'in' operator
+                    if (c === ',') {
+                        return [c, 'TK_COMMA'];
+                    } else if (c === '=') {
+                        return [c, 'TK_EQUALS'];
+                    } else {
                         return [c, 'TK_OPERATOR'];
                     }
-                    return [c, 'TK_RESERVED'];
                 }
 
-                return [c, 'TK_WORD'];
+                return [c, 'TK_UNKNOWN'];
             }
 
-            if (c === '(' || c === '[') {
-                return [c, 'TK_START_EXPR'];
-            }
 
-            if (c === ')' || c === ']') {
-                return [c, 'TK_END_EXPR'];
-            }
+            function unescape_string(s) {
+                var esc = false,
+                    out = '',
+                    pos = 0,
+                    s_hex = '',
+                    escaped = 0,
+                    c;
 
-            if (c === '{') {
-                return [c, 'TK_START_BLOCK'];
-            }
+                while (esc || pos < s.length) {
 
-            if (c === '}') {
-                return [c, 'TK_END_BLOCK'];
-            }
+                    c = s.charAt(pos);
+                    pos++;
 
-            if (c === ';') {
-                return [c, 'TK_SEMICOLON'];
-            }
-
-            if (c === '/') {
-                var comment = '';
-                // peek for comment /* ... */
-                if (input.charAt(parser_pos) === '*') {
-                    parser_pos += 1;
-                    block_comment_pattern.lastIndex = parser_pos;
-                    var comment_match = block_comment_pattern.exec(input);
-                    comment = '/*' + comment_match[0];
-                    parser_pos += comment_match[0].length;
-                    var directives = get_directives(comment);
-                    if (directives && directives['ignore'] === 'start') {
-                        directives_end_ignore_pattern.lastIndex = parser_pos;
-                        comment_match = directives_end_ignore_pattern.exec(input)
-                        comment += comment_match[0];
-                        parser_pos += comment_match[0].length;
-                    }
-                    comment = comment.replace(acorn.allLineBreaks, '\n');
-                    return [comment, 'TK_BLOCK_COMMENT', directives];
-                }
-                // peek for comment // ...
-                if (input.charAt(parser_pos) === '/') {
-                    parser_pos += 1;
-                    comment_pattern.lastIndex = parser_pos;
-                    var comment_match = comment_pattern.exec(input);
-                    comment = '//' + comment_match[0];
-                    parser_pos += comment_match[0].length;
-                    return [comment, 'TK_COMMENT'];
-                }
-
-            }
-
-            var startXmlRegExp = /^<([-a-zA-Z:0-9_.]+|{.+?}|!\[CDATA\[[\s\S]*?\]\])(\s+{.+?}|\s+[-a-zA-Z:0-9_.]+|\s+[-a-zA-Z:0-9_.]+\s*=\s*('[^']*'|"[^"]*"|{.+?}))*\s*(\/?)\s*>/
-
-            if (c === '`' || c === "'" || c === '"' || // string
-                (
-                    (c === '/') || // regexp
-                    (opts.e4x && c === "<" && input.slice(parser_pos - 1).match(startXmlRegExp)) // xml
-                ) && ( // regex and xml can only appear in specific locations during parsing
-                    (last_token.type === 'TK_RESERVED' && in_array(last_token.text , ['return', 'case', 'throw', 'else', 'do', 'typeof', 'yield'])) ||
-                    (last_token.type === 'TK_END_EXPR' && last_token.text === ')' &&
-                        last_token.parent && last_token.parent.type === 'TK_RESERVED' && in_array(last_token.parent.text, ['if', 'while', 'for'])) ||
-                    (in_array(last_token.type, ['TK_COMMENT', 'TK_START_EXPR', 'TK_START_BLOCK',
-                        'TK_END_BLOCK', 'TK_OPERATOR', 'TK_EQUALS', 'TK_EOF', 'TK_SEMICOLON', 'TK_COMMA'
-                    ]))
-                )) {
-
-                var sep = c,
-                    esc = false,
-                    has_char_escapes = false;
-
-                resulting_string = c;
-
-                if (sep === '/') {
-                    //
-                    // handle regexp
-                    //
-                    var in_char_class = false;
-                    while (parser_pos < input_length &&
-                            ((esc || in_char_class || input.charAt(parser_pos) !== sep) &&
-                            !acorn.newline.test(input.charAt(parser_pos)))) {
-                        resulting_string += input.charAt(parser_pos);
-                        if (!esc) {
-                            esc = input.charAt(parser_pos) === '\\';
-                            if (input.charAt(parser_pos) === '[') {
-                                in_char_class = true;
-                            } else if (input.charAt(parser_pos) === ']') {
-                                in_char_class = false;
-                            }
-                        } else {
-                            esc = false;
-                        }
-                        parser_pos += 1;
-                    }
-                } else if (opts.e4x && sep === '<') {
-                    //
-                    // handle e4x xml literals
-                    //
-
-                    var xmlRegExp = /<(\/?)([-a-zA-Z:0-9_.]+|{.+?}|!\[CDATA\[[\s\S]*?\]\])(\s+{.+?}|\s+[-a-zA-Z:0-9_.]+|\s+[-a-zA-Z:0-9_.]+\s*=\s*('[^']*'|"[^"]*"|{.+?}))*\s*(\/?)\s*>/g;
-                    var xmlStr = input.slice(parser_pos - 1);
-                    var match = xmlRegExp.exec(xmlStr);
-                    if (match && match.index === 0) {
-                        var rootTag = match[2];
-                        var depth = 0;
-                        while (match) {
-                            var isEndTag = !! match[1];
-                            var tagName = match[2];
-                            var isSingletonTag = ( !! match[match.length - 1]) || (tagName.slice(0, 8) === "![CDATA[");
-                            if (tagName === rootTag && !isSingletonTag) {
-                                if (isEndTag) {
-                                    --depth;
-                                } else {
-                                    ++depth;
-                                }
-                            }
-                            if (depth <= 0) {
-                                break;
-                            }
-                            match = xmlRegExp.exec(xmlStr);
-                        }
-                        var xmlLength = match ? match.index + match[0].length : xmlStr.length;
-                        xmlStr = xmlStr.slice(0, xmlLength);
-                        parser_pos += xmlLength - 1;
-                        xmlStr = xmlStr.replace(acorn.allLineBreaks, '\n');
-                        return [xmlStr, "TK_STRING"];
-                    }
-                } else {
-                    //
-                    // handle string
-                    //
-                    var parse_string = function(delimiter, allow_unescaped_newlines, start_sub) {
-                        // Template strings can travers lines without escape characters.
-                        // Other strings cannot
-                        var current_char;
-                        while (parser_pos < input_length) {
-                            current_char = input.charAt(parser_pos);
-                            if (!(esc || (current_char !== delimiter &&
-                                (allow_unescaped_newlines || !acorn.newline.test(current_char))))) {
-                                break;
-                            }
-
-                            // Handle \r\n linebreaks after escapes or in template strings
-                            if ((esc || allow_unescaped_newlines) && acorn.newline.test(current_char)) {
-                                if (current_char === '\r' && input.charAt(parser_pos + 1) === '\n') {
-                                    parser_pos += 1;
-                                    current_char = input.charAt(parser_pos);
-                                }
-                                resulting_string += '\n';
-                            } else {
-                                resulting_string += current_char;
-                            }
-                            if (esc) {
-                                if (current_char === 'x' || current_char === 'u') {
-                                    has_char_escapes = true;
-                                }
-                                esc = false;
-                            } else {
-                                esc = current_char === '\\';
-                            }
-
-                            parser_pos += 1;
-
-                            if (start_sub && resulting_string.indexOf(start_sub, resulting_string.length - start_sub.length) !== -1) {
-                                if (delimiter === '`') {
-                                    parse_string('}', allow_unescaped_newlines, '`')
-                                }  else {
-                                    parse_string('`', allow_unescaped_newlines, '${')
-                                }
-                            }
-                        }
-                    }
-                    if (sep === '`') {
-                        parse_string('`', true, '${')
-                    }  else {
-                        parse_string(sep)
-                    }
-                }
-
-                if (has_char_escapes && opts.unescape_strings) {
-                    resulting_string = unescape_string(resulting_string);
-                }
-
-                if (parser_pos < input_length && input.charAt(parser_pos) === sep) {
-                    resulting_string += sep;
-                    parser_pos += 1;
-
-                    if (sep === '/') {
-                        // regexps may have modifiers /regexp/MOD , so fetch those, too
-                        // Only [gim] are valid, but if the user puts in garbage, do what we can to take it.
-                        while (parser_pos < input_length && acorn.isIdentifierStart(input.charCodeAt(parser_pos))) {
-                            resulting_string += input.charAt(parser_pos);
-                            parser_pos += 1;
-                        }
-                    }
-                }
-                return [resulting_string, 'TK_STRING'];
-            }
-
-            if (c === '#') {
-
-                if (tokens.length === 0 && input.charAt(parser_pos) === '!') {
-                    // shebang
-                    resulting_string = c;
-                    while (parser_pos < input_length && c !== '\n') {
-                        c = input.charAt(parser_pos);
-                        resulting_string += c;
-                        parser_pos += 1;
-                    }
-                    return [trim(resulting_string) + '\n', 'TK_UNKNOWN'];
-                }
-
-
-
-                // Spidermonkey-specific sharp variables for circular references
-                // https://developer.mozilla.org/En/Sharp_variables_in_JavaScript
-                // http://mxr.mozilla.org/mozilla-central/source/js/src/jsscan.cpp around line 1935
-                var sharp = '#';
-                if (parser_pos < input_length && digit.test(input.charAt(parser_pos))) {
-                    do {
-                        c = input.charAt(parser_pos);
-                        sharp += c;
-                        parser_pos += 1;
-                    } while (parser_pos < input_length && c !== '#' && c !== '=');
-                    if (c === '#') {
-                        //
-                    } else if (input.charAt(parser_pos) === '[' && input.charAt(parser_pos + 1) === ']') {
-                        sharp += '[]';
-                        parser_pos += 2;
-                    } else if (input.charAt(parser_pos) === '{' && input.charAt(parser_pos + 1) === '}') {
-                        sharp += '{}';
-                        parser_pos += 2;
-                    }
-                    return [sharp, 'TK_WORD'];
-                }
-            }
-
-            if (c === '<' && (input.charAt(parser_pos) === '?' || input.charAt(parser_pos) === '%')) {
-                template_pattern.lastIndex = parser_pos - 1;
-                var template_match = template_pattern.exec(input);
-                if(template_match) {
-                    c = template_match[0];
-                    parser_pos += c.length - 1;
-                    c = c.replace(acorn.allLineBreaks, '\n');
-                    return [c, 'TK_STRING'];
-                }
-            }
-
-            if (c === '<' && input.substring(parser_pos - 1, parser_pos + 3) === '<!--') {
-                parser_pos += 3;
-                c = '<!--';
-                while (!acorn.newline.test(input.charAt(parser_pos)) && parser_pos < input_length) {
-                    c += input.charAt(parser_pos);
-                    parser_pos++;
-                }
-                in_html_comment = true;
-                return [c, 'TK_COMMENT'];
-            }
-
-            if (c === '-' && in_html_comment && input.substring(parser_pos - 1, parser_pos + 2) === '-->') {
-                in_html_comment = false;
-                parser_pos += 2;
-                return ['-->', 'TK_COMMENT'];
-            }
-
-            if (c === '.') {
-                return [c, 'TK_DOT'];
-            }
-
-            if (in_array(c, punct)) {
-                while (parser_pos < input_length && in_array(c + input.charAt(parser_pos), punct)) {
-                    c += input.charAt(parser_pos);
-                    parser_pos += 1;
-                    if (parser_pos >= input_length) {
-                        break;
-                    }
-                }
-
-                if (c === ',') {
-                    return [c, 'TK_COMMA'];
-                } else if (c === '=') {
-                    return [c, 'TK_EQUALS'];
-                } else {
-                    return [c, 'TK_OPERATOR'];
-                }
-            }
-
-            return [c, 'TK_UNKNOWN'];
-        }
-
-
-        function unescape_string(s) {
-            var esc = false,
-                out = '',
-                pos = 0,
-                s_hex = '',
-                escaped = 0,
-                c;
-
-            while (esc || pos < s.length) {
-
-                c = s.charAt(pos);
-                pos++;
-
-                if (esc) {
-                    esc = false;
-                    if (c === 'x') {
-                        // simple hex-escape \x24
-                        s_hex = s.substr(pos, 2);
-                        pos += 2;
-                    } else if (c === 'u') {
-                        // unicode-escape, \u2134
-                        s_hex = s.substr(pos, 4);
-                        pos += 4;
-                    } else {
-                        // some common escape, e.g \n
-                        out += '\\' + c;
-                        continue;
-                    }
-                    if (!s_hex.match(/^[0123456789abcdefABCDEF]+$/)) {
-                        // some weird escaping, bail out,
-                        // leaving whole string intact
-                        return s;
-                    }
-
-                    escaped = parseInt(s_hex, 16);
-
-                    if (escaped >= 0x00 && escaped < 0x20) {
-                        // leave 0x00...0x1f escaped
+                    if (esc) {
+                        esc = false;
                         if (c === 'x') {
-                            out += '\\x' + s_hex;
+                            // simple hex-escape \x24
+                            s_hex = s.substr(pos, 2);
+                            pos += 2;
+                        } else if (c === 'u') {
+                            // unicode-escape, \u2134
+                            s_hex = s.substr(pos, 4);
+                            pos += 4;
                         } else {
-                            out += '\\u' + s_hex;
+                            // some common escape, e.g \n
+                            out += '\\' + c;
+                            continue;
                         }
-                        continue;
-                    } else if (escaped === 0x22 || escaped === 0x27 || escaped === 0x5c) {
-                        // single-quote, apostrophe, backslash - escape these
-                        out += '\\' + String.fromCharCode(escaped);
-                    } else if (c === 'x' && escaped > 0x7e && escaped <= 0xff) {
-                        // we bail out on \x7f..\xff,
-                        // leaving whole string escaped,
-                        // as it's probably completely binary
-                        return s;
+                        if (!s_hex.match(/^[0123456789abcdefABCDEF]+$/)) {
+                            // some weird escaping, bail out,
+                            // leaving whole string intact
+                            return s;
+                        }
+
+                        escaped = parseInt(s_hex, 16);
+
+                        if (escaped >= 0x00 && escaped < 0x20) {
+                            // leave 0x00...0x1f escaped
+                            if (c === 'x') {
+                                out += '\\x' + s_hex;
+                            } else {
+                                out += '\\u' + s_hex;
+                            }
+                            continue;
+                        } else if (escaped === 0x22 || escaped === 0x27 || escaped === 0x5c) {
+                            // single-quote, apostrophe, backslash - escape these
+                            out += '\\' + String.fromCharCode(escaped);
+                        } else if (c === 'x' && escaped > 0x7e && escaped <= 0xff) {
+                            // we bail out on \x7f..\xff,
+                            // leaving whole string escaped,
+                            // as it's probably completely binary
+                            return s;
+                        } else {
+                            out += String.fromCharCode(escaped);
+                        }
+                    } else if (c === '\\') {
+                        esc = true;
                     } else {
-                        out += String.fromCharCode(escaped);
+                        out += c;
                     }
-                } else if (c === '\\') {
-                    esc = true;
-                } else {
-                    out += c;
                 }
+                return out;
             }
-            return out;
         }
+
+        var beautifier = new Beautifier(js_source_text, options);
+        return beautifier.beautify();
 
     }
-
 
     if (typeof define === "function" && define.amd) {
         // Add support for AMD ( https://github.com/amdjs/amdjs-api/wiki/AMD#defineamd-property- )
@@ -26935,7 +27800,6 @@ if (typeof define === "function" && define.amd) {
     }
 
 }());
-
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
 },{}],108:[function(require,module,exports){
@@ -28036,7 +28900,8 @@ function escape(html, encode) {
 }
 
 function unescape(html) {
-  return html.replace(/&([#\w]+);/g, function(_, n) {
+	// explicitly match decimal, hex, and named HTML entities 
+  return html.replace(/&(#(?:\d+)|(?:#x[0-9A-Fa-f]+)|(?:\w+));?/g, function(_, n) {
     n = n.toLowerCase();
     if (n === 'colon') return ':';
     if (n.charAt(0) === '#') {
@@ -28524,7 +29389,7 @@ module.exports = function (okey, password) {
 
 }).call(this,require("buffer").Buffer)
 
-},{"browserify-aes":23,"buffer":46,"evp_bytestokey":85}],114:[function(require,module,exports){
+},{"browserify-aes":23,"buffer":47,"evp_bytestokey":85}],114:[function(require,module,exports){
 (function (Buffer){
 var asn1 = require('./asn1')
 var aesid = require('./aesid.json')
@@ -28630,7 +29495,7 @@ function decrypt (data, password) {
 
 }).call(this,require("buffer").Buffer)
 
-},{"./aesid.json":111,"./asn1":112,"./fixProc":113,"browserify-aes":23,"buffer":46,"pbkdf2":117}],115:[function(require,module,exports){
+},{"./aesid.json":111,"./asn1":112,"./fixProc":113,"browserify-aes":23,"buffer":47,"pbkdf2":118}],115:[function(require,module,exports){
 (function (process){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -28859,7 +29724,7 @@ var substr = 'ab'.substr(-1) === 'b'
 
 }).call(this,require('_process'))
 
-},{"_process":119}],116:[function(require,module,exports){
+},{"_process":120}],116:[function(require,module,exports){
 var isarray = require('isarray')
 
 /**
@@ -28886,14 +29751,14 @@ var PATH_REGEXP = new RegExp([
   // "/:test(\\d+)?" => ["/", "test", "\d+", undefined, "?", undefined]
   // "/route(\\d+)"  => [undefined, undefined, undefined, "\d+", undefined, undefined]
   // "/*"            => ["/", undefined, undefined, undefined, undefined, "*"]
-  '([\\/.])?(?:(?:\\:(\\w+)(?:\\(((?:\\\\.|[^()])+)\\))?|\\(((?:\\\\.|[^()])+)\\))([+*?])?|(\\*))'
+  '([\\/.])?(?:(?:\\:(\\w+)(?:\\(((?:\\\\.|[^\\\\()])+)\\))?|\\(((?:\\\\.|[^\\\\()])+)\\))([+*?])?|(\\*))'
 ].join('|'), 'g')
 
 /**
  * Parse a string for the raw tokens.
  *
- * @param  {String} str
- * @return {Array}
+ * @param  {string} str
+ * @return {!Array}
  */
 function parse (str) {
   var tokens = []
@@ -28915,22 +29780,24 @@ function parse (str) {
       continue
     }
 
+    var next = str[index]
+    var prefix = res[2]
+    var name = res[3]
+    var capture = res[4]
+    var group = res[5]
+    var modifier = res[6]
+    var asterisk = res[7]
+
     // Push the current path onto the tokens.
     if (path) {
       tokens.push(path)
       path = ''
     }
 
-    var prefix = res[2]
-    var name = res[3]
-    var capture = res[4]
-    var group = res[5]
-    var suffix = res[6]
-    var asterisk = res[7]
-
-    var repeat = suffix === '+' || suffix === '*'
-    var optional = suffix === '?' || suffix === '*'
-    var delimiter = prefix || '/'
+    var partial = prefix != null && next != null && next !== prefix
+    var repeat = modifier === '+' || modifier === '*'
+    var optional = modifier === '?' || modifier === '*'
+    var delimiter = res[2] || '/'
     var pattern = capture || group || (asterisk ? '.*' : '[^' + delimiter + ']+?')
 
     tokens.push({
@@ -28939,6 +29806,8 @@ function parse (str) {
       delimiter: delimiter,
       optional: optional,
       repeat: repeat,
+      partial: partial,
+      asterisk: !!asterisk,
       pattern: escapeGroup(pattern)
     })
   }
@@ -28959,11 +29828,35 @@ function parse (str) {
 /**
  * Compile a string to a template function for the path.
  *
- * @param  {String}   str
- * @return {Function}
+ * @param  {string}             str
+ * @return {!function(Object=, Object=)}
  */
 function compile (str) {
   return tokensToFunction(parse(str))
+}
+
+/**
+ * Prettier encoding of URI path segments.
+ *
+ * @param  {string}
+ * @return {string}
+ */
+function encodeURIComponentPretty (str) {
+  return encodeURI(str).replace(/[\/?#]/g, function (c) {
+    return '%' + c.charCodeAt(0).toString(16).toUpperCase()
+  })
+}
+
+/**
+ * Encode the asterisk parameter. Similar to `pretty`, but allows slashes.
+ *
+ * @param  {string}
+ * @return {string}
+ */
+function encodeAsterisk (str) {
+  return encodeURI(str).replace(/[?#]/g, function (c) {
+    return '%' + c.charCodeAt(0).toString(16).toUpperCase()
+  })
 }
 
 /**
@@ -28976,13 +29869,15 @@ function tokensToFunction (tokens) {
   // Compile all the patterns before compilation.
   for (var i = 0; i < tokens.length; i++) {
     if (typeof tokens[i] === 'object') {
-      matches[i] = new RegExp('^' + tokens[i].pattern + '$')
+      matches[i] = new RegExp('^(?:' + tokens[i].pattern + ')$')
     }
   }
 
-  return function (obj) {
+  return function (obj, opts) {
     var path = ''
     var data = obj || {}
+    var options = opts || {}
+    var encode = options.pretty ? encodeURIComponentPretty : encodeURIComponent
 
     for (var i = 0; i < tokens.length; i++) {
       var token = tokens[i]
@@ -28998,6 +29893,11 @@ function tokensToFunction (tokens) {
 
       if (value == null) {
         if (token.optional) {
+          // Prepend partial segment prefixes.
+          if (token.partial) {
+            path += token.prefix
+          }
+
           continue
         } else {
           throw new TypeError('Expected "' + token.name + '" to be defined')
@@ -29006,7 +29906,7 @@ function tokensToFunction (tokens) {
 
       if (isarray(value)) {
         if (!token.repeat) {
-          throw new TypeError('Expected "' + token.name + '" to not repeat, but received "' + value + '"')
+          throw new TypeError('Expected "' + token.name + '" to not repeat, but received `' + JSON.stringify(value) + '`')
         }
 
         if (value.length === 0) {
@@ -29018,10 +29918,10 @@ function tokensToFunction (tokens) {
         }
 
         for (var j = 0; j < value.length; j++) {
-          segment = encodeURIComponent(value[j])
+          segment = encode(value[j])
 
           if (!matches[i].test(segment)) {
-            throw new TypeError('Expected all "' + token.name + '" to match "' + token.pattern + '", but received "' + segment + '"')
+            throw new TypeError('Expected all "' + token.name + '" to match "' + token.pattern + '", but received `' + JSON.stringify(segment) + '`')
           }
 
           path += (j === 0 ? token.prefix : token.delimiter) + segment
@@ -29030,7 +29930,7 @@ function tokensToFunction (tokens) {
         continue
       }
 
-      segment = encodeURIComponent(value)
+      segment = token.asterisk ? encodeAsterisk(value) : encode(value)
 
       if (!matches[i].test(segment)) {
         throw new TypeError('Expected "' + token.name + '" to match "' + token.pattern + '", but received "' + segment + '"')
@@ -29046,18 +29946,18 @@ function tokensToFunction (tokens) {
 /**
  * Escape a regular expression string.
  *
- * @param  {String} str
- * @return {String}
+ * @param  {string} str
+ * @return {string}
  */
 function escapeString (str) {
-  return str.replace(/([.+*?=^!:${}()[\]|\/])/g, '\\$1')
+  return str.replace(/([.+*?=^!:${}()[\]|\/\\])/g, '\\$1')
 }
 
 /**
  * Escape the capturing group by escaping special characters and meaning.
  *
- * @param  {String} group
- * @return {String}
+ * @param  {string} group
+ * @return {string}
  */
 function escapeGroup (group) {
   return group.replace(/([=!:$\/()])/g, '\\$1')
@@ -29066,9 +29966,9 @@ function escapeGroup (group) {
 /**
  * Attach the keys as a property of the regexp.
  *
- * @param  {RegExp} re
- * @param  {Array}  keys
- * @return {RegExp}
+ * @param  {!RegExp} re
+ * @param  {Array}   keys
+ * @return {!RegExp}
  */
 function attachKeys (re, keys) {
   re.keys = keys
@@ -29079,7 +29979,7 @@ function attachKeys (re, keys) {
  * Get the flags for a regexp from the options.
  *
  * @param  {Object} options
- * @return {String}
+ * @return {string}
  */
 function flags (options) {
   return options.sensitive ? '' : 'i'
@@ -29088,9 +29988,9 @@ function flags (options) {
 /**
  * Pull out keys from a regexp.
  *
- * @param  {RegExp} path
- * @param  {Array}  keys
- * @return {RegExp}
+ * @param  {!RegExp} path
+ * @param  {!Array}  keys
+ * @return {!RegExp}
  */
 function regexpToRegexp (path, keys) {
   // Use a negative lookahead to match only capturing groups.
@@ -29104,6 +30004,8 @@ function regexpToRegexp (path, keys) {
         delimiter: null,
         optional: false,
         repeat: false,
+        partial: false,
+        asterisk: false,
         pattern: null
       })
     }
@@ -29115,10 +30017,10 @@ function regexpToRegexp (path, keys) {
 /**
  * Transform an array into a regexp.
  *
- * @param  {Array}  path
- * @param  {Array}  keys
- * @param  {Object} options
- * @return {RegExp}
+ * @param  {!Array}  path
+ * @param  {Array}   keys
+ * @param  {!Object} options
+ * @return {!RegExp}
  */
 function arrayToRegexp (path, keys, options) {
   var parts = []
@@ -29135,10 +30037,10 @@ function arrayToRegexp (path, keys, options) {
 /**
  * Create a path regexp from string input.
  *
- * @param  {String} path
- * @param  {Array}  keys
- * @param  {Object} options
- * @return {RegExp}
+ * @param  {string}  path
+ * @param  {!Array}  keys
+ * @param  {!Object} options
+ * @return {!RegExp}
  */
 function stringToRegexp (path, keys, options) {
   var tokens = parse(path)
@@ -29157,10 +30059,9 @@ function stringToRegexp (path, keys, options) {
 /**
  * Expose a function for taking tokens and returning a RegExp.
  *
- * @param  {Array}  tokens
- * @param  {Array}  keys
- * @param  {Object} options
- * @return {RegExp}
+ * @param  {!Array}  tokens
+ * @param  {Object=} options
+ * @return {!RegExp}
  */
 function tokensToRegExp (tokens, options) {
   options = options || {}
@@ -29179,17 +30080,17 @@ function tokensToRegExp (tokens, options) {
       route += escapeString(token)
     } else {
       var prefix = escapeString(token.prefix)
-      var capture = token.pattern
+      var capture = '(?:' + token.pattern + ')'
 
       if (token.repeat) {
         capture += '(?:' + prefix + capture + ')*'
       }
 
       if (token.optional) {
-        if (prefix) {
+        if (!token.partial) {
           capture = '(?:' + prefix + '(' + capture + '))?'
         } else {
-          capture = '(' + capture + ')?'
+          capture = prefix + '(' + capture + ')?'
         }
       } else {
         capture = prefix + '(' + capture + ')'
@@ -29225,33 +30126,38 @@ function tokensToRegExp (tokens, options) {
  * placeholder key descriptions. For example, using `/user/:id`, `keys` will
  * contain `[{ name: 'id', delimiter: '/', optional: false, repeat: false }]`.
  *
- * @param  {(String|RegExp|Array)} path
- * @param  {Array}                 [keys]
- * @param  {Object}                [options]
- * @return {RegExp}
+ * @param  {(string|RegExp|Array)} path
+ * @param  {(Array|Object)=}       keys
+ * @param  {Object=}               options
+ * @return {!RegExp}
  */
 function pathToRegexp (path, keys, options) {
   keys = keys || []
 
   if (!isarray(keys)) {
-    options = keys
+    options = /** @type {!Object} */ (keys)
     keys = []
   } else if (!options) {
     options = {}
   }
 
   if (path instanceof RegExp) {
-    return regexpToRegexp(path, keys, options)
+    return regexpToRegexp(path, /** @type {!Array} */ (keys))
   }
 
   if (isarray(path)) {
-    return arrayToRegexp(path, keys, options)
+    return arrayToRegexp(/** @type {!Array} */ (path), /** @type {!Array} */ (keys), options)
   }
 
-  return stringToRegexp(path, keys, options)
+  return stringToRegexp(/** @type {string} */ (path), /** @type {!Array} */ (keys), options)
 }
 
-},{"isarray":103}],117:[function(require,module,exports){
+},{"isarray":117}],117:[function(require,module,exports){
+module.exports = Array.isArray || function (arr) {
+  return Object.prototype.toString.call(arr) == '[object Array]';
+};
+
+},{}],118:[function(require,module,exports){
 (function (Buffer){
 var createHmac = require('create-hmac')
 var MAX_ALLOC = Math.pow(2, 30) - 1 // default in iojs
@@ -29336,7 +30242,7 @@ function pbkdf2Sync (password, salt, iterations, keylen, digest) {
 
 }).call(this,require("buffer").Buffer)
 
-},{"buffer":46,"create-hmac":55}],118:[function(require,module,exports){
+},{"buffer":47,"create-hmac":55}],119:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -29348,29 +30254,121 @@ if (!process.version ||
   module.exports = process.nextTick;
 }
 
-function nextTick(fn) {
-  var args = new Array(arguments.length - 1);
-  var i = 0;
-  while (i < args.length) {
-    args[i++] = arguments[i];
+function nextTick(fn, arg1, arg2, arg3) {
+  if (typeof fn !== 'function') {
+    throw new TypeError('"callback" argument must be a function');
   }
-  process.nextTick(function afterTick() {
-    fn.apply(null, args);
-  });
+  var len = arguments.length;
+  var args, i;
+  switch (len) {
+  case 0:
+  case 1:
+    return process.nextTick(fn);
+  case 2:
+    return process.nextTick(function afterTickOne() {
+      fn.call(null, arg1);
+    });
+  case 3:
+    return process.nextTick(function afterTickTwo() {
+      fn.call(null, arg1, arg2);
+    });
+  case 4:
+    return process.nextTick(function afterTickThree() {
+      fn.call(null, arg1, arg2, arg3);
+    });
+  default:
+    args = new Array(len - 1);
+    i = 0;
+    while (i < args.length) {
+      args[i++] = arguments[i];
+    }
+    return process.nextTick(function afterTick() {
+      fn.apply(null, args);
+    });
+  }
 }
 
 }).call(this,require('_process'))
 
-},{"_process":119}],119:[function(require,module,exports){
+},{"_process":120}],120:[function(require,module,exports){
 // shim for using process in browser
-
 var process = module.exports = {};
+
+// cached from whatever global is present so that test runners that stub it
+// don't break things.  But we need to wrap it in a try catch in case it is
+// wrapped in strict mode code which doesn't define any globals.  It's inside a
+// function because try/catches deoptimize in certain engines.
+
+var cachedSetTimeout;
+var cachedClearTimeout;
+
+(function () {
+    try {
+        cachedSetTimeout = setTimeout;
+    } catch (e) {
+        cachedSetTimeout = function () {
+            throw new Error('setTimeout is not defined');
+        }
+    }
+    try {
+        cachedClearTimeout = clearTimeout;
+    } catch (e) {
+        cachedClearTimeout = function () {
+            throw new Error('clearTimeout is not defined');
+        }
+    }
+} ())
+function runTimeout(fun) {
+    if (cachedSetTimeout === setTimeout) {
+        //normal enviroments in sane situations
+        return setTimeout(fun, 0);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedSetTimeout(fun, 0);
+    } catch(e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+            return cachedSetTimeout.call(null, fun, 0);
+        } catch(e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+            return cachedSetTimeout.call(this, fun, 0);
+        }
+    }
+
+
+}
+function runClearTimeout(marker) {
+    if (cachedClearTimeout === clearTimeout) {
+        //normal enviroments in sane situations
+        return clearTimeout(marker);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedClearTimeout(marker);
+    } catch (e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+            return cachedClearTimeout.call(null, marker);
+        } catch (e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+            return cachedClearTimeout.call(this, marker);
+        }
+    }
+
+
+
+}
 var queue = [];
 var draining = false;
 var currentQueue;
 var queueIndex = -1;
 
 function cleanUpNextTick() {
+    if (!draining || !currentQueue) {
+        return;
+    }
     draining = false;
     if (currentQueue.length) {
         queue = currentQueue.concat(queue);
@@ -29386,7 +30384,7 @@ function drainQueue() {
     if (draining) {
         return;
     }
-    var timeout = setTimeout(cleanUpNextTick);
+    var timeout = runTimeout(cleanUpNextTick);
     draining = true;
 
     var len = queue.length;
@@ -29403,7 +30401,7 @@ function drainQueue() {
     }
     currentQueue = null;
     draining = false;
-    clearTimeout(timeout);
+    runClearTimeout(timeout);
 }
 
 process.nextTick = function (fun) {
@@ -29415,7 +30413,7 @@ process.nextTick = function (fun) {
     }
     queue.push(new Item(fun, args));
     if (queue.length === 1 && !draining) {
-        setTimeout(drainQueue, 0);
+        runTimeout(drainQueue);
     }
 };
 
@@ -29454,7 +30452,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],120:[function(require,module,exports){
+},{}],121:[function(require,module,exports){
 exports.publicEncrypt = require('./publicEncrypt');
 exports.privateDecrypt = require('./privateDecrypt');
 
@@ -29465,7 +30463,7 @@ exports.privateEncrypt = function privateEncrypt(key, buf) {
 exports.publicDecrypt = function publicDecrypt(key, buf) {
   return exports.privateDecrypt(key, buf, true);
 };
-},{"./privateDecrypt":122,"./publicEncrypt":123}],121:[function(require,module,exports){
+},{"./privateDecrypt":123,"./publicEncrypt":124}],122:[function(require,module,exports){
 (function (Buffer){
 var createHash = require('create-hash');
 module.exports = function (seed, len) {
@@ -29485,7 +30483,7 @@ function i2ops(c) {
 }
 }).call(this,require("buffer").Buffer)
 
-},{"buffer":46,"create-hash":52}],122:[function(require,module,exports){
+},{"buffer":47,"create-hash":52}],123:[function(require,module,exports){
 (function (Buffer){
 var parseKeys = require('parse-asn1');
 var mgf = require('./mgf');
@@ -29597,7 +30595,7 @@ function compare(a, b){
 }
 }).call(this,require("buffer").Buffer)
 
-},{"./mgf":121,"./withPublic":124,"./xor":125,"bn.js":18,"browserify-rsa":39,"buffer":46,"create-hash":52,"parse-asn1":114}],123:[function(require,module,exports){
+},{"./mgf":122,"./withPublic":125,"./xor":126,"bn.js":18,"browserify-rsa":39,"buffer":47,"create-hash":52,"parse-asn1":114}],124:[function(require,module,exports){
 (function (Buffer){
 var parseKeys = require('parse-asn1');
 var randomBytes = require('randombytes');
@@ -29696,7 +30694,7 @@ function nonZero(len, crypto) {
 }
 }).call(this,require("buffer").Buffer)
 
-},{"./mgf":121,"./withPublic":124,"./xor":125,"bn.js":18,"browserify-rsa":39,"buffer":46,"create-hash":52,"parse-asn1":114,"randombytes":126}],124:[function(require,module,exports){
+},{"./mgf":122,"./withPublic":125,"./xor":126,"bn.js":18,"browserify-rsa":39,"buffer":47,"create-hash":52,"parse-asn1":114,"randombytes":127}],125:[function(require,module,exports){
 (function (Buffer){
 var bn = require('bn.js');
 function withPublic(paddedMsg, key) {
@@ -29710,7 +30708,7 @@ function withPublic(paddedMsg, key) {
 module.exports = withPublic;
 }).call(this,require("buffer").Buffer)
 
-},{"bn.js":18,"buffer":46}],125:[function(require,module,exports){
+},{"bn.js":18,"buffer":47}],126:[function(require,module,exports){
 module.exports = function xor(a, b) {
   var len = a.length;
   var i = -1;
@@ -29719,7 +30717,7 @@ module.exports = function xor(a, b) {
   }
   return a
 };
-},{}],126:[function(require,module,exports){
+},{}],127:[function(require,module,exports){
 (function (process,global,Buffer){
 'use strict'
 
@@ -29760,7 +30758,1860 @@ function randomBytes (size, cb) {
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer)
 
-},{"_process":119,"buffer":46}],127:[function(require,module,exports){
+},{"_process":120,"buffer":47}],128:[function(require,module,exports){
+module.exports = require("./lib/_stream_duplex.js")
+
+},{"./lib/_stream_duplex.js":129}],129:[function(require,module,exports){
+// a duplex stream is just a stream that is both readable and writable.
+// Since JS doesn't have multiple prototypal inheritance, this class
+// prototypally inherits from Readable, and then parasitically from
+// Writable.
+
+'use strict';
+
+/*<replacement>*/
+
+var objectKeys = Object.keys || function (obj) {
+  var keys = [];
+  for (var key in obj) {
+    keys.push(key);
+  }return keys;
+};
+/*</replacement>*/
+
+module.exports = Duplex;
+
+/*<replacement>*/
+var processNextTick = require('process-nextick-args');
+/*</replacement>*/
+
+/*<replacement>*/
+var util = require('core-util-is');
+util.inherits = require('inherits');
+/*</replacement>*/
+
+var Readable = require('./_stream_readable');
+var Writable = require('./_stream_writable');
+
+util.inherits(Duplex, Readable);
+
+var keys = objectKeys(Writable.prototype);
+for (var v = 0; v < keys.length; v++) {
+  var method = keys[v];
+  if (!Duplex.prototype[method]) Duplex.prototype[method] = Writable.prototype[method];
+}
+
+function Duplex(options) {
+  if (!(this instanceof Duplex)) return new Duplex(options);
+
+  Readable.call(this, options);
+  Writable.call(this, options);
+
+  if (options && options.readable === false) this.readable = false;
+
+  if (options && options.writable === false) this.writable = false;
+
+  this.allowHalfOpen = true;
+  if (options && options.allowHalfOpen === false) this.allowHalfOpen = false;
+
+  this.once('end', onend);
+}
+
+// the no-half-open enforcer
+function onend() {
+  // if we allow half-open state, or if the writable side ended,
+  // then we're ok.
+  if (this.allowHalfOpen || this._writableState.ended) return;
+
+  // no more data can be written.
+  // But allow more writes to happen in this tick.
+  processNextTick(onEndNT, this);
+}
+
+function onEndNT(self) {
+  self.end();
+}
+
+function forEach(xs, f) {
+  for (var i = 0, l = xs.length; i < l; i++) {
+    f(xs[i], i);
+  }
+}
+},{"./_stream_readable":131,"./_stream_writable":133,"core-util-is":50,"inherits":101,"process-nextick-args":119}],130:[function(require,module,exports){
+// a passthrough stream.
+// basically just the most minimal sort of Transform stream.
+// Every written chunk gets output as-is.
+
+'use strict';
+
+module.exports = PassThrough;
+
+var Transform = require('./_stream_transform');
+
+/*<replacement>*/
+var util = require('core-util-is');
+util.inherits = require('inherits');
+/*</replacement>*/
+
+util.inherits(PassThrough, Transform);
+
+function PassThrough(options) {
+  if (!(this instanceof PassThrough)) return new PassThrough(options);
+
+  Transform.call(this, options);
+}
+
+PassThrough.prototype._transform = function (chunk, encoding, cb) {
+  cb(null, chunk);
+};
+},{"./_stream_transform":132,"core-util-is":50,"inherits":101}],131:[function(require,module,exports){
+(function (process){
+'use strict';
+
+module.exports = Readable;
+
+/*<replacement>*/
+var processNextTick = require('process-nextick-args');
+/*</replacement>*/
+
+/*<replacement>*/
+var isArray = require('isarray');
+/*</replacement>*/
+
+Readable.ReadableState = ReadableState;
+
+/*<replacement>*/
+var EE = require('events').EventEmitter;
+
+var EElistenerCount = function (emitter, type) {
+  return emitter.listeners(type).length;
+};
+/*</replacement>*/
+
+/*<replacement>*/
+var Stream;
+(function () {
+  try {
+    Stream = require('st' + 'ream');
+  } catch (_) {} finally {
+    if (!Stream) Stream = require('events').EventEmitter;
+  }
+})();
+/*</replacement>*/
+
+var Buffer = require('buffer').Buffer;
+/*<replacement>*/
+var bufferShim = require('buffer-shims');
+/*</replacement>*/
+
+/*<replacement>*/
+var util = require('core-util-is');
+util.inherits = require('inherits');
+/*</replacement>*/
+
+/*<replacement>*/
+var debugUtil = require('util');
+var debug = void 0;
+if (debugUtil && debugUtil.debuglog) {
+  debug = debugUtil.debuglog('stream');
+} else {
+  debug = function () {};
+}
+/*</replacement>*/
+
+var BufferList = require('./internal/streams/BufferList');
+var StringDecoder;
+
+util.inherits(Readable, Stream);
+
+function prependListener(emitter, event, fn) {
+  if (typeof emitter.prependListener === 'function') {
+    return emitter.prependListener(event, fn);
+  } else {
+    // This is a hack to make sure that our error handler is attached before any
+    // userland ones.  NEVER DO THIS. This is here only because this code needs
+    // to continue to work with older versions of Node.js that do not include
+    // the prependListener() method. The goal is to eventually remove this hack.
+    if (!emitter._events || !emitter._events[event]) emitter.on(event, fn);else if (isArray(emitter._events[event])) emitter._events[event].unshift(fn);else emitter._events[event] = [fn, emitter._events[event]];
+  }
+}
+
+var Duplex;
+function ReadableState(options, stream) {
+  Duplex = Duplex || require('./_stream_duplex');
+
+  options = options || {};
+
+  // object stream flag. Used to make read(n) ignore n and to
+  // make all the buffer merging and length checks go away
+  this.objectMode = !!options.objectMode;
+
+  if (stream instanceof Duplex) this.objectMode = this.objectMode || !!options.readableObjectMode;
+
+  // the point at which it stops calling _read() to fill the buffer
+  // Note: 0 is a valid value, means "don't call _read preemptively ever"
+  var hwm = options.highWaterMark;
+  var defaultHwm = this.objectMode ? 16 : 16 * 1024;
+  this.highWaterMark = hwm || hwm === 0 ? hwm : defaultHwm;
+
+  // cast to ints.
+  this.highWaterMark = ~ ~this.highWaterMark;
+
+  // A linked list is used to store data chunks instead of an array because the
+  // linked list can remove elements from the beginning faster than
+  // array.shift()
+  this.buffer = new BufferList();
+  this.length = 0;
+  this.pipes = null;
+  this.pipesCount = 0;
+  this.flowing = null;
+  this.ended = false;
+  this.endEmitted = false;
+  this.reading = false;
+
+  // a flag to be able to tell if the onwrite cb is called immediately,
+  // or on a later tick.  We set this to true at first, because any
+  // actions that shouldn't happen until "later" should generally also
+  // not happen before the first write call.
+  this.sync = true;
+
+  // whenever we return null, then we set a flag to say
+  // that we're awaiting a 'readable' event emission.
+  this.needReadable = false;
+  this.emittedReadable = false;
+  this.readableListening = false;
+  this.resumeScheduled = false;
+
+  // Crypto is kind of old and crusty.  Historically, its default string
+  // encoding is 'binary' so we have to make this configurable.
+  // Everything else in the universe uses 'utf8', though.
+  this.defaultEncoding = options.defaultEncoding || 'utf8';
+
+  // when piping, we only care about 'readable' events that happen
+  // after read()ing all the bytes and not getting any pushback.
+  this.ranOut = false;
+
+  // the number of writers that are awaiting a drain event in .pipe()s
+  this.awaitDrain = 0;
+
+  // if true, a maybeReadMore has been scheduled
+  this.readingMore = false;
+
+  this.decoder = null;
+  this.encoding = null;
+  if (options.encoding) {
+    if (!StringDecoder) StringDecoder = require('string_decoder/').StringDecoder;
+    this.decoder = new StringDecoder(options.encoding);
+    this.encoding = options.encoding;
+  }
+}
+
+var Duplex;
+function Readable(options) {
+  Duplex = Duplex || require('./_stream_duplex');
+
+  if (!(this instanceof Readable)) return new Readable(options);
+
+  this._readableState = new ReadableState(options, this);
+
+  // legacy
+  this.readable = true;
+
+  if (options && typeof options.read === 'function') this._read = options.read;
+
+  Stream.call(this);
+}
+
+// Manually shove something into the read() buffer.
+// This returns true if the highWaterMark has not been hit yet,
+// similar to how Writable.write() returns true if you should
+// write() some more.
+Readable.prototype.push = function (chunk, encoding) {
+  var state = this._readableState;
+
+  if (!state.objectMode && typeof chunk === 'string') {
+    encoding = encoding || state.defaultEncoding;
+    if (encoding !== state.encoding) {
+      chunk = bufferShim.from(chunk, encoding);
+      encoding = '';
+    }
+  }
+
+  return readableAddChunk(this, state, chunk, encoding, false);
+};
+
+// Unshift should *always* be something directly out of read()
+Readable.prototype.unshift = function (chunk) {
+  var state = this._readableState;
+  return readableAddChunk(this, state, chunk, '', true);
+};
+
+Readable.prototype.isPaused = function () {
+  return this._readableState.flowing === false;
+};
+
+function readableAddChunk(stream, state, chunk, encoding, addToFront) {
+  var er = chunkInvalid(state, chunk);
+  if (er) {
+    stream.emit('error', er);
+  } else if (chunk === null) {
+    state.reading = false;
+    onEofChunk(stream, state);
+  } else if (state.objectMode || chunk && chunk.length > 0) {
+    if (state.ended && !addToFront) {
+      var e = new Error('stream.push() after EOF');
+      stream.emit('error', e);
+    } else if (state.endEmitted && addToFront) {
+      var _e = new Error('stream.unshift() after end event');
+      stream.emit('error', _e);
+    } else {
+      var skipAdd;
+      if (state.decoder && !addToFront && !encoding) {
+        chunk = state.decoder.write(chunk);
+        skipAdd = !state.objectMode && chunk.length === 0;
+      }
+
+      if (!addToFront) state.reading = false;
+
+      // Don't add to the buffer if we've decoded to an empty string chunk and
+      // we're not in object mode
+      if (!skipAdd) {
+        // if we want the data now, just emit it.
+        if (state.flowing && state.length === 0 && !state.sync) {
+          stream.emit('data', chunk);
+          stream.read(0);
+        } else {
+          // update the buffer info.
+          state.length += state.objectMode ? 1 : chunk.length;
+          if (addToFront) state.buffer.unshift(chunk);else state.buffer.push(chunk);
+
+          if (state.needReadable) emitReadable(stream);
+        }
+      }
+
+      maybeReadMore(stream, state);
+    }
+  } else if (!addToFront) {
+    state.reading = false;
+  }
+
+  return needMoreData(state);
+}
+
+// if it's past the high water mark, we can push in some more.
+// Also, if we have no data yet, we can stand some
+// more bytes.  This is to work around cases where hwm=0,
+// such as the repl.  Also, if the push() triggered a
+// readable event, and the user called read(largeNumber) such that
+// needReadable was set, then we ought to push more, so that another
+// 'readable' event will be triggered.
+function needMoreData(state) {
+  return !state.ended && (state.needReadable || state.length < state.highWaterMark || state.length === 0);
+}
+
+// backwards compatibility.
+Readable.prototype.setEncoding = function (enc) {
+  if (!StringDecoder) StringDecoder = require('string_decoder/').StringDecoder;
+  this._readableState.decoder = new StringDecoder(enc);
+  this._readableState.encoding = enc;
+  return this;
+};
+
+// Don't raise the hwm > 8MB
+var MAX_HWM = 0x800000;
+function computeNewHighWaterMark(n) {
+  if (n >= MAX_HWM) {
+    n = MAX_HWM;
+  } else {
+    // Get the next highest power of 2 to prevent increasing hwm excessively in
+    // tiny amounts
+    n--;
+    n |= n >>> 1;
+    n |= n >>> 2;
+    n |= n >>> 4;
+    n |= n >>> 8;
+    n |= n >>> 16;
+    n++;
+  }
+  return n;
+}
+
+// This function is designed to be inlinable, so please take care when making
+// changes to the function body.
+function howMuchToRead(n, state) {
+  if (n <= 0 || state.length === 0 && state.ended) return 0;
+  if (state.objectMode) return 1;
+  if (n !== n) {
+    // Only flow one buffer at a time
+    if (state.flowing && state.length) return state.buffer.head.data.length;else return state.length;
+  }
+  // If we're asking for more than the current hwm, then raise the hwm.
+  if (n > state.highWaterMark) state.highWaterMark = computeNewHighWaterMark(n);
+  if (n <= state.length) return n;
+  // Don't have enough
+  if (!state.ended) {
+    state.needReadable = true;
+    return 0;
+  }
+  return state.length;
+}
+
+// you can override either this method, or the async _read(n) below.
+Readable.prototype.read = function (n) {
+  debug('read', n);
+  n = parseInt(n, 10);
+  var state = this._readableState;
+  var nOrig = n;
+
+  if (n !== 0) state.emittedReadable = false;
+
+  // if we're doing read(0) to trigger a readable event, but we
+  // already have a bunch of data in the buffer, then just trigger
+  // the 'readable' event and move on.
+  if (n === 0 && state.needReadable && (state.length >= state.highWaterMark || state.ended)) {
+    debug('read: emitReadable', state.length, state.ended);
+    if (state.length === 0 && state.ended) endReadable(this);else emitReadable(this);
+    return null;
+  }
+
+  n = howMuchToRead(n, state);
+
+  // if we've ended, and we're now clear, then finish it up.
+  if (n === 0 && state.ended) {
+    if (state.length === 0) endReadable(this);
+    return null;
+  }
+
+  // All the actual chunk generation logic needs to be
+  // *below* the call to _read.  The reason is that in certain
+  // synthetic stream cases, such as passthrough streams, _read
+  // may be a completely synchronous operation which may change
+  // the state of the read buffer, providing enough data when
+  // before there was *not* enough.
+  //
+  // So, the steps are:
+  // 1. Figure out what the state of things will be after we do
+  // a read from the buffer.
+  //
+  // 2. If that resulting state will trigger a _read, then call _read.
+  // Note that this may be asynchronous, or synchronous.  Yes, it is
+  // deeply ugly to write APIs this way, but that still doesn't mean
+  // that the Readable class should behave improperly, as streams are
+  // designed to be sync/async agnostic.
+  // Take note if the _read call is sync or async (ie, if the read call
+  // has returned yet), so that we know whether or not it's safe to emit
+  // 'readable' etc.
+  //
+  // 3. Actually pull the requested chunks out of the buffer and return.
+
+  // if we need a readable event, then we need to do some reading.
+  var doRead = state.needReadable;
+  debug('need readable', doRead);
+
+  // if we currently have less than the highWaterMark, then also read some
+  if (state.length === 0 || state.length - n < state.highWaterMark) {
+    doRead = true;
+    debug('length less than watermark', doRead);
+  }
+
+  // however, if we've ended, then there's no point, and if we're already
+  // reading, then it's unnecessary.
+  if (state.ended || state.reading) {
+    doRead = false;
+    debug('reading or ended', doRead);
+  } else if (doRead) {
+    debug('do read');
+    state.reading = true;
+    state.sync = true;
+    // if the length is currently zero, then we *need* a readable event.
+    if (state.length === 0) state.needReadable = true;
+    // call internal read method
+    this._read(state.highWaterMark);
+    state.sync = false;
+    // If _read pushed data synchronously, then `reading` will be false,
+    // and we need to re-evaluate how much data we can return to the user.
+    if (!state.reading) n = howMuchToRead(nOrig, state);
+  }
+
+  var ret;
+  if (n > 0) ret = fromList(n, state);else ret = null;
+
+  if (ret === null) {
+    state.needReadable = true;
+    n = 0;
+  } else {
+    state.length -= n;
+  }
+
+  if (state.length === 0) {
+    // If we have nothing in the buffer, then we want to know
+    // as soon as we *do* get something into the buffer.
+    if (!state.ended) state.needReadable = true;
+
+    // If we tried to read() past the EOF, then emit end on the next tick.
+    if (nOrig !== n && state.ended) endReadable(this);
+  }
+
+  if (ret !== null) this.emit('data', ret);
+
+  return ret;
+};
+
+function chunkInvalid(state, chunk) {
+  var er = null;
+  if (!Buffer.isBuffer(chunk) && typeof chunk !== 'string' && chunk !== null && chunk !== undefined && !state.objectMode) {
+    er = new TypeError('Invalid non-string/buffer chunk');
+  }
+  return er;
+}
+
+function onEofChunk(stream, state) {
+  if (state.ended) return;
+  if (state.decoder) {
+    var chunk = state.decoder.end();
+    if (chunk && chunk.length) {
+      state.buffer.push(chunk);
+      state.length += state.objectMode ? 1 : chunk.length;
+    }
+  }
+  state.ended = true;
+
+  // emit 'readable' now to make sure it gets picked up.
+  emitReadable(stream);
+}
+
+// Don't emit readable right away in sync mode, because this can trigger
+// another read() call => stack overflow.  This way, it might trigger
+// a nextTick recursion warning, but that's not so bad.
+function emitReadable(stream) {
+  var state = stream._readableState;
+  state.needReadable = false;
+  if (!state.emittedReadable) {
+    debug('emitReadable', state.flowing);
+    state.emittedReadable = true;
+    if (state.sync) processNextTick(emitReadable_, stream);else emitReadable_(stream);
+  }
+}
+
+function emitReadable_(stream) {
+  debug('emit readable');
+  stream.emit('readable');
+  flow(stream);
+}
+
+// at this point, the user has presumably seen the 'readable' event,
+// and called read() to consume some data.  that may have triggered
+// in turn another _read(n) call, in which case reading = true if
+// it's in progress.
+// However, if we're not ended, or reading, and the length < hwm,
+// then go ahead and try to read some more preemptively.
+function maybeReadMore(stream, state) {
+  if (!state.readingMore) {
+    state.readingMore = true;
+    processNextTick(maybeReadMore_, stream, state);
+  }
+}
+
+function maybeReadMore_(stream, state) {
+  var len = state.length;
+  while (!state.reading && !state.flowing && !state.ended && state.length < state.highWaterMark) {
+    debug('maybeReadMore read 0');
+    stream.read(0);
+    if (len === state.length)
+      // didn't get any data, stop spinning.
+      break;else len = state.length;
+  }
+  state.readingMore = false;
+}
+
+// abstract method.  to be overridden in specific implementation classes.
+// call cb(er, data) where data is <= n in length.
+// for virtual (non-string, non-buffer) streams, "length" is somewhat
+// arbitrary, and perhaps not very meaningful.
+Readable.prototype._read = function (n) {
+  this.emit('error', new Error('not implemented'));
+};
+
+Readable.prototype.pipe = function (dest, pipeOpts) {
+  var src = this;
+  var state = this._readableState;
+
+  switch (state.pipesCount) {
+    case 0:
+      state.pipes = dest;
+      break;
+    case 1:
+      state.pipes = [state.pipes, dest];
+      break;
+    default:
+      state.pipes.push(dest);
+      break;
+  }
+  state.pipesCount += 1;
+  debug('pipe count=%d opts=%j', state.pipesCount, pipeOpts);
+
+  var doEnd = (!pipeOpts || pipeOpts.end !== false) && dest !== process.stdout && dest !== process.stderr;
+
+  var endFn = doEnd ? onend : cleanup;
+  if (state.endEmitted) processNextTick(endFn);else src.once('end', endFn);
+
+  dest.on('unpipe', onunpipe);
+  function onunpipe(readable) {
+    debug('onunpipe');
+    if (readable === src) {
+      cleanup();
+    }
+  }
+
+  function onend() {
+    debug('onend');
+    dest.end();
+  }
+
+  // when the dest drains, it reduces the awaitDrain counter
+  // on the source.  This would be more elegant with a .once()
+  // handler in flow(), but adding and removing repeatedly is
+  // too slow.
+  var ondrain = pipeOnDrain(src);
+  dest.on('drain', ondrain);
+
+  var cleanedUp = false;
+  function cleanup() {
+    debug('cleanup');
+    // cleanup event handlers once the pipe is broken
+    dest.removeListener('close', onclose);
+    dest.removeListener('finish', onfinish);
+    dest.removeListener('drain', ondrain);
+    dest.removeListener('error', onerror);
+    dest.removeListener('unpipe', onunpipe);
+    src.removeListener('end', onend);
+    src.removeListener('end', cleanup);
+    src.removeListener('data', ondata);
+
+    cleanedUp = true;
+
+    // if the reader is waiting for a drain event from this
+    // specific writer, then it would cause it to never start
+    // flowing again.
+    // So, if this is awaiting a drain, then we just call it now.
+    // If we don't know, then assume that we are waiting for one.
+    if (state.awaitDrain && (!dest._writableState || dest._writableState.needDrain)) ondrain();
+  }
+
+  // If the user pushes more data while we're writing to dest then we'll end up
+  // in ondata again. However, we only want to increase awaitDrain once because
+  // dest will only emit one 'drain' event for the multiple writes.
+  // => Introduce a guard on increasing awaitDrain.
+  var increasedAwaitDrain = false;
+  src.on('data', ondata);
+  function ondata(chunk) {
+    debug('ondata');
+    increasedAwaitDrain = false;
+    var ret = dest.write(chunk);
+    if (false === ret && !increasedAwaitDrain) {
+      // If the user unpiped during `dest.write()`, it is possible
+      // to get stuck in a permanently paused state if that write
+      // also returned false.
+      // => Check whether `dest` is still a piping destination.
+      if ((state.pipesCount === 1 && state.pipes === dest || state.pipesCount > 1 && indexOf(state.pipes, dest) !== -1) && !cleanedUp) {
+        debug('false write response, pause', src._readableState.awaitDrain);
+        src._readableState.awaitDrain++;
+        increasedAwaitDrain = true;
+      }
+      src.pause();
+    }
+  }
+
+  // if the dest has an error, then stop piping into it.
+  // however, don't suppress the throwing behavior for this.
+  function onerror(er) {
+    debug('onerror', er);
+    unpipe();
+    dest.removeListener('error', onerror);
+    if (EElistenerCount(dest, 'error') === 0) dest.emit('error', er);
+  }
+
+  // Make sure our error handler is attached before userland ones.
+  prependListener(dest, 'error', onerror);
+
+  // Both close and finish should trigger unpipe, but only once.
+  function onclose() {
+    dest.removeListener('finish', onfinish);
+    unpipe();
+  }
+  dest.once('close', onclose);
+  function onfinish() {
+    debug('onfinish');
+    dest.removeListener('close', onclose);
+    unpipe();
+  }
+  dest.once('finish', onfinish);
+
+  function unpipe() {
+    debug('unpipe');
+    src.unpipe(dest);
+  }
+
+  // tell the dest that it's being piped to
+  dest.emit('pipe', src);
+
+  // start the flow if it hasn't been started already.
+  if (!state.flowing) {
+    debug('pipe resume');
+    src.resume();
+  }
+
+  return dest;
+};
+
+function pipeOnDrain(src) {
+  return function () {
+    var state = src._readableState;
+    debug('pipeOnDrain', state.awaitDrain);
+    if (state.awaitDrain) state.awaitDrain--;
+    if (state.awaitDrain === 0 && EElistenerCount(src, 'data')) {
+      state.flowing = true;
+      flow(src);
+    }
+  };
+}
+
+Readable.prototype.unpipe = function (dest) {
+  var state = this._readableState;
+
+  // if we're not piping anywhere, then do nothing.
+  if (state.pipesCount === 0) return this;
+
+  // just one destination.  most common case.
+  if (state.pipesCount === 1) {
+    // passed in one, but it's not the right one.
+    if (dest && dest !== state.pipes) return this;
+
+    if (!dest) dest = state.pipes;
+
+    // got a match.
+    state.pipes = null;
+    state.pipesCount = 0;
+    state.flowing = false;
+    if (dest) dest.emit('unpipe', this);
+    return this;
+  }
+
+  // slow case. multiple pipe destinations.
+
+  if (!dest) {
+    // remove all.
+    var dests = state.pipes;
+    var len = state.pipesCount;
+    state.pipes = null;
+    state.pipesCount = 0;
+    state.flowing = false;
+
+    for (var _i = 0; _i < len; _i++) {
+      dests[_i].emit('unpipe', this);
+    }return this;
+  }
+
+  // try to find the right one.
+  var i = indexOf(state.pipes, dest);
+  if (i === -1) return this;
+
+  state.pipes.splice(i, 1);
+  state.pipesCount -= 1;
+  if (state.pipesCount === 1) state.pipes = state.pipes[0];
+
+  dest.emit('unpipe', this);
+
+  return this;
+};
+
+// set up data events if they are asked for
+// Ensure readable listeners eventually get something
+Readable.prototype.on = function (ev, fn) {
+  var res = Stream.prototype.on.call(this, ev, fn);
+
+  if (ev === 'data') {
+    // Start flowing on next tick if stream isn't explicitly paused
+    if (this._readableState.flowing !== false) this.resume();
+  } else if (ev === 'readable') {
+    var state = this._readableState;
+    if (!state.endEmitted && !state.readableListening) {
+      state.readableListening = state.needReadable = true;
+      state.emittedReadable = false;
+      if (!state.reading) {
+        processNextTick(nReadingNextTick, this);
+      } else if (state.length) {
+        emitReadable(this, state);
+      }
+    }
+  }
+
+  return res;
+};
+Readable.prototype.addListener = Readable.prototype.on;
+
+function nReadingNextTick(self) {
+  debug('readable nexttick read 0');
+  self.read(0);
+}
+
+// pause() and resume() are remnants of the legacy readable stream API
+// If the user uses them, then switch into old mode.
+Readable.prototype.resume = function () {
+  var state = this._readableState;
+  if (!state.flowing) {
+    debug('resume');
+    state.flowing = true;
+    resume(this, state);
+  }
+  return this;
+};
+
+function resume(stream, state) {
+  if (!state.resumeScheduled) {
+    state.resumeScheduled = true;
+    processNextTick(resume_, stream, state);
+  }
+}
+
+function resume_(stream, state) {
+  if (!state.reading) {
+    debug('resume read 0');
+    stream.read(0);
+  }
+
+  state.resumeScheduled = false;
+  state.awaitDrain = 0;
+  stream.emit('resume');
+  flow(stream);
+  if (state.flowing && !state.reading) stream.read(0);
+}
+
+Readable.prototype.pause = function () {
+  debug('call pause flowing=%j', this._readableState.flowing);
+  if (false !== this._readableState.flowing) {
+    debug('pause');
+    this._readableState.flowing = false;
+    this.emit('pause');
+  }
+  return this;
+};
+
+function flow(stream) {
+  var state = stream._readableState;
+  debug('flow', state.flowing);
+  while (state.flowing && stream.read() !== null) {}
+}
+
+// wrap an old-style stream as the async data source.
+// This is *not* part of the readable stream interface.
+// It is an ugly unfortunate mess of history.
+Readable.prototype.wrap = function (stream) {
+  var state = this._readableState;
+  var paused = false;
+
+  var self = this;
+  stream.on('end', function () {
+    debug('wrapped end');
+    if (state.decoder && !state.ended) {
+      var chunk = state.decoder.end();
+      if (chunk && chunk.length) self.push(chunk);
+    }
+
+    self.push(null);
+  });
+
+  stream.on('data', function (chunk) {
+    debug('wrapped data');
+    if (state.decoder) chunk = state.decoder.write(chunk);
+
+    // don't skip over falsy values in objectMode
+    if (state.objectMode && (chunk === null || chunk === undefined)) return;else if (!state.objectMode && (!chunk || !chunk.length)) return;
+
+    var ret = self.push(chunk);
+    if (!ret) {
+      paused = true;
+      stream.pause();
+    }
+  });
+
+  // proxy all the other methods.
+  // important when wrapping filters and duplexes.
+  for (var i in stream) {
+    if (this[i] === undefined && typeof stream[i] === 'function') {
+      this[i] = function (method) {
+        return function () {
+          return stream[method].apply(stream, arguments);
+        };
+      }(i);
+    }
+  }
+
+  // proxy certain important events.
+  var events = ['error', 'close', 'destroy', 'pause', 'resume'];
+  forEach(events, function (ev) {
+    stream.on(ev, self.emit.bind(self, ev));
+  });
+
+  // when we try to consume some more bytes, simply unpause the
+  // underlying stream.
+  self._read = function (n) {
+    debug('wrapped _read', n);
+    if (paused) {
+      paused = false;
+      stream.resume();
+    }
+  };
+
+  return self;
+};
+
+// exposed for testing purposes only.
+Readable._fromList = fromList;
+
+// Pluck off n bytes from an array of buffers.
+// Length is the combined lengths of all the buffers in the list.
+// This function is designed to be inlinable, so please take care when making
+// changes to the function body.
+function fromList(n, state) {
+  // nothing buffered
+  if (state.length === 0) return null;
+
+  var ret;
+  if (state.objectMode) ret = state.buffer.shift();else if (!n || n >= state.length) {
+    // read it all, truncate the list
+    if (state.decoder) ret = state.buffer.join('');else if (state.buffer.length === 1) ret = state.buffer.head.data;else ret = state.buffer.concat(state.length);
+    state.buffer.clear();
+  } else {
+    // read part of list
+    ret = fromListPartial(n, state.buffer, state.decoder);
+  }
+
+  return ret;
+}
+
+// Extracts only enough buffered data to satisfy the amount requested.
+// This function is designed to be inlinable, so please take care when making
+// changes to the function body.
+function fromListPartial(n, list, hasStrings) {
+  var ret;
+  if (n < list.head.data.length) {
+    // slice is the same for buffers and strings
+    ret = list.head.data.slice(0, n);
+    list.head.data = list.head.data.slice(n);
+  } else if (n === list.head.data.length) {
+    // first chunk is a perfect match
+    ret = list.shift();
+  } else {
+    // result spans more than one buffer
+    ret = hasStrings ? copyFromBufferString(n, list) : copyFromBuffer(n, list);
+  }
+  return ret;
+}
+
+// Copies a specified amount of characters from the list of buffered data
+// chunks.
+// This function is designed to be inlinable, so please take care when making
+// changes to the function body.
+function copyFromBufferString(n, list) {
+  var p = list.head;
+  var c = 1;
+  var ret = p.data;
+  n -= ret.length;
+  while (p = p.next) {
+    var str = p.data;
+    var nb = n > str.length ? str.length : n;
+    if (nb === str.length) ret += str;else ret += str.slice(0, n);
+    n -= nb;
+    if (n === 0) {
+      if (nb === str.length) {
+        ++c;
+        if (p.next) list.head = p.next;else list.head = list.tail = null;
+      } else {
+        list.head = p;
+        p.data = str.slice(nb);
+      }
+      break;
+    }
+    ++c;
+  }
+  list.length -= c;
+  return ret;
+}
+
+// Copies a specified amount of bytes from the list of buffered data chunks.
+// This function is designed to be inlinable, so please take care when making
+// changes to the function body.
+function copyFromBuffer(n, list) {
+  var ret = bufferShim.allocUnsafe(n);
+  var p = list.head;
+  var c = 1;
+  p.data.copy(ret);
+  n -= p.data.length;
+  while (p = p.next) {
+    var buf = p.data;
+    var nb = n > buf.length ? buf.length : n;
+    buf.copy(ret, ret.length - n, 0, nb);
+    n -= nb;
+    if (n === 0) {
+      if (nb === buf.length) {
+        ++c;
+        if (p.next) list.head = p.next;else list.head = list.tail = null;
+      } else {
+        list.head = p;
+        p.data = buf.slice(nb);
+      }
+      break;
+    }
+    ++c;
+  }
+  list.length -= c;
+  return ret;
+}
+
+function endReadable(stream) {
+  var state = stream._readableState;
+
+  // If we get here before consuming all the bytes, then that is a
+  // bug in node.  Should never happen.
+  if (state.length > 0) throw new Error('"endReadable()" called on non-empty stream');
+
+  if (!state.endEmitted) {
+    state.ended = true;
+    processNextTick(endReadableNT, state, stream);
+  }
+}
+
+function endReadableNT(state, stream) {
+  // Check that we didn't get one last unshift.
+  if (!state.endEmitted && state.length === 0) {
+    state.endEmitted = true;
+    stream.readable = false;
+    stream.emit('end');
+  }
+}
+
+function forEach(xs, f) {
+  for (var i = 0, l = xs.length; i < l; i++) {
+    f(xs[i], i);
+  }
+}
+
+function indexOf(xs, x) {
+  for (var i = 0, l = xs.length; i < l; i++) {
+    if (xs[i] === x) return i;
+  }
+  return -1;
+}
+}).call(this,require('_process'))
+
+},{"./_stream_duplex":129,"./internal/streams/BufferList":134,"_process":120,"buffer":47,"buffer-shims":45,"core-util-is":50,"events":84,"inherits":101,"isarray":103,"process-nextick-args":119,"string_decoder/":149,"util":20}],132:[function(require,module,exports){
+// a transform stream is a readable/writable stream where you do
+// something with the data.  Sometimes it's called a "filter",
+// but that's not a great name for it, since that implies a thing where
+// some bits pass through, and others are simply ignored.  (That would
+// be a valid example of a transform, of course.)
+//
+// While the output is causally related to the input, it's not a
+// necessarily symmetric or synchronous transformation.  For example,
+// a zlib stream might take multiple plain-text writes(), and then
+// emit a single compressed chunk some time in the future.
+//
+// Here's how this works:
+//
+// The Transform stream has all the aspects of the readable and writable
+// stream classes.  When you write(chunk), that calls _write(chunk,cb)
+// internally, and returns false if there's a lot of pending writes
+// buffered up.  When you call read(), that calls _read(n) until
+// there's enough pending readable data buffered up.
+//
+// In a transform stream, the written data is placed in a buffer.  When
+// _read(n) is called, it transforms the queued up data, calling the
+// buffered _write cb's as it consumes chunks.  If consuming a single
+// written chunk would result in multiple output chunks, then the first
+// outputted bit calls the readcb, and subsequent chunks just go into
+// the read buffer, and will cause it to emit 'readable' if necessary.
+//
+// This way, back-pressure is actually determined by the reading side,
+// since _read has to be called to start processing a new chunk.  However,
+// a pathological inflate type of transform can cause excessive buffering
+// here.  For example, imagine a stream where every byte of input is
+// interpreted as an integer from 0-255, and then results in that many
+// bytes of output.  Writing the 4 bytes {ff,ff,ff,ff} would result in
+// 1kb of data being output.  In this case, you could write a very small
+// amount of input, and end up with a very large amount of output.  In
+// such a pathological inflating mechanism, there'd be no way to tell
+// the system to stop doing the transform.  A single 4MB write could
+// cause the system to run out of memory.
+//
+// However, even in such a pathological case, only a single written chunk
+// would be consumed, and then the rest would wait (un-transformed) until
+// the results of the previous transformed chunk were consumed.
+
+'use strict';
+
+module.exports = Transform;
+
+var Duplex = require('./_stream_duplex');
+
+/*<replacement>*/
+var util = require('core-util-is');
+util.inherits = require('inherits');
+/*</replacement>*/
+
+util.inherits(Transform, Duplex);
+
+function TransformState(stream) {
+  this.afterTransform = function (er, data) {
+    return afterTransform(stream, er, data);
+  };
+
+  this.needTransform = false;
+  this.transforming = false;
+  this.writecb = null;
+  this.writechunk = null;
+  this.writeencoding = null;
+}
+
+function afterTransform(stream, er, data) {
+  var ts = stream._transformState;
+  ts.transforming = false;
+
+  var cb = ts.writecb;
+
+  if (!cb) return stream.emit('error', new Error('no writecb in Transform class'));
+
+  ts.writechunk = null;
+  ts.writecb = null;
+
+  if (data !== null && data !== undefined) stream.push(data);
+
+  cb(er);
+
+  var rs = stream._readableState;
+  rs.reading = false;
+  if (rs.needReadable || rs.length < rs.highWaterMark) {
+    stream._read(rs.highWaterMark);
+  }
+}
+
+function Transform(options) {
+  if (!(this instanceof Transform)) return new Transform(options);
+
+  Duplex.call(this, options);
+
+  this._transformState = new TransformState(this);
+
+  // when the writable side finishes, then flush out anything remaining.
+  var stream = this;
+
+  // start out asking for a readable event once data is transformed.
+  this._readableState.needReadable = true;
+
+  // we have implemented the _read method, and done the other things
+  // that Readable wants before the first _read call, so unset the
+  // sync guard flag.
+  this._readableState.sync = false;
+
+  if (options) {
+    if (typeof options.transform === 'function') this._transform = options.transform;
+
+    if (typeof options.flush === 'function') this._flush = options.flush;
+  }
+
+  this.once('prefinish', function () {
+    if (typeof this._flush === 'function') this._flush(function (er) {
+      done(stream, er);
+    });else done(stream);
+  });
+}
+
+Transform.prototype.push = function (chunk, encoding) {
+  this._transformState.needTransform = false;
+  return Duplex.prototype.push.call(this, chunk, encoding);
+};
+
+// This is the part where you do stuff!
+// override this function in implementation classes.
+// 'chunk' is an input chunk.
+//
+// Call `push(newChunk)` to pass along transformed output
+// to the readable side.  You may call 'push' zero or more times.
+//
+// Call `cb(err)` when you are done with this chunk.  If you pass
+// an error, then that'll put the hurt on the whole operation.  If you
+// never call cb(), then you'll never get another chunk.
+Transform.prototype._transform = function (chunk, encoding, cb) {
+  throw new Error('Not implemented');
+};
+
+Transform.prototype._write = function (chunk, encoding, cb) {
+  var ts = this._transformState;
+  ts.writecb = cb;
+  ts.writechunk = chunk;
+  ts.writeencoding = encoding;
+  if (!ts.transforming) {
+    var rs = this._readableState;
+    if (ts.needTransform || rs.needReadable || rs.length < rs.highWaterMark) this._read(rs.highWaterMark);
+  }
+};
+
+// Doesn't matter what the args are here.
+// _transform does all the work.
+// That we got here means that the readable side wants more data.
+Transform.prototype._read = function (n) {
+  var ts = this._transformState;
+
+  if (ts.writechunk !== null && ts.writecb && !ts.transforming) {
+    ts.transforming = true;
+    this._transform(ts.writechunk, ts.writeencoding, ts.afterTransform);
+  } else {
+    // mark that we need a transform, so that any data that comes in
+    // will get processed, now that we've asked for it.
+    ts.needTransform = true;
+  }
+};
+
+function done(stream, er) {
+  if (er) return stream.emit('error', er);
+
+  // if there's nothing in the write buffer, then that means
+  // that nothing more will ever be provided
+  var ws = stream._writableState;
+  var ts = stream._transformState;
+
+  if (ws.length) throw new Error('Calling transform done when ws.length != 0');
+
+  if (ts.transforming) throw new Error('Calling transform done when still transforming');
+
+  return stream.push(null);
+}
+},{"./_stream_duplex":129,"core-util-is":50,"inherits":101}],133:[function(require,module,exports){
+(function (process){
+// A bit simpler than readable streams.
+// Implement an async ._write(chunk, encoding, cb), and it'll handle all
+// the drain event emission and buffering.
+
+'use strict';
+
+module.exports = Writable;
+
+/*<replacement>*/
+var processNextTick = require('process-nextick-args');
+/*</replacement>*/
+
+/*<replacement>*/
+var asyncWrite = !process.browser && ['v0.10', 'v0.9.'].indexOf(process.version.slice(0, 5)) > -1 ? setImmediate : processNextTick;
+/*</replacement>*/
+
+Writable.WritableState = WritableState;
+
+/*<replacement>*/
+var util = require('core-util-is');
+util.inherits = require('inherits');
+/*</replacement>*/
+
+/*<replacement>*/
+var internalUtil = {
+  deprecate: require('util-deprecate')
+};
+/*</replacement>*/
+
+/*<replacement>*/
+var Stream;
+(function () {
+  try {
+    Stream = require('st' + 'ream');
+  } catch (_) {} finally {
+    if (!Stream) Stream = require('events').EventEmitter;
+  }
+})();
+/*</replacement>*/
+
+var Buffer = require('buffer').Buffer;
+/*<replacement>*/
+var bufferShim = require('buffer-shims');
+/*</replacement>*/
+
+util.inherits(Writable, Stream);
+
+function nop() {}
+
+function WriteReq(chunk, encoding, cb) {
+  this.chunk = chunk;
+  this.encoding = encoding;
+  this.callback = cb;
+  this.next = null;
+}
+
+var Duplex;
+function WritableState(options, stream) {
+  Duplex = Duplex || require('./_stream_duplex');
+
+  options = options || {};
+
+  // object stream flag to indicate whether or not this stream
+  // contains buffers or objects.
+  this.objectMode = !!options.objectMode;
+
+  if (stream instanceof Duplex) this.objectMode = this.objectMode || !!options.writableObjectMode;
+
+  // the point at which write() starts returning false
+  // Note: 0 is a valid value, means that we always return false if
+  // the entire buffer is not flushed immediately on write()
+  var hwm = options.highWaterMark;
+  var defaultHwm = this.objectMode ? 16 : 16 * 1024;
+  this.highWaterMark = hwm || hwm === 0 ? hwm : defaultHwm;
+
+  // cast to ints.
+  this.highWaterMark = ~ ~this.highWaterMark;
+
+  this.needDrain = false;
+  // at the start of calling end()
+  this.ending = false;
+  // when end() has been called, and returned
+  this.ended = false;
+  // when 'finish' is emitted
+  this.finished = false;
+
+  // should we decode strings into buffers before passing to _write?
+  // this is here so that some node-core streams can optimize string
+  // handling at a lower level.
+  var noDecode = options.decodeStrings === false;
+  this.decodeStrings = !noDecode;
+
+  // Crypto is kind of old and crusty.  Historically, its default string
+  // encoding is 'binary' so we have to make this configurable.
+  // Everything else in the universe uses 'utf8', though.
+  this.defaultEncoding = options.defaultEncoding || 'utf8';
+
+  // not an actual buffer we keep track of, but a measurement
+  // of how much we're waiting to get pushed to some underlying
+  // socket or file.
+  this.length = 0;
+
+  // a flag to see when we're in the middle of a write.
+  this.writing = false;
+
+  // when true all writes will be buffered until .uncork() call
+  this.corked = 0;
+
+  // a flag to be able to tell if the onwrite cb is called immediately,
+  // or on a later tick.  We set this to true at first, because any
+  // actions that shouldn't happen until "later" should generally also
+  // not happen before the first write call.
+  this.sync = true;
+
+  // a flag to know if we're processing previously buffered items, which
+  // may call the _write() callback in the same tick, so that we don't
+  // end up in an overlapped onwrite situation.
+  this.bufferProcessing = false;
+
+  // the callback that's passed to _write(chunk,cb)
+  this.onwrite = function (er) {
+    onwrite(stream, er);
+  };
+
+  // the callback that the user supplies to write(chunk,encoding,cb)
+  this.writecb = null;
+
+  // the amount that is being written when _write is called.
+  this.writelen = 0;
+
+  this.bufferedRequest = null;
+  this.lastBufferedRequest = null;
+
+  // number of pending user-supplied write callbacks
+  // this must be 0 before 'finish' can be emitted
+  this.pendingcb = 0;
+
+  // emit prefinish if the only thing we're waiting for is _write cbs
+  // This is relevant for synchronous Transform streams
+  this.prefinished = false;
+
+  // True if the error was already emitted and should not be thrown again
+  this.errorEmitted = false;
+
+  // count buffered requests
+  this.bufferedRequestCount = 0;
+
+  // allocate the first CorkedRequest, there is always
+  // one allocated and free to use, and we maintain at most two
+  this.corkedRequestsFree = new CorkedRequest(this);
+}
+
+WritableState.prototype.getBuffer = function writableStateGetBuffer() {
+  var current = this.bufferedRequest;
+  var out = [];
+  while (current) {
+    out.push(current);
+    current = current.next;
+  }
+  return out;
+};
+
+(function () {
+  try {
+    Object.defineProperty(WritableState.prototype, 'buffer', {
+      get: internalUtil.deprecate(function () {
+        return this.getBuffer();
+      }, '_writableState.buffer is deprecated. Use _writableState.getBuffer ' + 'instead.')
+    });
+  } catch (_) {}
+})();
+
+var Duplex;
+function Writable(options) {
+  Duplex = Duplex || require('./_stream_duplex');
+
+  // Writable ctor is applied to Duplexes, though they're not
+  // instanceof Writable, they're instanceof Readable.
+  if (!(this instanceof Writable) && !(this instanceof Duplex)) return new Writable(options);
+
+  this._writableState = new WritableState(options, this);
+
+  // legacy.
+  this.writable = true;
+
+  if (options) {
+    if (typeof options.write === 'function') this._write = options.write;
+
+    if (typeof options.writev === 'function') this._writev = options.writev;
+  }
+
+  Stream.call(this);
+}
+
+// Otherwise people can pipe Writable streams, which is just wrong.
+Writable.prototype.pipe = function () {
+  this.emit('error', new Error('Cannot pipe, not readable'));
+};
+
+function writeAfterEnd(stream, cb) {
+  var er = new Error('write after end');
+  // TODO: defer error events consistently everywhere, not just the cb
+  stream.emit('error', er);
+  processNextTick(cb, er);
+}
+
+// If we get something that is not a buffer, string, null, or undefined,
+// and we're not in objectMode, then that's an error.
+// Otherwise stream chunks are all considered to be of length=1, and the
+// watermarks determine how many objects to keep in the buffer, rather than
+// how many bytes or characters.
+function validChunk(stream, state, chunk, cb) {
+  var valid = true;
+  var er = false;
+  // Always throw error if a null is written
+  // if we are not in object mode then throw
+  // if it is not a buffer, string, or undefined.
+  if (chunk === null) {
+    er = new TypeError('May not write null values to stream');
+  } else if (!Buffer.isBuffer(chunk) && typeof chunk !== 'string' && chunk !== undefined && !state.objectMode) {
+    er = new TypeError('Invalid non-string/buffer chunk');
+  }
+  if (er) {
+    stream.emit('error', er);
+    processNextTick(cb, er);
+    valid = false;
+  }
+  return valid;
+}
+
+Writable.prototype.write = function (chunk, encoding, cb) {
+  var state = this._writableState;
+  var ret = false;
+
+  if (typeof encoding === 'function') {
+    cb = encoding;
+    encoding = null;
+  }
+
+  if (Buffer.isBuffer(chunk)) encoding = 'buffer';else if (!encoding) encoding = state.defaultEncoding;
+
+  if (typeof cb !== 'function') cb = nop;
+
+  if (state.ended) writeAfterEnd(this, cb);else if (validChunk(this, state, chunk, cb)) {
+    state.pendingcb++;
+    ret = writeOrBuffer(this, state, chunk, encoding, cb);
+  }
+
+  return ret;
+};
+
+Writable.prototype.cork = function () {
+  var state = this._writableState;
+
+  state.corked++;
+};
+
+Writable.prototype.uncork = function () {
+  var state = this._writableState;
+
+  if (state.corked) {
+    state.corked--;
+
+    if (!state.writing && !state.corked && !state.finished && !state.bufferProcessing && state.bufferedRequest) clearBuffer(this, state);
+  }
+};
+
+Writable.prototype.setDefaultEncoding = function setDefaultEncoding(encoding) {
+  // node::ParseEncoding() requires lower case.
+  if (typeof encoding === 'string') encoding = encoding.toLowerCase();
+  if (!(['hex', 'utf8', 'utf-8', 'ascii', 'binary', 'base64', 'ucs2', 'ucs-2', 'utf16le', 'utf-16le', 'raw'].indexOf((encoding + '').toLowerCase()) > -1)) throw new TypeError('Unknown encoding: ' + encoding);
+  this._writableState.defaultEncoding = encoding;
+  return this;
+};
+
+function decodeChunk(state, chunk, encoding) {
+  if (!state.objectMode && state.decodeStrings !== false && typeof chunk === 'string') {
+    chunk = bufferShim.from(chunk, encoding);
+  }
+  return chunk;
+}
+
+// if we're already writing something, then just put this
+// in the queue, and wait our turn.  Otherwise, call _write
+// If we return false, then we need a drain event, so set that flag.
+function writeOrBuffer(stream, state, chunk, encoding, cb) {
+  chunk = decodeChunk(state, chunk, encoding);
+
+  if (Buffer.isBuffer(chunk)) encoding = 'buffer';
+  var len = state.objectMode ? 1 : chunk.length;
+
+  state.length += len;
+
+  var ret = state.length < state.highWaterMark;
+  // we must ensure that previous needDrain will not be reset to false.
+  if (!ret) state.needDrain = true;
+
+  if (state.writing || state.corked) {
+    var last = state.lastBufferedRequest;
+    state.lastBufferedRequest = new WriteReq(chunk, encoding, cb);
+    if (last) {
+      last.next = state.lastBufferedRequest;
+    } else {
+      state.bufferedRequest = state.lastBufferedRequest;
+    }
+    state.bufferedRequestCount += 1;
+  } else {
+    doWrite(stream, state, false, len, chunk, encoding, cb);
+  }
+
+  return ret;
+}
+
+function doWrite(stream, state, writev, len, chunk, encoding, cb) {
+  state.writelen = len;
+  state.writecb = cb;
+  state.writing = true;
+  state.sync = true;
+  if (writev) stream._writev(chunk, state.onwrite);else stream._write(chunk, encoding, state.onwrite);
+  state.sync = false;
+}
+
+function onwriteError(stream, state, sync, er, cb) {
+  --state.pendingcb;
+  if (sync) processNextTick(cb, er);else cb(er);
+
+  stream._writableState.errorEmitted = true;
+  stream.emit('error', er);
+}
+
+function onwriteStateUpdate(state) {
+  state.writing = false;
+  state.writecb = null;
+  state.length -= state.writelen;
+  state.writelen = 0;
+}
+
+function onwrite(stream, er) {
+  var state = stream._writableState;
+  var sync = state.sync;
+  var cb = state.writecb;
+
+  onwriteStateUpdate(state);
+
+  if (er) onwriteError(stream, state, sync, er, cb);else {
+    // Check if we're actually ready to finish, but don't emit yet
+    var finished = needFinish(state);
+
+    if (!finished && !state.corked && !state.bufferProcessing && state.bufferedRequest) {
+      clearBuffer(stream, state);
+    }
+
+    if (sync) {
+      /*<replacement>*/
+      asyncWrite(afterWrite, stream, state, finished, cb);
+      /*</replacement>*/
+    } else {
+        afterWrite(stream, state, finished, cb);
+      }
+  }
+}
+
+function afterWrite(stream, state, finished, cb) {
+  if (!finished) onwriteDrain(stream, state);
+  state.pendingcb--;
+  cb();
+  finishMaybe(stream, state);
+}
+
+// Must force callback to be called on nextTick, so that we don't
+// emit 'drain' before the write() consumer gets the 'false' return
+// value, and has a chance to attach a 'drain' listener.
+function onwriteDrain(stream, state) {
+  if (state.length === 0 && state.needDrain) {
+    state.needDrain = false;
+    stream.emit('drain');
+  }
+}
+
+// if there's something in the buffer waiting, then process it
+function clearBuffer(stream, state) {
+  state.bufferProcessing = true;
+  var entry = state.bufferedRequest;
+
+  if (stream._writev && entry && entry.next) {
+    // Fast case, write everything using _writev()
+    var l = state.bufferedRequestCount;
+    var buffer = new Array(l);
+    var holder = state.corkedRequestsFree;
+    holder.entry = entry;
+
+    var count = 0;
+    while (entry) {
+      buffer[count] = entry;
+      entry = entry.next;
+      count += 1;
+    }
+
+    doWrite(stream, state, true, state.length, buffer, '', holder.finish);
+
+    // doWrite is almost always async, defer these to save a bit of time
+    // as the hot path ends with doWrite
+    state.pendingcb++;
+    state.lastBufferedRequest = null;
+    if (holder.next) {
+      state.corkedRequestsFree = holder.next;
+      holder.next = null;
+    } else {
+      state.corkedRequestsFree = new CorkedRequest(state);
+    }
+  } else {
+    // Slow case, write chunks one-by-one
+    while (entry) {
+      var chunk = entry.chunk;
+      var encoding = entry.encoding;
+      var cb = entry.callback;
+      var len = state.objectMode ? 1 : chunk.length;
+
+      doWrite(stream, state, false, len, chunk, encoding, cb);
+      entry = entry.next;
+      // if we didn't call the onwrite immediately, then
+      // it means that we need to wait until it does.
+      // also, that means that the chunk and cb are currently
+      // being processed, so move the buffer counter past them.
+      if (state.writing) {
+        break;
+      }
+    }
+
+    if (entry === null) state.lastBufferedRequest = null;
+  }
+
+  state.bufferedRequestCount = 0;
+  state.bufferedRequest = entry;
+  state.bufferProcessing = false;
+}
+
+Writable.prototype._write = function (chunk, encoding, cb) {
+  cb(new Error('not implemented'));
+};
+
+Writable.prototype._writev = null;
+
+Writable.prototype.end = function (chunk, encoding, cb) {
+  var state = this._writableState;
+
+  if (typeof chunk === 'function') {
+    cb = chunk;
+    chunk = null;
+    encoding = null;
+  } else if (typeof encoding === 'function') {
+    cb = encoding;
+    encoding = null;
+  }
+
+  if (chunk !== null && chunk !== undefined) this.write(chunk, encoding);
+
+  // .end() fully uncorks
+  if (state.corked) {
+    state.corked = 1;
+    this.uncork();
+  }
+
+  // ignore unnecessary end() calls.
+  if (!state.ending && !state.finished) endWritable(this, state, cb);
+};
+
+function needFinish(state) {
+  return state.ending && state.length === 0 && state.bufferedRequest === null && !state.finished && !state.writing;
+}
+
+function prefinish(stream, state) {
+  if (!state.prefinished) {
+    state.prefinished = true;
+    stream.emit('prefinish');
+  }
+}
+
+function finishMaybe(stream, state) {
+  var need = needFinish(state);
+  if (need) {
+    if (state.pendingcb === 0) {
+      prefinish(stream, state);
+      state.finished = true;
+      stream.emit('finish');
+    } else {
+      prefinish(stream, state);
+    }
+  }
+  return need;
+}
+
+function endWritable(stream, state, cb) {
+  state.ending = true;
+  finishMaybe(stream, state);
+  if (cb) {
+    if (state.finished) processNextTick(cb);else stream.once('finish', cb);
+  }
+  state.ended = true;
+  stream.writable = false;
+}
+
+// It seems a linked list but it is not
+// there will be only 2 of these for each stream
+function CorkedRequest(state) {
+  var _this = this;
+
+  this.next = null;
+  this.entry = null;
+
+  this.finish = function (err) {
+    var entry = _this.entry;
+    _this.entry = null;
+    while (entry) {
+      var cb = entry.callback;
+      state.pendingcb--;
+      cb(err);
+      entry = entry.next;
+    }
+    if (state.corkedRequestsFree) {
+      state.corkedRequestsFree.next = _this;
+    } else {
+      state.corkedRequestsFree = _this;
+    }
+  };
+}
+}).call(this,require('_process'))
+
+},{"./_stream_duplex":129,"_process":120,"buffer":47,"buffer-shims":45,"core-util-is":50,"events":84,"inherits":101,"process-nextick-args":119,"util-deprecate":154}],134:[function(require,module,exports){
+'use strict';
+
+var Buffer = require('buffer').Buffer;
+/*<replacement>*/
+var bufferShim = require('buffer-shims');
+/*</replacement>*/
+
+module.exports = BufferList;
+
+function BufferList() {
+  this.head = null;
+  this.tail = null;
+  this.length = 0;
+}
+
+BufferList.prototype.push = function (v) {
+  var entry = { data: v, next: null };
+  if (this.length > 0) this.tail.next = entry;else this.head = entry;
+  this.tail = entry;
+  ++this.length;
+};
+
+BufferList.prototype.unshift = function (v) {
+  var entry = { data: v, next: this.head };
+  if (this.length === 0) this.tail = entry;
+  this.head = entry;
+  ++this.length;
+};
+
+BufferList.prototype.shift = function () {
+  if (this.length === 0) return;
+  var ret = this.head.data;
+  if (this.length === 1) this.head = this.tail = null;else this.head = this.head.next;
+  --this.length;
+  return ret;
+};
+
+BufferList.prototype.clear = function () {
+  this.head = this.tail = null;
+  this.length = 0;
+};
+
+BufferList.prototype.join = function (s) {
+  if (this.length === 0) return '';
+  var p = this.head;
+  var ret = '' + p.data;
+  while (p = p.next) {
+    ret += s + p.data;
+  }return ret;
+};
+
+BufferList.prototype.concat = function (n) {
+  if (this.length === 0) return bufferShim.alloc(0);
+  if (this.length === 1) return this.head.data;
+  var ret = bufferShim.allocUnsafe(n >>> 0);
+  var p = this.head;
+  var i = 0;
+  while (p) {
+    p.data.copy(ret, i);
+    i += p.data.length;
+    p = p.next;
+  }
+  return ret;
+};
+},{"buffer":47,"buffer-shims":45}],135:[function(require,module,exports){
+module.exports = require("./lib/_stream_passthrough.js")
+
+},{"./lib/_stream_passthrough.js":130}],136:[function(require,module,exports){
+(function (process){
+var Stream = (function (){
+  try {
+    return require('st' + 'ream'); // hack to fix a circular dependency issue when used with browserify
+  } catch(_){}
+}());
+exports = module.exports = require('./lib/_stream_readable.js');
+exports.Stream = Stream || exports;
+exports.Readable = exports;
+exports.Writable = require('./lib/_stream_writable.js');
+exports.Duplex = require('./lib/_stream_duplex.js');
+exports.Transform = require('./lib/_stream_transform.js');
+exports.PassThrough = require('./lib/_stream_passthrough.js');
+
+if (!process.browser && process.env.READABLE_STREAM === 'disable' && Stream) {
+  module.exports = Stream;
+}
+
+}).call(this,require('_process'))
+
+},{"./lib/_stream_duplex.js":129,"./lib/_stream_passthrough.js":130,"./lib/_stream_readable.js":131,"./lib/_stream_transform.js":132,"./lib/_stream_writable.js":133,"_process":120}],137:[function(require,module,exports){
+module.exports = require("./lib/_stream_transform.js")
+
+},{"./lib/_stream_transform.js":132}],138:[function(require,module,exports){
+module.exports = require("./lib/_stream_writable.js")
+
+},{"./lib/_stream_writable.js":133}],139:[function(require,module,exports){
 (function (Buffer){
 /*
 CryptoJS v3.1.2
@@ -29975,7 +32826,7 @@ module.exports = ripemd160
 
 }).call(this,require("buffer").Buffer)
 
-},{"buffer":46}],128:[function(require,module,exports){
+},{"buffer":47}],140:[function(require,module,exports){
 (function (Buffer){
 // prototype class for hash functions
 function Hash (blockSize, finalSize) {
@@ -30049,7 +32900,7 @@ module.exports = Hash
 
 }).call(this,require("buffer").Buffer)
 
-},{"buffer":46}],129:[function(require,module,exports){
+},{"buffer":47}],141:[function(require,module,exports){
 var exports = module.exports = function SHA (algorithm) {
   algorithm = algorithm.toLowerCase()
 
@@ -30066,7 +32917,7 @@ exports.sha256 = require('./sha256')
 exports.sha384 = require('./sha384')
 exports.sha512 = require('./sha512')
 
-},{"./sha":130,"./sha1":131,"./sha224":132,"./sha256":133,"./sha384":134,"./sha512":135}],130:[function(require,module,exports){
+},{"./sha":142,"./sha1":143,"./sha224":144,"./sha256":145,"./sha384":146,"./sha512":147}],142:[function(require,module,exports){
 (function (Buffer){
 /*
  * A JavaScript implementation of the Secure Hash Algorithm, SHA-0, as defined
@@ -30164,7 +33015,7 @@ module.exports = Sha
 
 }).call(this,require("buffer").Buffer)
 
-},{"./hash":128,"buffer":46,"inherits":101}],131:[function(require,module,exports){
+},{"./hash":140,"buffer":47,"inherits":101}],143:[function(require,module,exports){
 (function (Buffer){
 /*
  * A JavaScript implementation of the Secure Hash Algorithm, SHA-1, as defined
@@ -30267,7 +33118,7 @@ module.exports = Sha1
 
 }).call(this,require("buffer").Buffer)
 
-},{"./hash":128,"buffer":46,"inherits":101}],132:[function(require,module,exports){
+},{"./hash":140,"buffer":47,"inherits":101}],144:[function(require,module,exports){
 (function (Buffer){
 /**
  * A JavaScript implementation of the Secure Hash Algorithm, SHA-256, as defined
@@ -30324,7 +33175,7 @@ module.exports = Sha224
 
 }).call(this,require("buffer").Buffer)
 
-},{"./hash":128,"./sha256":133,"buffer":46,"inherits":101}],133:[function(require,module,exports){
+},{"./hash":140,"./sha256":145,"buffer":47,"inherits":101}],145:[function(require,module,exports){
 (function (Buffer){
 /**
  * A JavaScript implementation of the Secure Hash Algorithm, SHA-256, as defined
@@ -30463,7 +33314,7 @@ module.exports = Sha256
 
 }).call(this,require("buffer").Buffer)
 
-},{"./hash":128,"buffer":46,"inherits":101}],134:[function(require,module,exports){
+},{"./hash":140,"buffer":47,"inherits":101}],146:[function(require,module,exports){
 (function (Buffer){
 var inherits = require('inherits')
 var SHA512 = require('./sha512')
@@ -30524,7 +33375,7 @@ module.exports = Sha384
 
 }).call(this,require("buffer").Buffer)
 
-},{"./hash":128,"./sha512":135,"buffer":46,"inherits":101}],135:[function(require,module,exports){
+},{"./hash":140,"./sha512":147,"buffer":47,"inherits":101}],147:[function(require,module,exports){
 (function (Buffer){
 var inherits = require('inherits')
 var Hash = require('./hash')
@@ -30788,7 +33639,7 @@ module.exports = Sha512
 
 }).call(this,require("buffer").Buffer)
 
-},{"./hash":128,"buffer":46,"inherits":101}],136:[function(require,module,exports){
+},{"./hash":140,"buffer":47,"inherits":101}],148:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -30917,1723 +33768,7 @@ Stream.prototype.pipe = function(dest, options) {
   return dest;
 };
 
-},{"events":84,"inherits":101,"readable-stream/duplex.js":138,"readable-stream/passthrough.js":144,"readable-stream/readable.js":145,"readable-stream/transform.js":146,"readable-stream/writable.js":147}],137:[function(require,module,exports){
-arguments[4][47][0].apply(exports,arguments)
-},{"dup":47}],138:[function(require,module,exports){
-module.exports = require("./lib/_stream_duplex.js")
-
-},{"./lib/_stream_duplex.js":139}],139:[function(require,module,exports){
-// a duplex stream is just a stream that is both readable and writable.
-// Since JS doesn't have multiple prototypal inheritance, this class
-// prototypally inherits from Readable, and then parasitically from
-// Writable.
-
-'use strict';
-
-/*<replacement>*/
-
-var objectKeys = Object.keys || function (obj) {
-  var keys = [];
-  for (var key in obj) {
-    keys.push(key);
-  }return keys;
-};
-/*</replacement>*/
-
-module.exports = Duplex;
-
-/*<replacement>*/
-var processNextTick = require('process-nextick-args');
-/*</replacement>*/
-
-/*<replacement>*/
-var util = require('core-util-is');
-util.inherits = require('inherits');
-/*</replacement>*/
-
-var Readable = require('./_stream_readable');
-var Writable = require('./_stream_writable');
-
-util.inherits(Duplex, Readable);
-
-var keys = objectKeys(Writable.prototype);
-for (var v = 0; v < keys.length; v++) {
-  var method = keys[v];
-  if (!Duplex.prototype[method]) Duplex.prototype[method] = Writable.prototype[method];
-}
-
-function Duplex(options) {
-  if (!(this instanceof Duplex)) return new Duplex(options);
-
-  Readable.call(this, options);
-  Writable.call(this, options);
-
-  if (options && options.readable === false) this.readable = false;
-
-  if (options && options.writable === false) this.writable = false;
-
-  this.allowHalfOpen = true;
-  if (options && options.allowHalfOpen === false) this.allowHalfOpen = false;
-
-  this.once('end', onend);
-}
-
-// the no-half-open enforcer
-function onend() {
-  // if we allow half-open state, or if the writable side ended,
-  // then we're ok.
-  if (this.allowHalfOpen || this._writableState.ended) return;
-
-  // no more data can be written.
-  // But allow more writes to happen in this tick.
-  processNextTick(onEndNT, this);
-}
-
-function onEndNT(self) {
-  self.end();
-}
-
-function forEach(xs, f) {
-  for (var i = 0, l = xs.length; i < l; i++) {
-    f(xs[i], i);
-  }
-}
-},{"./_stream_readable":141,"./_stream_writable":143,"core-util-is":50,"inherits":101,"process-nextick-args":118}],140:[function(require,module,exports){
-// a passthrough stream.
-// basically just the most minimal sort of Transform stream.
-// Every written chunk gets output as-is.
-
-'use strict';
-
-module.exports = PassThrough;
-
-var Transform = require('./_stream_transform');
-
-/*<replacement>*/
-var util = require('core-util-is');
-util.inherits = require('inherits');
-/*</replacement>*/
-
-util.inherits(PassThrough, Transform);
-
-function PassThrough(options) {
-  if (!(this instanceof PassThrough)) return new PassThrough(options);
-
-  Transform.call(this, options);
-}
-
-PassThrough.prototype._transform = function (chunk, encoding, cb) {
-  cb(null, chunk);
-};
-},{"./_stream_transform":142,"core-util-is":50,"inherits":101}],141:[function(require,module,exports){
-(function (process){
-'use strict';
-
-module.exports = Readable;
-
-/*<replacement>*/
-var processNextTick = require('process-nextick-args');
-/*</replacement>*/
-
-/*<replacement>*/
-var isArray = require('isarray');
-/*</replacement>*/
-
-/*<replacement>*/
-var Buffer = require('buffer').Buffer;
-/*</replacement>*/
-
-Readable.ReadableState = ReadableState;
-
-var EE = require('events');
-
-/*<replacement>*/
-var EElistenerCount = function (emitter, type) {
-  return emitter.listeners(type).length;
-};
-/*</replacement>*/
-
-/*<replacement>*/
-var Stream;
-(function () {
-  try {
-    Stream = require('st' + 'ream');
-  } catch (_) {} finally {
-    if (!Stream) Stream = require('events').EventEmitter;
-  }
-})();
-/*</replacement>*/
-
-var Buffer = require('buffer').Buffer;
-
-/*<replacement>*/
-var util = require('core-util-is');
-util.inherits = require('inherits');
-/*</replacement>*/
-
-/*<replacement>*/
-var debugUtil = require('util');
-var debug = undefined;
-if (debugUtil && debugUtil.debuglog) {
-  debug = debugUtil.debuglog('stream');
-} else {
-  debug = function () {};
-}
-/*</replacement>*/
-
-var StringDecoder;
-
-util.inherits(Readable, Stream);
-
-var Duplex;
-function ReadableState(options, stream) {
-  Duplex = Duplex || require('./_stream_duplex');
-
-  options = options || {};
-
-  // object stream flag. Used to make read(n) ignore n and to
-  // make all the buffer merging and length checks go away
-  this.objectMode = !!options.objectMode;
-
-  if (stream instanceof Duplex) this.objectMode = this.objectMode || !!options.readableObjectMode;
-
-  // the point at which it stops calling _read() to fill the buffer
-  // Note: 0 is a valid value, means "don't call _read preemptively ever"
-  var hwm = options.highWaterMark;
-  var defaultHwm = this.objectMode ? 16 : 16 * 1024;
-  this.highWaterMark = hwm || hwm === 0 ? hwm : defaultHwm;
-
-  // cast to ints.
-  this.highWaterMark = ~ ~this.highWaterMark;
-
-  this.buffer = [];
-  this.length = 0;
-  this.pipes = null;
-  this.pipesCount = 0;
-  this.flowing = null;
-  this.ended = false;
-  this.endEmitted = false;
-  this.reading = false;
-
-  // a flag to be able to tell if the onwrite cb is called immediately,
-  // or on a later tick.  We set this to true at first, because any
-  // actions that shouldn't happen until "later" should generally also
-  // not happen before the first write call.
-  this.sync = true;
-
-  // whenever we return null, then we set a flag to say
-  // that we're awaiting a 'readable' event emission.
-  this.needReadable = false;
-  this.emittedReadable = false;
-  this.readableListening = false;
-  this.resumeScheduled = false;
-
-  // Crypto is kind of old and crusty.  Historically, its default string
-  // encoding is 'binary' so we have to make this configurable.
-  // Everything else in the universe uses 'utf8', though.
-  this.defaultEncoding = options.defaultEncoding || 'utf8';
-
-  // when piping, we only care about 'readable' events that happen
-  // after read()ing all the bytes and not getting any pushback.
-  this.ranOut = false;
-
-  // the number of writers that are awaiting a drain event in .pipe()s
-  this.awaitDrain = 0;
-
-  // if true, a maybeReadMore has been scheduled
-  this.readingMore = false;
-
-  this.decoder = null;
-  this.encoding = null;
-  if (options.encoding) {
-    if (!StringDecoder) StringDecoder = require('string_decoder/').StringDecoder;
-    this.decoder = new StringDecoder(options.encoding);
-    this.encoding = options.encoding;
-  }
-}
-
-var Duplex;
-function Readable(options) {
-  Duplex = Duplex || require('./_stream_duplex');
-
-  if (!(this instanceof Readable)) return new Readable(options);
-
-  this._readableState = new ReadableState(options, this);
-
-  // legacy
-  this.readable = true;
-
-  if (options && typeof options.read === 'function') this._read = options.read;
-
-  Stream.call(this);
-}
-
-// Manually shove something into the read() buffer.
-// This returns true if the highWaterMark has not been hit yet,
-// similar to how Writable.write() returns true if you should
-// write() some more.
-Readable.prototype.push = function (chunk, encoding) {
-  var state = this._readableState;
-
-  if (!state.objectMode && typeof chunk === 'string') {
-    encoding = encoding || state.defaultEncoding;
-    if (encoding !== state.encoding) {
-      chunk = new Buffer(chunk, encoding);
-      encoding = '';
-    }
-  }
-
-  return readableAddChunk(this, state, chunk, encoding, false);
-};
-
-// Unshift should *always* be something directly out of read()
-Readable.prototype.unshift = function (chunk) {
-  var state = this._readableState;
-  return readableAddChunk(this, state, chunk, '', true);
-};
-
-Readable.prototype.isPaused = function () {
-  return this._readableState.flowing === false;
-};
-
-function readableAddChunk(stream, state, chunk, encoding, addToFront) {
-  var er = chunkInvalid(state, chunk);
-  if (er) {
-    stream.emit('error', er);
-  } else if (chunk === null) {
-    state.reading = false;
-    onEofChunk(stream, state);
-  } else if (state.objectMode || chunk && chunk.length > 0) {
-    if (state.ended && !addToFront) {
-      var e = new Error('stream.push() after EOF');
-      stream.emit('error', e);
-    } else if (state.endEmitted && addToFront) {
-      var e = new Error('stream.unshift() after end event');
-      stream.emit('error', e);
-    } else {
-      var skipAdd;
-      if (state.decoder && !addToFront && !encoding) {
-        chunk = state.decoder.write(chunk);
-        skipAdd = !state.objectMode && chunk.length === 0;
-      }
-
-      if (!addToFront) state.reading = false;
-
-      // Don't add to the buffer if we've decoded to an empty string chunk and
-      // we're not in object mode
-      if (!skipAdd) {
-        // if we want the data now, just emit it.
-        if (state.flowing && state.length === 0 && !state.sync) {
-          stream.emit('data', chunk);
-          stream.read(0);
-        } else {
-          // update the buffer info.
-          state.length += state.objectMode ? 1 : chunk.length;
-          if (addToFront) state.buffer.unshift(chunk);else state.buffer.push(chunk);
-
-          if (state.needReadable) emitReadable(stream);
-        }
-      }
-
-      maybeReadMore(stream, state);
-    }
-  } else if (!addToFront) {
-    state.reading = false;
-  }
-
-  return needMoreData(state);
-}
-
-// if it's past the high water mark, we can push in some more.
-// Also, if we have no data yet, we can stand some
-// more bytes.  This is to work around cases where hwm=0,
-// such as the repl.  Also, if the push() triggered a
-// readable event, and the user called read(largeNumber) such that
-// needReadable was set, then we ought to push more, so that another
-// 'readable' event will be triggered.
-function needMoreData(state) {
-  return !state.ended && (state.needReadable || state.length < state.highWaterMark || state.length === 0);
-}
-
-// backwards compatibility.
-Readable.prototype.setEncoding = function (enc) {
-  if (!StringDecoder) StringDecoder = require('string_decoder/').StringDecoder;
-  this._readableState.decoder = new StringDecoder(enc);
-  this._readableState.encoding = enc;
-  return this;
-};
-
-// Don't raise the hwm > 8MB
-var MAX_HWM = 0x800000;
-function computeNewHighWaterMark(n) {
-  if (n >= MAX_HWM) {
-    n = MAX_HWM;
-  } else {
-    // Get the next highest power of 2
-    n--;
-    n |= n >>> 1;
-    n |= n >>> 2;
-    n |= n >>> 4;
-    n |= n >>> 8;
-    n |= n >>> 16;
-    n++;
-  }
-  return n;
-}
-
-function howMuchToRead(n, state) {
-  if (state.length === 0 && state.ended) return 0;
-
-  if (state.objectMode) return n === 0 ? 0 : 1;
-
-  if (n === null || isNaN(n)) {
-    // only flow one buffer at a time
-    if (state.flowing && state.buffer.length) return state.buffer[0].length;else return state.length;
-  }
-
-  if (n <= 0) return 0;
-
-  // If we're asking for more than the target buffer level,
-  // then raise the water mark.  Bump up to the next highest
-  // power of 2, to prevent increasing it excessively in tiny
-  // amounts.
-  if (n > state.highWaterMark) state.highWaterMark = computeNewHighWaterMark(n);
-
-  // don't have that much.  return null, unless we've ended.
-  if (n > state.length) {
-    if (!state.ended) {
-      state.needReadable = true;
-      return 0;
-    } else {
-      return state.length;
-    }
-  }
-
-  return n;
-}
-
-// you can override either this method, or the async _read(n) below.
-Readable.prototype.read = function (n) {
-  debug('read', n);
-  var state = this._readableState;
-  var nOrig = n;
-
-  if (typeof n !== 'number' || n > 0) state.emittedReadable = false;
-
-  // if we're doing read(0) to trigger a readable event, but we
-  // already have a bunch of data in the buffer, then just trigger
-  // the 'readable' event and move on.
-  if (n === 0 && state.needReadable && (state.length >= state.highWaterMark || state.ended)) {
-    debug('read: emitReadable', state.length, state.ended);
-    if (state.length === 0 && state.ended) endReadable(this);else emitReadable(this);
-    return null;
-  }
-
-  n = howMuchToRead(n, state);
-
-  // if we've ended, and we're now clear, then finish it up.
-  if (n === 0 && state.ended) {
-    if (state.length === 0) endReadable(this);
-    return null;
-  }
-
-  // All the actual chunk generation logic needs to be
-  // *below* the call to _read.  The reason is that in certain
-  // synthetic stream cases, such as passthrough streams, _read
-  // may be a completely synchronous operation which may change
-  // the state of the read buffer, providing enough data when
-  // before there was *not* enough.
-  //
-  // So, the steps are:
-  // 1. Figure out what the state of things will be after we do
-  // a read from the buffer.
-  //
-  // 2. If that resulting state will trigger a _read, then call _read.
-  // Note that this may be asynchronous, or synchronous.  Yes, it is
-  // deeply ugly to write APIs this way, but that still doesn't mean
-  // that the Readable class should behave improperly, as streams are
-  // designed to be sync/async agnostic.
-  // Take note if the _read call is sync or async (ie, if the read call
-  // has returned yet), so that we know whether or not it's safe to emit
-  // 'readable' etc.
-  //
-  // 3. Actually pull the requested chunks out of the buffer and return.
-
-  // if we need a readable event, then we need to do some reading.
-  var doRead = state.needReadable;
-  debug('need readable', doRead);
-
-  // if we currently have less than the highWaterMark, then also read some
-  if (state.length === 0 || state.length - n < state.highWaterMark) {
-    doRead = true;
-    debug('length less than watermark', doRead);
-  }
-
-  // however, if we've ended, then there's no point, and if we're already
-  // reading, then it's unnecessary.
-  if (state.ended || state.reading) {
-    doRead = false;
-    debug('reading or ended', doRead);
-  }
-
-  if (doRead) {
-    debug('do read');
-    state.reading = true;
-    state.sync = true;
-    // if the length is currently zero, then we *need* a readable event.
-    if (state.length === 0) state.needReadable = true;
-    // call internal read method
-    this._read(state.highWaterMark);
-    state.sync = false;
-  }
-
-  // If _read pushed data synchronously, then `reading` will be false,
-  // and we need to re-evaluate how much data we can return to the user.
-  if (doRead && !state.reading) n = howMuchToRead(nOrig, state);
-
-  var ret;
-  if (n > 0) ret = fromList(n, state);else ret = null;
-
-  if (ret === null) {
-    state.needReadable = true;
-    n = 0;
-  }
-
-  state.length -= n;
-
-  // If we have nothing in the buffer, then we want to know
-  // as soon as we *do* get something into the buffer.
-  if (state.length === 0 && !state.ended) state.needReadable = true;
-
-  // If we tried to read() past the EOF, then emit end on the next tick.
-  if (nOrig !== n && state.ended && state.length === 0) endReadable(this);
-
-  if (ret !== null) this.emit('data', ret);
-
-  return ret;
-};
-
-function chunkInvalid(state, chunk) {
-  var er = null;
-  if (!Buffer.isBuffer(chunk) && typeof chunk !== 'string' && chunk !== null && chunk !== undefined && !state.objectMode) {
-    er = new TypeError('Invalid non-string/buffer chunk');
-  }
-  return er;
-}
-
-function onEofChunk(stream, state) {
-  if (state.ended) return;
-  if (state.decoder) {
-    var chunk = state.decoder.end();
-    if (chunk && chunk.length) {
-      state.buffer.push(chunk);
-      state.length += state.objectMode ? 1 : chunk.length;
-    }
-  }
-  state.ended = true;
-
-  // emit 'readable' now to make sure it gets picked up.
-  emitReadable(stream);
-}
-
-// Don't emit readable right away in sync mode, because this can trigger
-// another read() call => stack overflow.  This way, it might trigger
-// a nextTick recursion warning, but that's not so bad.
-function emitReadable(stream) {
-  var state = stream._readableState;
-  state.needReadable = false;
-  if (!state.emittedReadable) {
-    debug('emitReadable', state.flowing);
-    state.emittedReadable = true;
-    if (state.sync) processNextTick(emitReadable_, stream);else emitReadable_(stream);
-  }
-}
-
-function emitReadable_(stream) {
-  debug('emit readable');
-  stream.emit('readable');
-  flow(stream);
-}
-
-// at this point, the user has presumably seen the 'readable' event,
-// and called read() to consume some data.  that may have triggered
-// in turn another _read(n) call, in which case reading = true if
-// it's in progress.
-// However, if we're not ended, or reading, and the length < hwm,
-// then go ahead and try to read some more preemptively.
-function maybeReadMore(stream, state) {
-  if (!state.readingMore) {
-    state.readingMore = true;
-    processNextTick(maybeReadMore_, stream, state);
-  }
-}
-
-function maybeReadMore_(stream, state) {
-  var len = state.length;
-  while (!state.reading && !state.flowing && !state.ended && state.length < state.highWaterMark) {
-    debug('maybeReadMore read 0');
-    stream.read(0);
-    if (len === state.length)
-      // didn't get any data, stop spinning.
-      break;else len = state.length;
-  }
-  state.readingMore = false;
-}
-
-// abstract method.  to be overridden in specific implementation classes.
-// call cb(er, data) where data is <= n in length.
-// for virtual (non-string, non-buffer) streams, "length" is somewhat
-// arbitrary, and perhaps not very meaningful.
-Readable.prototype._read = function (n) {
-  this.emit('error', new Error('not implemented'));
-};
-
-Readable.prototype.pipe = function (dest, pipeOpts) {
-  var src = this;
-  var state = this._readableState;
-
-  switch (state.pipesCount) {
-    case 0:
-      state.pipes = dest;
-      break;
-    case 1:
-      state.pipes = [state.pipes, dest];
-      break;
-    default:
-      state.pipes.push(dest);
-      break;
-  }
-  state.pipesCount += 1;
-  debug('pipe count=%d opts=%j', state.pipesCount, pipeOpts);
-
-  var doEnd = (!pipeOpts || pipeOpts.end !== false) && dest !== process.stdout && dest !== process.stderr;
-
-  var endFn = doEnd ? onend : cleanup;
-  if (state.endEmitted) processNextTick(endFn);else src.once('end', endFn);
-
-  dest.on('unpipe', onunpipe);
-  function onunpipe(readable) {
-    debug('onunpipe');
-    if (readable === src) {
-      cleanup();
-    }
-  }
-
-  function onend() {
-    debug('onend');
-    dest.end();
-  }
-
-  // when the dest drains, it reduces the awaitDrain counter
-  // on the source.  This would be more elegant with a .once()
-  // handler in flow(), but adding and removing repeatedly is
-  // too slow.
-  var ondrain = pipeOnDrain(src);
-  dest.on('drain', ondrain);
-
-  var cleanedUp = false;
-  function cleanup() {
-    debug('cleanup');
-    // cleanup event handlers once the pipe is broken
-    dest.removeListener('close', onclose);
-    dest.removeListener('finish', onfinish);
-    dest.removeListener('drain', ondrain);
-    dest.removeListener('error', onerror);
-    dest.removeListener('unpipe', onunpipe);
-    src.removeListener('end', onend);
-    src.removeListener('end', cleanup);
-    src.removeListener('data', ondata);
-
-    cleanedUp = true;
-
-    // if the reader is waiting for a drain event from this
-    // specific writer, then it would cause it to never start
-    // flowing again.
-    // So, if this is awaiting a drain, then we just call it now.
-    // If we don't know, then assume that we are waiting for one.
-    if (state.awaitDrain && (!dest._writableState || dest._writableState.needDrain)) ondrain();
-  }
-
-  src.on('data', ondata);
-  function ondata(chunk) {
-    debug('ondata');
-    var ret = dest.write(chunk);
-    if (false === ret) {
-      // If the user unpiped during `dest.write()`, it is possible
-      // to get stuck in a permanently paused state if that write
-      // also returned false.
-      if (state.pipesCount === 1 && state.pipes[0] === dest && src.listenerCount('data') === 1 && !cleanedUp) {
-        debug('false write response, pause', src._readableState.awaitDrain);
-        src._readableState.awaitDrain++;
-      }
-      src.pause();
-    }
-  }
-
-  // if the dest has an error, then stop piping into it.
-  // however, don't suppress the throwing behavior for this.
-  function onerror(er) {
-    debug('onerror', er);
-    unpipe();
-    dest.removeListener('error', onerror);
-    if (EElistenerCount(dest, 'error') === 0) dest.emit('error', er);
-  }
-  // This is a brutally ugly hack to make sure that our error handler
-  // is attached before any userland ones.  NEVER DO THIS.
-  if (!dest._events || !dest._events.error) dest.on('error', onerror);else if (isArray(dest._events.error)) dest._events.error.unshift(onerror);else dest._events.error = [onerror, dest._events.error];
-
-  // Both close and finish should trigger unpipe, but only once.
-  function onclose() {
-    dest.removeListener('finish', onfinish);
-    unpipe();
-  }
-  dest.once('close', onclose);
-  function onfinish() {
-    debug('onfinish');
-    dest.removeListener('close', onclose);
-    unpipe();
-  }
-  dest.once('finish', onfinish);
-
-  function unpipe() {
-    debug('unpipe');
-    src.unpipe(dest);
-  }
-
-  // tell the dest that it's being piped to
-  dest.emit('pipe', src);
-
-  // start the flow if it hasn't been started already.
-  if (!state.flowing) {
-    debug('pipe resume');
-    src.resume();
-  }
-
-  return dest;
-};
-
-function pipeOnDrain(src) {
-  return function () {
-    var state = src._readableState;
-    debug('pipeOnDrain', state.awaitDrain);
-    if (state.awaitDrain) state.awaitDrain--;
-    if (state.awaitDrain === 0 && EElistenerCount(src, 'data')) {
-      state.flowing = true;
-      flow(src);
-    }
-  };
-}
-
-Readable.prototype.unpipe = function (dest) {
-  var state = this._readableState;
-
-  // if we're not piping anywhere, then do nothing.
-  if (state.pipesCount === 0) return this;
-
-  // just one destination.  most common case.
-  if (state.pipesCount === 1) {
-    // passed in one, but it's not the right one.
-    if (dest && dest !== state.pipes) return this;
-
-    if (!dest) dest = state.pipes;
-
-    // got a match.
-    state.pipes = null;
-    state.pipesCount = 0;
-    state.flowing = false;
-    if (dest) dest.emit('unpipe', this);
-    return this;
-  }
-
-  // slow case. multiple pipe destinations.
-
-  if (!dest) {
-    // remove all.
-    var dests = state.pipes;
-    var len = state.pipesCount;
-    state.pipes = null;
-    state.pipesCount = 0;
-    state.flowing = false;
-
-    for (var _i = 0; _i < len; _i++) {
-      dests[_i].emit('unpipe', this);
-    }return this;
-  }
-
-  // try to find the right one.
-  var i = indexOf(state.pipes, dest);
-  if (i === -1) return this;
-
-  state.pipes.splice(i, 1);
-  state.pipesCount -= 1;
-  if (state.pipesCount === 1) state.pipes = state.pipes[0];
-
-  dest.emit('unpipe', this);
-
-  return this;
-};
-
-// set up data events if they are asked for
-// Ensure readable listeners eventually get something
-Readable.prototype.on = function (ev, fn) {
-  var res = Stream.prototype.on.call(this, ev, fn);
-
-  // If listening to data, and it has not explicitly been paused,
-  // then call resume to start the flow of data on the next tick.
-  if (ev === 'data' && false !== this._readableState.flowing) {
-    this.resume();
-  }
-
-  if (ev === 'readable' && !this._readableState.endEmitted) {
-    var state = this._readableState;
-    if (!state.readableListening) {
-      state.readableListening = true;
-      state.emittedReadable = false;
-      state.needReadable = true;
-      if (!state.reading) {
-        processNextTick(nReadingNextTick, this);
-      } else if (state.length) {
-        emitReadable(this, state);
-      }
-    }
-  }
-
-  return res;
-};
-Readable.prototype.addListener = Readable.prototype.on;
-
-function nReadingNextTick(self) {
-  debug('readable nexttick read 0');
-  self.read(0);
-}
-
-// pause() and resume() are remnants of the legacy readable stream API
-// If the user uses them, then switch into old mode.
-Readable.prototype.resume = function () {
-  var state = this._readableState;
-  if (!state.flowing) {
-    debug('resume');
-    state.flowing = true;
-    resume(this, state);
-  }
-  return this;
-};
-
-function resume(stream, state) {
-  if (!state.resumeScheduled) {
-    state.resumeScheduled = true;
-    processNextTick(resume_, stream, state);
-  }
-}
-
-function resume_(stream, state) {
-  if (!state.reading) {
-    debug('resume read 0');
-    stream.read(0);
-  }
-
-  state.resumeScheduled = false;
-  stream.emit('resume');
-  flow(stream);
-  if (state.flowing && !state.reading) stream.read(0);
-}
-
-Readable.prototype.pause = function () {
-  debug('call pause flowing=%j', this._readableState.flowing);
-  if (false !== this._readableState.flowing) {
-    debug('pause');
-    this._readableState.flowing = false;
-    this.emit('pause');
-  }
-  return this;
-};
-
-function flow(stream) {
-  var state = stream._readableState;
-  debug('flow', state.flowing);
-  if (state.flowing) {
-    do {
-      var chunk = stream.read();
-    } while (null !== chunk && state.flowing);
-  }
-}
-
-// wrap an old-style stream as the async data source.
-// This is *not* part of the readable stream interface.
-// It is an ugly unfortunate mess of history.
-Readable.prototype.wrap = function (stream) {
-  var state = this._readableState;
-  var paused = false;
-
-  var self = this;
-  stream.on('end', function () {
-    debug('wrapped end');
-    if (state.decoder && !state.ended) {
-      var chunk = state.decoder.end();
-      if (chunk && chunk.length) self.push(chunk);
-    }
-
-    self.push(null);
-  });
-
-  stream.on('data', function (chunk) {
-    debug('wrapped data');
-    if (state.decoder) chunk = state.decoder.write(chunk);
-
-    // don't skip over falsy values in objectMode
-    if (state.objectMode && (chunk === null || chunk === undefined)) return;else if (!state.objectMode && (!chunk || !chunk.length)) return;
-
-    var ret = self.push(chunk);
-    if (!ret) {
-      paused = true;
-      stream.pause();
-    }
-  });
-
-  // proxy all the other methods.
-  // important when wrapping filters and duplexes.
-  for (var i in stream) {
-    if (this[i] === undefined && typeof stream[i] === 'function') {
-      this[i] = function (method) {
-        return function () {
-          return stream[method].apply(stream, arguments);
-        };
-      }(i);
-    }
-  }
-
-  // proxy certain important events.
-  var events = ['error', 'close', 'destroy', 'pause', 'resume'];
-  forEach(events, function (ev) {
-    stream.on(ev, self.emit.bind(self, ev));
-  });
-
-  // when we try to consume some more bytes, simply unpause the
-  // underlying stream.
-  self._read = function (n) {
-    debug('wrapped _read', n);
-    if (paused) {
-      paused = false;
-      stream.resume();
-    }
-  };
-
-  return self;
-};
-
-// exposed for testing purposes only.
-Readable._fromList = fromList;
-
-// Pluck off n bytes from an array of buffers.
-// Length is the combined lengths of all the buffers in the list.
-function fromList(n, state) {
-  var list = state.buffer;
-  var length = state.length;
-  var stringMode = !!state.decoder;
-  var objectMode = !!state.objectMode;
-  var ret;
-
-  // nothing in the list, definitely empty.
-  if (list.length === 0) return null;
-
-  if (length === 0) ret = null;else if (objectMode) ret = list.shift();else if (!n || n >= length) {
-    // read it all, truncate the array.
-    if (stringMode) ret = list.join('');else if (list.length === 1) ret = list[0];else ret = Buffer.concat(list, length);
-    list.length = 0;
-  } else {
-    // read just some of it.
-    if (n < list[0].length) {
-      // just take a part of the first list item.
-      // slice is the same for buffers and strings.
-      var buf = list[0];
-      ret = buf.slice(0, n);
-      list[0] = buf.slice(n);
-    } else if (n === list[0].length) {
-      // first list is a perfect match
-      ret = list.shift();
-    } else {
-      // complex case.
-      // we have enough to cover it, but it spans past the first buffer.
-      if (stringMode) ret = '';else ret = new Buffer(n);
-
-      var c = 0;
-      for (var i = 0, l = list.length; i < l && c < n; i++) {
-        var buf = list[0];
-        var cpy = Math.min(n - c, buf.length);
-
-        if (stringMode) ret += buf.slice(0, cpy);else buf.copy(ret, c, 0, cpy);
-
-        if (cpy < buf.length) list[0] = buf.slice(cpy);else list.shift();
-
-        c += cpy;
-      }
-    }
-  }
-
-  return ret;
-}
-
-function endReadable(stream) {
-  var state = stream._readableState;
-
-  // If we get here before consuming all the bytes, then that is a
-  // bug in node.  Should never happen.
-  if (state.length > 0) throw new Error('endReadable called on non-empty stream');
-
-  if (!state.endEmitted) {
-    state.ended = true;
-    processNextTick(endReadableNT, state, stream);
-  }
-}
-
-function endReadableNT(state, stream) {
-  // Check that we didn't get one last unshift.
-  if (!state.endEmitted && state.length === 0) {
-    state.endEmitted = true;
-    stream.readable = false;
-    stream.emit('end');
-  }
-}
-
-function forEach(xs, f) {
-  for (var i = 0, l = xs.length; i < l; i++) {
-    f(xs[i], i);
-  }
-}
-
-function indexOf(xs, x) {
-  for (var i = 0, l = xs.length; i < l; i++) {
-    if (xs[i] === x) return i;
-  }
-  return -1;
-}
-}).call(this,require('_process'))
-
-},{"./_stream_duplex":139,"_process":119,"buffer":46,"core-util-is":50,"events":84,"inherits":101,"isarray":137,"process-nextick-args":118,"string_decoder/":148,"util":20}],142:[function(require,module,exports){
-// a transform stream is a readable/writable stream where you do
-// something with the data.  Sometimes it's called a "filter",
-// but that's not a great name for it, since that implies a thing where
-// some bits pass through, and others are simply ignored.  (That would
-// be a valid example of a transform, of course.)
-//
-// While the output is causally related to the input, it's not a
-// necessarily symmetric or synchronous transformation.  For example,
-// a zlib stream might take multiple plain-text writes(), and then
-// emit a single compressed chunk some time in the future.
-//
-// Here's how this works:
-//
-// The Transform stream has all the aspects of the readable and writable
-// stream classes.  When you write(chunk), that calls _write(chunk,cb)
-// internally, and returns false if there's a lot of pending writes
-// buffered up.  When you call read(), that calls _read(n) until
-// there's enough pending readable data buffered up.
-//
-// In a transform stream, the written data is placed in a buffer.  When
-// _read(n) is called, it transforms the queued up data, calling the
-// buffered _write cb's as it consumes chunks.  If consuming a single
-// written chunk would result in multiple output chunks, then the first
-// outputted bit calls the readcb, and subsequent chunks just go into
-// the read buffer, and will cause it to emit 'readable' if necessary.
-//
-// This way, back-pressure is actually determined by the reading side,
-// since _read has to be called to start processing a new chunk.  However,
-// a pathological inflate type of transform can cause excessive buffering
-// here.  For example, imagine a stream where every byte of input is
-// interpreted as an integer from 0-255, and then results in that many
-// bytes of output.  Writing the 4 bytes {ff,ff,ff,ff} would result in
-// 1kb of data being output.  In this case, you could write a very small
-// amount of input, and end up with a very large amount of output.  In
-// such a pathological inflating mechanism, there'd be no way to tell
-// the system to stop doing the transform.  A single 4MB write could
-// cause the system to run out of memory.
-//
-// However, even in such a pathological case, only a single written chunk
-// would be consumed, and then the rest would wait (un-transformed) until
-// the results of the previous transformed chunk were consumed.
-
-'use strict';
-
-module.exports = Transform;
-
-var Duplex = require('./_stream_duplex');
-
-/*<replacement>*/
-var util = require('core-util-is');
-util.inherits = require('inherits');
-/*</replacement>*/
-
-util.inherits(Transform, Duplex);
-
-function TransformState(stream) {
-  this.afterTransform = function (er, data) {
-    return afterTransform(stream, er, data);
-  };
-
-  this.needTransform = false;
-  this.transforming = false;
-  this.writecb = null;
-  this.writechunk = null;
-  this.writeencoding = null;
-}
-
-function afterTransform(stream, er, data) {
-  var ts = stream._transformState;
-  ts.transforming = false;
-
-  var cb = ts.writecb;
-
-  if (!cb) return stream.emit('error', new Error('no writecb in Transform class'));
-
-  ts.writechunk = null;
-  ts.writecb = null;
-
-  if (data !== null && data !== undefined) stream.push(data);
-
-  cb(er);
-
-  var rs = stream._readableState;
-  rs.reading = false;
-  if (rs.needReadable || rs.length < rs.highWaterMark) {
-    stream._read(rs.highWaterMark);
-  }
-}
-
-function Transform(options) {
-  if (!(this instanceof Transform)) return new Transform(options);
-
-  Duplex.call(this, options);
-
-  this._transformState = new TransformState(this);
-
-  // when the writable side finishes, then flush out anything remaining.
-  var stream = this;
-
-  // start out asking for a readable event once data is transformed.
-  this._readableState.needReadable = true;
-
-  // we have implemented the _read method, and done the other things
-  // that Readable wants before the first _read call, so unset the
-  // sync guard flag.
-  this._readableState.sync = false;
-
-  if (options) {
-    if (typeof options.transform === 'function') this._transform = options.transform;
-
-    if (typeof options.flush === 'function') this._flush = options.flush;
-  }
-
-  this.once('prefinish', function () {
-    if (typeof this._flush === 'function') this._flush(function (er) {
-      done(stream, er);
-    });else done(stream);
-  });
-}
-
-Transform.prototype.push = function (chunk, encoding) {
-  this._transformState.needTransform = false;
-  return Duplex.prototype.push.call(this, chunk, encoding);
-};
-
-// This is the part where you do stuff!
-// override this function in implementation classes.
-// 'chunk' is an input chunk.
-//
-// Call `push(newChunk)` to pass along transformed output
-// to the readable side.  You may call 'push' zero or more times.
-//
-// Call `cb(err)` when you are done with this chunk.  If you pass
-// an error, then that'll put the hurt on the whole operation.  If you
-// never call cb(), then you'll never get another chunk.
-Transform.prototype._transform = function (chunk, encoding, cb) {
-  throw new Error('not implemented');
-};
-
-Transform.prototype._write = function (chunk, encoding, cb) {
-  var ts = this._transformState;
-  ts.writecb = cb;
-  ts.writechunk = chunk;
-  ts.writeencoding = encoding;
-  if (!ts.transforming) {
-    var rs = this._readableState;
-    if (ts.needTransform || rs.needReadable || rs.length < rs.highWaterMark) this._read(rs.highWaterMark);
-  }
-};
-
-// Doesn't matter what the args are here.
-// _transform does all the work.
-// That we got here means that the readable side wants more data.
-Transform.prototype._read = function (n) {
-  var ts = this._transformState;
-
-  if (ts.writechunk !== null && ts.writecb && !ts.transforming) {
-    ts.transforming = true;
-    this._transform(ts.writechunk, ts.writeencoding, ts.afterTransform);
-  } else {
-    // mark that we need a transform, so that any data that comes in
-    // will get processed, now that we've asked for it.
-    ts.needTransform = true;
-  }
-};
-
-function done(stream, er) {
-  if (er) return stream.emit('error', er);
-
-  // if there's nothing in the write buffer, then that means
-  // that nothing more will ever be provided
-  var ws = stream._writableState;
-  var ts = stream._transformState;
-
-  if (ws.length) throw new Error('calling transform done when ws.length != 0');
-
-  if (ts.transforming) throw new Error('calling transform done when still transforming');
-
-  return stream.push(null);
-}
-},{"./_stream_duplex":139,"core-util-is":50,"inherits":101}],143:[function(require,module,exports){
-(function (process){
-// A bit simpler than readable streams.
-// Implement an async ._write(chunk, encoding, cb), and it'll handle all
-// the drain event emission and buffering.
-
-'use strict';
-
-module.exports = Writable;
-
-/*<replacement>*/
-var processNextTick = require('process-nextick-args');
-/*</replacement>*/
-
-/*<replacement>*/
-var asyncWrite = !process.browser && ['v0.10', 'v0.9.'].indexOf(process.version.slice(0, 5)) > -1 ? setImmediate : processNextTick;
-/*</replacement>*/
-
-/*<replacement>*/
-var Buffer = require('buffer').Buffer;
-/*</replacement>*/
-
-Writable.WritableState = WritableState;
-
-/*<replacement>*/
-var util = require('core-util-is');
-util.inherits = require('inherits');
-/*</replacement>*/
-
-/*<replacement>*/
-var internalUtil = {
-  deprecate: require('util-deprecate')
-};
-/*</replacement>*/
-
-/*<replacement>*/
-var Stream;
-(function () {
-  try {
-    Stream = require('st' + 'ream');
-  } catch (_) {} finally {
-    if (!Stream) Stream = require('events').EventEmitter;
-  }
-})();
-/*</replacement>*/
-
-var Buffer = require('buffer').Buffer;
-
-util.inherits(Writable, Stream);
-
-function nop() {}
-
-function WriteReq(chunk, encoding, cb) {
-  this.chunk = chunk;
-  this.encoding = encoding;
-  this.callback = cb;
-  this.next = null;
-}
-
-var Duplex;
-function WritableState(options, stream) {
-  Duplex = Duplex || require('./_stream_duplex');
-
-  options = options || {};
-
-  // object stream flag to indicate whether or not this stream
-  // contains buffers or objects.
-  this.objectMode = !!options.objectMode;
-
-  if (stream instanceof Duplex) this.objectMode = this.objectMode || !!options.writableObjectMode;
-
-  // the point at which write() starts returning false
-  // Note: 0 is a valid value, means that we always return false if
-  // the entire buffer is not flushed immediately on write()
-  var hwm = options.highWaterMark;
-  var defaultHwm = this.objectMode ? 16 : 16 * 1024;
-  this.highWaterMark = hwm || hwm === 0 ? hwm : defaultHwm;
-
-  // cast to ints.
-  this.highWaterMark = ~ ~this.highWaterMark;
-
-  this.needDrain = false;
-  // at the start of calling end()
-  this.ending = false;
-  // when end() has been called, and returned
-  this.ended = false;
-  // when 'finish' is emitted
-  this.finished = false;
-
-  // should we decode strings into buffers before passing to _write?
-  // this is here so that some node-core streams can optimize string
-  // handling at a lower level.
-  var noDecode = options.decodeStrings === false;
-  this.decodeStrings = !noDecode;
-
-  // Crypto is kind of old and crusty.  Historically, its default string
-  // encoding is 'binary' so we have to make this configurable.
-  // Everything else in the universe uses 'utf8', though.
-  this.defaultEncoding = options.defaultEncoding || 'utf8';
-
-  // not an actual buffer we keep track of, but a measurement
-  // of how much we're waiting to get pushed to some underlying
-  // socket or file.
-  this.length = 0;
-
-  // a flag to see when we're in the middle of a write.
-  this.writing = false;
-
-  // when true all writes will be buffered until .uncork() call
-  this.corked = 0;
-
-  // a flag to be able to tell if the onwrite cb is called immediately,
-  // or on a later tick.  We set this to true at first, because any
-  // actions that shouldn't happen until "later" should generally also
-  // not happen before the first write call.
-  this.sync = true;
-
-  // a flag to know if we're processing previously buffered items, which
-  // may call the _write() callback in the same tick, so that we don't
-  // end up in an overlapped onwrite situation.
-  this.bufferProcessing = false;
-
-  // the callback that's passed to _write(chunk,cb)
-  this.onwrite = function (er) {
-    onwrite(stream, er);
-  };
-
-  // the callback that the user supplies to write(chunk,encoding,cb)
-  this.writecb = null;
-
-  // the amount that is being written when _write is called.
-  this.writelen = 0;
-
-  this.bufferedRequest = null;
-  this.lastBufferedRequest = null;
-
-  // number of pending user-supplied write callbacks
-  // this must be 0 before 'finish' can be emitted
-  this.pendingcb = 0;
-
-  // emit prefinish if the only thing we're waiting for is _write cbs
-  // This is relevant for synchronous Transform streams
-  this.prefinished = false;
-
-  // True if the error was already emitted and should not be thrown again
-  this.errorEmitted = false;
-
-  // count buffered requests
-  this.bufferedRequestCount = 0;
-
-  // create the two objects needed to store the corked requests
-  // they are not a linked list, as no new elements are inserted in there
-  this.corkedRequestsFree = new CorkedRequest(this);
-  this.corkedRequestsFree.next = new CorkedRequest(this);
-}
-
-WritableState.prototype.getBuffer = function writableStateGetBuffer() {
-  var current = this.bufferedRequest;
-  var out = [];
-  while (current) {
-    out.push(current);
-    current = current.next;
-  }
-  return out;
-};
-
-(function () {
-  try {
-    Object.defineProperty(WritableState.prototype, 'buffer', {
-      get: internalUtil.deprecate(function () {
-        return this.getBuffer();
-      }, '_writableState.buffer is deprecated. Use _writableState.getBuffer ' + 'instead.')
-    });
-  } catch (_) {}
-})();
-
-var Duplex;
-function Writable(options) {
-  Duplex = Duplex || require('./_stream_duplex');
-
-  // Writable ctor is applied to Duplexes, though they're not
-  // instanceof Writable, they're instanceof Readable.
-  if (!(this instanceof Writable) && !(this instanceof Duplex)) return new Writable(options);
-
-  this._writableState = new WritableState(options, this);
-
-  // legacy.
-  this.writable = true;
-
-  if (options) {
-    if (typeof options.write === 'function') this._write = options.write;
-
-    if (typeof options.writev === 'function') this._writev = options.writev;
-  }
-
-  Stream.call(this);
-}
-
-// Otherwise people can pipe Writable streams, which is just wrong.
-Writable.prototype.pipe = function () {
-  this.emit('error', new Error('Cannot pipe. Not readable.'));
-};
-
-function writeAfterEnd(stream, cb) {
-  var er = new Error('write after end');
-  // TODO: defer error events consistently everywhere, not just the cb
-  stream.emit('error', er);
-  processNextTick(cb, er);
-}
-
-// If we get something that is not a buffer, string, null, or undefined,
-// and we're not in objectMode, then that's an error.
-// Otherwise stream chunks are all considered to be of length=1, and the
-// watermarks determine how many objects to keep in the buffer, rather than
-// how many bytes or characters.
-function validChunk(stream, state, chunk, cb) {
-  var valid = true;
-
-  if (!Buffer.isBuffer(chunk) && typeof chunk !== 'string' && chunk !== null && chunk !== undefined && !state.objectMode) {
-    var er = new TypeError('Invalid non-string/buffer chunk');
-    stream.emit('error', er);
-    processNextTick(cb, er);
-    valid = false;
-  }
-  return valid;
-}
-
-Writable.prototype.write = function (chunk, encoding, cb) {
-  var state = this._writableState;
-  var ret = false;
-
-  if (typeof encoding === 'function') {
-    cb = encoding;
-    encoding = null;
-  }
-
-  if (Buffer.isBuffer(chunk)) encoding = 'buffer';else if (!encoding) encoding = state.defaultEncoding;
-
-  if (typeof cb !== 'function') cb = nop;
-
-  if (state.ended) writeAfterEnd(this, cb);else if (validChunk(this, state, chunk, cb)) {
-    state.pendingcb++;
-    ret = writeOrBuffer(this, state, chunk, encoding, cb);
-  }
-
-  return ret;
-};
-
-Writable.prototype.cork = function () {
-  var state = this._writableState;
-
-  state.corked++;
-};
-
-Writable.prototype.uncork = function () {
-  var state = this._writableState;
-
-  if (state.corked) {
-    state.corked--;
-
-    if (!state.writing && !state.corked && !state.finished && !state.bufferProcessing && state.bufferedRequest) clearBuffer(this, state);
-  }
-};
-
-Writable.prototype.setDefaultEncoding = function setDefaultEncoding(encoding) {
-  // node::ParseEncoding() requires lower case.
-  if (typeof encoding === 'string') encoding = encoding.toLowerCase();
-  if (!(['hex', 'utf8', 'utf-8', 'ascii', 'binary', 'base64', 'ucs2', 'ucs-2', 'utf16le', 'utf-16le', 'raw'].indexOf((encoding + '').toLowerCase()) > -1)) throw new TypeError('Unknown encoding: ' + encoding);
-  this._writableState.defaultEncoding = encoding;
-};
-
-function decodeChunk(state, chunk, encoding) {
-  if (!state.objectMode && state.decodeStrings !== false && typeof chunk === 'string') {
-    chunk = new Buffer(chunk, encoding);
-  }
-  return chunk;
-}
-
-// if we're already writing something, then just put this
-// in the queue, and wait our turn.  Otherwise, call _write
-// If we return false, then we need a drain event, so set that flag.
-function writeOrBuffer(stream, state, chunk, encoding, cb) {
-  chunk = decodeChunk(state, chunk, encoding);
-
-  if (Buffer.isBuffer(chunk)) encoding = 'buffer';
-  var len = state.objectMode ? 1 : chunk.length;
-
-  state.length += len;
-
-  var ret = state.length < state.highWaterMark;
-  // we must ensure that previous needDrain will not be reset to false.
-  if (!ret) state.needDrain = true;
-
-  if (state.writing || state.corked) {
-    var last = state.lastBufferedRequest;
-    state.lastBufferedRequest = new WriteReq(chunk, encoding, cb);
-    if (last) {
-      last.next = state.lastBufferedRequest;
-    } else {
-      state.bufferedRequest = state.lastBufferedRequest;
-    }
-    state.bufferedRequestCount += 1;
-  } else {
-    doWrite(stream, state, false, len, chunk, encoding, cb);
-  }
-
-  return ret;
-}
-
-function doWrite(stream, state, writev, len, chunk, encoding, cb) {
-  state.writelen = len;
-  state.writecb = cb;
-  state.writing = true;
-  state.sync = true;
-  if (writev) stream._writev(chunk, state.onwrite);else stream._write(chunk, encoding, state.onwrite);
-  state.sync = false;
-}
-
-function onwriteError(stream, state, sync, er, cb) {
-  --state.pendingcb;
-  if (sync) processNextTick(cb, er);else cb(er);
-
-  stream._writableState.errorEmitted = true;
-  stream.emit('error', er);
-}
-
-function onwriteStateUpdate(state) {
-  state.writing = false;
-  state.writecb = null;
-  state.length -= state.writelen;
-  state.writelen = 0;
-}
-
-function onwrite(stream, er) {
-  var state = stream._writableState;
-  var sync = state.sync;
-  var cb = state.writecb;
-
-  onwriteStateUpdate(state);
-
-  if (er) onwriteError(stream, state, sync, er, cb);else {
-    // Check if we're actually ready to finish, but don't emit yet
-    var finished = needFinish(state);
-
-    if (!finished && !state.corked && !state.bufferProcessing && state.bufferedRequest) {
-      clearBuffer(stream, state);
-    }
-
-    if (sync) {
-      /*<replacement>*/
-      asyncWrite(afterWrite, stream, state, finished, cb);
-      /*</replacement>*/
-    } else {
-        afterWrite(stream, state, finished, cb);
-      }
-  }
-}
-
-function afterWrite(stream, state, finished, cb) {
-  if (!finished) onwriteDrain(stream, state);
-  state.pendingcb--;
-  cb();
-  finishMaybe(stream, state);
-}
-
-// Must force callback to be called on nextTick, so that we don't
-// emit 'drain' before the write() consumer gets the 'false' return
-// value, and has a chance to attach a 'drain' listener.
-function onwriteDrain(stream, state) {
-  if (state.length === 0 && state.needDrain) {
-    state.needDrain = false;
-    stream.emit('drain');
-  }
-}
-
-// if there's something in the buffer waiting, then process it
-function clearBuffer(stream, state) {
-  state.bufferProcessing = true;
-  var entry = state.bufferedRequest;
-
-  if (stream._writev && entry && entry.next) {
-    // Fast case, write everything using _writev()
-    var l = state.bufferedRequestCount;
-    var buffer = new Array(l);
-    var holder = state.corkedRequestsFree;
-    holder.entry = entry;
-
-    var count = 0;
-    while (entry) {
-      buffer[count] = entry;
-      entry = entry.next;
-      count += 1;
-    }
-
-    doWrite(stream, state, true, state.length, buffer, '', holder.finish);
-
-    // doWrite is always async, defer these to save a bit of time
-    // as the hot path ends with doWrite
-    state.pendingcb++;
-    state.lastBufferedRequest = null;
-    state.corkedRequestsFree = holder.next;
-    holder.next = null;
-  } else {
-    // Slow case, write chunks one-by-one
-    while (entry) {
-      var chunk = entry.chunk;
-      var encoding = entry.encoding;
-      var cb = entry.callback;
-      var len = state.objectMode ? 1 : chunk.length;
-
-      doWrite(stream, state, false, len, chunk, encoding, cb);
-      entry = entry.next;
-      // if we didn't call the onwrite immediately, then
-      // it means that we need to wait until it does.
-      // also, that means that the chunk and cb are currently
-      // being processed, so move the buffer counter past them.
-      if (state.writing) {
-        break;
-      }
-    }
-
-    if (entry === null) state.lastBufferedRequest = null;
-  }
-
-  state.bufferedRequestCount = 0;
-  state.bufferedRequest = entry;
-  state.bufferProcessing = false;
-}
-
-Writable.prototype._write = function (chunk, encoding, cb) {
-  cb(new Error('not implemented'));
-};
-
-Writable.prototype._writev = null;
-
-Writable.prototype.end = function (chunk, encoding, cb) {
-  var state = this._writableState;
-
-  if (typeof chunk === 'function') {
-    cb = chunk;
-    chunk = null;
-    encoding = null;
-  } else if (typeof encoding === 'function') {
-    cb = encoding;
-    encoding = null;
-  }
-
-  if (chunk !== null && chunk !== undefined) this.write(chunk, encoding);
-
-  // .end() fully uncorks
-  if (state.corked) {
-    state.corked = 1;
-    this.uncork();
-  }
-
-  // ignore unnecessary end() calls.
-  if (!state.ending && !state.finished) endWritable(this, state, cb);
-};
-
-function needFinish(state) {
-  return state.ending && state.length === 0 && state.bufferedRequest === null && !state.finished && !state.writing;
-}
-
-function prefinish(stream, state) {
-  if (!state.prefinished) {
-    state.prefinished = true;
-    stream.emit('prefinish');
-  }
-}
-
-function finishMaybe(stream, state) {
-  var need = needFinish(state);
-  if (need) {
-    if (state.pendingcb === 0) {
-      prefinish(stream, state);
-      state.finished = true;
-      stream.emit('finish');
-    } else {
-      prefinish(stream, state);
-    }
-  }
-  return need;
-}
-
-function endWritable(stream, state, cb) {
-  state.ending = true;
-  finishMaybe(stream, state);
-  if (cb) {
-    if (state.finished) processNextTick(cb);else stream.once('finish', cb);
-  }
-  state.ended = true;
-  stream.writable = false;
-}
-
-// It seems a linked list but it is not
-// there will be only 2 of these for each stream
-function CorkedRequest(state) {
-  var _this = this;
-
-  this.next = null;
-  this.entry = null;
-
-  this.finish = function (err) {
-    var entry = _this.entry;
-    _this.entry = null;
-    while (entry) {
-      var cb = entry.callback;
-      state.pendingcb--;
-      cb(err);
-      entry = entry.next;
-    }
-    if (state.corkedRequestsFree) {
-      state.corkedRequestsFree.next = _this;
-    } else {
-      state.corkedRequestsFree = _this;
-    }
-  };
-}
-}).call(this,require('_process'))
-
-},{"./_stream_duplex":139,"_process":119,"buffer":46,"core-util-is":50,"events":84,"inherits":101,"process-nextick-args":118,"util-deprecate":152}],144:[function(require,module,exports){
-module.exports = require("./lib/_stream_passthrough.js")
-
-},{"./lib/_stream_passthrough.js":140}],145:[function(require,module,exports){
-var Stream = (function (){
-  try {
-    return require('st' + 'ream'); // hack to fix a circular dependency issue when used with browserify
-  } catch(_){}
-}());
-exports = module.exports = require('./lib/_stream_readable.js');
-exports.Stream = Stream || exports;
-exports.Readable = exports;
-exports.Writable = require('./lib/_stream_writable.js');
-exports.Duplex = require('./lib/_stream_duplex.js');
-exports.Transform = require('./lib/_stream_transform.js');
-exports.PassThrough = require('./lib/_stream_passthrough.js');
-
-},{"./lib/_stream_duplex.js":139,"./lib/_stream_passthrough.js":140,"./lib/_stream_readable.js":141,"./lib/_stream_transform.js":142,"./lib/_stream_writable.js":143}],146:[function(require,module,exports){
-module.exports = require("./lib/_stream_transform.js")
-
-},{"./lib/_stream_transform.js":142}],147:[function(require,module,exports){
-module.exports = require("./lib/_stream_writable.js")
-
-},{"./lib/_stream_writable.js":143}],148:[function(require,module,exports){
+},{"events":84,"inherits":101,"readable-stream/duplex.js":128,"readable-stream/passthrough.js":135,"readable-stream/readable.js":136,"readable-stream/transform.js":137,"readable-stream/writable.js":138}],149:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -32856,7 +33991,7 @@ function base64DetectIncompleteChar(buffer) {
   this.charLength = this.charReceived ? 3 : 0;
 }
 
-},{"buffer":46}],149:[function(require,module,exports){
+},{"buffer":47}],150:[function(require,module,exports){
 /*
  * to-markdown - an HTML to Markdown converter
  *
@@ -32871,19 +34006,8 @@ var toMarkdown;
 var converters;
 var mdConverters = require('./lib/md-converters');
 var gfmConverters = require('./lib/gfm-converters');
+var HtmlParser = require('./lib/html-parser');
 var collapse = require('collapse-whitespace');
-
-/*
- * Set up window and document for Node.js
- */
-
-var _window = (typeof window !== 'undefined' ? window : this), _document;
-if (typeof document === 'undefined') {
-  _document = require('jsdom').jsdom();
-}
-else {
-  _document = document;
-}
 
 /*
  * Utilities
@@ -32914,46 +34038,9 @@ function isVoid(node) {
   return voids.indexOf(node.nodeName.toLowerCase()) !== -1;
 }
 
-/*
- * Parsing HTML strings
- */
-
-function canParseHtml() {
-  var Parser = _window.DOMParser, canParse = false;
-
-  // Adapted from https://gist.github.com/1129031
-  // Firefox/Opera/IE throw errors on unsupported types
-  try {
-    // WebKit returns null on unsupported types
-    if (new Parser().parseFromString('', 'text/html')) {
-      canParse = true;
-    }
-  } catch (e) {}
-  return canParse;
-}
-
-function createHtmlParser() {
-  var Parser = function () {};
-
-  Parser.prototype.parseFromString = function (string) {
-    var newDoc = _document.implementation.createHTMLDocument('');
-
-    if (string.toLowerCase().indexOf('<!doctype') > -1) {
-      newDoc.documentElement.innerHTML = string;
-    }
-    else {
-      newDoc.body.innerHTML = string;
-    }
-    return newDoc;
-  };
-  return Parser;
-}
-
-var HtmlParser = canParseHtml() ? _window.DOMParser : createHtmlParser();
-
 function htmlToDom(string) {
   var tree = new HtmlParser().parseFromString(string, 'text/html');
-  collapse(tree, isBlock);
+  collapse(tree.documentElement, isBlock);
   return tree;
 }
 
@@ -33069,7 +34156,7 @@ function process(node) {
   var replacement, content = getContent(node);
 
   // Remove blank nodes
-  if (!isVoid(node) && !/A/.test(node.nodeName) && /^\s*$/i.test(content)) {
+  if (!isVoid(node) && !/A|TH|TD/.test(node.nodeName) && /^\s*$/i.test(content)) {
     node._replacement = '';
     return;
   }
@@ -33140,7 +34227,7 @@ toMarkdown.outer = outer;
 
 module.exports = toMarkdown;
 
-},{"./lib/gfm-converters":150,"./lib/md-converters":151,"collapse-whitespace":49,"jsdom":20}],150:[function(require,module,exports){
+},{"./lib/gfm-converters":151,"./lib/html-parser":152,"./lib/md-converters":153,"collapse-whitespace":49}],151:[function(require,module,exports){
 'use strict';
 
 function cell(content, node) {
@@ -33252,7 +34339,85 @@ module.exports = [
   }
 ];
 
-},{}],151:[function(require,module,exports){
+},{}],152:[function(require,module,exports){
+/*
+ * Set up window for Node.js
+ */
+
+var _window = (typeof window !== 'undefined' ? window : this);
+
+/*
+ * Parsing HTML strings
+ */
+
+function canParseHtmlNatively () {
+  var Parser = _window.DOMParser
+  var canParse = false;
+
+  // Adapted from https://gist.github.com/1129031
+  // Firefox/Opera/IE throw errors on unsupported types
+  try {
+    // WebKit returns null on unsupported types
+    if (new Parser().parseFromString('', 'text/html')) {
+      canParse = true;
+    }
+  } catch (e) {}
+
+  return canParse;
+}
+
+function createHtmlParser () {
+  var Parser = function () {};
+  
+  // For Node.js environments
+  if (typeof document === 'undefined') {
+    var jsdom = require('jsdom');
+    Parser.prototype.parseFromString = function (string) {
+      return jsdom.jsdom(string, {
+        features: {
+          FetchExternalResources: [],
+          ProcessExternalResources: false
+        }
+      });
+    };
+  } else {
+    if (!shouldUseActiveX()) {
+      Parser.prototype.parseFromString = function (string) {
+        var doc = document.implementation.createHTMLDocument('');
+        doc.open();
+        doc.write(string);
+        doc.close();
+        return doc;
+      };
+    } else {
+      Parser.prototype.parseFromString = function (string) {
+        var doc = new ActiveXObject('htmlfile');
+        doc.designMode = 'on'; // disable on-page scripts
+        doc.open();
+        doc.write(string);
+        doc.close();
+        return doc;
+      };
+    }
+  }
+  return Parser;
+}
+
+function shouldUseActiveX () {
+  var useActiveX = false;
+
+  try {
+    document.implementation.createHTMLDocument('').open();
+  } catch (e) {
+    if (window.ActiveXObject) useActiveX = true;
+  }
+
+  return useActiveX;
+}
+
+module.exports = canParseHtmlNatively() ? _window.DOMParser : createHtmlParser()
+
+},{"jsdom":20}],153:[function(require,module,exports){
 'use strict';
 
 module.exports = [
@@ -33404,7 +34569,7 @@ module.exports = [
     }
   }
 ];
-},{}],152:[function(require,module,exports){
+},{}],154:[function(require,module,exports){
 (function (global){
 
 /**
@@ -33476,7 +34641,7 @@ function config (name) {
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{}],153:[function(require,module,exports){
+},{}],155:[function(require,module,exports){
 var indexOf = require('indexof');
 
 var Object_keys = function (obj) {
@@ -33616,7 +34781,7 @@ exports.createContext = Script.createContext = function (context) {
     return copy;
 };
 
-},{"indexof":100}],154:[function(require,module,exports){
+},{"indexof":100}],156:[function(require,module,exports){
 /**
  * This file automatically generated from `pre-publish.js`.
  * Do not manually edit.
@@ -33641,7 +34806,7 @@ module.exports = {
   "wbr": true
 };
 
-},{}],155:[function(require,module,exports){
+},{}],157:[function(require,module,exports){
 module.exports={
   "name": "hashbrown-cms",
   "repository": "https://github.com/Putaitu/hashbrown-cms.git",
@@ -33654,6 +34819,7 @@ module.exports={
   "author": "Putaitu Productions",
   "license": "MIT",
   "dependencies": {
+    "babel-preset-es2015-node5": "^1.2.0",
     "babelify": "^7.2.0",
     "bluebird": "^3.3.3",
     "body-parser": "^1.14.1",
@@ -33667,6 +34833,7 @@ module.exports={
     "gulp-livereload": "^3.8.1",
     "gulp-notify": "^2.2.0",
     "gulp-rename": "^1.2.2",
+    "gulp-sass": "^2.3.2",
     "gulp-sourcemaps": "^1.6.0",
     "gulp-util": "^3.0.7",
     "jade": "^1.11.0",
@@ -33684,17 +34851,16 @@ module.exports={
     "utils-merge": "^1.0.0",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
-    "watchify": "^3.7.0",
-    "babel-preset-es2015-node5": "^1.2.0"
+    "watchify": "^3.7.0"
   }
 }
 
-},{}],156:[function(require,module,exports){
+},{}],158:[function(require,module,exports){
 'use strict';
 
 require('./views/ConnectionEditor');
 
-},{"./views/ConnectionEditor":157}],157:[function(require,module,exports){
+},{"./views/ConnectionEditor":159}],159:[function(require,module,exports){
 'use strict';
 
 class ConnectionEditor extends View {
@@ -33823,12 +34989,12 @@ class ConnectionEditor extends View {
 
 resources.connectionEditors['GitHub Pages'] = ConnectionEditor;
 
-},{}],158:[function(require,module,exports){
+},{}],160:[function(require,module,exports){
 'use strict';
 
 require('./views/HashBrownDriverConnectionEditor');
 
-},{"./views/HashBrownDriverConnectionEditor":159}],159:[function(require,module,exports){
+},{"./views/HashBrownDriverConnectionEditor":161}],161:[function(require,module,exports){
 'use strict';
 
 class HashBrownDriverConnectionEditor extends View {
@@ -33880,7 +35046,7 @@ class HashBrownDriverConnectionEditor extends View {
 
 resources.connectionEditors['HashBrown Driver'] = HashBrownDriverConnectionEditor;
 
-},{}],160:[function(require,module,exports){
+},{}],162:[function(require,module,exports){
 'use strict';
 
 require('exomon');
@@ -33891,7 +35057,7 @@ require('./helpers');
 // Get package file
 window.app = require('../../../package.json');
 
-// Preload resources
+// Preload resources 
 $(document).ready(() => {
     reloadAllResources().then(function () {
         triggerReady('resources');
@@ -33911,7 +35077,7 @@ onReady('resources', function () {
     Router.init();
 });
 
-},{"../../../package.json":155,"./helpers":161,"./routes/index":175,"exomon":92}],161:[function(require,module,exports){
+},{"../../../package.json":157,"./helpers":163,"./routes/index":177,"exomon":92}],163:[function(require,module,exports){
 'use strict';
 
 // Resource cache
@@ -34177,7 +35343,7 @@ window.triggerReady = function triggerReady(name) {
     }
 };
 
-},{"../../common/helpers/DebugHelper":213,"./helpers/ConnectionHelper":162,"./helpers/ContentHelper":163,"./helpers/LanguageHelper":164,"./helpers/MediaHelper":165,"./helpers/ProjectHelper":166,"./helpers/SchemaHelper":167,"./helpers/SettingsHelper":168,"./models/Content":170,"./views/ConnectionEditor":179,"./views/ContentEditor":180,"./views/FormEditor":181,"./views/JSONEditor":182,"./views/LanguagePicker":183,"./views/LanguageSettings":184,"./views/MediaViewer":185,"./views/MessageModal":186,"./views/SchemaEditor":187,"./views/editors":202,"./views/navbar/NavbarMain":207,"bluebird":17,"exomon":92}],162:[function(require,module,exports){
+},{"../../common/helpers/DebugHelper":215,"./helpers/ConnectionHelper":164,"./helpers/ContentHelper":165,"./helpers/LanguageHelper":166,"./helpers/MediaHelper":167,"./helpers/ProjectHelper":168,"./helpers/SchemaHelper":169,"./helpers/SettingsHelper":170,"./models/Content":172,"./views/ConnectionEditor":181,"./views/ContentEditor":182,"./views/FormEditor":183,"./views/JSONEditor":184,"./views/LanguagePicker":185,"./views/LanguageSettings":186,"./views/MediaViewer":187,"./views/MessageModal":188,"./views/SchemaEditor":189,"./views/editors":204,"./views/navbar/NavbarMain":209,"bluebird":17,"exomon":92}],164:[function(require,module,exports){
 'use strict';
 
 let ConnectionHelperCommon = require('../../../common/helpers/ConnectionHelper');
@@ -34221,7 +35387,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
 
 module.exports = ConnectionHelper;
 
-},{"../../../common/helpers/ConnectionHelper":211,"../../../common/models/Connection":218}],163:[function(require,module,exports){
+},{"../../../common/helpers/ConnectionHelper":213,"../../../common/models/Connection":220}],165:[function(require,module,exports){
 'use strict';
 
 let ContentHelperCommon = require('../../../common/helpers/ContentHelper');
@@ -34293,7 +35459,7 @@ class ContentHelper extends ContentHelperCommon {
 
 module.exports = ContentHelper;
 
-},{"../../../common/helpers/ContentHelper":212,"../models/Content":170}],164:[function(require,module,exports){
+},{"../../../common/helpers/ContentHelper":214,"../models/Content":172}],166:[function(require,module,exports){
 'use strict';
 
 let LanguageHelperCommon = require('../../../common/helpers/LanguageHelper');
@@ -34302,7 +35468,7 @@ class LanguageHelper extends LanguageHelperCommon {}
 
 module.exports = LanguageHelper;
 
-},{"../../../common/helpers/LanguageHelper":214}],165:[function(require,module,exports){
+},{"../../../common/helpers/LanguageHelper":216}],167:[function(require,module,exports){
 'use strict';
 
 let MediaHelperCommon = require('../../../common/helpers/MediaHelper');
@@ -34377,7 +35543,7 @@ class MediaHelper extends MediaHelperCommon {
 
 module.exports = MediaHelper;
 
-},{"../../../common/helpers/MediaHelper":215}],166:[function(require,module,exports){
+},{"../../../common/helpers/MediaHelper":217}],168:[function(require,module,exports){
 'use strict';
 
 /**
@@ -34388,7 +35554,7 @@ class ProjectHelper {}
 
 module.exports = ProjectHelper;
 
-},{}],167:[function(require,module,exports){
+},{}],169:[function(require,module,exports){
 'use strict';
 
 // Helpers
@@ -34439,7 +35605,7 @@ class SchemaHelper extends SchemaHelperCommon {
 
 module.exports = SchemaHelper;
 
-},{"../../../common/helpers/SchemaHelper":216}],168:[function(require,module,exports){
+},{"../../../common/helpers/SchemaHelper":218}],170:[function(require,module,exports){
 'use strict';
 
 let SettingsHelperCommon = require('../../../common/helpers/SettingsHelper');
@@ -34479,7 +35645,7 @@ class SettingsHelper extends SettingsHelperCommon {
 
 module.exports = SettingsHelper;
 
-},{"../../../common/helpers/SettingsHelper":217}],169:[function(require,module,exports){
+},{"../../../common/helpers/SettingsHelper":219}],171:[function(require,module,exports){
 module.exports={
     "icons": [    
         "500px",
@@ -35179,7 +36345,7 @@ module.exports={
     ]
 }
 
-},{}],170:[function(require,module,exports){
+},{}],172:[function(require,module,exports){
 'use strict';
 
 let ContentCommon = require('../../../common/models/Content');
@@ -35191,7 +36357,7 @@ class Content extends ContentCommon {}
 
 module.exports = Content;
 
-},{"../../../common/models/Content":219}],171:[function(require,module,exports){
+},{"../../../common/models/Content":221}],173:[function(require,module,exports){
 'use strict';
 
 // Users
@@ -35240,7 +36406,7 @@ Router.route('/license/', function () {
     });
 });
 
-},{}],172:[function(require,module,exports){
+},{}],174:[function(require,module,exports){
 'use strict';
 
 // Dashboard
@@ -35273,7 +36439,7 @@ Router.route('/connections/json/:id', function () {
     $('.workspace').html(connectionEditor.$element);
 });
 
-},{}],173:[function(require,module,exports){
+},{}],175:[function(require,module,exports){
 'use strict';
 
 // Dashboard
@@ -35320,7 +36486,7 @@ Router.route('/content/:id/:tab', function () {
     }
 });
 
-},{}],174:[function(require,module,exports){
+},{}],176:[function(require,module,exports){
 'use strict';
 
 // Dashboard
@@ -35354,7 +36520,7 @@ Router.route('/forms/json/:id', function () {
     $('.workspace').html(formEditor.$element);
 });
 
-},{}],175:[function(require,module,exports){
+},{}],177:[function(require,module,exports){
 'use strict';
 
 require('./cms');
@@ -35365,7 +36531,7 @@ require('./schemas');
 require('./settings');
 require('./forms');
 
-},{"./cms":171,"./connections":172,"./content":173,"./forms":174,"./media":176,"./schemas":177,"./settings":178}],176:[function(require,module,exports){
+},{"./cms":173,"./connections":174,"./content":175,"./forms":176,"./media":178,"./schemas":179,"./settings":180}],178:[function(require,module,exports){
 'use strict';
 
 // Dashboard
@@ -35389,7 +36555,7 @@ Router.route('/media/:id', function () {
     $('.workspace').html(mediaViewer.$element);
 });
 
-},{}],177:[function(require,module,exports){
+},{}],179:[function(require,module,exports){
 'use strict';
 
 // Dashboard
@@ -35430,7 +36596,7 @@ Router.route('/schemas/json/:id', function () {
     $('.workspace').html(jsonEditor.$element);
 });
 
-},{}],178:[function(require,module,exports){
+},{}],180:[function(require,module,exports){
 'use strict';
 
 // Dashboard
@@ -35448,7 +36614,7 @@ Router.route('/settings/languages/', function () {
     $('.workspace').html(_.div({ class: 'dashboard-container' }, new LanguageSettings().$element));
 });
 
-},{}],179:[function(require,module,exports){
+},{}],181:[function(require,module,exports){
 'use strict';
 
 // Views
@@ -35656,7 +36822,7 @@ class ConnectionEditor extends View {
 
 module.exports = ConnectionEditor;
 
-},{"./MessageModal":186}],180:[function(require,module,exports){
+},{"./MessageModal":188}],182:[function(require,module,exports){
 'use strict';
 
 // Views
@@ -35989,7 +37155,7 @@ class ContentEditor extends View {
 
                 this.model.getSettings('publishing').then(publishing => {
                     this.$element.html(this.renderEditor(this.model, contentSchema).append(
-                    // Buttons
+                    // Buttons 
                     _.div({ class: 'panel panel-default panel-buttons' }, _.div({ class: 'btn-group' },
 
                     // JSON editor
@@ -36025,7 +37191,7 @@ class ContentEditor extends View {
 
 module.exports = ContentEditor;
 
-},{"../../../common/helpers/LanguageHelper":214,"./MessageModal":186}],181:[function(require,module,exports){
+},{"../../../common/helpers/LanguageHelper":216,"./MessageModal":188}],183:[function(require,module,exports){
 'use strict';
 
 /**
@@ -36263,7 +37429,7 @@ class FormEditor extends View {
 
 module.exports = FormEditor;
 
-},{}],182:[function(require,module,exports){
+},{}],184:[function(require,module,exports){
 'use strict';
 
 // Lib
@@ -36535,7 +37701,7 @@ class JSONEditor extends View {
 
 module.exports = JSONEditor;
 
-},{"./MessageModal":186,"js-beautify":104}],183:[function(require,module,exports){
+},{"./MessageModal":188,"js-beautify":104}],185:[function(require,module,exports){
 'use strict';
 
 class LanguagePicker extends View {
@@ -36575,7 +37741,7 @@ class LanguagePicker extends View {
 
 module.exports = LanguagePicker;
 
-},{}],184:[function(require,module,exports){
+},{}],186:[function(require,module,exports){
 'use strict';
 
 /**
@@ -36624,7 +37790,7 @@ class LanguageSettings extends View {
 
 module.exports = LanguageSettings;
 
-},{}],185:[function(require,module,exports){
+},{}],187:[function(require,module,exports){
 'use strict';
 
 // Views
@@ -36718,7 +37884,7 @@ class MediaViewer extends View {
 
 module.exports = MediaViewer;
 
-},{"./MessageModal":186}],186:[function(require,module,exports){
+},{"./MessageModal":188}],188:[function(require,module,exports){
 'use strict';
 
 /**
@@ -36787,7 +37953,7 @@ class MessageModal extends View {
 
 module.exports = MessageModal;
 
-},{}],187:[function(require,module,exports){
+},{}],189:[function(require,module,exports){
 'use strict';
 
 // Icons
@@ -37227,7 +38393,7 @@ class SchemaEditor extends View {
 
 module.exports = SchemaEditor;
 
-},{"../icons.json":169}],188:[function(require,module,exports){
+},{"../icons.json":171}],190:[function(require,module,exports){
 'use strict';
 
 /**
@@ -37431,7 +38597,7 @@ class ArrayEditor extends View {
 
 module.exports = ArrayEditor;
 
-},{}],189:[function(require,module,exports){
+},{}],191:[function(require,module,exports){
 'use strict';
 
 /**
@@ -37479,7 +38645,7 @@ class BooleanEditor extends View {
 
 module.exports = BooleanEditor;
 
-},{}],190:[function(require,module,exports){
+},{}],192:[function(require,module,exports){
 'use strict';
 
 /**
@@ -37502,12 +38668,30 @@ class ContentReferenceEditor extends View {
         this.trigger('change', this.value);
     }
 
+    /**
+     * Gets a list of allowed Content nodes
+     *
+     * @returns {Array} Allowed Content nodes
+     */
+    getAllowedContent() {
+        // If rules are defined, filter the Content node list
+        if (this.config && Array.isArray(this.config.allowedSchemas) && this.config.allowedSchemas.length > 0) {
+            return window.resources.content.filter(content => {
+                return this.config.allowedSchemas.indexOf(content.schemaId) > -1;
+            });
+
+            // If no rules are defined, return all content
+        } else {
+            return window.resources.content;
+        }
+    }
+
     render() {
         // Render main element
         this.$element = _.div({ class: 'field-editor input-group content-reference-editor' }, [
 
         // Render picker
-        this.$select = _.select({ class: 'form-control' }, _.each(window.resources.content, (i, node) => {
+        this.$select = _.select({ class: 'form-control' }, _.each(this.getAllowedContent(), (i, node) => {
             let content = new Content(node);
 
             if (content.id == Router.params.id) {
@@ -37536,7 +38720,7 @@ class ContentReferenceEditor extends View {
 
 module.exports = ContentReferenceEditor;
 
-},{}],191:[function(require,module,exports){
+},{}],193:[function(require,module,exports){
 'use strict';
 
 /**
@@ -37593,7 +38777,7 @@ class ContentSchemaReferenceEditor extends View {
 
 module.exports = ContentSchemaReferenceEditor;
 
-},{}],192:[function(require,module,exports){
+},{}],194:[function(require,module,exports){
 'use strict';
 
 /**
@@ -37638,7 +38822,7 @@ class DateEditor extends View {
 
 module.exports = DateEditor;
 
-},{}],193:[function(require,module,exports){
+},{}],195:[function(require,module,exports){
 'use strict';
 
 /**
@@ -37689,7 +38873,7 @@ class DropdownEditor extends View {
 
 module.exports = DropdownEditor;
 
-},{}],194:[function(require,module,exports){
+},{}],196:[function(require,module,exports){
 'use strict';
 
 /**
@@ -37743,7 +38927,7 @@ class LanguageEditor extends View {
 
 module.exports = LanguageEditor;
 
-},{}],195:[function(require,module,exports){
+},{}],197:[function(require,module,exports){
 'use strict';
 
 /**
@@ -37840,7 +39024,7 @@ class MediaReferenceEditor extends View {
 
 module.exports = MediaReferenceEditor;
 
-},{}],196:[function(require,module,exports){
+},{}],198:[function(require,module,exports){
 'use strict';
 
 /**
@@ -37905,7 +39089,7 @@ class PeriodEditor extends View {
 
 module.exports = PeriodEditor;
 
-},{}],197:[function(require,module,exports){
+},{}],199:[function(require,module,exports){
 'use strict';
 
 // Lib
@@ -37938,7 +39122,7 @@ class RichTextEditor extends View {
         // Toolbar
         _.div({ class: 'panel-heading' }, _.div({ class: 'btn-group' }, [_.button({ class: 'btn btn-default', 'data-wrap': 'strong' }, _.span({ class: 'fa fa-bold' })), _.button({ class: 'btn btn-default', 'data-wrap': 'em' }, _.span({ class: 'fa fa-italic' }))])),
 
-        // HTML output
+        // HTML output 
         _.div({ class: 'panel-body' }, this.$output = _.div({ class: 'rte-output', contenteditable: true }).bind('change propertychange keyup paste', function () {
             editor.$textarea.val(htmlToMarkdown(editor.$output.html()));
 
@@ -37959,7 +39143,7 @@ class RichTextEditor extends View {
 
 module.exports = RichTextEditor;
 
-},{"marked":108,"to-markdown":149}],198:[function(require,module,exports){
+},{"marked":108,"to-markdown":150}],200:[function(require,module,exports){
 'use strict';
 
 /**
@@ -37994,7 +39178,7 @@ class StringEditor extends View {
 
 module.exports = StringEditor;
 
-},{}],199:[function(require,module,exports){
+},{}],201:[function(require,module,exports){
 'use strict';
 
 /**
@@ -38072,7 +39256,7 @@ class StructEditor extends View {
 
 module.exports = StructEditor;
 
-},{}],200:[function(require,module,exports){
+},{}],202:[function(require,module,exports){
 'use strict';
 
 /**
@@ -38138,7 +39322,7 @@ class TemplateReferenceEditor extends View {
 
 module.exports = TemplateReferenceEditor;
 
-},{}],201:[function(require,module,exports){
+},{}],203:[function(require,module,exports){
 'use strict';
 
 /**
@@ -38322,7 +39506,7 @@ class UrlEditor extends View {
 
 module.exports = UrlEditor;
 
-},{}],202:[function(require,module,exports){
+},{}],204:[function(require,module,exports){
 'use strict';
 
 window.resources.editors = {
@@ -38342,7 +39526,7 @@ window.resources.editors = {
     url: require('./UrlEditor')
 };
 
-},{"./ArrayEditor":188,"./BooleanEditor":189,"./ContentReferenceEditor":190,"./ContentSchemaReferenceEditor":191,"./DateEditor":192,"./DropdownEditor":193,"./LanguageEditor":194,"./MediaReferenceEditor":195,"./PeriodEditor":196,"./RichTextEditor":197,"./StringEditor":198,"./StructEditor":199,"./TemplateReferenceEditor":200,"./UrlEditor":201}],203:[function(require,module,exports){
+},{"./ArrayEditor":190,"./BooleanEditor":191,"./ContentReferenceEditor":192,"./ContentSchemaReferenceEditor":193,"./DateEditor":194,"./DropdownEditor":195,"./LanguageEditor":196,"./MediaReferenceEditor":197,"./PeriodEditor":198,"./RichTextEditor":199,"./StringEditor":200,"./StructEditor":201,"./TemplateReferenceEditor":202,"./UrlEditor":203}],205:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -38439,7 +39623,7 @@ class ConnectionPane extends Pane {
 
 module.exports = ConnectionPane;
 
-},{"./Pane":208}],204:[function(require,module,exports){
+},{"./Pane":210}],206:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -38453,7 +39637,7 @@ class ContentPane extends Pane {
         let id = $('.context-menu-target-element').data('id');
 
         // This function should only exist if an item has been copied
-        navbar.onClickPasteContent = function onClickPasteContent() {
+        this.onClickPasteContent = function onClickPasteContent() {
             let parentId = $('.context-menu-target-element').data('id');
 
             apiCall('get', 'content/' + id).then(copiedContent => {
@@ -38564,7 +39748,7 @@ class ContentPane extends Pane {
                         }
                     }
 
-                    // Render modal
+                    // Render modal 
                     let modal = messageModal('Settings for "' + content.prop('title', window.language) + '"', [
                     // Publishing
                     _.h5('Publishing'), function () {
@@ -38742,16 +39926,16 @@ class ContentPane extends Pane {
 
                         // If this element has a next sibling, base the sorting index on that
                     } else if ($(dragdropItem.element).next('.pane-item-container').length > 0) {
-                            let nextSort = parseInt(dragdropItem.element.nextSibling.dataset.sort);
+                        let nextSort = parseInt(dragdropItem.element.nextSibling.dataset.sort);
 
-                            newSort = nextSort - 1;
-                            newSortBasedOn = 'next sibling';
+                        newSort = nextSort - 1;
+                        newSortBasedOn = 'next sibling';
 
-                            // If it has neither, just assign the lowest possible one
-                        } else {
-                                newSort = 10000;
-                                newSortBasedOn = 'lowest possible index';
-                            }
+                        // If it has neither, just assign the lowest possible one
+                    } else {
+                        newSort = 10000;
+                        newSortBasedOn = 'lowest possible index';
+                    }
 
                     if (newSort != thisContent.sort) {
                         thisContent.sort = newSort;
@@ -38769,7 +39953,7 @@ class ContentPane extends Pane {
 
 module.exports = ContentPane;
 
-},{"./Pane":208}],205:[function(require,module,exports){
+},{"./Pane":210}],207:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -38837,7 +40021,7 @@ class FormsPane extends Pane {
 
 module.exports = FormsPane;
 
-},{"./Pane":208}],206:[function(require,module,exports){
+},{"./Pane":210}],208:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -39124,7 +40308,7 @@ class MediaPane extends Pane {
 
 module.exports = MediaPane;
 
-},{"./Pane":208}],207:[function(require,module,exports){
+},{"./Pane":210}],209:[function(require,module,exports){
 'use strict';
 
 // Views
@@ -39310,51 +40494,51 @@ class NavbarMain extends View {
 
                     // If not, create parent elements if specified
                 } else if (queueItem.createDir) {
-                        let dirNames = parentDirAttrValue.split('/').filter(item => {
-                            return item != '';
-                        });
-                        let finalDirName = '/';
+                    let dirNames = parentDirAttrValue.split('/').filter(item => {
+                        return item != '';
+                    });
+                    let finalDirName = '/';
 
-                        for (let i in dirNames) {
-                            let dirName = dirNames[i];
+                    for (let i in dirNames) {
+                        let dirName = dirNames[i];
 
-                            let prevFinalDirName = finalDirName;
-                            finalDirName += dirName + '/';
+                        let prevFinalDirName = finalDirName;
+                        finalDirName += dirName + '/';
 
-                            let $dir = $pane.find('[' + parentDirAttrKey + '="' + finalDirName + '"]');
+                        let $dir = $pane.find('[' + parentDirAttrKey + '="' + finalDirName + '"]');
 
-                            if ($dir.length < 1) {
-                                $dir = _.div({ class: 'pane-item-container' }, _.a({
-                                    class: 'pane-item'
-                                }, _.span({ class: 'fa fa-folder' }), _.span(dirName)), _.div({ class: 'children' }));
+                        if ($dir.length < 1) {
+                            $dir = _.div({ class: 'pane-item-container' }, _.a({
+                                class: 'pane-item'
+                            }, _.span({ class: 'fa fa-folder' }), _.span(dirName)), _.div({ class: 'children' }));
 
-                                $dir.attr(parentDirAttrKey, finalDirName);
+                            $dir.attr(parentDirAttrKey, finalDirName);
 
-                                // Append to previous dir
-                                let $prevDir = $pane.find('[' + parentDirAttrKey + '="' + prevFinalDirName + '"]');
+                            // Append to previous dir 
+                            let $prevDir = $pane.find('[' + parentDirAttrKey + '="' + prevFinalDirName + '"]');
 
-                                if ($prevDir.length > 0) {
-                                    $prevDir.children('.children').append($dir);
+                            if ($prevDir.length > 0) {
+                                $prevDir.children('.children').append($dir);
 
-                                    // If no previous dir was found, append directly to pane
-                                } else {
-                                        $pane.append($dir);
-                                    }
-                            }
-
-                            // Attach item context menu
-                            if (params.dirContextMenu) {
-                                $dir.exocontext(params.dirContextMenu);
-                            }
-
-                            // Only append the queue item to the final parent element
-                            if (i >= dirNames.length - 1) {
-                                $parentDir = $dir;
+                                // If no previous dir was found, append directly to pane
+                            } else {
+                                $pane.append($dir);
                             }
                         }
 
-                        $parentDir.children('.children').append(queueItem.$element);
+                        // Attach item context menu
+                        if (params.dirContextMenu) {
+                            $dir.exocontext(params.dirContextMenu);
+                        }
+
+                        // Only append the queue item to the final parent element
+                        if (i >= dirNames.length - 1) {
+                            $parentDir = $dir;
+                        }
                     }
+
+                    $parentDir.children('.children').append(queueItem.$element);
+                }
             }
         }
 
@@ -39555,7 +40739,7 @@ class NavbarMain extends View {
 
 module.exports = NavbarMain;
 
-},{"../../../../common/models/Content":219,"../MessageModal":186,"./ConnectionPane":203,"./ContentPane":204,"./FormsPane":205,"./MediaPane":206,"./SchemaPane":209}],208:[function(require,module,exports){
+},{"../../../../common/models/Content":221,"../MessageModal":188,"./ConnectionPane":205,"./ContentPane":206,"./FormsPane":207,"./MediaPane":208,"./SchemaPane":211}],210:[function(require,module,exports){
 'use strict';
 
 class Pane {
@@ -39571,7 +40755,7 @@ class Pane {
 
 module.exports = Pane;
 
-},{}],209:[function(require,module,exports){
+},{}],211:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -39690,7 +40874,7 @@ class SchemaPane extends Pane {
 
 module.exports = SchemaPane;
 
-},{"./Pane":208}],210:[function(require,module,exports){
+},{"./Pane":210}],212:[function(require,module,exports){
 module.exports=[
     "aa",
     "ab",
@@ -39879,7 +41063,7 @@ module.exports=[
     "zu"
 ]
 
-},{}],211:[function(require,module,exports){
+},{}],213:[function(require,module,exports){
 'use strict';
 
 class ConnectionHelper {
@@ -39949,7 +41133,7 @@ class ConnectionHelper {
 
 module.exports = ConnectionHelper;
 
-},{}],212:[function(require,module,exports){
+},{}],214:[function(require,module,exports){
 'use strict';
 
 class ContentHelper {
@@ -40003,6 +41187,28 @@ class ContentHelper {
     }
 
     /**
+     * Checks if a Schema type is allowed as a child of a Content object
+     *
+     * @param {String} parentId
+     * @param {String} childSchemaId
+     *
+     * @returns {Promise} Is the Content node allowed as a child
+     */
+    static isSchemaAllowedAsChild(parentId, childSchemaId) {
+        return new Promise((resolve, reject) => {
+            this.getContentById(parentId).then(parentContent => {
+                SchemaHelper.getSchemaById(parentContent.schemaId).then(parentSchema => {
+                    if (parentSchema.allowedChildSchemas.length > 0 && parentSchema.allowedChildSchemas.indexOf(childSchemaId) < 0) {
+                        reject(new Error('Content with Schema "' + childSchemaId + '" is not an allowed child of Content with Schema "' + parentSchema.id + '"'));
+                    } else {
+                        resolve();
+                    }
+                }).catch(reject);
+            }).catch(reject);
+        });
+    }
+
+    /**
      * Creates a new content object
      *
      * @return {Promise} promise
@@ -40029,7 +41235,7 @@ class ContentHelper {
 
 module.exports = ContentHelper;
 
-},{}],213:[function(require,module,exports){
+},{}],215:[function(require,module,exports){
 'use strict';
 
 let lastSenderName = '';
@@ -40133,7 +41339,7 @@ class DebugHelper {
 
 module.exports = DebugHelper;
 
-},{}],214:[function(require,module,exports){
+},{}],216:[function(require,module,exports){
 'use strict';
 
 class LanguageHelper {
@@ -40225,7 +41431,7 @@ class LanguageHelper {
 
 module.exports = LanguageHelper;
 
-},{"../data/languages.json":210}],215:[function(require,module,exports){
+},{"../data/languages.json":212}],217:[function(require,module,exports){
 'use strict';
 
 // Models
@@ -40287,7 +41493,7 @@ class MediaHelper {
 
 module.exports = MediaHelper;
 
-},{"../models/Media":223}],216:[function(require,module,exports){
+},{"../models/Media":225}],218:[function(require,module,exports){
 'use strict';
 
 // Models
@@ -40332,7 +41538,7 @@ class SchemaHelper {
 
 module.exports = SchemaHelper;
 
-},{"../models/ContentSchema":220,"../models/FieldSchema":222}],217:[function(require,module,exports){
+},{"../models/ContentSchema":222,"../models/FieldSchema":224}],219:[function(require,module,exports){
 'use strict';
 
 class SettingsHelper {
@@ -40366,7 +41572,7 @@ class SettingsHelper {
 
 module.exports = SettingsHelper;
 
-},{}],218:[function(require,module,exports){
+},{}],220:[function(require,module,exports){
 'use strict';
 
 let Entity = require('./Entity');
@@ -40593,7 +41799,7 @@ class Connection extends Entity {
 
 module.exports = Connection;
 
-},{"./Entity":221}],219:[function(require,module,exports){
+},{"./Entity":223}],221:[function(require,module,exports){
 'use strict';
 
 let Entity = require('./Entity');
@@ -40825,26 +42031,26 @@ class Content extends Entity {
 
                         // If not, recurse into the object
                     } else {
-                            // If this value was created with the ArrayEditor, filter out schema
-                            // bindings by assigning the "items" value to the value variable
-                            if (value instanceof Object && value.items && Array.isArray(value.items) && value.schemaBindings && Array.isArray(value.schemaBindings)) {
-                                value = value.items;
-                            }
-
-                            // Prepare target data type for either Object or Array
-                            if (Array.isArray(value)) {
-                                target[key] = [];
-                            } else {
-                                target[key] = {};
-                            }
-
-                            flattenRecursively(value, target[key]);
+                        // If this value was created with the ArrayEditor, filter out schema
+                        // bindings by assigning the "items" value to the value variable
+                        if (value instanceof Object && value.items && Array.isArray(value.items) && value.schemaBindings && Array.isArray(value.schemaBindings)) {
+                            value = value.items;
                         }
+
+                        // Prepare target data type for either Object or Array
+                        if (Array.isArray(value)) {
+                            target[key] = [];
+                        } else {
+                            target[key] = {};
+                        }
+
+                        flattenRecursively(value, target[key]);
+                    }
 
                     // If not, just return the localised value
                 } else {
-                        target[key] = value;
-                    }
+                    target[key] = value;
+                }
             }
         }
 
@@ -40876,7 +42082,7 @@ class Content extends Entity {
 
 module.exports = Content;
 
-},{"./Entity":221}],220:[function(require,module,exports){
+},{"./Entity":223}],222:[function(require,module,exports){
 'use strict';
 
 let Schema = require('./Schema');
@@ -40891,6 +42097,7 @@ class ContentSchema extends Schema {
         this.def(String, 'defaultTabId');
         this.def(Object, 'tabs', {});
         this.def(Object, 'fields', {});
+        this.def(Array, 'allowedChildSchemas', []);
 
         this.name = 'New content schema';
         this.type = 'content';
@@ -40899,7 +42106,7 @@ class ContentSchema extends Schema {
 
 module.exports = ContentSchema;
 
-},{"./Schema":224}],221:[function(require,module,exports){
+},{"./Schema":226}],223:[function(require,module,exports){
 'use strict';
 
 let crypto = require('crypto');
@@ -41056,7 +42263,7 @@ class Entity {
 
 module.exports = Entity;
 
-},{"crypto":56}],222:[function(require,module,exports){
+},{"crypto":56}],224:[function(require,module,exports){
 'use strict';
 
 let Schema = require('./Schema');
@@ -41078,7 +42285,7 @@ class FieldSchema extends Schema {
 
 module.exports = FieldSchema;
 
-},{"./Schema":224}],223:[function(require,module,exports){
+},{"./Schema":226}],225:[function(require,module,exports){
 'use strict';
 
 // Libs
@@ -41107,7 +42314,7 @@ class Media extends Entity {
         let name = path.basename(filePath);
         let id = filePath;
 
-        // Trim file path for id
+        // Trim file path for id 
         id = id.replace('/' + name, '');
         id = id.substring(id.lastIndexOf('/') + 1);
 
@@ -41155,7 +42362,7 @@ class Media extends Entity {
 
 module.exports = Media;
 
-},{"./Entity":221,"path":115}],224:[function(require,module,exports){
+},{"./Entity":223,"path":115}],226:[function(require,module,exports){
 'use strict';
 
 let Entity = require('./Entity');
@@ -41191,7 +42398,7 @@ class Schema extends Entity {
 
 module.exports = Schema;
 
-},{"./Entity":221}]},{},[160,156,158])
+},{"./Entity":223}]},{},[162,158,160])
 
 
 //# sourceMappingURL=maps/client.js.map

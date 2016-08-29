@@ -145,6 +145,21 @@ class ApiController extends Controller {
             }
         }
     }
+
+    /**
+     * Error reporting
+     *
+     * @param {Error} error
+     *
+     * @returns {String} Pretty print fo the error message
+     */
+     static error(error) {
+        if(!error) {
+            return 'Unspecified error';
+        }
+
+        return error.stack;
+     }
 }
 
 module.exports = ApiController;

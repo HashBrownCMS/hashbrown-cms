@@ -13,7 +13,7 @@ class Content extends ContentCommon {
      */
     getSchema() {
         return new Promise((resolve, reject) => {
-            SchemaHelper.getSchema(this.schemaId)
+            SchemaHelper.getSchemaById(this.schemaId)
             .then((schema) => {
                 resolve(schema);
             });

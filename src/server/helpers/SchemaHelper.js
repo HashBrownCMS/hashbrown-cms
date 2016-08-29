@@ -226,7 +226,7 @@ class SchemaHelper extends SchemaHelperCommon {
      *
      * @return {Promise} Schema
      */
-    static getSchema(id) {
+    static getSchemaById(id) {
         let collection = ProjectHelper.currentEnvironment + '.schemas';
 
         return new Promise(function(resolve, reject) {
@@ -331,7 +331,7 @@ class SchemaHelper extends SchemaHelperCommon {
      */
     static getSchemaWithParentFields(id) {
         return new Promise((resolve, reject) => {
-            SchemaHelper.getSchema(id)
+            SchemaHelper.getSchemaById(id)
             .then((schema) => {
                 // If this Schema has a parent, merge fields with it
                 if(schema.parentSchemaId) {

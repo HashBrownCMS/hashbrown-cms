@@ -34,7 +34,7 @@ class ContentHelper extends ContentHelperCommon {
      */
     static getContentById(id) {
         let collection = ProjectHelper.currentEnvironment + '.content';
-        
+
         return MongoHelper.findOne(
             ProjectHelper.currentProject,
             collection,
@@ -47,29 +47,43 @@ class ContentHelper extends ContentHelperCommon {
     /**
      * Sets a Content object by id
      *
-     * @param {Number} id
+     * @param {String} id
      * @param {Object} content
      *
-     * @return {Promise} promise
+     * @return {Promise} Promise
      */
     static setContentById(id, content) {
-        if(!content || Object.keys(content).length < 1) {
-            return new Promise((resolve, reject) => {
-                reject(new Error('Posted content with id "' + id + '" is empty'));
-            });
-        } else {
-            content.updateDate = Date.now();
-            let collection = ProjectHelper.currentEnvironment + '.content';
+        return new Promise((resolve, reject) => {
+            let updateContent = () => {
+                content.updateDate = Date.now();
+                let collection = ProjectHelper.currentEnvironment + '.content';
 
-            return MongoHelper.updateOne(
-                ProjectHelper.currentProject,
-                collection,
-                {
-                    id: id
-                },
-                content
-            );
-        }
+                MongoHelper.updateOne(
+                    ProjectHelper.currentProject,
+                    collection,
+                    {
+                        id: id
+                    },
+                    content
+                )
+                .then(resolve)
+                .catch(reject);
+            };
+
+            // Check for empty Content object
+            if(!content || Object.keys(content).length < 1) {
+                reject(new Error('Posted content with id "' + id + '" is empty'));
+
+            } else if(content.parentId) {
+                this.isSchemaAllowedAsChild(content.parentId, content.schemaId)
+                .then(updateContent)
+                .catch(reject);
+
+            } else {
+                updateContent();
+
+            }
+        });
     }
 
     /**
