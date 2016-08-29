@@ -28,15 +28,7 @@ class NavbarMain extends View {
 
         this.$element = _.nav({class: 'navbar-main'},
             _.div({class: 'tab-buttons'}),
-            _.div({class: 'tab-panes'}),
-            _.div({class: 'fullscreen-toggle'},
-                _.button({class: 'btn'},
-                    _.span({class: 'fa fa-chevron-right'}),
-                    _.span({class: 'fa fa-chevron-left'})
-                ).click(() => {
-                    this.onClickToggleFullscreen();
-                })
-            )
+            _.div({class: 'tab-panes'})
         );
         
         $('.navspace').html(this.$element);
@@ -64,15 +56,6 @@ class NavbarMain extends View {
 
         copyToClipboard(id);
     }
-
-
-    /**
-     * Event: Click toggle fullscreen
-     */
-    onClickToggleFullscreen() {
-        $('.cms-container').toggleClass('fullscreen');
-    }
-
 
     /**
      * Fetches pane information and renders it

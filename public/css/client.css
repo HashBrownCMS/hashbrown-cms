@@ -440,6 +440,9 @@ body {
     .cms-container .workspace .editor .field-container {
       display: flex;
       margin-bottom: 30px; }
+      @media (max-width: 991px) {
+        .cms-container .workspace .editor .field-container {
+          flex-direction: column; } }
       .cms-container .workspace .editor .field-container div > .field-container:last-child {
         margin-bottom: 0px; }
       .cms-container .workspace .editor .field-container .field-icon {
@@ -797,67 +800,34 @@ body {
           color: #f44336;
           line-height: 34px; }
 
-.cms-container.fullscreen .navbar-main .fullscreen-toggle .fa-chevron-left {
-  display: none; }
+@media (max-width: 991px) {
+  .navspace {
+    overflow-x: hidden; }
+    .navspace:not(.expanded) {
+      width: 60px;
+      flex-basis: 60px; }
+      .navspace:not(.expanded) .navbar-main .tab-panes {
+        display: none; } }
 
-.cms-container.fullscreen .navbar-main .fullscreen-toggle .fa-chevron-right {
-  display: inline; }
-
-.cms-container.fullscreen .navbar-main .tab-panes, .cms-container.fullscreen .navbar-main .tab-buttons {
-  opacity: 0;
-  width: 0px; }
-
-.navbar-main {
+.navspace .navbar-main {
   display: flex;
   height: 100%;
   width: 100%;
   position: relative;
   background-color: #222; }
-  .navbar-main .fullscreen-toggle {
-    width: 0px;
-    flex-shrink: 0;
-    padding: 0px;
-    position: relative;
-    border: 0px; }
-    .navbar-main .fullscreen-toggle:after {
-      position: absolute;
-      right: -10px;
-      top: 0px;
-      z-index: 100;
-      content: '';
-      display: block;
-      height: 100%;
-      width: 10px;
-      background-image: linear-gradient(to right, rgba(0, 0, 0, 0.25), transparent); }
-    .navbar-main .fullscreen-toggle .btn {
-      background-color: #333;
-      position: absolute;
-      top: 50%;
-      left: 0px;
-      transform: translateY(-50%);
-      padding: 12px 4px 12px 0px;
-      display: block;
-      text-align: center;
-      z-index: 200;
-      border-top-right-radius: 5px;
-      border-bottom-right-radius: 5px; }
-    .navbar-main .fullscreen-toggle .fa {
-      font-size: 8px;
-      color: #9e9e9e; }
-      .navbar-main .fullscreen-toggle .fa.fa-chevron-left {
-        display: inline; }
-      .navbar-main .fullscreen-toggle .fa.fa-chevron-right {
-        display: none; }
-  .navbar-main .tab-panes, .navbar-main .tab-buttons {
+  .navspace .navbar-main .tab-panes, .navspace .navbar-main .tab-buttons {
     transition: opacity 0.5s, width 0.5s;
     overflow-x: hidden; }
-  .navbar-main .tab-buttons {
+  .navspace .navbar-main .tab-buttons {
     width: 160px;
     height: 100%;
     background-color: #222;
     position: relative;
     z-index: 10; }
-    .navbar-main .tab-buttons button {
+    @media (max-width: 991px) {
+      .navspace .navbar-main .tab-buttons {
+        width: 60px; } }
+    .navspace .navbar-main .tab-buttons button {
       width: 100%;
       height: 60px;
       background-color: #222;
@@ -868,19 +838,19 @@ body {
       border-radius: 0px;
       clear: both;
       position: relative; }
-      .navbar-main .tab-buttons button[data-route="about"] {
+      .navspace .navbar-main .tab-buttons button[data-route="about"] {
         font-weight: bold; }
-      .navbar-main .tab-buttons button.active, .navbar-main .tab-buttons button:hover {
+      .navspace .navbar-main .tab-buttons button.active, .navspace .navbar-main .tab-buttons button:hover {
         background-color: #333; }
-      .navbar-main .tab-buttons button .pane-icon {
+      .navspace .navbar-main .tab-buttons button .pane-icon {
         width: 60px;
         height: 60px;
         float: left; }
-        .navbar-main .tab-buttons button .pane-icon .about-logo {
+        .navspace .navbar-main .tab-buttons button .pane-icon .about-logo {
           width: 30px;
           height: 30px;
           margin-top: 15px; }
-        .navbar-main .tab-buttons button .pane-icon .fa {
+        .navspace .navbar-main .tab-buttons button .pane-icon .fa {
           margin: 0px;
           height: 60px;
           line-height: 60px;
@@ -888,7 +858,7 @@ body {
           font-size: 20px;
           width: 60px;
           display: block; }
-      .navbar-main .tab-buttons button .pane-text {
+      .navspace .navbar-main .tab-buttons button .pane-text {
         height: 60px;
         width: 100px;
         display: flex;
@@ -897,51 +867,54 @@ body {
         align-items: center;
         justify-content: center;
         text-align: left; }
-        .navbar-main .tab-buttons button .pane-text .pane-label, .navbar-main .tab-buttons button .pane-text .pane-sublabel {
+        @media (max-width: 991px) {
+          .navspace .navbar-main .tab-buttons button .pane-text {
+            display: none; } }
+        .navspace .navbar-main .tab-buttons button .pane-text .pane-label, .navspace .navbar-main .tab-buttons button .pane-text .pane-sublabel {
           display: block;
           width: 100%; }
-        .navbar-main .tab-buttons button .pane-text .pane-sublabel {
+        .navspace .navbar-main .tab-buttons button .pane-text .pane-sublabel {
           line-height: 10px;
           height: 10px;
           opacity: 0.5;
           font-size: 10px; }
-  .navbar-main .tab-panes {
+  .navspace .navbar-main .tab-panes {
     height: 100%;
     flex-grow: 1;
     background-color: #333;
     position: relative;
     z-index: 5; }
-    .navbar-main .tab-panes .pane-container {
+    .navspace .navbar-main .tab-panes .pane-container {
       display: none;
       height: 100%; }
-      .navbar-main .tab-panes .pane-container.active {
+      .navspace .navbar-main .tab-panes .pane-container.active {
         display: block; }
-        .navbar-main .tab-panes .pane-container.active[data-dragdrop-hovering="true"] .pane .pane-item-container:hover > .children {
+        .navspace .navbar-main .tab-panes .pane-container.active[data-dragdrop-hovering="true"] .pane .pane-item-container:hover > .children {
           min-height: 60px;
           display: block; }
-      .navbar-main .tab-panes .pane-container .pane {
+      .navspace .navbar-main .tab-panes .pane-container .pane {
         margin: 0px;
         height: 100%;
         width: 100%;
         border: none;
         overflow-y: auto; }
-        .navbar-main .tab-panes .pane-container .pane .pane-item-container.active > .pane-item {
+        .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container.active > .pane-item {
           border-right: 5px solid #e0e0e0;
           background-color: #424242; }
-          .navbar-main .tab-panes .pane-container .pane .pane-item-container.active > .pane-item:hover {
+          .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container.active > .pane-item:hover {
             background-color: #424242;
             border-right: 5px solid #9e9e9e; }
-          .navbar-main .tab-panes .pane-container .pane .pane-item-container.active > .pane-item .btn-children-toggle {
+          .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container.active > .pane-item .btn-children-toggle {
             right: 0px; }
-        .navbar-main .tab-panes .pane-container .pane .pane-item-container.open > .pane-item .btn-children-toggle .fa-caret-right {
+        .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container.open > .pane-item .btn-children-toggle .fa-caret-right {
           display: none; }
-        .navbar-main .tab-panes .pane-container .pane .pane-item-container.open > .children {
+        .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container.open > .children {
           display: block; }
-        .navbar-main .tab-panes .pane-container .pane .pane-item-container:not(.open) > .pane-item .btn-children-toggle .fa-caret-down {
+        .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container:not(.open) > .pane-item .btn-children-toggle .fa-caret-down {
           display: none; }
-        .navbar-main .tab-panes .pane-container .pane .pane-item-container:not(.open) > .children {
+        .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container:not(.open) > .children {
           display: none; }
-        .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item {
+        .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item {
           display: block;
           border-radius: 0px;
           border: none;
@@ -953,14 +926,14 @@ body {
           clear: both;
           cursor: pointer;
           position: relative; }
-          .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item, .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item:focus, .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item:hover, .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item:active {
+          .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item, .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item:focus, .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item:hover, .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item:active {
             text-decoration: none; }
-          .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item:hover {
+          .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item:hover {
             background-color: #424242;
             border-right: 5px solid #9e9e9e; }
-            .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item:hover .btn-children-toggle {
+            .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item:hover .btn-children-toggle {
               right: 0px; }
-          .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item .btn-children-toggle {
+          .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item .btn-children-toggle {
             position: absolute;
             top: 0px;
             right: 5px;
@@ -969,18 +942,18 @@ body {
             padding: 0px;
             background-color: transparent;
             border: none; }
-            .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item .btn-children-toggle .fa {
+            .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item .btn-children-toggle .fa {
               margin: 0px;
               display: block;
               width: 100%; }
-          .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item span {
+          .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item span {
             height: 60px;
             line-height: 60px;
             display: block;
             float: left; }
-            .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item span.fa {
+            .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item span.fa {
               margin-right: 15px; }
-        .navbar-main .tab-panes .pane-container .pane .pane-item-container .children .pane-item-container {
+        .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .children .pane-item-container {
           padding-left: 15px; }
 
 .media-viewer {

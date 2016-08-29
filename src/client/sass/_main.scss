@@ -196,7 +196,11 @@ body {
             .field-container {
                 display: flex;
                 margin-bottom: 30px;
-                
+             
+                @media($sm) {
+                    flex-direction: column;
+                }
+
                 div >.field-container {
                     &:last-child {
                         margin-bottom: 0px;

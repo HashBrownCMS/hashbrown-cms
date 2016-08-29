@@ -39154,9 +39154,7 @@ class NavbarMain extends View {
         this.mediaPane = MediaPane;
         this.schemaPane = SchemaPane;
 
-        this.$element = _.nav({ class: 'navbar-main' }, _.div({ class: 'tab-buttons' }), _.div({ class: 'tab-panes' }), _.div({ class: 'fullscreen-toggle' }, _.button({ class: 'btn' }, _.span({ class: 'fa fa-chevron-right' }), _.span({ class: 'fa fa-chevron-left' })).click(() => {
-            this.onClickToggleFullscreen();
-        })));
+        this.$element = _.nav({ class: 'navbar-main' }, _.div({ class: 'tab-buttons' }), _.div({ class: 'tab-panes' }));
 
         $('.navspace').html(this.$element);
 
@@ -39182,13 +39180,6 @@ class NavbarMain extends View {
         let id = $('.context-menu-target-element').data('id');
 
         copyToClipboard(id);
-    }
-
-    /**
-     * Event: Click toggle fullscreen
-     */
-    onClickToggleFullscreen() {
-        $('.cms-container').toggleClass('fullscreen');
     }
 
     /**
