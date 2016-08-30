@@ -38345,9 +38345,17 @@ class SchemaEditor extends View {
         function onChange() {
             view.model.allowedChildSchemas = [];
 
-            $element.find('.schemas .schema').each(function () {
-                view.model.allowedChildSchemas.push($(this).attr('title'));
+            $element.find('.schemas .schema select').each(function () {
+                view.model.allowedChildSchemas.push($(this).val());
             });
+
+            render();
+        }
+
+        function onClickAdd() {
+            view.model.allowedChildSchemas.push('page');
+
+            render();
         }
 
         function onClear() {
@@ -38356,13 +38364,29 @@ class SchemaEditor extends View {
             $element.find('select').val(null);
         }
 
-        let $element = _.div({ class: 'allowed-child-schemas-editor' }, _.div({ class: 'schemas' }, _.each(this.model.allowedChildSchemas, (i, schemaId) => {
-            try {
-                return _.p({ class: 'schema', title: schemaId }, resources.schemas[schemaId].name);
-            } catch (e) {
-                errorModal(e);
-            }
-        })));
+        function render() {
+            _.append($element.empty(), _.div({ class: 'schemas chip-group' }, _.each(view.model.allowedChildSchemas, (i, schemaId) => {
+                try {
+                    let $schema = _.div({ class: 'chip schema' }, _.select({ class: 'chip-label' }, _.each(resources.schemas, (id, schema) => {
+                        if (schema.type == 'content' && (id == schemaId || view.model.allowedChildSchemas.indexOf(schema.id) < 0)) {
+                            return _.option({ value: id, selected: id == schemaId }, schema.name);
+                        }
+                    })).change(onChange), _.button({ class: 'btn chip-remove' }, _.span({ class: 'fa fa-remove' })).click(() => {
+                        $schema.remove();
+
+                        onChange();
+                    }));
+
+                    return $schema;
+                } catch (e) {
+                    errorModal(e);
+                }
+            }), _.button({ class: 'btn chip-add' }, _.span({ class: 'fa fa-plus' })).click(onClickAdd)));
+        }
+
+        let $element = _.div({ class: 'allowed-child-schemas-editor' });
+
+        render();
 
         return $element;
     }

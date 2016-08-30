@@ -38,12 +38,12 @@ button, a {
 // Chips
 .chip-group {
     .chip {
-        margin: 0px 0px 8px 8px;
+        margin: 0px 0px 4px 8px;
         height: 32px;
         line-height: 32px;
         padding: 0px 4px;
         border-radius: 16px;
-        background-color: material-color('grey', '300');
+        background-color: material-color('blue', '600');
         display: inline-block;
 
         input.chip-label {
@@ -51,13 +51,15 @@ button, a {
         }
         
         .chip-label {
-            color: material-color('grey', '600');
+            color: #fff;
             margin: 0px 8px 0px 8px;
             height: 32px;
             line-height: 32px;
             background-color: transparent;
             border: 0px;
             padding: 0px;
+            display: inline;
+            width: auto;
         }
 
         .chip-remove {
@@ -70,7 +72,7 @@ button, a {
             top: -2px;
 
            .fa {
-                color: material-color('grey', '600');
+                color: #fff;
                 position: absolute;
                 top: 50%;
                 left: 50%;
@@ -80,18 +82,18 @@ button, a {
     }
 
     .chip-add {
-        margin: 0px 0px 8px 8px;
+        margin: 0px 0px 4px 8px;
         height: 32px;
         width: 32px;
         line-height: 32px;
         border-radius: 16px;
-        background-color: material-color('grey', '600');
+        background-color: material-color('blue', '600');
         display: inline-block;
         padding: 0px !important;
         position: relative;
 
         .fa {
-            color: material-color('grey', '200');
+            color: #fff;
             position: absolute;
             top: 50%;
             left: 50%;
