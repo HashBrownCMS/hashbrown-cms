@@ -15,7 +15,10 @@
         },
         "schemaId": {
             "label": "Schema",
-            "schemaId": "contentSchemaReference"
+            "schemaId": "contentSchemaReference",
+            "config": {
+                "allowedSchemas": "fromParent"
+            }
         },
         "properties": {
             "title": {

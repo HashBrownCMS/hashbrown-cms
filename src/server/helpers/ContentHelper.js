@@ -89,23 +89,36 @@ class ContentHelper extends ContentHelperCommon {
     /**
      * Creates a new content object
      *
+     * @param {String} schemaId
      * @param {String} parentId
      *
-     * @return {Promise} promise
+     * @return {Promise} New Content object
      */
-    static createContent(parentId) {
-        let content = Content.create();
-        let collection = ProjectHelper.currentEnvironment + '.content';
+    static createContent(schemaId, parentId) {
+        return new Promise((resolve, reject) => {
+            this.isSchemaAllowedAsChild(parentId, schemaId)
+            .then(() => {
+                SchemaHelper.getSchemaById(schemaId)
+                .then((schema) => {
+                    let content = Content.create(schema.id);
+                    let collection = ProjectHelper.currentEnvironment + '.content';
 
-        if(parentId) {
-            content.parentId = parentId;
-        }
+                    if(parentId) {
+                        content.parentId = parentId;
+                    }
 
-        return MongoHelper.insertOne(
-            ProjectHelper.currentProject,
-            collection,
-            content.getFields()
-        );
+                    MongoHelper.insertOne(
+                        ProjectHelper.currentProject,
+                        collection,
+                        content.getFields()
+                    )
+                    .then(resolve)
+                    .catch(reject);
+                })
+                .catch(reject);
+            })
+            .catch(reject);
+        });
     }
     
     /**

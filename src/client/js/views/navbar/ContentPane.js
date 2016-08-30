@@ -73,22 +73,78 @@ class ContentPane extends Pane {
      */
     static onClickNewContent(parentId) {
         let navbar = ViewHelper.get('NavbarMain');
-        let apiUrl = 'content/new';
-        
-        if(parentId) {
-            apiUrl += '?parent=' + parentId;
-        }
+        let messageModal;
 
-        apiCall('post', apiUrl)
-        .then((newContent) => {
-            reloadResource('content')
-            .then(() => {
-                navbar.reload();
+        // Event fired when clicking "OK"
+        let onPickedSchema = () => {
+            let schemaId = messageModal.$element.find('.content-schema-reference-editor select').val();
+
+            if(schemaId) {
+                let apiUrl = 'content/new/' + schemaId;
                 
-                location.hash = '/content/' + newContent.id;
+                if(parentId) {
+                    apiUrl += '?parent=' + parentId;
+                }
+
+                apiCall('post', apiUrl)
+                .then((newContent) => {
+                    reloadResource('content')
+                    .then(() => {
+                        navbar.reload();
+                        
+                        location.hash = '/content/' + newContent.id;
+                    });
+                })
+                .catch(navbar.onError);
+            }
+        };
+
+        // Shows the Schema picker modal
+        let showModal = (allowedSchemas) => {
+            let contentSchemaReferenceEditor = new resources.editors.contentSchemaReference({
+                config: {
+                    allowedSchemas: allowedSchemas   
+                }
             });
-        })
-        .catch(navbar.onError);
+
+            messageModal = new MessageModal({
+                model: {
+                    heading: 'New content',
+                    body: _.div({},
+                        _.p('Please pick a Schema'),
+                        contentSchemaReferenceEditor.$element
+                    )
+                },
+                buttons: [
+                    {
+                        label: 'Cancel',
+                        class: 'btn-default',
+                        callback: function() {
+                        }
+                    },
+                    {
+                        label: 'OK',
+                        class: 'btn-primary',
+                        callback: onPickedSchema
+                    }
+                ]
+            });
+        };
+
+        if(parentId) {
+            ContentHelper.getContentById(parentId)
+            .then((parentContent) => {
+                SchemaHelper.getSchemaById(parentContent.schemaId)
+                .then((parentSchema) => {
+                    showModal(parentSchema.allowedChildSchemas);
+                })
+                .catch(navbar.onError);
+            })
+            .catch(navbar.onError);
+
+        } else {
+            showModal();
+        }
     }
 
     /**

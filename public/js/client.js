@@ -38731,7 +38731,25 @@ class ContentSchemaReferenceEditor extends View {
     constructor(params) {
         super(params);
 
-        this.init();
+        this.$element = _.div({ class: 'field-editor content-schema-reference-editor' });
+
+        // Fetch allowed Schemas from parent if needed 
+        if (this.config && this.config.allowedSchemas == 'fromParent') {
+            ContentHelper.getContentById(Router.params.id).then(thisContent => {
+                if (thisContent.parentId) {
+                    ContentHelper.getContentById(thisContent.parentId).then(parentContent => {
+                        SchemaHelper.getSchemaById(parentContent.schemaId).then(parentSchema => {
+                            this.config.allowedSchemas = parentSchema.allowedChildSchemas;
+                            this.init();
+                        }).catch(errorModal);
+                    }).catch(errorModal);
+                } else {
+                    this.init();
+                }
+            }).catch(errorModal);
+        } else {
+            this.init();
+        }
     }
 
     /**
@@ -38741,9 +38759,12 @@ class ContentSchemaReferenceEditor extends View {
         this.value = this.$select.val();
         this.trigger('change', this.value);
 
-        let contentEditor = ViewHelper.get('ContentEditor');
+        // Only re-render if the ContentEditor is the parent
+        if (this.$element.parents('.content-editor').length > 0) {
+            let contentEditor = ViewHelper.get('ContentEditor');
 
-        contentEditor.render();
+            contentEditor.render();
+        }
     }
 
     /**
@@ -38756,7 +38777,7 @@ class ContentSchemaReferenceEditor extends View {
             let schema = window.resources.schemas[id];
             let isNative = schema.id == 'page' || schema.id == 'contentBase';
 
-            if (schema.type == 'content' && !isNative) {
+            if (schema.type == 'content' && !isNative && (!this.config || !this.config.allowedSchemas || !Array.isArray(this.config.allowedSchemas) || this.config.allowedSchemas.indexOf(schema.id) > -1)) {
                 contentSchemas[contentSchemas.length] = schema;
             }
         }
@@ -38765,7 +38786,7 @@ class ContentSchemaReferenceEditor extends View {
     }
 
     render() {
-        this.$element = _.div({ class: 'field-editor content-schema-reference-editor' }, this.$select = _.select({ class: 'form-control' }, _.each(this.getContentSchemas(), (i, schema) => {
+        this.$element.html(this.$select = _.select({ class: 'form-control' }, _.each(this.getContentSchemas(), (i, schema) => {
             return _.option({ value: schema.id }, schema.name);
         })).change(() => {
             this.onChange();
@@ -39690,19 +39711,63 @@ class ContentPane extends Pane {
      */
     static onClickNewContent(parentId) {
         let navbar = ViewHelper.get('NavbarMain');
-        let apiUrl = 'content/new';
+        let messageModal;
+
+        // Event fired when clicking "OK"
+        let onPickedSchema = () => {
+            let schemaId = messageModal.$element.find('.content-schema-reference-editor select').val();
+
+            if (schemaId) {
+                let apiUrl = 'content/new/' + schemaId;
+
+                if (parentId) {
+                    apiUrl += '?parent=' + parentId;
+                }
+
+                apiCall('post', apiUrl).then(newContent => {
+                    reloadResource('content').then(() => {
+                        navbar.reload();
+
+                        location.hash = '/content/' + newContent.id;
+                    });
+                }).catch(navbar.onError);
+            }
+        };
+
+        // Shows the Schema picker modal
+        let showModal = allowedSchemas => {
+            let contentSchemaReferenceEditor = new resources.editors.contentSchemaReference({
+                config: {
+                    allowedSchemas: allowedSchemas
+                }
+            });
+
+            messageModal = new MessageModal({
+                model: {
+                    heading: 'New content',
+                    body: _.div({}, _.p('Please pick a Schema'), contentSchemaReferenceEditor.$element)
+                },
+                buttons: [{
+                    label: 'Cancel',
+                    class: 'btn-default',
+                    callback: function callback() {}
+                }, {
+                    label: 'OK',
+                    class: 'btn-primary',
+                    callback: onPickedSchema
+                }]
+            });
+        };
 
         if (parentId) {
-            apiUrl += '?parent=' + parentId;
+            ContentHelper.getContentById(parentId).then(parentContent => {
+                SchemaHelper.getSchemaById(parentContent.schemaId).then(parentSchema => {
+                    showModal(parentSchema.allowedChildSchemas);
+                }).catch(navbar.onError);
+            }).catch(navbar.onError);
+        } else {
+            showModal();
         }
-
-        apiCall('post', apiUrl).then(newContent => {
-            reloadResource('content').then(() => {
-                navbar.reload();
-
-                location.hash = '/content/' + newContent.id;
-            });
-        }).catch(navbar.onError);
     }
 
     /**
@@ -41198,7 +41263,7 @@ class ContentHelper {
         return new Promise((resolve, reject) => {
             this.getContentById(parentId).then(parentContent => {
                 SchemaHelper.getSchemaById(parentContent.schemaId).then(parentSchema => {
-                    if (parentSchema.allowedChildSchemas.length > 0 && parentSchema.allowedChildSchemas.indexOf(childSchemaId) < 0) {
+                    if (parentSchema.allowedChildSchemas.indexOf(childSchemaId) < 0) {
                         reject(new Error('Content with Schema "' + childSchemaId + '" is not an allowed child of Content with Schema "' + parentSchema.id + '"'));
                     } else {
                         resolve();
@@ -41852,11 +41917,17 @@ class Content extends Entity {
     /**
      * Creates a new Content object
      *
+     * @param {String} schemaId
      * @param {Object} properties
      *
-     * @returns {Object} content
+     * @returns {Content} New Content object
      */
-    static create(properties) {
+    static create(schemaId, properties) {
+        if (typeof schemaId !== 'string') {
+            debug.error('Schema ID was not provided', this);
+            return;
+        }
+
         let defaultProperties = {
             title: 'New content'
         };
@@ -41865,7 +41936,7 @@ class Content extends Entity {
             id: Entity.createId(),
             createDate: new Date(),
             updateDate: new Date(),
-            schemaId: 'contentBase',
+            schemaId: schemaId,
             properties: properties || defaultProperties
         });
 

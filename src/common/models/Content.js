@@ -50,11 +50,17 @@ class Content extends Entity {
     /**
      * Creates a new Content object
      *
+     * @param {String} schemaId
      * @param {Object} properties
      *
-     * @returns {Object} content
+     * @returns {Content} New Content object
      */
-    static create(properties) {
+    static create(schemaId, properties) {
+        if(typeof schemaId !== 'string') {
+            debug.error('Schema ID was not provided', this);
+            return;
+        }
+
         let defaultProperties = {
             title: 'New content'
         };
@@ -63,7 +69,7 @@ class Content extends Entity {
             id: Entity.createId(),
             createDate: new Date(),
             updateDate: new Date(),
-            schemaId: 'contentBase',
+            schemaId: schemaId,
             properties: properties || defaultProperties
         });
 

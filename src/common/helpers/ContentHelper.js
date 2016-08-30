@@ -74,7 +74,6 @@ class ContentHelper {
                 SchemaHelper.getSchemaById(parentContent.schemaId)
                 .then((parentSchema) => {
                     if(
-                        parentSchema.allowedChildSchemas.length > 0 &&
                         parentSchema.allowedChildSchemas.indexOf(childSchemaId) < 0
                     ) {
                         reject(new Error('Content with Schema "' + childSchemaId + '" is not an allowed child of Content with Schema "' + parentSchema.id + '"'));

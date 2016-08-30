@@ -14,7 +14,7 @@ class ContentController extends ApiController {
     static init(app) {
         app.get('/api/:project/:environment/content', this.middleware(), this.getAllContents);
         app.get('/api/:project/:environment/content/:id', this.middleware(), this.getContent);
-        app.post('/api/:project/:environment/content/new', this.middleware(), this.createContent);
+        app.post('/api/:project/:environment/content/new/:schemaId', this.middleware(), this.createContent);
         app.post('/api/:project/:environment/content/publish', this.middleware(), this.publishContent);
         app.post('/api/:project/:environment/content/unpublish', this.middleware(), this.unpublishContent);
         app.post('/api/:project/:environment/content/:id', this.middleware(), this.postContent);
@@ -64,8 +64,9 @@ class ContentController extends ApiController {
      */
     static createContent(req, res) {
         let parentId = req.query.parent;
+        let schemaId = req.params.schemaId;
 
-        ContentHelper.createContent(parentId)
+        ContentHelper.createContent(schemaId, parentId)
         .then((node) => {
             res.status(200).send(node);
         })
