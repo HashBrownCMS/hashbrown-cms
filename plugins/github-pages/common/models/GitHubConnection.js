@@ -131,7 +131,7 @@ class GitHubConnection extends Connection {
                                         media[media.length] = new Media({
                                             name: path.basename(node.path),
                                             id: path.dirname(node.path).replace('media/', ''),
-                                            url: node.path
+                                            url: '/' + node.path
                                         });
                                     }
                                 }

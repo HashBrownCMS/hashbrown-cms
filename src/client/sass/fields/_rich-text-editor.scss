@@ -18,7 +18,12 @@
                 margin-top: 0px;
             }   
         }   
-        
+
+        img {
+            max-width: 100px;
+            max-height: 100px;
+        }
+
         height: 300px;
         overflow-y: auto;
     }
@@ -35,7 +40,7 @@
             border: 0px;
             resize: none;
             line-height: 1.25em;  
-            height: 1.25em;
+            height: 5em;
             resize: none;
             overflow: hidden;
         }

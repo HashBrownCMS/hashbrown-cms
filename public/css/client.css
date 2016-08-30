@@ -705,6 +705,9 @@ body {
     overflow-y: auto; }
     .rich-text-editor .rte-output h1:first-child, .rich-text-editor .rte-output h2:first-child, .rich-text-editor .rte-output h3:first-child, .rich-text-editor .rte-output h4:first-child, .rich-text-editor .rte-output h5:first-child, .rich-text-editor .rte-output h6:first-child {
       margin-top: 0px; }
+    .rich-text-editor .rte-output img {
+      max-width: 100px;
+      max-height: 100px; }
   .rich-text-editor .panel-footer {
     background-color: #212121; }
     .rich-text-editor .panel-footer textarea {
@@ -716,7 +719,7 @@ body {
       border: 0px;
       resize: none;
       line-height: 1.25em;
-      height: 1.25em;
+      height: 5em;
       resize: none;
       overflow: hidden; }
 
