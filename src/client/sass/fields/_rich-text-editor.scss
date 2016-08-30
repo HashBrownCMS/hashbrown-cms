@@ -1,0 +1,43 @@
+.rich-text-editor {
+    margin: 0px;
+
+    .panel-heading {
+        background-color: material-color('blue', '600');
+        padding: 5px;
+
+        .btn, .dropdown {
+            min-width: 0px;
+            display: inline-block;
+            color: #fff;
+        }
+    }
+
+    .rte-output {
+        h1, h2, h3, h4, h5, h6 {
+            &:first-child {
+                margin-top: 0px;
+            }   
+        }   
+        
+        height: 300px;
+        overflow-y: auto;
+    }
+
+    .panel-footer {
+        background-color: material-color('grey', '900');        
+
+        textarea {
+            padding: 0px;
+            color: material-color('grey', '200');        
+            font-family: 'Roboto Mono';
+            overflow: auto;
+            display: block;
+            border: 0px;
+            resize: none;
+            line-height: 1.25em;  
+            height: 1.25em;
+            resize: none;
+            overflow: hidden;
+        }
+    }
+}

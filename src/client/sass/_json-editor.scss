@@ -10,7 +10,7 @@
 
         .line-numbers, textarea {
             line-height: 1.25em;  
-            font-family: monospace;
+            font-family: 'Roboto Mono';
             padding: 0px;
         }
 
@@ -24,7 +24,6 @@
         textarea {
             color: material-color('grey', '200');        
             background-color: material-color('grey', '900');        
-            font-family: 'Roboto Mono';
             overflow: auto;
             display: block;
             border: 0px;

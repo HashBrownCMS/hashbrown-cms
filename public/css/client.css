@@ -248,13 +248,13 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
     margin-right: auto; }
   .btn.btn-round {
     padding: 0px !important;
-    width: 56px;
-    height: 56px;
+    width: 45px;
+    height: 45px;
     min-width: auto;
     min-height: auto;
-    line-height: 56px;
+    line-height: 45px;
     border-radius: 50%;
-    font-size: 30px;
+    font-size: 20px;
     font-weight: 100; }
   .btn.btn-raised {
     box-shadow: 0px 2px 3px 1px rgba(0, 0, 0, 0.2);
@@ -489,17 +489,6 @@ body {
           padding: 5px; }
           .cms-container .workspace .editor .field-container .field-value .period-editor .arrow-middle span {
             line-height: 20px; }
-        .cms-container .workspace .editor .field-container .field-value .rich-text-editor {
-          margin: 0px; }
-          .cms-container .workspace .editor .field-container .field-value .rich-text-editor .rte-output {
-            height: 300px;
-            overflow-y: auto; }
-            .cms-container .workspace .editor .field-container .field-value .rich-text-editor .rte-output h1:first-child, .cms-container .workspace .editor .field-container .field-value .rich-text-editor .rte-output h2:first-child, .cms-container .workspace .editor .field-container .field-value .rich-text-editor .rte-output h3:first-child, .cms-container .workspace .editor .field-container .field-value .rich-text-editor .rte-output h4:first-child, .cms-container .workspace .editor .field-container .field-value .rich-text-editor .rte-output h5:first-child, .cms-container .workspace .editor .field-container .field-value .rich-text-editor .rte-output h6:first-child {
-              margin-top: 0px; }
-          .cms-container .workspace .editor .field-container .field-value .rich-text-editor textarea {
-            height: 200px;
-            resize: none;
-            overflow: hidden; }
     .cms-container .workspace .panel-buttons {
       flex-shrink: 0;
       padding: 15px;
@@ -555,7 +544,7 @@ body {
     position: relative; }
     .json-editor .editor-container .line-numbers, .json-editor .editor-container textarea {
       line-height: 1.25em;
-      font-family: monospace;
+      font-family: 'Roboto Mono';
       padding: 0px; }
     .json-editor .editor-container .line-numbers {
       flex-shrink: 0;
@@ -565,7 +554,6 @@ body {
     .json-editor .editor-container textarea {
       color: #eeeeee;
       background-color: #212121;
-      font-family: 'Roboto Mono';
       overflow: auto;
       display: block;
       border: 0px;
@@ -702,6 +690,35 @@ body {
       width: auto;
       flex-grow: 1;
       margin: 1em; }
+
+.rich-text-editor {
+  margin: 0px; }
+  .rich-text-editor .panel-heading {
+    background-color: #1e88e5;
+    padding: 5px; }
+    .rich-text-editor .panel-heading .btn, .rich-text-editor .panel-heading .dropdown {
+      min-width: 0px;
+      display: inline-block;
+      color: #fff; }
+  .rich-text-editor .rte-output {
+    height: 300px;
+    overflow-y: auto; }
+    .rich-text-editor .rte-output h1:first-child, .rich-text-editor .rte-output h2:first-child, .rich-text-editor .rte-output h3:first-child, .rich-text-editor .rte-output h4:first-child, .rich-text-editor .rte-output h5:first-child, .rich-text-editor .rte-output h6:first-child {
+      margin-top: 0px; }
+  .rich-text-editor .panel-footer {
+    background-color: #212121; }
+    .rich-text-editor .panel-footer textarea {
+      padding: 0px;
+      color: #eeeeee;
+      font-family: 'Roboto Mono';
+      overflow: auto;
+      display: block;
+      border: 0px;
+      resize: none;
+      line-height: 1.25em;
+      height: 1.25em;
+      resize: none;
+      overflow: hidden; }
 
 .content-editor {
   height: 100%; }
