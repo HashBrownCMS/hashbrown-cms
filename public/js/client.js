@@ -37931,9 +37931,9 @@ class MessageModal extends View {
             if (view.buttons) {
                 return _.each(view.buttons, function (i, button) {
                     return _.button({ class: 'btn ' + button.class }, button.label).click(function () {
-                        view.hide();
-
-                        button.callback();
+                        if (button.callback() != false) {
+                            view.hide();
+                        }
                     });
                 });
             } else {
@@ -38869,12 +38869,12 @@ class ContentSchemaReferenceEditor extends View {
 
     render() {
         this.$element.html(this.$select = _.select({ class: 'form-control' }, _.each(this.getContentSchemas(), (i, schema) => {
-            return _.option({ value: schema.id }, schema.name);
+            let selected = !this.value ? i == 0 : schema.id == this.value;
+
+            return _.option({ value: schema.id, selected: selected }, schema.name);
         })).change(() => {
             this.onChange();
         }));
-
-        this.$select.val(this.value);
     }
 }
 
@@ -39813,32 +39813,43 @@ class ContentPane extends Pane {
                         location.hash = '/content/' + newContent.id;
                     });
                 }).catch(navbar.onError);
+            } else {
+                return false;
             }
         };
 
         // Shows the Schema picker modal
         let showModal = allowedSchemas => {
-            let contentSchemaReferenceEditor = new resources.editors.contentSchemaReference({
-                config: {
-                    allowedSchemas: allowedSchemas
-                }
-            });
+            if (allowedSchemas && allowedSchemas.length < 1) {
+                messageModal = new MessageModal({
+                    model: {
+                        title: 'Can\'t create new content',
+                        body: 'No child content schemas are allowed under this parent'
+                    }
+                });
+            } else {
+                let contentSchemaReferenceEditor = new resources.editors.contentSchemaReference({
+                    config: {
+                        allowedSchemas: allowedSchemas
+                    }
+                });
 
-            messageModal = new MessageModal({
-                model: {
-                    heading: 'New content',
-                    body: _.div({}, _.p('Please pick a Schema'), contentSchemaReferenceEditor.$element)
-                },
-                buttons: [{
-                    label: 'Cancel',
-                    class: 'btn-default',
-                    callback: function callback() {}
-                }, {
-                    label: 'OK',
-                    class: 'btn-primary',
-                    callback: onPickedSchema
-                }]
-            });
+                messageModal = new MessageModal({
+                    model: {
+                        title: 'Create new content',
+                        body: _.div({}, _.p('Please pick a schema'), contentSchemaReferenceEditor.$element)
+                    },
+                    buttons: [{
+                        label: 'Cancel',
+                        class: 'btn-default',
+                        callback: function callback() {}
+                    }, {
+                        label: 'OK',
+                        class: 'btn-primary',
+                        callback: onPickedSchema
+                    }]
+                });
+            }
         };
 
         if (parentId) {
@@ -41343,15 +41354,20 @@ class ContentHelper {
      */
     static isSchemaAllowedAsChild(parentId, childSchemaId) {
         return new Promise((resolve, reject) => {
-            this.getContentById(parentId).then(parentContent => {
-                SchemaHelper.getSchemaById(parentContent.schemaId).then(parentSchema => {
-                    if (parentSchema.allowedChildSchemas.indexOf(childSchemaId) < 0) {
-                        reject(new Error('Content with Schema "' + childSchemaId + '" is not an allowed child of Content with Schema "' + parentSchema.id + '"'));
-                    } else {
-                        resolve();
-                    }
+            // No parent ID means root, and all Schemas are allowed there
+            if (!parentId) {
+                resolve();
+            } else {
+                this.getContentById(parentId).then(parentContent => {
+                    SchemaHelper.getSchemaById(parentContent.schemaId).then(parentSchema => {
+                        if (parentSchema.allowedChildSchemas.indexOf(childSchemaId) < 0) {
+                            reject(new Error('Content with Schema "' + childSchemaId + '" is not an allowed child of Content with Schema "' + parentSchema.id + '"'));
+                        } else {
+                            resolve();
+                        }
+                    }).catch(reject);
                 }).catch(reject);
-            }).catch(reject);
+            }
         });
     }
 

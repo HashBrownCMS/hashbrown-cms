@@ -84,12 +84,12 @@ class ContentSchemaReferenceEditor extends View {
         this.$element.html(
             this.$select = _.select({class: 'form-control'},
                 _.each(this.getContentSchemas(), (i, schema) => {
-                    return _.option({value: schema.id}, schema.name);
+                    let selected = !this.value ? i == 0 : schema.id == this.value;
+
+                    return _.option({value: schema.id, selected: selected}, schema.name);
                 })
             ).change(() => { this.onChange(); })
         );
-
-        this.$select.val(this.value);
     }
 }
 

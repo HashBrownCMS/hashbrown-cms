@@ -69,23 +69,29 @@ class ContentHelper {
      */
     static isSchemaAllowedAsChild(parentId, childSchemaId) {
         return new Promise((resolve, reject) => {
-            this.getContentById(parentId)
-            .then((parentContent) => {
-                SchemaHelper.getSchemaById(parentContent.schemaId)
-                .then((parentSchema) => {
-                    if(
-                        parentSchema.allowedChildSchemas.indexOf(childSchemaId) < 0
-                    ) {
-                        reject(new Error('Content with Schema "' + childSchemaId + '" is not an allowed child of Content with Schema "' + parentSchema.id + '"'));
-                    
-                    } else {
-                        resolve();
+            // No parent ID means root, and all Schemas are allowed there
+            if(!parentId) {
+                resolve();
 
-                    }
+            } else {
+                this.getContentById(parentId)
+                .then((parentContent) => {
+                    SchemaHelper.getSchemaById(parentContent.schemaId)
+                    .then((parentSchema) => {
+                        if(
+                            parentSchema.allowedChildSchemas.indexOf(childSchemaId) < 0
+                        ) {
+                            reject(new Error('Content with Schema "' + childSchemaId + '" is not an allowed child of Content with Schema "' + parentSchema.id + '"'));
+                        
+                        } else {
+                            resolve();
+
+                        }
+                    })
+                    .catch(reject);
                 })
                 .catch(reject);
-            })
-            .catch(reject);
+            }
         });
     }
 

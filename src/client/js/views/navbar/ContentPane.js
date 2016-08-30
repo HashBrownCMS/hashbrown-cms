@@ -96,39 +96,53 @@ class ContentPane extends Pane {
                     });
                 })
                 .catch(navbar.onError);
+           
+            } else {
+                return false;
+        
             }
         };
 
         // Shows the Schema picker modal
         let showModal = (allowedSchemas) => {
-            let contentSchemaReferenceEditor = new resources.editors.contentSchemaReference({
-                config: {
-                    allowedSchemas: allowedSchemas   
-                }
-            });
-
-            messageModal = new MessageModal({
-                model: {
-                    heading: 'New content',
-                    body: _.div({},
-                        _.p('Please pick a Schema'),
-                        contentSchemaReferenceEditor.$element
-                    )
-                },
-                buttons: [
-                    {
-                        label: 'Cancel',
-                        class: 'btn-default',
-                        callback: function() {
-                        }
-                    },
-                    {
-                        label: 'OK',
-                        class: 'btn-primary',
-                        callback: onPickedSchema
+            if(allowedSchemas && allowedSchemas.length < 1) {
+                messageModal = new MessageModal({
+                    model: {
+                        title: 'Can\'t create new content',
+                        body: 'No child content schemas are allowed under this parent'
                     }
-                ]
-            });
+                });
+            
+            } else {
+                let contentSchemaReferenceEditor = new resources.editors.contentSchemaReference({
+                    config: {
+                        allowedSchemas: allowedSchemas   
+                    }
+                });
+
+                messageModal = new MessageModal({
+                    model: {
+                        title: 'Create new content',
+                        body: _.div({},
+                            _.p('Please pick a schema'),
+                            contentSchemaReferenceEditor.$element
+                        )
+                    },
+                    buttons: [
+                        {
+                            label: 'Cancel',
+                            class: 'btn-default',
+                            callback: function() {
+                            }
+                        },
+                        {
+                            label: 'OK',
+                            class: 'btn-primary',
+                            callback: onPickedSchema
+                        }
+                    ]
+                });
+            }
         };
 
         if(parentId) {
