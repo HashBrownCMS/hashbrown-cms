@@ -105,7 +105,7 @@ class JSONEditor extends View {
 
                     return 'Schema "' + v + '" not found';
                
-                case 'schemaBindings':
+                case 'schemaBindings': case 'allowedSchemas': case 'allowedChildSchemas':
                     let invalidSchemas = v.slice(0);
                     
                     for(let r in resources.schemas) {

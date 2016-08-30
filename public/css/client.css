@@ -738,6 +738,8 @@ body {
     .schema-editor > .schema .field-value .read-only {
       line-height: 30px;
       margin: 0px; }
+    .schema-editor > .schema .field-value .allowed-child-schemas-editor {
+      line-height: 30px; }
     .schema-editor > .schema .icon-editor > .fa {
       line-height: 30px; }
 

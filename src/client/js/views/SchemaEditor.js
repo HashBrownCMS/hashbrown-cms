@@ -22,6 +22,58 @@ class SchemaEditor extends View {
     onClickAdvanced() {
         location.hash = location.hash.replace('/schemas/', '/schemas/json/');
     }
+    
+    /**
+     * Event: On click remove
+     */
+    onClickDelete() {
+        let view = this;
+
+        function onSuccess() {
+            debug.log('Removed Schema with id "' + view.model.id + '"', view); 
+        
+            reloadResource('schemas')
+            .then(function() {
+                ViewHelper.get('NavbarMain').reload();
+                
+                // Cancel the SchemaEditor view
+                location.hash = '/schemas/';
+            });
+        }
+
+        function onError(err) {
+            new MessageModal({
+                model: {
+                    title: 'Error',
+                    body: err.message
+                }
+            });
+        }
+
+        new MessageModal({
+            model: {
+                title: 'Delete schema',
+                body: 'Are you sure you want to delete the schema "' + view.model.name + '"?'
+            },
+            buttons: [
+                {
+                    label: 'Cancel',
+                    class: 'btn-default',
+                    callback: () => {
+                    }
+                },
+                {
+                    label: 'OK',
+                    class: 'btn-danger',
+                    callback: () => {
+                        apiCall('delete', 'schemas/' + view.model.id)
+                        .then(onSuccess)
+                        .catch(onError);
+                    }
+                }
+            ]
+        });
+    }
 
     /**
      * Event: Click save. Posts the model to the modelUrl
@@ -358,7 +410,9 @@ class SchemaEditor extends View {
 
         // TODO: Filter out irrelevant schemas and self
         for(let id in resources.schemas) {
-            schemas[id] = resources.schemas[id];
+            if(resources.schemas[id].type == view.model.type) {
+                schemas[id] = resources.schemas[id];
+            }
         }
 
         let parentName = '(none)';
@@ -393,58 +447,6 @@ class SchemaEditor extends View {
     }
 
     /**
-     * Event: On click remove
-     */
-    onClickDelete() {
-        let view = this;
-
-        function onSuccess() {
-            debug.log('Removed Schema with id "' + view.model.id + '"', view); 
-        
-            reloadResource('schemas')
-            .then(function() {
-                ViewHelper.get('NavbarMain').reload();
-                
-                // Cancel the SchemaEditor view
-                location.hash = '/schemas/';
-            });
-        }
-
-        function onError(err) {
-            new MessageModal({
-                model: {
-                    title: 'Error',
-                    body: err.message
-                }
-            });
-        }
-
-        new MessageModal({
-            model: {
-                title: 'Delete schema',
-                body: 'Are you sure you want to delete the schema "' + view.model.name + '"?'
-            },
-            buttons: [
-                {
-                    label: 'Cancel',
-                    class: 'btn-default',
-                    callback: () => {
-                    }
-                },
-                {
-                    label: 'OK',
-                    class: 'btn-danger',
-                    callback: () => {
-                        apiCall('delete', 'schemas/' + view.model.id)
-                        .then(onSuccess)
-                        .catch(onError);
-                    }
-                }
-            ]
-        });
-    }
-
-    /**
      * Renders the default tab editor
      *  
      * @return {Object} element
@@ -476,6 +478,45 @@ class SchemaEditor extends View {
                 _.p({class: 'read-only'},
                     tabs[this.model.defaultTabId]
                 )
+            )
+        );
+        
+        return $element;
+    }
+
+    /**
+     * Renders the allowed child Schemas editor (ContentSchema only)
+     *
+     * @return {HTMLElement} Element
+     */
+    renderAllowedChildSchemasEditor() {
+        let view = this;
+
+        function onChange() {
+            view.model.allowedChildSchemas = [];
+            
+            $element.find('.schemas .schema').each(function() {
+                 view.model.allowedChildSchemas.push($(this).attr('title'));
+            });
+        }
+
+        function onClear() {
+            view.model.parentSchemaId = null;
+           
+            $element.find('select').val(null);
+        }
+
+        let $element = _.div({class: 'allowed-child-schemas-editor'},
+            _.div({class: 'schemas'},
+                _.each(this.model.allowedChildSchemas, (i, schemaId) => {
+                    try {
+                        return _.p({class: 'schema', title: schemaId},
+                            resources.schemas[schemaId].name
+                        );
+                    } catch(e) {
+                        errorModal(e);
+                    }
+                })
             )
         );
         
@@ -519,6 +560,7 @@ class SchemaEditor extends View {
             case 'content':
                 $element.append(this.renderField('Default tab', this.renderDefaultTabEditor()));
                 $element.append(this.renderField('Tabs', this.renderTabsEditor()));
+                $element.append(this.renderField('Allowed child Schemas', this.renderAllowedChildSchemasEditor()));
                 break;
 
             case 'field':
