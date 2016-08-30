@@ -12,6 +12,7 @@ let ContentPane = require('./ContentPane');
 let FormsPane = require('./FormsPane');
 let MediaPane = require('./MediaPane');
 let SchemaPane = require('./SchemaPane');
+let UserPane = require('./UserPane');
 
 /**
  * The main navbar
@@ -122,6 +123,9 @@ class NavbarMain extends View {
 
                 } else if(typeof item.name === 'string') {
                     name = item.name;
+
+                } else if(typeof item.username === 'string') {
+                    name = item.username;
 
                 } else {
                     name = id;
@@ -431,6 +435,11 @@ class NavbarMain extends View {
                 if(scopes.indexOf('schemas') > -1) {
                     this.renderPane(SchemaPane.getRenderSettings());
                 }
+                
+                // Render the "users" pane
+                if(scopes.indexOf('users') > -1) {
+                    this.renderPane(UserPane.getRenderSettings());
+                }
 
                 // ----------
                 // Render the "settings" pane
@@ -449,18 +458,6 @@ class NavbarMain extends View {
                     });
                 }
                 
-                // ----------
-                // Render the "users" pane
-                // ----------
-                if(scopes.indexOf('users') > -1) {
-                    this.renderPane({
-                        label: 'Users',
-                        route: '/users/',
-                        icon: 'user',
-                        items: []
-                    });
-                }
-
                 triggerReady('navbar');
 
                 $('.cms-container').removeClass('faded');

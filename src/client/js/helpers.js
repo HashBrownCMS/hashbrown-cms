@@ -8,7 +8,8 @@ window.resources = {
     media: [],
     templates: [],
     sectionTemplates: [],
-    forms: []
+    forms: [],
+    users: []
 };
 
 // Libraries
@@ -29,6 +30,7 @@ window.FormEditor = require('./views/FormEditor');
 window.ConnectionEditor = require('./views/ConnectionEditor');
 window.SchemaEditor = require('./views/SchemaEditor');
 window.LanguageSettings = require('./views/LanguageSettings');
+window.UserEditor = require('./views/UserEditor');
 
 // Models
 window.Content = require('./models/Content');
@@ -226,7 +228,8 @@ window.reloadAllResources = function reloadAllResources() {
             'connections',
             'templates',
             'sectionTemplates',
-            'forms'
+            'forms',
+            'users'
         ];
 
         function processQueue(name) {

@@ -116,14 +116,52 @@ class UserHelper {
     }
     
     /**
+     * Removes a project scope from a User object
+     *
+     * @param {String} id
+     * @param {String} scope
+     *
+     * @returns {Promise} Promise
+     */
+    static removeUserProjectScope(id, scope) {
+        return new Promise((resolve, reject) => {
+            MongoHelper.findOne(
+                'users',
+                'users',
+                {
+                    id: id
+                }
+            ).then((found) => {
+                delete found.scopes[scope];
+
+                MongoHelper.updateOne(
+                    'users',
+                    'users',
+                    {
+                        id: id
+                    },
+                    found
+                )
+                .then((user) => { resolve(user); })
+                .catch(reject);
+            })
+            .catch(reject);
+        });
+    }
+
+    /**
      * Creates a User
      *
-     * @param {Object} properties
+     * @param {String} username
+     * @param {String} password
+     * @param {Object} scopes
      *
      * @returns {Promise} promise
      */
-    static createUser(username, password) {
+    static createUser(username, password, scopes) {
         let user = User.create(username, password);
+
+        user.scopes = scopes;
 
         return new Promise((resolve, reject) => {
             MongoHelper.findOne(
@@ -133,6 +171,9 @@ class UserHelper {
                     username: username
                 }
             ).then((found) => {
+                let foundUser = new User(found);
+
+                // User wasn't found, create
                 if(!found) {
                     debug.log('Creating user "' + username + '"...', this);
                     
@@ -143,9 +184,33 @@ class UserHelper {
                     ).then(() => {
                         debug.log('Created user "' + username + '" successfully.', this);
                         
-                        resolve();
+                        resolve(user);
                     })
                     .catch(reject);
+
+                // If scopes are defined and credentials match, just update the user
+                } else if(
+                    scopes &&
+                    user.username === found.username &&
+                    foundUser.validatePassword(password)
+                ) {
+                    for(let project in scopes) {
+                        found.scopes[project] = scopes[project];
+                    }
+
+                    MongoHelper.updateOne(
+                        'users',
+                        'users',
+                        {
+                            username: username  
+                        },
+                        found
+                    ).then(() => {
+                        resolve(found);
+                    })
+                    .catch(reject);
+
+                // Scopes are not defined, user is a duplicate
                 } else {
                     reject(new Error('User with username "' + username + '" already exists'))
 
@@ -158,20 +223,56 @@ class UserHelper {
     /**
      * Gets a list of all users
      *
-     * @returns {Promise(Array)} users
+     * @param {String} project
+     *
+     * @returns {Promise} Array of User objects
      */
-    static getAllUsers() {
-        debug.log('Getting all users...', this);
+    static getAllUsers(project) {
+        let query = {};
 
-        return new Promise((resolve, reject) => {
-            MongoHelper.find(
-                'users',
-                'users',
-                {}
-            ).then((users) => {
-                resolve(users);
-            });
-        });
+        if(project) {
+            debug.log('Getting all users with project "' + project + '" in scope...', this);
+
+            query['scopes.' + project] = { $exists: true };
+
+        } else {
+            debug.log('Getting all users...', this);
+        }
+
+        return MongoHelper.find(
+            'users',
+            'users',
+            query,
+            {
+                tokens: 0,
+                password: 0
+            }
+        );
+    }
+    
+    /**
+     * Gets a single user
+     *
+     * @param {String} id
+     *
+     * @returns {Promise} User object
+     */
+    static getUserById(id) {
+        let query = {};
+
+        debug.log('Getting user "' + id + '"...', this);
+
+        return MongoHelper.findOne(
+            'users',
+            'users',
+            {
+                id: id
+            },
+            {
+                tokens: 0,
+                password: 0
+            }
+        );
     }
 
     /**
@@ -200,6 +301,31 @@ class UserHelper {
             .catch(reject);
         });
     }
+    
+    /**
+     * Updates a User by id
+     *
+     * @param {String} id
+     * @param {Object} properties
+     *
+     * @returns {Promise} Promise
+     */
+    static updateUserById(id, properties) {
+        return new Promise((callback) => {
+            MongoHelper.mergeOne(
+                'users',
+                'users',
+                {
+                    id: id
+                },
+                properties
+            ).then(() => {
+                debug.log('Updated user "' + id + '" successfully with properties: ' + JSON.stringify(properties), this);
+                
+                callback();
+            });
+        });
+    }
 
     /**
      * Updates a User
@@ -211,7 +337,7 @@ class UserHelper {
      */
     static updateUser(username, properties) {
         return new Promise((callback) => {
-            MongoHelper.updateOne(
+            MongoHelper.mergeOne(
                 'users',
                 'users',
                 {

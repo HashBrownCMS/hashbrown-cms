@@ -83,7 +83,6 @@ class SchemaEditor extends View {
 
         apiCall('post', 'schemas/' + this.model.id, this.model)
         .then(() => {
-            debug.log('Saved model to', this);
             this.$saveBtn.toggleClass('working', false);
         
             reloadResource('schemas')
@@ -159,7 +158,7 @@ class SchemaEditor extends View {
 
         let $element = _.div({class: 'name-editor'},
             _.if(!this.model.locked,
-                _.input({class: 'form-control', type: 'text', value: view.model.name, placeholder: 'Write the schema name here'})
+                _.input({class: 'form-control', type: 'text', value: view.model.name, placeholder: 'Input the schema name here'})
                     .on('change', onInputChange)
             ),
             _.if(this.model.locked,
@@ -517,12 +516,6 @@ class SchemaEditor extends View {
 
                 render();
             }
-        }
-
-        function onClear() {
-            view.model.parentSchemaId = null;
-           
-            $element.find('select').val(null);
         }
 
         function render() {

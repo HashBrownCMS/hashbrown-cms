@@ -7,3 +7,4 @@ require('./media');
 require('./schemas');
 require('./settings');
 require('./forms');
+require('./users');

@@ -35090,7 +35090,8 @@ window.resources = {
     media: [],
     templates: [],
     sectionTemplates: [],
-    forms: []
+    forms: [],
+    users: []
 };
 
 // Libraries
@@ -35111,6 +35112,7 @@ window.FormEditor = require('./views/FormEditor');
 window.ConnectionEditor = require('./views/ConnectionEditor');
 window.SchemaEditor = require('./views/SchemaEditor');
 window.LanguageSettings = require('./views/LanguageSettings');
+window.UserEditor = require('./views/UserEditor');
 
 // Models
 window.Content = require('./models/Content');
@@ -35292,7 +35294,7 @@ window.reloadResource = function reloadResource(name) {
  */
 window.reloadAllResources = function reloadAllResources() {
     return new Promise(function (resolve) {
-        let queue = ['content', 'schemas', 'media', 'connections', 'templates', 'sectionTemplates', 'forms'];
+        let queue = ['content', 'schemas', 'media', 'connections', 'templates', 'sectionTemplates', 'forms', 'users'];
 
         function processQueue(name) {
             window.reloadResource(name).then(function () {
@@ -35345,7 +35347,7 @@ window.triggerReady = function triggerReady(name) {
     }
 };
 
-},{"../../common/helpers/DebugHelper":215,"./helpers/ConnectionHelper":164,"./helpers/ContentHelper":165,"./helpers/LanguageHelper":166,"./helpers/MediaHelper":167,"./helpers/ProjectHelper":168,"./helpers/SchemaHelper":169,"./helpers/SettingsHelper":170,"./models/Content":172,"./views/ConnectionEditor":181,"./views/ContentEditor":182,"./views/FormEditor":183,"./views/JSONEditor":184,"./views/LanguagePicker":185,"./views/LanguageSettings":186,"./views/MediaViewer":187,"./views/MessageModal":188,"./views/SchemaEditor":189,"./views/editors":204,"./views/navbar/NavbarMain":209,"bluebird":17,"exomon":92}],164:[function(require,module,exports){
+},{"../../common/helpers/DebugHelper":218,"./helpers/ConnectionHelper":164,"./helpers/ContentHelper":165,"./helpers/LanguageHelper":166,"./helpers/MediaHelper":167,"./helpers/ProjectHelper":168,"./helpers/SchemaHelper":169,"./helpers/SettingsHelper":170,"./models/Content":172,"./views/ConnectionEditor":182,"./views/ContentEditor":183,"./views/FormEditor":184,"./views/JSONEditor":185,"./views/LanguagePicker":186,"./views/LanguageSettings":187,"./views/MediaViewer":188,"./views/MessageModal":189,"./views/SchemaEditor":190,"./views/UserEditor":191,"./views/editors":206,"./views/navbar/NavbarMain":211,"bluebird":17,"exomon":92}],164:[function(require,module,exports){
 'use strict';
 
 let ConnectionHelperCommon = require('../../../common/helpers/ConnectionHelper');
@@ -35389,7 +35391,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
 
 module.exports = ConnectionHelper;
 
-},{"../../../common/helpers/ConnectionHelper":213,"../../../common/models/Connection":220}],165:[function(require,module,exports){
+},{"../../../common/helpers/ConnectionHelper":216,"../../../common/models/Connection":223}],165:[function(require,module,exports){
 'use strict';
 
 let ContentHelperCommon = require('../../../common/helpers/ContentHelper');
@@ -35461,7 +35463,7 @@ class ContentHelper extends ContentHelperCommon {
 
 module.exports = ContentHelper;
 
-},{"../../../common/helpers/ContentHelper":214,"../models/Content":172}],166:[function(require,module,exports){
+},{"../../../common/helpers/ContentHelper":217,"../models/Content":172}],166:[function(require,module,exports){
 'use strict';
 
 let LanguageHelperCommon = require('../../../common/helpers/LanguageHelper');
@@ -35470,7 +35472,7 @@ class LanguageHelper extends LanguageHelperCommon {}
 
 module.exports = LanguageHelper;
 
-},{"../../../common/helpers/LanguageHelper":216}],167:[function(require,module,exports){
+},{"../../../common/helpers/LanguageHelper":219}],167:[function(require,module,exports){
 'use strict';
 
 let MediaHelperCommon = require('../../../common/helpers/MediaHelper');
@@ -35545,7 +35547,7 @@ class MediaHelper extends MediaHelperCommon {
 
 module.exports = MediaHelper;
 
-},{"../../../common/helpers/MediaHelper":217}],168:[function(require,module,exports){
+},{"../../../common/helpers/MediaHelper":220}],168:[function(require,module,exports){
 'use strict';
 
 /**
@@ -35607,7 +35609,7 @@ class SchemaHelper extends SchemaHelperCommon {
 
 module.exports = SchemaHelper;
 
-},{"../../../common/helpers/SchemaHelper":218}],170:[function(require,module,exports){
+},{"../../../common/helpers/SchemaHelper":221}],170:[function(require,module,exports){
 'use strict';
 
 let SettingsHelperCommon = require('../../../common/helpers/SettingsHelper');
@@ -35647,7 +35649,7 @@ class SettingsHelper extends SettingsHelperCommon {
 
 module.exports = SettingsHelper;
 
-},{"../../../common/helpers/SettingsHelper":219}],171:[function(require,module,exports){
+},{"../../../common/helpers/SettingsHelper":222}],171:[function(require,module,exports){
 module.exports={
     "icons": [    
         "500px",
@@ -36359,30 +36361,11 @@ class Content extends ContentCommon {}
 
 module.exports = Content;
 
-},{"../../../common/models/Content":221}],173:[function(require,module,exports){
+},{"../../../common/models/Content":224}],173:[function(require,module,exports){
 'use strict';
 
-// Users
-
-Router.route('/users/', function () {
-    ViewHelper.get('NavbarMain').highlightItem('users');
-
-    $('.workspace').html(_.div({ class: 'dashboard-container' }, _.h1('Users'), _.p('Hi'), _.button('Create').click(() => {
-        $.ajax({
-            type: 'POST',
-            url: apiUrl('user/new'),
-            data: {
-                username: 'hest',
-                password: 'test'
-            },
-            success: function success() {
-                debug.log('wooh!', this);
-            }
-        });
-    })));
-});
-
 // Readme
+
 Router.route('/readme/', function () {
     ViewHelper.get('NavbarMain').highlightItem('readme');
 
@@ -36532,8 +36515,9 @@ require('./media');
 require('./schemas');
 require('./settings');
 require('./forms');
+require('./users');
 
-},{"./cms":173,"./connections":174,"./content":175,"./forms":176,"./media":178,"./schemas":179,"./settings":180}],178:[function(require,module,exports){
+},{"./cms":173,"./connections":174,"./content":175,"./forms":176,"./media":178,"./schemas":179,"./settings":180,"./users":181}],178:[function(require,module,exports){
 'use strict';
 
 // Dashboard
@@ -36617,6 +36601,30 @@ Router.route('/settings/languages/', function () {
 });
 
 },{}],181:[function(require,module,exports){
+'use strict';
+
+// Users
+
+Router.route('/users/', function () {
+    ViewHelper.get('NavbarMain').showTab('/users/');
+
+    $('.workspace').html(_.div({ class: 'dashboard-container' }, _.h1('Users'), _.p('Please click on a user to continue')));
+});
+
+// Edit
+Router.route('/users/:id', function () {
+    ViewHelper.get('NavbarMain').highlightItem(this.id);
+
+    apiCall('get', 'users/' + this.id).then(user => {
+        let userEditor = new UserEditor({
+            model: user
+        });
+
+        $('.workspace').html(userEditor.$element);
+    }).catch(errorModal);
+});
+
+},{}],182:[function(require,module,exports){
 'use strict';
 
 // Views
@@ -36824,7 +36832,7 @@ class ConnectionEditor extends View {
 
 module.exports = ConnectionEditor;
 
-},{"./MessageModal":188}],182:[function(require,module,exports){
+},{"./MessageModal":189}],183:[function(require,module,exports){
 'use strict';
 
 // Views
@@ -37193,7 +37201,7 @@ class ContentEditor extends View {
 
 module.exports = ContentEditor;
 
-},{"../../../common/helpers/LanguageHelper":216,"./MessageModal":188}],183:[function(require,module,exports){
+},{"../../../common/helpers/LanguageHelper":219,"./MessageModal":189}],184:[function(require,module,exports){
 'use strict';
 
 /**
@@ -37431,7 +37439,7 @@ class FormEditor extends View {
 
 module.exports = FormEditor;
 
-},{}],184:[function(require,module,exports){
+},{}],185:[function(require,module,exports){
 'use strict';
 
 // Lib
@@ -37703,7 +37711,7 @@ class JSONEditor extends View {
 
 module.exports = JSONEditor;
 
-},{"./MessageModal":188,"js-beautify":104}],185:[function(require,module,exports){
+},{"./MessageModal":189,"js-beautify":104}],186:[function(require,module,exports){
 'use strict';
 
 class LanguagePicker extends View {
@@ -37743,7 +37751,7 @@ class LanguagePicker extends View {
 
 module.exports = LanguagePicker;
 
-},{}],186:[function(require,module,exports){
+},{}],187:[function(require,module,exports){
 'use strict';
 
 /**
@@ -37792,7 +37800,7 @@ class LanguageSettings extends View {
 
 module.exports = LanguageSettings;
 
-},{}],187:[function(require,module,exports){
+},{}],188:[function(require,module,exports){
 'use strict';
 
 // Views
@@ -37886,7 +37894,7 @@ class MediaViewer extends View {
 
 module.exports = MediaViewer;
 
-},{"./MessageModal":188}],188:[function(require,module,exports){
+},{"./MessageModal":189}],189:[function(require,module,exports){
 'use strict';
 
 /**
@@ -37955,7 +37963,7 @@ class MessageModal extends View {
 
 module.exports = MessageModal;
 
-},{}],189:[function(require,module,exports){
+},{}],190:[function(require,module,exports){
 'use strict';
 
 // Icons
@@ -38035,7 +38043,6 @@ class SchemaEditor extends View {
         this.$saveBtn.toggleClass('working', true);
 
         apiCall('post', 'schemas/' + this.model.id, this.model).then(() => {
-            debug.log('Saved model to', this);
             this.$saveBtn.toggleClass('working', false);
 
             reloadResource('schemas').then(() => {
@@ -38096,7 +38103,7 @@ class SchemaEditor extends View {
             view.model.name = $(this).val();
         }
 
-        let $element = _.div({ class: 'name-editor' }, _.if(!this.model.locked, _.input({ class: 'form-control', type: 'text', value: view.model.name, placeholder: 'Write the schema name here' }).on('change', onInputChange)), _.if(this.model.locked, _.p({ class: 'read-only' }, view.model.name)));
+        let $element = _.div({ class: 'name-editor' }, _.if(!this.model.locked, _.input({ class: 'form-control', type: 'text', value: view.model.name, placeholder: 'Input the schema name here' }).on('change', onInputChange)), _.if(this.model.locked, _.p({ class: 'read-only' }, view.model.name)));
 
         return $element;
     }
@@ -38371,12 +38378,6 @@ class SchemaEditor extends View {
             }
         }
 
-        function onClear() {
-            view.model.parentSchemaId = null;
-
-            $element.find('select').val(null);
-        }
-
         function render() {
             _.append($element.empty(), _.div({ class: 'schemas chip-group' }, _.each(view.model.allowedChildSchemas, (i, schemaId) => {
                 try {
@@ -38475,7 +38476,200 @@ class SchemaEditor extends View {
 
 module.exports = SchemaEditor;
 
-},{"../icons.json":171}],190:[function(require,module,exports){
+},{"../icons.json":171}],191:[function(require,module,exports){
+'use strict';
+
+class UserEditor extends View {
+    constructor(params) {
+        super(params);
+
+        this.$element = _.div({ class: 'editor user-editor' });
+
+        this.init();
+    }
+
+    /**
+     * Event: Click save.
+     */
+    onClickSave() {
+        this.$saveBtn.toggleClass('working', true);
+
+        apiCall('post', 'users/' + this.model.id, this.model).then(() => {
+            this.$saveBtn.toggleClass('working', false);
+
+            reloadResource('users').then(() => {
+                let navbar = ViewHelper.get('NavbarMain');
+
+                navbar.reload();
+            });
+        }).catch(err => {
+            new MessageModal({
+                model: {
+                    title: 'Error',
+                    body: err
+                }
+            });
+        });
+    }
+
+    /**
+     * Gets a list of available scopes
+     *
+     * @returns {Array} Array of scope strings
+     */
+    getScopes() {
+        return ['connections', 'schemas', 'settings', 'users'];
+    }
+
+    /**
+     * Gets a list of user scopes
+     *
+     * @returns {Array} Array of scope strings
+     */
+    getUserScopes() {
+        let project = ProjectHelper.currentProject;
+
+        if (!this.model.scopes) {
+            this.model.scopes = {};
+        }
+
+        if (!this.model.scopes[project]) {
+            this.model.scopes[project] = [];
+        }
+
+        return this.model.scopes[project];
+    }
+
+    /**
+     * Renders the username editor
+     *
+     * @returns {HTMLElement} Element
+     */
+    renderUserNameEditor() {
+        let view = this;
+
+        function onInputChange() {
+            view.model.username = $(this).val();
+        }
+
+        let $element = _.div({ class: 'username-editor' }, _.input({
+            class: 'form-control',
+            type: 'text',
+            value: view.model.username,
+            placeholder: 'Input the username here'
+        }).on('change', onInputChange));
+
+        return $element;
+    }
+
+    /**
+     * Renders the scopes editor
+     *
+     * @returns {HTMLElement} Element
+     */
+    renderScopesEditor() {
+        let view = this;
+
+        function onChange() {
+            view.getUserScopes().splice(0, view.getUserScopes().length);
+
+            $element.find('.scopes .scope .dropdown .dropdown-toggle').each(function () {
+                view.getUserScopes().push($(this).attr('data-id'));
+            });
+
+            render();
+        }
+
+        function onClickAdd() {
+            let newScope = '';
+
+            for (let scope of view.getScopes()) {
+                if (view.getUserScopes().indexOf(scope) < 0) {
+                    newScope = scope;
+                    break;
+                }
+            }
+
+            if (newScope) {
+                view.getUserScopes().push(newScope);
+
+                render();
+            }
+        }
+
+        function render() {
+            _.append($element.empty(), _.div({ class: 'scopes chip-group' }, _.each(view.getUserScopes(), (i, userScope) => {
+                try {
+                    let $scope = _.div({ class: 'chip scope' }, _.div({ class: 'chip-label dropdown' }, _.button({ class: 'dropdown-toggle', 'data-id': userScope, 'data-toggle': 'dropdown' }, userScope), _.ul({ class: 'dropdown-menu' }, _.each(view.getScopes(), (i, scope) => {
+                        if (scope == userScope || view.getUserScopes().indexOf(scope) < 0) {
+                            return _.li(_.a({ href: '#', 'data-id': scope }, scope).click(function (e) {
+                                e.preventDefault();
+
+                                let $btn = $(this).parents('.dropdown').children('.dropdown-toggle');
+
+                                $btn.text($(this).text());
+                                $btn.attr('data-id', $(this).attr('data-id'));
+
+                                onChange();
+                            }));
+                        }
+                    }))).change(onChange), _.button({ class: 'btn chip-remove' }, _.span({ class: 'fa fa-remove' })).click(() => {
+                        $scope.remove();
+
+                        onChange();
+                    }));
+
+                    return $scope;
+                } catch (e) {
+                    errorModal(e);
+                }
+            }), _.button({ class: 'btn chip-add' }, _.span({ class: 'fa fa-plus' })).click(onClickAdd)));
+        }
+
+        let $element = _.div({ class: 'scopes-editor' });
+
+        render();
+
+        return $element;
+    }
+
+    /**
+     * Renders a single field
+     *
+     * @return {Object} element
+     */
+    renderField(label, $content) {
+        return _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, label), _.div({ class: 'field-value' }, $content));
+    }
+
+    /**
+     * Renders all fields
+     *
+     * @return {Object} element
+     */
+    renderFields() {
+        let id = parseInt(this.model.id);
+
+        let $element = _.div({ class: 'user' });
+
+        $element.append(this.renderField('Username', this.renderUserNameEditor()));
+        $element.append(this.renderField('Scopes', this.renderScopesEditor()));
+
+        return $element;
+    }
+
+    render() {
+        _.append(this.$element.empty(), this.renderFields(), _.div({ class: 'panel panel-default panel-buttons' }, _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-danger btn-raised' }, 'Delete').click(() => {
+            this.onClickDelete();
+        }), this.$saveBtn = _.button({ class: 'btn btn-success btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Save '), _.span({ class: 'text-working' }, 'Saving ')).click(() => {
+            this.onClickSave();
+        }))));
+    }
+}
+
+module.exports = UserEditor;
+
+},{}],192:[function(require,module,exports){
 'use strict';
 
 /**
@@ -38679,7 +38873,7 @@ class ArrayEditor extends View {
 
 module.exports = ArrayEditor;
 
-},{}],191:[function(require,module,exports){
+},{}],193:[function(require,module,exports){
 'use strict';
 
 /**
@@ -38727,7 +38921,7 @@ class BooleanEditor extends View {
 
 module.exports = BooleanEditor;
 
-},{}],192:[function(require,module,exports){
+},{}],194:[function(require,module,exports){
 'use strict';
 
 /**
@@ -38802,7 +38996,7 @@ class ContentReferenceEditor extends View {
 
 module.exports = ContentReferenceEditor;
 
-},{}],193:[function(require,module,exports){
+},{}],195:[function(require,module,exports){
 'use strict';
 
 /**
@@ -38880,7 +39074,7 @@ class ContentSchemaReferenceEditor extends View {
 
 module.exports = ContentSchemaReferenceEditor;
 
-},{}],194:[function(require,module,exports){
+},{}],196:[function(require,module,exports){
 'use strict';
 
 /**
@@ -38925,7 +39119,7 @@ class DateEditor extends View {
 
 module.exports = DateEditor;
 
-},{}],195:[function(require,module,exports){
+},{}],197:[function(require,module,exports){
 'use strict';
 
 /**
@@ -38976,7 +39170,7 @@ class DropdownEditor extends View {
 
 module.exports = DropdownEditor;
 
-},{}],196:[function(require,module,exports){
+},{}],198:[function(require,module,exports){
 'use strict';
 
 /**
@@ -39030,7 +39224,7 @@ class LanguageEditor extends View {
 
 module.exports = LanguageEditor;
 
-},{}],197:[function(require,module,exports){
+},{}],199:[function(require,module,exports){
 'use strict';
 
 /**
@@ -39127,7 +39321,7 @@ class MediaReferenceEditor extends View {
 
 module.exports = MediaReferenceEditor;
 
-},{}],198:[function(require,module,exports){
+},{}],200:[function(require,module,exports){
 'use strict';
 
 /**
@@ -39192,7 +39386,7 @@ class PeriodEditor extends View {
 
 module.exports = PeriodEditor;
 
-},{}],199:[function(require,module,exports){
+},{}],201:[function(require,module,exports){
 'use strict';
 
 // Lib
@@ -39246,7 +39440,7 @@ class RichTextEditor extends View {
 
 module.exports = RichTextEditor;
 
-},{"marked":108,"to-markdown":150}],200:[function(require,module,exports){
+},{"marked":108,"to-markdown":150}],202:[function(require,module,exports){
 'use strict';
 
 /**
@@ -39281,7 +39475,7 @@ class StringEditor extends View {
 
 module.exports = StringEditor;
 
-},{}],201:[function(require,module,exports){
+},{}],203:[function(require,module,exports){
 'use strict';
 
 /**
@@ -39359,7 +39553,7 @@ class StructEditor extends View {
 
 module.exports = StructEditor;
 
-},{}],202:[function(require,module,exports){
+},{}],204:[function(require,module,exports){
 'use strict';
 
 /**
@@ -39425,7 +39619,7 @@ class TemplateReferenceEditor extends View {
 
 module.exports = TemplateReferenceEditor;
 
-},{}],203:[function(require,module,exports){
+},{}],205:[function(require,module,exports){
 'use strict';
 
 /**
@@ -39609,7 +39803,7 @@ class UrlEditor extends View {
 
 module.exports = UrlEditor;
 
-},{}],204:[function(require,module,exports){
+},{}],206:[function(require,module,exports){
 'use strict';
 
 window.resources.editors = {
@@ -39629,7 +39823,7 @@ window.resources.editors = {
     url: require('./UrlEditor')
 };
 
-},{"./ArrayEditor":190,"./BooleanEditor":191,"./ContentReferenceEditor":192,"./ContentSchemaReferenceEditor":193,"./DateEditor":194,"./DropdownEditor":195,"./LanguageEditor":196,"./MediaReferenceEditor":197,"./PeriodEditor":198,"./RichTextEditor":199,"./StringEditor":200,"./StructEditor":201,"./TemplateReferenceEditor":202,"./UrlEditor":203}],205:[function(require,module,exports){
+},{"./ArrayEditor":192,"./BooleanEditor":193,"./ContentReferenceEditor":194,"./ContentSchemaReferenceEditor":195,"./DateEditor":196,"./DropdownEditor":197,"./LanguageEditor":198,"./MediaReferenceEditor":199,"./PeriodEditor":200,"./RichTextEditor":201,"./StringEditor":202,"./StructEditor":203,"./TemplateReferenceEditor":204,"./UrlEditor":205}],207:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -39726,7 +39920,7 @@ class ConnectionPane extends Pane {
 
 module.exports = ConnectionPane;
 
-},{"./Pane":210}],206:[function(require,module,exports){
+},{"./Pane":212}],208:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -40111,7 +40305,7 @@ class ContentPane extends Pane {
 
 module.exports = ContentPane;
 
-},{"./Pane":210}],207:[function(require,module,exports){
+},{"./Pane":212}],209:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -40179,7 +40373,7 @@ class FormsPane extends Pane {
 
 module.exports = FormsPane;
 
-},{"./Pane":210}],208:[function(require,module,exports){
+},{"./Pane":212}],210:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -40466,7 +40660,7 @@ class MediaPane extends Pane {
 
 module.exports = MediaPane;
 
-},{"./Pane":210}],209:[function(require,module,exports){
+},{"./Pane":212}],211:[function(require,module,exports){
 'use strict';
 
 // Views
@@ -40482,6 +40676,7 @@ let ContentPane = require('./ContentPane');
 let FormsPane = require('./FormsPane');
 let MediaPane = require('./MediaPane');
 let SchemaPane = require('./SchemaPane');
+let UserPane = require('./UserPane');
 
 /**
  * The main navbar
@@ -40576,6 +40771,8 @@ class NavbarMain extends View {
                 name = item.title;
             } else if (typeof item.name === 'string') {
                 name = item.name;
+            } else if (typeof item.username === 'string') {
+                name = item.username;
             } else {
                 name = id;
             }
@@ -40859,6 +41056,11 @@ class NavbarMain extends View {
                     this.renderPane(SchemaPane.getRenderSettings());
                 }
 
+                // Render the "users" pane
+                if (scopes.indexOf('users') > -1) {
+                    this.renderPane(UserPane.getRenderSettings());
+                }
+
                 // ----------
                 // Render the "settings" pane
                 // ----------
@@ -40874,18 +41076,6 @@ class NavbarMain extends View {
                     });
                 }
 
-                // ----------
-                // Render the "users" pane
-                // ----------
-                if (scopes.indexOf('users') > -1) {
-                    this.renderPane({
-                        label: 'Users',
-                        route: '/users/',
-                        icon: 'user',
-                        items: []
-                    });
-                }
-
                 triggerReady('navbar');
 
                 $('.cms-container').removeClass('faded');
@@ -40897,7 +41087,7 @@ class NavbarMain extends View {
 
 module.exports = NavbarMain;
 
-},{"../../../../common/models/Content":221,"../MessageModal":188,"./ConnectionPane":205,"./ContentPane":206,"./FormsPane":207,"./MediaPane":208,"./SchemaPane":211}],210:[function(require,module,exports){
+},{"../../../../common/models/Content":224,"../MessageModal":189,"./ConnectionPane":207,"./ContentPane":208,"./FormsPane":209,"./MediaPane":210,"./SchemaPane":213,"./UserPane":214}],212:[function(require,module,exports){
 'use strict';
 
 class Pane {
@@ -40913,7 +41103,7 @@ class Pane {
 
 module.exports = Pane;
 
-},{}],211:[function(require,module,exports){
+},{}],213:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -41032,7 +41222,133 @@ class SchemaPane extends Pane {
 
 module.exports = SchemaPane;
 
-},{"./Pane":210}],212:[function(require,module,exports){
+},{"./Pane":212}],214:[function(require,module,exports){
+'use strict';
+
+let Pane = require('./Pane');
+
+class UserPane extends Pane {
+    /**
+     * Event: Click create new User
+     */
+    static onClickNewUser() {
+        let navbar = ViewHelper.get('NavbarMain');
+
+        let onSubmit = () => {
+            let username = messageModal.$element.find('input.username').val();
+            let password = messageModal.$element.find('input.password').val();
+
+            let usernameValid = username != '';
+            let passwordValid = password != '';
+
+            if (usernameValid && passwordValid) {
+                let scopes = {};
+                scopes[ProjectHelper.currentProject] = [];
+
+                let user = {
+                    username: username,
+                    password: password,
+                    scopes: scopes
+                };
+
+                apiCall('post', 'users/new', user).then(newUser => {
+                    reloadResource('users').then(() => {
+                        navbar.reload();
+
+                        location.hash = '/users/' + newUser.id;
+                    });
+                }).catch(errorModal);
+            } else {
+                return false;
+            }
+        };
+
+        let messageModal = new MessageModal({
+            model: {
+                title: 'Create new user',
+                body: _.div({}, _.input({ class: 'form-control username', placeholder: 'Username', type: 'text' }), _.input({ class: 'form-control password', placeholder: 'Password', type: 'password' }))
+            },
+            buttons: [{
+                label: 'Cancel',
+                class: 'btn-default'
+            }, {
+                label: 'OK',
+                class: 'btn-primary',
+                callback: onSubmit
+            }]
+        });
+    }
+
+    /**
+     * Event: On click remove User
+     */
+    static onClickRemoveUser() {
+        let navbar = ViewHelper.get('NavbarMain');
+        let id = $('.context-menu-target-element').data('id');
+        let name = $('.context-menu-target-element').data('name');
+
+        function onSuccess() {
+            reloadResource('users').then(function () {
+                navbar.reload();
+
+                // Cancel the UserEditor view if it was displaying the deleted user
+                if (location.hash == '#/users/' + id) {
+                    location.hash = '/users/';
+                }
+            });
+        }
+
+        new MessageModal({
+            model: {
+                title: 'Delete user',
+                body: 'Are you sure you want to remove the user "' + name + '"?'
+            },
+            buttons: [{
+                label: 'Cancel',
+                class: 'btn-default',
+                callback: function callback() {}
+            }, {
+                label: 'OK',
+                class: 'btn-danger',
+                callback: function callback() {
+                    apiCall('delete', 'users/' + id).then(onSuccess).catch(navbar.onError);
+                }
+            }]
+        });
+    }
+
+    static getRenderSettings() {
+        return {
+            label: 'Users',
+            route: '/users/',
+            icon: 'user',
+            items: resources.users,
+
+            // Item context menu
+            itemContextMenu: {
+                'This user': '---',
+                'Copy id': () => {
+                    this.onClickCopyItemId();
+                },
+                'Remove': () => {
+                    this.onClickRemoveUser();
+                }
+            },
+
+            // General context menu
+            paneContextMenu: {
+                'User': '---',
+                'New user': () => {
+                    this.onClickNewUser();
+                }
+            }
+        };
+    }
+}
+
+module.exports = UserPane;
+
+},{"./Pane":212}],215:[function(require,module,exports){
 module.exports=[
     "aa",
     "ab",
@@ -41221,7 +41537,7 @@ module.exports=[
     "zu"
 ]
 
-},{}],213:[function(require,module,exports){
+},{}],216:[function(require,module,exports){
 'use strict';
 
 class ConnectionHelper {
@@ -41291,7 +41607,7 @@ class ConnectionHelper {
 
 module.exports = ConnectionHelper;
 
-},{}],214:[function(require,module,exports){
+},{}],217:[function(require,module,exports){
 'use strict';
 
 class ContentHelper {
@@ -41398,7 +41714,7 @@ class ContentHelper {
 
 module.exports = ContentHelper;
 
-},{}],215:[function(require,module,exports){
+},{}],218:[function(require,module,exports){
 'use strict';
 
 let lastSenderName = '';
@@ -41502,7 +41818,7 @@ class DebugHelper {
 
 module.exports = DebugHelper;
 
-},{}],216:[function(require,module,exports){
+},{}],219:[function(require,module,exports){
 'use strict';
 
 class LanguageHelper {
@@ -41594,7 +41910,7 @@ class LanguageHelper {
 
 module.exports = LanguageHelper;
 
-},{"../data/languages.json":212}],217:[function(require,module,exports){
+},{"../data/languages.json":215}],220:[function(require,module,exports){
 'use strict';
 
 // Models
@@ -41656,7 +41972,7 @@ class MediaHelper {
 
 module.exports = MediaHelper;
 
-},{"../models/Media":225}],218:[function(require,module,exports){
+},{"../models/Media":228}],221:[function(require,module,exports){
 'use strict';
 
 // Models
@@ -41701,7 +42017,7 @@ class SchemaHelper {
 
 module.exports = SchemaHelper;
 
-},{"../models/ContentSchema":222,"../models/FieldSchema":224}],219:[function(require,module,exports){
+},{"../models/ContentSchema":225,"../models/FieldSchema":227}],222:[function(require,module,exports){
 'use strict';
 
 class SettingsHelper {
@@ -41735,7 +42051,7 @@ class SettingsHelper {
 
 module.exports = SettingsHelper;
 
-},{}],220:[function(require,module,exports){
+},{}],223:[function(require,module,exports){
 'use strict';
 
 let Entity = require('./Entity');
@@ -41962,7 +42278,7 @@ class Connection extends Entity {
 
 module.exports = Connection;
 
-},{"./Entity":223}],221:[function(require,module,exports){
+},{"./Entity":226}],224:[function(require,module,exports){
 'use strict';
 
 let Entity = require('./Entity');
@@ -42251,7 +42567,7 @@ class Content extends Entity {
 
 module.exports = Content;
 
-},{"./Entity":223}],222:[function(require,module,exports){
+},{"./Entity":226}],225:[function(require,module,exports){
 'use strict';
 
 let Schema = require('./Schema');
@@ -42275,7 +42591,7 @@ class ContentSchema extends Schema {
 
 module.exports = ContentSchema;
 
-},{"./Schema":226}],223:[function(require,module,exports){
+},{"./Schema":229}],226:[function(require,module,exports){
 'use strict';
 
 let crypto = require('crypto');
@@ -42432,7 +42748,7 @@ class Entity {
 
 module.exports = Entity;
 
-},{"crypto":56}],224:[function(require,module,exports){
+},{"crypto":56}],227:[function(require,module,exports){
 'use strict';
 
 let Schema = require('./Schema');
@@ -42454,7 +42770,7 @@ class FieldSchema extends Schema {
 
 module.exports = FieldSchema;
 
-},{"./Schema":226}],225:[function(require,module,exports){
+},{"./Schema":229}],228:[function(require,module,exports){
 'use strict';
 
 // Libs
@@ -42531,7 +42847,7 @@ class Media extends Entity {
 
 module.exports = Media;
 
-},{"./Entity":223,"path":115}],226:[function(require,module,exports){
+},{"./Entity":226,"path":115}],229:[function(require,module,exports){
 'use strict';
 
 let Entity = require('./Entity');
@@ -42567,7 +42883,7 @@ class Schema extends Entity {
 
 module.exports = Schema;
 
-},{"./Entity":223}]},{},[162,158,160])
+},{"./Entity":226}]},{},[162,158,160])
 
 
 //# sourceMappingURL=maps/client.js.map

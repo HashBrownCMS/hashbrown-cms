@@ -19,6 +19,7 @@ class ContentHelper extends ContentHelperCommon {
             ProjectHelper.currentProject,
             collection,
             {},
+            {},
             {
                 sort: 1
             }

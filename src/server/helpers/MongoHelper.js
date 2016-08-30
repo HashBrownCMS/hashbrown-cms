@@ -85,16 +85,16 @@ class MongoHelper {
      * @param {String} databaseName
      * @param {String} collectionName
      * @param {Object} query
+     * @param {Object} pattern
      *
      * @return {Promise} promise
      */
-    static findOne(databaseName, collectionName, query) {
+    static findOne(databaseName, collectionName, query, pattern) {
         return new Promise((resolve, reject) => {
             debug.log(databaseName + '/' + collectionName + '::findOne ' + JSON.stringify(query) + '...', this, 3);
 
-            let pattern = {
-                _id: 0
-            };
+            pattern = pattern || {};
+            pattern._id = 0;
 
             MongoHelper.getDatabase(databaseName)
             .then(function(db) {
@@ -118,17 +118,17 @@ class MongoHelper {
      * @param {String} databaseName
      * @param {String} collectionName
      * @param {Object} query
+     * @param {Object} pattern
      * @param {Object} sort
      *
      * @return {Promise} promise
      */
-    static find(databaseName, collectionName, query, sort) {
+    static find(databaseName, collectionName, query, pattern, sort) {
         return new Promise((resolve, reject) => {
             debug.log(databaseName + '/' + collectionName + '::find ' + JSON.stringify(query) + '...', this, 3);
 
-            let pattern = {
-                _id: 0
-            };
+            pattern = pattern || {};
+            pattern._id = 0;
 
             MongoHelper.getDatabase(databaseName)
             .then(function(db) {
@@ -149,6 +149,33 @@ class MongoHelper {
     }
     
     /**
+     * Merges a single Mongo document
+     *
+     * @param {String} databaseName
+     * @param {String} collectionName
+     * @param {Object} query
+     * @param {Object} doc
+     * @param {Object} options
+     *
+     * @return {Promise} promise
+     */
+    static mergeOne(databaseName, collectionName, query, doc, options) {
+        return new Promise((resolve, reject) => {
+            this.findOne(databaseName, collectionName, query)
+            .then((foundDoc) => {
+                for(let k in doc) {
+                    foundDoc[k] = doc[k];
+                }
+
+                this.updateOne(databaseName, collectionName, query, foundDoc, options)
+                .then(resolve)
+                .catch(reject);
+            })
+            .catch(reject);
+        });
+    }
+    
+    /**
      * Updates a single Mongo document
      *
      * @param {String} databaseName
@@ -160,10 +187,10 @@ class MongoHelper {
      * @return {Promise} promise
      */
     static updateOne(databaseName, collectionName, query, doc, options) {
-        // Make sure the MongoId isn't included
-        delete doc['_id'];
-
         return new Promise((resolve, reject) => {
+            // Make sure the MongoId isn't included
+            delete doc['_id'];
+
             debug.log(databaseName + '/' + collectionName + '::updateOne ' + JSON.stringify(query) + ' with options ' + JSON.stringify(options || {}) + '...', this, 3);
         
             MongoHelper.getDatabase(databaseName)
