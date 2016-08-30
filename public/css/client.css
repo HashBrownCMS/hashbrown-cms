@@ -33,7 +33,6 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
   .chip-group .chip input.chip-label {
     max-width: 100px; }
   .chip-group .chip .chip-label {
-    color: #fff;
     margin: 0px 8px 0px 8px;
     height: 32px;
     line-height: 32px;
@@ -41,7 +40,19 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
     border: 0px;
     padding: 0px;
     display: inline;
-    width: auto; }
+    width: auto;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    color: #fff; }
+    .chip-group .chip .chip-label.dropdown .dropdown-toggle {
+      background: none;
+      border: 0px;
+      padding: 0px;
+      margin: 0px;
+      font-size: 14px; }
+      .chip-group .chip .chip-label.dropdown .dropdown-toggle .fa {
+        margin-left: 0.5em; }
   .chip-group .chip .chip-remove {
     margin: 0px 0px 0px 4px;
     background-color: transparent;

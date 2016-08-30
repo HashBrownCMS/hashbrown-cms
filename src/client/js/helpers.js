@@ -67,14 +67,16 @@ window.messageModal = function messageModal(title, body, onSubmit) {
 /**
  * Brings up an error modal
  *
- * @param {String} message
+ * @param {String|Error} error
  */
-window.errorModal = function errorModal(message) {
-    if(message instanceof Error) {
-        message = message.message;
+window.errorModal = function errorModal(error) {
+    if(error instanceof String) {
+        error = new Error(error);
     }
 
-    messageModal('Error', message);
+    messageModal('Error', error.message);
+
+    throw error;
 }
 
 /**

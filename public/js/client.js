@@ -35149,14 +35149,16 @@ window.messageModal = function messageModal(title, body, onSubmit) {
 /**
  * Brings up an error modal
  *
- * @param {String} message
+ * @param {String|Error} error
  */
-window.errorModal = function errorModal(message) {
-    if (message instanceof Error) {
-        message = message.message;
+window.errorModal = function errorModal(error) {
+    if (error instanceof String) {
+        error = new Error(error);
     }
 
-    messageModal('Error', message);
+    messageModal('Error', error.message);
+
+    throw error;
 };
 
 /**
@@ -38345,17 +38347,28 @@ class SchemaEditor extends View {
         function onChange() {
             view.model.allowedChildSchemas = [];
 
-            $element.find('.schemas .schema select').each(function () {
-                view.model.allowedChildSchemas.push($(this).val());
+            $element.find('.schemas .schema .dropdown .dropdown-toggle').each(function () {
+                view.model.allowedChildSchemas.push($(this).attr('data-id'));
             });
 
             render();
         }
 
         function onClickAdd() {
-            view.model.allowedChildSchemas.push('page');
+            let newSchemaId = '';
 
-            render();
+            for (let id in resources.schemas) {
+                if (resources.schemas[id].type == 'content' && view.model.allowedChildSchemas.indexOf(id) < 0) {
+                    newSchemaId = id;
+                    break;
+                }
+            }
+
+            if (newSchemaId) {
+                view.model.allowedChildSchemas.push(newSchemaId);
+
+                render();
+            }
         }
 
         function onClear() {
@@ -38367,11 +38380,20 @@ class SchemaEditor extends View {
         function render() {
             _.append($element.empty(), _.div({ class: 'schemas chip-group' }, _.each(view.model.allowedChildSchemas, (i, schemaId) => {
                 try {
-                    let $schema = _.div({ class: 'chip schema' }, _.select({ class: 'chip-label' }, _.each(resources.schemas, (id, schema) => {
+                    let $schema = _.div({ class: 'chip schema' }, _.div({ class: 'chip-label dropdown' }, _.button({ class: 'dropdown-toggle', 'data-id': schemaId, 'data-toggle': 'dropdown' }, resources.schemas[schemaId].name), _.ul({ class: 'dropdown-menu' }, _.each(resources.schemas, (id, schema) => {
                         if (schema.type == 'content' && (id == schemaId || view.model.allowedChildSchemas.indexOf(schema.id) < 0)) {
-                            return _.option({ value: id, selected: id == schemaId }, schema.name);
+                            return _.li(_.a({ href: '#', 'data-id': id }, schema.name).click(function (e) {
+                                e.preventDefault();
+
+                                let $btn = $(this).parents('.dropdown').children('.dropdown-toggle');
+
+                                $btn.text($(this).text());
+                                $btn.attr('data-id', $(this).attr('data-id'));
+
+                                onChange();
+                            }));
                         }
-                    })).change(onChange), _.button({ class: 'btn chip-remove' }, _.span({ class: 'fa fa-remove' })).click(() => {
+                    }))).change(onChange), _.button({ class: 'btn chip-remove' }, _.span({ class: 'fa fa-remove' })).click(() => {
                         $schema.remove();
 
                         onChange();
