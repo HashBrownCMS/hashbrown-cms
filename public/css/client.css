@@ -519,10 +519,12 @@ body {
 
 .dashboard .projects {
   display: flex;
-  flex-wrap: wrap; }
+  flex-wrap: wrap;
+  margin: 0px -15px; }
   .dashboard .projects .project-editor {
     flex-grow: 1;
     padding: 15px;
+    margin: 15px;
     max-width: 300px;
     height: 200px; }
     .dashboard .projects .project-editor .body {
