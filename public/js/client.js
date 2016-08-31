@@ -36932,44 +36932,33 @@ class ContentEditor extends View {
      * @param {Object} publishing
      */
     onClickSave(publishing) {
-        let view = this;
+        this.model.unpublished = false;
 
-        view.model.unpublished = false;
+        let publishConnections = () => {
+            if (publishing.connections && publishing.connections.length > 0) {
+                return apiCall('post', 'content/publish', this.model);
+            } else {
+                return new Promise(resolve => {
+                    resolve();
+                });
+            }
+        };
 
-        function publishConnections() {
-            apiCall('post', 'content/publish', view.model).then(onSuccess).catch(onError);
-        }
+        let reloadView = () => {
+            this.$saveBtn.toggleClass('saving', false);
 
-        function onSuccess() {
-            view.$saveBtn.toggleClass('saving', false);
+            this.reload();
+            ViewHelper.get('NavbarMain').reload();
+        };
 
-            reloadResource('content').then(function () {
-                let navbar = ViewHelper.get('NavbarMain');
-
-                view.reload();
-                navbar.reload();
-            });
-        }
-
-        function onError(err) {
-            new MessageModal({
-                model: {
-                    title: 'Error',
-                    body: err
-                }
-            });
-        }
-
-        view.$saveBtn.toggleClass('working', true);
+        this.$saveBtn.toggleClass('working', true);
 
         // Save content to database
-        apiCall('post', 'content/' + view.model.id, view.model).then(response => {
-            if (publishing.connections && publishing.connections.length > 0) {
-                publishConnections();
-            } else {
-                onSuccess();
-            }
-        }).catch(onError);
+        apiCall('post', 'content/' + this.model.id, this.model).then(() => {
+            return publishConnections();
+        }).then(() => {
+            return reloadResource('content');
+        }).then(reloadView).catch(errorModal);
     }
 
     /**

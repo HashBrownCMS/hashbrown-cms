@@ -22,6 +22,10 @@ class HashBrownDriverConnection extends Connection {
      * @returns {Promise(Object)} tree
      */
     getTree() {
+        let headers = {
+            'Accept': 'application/json'
+        };
+            
         return new Promise((resolve, reject) => {
             restler.get(this.settings.url + '/hashbrown/content/tree?token=' + this.settings.token, {
                 headers: headers
@@ -33,7 +37,8 @@ class HashBrownDriverConnection extends Connection {
                         resolve(tree);
               
                     } catch(e) {
-                        reject(e);
+                        debug.log(e, this);
+                        resolve({});
               
                     }
 
@@ -53,6 +58,11 @@ class HashBrownDriverConnection extends Connection {
      * @returns {Promise} promise
      */
     setTree(json) {
+        let headers = {
+            'Accept': 'application/json',
+            'DataType': 'application/json'
+        };
+            
         return new Promise((resolve) => {
             restler.post(this.settings.url + '/hashbrown/content/tree?token=' + this.settings.token, {
                 headers: headers,
