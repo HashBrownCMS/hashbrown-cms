@@ -70,7 +70,10 @@ $('.login').each(function() {
         .then(function(token) {
             localStorage.setItem('token', token);
 
-            location = location.href.replace(location.protocol + '//' + location.hostname + location.pathname + '?path=', '');
+            let newLocation = location.href.replace(location.protocol + '//' + location.hostname + location.pathname, '');
+            newLocation = newLocation.replace('?path=', '');
+
+            location = newLocation || '/';
         })
         .catch(function(e) {
             alert(e.toString());

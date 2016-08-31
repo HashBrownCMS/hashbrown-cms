@@ -407,6 +407,10 @@ class NavbarMain extends View {
                     $icon: _.img({src: '/svg/logo.svg', class: 'about-logo'}),
                     items: [
                         {
+                            name: 'User',
+                            path: 'user'
+                        },
+                        {
                             name: 'Readme',
                             path: 'readme'
                         },

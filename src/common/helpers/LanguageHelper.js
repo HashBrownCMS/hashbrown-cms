@@ -16,7 +16,7 @@ class LanguageHelper {
      * @returns {String[]} languages
      */
     static getSelectedLanguages() {
-        return new Promise((callback) => {
+        return new Promise((resolve, reject) => {
             SettingsHelper.getSettings('language')
             .then((settings) => {
                 if(!settings) {
@@ -29,8 +29,9 @@ class LanguageHelper {
           
                 settings.selected.sort();
 
-                callback(settings.selected);
-            });  
+                resolve(settings.selected);
+            })
+            .catch(reject);  
         });
     }
 

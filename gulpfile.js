@@ -4,7 +4,6 @@ var gulp = require('gulp');                         // Base gulp package
 var babelify = require('babelify');                 // Used to convert ES6 & JSX to ES5
 var browserify = require('browserify');             // Providers "require" support, CommonJS
 var notify = require('gulp-notify');                // Provides notification to both the console and Growel
-var rename = require('gulp-rename');                // Rename sources
 var sourcemaps = require('gulp-sourcemaps');        // Provide external sourcemap files
 var gutil = require('gulp-util');                   // Provides gulp utilities, including logging and beep
 var chalk = require('chalk');                       // Allows for colouring for logging
@@ -28,8 +27,7 @@ var config = {
             './plugins/hashbrown-driver/client/js/client.js'
         ],
         watch: [ './src/client/js/**/*.js', './node_modules/exomon/*.js' ],
-        outputDir: './public/js/',
-        outputFile: 'client.js',
+        outputDir: './public/js/'
     },
     sass: {
         src: [
@@ -60,30 +58,27 @@ function mapError(err) {
 }
 
 /**
- * JavaScript file output
- */
-function bundle(bundler) {
-    var bundleTimer = duration('Javascript bundle time');
-
-    bundler
-    .bundle()
-    .on('error', mapError)                          // Map error reporting
-    .pipe(source('client.js'))                      // Set source name
-    .pipe(buffer())                                 // Convert to gulp pipeline
-    .pipe(rename(config.js.outputFile))             // Rename the output file
-    .pipe(sourcemaps.init({loadMaps: true}))        // Extract the inline sourcemaps
-    .pipe(sourcemaps.write('./maps'))               // Set folder for sourcemaps to output to
-    .pipe(gulp.dest(config.js.outputDir))           // Set the output folder
-    .pipe(notify({
-        message: 'Generated file: <%= file.relative %>',
-    }))                                             // Output the file being created
-    .pipe(bundleTimer);                             // Output time timing of the file creation
-}
-
-/**
- * Build JavaScript
+ * Build JavaScript for environment
  */
 gulp.task('js', function() {
+    function bundle(bundler) {
+        var bundleTimer = duration('Javascript bundle time');
+
+        bundler
+        .bundle()
+        .on('error', mapError)                      // Map error reporting
+        .pipe(source('client.js'))                  // Set source name
+        .pipe(buffer())                             // Convert to gulp pipeline
+        .pipe(sourcemaps.init({loadMaps: true}))    // Extract the inline sourcemaps
+        .pipe(sourcemaps.write('./maps'))           // Set folder for sourcemaps to output to
+        .pipe(gulp.dest(config.js.outputDir))       // Set the output folder
+        .pipe(notify({
+            message: 'Generated file: <%= file.relative %>',
+        }))                                         // Output the file being created
+        .pipe(bundleTimer);                         // Output time timing of the file creation
+    }
+    
+    
     var args = merge(                               // Merge in default watchify args with browserify arguments
         watchify.args,
         {
@@ -92,7 +87,7 @@ gulp.task('js', function() {
         }
     );
 
-    var bundler = browserify(args)   // Browserify
+    var bundler = browserify(args)                  // Browserify
         .plugin(watchify)                           // Watchify to watch source file changes
         .transform(babelify, {                      // Babel transforms
             presets: ['es2015-node5']
@@ -101,7 +96,50 @@ gulp.task('js', function() {
     bundle(bundler);                                // Run the bundle the first time (required for Watchify to kick in)
 
     bundler.on('update', function() {
-        bundle(bundler);                            // Re-run bundle on source updates
+        bundle(bundler);                           // Re-run bundle on source updates
+    });
+});
+
+/**
+ * Build JavaScript for dashboard
+ */
+gulp.task('js-dashboard', function() {
+    function bundle(bundler) {
+        var bundleTimer = duration('Javascript bundle time');
+
+        bundler
+        .bundle()
+        .on('error', mapError)                      // Map error reporting
+        .pipe(source('dashboard.js'))               // Set source name
+        .pipe(buffer())                             // Convert to gulp pipeline
+        .pipe(sourcemaps.init({loadMaps: true}))    // Extract the inline sourcemaps
+        .pipe(sourcemaps.write('./maps'))           // Set folder for sourcemaps to output to
+        .pipe(gulp.dest(config.js.outputDir))       // Set the output folder
+        .pipe(notify({
+            message: 'Generated file: <%= file.relative %>',
+        }))                                         // Output the file being created
+        .pipe(bundleTimer);                         // Output time timing of the file creation
+    }
+    
+    
+    var args = merge(                               // Merge in default watchify args with browserify arguments
+        watchify.args,
+        {
+            debug: true,
+            entries: [ './src/client/js/dashboard.js' ]
+        }
+    );
+
+    var bundler = browserify(args)                  // Browserify
+        .plugin(watchify)                           // Watchify to watch source file changes
+        .transform(babelify, {                      // Babel transforms
+            presets: ['es2015-node5']
+        });
+
+    bundle(bundler);                                // Run the bundle the first time (required for Watchify to kick in)
+
+    bundler.on('update', function() {
+        bundle(bundler);                           // Re-run bundle on source updates
     });
 });
 
@@ -130,9 +168,14 @@ gulp.task('sass', function() {
 });
 
 /**
- * Gulp task
+ * Gulp tasks
  */
 gulp.task('default', [
     'sass',
     'js'
+]);
+
+gulp.task('dashboard', [
+    'sass',
+    'js-dashboard'
 ]);

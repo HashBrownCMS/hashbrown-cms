@@ -18,7 +18,6 @@ class ApiController extends Controller {
      */
     static authenticate(token, scope) {
         return new Promise((resolve, reject) => {
-            
             UserHelper.findToken(token)
             .then((user) => {
                 if(user) {

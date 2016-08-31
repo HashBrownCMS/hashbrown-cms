@@ -162,14 +162,9 @@ app.get('/login/', function(req, res) {
     res.render('login');
 });
 
-// Project list
+// Dashboard
 app.get('/', function(req, res) {
-    res.render('select-project');
-});
-
-// Project
-app.get('/:project', function(req, res) {
-    res.render('select-environment', { project: req.params.project });
+    res.render('dashboard');
 });
 
 // Environment
@@ -181,9 +176,14 @@ app.get('/:project/:environment/', function(req, res) {
             currentEnvironment: ProjectHelper.currentEnvironment
         });
     })
-    .catch(() => {
-        res.sendStatus(404);  
+    .catch((e) => {
+        res.status(404).send(e.message);  
     });
+});
+
+// 404
+app.get('*', function(req, res) {
+    res.redirect('/');
 });
 
 // ----------

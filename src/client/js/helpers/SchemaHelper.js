@@ -8,11 +8,11 @@ let SchemaHelperCommon = require('../../../common/helpers/SchemaHelper');
  */
 class SchemaHelper extends SchemaHelperCommon {
     /**
-     * Gets all parent fields
+     * Gets a Schema with all parent fields
      *
      * @param {String} id
      *
-     * @returns {Promise(Schema)} schema
+     * @returns {Promise} Schema with parent fields
      */
     static getSchemaWithParentFields(id) {
         return new Promise((resolve, reject) => {
@@ -27,9 +27,9 @@ class SchemaHelper extends SchemaHelperCommon {
     /**
      * Gets a Schema by id
      *
-     * @param {string} id
+     * @param {String} id
      *
-     * @return {Promise(Schema)} promise
+     * @return {Promise} Promise
      */
     static getSchemaById(id) {
         return new Promise((resolve, reject) => {

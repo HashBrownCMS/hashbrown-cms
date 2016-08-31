@@ -4,6 +4,7 @@ $sm: 'max-width: 991px';
 $xs: 'max-width: 767px';
 
 @import '_main';
+@import '_dashboard';
 @import '_icon-picker';
 @import '_select-views';
 @import '_json-editor';

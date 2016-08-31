@@ -14,18 +14,14 @@ Router.route('/content/', function() {
 
 // Edit (JSON editor)
 Router.route('/content/json/:id', function() {
-    ContentHelper.getContentById(this.id)
-    .then((content) => {
-        let contentEditor = new JSONEditor({
-            model: content,
-            apiPath: 'content/' + this.id
-        });
+    ViewHelper.get('NavbarMain').highlightItem(this.id);
+    
+    let contentEditor = new JSONEditor({
+        modelUrl: apiUrl('content/' + this.id),
+        apiPath: 'content/' + this.id
+    });
 
-        ViewHelper.get('NavbarMain').highlightItem(this.id);
-        
-        $('.workspace').html(contentEditor.$element);
-    })
-    .catch(errorModal);
+    $('.workspace').html(contentEditor.$element);
 });
 
 // Edit (redirect to meta tab)
@@ -38,17 +34,13 @@ Router.route('/content/:id/:tab', function() {
     let contentEditor = ViewHelper.get('ContentEditor');
   
     if(!contentEditor || contentEditor.model.id != this.id) {
-        ContentHelper.getContentById(this.id)
-        .then((content) => { 
-            ViewHelper.get('NavbarMain').highlightItem(this.id);
-       
-            contentEditor = new ContentEditor({
-                model: content
-            });
-
-            $('.workspace').html(contentEditor.$element);
-        })
-        .catch(errorModal);
+        ViewHelper.get('NavbarMain').highlightItem(this.id);
+   
+        contentEditor = new ContentEditor({
+            modelUrl: apiUrl('content/' + this.id)
+        });
+        
+        $('.workspace').html(contentEditor.$element);
     }
 });
 

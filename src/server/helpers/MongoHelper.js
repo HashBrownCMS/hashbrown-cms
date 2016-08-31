@@ -37,6 +37,33 @@ class MongoHelper {
             });
         });
     }
+    
+    /**
+     * Lists all collections in a database
+     *
+     * @param {String} databaseName
+     *
+     * @return {Promise} promise
+     */
+    static listCollections(databaseName) {
+        return new Promise((resolve, reject) => {
+            debug.log(databaseName + '::listCollections...', this, 3);
+
+            MongoHelper.getDatabase(databaseName)
+            .then(function(db) {
+                db.listCollections().toArray(function(findErr, arr) {
+                    if(findErr) {
+                        reject(new Error(findErr));
+                    } else {
+                        resolve(arr);
+                    }
+
+                    db.close();
+                });
+            })
+            .catch(reject);
+        });
+    }
 
     /**
      * Lists all databases
@@ -62,7 +89,14 @@ class MongoHelper {
                             for(let i = 0; i < result.databases.length; i++) {
                                 let database = result.databases[i];
 
-                                if(!database.empty && database.name != 'local' && database.name != 'users') {
+                                if(
+                                    !database.empty &&
+                                    database.name != 'local' &&
+                                    database.name != 'users' &&
+                                    database.name != 'admin' &&
+                                    database.name != 'undefined' && 
+                                    database.name != 'false'
+                                ) {
                                     databases[databases.length] = database.name;
                                 }
                             }

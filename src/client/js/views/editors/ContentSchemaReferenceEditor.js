@@ -11,26 +11,33 @@ class ContentSchemaReferenceEditor extends View {
         
         // Fetch allowed Schemas from parent if needed 
         if(this.config && this.config.allowedSchemas == 'fromParent') {
-            ContentHelper.getContentById(Router.params.id)
-            .then((thisContent) => {
-                if(thisContent.parentId) {
-                    ContentHelper.getContentById(thisContent.parentId)
-                    .then((parentContent) => {
-                        SchemaHelper.getSchemaById(parentContent.schemaId)
-                        .then((parentSchema) => {
-                            this.config.allowedSchemas = parentSchema.allowedChildSchemas;                            
-                            this.init();
-                        })
-                        .catch(errorModal);
-                    })
-                    .catch(errorModal);
+            let thisContent = resources.content.filter((c) => { return c.id == Router.params.id; })[0];
+
+            if(!thisContent) {
+                errorModal(new Error('Content by id "' + Router.params.id + '" not found'));
+
+            } else if(thisContent.parentId) {
+                let parentContent = resources.content.filter((c) => { return c.id == thisContent.parentId; })[0];
+
+                if(!parentContent) {
+                    errorModal(new Error('Content by id "' + thisContent.parentId + '" not found'));
 
                 } else {
-                    this.init();
-                
+                    let parentSchema = resources.schemas[parentContent.schemaId];
+                        
+                    if(!parentSchema) {
+                        errorModal(new Error('Schema by id "' + parentContent.schematId + '" not found'));
+
+                    } else {
+                        this.config.allowedSchemas = parentSchema.allowedChildSchemas;                            
+                        this.init();
+                    }
                 }
-            })
-            .catch(errorModal);
+
+            } else {
+                this.init();
+            
+            }
 
         } else {
             this.init();

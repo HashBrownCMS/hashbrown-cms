@@ -1,5 +1,7 @@
 'use strict';
 
+let Project = require('../../common/models/Project');
+
 /**
  * A helper class for managing projects
  */
@@ -7,24 +9,26 @@ class ProjectHelper {
     /**
      * Sets the current project and environment
      *
-     * @param {String} project
-     * @param {String} environment
+     * @param {String} projectName
+     * @param {String} environmentName
      *
-     * @returns {Promise} promise
+     * @returns {Promise} Promise
      */
-    static setCurrent(project, environment) {
+    static setCurrent(projectName, environmentName) {
         return new Promise((resolve, reject) => {
-            this.currentProject = project;
-        
-            // First check if the environment is enabled
-            ProjectHelper.getAllEnvironments()
-            .then((environments) => {
-                if(environments.indexOf(environment) > -1) {
-                    this.currentEnvironment = environment;
+            // First check if the project exists
+            this.getProject(projectName)
+            .then((project) => {
+                this.currentProject = project.name;
+
+                // Then check if the environment is enabled
+                if(project.settings.environments.names.indexOf(environmentName) > -1) {
+                    this.currentEnvironment = environmentName;
 
                     resolve();
+
                 } else {
-                    reject(new Error('Environment "' + environment + '" is not enabled'));
+                    reject(new Error('Environment "' + environment + '" is does not exist in project "' + project.name + '"'));
 
                 }
             })
@@ -35,14 +39,51 @@ class ProjectHelper {
     /**
      * Gets a list of all available projects
      *
-     * @returns {Promise(Array)} projects
+     * @returns {Promise} Array of Project objects
      */
     static getAllProjects() {
         return new Promise((resolve, reject) => {
             MongoHelper.listDatabases()
-            .then((databases) => {
-                resolve(databases);
-            }); 
+            .then(resolve)
+            .catch(reject); 
+        });
+    }
+
+    /**
+     * Gets a Project object
+     *
+     * @param {String} name
+     *
+     * @returns {Promise} Project object
+     */
+    static getProject(name) {
+        return new Promise((resolve, reject) => {
+            MongoHelper.find(name, 'settings', {})
+            .then((settings) => {
+                UserHelper.getAllUsers(name)
+                .then((users) => {
+                    let project = new Project();
+
+                    project.name = name;
+
+                    for(let section of (settings || [])) {
+                        project.settings[section.section] = section;
+                    }
+
+                    // Sanity check
+                    if(!project.settings.environments) {
+                        project.settings.environments = {
+                            section: 'environments',
+                            names: [ 'live' ]
+                        };
+                    }
+                
+                    project.users = users;
+
+                    resolve(project.getObject());
+                });
+            })
+            .catch(reject);
         });
     }
 

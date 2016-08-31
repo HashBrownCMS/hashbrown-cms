@@ -1,5 +1,33 @@
 'use strict';
 
+// Root
+Router.route('/', function() {
+    ViewHelper.get('NavbarMain').showTab('/');
+
+    $('.workspace').html(
+        _.div({class: 'dashboard-container readme'},
+            _.h1('Welcome to HashBrown CMS')
+        )
+    );
+});
+
+// User
+Router.route('/user/', function() {
+    ViewHelper.get('NavbarMain').highlightItem('user');
+
+    $('.workspace').html(
+        _.div({class: 'dashboard-container user'},
+            _.div({class: 'btn btn-danger'},
+                'Log out'
+            ).click(() => {
+                localStorage.clear();
+
+                location = '/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment;
+            })
+        )
+    );
+});
+
 // Readme
 Router.route('/readme/', function() {
     ViewHelper.get('NavbarMain').highlightItem('readme');

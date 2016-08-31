@@ -1,54 +1,12 @@
-// Resource cache
-window.resources = {
-    editors: {},
-    connections: {},
-    connectionEditors: {},
-    content: [],
-    schemas: [],
-    media: [],
-    templates: [],
-    sectionTemplates: [],
-    forms: [],
-    users: []
-};
-
 // Libraries
 require('exomon');
 window.Promise = require('bluebird');
 
-// Main views
+// Common views
 window.MessageModal = require('./views/MessageModal');
-window.NavbarMain = require('./views/navbar/NavbarMain');
-window.MediaViewer = require('./views/MediaViewer');
-window.LanguagePicker = require('./views/LanguagePicker');
 
-// Editor views
-require('./views/editors');
-window.JSONEditor = require('./views/JSONEditor');
-window.ContentEditor = require('./views/ContentEditor');
-window.FormEditor = require('./views/FormEditor');
-window.ConnectionEditor = require('./views/ConnectionEditor');
-window.SchemaEditor = require('./views/SchemaEditor');
-window.LanguageSettings = require('./views/LanguageSettings');
-window.UserEditor = require('./views/UserEditor');
-
-// Models
-window.Content = require('./models/Content');
-
-// Helpers
+// Common helpers
 window.ProjectHelper = require('./helpers/ProjectHelper');
-window.MediaHelper = require('./helpers/MediaHelper');
-window.ConnectionHelper = require('./helpers/ConnectionHelper');
-window.ContentHelper = require('./helpers/ContentHelper');
-window.LanguageHelper = require('./helpers/LanguageHelper');
-window.SchemaHelper = require('./helpers/SchemaHelper');
-window.SettingsHelper = require('./helpers/SettingsHelper');
-
-window.debug = require('../../common/helpers/DebugHelper');
-window.debug.verbosity = 3;
-
-let onReadyCallbacks = {};
-let isReady = {};
 
 /**
  * Brings up a message modal
@@ -114,17 +72,23 @@ window.copyToClipboard = function copyToClipboard(string) {
  * @param {String} url
  */
 window.apiUrl = function apiUrl(url) {
-    let newUrl = 
-        '/api/' + 
-        ProjectHelper.currentProject + '/' +
-        ProjectHelper.currentEnvironment + '/' + 
-        url;
+    let newUrl = '/api/';
+
+    if(ProjectHelper.currentProject) {
+        newUrl += ProjectHelper.currentProject + '/';
+    }
+        
+    if(ProjectHelper.currentEnvironment) {
+        newUrl += ProjectHelper.currentEnvironment + '/';
+    }
+
+    newUrl += url;
    
-        if(url.indexOf('?') > -1) {
-            newUrl += '&token=' + localStorage.getItem('token');
-        } else {
-            newUrl += '?token=' + localStorage.getItem('token');
-        }
+    if(url.indexOf('?') > -1) {
+        newUrl += '&token=' + localStorage.getItem('token');
+    } else {
+        newUrl += '?token=' + localStorage.getItem('token');
+    }
 
     return newUrl;
 };
@@ -138,7 +102,6 @@ window.apiUrl = function apiUrl(url) {
  */
 window.apiCall = function apiCall(method, url, data) {
     return new Promise((resolve, reject) => {
-
         var xhr = new XMLHttpRequest();
         xhr.open(method.toUpperCase(), apiUrl(url));
         xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
@@ -159,9 +122,15 @@ window.apiCall = function apiCall(method, url, data) {
             let DONE = 4;
             let OK = 200;
             let NOT_MODIFIED = 304;
-            
-            if (xhr.readyState === DONE) {
-                if(xhr.status == OK || xhr.status == NOT_MODIFIED) {
+            let UNAUTHORIZED = 403;
+
+            if(xhr.readyState === DONE) {
+                if(xhr.status === UNAUTHORIZED) {
+                    location = '/login/?path=' + location.pathname + location.hash;
+
+                    reject(new Error('User is not logged in'));
+
+                } else if(xhr.status == OK || xhr.status == NOT_MODIFIED) {
                     let response = xhr.responseText;
 
                     if(response && response != 'OK') {
@@ -184,110 +153,3 @@ window.apiCall = function apiCall(method, url, data) {
         }
     });
 };
-
-/**
- * Clears the workspace
- */
-window.clearWorkspace = function clearWorkspace() {
-    $('.workspace > div').remove();
-};
-
-/**
- * Reloads a resource
- */
-window.reloadResource = function reloadResource(name) {
-    return new Promise(function(callback) {
-        $.ajax({
-            type: 'GET',
-            url: apiUrl(name),
-            success: function(result) {
-                window.resources[name] = result;
-
-                callback(result);
-            },
-            error: function(e) {
-                // Users is an exceptional API call, in that it can only be seen by other users with the right scope
-                if(name == 'users') {
-                    callback([]);
-
-                } else {
-                    if(e.status == 403) {
-                        location = '/login/?path=' + location.pathname + location.hash;
-                    }
-                    
-                    callback(null);
-                }
-            }
-        });
-    });
-};
-
-/**
- * Reloads all resources
- */
-window.reloadAllResources = function reloadAllResources() {
-    return new Promise(function(resolve) {
-        let queue = [
-            'content',
-            'schemas',
-            'media',
-            'connections',
-            'templates',
-            'sectionTemplates',
-            'forms',
-            'users'
-        ];
-
-        function processQueue(name) {
-            window.reloadResource(name)
-            .then(function() {
-                queue.pop();
-
-                if(queue.length < 1) {
-                    resolve();
-                }
-            });
-        }
-
-        for(let name of queue) {
-            processQueue(name);
-        }
-    });
-};
-
-/**
- * Adds a ready callback to the queue or executes it if given key is already triggered
- */
-window.onReady = function onReady(name, callback) {
-    if(isReady[name]) {
-        callback();
-    
-    } else {
-        if(!onReadyCallbacks[name]) {
-            onReadyCallbacks[name] = [];
-        }
-
-        onReadyCallbacks[name].push(callback);
-    
-    }
-}
-
-/**
- * Resets a key
- */
-window.resetReady = function resetReady(name) {
-    delete isReady[name];
-}
-
-/**
- * Triggers a key
- */
-window.triggerReady = function triggerReady(name) {
-    isReady[name] = true;
-
-    if(onReadyCallbacks[name]) {
-        for(let callback of onReadyCallbacks[name]) {
-            callback();
-        }
-    }
-}

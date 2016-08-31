@@ -11,15 +11,7 @@ class SettingsHelper extends SettingsHelperCommon {
      * @return {Promise} promise
      */
     static getSettings(section) {
-        return new Promise((resolve) => {
-            $.ajax({
-                url: apiUrl('settings/' + section),
-                type: 'GET',
-                success: (settings) => {
-                    resolve(settings || {});
-                }
-            }); 
-        });
+        return apiCall('get', 'settings/' + section);
     }
     
     /**

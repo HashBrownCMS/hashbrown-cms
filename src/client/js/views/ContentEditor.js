@@ -331,10 +331,11 @@ class ContentEditor extends View {
      *
      * @param {Content} content
      * @param {Object} schema
+     * @param {Array} languages
      *
      * @return {Object} element
      */
-    renderEditor(content, schema) {
+    renderEditor(content, schema, languages) {
         let view = this;
 
         // Check for active tab
@@ -346,7 +347,7 @@ class ContentEditor extends View {
 
         // Render editor
         return _.div({class: 'object'},
-            new LanguagePicker().$element,
+            new LanguagePicker({ model: languages }).$element,
             _.ul({class: 'nav nav-tabs'}, 
                 _.each(schema.tabs, (tabId, tab) => {
                     return _.li({class: isTabActive(tabId) ? 'active' : ''}, 
@@ -379,57 +380,70 @@ class ContentEditor extends View {
     }
 
     render() {
-        SchemaHelper.getSchemaWithParentFields(this.model.schemaId)
-        .then((contentSchema) => {
-            if(contentSchema) {
-                if(!this.model.properties) {
-                    this.model.properties = {};
-                }
+        // Make sure the model data is using the Content model
+        if(!this.model.properties) {
+            this.model.properties = {};
+        }
 
-                this.model = new Content(this.model);
+        this.model = new Content(this.model);
+        
+        // Fetch information
+        let contentSchema;
+        let publishingSettings;
+        let selectedLanguages;
 
-                this.model.getSettings('publishing')
-                .then((publishing) => {
-                    this.$element.html(
-                        this.renderEditor(this.model, contentSchema).append(
-                            // Buttons 
-                            _.div({class: 'panel panel-default panel-buttons'}, 
-                                _.div({class: 'btn-group'},
+        LanguageHelper.getSelectedLanguages()
+        .then((languages) => {
+            selectedLanguages = languages;
 
-                                    // JSON editor
-                                    _.button({class: 'btn btn-embedded'},
-                                        'Advanced'
-                                    ).click(() => { this.onClickAdvanced(); }),
+            return SchemaHelper.getSchemaWithParentFields(this.model.schemaId);
+        })
+        .then((schema) => {
+            contentSchema = schema;
+            
+            return this.model.getSettings('publishing');
+        })
+        .then((settings) => {
+            publishingSettings = settings;
 
-                                    // Delete
-                                    _.button({class: 'btn btn-danger btn-raised'},
-                                        'Delete'
-                                    ).click(() => { this.onClickDelete(publishing); }),
+            this.$element.html(
+                // Render editor
+                this.renderEditor(this.model, contentSchema, selectedLanguages)
 
-                                    // Unpublish
-                                    _.if(publishing.connections && publishing.connections.length > 0 && !this.model.unpublished,
-                                        this.$unpublishBtn = _.button({class: 'btn btn-primary btn-raised btn-save'},
-                                            _.span({class: 'text-default'}, 'Unpublish'),
-                                            _.span({class: 'text-working'}, 'Unpublishing')
-                                        ).click(() => { this.onClickUnpublish(publishing); })
-                                    ),
+                // Render buttons 
+                .append(
+                    _.div({class: 'panel panel-default panel-buttons'}, 
+                        _.div({class: 'btn-group'},
 
-                                    // Save & publish
-                                    this.$saveBtn = _.button({class: 'btn btn-success btn-raised btn-save'},
-                                        _.span({class: 'text-default'}, 'Save' + (publishing.connections && publishing.connections.length > 0 ? ' & publish' : '')),
-                                        _.span({class: 'text-working'}, 'Saving')
-                                    ).click(() => { this.onClickSave(publishing); })
-                                )
-                            )
+                            // JSON editor
+                            _.button({class: 'btn btn-embedded'},
+                                'Advanced'
+                            ).click(() => { this.onClickAdvanced(); }),
+
+                            // Delete
+                            _.button({class: 'btn btn-danger btn-raised'},
+                                'Delete'
+                            ).click(() => { this.onClickDelete(publishingSettings); }),
+
+                            // Unpublish
+                            _.if(publishingSettings.connections && publishingSettings.connections.length > 0 && !this.model.unpublished,
+                                this.$unpublishBtn = _.button({class: 'btn btn-primary btn-raised btn-save'},
+                                    _.span({class: 'text-default'}, 'Unpublish'),
+                                    _.span({class: 'text-working'}, 'Unpublishing')
+                                ).click(() => { this.onClickUnpublish(publishing); })
+                            ),
+
+                            // Save & publish
+                            this.$saveBtn = _.button({class: 'btn btn-success btn-raised btn-save'},
+                                _.span({class: 'text-default'}, 'Save' + (publishingSettings.connections && publishingSettings.connections.length > 0 ? ' & publish' : '')),
+                                _.span({class: 'text-working'}, 'Saving')
+                            ).click(() => { this.onClickSave(publishingSettings); })
                         )
-                    );
-                })
-                .catch((e) => {
-                    errorModal(e);
-                });
-
-                this.onFieldEditorsReady();
-            }
+                    )
+                )
+            );
+            
+            this.onFieldEditorsReady();
         })
         .catch((e) => {
             errorModal(e);

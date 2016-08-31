@@ -517,6 +517,31 @@ body {
           .cms-container .workspace .panel-buttons .btn-group .btn.working .text-working {
             display: inline; }
 
+.dashboard .projects {
+  display: flex;
+  flex-wrap: wrap; }
+  .dashboard .projects .project-editor {
+    flex-grow: 1;
+    padding: 15px;
+    max-width: 300px;
+    height: 200px; }
+    .dashboard .projects .project-editor .body {
+      height: 100%;
+      display: flex;
+      flex-direction: column; }
+      .dashboard .projects .project-editor .body .info {
+        flex-grow: 1; }
+        .dashboard .projects .project-editor .body .info h4 {
+          margin-top: 0px; }
+      .dashboard .projects .project-editor .body .environments {
+        display: flex;
+        flex-wrap: wrap;
+        margin: 0px -2px; }
+        .dashboard .projects .project-editor .body .environments .btn {
+          flex-grow: 1;
+          min-width: 40%;
+          margin: 2px; }
+
 .modal.modal-icon-picker .modal-dialog {
   width: calc(100% - 30px);
   max-width: 900px; }

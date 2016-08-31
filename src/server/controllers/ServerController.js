@@ -8,6 +8,7 @@ class ServerController extends ApiController {
      */
     static init(app) {
         app.get('/api/server/projects', this.middleware({ setProject: false }), this.getAllProjects);
+        app.get('/api/server/projects/:project', this.middleware({ setProject: false }), this.getProject);
         app.get('/api/server/:project/environments', this.middleware({ setProject: false }), this.getAllEnvironments);
     }
     
@@ -21,6 +22,19 @@ class ServerController extends ApiController {
         })
         .catch((e) => {
             res.status(502).send(e);
+        });
+    }
+    
+    /**
+     * Gets a project
+     */
+    static getProject(req, res) {
+        ProjectHelper.getProject(req.params.project)
+        .then((project) => {
+            res.send(project);
+        })
+        .catch((e) => {
+            res.status(502).send(e.message);
         });
     }
     
