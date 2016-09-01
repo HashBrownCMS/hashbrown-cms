@@ -28868,8 +28868,10 @@ class MessageModal extends View {
             if (view.buttons) {
                 return _.each(view.buttons, function (i, button) {
                     return _.button({ class: 'btn ' + button.class }, button.label).click(function () {
-                        if (button.callback() != false) {
-                            view.hide();
+                        if (button.callback) {
+                            if (button.callback() != false) {
+                                view.hide();
+                            }
                         }
                     });
                 });

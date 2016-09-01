@@ -53,7 +53,12 @@ class MessageModal extends View {
                                     return _.button({class: 'btn ' + button.class},
                                         button.label
                                     ).click(function() {
-                                        if(button.callback() != false) {
+                                        if(button.callback) {
+                                            if(button.callback() != false) {
+                                                view.hide();
+                                            }
+                                        
+                                        } else {
                                             view.hide();
                                         }
                                     })
