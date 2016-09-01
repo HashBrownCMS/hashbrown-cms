@@ -95,6 +95,8 @@ class User extends Entity {
             expires: expires
         };
 
+        this.cleanUpTokens();
+        
         this.tokens.push(token);
 
         return key;
