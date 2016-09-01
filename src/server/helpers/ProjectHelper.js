@@ -60,10 +60,10 @@ class ProjectHelper {
         return new Promise((resolve, reject) => {
             MongoHelper.find(name, 'settings', {})
             .then((settings) => {
-                if(!Array.isArray(settings) || settings.length < 1) {
+                /*if(!Array.isArray(settings) || settings.length < 1) {
                     reject(new Error('Project "' + name + '" does not exist'));
 
-                } else {
+                } else {*/
                     UserHelper.getAllUsers(name)
                     .then((users) => {
                         let project = new Project();
@@ -86,7 +86,7 @@ class ProjectHelper {
 
                         resolve(project.getObject());
                     });
-                }
+               /* }*/
             })
             .catch(reject);
         });
