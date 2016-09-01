@@ -11,11 +11,6 @@ let exec = require('child_process').exec;
 let os = require('os');
 let cookieparser = require('cookie-parser');
 
-Promise.onPossiblyUnhandledRejection((error, promise) => {
-//    debug.warning(error, Promise);
-    throw error;
-});
-
 // ----------
 // Express app
 // ----------

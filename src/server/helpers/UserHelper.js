@@ -126,7 +126,6 @@ class UserHelper {
     static removeUserProjectScope(id, scope) {
         return new Promise((resolve, reject) => {
             let foundUser = null;
-            let foundProject = null;
             
             MongoHelper.findOne('users', 'users', { id: id })
             .then((found) => {
@@ -136,16 +135,18 @@ class UserHelper {
             })
             .then((project) => {
                 if(project.users.length < 2) {
-                    debug.error('The last user can\'t be removed from a project. If you want to delete the project, please do so explicitly', this);
-                }
+                    reject(new Error('The last user can\'t be removed from a project. If you want to delete the project, please do so explicitly'));
                 
-                debug.log('Removing user "' + foundUser.username + '" from project "' + project.name + '"', this);
+                } else {
+                    debug.log('Removing user "' + foundUser.username + '" from project "' + project.name + '"', this);
 
-                delete foundUser.scopes[scope];
-                
-                return MongoHelper.updateOne('users', 'users', { id: id }, foundUser);
+                    delete foundUser.scopes[scope];
+                    
+                    MongoHelper.updateOne('users', 'users', { id: id }, foundUser)
+                    .then(resolve)
+                    .catch(reject);
+                }
             })
-            .then(resolve)
             .catch(reject);
         });
     }
@@ -183,7 +184,7 @@ class UserHelper {
                         'users',
                         user.getFields()
                     ).then(() => {
-                        debug.log('Created user "' + username + '" successfully.', this);
+                        debug.log('Created user "' + username + '" successfully', this);
                         
                         resolve(user);
                     })
@@ -321,7 +322,7 @@ class UserHelper {
                 },
                 properties
             ).then(() => {
-                debug.log('Updated user "' + id + '" successfully with properties: ' + JSON.stringify(properties), this);
+                debug.log('Updated user "' + id + '" successfully', this);
                 
                 callback();
             });
