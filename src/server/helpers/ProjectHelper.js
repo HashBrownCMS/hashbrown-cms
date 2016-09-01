@@ -60,28 +60,33 @@ class ProjectHelper {
         return new Promise((resolve, reject) => {
             MongoHelper.find(name, 'settings', {})
             .then((settings) => {
-                UserHelper.getAllUsers(name)
-                .then((users) => {
-                    let project = new Project();
+                if(!Array.isArray(settings) || settings.length < 1) {
+                    reject(new Error('Project "' + name + '" does not exist'));
 
-                    project.name = name;
+                } else {
+                    UserHelper.getAllUsers(name)
+                    .then((users) => {
+                        let project = new Project();
 
-                    for(let section of (settings || [])) {
-                        project.settings[section.section] = section;
-                    }
+                        project.name = name;
 
-                    // Sanity check
-                    if(!project.settings.environments) {
-                        project.settings.environments = {
-                            section: 'environments',
-                            names: [ 'live' ]
-                        };
-                    }
-                
-                    project.users = users;
+                        for(let section of (settings || [])) {
+                            project.settings[section.section] = section;
+                        }
 
-                    resolve(project.getObject());
-                });
+                        // Sanity check
+                        if(!project.settings.environments) {
+                            project.settings.environments = {
+                                section: 'environments',
+                                names: [ 'live' ]
+                            };
+                        }
+                    
+                        project.users = users;
+
+                        resolve(project.getObject());
+                    });
+                }
             })
             .catch(reject);
         });

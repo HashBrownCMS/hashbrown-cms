@@ -47,8 +47,14 @@ body {
 }
 
 // About logo
-.about-logo {
-    color: material-color('green', '500');
+img.logo {
+    width: 30px;
+    height: 30px;
+
+    &.lg {
+        width: 60px;
+        height: 60px;
+    }
 }
 
 // Spinner

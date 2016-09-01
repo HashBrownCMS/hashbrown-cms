@@ -12,6 +12,7 @@ window.ProjectEditor = require('./views/dashboard/ProjectEditor');
 // Models
 window.Project = require('../../common/models/Project');
 
+// Get projects
 apiCall('get', 'server/projects')
 .then((projects) => {
     for(let i in projects) {
@@ -21,9 +22,15 @@ apiCall('get', 'server/projects')
                 model: new Project(project)
             });
 
-            $('.dashboard .projects').append(projectEditor.$element);
+            $('.dashboard-container .workspace .projects').append(projectEditor.$element);
         })
         .catch(errorModal);
     }
 })
 .catch(errorModal);
+
+// Set navbar button events
+$('.navbar-main a').click(function() {
+    $('.navbar-main a').removeClass('active');
+    $(this).addClass('active');
+});

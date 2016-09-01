@@ -8,6 +8,7 @@ let markdownToHtml = require('marked');
 let express = require('express');
 let bodyparser = require('body-parser');
 let exec = require('child_process').exec;
+let os = require('os');
 
 Promise.onPossiblyUnhandledRejection((error, promise) => {
 //    debug.warning(error, Promise);
@@ -130,9 +131,9 @@ function ready() {
 // ----------
 // Views
 // ----------
-// Catch
+// Catch evil-doers
 app.get([ '/wp-admin', '/wp-admin/', '/umbraco', '/umbraco/' ], (req, res) => {
-    res.status(200).send('Nice try, but wrong CMS ;) This incident will be reported.');
+    res.status(200).send('Nice try, but wrong CMS. This incident will be reported.');
 });
 
 // Readme
@@ -164,7 +165,9 @@ app.get('/login/', function(req, res) {
 
 // Dashboard
 app.get('/', function(req, res) {
-    res.render('dashboard');
+    res.render('dashboard', {
+        os: os
+    });
 });
 
 // Environment
@@ -177,7 +180,7 @@ app.get('/:project/:environment/', function(req, res) {
         });
     })
     .catch((e) => {
-        res.status(404).send(e.message);  
+        res.status(404).redirect('/');  
     });
 });
 
@@ -185,8 +188,3 @@ app.get('/:project/:environment/', function(req, res) {
 app.get('*', function(req, res) {
     res.redirect('/');
 });
-
-// ----------
-// HashBrown driver
-// ----------
-require(appRoot + '/driver/node/HashBrown').init(app);

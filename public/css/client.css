@@ -177,6 +177,9 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
     .modal .modal-dialog .modal-content .modal-footer {
       border-top: 0px; }
 
+input:-webkit-autofill, input:-webkit-autofill:active, input:-webkit-autofill:visited, input:-webkit-autofill:focus, input:-webkit-autofill:hover {
+  -webkit-box-shadow: 0 0 0px 1000px white inset; }
+
 .form-control, .form-control:active, .form-control:focus, .form-control[readonly] {
   background-color: transparent;
   border-radius: 0px;
@@ -351,8 +354,12 @@ body {
   cursor: -moz-grabbing !important;
   cursor: grabbing !important; }
 
-.about-logo {
-  color: #4caf50; }
+img.logo {
+  width: 30px;
+  height: 30px; }
+  img.logo.lg {
+    width: 60px;
+    height: 60px; }
 
 @keyframes spinner {
   0% {
@@ -517,32 +524,51 @@ body {
           .cms-container .workspace .panel-buttons .btn-group .btn.working .text-working {
             display: inline; }
 
-.dashboard .projects {
-  display: flex;
-  flex-wrap: wrap;
-  margin: 0px -15px; }
-  .dashboard .projects .project-editor {
+.dashboard-container {
+  display: flex; }
+  .dashboard-container .navspace {
+    width: 160px;
+    flex-basis: 160px;
+    flex-shrink: 0;
+    height: 100%; }
+  .dashboard-container .workspace {
     flex-grow: 1;
-    padding: 15px;
-    margin: 15px;
-    max-width: 300px;
-    height: 200px; }
-    .dashboard .projects .project-editor .body {
-      height: 100%;
+    height: 100%;
+    padding: 15px 30px;
+    overflow-y: auto; }
+    .dashboard-container .workspace .diagnostics tr {
+      font-size: 14px; }
+      .dashboard-container .workspace .diagnostics tr td {
+        padding-bottom: 1em; }
+        .dashboard-container .workspace .diagnostics tr td:first-child {
+          min-width: 200px;
+          font-weight: bold; }
+    .dashboard-container .workspace .projects {
       display: flex;
-      flex-direction: column; }
-      .dashboard .projects .project-editor .body .info {
-        flex-grow: 1; }
-        .dashboard .projects .project-editor .body .info h4 {
-          margin-top: 0px; }
-      .dashboard .projects .project-editor .body .environments {
-        display: flex;
-        flex-wrap: wrap;
-        margin: 0px -2px; }
-        .dashboard .projects .project-editor .body .environments .btn {
-          flex-grow: 1;
-          min-width: 40%;
-          margin: 2px; }
+      flex-wrap: wrap;
+      margin: 0px -15px; }
+      .dashboard-container .workspace .projects .project-editor {
+        flex-grow: 1;
+        padding: 15px;
+        margin: 15px;
+        max-width: 300px;
+        height: 200px; }
+        .dashboard-container .workspace .projects .project-editor .body {
+          height: 100%;
+          display: flex;
+          flex-direction: column; }
+          .dashboard-container .workspace .projects .project-editor .body .info {
+            flex-grow: 1; }
+            .dashboard-container .workspace .projects .project-editor .body .info h4 {
+              margin-top: 0px; }
+          .dashboard-container .workspace .projects .project-editor .body .environments {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0px -2px; }
+            .dashboard-container .workspace .projects .project-editor .body .environments .btn {
+              flex-grow: 1;
+              min-width: 40%;
+              margin: 2px; }
 
 .modal.modal-icon-picker .modal-dialog {
   width: calc(100% - 30px);
@@ -900,7 +926,7 @@ body {
     @media (max-width: 991px) {
       .navspace .navbar-main .tab-buttons {
         width: 60px; } }
-    .navspace .navbar-main .tab-buttons button {
+    .navspace .navbar-main .tab-buttons button, .navspace .navbar-main .tab-buttons a {
       width: 100%;
       height: 60px;
       background-color: #222;
@@ -910,20 +936,20 @@ body {
       border: none;
       border-radius: 0px;
       clear: both;
-      position: relative; }
-      .navspace .navbar-main .tab-buttons button[data-route="about"] {
+      position: relative;
+      display: block; }
+      .navspace .navbar-main .tab-buttons button[data-route="about"], .navspace .navbar-main .tab-buttons a[data-route="about"] {
         font-weight: bold; }
-      .navspace .navbar-main .tab-buttons button.active, .navspace .navbar-main .tab-buttons button:hover {
+      .navspace .navbar-main .tab-buttons button.active, .navspace .navbar-main .tab-buttons button:hover, .navspace .navbar-main .tab-buttons a.active, .navspace .navbar-main .tab-buttons a:hover {
         background-color: #333; }
-      .navspace .navbar-main .tab-buttons button .pane-icon {
+      .navspace .navbar-main .tab-buttons button .pane-icon, .navspace .navbar-main .tab-buttons a .pane-icon {
         width: 60px;
         height: 60px;
-        float: left; }
-        .navspace .navbar-main .tab-buttons button .pane-icon .about-logo {
-          width: 30px;
-          height: 30px;
+        float: left;
+        text-align: center; }
+        .navspace .navbar-main .tab-buttons button .pane-icon .logo, .navspace .navbar-main .tab-buttons a .pane-icon .logo {
           margin-top: 15px; }
-        .navspace .navbar-main .tab-buttons button .pane-icon .fa {
+        .navspace .navbar-main .tab-buttons button .pane-icon .fa, .navspace .navbar-main .tab-buttons a .pane-icon .fa {
           margin: 0px;
           height: 60px;
           line-height: 60px;
@@ -931,7 +957,7 @@ body {
           font-size: 20px;
           width: 60px;
           display: block; }
-      .navspace .navbar-main .tab-buttons button .pane-text {
+      .navspace .navbar-main .tab-buttons button .pane-text, .navspace .navbar-main .tab-buttons a .pane-text {
         height: 60px;
         width: 100px;
         display: flex;
@@ -941,12 +967,12 @@ body {
         justify-content: center;
         text-align: left; }
         @media (max-width: 991px) {
-          .navspace .navbar-main .tab-buttons button .pane-text {
+          .navspace .navbar-main .tab-buttons button .pane-text, .navspace .navbar-main .tab-buttons a .pane-text {
             display: none; } }
-        .navspace .navbar-main .tab-buttons button .pane-text .pane-label, .navspace .navbar-main .tab-buttons button .pane-text .pane-sublabel {
+        .navspace .navbar-main .tab-buttons button .pane-text .pane-label, .navspace .navbar-main .tab-buttons button .pane-text .pane-sublabel, .navspace .navbar-main .tab-buttons a .pane-text .pane-label, .navspace .navbar-main .tab-buttons a .pane-text .pane-sublabel {
           display: block;
           width: 100%; }
-        .navspace .navbar-main .tab-buttons button .pane-text .pane-sublabel {
+        .navspace .navbar-main .tab-buttons button .pane-text .pane-sublabel, .navspace .navbar-main .tab-buttons a .pane-text .pane-sublabel {
           line-height: 10px;
           height: 10px;
           opacity: 0.5;

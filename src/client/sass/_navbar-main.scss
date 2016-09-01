@@ -37,7 +37,7 @@
                 width: 60px;
             }
 
-            button {
+            button, a {
                 width: 100%;
                 height: 60px;
                 background-color: $darkest-grey;
@@ -48,6 +48,7 @@
                 border-radius: 0px;
                 clear: both;
                 position: relative;
+                display: block;
 
                 &[data-route="about"] {
                     font-weight: bold;
@@ -61,10 +62,9 @@
                     width: 60px;
                     height: 60px;
                     float: left;
+                    text-align: center;
 
-                    .about-logo {
-                        width: 30px;
-                        height: 30px;
+                    .logo {
                         margin-top: 15px;
                     }
 
