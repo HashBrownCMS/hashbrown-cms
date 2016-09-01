@@ -92,6 +92,8 @@ window.reloadResource = function reloadResource(name) {
  * Reloads all resources
  */
 window.reloadAllResources = function reloadAllResources() {
+    $('.loading-messages').empty();
+    
     return new Promise(function(resolve) {
         let queue = [
             'content',
@@ -105,8 +107,14 @@ window.reloadAllResources = function reloadAllResources() {
         ];
 
         function processQueue(name) {
+            let $msg = _.div({'data-name': name}, 'Loading ' + name + '...');
+
+            $('.loading-messages').append($msg);
+
             window.reloadResource(name)
             .then(function() {
+                $msg.append(' OK');
+                
                 queue.pop();
 
                 if(queue.length < 1) {

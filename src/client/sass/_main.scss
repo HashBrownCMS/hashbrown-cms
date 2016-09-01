@@ -96,6 +96,8 @@ img.logo {
 
         &.inline {
             display: flex;
+            flex-wrap: wrap;
+            width: 300px;
 
             .spinner {
                 position: static;
@@ -109,6 +111,11 @@ img.logo {
                 line-height: 32px;
                 font-size: 32px;
                 margin-left: 16px;
+            }
+
+            .loading-messages {
+                padding: 15px 30px;
+                width: 100%;
             }
         }
     }

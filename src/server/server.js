@@ -167,14 +167,28 @@ app.get('/login/', function(req, res) {
 
 // Dashboard
 app.get('/', function(req, res) {
-    res.render('dashboard', {
-        os: os
+    ApiController.authenticate(req.cookies.token)
+    .then(() => {
+        res.render('dashboard', {
+            os: os
+        });
+    })
+    .catch((e) => {
+        debug.log(e.message, this);
+        res.status(403).redirect('/login');  
     });
 });
 
 // Environment
 app.get('/:project/:environment/', function(req, res) {
-    ProjectHelper.setCurrent(req.params.project, req.params.environment)
+    ApiController.authenticate(req.cookies.token)
+    .then((user) => {
+        if(!user.scopes[req.params.project]) {
+            debug.error('User "' + user.username + '" doesn\'t have project "' + req.params.project + '" in scopes');
+        }  
+
+        return ProjectHelper.setCurrent(req.params.project, req.params.environment);
+    })
     .then(() => {
         res.render('environment', {
             currentProject: ProjectHelper.currentProject,
@@ -182,7 +196,8 @@ app.get('/:project/:environment/', function(req, res) {
         });
     })
     .catch((e) => {
-        res.status(404).redirect('/');  
+        debug.log(e.message, this);
+        res.status(403).redirect('/login');  
     });
 });
 

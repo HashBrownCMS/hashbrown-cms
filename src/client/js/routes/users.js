@@ -7,7 +7,7 @@ Router.route('/users/', function() {
     $('.workspace').html(
         _.div({class: 'dashboard-container'},
             _.h1('Users'),
-            _.p('Please click on a user to continue'),
+            _.p('Please click on a user to continue')
         )
     );
 });

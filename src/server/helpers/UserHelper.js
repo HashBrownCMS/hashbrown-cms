@@ -125,26 +125,27 @@ class UserHelper {
      */
     static removeUserProjectScope(id, scope) {
         return new Promise((resolve, reject) => {
-            MongoHelper.findOne(
-                'users',
-                'users',
-                {
-                    id: id
-                }
-            ).then((found) => {
-                delete found.scopes[scope];
+            let foundUser = null;
+            let foundProject = null;
+            
+            MongoHelper.findOne('users', 'users', { id: id })
+            .then((found) => {
+                foundUser = found;
 
-                MongoHelper.updateOne(
-                    'users',
-                    'users',
-                    {
-                        id: id
-                    },
-                    found
-                )
-                .then((user) => { resolve(user); })
-                .catch(reject);
+                return ProjectHelper.getProject(scope); 
             })
+            .then((project) => {
+                if(project.users.length < 2) {
+                    debug.error('The last user can\'t be removed from a project. If you want to delete the project, please do so explicitly', this);
+                }
+                
+                debug.log('Removing user "' + foundUser.username + '" from project "' + project.name + '"', this);
+
+                delete foundUser.scopes[scope];
+                
+                return MongoHelper.updateOne('users', 'users', { id: id }, foundUser);
+            })
+            .then(resolve)
             .catch(reject);
         });
     }
@@ -231,7 +232,7 @@ class UserHelper {
         let query = {};
 
         if(project) {
-            debug.log('Getting all users with project "' + project + '" in scope...', this);
+            debug.log('Getting all users with project "' + project + '" in scope...', this, 3);
 
             query['scopes.' + project] = { $exists: true };
 

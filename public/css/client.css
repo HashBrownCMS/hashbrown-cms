@@ -388,7 +388,9 @@ img.logo {
     left: 50%;
     transform: translate(-50%, -50%); }
     .spinner-obscure .spinner-container.inline {
-      display: flex; }
+      display: flex;
+      flex-wrap: wrap;
+      width: 300px; }
       .spinner-obscure .spinner-container.inline .spinner {
         position: static;
         transform: none;
@@ -399,6 +401,9 @@ img.logo {
         line-height: 32px;
         font-size: 32px;
         margin-left: 16px; }
+      .spinner-obscure .spinner-container.inline .loading-messages {
+        padding: 15px 30px;
+        width: 100%; }
 
 .spinner-container {
   position: relative; }
