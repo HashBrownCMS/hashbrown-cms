@@ -75,6 +75,13 @@ class ProjectHelper {
                         }
 
                         // Sanity check
+                        if(!project.settings.language) {
+                            project.settings.language = {
+                                section: 'language',
+                                selected: [ 'en' ]
+                            };
+                        }
+                        
                         if(!project.settings.environments) {
                             project.settings.environments = {
                                 section: 'environments',
