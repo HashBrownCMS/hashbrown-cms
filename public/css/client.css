@@ -524,48 +524,48 @@ img.logo {
           .cms-container .workspace .panel-buttons .btn-group .btn.working .text-working {
             display: inline; }
 
-.dashboard-container {
+body > .dashboard-container {
   display: flex; }
-  .dashboard-container .navspace {
+  body > .dashboard-container .navspace {
     width: 160px;
     flex-basis: 160px;
     flex-shrink: 0;
     height: 100%; }
-  .dashboard-container .workspace {
+  body > .dashboard-container .workspace {
     flex-grow: 1;
     height: 100%;
     padding: 15px 30px;
     overflow-y: auto; }
-    .dashboard-container .workspace .diagnostics tr {
+    body > .dashboard-container .workspace .diagnostics tr {
       font-size: 14px; }
-      .dashboard-container .workspace .diagnostics tr td {
+      body > .dashboard-container .workspace .diagnostics tr td {
         padding-bottom: 1em; }
-        .dashboard-container .workspace .diagnostics tr td:first-child {
+        body > .dashboard-container .workspace .diagnostics tr td:first-child {
           min-width: 200px;
           font-weight: bold; }
-    .dashboard-container .workspace .projects {
+    body > .dashboard-container .workspace .projects {
       display: flex;
       flex-wrap: wrap;
       margin: 0px -15px; }
-      .dashboard-container .workspace .projects .project-editor {
+      body > .dashboard-container .workspace .projects .project-editor {
         flex-grow: 1;
         padding: 15px;
         margin: 15px;
         max-width: 300px;
         height: 200px; }
-        .dashboard-container .workspace .projects .project-editor .body {
+        body > .dashboard-container .workspace .projects .project-editor .body {
           height: 100%;
           display: flex;
           flex-direction: column; }
-          .dashboard-container .workspace .projects .project-editor .body .info {
+          body > .dashboard-container .workspace .projects .project-editor .body .info {
             flex-grow: 1; }
-            .dashboard-container .workspace .projects .project-editor .body .info h4 {
+            body > .dashboard-container .workspace .projects .project-editor .body .info h4 {
               margin-top: 0px; }
-          .dashboard-container .workspace .projects .project-editor .body .environments {
+          body > .dashboard-container .workspace .projects .project-editor .body .environments {
             display: flex;
             flex-wrap: wrap;
             margin: 0px -2px; }
-            .dashboard-container .workspace .projects .project-editor .body .environments .btn {
+            body > .dashboard-container .workspace .projects .project-editor .body .environments .btn {
               flex-grow: 1;
               min-width: 40%;
               margin: 2px; }
@@ -610,6 +610,7 @@ img.logo {
       overflow: auto;
       display: block;
       border: 0px;
+      white-space: nowrap;
       resize: none;
       flex-grow: 1; }
     .json-editor .editor-container .btn-prettify {
@@ -764,6 +765,7 @@ img.logo {
   .rich-text-editor .panel-footer {
     background-color: #212121; }
     .rich-text-editor .panel-footer textarea {
+      white-space: nowrap;
       padding: 0px;
       color: #eeeeee;
       font-family: 'Roboto Mono';

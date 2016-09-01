@@ -9,6 +9,7 @@ let express = require('express');
 let bodyparser = require('body-parser');
 let exec = require('child_process').exec;
 let os = require('os');
+let cookieparser = require('cookie-parser');
 
 Promise.onPossiblyUnhandledRejection((error, promise) => {
 //    debug.warning(error, Promise);
@@ -26,6 +27,7 @@ app.set('views', appRoot + '/src/server/views');
 // ----------
 // App middlewares
 // ----------
+app.use(cookieparser());
 app.use(bodyparser.json({limit: '50mb'}));
 app.use(express.static(appRoot + '/public'));
 

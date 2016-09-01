@@ -83,12 +83,13 @@ window.apiUrl = function apiUrl(url) {
     }
 
     newUrl += url;
-   
+  
+    /*
     if(url.indexOf('?') > -1) {
         newUrl += '&token=' + localStorage.getItem('token');
     } else {
         newUrl += '?token=' + localStorage.getItem('token');
-    }
+    }*/
 
     return newUrl;
 };

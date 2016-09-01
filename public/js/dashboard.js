@@ -28592,6 +28592,7 @@ module.exports={
     "body-parser": "^1.14.1",
     "browserify": "^13.0.0",
     "chalk": "^1.1.3",
+    "cookie-parser": "^1.4.3",
     "exomon": "^1.1.0",
     "express": "^4.13.3",
     "glob": "^7.0.3",
@@ -28746,11 +28747,12 @@ window.apiUrl = function apiUrl(url) {
 
     newUrl += url;
 
-    if (url.indexOf('?') > -1) {
+    /*
+    if(url.indexOf('?') > -1) {
         newUrl += '&token=' + localStorage.getItem('token');
     } else {
         newUrl += '?token=' + localStorage.getItem('token');
-    }
+    }*/
 
     return newUrl;
 };

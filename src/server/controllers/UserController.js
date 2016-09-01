@@ -27,7 +27,8 @@ class UserController extends ApiController {
 
         UserHelper.loginUser(username, password)
         .then((token) => {
-            res.status(200).send(token);
+            // The cookie doesn't handle token expiration client side, so just send the token string
+            res.status(200).cookie('token').send('OK');
         })
         .catch((e) => {
             res.status(403).send(e.message);   
@@ -38,7 +39,7 @@ class UserController extends ApiController {
      * Get current scopes
      */
     static getScopes(req, res) {
-        ApiController.authenticate(req.query.token)
+        ApiController.authenticate(req.cookies.token)
         .then((user) => {
             res.send(user.scopes);
         })

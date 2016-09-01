@@ -111,7 +111,7 @@ class ApiController extends Controller {
                 ApiController.setProjectVariables(req.originalUrl)
                 .then(() => {
                     if(settings.authenticate != false) {
-                        ApiController.authenticate(req.query.token, settings.scope)
+                        ApiController.authenticate(req.cookies.token, settings.scope)
                         .then(() => {
                             next();
                         })
@@ -130,7 +130,7 @@ class ApiController extends Controller {
                 });
             
             } else if(settings.authenticate != false) {
-                ApiController.authenticate(req.query.token, settings.scope)
+                ApiController.authenticate(req.cookies.token, settings.scope)
                 .then(() => {
                     next();
                 })

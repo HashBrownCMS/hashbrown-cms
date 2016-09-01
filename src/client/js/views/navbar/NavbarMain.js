@@ -393,7 +393,7 @@ class NavbarMain extends View {
         // Get user scopes
         $.ajax({
             type: 'GET',
-            url: '/api/user/scopes?token=' + localStorage.getItem('token'),
+            url: '/api/user/scopes',
             success: (allScopes) => {
                 let scopes = allScopes[ProjectHelper.currentProject] || [];
 

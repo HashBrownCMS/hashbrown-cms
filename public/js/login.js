@@ -67,9 +67,7 @@ $('.login').each(function() {
         };
 
         apiCall('post', '/api/user/login', data)
-        .then(function(token) {
-            localStorage.setItem('token', token);
-
+        .then(function() {
             let newLocation = location.href.replace(location.protocol + '//' + location.hostname + location.pathname, '');
             newLocation = newLocation.replace('?path=', '');
 
