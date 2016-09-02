@@ -1,5 +1,8 @@
 'use strict';
 
+// Libraries
+let fs = require('fs');
+
 // Classes
 let ApiController = require('./ApiController');
 let Media = require('../models/Media');

@@ -124,30 +124,25 @@ class UserHelper {
      * @returns {Promise} Promise
      */
     static removeUserProjectScope(id, scope) {
-        return new Promise((resolve, reject) => {
-            let foundUser = null;
+        let foundUser = null;
+        
+        return MongoHelper.findOne('users', 'users', { id: id })
+        .then((found) => {
+            foundUser = found;
+
+            return ProjectHelper.getProject(scope); 
+        })
+        .then((project) => {
+            if(project.users.length < 2) {
+                debug.error('The last user can\'t be removed from a project. If you want to delete the project, please do so explicitly', this);
             
-            MongoHelper.findOne('users', 'users', { id: id })
-            .then((found) => {
-                foundUser = found;
+            } else {
+                debug.log('Removing user "' + foundUser.username + '" from project "' + project.name + '"', this);
 
-                return ProjectHelper.getProject(scope); 
-            })
-            .then((project) => {
-                if(project.users.length < 2) {
-                    reject(new Error('The last user can\'t be removed from a project. If you want to delete the project, please do so explicitly'));
+                delete foundUser.scopes[scope];
                 
-                } else {
-                    debug.log('Removing user "' + foundUser.username + '" from project "' + project.name + '"', this);
-
-                    delete foundUser.scopes[scope];
-                    
-                    MongoHelper.updateOne('users', 'users', { id: id }, foundUser)
-                    .then(resolve)
-                    .catch(reject);
-                }
-            })
-            .catch(reject);
+                return MongoHelper.updateOne('users', 'users', { id: id }, foundUser);
+            }
         });
     }
 
@@ -190,14 +185,27 @@ class UserHelper {
                     })
                     .catch(reject);
 
-                // If scopes are defined and credentials match, just update the user
+                // If scopes are defined and credentials match
                 } else if(
                     scopes &&
                     user.username === found.username &&
                     foundUser.validatePassword(password)
                 ) {
                     for(let project in scopes) {
-                        found.scopes[project] = scopes[project];
+                        let projectScopes = scopes[project] || [];
+
+                        // User already has project scope, merge them
+                        if(found.scopes[project]) {
+                            for(let projectScope in projectScopes) {
+                                if(found.scopes[project].indexOf(projectScope) < 0) {
+                                    found.scopes[project].push(projectScope);
+                                }
+                            }
+                        
+                        } else {
+                            found.scopes[project] = projectScopes;
+                        
+                        }
                     }
 
                     MongoHelper.updateOne(
@@ -347,7 +355,7 @@ class UserHelper {
                 },
                 properties
             ).then(() => {
-                debug.log('Updated "' + username + '" successfully with properties: ' + JSON.stringify(properties), this);
+                debug.log('Updated "' + username + '" successfully', this);
                 
                 callback();
             });

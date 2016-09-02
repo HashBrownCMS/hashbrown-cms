@@ -24,9 +24,25 @@ Router.route('/content/json/:id', function() {
     $('.workspace').html(contentEditor.$element);
 });
 
-// Edit (redirect to meta tab)
+// Edit (redirect to default tab)
 Router.route('/content/:id', function() {
-    location.hash = '/content/' + this.id + '/meta';
+    let content = resources.content.filter((c) => { return c.id == this.id; })[0];
+
+    if(content) {
+        let contentSchema = resources.schemas[content.schemaId];
+
+        if(contentSchema) {
+            location.hash = '/content/' + this.id + '/' + (contentSchema.defaultTabId || 'meta');
+        
+        } else {
+            errorModal(new Error('Schema by id "' + content.schemaId + '" not found'));
+
+        }
+    
+    } else {
+        errorModal(new Error('Content by id "' + this.id + '" not found'));
+
+    }
 });
 
 // Edit (with tab specified)

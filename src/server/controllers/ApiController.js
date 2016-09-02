@@ -18,30 +18,38 @@ class ApiController extends Controller {
      */
     static authenticate(token, scope) {
         return new Promise((resolve, reject) => {
-            UserHelper.findToken(token)
-            .then((user) => {
-                if(user) {
-                    // If a scope is defined, check for it
-                    if(scope) {
-                        if(user.hasScope(ProjectHelper.currentProject, scope)) {
-                            resolve(user);
-                
+            if(!token) {
+                reject(new Error('No token was provided'));
+
+            } else {
+                UserHelper.findToken(token)
+                .then((user) => {
+                    if(user) {
+                        // Set the currently authenticated user as a static variable
+                        UserHelper.current = user;
+
+                        // If a scope is defined, check for it
+                        if(scope) {
+                            if(user.hasScope(ProjectHelper.currentProject, scope)) {
+                                resolve(user);
+                    
+                            } else {
+                                reject(new Error('User "' + user.username + '" with token "' + token + '" doesn\'t have scope "' + scope + '"'));
+
+                            }
+                       
+                        // If no scope is required, return as normal 
                         } else {
-                            reject(new Error('User with token "' + token + '" doesn\'t have scope "' + scope + '"'));
+                            resolve(user);
 
                         }
-                   
-                    // If no scope is required, return as normal 
+
                     } else {
-                        resolve(user);
-
+                        reject(new Error('Found no user with token "' + token + '"'));
                     }
-
-                } else {
-                    reject(new Error('Found no user with token "' + token + '"'));
-                }
-            })
-            .catch(reject);
+                })
+                .catch(reject);
+            }
         });
     }
 
@@ -100,6 +108,7 @@ class ApiController extends Controller {
         settings = settings || {};
 
         return function middleware(req, res, next) {
+            // Allow CORS if specified
             if(settings.allowCORS == true) {
                 res.header('Access-Control-Allow-Origin', '*');
                 res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
@@ -107,9 +116,12 @@ class ApiController extends Controller {
                 debug.log('Allowing CORS for API call "' + req.originalUrl + '"', this);
             }
 
+            // Using project parameter
             if(settings.setProject != false) {
+                // Set the project variables
                 ApiController.setProjectVariables(req.originalUrl)
                 .then(() => {
+                    // Using authentication
                     if(settings.authenticate != false) {
                         ApiController.authenticate(req.cookies.token, settings.scope)
                         .then(() => {
@@ -120,6 +132,7 @@ class ApiController extends Controller {
                             debug.log(e.message, ApiController);
                         });    
                     
+                    // No authentication needed
                     } else {
                         next();
                     }
@@ -129,6 +142,7 @@ class ApiController extends Controller {
                     debug.log(e.message, ApiController);
                 });
             
+            // Disregarding project parameter, but using authentication
             } else if(settings.authenticate != false) {
                 ApiController.authenticate(req.cookies.token, settings.scope)
                 .then(() => {
@@ -138,6 +152,8 @@ class ApiController extends Controller {
                     res.status(403).send(e.message);   
                     debug.log(e.message, ApiController);
                 });    
+
+            // Neither project parameter not authentication needed
             } else {
                 next();
             

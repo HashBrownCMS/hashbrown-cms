@@ -69,7 +69,12 @@ $('.login').each(function() {
         apiCall('post', '/api/user/login', data)
         .then(function() {
             let newLocation = location.href.replace(location.protocol + '//' + location.hostname + location.pathname, '');
-            newLocation = newLocation.replace('?path=', '');
+            newLocation = newLocation.replace('?path=', '') || '';
+
+            // Check for initial slash
+            if(newLocation[0] != '/') {
+                newLocation = '/' + newLocation;
+            }
 
             location = newLocation || '/';
         })
