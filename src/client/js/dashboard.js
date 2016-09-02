@@ -34,3 +34,33 @@ $('.navbar-main a').click(function() {
     $('.navbar-main a').removeClass('active');
     $(this).addClass('active');
 });
+
+// Set create new project event
+$('.btn-create-project').click(function() {
+    function onClickCreate() {
+        let project = modal.$element.find('input').val();
+
+        // TODO: Create project 
+    }
+
+    let modal = new MessageModal({
+        model: {
+            title: 'Create new project',
+            body: _.div({},
+                _.p('Please input the new project name'),
+                _.input({class: 'form-control', type: 'text', placeholder: 'Project name'})
+            )
+        },
+        buttons: [
+            {
+                label: 'Cancel',
+                class: 'btn-default'
+            },
+            {
+                label: 'Create',
+                class: 'btn-primary',
+                callback: onClickCreate
+            }
+        ]
+    });
+});

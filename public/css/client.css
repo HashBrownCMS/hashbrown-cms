@@ -541,6 +541,20 @@ body > .dashboard-container {
     height: 100%;
     padding: 15px 30px;
     overflow-y: auto; }
+    body > .dashboard-container .workspace section {
+      display: flex;
+      margin-bottom: 15px; }
+      body > .dashboard-container .workspace section > h4 {
+        flex-shrink: 0;
+        flex-basis: 200px;
+        width: 200px;
+        white-space: pre;
+        margin: 0px; }
+        body > .dashboard-container .workspace section > h4 button {
+          display: block;
+          margin-top: 15px; }
+      body > .dashboard-container .workspace section > div, body > .dashboard-container .workspace section > table {
+        flex-grow: 1; }
     body > .dashboard-container .workspace .diagnostics tr {
       font-size: 14px; }
       body > .dashboard-container .workspace .diagnostics tr td {
@@ -550,12 +564,11 @@ body > .dashboard-container {
           font-weight: bold; }
     body > .dashboard-container .workspace .projects {
       display: flex;
-      flex-wrap: wrap;
-      margin: 0px -15px; }
+      flex-wrap: wrap; }
       body > .dashboard-container .workspace .projects .project-editor {
         flex-grow: 1;
         padding: 15px;
-        margin: 15px;
+        margin: 0px 15px 15px 0px;
         max-width: 300px;
         height: 200px; }
         body > .dashboard-container .workspace .projects .project-editor .body {
