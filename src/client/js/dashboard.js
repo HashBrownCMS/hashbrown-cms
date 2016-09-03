@@ -43,12 +43,19 @@ $('.btn-create-project').click(function() {
         // TODO: Create project 
     }
 
+    function onChange() {
+        let val = $(this).val();
+        
+        let newVal = (val || '').toLowerCase();
+    }
+
     let modal = new MessageModal({
         model: {
             title: 'Create new project',
             body: _.div({},
                 _.p('Please input the new project name'),
                 _.input({class: 'form-control', type: 'text', placeholder: 'Project name'})
+                .on('change propertychange keyup paste', onChange)
             )
         },
         buttons: [
