@@ -550,6 +550,8 @@ body > .dashboard-container {
         width: 200px;
         white-space: pre;
         margin: 0px; }
+        body > .dashboard-container .workspace section > h4 a {
+          color: #424242; }
         body > .dashboard-container .workspace section > h4 button {
           display: block;
           margin-top: 15px; }

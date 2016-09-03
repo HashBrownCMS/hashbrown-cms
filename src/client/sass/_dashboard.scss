@@ -25,6 +25,10 @@ body >.dashboard-container {
                 white-space: pre;
                 margin: 0px;
 
+                a {
+                    color: material-color('grey', '800');
+                }
+
                 button {
                     display: block;
                     margin-top: 15px;
