@@ -4,11 +4,17 @@
 Router.route('/', function() {
     ViewHelper.get('NavbarMain').showTab('/');
 
-    $('.workspace').html(
-        _.div({class: 'dashboard-container readme'},
-            _.h1('Welcome to HashBrown CMS')
-        )
-    );
+    $.ajax({
+        type: 'GET',
+        url: '/text/welcome',
+        success: (html) => {
+            $('.workspace').html(
+                _.div({class: 'dashboard-container readme'},
+                    html
+                )
+            );
+        }
+    });
 });
 
 // User
@@ -34,7 +40,7 @@ Router.route('/readme/', function() {
 
     $.ajax({
         type: 'GET',
-        url: '/readme',
+        url: '/text/readme',
         success: (html) => {
             $('.workspace').html(
                 _.div({class: 'dashboard-container readme'},
@@ -51,7 +57,7 @@ Router.route('/license/', function() {
 
     $.ajax({
         type: 'GET',
-        url: '/license',
+        url: '/text/license',
         success: (html) => {
             $('.workspace').html(
                 _.div({class: 'dashboard-container license'},

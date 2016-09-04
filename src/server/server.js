@@ -137,24 +137,32 @@ app.get([ '/wp-admin', '/wp-admin/', '/umbraco', '/umbraco/' ], (req, res) => {
     res.status(200).send('Nice try, but wrong CMS. This incident will be reported.');
 });
 
-// Readme
-app.get('/readme', function(req, res) {
-    fs.readFile(appRoot + '/README.md', (err, file) => {
-        if(err) {
-            res.status(502).send(e.message);
-        } else {
-            res.status(200).send(markdownToHtml(file.toString()));        
-        }
-    });
-});
+// Text
+app.get('/text/:name', function(req, res) {
+    let filename = '';
+    let isMarkdown = false;
 
-// License
-app.get('/license', function(req, res) {
-    fs.readFile(appRoot + '/LICENSE', (err, file) => {
+    switch(req.params.name) {
+        case 'readme':
+            filename = 'README.md';
+            isMarkdown = true;
+            break;
+        
+        case 'license':
+            filename = 'LICENSE';
+            break;
+        
+        case 'welcome':
+            filename = 'WELCOME.md';
+            isMarkdown = true;
+            break;
+    }
+
+    fs.readFile(appRoot + '/' + filename, (err, file) => {
         if(err) {
             res.status(502).send(e.message);
         } else {
-            res.status(200).send(file.toString().replace(/\n/g, '<br />'));        
+            res.status(200).send(isMarkdown ? markdownToHtml(file.toString()) : file.toString());
         }
     });
 });
