@@ -7,9 +7,11 @@ class ServerController extends ApiController {
      * Initialises this controller
      */
     static init(app) {
+        app.post('/api/server/projects/new', this.middleware({ authenticate: false, setProject: false }), this.createProject);
         app.get('/api/server/projects', this.middleware({ authenticate: false, setProject: false }), this.getAllProjects);
         app.get('/api/server/projects/:project', this.middleware({ authenticate: false, setProject: false }), this.getProject);
         app.get('/api/server/:project/environments', this.middleware({ authenticate: false, setProject: false }), this.getAllEnvironments);
+        app.delete('/api/server/projects/:project', this.middleware({ authenticate: false, setProject: false }), this.deleteProject);
     }
     
     /**
@@ -33,7 +35,7 @@ class ServerController extends ApiController {
                 }
             }
 
-            res.send(scopedProjects);
+            res.status(200).send(scopedProjects);
         })
         .catch((e) => {
             res.status(404).send(e.message);   
@@ -57,7 +59,7 @@ class ServerController extends ApiController {
             }
         })
         .then((project) => {
-            res.send(project);
+            res.status(200).send(project);
         })
         .catch((e) => {
             res.status(404).send(e.message);
@@ -81,10 +83,56 @@ class ServerController extends ApiController {
             }
         })
         .then((environments) => {
-            res.send(environments);
+            res.status(200).send(environments);
         })
         .catch((e) => {
             res.status(404).send(e.message);
+        });
+    }
+
+    /**
+     * Deletes a project
+     */
+    static deleteProject(req, res) {
+        let project = req.params.project;
+
+        ApiController.authenticate(req.cookies.token)
+        .then((user) => {
+            if(!user.isAdmin) {
+                throw new Error('Only admins can delete projects');
+
+            } else {
+                return MongoHelper.dropDatabase(project);
+            }
+        })
+        .then(() => {
+            res.status(200).send('OK');
+        })
+        .catch((e) => {
+            res.status(502).send(e.message);  
+        });
+    }
+
+    /**
+     * Creates a new project
+     */
+    static createProject(req, res) {
+        let project = req.body.project;
+        
+        ApiController.authenticate(req.cookies.token)
+        .then((user) => {
+            if(!user.isAdmin) {
+                throw new Error('Only admins can create new projects');
+
+            } else {
+                return ProjectHelper.createProject(project, user.id);
+            }
+        })
+        .then((project) => {
+            res.status(200).send(project);
+        })
+        .catch((e) => {
+            res.status(502).send(e.message);
         });
     }
 }

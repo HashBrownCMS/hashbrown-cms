@@ -119,6 +119,33 @@ class ProjectHelper {
             });
         });
     }
+
+    /**
+     * Creates a new Project
+     *
+     * @param {String} name
+     * @param {String} userId
+     *
+     * @returns {Promise} The new Project
+     */
+    static createProject(name, userId) {
+        return new Promise((resolve, reject) => {
+            if(name && userId) {
+                name = (name || '').toLowerCase();
+                name = name.replace(/[^a-z_.]/g, '');
+
+                MongoHelper.insertOne(name, 'settings', {})
+                .then(() => {
+                    // The user that creates a project gets all scopes
+                    return UserHelper.addUserProjectScope(userId, name, [ 'users', 'settings', 'connections', 'schemas' ]);
+                })
+                .then(resolve)
+                .catch(reject);
+            } else {
+                reject(new Error('Projects cannot be created without a name and user id specified. Provided "' + name + '" and "' + userId + '"'));
+            }
+        });
+    }
 }
 
 module.exports = ProjectHelper;

@@ -26,6 +26,7 @@ class User extends Entity {
     
     structure() {
         this.def(String, 'id');
+        this.def(Boolean, 'isAdmin', false);
         this.def(String, 'username');
         this.def(Password, 'password', new Password());
         this.def(Array, 'tokens', []);

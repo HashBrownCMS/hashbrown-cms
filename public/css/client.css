@@ -572,7 +572,15 @@ body > .dashboard-container {
         padding: 15px;
         margin: 0px 15px 15px 0px;
         max-width: 300px;
-        height: 200px; }
+        height: 200px;
+        position: relative; }
+        body > .dashboard-container .workspace .projects .project-editor .btn-remove {
+          padding: 0rem;
+          position: absolute;
+          right: 1rem;
+          top: 1rem;
+          display: block;
+          color: #f44336; }
         body > .dashboard-container .workspace .projects .project-editor .body {
           height: 100%;
           display: flex;

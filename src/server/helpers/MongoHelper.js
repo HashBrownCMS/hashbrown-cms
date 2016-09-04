@@ -302,9 +302,9 @@ class MongoHelper {
                 db.collection(collectionName).insertOne(doc, function(insertErr) {
                     if(insertErr) {
                         reject(new Error(insertErr));
+                    } else {
+                        resolve(doc);
                     }
-
-                    resolve(doc);
 
                     db.close();
                 });
@@ -331,9 +331,9 @@ class MongoHelper {
                 db.collection(collectionName).remove(query, true, function(findErr) {
                     if(findErr) {
                         reject(new Error(findErr));
+                    } else {
+                        resolve();
                     }
-
-                    resolve();
 
                     db.close();
                 });
@@ -360,9 +360,9 @@ class MongoHelper {
                 db.collection(collectionName).remove(query, true, function(findErr) {
                     if(findErr) {
                         reject(new Error(findErr));
+                    } else {
+                        resolve();
                     }
-
-                    resolve();
 
                     db.close();
                 });
@@ -370,6 +370,34 @@ class MongoHelper {
             .catch(reject);
         });
     }    
+
+    /**
+     * Drops an entire database
+     *
+     * @param {String} databaseName
+     *
+     * @return {Promise} promise
+     */
+    static dropDatabase(databaseName) {
+        return new Promise((resolve, reject) => {
+            debug.log(databaseName + '::dropDatabase...', this, 3);
+
+            MongoHelper.getDatabase(databaseName)
+            .then(function(db) {
+                db.dropDatabase(function(err) {
+                    if(err) {
+                        reject(new Error(err));
+                    
+                    } else {
+                        resolve();
+                    }
+
+                    db.close();
+                });
+            })
+            .catch(reject);
+        });
+    }
 }
 
 module.exports = MongoHelper

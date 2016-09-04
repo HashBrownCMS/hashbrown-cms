@@ -40,13 +40,28 @@ $('.btn-create-project').click(function() {
     function onClickCreate() {
         let project = modal.$element.find('input').val();
 
-        // TODO: Create project 
+        if(project) {
+            apiCall('post', 'server/projects/new', {
+                project: project
+            })
+            .then(() => {
+                location.reload();
+            })
+            .catch(errorModal);
+        
+        } else {
+            return false;
+
+        }
     }
 
     function onChange() {
         let val = $(this).val();
         
-        let newVal = (val || '').toLowerCase();
+        val = (val || '').toLowerCase();
+        val = val.replace(/[^a-z_.]/g, '');
+
+        $(this).val(val);
     }
 
     let modal = new MessageModal({

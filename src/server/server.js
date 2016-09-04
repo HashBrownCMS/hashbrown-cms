@@ -103,9 +103,14 @@ function ready() {
         case 'create-user':
             UserHelper.createUser(args.u, args.p);
             return;
-        
+       
+        case 'make-user-admin':
+            UserHelper.makeUserAdmin(args.u);
+            return;
+
         case 'revoke-tokens':
             UserHelper.revokeTokens(args.u, args.p);
+            return;
     
         case 'set-user-scopes':
             UserHelper.findUser(args.u)
@@ -120,7 +125,6 @@ function ready() {
 
                 UserHelper.updateUser(args.u, obj);
             });
-
             return;
     }
 }

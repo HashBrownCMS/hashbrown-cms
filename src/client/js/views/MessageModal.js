@@ -11,7 +11,7 @@ class MessageModal extends View {
 
         for(let i in otherModals) {
             if(otherModals[i] != this) {
-                otherModals[i].remove();
+                otherModals[i].hide();
             }
         }
 
@@ -82,6 +82,10 @@ class MessageModal extends View {
         });
 
         this.$element.modal('show');
+
+        this.$element.on('hidden.bs.modal', () => {
+            this.remove();
+        });
     }
 }
 

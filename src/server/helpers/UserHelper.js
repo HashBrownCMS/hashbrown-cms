@@ -116,7 +116,7 @@ class UserHelper {
     }
     
     /**
-     * Removes a project scope from a User object
+     * Removes a Project scope from a User object
      *
      * @param {String} id
      * @param {String} scope
@@ -143,6 +143,26 @@ class UserHelper {
                 
                 return MongoHelper.updateOne('users', 'users', { id: id }, foundUser);
             }
+        });
+    }
+    
+    /**
+     * Adds a Project scope to a User object
+     *
+     * @param {String} id
+     * @param {String} project
+     * @param {Array} scopes
+     *
+     * @returns {Promise} Promise
+     */
+    static addUserProjectScope(id, project, scopes) {
+        return MongoHelper.findOne('users', 'users', { id: id })
+        .then((user) => {
+            user.scopes  = user.scopes || {};
+
+            user.scopes[project] = scopes || [];
+
+            return this.updateUserById(id, user);
         });
     }
 
@@ -231,6 +251,22 @@ class UserHelper {
     }
 
     /**
+     * Makes a User an admin
+     *
+     * @param {String} username
+     *
+     * @returns {Promise} Promise
+     */
+    static makeUserAdmin(username) {
+        return this.getUser(username)
+        .then((user) => {
+            user.isAdmin = true;
+
+            return this.updateUser(username, user);
+        });
+    }
+
+    /**
      * Gets a list of all users
      *
      * @param {String} project
@@ -261,7 +297,7 @@ class UserHelper {
     }
     
     /**
-     * Gets a single user
+     * Gets a single User by id
      *
      * @param {String} id
      *
@@ -277,6 +313,31 @@ class UserHelper {
             'users',
             {
                 id: id
+            },
+            {
+                tokens: 0,
+                password: 0
+            }
+        );
+    }
+    
+    /**
+     * Gets a single User
+     *
+     * @param {String} username
+     *
+     * @returns {Promise} User object
+     */
+    static getUser(username) {
+        let query = {};
+
+        debug.log('Getting user "' + username + '"...', this);
+
+        return MongoHelper.findOne(
+            'users',
+            'users',
+            {
+                username: username
             },
             {
                 tokens: 0,
