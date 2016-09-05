@@ -30,6 +30,18 @@
             height: 100%;
             position: relative;
             z-index: 10;
+            background-color: #fff;
+
+            &:after {
+                content: '';
+                display: block;
+                position: absolute;
+                width: 1px;
+                height: 100%;
+                background-color: material-color('grey', '300');
+                right: 0px;
+                top: 0px;
+            }
 
             @media($sm) {
                 width: 60px;
@@ -47,14 +59,33 @@
                 clear: both;
                 position: relative;
                 display: block;
+                z-index: 2;
 
                 &[data-route="about"] {
                     font-weight: bold;
                 }
 
-                &.active, &:hover {
-                    background-color: rgba(0, 0, 0, 0.03);
+                &.active {
+                    background-color: material-color('grey', '100');
 
+                    &:before, &:after {
+                        content: '';
+                        display: block;
+                        position: absolute;
+                        width: 100%;
+                        height: 1px;
+                        background-color: material-color('grey', '300');
+                        left: 0px;
+                    }
+
+                    &:before {
+                        top: 0px;
+                    }
+
+                    &:after {
+                        bottom: -1px;
+                    }
+                    
                     .pane-text {
                         .pane-label {
                             font-weight: 700;
@@ -62,6 +93,14 @@
                     }
                 }
                 
+                &:hover {
+                    .pane-text {
+                        .pane-label {
+                            font-weight: 700;
+                        }
+                    }
+                }
+
                 .pane-icon {
                     width: 60px;
                     height: 60px;
@@ -115,9 +154,21 @@
         .tab-panes {
             height: 100%;
             flex-grow: 1;
-            background-color: rgba(0, 0, 0, 0.03);
+            background-color: material-color('grey', '100');
             position: relative;
             z-index: 5;
+            box-shadow: 2px 0px 5px 0px rgba(0, 0, 0, 0.2);
+            
+            &:after {
+                content: '';
+                display: block;
+                position: absolute;
+                width: 1px;
+                height: 100%;
+                background-color: material-color('grey', '300');
+                right: 0px;
+                top: 0px;
+            }
 
             .pane-container {
                 display: none;
@@ -147,11 +198,21 @@
                     overflow-y: auto;
 
                     .pane-item-container {
-                        border-bottom: 1px solid material-color('grey', '300');
-
                         &.active {
+                            position: relative;
+
+                            &:before {
+                                content: '';
+                                display: block;
+                                height: 60px;
+                                width: 5px;
+                                background-color: material-color('blue', '600');
+                                position: absolute;
+                                left: 0px;
+                                top: 0px;
+                            }
+
                             >.pane-item {
-                                border-right: 5px solid material-color('blue', '600');
                                 font-weight: 700;
                                 color: material-color('grey', '800');
                                
@@ -167,8 +228,6 @@
 
                         &.open {
                             >.pane-item {
-                                border-bottom: 1px solid material-color('grey', '300');
-
                                 .btn-children-toggle {
                                     .fa-caret-right {
                                         display: none;
@@ -212,7 +271,6 @@
                             }
 
                             &:hover {
-                                border-right: 5px solid material-color('grey', '500');
                                 font-weight: 700;
                                 color: material-color('grey', '800');
 
@@ -253,10 +311,6 @@
                         .children {
                             .pane-item-container {
                                 padding-left: 15px;
-
-                                &:last-child {
-                                    border-bottom: 0px;
-                                }
                             }
                         }
                     }

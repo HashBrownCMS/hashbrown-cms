@@ -1,5 +1,6 @@
 body >.dashboard-container {
     display: flex;
+    height: 100%;
 
     .navspace {
         width: 160px;
@@ -13,6 +14,7 @@ body >.dashboard-container {
         height: 100%;
         padding: 15px 30px;
         overflow-y: auto;
+        background-color: material-color('grey', '100');
 
         section {
             display: flex;
