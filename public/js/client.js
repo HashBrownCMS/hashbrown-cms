@@ -37987,10 +37987,11 @@ class MediaViewer extends View {
 
     render() {
         let view = this;
+        let imgSrc = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + view.model.id;
 
-        this.$element.empty().append(_.div({ class: 'media-heading' }, _.h4({ class: 'media-title' }, this.model.name), _.p({ class: 'media-data' })), _.div({ class: 'media-preview' }, _.img({ class: 'img-responsive', src: this.model.url }).on('load', function () {
+        this.$element.empty().append(_.div({ class: 'media-heading' }, _.h4({ class: 'media-title' }, this.model.name), _.p({ class: 'media-data' })), _.div({ class: 'media-preview' }, _.img({ class: 'img-responsive', src: imgSrc }).on('load', function () {
             let img = new Image();
-            img.src = view.model.url;
+            img.src = imgSrc;
 
             view.$element.find('.media-data').html('(' + img.width + 'x' + img.height + ')');
         })), _.div({ class: 'panel panel-default panel-buttons' }, _.input({ class: 'form-control', value: this.model.folder, placeholder: 'Type folder path here' }).change(function () {
@@ -43096,6 +43097,34 @@ class Media extends Entity {
         this.id = id;
         this.name = name;
         this.url = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + id;
+    }
+
+    /**
+     * Gets the content type header
+     *
+     * @returns {String} Content-Type header
+     */
+    getContentTypeHeader() {
+        this.name = this.name || '';
+
+        // Image types
+        if (this.name.match(/\.jpg/)) {
+            return 'image/jpeg';
+        } else if (this.name.match(/\.png/)) {
+            return 'image/png';
+        } else if (this.name.match(/\.gif/)) {
+            return 'image/gif';
+        } else if (this.name.match(/\.bmp/)) {
+            return 'image/bmp';
+
+            // SVG
+        } else if (this.name.match(/\.svg/)) {
+            return 'image/svg+xml';
+
+            // Everything else
+        } else {
+            return 'application/octet-stream';
+        }
     }
 
     /**

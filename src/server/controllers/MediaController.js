@@ -3,6 +3,8 @@
 // Libraries
 let fs = require('fs');
 
+let restler = require('restler');
+
 // Classes
 let ApiController = require('./ApiController');
 let Media = require('../models/Media');
@@ -31,17 +33,35 @@ class MediaController extends ApiController {
 
         ConnectionHelper.getMediaProvider()
         .then((connection) => {
-            connection.getMedia(id)
-            .then((media) => {
-                if(media) {
+            return connection.getMedia(id);
+        })
+        .then((media) => {
+            if(media) {
+                let contentType = media.getContentTypeHeader();
+
+                // TODO: Remplace this temporary hack with an actual file service
+                // The problem here is that SVG content is received fine through binary representation, but actual binary content isn't
+                if(contentType != 'image/svg+xml') {
                     res.redirect(media.url);
+
                 } else {
-                    res.status(404).send('Not found');
+                    restler.get(media.url, {
+                        headers: {
+                            'Accept': contentType 
+                        }
+                    })
+                    .on('success', (data, response) => {
+                        res.header('Content-Type', contentType);
+
+                        res.status(200).end(data, 'binary');
+                    })
+                    .on('fail', (data, response) => {
+                        res.status(404).send(e);   
+                    });
                 }
-            })
-            .catch((e) => {
-                res.status(400).end(e.message);  
-            });
+            } else {
+                res.status(404).send('Not found');
+            }
         })
         .catch((e) => {
             res.status(400).end(e.message);  

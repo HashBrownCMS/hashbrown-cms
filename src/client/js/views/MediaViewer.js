@@ -86,6 +86,7 @@ class MediaViewer extends View {
 
     render() {
         let view = this;
+        let imgSrc = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + view.model.id;
 
         this.$element.empty().append(
             _.div({class: 'media-heading'},
@@ -93,9 +94,9 @@ class MediaViewer extends View {
                 _.p({class: 'media-data'})
             ),
             _.div({class: 'media-preview'},
-                _.img({class: 'img-responsive', src: this.model.url}).on('load', function() {
+                _.img({class: 'img-responsive', src: imgSrc}).on('load', function() {
                     let img = new Image();
-                    img.src = view.model.url;
+                    img.src = imgSrc;
 
                     view.$element.find('.media-data').html(
                         '(' + img.width + 'x' + img.height + ')'

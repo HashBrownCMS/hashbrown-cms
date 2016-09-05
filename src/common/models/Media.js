@@ -38,6 +38,34 @@ class Media extends Entity {
     }
 
     /**
+     * Gets the content type header
+     *
+     * @returns {String} Content-Type header
+     */
+    getContentTypeHeader() {
+        this.name = this.name || '';
+
+        // Image types
+        if(this.name.match(/\.jpg/)) {
+            return 'image/jpeg';
+        } else if(this.name.match(/\.png/)) {
+            return 'image/png';
+        } else if(this.name.match(/\.gif/)) {
+            return 'image/gif';
+        } else if(this.name.match(/\.bmp/)) {
+            return 'image/bmp';
+
+        // SVG
+        } else if(this.name.match(/\.svg/)) {
+            return 'image/svg+xml';
+        
+        // Everything else
+        } else {
+            return 'application/octet-stream';
+        }
+    }
+
+    /**
      * Applies folder string from tree
      *
      * @param {Object} tree
