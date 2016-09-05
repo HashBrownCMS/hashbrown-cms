@@ -1,5 +1,3 @@
-<img src="https://cdn.rawgit.com/Putaitu/hashbrown-cms/master/public/svg/logo.svg" width="128"/>
-
 # HashBrown CMS
 A free and open-source CMS built with Node.js and MongoDB
 
@@ -10,3 +8,6 @@ cd ./hashbrown-cms
 npm install
 node hashbrown.js
 ```
+
+## Getting started
+- [A guide for authors](./WELCOME.md)
