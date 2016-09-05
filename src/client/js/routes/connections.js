@@ -26,7 +26,7 @@ Router.route('/connections/:id', function() {
 // Edit (JSON editor)
 Router.route('/connections/json/:id', function() {
     let connectionEditor = new JSONEditor({
-        modelUrl: apiUrl('connections/' + this.id)
+        apiPath: 'connections/' + this.id
     });
      
     ViewHelper.get('NavbarMain').highlightItem(this.id);

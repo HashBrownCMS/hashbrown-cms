@@ -201,7 +201,7 @@ class ConnectionEditor extends View {
 
         function onChange() {
             let type = $(this).val();
-
+        
             view.model.type = type;
 
             view.$element.find('.connection-settings .field-value').html(
@@ -252,7 +252,12 @@ class ConnectionEditor extends View {
                             this.renderMediaProviderEditor()
                         )
                     ),
-                    this.renderSettingsEditor()
+                    _.div({class: 'field-container connection-settings'},
+                        _.div({class: 'field-key'}, 'Settings'),
+                        _.div({class: 'field-value'},
+                            this.renderSettingsEditor()
+                        )
+                    )
                 ),
                 _.div({class: 'panel panel-default panel-buttons'}, 
                     _.div({class: 'btn-group'},

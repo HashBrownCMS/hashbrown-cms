@@ -30,22 +30,15 @@ class ConnectionEditor extends View {
         
         function onChange() {
             view.model.token = $(this).val();
-        }
 
-        function onClickRenew() {
-            location = '/api/github/oauth/start?route=' + Router.url;
+            view.render();
         }
 
         this.model.token = Router.query('token') || this.model.token; 
 
-        return _.div({class: 'input-group field-editor'},
+        return _.div({class: 'field-editor'},
             _.input({class: 'form-control', type: 'text', value: this.model.token, placeholder: 'Input GitHub API token'})
-                .change(onChange),
-            _.div({class: 'input-group-btn'},
-                _.button({class: 'btn btn-primary'},
-                    'Renew'
-                ).click(onClickRenew)
-            )
+                .change(onChange)
         );
     }
     
@@ -71,20 +64,24 @@ class ConnectionEditor extends View {
         
         $editor.children('select').val(view.model.org);
 
-        $.ajax({
-            type: 'get',
-            url: '/api/github/orgs?token=' + this.model.token,
-            success: (orgs) => {
-                _.append($editor.children('select').empty(),
-                    _.option({value: ''}, '(none)'),
-                    _.each(orgs, function(i, org) {
-                        return _.option({value: org.login}, org.login);
-                    })
-                );
-                
-                $editor.children('select').val(view.model.org);
-            }
-        });
+        if(this.model.token) {
+            $.ajax({
+                type: 'get',
+                url: '/api/github/orgs?token=' + this.model.token,
+                success: (orgs) => {
+                    _.append($editor.children('select').empty(),
+                        _.option({value: ''}, '(none)'),
+                        _.if(typeof orgs === 'object',
+                            _.each(orgs, function(i, org) {
+                                return _.option({value: org.login}, org.login);
+                            })
+                        )
+                    );
+                    
+                    $editor.children('select').val(view.model.org);
+                }
+            });
+        }
 
         return $editor;
     }
@@ -112,19 +109,66 @@ class ConnectionEditor extends View {
         
         $editor.children('select').val(view.model.repo);
 
-        $.ajax({
-            type: 'get',
-            url: '/api/github/repos?token=' + this.model.token + '&org=' + this.model.org,
-            success: (repos) => {
-                $editor.children('select').html(
-                    _.each(repos, function(i, repo) {
-                        return _.option({value: repo.full_name}, repo.full_name);
-                    })
-                );
-                
-                $editor.children('select').val(view.model.repo);
-            }
-        });
+        if(this.model.token) {
+            $.ajax({
+                type: 'get',
+                url: '/api/github/repos?token=' + this.model.token + '&org=' + this.model.org,
+                success: (repos) => {
+                    if(typeof repos === 'object') {
+                        $editor.children('select').html(
+                            _.each(repos, function(i, repo) {
+                                return _.option({value: repo.full_name}, repo.full_name);
+                            })
+                        );
+                        
+                        $editor.children('select').val(view.model.repo);
+                    }
+                }
+            });
+        }
+
+        return $editor;
+    }
+
+    /**
+     * Render branch picker
+     */
+    renderBranchPicker() {
+        let view = this;
+        
+        let $editor = _.div({class: 'field-editor dropdown-editor'},
+            _.select({class: 'form-control'},
+                _.option({value: this.model.branch}, this.model.branch)
+            ).change(onChange)
+        );
+        
+        function onChange() {
+            let branch = $(this).val();
+
+            view.model.branch = branch;
+
+            view.render();
+        }
+        
+        $editor.children('select').val(view.model.branch);
+
+        if(this.model.token && this.model.repo) {
+            $.ajax({
+                type: 'get',
+                url: '/api/github/' + this.model.repo + '/branches?token=' + this.model.token + '&org=' + this.model.org,
+                success: (branches) => {
+                    if(typeof branches === 'object') {
+                        $editor.children('select').html(
+                            _.each(branches, function(i, branch) {
+                                return _.option({value: branch.name}, branch.name);
+                            })
+                        );
+                        
+                        $editor.children('select').val(view.model.branch);
+                    }
+                }
+            });
+        }
 
         return $editor;
     }
@@ -154,6 +198,14 @@ class ConnectionEditor extends View {
                 _.div({class: 'field-key'}, 'Repository'),
                 _.div({class: 'field-value'},
                     this.renderRepoPicker()
+                )
+            ),
+            
+            // Branch picker
+            _.div({class: 'field-container github-branch'},
+                _.div({class: 'field-key'}, 'Branch'),
+                _.div({class: 'field-value'},
+                    this.renderBranchPicker()
                 )
             )
         );

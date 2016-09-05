@@ -34896,15 +34896,13 @@ class ConnectionEditor extends View {
 
         function onChange() {
             view.model.token = $(this).val();
-        }
 
-        function onClickRenew() {
-            location = '/api/github/oauth/start?route=' + Router.url;
+            view.render();
         }
 
         this.model.token = Router.query('token') || this.model.token;
 
-        return _.div({ class: 'input-group field-editor' }, _.input({ class: 'form-control', type: 'text', value: this.model.token, placeholder: 'Input GitHub API token' }).change(onChange), _.div({ class: 'input-group-btn' }, _.button({ class: 'btn btn-primary' }, 'Renew').click(onClickRenew)));
+        return _.div({ class: 'field-editor' }, _.input({ class: 'form-control', type: 'text', value: this.model.token, placeholder: 'Input GitHub API token' }).change(onChange));
     }
 
     /**
@@ -34925,17 +34923,19 @@ class ConnectionEditor extends View {
 
         $editor.children('select').val(view.model.org);
 
-        $.ajax({
-            type: 'get',
-            url: '/api/github/orgs?token=' + this.model.token,
-            success: orgs => {
-                _.append($editor.children('select').empty(), _.option({ value: '' }, '(none)'), _.each(orgs, function (i, org) {
-                    return _.option({ value: org.login }, org.login);
-                }));
+        if (this.model.token) {
+            $.ajax({
+                type: 'get',
+                url: '/api/github/orgs?token=' + this.model.token,
+                success: orgs => {
+                    _.append($editor.children('select').empty(), _.option({ value: '' }, '(none)'), _.if(typeof orgs === 'object', _.each(orgs, function (i, org) {
+                        return _.option({ value: org.login }, org.login);
+                    })));
 
-                $editor.children('select').val(view.model.org);
-            }
-        });
+                    $editor.children('select').val(view.model.org);
+                }
+            });
+        }
 
         return $editor;
     }
@@ -34958,17 +34958,58 @@ class ConnectionEditor extends View {
 
         $editor.children('select').val(view.model.repo);
 
-        $.ajax({
-            type: 'get',
-            url: '/api/github/repos?token=' + this.model.token + '&org=' + this.model.org,
-            success: repos => {
-                $editor.children('select').html(_.each(repos, function (i, repo) {
-                    return _.option({ value: repo.full_name }, repo.full_name);
-                }));
+        if (this.model.token) {
+            $.ajax({
+                type: 'get',
+                url: '/api/github/repos?token=' + this.model.token + '&org=' + this.model.org,
+                success: repos => {
+                    if (typeof repos === 'object') {
+                        $editor.children('select').html(_.each(repos, function (i, repo) {
+                            return _.option({ value: repo.full_name }, repo.full_name);
+                        }));
 
-                $editor.children('select').val(view.model.repo);
-            }
-        });
+                        $editor.children('select').val(view.model.repo);
+                    }
+                }
+            });
+        }
+
+        return $editor;
+    }
+
+    /**
+     * Render branch picker
+     */
+    renderBranchPicker() {
+        let view = this;
+
+        let $editor = _.div({ class: 'field-editor dropdown-editor' }, _.select({ class: 'form-control' }, _.option({ value: this.model.branch }, this.model.branch)).change(onChange));
+
+        function onChange() {
+            let branch = $(this).val();
+
+            view.model.branch = branch;
+
+            view.render();
+        }
+
+        $editor.children('select').val(view.model.branch);
+
+        if (this.model.token && this.model.repo) {
+            $.ajax({
+                type: 'get',
+                url: '/api/github/' + this.model.repo + '/branches?token=' + this.model.token + '&org=' + this.model.org,
+                success: branches => {
+                    if (typeof branches === 'object') {
+                        $editor.children('select').html(_.each(branches, function (i, branch) {
+                            return _.option({ value: branch.name }, branch.name);
+                        }));
+
+                        $editor.children('select').val(view.model.branch);
+                    }
+                }
+            });
+        }
 
         return $editor;
     }
@@ -34984,7 +35025,10 @@ class ConnectionEditor extends View {
         _.div({ class: 'field-container github-org' }, _.div({ class: 'field-key' }, 'Organisation'), _.div({ class: 'field-value' }, this.renderOrgPicker())),
 
         // Repo picker
-        _.div({ class: 'field-container github-repo' }, _.div({ class: 'field-key' }, 'Repository'), _.div({ class: 'field-value' }, this.renderRepoPicker())));
+        _.div({ class: 'field-container github-repo' }, _.div({ class: 'field-key' }, 'Repository'), _.div({ class: 'field-value' }, this.renderRepoPicker())),
+
+        // Branch picker
+        _.div({ class: 'field-container github-branch' }, _.div({ class: 'field-key' }, 'Branch'), _.div({ class: 'field-value' }, this.renderBranchPicker())));
     }
 }
 
@@ -36466,7 +36510,7 @@ Router.route('/connections/:id', function () {
 // Edit (JSON editor)
 Router.route('/connections/json/:id', function () {
     let connectionEditor = new JSONEditor({
-        modelUrl: apiUrl('connections/' + this.id)
+        apiPath: 'connections/' + this.id
     });
 
     ViewHelper.get('NavbarMain').highlightItem(this.id);
@@ -36880,7 +36924,7 @@ class ConnectionEditor extends View {
     render() {
         let view = this;
 
-        this.$element.html(_.div({ class: 'object' }, _.div({ class: 'tab-content' }, _.div({ class: 'field-container connection-title' }, _.div({ class: 'field-key' }, 'Title'), _.div({ class: 'field-value' }, this.renderTitleEditor())), _.div({ class: 'field-container connection-type' }, _.div({ class: 'field-key' }, 'Type'), _.div({ class: 'field-value' }, this.renderTypeEditor())), _.div({ class: 'field-container template-provider' }, _.div({ class: 'field-key' }, 'Provide templates'), _.div({ class: 'field-value' }, this.renderTemplateProviderEditor())), _.div({ class: 'field-container media-provider' }, _.div({ class: 'field-key' }, 'Provide media'), _.div({ class: 'field-value' }, this.renderMediaProviderEditor())), this.renderSettingsEditor()), _.div({ class: 'panel panel-default panel-buttons' }, _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-embedded' }, 'Advanced').click(function () {
+        this.$element.html(_.div({ class: 'object' }, _.div({ class: 'tab-content' }, _.div({ class: 'field-container connection-title' }, _.div({ class: 'field-key' }, 'Title'), _.div({ class: 'field-value' }, this.renderTitleEditor())), _.div({ class: 'field-container connection-type' }, _.div({ class: 'field-key' }, 'Type'), _.div({ class: 'field-value' }, this.renderTypeEditor())), _.div({ class: 'field-container template-provider' }, _.div({ class: 'field-key' }, 'Provide templates'), _.div({ class: 'field-value' }, this.renderTemplateProviderEditor())), _.div({ class: 'field-container media-provider' }, _.div({ class: 'field-key' }, 'Provide media'), _.div({ class: 'field-value' }, this.renderMediaProviderEditor())), _.div({ class: 'field-container connection-settings' }, _.div({ class: 'field-key' }, 'Settings'), _.div({ class: 'field-value' }, this.renderSettingsEditor()))), _.div({ class: 'panel panel-default panel-buttons' }, _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-embedded' }, 'Advanced').click(function () {
             view.onClickAdvanced();
         }), _.button({ class: 'btn btn-danger btn-raised' }, 'Delete').click(function () {
             view.onClickDelete();
@@ -37521,6 +37565,10 @@ class JSONEditor extends View {
 
         this.$element = _.div({ class: 'json-editor flex-vertical' });
         this.$error = _.div({ class: 'panel panel-danger' }, _.div({ class: 'panel-heading' }), _.div({ class: 'panel-body' })).hide();
+
+        if (!this.model && !this.modelUrl) {
+            this.modelUrl = apiUrl(this.apiPath);
+        }
 
         this.fetch();
     }

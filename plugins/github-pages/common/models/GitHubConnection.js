@@ -44,7 +44,7 @@ class GitHubConnection extends Connection {
                 'Accept': 'application/json'
             };
             
-            restler.get('https://api.github.com/repos/' + this.settings.repo + '/contents/_layouts?access_token=' + this.settings.token, {
+            restler.get('https://api.github.com/repos/' + this.settings.repo + '/contents/_layouts?access_token=' + this.settings.token + '&ref=' + (this.settings.branch || 'gh-pages'), {
                 headers: headers
             }).on('complete', (data, response) => {
                 let templates = [];
@@ -78,7 +78,7 @@ class GitHubConnection extends Connection {
                 'Accept': 'application/json'
             };
             
-            restler.get('https://api.github.com/repos/' + this.settings.repo + '/contents/_includes/sections?access_token=' + this.settings.token, {
+            restler.get('https://api.github.com/repos/' + this.settings.repo + '/contents/_includes/sections?access_token=' + this.settings.token + '&ref=' + (this.settings.branch || 'gh-pages'), {
                 headers: headers
             }).on('complete', (data, response) => {
                 let templates = [];
@@ -113,13 +113,13 @@ class GitHubConnection extends Connection {
             };
            
             // Grab SHA first
-            restler.get('https://api.github.com/repos/' + this.settings.repo + '/commits/HEAD?access_token=' + this.settings.token, {
+            restler.get('https://api.github.com/repos/' + this.settings.repo + '/commits/HEAD?access_token=' + this.settings.token + '&ref=' + (this.settings.branch || 'gh-pages'), {
                 headers: headers
             }).on('complete', (data, response) => {
                 if(data) {
                     let sha = data.sha;
 
-                    restler.get('https://api.github.com/repos/' + this.settings.repo + '/git/trees/' + sha + '?recursive=1&access_token=' + this.settings.token, {
+                    restler.get('https://api.github.com/repos/' + this.settings.repo + '/git/trees/' + sha + '?recursive=1&access_token=' + this.settings.token + '&ref=' + (this.settings.branch || 'gh-pages'), {
                         headers: headers
                     }).on('complete', (data, response) => {
                         if(data) {
@@ -169,7 +169,7 @@ class GitHubConnection extends Connection {
                     'Accept': 'application/json'
                 };
                 
-                restler.get('https://api.github.com/repos/' + this.settings.repo + '/contents/media/' + id + '?access_token=' + this.settings.token, {
+                restler.get('https://api.github.com/repos/' + this.settings.repo + '/contents/media/' + id + '?access_token=' + this.settings.token + '&ref=' + (this.settings.branch || 'gh-pages'), {
                     headers: headers
                 }).on('complete', (data, response) => {
                     if(data) {
@@ -226,7 +226,7 @@ class GitHubConnection extends Connection {
             let tempPath = file.path;
             let apiUrl = 'https://api.github.com/repos/' + this.settings.repo + '/contents/media/' + id;
             let dirApiPath = apiUrl + '?access_token=' + this.settings.token;
-            let fileApiPath = apiUrl + '/' + file.filename + '?access_token=' + this.settings.token;
+            let fileApiPath = apiUrl + '/' + file.filename + '?access_token=' + this.settings.token + '&ref=' + (this.settings.branch || 'gh-pages');
             let headers = {
                 'Accept': 'application/json'
             };
@@ -287,7 +287,7 @@ class GitHubConnection extends Connection {
     removeMedia(id) {
         return new Promise((resolve, reject) => {
             let apiPath = 'https://api.github.com/repos/' + this.settings.repo + '/contents/';
-            let dirApiPath = apiPath + 'media/' + id + '?access_token=' + this.settings.token;
+            let dirApiPath = apiPath + 'media/' + id + '?access_token=' + this.settings.token + '&ref=' + (this.settings.branch || 'gh-pages');
             let headers = {
                 'Accept': 'application/json'
             };
@@ -302,7 +302,7 @@ class GitHubConnection extends Connection {
                     // Check if data object is empty
                     if(data[i] && typeof data[i] !== 'undefined') {
                         let sha = data[i].sha;
-                        let fileApiPath = apiPath + 'media/' + id + '/' + data[i].name + '?access_token=' + this.settings.token;
+                        let fileApiPath = apiPath + 'media/' + id + '/' + data[i].name + '?access_token=' + this.settings.token + '&ref=' + (this.settings.branch || 'gh-pages');
                         let postData = {
                             sha: sha,
                             path: 'media/' + id,
@@ -371,7 +371,7 @@ class GitHubConnection extends Connection {
         return new Promise((resolve, reject) => {
             let path = 'content/' + language + '/' + id + '.md';
 
-            let apiPath = 'https://api.github.com/repos/' + this.settings.repo + '/contents/' + path + '?access_token=' + this.settings.token;
+            let apiPath = 'https://api.github.com/repos/' + this.settings.repo + '/contents/' + path + '?access_token=' + this.settings.token + '&ref=' + (this.settings.branch || 'gh-pages');
             let headers = {
                 'Accept': 'application/json'
             };
@@ -444,7 +444,7 @@ class GitHubConnection extends Connection {
                 delete properties.template;
             }
 
-            let apiPath = 'https://api.github.com/repos/' + this.settings.repo + '/contents/' + path + '?access_token=' + this.settings.token;
+            let apiPath = 'https://api.github.com/repos/' + this.settings.repo + '/contents/' + path + '?access_token=' + this.settings.token + '&ref=' + (this.settings.branch || 'gh-pages');
             let fileContent = this.compileForJekyll(properties);
             let headers = {
                 'Accept': 'application/json'

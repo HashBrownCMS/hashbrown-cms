@@ -19,6 +19,10 @@ class JSONEditor extends View {
             _.div({class: 'panel-body'})
         ).hide();
 
+        if(!this.model && !this.modelUrl) {
+            this.modelUrl = apiUrl(this.apiPath);
+        }
+
         this.fetch();
     }
 

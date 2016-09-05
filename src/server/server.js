@@ -207,8 +207,3 @@ app.get('/:project/:environment/', function(req, res) {
         res.status(403).redirect('/login');  
     });
 });
-
-// 404
-app.get('*', function(req, res) {
-    res.redirect('/');
-});

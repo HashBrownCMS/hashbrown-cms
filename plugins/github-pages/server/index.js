@@ -85,6 +85,21 @@ class GitHubPages {
         });
 
         /**
+         * Lists all branches
+         */
+        app.get('/api/github/:owner/:repo/branches', (req, res) => {
+            let headers = {
+                'Accept': 'application/json'
+            };
+            
+            restler.get('https://api.github.com/repos/' + req.params.owner + '/' + req.params.repo + '/branches?access_token=' + req.query.token, {
+                headers: headers
+            }).on('complete', (data, response) => {
+                res.send(data);
+            });
+        });
+
+        /**
          * Lists all root directories
          */
         app.get('/api/github/:owner/:repo/dirs', (req, res) => {
