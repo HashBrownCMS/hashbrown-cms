@@ -19,7 +19,6 @@
         height: 100%;
         width: 100%;
         position: relative;
-        background-color: $darkest-grey;
 
         .tab-panes, .tab-buttons {
             transition: opacity 0.5s, width 0.5s;
@@ -29,7 +28,6 @@
         .tab-buttons {
             width: 160px;
             height: 100%;
-            background-color: $darkest-grey;
             position: relative;
             z-index: 10;
 
@@ -38,10 +36,10 @@
             }
 
             button, a {
+                background-color: transparent;
                 width: 100%;
                 height: 60px;
-                background-color: $darkest-grey;
-                color: $lightest-grey;
+                color: material-color('grey', '700');
                 padding: 0px;
                 margin: 0px;
                 border: none;
@@ -55,7 +53,13 @@
                 }
 
                 &.active, &:hover {
-                    background-color: $darker-grey;
+                    background-color: rgba(0, 0, 0, 0.03);
+
+                    .pane-text {
+                        .pane-label {
+                            font-weight: 700;
+                        }
+                    }
                 }
                 
                 .pane-icon {
@@ -111,7 +115,7 @@
         .tab-panes {
             height: 100%;
             flex-grow: 1;
-            background-color: $darker-grey;
+            background-color: rgba(0, 0, 0, 0.03);
             position: relative;
             z-index: 5;
 
@@ -143,14 +147,16 @@
                     overflow-y: auto;
 
                     .pane-item-container {
+                        border-bottom: 1px solid material-color('grey', '300');
+
                         &.active {
                             >.pane-item {
-                                border-right: 5px solid material-color('grey', '300');
-                                background-color: material-color('grey', '800');
-                                
-                                &:hover {
-                                    background-color: material-color('grey', '800');
-                                    border-right: 5px solid material-color('grey', '500');
+                                border-right: 5px solid material-color('blue', '600');
+                                font-weight: 700;
+                                color: material-color('grey', '800');
+                               
+                                .fa {
+                                    color: material-color('blue', '600');
                                 }
 
                                 .btn-children-toggle {
@@ -161,6 +167,8 @@
 
                         &.open {
                             >.pane-item {
+                                border-bottom: 1px solid material-color('grey', '300');
+
                                 .btn-children-toggle {
                                     .fa-caret-right {
                                         display: none;
@@ -188,11 +196,10 @@
                         }
 
                         .pane-item {
+                            color: material-color('grey', '700');
                             display: block;
                             border-radius: 0px;
                             border: none;
-                            color: $lightest-grey;
-                            background-color: $darker-grey;
                             margin: 0px;
                             height: 60px;
                             padding: 0px 15px;
@@ -205,8 +212,9 @@
                             }
 
                             &:hover {
-                                background-color: material-color('grey', '800');
                                 border-right: 5px solid material-color('grey', '500');
+                                font-weight: 700;
+                                color: material-color('grey', '800');
 
                                 .btn-children-toggle {
                                     right: 0px;
@@ -245,6 +253,10 @@
                         .children {
                             .pane-item-container {
                                 padding-left: 15px;
+
+                                &:last-child {
+                                    border-bottom: 0px;
+                                }
                             }
                         }
                     }

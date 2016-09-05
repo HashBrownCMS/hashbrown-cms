@@ -26,8 +26,6 @@ Router.route('/user/', function() {
             _.div({class: 'btn btn-danger'},
                 'Log out'
             ).click(() => {
-                localStorage.clear();
-
                 location = '/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment;
             })
         )

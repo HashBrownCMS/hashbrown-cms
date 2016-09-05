@@ -404,7 +404,7 @@ class NavbarMain extends View {
                     label: 'HashBrown',
                     sublabel: 'v' + app.version,
                     route: '/',
-                    $icon: _.img({src: '/svg/logo.svg', class: 'logo'}),
+                    $icon: _.img({src: '/svg/logo_grey.svg', class: 'logo'}),
                     items: [
                         {
                             name: 'User',

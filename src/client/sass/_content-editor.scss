@@ -28,10 +28,31 @@
         // Language picker
         .language-picker {
             position: absolute;
-            top: 15px;
-            right: 15px;
+            top: 10px;
+            right: 10px;
             z-index: 200;
-            background-color: material-color('blue', '300');
+            text-transform: uppercase;
+            color: material-color('blue', '100');
+            font-weight: 700;
+
+            button {
+                text-transform: uppercase;
+            }
+
+            span {
+                margin-right: 1em;
+            }
+
+            .dropdown-toggle {
+                background-color: transparent;
+                border: 0px;
+                color: #fff;
+
+                .fa {
+                    margin-left: 0.5em;
+                    margin-right: 0px;
+                }
+            }
 
             .dropdown-menu {
                 width: 100%;
@@ -39,6 +60,10 @@
                 margin-top: -1px;
                 border-radius: 0px;
                 padding: 0px;
+                border: 0px;
+                background-color: material-color('grey', '200');
+
+                @extend .raised;
 
                 li {
                     a {

@@ -34810,7 +34810,7 @@ module.exports = {
 module.exports={
   "name": "hashbrown-cms",
   "repository": "https://github.com/Putaitu/hashbrown-cms.git",
-  "version": "0.3.5",
+  "version": "0.3.6",
   "description": "The pluggable CMS",
   "main": "hashbrown.js",
   "scripts": {
@@ -36453,8 +36453,6 @@ Router.route('/user/', function () {
     ViewHelper.get('NavbarMain').highlightItem('user');
 
     $('.workspace').html(_.div({ class: 'dashboard-container user' }, _.div({ class: 'btn btn-danger' }, 'Log out').click(() => {
-        localStorage.clear();
-
         location = '/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment;
     })));
 });
@@ -37847,7 +37845,7 @@ class LanguagePicker extends View {
         this.$element = _.div({ class: 'language-picker dropdown' });
 
         if (Array.isArray(this.model) && this.model.length > 1) {
-            this.$element.append(_.button({ class: 'btn btn-default dropdown-toggle', 'data-toggle': 'dropdown' }, window.language), _.ul({ class: 'dropdown-menu' }, _.each(this.model.filter(language => {
+            this.$element.append(_.span('Language'), _.button({ class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, window.language, _.span({ class: 'fa fa-caret-down' })), _.ul({ class: 'dropdown-menu' }, _.each(this.model.filter(language => {
                 return language != window.language;
             }), (i, language) => {
                 return _.li({ value: language }, _.a({ href: '#' }, language).click(this.onChangeLanguage));
@@ -41311,7 +41309,7 @@ class NavbarMain extends View {
                     label: 'HashBrown',
                     sublabel: 'v' + app.version,
                     route: '/',
-                    $icon: _.img({ src: '/svg/logo.svg', class: 'logo' }),
+                    $icon: _.img({ src: '/svg/logo_grey.svg', class: 'logo' }),
                     items: [{
                         name: 'User',
                         path: 'user'

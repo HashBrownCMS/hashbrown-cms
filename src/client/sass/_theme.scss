@@ -5,7 +5,7 @@ html, body {
     height: 100%;
     font-family: 'Roboto';
     font-size: 12px;
-    background-color: material-color('grey', '300');
+    background-color: material-color('grey', '200');
 }
 
 // Bootstrap fixes
@@ -398,16 +398,18 @@ input {
 
     li {
         &.active {
-            a, a:focus {
-                background-color: material-color('grey', '300');
+            a, a:hover, a:focus {
+                color: #fff;
+                border: 0px;
+                background-color: transparent;
+                border-bottom: 5px solid material-color('blue', '300');
             }
         }
 
         &:not(.active) {
-            a, a:focus {
-                color: material-color('grey', '300');
-                
+            a {
                 &, &:hover, &:focus {
+                    color: material-color('blue', '100');
                     background-color: transparent;
                     border: 0px;
                 }
@@ -416,6 +418,7 @@ input {
 
         a {
             border-radius: 0px;
+            margin-bottom: 1px;
         }
     }
 }

@@ -23,8 +23,10 @@ class LanguagePicker extends View {
 
         if(Array.isArray(this.model) && this.model.length > 1) {
             this.$element.append(
-                _.button({class: 'btn btn-default dropdown-toggle', 'data-toggle': 'dropdown'},
-                    window.language
+                _.span('Language'),
+                _.button({class: 'dropdown-toggle', 'data-toggle': 'dropdown'},
+                    window.language,
+                    _.span({class: 'fa fa-caret-down'})
                 ),
                 _.ul({class: 'dropdown-menu'},
                     _.each(
