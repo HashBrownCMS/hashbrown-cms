@@ -225,7 +225,7 @@ class GitHubConnection extends Connection {
         return new Promise((resolve, reject) => {
             let tempPath = file.path;
             let apiUrl = 'https://api.github.com/repos/' + this.settings.repo + '/contents/media/' + id;
-            let dirApiPath = apiUrl + '?access_token=' + this.settings.token;
+            let dirApiPath = apiUrl + '?access_token=' + this.settings.token + '&ref=' + (this.settings.branch || 'gh-pages');
             let fileApiPath = apiUrl + '/' + file.filename + '?access_token=' + this.settings.token + '&ref=' + (this.settings.branch || 'gh-pages');
             let headers = {
                 'Accept': 'application/json'
