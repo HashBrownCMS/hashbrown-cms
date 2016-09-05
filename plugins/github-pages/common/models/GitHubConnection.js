@@ -15,6 +15,15 @@ class GitHubConnection extends Connection {
     }
 
     /**
+     * Gets API URL appendix
+     *
+     * @returns {String} Appendix
+     */
+    getAppendix() {
+        return 'access_token=' + this.settings.token + '&' + 'ref=' + (this.settings.branch || 'gh-pages');
+    }
+
+    /**
      * Compiles content for Jekyll
      *
      * @param {Object} properties
@@ -44,7 +53,7 @@ class GitHubConnection extends Connection {
                 'Accept': 'application/json'
             };
             
-            restler.get('https://api.github.com/repos/' + this.settings.repo + '/contents/_layouts?access_token=' + this.settings.token + '&ref=' + (this.settings.branch || 'gh-pages'), {
+            restler.get('https://api.github.com/repos/' + this.settings.repo + '/contents/_layouts?' + this.getAppendix(), {
                 headers: headers
             }).on('complete', (data, response) => {
                 let templates = [];
@@ -78,7 +87,7 @@ class GitHubConnection extends Connection {
                 'Accept': 'application/json'
             };
             
-            restler.get('https://api.github.com/repos/' + this.settings.repo + '/contents/_includes/sections?access_token=' + this.settings.token + '&ref=' + (this.settings.branch || 'gh-pages'), {
+            restler.get('https://api.github.com/repos/' + this.settings.repo + '/contents/_includes/sections?' + this.getAppendix(), {
                 headers: headers
             }).on('complete', (data, response) => {
                 let templates = [];
@@ -112,41 +121,31 @@ class GitHubConnection extends Connection {
                 'Accept': 'application/json'
             };
            
-            // Grab SHA first
-            restler.get('https://api.github.com/repos/' + this.settings.repo + '/commits/HEAD?access_token=' + this.settings.token + '&ref=' + (this.settings.branch || 'gh-pages'), {
+            let getApiUrl = 'https://api.github.com/repos/' + this.settings.repo + '/git/trees/' + (this.settings.branch || 'gh-pages') + '?recursive=1&access_token=' + this.settings.token;
+
+            restler.get(getApiUrl, {
                 headers: headers
             }).on('complete', (data, response) => {
                 if(data) {
-                    let sha = data.sha;
+                    if(data.tree) {
+                        let media = [];
 
-                    restler.get('https://api.github.com/repos/' + this.settings.repo + '/git/trees/' + sha + '?recursive=1&access_token=' + this.settings.token + '&ref=' + (this.settings.branch || 'gh-pages'), {
-                        headers: headers
-                    }).on('complete', (data, response) => {
-                        if(data) {
-                            if(data.tree) {
-                                let media = [];
-
-                                for(let node of data.tree) {
-                                    if(node.path.indexOf('media/') == 0 && node.mode == '100644') {
-                                        media[media.length] = new Media({
-                                            name: path.basename(node.path),
-                                            id: path.dirname(node.path).replace('media/', ''),
-                                            url: '/' + node.path
-                                        });
-                                    }
-                                }
-
-                                resolve(media);    
-                            
-                            } else {
-                                reject(new Error('No tree in GitHub response'));
-
+                        for(let node of data.tree) {
+                            if(node.path.indexOf('media/') == 0 && node.mode == '100644') {
+                                media[media.length] = new Media({
+                                    name: path.basename(node.path),
+                                    id: path.dirname(node.path).replace('media/', ''),
+                                    url: '/' + node.path
+                                });
                             }
-
-                        } else {
-                            reject(new Error('No data in GitHub response'));
                         }
-                    });
+
+                        resolve(media);    
+                    
+                    } else {
+                        reject(new Error('No tree in GitHub response'));
+
+                    }
 
                 } else {
                     reject(new Error('No data in GitHub response'));
@@ -169,7 +168,7 @@ class GitHubConnection extends Connection {
                     'Accept': 'application/json'
                 };
                 
-                restler.get('https://api.github.com/repos/' + this.settings.repo + '/contents/media/' + id + '?access_token=' + this.settings.token + '&ref=' + (this.settings.branch || 'gh-pages'), {
+                restler.get('https://api.github.com/repos/' + this.settings.repo + '/contents/media/' + id + '?' + this.getAppendix(), {
                     headers: headers
                 }).on('complete', (data, response) => {
                     if(data) {
@@ -225,8 +224,8 @@ class GitHubConnection extends Connection {
         return new Promise((resolve, reject) => {
             let tempPath = file.path;
             let apiUrl = 'https://api.github.com/repos/' + this.settings.repo + '/contents/media/' + id;
-            let dirApiPath = apiUrl + '?access_token=' + this.settings.token + '&ref=' + (this.settings.branch || 'gh-pages');
-            let fileApiPath = apiUrl + '/' + file.filename + '?access_token=' + this.settings.token + '&ref=' + (this.settings.branch || 'gh-pages');
+            let dirApiPath = apiUrl + '?' + this.getAppendix();
+            let fileApiPath = apiUrl + '/' + file.filename + '?' + this.getAppendix();
             let headers = {
                 'Accept': 'application/json'
             };
@@ -249,8 +248,9 @@ class GitHubConnection extends Connection {
                         // SHA is not needed, since we emptied the folder first
                         let postData = {
                             path: 'media/' + id + '/' + file.filename,
-                            message: 'Commit from Endomon CMS',
-                            content: new Buffer(fileData).toString('base64')
+                            message: 'Commit from HashBrown CMS',
+                            content: new Buffer(fileData).toString('base64'),
+                            branch: this.settings.branch || 'gh-pages'
                         };
 
                         // Commit the file
@@ -266,7 +266,7 @@ class GitHubConnection extends Connection {
                                 reject(new Error(data.message));
                             
                             } else {
-                                debug.log('Committed file successfully!', this);
+                                debug.log('Committed file successfully to ' + fileApiPath, this);
                                 resolve();
                             
                             }
@@ -287,7 +287,7 @@ class GitHubConnection extends Connection {
     removeMedia(id) {
         return new Promise((resolve, reject) => {
             let apiPath = 'https://api.github.com/repos/' + this.settings.repo + '/contents/';
-            let dirApiPath = apiPath + 'media/' + id + '?access_token=' + this.settings.token + '&ref=' + (this.settings.branch || 'gh-pages');
+            let dirApiPath = apiPath + 'media/' + id + '?' + this.getAppendix();
             let headers = {
                 'Accept': 'application/json'
             };
@@ -302,11 +302,12 @@ class GitHubConnection extends Connection {
                     // Check if data object is empty
                     if(data[i] && typeof data[i] !== 'undefined') {
                         let sha = data[i].sha;
-                        let fileApiPath = apiPath + 'media/' + id + '/' + data[i].name + '?access_token=' + this.settings.token + '&ref=' + (this.settings.branch || 'gh-pages');
+                        let fileApiPath = apiPath + 'media/' + id + '/' + data[i].name + '?' + this.getAppendix();
                         let postData = {
                             sha: sha,
                             path: 'media/' + id,
-                            message: 'Removed by Endomon CMS',
+                            message: 'Removed by HashBrown CMS',
+                            branch: this.settings.branch || 'gh-pages'
                         };
 
                         // Remove the file
@@ -371,7 +372,8 @@ class GitHubConnection extends Connection {
         return new Promise((resolve, reject) => {
             let path = 'content/' + language + '/' + id + '.md';
 
-            let apiPath = 'https://api.github.com/repos/' + this.settings.repo + '/contents/' + path + '?access_token=' + this.settings.token + '&ref=' + (this.settings.branch || 'gh-pages');
+            let getApiPath = 'https://api.github.com/repos/' + this.settings.repo + '/contents/' + path + '?' + this.getAppendix();
+            let delApiPath = 'https://api.github.com/repos/' + this.settings.repo + '/contents/' + path + '?' + this.getAppendix();
             let headers = {
                 'Accept': 'application/json'
             };
@@ -381,19 +383,20 @@ class GitHubConnection extends Connection {
             // Fetch first to get the SHA
             debug.log('Getting SHA...', this);
             
-            restler.get(apiPath, {
+            restler.get(getApiPath, {
                 headers: headers
             }).on('complete', (data, response) => {
                 let postData = {
                     sha: data.sha,
                     path: path,
-                    message: 'Removed by Endomon CMS',
+                    message: 'Removed by HashBrown CMS',
+                    branch: this.settings.branch || 'gh-pages'
                 };
 
                 // Remove the file
                 debug.log('Removing data...', this);
 
-                restler.del(apiPath, {
+                restler.del(delApiPath, {
                     headers: headers,
                     data: JSON.stringify(postData)
                 }).on('complete', (data, response) => {
@@ -444,7 +447,7 @@ class GitHubConnection extends Connection {
                 delete properties.template;
             }
 
-            let apiPath = 'https://api.github.com/repos/' + this.settings.repo + '/contents/' + path + '?access_token=' + this.settings.token + '&ref=' + (this.settings.branch || 'gh-pages');
+            let apiPath = 'https://api.github.com/repos/' + this.settings.repo + '/contents/' + path + '?' + this.getAppendix();
             let fileContent = this.compileForJekyll(properties);
             let headers = {
                 'Accept': 'application/json'
@@ -461,8 +464,9 @@ class GitHubConnection extends Connection {
                 let postData = {
                     sha: data.sha,
                     path: path,
-                    message: 'Commit from Endomon CMS',
-                    content: new Buffer(fileContent).toString('base64')
+                    message: 'Commit from HashBrown CMS',
+                    content: new Buffer(fileContent).toString('base64'),
+                    branch: this.settings.branch || 'gh-pages'
                 };
 
                 // Commit the file
