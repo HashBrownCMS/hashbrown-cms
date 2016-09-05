@@ -13,57 +13,68 @@ class ConnectionHelper {
     }
     
     /**
+     * Sets the Template provider
+     *
+     * @param {String} id
+     *
+     * @return {Promise} Promise
+     */
+    static setTemplateProvider(id) {
+        return SettingsHelper.getSettings('providers')
+        .then((providers) => {
+            providers = providers || {};
+            providers.template = id;
+
+            SettingsHelper.setSettings('providers', providers)
+        });
+    }
+
+    /**
      * Gets the Template provider
      *
-     * @return {Promise(Connection)} provider
+     * @return {Promise} Connection object
      */
     static getTemplateProvider() {
         return new Promise((resolve, reject) => {
-            this.getAllConnections()
-            .then((connections) => {
-                let foundProvider = false;
+            SettingsHelper.getSettings('providers')
+            .then((providers) => {
+                return this.getConnectionById(providers.template);
+            })
+            .then(resolve)
+            .catch(reject);
+        });
+    }
 
-                for(let i in connections) {
-                    if(connections[i].provideTemplates) {
-                        foundProvider = true;
+    /**
+     * Sets the Media provider
+     *
+     * @param {String} id
+     *
+     * @return {Promise} Promise
+     */
+    static setMediaProvider(id) {
+        return SettingsHelper.getSettings('providers')
+        .then((providers) => {
+            providers = providers || {};
+            providers.media = id;
 
-                        resolve(connections[i]);
-                        break;
-                    }
-                }
-
-
-                if(!foundProvider) {
-                    reject(new Error('Found no connection with "provideTemplates" switched on'));
-                }
-            });            
+            SettingsHelper.setSettings('providers', providers)
         });
     }
 
     /**
      * Gets the Media provider
      *
-     * @return {Promise(Connection)} provider
+     * @return {Promise} Connection object
      */
     static getMediaProvider() {
         return new Promise((resolve, reject) => {
-            this.getAllConnections()
-            .then((connections) => {
-                let foundProvider = false;
-
-                for(let i in connections) {
-                    if(connections[i].provideMedia) {
-                        foundProvider = true;
-
-                        resolve(connections[i]);
-                        break;
-                    }
-                }
-
-                if(!foundProvider) {
-                    reject(new Error('Found no connection with "provideMedia" switched on'));
-                }
-            });            
+            SettingsHelper.getSettings('providers')
+            .then((providers) => {
+                return this.getConnectionById(providers.media);
+            })
+            .then(resolve)
+            .catch(reject);
         });
     }
 }

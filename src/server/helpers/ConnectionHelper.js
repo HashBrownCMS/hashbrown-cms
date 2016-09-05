@@ -174,7 +174,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
     static getConnectionById(id) {
         let collection = ProjectHelper.currentEnvironment + '.connections';
         
-        return new Promise((callback) => {
+        return new Promise((resolve, reject) => {
             MongoHelper.findOne(
                 ProjectHelper.currentProject,
                 collection,
@@ -185,9 +185,9 @@ class ConnectionHelper extends ConnectionHelperCommon {
                 if(data) {
                     let connection = ConnectionHelper.initConnection(data);
 
-                    callback(connection);
+                    resolve(connection);
                 } else {
-                    debug.error('Found no connection with id "' + id + '"', this);
+                    reject(new Error('Found no connection with id "' + id + '"'));
 
                 }
             });

@@ -126,51 +126,6 @@ class ConnectionEditor extends View {
         return $editor;
     }
     
-    /**
-     * Renders the template provider editor
-     */
-    renderTemplateProviderEditor() {
-        let view = this;
-
-        function onChange() {
-            view.model.provideTemplates = this.checked;
-        } 
-
-        let switchId = 'switch-provide-templates';
-
-        let $editor = _.div({class: 'field-editor switch-editor'},
-            _.div({class: 'switch'},
-                _.input({id: switchId, class: 'form-control switch', type: 'checkbox', checked: this.model.provideTemplates})
-                    .change(onChange),
-                _.label({for: switchId})
-            )
-        );
-
-        return $editor;
-    }
-    
-    /**
-     * Renders the media provider editor
-     */
-    renderMediaProviderEditor() {
-        let view = this;
-
-        function onChange() {
-            view.model.provideMedia = this.checked;
-        } 
-
-        let switchId = 'switch-provide-media';
-
-        let $editor = _.div({class: 'field-editor switch-editor'},
-            _.div({class: 'switch'},
-                _.input({id: switchId, class: 'form-control switch', type: 'checkbox', checked: this.model.provideMedia})
-                    .change(onChange),
-                _.label({for: switchId})
-            )
-        );
-
-        return $editor;
-    }
     
     /**
      * Renders the settings editor
@@ -238,18 +193,6 @@ class ConnectionEditor extends View {
                         _.div({class: 'field-key'}, 'Type'),
                         _.div({class: 'field-value'},
                             this.renderTypeEditor()
-                        )
-                    ),
-                    _.div({class: 'field-container template-provider'},
-                        _.div({class: 'field-key'}, 'Provide templates'),
-                        _.div({class: 'field-value'},
-                            this.renderTemplateProviderEditor()
-                        )
-                    ),
-                    _.div({class: 'field-container media-provider'},
-                        _.div({class: 'field-key'}, 'Provide media'),
-                        _.div({class: 'field-value'},
-                            this.renderMediaProviderEditor()
                         )
                     ),
                     _.div({class: 'field-container connection-settings'},

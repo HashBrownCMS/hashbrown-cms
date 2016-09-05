@@ -69,6 +69,71 @@ class ConnectionPane extends Pane {
     }
 
     /**
+     * Renders the toolbar
+     *
+     * @returns {HTMLElement} The toolbar element
+     */
+    static renderToolbar() {
+        let $mediaProvider;
+        let $templateProvider;
+
+        function onChangeMediaProvider() {
+            ConnectionHelper.setMediaProvider($(this).val())
+            .then(() => {
+                // OK   
+            })
+            .catch(errorModal);
+        }
+
+        function onChangeTemplateProvider() {
+            ConnectionHelper.setTemplateProvider($(this).val())
+            .then(() => {
+                // OK   
+            })
+            .catch(errorModal);
+        }
+
+        let $toolbar = _.div({class: 'pane-toolbar'},
+            _.div({},
+                _.label('Media provider'),
+                $mediaProvider = _.select({},
+                    _.option({value: null}, '(none)'),
+                    _.each(resources.connections, (i, connection) => {
+                        return _.option({value: connection.id},
+                            connection.title
+                        );
+                    })
+                ).change(onChangeMediaProvider)
+            ),
+            _.div({},
+                _.label('Template provider'),
+                $templateProvider = _.select({},
+                    _.option({value: null}, '(none)'),
+                    _.each(resources.connections, (i, connection) => {
+                        return _.option({value: connection.id},
+                            connection.title
+                        );
+                    })
+                ).change(onChangeTemplateProvider)
+            )
+        );
+        
+        ConnectionHelper.getMediaProvider()
+        .then((connection) => {
+            $mediaProvider.val(connection.id);
+
+            return ConnectionHelper.getTemplateProvider();
+        })
+        .then((connection) => {
+            $templateProvider.val(connection.id);
+        })
+        .catch(errorModal);
+
+
+        return $toolbar;
+    }
+
+    /**
      * Gets render settings
      *
      * @returns {Object} settings
@@ -79,6 +144,7 @@ class ConnectionPane extends Pane {
             route: '/connections/',
             icon: 'exchange',
             items: resources.connections,
+            toolbar: this.renderToolbar(),
 
             // Item context menu
             itemContextMenu: {

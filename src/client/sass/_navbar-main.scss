@@ -197,6 +197,31 @@
                     border: none;
                     overflow-y: auto;
 
+                    .pane-toolbar {
+                        border-bottom: 1px solid material-color('grey', '300');
+                        display: flex;
+                        padding: 5px;
+
+                        >* {
+                            margin: 5px;
+                            flex-grow: 1;
+                        }
+
+                        label {
+                            text-transform: uppercase;
+                            color: material-color('grey', '600');
+                            font-size: 10px;
+                        }
+
+                        select {
+                            width: 100%;
+                            display: block;
+                            background-color: material-color('grey', '300');     
+                            border: 0px;
+                            padding: 5px 3px;
+                        }
+                    }
+
                     .pane-item-container {
                         &.active {
                             position: relative;

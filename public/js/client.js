@@ -36844,40 +36844,6 @@ class ConnectionEditor extends View {
     }
 
     /**
-     * Renders the template provider editor
-     */
-    renderTemplateProviderEditor() {
-        let view = this;
-
-        function onChange() {
-            view.model.provideTemplates = this.checked;
-        }
-
-        let switchId = 'switch-provide-templates';
-
-        let $editor = _.div({ class: 'field-editor switch-editor' }, _.div({ class: 'switch' }, _.input({ id: switchId, class: 'form-control switch', type: 'checkbox', checked: this.model.provideTemplates }).change(onChange), _.label({ for: switchId })));
-
-        return $editor;
-    }
-
-    /**
-     * Renders the media provider editor
-     */
-    renderMediaProviderEditor() {
-        let view = this;
-
-        function onChange() {
-            view.model.provideMedia = this.checked;
-        }
-
-        let switchId = 'switch-provide-media';
-
-        let $editor = _.div({ class: 'field-editor switch-editor' }, _.div({ class: 'switch' }, _.input({ id: switchId, class: 'form-control switch', type: 'checkbox', checked: this.model.provideMedia }).change(onChange), _.label({ for: switchId })));
-
-        return $editor;
-    }
-
-    /**
      * Renders the settings editor
      */
     renderSettingsEditor() {
@@ -36922,7 +36888,7 @@ class ConnectionEditor extends View {
     render() {
         let view = this;
 
-        this.$element.html(_.div({ class: 'object' }, _.div({ class: 'tab-content' }, _.div({ class: 'field-container connection-title' }, _.div({ class: 'field-key' }, 'Title'), _.div({ class: 'field-value' }, this.renderTitleEditor())), _.div({ class: 'field-container connection-type' }, _.div({ class: 'field-key' }, 'Type'), _.div({ class: 'field-value' }, this.renderTypeEditor())), _.div({ class: 'field-container template-provider' }, _.div({ class: 'field-key' }, 'Provide templates'), _.div({ class: 'field-value' }, this.renderTemplateProviderEditor())), _.div({ class: 'field-container media-provider' }, _.div({ class: 'field-key' }, 'Provide media'), _.div({ class: 'field-value' }, this.renderMediaProviderEditor())), _.div({ class: 'field-container connection-settings' }, _.div({ class: 'field-key' }, 'Settings'), _.div({ class: 'field-value' }, this.renderSettingsEditor()))), _.div({ class: 'panel panel-default panel-buttons' }, _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-embedded' }, 'Advanced').click(function () {
+        this.$element.html(_.div({ class: 'object' }, _.div({ class: 'tab-content' }, _.div({ class: 'field-container connection-title' }, _.div({ class: 'field-key' }, 'Title'), _.div({ class: 'field-value' }, this.renderTitleEditor())), _.div({ class: 'field-container connection-type' }, _.div({ class: 'field-key' }, 'Type'), _.div({ class: 'field-value' }, this.renderTypeEditor())), _.div({ class: 'field-container connection-settings' }, _.div({ class: 'field-key' }, 'Settings'), _.div({ class: 'field-value' }, this.renderSettingsEditor()))), _.div({ class: 'panel panel-default panel-buttons' }, _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-embedded' }, 'Advanced').click(function () {
             view.onClickAdvanced();
         }), _.button({ class: 'btn btn-danger btn-raised' }, 'Delete').click(function () {
             view.onClickDelete();
@@ -40167,6 +40133,44 @@ class ConnectionPane extends Pane {
     }
 
     /**
+     * Renders the toolbar
+     *
+     * @returns {HTMLElement} The toolbar element
+     */
+    static renderToolbar() {
+        let $mediaProvider;
+        let $templateProvider;
+
+        function onChangeMediaProvider() {
+            ConnectionHelper.setMediaProvider($(this).val()).then(() => {
+                // OK   
+            }).catch(errorModal);
+        }
+
+        function onChangeTemplateProvider() {
+            ConnectionHelper.setTemplateProvider($(this).val()).then(() => {
+                // OK   
+            }).catch(errorModal);
+        }
+
+        let $toolbar = _.div({ class: 'pane-toolbar' }, _.div({}, _.label('Media provider'), $mediaProvider = _.select({}, _.option({ value: null }, '(none)'), _.each(resources.connections, (i, connection) => {
+            return _.option({ value: connection.id }, connection.title);
+        })).change(onChangeMediaProvider)), _.div({}, _.label('Template provider'), $templateProvider = _.select({}, _.option({ value: null }, '(none)'), _.each(resources.connections, (i, connection) => {
+            return _.option({ value: connection.id }, connection.title);
+        })).change(onChangeTemplateProvider)));
+
+        ConnectionHelper.getMediaProvider().then(connection => {
+            $mediaProvider.val(connection.id);
+
+            return ConnectionHelper.getTemplateProvider();
+        }).then(connection => {
+            $templateProvider.val(connection.id);
+        }).catch(errorModal);
+
+        return $toolbar;
+    }
+
+    /**
      * Gets render settings
      *
      * @returns {Object} settings
@@ -40177,6 +40181,7 @@ class ConnectionPane extends Pane {
             route: '/connections/',
             icon: 'exchange',
             items: resources.connections,
+            toolbar: this.renderToolbar(),
 
             // Item context menu
             itemContextMenu: {
@@ -41029,6 +41034,11 @@ class NavbarMain extends View {
         let items = params.items;
         let sortingQueue = [];
 
+        // Append toolbar
+        if (params.toolbar) {
+            $pane.append(params.toolbar);
+        }
+
         // Attach item context menu
         if (params.paneContextMenu) {
             $pane.exocontext(params.paneContextMenu);
@@ -41838,54 +41848,60 @@ class ConnectionHelper {
     }
 
     /**
+     * Sets the Template provider
+     *
+     * @param {String} id
+     *
+     * @return {Promise} Promise
+     */
+    static setTemplateProvider(id) {
+        return SettingsHelper.getSettings('providers').then(providers => {
+            providers = providers || {};
+            providers.template = id;
+
+            SettingsHelper.setSettings('providers', providers);
+        });
+    }
+
+    /**
      * Gets the Template provider
      *
-     * @return {Promise(Connection)} provider
+     * @return {Promise} Connection object
      */
     static getTemplateProvider() {
         return new Promise((resolve, reject) => {
-            this.getAllConnections().then(connections => {
-                let foundProvider = false;
+            SettingsHelper.getSettings('providers').then(providers => {
+                return this.getConnectionById(providers.template);
+            }).then(resolve).catch(reject);
+        });
+    }
 
-                for (let i in connections) {
-                    if (connections[i].provideTemplates) {
-                        foundProvider = true;
+    /**
+     * Sets the Media provider
+     *
+     * @param {String} id
+     *
+     * @return {Promise} Promise
+     */
+    static setMediaProvider(id) {
+        return SettingsHelper.getSettings('providers').then(providers => {
+            providers = providers || {};
+            providers.media = id;
 
-                        resolve(connections[i]);
-                        break;
-                    }
-                }
-
-                if (!foundProvider) {
-                    reject(new Error('Found no connection with "provideTemplates" switched on'));
-                }
-            });
+            SettingsHelper.setSettings('providers', providers);
         });
     }
 
     /**
      * Gets the Media provider
      *
-     * @return {Promise(Connection)} provider
+     * @return {Promise} Connection object
      */
     static getMediaProvider() {
         return new Promise((resolve, reject) => {
-            this.getAllConnections().then(connections => {
-                let foundProvider = false;
-
-                for (let i in connections) {
-                    if (connections[i].provideMedia) {
-                        foundProvider = true;
-
-                        resolve(connections[i]);
-                        break;
-                    }
-                }
-
-                if (!foundProvider) {
-                    reject(new Error('Found no connection with "provideMedia" switched on'));
-                }
-            });
+            SettingsHelper.getSettings('providers').then(providers => {
+                return this.getConnectionById(providers.media);
+            }).then(resolve).catch(reject);
         });
     }
 }

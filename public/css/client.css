@@ -1082,6 +1082,23 @@ body > .dashboard-container {
         width: 100%;
         border: none;
         overflow-y: auto; }
+        .navspace .navbar-main .tab-panes .pane-container .pane .pane-toolbar {
+          border-bottom: 1px solid #e0e0e0;
+          display: flex;
+          padding: 5px; }
+          .navspace .navbar-main .tab-panes .pane-container .pane .pane-toolbar > * {
+            margin: 5px;
+            flex-grow: 1; }
+          .navspace .navbar-main .tab-panes .pane-container .pane .pane-toolbar label {
+            text-transform: uppercase;
+            color: #757575;
+            font-size: 10px; }
+          .navspace .navbar-main .tab-panes .pane-container .pane .pane-toolbar select {
+            width: 100%;
+            display: block;
+            background-color: #e0e0e0;
+            border: 0px;
+            padding: 5px 3px; }
         .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container.active {
           position: relative; }
           .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container.active:before {

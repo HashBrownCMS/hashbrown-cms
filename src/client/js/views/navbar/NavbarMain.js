@@ -96,6 +96,11 @@ class NavbarMain extends View {
         let items = params.items;
         let sortingQueue = [];
 
+        // Append toolbar
+        if(params.toolbar) {
+            $pane.append(params.toolbar);
+        }
+
         // Attach item context menu
         if(params.paneContextMenu) {
             $pane.exocontext(params.paneContextMenu);
