@@ -210,7 +210,7 @@ class GitHubConnection extends Connection {
      * @returns {String} path
      */
     getMediaPath() {
-        return 'https://raw.githubusercontent.com/' + this.settings.repo + '/master/media/';
+        return 'https://raw.githubusercontent.com/' + this.settings.repo + '/' + (this.settings.branch || 'gh-pages') + '/media/';
     }
 
     /**
