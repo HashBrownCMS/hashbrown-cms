@@ -10,4 +10,5 @@ node hashbrown.js
 ```
 
 ## Getting started
-- [A guide for authors](./WELCOME.md)
+- [A guide to the GUI](http://hashbrown.rocks/gui-guide)
+- [Documentation](http://hashbrown.rocks/docs)
