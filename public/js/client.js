@@ -40084,11 +40084,11 @@ class ConnectionPane extends Pane {
         let navbar = ViewHelper.get('NavbarMain');
 
         apiCall('post', 'connections/new').then(newConnection => {
-            reloadResource('connections').then(() => {
-                navbar.reload();
+            return reloadResource('connections');
+        }).then(() => {
+            navbar.reload();
 
-                location.hash = '/connections/' + newConnection.id;
-            });
+            location.hash = '/connections/' + newConnection.id;
         }).catch(navbar.onError);
     }
 
@@ -40143,13 +40143,19 @@ class ConnectionPane extends Pane {
 
         function onChangeMediaProvider() {
             ConnectionHelper.setMediaProvider($(this).val()).then(() => {
-                // OK   
+                return reloadResource('media');
+            }).then(() => {
+                ViewHelper.get('NavbarMain').reload();
             }).catch(errorModal);
         }
 
         function onChangeTemplateProvider() {
             ConnectionHelper.setTemplateProvider($(this).val()).then(() => {
-                // OK   
+                return reloadResource('templates');
+            }).then(() => {
+                return reloadResource('sectionTemplates');
+            }).then(() => {
+                ViewHelper.get('NavbarMain').reload();
             }).catch(errorModal);
         }
 
@@ -40165,7 +40171,9 @@ class ConnectionPane extends Pane {
             return ConnectionHelper.getTemplateProvider();
         }).then(connection => {
             $templateProvider.val(connection.id);
-        }).catch(errorModal);
+        }).catch(e => {
+            debug.log(e.message, this);
+        });
 
         return $toolbar;
     }
@@ -41871,6 +41879,8 @@ class ConnectionHelper {
     static getTemplateProvider() {
         return new Promise((resolve, reject) => {
             SettingsHelper.getSettings('providers').then(providers => {
+                providers = providers || {};
+
                 return this.getConnectionById(providers.template);
             }).then(resolve).catch(reject);
         });
@@ -41900,6 +41910,8 @@ class ConnectionHelper {
     static getMediaProvider() {
         return new Promise((resolve, reject) => {
             SettingsHelper.getSettings('providers').then(providers => {
+                providers = providers || {};
+
                 return this.getConnectionById(providers.media);
             }).then(resolve).catch(reject);
         });

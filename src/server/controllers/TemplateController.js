@@ -17,14 +17,10 @@ class TemplateController extends ApiController {
     static getTemplates(req, res) {
         ConnectionHelper.getTemplateProvider()
         .then((connection) => {
-            connection.getTemplates()
-            .then((templates) => {
-                res.status(200).send(templates);
-            })
-            .catch((e) => {
-                debug.log(e, ApiController)
-                res.status(404).send([]);
-            });            
+            return connection.getTemplates();
+        })
+        .then((templates) => {
+            res.status(200).send(templates);
         })
         .catch((e) => {
             // No template provider was found
@@ -38,14 +34,10 @@ class TemplateController extends ApiController {
     static getSectionTemplates(req, res) {
         ConnectionHelper.getTemplateProvider()
         .then((connection) => {
-            connection.getSectionTemplates()
-            .then((templates) => {
-                res.status(200).send(templates);
-            })
-            .catch((e) => {
-                debug.log(e, ApiController)
-                res.status(404).send([]);
-            });            
+            return connection.getSectionTemplates();
+        })
+        .then((templates) => {
+            res.status(200).send(templates);
         })
         .catch((e) => {
             // No template provider was found

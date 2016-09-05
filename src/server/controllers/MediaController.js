@@ -103,30 +103,29 @@ class MediaController extends ApiController {
      * Gets a list of Media objects
      */
     static getMedia(req, res) {
+        let media;
+        let tree;
+
         ConnectionHelper.getMediaProvider()
         .then((connection) => {
-            connection.getAllMedia()
-            .then((media) => {
-                MediaHelper.getTree()
-                .then((tree) => {
-                    for(let i in media) {
-                        media[i].applyFolderFromTree(tree);  
-                    }
+            return connection.getAllMedia();
+        })
+        .then((result) => {
+            media = result;
 
-                    res.status(200).send(media);
-                })
-                .catch((e) => {
-                    debug.log(e, ApiController);
-                    res.status(404).send([]);
-                });
-            })
-            .catch((e) => {
-                debug.log(e, ApiController);
-                res.status(404).send([]);    
-            });            
+            return MediaHelper.getTree();
+        })
+        .then((result) => {
+            let tree = result;
+
+            for(let i in media) {
+                media[i].applyFolderFromTree(tree);  
+            }
+
+            res.status(200).send(media);
         })
         .catch((e) => {
-            debug.log(e, ApiController);
+            debug.log(e.message, MediaController);
             res.status(404).send([]);    
         });            
     }
@@ -136,29 +135,27 @@ class MediaController extends ApiController {
      */
     static getSingleMedia(req, res) {
         let id = req.params.id;
+        let media;
+        let tree;
 
         ConnectionHelper.getMediaProvider()
         .then((connection) => {
-            connection.getMedia(id)
-            .then((media) => {
-                MediaHelper.getTree()
-                .then((tree) => {
-                    media.applyFolderFromTree(tree);
+            return connection.getMedia(id);
+        })
+        .then((result) => {
+            media = result;
 
-                    res.status(200).send(media);
-                })
-                .catch((e) => {
-                    debug.log(e, ApiController);
-                    res.status(404).send(e.message);    
-                });            
-            })
-            .catch((e) => {
-                debug.log(e, ApiController);
-                res.status(404).send(e.message);    
-            });            
-        })            
+            return MediaHelper.getTree();
+        })
+        .then((result) => {
+            tree = result;
+
+            media.applyFolderFromTree(tree);
+
+            res.status(200).send(media);
+        })
         .catch((e) => {
-            debug.log(e, ApiController);
+            debug.log(e, MediaController);
             res.status(404).send(e.message);    
         });            
     }
@@ -171,17 +168,14 @@ class MediaController extends ApiController {
 
         ConnectionHelper.getMediaProvider()
         .then((connection) => {
-            connection.removeMedia(id)
-            .then(() => {
-                res.sendStatus(200);
-            })
-            .catch((e) => {
-                res.status(404).send(e);    
-            });            
-        })            
+            return connection.removeMedia(id);
+        })
+        .then(() => {
+            res.sendStatus(200);
+        })
         .catch((e) => {
-            res.status(404).send(e);
-            debug.warning(e, ApiController);
+            res.status(404).send(e.message);
+            debug.warning(e, MediaController);
         });            
     }
 
@@ -195,18 +189,14 @@ class MediaController extends ApiController {
         if(file) {
             ConnectionHelper.getMediaProvider()
             .then((connection) => {
-                connection.setMedia(id, file)
-                .then(() => {
-                    // Remove temp file
-                    fs.unlinkSync(file.path);
+                return connection.setMedia(id, file);
+            })
+            .then(() => {
+                // Remove temp file
+                fs.unlinkSync(file.path);
 
-                    // Return the id
-                    res.send(id);
-                })
-                .catch((e) => {
-                    debug.warning(e);
-                    res.status(400).send(e);
-                });            
+                // Return the id
+                res.send(id);
             })            
             .catch((e) => {
                 debug.warning(e);
@@ -229,24 +219,20 @@ class MediaController extends ApiController {
             let media = Media.create();
 
             ConnectionHelper.getMediaProvider()
-                .then((connection) => {
-                    connection.setMedia(media.id, file)
-                        .then(() => {
-                            res.status(200).send(media.id);
-                        })
-                    .catch((e) => {
-                        debug.warning(e);
-                        res.status(400).send(e);    
-                    });
-                })            
+            .then((connection) => {
+                return connection.setMedia(media.id, file);
+            })
+            .then(() => {
+                res.status(200).send(media.id);
+            })
             .catch((e) => {
                 debug.warning(e);
                 res.status(400).send(e);    
             });
 
         } else {
-            debug.warning(e);
-            res.status(400).send(e);    
+            debug.warning('File was not provided', MediaController);
+            res.status(400).send('File was not provided');    
         }
     }
 }

@@ -11,12 +11,12 @@ class ConnectionPane extends Pane {
 
         apiCall('post', 'connections/new')
         .then((newConnection) => {
-            reloadResource('connections')
-            .then(() => {
-                navbar.reload();
+            return reloadResource('connections');
+        })
+        .then(() => {
+            navbar.reload();
 
-                location.hash = '/connections/' + newConnection.id;
-            });
+            location.hash = '/connections/' + newConnection.id;
         })
         .catch(navbar.onError);
     }
@@ -80,7 +80,10 @@ class ConnectionPane extends Pane {
         function onChangeMediaProvider() {
             ConnectionHelper.setMediaProvider($(this).val())
             .then(() => {
-                // OK   
+                return reloadResource('media');
+            })
+            .then(() => {
+                ViewHelper.get('NavbarMain').reload();
             })
             .catch(errorModal);
         }
@@ -88,7 +91,13 @@ class ConnectionPane extends Pane {
         function onChangeTemplateProvider() {
             ConnectionHelper.setTemplateProvider($(this).val())
             .then(() => {
-                // OK   
+                return reloadResource('templates');
+            })
+            .then(() => {
+                return reloadResource('sectionTemplates');
+            })
+            .then(() => {
+                ViewHelper.get('NavbarMain').reload();
             })
             .catch(errorModal);
         }
@@ -127,7 +136,9 @@ class ConnectionPane extends Pane {
         .then((connection) => {
             $templateProvider.val(connection.id);
         })
-        .catch(errorModal);
+        .catch((e) => {
+            debug.log(e.message, this);
+        });
 
 
         return $toolbar;

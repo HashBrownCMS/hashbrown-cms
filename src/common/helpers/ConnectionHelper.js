@@ -38,6 +38,8 @@ class ConnectionHelper {
         return new Promise((resolve, reject) => {
             SettingsHelper.getSettings('providers')
             .then((providers) => {
+                providers = providers || {};
+
                 return this.getConnectionById(providers.template);
             })
             .then(resolve)
@@ -71,6 +73,8 @@ class ConnectionHelper {
         return new Promise((resolve, reject) => {
             SettingsHelper.getSettings('providers')
             .then((providers) => {
+                providers = providers || {};
+
                 return this.getConnectionById(providers.media);
             })
             .then(resolve)
