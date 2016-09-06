@@ -110,6 +110,11 @@ class UserPane extends Pane {
         });
     }
 
+    /**
+     * Gets the render settings
+     *
+     * @returns {Object} Settings
+     */
     static getRenderSettings() {
         return {
             label: 'Users',

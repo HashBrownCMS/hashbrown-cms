@@ -85,7 +85,13 @@
                     &:after {
                         bottom: -1px;
                     }
-                    
+                   
+                    &:first-child {
+                        &:before {
+                            display: none;
+                        }
+                    }
+
                     .pane-text {
                         .pane-label {
                             font-weight: 700;
@@ -201,24 +207,31 @@
                         border-bottom: 1px solid material-color('grey', '300');
                         display: flex;
                         padding: 5px;
+                        height: 61px;
 
                         >* {
                             margin: 5px;
                             flex-grow: 1;
+                            width: 50%;
                         }
 
                         label {
                             text-transform: uppercase;
                             color: material-color('grey', '600');
                             font-size: 10px;
+                            margin: 0px;
+                            padding: 0px;
                         }
 
-                        select {
+                        select, button {
                             width: 100%;
                             display: block;
-                            background-color: material-color('grey', '300');     
+                            background-color: material-color('blue', '600');     
                             border: 0px;
                             padding: 5px 3px;
+                            color: #fff;
+                            text-transform: uppercase;
+                            font-weight: 700;
                         }
                     }
 

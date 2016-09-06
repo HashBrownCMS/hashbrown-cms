@@ -34914,7 +34914,7 @@ onReady('resources', function () {
     Router.init();
 });
 
-},{"../../../package.json":156,"../../common/helpers/DebugHelper":218,"./helpers":162,"./helpers/ConnectionHelper":163,"./helpers/ContentHelper":164,"./helpers/LanguageHelper":165,"./helpers/MediaHelper":166,"./helpers/SchemaHelper":168,"./helpers/SettingsHelper":169,"./models/Content":171,"./routes/index":176,"./views/ConnectionEditor":181,"./views/ContentEditor":182,"./views/FormEditor":183,"./views/JSONEditor":184,"./views/LanguagePicker":185,"./views/LanguageSettings":186,"./views/MediaViewer":187,"./views/SchemaEditor":189,"./views/UserEditor":190,"./views/editors":206,"./views/navbar/NavbarMain":211}],162:[function(require,module,exports){
+},{"../../../package.json":156,"../../common/helpers/DebugHelper":219,"./helpers":162,"./helpers/ConnectionHelper":163,"./helpers/ContentHelper":164,"./helpers/LanguageHelper":165,"./helpers/MediaHelper":166,"./helpers/SchemaHelper":168,"./helpers/SettingsHelper":169,"./models/Content":171,"./routes/index":176,"./views/ConnectionEditor":181,"./views/ContentEditor":182,"./views/FormEditor":183,"./views/JSONEditor":184,"./views/LanguagePicker":185,"./views/LanguageSettings":186,"./views/MediaViewer":187,"./views/SchemaEditor":189,"./views/UserEditor":190,"./views/editors":206,"./views/navbar/NavbarMain":212}],162:[function(require,module,exports){
 'use strict';
 
 // Libraries
@@ -35112,7 +35112,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
 
 module.exports = ConnectionHelper;
 
-},{"../../../common/helpers/ConnectionHelper":216,"../../../common/models/Connection":223}],164:[function(require,module,exports){
+},{"../../../common/helpers/ConnectionHelper":217,"../../../common/models/Connection":224}],164:[function(require,module,exports){
 'use strict';
 
 let ContentHelperCommon = require('../../../common/helpers/ContentHelper');
@@ -35184,7 +35184,7 @@ class ContentHelper extends ContentHelperCommon {
 
 module.exports = ContentHelper;
 
-},{"../../../common/helpers/ContentHelper":217,"../models/Content":171}],165:[function(require,module,exports){
+},{"../../../common/helpers/ContentHelper":218,"../models/Content":171}],165:[function(require,module,exports){
 'use strict';
 
 let LanguageHelperCommon = require('../../../common/helpers/LanguageHelper');
@@ -35193,7 +35193,7 @@ class LanguageHelper extends LanguageHelperCommon {}
 
 module.exports = LanguageHelper;
 
-},{"../../../common/helpers/LanguageHelper":219}],166:[function(require,module,exports){
+},{"../../../common/helpers/LanguageHelper":220}],166:[function(require,module,exports){
 'use strict';
 
 let MediaHelperCommon = require('../../../common/helpers/MediaHelper');
@@ -35268,7 +35268,7 @@ class MediaHelper extends MediaHelperCommon {
 
 module.exports = MediaHelper;
 
-},{"../../../common/helpers/MediaHelper":220}],167:[function(require,module,exports){
+},{"../../../common/helpers/MediaHelper":221}],167:[function(require,module,exports){
 'use strict';
 
 /**
@@ -35330,7 +35330,7 @@ class SchemaHelper extends SchemaHelperCommon {
 
 module.exports = SchemaHelper;
 
-},{"../../../common/helpers/SchemaHelper":221}],169:[function(require,module,exports){
+},{"../../../common/helpers/SchemaHelper":222}],169:[function(require,module,exports){
 'use strict';
 
 let SettingsHelperCommon = require('../../../common/helpers/SettingsHelper');
@@ -35362,7 +35362,7 @@ class SettingsHelper extends SettingsHelperCommon {
 
 module.exports = SettingsHelper;
 
-},{"../../../common/helpers/SettingsHelper":222}],170:[function(require,module,exports){
+},{"../../../common/helpers/SettingsHelper":223}],170:[function(require,module,exports){
 module.exports={
     "icons": [    
         "500px",
@@ -36074,7 +36074,7 @@ class Content extends ContentCommon {}
 
 module.exports = Content;
 
-},{"../../../common/models/Content":224}],172:[function(require,module,exports){
+},{"../../../common/models/Content":225}],172:[function(require,module,exports){
 'use strict';
 
 // Root
@@ -36915,7 +36915,7 @@ class ContentEditor extends View {
 
 module.exports = ContentEditor;
 
-},{"../../../common/helpers/LanguageHelper":219,"./MessageModal":188}],183:[function(require,module,exports){
+},{"../../../common/helpers/LanguageHelper":220,"./MessageModal":188}],183:[function(require,module,exports){
 'use strict';
 
 /**
@@ -39783,6 +39783,58 @@ window.resources.editors = {
 
 let Pane = require('./Pane');
 
+class CMSPane extends Pane {
+    /**
+     * Renders the toolbar
+     *
+     * @returns {HTMLElement} Toolbar
+     */
+    static renderToolbar() {
+        function onClickLogOut() {
+            document.cookie = 'token=';
+
+            location.reload();
+        }
+
+        function onClickDashboard() {
+            location = '/';
+        }
+
+        let $toolbar = _.div({ class: 'pane-toolbar' }, _.div({}, _.label('Server'), _.button('Dashboard').click(onClickDashboard)), _.div({}, _.label('Session'), _.button('Log out').click(onClickLogOut)));
+
+        return $toolbar;
+    }
+
+    /**
+     * Gets the render settings
+     *
+     * @returns {Object} Settings
+     */
+    static getRenderSettings() {
+        return {
+            label: 'HashBrown',
+            sublabel: 'v' + app.version,
+            route: '/',
+            $icon: _.img({ src: '/svg/logo_grey.svg', class: 'logo' }),
+            toolbar: this.renderToolbar(),
+            items: [{
+                name: 'Readme',
+                path: 'readme'
+            }, {
+                name: 'License',
+                path: 'license'
+            }]
+        };
+    }
+}
+
+module.exports = CMSPane;
+
+},{"./Pane":213}],208:[function(require,module,exports){
+'use strict';
+
+let Pane = require('./Pane');
+
 class ConnectionPane extends Pane {
     /**
      * Event: Click new connection
@@ -39922,7 +39974,7 @@ class ConnectionPane extends Pane {
 
 module.exports = ConnectionPane;
 
-},{"./Pane":212}],208:[function(require,module,exports){
+},{"./Pane":213}],209:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -40307,7 +40359,7 @@ class ContentPane extends Pane {
 
 module.exports = ContentPane;
 
-},{"./Pane":212}],209:[function(require,module,exports){
+},{"./Pane":213}],210:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -40375,7 +40427,7 @@ class FormsPane extends Pane {
 
 module.exports = FormsPane;
 
-},{"./Pane":212}],210:[function(require,module,exports){
+},{"./Pane":213}],211:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -40662,7 +40714,7 @@ class MediaPane extends Pane {
 
 module.exports = MediaPane;
 
-},{"./Pane":212}],211:[function(require,module,exports){
+},{"./Pane":213}],212:[function(require,module,exports){
 'use strict';
 
 // Views
@@ -40679,6 +40731,7 @@ let FormsPane = require('./FormsPane');
 let MediaPane = require('./MediaPane');
 let SchemaPane = require('./SchemaPane');
 let UserPane = require('./UserPane');
+let CMSPane = require('./CMSPane');
 
 /**
  * The main navbar
@@ -41027,25 +41080,8 @@ class NavbarMain extends View {
             success: allScopes => {
                 let scopes = allScopes[ProjectHelper.currentProject] || [];
 
-                // ----------
-                // Render the "about" pane
-                // ----------
-                this.renderPane({
-                    label: 'HashBrown',
-                    sublabel: 'v' + app.version,
-                    route: '/',
-                    $icon: _.img({ src: '/svg/logo_grey.svg', class: 'logo' }),
-                    items: [{
-                        name: 'User',
-                        path: 'user'
-                    }, {
-                        name: 'Readme',
-                        path: 'readme'
-                    }, {
-                        name: 'License',
-                        path: 'license'
-                    }]
-                });
+                // Render the "cms" pane
+                this.renderPane(CMSPane.getRenderSettings());
 
                 // Render the "content" pane
                 this.renderPane(ContentPane.getRenderSettings());
@@ -41097,7 +41133,7 @@ class NavbarMain extends View {
 
 module.exports = NavbarMain;
 
-},{"../../../../common/models/Content":224,"../MessageModal":188,"./ConnectionPane":207,"./ContentPane":208,"./FormsPane":209,"./MediaPane":210,"./SchemaPane":213,"./UserPane":214}],212:[function(require,module,exports){
+},{"../../../../common/models/Content":225,"../MessageModal":188,"./CMSPane":207,"./ConnectionPane":208,"./ContentPane":209,"./FormsPane":210,"./MediaPane":211,"./SchemaPane":214,"./UserPane":215}],213:[function(require,module,exports){
 'use strict';
 
 class Pane {
@@ -41113,7 +41149,7 @@ class Pane {
 
 module.exports = Pane;
 
-},{}],213:[function(require,module,exports){
+},{}],214:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -41232,7 +41268,7 @@ class SchemaPane extends Pane {
 
 module.exports = SchemaPane;
 
-},{"./Pane":212}],214:[function(require,module,exports){
+},{"./Pane":213}],215:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -41327,6 +41363,11 @@ class UserPane extends Pane {
         });
     }
 
+    /**
+     * Gets the render settings
+     *
+     * @returns {Object} Settings
+     */
     static getRenderSettings() {
         return {
             label: 'Users',
@@ -41358,7 +41399,7 @@ class UserPane extends Pane {
 
 module.exports = UserPane;
 
-},{"./Pane":212}],215:[function(require,module,exports){
+},{"./Pane":213}],216:[function(require,module,exports){
 module.exports=[
     "aa",
     "ab",
@@ -41547,7 +41588,7 @@ module.exports=[
     "zu"
 ]
 
-},{}],216:[function(require,module,exports){
+},{}],217:[function(require,module,exports){
 'use strict';
 
 class ConnectionHelper {
@@ -41627,7 +41668,7 @@ class ConnectionHelper {
 
 module.exports = ConnectionHelper;
 
-},{}],217:[function(require,module,exports){
+},{}],218:[function(require,module,exports){
 'use strict';
 
 class ContentHelper {
@@ -41734,7 +41775,7 @@ class ContentHelper {
 
 module.exports = ContentHelper;
 
-},{}],218:[function(require,module,exports){
+},{}],219:[function(require,module,exports){
 'use strict';
 
 let lastSenderName = '';
@@ -41839,7 +41880,7 @@ class DebugHelper {
 
 module.exports = DebugHelper;
 
-},{}],219:[function(require,module,exports){
+},{}],220:[function(require,module,exports){
 'use strict';
 
 class LanguageHelper {
@@ -41931,7 +41972,7 @@ class LanguageHelper {
 
 module.exports = LanguageHelper;
 
-},{"../data/languages.json":215}],220:[function(require,module,exports){
+},{"../data/languages.json":216}],221:[function(require,module,exports){
 'use strict';
 
 // Models
@@ -41993,7 +42034,7 @@ class MediaHelper {
 
 module.exports = MediaHelper;
 
-},{"../models/Media":228}],221:[function(require,module,exports){
+},{"../models/Media":229}],222:[function(require,module,exports){
 'use strict';
 
 // Models
@@ -42038,7 +42079,7 @@ class SchemaHelper {
 
 module.exports = SchemaHelper;
 
-},{"../models/ContentSchema":225,"../models/FieldSchema":227}],222:[function(require,module,exports){
+},{"../models/ContentSchema":226,"../models/FieldSchema":228}],223:[function(require,module,exports){
 'use strict';
 
 class SettingsHelper {
@@ -42072,7 +42113,7 @@ class SettingsHelper {
 
 module.exports = SettingsHelper;
 
-},{}],223:[function(require,module,exports){
+},{}],224:[function(require,module,exports){
 'use strict';
 
 let Entity = require('./Entity');
@@ -42299,7 +42340,7 @@ class Connection extends Entity {
 
 module.exports = Connection;
 
-},{"./Entity":226}],224:[function(require,module,exports){
+},{"./Entity":227}],225:[function(require,module,exports){
 'use strict';
 
 let Entity = require('./Entity');
@@ -42592,7 +42633,7 @@ class Content extends Entity {
 
 module.exports = Content;
 
-},{"./Entity":226}],225:[function(require,module,exports){
+},{"./Entity":227}],226:[function(require,module,exports){
 'use strict';
 
 let Schema = require('./Schema');
@@ -42616,7 +42657,7 @@ class ContentSchema extends Schema {
 
 module.exports = ContentSchema;
 
-},{"./Schema":229}],226:[function(require,module,exports){
+},{"./Schema":230}],227:[function(require,module,exports){
 'use strict';
 
 let crypto = require('crypto');
@@ -42773,7 +42814,7 @@ class Entity {
 
 module.exports = Entity;
 
-},{"crypto":56}],227:[function(require,module,exports){
+},{"crypto":56}],228:[function(require,module,exports){
 'use strict';
 
 let Schema = require('./Schema');
@@ -42795,7 +42836,7 @@ class FieldSchema extends Schema {
 
 module.exports = FieldSchema;
 
-},{"./Schema":229}],228:[function(require,module,exports){
+},{"./Schema":230}],229:[function(require,module,exports){
 'use strict';
 
 // Libs
@@ -42900,7 +42941,7 @@ class Media extends Entity {
 
 module.exports = Media;
 
-},{"./Entity":226,"path":115}],229:[function(require,module,exports){
+},{"./Entity":227,"path":115}],230:[function(require,module,exports){
 'use strict';
 
 let Entity = require('./Entity');
@@ -42936,7 +42977,7 @@ class Schema extends Entity {
 
 module.exports = Schema;
 
-},{"./Entity":226}]},{},[161,157,159])
+},{"./Entity":227}]},{},[161,157,159])
 
 
 //# sourceMappingURL=maps/client.js.map

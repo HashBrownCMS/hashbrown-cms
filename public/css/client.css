@@ -1013,6 +1013,8 @@ body > .dashboard-container {
           top: 0px; }
         .navspace .navbar-main .tab-buttons button.active:after, .navspace .navbar-main .tab-buttons a.active:after {
           bottom: -1px; }
+        .navspace .navbar-main .tab-buttons button.active:first-child:before, .navspace .navbar-main .tab-buttons a.active:first-child:before {
+          display: none; }
         .navspace .navbar-main .tab-buttons button.active .pane-text .pane-label, .navspace .navbar-main .tab-buttons a.active .pane-text .pane-label {
           font-weight: 700; }
       .navspace .navbar-main .tab-buttons button:hover .pane-text .pane-label, .navspace .navbar-main .tab-buttons a:hover .pane-text .pane-label {
@@ -1085,20 +1087,27 @@ body > .dashboard-container {
         .navspace .navbar-main .tab-panes .pane-container .pane .pane-toolbar {
           border-bottom: 1px solid #e0e0e0;
           display: flex;
-          padding: 5px; }
+          padding: 5px;
+          height: 61px; }
           .navspace .navbar-main .tab-panes .pane-container .pane .pane-toolbar > * {
             margin: 5px;
-            flex-grow: 1; }
+            flex-grow: 1;
+            width: 50%; }
           .navspace .navbar-main .tab-panes .pane-container .pane .pane-toolbar label {
             text-transform: uppercase;
             color: #757575;
-            font-size: 10px; }
-          .navspace .navbar-main .tab-panes .pane-container .pane .pane-toolbar select {
+            font-size: 10px;
+            margin: 0px;
+            padding: 0px; }
+          .navspace .navbar-main .tab-panes .pane-container .pane .pane-toolbar select, .navspace .navbar-main .tab-panes .pane-container .pane .pane-toolbar button {
             width: 100%;
             display: block;
-            background-color: #e0e0e0;
+            background-color: #1e88e5;
             border: 0px;
-            padding: 5px 3px; }
+            padding: 5px 3px;
+            color: #fff;
+            text-transform: uppercase;
+            font-weight: 700; }
         .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container.active {
           position: relative; }
           .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container.active:before {

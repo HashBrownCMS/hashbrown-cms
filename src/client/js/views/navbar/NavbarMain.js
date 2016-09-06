@@ -13,6 +13,7 @@ let FormsPane = require('./FormsPane');
 let MediaPane = require('./MediaPane');
 let SchemaPane = require('./SchemaPane');
 let UserPane = require('./UserPane');
+let CMSPane = require('./CMSPane');
 
 /**
  * The main navbar
@@ -402,29 +403,8 @@ class NavbarMain extends View {
             success: (allScopes) => {
                 let scopes = allScopes[ProjectHelper.currentProject] || [];
 
-                // ----------
-                // Render the "about" pane
-                // ----------
-                this.renderPane({
-                    label: 'HashBrown',
-                    sublabel: 'v' + app.version,
-                    route: '/',
-                    $icon: _.img({src: '/svg/logo_grey.svg', class: 'logo'}),
-                    items: [
-                        {
-                            name: 'User',
-                            path: 'user'
-                        },
-                        {
-                            name: 'Readme',
-                            path: 'readme'
-                        },
-                        {
-                            name: 'License',
-                            path: 'license'
-                        }
-                    ]
-                });
+                // Render the "cms" pane
+                this.renderPane(CMSPane.getRenderSettings());
 
                 // Render the "content" pane
                 this.renderPane(ContentPane.getRenderSettings());
