@@ -272,13 +272,14 @@ input:-webkit-autofill, input:-webkit-autofill:active, input:-webkit-autofill:vi
     color: #1e88e5; }
 
 .btn-group {
-  display: flex; }
-  .btn-group:after {
-    content: '';
-    clear: both; }
-  .btn-group .btn {
+  display: flex;
+  width: 100%; }
+  .btn-group .btn:not(.btn-group-addon) {
     display: block;
     flex-grow: 1; }
+  .btn-group .btn-group-addon {
+    flex-grow: 0;
+    flex-shrink: 0; }
 
 .form-control.disabled {
   pointer-events: none;
@@ -595,13 +596,9 @@ body > .dashboard-container {
             body > .dashboard-container .workspace .projects .project-editor .body .info h4 {
               margin-top: 0px; }
           body > .dashboard-container .workspace .projects .project-editor .body .environments {
-            display: flex;
-            flex-wrap: wrap;
             margin: 0px -2px; }
-            body > .dashboard-container .workspace .projects .project-editor .body .environments .btn {
-              flex-grow: 1;
-              min-width: 40%;
-              margin: 2px; }
+            body > .dashboard-container .workspace .projects .project-editor .body .environments .environment {
+              width: 100%; }
 
 .modal.modal-icon-picker .modal-dialog {
   width: calc(100% - 30px);

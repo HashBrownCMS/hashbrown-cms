@@ -7,13 +7,29 @@ class ServerController extends ApiController {
      * Initialises this controller
      */
     static init(app) {
-        app.post('/api/server/projects/new', this.middleware({ authenticate: false, setProject: false }), this.createProject);
         app.get('/api/server/projects', this.middleware({ authenticate: false, setProject: false }), this.getAllProjects);
         app.get('/api/server/projects/:project', this.middleware({ authenticate: false, setProject: false }), this.getProject);
         app.get('/api/server/:project/environments', this.middleware({ authenticate: false, setProject: false }), this.getAllEnvironments);
+        
+        app.post('/api/server/projects/new', this.middleware({ authenticate: false, setProject: false }), this.createProject);
+        app.post('/api/server/projects/:project/backup', this.middleware({ setProject: false }), this.postBackupProject);
+        
         app.delete('/api/server/projects/:project', this.middleware({ authenticate: false, setProject: false }), this.deleteProject);
     }
     
+    /**
+     * Makes a backup of a project
+     */
+    static postBackupProject(req, res) {
+        MongoHelper.dump(req.params.project)
+        .then((data) => {
+            res.status(200).send(data);
+        })
+        .catch((e) => {
+            res.status(502).send(e.message);
+        });
+    }
+
     /**
      * Gets a list of all projects
      */

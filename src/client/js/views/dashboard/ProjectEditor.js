@@ -33,6 +33,19 @@ class ProjectEditor extends View {
         });
     }
 
+    onClickBackup() {
+        apiCall('post', 'server/projects/' + this.model.name + '/backup')
+        .then((data) => {
+            new MessageModal({
+                model: {
+                    title: 'Success',
+                    body: 'Project "' + this.model.name + '" was backed up successfully'
+                }
+            });
+        })
+        .catch(errorModal);
+    }
+
     render() {
         let environmentCount = this.model.settings.environments.names.length;
         let languageCount = this.model.settings.language.selected.length;
@@ -51,9 +64,14 @@ class ProjectEditor extends View {
                 ),
                 _.div({class: 'environments'},
                     _.each(this.model.settings.environments.names, (i, environment) => {
-                        return _.a({href: '/' + this.model.name + '/' + environment, class: 'btn btn-primary environment'},
-                            environment
-                        )
+                        return _.div({class: 'environment'},
+                            _.p(environment),
+                            _.div({class: 'btn-group'},
+                                _.a({href: '/' + this.model.name + '/' + environment, class: 'btn btn-primary environment'}, 'cms'),
+                                _.button({class: 'btn btn-group-addon btn-default'}, 'backup')
+                                    .click(() => { this.onClickBackup(); })
+                            )
+                        );
                     })
                 )
             )
