@@ -1115,8 +1115,6 @@ body > .dashboard-container {
             color: #424242; }
             .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container.active > .pane-item .fa {
               color: #1e88e5; }
-            .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container.active > .pane-item .btn-children-toggle {
-              right: 0px; }
         .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container.open > .pane-item .btn-children-toggle .fa-caret-right {
           display: none; }
         .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container.open > .children {
@@ -1141,8 +1139,6 @@ body > .dashboard-container {
           .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item:hover {
             font-weight: 700;
             color: #424242; }
-            .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item:hover .btn-children-toggle {
-              right: 0px; }
           .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item .btn-children-toggle {
             position: absolute;
             top: 0px;

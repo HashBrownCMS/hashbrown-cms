@@ -11,9 +11,9 @@ class UserController extends ApiController {
         app.get('/api/user/scopes', this.getScopes);
         app.get('/api/users', this.middleware({scope: 'users', setProject: false}), this.getUsers);
         
-        app.get('/api/:project/:environment/users', this.middleware({scope: 'users', setProject: false}), this.getUsers);
+        app.get('/api/:project/:environment/users', this.middleware({setProject: false}), this.getUsers);
         app.post('/api/:project/:environment/users/new', this.middleware({scope: 'users', setProject: false}), this.createUser);
-        app.get('/api/:project/:environment/users/:id', this.middleware({scope: 'users', setProject: false}), this.getUser);
+        app.get('/api/:project/:environment/users/:id', this.middleware({setProject: false}), this.getUser);
         app.post('/api/:project/:environment/users/:id', this.middleware({scope: 'users', setProject: false}), this.postUser);
         app.delete('/api/:project/:environment/users/:id', this.middleware({scope: 'users', setProject: false}), this.deleteUser);
     }    

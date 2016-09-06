@@ -119,7 +119,7 @@ class ConnectionEditor extends View {
         } 
 
         let $editor = _.div({class: 'field-editor string-editor'},
-            _.input({class: 'form-control', value: this.model.title})
+            _.input({class: 'form-control', value: this.model.title, type: 'text'})
                 .change(onChange)
         );
 

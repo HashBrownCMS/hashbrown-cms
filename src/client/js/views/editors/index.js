@@ -8,6 +8,7 @@ window.resources.editors = {
     language: require('./LanguageEditor'),
     mediaReference: require('./MediaReferenceEditor'),
     period: require('./PeriodEditor'),
+    resourceReference: require('./ResourceReferenceEditor'),
     richText: require('./RichTextEditor'),
     string: require('./StringEditor'),
     struct: require('./StructEditor'),

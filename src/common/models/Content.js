@@ -30,6 +30,8 @@ class Content extends Entity {
         // Fundamental fields
         this.def(String, 'id');
         this.def(String, 'parentId');
+        this.def(String, 'createdBy');
+        this.def(String, 'updatedBy');
         this.def(Date, 'createDate');
         this.def(Date, 'updateDate');
         this.def(String, 'schemaId');
@@ -183,7 +185,9 @@ class Content extends Entity {
         return {
             parentId: this.parentId,
             createDate: this.createDate,
-            updateDate: this.updateDate
+            updateDate: this.updateDate,
+            createdBy: this.createdBy,
+            updatedBy: this.updatedBy
         };
     }
 

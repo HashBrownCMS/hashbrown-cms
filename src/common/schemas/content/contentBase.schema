@@ -13,6 +13,24 @@
             "label": "Updated at",
             "schemaId": "date"
         },
+        "createdBy": {
+            "disabled": "true",
+            "label": "Created by",
+            "schemaId": "resourceReference",
+            "config": {
+                "resource": "users",
+                "resourceKeys": ["fullName", "username"]
+            }
+        },
+        "updatedBy": {
+            "disabled": "true",
+            "label": "Updated by",
+            "schemaId": "resourceReference",
+            "config": {
+                "resource": "users",
+                "resourceKeys": ["fullName", "username"]
+            }
+        },
         "schemaId": {
             "label": "Schema",
             "schemaId": "contentSchemaReference",

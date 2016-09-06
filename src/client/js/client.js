@@ -71,18 +71,11 @@ window.reloadResource = function reloadResource(name) {
                 callback(result);
             },
             error: function(e) {
-                // Users is an exceptional API call, in that it can
-                // only be seen by other users with the right scope
-                if(name == 'users') {
-                    callback([]);
-
-                } else {
-                    if(e.status == 403) {
-                        location = '/login/?path=' + location.pathname + location.hash;
-                    }
-                    
-                    callback(null);
+                if(e.status == 403) {
+                    location = '/login/?path=' + location.pathname + location.hash;
                 }
+                
+                callback(null);
             }
         });
     });

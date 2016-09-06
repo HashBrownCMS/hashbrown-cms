@@ -28,6 +28,7 @@ class User extends Entity {
         this.def(String, 'id');
         this.def(Boolean, 'isAdmin', false);
         this.def(String, 'username');
+        this.def(String, 'fullName');
         this.def(Password, 'password', new Password());
         this.def(Array, 'tokens', []);
         this.def(Object, 'scopes', {});

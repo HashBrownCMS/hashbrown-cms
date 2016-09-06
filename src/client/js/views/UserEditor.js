@@ -189,9 +189,29 @@ class UserEditor extends View {
     }
 
     /**
+     * Renders the full name editor
+     *
+     * @return {HTMLElement} Element
+     */
+    renderFullNameEditor() {
+        let view = this;
+
+        function onChange() {
+            let fullName = $(this).val();
+
+            view.model.fullName = fullName;
+        } 
+
+        return _.div({class: 'full-name-editor'},
+            _.input({class: 'form-control', type: 'text', value: this.model.fullName}).
+                change(onChange)
+        );
+    }
+
+    /**
      * Renders a single field
      *
-     * @return {Object} element
+     * @return {HTMLElement} Element
      */
     renderField(label, $content) {
         return _.div({class: 'field-container'},
@@ -215,6 +235,7 @@ class UserEditor extends View {
         let $element = _.div({class: 'user'});
         
         $element.append(this.renderField('Username', this.renderUserNameEditor()));
+        $element.append(this.renderField('Full name', this.renderFullNameEditor()));
         $element.append(this.renderField('Scopes', this.renderScopesEditor()));
 
         return $element;

@@ -56,7 +56,13 @@ class ContentHelper extends ContentHelperCommon {
     static setContentById(id, content) {
         return new Promise((resolve, reject) => {
             let updateContent = () => {
+                content.updatedBy = UserHelper.current.id;
                 content.updateDate = Date.now();
+                
+                if(!content.createdBy) {
+                    content.createdBy = content.updatedBy;
+                }
+                
                 let collection = ProjectHelper.currentEnvironment + '.content';
 
                 MongoHelper.updateOne(
@@ -103,6 +109,9 @@ class ContentHelper extends ContentHelperCommon {
                 .then((schema) => {
                     let content = Content.create(schema.id);
                     let collection = ProjectHelper.currentEnvironment + '.content';
+
+                    content.createdBy = UserHelper.current.id;
+                    content.upadtedBy = content.createdBy;
 
                     if(parentId) {
                         content.parentId = parentId;

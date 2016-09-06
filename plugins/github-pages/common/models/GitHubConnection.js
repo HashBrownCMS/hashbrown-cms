@@ -427,66 +427,88 @@ class GitHubConnection extends Connection {
     postContentProperties(properties, id, language, meta) {
         return new Promise((resolve, reject) => {
             let path = 'content/' + language + '/' + id + '.md';
+            let createdBy;
+            let updatedBy;
 
-            // Add meta data to the properties
-            properties.meta = {
-                id: id,
-                parentId: meta.parentId,
-                language: language
-            };
+            console.log(meta);
+                
+            // Get created by user
+            UserHelper.getUserById(meta.createdBy)
+            .then((user) => {
+                createdBy = user;
 
-            // Remap "url" to "permalink"
-            if(properties.url) {
-                properties.permalink = properties.url;
-                delete properties.url;
-            }
+                return UserHelper.getUserById(meta.updatedBy);
+            })
+            // Get updated by user
+            .then((user) => {
+                updatedBy = user;
 
-            // Remap "template" to "layout"
-            if(properties.template) {
-                properties.layout = properties.template;
-                delete properties.template;
-            }
-
-            let apiPath = 'https://api.github.com/repos/' + this.settings.repo + '/contents/' + path + '?' + this.getAppendix();
-            let fileContent = this.compileForJekyll(properties);
-            let headers = {
-                'Accept': 'application/json'
-            };
-
-            debug.log('Uploading "' + path + '"...', this);
-
-            // Fetch first to get the SHA
-            debug.log('Getting SHA...', this);
-            
-            restler.get(apiPath, {
-                headers: headers
-            }).on('complete', (data, response) => {
-                let postData = {
-                    sha: data.sha,
-                    path: path,
-                    message: 'Commit from HashBrown CMS',
-                    content: new Buffer(fileContent).toString('base64'),
-                    branch: this.settings.branch || 'gh-pages'
+                // Add meta data to the properties
+                properties.meta = {
+                    id: id,
+                    parentId: meta.parentId,
+                    language: language,
+                    createDate: meta.createDate,
+                    updateDate: meta.updateDate,
+                    createdBy: createdBy.fullName || createdBy.username,
+                    updatedBy: updatedBy.fullName || updatedBy.username
                 };
 
-                // Commit the file
-                debug.log('Committing data...', this);
+                // Remap "url" to "permalink"
+                if(properties.url) {
+                    properties.permalink = properties.url;
+                    delete properties.url;
+                }
 
-                restler.put(apiPath, {
-                    headers: headers,
-                    data: JSON.stringify(postData)
+                // Remap "template" to "layout"
+                if(properties.template) {
+                    properties.layout = properties.template;
+                    delete properties.template;
+                }
+
+                let apiPath = 'https://api.github.com/repos/' + this.settings.repo + '/contents/' + path + '?' + this.getAppendix();
+                let fileContent = this.compileForJekyll(properties);
+                let headers = {
+                    'Accept': 'application/json'
+                };
+
+                debug.log('Uploading "' + path + '"...', this);
+
+                // Fetch first to get the SHA
+                debug.log('Getting SHA...', this);
+                
+                restler.get(apiPath, {
+                    headers: headers
                 }).on('complete', (data, response) => {
-                    if(data.message) {
-                        debug.log('Committing file failed: ' + data.message, this);
-                        reject(newError(data.message));
-                    
-                    } else {
-                        debug.log('Committed file successfully!', this);
-                        resolve();
+                    let postData = {
+                        sha: data.sha,
+                        path: path,
+                        message: 'Commit from HashBrown CMS',
+                        content: new Buffer(fileContent).toString('base64'),
+                        branch: this.settings.branch || 'gh-pages'
+                    };
 
-                    }
+                    // Commit the file
+                    debug.log('Committing data...', this);
+
+                    restler.put(apiPath, {
+                        headers: headers,
+                        data: JSON.stringify(postData)
+                    }).on('complete', (data, response) => {
+                        if(data.message) {
+                            debug.log('Committing file failed: ' + data.message, this);
+                            reject(newError(data.message));
+                        
+                        } else {
+                            debug.log('Committed file successfully!', this);
+                            resolve();
+
+                        }
+                    });
                 });
-            });
+            })
+            .catch(reject);
+            
         });
     }
 }
