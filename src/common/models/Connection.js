@@ -194,7 +194,8 @@ class Connection extends Entity {
                             resolve();
                         
                         }
-                    });
+                    })
+                    .catch(reject);
                 }
 
                 next(0);

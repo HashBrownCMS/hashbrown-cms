@@ -440,6 +440,16 @@ class GitHubConnection extends Connection {
             // Get updated by user
             .then((user) => {
                 updatedBy = user;
+                
+                if(!createdBy) {
+                    reject(new Error('"Created by" user not found'));
+                    return;
+                }
+
+                if(!updatedBy) {
+                    reject(new Error('"Updated by" user not found'));
+                    return;
+                }
 
                 // Format date string
                 let dateString = '';
