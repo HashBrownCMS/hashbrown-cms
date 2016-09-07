@@ -643,7 +643,6 @@ body > .dashboard-container {
       overflow: auto;
       display: block;
       border: 0px;
-      white-space: nowrap;
       resize: none;
       flex-grow: 1; }
     .json-editor .editor-container .btn-prettify {
@@ -798,7 +797,6 @@ body > .dashboard-container {
   .rich-text-editor .panel-footer {
     background-color: #212121; }
     .rich-text-editor .panel-footer textarea {
-      white-space: nowrap;
       padding: 0px;
       color: #eeeeee;
       font-family: 'Roboto Mono';

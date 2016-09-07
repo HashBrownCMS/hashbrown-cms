@@ -132,6 +132,10 @@ class Content extends Entity {
                         parentContent.settings[key].applyToChildren
                     ) {
                         let settings = parentContent.settings[key];
+
+                        // Make clone as to avoid interference with inherent values
+                        settings = JSON.parse(JSON.stringify(settings));
+
                         settings.governedBy = parentContent;
 
                         resolve(settings);
