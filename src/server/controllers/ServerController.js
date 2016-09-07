@@ -10,18 +10,32 @@ class ServerController extends ApiController {
         app.get('/api/server/projects', this.middleware({ authenticate: false, setProject: false }), this.getAllProjects);
         app.get('/api/server/projects/:project', this.middleware({ authenticate: false, setProject: false }), this.getProject);
         app.get('/api/server/:project/environments', this.middleware({ authenticate: false, setProject: false }), this.getAllEnvironments);
+        app.get('/api/server/backups/:project/:time', this.middleware({ setProject: false }), this.getBackup);
         
         app.post('/api/server/projects/new', this.middleware({ authenticate: false, setProject: false }), this.createProject);
-        app.post('/api/server/projects/:project/backup', this.middleware({ setProject: false }), this.postBackupProject);
+        app.post('/api/server/backups/:project/new', this.middleware({ setProject: false }), this.postBackupProject);
         
         app.delete('/api/server/projects/:project', this.middleware({ authenticate: false, setProject: false }), this.deleteProject);
     }
     
     /**
+     * Gets a backup of a project
+     */
+    static getBackup(req, res) {
+        BackupHelper.getBackupPath(req.params.project, req.params.time)
+        .then((path) => {
+            res.status(200).sendFile(path);
+        })
+        .catch((e) => {
+            res.status(502).send(e.message);
+        });
+    }
+
+    /**
      * Makes a backup of a project
      */
     static postBackupProject(req, res) {
-        MongoHelper.dump(req.params.project)
+        BackupHelper.createBackup(req.params.project)
         .then((data) => {
             res.status(200).send(data);
         })

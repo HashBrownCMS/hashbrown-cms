@@ -1,5 +1,8 @@
 'use strict';
 
+// Libs
+let fs = require('fs');
+
 // MongoHelper client
 let mongodb = require('mongodb');
 let mongoClient = mongodb.MongoClient;
@@ -50,6 +53,8 @@ class MongoHelper {
     static dump(databaseName, collectionName) {
         return new Promise((resolve, reject) => {
             let args = [];
+            let basePath = appRoot + '/dump';
+            let projectPath = basePath + '/' + databaseName;
 
             if(databaseName) {
                 args.push('--db');
@@ -61,9 +66,16 @@ class MongoHelper {
                 args.push(collectionName);
             }
 
-            // Output directory
-            args.push('--out');
-            args.push(appRoot + '/dump/' + Date.now());
+            // Archive
+            if(!fs.existsSync(basePath)) {
+                fs.mkdirSync(basePath);
+            }
+            
+            if(!fs.existsSync(projectPath)) {
+                fs.mkdirSync(projectPath);
+            }
+
+            args.push('--archive=' + projectPath + '/' + Date.now() + '.hba');
 
             let mongodump = spawn('mongodump', args);
 
@@ -72,7 +84,7 @@ class MongoHelper {
             });
 
             mongodump.stderr.on('data', (data) => {
-                resolve(data);
+                reject(new Error(data));
             });
             
             mongodump.on('exit', (code) => {

@@ -13,7 +13,7 @@ class Password extends Entity {
 
 class User extends Entity {
     constructor(params) {
-        if(params) {
+        if(params && params.password) {
             // Ensure correct object type
             params.password = new Password({
                 hash: params.password.hash,
@@ -22,11 +22,16 @@ class User extends Entity {
         }
 
         super(params);
+
+        if(UserHelper.current) {
+            this.isCurrent = UserHelper.current.id == this.id;
+        }
     }
     
     structure() {
         this.def(String, 'id');
         this.def(Boolean, 'isAdmin', false);
+        this.def(Boolean, 'isCurrent', false);
         this.def(String, 'username');
         this.def(String, 'fullName');
         this.def(Password, 'password', new Password());

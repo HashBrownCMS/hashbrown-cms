@@ -1,3 +1,17 @@
+.modal-project-admin {
+    .project-backup {
+        margin-top: 1em;
+        display: flex;
+        height: 30px;
+        
+        .project-backup-name {
+            line-height: 30px;
+            margin: 0px;
+            flex-grow: 1;
+        }
+    }
+}
+
 body >.dashboard-container {
     display: flex;
     height: 100%;
@@ -100,6 +114,14 @@ body >.dashboard-container {
                     
                         .environment {
                             width: 100%;
+
+                            .environment-title {
+                                line-height: 30px;
+                                text-transform: uppercase;
+                                font-weight: 700;
+                                width: 100px;
+                                flex-shrink: 0;
+                            }
                         }
                     } 
                 }

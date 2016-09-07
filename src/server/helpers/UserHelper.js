@@ -274,26 +274,38 @@ class UserHelper {
      * @returns {Promise} Array of User objects
      */
     static getAllUsers(project) {
-        let query = {};
+        return new Promise((resolve, reject) => {
+            let query = {};
 
-        if(project) {
-            debug.log('Getting all users with project "' + project + '" in scope...', this, 3);
+            if(project) {
+                debug.log('Getting all users with project "' + project + '" in scope...', this, 3);
 
-            query['scopes.' + project] = { $exists: true };
+                query['scopes.' + project] = { $exists: true };
 
-        } else {
-            debug.log('Getting all users...', this);
-        }
-
-        return MongoHelper.find(
-            'users',
-            'users',
-            query,
-            {
-                tokens: 0,
-                password: 0
+            } else {
+                debug.log('Getting all users...', this);
             }
-        );
+
+            MongoHelper.find(
+                'users',
+                'users',
+                query,
+                {
+                    tokens: 0,
+                    password: 0
+                }
+            )
+            .then((users) => {
+                let userModels = [];
+
+                for(let user of users) {
+                    userModels.push(new User(user));
+                }  
+
+                resolve(userModels);
+            })
+            .catch(reject);
+        });
     }
     
     /**

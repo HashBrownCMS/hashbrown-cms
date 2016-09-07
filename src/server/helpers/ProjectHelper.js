@@ -57,45 +57,53 @@ class ProjectHelper {
      * @returns {Promise} Project object
      */
     static getProject(name) {
-        return new Promise((resolve, reject) => {
-            MongoHelper.find(name, 'settings', {})
-            .then((settings) => {
-                /*if(!Array.isArray(settings) || settings.length < 1) {
-                    reject(new Error('Project "' + name + '" does not exist'));
+        let settings;
+        let users;
+        let backups;
 
-                } else {*/
-                    UserHelper.getAllUsers(name)
-                    .then((users) => {
-                        let project = new Project();
+        return MongoHelper.find(name, 'settings', {})
+        .then((foundSettings) => {
+            settings = foundSettings;
 
-                        project.name = name;
+            return UserHelper.getAllUsers(name);
+        })
+        .then((foundUsers) => {
+            users = foundUsers;
 
-                        for(let section of (settings || [])) {
-                            project.settings[section.section] = section;
-                        }
+            return BackupHelper.getBackupsForProject(name);
+        })
+        .then((foundBackups) => {
+            backups = foundBackups;
 
-                        // Sanity check
-                        if(!project.settings.language) {
-                            project.settings.language = {
-                                section: 'language',
-                                selected: [ 'en' ]
-                            };
-                        }
-                        
-                        if(!project.settings.environments) {
-                            project.settings.environments = {
-                                section: 'environments',
-                                names: [ 'live' ]
-                            };
-                        }
-                    
-                        project.users = users;
+            let project = new Project();
 
-                        resolve(project.getObject());
-                    });
-               /* }*/
-            })
-            .catch(reject);
+            project.name = name;
+            project.backups = backups;
+
+            for(let section of (settings || [])) {
+                project.settings[section.section] = section;
+            }
+
+            // Sanity check
+            if(!project.settings.language) {
+                project.settings.language = {
+                    section: 'language',
+                    selected: [ 'en' ]
+                };
+            }
+            
+            if(!project.settings.environments) {
+                project.settings.environments = {
+                    section: 'environments',
+                    names: [ 'live' ]
+                };
+            }
+        
+            project.users = users;
+
+            return new Promise((resolve) => {
+                resolve(project.getObject());
+            });
         });
     }
 

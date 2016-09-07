@@ -37,7 +37,7 @@ class MessageModal extends View {
     render() {
         let view = this;
 
-        this.$element = _.div({class: 'modal fade'},
+        this.$element = _.div({class: 'modal fade ' + (this.model.class ? this.model.class : '')},
             _.div({class: 'modal-dialog'},
                 _.div({class: 'modal-content'},
                     _.div({class: 'modal-header'},

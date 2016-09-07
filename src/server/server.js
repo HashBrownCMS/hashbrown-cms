@@ -41,6 +41,7 @@ global.ProjectHelper = require('./helpers/ProjectHelper');
 global.SchemaHelper = require('./helpers/SchemaHelper');
 global.SettingsHelper = require('./helpers/SettingsHelper');
 global.LogHelper = require('./helpers/LogHelper');
+global.BackupHelper = require('./helpers/BackupHelper');
 
 global.debug = require('./helpers/DebugHelper');
 global.debug.verbosity = 2;

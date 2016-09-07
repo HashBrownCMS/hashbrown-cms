@@ -367,16 +367,14 @@ input {
 // Button group
 .btn-group {
     display: flex;
-    width: 100%;
 
-    .btn:not(.btn-group-addon) {
-        display: block;
-        flex-grow: 1;
+    .btn {
+        flex-grow: 0;
     }
 
     .btn-group-addon {
-        flex-grow: 0;
-        flex-shrink: 0;
+        min-width: 40px;
+        padding: 6px;
     }
 }
 
