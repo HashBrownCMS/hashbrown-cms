@@ -108,6 +108,11 @@ class ApiController extends Controller {
         settings = settings || {};
 
         return function middleware(req, res, next) {
+            // Make sure to clear double cookie values, if they occur
+            if(!req.cookies.token) {
+                res.clearCookie('token');
+            }
+
             // Allow CORS if specified
             if(settings.allowCORS == true) {
                 res.header('Access-Control-Allow-Origin', '*');
@@ -176,14 +181,14 @@ class ApiController extends Controller {
         let errorString = '';
 
         if(error instanceof Error) {
-            errorString = error.stack || error.message || error;
+            errorString = error.message || error.stack || error;
 
         } else if(typeof error !== 'object') {
             errorString = error.toString();
 
         }
 
-        debug.warning(errorString, this);
+        debug.log(errorString, this);
 
         return errorString;
      }

@@ -103,8 +103,13 @@ class DebugHelper {
      * @param {Object} sender
      */
     static error(message, sender) {
+        if(message instanceof Error) {
+            message = message.message || message.trace;
+        }
+
         console.log(this.parseSender(sender), this.getDateString(), message);
-        throw new Error(this.parseSender(sender) + ' ' + this.getDateString() + ' ' + message);
+
+        throw new Error(message);
     }
 
     /**

@@ -37,6 +37,50 @@ class UserEditor extends View {
     }
     
     /**
+     * Event: Click remove User
+     */
+    onClickRemove() {
+        let id = this.model.id;
+        let name = this.model.username;
+        
+        function onSuccess() {
+            reloadResource('users')
+            .then(function() {
+                ViewHelper.get('NavbarMain').reload();
+                
+                location.hash = '/users/';
+            });
+        }
+
+        function onClickOK() {
+            apiCall('delete', 'users/' + id)
+            .then(onSuccess)
+            .catch(errorModal);
+        }
+
+        new MessageModal({
+            model: {
+                title: 'Delete user',
+                body: 'Are you sure you want to remove the user "' + name + '"?'
+            },
+            buttons: [
+                {
+                    label: 'Cancel',
+                    class: 'btn-default',
+                    callback: function() {
+                    }
+                },
+                {
+                    label: 'Remove',
+                    class: 'btn-danger',
+                    callback: onClickOK
+                }
+            ]
+        });
+    }
+
+    
+    /**
      * Gets a list of available scopes
      *
      * @returns {Array} Array of scope strings
@@ -207,6 +251,26 @@ class UserEditor extends View {
                 change(onChange)
         );
     }
+    
+    /**
+     * Renders the email editor
+     *
+     * @return {HTMLElement} Element
+     */
+    renderEmailEditor() {
+        let view = this;
+
+        function onChange() {
+            let email = $(this).val();
+
+            view.model.email = email;
+        } 
+
+        return _.div({class: 'full-name-editor'},
+            _.input({class: 'form-control', type: 'email', value: this.model.email}).
+                change(onChange)
+        );
+    }
 
     /**
      * Renders a single field
@@ -236,6 +300,7 @@ class UserEditor extends View {
         
         $element.append(this.renderField('Username', this.renderUserNameEditor()));
         $element.append(this.renderField('Full name', this.renderFullNameEditor()));
+        $element.append(this.renderField('Email', this.renderEmailEditor()));
         $element.append(this.renderField('Scopes', this.renderScopesEditor()));
 
         return $element;
@@ -247,8 +312,8 @@ class UserEditor extends View {
             _.div({class: 'panel panel-default panel-buttons'}, 
                 _.div({class: 'btn-group'},
                     _.button({class: 'btn btn-danger btn-raised'},
-                        'Delete'
-                    ).click(() => { this.onClickDelete(); }),
+                        'Remove'
+                    ).click(() => { this.onClickRemove(); }),
                     this.$saveBtn = _.button({class: 'btn btn-success btn-raised btn-save'},
                         _.span({class: 'text-default'}, 'Save '),
                         _.span({class: 'text-working'}, 'Saving ')

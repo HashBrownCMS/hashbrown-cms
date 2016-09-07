@@ -32,12 +32,49 @@ class BackupHelper {
     }
 
     /**
+     * Restores a backup for a project
+     *
+     * @param {String} projectName
+     * @param {String} timestamp
+     *
+     * @returns {Promise} Promise
+     */
+    static restoreBackup(projectName, timestamp) {
+        return MongoHelper.restore(projectName, timestamp);
+    }
+    
+
+    /**
      * Creates a backup for a project
      *
      * @param {String} projectName
+     *
+     * @returns {Promise} Promise
      */
     static createBackup(projectName) {
         return MongoHelper.dump(projectName);
+    }
+
+    /**
+     * Deletes a backup
+     *
+     * @param {String} projectName
+     * @param {String} timestamp
+     *
+     * @returns {Promise} Promise
+     */
+    static deleteBackup(projectName, timestamp) {
+        return new Promise((resolve, reject) => {
+            let path = appRoot + '/dump/' + projectName + '/' + timestamp + '.hba';
+
+            if(fs.existsSync(path)) {
+                fs.unlinkSync(path);
+                resolve();
+
+            } else {
+                reject(new Error('Backup for project "' + projectName + '" width timestamp "' + timestamp + '" could not be found'));
+            }
+        });
     }
 
     /**
@@ -56,7 +93,7 @@ class BackupHelper {
                 resolve(path);
             
             } else {
-                reject(new Ereor('Project backup for "' + projectName + '" with timestamp "' + timestamp + '" could not be found'));
+                reject(new Error('Project backup for "' + projectName + '" with timestamp "' + timestamp + '" could not be found'));
             
             }
         });

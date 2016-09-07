@@ -41,16 +41,62 @@ class MongoHelper {
             });
         });
     }
+    
+    /**
+     * Restores a database
+     *
+     * @param {String} databaseName
+     * @param {String} timestamp
+     *
+     * @returns {Promise} Data string
+     */
+    static restore(databaseName, timestamp) {
+        return new Promise((resolve, reject) => {
+            let args = [];
+            let basePath = appRoot + '/dump';
+            let projectPath = basePath + '/' + databaseName;
+            let archivePath = projectPath + '/' + timestamp + '.hba';
+
+            // Drop existing
+            args.push('--drop');
+
+            // Archive
+            if(!fs.existsSync(archivePath)) {
+                reject(new Error('Archive at "' + archivePath + '" could not be found'));
+            
+            } else {
+                args.push('--archive=' + archivePath);
+
+                let mongorestore = spawn('mongorestore', args);
+
+                mongorestore.stdout.on('data', (data) => {
+                    resolve(data);
+                });
+
+                mongorestore.stderr.on('data', (data) => {
+                    // For some odd reason, this success message is written to stderr
+                    if(data.toString().match(/creating intents for archive/)) {
+                        resolve(data);
+                    } else {
+                        reject(new Error(data));
+                    }
+                });
+                
+                mongorestore.on('exit', (code) => {
+                    reject(new Error('mongorestore exited with status code ' + code));
+                });
+            }
+        });
+    }
    
     /**
      * Dumps a database
      *
      * @param {String} databaseName
-     * @param {String} collectionName
      *
      * @returns {Promise} Data string
      */
-    static dump(databaseName, collectionName) {
+    static dump(databaseName) {
         return new Promise((resolve, reject) => {
             let args = [];
             let basePath = appRoot + '/dump';
@@ -59,11 +105,6 @@ class MongoHelper {
             if(databaseName) {
                 args.push('--db');
                 args.push(databaseName);
-            }
-
-            if(collectionName) {
-                args.push('--collection');
-                args.push(collectionName);
             }
 
             // Archive
@@ -84,11 +125,16 @@ class MongoHelper {
             });
 
             mongodump.stderr.on('data', (data) => {
-                reject(new Error(data));
+                // For some odd reason, this success message is written to stderr
+                if(data.toString().match(/writing .+ to archive/)) {
+                    resolve(data);
+                } else {
+                    reject(new Error(data));
+                }
             });
             
             mongodump.on('exit', (code) => {
-                reject(new Error('MongoDump exited with status code ' + code));
+                reject(new Error('mongodump exited with status code ' + code));
             });
         });
     }

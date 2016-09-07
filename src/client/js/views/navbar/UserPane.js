@@ -85,9 +85,15 @@ class UserPane extends Pane {
             });
         }
 
+        function onClickOK() {
+            apiCall('delete', 'users/' + id)
+            .then(onSuccess)
+            .catch(navbar.onError);
+        }
+
         new MessageModal({
             model: {
-                title: 'Delete user',
+                title: 'Remove user',
                 body: 'Are you sure you want to remove the user "' + name + '"?'
             },
             buttons: [
@@ -98,13 +104,9 @@ class UserPane extends Pane {
                     }
                 },
                 {
-                    label: 'OK',
+                    label: 'Remove',
                     class: 'btn-danger',
-                    callback: function() {
-                        apiCall('delete', 'users/' + id)
-                        .then(onSuccess)
-                        .catch(navbar.onError);
-                    }
+                    callback: onClickOK
                 }
             ]
         });

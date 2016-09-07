@@ -34,6 +34,7 @@ class User extends Entity {
         this.def(Boolean, 'isCurrent', false);
         this.def(String, 'username');
         this.def(String, 'fullName');
+        this.def(String, 'email');
         this.def(Password, 'password', new Password());
         this.def(Array, 'tokens', []);
         this.def(Object, 'scopes', {});

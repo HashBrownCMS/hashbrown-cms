@@ -34810,7 +34810,7 @@ module.exports = {
 module.exports={
   "name": "hashbrown-cms",
   "repository": "https://github.com/Putaitu/hashbrown-cms.git",
-  "version": "0.3.6",
+  "version": "0.3.7",
   "description": "The pluggable CMS",
   "main": "hashbrown.js",
   "scripts": {
@@ -38619,6 +38619,42 @@ class UserEditor extends View {
     }
 
     /**
+     * Event: Click remove User
+     */
+    onClickRemove() {
+        let id = this.model.id;
+        let name = this.model.username;
+
+        function onSuccess() {
+            reloadResource('users').then(function () {
+                ViewHelper.get('NavbarMain').reload();
+
+                location.hash = '/users/';
+            });
+        }
+
+        function onClickOK() {
+            apiCall('delete', 'users/' + id).then(onSuccess).catch(errorModal);
+        }
+
+        new MessageModal({
+            model: {
+                title: 'Delete user',
+                body: 'Are you sure you want to remove the user "' + name + '"?'
+            },
+            buttons: [{
+                label: 'Cancel',
+                class: 'btn-default',
+                callback: function callback() {}
+            }, {
+                label: 'Remove',
+                class: 'btn-danger',
+                callback: onClickOK
+            }]
+        });
+    }
+
+    /**
      * Gets a list of available scopes
      *
      * @returns {Array} Array of scope strings
@@ -38757,6 +38793,23 @@ class UserEditor extends View {
     }
 
     /**
+     * Renders the email editor
+     *
+     * @return {HTMLElement} Element
+     */
+    renderEmailEditor() {
+        let view = this;
+
+        function onChange() {
+            let email = $(this).val();
+
+            view.model.email = email;
+        }
+
+        return _.div({ class: 'full-name-editor' }, _.input({ class: 'form-control', type: 'email', value: this.model.email }).change(onChange));
+    }
+
+    /**
      * Renders a single field
      *
      * @return {HTMLElement} Element
@@ -38777,14 +38830,15 @@ class UserEditor extends View {
 
         $element.append(this.renderField('Username', this.renderUserNameEditor()));
         $element.append(this.renderField('Full name', this.renderFullNameEditor()));
+        $element.append(this.renderField('Email', this.renderEmailEditor()));
         $element.append(this.renderField('Scopes', this.renderScopesEditor()));
 
         return $element;
     }
 
     render() {
-        _.append(this.$element.empty(), this.renderFields(), _.div({ class: 'panel panel-default panel-buttons' }, _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-danger btn-raised' }, 'Delete').click(() => {
-            this.onClickDelete();
+        _.append(this.$element.empty(), this.renderFields(), _.div({ class: 'panel panel-default panel-buttons' }, _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-danger btn-raised' }, 'Remove').click(() => {
+            this.onClickRemove();
         }), this.$saveBtn = _.button({ class: 'btn btn-success btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Save '), _.span({ class: 'text-working' }, 'Saving ')).click(() => {
             this.onClickSave();
         }))));
@@ -41725,9 +41779,13 @@ class UserPane extends Pane {
             });
         }
 
+        function onClickOK() {
+            apiCall('delete', 'users/' + id).then(onSuccess).catch(navbar.onError);
+        }
+
         new MessageModal({
             model: {
-                title: 'Delete user',
+                title: 'Remove user',
                 body: 'Are you sure you want to remove the user "' + name + '"?'
             },
             buttons: [{
@@ -41735,11 +41793,9 @@ class UserPane extends Pane {
                 class: 'btn-default',
                 callback: function callback() {}
             }, {
-                label: 'OK',
+                label: 'Remove',
                 class: 'btn-danger',
-                callback: function callback() {
-                    apiCall('delete', 'users/' + id).then(onSuccess).catch(navbar.onError);
-                }
+                callback: onClickOK
             }]
         });
     }
@@ -42246,8 +42302,13 @@ class DebugHelper {
      * @param {Object} sender
      */
     static error(message, sender) {
+        if (message instanceof Error) {
+            message = message.message || message.trace;
+        }
+
         console.log(this.parseSender(sender), this.getDateString(), message);
-        throw new Error(this.parseSender(sender) + ' ' + this.getDateString() + ' ' + message);
+
+        throw new Error(message);
     }
 
     /**

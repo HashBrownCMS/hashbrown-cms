@@ -10,21 +10,49 @@ class ServerController extends ApiController {
         app.get('/api/server/projects', this.middleware({ authenticate: false, setProject: false }), this.getAllProjects);
         app.get('/api/server/projects/:project', this.middleware({ authenticate: false, setProject: false }), this.getProject);
         app.get('/api/server/:project/environments', this.middleware({ authenticate: false, setProject: false }), this.getAllEnvironments);
-        app.get('/api/server/backups/:project/:time', this.middleware({ setProject: false }), this.getBackup);
+        app.get('/api/server/backups/:project/:timestamp', this.middleware({ setProject: false }), this.getBackup);
         
         app.post('/api/server/projects/new', this.middleware({ authenticate: false, setProject: false }), this.createProject);
         app.post('/api/server/backups/:project/new', this.middleware({ setProject: false }), this.postBackupProject);
+        app.post('/api/server/backups/:project/:timestamp/restore', this.middleware({ setProject: false }), this.postRestoreProjectBackup);
         
+        app.delete('/api/server/backups/:project/:timestamp', this.middleware({ setProject: false }), this.deleteBackup);
         app.delete('/api/server/projects/:project', this.middleware({ authenticate: false, setProject: false }), this.deleteProject);
+    }
+    
+    /**
+     * Deletes a backup of a project
+     */
+    static deleteBackup(req, res) {
+        BackupHelper.deleteBackup(req.params.project, req.params.timestamp)
+        .then((path) => {
+            res.status(200).send('OK');
+        })
+        .catch((e) => {
+            res.status(502).send(e.message);
+        });
     }
     
     /**
      * Gets a backup of a project
      */
     static getBackup(req, res) {
-        BackupHelper.getBackupPath(req.params.project, req.params.time)
+        BackupHelper.getBackupPath(req.params.project, req.params.timestamp)
         .then((path) => {
             res.status(200).sendFile(path);
+        })
+        .catch((e) => {
+            res.status(502).send(e.message);
+        });
+    }
+    
+    /**
+     * Restores a backup of a project
+     */
+    static postRestoreProjectBackup(req, res) {
+        BackupHelper.restoreBackup(req.params.project, req.params.timestamp)
+        .then((data) => {
+            res.status(200).send(data);
         })
         .catch((e) => {
             res.status(502).send(e.message);
@@ -64,6 +92,18 @@ class ServerController extends ApiController {
                     scopedProjects.push(scope);
                 }
             }
+
+            scopedProjects.sort((a, b) => {
+                if(a < b) {
+                    return -1;
+                }
+                
+                if(a > b) {
+                    return 1;
+                }
+
+                return 0;
+            });
 
             res.status(200).send(scopedProjects);
         })
