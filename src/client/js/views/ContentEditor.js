@@ -205,14 +205,15 @@ class ContentEditor extends View {
     /**
      * Renders a field view
      *
-     * @param {Object} fieldValue
-     * @param {Object} schemaValue
-     * @param {Function} onChange
+     * @param {Object} fieldValue The field value to inject into the field editor
+     * @param {Object} fieldDefinition The field definition
+     * @param {Function} onChange The change event
+     * @param {Object} config The field config
      *
      * @return {Object} element
      */
-    renderField(fieldValue, schemaValue, onChange, config) {
-        let fieldSchema = resources.schemas[schemaValue.schemaId];
+    renderField(fieldValue, fieldDefinition, onChange, config) {
+        let fieldSchema = resources.schemas[fieldDefinition.schemaId];
 
         if(fieldSchema) {
             let fieldEditor = resources.editors[fieldSchema.editorId];
@@ -220,10 +221,10 @@ class ContentEditor extends View {
             if(fieldEditor) {
                 let fieldEditorInstance = new fieldEditor({
                     value: fieldValue,
-                    disabled: schemaValue.disabled || false,
+                    disabled: fieldDefinition.disabled || false,
                     config: config || {},
                     schema: fieldSchema,
-                    multilingual: schemaValue.multilingual
+                    multilingual: fieldDefinition.multilingual
                 });
 
                 fieldEditorInstance.on('change', onChange);
@@ -236,61 +237,83 @@ class ContentEditor extends View {
             }
         
         } else {
-            debug.log('No field schema found for schema id "' + schemaValue.schemaId + '"', this);
+            debug.log('No field schema found for schema id "' + fieldDefinition.schemaId + '"', this);
 
         }
     }
 
     /**
      * Renders fields
+     *
+     * @param {String} tabId The tab for which to render the fields
+     * @param {Object} fieldDefinitions The set of field definitions to render
+     * @param {Object} fieldValues The set of field values to inject into the field editor
+     *
+     * @returns {Array} A list of HTMLElements to render
      */
-    renderFields(tabId, schema, fields) {
+    renderFields(tabId, fieldDefinitions, fieldValues) {
         let view = this;
-        let schemaFields = {};
+        let tabFieldDefinitions = {};
 
-        // Map out fields to render
-        for(let alias in schema) {
-            let field = schema[alias];
+        // Map out field definitions to render
+        // This is necessary because we're only rendering the fields for the specified tab
+        for(let key in fieldDefinitions) {
+            let fieldDefinition = fieldDefinitions[key];
 
-            let noTabAssigned = !field.tabId;
+            let noTabAssigned = !fieldDefinition.tabId;
             let isMetaTab = tabId == 'meta';
-            let thisTabAssigned = field.tabId == tabId;
+            let thisTabAssigned = fieldDefinition.tabId == tabId;
 
             // Don't include "properties" field, if this is the meta tab
-            if(isMetaTab && alias == 'properties') {
+            if(isMetaTab && key == 'properties') {
                 continue;
             }
 
             if((noTabAssigned && isMetaTab) || thisTabAssigned) {
-                schemaFields[alias] = field;
+                tabFieldDefinitions[key] = fieldDefinition;
             }
         }
 
-        return _.each(schemaFields, (key, schemaValue) => {
-            let fieldSchema = resources.schemas[schemaValue.schemaId];
+        // Render all fields
+        return _.each(tabFieldDefinitions, (key, fieldDefinition) => {
+            // Fetch field schema
+            let fieldSchema = resources.schemas[fieldDefinition.schemaId];
 
-            // Sanity check
-            fields[key] = ContentHelper.fieldSanityCheck(fields[key], schemaValue);
+            // Field value sanity check
+            fieldValues[key] = ContentHelper.fieldSanityCheck(fieldValues[key], fieldDefinition);
 
+            // Render the field container
             return _.div({class: 'field-container', 'data-key': key},
+                // Render the label and icon
                 _.div({class: 'field-key'},
                     _.span({class: 'field-key-icon fa fa-' + fieldSchema.icon}),
-                    _.span({class: 'field-key-label'}, schemaValue.label || key)
+                    _.span({class: 'field-key-label'}, fieldDefinition.label || key)
                 ),
+
+                // Render the field editor
                 _.div({class: 'field-value'},
                     view.renderField(
-                        schemaValue.multilingual ? fields[key][window.language] : fields[key],
-                        schema[key],
-                        function(newValue) {
-                            if(schemaValue.multilingual) {
-                                fields[key]._multilingual = true;
-                                fields[key][window.language] = newValue;
+                        // If the field definition is set to multilingual, pass value from object
+                        fieldDefinition.multilingual ? fieldValues[key][window.language] : fieldValues[key],
 
+                        // Pass the field definition
+                        fieldDefinition,
+
+                        // On change function
+                        function(newValue) {
+                            // If field definition is set to multilingual, assign flag and value onto object...
+                            if(fieldDefinition.multilingual) {
+                                fieldValues[key]._multilingual = true;
+                                fieldValues[key][window.language] = newValue;
+
+                            // ...if not, assign the value directly
                             } else {
-                                fields[key] = newValue;
+                                fieldValues[key] = newValue;
                             }
                         },
-                        schemaValue.config
+
+                        // Pass the field definition config, and use the field's schema config as fallback
+                        fieldDefinition.config || fieldSchema.config
                     )
                 )
             );

@@ -111,7 +111,7 @@ class ContentHelper extends ContentHelperCommon {
                     let collection = ProjectHelper.currentEnvironment + '.content';
 
                     content.createdBy = UserHelper.current.id;
-                    content.upadtedBy = content.createdBy;
+                    content.updatedBy = content.createdBy;
 
                     if(parentId) {
                         content.parentId = parentId;
