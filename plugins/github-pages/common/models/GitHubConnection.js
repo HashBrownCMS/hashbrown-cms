@@ -430,8 +430,6 @@ class GitHubConnection extends Connection {
             let createdBy;
             let updatedBy;
 
-            console.log(meta);
-                
             // Get created by user
             UserHelper.getUserById(meta.createdBy)
             .then((user) => {
@@ -442,17 +440,34 @@ class GitHubConnection extends Connection {
             // Get updated by user
             .then((user) => {
                 updatedBy = user;
+                
+                if(!createdBy) {
+                    reject(new Error('"Created by" user not found'));
+                    return;
+                }
+
+                if(!updatedBy) {
+                    reject(new Error('"Updated by" user not found'));
+                    return;
+                }
+
+                // Format date string
+                let dateString = '';
+                
+                dateString += meta.createDate.getFullYear() + '-';
+                dateString += (meta.createDate.getMonth() + 1) + '-';
+                dateString += meta.createDate.getDate();
 
                 // Add meta data to the properties
                 properties.meta = {
                     id: id,
                     parentId: meta.parentId,
-                    language: language,
-                    createDate: meta.createDate,
-                    updateDate: meta.updateDate,
-                    createdBy: createdBy.fullName || createdBy.username,
-                    updatedBy: updatedBy.fullName || updatedBy.username
+                    language: language
                 };
+
+                // Date and author go in as main properties in Jekyll, not as meta
+                properties.date = dateString;
+                properties.author = createdBy.fullName || createdBy.username;
 
                 // Remap "url" to "permalink"
                 if(properties.url) {

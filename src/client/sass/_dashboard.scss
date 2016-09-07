@@ -96,14 +96,10 @@ body >.dashboard-container {
                     }
 
                     .environments {
-                        display: flex;
-                        flex-wrap: wrap;
                         margin: 0px -2px;
-
-                        .btn {
-                            flex-grow: 1;
-                            min-width: 40%;
-                            margin: 2px;
+                    
+                        .environment {
+                            width: 100%;
                         }
                     } 
                 }

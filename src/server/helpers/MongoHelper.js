@@ -3,6 +3,7 @@
 // MongoHelper client
 let mongodb = require('mongodb');
 let mongoClient = mongodb.MongoClient;
+let spawn = require('child_process').spawn;
 
 // Models
 let Content = require('../models/Content');
@@ -37,7 +38,49 @@ class MongoHelper {
             });
         });
     }
-    
+   
+    /**
+     * Dumps a database
+     *
+     * @param {String} databaseName
+     * @param {String} collectionName
+     *
+     * @returns {Promise} Data string
+     */
+    static dump(databaseName, collectionName) {
+        return new Promise((resolve, reject) => {
+            let args = [];
+
+            if(databaseName) {
+                args.push('--db');
+                args.push(databaseName);
+            }
+
+            if(collectionName) {
+                args.push('--collection');
+                args.push(collectionName);
+            }
+
+            // Output directory
+            args.push('--out');
+            args.push(appRoot + '/dump/' + Date.now());
+
+            let mongodump = spawn('mongodump', args);
+
+            mongodump.stdout.on('data', (data) => {
+                resolve(data);
+            });
+
+            mongodump.stderr.on('data', (data) => {
+                resolve(data);
+            });
+            
+            mongodump.on('exit', (code) => {
+                reject(new Error('MongoDump exited with status code ' + code));
+            });
+        });
+    }
+
     /**
      * Lists all collections in a database
      *
