@@ -173,7 +173,19 @@ class ApiController extends Controller {
             return 'Unspecified error';
         }
 
-        return error.stack;
+        let errorString = '';
+
+        if(error instanceof Error) {
+            errorString = error.stack || error.message || error;
+
+        } else if(typeof error !== 'object') {
+            errorString = error.toString();
+
+        }
+
+        debug.warning(errorString, this);
+
+        return errorString;
      }
 }
 

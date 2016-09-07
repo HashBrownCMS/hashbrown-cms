@@ -26,19 +26,28 @@ class HashBrownDriverConnection extends Connection {
             'Accept': 'application/json'
         };
             
+        debug.log('Getting entire tree from ' + this.settings.url + '...', this);
+        
         return new Promise((resolve, reject) => {
-            restler.get(this.settings.url + '/hashbrown/content/tree?token=' + this.settings.token, {
+            let apiUrl = this.settings.url + '/hashbrown/api/content/tree?token=' + this.settings.token;
+
+            restler.get(apiUrl, {
                 headers: headers
             }).on('complete', (data, response) => {
                 if(data) {
                     try {
-                        let tree = JSON.parse(data);
+                        let tree = data;
+                        
+                        if(typeof data === 'string') {
+                            tree = JSON.parse(data);
+                        }
 
                         resolve(tree);
               
                     } catch(e) {
-                        debug.log(e, this);
-                        resolve({});
+                        reject(e);
+                        debug.log('Failed API URL was ' + apiUrl, this);
+                        debug.log('Failed API response was ' + data, this);
               
                     }
 
@@ -60,15 +69,25 @@ class HashBrownDriverConnection extends Connection {
     setTree(json) {
         let headers = {
             'Accept': 'application/json',
-            'DataType': 'application/json'
+            'Content-Type': 'application/json; charset=utf-8'
         };
-            
-        return new Promise((resolve) => {
-            restler.post(this.settings.url + '/hashbrown/content/tree?token=' + this.settings.token, {
+
+        if(typeof json === 'object') {
+            json = JSON.stringify(json);
+        }
+
+        debug.log('Posting entire tree to ' + this.settings.url + '...', this);
+    
+        return new Promise((resolve, reject) => {
+            restler.post(this.settings.url + '/hashbrown/api/content/tree?token=' + this.settings.token, {
                 headers: headers,
                 data: json
-            }).on('complete', (data, response) => {
-                resolve(response);
+            })
+            .on('success', (data, response) => {
+                resolve(data);
+            })
+            .on('fail', (data, response) => {
+                reject(data);
             });
         });
     }
@@ -84,16 +103,11 @@ class HashBrownDriverConnection extends Connection {
     deleteContentProperties(id, language) {
         debug.log('Processing "' + id + '"...', this);
 
-        return new Promise((callback) => {
-            this.getTree()
-            .then((tree) => {
-                delete tree[id];
-                
-                this.setTree(tree)
-                .then(() => {
-                    callback();
-                });
-            });
+        return this.getTree()
+        .then((tree) => {
+            delete tree[id];
+            
+            return this.setTree(tree);
         });
     }
 
@@ -110,7 +124,7 @@ class HashBrownDriverConnection extends Connection {
     postContentProperties(properties, id, language, meta) {
         debug.log('Processing "' + properties.title + '"...', this);
 
-        return new Promise((callback) => {
+        return new Promise((resolve, reject) => {
             this.getTree()
             .then((tree) => {
                 if(!tree[id]) {
@@ -129,11 +143,10 @@ class HashBrownDriverConnection extends Connection {
                     }
                 }
 
-                this.setTree(tree)
-                .then(() => {
-                    callback();
-                });
-            });
+                return this.setTree(tree);
+            })
+            .then(resolve)
+            .catch(reject);
         });
     }
 }
