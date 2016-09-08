@@ -83,6 +83,7 @@ body >.dashboard-container {
             .btn-create-project {
                 display: block;
                 margin-left: auto;
+                margin-right: 12px;
             }
 
             .project-editor {
@@ -100,6 +101,7 @@ body >.dashboard-container {
                 }
 
                 .body {
+                    position: relative;
                     display: flex;
                     flex-direction: column;
 
@@ -112,19 +114,9 @@ body >.dashboard-container {
                     }
 
                     .admin {
-                        .btn-group {
-                            margin-bottom: 15px;
-
-                            &:last-of-type {
-                                margin-bottom: 0px;
-                            }
-
-                            span {
-                                flex-grow: 1;
-                                line-height: 31px;
-                                text-align: right;
-                            }
-                        }
+                        position: absolute;
+                        top: 0px;
+                        right: 0px;
                     }
 
                     .environments {
@@ -143,9 +135,18 @@ body >.dashboard-container {
                                 max-width: 110px;
                             }
 
+                            .dropdown {
+                                .dropdown-toggle {
+                                    width: 26px;
+                                    line-height: 30px;
+                                    display: block;
+                                    height: 30px;
+                                    text-align: right;
+                                }
+                            }
+
                             .environment-title {
                                 line-height: 30px;
-                                text-transform: uppercase;
                                 font-weight: 700;
                                 width: 100px;
                                 flex-shrink: 0;

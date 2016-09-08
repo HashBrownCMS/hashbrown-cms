@@ -22,6 +22,38 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
 /**
  * Colour a button
  */
+.dropdown.open .dropdown-toggle {
+  color: #757575;
+  position: relative; }
+  .dropdown.open .dropdown-toggle:before {
+    content: '';
+    display: block;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #e0e0e0; }
+  .dropdown.open .dropdown-toggle .fa {
+    position: relative;
+    z-index: 2; }
+
+.dropdown .dropdown-toggle {
+  color: #bdbdbd;
+  border: 0px;
+  background-color: transparent;
+  font-size: 1.5rem; }
+  .dropdown .dropdown-toggle:hover {
+    color: #757575; }
+
+.dropdown .dropdown-menu {
+  padding: 10px 0px !important;
+  border: 1px solid #f5f5f5; }
+  .dropdown .dropdown-menu > li > a {
+    padding: 3px 20px; }
+
 .chip-group .chip {
   margin: 0px 0px 4px 8px;
   height: 32px;
@@ -87,7 +119,7 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
     left: 50%;
     transform: translate(-50%, -50%); }
 
-.raised, .content-editor > .object .language-picker .dropdown-menu {
+.raised, .dropdown .dropdown-menu, .content-editor > .object .language-picker .dropdown-menu {
   box-shadow: 0px 2px 3px 1px rgba(0, 0, 0, 0.2);
   background-color: #fff;
   padding: 15px 30px; }
@@ -583,7 +615,8 @@ body > .dashboard-container {
           font-weight: bold; }
     body > .dashboard-container .workspace .projects .btn-create-project {
       display: block;
-      margin-left: auto; }
+      margin-left: auto;
+      margin-right: 12px; }
     body > .dashboard-container .workspace .projects .project-editor {
       padding: 15px;
       margin-bottom: 30px;
@@ -596,20 +629,17 @@ body > .dashboard-container {
         display: block;
         color: #f44336; }
       body > .dashboard-container .workspace .projects .project-editor .body {
+        position: relative;
         display: flex;
         flex-direction: column; }
         body > .dashboard-container .workspace .projects .project-editor .body .info {
           flex-grow: 1; }
           body > .dashboard-container .workspace .projects .project-editor .body .info h4, body > .dashboard-container .workspace .projects .project-editor .body .info h2 {
             margin-top: 0px; }
-        body > .dashboard-container .workspace .projects .project-editor .body .admin .btn-group {
-          margin-bottom: 15px; }
-          body > .dashboard-container .workspace .projects .project-editor .body .admin .btn-group:last-of-type {
-            margin-bottom: 0px; }
-          body > .dashboard-container .workspace .projects .project-editor .body .admin .btn-group span {
-            flex-grow: 1;
-            line-height: 31px;
-            text-align: right; }
+        body > .dashboard-container .workspace .projects .project-editor .body .admin {
+          position: absolute;
+          top: 0px;
+          right: 0px; }
         body > .dashboard-container .workspace .projects .project-editor .body .environments {
           margin: 0px -2px; }
           body > .dashboard-container .workspace .projects .project-editor .body .environments .btn-add {
@@ -620,9 +650,14 @@ body > .dashboard-container {
             width: 100%; }
             body > .dashboard-container .workspace .projects .project-editor .body .environments .environment .btn {
               max-width: 110px; }
+            body > .dashboard-container .workspace .projects .project-editor .body .environments .environment .dropdown .dropdown-toggle {
+              width: 26px;
+              line-height: 30px;
+              display: block;
+              height: 30px;
+              text-align: right; }
             body > .dashboard-container .workspace .projects .project-editor .body .environments .environment .environment-title {
               line-height: 30px;
-              text-transform: uppercase;
               font-weight: 700;
               width: 100px;
               flex-shrink: 0;
@@ -703,7 +738,7 @@ body > .dashboard-container {
   .struct-editor .kvp .value {
     flex-grow: 1; }
 
-.array-editor .array-editor .item.raised, .array-editor .array-editor .content-editor > .object .language-picker .item.dropdown-menu, .content-editor > .object .language-picker .array-editor .array-editor .item.dropdown-menu {
+.array-editor .array-editor .item.raised, .array-editor .array-editor .dropdown .item.dropdown-menu, .dropdown .array-editor .array-editor .item.dropdown-menu, .array-editor .array-editor .content-editor > .object .language-picker .item.dropdown-menu, .content-editor > .object .language-picker .array-editor .array-editor .item.dropdown-menu {
   padding: 0px;
   box-shadow: none; }
 

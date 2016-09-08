@@ -35,6 +35,57 @@ button, a {
     }
 }
 
+// Dropdown
+.dropdown {
+    &.open {
+        .dropdown-toggle {
+            color: material-color('grey', '600');
+            position: relative;
+
+            &:before {
+                content: '';
+                display: block;
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                background-color: material-color('grey', '300'); 
+            }
+
+            .fa {
+                position: relative;
+                z-index: 2;
+            }
+        }
+    }
+
+    .dropdown-toggle {
+        color: material-color('grey', '400');
+        border: 0px;
+        background-color: transparent;
+        font-size: 1.5rem;
+
+        &:hover {
+            color: material-color('grey', '600');
+        }
+    }
+
+    .dropdown-menu {
+        @extend .raised;
+        padding: 10px 0px !important;
+        border: 1px solid material-color('grey', '100');
+
+        >li {
+            >a {
+                padding: 3px 20px;
+            }
+        }
+    }
+}
+
 // Chips
 .chip-group {
     .chip {

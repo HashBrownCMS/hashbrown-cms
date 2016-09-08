@@ -28989,7 +28989,7 @@ class ProjectEditor extends View {
         if (this.isAdmin()) {
             let modal = new MessageModal({
                 model: {
-                    title: 'Remove project',
+                    title: 'Delete project',
                     body: _.div({}, _.p('Please type in the project name to confirm'), _.input({ class: 'form-control', type: 'text', placeholder: 'Project name' }).on('change propertychange input keyup paste', function () {
                         let $btn = modal.$element.find('.btn-danger');
                         let isMatch = $(this).val() == view.model.name;
@@ -29002,7 +29002,7 @@ class ProjectEditor extends View {
                     label: 'Cancel',
                     class: 'btn-default'
                 }, {
-                    label: 'Remove',
+                    label: 'Delete',
                     class: 'btn-danger disabled',
                     disabled: true,
                     callback: () => {
@@ -29148,15 +29148,15 @@ class ProjectEditor extends View {
         let languageCount = this.model.settings.language.selected.length;
         let userCount = this.model.users.length;
 
-        this.$element = _.div({ class: 'raised project-editor' }, _.div({ class: 'body' }, _.div({ class: 'info' }, _.h2(this.model.name), _.p(userCount + ' user' + (userCount != 1 ? 's' : '')), _.p(languageCount + ' language' + (languageCount != 1 ? 's' : '') + ' (' + this.model.settings.language.selected.join(', ') + ')')), _.div({ class: 'environments' }, _.h4('Environments'), _.each(this.model.settings.environments.names, (i, environment) => {
-            return _.div({ class: 'environment' }, _.div({ class: 'btn-group' }, _.span({ class: 'environment-title' }, environment), _.a({ href: '/' + this.model.name + '/' + environment, class: 'btn btn-primary environment' }, 'cms'), _.if(this.isAdmin(), _.button({ class: 'btn btn-group-addon btn-remove-environment btn-danger' }, _.span({ class: 'fa fa-remove' })).click(() => {
-                this.onClickRemove();
-            }))));
-        }), _.button({ class: 'btn btn-primary btn-add btn-round' }, '+')), _.if(this.isAdmin(), _.div({ class: 'admin' }, _.h4('Administrator'), _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-admin btn-primary' }, 'Backups').click(() => {
-            this.onClickBackups();
-        }), _.span('Manage backups for this project')), _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-danger btn-delete-project' }, 'Delete').click(() => {
-            this.onClickRemove();
-        }), _.span('Delete this project'))))));
+        this.$element = _.div({ class: 'raised project-editor' }, _.div({ class: 'body' }, _.if(this.isAdmin(), _.div({ class: 'admin dropdown' }, _.button({ class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, _.span({ class: 'fa fa-ellipsis-v' })), _.ul({ class: 'dropdown-menu' }, _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Backups').click(e => {
+            e.preventDefault();this.onClickBackups();
+        })), _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Delete').click(e => {
+            e.preventDefault();this.onClickRemove();
+        }))))), _.div({ class: 'info' }, _.h2(this.model.name), _.p(userCount + ' user' + (userCount != 1 ? 's' : '')), _.p(languageCount + ' language' + (languageCount != 1 ? 's' : '') + ' (' + this.model.settings.language.selected.join(', ') + ')')), _.div({ class: 'environments' }, _.h4('Environments'), _.each(this.model.settings.environments.names, (i, environment) => {
+            return _.div({ class: 'environment' }, _.div({ class: 'btn-group' }, _.span({ class: 'environment-title' }, environment), _.a({ href: '/' + this.model.name + '/' + environment, class: 'btn btn-primary environment' }, 'cms'), _.if(this.isAdmin(), _.div({ class: 'dropdown' }, _.button({ class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, _.span({ class: 'fa fa-ellipsis-v' })), _.ul({ class: 'dropdown-menu' }, _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Delete').click(e => {
+                e.preventDefault();this.onClickRemove();
+            })))))));
+        }), _.button({ class: 'btn btn-primary btn-add btn-round' }, '+'))));
     }
 }
 
