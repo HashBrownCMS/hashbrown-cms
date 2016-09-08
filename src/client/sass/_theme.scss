@@ -86,6 +86,63 @@ button, a {
     }
 }
 
+// Round button group
+.btn-round-group {
+    width: 45px;
+
+    &:hover {
+        .btn-group-addon {
+            transform: scale(0.8);
+        }   
+        
+        .btn {
+            .btn-icon-display {
+                opacity: 1;
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+            
+            .btn-icon-initial {
+                opacity: 0;
+                transform: translate(-50%, -50%) rotate(-90deg);
+            }
+        }
+    }
+
+    .btn {
+        display: block;
+        position: relative;
+
+        label {
+            display: none;
+        }
+        
+        .btn-icon-initial,
+        .btn-icon-display {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            transition: opacity 0.25s ease, transform 0.25s ease;
+        }
+
+        .btn-icon-initial {
+            opacity: 1;
+            transform: translate(-50%, -50%) rotate(0deg);
+        }
+        
+        .btn-icon-display {
+            opacity: 0;
+            transform: translate(-50%, -50%) rotate(-180deg);
+        }
+    }
+
+    .btn-group-addon {
+        transform: scale(0);
+        margin-bottom: 10px;
+        transition: transform 0.25s ease;
+    }
+}
+
 // Chips
 .chip-group {
     .chip {

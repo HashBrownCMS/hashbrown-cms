@@ -54,6 +54,39 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
   .dropdown .dropdown-menu > li > a {
     padding: 3px 20px; }
 
+.btn-round-group {
+  width: 45px; }
+  .btn-round-group:hover .btn-group-addon {
+    transform: scale(0.8); }
+  .btn-round-group:hover .btn .btn-icon-display {
+    opacity: 1;
+    transform: translate(-50%, -50%) rotate(0deg); }
+  .btn-round-group:hover .btn .btn-icon-initial {
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(-90deg); }
+  .btn-round-group .btn {
+    display: block;
+    position: relative; }
+    .btn-round-group .btn label {
+      display: none; }
+    .btn-round-group .btn .btn-icon-initial,
+    .btn-round-group .btn .btn-icon-display {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      transition: opacity 0.25s ease, transform 0.25s ease; }
+    .btn-round-group .btn .btn-icon-initial {
+      opacity: 1;
+      transform: translate(-50%, -50%) rotate(0deg); }
+    .btn-round-group .btn .btn-icon-display {
+      opacity: 0;
+      transform: translate(-50%, -50%) rotate(-180deg); }
+  .btn-round-group .btn-group-addon {
+    transform: scale(0);
+    margin-bottom: 10px;
+    transition: transform 0.25s ease; }
+
 .chip-group .chip {
   margin: 0px 0px 4px 8px;
   height: 32px;
@@ -571,6 +604,10 @@ img.logo {
     line-height: 30px;
     margin: 0px;
     flex-grow: 1; }
+
+.modal-project-admin .btn-round-group {
+  display: block;
+  margin-left: auto; }
 
 body > .dashboard-container {
   display: flex;

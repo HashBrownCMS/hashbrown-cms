@@ -182,15 +182,6 @@ class ProjectEditor extends View {
                     class: 'modal-project-admin',
                     title: this.model.name + ' backups',
                     body: _.div({},
-                        // Create backup
-                        _.span({class: 'btn-group'},
-                            _.button({class: 'btn btn-primary btn-backup'}, 'Create')
-                                .click(() => { this.onClickCreateBackup(); }),
-                            _.button({class: 'btn btn-default btn-group-addon btn-upload'},
-                                _.span({class: 'fa fa-upload'})
-                            ).click(() => { this.onClickUploadBackup(); })
-                        ),
-
                         // List existing backups
                         _.each(this.model.backups, (i, backup) => {
                             let date = new Date(parseInt(backup));
@@ -222,7 +213,20 @@ class ProjectEditor extends View {
                                     )
                                 )
                             );
-                        })
+                        }),
+                        
+                        // Create backup
+                        _.div({class: 'btn-round-group'},
+                            _.button({class: 'btn btn-round btn-default btn-group-addon btn-upload-backup'},
+                                _.span({class: 'fa fa-upload'}),
+                                _.label('Upload')
+                            ).click(() => { this.onClickUploadBackup(); }),
+                            _.button({class: 'btn btn-round btn-primary btn-create-backup'},
+                                _.span({class: 'btn-icon-initial'}, '+'),
+                                _.span({class: 'btn-icon-display fa fa-database'}),
+                                _.label('Create')
+                            ).click(() => { this.onClickCreateBackup(); })
+                        )
                     )
                 }
             }); 
