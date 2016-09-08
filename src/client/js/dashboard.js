@@ -15,16 +15,24 @@ window.Project = require('../../common/models/Project');
 // Get projects
 apiCall('get', 'server/projects')
 .then((projects) => {
-    for(let i in projects) {
+    function renderNext(i) {
         apiCall('get', 'server/projects/' + projects[i])
         .then((project) => {
             let projectEditor = new ProjectEditor({
                 model: new Project(project)
             });
 
-            $('.dashboard-container .workspace .projects').append(projectEditor.$element);
+            $('.dashboard-container .workspace .projects .project-list').append(projectEditor.$element);
+
+            if(i < projects.length - 1) {
+                renderNext(i + 1);
+            }
         })
         .catch(errorModal);
+    }
+    
+    if(projects.length > 0) {
+        renderNext(0);
     }
 })
 .catch(errorModal);

@@ -31,11 +31,23 @@ class ProjectEditor extends View {
      * Event: Click remove button
      */ 
     onClickRemove() {
+        let view = this;
+
         if(this.isAdmin()) {
             let modal = new MessageModal({
                 model: {
                     title: 'Remove project',
-                    body: 'Are you sure?'
+                    body: _.div({},
+                        _.p('Please type in the project name to confirm'),
+                        _.input({class: 'form-control', type: 'text', placeholder: 'Project name'})
+                            .on('change propertychange input keyup paste', function() {
+                                let $btn = modal.$element.find('.btn-danger');
+                                let isMatch = $(this).val() == view.model.name;
+                                
+                                $btn.attr('disabled', !isMatch);
+                                $btn.toggleClass('disabled', !isMatch);
+                            })
+                    )
                 },
                 buttons: [
                     {
@@ -44,7 +56,8 @@ class ProjectEditor extends View {
                     },
                     {
                         label: 'Remove',
-                        class: 'btn-danger',
+                        class: 'btn-danger disabled',
+                        disabled: true,
                         callback: () => {
                             apiCall('delete', 'server/projects/' + this.model.name)
                             .then(() => {
@@ -160,19 +173,15 @@ class ProjectEditor extends View {
     }
 
     /**
-     * Event: Click admin button
+     * Event: Click backups button
      */
-    onClickAdmin() {
+    onClickBackups() {
         if(this.isAdmin()) {
             new MessageModal({
                 model: {
                     class: 'modal-project-admin',
-                    title: this.model.name + ' administration',
+                    title: this.model.name + ' backups',
                     body: _.div({},
-
-                        // Backups
-                        _.h4('Backups'),
-
                         // Create backup
                         _.span({class: 'btn-group'},
                             _.button({class: 'btn btn-primary btn-backup'}, 'Create')
@@ -212,37 +221,49 @@ class ProjectEditor extends View {
     }
 
     render() {
-        let environmentCount = this.model.settings.environments.names.length;
         let languageCount = this.model.settings.language.selected.length;
         let userCount = this.model.users.length;
 
         this.$element = _.div({class: 'raised project-editor'},
-            _.if(this.isAdmin(),
-                _.button({class: 'btn btn-embedded btn-remove'},
-                    _.span({class: 'fa fa-remove'})
-                ).click(() => { this.onClickRemove(); })
-            ),
             _.div({class: 'body'},
                 _.div({class: 'info'},
-                    _.h4(this.model.name),
-                    _.p(environmentCount + ' environment' + (environmentCount != 1 ? 's' : '')),
+                    _.h2(this.model.name),
                     _.p(userCount + ' user' + (userCount != 1 ? 's' : '')),
                     _.p(languageCount + ' language' + (languageCount != 1 ? 's' : '') + ' (' + this.model.settings.language.selected.join(', ') + ')')
                 ),
                 _.div({class: 'environments'},
+                    _.h4('Environments'),
                     _.each(this.model.settings.environments.names, (i, environment) => {
                         return _.div({class: 'environment'},
                             _.div({class: 'btn-group'},
                                 _.span({class: 'environment-title'}, environment),
                                 _.a({href: '/' + this.model.name + '/' + environment, class: 'btn btn-primary environment'}, 'cms'),
                                 _.if(this.isAdmin(),
-                                    _.button({class: 'btn btn-group-addon btn-admin btn-default'}, 
-                                        _.span({class: 'fa fa-cogs'})
-                                    ).click(() => { this.onClickAdmin(); })
+                                    _.button({class: 'btn btn-group-addon btn-remove-environment btn-danger'}, 
+                                        _.span({class: 'fa fa-remove'})
+                                    ).click(() => { this.onClickRemove(); })
                                 )
                             )
                         );
-                    })
+                    }),
+                    _.button({class: 'btn btn-primary btn-add btn-round'}, '+')
+                ),
+                _.if(this.isAdmin(),
+                    _.div({class: 'admin'}, 
+                        _.h4('Administrator'),
+                        _.div({class: 'btn-group'},
+                            _.button({class: 'btn btn-admin btn-primary'}, 
+                                'Backups'
+                            ).click(() => { this.onClickBackups(); }),
+                            _.span('Manage backups for this project')
+                        ),
+                        _.div({class: 'btn-group'},
+                            _.button({class: 'btn btn-danger btn-delete-project'},
+                                'Delete'
+                            ).click(() => { this.onClickRemove(); }),
+                            _.span('Delete this project')
+                        )
+                    )
                 )
             )
         );

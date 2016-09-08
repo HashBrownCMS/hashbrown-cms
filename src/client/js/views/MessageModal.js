@@ -50,7 +50,7 @@ class MessageModal extends View {
                         function() {
                             if(view.buttons) {
                                 return _.each(view.buttons, function(i, button) {
-                                    return _.button({class: 'btn ' + button.class},
+                                    return _.button({class: 'btn ' + button.class, disabled: button.disabled},
                                         button.label
                                     ).click(function() {
                                         if(button.callback) {
