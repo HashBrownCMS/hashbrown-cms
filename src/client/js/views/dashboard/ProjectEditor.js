@@ -197,20 +197,29 @@ class ProjectEditor extends View {
 
                             return _.div({class: 'project-backup'},
                                 _.p({class: 'project-backup-name'}, date.toString()),
-                                _.div({class: 'btn-group'},
-                                    // Restore backup
-                                    _.button({class: 'btn btn-primary btn-restore'}, 'Restore')
-                                        .click(() => { this.onClickRestoreBackup(backup); }),
-
-                                    // Download backup
-                                    _.a({class: 'btn btn-default btn-group-addon btn-download', href: apiUrl('server/backups/' + this.model.name + '/' + backup)},
-                                        _.span({class: 'fa fa-download'})
+                                _.div({class: 'dropdown'},
+                                    _.button({class: 'dropdown-toggle', 'data-toggle': 'dropdown'},
+                                        _.span({class: 'fa fa-ellipsis-v'})
                                     ),
-                                    
-                                    // Delete backup
-                                    _.button({class: 'btn btn-danger btn-group-addon btn-delete'},
-                                        _.span({class: 'fa fa-remove'})
-                                    ).click(() => { this.onClickDeleteBackup(backup); })
+                                    _.ul({class: 'dropdown-menu'},
+                                        _.li(
+                                            // Restore backup
+                                            _.a({href: '#', class: 'dropdown-item'}, 'Restore')
+                                                .click((e) => { e.preventDefault(); this.onClickRestoreBackup(backup); })
+                                        ),
+                                        _.li(
+                                            // Download backup
+                                            _.a({class: 'dropdown-item', href: apiUrl('server/backups/' + this.model.name + '/' + backup)},
+                                                'Download'
+                                            )
+                                        ),
+                                        _.li(
+                                            // Delete backup
+                                            _.a({href: '#', class: 'dropdown-item'},
+                                                'Delete'
+                                            ).click((e) => { e.preventDefault(); this.onClickDeleteBackup(backup); })
+                                        )
+                                    )
                                 )
                             );
                         })
