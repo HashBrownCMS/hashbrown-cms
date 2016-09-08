@@ -1,11 +1,19 @@
 .modal-project-admin {
+    .modal-body {
+        position: relative;
+        padding-top: 0px;
+        min-height: 70px;
+    }
+
     .project-backup {
-        margin-top: 1em;
         display: flex;
-        height: 30px;
-        
+        width: 300px;
+        margin: 1em auto 0em auto;
+        border-bottom: 1px solid material-color('grey', '200');
+        padding: 10px;
+
         .project-backup-name {
-            line-height: 30px;
+            line-height: 1.5em;
             margin: 0px;
             flex-grow: 1;
         }
@@ -13,7 +21,9 @@
 
     .btn-round-group {
         display: block;
-        margin-left: auto;
+        position: absolute;
+        right: 15px;
+        bottom: 15px;
     }
 }
 
@@ -142,11 +152,11 @@ body >.dashboard-container {
 
                             .dropdown {
                                 .dropdown-toggle {
-                                    width: 26px;
+                                    width: 30px;
                                     line-height: 30px;
                                     display: block;
                                     height: 30px;
-                                    text-align: right;
+                                    margin: 0px -5px 0px 15px;
                                 }
                             }
 

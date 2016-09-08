@@ -157,7 +157,7 @@ class ProjectEditor extends View {
                         class: 'btn-default'
                     },
                     {
-                        label: 'Remove',
+                        label: 'Delete',
                         class: 'btn-danger',
                         callback: () => {
                             apiCall('delete', 'server/backups/' + this.model.name + '/' + timestamp)
@@ -183,47 +183,54 @@ class ProjectEditor extends View {
                     title: this.model.name + ' backups',
                     body: _.div({},
                         // List existing backups
-                        _.each(this.model.backups, (i, backup) => {
-                            let date = new Date(parseInt(backup));
+                        _.if(this.model.backups.length > 0,
+                            _.each(this.model.backups, (i, backup) => {
+                                let date = new Date(parseInt(backup));
 
-                            return _.div({class: 'project-backup'},
-                                _.p({class: 'project-backup-name'}, date.toString()),
-                                _.div({class: 'dropdown'},
-                                    _.button({class: 'dropdown-toggle', 'data-toggle': 'dropdown'},
-                                        _.span({class: 'fa fa-ellipsis-v'})
-                                    ),
-                                    _.ul({class: 'dropdown-menu'},
-                                        _.li(
-                                            // Restore backup
-                                            _.a({href: '#', class: 'dropdown-item'}, 'Restore')
-                                                .click((e) => { e.preventDefault(); this.onClickRestoreBackup(backup); })
+                                return _.div({class: 'project-backup'},
+                                    _.p({class: 'project-backup-name'}, date.toString()),
+                                    _.div({class: 'dropdown'},
+                                        _.button({class: 'dropdown-toggle', 'data-toggle': 'dropdown'},
+                                            _.span({class: 'fa fa-ellipsis-v'})
                                         ),
-                                        _.li(
-                                            // Download backup
-                                            _.a({class: 'dropdown-item', href: apiUrl('server/backups/' + this.model.name + '/' + backup)},
-                                                'Download'
+                                        _.ul({class: 'dropdown-menu'},
+                                            _.li(
+                                                // Restore backup
+                                                _.a({href: '#', class: 'dropdown-item'}, 'Restore')
+                                                    .click((e) => { e.preventDefault(); this.onClickRestoreBackup(backup); })
+                                            ),
+                                            _.li(
+                                                // Download backup
+                                                _.a({class: 'dropdown-item', href: apiUrl('server/backups/' + this.model.name + '/' + backup)},
+                                                    'Download'
+                                                )
+                                            ),
+                                            _.li(
+                                                // Delete backup
+                                                _.a({href: '#', class: 'dropdown-item'},
+                                                    'Delete'
+                                                ).click((e) => { e.preventDefault(); this.onClickDeleteBackup(backup); })
                                             )
-                                        ),
-                                        _.li(
-                                            // Delete backup
-                                            _.a({href: '#', class: 'dropdown-item'},
-                                                'Delete'
-                                            ).click((e) => { e.preventDefault(); this.onClickDeleteBackup(backup); })
                                         )
                                     )
-                                )
-                            );
-                        }),
+                                );
+                            })
+                        ),
+
+                        // Empty message
+                        _.if(this.model.backups.length < 1,
+                            _.p('No backups here')
+                        ),
                         
                         // Create backup
                         _.div({class: 'btn-round-group'},
-                            _.button({class: 'btn btn-round btn-default btn-group-addon btn-upload-backup'},
+                            _.button({class: 'btn btn-round btn-raised btn-default btn-group-addon btn-upload-backup'},
                                 _.span({class: 'fa fa-upload'}),
                                 _.label('Upload')
                             ).click(() => { this.onClickUploadBackup(); }),
-                            _.button({class: 'btn btn-round btn-primary btn-create-backup'},
+                            _.button({class: 'btn btn-round btn-raised btn-primary btn-create-backup'},
                                 _.span({class: 'btn-icon-initial'}, '+'),
-                                _.span({class: 'btn-icon-display fa fa-database'}),
+                                _.span({class: 'btn-icon-display fa fa-save'}),
                                 _.label('Create')
                             ).click(() => { this.onClickCreateBackup(); })
                         )
@@ -287,7 +294,7 @@ class ProjectEditor extends View {
                             )
                         );
                     }),
-                    _.button({class: 'btn btn-primary btn-add btn-round'}, '+')
+                    _.button({class: 'btn btn-primary btn-add btn-raised btn-round'}, '+')
                 )
             )
         );

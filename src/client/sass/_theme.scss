@@ -92,7 +92,7 @@ button, a {
 
     &:hover {
         .btn-group-addon {
-            transform: scale(0.8);
+            transform: scale(1);
         }   
         
         .btn {
@@ -111,9 +111,28 @@ button, a {
     .btn {
         display: block;
         position: relative;
+        
+        &:hover {
+            label {
+                display: block;
+            }
+        }
 
         label {
             display: none;
+            position: absolute;
+            margin: 0px;
+            top: 50%;
+            left: -10px;
+            transform: translate(-100%, -50%);
+            font-size: 12px;
+            border-radius: 2px;
+            color: material-color('grey', '100');
+            background-color: material-color('grey', '600');
+            padding: 5px 10px;
+            text-transform: none;
+            line-height: 1em;
+            max-width: none;
         }
         
         .btn-icon-initial,
@@ -140,6 +159,15 @@ button, a {
         transform: scale(0);
         margin-bottom: 10px;
         transition: transform 0.25s ease;
+        width: 35px !important;
+        height: 35px !important;
+        line-height: 35px !important;
+        margin-left: 5px;
+        margin-right: 5px;
+
+        .fa {
+            font-size: 13px;
+        }
     }
 }
 

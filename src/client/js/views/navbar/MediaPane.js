@@ -271,6 +271,23 @@ class MediaPane extends Pane {
     }
     
     /**
+     * Renders the toolbar
+     *
+     * @returns {HTMLElement} Toolbar
+     */
+    static renderToolbar() {
+        let $toolbar = _.div({class: 'pane-toolbar'},
+            _.div({},
+                _.label('Library'),
+                _.button('Upload')
+                    .click(() => { this.onClickUploadMedia(); })
+            )
+        );
+
+        return $toolbar;
+    }
+
+    /**
      * Gets the render settings
      *
      * @returns {Object} settings
@@ -281,6 +298,7 @@ class MediaPane extends Pane {
             route: '/media/',
             icon: 'file-image-o',
             items: resources.media,
+            toolbar: this.renderToolbar(),
 
             // Sorting logic
             sort: function(item, queueItem) {
