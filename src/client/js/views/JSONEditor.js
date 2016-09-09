@@ -13,7 +13,7 @@ class JSONEditor extends View {
     constructor(params) {
         super(params);
 
-        this.$element = _.div({class: 'json-editor flex-vertical'});
+        this.$element = _.div({class: 'json-editor editor flex-vertical'});
         this.$error = _.div({class: 'panel panel-danger'},
             _.div({class: 'panel-heading'}),
             _.div({class: 'panel-body'})
@@ -277,7 +277,7 @@ class JSONEditor extends View {
                     '{ }'
                 ).click(() => { this.onClickBeautify(); })
             ),
-            _.div({class: 'panel panel-default panel-buttons'}, 
+            _.div({class: 'editor-footer'}, 
                 _.div({class: 'btn-group'},
                     _.button({class: 'btn btn-embedded'},
                         'Basic'
