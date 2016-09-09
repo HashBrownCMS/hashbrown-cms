@@ -15,13 +15,18 @@ class SchemaHelper extends SchemaHelperCommon {
      * @returns {Promise} Schema with parent fields
      */
     static getSchemaWithParentFields(id) {
-        return new Promise((resolve, reject) => {
-            apiCall('get', 'schemas/' + id + '/?withParentFields=true')
+        if(id) {
+            return apiCall('get', 'schemas/' + id + '/?withParentFields=true')
             .then((schema) => {
-                resolve(SchemaHelper.getModel(schema));
-            })
-            .catch(reject);
-        });
+                return new Promise((resolve) => {
+                    resolve(SchemaHelper.getModel(schema));
+                })
+            });
+        } else {
+            return new Promise((resolve) => {
+                resolve(null);
+            });
+        }
     }
 
     /**

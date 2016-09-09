@@ -441,7 +441,8 @@ class NavbarMain extends View {
                         items: [
                             {
                                 name: 'Languages',
-                                path: 'languages'
+                                path: 'languages',
+                                icon: 'flag'
                             }
                         ]
                     });

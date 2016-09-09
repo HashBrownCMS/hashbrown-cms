@@ -1,11 +1,5 @@
 'use strict';
 
-// Views
-let MessageModal = require('./MessageModal');
-
-// Helpers
-let LanguageHelper = require('../../../common/helpers/LanguageHelper');
-
 class ContentEditor extends View {
     constructor(params) {
         super(params);
@@ -334,11 +328,10 @@ class ContentEditor extends View {
      *
      * @param {Content} content
      * @param {Object} schema
-     * @param {Array} languages
      *
      * @return {Object} element
      */
-    renderEditor(content, schema, languages) {
+    renderEditor(content, schema) {
         let view = this;
 
         // Check for active tab
@@ -350,8 +343,7 @@ class ContentEditor extends View {
 
         // Render editor
         return _.div({class: 'object'},
-            new LanguagePicker({ model: languages }).$element,
-            _.ul({class: 'nav nav-tabs'}, 
+            _.ul({class: 'nav editor-header nav-tabs'}, 
                 _.each(schema.tabs, (tabId, tab) => {
                     return _.li({class: isTabActive(tabId) ? 'active' : ''}, 
                         _.a({'data-toggle': 'tab', href: '#tab-' + tabId},
@@ -365,7 +357,7 @@ class ContentEditor extends View {
                     ).click(() => { this.onClickTab('meta'); })
                 )
             ),
-            _.div({class: 'tab-content'},
+            _.div({class: 'tab-content editor-body'},
                 // Render content properties
                 _.each(schema.tabs, (tabId, tab) => {
                     return _.div({id: 'tab-' + tabId, class: 'tab-pane' + (isTabActive(tabId) ? ' active' : '')},
@@ -393,14 +385,8 @@ class ContentEditor extends View {
         // Fetch information
         let contentSchema;
         let publishingSettings;
-        let selectedLanguages;
 
-        LanguageHelper.getSelectedLanguages()
-        .then((languages) => {
-            selectedLanguages = languages;
-
-            return SchemaHelper.getSchemaWithParentFields(this.model.schemaId);
-        })
+        SchemaHelper.getSchemaWithParentFields(this.model.schemaId)
         .then((schema) => {
             contentSchema = schema;
             
@@ -411,11 +397,11 @@ class ContentEditor extends View {
 
             this.$element.html(
                 // Render editor
-                this.renderEditor(this.model, contentSchema, selectedLanguages)
+                this.renderEditor(this.model, contentSchema)
 
                 // Render buttons 
                 .append(
-                    _.div({class: 'panel panel-default panel-buttons'}, 
+                    _.div({class: 'editor-footer'}, 
                         _.div({class: 'btn-group'},
 
                             // JSON editor

@@ -34810,7 +34810,7 @@ module.exports = {
 module.exports={
   "name": "hashbrown-cms",
   "repository": "https://github.com/Putaitu/hashbrown-cms.git",
-  "version": "0.3.7",
+  "version": "0.3.8",
   "description": "The pluggable CMS",
   "main": "hashbrown.js",
   "scripts": {
@@ -35116,7 +35116,6 @@ require('./helpers');
 window.MainMenu = require('./views/MainMenu');
 window.NavbarMain = require('./views/navbar/NavbarMain');
 window.MediaViewer = require('./views/MediaViewer');
-window.LanguagePicker = require('./views/LanguagePicker');
 
 // Editor views
 require('./views/editors');
@@ -35267,7 +35266,7 @@ onReady('resources', function () {
     Router.init();
 });
 
-},{"../../../package.json":157,"../../common/helpers/DebugHelper":221,"./helpers":163,"./helpers/ConnectionHelper":164,"./helpers/ContentHelper":165,"./helpers/LanguageHelper":166,"./helpers/MediaHelper":167,"./helpers/SchemaHelper":169,"./helpers/SettingsHelper":170,"./models/Content":172,"./routes/index":177,"./views/ConnectionEditor":182,"./views/ContentEditor":183,"./views/FormEditor":184,"./views/JSONEditor":185,"./views/LanguagePicker":186,"./views/LanguageSettings":187,"./views/MainMenu":188,"./views/MediaViewer":189,"./views/SchemaEditor":191,"./views/UserEditor":192,"./views/editors":208,"./views/navbar/NavbarMain":214}],163:[function(require,module,exports){
+},{"../../../package.json":157,"../../common/helpers/DebugHelper":220,"./helpers":163,"./helpers/ConnectionHelper":164,"./helpers/ContentHelper":165,"./helpers/LanguageHelper":166,"./helpers/MediaHelper":167,"./helpers/SchemaHelper":169,"./helpers/SettingsHelper":170,"./models/Content":172,"./routes/index":177,"./views/ConnectionEditor":182,"./views/ContentEditor":183,"./views/FormEditor":184,"./views/JSONEditor":185,"./views/LanguageSettings":186,"./views/MainMenu":187,"./views/MediaViewer":188,"./views/SchemaEditor":190,"./views/UserEditor":191,"./views/editors":207,"./views/navbar/NavbarMain":213}],163:[function(require,module,exports){
 'use strict';
 
 // Libraries
@@ -35423,7 +35422,7 @@ window.apiCall = function apiCall(method, url, data) {
     });
 };
 
-},{"./helpers/ProjectHelper":168,"./views/MessageModal":190,"bluebird":17,"exomon":92}],164:[function(require,module,exports){
+},{"./helpers/ProjectHelper":168,"./views/MessageModal":189,"bluebird":17,"exomon":92}],164:[function(require,module,exports){
 'use strict';
 
 let ConnectionHelperCommon = require('../../../common/helpers/ConnectionHelper');
@@ -35467,7 +35466,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
 
 module.exports = ConnectionHelper;
 
-},{"../../../common/helpers/ConnectionHelper":219,"../../../common/models/Connection":226}],165:[function(require,module,exports){
+},{"../../../common/helpers/ConnectionHelper":218,"../../../common/models/Connection":225}],165:[function(require,module,exports){
 'use strict';
 
 let ContentHelperCommon = require('../../../common/helpers/ContentHelper');
@@ -35539,7 +35538,7 @@ class ContentHelper extends ContentHelperCommon {
 
 module.exports = ContentHelper;
 
-},{"../../../common/helpers/ContentHelper":220,"../models/Content":172}],166:[function(require,module,exports){
+},{"../../../common/helpers/ContentHelper":219,"../models/Content":172}],166:[function(require,module,exports){
 'use strict';
 
 let LanguageHelperCommon = require('../../../common/helpers/LanguageHelper');
@@ -35548,7 +35547,7 @@ class LanguageHelper extends LanguageHelperCommon {}
 
 module.exports = LanguageHelper;
 
-},{"../../../common/helpers/LanguageHelper":222}],167:[function(require,module,exports){
+},{"../../../common/helpers/LanguageHelper":221}],167:[function(require,module,exports){
 'use strict';
 
 let MediaHelperCommon = require('../../../common/helpers/MediaHelper');
@@ -35623,7 +35622,7 @@ class MediaHelper extends MediaHelperCommon {
 
 module.exports = MediaHelper;
 
-},{"../../../common/helpers/MediaHelper":223}],168:[function(require,module,exports){
+},{"../../../common/helpers/MediaHelper":222}],168:[function(require,module,exports){
 'use strict';
 
 /**
@@ -35653,11 +35652,17 @@ class SchemaHelper extends SchemaHelperCommon {
      * @returns {Promise} Schema with parent fields
      */
     static getSchemaWithParentFields(id) {
-        return new Promise((resolve, reject) => {
-            apiCall('get', 'schemas/' + id + '/?withParentFields=true').then(schema => {
-                resolve(SchemaHelper.getModel(schema));
-            }).catch(reject);
-        });
+        if (id) {
+            return apiCall('get', 'schemas/' + id + '/?withParentFields=true').then(schema => {
+                return new Promise(resolve => {
+                    resolve(SchemaHelper.getModel(schema));
+                });
+            });
+        } else {
+            return new Promise(resolve => {
+                resolve(null);
+            });
+        }
     }
 
     /**
@@ -35685,7 +35690,7 @@ class SchemaHelper extends SchemaHelperCommon {
 
 module.exports = SchemaHelper;
 
-},{"../../../common/helpers/SchemaHelper":224}],170:[function(require,module,exports){
+},{"../../../common/helpers/SchemaHelper":223}],170:[function(require,module,exports){
 'use strict';
 
 let SettingsHelperCommon = require('../../../common/helpers/SettingsHelper');
@@ -35717,7 +35722,7 @@ class SettingsHelper extends SettingsHelperCommon {
 
 module.exports = SettingsHelper;
 
-},{"../../../common/helpers/SettingsHelper":225}],171:[function(require,module,exports){
+},{"../../../common/helpers/SettingsHelper":224}],171:[function(require,module,exports){
 module.exports={
     "icons": [    
         "500px",
@@ -36429,7 +36434,7 @@ class Content extends ContentCommon {}
 
 module.exports = Content;
 
-},{"../../../common/models/Content":227}],173:[function(require,module,exports){
+},{"../../../common/models/Content":226}],173:[function(require,module,exports){
 'use strict';
 
 // Root
@@ -36697,7 +36702,7 @@ Router.route('/settings/', function () {
 Router.route('/settings/languages/', function () {
     ViewHelper.get('NavbarMain').highlightItem('languages');
 
-    $('.workspace').html(_.div({ class: 'dashboard-container' }, new LanguageSettings().$element));
+    $('.workspace').html(new LanguageSettings().$element);
 });
 
 },{}],181:[function(require,module,exports){
@@ -36886,7 +36891,7 @@ class ConnectionEditor extends View {
     render() {
         let view = this;
 
-        this.$element.html(_.div({ class: 'object' }, _.div({ class: 'tab-content' }, _.div({ class: 'field-container connection-title' }, _.div({ class: 'field-key' }, 'Title'), _.div({ class: 'field-value' }, this.renderTitleEditor())), _.div({ class: 'field-container connection-type' }, _.div({ class: 'field-key' }, 'Type'), _.div({ class: 'field-value' }, this.renderTypeEditor())), _.div({ class: 'field-container connection-settings' }, _.div({ class: 'field-key' }, 'Settings'), _.div({ class: 'field-value' }, this.renderSettingsEditor()))), _.div({ class: 'panel panel-default panel-buttons' }, _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-embedded' }, 'Advanced').click(function () {
+        this.$element.html(_.div({ class: 'object' }, _.div({ class: 'editor-header' }, _.span({ class: 'fa fa-exchange' }), _.h4(this.model.title)), _.div({ class: 'tab-content editor-body' }, _.div({ class: 'field-container connection-title' }, _.div({ class: 'field-key' }, 'Title'), _.div({ class: 'field-value' }, this.renderTitleEditor())), _.div({ class: 'field-container connection-type' }, _.div({ class: 'field-key' }, 'Type'), _.div({ class: 'field-value' }, this.renderTypeEditor())), _.div({ class: 'field-container connection-settings' }, _.div({ class: 'field-key' }, 'Settings'), _.div({ class: 'field-value' }, this.renderSettingsEditor()))), _.div({ class: 'editor-footer' }, _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-embedded' }, 'Advanced').click(function () {
             view.onClickAdvanced();
         }), _.button({ class: 'btn btn-danger btn-raised' }, 'Delete').click(function () {
             view.onClickDelete();
@@ -36898,15 +36903,8 @@ class ConnectionEditor extends View {
 
 module.exports = ConnectionEditor;
 
-},{"./MessageModal":190}],183:[function(require,module,exports){
+},{"./MessageModal":189}],183:[function(require,module,exports){
 'use strict';
-
-// Views
-
-let MessageModal = require('./MessageModal');
-
-// Helpers
-let LanguageHelper = require('../../../common/helpers/LanguageHelper');
 
 class ContentEditor extends View {
     constructor(params) {
@@ -37209,11 +37207,10 @@ class ContentEditor extends View {
      *
      * @param {Content} content
      * @param {Object} schema
-     * @param {Array} languages
      *
      * @return {Object} element
      */
-    renderEditor(content, schema, languages) {
+    renderEditor(content, schema) {
         let view = this;
 
         // Check for active tab
@@ -37224,13 +37221,13 @@ class ContentEditor extends View {
         }
 
         // Render editor
-        return _.div({ class: 'object' }, new LanguagePicker({ model: languages }).$element, _.ul({ class: 'nav nav-tabs' }, _.each(schema.tabs, (tabId, tab) => {
+        return _.div({ class: 'object' }, _.ul({ class: 'nav editor-header nav-tabs' }, _.each(schema.tabs, (tabId, tab) => {
             return _.li({ class: isTabActive(tabId) ? 'active' : '' }, _.a({ 'data-toggle': 'tab', href: '#tab-' + tabId }, tab).click(() => {
                 this.onClickTab(tabId);
             }));
         }), _.li({ class: isTabActive('meta') ? 'active' : '' }, _.a({ 'data-toggle': 'tab', href: '#tab-meta' }, 'meta').click(() => {
             this.onClickTab('meta');
-        }))), _.div({ class: 'tab-content' },
+        }))), _.div({ class: 'tab-content editor-body' },
         // Render content properties
         _.each(schema.tabs, (tabId, tab) => {
             return _.div({ id: 'tab-' + tabId, class: 'tab-pane' + (isTabActive(tabId) ? ' active' : '') }, this.renderFields(tabId, schema.fields.properties, content.properties));
@@ -37251,13 +37248,8 @@ class ContentEditor extends View {
         // Fetch information
         let contentSchema;
         let publishingSettings;
-        let selectedLanguages;
 
-        LanguageHelper.getSelectedLanguages().then(languages => {
-            selectedLanguages = languages;
-
-            return SchemaHelper.getSchemaWithParentFields(this.model.schemaId);
-        }).then(schema => {
+        SchemaHelper.getSchemaWithParentFields(this.model.schemaId).then(schema => {
             contentSchema = schema;
 
             return this.model.getSettings('publishing');
@@ -37266,10 +37258,10 @@ class ContentEditor extends View {
 
             this.$element.html(
             // Render editor
-            this.renderEditor(this.model, contentSchema, selectedLanguages)
+            this.renderEditor(this.model, contentSchema)
 
             // Render buttons 
-            .append(_.div({ class: 'panel panel-default panel-buttons' }, _.div({ class: 'btn-group' },
+            .append(_.div({ class: 'editor-footer' }, _.div({ class: 'btn-group' },
 
             // JSON editor
             _.button({ class: 'btn btn-embedded' }, 'Advanced').click(() => {
@@ -37300,7 +37292,7 @@ class ContentEditor extends View {
 
 module.exports = ContentEditor;
 
-},{"../../../common/helpers/LanguageHelper":222,"./MessageModal":190}],184:[function(require,module,exports){
+},{}],184:[function(require,module,exports){
 'use strict';
 
 /**
@@ -37506,7 +37498,7 @@ class FormEditor extends View {
     renderFields() {
         let id = parseInt(this.model.id);
 
-        let $element = _.div({ class: 'form' });
+        let $element = _.div({ class: 'form editor-body' });
         let postUrl = location.protocol + '//' + location.hostname + '/api/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/forms/' + this.model.id + '/submit';
 
         // Content type
@@ -37526,7 +37518,7 @@ class FormEditor extends View {
     }
 
     render() {
-        _.append(this.$element.empty(), this.renderFields(), _.div({ class: 'panel panel-default panel-buttons' }, _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-embedded' }, 'Advanced').click(() => {
+        _.append(this.$element.empty(), _.div({ class: 'editor-header' }, _.span({ class: 'fa fa-wpforms' }), _.h4(this.model.title)), this.renderFields(), _.div({ class: 'editor-footer' }, _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-embedded' }, 'Advanced').click(() => {
             this.onClickAdvanced();
         }), _.if(!this.model.locked, _.button({ class: 'btn btn-danger btn-raised' }, 'Delete').click(() => {
             this.onClickDelete();
@@ -37814,45 +37806,7 @@ class JSONEditor extends View {
 
 module.exports = JSONEditor;
 
-},{"./MessageModal":190,"js-beautify":104}],186:[function(require,module,exports){
-'use strict';
-
-class LanguagePicker extends View {
-    constructor(params) {
-        super(params);
-
-        this.fetch();
-    }
-
-    /**
-     * Event: On change language
-     */
-    onChangeLanguage(e) {
-        e.preventDefault();
-
-        localStorage.setItem('language', $(this).text());
-
-        location.reload();
-    }
-
-    render() {
-        this.$element = _.div({ class: 'language-picker dropdown' });
-
-        if (Array.isArray(this.model) && this.model.length > 1) {
-            this.$element.append(_.span('Language'), _.button({ class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, window.language, _.span({ class: 'fa fa-caret-down' })), _.ul({ class: 'dropdown-menu' }, _.each(this.model.filter(language => {
-                return language != window.language;
-            }), (i, language) => {
-                return _.li({ value: language }, _.a({ href: '#' }, language).click(this.onChangeLanguage));
-            })));
-        } else {
-            this.$element.remove();
-        }
-    }
-}
-
-module.exports = LanguagePicker;
-
-},{}],187:[function(require,module,exports){
+},{"./MessageModal":189,"js-beautify":104}],186:[function(require,module,exports){
 'use strict';
 
 /**
@@ -37883,10 +37837,10 @@ class LanguageSettings extends View {
     }
 
     render() {
-        this.$element = _.div({ class: 'language-settings' });
+        this.$element = _.div({ class: 'editor language-settings' });
 
         LanguageHelper.getSelectedLanguages().then(selectedLanguages => {
-            this.$element.html(_.each(LanguageHelper.getLanguages(), (i, language) => {
+            _.append(this.$element.empty(), _.div({ class: 'editor-header' }, _.span({ class: 'fa fa-flag' }), _.h4('Languages')), _.div({ class: 'editor-body' }, _.each(LanguageHelper.getLanguages(), (i, language) => {
                 return _.div({ class: 'input-group' }, _.span(language), _.div({ class: 'input-group-addon' }, _.div({ class: 'switch' }, _.input({
                     id: 'switch-' + language,
                     'data-language': language,
@@ -37894,20 +37848,39 @@ class LanguageSettings extends View {
                     type: 'checkbox',
                     checked: selectedLanguages.indexOf(language) > -1
                 }).change(this.onClickSwitch), _.label({ for: 'switch-' + language }))));
-            }));
+            })));
         });
     }
 }
 
 module.exports = LanguageSettings;
 
-},{}],188:[function(require,module,exports){
+},{}],187:[function(require,module,exports){
 'use strict';
 
 class MainMenu extends View {
     constructor(params) {
         super(params);
 
+        this.$element = _.div({ class: 'main-menu' });
+
+        $('.menuspace').html(this.$element);
+
+        this.fetch();
+    }
+
+    /**
+     * Event: On change language
+     */
+    onChangeLanguage(e) {
+        e.preventDefault();
+
+        localStorage.setItem('language', $(this).text());
+
+        location.reload();
+    }
+
+    render() {
         // Find current user
         for (let user of resources.users) {
             if (user.isCurrent) {
@@ -37915,21 +37888,31 @@ class MainMenu extends View {
             }
         }
 
-        this.fetch();
-    }
+        // Get selected languages
+        LanguageHelper.getSelectedLanguages().then(languages => {
+            this.languages = languages;
 
-    render() {
-        this.$element = _.div({ class: 'main-menu' }, _.div({ class: 'main-menu-spacer' }), _.div({ class: 'main-menu-item' }, _.a({ href: '/', class: 'main-menu-dashboard' }, _.span({ class: 'fa fa-dashboard' }), _.label('dashboard'))), _.div({ class: 'main-menu-item main-menu-user dropdown' }, _.button({ class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, _.span({ class: 'fa fa-user' }), _.label(this.user.username)), _.ul({ class: 'dropdown-menu' }, _.li(_.a({ class: 'dropdown-item', href: '#/users/' + this.user.id }, 'User settings')), _.li(_.a({ class: 'dropdown-item', href: '#' }, 'Log out').click(e => {
-            e.preventDefault();logout();
-        })))));
+            // Render menu
+            _.append(this.$element.empty(),
+            // Language picker
+            _.if(Array.isArray(this.languages) && this.languages.length > 1, _.div({ class: 'main-menu-item dropdown main-menu-language' }, _.button({ title: 'Language', class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, _.span({ class: 'fa fa-flag' })), _.ul({ class: 'dropdown-menu' }, _.each(this.languages, (i, language) => {
+                return _.li({ value: language, class: language == window.language ? 'active' : '' }, _.a({ href: '#' }, language).click(this.onChangeLanguage));
+            })))),
 
-        $('.menuspace').html(this.$element);
+            // Dashboard link
+            _.div({ class: 'main-menu-item' }, _.a({ title: 'Dashboard', href: '/', class: 'main-menu-dashboard' }, _.span({ class: 'fa fa-dashboard' }))),
+
+            // User dropdown
+            _.div({ class: 'main-menu-item main-menu-user dropdown' }, _.button({ title: 'User', class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, _.span({ class: 'fa fa-user' })), _.ul({ class: 'dropdown-menu' }, _.li(_.a({ class: 'dropdown-item', href: '#/users/' + this.user.id }, 'User settings')), _.li(_.a({ class: 'dropdown-item', href: '#' }, 'Log out').click(e => {
+                e.preventDefault();logout();
+            })))));
+        });
     }
 }
 
 module.exports = MainMenu;
 
-},{}],189:[function(require,module,exports){
+},{}],188:[function(require,module,exports){
 'use strict';
 
 // Views
@@ -37940,7 +37923,7 @@ class MediaViewer extends View {
     constructor(params) {
         super(params);
 
-        this.$element = _.div({ class: 'media-viewer' });
+        this.$element = _.div({ class: 'editor media-viewer' });
 
         this.fetch();
     }
@@ -38009,12 +37992,12 @@ class MediaViewer extends View {
         let view = this;
         let imgSrc = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + view.model.id;
 
-        this.$element.empty().append(_.div({ class: 'media-heading' }, _.h4({ class: 'media-title' }, this.model.name), _.p({ class: 'media-data' })), _.div({ class: 'media-preview' }, _.img({ class: 'img-responsive', src: imgSrc }).on('load', function () {
+        this.$element.empty().append(_.div({ class: 'editor-header media-heading' }, _.span({ class: 'fa fa-file-image-o' }), _.h4({ class: 'media-title' }, this.model.name, _.span({ class: 'media-data' }))), _.div({ class: 'media-preview editor-body' }, _.img({ class: 'img-responsive', src: imgSrc }).on('load', function () {
             let img = new Image();
             img.src = imgSrc;
 
             view.$element.find('.media-data').html('(' + img.width + 'x' + img.height + ')');
-        })), _.div({ class: 'panel panel-default panel-buttons' }, _.input({ class: 'form-control', value: this.model.folder, placeholder: 'Type folder path here' }).change(function () {
+        })), _.div({ class: 'editor-footer' }, _.input({ class: 'form-control', value: this.model.folder, placeholder: 'Type folder path here' }).change(function () {
             view.onChangeFolder($(this).val());
         }), _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-danger btn-raised' }, 'Delete').click(function () {
             view.onClickDelete();
@@ -38024,7 +38007,7 @@ class MediaViewer extends View {
 
 module.exports = MediaViewer;
 
-},{"./MessageModal":190}],190:[function(require,module,exports){
+},{"./MessageModal":189}],189:[function(require,module,exports){
 'use strict';
 
 /**
@@ -38101,7 +38084,7 @@ class MessageModal extends View {
 
 module.exports = MessageModal;
 
-},{}],191:[function(require,module,exports){
+},{}],190:[function(require,module,exports){
 'use strict';
 
 // Icons
@@ -38569,7 +38552,7 @@ class SchemaEditor extends View {
     renderFields() {
         let id = parseInt(this.model.id);
 
-        let $element = _.div({ class: 'schema' });
+        let $element = _.div({ class: 'schema editor-body' });
 
         // Content type
         $element.empty();
@@ -38597,24 +38580,24 @@ class SchemaEditor extends View {
         SchemaHelper.getSchemaWithParentFields(this.model.parentSchemaId).then(parentSchema => {
             this.parentSchema = parentSchema;
 
-            SchemaHelper.getSchemaWithParentFields(this.model.id).then(compiledSchema => {
-                this.compiledSchema = compiledSchema;
+            return SchemaHelper.getSchemaWithParentFields(this.model.id);
+        }).then(compiledSchema => {
+            this.compiledSchema = compiledSchema;
 
-                _.append(this.$element.empty(), this.renderFields(), _.div({ class: 'panel panel-default panel-buttons' }, _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-embedded' }, 'Advanced').click(() => {
-                    this.onClickAdvanced();
-                }), _.if(!this.model.locked, _.button({ class: 'btn btn-danger btn-raised' }, 'Delete').click(() => {
-                    this.onClickDelete();
-                }), this.$saveBtn = _.button({ class: 'btn btn-success btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Save '), _.span({ class: 'text-working' }, 'Saving ')).click(() => {
-                    this.onClickSave();
-                })))));
-            });
+            _.append(this.$element.empty(), _.div({ class: 'editor-header' }, _.span({ class: 'fa fa-' + this.compiledSchema.icon }), _.h4(this.model.name)), this.renderFields(), _.div({ class: 'editor-footer panel panel-default panel-buttons' }, _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-embedded' }, 'Advanced').click(() => {
+                this.onClickAdvanced();
+            }), _.if(!this.model.locked, _.button({ class: 'btn btn-danger btn-raised' }, 'Delete').click(() => {
+                this.onClickDelete();
+            }), this.$saveBtn = _.button({ class: 'btn btn-success btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Save '), _.span({ class: 'text-working' }, 'Saving ')).click(() => {
+                this.onClickSave();
+            })))));
         });
     }
 }
 
 module.exports = SchemaEditor;
 
-},{"../icons.json":171}],192:[function(require,module,exports){
+},{"../icons.json":171}],191:[function(require,module,exports){
 'use strict';
 
 class UserEditor extends View {
@@ -38858,7 +38841,7 @@ class UserEditor extends View {
     renderFields() {
         let id = parseInt(this.model.id);
 
-        let $element = _.div({ class: 'user' });
+        let $element = _.div({ class: 'user editor-body' });
 
         $element.append(this.renderField('Username', this.renderUserNameEditor()));
         $element.append(this.renderField('Full name', this.renderFullNameEditor()));
@@ -38869,7 +38852,7 @@ class UserEditor extends View {
     }
 
     render() {
-        _.append(this.$element.empty(), this.renderFields(), _.div({ class: 'panel panel-default panel-buttons' }, _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-danger btn-raised' }, 'Remove').click(() => {
+        _.append(this.$element.empty(), _.div({ class: 'editor-header' }, _.span({ class: 'fa fa-user' }), _.h4(this.model.username)), this.renderFields(), _.div({ class: 'editor-footer' }, _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-danger btn-raised' }, 'Remove').click(() => {
             this.onClickRemove();
         }), this.$saveBtn = _.button({ class: 'btn btn-success btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Save '), _.span({ class: 'text-working' }, 'Saving ')).click(() => {
             this.onClickSave();
@@ -38879,7 +38862,7 @@ class UserEditor extends View {
 
 module.exports = UserEditor;
 
-},{}],193:[function(require,module,exports){
+},{}],192:[function(require,module,exports){
 'use strict';
 
 /**
@@ -39083,7 +39066,7 @@ class ArrayEditor extends View {
 
 module.exports = ArrayEditor;
 
-},{}],194:[function(require,module,exports){
+},{}],193:[function(require,module,exports){
 'use strict';
 
 /**
@@ -39131,7 +39114,7 @@ class BooleanEditor extends View {
 
 module.exports = BooleanEditor;
 
-},{}],195:[function(require,module,exports){
+},{}],194:[function(require,module,exports){
 'use strict';
 
 /**
@@ -39206,7 +39189,7 @@ class ContentReferenceEditor extends View {
 
 module.exports = ContentReferenceEditor;
 
-},{}],196:[function(require,module,exports){
+},{}],195:[function(require,module,exports){
 'use strict';
 
 /**
@@ -39298,7 +39281,7 @@ class ContentSchemaReferenceEditor extends View {
 
 module.exports = ContentSchemaReferenceEditor;
 
-},{}],197:[function(require,module,exports){
+},{}],196:[function(require,module,exports){
 'use strict';
 
 /**
@@ -39343,7 +39326,7 @@ class DateEditor extends View {
 
 module.exports = DateEditor;
 
-},{}],198:[function(require,module,exports){
+},{}],197:[function(require,module,exports){
 'use strict';
 
 /**
@@ -39394,7 +39377,7 @@ class DropdownEditor extends View {
 
 module.exports = DropdownEditor;
 
-},{}],199:[function(require,module,exports){
+},{}],198:[function(require,module,exports){
 'use strict';
 
 /**
@@ -39448,7 +39431,7 @@ class LanguageEditor extends View {
 
 module.exports = LanguageEditor;
 
-},{}],200:[function(require,module,exports){
+},{}],199:[function(require,module,exports){
 'use strict';
 
 /**
@@ -39545,7 +39528,7 @@ class MediaReferenceEditor extends View {
 
 module.exports = MediaReferenceEditor;
 
-},{}],201:[function(require,module,exports){
+},{}],200:[function(require,module,exports){
 'use strict';
 
 /**
@@ -39610,7 +39593,7 @@ class PeriodEditor extends View {
 
 module.exports = PeriodEditor;
 
-},{}],202:[function(require,module,exports){
+},{}],201:[function(require,module,exports){
 'use strict';
 
 /**
@@ -39655,7 +39638,7 @@ class ResourceReferenceEditor extends View {
 
 module.exports = ResourceReferenceEditor;
 
-},{}],203:[function(require,module,exports){
+},{}],202:[function(require,module,exports){
 'use strict';
 
 // Lib
@@ -39861,7 +39844,7 @@ class RichTextEditor extends View {
 
 module.exports = RichTextEditor;
 
-},{"marked":108,"to-markdown":150}],204:[function(require,module,exports){
+},{"marked":108,"to-markdown":150}],203:[function(require,module,exports){
 'use strict';
 
 /**
@@ -39896,7 +39879,7 @@ class StringEditor extends View {
 
 module.exports = StringEditor;
 
-},{}],205:[function(require,module,exports){
+},{}],204:[function(require,module,exports){
 'use strict';
 
 /**
@@ -39974,7 +39957,7 @@ class StructEditor extends View {
 
 module.exports = StructEditor;
 
-},{}],206:[function(require,module,exports){
+},{}],205:[function(require,module,exports){
 'use strict';
 
 /**
@@ -40040,7 +40023,7 @@ class TemplateReferenceEditor extends View {
 
 module.exports = TemplateReferenceEditor;
 
-},{}],207:[function(require,module,exports){
+},{}],206:[function(require,module,exports){
 'use strict';
 
 /**
@@ -40224,7 +40207,7 @@ class UrlEditor extends View {
 
 module.exports = UrlEditor;
 
-},{}],208:[function(require,module,exports){
+},{}],207:[function(require,module,exports){
 'use strict';
 
 window.resources.editors = {
@@ -40245,33 +40228,12 @@ window.resources.editors = {
     url: require('./UrlEditor')
 };
 
-},{"./ArrayEditor":193,"./BooleanEditor":194,"./ContentReferenceEditor":195,"./ContentSchemaReferenceEditor":196,"./DateEditor":197,"./DropdownEditor":198,"./LanguageEditor":199,"./MediaReferenceEditor":200,"./PeriodEditor":201,"./ResourceReferenceEditor":202,"./RichTextEditor":203,"./StringEditor":204,"./StructEditor":205,"./TemplateReferenceEditor":206,"./UrlEditor":207}],209:[function(require,module,exports){
+},{"./ArrayEditor":192,"./BooleanEditor":193,"./ContentReferenceEditor":194,"./ContentSchemaReferenceEditor":195,"./DateEditor":196,"./DropdownEditor":197,"./LanguageEditor":198,"./MediaReferenceEditor":199,"./PeriodEditor":200,"./ResourceReferenceEditor":201,"./RichTextEditor":202,"./StringEditor":203,"./StructEditor":204,"./TemplateReferenceEditor":205,"./UrlEditor":206}],208:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
 
 class CMSPane extends Pane {
-    /**
-     * Renders the toolbar
-     *
-     * @returns {HTMLElement} Toolbar
-     */
-    static renderToolbar() {
-        function onClickLogOut() {
-            document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-
-            location.reload();
-        }
-
-        function onClickDashboard() {
-            location = '/';
-        }
-
-        let $toolbar = _.div({ class: 'pane-toolbar' }, _.div({}, _.label('Server'), _.button({ class: 'btn btn-primary' }, 'Dashboard').click(onClickDashboard)), _.div({}, _.label('Session'), _.button({ class: 'btn btn-primary' }, 'Log out').click(onClickLogOut)));
-
-        return $toolbar;
-    }
-
     /**
      * Gets the render settings
      *
@@ -40283,7 +40245,6 @@ class CMSPane extends Pane {
             sublabel: 'v' + app.version,
             route: '/',
             $icon: _.img({ src: '/svg/logo_grey.svg', class: 'logo' }),
-            toolbar: this.renderToolbar(),
             items: [{
                 name: 'Readme',
                 path: 'readme'
@@ -40297,7 +40258,7 @@ class CMSPane extends Pane {
 
 module.exports = CMSPane;
 
-},{"./Pane":215}],210:[function(require,module,exports){
+},{"./Pane":214}],209:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -40391,12 +40352,11 @@ class ConnectionPane extends Pane {
             return _.option({ value: connection.id }, connection.title);
         })).change(onChangeTemplateProvider)));
 
-        ConnectionHelper.getMediaProvider().then(connection => {
-            $mediaProvider.val(connection.id);
+        SettingsHelper.getSettings('providers').then(providers => {
+            providers = providers || {};
 
-            return ConnectionHelper.getTemplateProvider();
-        }).then(connection => {
-            $templateProvider.val(connection.id);
+            $mediaProvider.val(providers.media);
+            $templateProvider.val(providers.template);
         }).catch(e => {
             debug.log(e.message, this);
         });
@@ -40441,7 +40401,7 @@ class ConnectionPane extends Pane {
 
 module.exports = ConnectionPane;
 
-},{"./Pane":215}],211:[function(require,module,exports){
+},{"./Pane":214}],210:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -40826,7 +40786,7 @@ class ContentPane extends Pane {
 
 module.exports = ContentPane;
 
-},{"./Pane":215}],212:[function(require,module,exports){
+},{"./Pane":214}],211:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -40894,7 +40854,7 @@ class FormsPane extends Pane {
 
 module.exports = FormsPane;
 
-},{"./Pane":215}],213:[function(require,module,exports){
+},{"./Pane":214}],212:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -41195,7 +41155,7 @@ class MediaPane extends Pane {
 
 module.exports = MediaPane;
 
-},{"./Pane":215}],214:[function(require,module,exports){
+},{"./Pane":214}],213:[function(require,module,exports){
 'use strict';
 
 // Views
@@ -41598,7 +41558,8 @@ class NavbarMain extends View {
                         icon: 'wrench',
                         items: [{
                             name: 'Languages',
-                            path: 'languages'
+                            path: 'languages',
+                            icon: 'flag'
                         }]
                     });
                 }
@@ -41614,7 +41575,7 @@ class NavbarMain extends View {
 
 module.exports = NavbarMain;
 
-},{"../../../../common/models/Content":227,"../MessageModal":190,"./CMSPane":209,"./ConnectionPane":210,"./ContentPane":211,"./FormsPane":212,"./MediaPane":213,"./SchemaPane":216,"./UserPane":217}],215:[function(require,module,exports){
+},{"../../../../common/models/Content":226,"../MessageModal":189,"./CMSPane":208,"./ConnectionPane":209,"./ContentPane":210,"./FormsPane":211,"./MediaPane":212,"./SchemaPane":215,"./UserPane":216}],214:[function(require,module,exports){
 'use strict';
 
 class Pane {
@@ -41630,7 +41591,7 @@ class Pane {
 
 module.exports = Pane;
 
-},{}],216:[function(require,module,exports){
+},{}],215:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -41749,7 +41710,7 @@ class SchemaPane extends Pane {
 
 module.exports = SchemaPane;
 
-},{"./Pane":215}],217:[function(require,module,exports){
+},{"./Pane":214}],216:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -41882,7 +41843,7 @@ class UserPane extends Pane {
 
 module.exports = UserPane;
 
-},{"./Pane":215}],218:[function(require,module,exports){
+},{"./Pane":214}],217:[function(require,module,exports){
 module.exports=[
     "aa",
     "ab",
@@ -42071,7 +42032,7 @@ module.exports=[
     "zu"
 ]
 
-},{}],219:[function(require,module,exports){
+},{}],218:[function(require,module,exports){
 'use strict';
 
 class ConnectionHelper {
@@ -42151,7 +42112,7 @@ class ConnectionHelper {
 
 module.exports = ConnectionHelper;
 
-},{}],220:[function(require,module,exports){
+},{}],219:[function(require,module,exports){
 'use strict';
 
 class ContentHelper {
@@ -42258,7 +42219,7 @@ class ContentHelper {
 
 module.exports = ContentHelper;
 
-},{}],221:[function(require,module,exports){
+},{}],220:[function(require,module,exports){
 'use strict';
 
 let lastSenderName = '';
@@ -42368,7 +42329,7 @@ class DebugHelper {
 
 module.exports = DebugHelper;
 
-},{}],222:[function(require,module,exports){
+},{}],221:[function(require,module,exports){
 'use strict';
 
 class LanguageHelper {
@@ -42460,7 +42421,7 @@ class LanguageHelper {
 
 module.exports = LanguageHelper;
 
-},{"../data/languages.json":218}],223:[function(require,module,exports){
+},{"../data/languages.json":217}],222:[function(require,module,exports){
 'use strict';
 
 // Models
@@ -42522,7 +42483,7 @@ class MediaHelper {
 
 module.exports = MediaHelper;
 
-},{"../models/Media":231}],224:[function(require,module,exports){
+},{"../models/Media":230}],223:[function(require,module,exports){
 'use strict';
 
 // Models
@@ -42567,7 +42528,7 @@ class SchemaHelper {
 
 module.exports = SchemaHelper;
 
-},{"../models/ContentSchema":228,"../models/FieldSchema":230}],225:[function(require,module,exports){
+},{"../models/ContentSchema":227,"../models/FieldSchema":229}],224:[function(require,module,exports){
 'use strict';
 
 class SettingsHelper {
@@ -42601,7 +42562,7 @@ class SettingsHelper {
 
 module.exports = SettingsHelper;
 
-},{}],226:[function(require,module,exports){
+},{}],225:[function(require,module,exports){
 'use strict';
 
 let Entity = require('./Entity');
@@ -42828,7 +42789,7 @@ class Connection extends Entity {
 
 module.exports = Connection;
 
-},{"./Entity":229}],227:[function(require,module,exports){
+},{"./Entity":228}],226:[function(require,module,exports){
 'use strict';
 
 let Entity = require('./Entity');
@@ -43125,7 +43086,7 @@ class Content extends Entity {
 
 module.exports = Content;
 
-},{"./Entity":229}],228:[function(require,module,exports){
+},{"./Entity":228}],227:[function(require,module,exports){
 'use strict';
 
 let Schema = require('./Schema');
@@ -43149,7 +43110,7 @@ class ContentSchema extends Schema {
 
 module.exports = ContentSchema;
 
-},{"./Schema":232}],229:[function(require,module,exports){
+},{"./Schema":231}],228:[function(require,module,exports){
 'use strict';
 
 let crypto = require('crypto');
@@ -43306,7 +43267,7 @@ class Entity {
 
 module.exports = Entity;
 
-},{"crypto":56}],230:[function(require,module,exports){
+},{"crypto":56}],229:[function(require,module,exports){
 'use strict';
 
 let Schema = require('./Schema');
@@ -43328,7 +43289,7 @@ class FieldSchema extends Schema {
 
 module.exports = FieldSchema;
 
-},{"./Schema":232}],231:[function(require,module,exports){
+},{"./Schema":231}],230:[function(require,module,exports){
 'use strict';
 
 // Libs
@@ -43433,7 +43394,7 @@ class Media extends Entity {
 
 module.exports = Media;
 
-},{"./Entity":229,"path":115}],232:[function(require,module,exports){
+},{"./Entity":228,"path":115}],231:[function(require,module,exports){
 'use strict';
 
 let Entity = require('./Entity');
@@ -43469,7 +43430,7 @@ class Schema extends Entity {
 
 module.exports = Schema;
 
-},{"./Entity":229}]},{},[162,158,160])
+},{"./Entity":228}]},{},[162,158,160])
 
 
 //# sourceMappingURL=maps/client.js.map

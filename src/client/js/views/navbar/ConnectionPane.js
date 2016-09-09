@@ -127,14 +127,12 @@ class ConnectionPane extends Pane {
             )
         );
         
-        ConnectionHelper.getMediaProvider()
-        .then((connection) => {
-            $mediaProvider.val(connection.id);
+        SettingsHelper.getSettings('providers')
+        .then((providers) => {
+            providers = providers || {};
 
-            return ConnectionHelper.getTemplateProvider();
-        })
-        .then((connection) => {
-            $templateProvider.val(connection.id);
+            $mediaProvider.val(providers.media);
+            $templateProvider.val(providers.template);
         })
         .catch((e) => {
             debug.log(e.message, this);

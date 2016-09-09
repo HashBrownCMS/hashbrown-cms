@@ -5,7 +5,14 @@
     height: 100%;
 
     .media-heading {
-        padding: 0px 15px;
+        .media-title {
+            display: inline;
+
+            .media-data {
+                margin-left: 10px;
+                opacity: 0.5;
+            }
+        }
     }
 
     .media-preview {
@@ -22,7 +29,7 @@
         }
     }
 
-    .panel-buttons {
+    .editor-footer {
         input.form-control {
             float: left;
             width: 50%;

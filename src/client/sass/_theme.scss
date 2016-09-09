@@ -77,10 +77,33 @@ button, a {
         @extend .raised;
         padding: 10px 0px !important;
         border: 1px solid material-color('grey', '100');
+        border-radius: 2px;
+        color: material-color('grey', '800');
 
         >li {
+            &.active {
+                >a {
+                    background-color: transparent;
+                    color: material-color('grey', '800');
+                    
+                    &:hover {
+                        background-color: material-color('grey', '200');
+                    }
+
+                    &:after {
+                        font-family: 'FontAwesome';
+                        content: '\f00c';
+                        margin-left: 10px;
+                    }
+                }
+            }
+
             >a {
                 padding: 3px 20px;
+
+                &:hover {
+                    background-color: material-color('grey', '200');
+                }
             }
         }
     }
@@ -414,6 +437,14 @@ button, a {
         &[readonly] {
             border-bottom: 0px;
         }
+    }
+
+    &[type="color"] {
+        max-width: 110px;
+        padding: 0px;
+        border-bottom: 0px;
+        cursor: pointer;
+        border-radius: 2px;
     }
 }
 

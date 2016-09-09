@@ -290,7 +290,7 @@ class FormEditor extends View {
     renderFields() {
         let id = parseInt(this.model.id);
 
-        let $element = _.div({class: 'form'});
+        let $element = _.div({class: 'form editor-body'});
         let postUrl = location.protocol + '//' + location.hostname + '/api/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/forms/' + this.model.id + '/submit';
         
         // Content type
@@ -320,8 +320,12 @@ class FormEditor extends View {
 
     render() {
         _.append(this.$element.empty(),
+            _.div({class: 'editor-header'},
+                _.span({class: 'fa fa-wpforms'}),
+                _.h4(this.model.title)
+            ),
             this.renderFields(),
-            _.div({class: 'panel panel-default panel-buttons'}, 
+            _.div({class: 'editor-footer'}, 
                 _.div({class: 'btn-group'},
                     _.button({class: 'btn btn-embedded'},
                         'Advanced'

@@ -296,7 +296,7 @@ class UserEditor extends View {
     renderFields() {
         let id = parseInt(this.model.id);
 
-        let $element = _.div({class: 'user'});
+        let $element = _.div({class: 'user editor-body'});
         
         $element.append(this.renderField('Username', this.renderUserNameEditor()));
         $element.append(this.renderField('Full name', this.renderFullNameEditor()));
@@ -308,8 +308,12 @@ class UserEditor extends View {
     
     render() {
         _.append(this.$element.empty(),
+            _.div({class: 'editor-header'},
+                _.span({class: 'fa fa-user'}),
+                _.h4(this.model.username)
+            ),
             this.renderFields(),
-            _.div({class: 'panel panel-default panel-buttons'}, 
+            _.div({class: 'editor-footer'}, 
                 _.div({class: 'btn-group'},
                     _.button({class: 'btn btn-danger btn-raised'},
                         'Remove'

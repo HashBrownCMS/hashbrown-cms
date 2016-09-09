@@ -5,19 +5,16 @@
         flex-grow: 1;
     }
 
-    .main-menu-user {
+    .main-menu-item {
         position: relative;
-
+        margin: 0px 5px;
+        width: 30px;
+        
         .dropdown-menu {
             left: auto;
             right: 0px;
+            min-width: auto;
         }
-    }
-
-    .main-menu-item {
-        position: relative;
-        margin-left: 10px;
-        width: 50px;
 
         >a, >button {
             text-decoration: none;
@@ -32,22 +29,13 @@
                 color: material-color('grey', '600');
             }
 
-            >label {
-                line-height: 1em;
-                cursor: pointer;
-                font-size: 10px;
-                display: block;
-                z-index: 10;
-                margin: 2px 0px 0px 0px;
-            }
-
             >.fa {
                 position: relative;
                 z-index: 10;
                 line-height: 20px;
                 height: 20px;
                 display: block;
-                font-size: 16px;
+                font-size: 20px;
             }
         }
     }

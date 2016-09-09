@@ -602,7 +602,7 @@ class SchemaEditor extends View {
     renderFields() {
         let id = parseInt(this.model.id);
 
-        let $element = _.div({class: 'schema'});
+        let $element = _.div({class: 'schema editor-body'});
         
         // Content type
         $element.empty();
@@ -631,30 +631,34 @@ class SchemaEditor extends View {
         .then((parentSchema) => {
             this.parentSchema = parentSchema;
 
-            SchemaHelper.getSchemaWithParentFields(this.model.id)
-            .then((compiledSchema) => {
-                this.compiledSchema = compiledSchema;
-                
-                _.append(this.$element.empty(),
-                    this.renderFields(),
-                    _.div({class: 'panel panel-default panel-buttons'}, 
-                        _.div({class: 'btn-group'},
-                            _.button({class: 'btn btn-embedded'},
-                                'Advanced'
-                            ).click(() => { this.onClickAdvanced(); }),
-                            _.if(!this.model.locked,
-                                _.button({class: 'btn btn-danger btn-raised'},
-                                    'Delete'
-                                ).click(() => { this.onClickDelete(); }),
-                                this.$saveBtn = _.button({class: 'btn btn-success btn-raised btn-save'},
-                                    _.span({class: 'text-default'}, 'Save '),
-                                    _.span({class: 'text-working'}, 'Saving ')
-                                ).click(() => { this.onClickSave(); })
-                            )
+            return SchemaHelper.getSchemaWithParentFields(this.model.id);
+        })
+        .then((compiledSchema) => {
+            this.compiledSchema = compiledSchema;
+           
+            _.append(this.$element.empty(),
+                _.div({class: 'editor-header'},
+                    _.span({class: 'fa fa-' + this.compiledSchema.icon}),
+                    _.h4(this.model.name)
+                ),
+                this.renderFields(),
+                _.div({class: 'editor-footer panel panel-default panel-buttons'}, 
+                    _.div({class: 'btn-group'},
+                        _.button({class: 'btn btn-embedded'},
+                            'Advanced'
+                        ).click(() => { this.onClickAdvanced(); }),
+                        _.if(!this.model.locked,
+                            _.button({class: 'btn btn-danger btn-raised'},
+                                'Delete'
+                            ).click(() => { this.onClickDelete(); }),
+                            this.$saveBtn = _.button({class: 'btn btn-success btn-raised btn-save'},
+                                _.span({class: 'text-default'}, 'Save '),
+                                _.span({class: 'text-working'}, 'Saving ')
+                            ).click(() => { this.onClickSave(); })
                         )
                     )
-                );
-            });
+                )
+            );
         });
     }
 }

@@ -21,7 +21,6 @@ require('./helpers');
 window.MainMenu = require('./views/MainMenu');
 window.NavbarMain = require('./views/navbar/NavbarMain');
 window.MediaViewer = require('./views/MediaViewer');
-window.LanguagePicker = require('./views/LanguagePicker');
 
 // Editor views
 require('./views/editors');

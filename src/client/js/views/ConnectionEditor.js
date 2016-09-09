@@ -182,7 +182,11 @@ class ConnectionEditor extends View {
 
         this.$element.html(
             _.div({class: 'object'},
-                _.div({class: 'tab-content'},
+                _.div({class: 'editor-header'},
+                    _.span({class: 'fa fa-exchange'}),
+                    _.h4(this.model.title)
+                ),
+                _.div({class: 'tab-content editor-body'},
                     _.div({class: 'field-container connection-title'},
                         _.div({class: 'field-key'}, 'Title'),
                         _.div({class: 'field-value'},
@@ -202,7 +206,7 @@ class ConnectionEditor extends View {
                         )
                     )
                 ),
-                _.div({class: 'panel panel-default panel-buttons'}, 
+                _.div({class: 'editor-footer'}, 
                     _.div({class: 'btn-group'},
                         _.button({class: 'btn btn-embedded'},
                             'Advanced'

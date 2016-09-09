@@ -7,7 +7,7 @@ class MediaViewer extends View {
     constructor(params) {
         super(params);
         
-        this.$element = _.div({class: 'media-viewer'});
+        this.$element = _.div({class: 'editor media-viewer'});
 
         this.fetch();
     }
@@ -89,11 +89,14 @@ class MediaViewer extends View {
         let imgSrc = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + view.model.id;
 
         this.$element.empty().append(
-            _.div({class: 'media-heading'},
-                _.h4({class: 'media-title'}, this.model.name),
-                _.p({class: 'media-data'})
+            _.div({class: 'editor-header media-heading'},
+                _.span({class: 'fa fa-file-image-o'}),
+                _.h4({class: 'media-title'},
+                    this.model.name,
+                    _.span({class: 'media-data'})
+                )
             ),
-            _.div({class: 'media-preview'},
+            _.div({class: 'media-preview editor-body'},
                 _.img({class: 'img-responsive', src: imgSrc}).on('load', function() {
                     let img = new Image();
                     img.src = imgSrc;
@@ -103,7 +106,7 @@ class MediaViewer extends View {
                     );
                 })
             ),
-            _.div({class: 'panel panel-default panel-buttons'}, 
+            _.div({class: 'editor-footer'}, 
                 _.input({class: 'form-control', value: this.model.folder, placeholder: 'Type folder path here'})
                     .change(function() { view.onChangeFolder($(this).val()); }),
                 _.div({class: 'btn-group'},

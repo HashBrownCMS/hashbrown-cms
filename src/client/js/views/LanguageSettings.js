@@ -28,28 +28,34 @@ class LanguageSettings extends View {
     }
 
     render() {
-        this.$element = _.div({class: 'language-settings'});
+        this.$element = _.div({class: 'editor language-settings'});
 
         LanguageHelper.getSelectedLanguages()
         .then((selectedLanguages) => {
-            this.$element.html(
-                _.each(LanguageHelper.getLanguages(), (i, language) => {
-                    return _.div({class: 'input-group'},      
-                        _.span(language),
-                        _.div({class: 'input-group-addon'},
-                            _.div({class: 'switch'},
-                                _.input({
-                                    id: 'switch-' + language,
-                                    'data-language': language,
-                                    class: 'form-control switch',
-                                    type: 'checkbox',
-                                    checked: selectedLanguages.indexOf(language) > -1
-                                }).change(this.onClickSwitch),
-                                _.label({for: 'switch-' + language})
+            _.append(this.$element.empty(),
+                _.div({class: 'editor-header'},
+                    _.span({class: 'fa fa-flag'}),
+                    _.h4('Languages')
+                ),
+                _.div({class: 'editor-body'},
+                    _.each(LanguageHelper.getLanguages(), (i, language) => {
+                        return _.div({class: 'input-group'},      
+                            _.span(language),
+                            _.div({class: 'input-group-addon'},
+                                _.div({class: 'switch'},
+                                    _.input({
+                                        id: 'switch-' + language,
+                                        'data-language': language,
+                                        class: 'form-control switch',
+                                        type: 'checkbox',
+                                        checked: selectedLanguages.indexOf(language) > -1
+                                    }).change(this.onClickSwitch),
+                                    _.label({for: 'switch-' + language})
+                                )
                             )
-                        )
-                    );
-                })
+                        );
+                    })
+                )
             );
         });
     } 
