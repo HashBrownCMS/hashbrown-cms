@@ -46,6 +46,39 @@ body {
     }
 }
 
+// Login
+.login-container {
+    background-color: #fff;
+    height: 100%;
+
+    .login {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        width: 374px;
+        transform: translate(-50%, -50%);
+        padding: 40px;
+
+        .panel-footer {
+            border: 0px;
+        }
+
+        input {
+            &.form-control, &.btn {
+                font-size: 16px;
+                height: 44px;
+            }
+
+            &.form-control {
+                line-height: 44px;
+                margin-bottom: 10px;
+                border: 1px solid material-color('grey', '400');
+                padding: 0px 8px;
+            }
+        }
+    }
+}
+
 // About logo
 img.logo {
     width: 30px;
@@ -170,6 +203,7 @@ img.logo {
     opacity: 1;
     position: relative;
     z-index: 2;
+    flex-wrap: wrap;
 
     &.faded {
         pointer-events: none;
@@ -195,6 +229,17 @@ img.logo {
         transition: width 0.5s, flex-basis 0.5s;
     }
     
+    .menuspace {
+        padding: 10px 5px;
+        width: 100%;
+        flex-basis: 100%;
+        flex-grow: 1;
+        position: relative;
+        z-index: 50;
+
+        @extend .raised;
+    }
+
     .workspace {
         flex-grow: 1;
         height: 100%;

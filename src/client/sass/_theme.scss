@@ -55,7 +55,7 @@ button, a {
                 background-color: material-color('grey', '300'); 
             }
 
-            .fa {
+            span {
                 position: relative;
                 z-index: 2;
             }
@@ -205,12 +205,21 @@ button, a {
             color: #fff;
 
             &.dropdown {
+                &.open {
+                    .dropdown-toggle {
+                        &:before {
+                            content: none;
+                        }
+                    }
+                }
+
                 .dropdown-toggle {
                     background: none;
                     border: 0px;
                     padding: 0px;
                     margin: 0px;
                     font-size: 14px;
+                    color: #fff;
 
                     .fa {
                         margin-left: 0.5em;
@@ -392,15 +401,6 @@ button, a {
     }
 }
 
-// Input
-input {
-    &:-webkit-autofill {
-        &, &:active, &:visited, &:focus, &:hover {
-            -webkit-box-shadow: 0 0 0px 1000px white inset;
-        }
-    }
-}
-
 .form-control {
     &, &:active, &:focus, &[readonly] {
         background-color: transparent;
@@ -427,6 +427,12 @@ input {
     
     .input-group-btn {
         padding-left: 15px;
+
+        &:last-child {
+            >.btn {
+                border-radius: 2px;
+            }
+        }
     }
 }
 
@@ -438,7 +444,8 @@ input {
 
 // Buttons
 .btn {
-    border-radius: 0px;
+    border-radius: 2px;
+    letter-spacing: 0.1em;
     font-weight: bold;
     text-transform: uppercase;
     font-size: 12px;
@@ -506,6 +513,10 @@ input {
 
     .btn {
         flex-grow: 0;
+
+        &:not(:first-child):not(:last-child):not(.dropdown-toggle) {
+            border-radius: 2px;
+        }
     }
 
     .btn-group-addon {

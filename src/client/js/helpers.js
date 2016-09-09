@@ -40,6 +40,15 @@ window.errorModal = function errorModal(error) {
 }
 
 /**
+ * Logs out the current user
+ */
+window.logout = function logout() {
+    document.cookie = 'token=; Path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    
+    location.reload();
+}
+
+/**
  * Copies string to the clipboard
  *
  * @param {String} string
@@ -84,13 +93,6 @@ window.apiUrl = function apiUrl(url) {
 
     newUrl += url;
   
-    /*
-    if(url.indexOf('?') > -1) {
-        newUrl += '&token=' + localStorage.getItem('token');
-    } else {
-        newUrl += '?token=' + localStorage.getItem('token');
-    }*/
-
     return newUrl;
 };
 

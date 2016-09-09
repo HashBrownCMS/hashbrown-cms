@@ -18,6 +18,7 @@ window.resources = {
 require('./helpers');
 
 // Main views
+window.MainMenu = require('./views/MainMenu');
 window.NavbarMain = require('./views/navbar/NavbarMain');
 window.MediaViewer = require('./views/MediaViewer');
 window.LanguagePicker = require('./views/LanguagePicker');
@@ -179,6 +180,7 @@ require('./routes/index');
 // Init
 onReady('resources', function() {
     new NavbarMain();
+    new MainMenu();
 
     Router.init();
 });

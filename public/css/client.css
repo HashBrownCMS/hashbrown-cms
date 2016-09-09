@@ -36,7 +36,7 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
     height: 40px;
     border-radius: 50%;
     background-color: #e0e0e0; }
-  .dropdown.open .dropdown-toggle .fa {
+  .dropdown.open .dropdown-toggle span {
     position: relative;
     z-index: 2; }
 
@@ -134,12 +134,15 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
     -moz-appearance: none;
     appearance: none;
     color: #fff; }
+    .chip-group .chip .chip-label.dropdown.open .dropdown-toggle:before {
+      content: none; }
     .chip-group .chip .chip-label.dropdown .dropdown-toggle {
       background: none;
       border: 0px;
       padding: 0px;
       margin: 0px;
-      font-size: 14px; }
+      font-size: 14px;
+      color: #fff; }
       .chip-group .chip .chip-label.dropdown .dropdown-toggle .fa {
         margin-left: 0.5em; }
   .chip-group .chip .chip-remove {
@@ -174,7 +177,7 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
     left: 50%;
     transform: translate(-50%, -50%); }
 
-.raised, .dropdown .dropdown-menu, .content-editor > .object .language-picker .dropdown-menu {
+.raised, .dropdown .dropdown-menu, .cms-container .menuspace, .content-editor > .object .language-picker .dropdown-menu {
   box-shadow: 0px 2px 3px 1px rgba(0, 0, 0, 0.2);
   background-color: #fff;
   padding: 15px 30px; }
@@ -264,9 +267,6 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
     .modal .modal-dialog .modal-content .modal-footer {
       border-top: 0px; }
 
-input:-webkit-autofill, input:-webkit-autofill:active, input:-webkit-autofill:visited, input:-webkit-autofill:focus, input:-webkit-autofill:hover {
-  -webkit-box-shadow: 0 0 0px 1000px white inset; }
-
 .form-control, .form-control:active, .form-control:focus, .form-control[readonly] {
   background-color: transparent;
   border-radius: 0px;
@@ -286,13 +286,16 @@ input:-webkit-autofill, input:-webkit-autofill:active, input:-webkit-autofill:vi
 
 .input-group .input-group-btn {
   padding-left: 15px; }
+  .input-group .input-group-btn:last-child > .btn {
+    border-radius: 2px; }
 
 .context-menu {
   border-radius: 0px;
   box-shadow: 0px 2px 3px 1px rgba(0, 0, 0, 0.2); }
 
 .btn {
-  border-radius: 0px;
+  border-radius: 2px;
+  letter-spacing: 0.1em;
   font-weight: bold;
   text-transform: uppercase;
   font-size: 12px; }
@@ -362,6 +365,8 @@ input:-webkit-autofill, input:-webkit-autofill:active, input:-webkit-autofill:vi
   display: flex; }
   .btn-group .btn {
     flex-grow: 0; }
+    .btn-group .btn:not(:first-child):not(:last-child):not(.dropdown-toggle) {
+      border-radius: 2px; }
   .btn-group .btn-group-addon {
     min-width: 40px;
     padding: 6px; }
@@ -442,6 +447,27 @@ body {
   cursor: -webkit-grabbing !important;
   cursor: -moz-grabbing !important;
   cursor: grabbing !important; }
+
+.login-container {
+  background-color: #fff;
+  height: 100%; }
+  .login-container .login {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 374px;
+    transform: translate(-50%, -50%);
+    padding: 40px; }
+    .login-container .login .panel-footer {
+      border: 0px; }
+    .login-container .login input.form-control, .login-container .login input.btn {
+      font-size: 16px;
+      height: 44px; }
+    .login-container .login input.form-control {
+      line-height: 44px;
+      margin-bottom: 10px;
+      border: 1px solid #bdbdbd;
+      padding: 0px 8px; }
 
 img.logo {
   width: 30px;
@@ -531,7 +557,8 @@ img.logo {
   transition: opacity 0.5s ease;
   opacity: 1;
   position: relative;
-  z-index: 2; }
+  z-index: 2;
+  flex-wrap: wrap; }
   .cms-container.faded {
     pointer-events: none;
     opacity: 0; }
@@ -546,6 +573,13 @@ img.logo {
     flex-shrink: 0;
     height: 100%;
     transition: width 0.5s, flex-basis 0.5s; }
+  .cms-container .menuspace {
+    padding: 10px 5px;
+    width: 100%;
+    flex-basis: 100%;
+    flex-grow: 1;
+    position: relative;
+    z-index: 50; }
   .cms-container .workspace {
     flex-grow: 1;
     height: 100%; }
@@ -617,6 +651,44 @@ img.logo {
             display: none; }
           .cms-container .workspace .panel-buttons .btn-group .btn.working .text-working {
             display: inline; }
+
+.main-menu {
+  display: flex; }
+  .main-menu .main-menu-spacer {
+    flex-grow: 1; }
+  .main-menu .main-menu-user {
+    position: relative; }
+    .main-menu .main-menu-user .dropdown-menu {
+      left: auto;
+      right: 0px; }
+  .main-menu .main-menu-item {
+    position: relative;
+    margin-left: 10px;
+    width: 50px; }
+    .main-menu .main-menu-item > a, .main-menu .main-menu-item > button {
+      text-decoration: none;
+      color: #9e9e9e;
+      position: relative;
+      display: block;
+      text-align: center;
+      width: 100%;
+      line-height: 20px; }
+      .main-menu .main-menu-item > a:hover, .main-menu .main-menu-item > button:hover {
+        color: #757575; }
+      .main-menu .main-menu-item > a > label, .main-menu .main-menu-item > button > label {
+        line-height: 1em;
+        cursor: pointer;
+        font-size: 10px;
+        display: block;
+        z-index: 10;
+        margin: 2px 0px 0px 0px; }
+      .main-menu .main-menu-item > a > .fa, .main-menu .main-menu-item > button > .fa {
+        position: relative;
+        z-index: 10;
+        line-height: 20px;
+        height: 20px;
+        display: block;
+        font-size: 16px; }
 
 .modal-project-admin .modal-body {
   position: relative;
@@ -806,7 +878,7 @@ body > .dashboard-container {
   .struct-editor .kvp .value {
     flex-grow: 1; }
 
-.array-editor .array-editor .item.raised, .array-editor .array-editor .dropdown .item.dropdown-menu, .dropdown .array-editor .array-editor .item.dropdown-menu, .array-editor .array-editor .content-editor > .object .language-picker .item.dropdown-menu, .content-editor > .object .language-picker .array-editor .array-editor .item.dropdown-menu {
+.array-editor .array-editor .item.raised, .array-editor .array-editor .dropdown .item.dropdown-menu, .dropdown .array-editor .array-editor .item.dropdown-menu, .array-editor .array-editor .cms-container .item.menuspace, .cms-container .array-editor .array-editor .item.menuspace, .array-editor .array-editor .content-editor > .object .language-picker .item.dropdown-menu, .content-editor > .object .language-picker .array-editor .array-editor .item.dropdown-menu {
   padding: 0px;
   box-shadow: none; }
 
@@ -1218,7 +1290,7 @@ body > .dashboard-container {
           .navspace .navbar-main .tab-panes .pane-container .pane .pane-toolbar > * {
             margin: 5px;
             flex-grow: 1;
-            width: 50%; }
+            max-width: 50%; }
           .navspace .navbar-main .tab-panes .pane-container .pane .pane-toolbar label {
             text-transform: uppercase;
             color: #757575;

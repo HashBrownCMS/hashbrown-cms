@@ -105,7 +105,7 @@ class ConnectionPane extends Pane {
         let $toolbar = _.div({class: 'pane-toolbar'},
             _.div({},
                 _.label('Media provider'),
-                $mediaProvider = _.select({},
+                $mediaProvider = _.select({class: 'btn btn-primary'},
                     _.option({value: null}, '(none)'),
                     _.each(resources.connections, (i, connection) => {
                         return _.option({value: connection.id},
@@ -116,7 +116,7 @@ class ConnectionPane extends Pane {
             ),
             _.div({},
                 _.label('Template provider'),
-                $templateProvider = _.select({},
+                $templateProvider = _.select({class: 'btn btn-primary'},
                     _.option({value: null}, '(none)'),
                     _.each(resources.connections, (i, connection) => {
                         return _.option({value: connection.id},

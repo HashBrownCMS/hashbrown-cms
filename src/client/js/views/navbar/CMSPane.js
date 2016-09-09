@@ -22,12 +22,12 @@ class CMSPane extends Pane {
         let $toolbar = _.div({class: 'pane-toolbar'},
             _.div({},
                 _.label('Server'),
-                _.button('Dashboard')
+                _.button({class: 'btn btn-primary'}, 'Dashboard')
                     .click(onClickDashboard)
             ),
             _.div({},
                 _.label('Session'),
-                _.button('Log out')
+                _.button({class: 'btn btn-primary'}, 'Log out')
                     .click(onClickLogOut)
             )
         );

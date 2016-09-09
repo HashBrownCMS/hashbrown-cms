@@ -35113,6 +35113,7 @@ window.resources = {
 require('./helpers');
 
 // Main views
+window.MainMenu = require('./views/MainMenu');
 window.NavbarMain = require('./views/navbar/NavbarMain');
 window.MediaViewer = require('./views/MediaViewer');
 window.LanguagePicker = require('./views/LanguagePicker');
@@ -35261,11 +35262,12 @@ require('./routes/index');
 // Init
 onReady('resources', function () {
     new NavbarMain();
+    new MainMenu();
 
     Router.init();
 });
 
-},{"../../../package.json":157,"../../common/helpers/DebugHelper":220,"./helpers":163,"./helpers/ConnectionHelper":164,"./helpers/ContentHelper":165,"./helpers/LanguageHelper":166,"./helpers/MediaHelper":167,"./helpers/SchemaHelper":169,"./helpers/SettingsHelper":170,"./models/Content":172,"./routes/index":177,"./views/ConnectionEditor":182,"./views/ContentEditor":183,"./views/FormEditor":184,"./views/JSONEditor":185,"./views/LanguagePicker":186,"./views/LanguageSettings":187,"./views/MediaViewer":188,"./views/SchemaEditor":190,"./views/UserEditor":191,"./views/editors":207,"./views/navbar/NavbarMain":213}],163:[function(require,module,exports){
+},{"../../../package.json":157,"../../common/helpers/DebugHelper":221,"./helpers":163,"./helpers/ConnectionHelper":164,"./helpers/ContentHelper":165,"./helpers/LanguageHelper":166,"./helpers/MediaHelper":167,"./helpers/SchemaHelper":169,"./helpers/SettingsHelper":170,"./models/Content":172,"./routes/index":177,"./views/ConnectionEditor":182,"./views/ContentEditor":183,"./views/FormEditor":184,"./views/JSONEditor":185,"./views/LanguagePicker":186,"./views/LanguageSettings":187,"./views/MainMenu":188,"./views/MediaViewer":189,"./views/SchemaEditor":191,"./views/UserEditor":192,"./views/editors":208,"./views/navbar/NavbarMain":214}],163:[function(require,module,exports){
 'use strict';
 
 // Libraries
@@ -35307,6 +35309,15 @@ window.errorModal = function errorModal(error) {
     messageModal('Error', error.message);
 
     throw error;
+};
+
+/**
+ * Logs out the current user
+ */
+window.logout = function logout() {
+    document.cookie = 'token=; Path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+
+    location.reload();
 };
 
 /**
@@ -35353,13 +35364,6 @@ window.apiUrl = function apiUrl(url) {
     }
 
     newUrl += url;
-
-    /*
-    if(url.indexOf('?') > -1) {
-        newUrl += '&token=' + localStorage.getItem('token');
-    } else {
-        newUrl += '?token=' + localStorage.getItem('token');
-    }*/
 
     return newUrl;
 };
@@ -35419,7 +35423,7 @@ window.apiCall = function apiCall(method, url, data) {
     });
 };
 
-},{"./helpers/ProjectHelper":168,"./views/MessageModal":189,"bluebird":17,"exomon":92}],164:[function(require,module,exports){
+},{"./helpers/ProjectHelper":168,"./views/MessageModal":190,"bluebird":17,"exomon":92}],164:[function(require,module,exports){
 'use strict';
 
 let ConnectionHelperCommon = require('../../../common/helpers/ConnectionHelper');
@@ -35463,7 +35467,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
 
 module.exports = ConnectionHelper;
 
-},{"../../../common/helpers/ConnectionHelper":218,"../../../common/models/Connection":225}],165:[function(require,module,exports){
+},{"../../../common/helpers/ConnectionHelper":219,"../../../common/models/Connection":226}],165:[function(require,module,exports){
 'use strict';
 
 let ContentHelperCommon = require('../../../common/helpers/ContentHelper');
@@ -35535,7 +35539,7 @@ class ContentHelper extends ContentHelperCommon {
 
 module.exports = ContentHelper;
 
-},{"../../../common/helpers/ContentHelper":219,"../models/Content":172}],166:[function(require,module,exports){
+},{"../../../common/helpers/ContentHelper":220,"../models/Content":172}],166:[function(require,module,exports){
 'use strict';
 
 let LanguageHelperCommon = require('../../../common/helpers/LanguageHelper');
@@ -35544,7 +35548,7 @@ class LanguageHelper extends LanguageHelperCommon {}
 
 module.exports = LanguageHelper;
 
-},{"../../../common/helpers/LanguageHelper":221}],167:[function(require,module,exports){
+},{"../../../common/helpers/LanguageHelper":222}],167:[function(require,module,exports){
 'use strict';
 
 let MediaHelperCommon = require('../../../common/helpers/MediaHelper');
@@ -35619,7 +35623,7 @@ class MediaHelper extends MediaHelperCommon {
 
 module.exports = MediaHelper;
 
-},{"../../../common/helpers/MediaHelper":222}],168:[function(require,module,exports){
+},{"../../../common/helpers/MediaHelper":223}],168:[function(require,module,exports){
 'use strict';
 
 /**
@@ -35681,7 +35685,7 @@ class SchemaHelper extends SchemaHelperCommon {
 
 module.exports = SchemaHelper;
 
-},{"../../../common/helpers/SchemaHelper":223}],170:[function(require,module,exports){
+},{"../../../common/helpers/SchemaHelper":224}],170:[function(require,module,exports){
 'use strict';
 
 let SettingsHelperCommon = require('../../../common/helpers/SettingsHelper');
@@ -35713,7 +35717,7 @@ class SettingsHelper extends SettingsHelperCommon {
 
 module.exports = SettingsHelper;
 
-},{"../../../common/helpers/SettingsHelper":224}],171:[function(require,module,exports){
+},{"../../../common/helpers/SettingsHelper":225}],171:[function(require,module,exports){
 module.exports={
     "icons": [    
         "500px",
@@ -36425,7 +36429,7 @@ class Content extends ContentCommon {}
 
 module.exports = Content;
 
-},{"../../../common/models/Content":226}],173:[function(require,module,exports){
+},{"../../../common/models/Content":227}],173:[function(require,module,exports){
 'use strict';
 
 // Root
@@ -36894,7 +36898,7 @@ class ConnectionEditor extends View {
 
 module.exports = ConnectionEditor;
 
-},{"./MessageModal":189}],183:[function(require,module,exports){
+},{"./MessageModal":190}],183:[function(require,module,exports){
 'use strict';
 
 // Views
@@ -37296,7 +37300,7 @@ class ContentEditor extends View {
 
 module.exports = ContentEditor;
 
-},{"../../../common/helpers/LanguageHelper":221,"./MessageModal":189}],184:[function(require,module,exports){
+},{"../../../common/helpers/LanguageHelper":222,"./MessageModal":190}],184:[function(require,module,exports){
 'use strict';
 
 /**
@@ -37810,7 +37814,7 @@ class JSONEditor extends View {
 
 module.exports = JSONEditor;
 
-},{"./MessageModal":189,"js-beautify":104}],186:[function(require,module,exports){
+},{"./MessageModal":190,"js-beautify":104}],186:[function(require,module,exports){
 'use strict';
 
 class LanguagePicker extends View {
@@ -37898,6 +37902,34 @@ class LanguageSettings extends View {
 module.exports = LanguageSettings;
 
 },{}],188:[function(require,module,exports){
+'use strict';
+
+class MainMenu extends View {
+    constructor(params) {
+        super(params);
+
+        // Find current user
+        for (let user of resources.users) {
+            if (user.isCurrent) {
+                this.user = user;
+            }
+        }
+
+        this.fetch();
+    }
+
+    render() {
+        this.$element = _.div({ class: 'main-menu' }, _.div({ class: 'main-menu-spacer' }), _.div({ class: 'main-menu-item' }, _.a({ href: '/', class: 'main-menu-dashboard' }, _.span({ class: 'fa fa-dashboard' }), _.label('dashboard'))), _.div({ class: 'main-menu-item main-menu-user dropdown' }, _.button({ class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, _.span({ class: 'fa fa-user' }), _.label(this.user.username)), _.ul({ class: 'dropdown-menu' }, _.li(_.a({ class: 'dropdown-item', href: '#/users/' + this.user.id }, 'User settings')), _.li(_.a({ class: 'dropdown-item', href: '#' }, 'Log out').click(e => {
+            e.preventDefault();logout();
+        })))));
+
+        $('.menuspace').html(this.$element);
+    }
+}
+
+module.exports = MainMenu;
+
+},{}],189:[function(require,module,exports){
 'use strict';
 
 // Views
@@ -37992,7 +38024,7 @@ class MediaViewer extends View {
 
 module.exports = MediaViewer;
 
-},{"./MessageModal":189}],189:[function(require,module,exports){
+},{"./MessageModal":190}],190:[function(require,module,exports){
 'use strict';
 
 /**
@@ -38069,7 +38101,7 @@ class MessageModal extends View {
 
 module.exports = MessageModal;
 
-},{}],190:[function(require,module,exports){
+},{}],191:[function(require,module,exports){
 'use strict';
 
 // Icons
@@ -38582,7 +38614,7 @@ class SchemaEditor extends View {
 
 module.exports = SchemaEditor;
 
-},{"../icons.json":171}],191:[function(require,module,exports){
+},{"../icons.json":171}],192:[function(require,module,exports){
 'use strict';
 
 class UserEditor extends View {
@@ -38847,7 +38879,7 @@ class UserEditor extends View {
 
 module.exports = UserEditor;
 
-},{}],192:[function(require,module,exports){
+},{}],193:[function(require,module,exports){
 'use strict';
 
 /**
@@ -39051,7 +39083,7 @@ class ArrayEditor extends View {
 
 module.exports = ArrayEditor;
 
-},{}],193:[function(require,module,exports){
+},{}],194:[function(require,module,exports){
 'use strict';
 
 /**
@@ -39099,7 +39131,7 @@ class BooleanEditor extends View {
 
 module.exports = BooleanEditor;
 
-},{}],194:[function(require,module,exports){
+},{}],195:[function(require,module,exports){
 'use strict';
 
 /**
@@ -39174,7 +39206,7 @@ class ContentReferenceEditor extends View {
 
 module.exports = ContentReferenceEditor;
 
-},{}],195:[function(require,module,exports){
+},{}],196:[function(require,module,exports){
 'use strict';
 
 /**
@@ -39266,7 +39298,7 @@ class ContentSchemaReferenceEditor extends View {
 
 module.exports = ContentSchemaReferenceEditor;
 
-},{}],196:[function(require,module,exports){
+},{}],197:[function(require,module,exports){
 'use strict';
 
 /**
@@ -39311,7 +39343,7 @@ class DateEditor extends View {
 
 module.exports = DateEditor;
 
-},{}],197:[function(require,module,exports){
+},{}],198:[function(require,module,exports){
 'use strict';
 
 /**
@@ -39362,7 +39394,7 @@ class DropdownEditor extends View {
 
 module.exports = DropdownEditor;
 
-},{}],198:[function(require,module,exports){
+},{}],199:[function(require,module,exports){
 'use strict';
 
 /**
@@ -39416,7 +39448,7 @@ class LanguageEditor extends View {
 
 module.exports = LanguageEditor;
 
-},{}],199:[function(require,module,exports){
+},{}],200:[function(require,module,exports){
 'use strict';
 
 /**
@@ -39513,7 +39545,7 @@ class MediaReferenceEditor extends View {
 
 module.exports = MediaReferenceEditor;
 
-},{}],200:[function(require,module,exports){
+},{}],201:[function(require,module,exports){
 'use strict';
 
 /**
@@ -39578,7 +39610,7 @@ class PeriodEditor extends View {
 
 module.exports = PeriodEditor;
 
-},{}],201:[function(require,module,exports){
+},{}],202:[function(require,module,exports){
 'use strict';
 
 /**
@@ -39623,7 +39655,7 @@ class ResourceReferenceEditor extends View {
 
 module.exports = ResourceReferenceEditor;
 
-},{}],202:[function(require,module,exports){
+},{}],203:[function(require,module,exports){
 'use strict';
 
 // Lib
@@ -39829,7 +39861,7 @@ class RichTextEditor extends View {
 
 module.exports = RichTextEditor;
 
-},{"marked":108,"to-markdown":150}],203:[function(require,module,exports){
+},{"marked":108,"to-markdown":150}],204:[function(require,module,exports){
 'use strict';
 
 /**
@@ -39864,7 +39896,7 @@ class StringEditor extends View {
 
 module.exports = StringEditor;
 
-},{}],204:[function(require,module,exports){
+},{}],205:[function(require,module,exports){
 'use strict';
 
 /**
@@ -39942,7 +39974,7 @@ class StructEditor extends View {
 
 module.exports = StructEditor;
 
-},{}],205:[function(require,module,exports){
+},{}],206:[function(require,module,exports){
 'use strict';
 
 /**
@@ -40008,7 +40040,7 @@ class TemplateReferenceEditor extends View {
 
 module.exports = TemplateReferenceEditor;
 
-},{}],206:[function(require,module,exports){
+},{}],207:[function(require,module,exports){
 'use strict';
 
 /**
@@ -40192,7 +40224,7 @@ class UrlEditor extends View {
 
 module.exports = UrlEditor;
 
-},{}],207:[function(require,module,exports){
+},{}],208:[function(require,module,exports){
 'use strict';
 
 window.resources.editors = {
@@ -40213,7 +40245,7 @@ window.resources.editors = {
     url: require('./UrlEditor')
 };
 
-},{"./ArrayEditor":192,"./BooleanEditor":193,"./ContentReferenceEditor":194,"./ContentSchemaReferenceEditor":195,"./DateEditor":196,"./DropdownEditor":197,"./LanguageEditor":198,"./MediaReferenceEditor":199,"./PeriodEditor":200,"./ResourceReferenceEditor":201,"./RichTextEditor":202,"./StringEditor":203,"./StructEditor":204,"./TemplateReferenceEditor":205,"./UrlEditor":206}],208:[function(require,module,exports){
+},{"./ArrayEditor":193,"./BooleanEditor":194,"./ContentReferenceEditor":195,"./ContentSchemaReferenceEditor":196,"./DateEditor":197,"./DropdownEditor":198,"./LanguageEditor":199,"./MediaReferenceEditor":200,"./PeriodEditor":201,"./ResourceReferenceEditor":202,"./RichTextEditor":203,"./StringEditor":204,"./StructEditor":205,"./TemplateReferenceEditor":206,"./UrlEditor":207}],209:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -40235,7 +40267,7 @@ class CMSPane extends Pane {
             location = '/';
         }
 
-        let $toolbar = _.div({ class: 'pane-toolbar' }, _.div({}, _.label('Server'), _.button('Dashboard').click(onClickDashboard)), _.div({}, _.label('Session'), _.button('Log out').click(onClickLogOut)));
+        let $toolbar = _.div({ class: 'pane-toolbar' }, _.div({}, _.label('Server'), _.button({ class: 'btn btn-primary' }, 'Dashboard').click(onClickDashboard)), _.div({}, _.label('Session'), _.button({ class: 'btn btn-primary' }, 'Log out').click(onClickLogOut)));
 
         return $toolbar;
     }
@@ -40265,7 +40297,7 @@ class CMSPane extends Pane {
 
 module.exports = CMSPane;
 
-},{"./Pane":214}],209:[function(require,module,exports){
+},{"./Pane":215}],210:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -40353,9 +40385,9 @@ class ConnectionPane extends Pane {
             }).catch(errorModal);
         }
 
-        let $toolbar = _.div({ class: 'pane-toolbar' }, _.div({}, _.label('Media provider'), $mediaProvider = _.select({}, _.option({ value: null }, '(none)'), _.each(resources.connections, (i, connection) => {
+        let $toolbar = _.div({ class: 'pane-toolbar' }, _.div({}, _.label('Media provider'), $mediaProvider = _.select({ class: 'btn btn-primary' }, _.option({ value: null }, '(none)'), _.each(resources.connections, (i, connection) => {
             return _.option({ value: connection.id }, connection.title);
-        })).change(onChangeMediaProvider)), _.div({}, _.label('Template provider'), $templateProvider = _.select({}, _.option({ value: null }, '(none)'), _.each(resources.connections, (i, connection) => {
+        })).change(onChangeMediaProvider)), _.div({}, _.label('Template provider'), $templateProvider = _.select({ class: 'btn btn-primary' }, _.option({ value: null }, '(none)'), _.each(resources.connections, (i, connection) => {
             return _.option({ value: connection.id }, connection.title);
         })).change(onChangeTemplateProvider)));
 
@@ -40409,7 +40441,7 @@ class ConnectionPane extends Pane {
 
 module.exports = ConnectionPane;
 
-},{"./Pane":214}],210:[function(require,module,exports){
+},{"./Pane":215}],211:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -40794,7 +40826,7 @@ class ContentPane extends Pane {
 
 module.exports = ContentPane;
 
-},{"./Pane":214}],211:[function(require,module,exports){
+},{"./Pane":215}],212:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -40862,7 +40894,7 @@ class FormsPane extends Pane {
 
 module.exports = FormsPane;
 
-},{"./Pane":214}],212:[function(require,module,exports){
+},{"./Pane":215}],213:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -41056,7 +41088,7 @@ class MediaPane extends Pane {
             });
         }
 
-        let $uploadModal = _.div({ class: 'modal modal-upload-media fade' }, _.div({ class: 'modal-dialog' }, _.div({ class: 'modal-content' }, _.div({ class: 'modal-header' }, _.h4({ class: 'modal-title' }, 'Upload a file')), _.div({ class: 'modal-body' }, _.div({ class: 'spinner-container hidden' }, _.span({ class: 'spinner fa fa-refresh' })), _.div({ class: 'media-preview' })), _.div({ class: 'modal-footer' }, _.div({ class: 'input-group' }, _.form({ class: 'form-control' }, _.input({ type: 'file', name: 'media' }).change(onChangeFile)).submit(onSubmit), _.div({ class: 'input-group-btn' }, _.button({ class: 'btn btn-success' }, 'Upload').click(onClickUpload)))))));
+        let $uploadModal = _.div({ class: 'modal modal-upload-media fade' }, _.div({ class: 'modal-dialog' }, _.div({ class: 'modal-content' }, _.div({ class: 'modal-header' }, _.h4({ class: 'modal-title' }, 'Upload a file')), _.div({ class: 'modal-body' }, _.div({ class: 'spinner-container hidden' }, _.span({ class: 'spinner fa fa-refresh' })), _.div({ class: 'media-preview' })), _.div({ class: 'modal-footer' }, _.div({ class: 'input-group' }, _.form({ class: 'form-control' }, _.input({ type: 'file', name: 'media' }).change(onChangeFile)).submit(onSubmit), _.div({ class: 'input-group-btn' }, _.button({ class: 'btn btn-primary' }, 'Upload').click(onClickUpload)))))));
 
         $uploadModal.on('hidden.bs.modal', function () {
             $uploadModal.remove();
@@ -41073,7 +41105,7 @@ class MediaPane extends Pane {
      * @returns {HTMLElement} Toolbar
      */
     static renderToolbar() {
-        let $toolbar = _.div({ class: 'pane-toolbar' }, _.div({}, _.label('Library'), _.button('Upload').click(() => {
+        let $toolbar = _.div({ class: 'pane-toolbar' }, _.div({}, _.label('Library'), _.button({ class: 'btn btn-primary' }, 'Upload media').click(() => {
             this.onClickUploadMedia();
         })));
 
@@ -41163,7 +41195,7 @@ class MediaPane extends Pane {
 
 module.exports = MediaPane;
 
-},{"./Pane":214}],213:[function(require,module,exports){
+},{"./Pane":215}],214:[function(require,module,exports){
 'use strict';
 
 // Views
@@ -41582,7 +41614,7 @@ class NavbarMain extends View {
 
 module.exports = NavbarMain;
 
-},{"../../../../common/models/Content":226,"../MessageModal":189,"./CMSPane":208,"./ConnectionPane":209,"./ContentPane":210,"./FormsPane":211,"./MediaPane":212,"./SchemaPane":215,"./UserPane":216}],214:[function(require,module,exports){
+},{"../../../../common/models/Content":227,"../MessageModal":190,"./CMSPane":209,"./ConnectionPane":210,"./ContentPane":211,"./FormsPane":212,"./MediaPane":213,"./SchemaPane":216,"./UserPane":217}],215:[function(require,module,exports){
 'use strict';
 
 class Pane {
@@ -41598,7 +41630,7 @@ class Pane {
 
 module.exports = Pane;
 
-},{}],215:[function(require,module,exports){
+},{}],216:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -41717,7 +41749,7 @@ class SchemaPane extends Pane {
 
 module.exports = SchemaPane;
 
-},{"./Pane":214}],216:[function(require,module,exports){
+},{"./Pane":215}],217:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -41850,7 +41882,7 @@ class UserPane extends Pane {
 
 module.exports = UserPane;
 
-},{"./Pane":214}],217:[function(require,module,exports){
+},{"./Pane":215}],218:[function(require,module,exports){
 module.exports=[
     "aa",
     "ab",
@@ -42039,7 +42071,7 @@ module.exports=[
     "zu"
 ]
 
-},{}],218:[function(require,module,exports){
+},{}],219:[function(require,module,exports){
 'use strict';
 
 class ConnectionHelper {
@@ -42119,7 +42151,7 @@ class ConnectionHelper {
 
 module.exports = ConnectionHelper;
 
-},{}],219:[function(require,module,exports){
+},{}],220:[function(require,module,exports){
 'use strict';
 
 class ContentHelper {
@@ -42226,7 +42258,7 @@ class ContentHelper {
 
 module.exports = ContentHelper;
 
-},{}],220:[function(require,module,exports){
+},{}],221:[function(require,module,exports){
 'use strict';
 
 let lastSenderName = '';
@@ -42336,7 +42368,7 @@ class DebugHelper {
 
 module.exports = DebugHelper;
 
-},{}],221:[function(require,module,exports){
+},{}],222:[function(require,module,exports){
 'use strict';
 
 class LanguageHelper {
@@ -42428,7 +42460,7 @@ class LanguageHelper {
 
 module.exports = LanguageHelper;
 
-},{"../data/languages.json":217}],222:[function(require,module,exports){
+},{"../data/languages.json":218}],223:[function(require,module,exports){
 'use strict';
 
 // Models
@@ -42490,7 +42522,7 @@ class MediaHelper {
 
 module.exports = MediaHelper;
 
-},{"../models/Media":230}],223:[function(require,module,exports){
+},{"../models/Media":231}],224:[function(require,module,exports){
 'use strict';
 
 // Models
@@ -42535,7 +42567,7 @@ class SchemaHelper {
 
 module.exports = SchemaHelper;
 
-},{"../models/ContentSchema":227,"../models/FieldSchema":229}],224:[function(require,module,exports){
+},{"../models/ContentSchema":228,"../models/FieldSchema":230}],225:[function(require,module,exports){
 'use strict';
 
 class SettingsHelper {
@@ -42569,7 +42601,7 @@ class SettingsHelper {
 
 module.exports = SettingsHelper;
 
-},{}],225:[function(require,module,exports){
+},{}],226:[function(require,module,exports){
 'use strict';
 
 let Entity = require('./Entity');
@@ -42796,7 +42828,7 @@ class Connection extends Entity {
 
 module.exports = Connection;
 
-},{"./Entity":228}],226:[function(require,module,exports){
+},{"./Entity":229}],227:[function(require,module,exports){
 'use strict';
 
 let Entity = require('./Entity');
@@ -43093,7 +43125,7 @@ class Content extends Entity {
 
 module.exports = Content;
 
-},{"./Entity":228}],227:[function(require,module,exports){
+},{"./Entity":229}],228:[function(require,module,exports){
 'use strict';
 
 let Schema = require('./Schema');
@@ -43117,7 +43149,7 @@ class ContentSchema extends Schema {
 
 module.exports = ContentSchema;
 
-},{"./Schema":231}],228:[function(require,module,exports){
+},{"./Schema":232}],229:[function(require,module,exports){
 'use strict';
 
 let crypto = require('crypto');
@@ -43274,7 +43306,7 @@ class Entity {
 
 module.exports = Entity;
 
-},{"crypto":56}],229:[function(require,module,exports){
+},{"crypto":56}],230:[function(require,module,exports){
 'use strict';
 
 let Schema = require('./Schema');
@@ -43296,7 +43328,7 @@ class FieldSchema extends Schema {
 
 module.exports = FieldSchema;
 
-},{"./Schema":231}],230:[function(require,module,exports){
+},{"./Schema":232}],231:[function(require,module,exports){
 'use strict';
 
 // Libs
@@ -43401,7 +43433,7 @@ class Media extends Entity {
 
 module.exports = Media;
 
-},{"./Entity":228,"path":115}],231:[function(require,module,exports){
+},{"./Entity":229,"path":115}],232:[function(require,module,exports){
 'use strict';
 
 let Entity = require('./Entity');
@@ -43437,7 +43469,7 @@ class Schema extends Entity {
 
 module.exports = Schema;
 
-},{"./Entity":228}]},{},[162,158,160])
+},{"./Entity":229}]},{},[162,158,160])
 
 
 //# sourceMappingURL=maps/client.js.map

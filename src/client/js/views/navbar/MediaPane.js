@@ -251,7 +251,7 @@ class MediaPane extends Pane {
                                     .change(onChangeFile)
                             ).submit(onSubmit),
                             _.div({class: 'input-group-btn'},
-                                _.button({class: 'btn btn-success'},
+                                _.button({class: 'btn btn-primary'},
                                     'Upload'
                                 ).click(onClickUpload)
                             )
@@ -279,7 +279,7 @@ class MediaPane extends Pane {
         let $toolbar = _.div({class: 'pane-toolbar'},
             _.div({},
                 _.label('Library'),
-                _.button('Upload')
+                _.button({class: 'btn btn-primary'}, 'Upload media')
                     .click(() => { this.onClickUploadMedia(); })
             )
         );
