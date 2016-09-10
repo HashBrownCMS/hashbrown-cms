@@ -14,12 +14,27 @@ class ServerController extends ApiController {
         
         app.post('/api/server/projects/new', this.middleware({ authenticate: false, setProject: false }), this.createProject);
         app.post('/api/server/backups/:project/new', this.middleware({ setProject: false }), this.postBackupProject);
+        app.post('/api/server/backups/:project/upload', this.middleware({ setProject: false }), BackupHelper.getUploadHandler(), this.postUploadProjectBackup);
         app.post('/api/server/backups/:project/:timestamp/restore', this.middleware({ setProject: false }), this.postRestoreProjectBackup);
-        
+
         app.delete('/api/server/backups/:project/:timestamp', this.middleware({ setProject: false }), this.deleteBackup);
         app.delete('/api/server/projects/:project', this.middleware({ authenticate: false, setProject: false }), this.deleteProject);
     }
     
+    /**
+     * Uploads a project backup
+     */
+   static postUploadProjectBackup(req, res) {
+        let file = req.file;
+
+        if(file) {
+            res.status(200).send('OK');
+
+        } else {
+            res.status(400).send('File was not provided');    
+        }
+   } 
+
     /**
      * Deletes a backup of a project
      */

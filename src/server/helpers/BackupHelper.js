@@ -3,11 +3,41 @@
 // Libs
 let fs = require('fs');
 let glob = require('glob');
+let multer = require('multer');
 
 /**
  * A helper class for managing backups
  */
 class BackupHelper {
+    /**
+     * Gets the upload handler
+     *
+     * @return {Function} handler
+     */
+    static getUploadHandler() {
+        let handler = multer({
+            storage: multer.diskStorage({
+                destination: (req, file, resolve) => {
+                    let path = appRoot + '/dump/' + req.params.project + '/';
+                   
+                    debug.log('Handling file upload to dump storage...', this);
+
+                    if(!fs.existsSync(path)){
+                        MediaHelper.mkdirRecursively(path, () => {
+                            resolve(null, path);
+                        });
+                    
+                    } else {
+                        resolve(null, path);
+
+                    }
+                }
+            })
+        });
+        
+        return handler.single('backup');
+    }
+    
     /**
      * Gets a list of backups for a project
      *

@@ -72,6 +72,80 @@ class ProjectEditor extends View {
     }
 
     /**
+     * Event: Click upload button
+     */
+    onClickUploadBackup() {
+        let view = this;
+
+        function onChangeFile() {
+            let input = $(this);
+            let numFiles = this.files ? this.files.length : 1;
+            
+            if(numFiles > 0) {
+                let file = this.files[0];
+                
+                debug.log('Reading data of file type ' + file.type + '...', view);
+            }
+        }
+        
+        function onClickUpload() {
+            $uploadModal.find('form').submit();
+        }
+
+        function onSubmit(e) {
+            e.preventDefault();
+
+            $uploadModal.find('.spinner-container').toggleClass('hidden', false);
+            
+            let apiPath = 'server/backups/' + view.model.name + '/upload';
+
+            $.ajax({
+                url: apiUrl(apiPath),
+                type: 'POST',
+                data: new FormData(this),
+                processData: false,
+                contentType: false,
+                success: function(id) {
+                    $uploadModal.find('.spinner-container').toggleClass('hidden', true);
+
+                    $uploadModal.modal('hide');
+                }
+            });
+        }
+
+        let $uploadModal = _.div({class: 'modal modal-upload-media fade'},
+            _.div({class: 'modal-dialog'},
+                _.div({class: 'modal-content'},
+                    _.div({class: 'modal-header'},
+                        _.h4({class: 'modal-title'}, 'Upload a file')
+                    ),
+                    _.div({class: 'modal-footer'},
+                        _.div({class: 'input-group'},
+                            _.form({class: 'form-control'},
+                                _.input({type: 'file', name: 'backup'})
+                                    .change(onChangeFile)
+                            ).submit(onSubmit),
+                            _.div({class: 'input-group-btn'},
+                                _.button({class: 'btn btn-primary'},
+                                    'Upload'
+                                ).click(onClickUpload)
+                            )
+                        )
+                    )
+                )
+            )
+        );
+
+        $uploadModal.on('hidden.bs.modal', function() {
+            $uploadModal.remove();
+        });
+
+        $('body').append($uploadModal);
+
+        $uploadModal.modal('show');
+    }
+
+    /**
      * Event: Click backup button
      */
     onClickCreateBackup() {

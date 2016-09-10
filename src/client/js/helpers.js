@@ -8,6 +8,9 @@ window.MessageModal = require('./views/MessageModal');
 // Common helpers
 window.ProjectHelper = require('./helpers/ProjectHelper');
 
+window.debug = require('../../common/helpers/DebugHelper');
+window.debug.verbosity = 3;
+
 /**
  * Brings up a message modal
  *
