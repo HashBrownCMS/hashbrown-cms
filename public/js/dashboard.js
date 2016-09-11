@@ -28661,9 +28661,9 @@ apiCall('get', 'server/projects').then(projects => {
 }).catch(errorModal);
 
 // Set navbar button events
-$('.navbar-main a').click(() => {
+$('.navbar-main a').click(function () {
     $('.navbar-main a').removeClass('active');
-    $(undefined).addClass('active');
+    $(this).addClass('active');
 });
 
 // Set create new project event

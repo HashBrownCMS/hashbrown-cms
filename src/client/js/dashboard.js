@@ -38,7 +38,7 @@ apiCall('get', 'server/projects')
 .catch(errorModal);
 
 // Set navbar button events
-$('.navbar-main a').click(() => {
+$('.navbar-main a').click(function() {
     $('.navbar-main a').removeClass('active');
     $(this).addClass('active');
 });
