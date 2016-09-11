@@ -63,8 +63,8 @@ class ApiController extends Controller {
             let keys = [];
             let re = pathToRegexp('/:root/:project/:environment/*', keys);
             let values = re.exec(url);
-            let project;
-            let environment;
+            let project = null;
+            let environment = null;
 
             if(values) {
                 // The first array item is the entire url, so remove it
@@ -85,8 +85,8 @@ class ApiController extends Controller {
                 }
             }
 
-            // We have both project and environment, we'll set them as current
-            if(project && environment) {
+            // We have project (environment optional), we'll set them as current
+            if(project) {
                 ProjectHelper.setCurrent(project, environment)
                 .then(resolve)
                 .catch(reject);

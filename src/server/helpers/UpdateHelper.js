@@ -16,6 +16,8 @@ class UpdateHelper {
     static check() {
         return new Promise((resolve, reject) => {
             let resolveObj = {};
+            
+            debug.log('Checking for updates...', this);
 
             function checkOutput(data) {
                 let behindMatches = data.match(/Your branch is behind '(.+)' by (\d) commit/);
@@ -52,8 +54,10 @@ class UpdateHelper {
             
             git.on('exit', (code) => {
                 if(code == 0 || code == '0') {
+                    debug.log('Done checking for updates', this);
                     resolve(resolveObj);
                 } else {
+                    debug.log('Checking for updates failed', this);
                     reject(new Error('git exited with status code ' + code));
                 }
             });
@@ -67,22 +71,26 @@ class UpdateHelper {
      */
     static update() {
         return new Promise((resolve, reject) => {
+            debug.log('Updating HashBrown...', this);
+            
             let git = exec('git pull', {
                 cwd: appRoot
             });
 
             git.stdout.on('data', (data) => {
-                debug.log(data, this);
+                debug.log(data, this, 3);
             });
 
             git.stderr.on('data', (data) => {
-                debug.log(data, this);
+                debug.log(data, this, 3);
             });
             
             git.on('exit', (code) => {
                 if(code == 0 || code == '0') {
+                    debug.log('Update successful', this);
                     resolve();
                 } else {
+                    debug.log('Update failed', this);
                     reject(new Error('git exited with status code ' + code));
                 }
             });

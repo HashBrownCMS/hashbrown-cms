@@ -880,7 +880,10 @@ body > .dashboard-container {
             margin-top: 1em;
             margin-left: auto; }
           body > .dashboard-container .workspace .projects .project-editor .body .environments .environment {
-            width: 100%; }
+            width: 100%;
+            margin-bottom: 15px; }
+            body > .dashboard-container .workspace .projects .project-editor .body .environments .environment:last-of-type {
+              margin-bottom: 0px; }
             body > .dashboard-container .workspace .projects .project-editor .body .environments .environment .btn {
               max-width: 110px; }
             body > .dashboard-container .workspace .projects .project-editor .body .environments .environment .dropdown .dropdown-toggle {

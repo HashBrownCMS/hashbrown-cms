@@ -18,11 +18,29 @@ class ServerController extends ApiController {
         app.post('/api/server/backups/:project/new', this.middleware({ setProject: false }), this.postBackupProject);
         app.post('/api/server/backups/:project/upload', this.middleware({ setProject: false }), BackupHelper.getUploadHandler(), this.postUploadProjectBackup);
         app.post('/api/server/backups/:project/:timestamp/restore', this.middleware({ setProject: false }), this.postRestoreProjectBackup);
+        app.post('/api/server/settings/:project/:section', this.middleware({ setProject: false }), this.postProjectSettings);
 
         app.delete('/api/server/backups/:project/:timestamp', this.middleware({ setProject: false }), this.deleteBackup);
         app.delete('/api/server/projects/:project', this.middleware({ authenticate: false, setProject: false }), this.deleteProject);
     }
     
+    /**
+     * Update project settings
+     */
+    static postProjectSettings(req, res) {
+        let settings = req.body;
+    
+        ProjectHelper.currentProject = req.params.project;
+
+        SettingsHelper.setSettings(req.params.section, settings)
+        .then(() => {
+            res.status(200).send(settings);
+        })
+        .catch((e) => {
+            res.status(502).send(ApiController.error(e));
+        });
+    }
+        
     /**
      * Checks for new updates
      */

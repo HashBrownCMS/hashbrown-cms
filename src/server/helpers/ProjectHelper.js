@@ -21,14 +21,21 @@ class ProjectHelper {
             .then((project) => {
                 this.currentProject = project.name;
 
-                // Then check if the environment is enabled
-                if(project.settings.environments.names.indexOf(environmentName) > -1) {
-                    this.currentEnvironment = environmentName;
+                // Environment is optional
+                if(environmentName) {
+                    // Then check if the environment is enabled
+                    if(project.settings.environments.names.indexOf(environmentName) > -1) {
+                        this.currentEnvironment = environmentName;
 
-                    resolve();
+                        resolve();
 
+                    } else {
+                        reject(new Error('Environment "' + environmentName + '" does not exist in project "' + project.name + '"'));
+
+                    }
+                
                 } else {
-                    reject(new Error('Environment "' + environment + '" is does not exist in project "' + project.name + '"'));
+                    resolve();
 
                 }
             })

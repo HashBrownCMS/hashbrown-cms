@@ -29250,19 +29250,67 @@ class ProjectEditor extends View {
         }
     }
 
+    /**
+     * Event: Click migration button
+     */
+    onClickMigrate() {
+        let modal = new MessageModal({
+            model: {
+                class: 'modal-migrate-content',
+                title: 'Migrate content',
+                body: _.div({}, _.select({ class: 'form-control' }, _.each(this.model.settings.environments.names, (i, environment) => {
+                    return _.option({ value: environment }, environment);
+                })))
+            }
+        });
+    }
+
+    /**
+     * Event: Click add environment button
+     */
+    onClickAddEnvironment() {
+        let modal = new MessageModal({
+            model: {
+                title: 'New environment for "' + this.model.name + '"',
+                body: _.input({ class: 'form-control', type: 'text', placeholder: 'Type environment name here' })
+            },
+            buttons: [{
+                label: 'Create',
+                class: 'btn-primary',
+                callback: () => {
+                    let newName = modal.$element.find('input').val();
+
+                    this.model.settings.environments.names.push(newName);
+
+                    apiCall('post', 'server/settings/' + this.model.name + '/environments', this.model.settings.environments).then(() => {
+                        messageModal('Succes', 'The new environment "' + newName + '" was created successfully', () => {
+                            location.reload();
+                        });
+                    }).catch(errorModal);
+
+                    return false;
+                }
+            }]
+        });
+    }
+
     render() {
         let languageCount = this.model.settings.language.selected.length;
         let userCount = this.model.users.length;
 
         this.$element = _.div({ class: 'raised project-editor' }, _.div({ class: 'body' }, _.if(this.isAdmin(), _.div({ class: 'admin dropdown' }, _.button({ class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, _.span({ class: 'fa fa-ellipsis-v' })), _.ul({ class: 'dropdown-menu' }, _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Backups').click(e => {
             e.preventDefault();this.onClickBackups();
-        })), _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Delete').click(e => {
+        })), _.if(this.model.settings.environments.names.length > 1, _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Migrate content').click(e => {
+            e.preventDefault();this.onClickMigrate();
+        }))), _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Delete').click(e => {
             e.preventDefault();this.onClickRemove();
         }))))), _.div({ class: 'info' }, _.h2(this.model.name), _.p(userCount + ' user' + (userCount != 1 ? 's' : '')), _.p(languageCount + ' language' + (languageCount != 1 ? 's' : '') + ' (' + this.model.settings.language.selected.join(', ') + ')')), _.div({ class: 'environments' }, _.h4('Environments'), _.each(this.model.settings.environments.names, (i, environment) => {
             return _.div({ class: 'environment' }, _.div({ class: 'btn-group' }, _.span({ class: 'environment-title' }, environment), _.a({ href: '/' + this.model.name + '/' + environment, class: 'btn btn-primary environment' }, 'cms'), _.if(this.isAdmin(), _.div({ class: 'dropdown' }, _.button({ class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, _.span({ class: 'fa fa-ellipsis-v' })), _.ul({ class: 'dropdown-menu' }, _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Delete').click(e => {
-                e.preventDefault();this.onClickRemove();
+                e.preventDefault();this.onClickRemoveEnvironment();
             })))))));
-        }), _.button({ class: 'btn btn-primary btn-add btn-raised btn-round' }, '+'))));
+        }), _.button({ class: 'btn btn-primary btn-add btn-raised btn-round' }, '+').click(() => {
+            this.onClickAddEnvironment();
+        }))));
     }
 }
 
