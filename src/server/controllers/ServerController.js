@@ -19,11 +19,134 @@ class ServerController extends ApiController {
         app.post('/api/server/backups/:project/upload', this.middleware({ setProject: false }), BackupHelper.getUploadHandler(), this.postUploadProjectBackup);
         app.post('/api/server/backups/:project/:timestamp/restore', this.middleware({ setProject: false }), this.postRestoreProjectBackup);
         app.post('/api/server/settings/:project/:section', this.middleware({ setProject: false }), this.postProjectSettings);
+        app.post('/api/server/migrate/:project/', this.middleware({ setProject: false }), this.postMigrateContent);
 
         app.delete('/api/server/backups/:project/:timestamp', this.middleware({ setProject: false }), this.deleteBackup);
         app.delete('/api/server/projects/:project', this.middleware({ authenticate: false, setProject: false }), this.deleteProject);
     }
     
+    /**
+     * Migrates content between environments
+     */
+    static postMigrateContent(req, res) {
+        let data = req.body;
+        let project = req.params.project;
+
+        let from = {};
+        let to = {};
+
+        debug.log('Starting migration from "' + data.from + '" to "' + data.to + '"...', this);
+
+        debug.log('Getting "' + data.from + '" connections...', this);
+        MongoHelper.find(project, data.from + '.connections', {})
+        .then((result) => {
+            from.connections = result;
+
+            debug.log('Getting "' + data.from + '" content...', this);
+            return MongoHelper.find(project, data.from + '.content');
+        })
+        .then((result) => {
+            from.content = result;
+
+            debug.log('Getting "' + data.from + '" forms...', this);
+            return MongoHelper.find(project, data.from + '.forms');
+        })
+        .then((result) => {
+            from.forms = result;
+
+            debug.log('Getting "' + data.from + '" media...', this);
+            return MongoHelper.find(project, data.from + '.media');
+        })
+        .then((result) => {
+            from.media = result;
+
+            debug.log('Getting "' + data.from + '" schemas...', this);
+            return MongoHelper.find(project, data.from + '.schemas');
+        })
+        .then((result) => {
+            from.schemas = result;
+
+            debug.log('Getting "' + data.to + '" connections...', this);
+            return MongoHelper.find(project, data.to + '.connections', {})
+        })
+        .then((result) => {
+            to.connections = result;
+
+            debug.log('Getting "' + data.to + '" content...', this);
+            return MongoHelper.find(project, data.to + '.content', {})
+        })
+        .then((result) => {
+            to.content = result;
+
+            debug.log('Getting "' + data.to + '" forms...', this);
+            return MongoHelper.find(project, data.to + '.forms');
+        })
+        .then((result) => {
+            to.forms = result;
+
+            debug.log('Getting "' + data.to + '" media...', this);
+            return MongoHelper.find(project, data.to + '.media');
+        })
+        .then((result) => {
+            to.media = result;
+
+            debug.log('Getting "' + data.to + '" schemas...', this);
+            return MongoHelper.find(project, data.to + '.schemas');
+        })
+        .then((result) => {
+            to.schemas = result;
+
+            function merge(resource) {
+                return new Promise((resolve, reject) => {
+                    debug.log('Merging ' + resource + '...', this);
+
+                    function next(num) {
+                        let item = from[resource][num];
+
+                        if(item) {
+                            debug.log('Updating ' + resource + ' with "' + item.id + '"...', this);
+                            MongoHelper.updateOne(project, data.to + '.' + resource, { id: item.id }, item, { upsert: true })
+                            .then(() => {
+                                if(num < from[resource].length - 1) {
+                                    next(num + 1);
+                                } else {
+                                    resolve();
+                                }
+                            })
+                            .catch(reject);
+                        
+                        } else {
+                            resolve();
+
+                        }
+                    } 
+
+                    next(0);
+                });
+            }
+
+            return merge('connections')
+            .then(() => {
+                return merge('content')
+            })
+            .then(() => {
+                return merge('forms');
+            })
+            .then(() => {
+                return merge('media');
+            })
+            .then(() => {
+                return merge('schemas');
+            });
+        })
+        .then(() => {
+            res.status(200).send('OK');
+        })
+        .catch((e) => {
+            res.status(502).send(ApiController.error(e));  
+        });
+    }
+
     /**
      * Update project settings
      */

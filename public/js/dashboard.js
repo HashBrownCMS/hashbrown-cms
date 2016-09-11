@@ -29263,6 +29263,17 @@ class ProjectEditor extends View {
             }));
         };
 
+        let onSubmit = () => {
+            data.from = modal.$element.find('.environment-from').val();
+            data.to = modal.$element.find('.environment-to').val();
+
+            data.settings.replace = modal.$element.find('#switch-migration-replace').is(':checked');
+
+            apiCall('post', 'server/migrate/' + this.model.name, data).then(() => {
+                messageModal('Success', 'Successfully migrated content from "' + data.from + '" to "' + data.to + '"');
+            }).catch(errorModal);
+        };
+
         let data = {
             from: '',
             to: '',
@@ -29297,6 +29308,7 @@ class ProjectEditor extends View {
                 label: 'Migrate',
                 class: 'btn-primary',
                 callback: () => {
+                    onSubmit();
 
                     return false;
                 }
