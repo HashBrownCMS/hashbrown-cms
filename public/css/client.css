@@ -589,6 +589,13 @@ img.logo {
     width: 32px;
     height: 32px; }
 
+.error-modal .modal-dialog .fa-warning {
+  margin-right: 10px; }
+
+.error-modal .modal-dialog .modal-header {
+  background-color: #e53935;
+  color: #fff; }
+
 .modal-upload-media .modal-body .spinner-container {
   height: 100%;
   position: absolute;
@@ -600,7 +607,7 @@ img.logo {
   display: block;
   max-height: 200px;
   max-width: 100%;
-  margin: 0px auto; }
+  margin: 0px auto 30px auto; }
 
 .cms-container {
   display: flex;
@@ -684,6 +691,19 @@ img.logo {
             margin-right: 10px; }
         .cms-container .workspace .editor .field-container .field-editor {
           position: relative; }
+          .cms-container .workspace .editor .field-container .field-editor > .field-warning {
+            margin: 0px;
+            line-height: 30px;
+            color: #fff;
+            background-color: #e53935;
+            display: inline-block;
+            height: 30px;
+            padding: 0px 10px;
+            border-radius: 2px; }
+            .cms-container .workspace .editor .field-container .field-editor > .field-warning:before {
+              font-family: 'FontAwesome';
+              content: '\f071';
+              margin-right: 5px; }
         .cms-container .workspace .editor .field-container .field-value {
           flex-grow: 1; }
           .cms-container .workspace .editor .field-container .field-value input, .cms-container .workspace .editor .field-container .field-value select, .cms-container .workspace .editor .field-container .field-value option, .cms-container .workspace .editor .field-container .field-value textarea, .cms-container .workspace .editor .field-container .field-value p {
@@ -1449,6 +1469,11 @@ body > .dashboard-container {
               margin-right: 15px; }
         .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .children .pane-item-container {
           padding-left: 15px; }
+
+.media-upload-modal img {
+  max-height: 300px;
+  margin: 0px auto 30px auto;
+  max-width: 100%; }
 
 .media-viewer {
   display: flex;

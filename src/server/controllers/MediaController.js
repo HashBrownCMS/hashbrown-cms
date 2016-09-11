@@ -227,7 +227,7 @@ class MediaController extends ApiController {
             })
             .catch((e) => {
                 debug.warning(e);
-                res.status(400).send(e);    
+                res.status(400).send(ApiController.error(e));    
             });
 
         } else {

@@ -180,21 +180,21 @@ class MediaPane extends Pane {
 
                 reader.onload = function(e) {
                     if(isImage) {
-                        $uploadModal.find('.media-preview').html(
-                            _.img({src: e.target.result })
+                        uploadModal.$element.find('.media-preview').html(
+                            _.img({src: e.target.result})
                         );
                     }
 
                     if(isVideo) {
-                        $uploadModal.find('.media-preview').html(
+                        uploadModal.$element.find('.media-preview').html(
                             _.video({src: e.target.result })
                         );
                     }
 
-                    $uploadModal.find('.spinner-container').toggleClass('hidden', true);
+                    uploadModal.$element.find('.spinner-container').toggleClass('hidden', true);
                 }
                         
-                $uploadModal.find('.spinner-container').toggleClass('hidden', false);
+                uploadModal.$element.find('.spinner-container').toggleClass('hidden', false);
 
                 reader.readAsDataURL(file);
                 debug.log('Reading data of file type ' + file.type + '...', navbar);
@@ -202,13 +202,13 @@ class MediaPane extends Pane {
         }
         
         function onClickUpload() {
-            $uploadModal.find('form').submit();
+            uploadModal.$element.find('form').submit();
         }
 
         function onSubmit(e) {
             e.preventDefault();
 
-            $uploadModal.find('.spinner-container').toggleClass('hidden', false);
+            uploadModal.$element.find('.spinner-container').toggleClass('hidden', false);
             
             let apiPath = 'media/' + (replaceId ? replaceId : 'new');
 
@@ -219,55 +219,49 @@ class MediaPane extends Pane {
                 processData: false,
                 contentType: false,
                 success: function(id) {
-                    $uploadModal.find('.spinner-container').toggleClass('hidden', true);
+                    uploadModal.$element.find('.spinner-container').toggleClass('hidden', true);
 
                     reloadResource('media')
                     .then(function() {
                         navbar.reload();
                         location.hash = '/media/' + id;
 
-                        $uploadModal.modal('hide');
+                        uploadModal.$element.modal('hide');
                     });
-                }
+                },
+                error: errorModal
             });
+
+            return false;
         }
 
-        let $uploadModal = _.div({class: 'modal modal-upload-media fade'},
-            _.div({class: 'modal-dialog'},
-                _.div({class: 'modal-content'},
-                    _.div({class: 'modal-header'},
-                        _.h4({class: 'modal-title'}, 'Upload a file')
+        let uploadModal = new MessageModal({
+            model: {
+                class: 'modal-upload-media',
+                title: 'Upload a file',
+                body: [
+                    _.div({class: 'spinner-container hidden'},
+                        _.span({class: 'spinner fa fa-refresh'})
                     ),
-                    _.div({class: 'modal-body'},
-                        _.div({class: 'spinner-container hidden'},
-                            _.span({class: 'spinner fa fa-refresh'})
-                        ),
-                        _.div({class: 'media-preview'})
-                    ),
-                    _.div({class: 'modal-footer'},
-                        _.div({class: 'input-group'},
-                            _.form({class: 'form-control'},
-                                _.input({type: 'file', name: 'media'})
-                                    .change(onChangeFile)
-                            ).submit(onSubmit),
-                            _.div({class: 'input-group-btn'},
-                                _.button({class: 'btn btn-primary'},
-                                    'Upload'
-                                ).click(onClickUpload)
-                            )
-                        )
-                    )
-                )
-            )
-        );
-
-        $uploadModal.on('hidden.bs.modal', function() {
-            $uploadModal.remove();
+                    _.div({class: 'media-preview'}),
+                    _.form({class: 'form-control'},
+                        _.input({type: 'file', name: 'media'})
+                            .change(onChangeFile)
+                    ).submit(onSubmit)
+                ]
+            },
+            buttons: [
+                {
+                    label: 'Cancel',
+                    class: 'btn-default'
+                },
+                {
+                    label: 'Upload',
+                    class: 'btn-primary',
+                    callback: onClickUpload
+                }
+            ]
         });
-
-        $('body').append($uploadModal);
-
-        $uploadModal.modal('show');
     }
     
     /**

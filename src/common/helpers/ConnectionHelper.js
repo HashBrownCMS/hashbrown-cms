@@ -40,7 +40,13 @@ class ConnectionHelper {
             .then((providers) => {
                 providers = providers || {};
 
-                return this.getConnectionById(providers.template);
+                if(providers.template) {
+                    return this.getConnectionById(providers.template);  
+                } else {
+                    return new Promise((resolve, reject) => {
+                        reject(new Error('Template provider is not defined'));
+                    });
+                }
             })
             .then(resolve)
             .catch(reject);
@@ -75,7 +81,13 @@ class ConnectionHelper {
             .then((providers) => {
                 providers = providers || {};
 
-                return this.getConnectionById(providers.media);
+                if(providers.media) {
+                    return this.getConnectionById(providers.media);
+                } else {
+                    return new Promise((resolve, reject) => {
+                        reject(new Error('Media provider is not defined'));
+                    });
+                }
             })
             .then(resolve)
             .catch(reject);

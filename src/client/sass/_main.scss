@@ -175,6 +175,20 @@ img.logo {
     }
 }
 
+// Error modal
+.error-modal {
+    .modal-dialog {
+        .fa-warning {
+            margin-right: 10px;
+        }
+
+        .modal-header {
+            background-color: material-color('red', '600');
+            color: #fff;
+        }
+    }    
+}
+
 // Upload media modal
 .modal-upload-media {
     .modal-body {
@@ -190,7 +204,7 @@ img.logo {
             display: block;
             max-height: 200px;
             max-width: 100%;
-            margin: 0px auto;
+            margin: 0px auto 30px auto;
         }
     }
 }
@@ -318,6 +332,23 @@ img.logo {
 
                 .field-editor {
                     position: relative;
+
+                    >.field-warning {
+                        margin: 0px;
+                        line-height: 30px;
+                        color: #fff;
+                        background-color: material-color('red', '600');
+                        display: inline-block;
+                        height: 30px;
+                        padding: 0px 10px;
+                        border-radius: 2px;
+
+                        &:before {
+                            font-family: 'FontAwesome';
+                            content: '\f071';
+                            margin-right: 5px;
+                        }
+                    }
                 }
 
                 .field-value {

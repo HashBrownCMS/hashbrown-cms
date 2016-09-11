@@ -35303,9 +35303,15 @@ window.messageModal = function messageModal(title, body, onSubmit) {
 window.errorModal = function errorModal(error) {
     if (error instanceof String) {
         error = new Error(error);
+    } else if (error && error instanceof Object) {
+        if (error.responseText) {
+            error = new Error(error.responseText);
+        }
     }
 
-    messageModal('Error', error.message);
+    let modal = messageModal('<span class="fa fa-warning"></span> Error', error.message);
+
+    modal.$element.toggleClass('error-modal', true);
 
     throw error;
 };
@@ -40151,7 +40157,7 @@ class TemplateReferenceEditor extends View {
                     this.trigger('change', this.value);
                 }, 1);
             } else {
-                debug.log('No allowed templates configured', this);
+                this.$element.html(_.span({ class: 'field-warning' }, 'No allowed templates configured'));
             }
         } else {
             this.$element.find('select').val(this.value);
@@ -41140,17 +41146,17 @@ class MediaPane extends Pane {
 
                 reader.onload = function (e) {
                     if (isImage) {
-                        $uploadModal.find('.media-preview').html(_.img({ src: e.target.result }));
+                        uploadModal.$element.find('.media-preview').html(_.img({ src: e.target.result }));
                     }
 
                     if (isVideo) {
-                        $uploadModal.find('.media-preview').html(_.video({ src: e.target.result }));
+                        uploadModal.$element.find('.media-preview').html(_.video({ src: e.target.result }));
                     }
 
-                    $uploadModal.find('.spinner-container').toggleClass('hidden', true);
+                    uploadModal.$element.find('.spinner-container').toggleClass('hidden', true);
                 };
 
-                $uploadModal.find('.spinner-container').toggleClass('hidden', false);
+                uploadModal.$element.find('.spinner-container').toggleClass('hidden', false);
 
                 reader.readAsDataURL(file);
                 debug.log('Reading data of file type ' + file.type + '...', navbar);
@@ -41158,13 +41164,13 @@ class MediaPane extends Pane {
         }
 
         function onClickUpload() {
-            $uploadModal.find('form').submit();
+            uploadModal.$element.find('form').submit();
         }
 
         function onSubmit(e) {
             e.preventDefault();
 
-            $uploadModal.find('.spinner-container').toggleClass('hidden', false);
+            uploadModal.$element.find('.spinner-container').toggleClass('hidden', false);
 
             let apiPath = 'media/' + (replaceId ? replaceId : 'new');
 
@@ -41175,27 +41181,36 @@ class MediaPane extends Pane {
                 processData: false,
                 contentType: false,
                 success: function success(id) {
-                    $uploadModal.find('.spinner-container').toggleClass('hidden', true);
+                    uploadModal.$element.find('.spinner-container').toggleClass('hidden', true);
 
                     reloadResource('media').then(function () {
                         navbar.reload();
                         location.hash = '/media/' + id;
 
-                        $uploadModal.modal('hide');
+                        uploadModal.$element.modal('hide');
                     });
-                }
+                },
+                error: errorModal
             });
+
+            return false;
         }
 
-        let $uploadModal = _.div({ class: 'modal modal-upload-media fade' }, _.div({ class: 'modal-dialog' }, _.div({ class: 'modal-content' }, _.div({ class: 'modal-header' }, _.h4({ class: 'modal-title' }, 'Upload a file')), _.div({ class: 'modal-body' }, _.div({ class: 'spinner-container hidden' }, _.span({ class: 'spinner fa fa-refresh' })), _.div({ class: 'media-preview' })), _.div({ class: 'modal-footer' }, _.div({ class: 'input-group' }, _.form({ class: 'form-control' }, _.input({ type: 'file', name: 'media' }).change(onChangeFile)).submit(onSubmit), _.div({ class: 'input-group-btn' }, _.button({ class: 'btn btn-primary' }, 'Upload').click(onClickUpload)))))));
-
-        $uploadModal.on('hidden.bs.modal', function () {
-            $uploadModal.remove();
+        let uploadModal = new MessageModal({
+            model: {
+                class: 'modal-upload-media',
+                title: 'Upload a file',
+                body: [_.div({ class: 'spinner-container hidden' }, _.span({ class: 'spinner fa fa-refresh' })), _.div({ class: 'media-preview' }), _.form({ class: 'form-control' }, _.input({ type: 'file', name: 'media' }).change(onChangeFile)).submit(onSubmit)]
+            },
+            buttons: [{
+                label: 'Cancel',
+                class: 'btn-default'
+            }, {
+                label: 'Upload',
+                class: 'btn-primary',
+                callback: onClickUpload
+            }]
         });
-
-        $('body').append($uploadModal);
-
-        $uploadModal.modal('show');
     }
 
     /**
@@ -42212,7 +42227,13 @@ class ConnectionHelper {
             SettingsHelper.getSettings('providers').then(providers => {
                 providers = providers || {};
 
-                return this.getConnectionById(providers.template);
+                if (providers.template) {
+                    return this.getConnectionById(providers.template);
+                } else {
+                    return new Promise((resolve, reject) => {
+                        reject(new Error('Template provider is not defined'));
+                    });
+                }
             }).then(resolve).catch(reject);
         });
     }
@@ -42243,7 +42264,13 @@ class ConnectionHelper {
             SettingsHelper.getSettings('providers').then(providers => {
                 providers = providers || {};
 
-                return this.getConnectionById(providers.media);
+                if (providers.media) {
+                    return this.getConnectionById(providers.media);
+                } else {
+                    return new Promise((resolve, reject) => {
+                        reject(new Error('Media provider is not defined'));
+                    });
+                }
             }).then(resolve).catch(reject);
         });
     }

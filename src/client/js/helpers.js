@@ -35,9 +35,16 @@ window.messageModal = function messageModal(title, body, onSubmit) {
 window.errorModal = function errorModal(error) {
     if(error instanceof String) {
         error = new Error(error);
+    
+    } else if (error && error instanceof Object) {
+        if(error.responseText) {
+            error = new Error(error.responseText);
+        }
     }
 
-    messageModal('Error', error.message);
+    let modal = messageModal('<span class="fa fa-warning"></span> Error', error.message);
+
+    modal.$element.toggleClass('error-modal', true);
 
     throw error;
 }

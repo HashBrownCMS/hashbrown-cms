@@ -55,7 +55,7 @@ class TemplateReferenceEditor extends View {
                 }, 1);
             
             } else {
-                debug.log('No allowed templates configured', this);
+                this.$element.html(_.span({class: 'field-warning'}, 'No allowed templates configured'));
 
             }
 
