@@ -29254,15 +29254,56 @@ class ProjectEditor extends View {
      * Event: Click migration button
      */
     onClickMigrate() {
+        let updateOptions = () => {
+            _.append(modal.$element.find('.environment-to').empty(), _.each(this.model.settings.environments.names, (i, environment) => {
+                // Filter out "from" environment
+                if (environment != modal.$element.find('.environment-from').val()) {
+                    return _.option({ value: environment }, environment);
+                }
+            }));
+        };
+
+        let data = {
+            from: '',
+            to: '',
+            settings: {
+                replace: true
+            }
+        };
+
         let modal = new MessageModal({
             model: {
                 class: 'modal-migrate-content',
                 title: 'Migrate content',
-                body: _.div({}, _.select({ class: 'form-control' }, _.each(this.model.settings.environments.names, (i, environment) => {
+                body: [_.div({ class: 'migration-message' }, _.span({ class: 'fa fa-warning' }), _.span('It might be a good idea to make a project backup before you proceed')), _.div({ class: 'migration-operation' }, _.select({ class: 'form-control environment-from' }, _.each(this.model.settings.environments.names, (i, environment) => {
                     return _.option({ value: environment }, environment);
-                })))
-            }
+                })).change(() => {
+                    updateOptions();
+                }), _.span({ class: 'fa fa-arrow-right' }), _.select({ class: 'form-control environment-to' })), _.div({ class: 'migration-settings' }, _.each({
+                    replace: 'Replace content on target'
+                }, (value, label) => {
+                    return _.div({ class: 'input-group' }, _.span(label), _.div({ class: 'input-group-addon' }, _.div({ class: 'switch' }, _.input({
+                        id: 'switch-migration-' + value,
+                        class: 'form-control switch',
+                        type: 'checkbox',
+                        checked: data.settings[value]
+                    }), _.label({ for: 'switch-migration-' + value }))));
+                }))]
+            },
+            buttons: [{
+                label: 'Cancel',
+                class: 'btn-default'
+            }, {
+                label: 'Migrate',
+                class: 'btn-primary',
+                callback: () => {
+
+                    return false;
+                }
+            }]
         });
+
+        updateOptions();
     }
 
     /**

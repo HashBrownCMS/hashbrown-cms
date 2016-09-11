@@ -27,6 +27,52 @@
     }
 }
 
+.modal-migrate-content {
+    .modal-body {
+        padding-top: 0px;
+
+        .migration-message {
+            border-radius: 2px;
+            padding: 10px 15px;
+            background-color: material-color('yellow', '800');
+            margin-bottom: 20px;
+
+            .fa {
+                margin-right: 10px;
+            }
+        }
+
+        .migration-operation {
+            display: flex;
+            flex-wrap: wrap;
+
+            select {
+                width: 40%;
+                flex-grow: 1;
+            }
+
+            .fa {
+                width: 20%;
+                line-height: 34px;
+                text-align: center;
+            }
+        }
+
+        .migration-settings {
+            margin-top: 30px;
+
+            .input-group {
+                width: 50%;
+                margin: 0px auto;
+
+                >span {
+                    line-height: 22px;
+                }
+            }
+        }
+    }
+}
+
 body >.dashboard-container {
     display: flex;
     height: 100%;

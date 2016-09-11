@@ -805,6 +805,33 @@ img.logo {
   right: 15px;
   bottom: 15px; }
 
+.modal-migrate-content .modal-body {
+  padding-top: 0px; }
+  .modal-migrate-content .modal-body .migration-message {
+    border-radius: 2px;
+    padding: 10px 15px;
+    background-color: #f9a825;
+    margin-bottom: 20px; }
+    .modal-migrate-content .modal-body .migration-message .fa {
+      margin-right: 10px; }
+  .modal-migrate-content .modal-body .migration-operation {
+    display: flex;
+    flex-wrap: wrap; }
+    .modal-migrate-content .modal-body .migration-operation select {
+      width: 40%;
+      flex-grow: 1; }
+    .modal-migrate-content .modal-body .migration-operation .fa {
+      width: 20%;
+      line-height: 34px;
+      text-align: center; }
+  .modal-migrate-content .modal-body .migration-settings {
+    margin-top: 30px; }
+    .modal-migrate-content .modal-body .migration-settings .input-group {
+      width: 50%;
+      margin: 0px auto; }
+      .modal-migrate-content .modal-body .migration-settings .input-group > span {
+        line-height: 22px; }
+
 body > .dashboard-container {
   display: flex;
   height: 100%; }
