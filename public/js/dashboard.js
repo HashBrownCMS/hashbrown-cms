@@ -29033,6 +29033,8 @@ class ProjectEditor extends View {
             if (numFiles > 0) {
                 let file = this.files[0];
 
+                console.log(file);
+
                 debug.log('Reading data of file type ' + file.type + '...', view);
             }
         }
@@ -29114,10 +29116,17 @@ class ProjectEditor extends View {
      */
     onClickRestoreBackup(timestamp) {
         if (this.isAdmin()) {
+            let label = '"' + timestamp + '"';
+            let date = new Date(parseInt(timestamp));
+
+            if (!isNaN(date.getTime())) {
+                label = date.toString();
+            }
+
             let modal = new MessageModal({
                 model: {
                     title: 'Restore backup',
-                    body: 'Are you sure you want to restore the backup ' + new Date(parseInt(timestamp)) + '? Current content will be replaced.'
+                    body: 'Are you sure you want to restore the backup ' + label + '? Current content will be replaced.'
                 },
                 buttons: [{
                     label: 'Cancel',
@@ -29130,7 +29139,7 @@ class ProjectEditor extends View {
                             new MessageModal({
                                 model: {
                                     title: 'Success',
-                                    body: 'Project "' + this.model.name + '" was restored successfully to ' + new Date(parseInt(timestamp))
+                                    body: 'Project "' + this.model.name + '" was restored successfully to ' + label
                                 },
                                 buttons: [{
                                     callback: () => {
@@ -29152,10 +29161,17 @@ class ProjectEditor extends View {
      */
     onClickDeleteBackup(timestamp) {
         if (this.isAdmin()) {
+            let label = backup;
+            let date = new Date(parseInt(backup));
+
+            if (!isNaN(date.getTime())) {
+                label = date.toString();
+            }
+
             let modal = new MessageModal({
                 model: {
                     title: 'Delete backup',
-                    body: 'Are you sure you want to delete the backup ' + new Date(parseInt(timestamp)) + '?'
+                    body: 'Are you sure you want to delete the backup ' + label + '?'
                 },
                 buttons: [{
                     label: 'Cancel',
@@ -29185,9 +29201,14 @@ class ProjectEditor extends View {
                     body: _.div({},
                     // List existing backups
                     _.if(this.model.backups.length > 0, _.each(this.model.backups, (i, backup) => {
+                        let label = backup;
                         let date = new Date(parseInt(backup));
 
-                        return _.div({ class: 'project-backup' }, _.p({ class: 'project-backup-name' }, date.toString()), _.div({ class: 'dropdown' }, _.button({ class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, _.span({ class: 'fa fa-ellipsis-v' })), _.ul({ class: 'dropdown-menu' }, _.li(
+                        if (!isNaN(date.getTime())) {
+                            label = date.toString();
+                        }
+
+                        return _.div({ class: 'project-backup' }, _.p({ class: 'project-backup-name' }, label), _.div({ class: 'dropdown' }, _.button({ class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, _.span({ class: 'fa fa-ellipsis-v' })), _.ul({ class: 'dropdown-menu' }, _.li(
                         // Restore backup
                         _.a({ href: '#', class: 'dropdown-item' }, 'Restore').click(e => {
                             e.preventDefault();this.onClickRestoreBackup(backup);

@@ -54,8 +54,6 @@ class ServerController extends ApiController {
     static getBackup(req, res) {
         BackupHelper.getBackupPath(req.params.project, req.params.timestamp)
         .then((path) => {
-            res.setHeader('Content-Type', 'application/hba');
-
             res.status(200).sendFile(path);
         })
         .catch((e) => {

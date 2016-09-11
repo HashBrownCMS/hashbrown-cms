@@ -79,6 +79,9 @@ button, a {
         border: 1px solid material-color('grey', '100');
         border-radius: 2px;
         color: material-color('grey', '800');
+        left: auto;
+        right: 0px;
+        min-width: auto;
 
         >li {
             &.active {
