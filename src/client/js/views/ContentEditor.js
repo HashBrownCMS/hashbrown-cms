@@ -394,14 +394,14 @@ class ContentEditor extends View {
                 // Unpublish
                 _.if(this.publishingSettings.connections && this.publishingSettings.connections.length > 0 && !this.model.unpublished,
                     this.$unpublishBtn = _.button({class: 'btn btn-primary btn-raised btn-save'},
-                        _.span({class: 'text-default'}, 'Unthis.publish'),
-                        _.span({class: 'text-working'}, 'Unthis.publishing')
+                        _.span({class: 'text-default'}, 'Unpublish'),
+                        _.span({class: 'text-working'}, 'Unpublishing')
                     ).click(() => { this.onClickUnthis.publish(this.publishing); })
                 ),
 
                 // Save & this.publish
                 this.$saveBtn = _.button({class: 'btn btn-success btn-raised btn-save'},
-                    _.span({class: 'text-default'}, 'Save' + (this.publishingSettings.connections && this.publishingSettings.connections.length > 0 ? ' & this.publish' : '')),
+                    _.span({class: 'text-default'}, 'Save' + (this.publishingSettings.connections && this.publishingSettings.connections.length > 0 ? ' & publish' : '')),
                     _.span({class: 'text-working'}, 'Saving')
                 ).click(() => { this.onClickSave(this.publishingSettings); })
             )
