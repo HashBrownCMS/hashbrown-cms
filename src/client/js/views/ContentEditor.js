@@ -35,7 +35,7 @@ class ContentEditor extends View {
         
             reloadResource('content')
             .then(function() {
-                view.render();
+                view.renderButtons();
             });
         }
 
@@ -170,7 +170,7 @@ class ContentEditor extends View {
      * Reload this view
      */
     reload() {
-        this.fetch();
+        this.renderButtons();
     }
 
     /**
@@ -370,6 +370,40 @@ class ContentEditor extends View {
                     this.renderFields('meta', schema.fields, content),
                     this.renderFields('meta', schema.fields.properties, content.properties)
                 )
+            ),
+            _.div({class: 'editor-footer'})
+        );
+    }
+
+    /**
+     * Renders the action buttons
+     */
+    renderButtons() {
+        _.append($('.editor-footer').empty(), 
+            _.div({class: 'btn-group'},
+                // JSON editor
+                _.button({class: 'btn btn-embedded'},
+                    'Advanced'
+                ).click(() => { this.onClickAdvanced(); }),
+
+                // Delete
+                _.button({class: 'btn btn-danger btn-raised'},
+                    'Delete'
+                ).click(() => { this.onClickDelete(this.publishingSettings); }),
+
+                // Unthis.publish
+                _.if(this.publishingSettings.connections && this.publishingSettings.connections.length > 0 && !this.model.unthis.published,
+                    this.$unpublishBtn = _.button({class: 'btn btn-primary btn-raised btn-save'},
+                        _.span({class: 'text-default'}, 'Unthis.publish'),
+                        _.span({class: 'text-working'}, 'Unthis.publishing')
+                    ).click(() => { this.onClickUnthis.publish(this.publishing); })
+                ),
+
+                // Save & this.publish
+                this.$saveBtn = _.button({class: 'btn btn-success btn-raised btn-save'},
+                    _.span({class: 'text-default'}, 'Save' + (this.publishingSettings.connections && this.publishingSettings.connections.length > 0 ? ' & this.publish' : '')),
+                    _.span({class: 'text-working'}, 'Saving')
+                ).click(() => { this.onClickSave(this.publishingSettings); })
             )
         );
     }
@@ -393,45 +427,15 @@ class ContentEditor extends View {
             return this.model.getSettings('publishing');
         })
         .then((settings) => {
-            publishingSettings = settings;
+            this.publishingSettings = settings;
 
             this.$element.html(
                 // Render editor
                 this.renderEditor(this.model, contentSchema)
-
-                // Render buttons 
-                .append(
-                    _.div({class: 'editor-footer'}, 
-                        _.div({class: 'btn-group'},
-
-                            // JSON editor
-                            _.button({class: 'btn btn-embedded'},
-                                'Advanced'
-                            ).click(() => { this.onClickAdvanced(); }),
-
-                            // Delete
-                            _.button({class: 'btn btn-danger btn-raised'},
-                                'Delete'
-                            ).click(() => { this.onClickDelete(publishingSettings); }),
-
-                            // Unpublish
-                            _.if(publishingSettings.connections && publishingSettings.connections.length > 0 && !this.model.unpublished,
-                                this.$unpublishBtn = _.button({class: 'btn btn-primary btn-raised btn-save'},
-                                    _.span({class: 'text-default'}, 'Unpublish'),
-                                    _.span({class: 'text-working'}, 'Unpublishing')
-                                ).click(() => { this.onClickUnpublish(publishing); })
-                            ),
-
-                            // Save & publish
-                            this.$saveBtn = _.button({class: 'btn btn-success btn-raised btn-save'},
-                                _.span({class: 'text-default'}, 'Save' + (publishingSettings.connections && publishingSettings.connections.length > 0 ? ' & publish' : '')),
-                                _.span({class: 'text-working'}, 'Saving')
-                            ).click(() => { this.onClickSave(publishingSettings); })
-                        )
-                    )
-                )
             );
-            
+           
+            this.renderButtons();
+
             this.onFieldEditorsReady();
         })
         .catch((e) => {
