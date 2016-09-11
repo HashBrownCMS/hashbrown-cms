@@ -35263,7 +35263,7 @@ onReady('resources', function () {
     Router.init();
 });
 
-},{"../../../package.json":157,"./helpers":163,"./helpers/ConnectionHelper":164,"./helpers/ContentHelper":165,"./helpers/LanguageHelper":166,"./helpers/MediaHelper":167,"./helpers/SchemaHelper":169,"./helpers/SettingsHelper":170,"./models/Content":172,"./routes/index":177,"./views/ConnectionEditor":182,"./views/ContentEditor":183,"./views/FormEditor":184,"./views/JSONEditor":185,"./views/LanguageSettings":186,"./views/MainMenu":187,"./views/MediaViewer":188,"./views/SchemaEditor":190,"./views/UserEditor":191,"./views/editors":207,"./views/navbar/NavbarMain":213}],163:[function(require,module,exports){
+},{"../../../package.json":157,"./helpers":163,"./helpers/ConnectionHelper":164,"./helpers/ContentHelper":165,"./helpers/LanguageHelper":166,"./helpers/MediaHelper":167,"./helpers/SchemaHelper":169,"./helpers/SettingsHelper":170,"./models/Content":172,"./routes/index":177,"./views/ConnectionEditor":182,"./views/ContentEditor":183,"./views/FormEditor":184,"./views/JSONEditor":185,"./views/LanguageSettings":186,"./views/MainMenu":187,"./views/MediaViewer":188,"./views/SchemaEditor":190,"./views/UserEditor":191,"./views/editors":208,"./views/navbar/NavbarMain":214}],163:[function(require,module,exports){
 'use strict';
 
 // Libraries
@@ -35422,7 +35422,7 @@ window.apiCall = function apiCall(method, url, data) {
     });
 };
 
-},{"../../common/helpers/DebugHelper":220,"./helpers/ProjectHelper":168,"./views/MessageModal":189,"bluebird":17,"exomon":92}],164:[function(require,module,exports){
+},{"../../common/helpers/DebugHelper":221,"./helpers/ProjectHelper":168,"./views/MessageModal":189,"bluebird":17,"exomon":92}],164:[function(require,module,exports){
 'use strict';
 
 let ConnectionHelperCommon = require('../../../common/helpers/ConnectionHelper');
@@ -35466,7 +35466,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
 
 module.exports = ConnectionHelper;
 
-},{"../../../common/helpers/ConnectionHelper":218,"../../../common/models/Connection":225}],165:[function(require,module,exports){
+},{"../../../common/helpers/ConnectionHelper":219,"../../../common/models/Connection":226}],165:[function(require,module,exports){
 'use strict';
 
 let ContentHelperCommon = require('../../../common/helpers/ContentHelper');
@@ -35538,7 +35538,7 @@ class ContentHelper extends ContentHelperCommon {
 
 module.exports = ContentHelper;
 
-},{"../../../common/helpers/ContentHelper":219,"../models/Content":172}],166:[function(require,module,exports){
+},{"../../../common/helpers/ContentHelper":220,"../models/Content":172}],166:[function(require,module,exports){
 'use strict';
 
 let LanguageHelperCommon = require('../../../common/helpers/LanguageHelper');
@@ -35547,7 +35547,7 @@ class LanguageHelper extends LanguageHelperCommon {}
 
 module.exports = LanguageHelper;
 
-},{"../../../common/helpers/LanguageHelper":221}],167:[function(require,module,exports){
+},{"../../../common/helpers/LanguageHelper":222}],167:[function(require,module,exports){
 'use strict';
 
 let MediaHelperCommon = require('../../../common/helpers/MediaHelper');
@@ -35622,7 +35622,7 @@ class MediaHelper extends MediaHelperCommon {
 
 module.exports = MediaHelper;
 
-},{"../../../common/helpers/MediaHelper":222}],168:[function(require,module,exports){
+},{"../../../common/helpers/MediaHelper":223}],168:[function(require,module,exports){
 'use strict';
 
 /**
@@ -35690,7 +35690,7 @@ class SchemaHelper extends SchemaHelperCommon {
 
 module.exports = SchemaHelper;
 
-},{"../../../common/helpers/SchemaHelper":223}],170:[function(require,module,exports){
+},{"../../../common/helpers/SchemaHelper":224}],170:[function(require,module,exports){
 'use strict';
 
 let SettingsHelperCommon = require('../../../common/helpers/SettingsHelper');
@@ -35722,7 +35722,7 @@ class SettingsHelper extends SettingsHelperCommon {
 
 module.exports = SettingsHelper;
 
-},{"../../../common/helpers/SettingsHelper":224}],171:[function(require,module,exports){
+},{"../../../common/helpers/SettingsHelper":225}],171:[function(require,module,exports){
 module.exports={
     "icons": [    
         "500px",
@@ -36434,7 +36434,7 @@ class Content extends ContentCommon {}
 
 module.exports = Content;
 
-},{"../../../common/models/Content":226}],173:[function(require,module,exports){
+},{"../../../common/models/Content":227}],173:[function(require,module,exports){
 'use strict';
 
 // Root
@@ -39442,7 +39442,11 @@ class MediaReferenceEditor extends View {
     constructor(params) {
         super(params);
 
-        this.$element = _.div({ class: 'field-editor media-reference-editor' }, [this.$body = _.div({ class: 'thumbnail raised' }), this.$footer = _.div()]);
+        this.$element = _.div({ class: 'field-editor media-reference-editor' }, this.$body = _.button({ class: 'thumbnail raised' }).click(() => {
+            this.onClickBrowse();
+        }), _.button({ class: 'btn btn-remove' }, _.span({ class: 'fa fa-remove' })).click(e => {
+            e.stopPropagation();e.preventDefault();this.onClickRemove();
+        }));
 
         this.init();
     }
@@ -39454,6 +39458,15 @@ class MediaReferenceEditor extends View {
         this.trigger('change', this.value);
 
         this.render();
+    }
+
+    /**
+     * Event: Click remove
+     */
+    onClickRemove() {
+        this.value = null;
+
+        this.onChange();
     }
 
     /**
@@ -39517,12 +39530,12 @@ class MediaReferenceEditor extends View {
 
             if (mediaObject) {
                 this.$body.attr('style', 'background-image: url(\'/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + this.value + '\')').html(_.label(mediaObject.name));
+            } else {
+                this.$body.removeAttr('style').empty();
             }
+        } else {
+            this.$body.removeAttr('style').empty();
         }
-
-        this.$footer.html(this.$button = _.button({ class: 'btn btn-primary' }, 'Browse').click(() => {
-            this.onClickBrowse();
-        }));
     }
 }
 
@@ -39961,6 +39974,131 @@ module.exports = StructEditor;
 'use strict';
 
 /**
+ * A CSV string editor
+ */
+
+class TagsEditor extends View {
+    constructor(params) {
+        super(params);
+
+        this.init();
+    }
+
+    /**
+     * Event: Change
+     */
+    onChange() {
+        this.trigger('change', this.value);
+
+        this.cleanUpTags();
+
+        this.renderTags();
+    }
+
+    /**
+     * Event: Click add tag
+     */
+    onClickAdd() {
+        let tags = (this.value || '').split(',');
+
+        tags.push('new tag');
+
+        this.value = tags.join(',');
+
+        this.onChange();
+    }
+
+    /**
+     * Event: Click remove tag
+     *
+     * @param {String} tag
+     */
+    onClickRemove(tag) {
+        let tags = (this.value || '').split(',');
+
+        for (let i = tags.length - 1; i >= 0; i--) {
+            if (tags[i] == tag) {
+                tags.splice(i, 1);
+                break;
+            }
+        }
+
+        this.value = tags.join(',');
+
+        this.onChange();
+    }
+
+    /**
+     * Event: On change tag
+     *
+     * @param {String} oldTag
+     * @param {String} newTag
+     */
+    onChangeTag(oldTag, newTag) {
+        let tags = (this.value || '').split(',');
+
+        for (let i in tags) {
+            if (tags[i] == oldTag) {
+                tags[i] = newTag;
+                break;
+            }
+        }
+
+        this.value = tags.join(',');
+
+        this.onChange();
+    }
+
+    /**
+     * Cleans up tags
+     */
+    cleanUpTags() {
+        let tags = (this.value || '').split(',');
+
+        for (let i = tags.length - 1; i >= 0; i--) {
+            if (!tags[i]) {
+                tags.splice(i, 1);
+            }
+        }
+
+        this.value = tags.join(',');
+    }
+
+    /**
+     * Renders all tags
+     */
+    renderTags() {
+        _.append(this.$tags.empty(), _.each((this.value || '').split(','), (i, tag) => {
+            if (tag) {
+                let $input;
+
+                return _.div({ class: 'chip' }, $input = _.input({ type: 'text', class: 'chip-label', value: tag }).change(() => {
+                    this.onChangeTag(tag, $input.val());
+                }), _.button({ class: 'btn chip-remove' }, _.span({ class: 'fa fa-remove' })).click(() => {
+                    this.onClickRemove(tag);
+                }));
+            }
+        }), _.button({ class: 'btn chip-add' }, _.span({ class: 'fa fa-plus' })).click(() => {
+            this.onClickAdd();
+        }));
+    }
+
+    render() {
+        var editor = this;
+
+        // Main element
+        this.$element = _.div({ class: 'field-editor tags-editor' }, _.if(this.disabled, _.p(this.value || '(none)')), _.if(!this.disabled, this.$tags = _.div({ class: 'tags chip-group' })));
+
+        this.renderTags();
+    }
+}
+
+module.exports = TagsEditor;
+
+},{}],206:[function(require,module,exports){
+'use strict';
+
+/**
  * An editor for referencing templates
  */
 
@@ -40023,7 +40161,7 @@ class TemplateReferenceEditor extends View {
 
 module.exports = TemplateReferenceEditor;
 
-},{}],206:[function(require,module,exports){
+},{}],207:[function(require,module,exports){
 'use strict';
 
 /**
@@ -40207,7 +40345,7 @@ class UrlEditor extends View {
 
 module.exports = UrlEditor;
 
-},{}],207:[function(require,module,exports){
+},{}],208:[function(require,module,exports){
 'use strict';
 
 window.resources.editors = {
@@ -40224,11 +40362,12 @@ window.resources.editors = {
     richText: require('./RichTextEditor'),
     string: require('./StringEditor'),
     struct: require('./StructEditor'),
+    tags: require('./TagsEditor'),
     templateReference: require('./TemplateReferenceEditor'),
     url: require('./UrlEditor')
 };
 
-},{"./ArrayEditor":192,"./BooleanEditor":193,"./ContentReferenceEditor":194,"./ContentSchemaReferenceEditor":195,"./DateEditor":196,"./DropdownEditor":197,"./LanguageEditor":198,"./MediaReferenceEditor":199,"./PeriodEditor":200,"./ResourceReferenceEditor":201,"./RichTextEditor":202,"./StringEditor":203,"./StructEditor":204,"./TemplateReferenceEditor":205,"./UrlEditor":206}],208:[function(require,module,exports){
+},{"./ArrayEditor":192,"./BooleanEditor":193,"./ContentReferenceEditor":194,"./ContentSchemaReferenceEditor":195,"./DateEditor":196,"./DropdownEditor":197,"./LanguageEditor":198,"./MediaReferenceEditor":199,"./PeriodEditor":200,"./ResourceReferenceEditor":201,"./RichTextEditor":202,"./StringEditor":203,"./StructEditor":204,"./TagsEditor":205,"./TemplateReferenceEditor":206,"./UrlEditor":207}],209:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -40258,7 +40397,7 @@ class CMSPane extends Pane {
 
 module.exports = CMSPane;
 
-},{"./Pane":214}],209:[function(require,module,exports){
+},{"./Pane":215}],210:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -40401,7 +40540,7 @@ class ConnectionPane extends Pane {
 
 module.exports = ConnectionPane;
 
-},{"./Pane":214}],210:[function(require,module,exports){
+},{"./Pane":215}],211:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -40786,7 +40925,7 @@ class ContentPane extends Pane {
 
 module.exports = ContentPane;
 
-},{"./Pane":214}],211:[function(require,module,exports){
+},{"./Pane":215}],212:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -40854,7 +40993,7 @@ class FormsPane extends Pane {
 
 module.exports = FormsPane;
 
-},{"./Pane":214}],212:[function(require,module,exports){
+},{"./Pane":215}],213:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -41155,7 +41294,7 @@ class MediaPane extends Pane {
 
 module.exports = MediaPane;
 
-},{"./Pane":214}],213:[function(require,module,exports){
+},{"./Pane":215}],214:[function(require,module,exports){
 'use strict';
 
 // Views
@@ -41575,7 +41714,7 @@ class NavbarMain extends View {
 
 module.exports = NavbarMain;
 
-},{"../../../../common/models/Content":226,"../MessageModal":189,"./CMSPane":208,"./ConnectionPane":209,"./ContentPane":210,"./FormsPane":211,"./MediaPane":212,"./SchemaPane":215,"./UserPane":216}],214:[function(require,module,exports){
+},{"../../../../common/models/Content":227,"../MessageModal":189,"./CMSPane":209,"./ConnectionPane":210,"./ContentPane":211,"./FormsPane":212,"./MediaPane":213,"./SchemaPane":216,"./UserPane":217}],215:[function(require,module,exports){
 'use strict';
 
 class Pane {
@@ -41591,7 +41730,7 @@ class Pane {
 
 module.exports = Pane;
 
-},{}],215:[function(require,module,exports){
+},{}],216:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -41710,7 +41849,7 @@ class SchemaPane extends Pane {
 
 module.exports = SchemaPane;
 
-},{"./Pane":214}],216:[function(require,module,exports){
+},{"./Pane":215}],217:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -41843,7 +41982,7 @@ class UserPane extends Pane {
 
 module.exports = UserPane;
 
-},{"./Pane":214}],217:[function(require,module,exports){
+},{"./Pane":215}],218:[function(require,module,exports){
 module.exports=[
     "aa",
     "ab",
@@ -42032,7 +42171,7 @@ module.exports=[
     "zu"
 ]
 
-},{}],218:[function(require,module,exports){
+},{}],219:[function(require,module,exports){
 'use strict';
 
 class ConnectionHelper {
@@ -42112,7 +42251,7 @@ class ConnectionHelper {
 
 module.exports = ConnectionHelper;
 
-},{}],219:[function(require,module,exports){
+},{}],220:[function(require,module,exports){
 'use strict';
 
 class ContentHelper {
@@ -42219,7 +42358,7 @@ class ContentHelper {
 
 module.exports = ContentHelper;
 
-},{}],220:[function(require,module,exports){
+},{}],221:[function(require,module,exports){
 'use strict';
 
 let lastSenderName = '';
@@ -42329,7 +42468,7 @@ class DebugHelper {
 
 module.exports = DebugHelper;
 
-},{}],221:[function(require,module,exports){
+},{}],222:[function(require,module,exports){
 'use strict';
 
 class LanguageHelper {
@@ -42421,7 +42560,7 @@ class LanguageHelper {
 
 module.exports = LanguageHelper;
 
-},{"../data/languages.json":217}],222:[function(require,module,exports){
+},{"../data/languages.json":218}],223:[function(require,module,exports){
 'use strict';
 
 // Models
@@ -42483,7 +42622,7 @@ class MediaHelper {
 
 module.exports = MediaHelper;
 
-},{"../models/Media":230}],223:[function(require,module,exports){
+},{"../models/Media":231}],224:[function(require,module,exports){
 'use strict';
 
 // Models
@@ -42528,7 +42667,7 @@ class SchemaHelper {
 
 module.exports = SchemaHelper;
 
-},{"../models/ContentSchema":227,"../models/FieldSchema":229}],224:[function(require,module,exports){
+},{"../models/ContentSchema":228,"../models/FieldSchema":230}],225:[function(require,module,exports){
 'use strict';
 
 class SettingsHelper {
@@ -42562,7 +42701,7 @@ class SettingsHelper {
 
 module.exports = SettingsHelper;
 
-},{}],225:[function(require,module,exports){
+},{}],226:[function(require,module,exports){
 'use strict';
 
 let Entity = require('./Entity');
@@ -42789,7 +42928,7 @@ class Connection extends Entity {
 
 module.exports = Connection;
 
-},{"./Entity":228}],226:[function(require,module,exports){
+},{"./Entity":229}],227:[function(require,module,exports){
 'use strict';
 
 let Entity = require('./Entity');
@@ -43086,7 +43225,7 @@ class Content extends Entity {
 
 module.exports = Content;
 
-},{"./Entity":228}],227:[function(require,module,exports){
+},{"./Entity":229}],228:[function(require,module,exports){
 'use strict';
 
 let Schema = require('./Schema');
@@ -43110,7 +43249,7 @@ class ContentSchema extends Schema {
 
 module.exports = ContentSchema;
 
-},{"./Schema":231}],228:[function(require,module,exports){
+},{"./Schema":232}],229:[function(require,module,exports){
 'use strict';
 
 let crypto = require('crypto');
@@ -43267,7 +43406,7 @@ class Entity {
 
 module.exports = Entity;
 
-},{"crypto":56}],229:[function(require,module,exports){
+},{"crypto":56}],230:[function(require,module,exports){
 'use strict';
 
 let Schema = require('./Schema');
@@ -43289,7 +43428,7 @@ class FieldSchema extends Schema {
 
 module.exports = FieldSchema;
 
-},{"./Schema":231}],230:[function(require,module,exports){
+},{"./Schema":232}],231:[function(require,module,exports){
 'use strict';
 
 // Libs
@@ -43394,7 +43533,7 @@ class Media extends Entity {
 
 module.exports = Media;
 
-},{"./Entity":228,"path":115}],231:[function(require,module,exports){
+},{"./Entity":229,"path":115}],232:[function(require,module,exports){
 'use strict';
 
 let Entity = require('./Entity');
@@ -43430,7 +43569,7 @@ class Schema extends Entity {
 
 module.exports = Schema;
 
-},{"./Entity":228}]},{},[162,158,160])
+},{"./Entity":229}]},{},[162,158,160])
 
 
 //# sourceMappingURL=maps/client.js.map

@@ -7,10 +7,13 @@ class MediaReferenceEditor extends View {
     constructor(params) {
         super(params);
 
-        this.$element = _.div({class: 'field-editor media-reference-editor'}, [
-            this.$body = _.div({class: 'thumbnail raised'}),
-            this.$footer = _.div()
-        ]);
+        this.$element = _.div({class: 'field-editor media-reference-editor'},
+            this.$body = _.button({class: 'thumbnail raised'})
+                .click(() => { this.onClickBrowse(); }),
+            _.button({class: 'btn btn-remove'},
+                _.span({class: 'fa fa-remove'})
+            ).click((e) => { e.stopPropagation(); e.preventDefault(); this.onClickRemove(); })
+        );
 
         this.init();
     }
@@ -22,6 +25,15 @@ class MediaReferenceEditor extends View {
         this.trigger('change', this.value);
 
         this.render();
+    }
+
+    /**
+     * Event: Click remove
+     */
+    onClickRemove() {
+        this.value = null;
+
+        this.onChange();
     }
 
     /**
@@ -111,14 +123,16 @@ class MediaReferenceEditor extends View {
                     .html(
                         _.label(mediaObject.name)
                     );
+            } else {
+                this.$body
+                    .removeAttr('style')
+                    .empty();
             }
+        } else {
+            this.$body
+                .removeAttr('style')
+                .empty();
         }
-
-        this.$footer.html(
-            this.$button = _.button({class: 'btn btn-primary'},
-                'Browse'
-            ).click(() => { this.onClickBrowse(); })
-        );
     }
 }
 

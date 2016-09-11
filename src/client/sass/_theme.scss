@@ -566,6 +566,17 @@ select.form-control {
         border: 0px;
         color: material-color('blue', '600');
     }
+    
+    &.btn-remove {
+        background-color: transparent;
+        border: 0px;
+        color: material-color('red', '500');
+        position: absolute;
+        top: 0px;
+        right: 0px;
+        padding: 6px;
+    }
+
 }
 
 // Button group

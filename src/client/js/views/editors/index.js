@@ -12,6 +12,7 @@ window.resources.editors = {
     richText: require('./RichTextEditor'),
     string: require('./StringEditor'),
     struct: require('./StructEditor'),
+    tags: require('./TagsEditor'),
     templateReference: require('./TemplateReferenceEditor'),
     url: require('./UrlEditor')
 };
