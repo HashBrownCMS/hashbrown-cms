@@ -9,7 +9,7 @@ Dependencies:
 - node.js v4  
 - mongodb v3.2  
 
-Commands:
+Commands:  
 ```
 git clone https://github.com/Putaitu/hashbrown-cms.git
 cd ./hashbrown-cms
