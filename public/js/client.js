@@ -37258,8 +37258,8 @@ class ContentEditor extends View {
             this.onClickDelete(this.publishingSettings);
         }),
 
-        // Unthis.publish
-        _.if(this.publishingSettings.connections && this.publishingSettings.connections.length > 0 && !this.model.unthis.published, this.$unpublishBtn = _.button({ class: 'btn btn-primary btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Unthis.publish'), _.span({ class: 'text-working' }, 'Unthis.publishing')).click(() => {
+        // Unpublish
+        _.if(this.publishingSettings.connections && this.publishingSettings.connections.length > 0 && !this.model.unpublished, this.$unpublishBtn = _.button({ class: 'btn btn-primary btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Unthis.publish'), _.span({ class: 'text-working' }, 'Unthis.publishing')).click(() => {
             this.onClickUnthis.publish(this.publishing);
         })),
 

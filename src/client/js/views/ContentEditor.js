@@ -391,8 +391,8 @@ class ContentEditor extends View {
                     'Delete'
                 ).click(() => { this.onClickDelete(this.publishingSettings); }),
 
-                // Unthis.publish
-                _.if(this.publishingSettings.connections && this.publishingSettings.connections.length > 0 && !this.model.unthis.published,
+                // Unpublish
+                _.if(this.publishingSettings.connections && this.publishingSettings.connections.length > 0 && !this.model.unpublished,
                     this.$unpublishBtn = _.button({class: 'btn btn-primary btn-raised btn-save'},
                         _.span({class: 'text-default'}, 'Unthis.publish'),
                         _.span({class: 'text-working'}, 'Unthis.publishing')
