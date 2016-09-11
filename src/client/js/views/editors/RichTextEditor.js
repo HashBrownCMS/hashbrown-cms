@@ -60,9 +60,11 @@ class RichTextEditor extends View {
     }
     
     /**
-     * Event: Click header
+     * Event: Change heading
      */
-    onClickHeader(num) {
+    onChangeHeading() {
+        let num = parseInt(this.$element.find('.panel-heading select').val());
+
         document.execCommand('formatBlock', false, '<' + num + '>');
 
         this.updateTextArea();
@@ -189,30 +191,17 @@ class RichTextEditor extends View {
     }
 
     render() {
-        var editor = this;
+        let editor = this;
 
         // Main element
         this.$element = _.div({class: 'field-editor rich-text-editor panel panel-default'}, [
             // Toolbar
             _.div({class: 'panel-heading'}, 
-                _.div({class: 'dropdown'},
-                    _.button({class: 'btn btn-primary dropdown-toggle', 'data-toggle': 'dropdown'},
-                        _.span({class: 'fa fa-header'})
-                    ),
-                    _.ul({class: 'dropdown-menu'},
-                        _.each([1, 2, 3, 4, 5, 6], (i, num) => {
-                            return _.li(
-                                _.a({href: '#'},
-                                    'H' + num
-                                ).click(function(e) {
-                                    e.preventDefault();
-                                        
-                                    editor.onClickHeader(num);
-                                })
-                            );
-                        })
-                    )
-                ),
+                _.select({class: 'form-control btn btn-primary'},
+                    _.each([1, 2, 3, 4, 5, 6], (i, num) => {
+                        return _.option({value: 'h' + num}, 'H' + num);
+                    })
+                ).change((e) => { this.onChangeHeading(); }),
                 _.button({class: 'btn btn-primary'}, 
                     _.span({class: 'fa fa-bold'})
                 ).click(() => { this.onClickBold(); }),

@@ -5,7 +5,9 @@
         background-color: material-color('blue', '600');
         padding: 5px;
 
-        .btn, .dropdown {
+        select, .btn, .dropdown {
+            line-height: 1em;
+            height: 26px;
             min-width: 0px;
             display: inline-block;
             color: #fff;

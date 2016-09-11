@@ -451,6 +451,33 @@ button, a {
     }
 }
 
+select.form-control {
+    &, &:active, &:focus, &[readonly] {
+        border-bottom: 0px;
+        background-color: material-color('blue', '600');
+        color: #fff;
+        cursor: pointer;
+        width: auto;
+        padding: 0px 30px 0px 10px;
+        border-radius: 2px;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-image: url('/svg/fa/angle-down.svg');
+        background-size: auto 20px;
+        background-repeat: no-repeat;
+        background-position: top 50% right 10px;
+
+        option {
+            cursor: pointer;
+
+            &:hover {
+                background-color: material-color('blue', '400');
+            }
+        }
+    }
+}
+
 .input-group {
     .input-group-addon {
         background-color: transparent;

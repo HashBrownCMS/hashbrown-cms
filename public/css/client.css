@@ -301,6 +301,26 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
   cursor: pointer;
   border-radius: 2px; }
 
+select.form-control, select.form-control:active, select.form-control:focus, select.form-control[readonly] {
+  border-bottom: 0px;
+  background-color: #1e88e5;
+  color: #fff;
+  cursor: pointer;
+  width: auto;
+  padding: 0px 30px 0px 10px;
+  border-radius: 2px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("/svg/fa/angle-down.svg");
+  background-size: auto 20px;
+  background-repeat: no-repeat;
+  background-position: top 50% right 10px; }
+  select.form-control option, select.form-control:active option, select.form-control:focus option, select.form-control[readonly] option {
+    cursor: pointer; }
+    select.form-control option:hover, select.form-control:active option:hover, select.form-control:focus option:hover, select.form-control[readonly] option:hover {
+      background-color: #42a5f5; }
+
 .input-group .input-group-addon {
   background-color: transparent;
   border-radius: 0px;
@@ -1021,7 +1041,9 @@ body > .dashboard-container {
   .rich-text-editor .panel-heading {
     background-color: #1e88e5;
     padding: 5px; }
-    .rich-text-editor .panel-heading .btn, .rich-text-editor .panel-heading .dropdown {
+    .rich-text-editor .panel-heading select, .rich-text-editor .panel-heading .btn, .rich-text-editor .panel-heading .dropdown {
+      line-height: 1em;
+      height: 26px;
       min-width: 0px;
       display: inline-block;
       color: #fff; }
