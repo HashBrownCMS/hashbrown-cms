@@ -178,8 +178,14 @@ app.get('/login/', function(req, res) {
 // Dashboard
 app.get('/', function(req, res) {
     ApiController.authenticate(req.cookies.token)
-    .then(() => {
-        return UpdateHelper.check();
+    .then((user) => {
+        if(user.isAdmin) {
+            return UpdateHelper.check();
+        } else {
+            return new Promise((resolve) => {
+                resolve({});
+            });
+        }
     })
     .then((update) => {
         res.render('dashboard', {
