@@ -99,7 +99,7 @@ $('.btn-create-project').click(() => {
 $('.btn-update-hashbrown').click(() => {
     apiCall('post', 'server/update/start')
     .then(() => {
-        messageModal('Success', 'HashBrown was updated successfully');
+        messageModal('Success', 'HashBrown was updated successfully', () => { location.reload(); });
     })
     .catch(errorModal);
 });

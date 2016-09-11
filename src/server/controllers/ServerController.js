@@ -52,7 +52,7 @@ class ServerController extends ApiController {
         .then(() => {
             res.status(200).send('OK');
 
-            //AppHelper.restart();
+            process.exit(1);
         })
         .catch((e) => {
             res.status(502).send(e.message);  
