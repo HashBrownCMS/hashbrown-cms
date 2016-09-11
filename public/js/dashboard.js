@@ -28661,13 +28661,13 @@ apiCall('get', 'server/projects').then(projects => {
 }).catch(errorModal);
 
 // Set navbar button events
-$('.navbar-main a').click(function () {
+$('.navbar-main a').click(() => {
     $('.navbar-main a').removeClass('active');
-    $(this).addClass('active');
+    $(undefined).addClass('active');
 });
 
 // Set create new project event
-$('.btn-create-project').click(function () {
+$('.btn-create-project').click(() => {
     function onClickCreate() {
         let project = modal.$element.find('input').val();
 
@@ -28705,6 +28705,13 @@ $('.btn-create-project').click(function () {
             callback: onClickCreate
         }]
     });
+});
+
+// Set update hashbrown event
+$('.btn-update-hashbrown').click(() => {
+    apiCall('post', 'server/update/start').then(() => {
+        messageModal('Success', 'HashBrown was updated successfully');
+    }).catch(errorModal);
 });
 
 },{"../../../package.json":144,"../../common/models/Project":152,"./helpers":146,"./views/dashboard/ProjectEditor":149}],146:[function(require,module,exports){
@@ -28747,9 +28754,15 @@ window.messageModal = function messageModal(title, body, onSubmit) {
 window.errorModal = function errorModal(error) {
     if (error instanceof String) {
         error = new Error(error);
+    } else if (error && error instanceof Object) {
+        if (error.responseText) {
+            error = new Error(error.responseText);
+        }
     }
 
-    messageModal('Error', error.message);
+    let modal = messageModal('<span class="fa fa-warning"></span> Error', error.message);
+
+    modal.$element.toggleClass('error-modal', true);
 
     throw error;
 };

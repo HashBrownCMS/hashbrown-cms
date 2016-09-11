@@ -42,6 +42,8 @@ global.SchemaHelper = require('./helpers/SchemaHelper');
 global.SettingsHelper = require('./helpers/SettingsHelper');
 global.LogHelper = require('./helpers/LogHelper');
 global.BackupHelper = require('./helpers/BackupHelper');
+global.UpdateHelper = require('./helpers/UpdateHelper');
+global.AppHelper = require('./helpers/AppHelper');
 
 global.debug = require('./helpers/DebugHelper');
 global.debug.verbosity = 2;
@@ -177,8 +179,12 @@ app.get('/login/', function(req, res) {
 app.get('/', function(req, res) {
     ApiController.authenticate(req.cookies.token)
     .then(() => {
+        return UpdateHelper.check();
+    })
+    .then((update) => {
         res.render('dashboard', {
-            os: os
+            os: os,
+            update: update
         });
     })
     .catch((e) => {

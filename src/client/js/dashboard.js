@@ -38,13 +38,13 @@ apiCall('get', 'server/projects')
 .catch(errorModal);
 
 // Set navbar button events
-$('.navbar-main a').click(function() {
+$('.navbar-main a').click(() => {
     $('.navbar-main a').removeClass('active');
     $(this).addClass('active');
 });
 
 // Set create new project event
-$('.btn-create-project').click(function() {
+$('.btn-create-project').click(() => {
     function onClickCreate() {
         let project = modal.$element.find('input').val();
 
@@ -93,4 +93,13 @@ $('.btn-create-project').click(function() {
             }
         ]
     });
+});
+
+// Set update hashbrown event
+$('.btn-update-hashbrown').click(() => {
+    apiCall('post', 'server/update/start')
+    .then(() => {
+        messageModal('Success', 'HashBrown was updated successfully');
+    })
+    .catch(errorModal);
 });

@@ -2,17 +2,20 @@
 
 // Libs
 let fs = require('fs');
+let spawn = require('child_process').spawn;
 
 // MongoHelper client
 let mongodb = require('mongodb');
 let mongoClient = mongodb.MongoClient;
-let spawn = require('child_process').spawn;
 
 // Models
 let Content = require('../models/Content');
 let Connection = require('../../common/models/Connection');
 let User = require('../models/User');
 
+/**
+ * The helper class for MongoDB operations
+ */
 class MongoHelper {
     /**
      * Inits the MongoHelper database

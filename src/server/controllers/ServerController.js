@@ -7,11 +7,13 @@ class ServerController extends ApiController {
      * Initialises this controller
      */
     static init(app) {
+        app.get('/api/server/update/check', this.middleware({ setProject: false }), this.getUpdateCheck);
         app.get('/api/server/projects', this.middleware({ authenticate: false, setProject: false }), this.getAllProjects);
         app.get('/api/server/projects/:project', this.middleware({ authenticate: false, setProject: false }), this.getProject);
         app.get('/api/server/:project/environments', this.middleware({ authenticate: false, setProject: false }), this.getAllEnvironments);
         app.get('/api/server/backups/:project/:timestamp.hba', this.middleware({ setProject: false }), this.getBackup);
         
+        app.post('/api/server/update/start', this.middleware({ authenticate: false, setProject: false }), this.postUpdateServer);
         app.post('/api/server/projects/new', this.middleware({ authenticate: false, setProject: false }), this.createProject);
         app.post('/api/server/backups/:project/new', this.middleware({ setProject: false }), this.postBackupProject);
         app.post('/api/server/backups/:project/upload', this.middleware({ setProject: false }), BackupHelper.getUploadHandler(), this.postUploadProjectBackup);
@@ -21,6 +23,42 @@ class ServerController extends ApiController {
         app.delete('/api/server/projects/:project', this.middleware({ authenticate: false, setProject: false }), this.deleteProject);
     }
     
+    /**
+     * Checks for new updates
+     */
+    static getUpdateCheck(req, res) {
+        UpdateHelper.check()
+        .then((statusObj) => {
+            res.status(200).send(statusObj);
+        })
+        .catch((e) => {
+            res.status(502).send(ApiController.error(e));
+        });
+    }
+
+    /**
+     * Updates the server
+     */
+    static postUpdateServer(req, res) {
+        ApiController.authenticate(req.cookies.token)
+        .then((user) => {
+            if(!user.isAdmin) {
+                throw new Error('Only admins can update HashBrown');
+
+            } else {
+                return UpdateHelper.update();
+            }
+        })
+        .then(() => {
+            res.status(200).send('OK');
+
+            //AppHelper.restart();
+        })
+        .catch((e) => {
+            res.status(502).send(e.message);  
+        });
+    }
+
     /**
      * Uploads a project backup
      */
