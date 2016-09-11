@@ -25,4 +25,4 @@ node hashbrown.js
 If you'd like to contribute to HashBrown development, you can make a pull request to [our repo](https://github.com/Putaitu/hashbrown-cms) or contact us about becoming a collaborator
 
 ## Report issues
-If you have questions, bug reports or anothing else of the sort, please use the [issue tracker](https://github.com/Putaitu/hashbrown-cms/issues)
+If you have questions, bug reports or anything else of the sort, please use the [issue tracker](https://github.com/Putaitu/hashbrown-cms/issues)
