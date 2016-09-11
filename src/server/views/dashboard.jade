@@ -44,7 +44,7 @@ html
                         
                         .update
                             p
-                                | You are #{update.amount} version behind #{ update.branch }
+                                | You are #{update.amount} version#{update.amount != '1' ? 's' : ''} behind #{ update.branch }
 
                             button.btn.btn-primary.btn-update-hashbrown
                                 | Update
