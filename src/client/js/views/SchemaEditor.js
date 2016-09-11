@@ -323,10 +323,10 @@ class SchemaEditor extends View {
 
         function onClickBrowse() {
             function onSearch() {
-                let query = $element.find('.icon-search input').val().toLowerCase();
+                let query = modal.$element.find('.icon-search input').val().toLowerCase();
 
                 if(query.length > 2 || query.length == 0) {
-                    view.$element.find('.btn-icon').each(function(i) {
+                    modal.$element.find('.btn-icon').each(function(i) {
                         let $btn = $(this);
                         let name = $btn.children('.icon-name').html();
 
@@ -335,42 +335,34 @@ class SchemaEditor extends View {
                 }
             }
 
-            let $modal = _.div({class: 'modal modal-icon-picker fade'},
-                _.div({class: 'modal-dialog'},
-                    _.div({class: 'modal-content'},
-                        _.div({class: 'modal-body'},
-                            _.div({class: 'icon-search'},
-                                _.input({type: 'text', class: 'form-control', placeholder: 'Search for icons'})
-                                    .on('change', function(e) {
-                                        onSearch();
-                                    })
-                            ),
-                            _.each(icons, function(i, icon) {
-                                function onClickButton() {
-                                    view.model.icon = icon;
+            let modal = new MessageModal({
+                model: {
+                    class: 'modal-icon-picker',
+                    title: 'Pick an icon',
+                    body: [   
+                        _.div({class: 'icon-search'},
+                            _.input({type: 'text', class: 'form-control', placeholder: 'Search for icons'})
+                                .on('change', function(e) {
+                                    onSearch();
+                                })
+                        ),
+                        _.each(icons, function(i, icon) {
+                            function onClickButton() {
+                                view.model.icon = icon;
 
-                                    $element.find('.btn-icon-browse .fa').attr('class', 'fa fa-' + icon);
+                                view.$element.find('.btn-icon-browse .fa').attr('class', 'fa fa-' + icon);
 
-                                    $element.find('.modal').modal('hide');
-                                }
-                                
-                                return _.button({class: 'btn btn-default btn-icon'},
-                                    _.span({class: 'fa fa-' + icon}),
-                                    _.span({class: 'icon-name'}, icon)
-                                ).click(onClickButton);
-                            })
-                        )
-                    )
-                )
-            );
-            
-            $modal.on('hidden.bs.modal', function() {
-                $modal.remove();
+                                modal.hide();
+                            }
+                            
+                            return _.button({class: 'btn btn-default btn-icon'},
+                                _.span({class: 'fa fa-' + icon}),
+                                _.span({class: 'icon-name'}, icon)
+                            ).click(onClickButton);
+                        })
+                    ]
+                }
             });
-
-            $('body').append($modal);
-
-            $modal.modal('show');
         }
 
         let $element = _.div({class: 'icon-editor'},
