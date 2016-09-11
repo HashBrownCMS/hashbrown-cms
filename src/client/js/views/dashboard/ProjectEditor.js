@@ -89,14 +89,14 @@ class ProjectEditor extends View {
         }
         
         function onClickUpload() {
-            $uploadModal.find('form').submit();
+            uploadModal.$element.find('form').submit();
+
+            return false;
         }
 
         function onSubmit(e) {
             e.preventDefault();
 
-            $uploadModal.find('.spinner-container').toggleClass('hidden', false);
-            
             let apiPath = 'server/backups/' + view.model.name + '/upload';
 
             $.ajax({
@@ -106,43 +106,39 @@ class ProjectEditor extends View {
                 processData: false,
                 contentType: false,
                 success: function(id) {
-                    $uploadModal.find('.spinner-container').toggleClass('hidden', true);
-
-                    $uploadModal.modal('hide');
+                    new MessageModal({
+                        model: {
+                            title: 'Success',
+                            body: 'Backup uploaded successfully',
+                            onSubmit: () => {
+                                location.reload();
+                            }
+                        }
+                    });
                 }
             });
         }
 
-        let $uploadModal = _.div({class: 'modal modal-upload-media fade'},
-            _.div({class: 'modal-dialog'},
-                _.div({class: 'modal-content'},
-                    _.div({class: 'modal-header'},
-                        _.h4({class: 'modal-title'}, 'Upload a file')
-                    ),
-                    _.div({class: 'modal-footer'},
-                        _.div({class: 'input-group'},
-                            _.form({class: 'form-control'},
-                                _.input({type: 'file', name: 'backup'})
-                                    .change(onChangeFile)
-                            ).submit(onSubmit),
-                            _.div({class: 'input-group-btn'},
-                                _.button({class: 'btn btn-primary'},
-                                    'Upload'
-                                ).click(onClickUpload)
-                            )
-                        )
-                    )
-                )
-            )
-        );
-
-        $uploadModal.on('hidden.bs.modal', function() {
-            $uploadModal.remove();
+        let uploadModal = new MessageModal({
+            model: {
+                title: 'Upload a backup file',
+                body: _.form(
+                    _.input({class: 'form-control', type: 'file', name: 'backup'})
+                        .change(onChangeFile)
+                ).submit(onSubmit)
+            },
+            buttons: [
+                {
+                    label: 'Cancel',
+                    class: 'btn-default'
+                },
+                {
+                    label: 'OK',
+                    class: 'btn-primary',
+                    callback: onClickUpload
+                }
+            ]
         });
-
-        $('body').append($uploadModal);
-
-        $uploadModal.modal('show');
     }
 
     /**
@@ -275,7 +271,7 @@ class ProjectEditor extends View {
                                             ),
                                             _.li(
                                                 // Download backup
-                                                _.a({class: 'dropdown-item', href: apiUrl('server/backups/' + this.model.name + '/' + backup)},
+                                                _.a({class: 'dropdown-item', href: apiUrl('server/backups/' + this.model.name + '/' + backup + '.hba')},
                                                     'Download'
                                                 )
                                             ),

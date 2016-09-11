@@ -31,6 +31,9 @@ class BackupHelper {
                         resolve(null, path);
 
                     }
+                },
+                filename: (req, file, resolve) => {
+                    resolve(null, file.originalname);
                 }
             })
         });
