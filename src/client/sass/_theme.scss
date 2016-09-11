@@ -442,6 +442,10 @@ button, a {
         }
     }
 
+    &[type="text"], &:not([type]) {
+        max-width: 400px;
+    }
+
     &[type="color"] {
         max-width: 110px;
         padding: 0px;

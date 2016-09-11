@@ -203,6 +203,8 @@ class MediaPane extends Pane {
         
         function onClickUpload() {
             uploadModal.$element.find('form').submit();
+
+            return false;
         }
 
         function onSubmit(e) {
@@ -219,20 +221,25 @@ class MediaPane extends Pane {
                 processData: false,
                 contentType: false,
                 success: function(id) {
-                    uploadModal.$element.find('.spinner-container').toggleClass('hidden', true);
-
                     reloadResource('media')
                     .then(function() {
+                        uploadModal.$element.find('.spinner-container').toggleClass('hidden', true);
+
                         navbar.reload();
                         location.hash = '/media/' + id;
 
-                        uploadModal.$element.modal('hide');
+                        // Refresh on replace
+                        if(replaceId) {
+                            let src = $('.media-preview img').attr('src');
+                            
+                            $('.media-preview img').attr('src', src + '?date=' + Date.now());
+                        }
+
+                        uploadModal.hide();
                     });
                 },
                 error: errorModal
             });
-
-            return false;
         }
 
         let uploadModal = new MessageModal({

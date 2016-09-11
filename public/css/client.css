@@ -294,6 +294,9 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
   .form-control[readonly], .form-control:active[readonly], .form-control:focus[readonly], .form-control[readonly][readonly] {
     border-bottom: 0px; }
 
+.form-control[type="text"], .form-control:not([type]) {
+  max-width: 400px; }
+
 .form-control[type="color"] {
   max-width: 110px;
   padding: 0px;
@@ -601,7 +604,8 @@ img.logo {
   position: absolute;
   width: 100%;
   top: 0px;
-  left: 0px; }
+  left: 0px;
+  background-color: rgba(255, 255, 255, 0.75); }
 
 .modal-upload-media .modal-body img, .modal-upload-media .modal-body video {
   display: block;
@@ -1058,15 +1062,40 @@ body > .dashboard-container {
 .media-modal .modal-dialog {
   width: calc(100% - 30px);
   max-width: 1040px; }
+  .media-modal .modal-dialog .modal-body {
+    padding: 15px 0px; }
+  .media-modal .modal-dialog .modal-footer .form-control {
+    float: left; }
   .media-modal .modal-dialog .thumbnail-container {
     display: flex;
     flex-wrap: wrap;
     overflow-y: auto;
-    max-height: 550px; }
-    .media-modal .modal-dialog .thumbnail-container .thumbnail {
-      min-width: 200px;
-      width: auto;
+    max-height: 550px;
+    padding: 0px 15px; }
+    .media-modal .modal-dialog .thumbnail-container .folder {
+      width: 100%;
       flex-grow: 1;
+      flex-basis: 100%;
+      margin-top: 30px; }
+      .media-modal .modal-dialog .thumbnail-container .folder .folder-heading h4 {
+        background-color: #eeeeee;
+        margin: 0px;
+        padding: 10px 15px;
+        border-top-left-radius: 2px;
+        border-top-right-radius: 2px;
+        display: inline-block; }
+        .media-modal .modal-dialog .thumbnail-container .folder .folder-heading h4 .fa {
+          margin-right: 10px; }
+      .media-modal .modal-dialog .thumbnail-container .folder .folder-items {
+        display: flex;
+        flex-wrap: wrap;
+        background-color: #eeeeee;
+        border-top-right-radius: 2px;
+        border-bottom-left-radius: 2px;
+        border-bottom-right-radius: 2px; }
+    .media-modal .modal-dialog .thumbnail-container .thumbnail {
+      width: 224px;
+      flex-grow: 0;
       margin: 1em; }
 
 .rich-text-editor {
@@ -1469,11 +1498,6 @@ body > .dashboard-container {
               margin-right: 15px; }
         .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .children .pane-item-container {
           padding-left: 15px; }
-
-.media-upload-modal img {
-  max-height: 300px;
-  margin: 0px auto 30px auto;
-  max-width: 100%; }
 
 .media-viewer {
   display: flex;
