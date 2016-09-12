@@ -195,7 +195,8 @@ app.get('/', function(req, res) {
         res.render('dashboard', {
             os: os,
             update: update,
-            user: user
+            user: user,
+            app: require(appRoot + '/package.json')
         });
     })
     .catch((e) => {

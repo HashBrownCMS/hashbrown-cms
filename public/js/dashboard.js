@@ -28577,7 +28577,7 @@ exports.createContext = Script.createContext = function (context) {
 module.exports={
   "name": "hashbrown-cms",
   "repository": "https://github.com/Putaitu/hashbrown-cms.git",
-  "version": "0.3.8",
+  "version": "0.3.9",
   "description": "The pluggable CMS",
   "main": "hashbrown.js",
   "scripts": {
