@@ -43,6 +43,7 @@ global.SettingsHelper = require('./helpers/SettingsHelper');
 global.LogHelper = require('./helpers/LogHelper');
 global.BackupHelper = require('./helpers/BackupHelper');
 global.UpdateHelper = require('./helpers/UpdateHelper');
+global.ScheduleHelper = require('./helpers/ScheduleHelper');
 global.AppHelper = require('./helpers/AppHelper');
 
 global.debug = require('./helpers/DebugHelper');
@@ -61,6 +62,7 @@ let FormsController = require('./controllers/FormsController');
 let MediaController = require('./controllers/MediaController');
 let ServerController = require('./controllers/ServerController');
 let SettingsController = require('./controllers/SettingsController');
+let ScheduleController = require('./controllers/ScheduleController');
 let SchemaController = require('./controllers/SchemaController');
 let TemplateController = require('./controllers/TemplateController');
 let UserController = require('./controllers/UserController');
@@ -70,6 +72,7 @@ ConnectionController.init(app);
 ContentController.init(app);
 FormsController.init(app);
 MediaController.init(app);
+ScheduleController.init(app);
 SchemaController.init(app);
 ServerController.init(app);
 SettingsController.init(app);
@@ -85,7 +88,10 @@ function ready() {
     let server = app.listen(port);
 
     console.log('RESTART');
-    
+   
+    // Start schedule helper
+    ScheduleHelper.startWatching();
+
     // Startup arguments
     let cmd;
     let args = {};

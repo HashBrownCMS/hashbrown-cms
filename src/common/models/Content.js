@@ -34,6 +34,8 @@ class Content extends Entity {
         this.def(String, 'updatedBy');
         this.def(Date, 'createDate');
         this.def(Date, 'updateDate');
+        this.def(Date, 'publishOn', new Date('xyz'));
+        this.def(Date, 'unpublishOn', new Date('xyz'));
         this.def(String, 'schemaId');
         this.def(Boolean, 'unpublished');
         this.def(Number, 'sort', -1);
@@ -76,6 +78,27 @@ class Content extends Entity {
         });
 
         return content;
+    }
+
+    /**
+     * Adopts a list of tasks, turning them into un/publish dates
+     *
+     * @param {Array} tasks
+     */
+    adoptTasks(tasks) {
+        if(tasks) {
+            for(let i in tasks) {
+                switch(tasks[i].type) {
+                    case 'publish':
+                        this.publishOn = tasks[i].date;
+                        break;
+
+                    case 'unpublish':
+                        this.unpublishOn = tasks[i].date;
+                        break;
+                }
+            }
+        }
     }
 
     /**

@@ -95,7 +95,7 @@ class Entity {
                     break;
 
                 case Date:
-                    defaultValue = new Date();
+                    defaultValue = null;
                     break;
 
                 case Boolean:
@@ -138,6 +138,17 @@ class Entity {
                     
                     } else if(thatValue.constructor == String && !isNaN(thatValue)) {
                         thatValue = parseFloat(thatValue);
+
+                    }
+                }
+
+                // Auto cast for dates
+                if(thisType == Date) {
+                    if(!thatValue) {
+                        thatValue = null;
+                    
+                    } else if(thatValue.constructor == String || thatValue.constructor == Number) {
+                        thatValue = new Date(thatValue);
 
                     }
                 }

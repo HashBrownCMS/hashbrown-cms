@@ -15,6 +15,8 @@ class MessageModal extends View {
             }
         }
 
+        this.$element = _.div();
+        
         this.fetch();
     }
 
@@ -34,42 +36,53 @@ class MessageModal extends View {
         this.hide();
     }
 
+    reload() {
+        this.$element.find('.modal-title').html(this.renderTitle());
+        this.$element.find('.modal-body').html(this.renderBody());
+    }
+
+    renderTitle() {
+        return this.model.title;
+    }
+    
+    renderBody() {
+        return this.model.body;
+    }
+
     render() {
         let view = this;
 
-        this.$element = _.div({class: 'modal fade ' + (this.model.class ? this.model.class : '')},
+        this.$element = _.div({class: 'modal fade ' + (this.model.class ? this.model.class : '')}, 
             _.div({class: 'modal-dialog'},
                 _.div({class: 'modal-content'},
                     _.div({class: 'modal-header'},
-                        _.h4({class: 'modal-title'}, this.model.title)
+                        _.h4({class: 'modal-title'}, this.renderTitle())
                     ),
                     _.div({class: 'modal-body'},
-                        this.model.body
+                        this.renderBody()
                     ),
                     _.div({class: 'modal-footer'},
-                        function() {
-                            if(view.buttons) {
-                                return _.each(view.buttons, function(i, button) {
-                                    return _.button({class: 'btn ' + button.class, disabled: button.disabled},
-                                        button.label
-                                    ).click(function() {
-                                        if(button.callback) {
-                                            if(button.callback() != false) {
-                                                view.hide();
-                                            }
-                                        
-                                        } else {
-                                            view.hide();
+                        _.if(this.buttons,
+                            _.each(this.buttons, (i, button) => {
+                                return _.button({class: 'btn ' + button.class, disabled: button.disabled},
+                                    button.label
+                                ).click(() => {
+                                    if(button.callback) {
+                                        if(button.callback() != false) {
+                                            this.hide();
                                         }
-                                    })
-                                });
-
-                            } else if(view.model.onSubmit != false) {
-                                return _.button({class: 'btn btn-default'},
-                                    'OK'
-                                ).click(function() { view.onClickOK(); })
-                            }
-                        }()
+                                    
+                                    } else {
+                                        this.hide();
+                                    }
+                                })
+                            })
+                        ),
+                        _.if(!this.buttons && this.model.onSubmit != false,
+                            _.button({class: 'btn btn-default'},
+                                'OK'
+                            ).click(() => { this.onClickOK(); })
+                        )
                     )
                 )
             )

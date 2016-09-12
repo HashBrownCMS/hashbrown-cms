@@ -14,7 +14,8 @@ class ContentHelper extends ContentHelperCommon {
      */
     static getAllContents() {
         let collection = ProjectHelper.currentEnvironment + '.content';
-        
+        let contentList = [];
+
         return MongoHelper.find(
             ProjectHelper.currentProject,
             collection,
@@ -23,7 +24,22 @@ class ContentHelper extends ContentHelperCommon {
             {
                 sort: 1
             }
-        );
+        ).then((results) => {
+            for(let i in results) {
+                let content = new Content(results[i]);
+
+                // Make sure runaway publish dates are not included
+                content.publishOn = null;
+                content.unpublishOn = null;
+                
+                contentList[contentList.length] = content;
+
+            }
+
+            return new Promise((resolve) => {
+                resolve(contentList);
+            });
+        });
     }
 
     /**
@@ -35,6 +51,7 @@ class ContentHelper extends ContentHelperCommon {
      */
     static getContentById(id) {
         let collection = ProjectHelper.currentEnvironment + '.content';
+        let content;
 
         return MongoHelper.findOne(
             ProjectHelper.currentProject,
@@ -42,7 +59,22 @@ class ContentHelper extends ContentHelperCommon {
             {
                 id: id
             }
-        );
+        ).then((result) => {
+            content = new Content(result);
+
+            // Make sure runaway publish dates are not included
+            content.publishOn = null;
+            content.unpublishOn = null;
+
+            return ScheduleHelper.getTasks(null, content.id);
+        })
+        .then((tasks) => {
+            content.adoptTasks(tasks);
+
+            return new Promise((resolve) => {
+                resolve(content);
+            });  
+        });
     }
     
     /**
@@ -55,6 +87,8 @@ class ContentHelper extends ContentHelperCommon {
      */
     static setContentById(id, content) {
         return new Promise((resolve, reject) => {
+            debug.log('Updating content "' + id + '"...', this);
+            
             let updateContent = () => {
                 content.updatedBy = UserHelper.current.id;
                 content.updateDate = Date.now();
@@ -64,7 +98,24 @@ class ContentHelper extends ContentHelperCommon {
                 }
                 
                 let collection = ProjectHelper.currentEnvironment + '.content';
+                
+                // Register publish dates centrally
+                if(content.publishOn) {
+                    ScheduleHelper.updateTask('publish', id, content.publishOn);
+                } else {
+                    ScheduleHelper.removeTask('publish', id, content.publishOn);
+                }
 
+                if(content.unpublishOn) {
+                    ScheduleHelper.updateTask('unpublish', id, content.unpublishOn);
+                } else {
+                    ScheduleHelper.removeTask('unpublish', id, content.unpublishOn);
+                }
+
+                // Remove inserted publish dates
+                content.publishOn = null;
+                content.unpublishOn = null;
+                
                 MongoHelper.updateOne(
                     ProjectHelper.currentProject,
                     collection,
@@ -73,7 +124,11 @@ class ContentHelper extends ContentHelperCommon {
                     },
                     content
                 )
-                .then(resolve)
+                .then(() => {
+                    debug.log('Done updating content.', this);
+
+                    resolve();
+                })
                 .catch(reject);
             };
 

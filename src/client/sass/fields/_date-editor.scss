@@ -1,0 +1,85 @@
+.modal.date-picker {
+    .modal-dialog {
+        max-width: 330px;
+
+        .modal-header {
+            background-color: material-color('blue', '600');
+            color: #fff;
+        }
+
+        .modal-body {
+            .date-picker-top-nav {
+                display: flex;
+
+                span {
+                    flex-grow: 1;
+                    text-align: center;
+                    line-height: 24px;
+                    font-size: 14px;
+                    font-weight: 700;
+                }
+
+                .btn {
+                    flex-shrink: 0;
+                    flex-grow: 0;
+                    padding: 0px 12px;
+                    font-size: 24px;
+                    width: 42px;
+
+                    .fa {
+                        position: relative;
+                        top: -2px;
+                    }
+                }
+            }
+
+            .date-picker-weekdays {
+                display: flex;
+
+                span {
+                    display: block;
+                    width: 42px;
+                    text-align: center;
+                    color: material-color('grey', '400');
+                    font-weight: 700;
+                    line-height: 42px;
+                }
+            }
+
+            .date-picker-days {
+                display: flex;
+                flex-wrap: wrap;
+
+                .btn {
+                    position: relative;
+                    display: block;
+                    width: 42px;
+                    height: 42px;
+                    
+                    &:not(.current) {
+                        color: material-color('grey', '600');
+                    }
+
+                    &.active {
+                        box-shadow: none;
+                        background-color: material-color('blue', '600');
+                        border-radius: 50%;
+                        color: #fff;
+                    }
+                }
+            }
+        }
+    }
+}
+
+.date-editor {
+    width: 130px;
+
+    .btn-remove {
+        top: 5px;
+    }
+
+    .btn-edit {
+        max-width: 110px;
+    }
+}

@@ -38037,6 +38037,8 @@ class MessageModal extends View {
             }
         }
 
+        this.$element = _.div();
+
         this.fetch();
     }
 
@@ -38056,28 +38058,35 @@ class MessageModal extends View {
         this.hide();
     }
 
+    reload() {
+        this.$element.find('.modal-title').html(this.renderTitle());
+        this.$element.find('.modal-body').html(this.renderBody());
+    }
+
+    renderTitle() {
+        return this.model.title;
+    }
+
+    renderBody() {
+        return this.model.body;
+    }
+
     render() {
         let view = this;
 
-        this.$element = _.div({ class: 'modal fade ' + (this.model.class ? this.model.class : '') }, _.div({ class: 'modal-dialog' }, _.div({ class: 'modal-content' }, _.div({ class: 'modal-header' }, _.h4({ class: 'modal-title' }, this.model.title)), _.div({ class: 'modal-body' }, this.model.body), _.div({ class: 'modal-footer' }, function () {
-            if (view.buttons) {
-                return _.each(view.buttons, function (i, button) {
-                    return _.button({ class: 'btn ' + button.class, disabled: button.disabled }, button.label).click(function () {
-                        if (button.callback) {
-                            if (button.callback() != false) {
-                                view.hide();
-                            }
-                        } else {
-                            view.hide();
-                        }
-                    });
-                });
-            } else if (view.model.onSubmit != false) {
-                return _.button({ class: 'btn btn-default' }, 'OK').click(function () {
-                    view.onClickOK();
-                });
-            }
-        }()))));
+        this.$element = _.div({ class: 'modal fade ' + (this.model.class ? this.model.class : '') }, _.div({ class: 'modal-dialog' }, _.div({ class: 'modal-content' }, _.div({ class: 'modal-header' }, _.h4({ class: 'modal-title' }, this.renderTitle())), _.div({ class: 'modal-body' }, this.renderBody()), _.div({ class: 'modal-footer' }, _.if(this.buttons, _.each(this.buttons, (i, button) => {
+            return _.button({ class: 'btn ' + button.class, disabled: button.disabled }, button.label).click(() => {
+                if (button.callback) {
+                    if (button.callback() != false) {
+                        this.hide();
+                    }
+                } else {
+                    this.hide();
+                }
+            });
+        })), _.if(!this.buttons && this.model.onSubmit != false, _.button({ class: 'btn btn-default' }, 'OK').click(() => {
+            this.onClickOK();
+        }))))));
 
         // Callback was set to false, disable dismissing
         if (this.model.onSubmit == false) {
@@ -39321,21 +39330,143 @@ class DateEditor extends View {
      * Event: Change value
      */
     onChange() {
-        this.value = new Date(this.$input.val());
-
         this.trigger('change', this.value);
     }
 
-    render() {
-        this.$element = _.div({ class: 'field-editor date-editor' }, this.disabled ? _.p({}, this.value) : this.$input = _.input({ class: 'form-control', type: 'text', value: this.value }));
+    /**
+     * Event: On click remove
+     */
+    onClickRemove() {
+        this.value = null;
 
-        if (this.$input) {
-            this.$input.datepicker();
+        this.$element.find('.btn-edit').html(this.formatDate(this.value));
 
-            this.$input.on('changeDate', () => {
-                editor.onChange();
-            });
+        this.onChange();
+    }
+
+    /**
+     * Event: Click open
+     */
+    onClickOpen() {
+        let date = this.value ? new Date(this.value) : new Date();
+
+        if (isNaN(date.getDate())) {
+            date = new Date();
         }
+
+        let days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+        let months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+        let messageModal = new MessageModal({
+            model: {
+                class: 'date-picker'
+            },
+            renderTitle: () => {
+                return [_.span(date.getFullYear().toString()), _.h2({ class: 'date-picker-title' }, days[date.getDay()] + ', ' + months[date.getMonth()] + ' ' + date.getDate())];
+            },
+            renderBody: () => {
+                return [_.div({ class: 'date-picker-top-nav' }, _.button({ class: 'btn btn-embedded' }, _.span({ class: 'fa fa-angle-left' })).click(() => {
+                    date.setMonth(date.getMonth() - 1);
+
+                    messageModal.reload();
+                }), _.span(months[date.getMonth()] + ' ' + date.getFullYear()), _.button({ class: 'btn btn-embedded' }, _.span({ class: 'fa fa-angle-right' })).click(() => {
+                    date.setMonth(date.getMonth() + 1);
+
+                    messageModal.reload();
+                })), _.div({ class: 'date-picker-weekdays' }, _.span('M'), _.span('T'), _.span('W'), _.span('T'), _.span('F'), _.span('S'), _.span('S')), _.div({ class: 'date-picker-days' }, _.each(this.getDays(date.getFullYear(), date.getMonth() + 1), (i, day) => {
+                    let thisDate = new Date(date.getTime());
+                    let now = new Date();
+
+                    let isCurrent = now.getFullYear() == date.getFullYear() && now.getMonth() == date.getMonth() && now.getDate() == day;
+
+                    let isActive = date.getDate() == day;
+
+                    thisDate.setDate(day);
+
+                    let $button = _.button({ class: 'btn btn-embedded' + (isCurrent ? ' current' : '') + (isActive ? ' active' : '') }, day).click(() => {
+                        date.setDate(day);
+
+                        $button.siblings().removeClass('active');
+                        $button.addClass('active');
+
+                        messageModal.$element.find('.date-picker-title').html(days[date.getDay()] + ', ' + months[date.getMonth()] + ' ' + date.getDate());
+                    });
+
+                    return $button;
+                }))];
+            },
+            buttons: [{
+                label: 'Cancel',
+                class: 'btn-default'
+            }, {
+                label: 'OK',
+                class: 'btn-primary',
+                callback: () => {
+                    this.value = date;
+
+                    this.$element.find('.btn-edit').html(this.formatDate(date));
+
+                    this.onChange();
+                }
+            }]
+        });
+    }
+
+    /**
+     * Renders day buttons
+     *
+     * @param {Number} year
+     * @param {Number} month
+     *
+     * @returns {Array} Days
+     */
+    getDays(year, month) {
+        let max = new Date(year, month, 0).getDate();
+        let days = [];
+
+        while (days.length < max) {
+            days[days.length] = days.length + 1;
+        }
+
+        return days;
+    }
+
+    /**
+     * Format a date string
+     *
+     * @param {String} input
+     *
+     * @returns {String} Formatted date string
+     */
+    formatDate(input) {
+        let output = '(none)';
+        let date = new Date(input);
+
+        if (input && !isNaN(date.getTime())) {
+            let day = date.getDate();
+            let month = date.getMonth() + 1;
+
+            if (day < 10) {
+                day = '0' + day;
+            }
+
+            if (month < 10) {
+                month = '0' + month;
+            }
+
+            output = date.getFullYear() + '.' + month + '.' + day;
+        }
+
+        return output;
+    }
+
+    render() {
+        this.$element = _.div({ class: 'field-editor date-editor' }, _.if(this.disabled, _.p({}, this.formatDate(this.value))), _.if(!this.disabled, _.button({ class: 'form-control btn btn-edit' }, this.formatDate(this.value)).click(() => {
+            this.onClickOpen();
+        }), _.button({ class: 'btn btn-remove' }, _.span({ class: 'fa fa-remove' })).click(() => {
+            this.onClickRemove();
+        })));
     }
 }
 
@@ -43040,6 +43171,8 @@ class Content extends Entity {
         this.def(String, 'updatedBy');
         this.def(Date, 'createDate');
         this.def(Date, 'updateDate');
+        this.def(Date, 'publishOn', new Date('xyz'));
+        this.def(Date, 'unpublishOn', new Date('xyz'));
         this.def(String, 'schemaId');
         this.def(Boolean, 'unpublished');
         this.def(Number, 'sort', -1);
@@ -43082,6 +43215,27 @@ class Content extends Entity {
         });
 
         return content;
+    }
+
+    /**
+     * Adopts a list of tasks, turning them into un/publish dates
+     *
+     * @param {Array} tasks
+     */
+    adoptTasks(tasks) {
+        if (tasks) {
+            for (let i in tasks) {
+                switch (tasks[i].type) {
+                    case 'publish':
+                        this.publishOn = tasks[i].date;
+                        break;
+
+                    case 'unpublish':
+                        this.unpublishOn = tasks[i].date;
+                        break;
+                }
+            }
+        }
     }
 
     /**
@@ -43419,7 +43573,7 @@ class Entity {
                     break;
 
                 case Date:
-                    defaultValue = new Date();
+                    defaultValue = null;
                     break;
 
                 case Boolean:
@@ -43460,6 +43614,15 @@ class Entity {
                         thatValue = 0;
                     } else if (thatValue.constructor == String && !isNaN(thatValue)) {
                         thatValue = parseFloat(thatValue);
+                    }
+                }
+
+                // Auto cast for dates
+                if (thisType == Date) {
+                    if (!thatValue) {
+                        thatValue = null;
+                    } else if (thatValue.constructor == String || thatValue.constructor == Number) {
+                        thatValue = new Date(thatValue);
                     }
                 }
 

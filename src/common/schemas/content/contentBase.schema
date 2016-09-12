@@ -31,6 +31,14 @@
                 "resourceKeys": ["fullName", "username"]
             }
         },
+        "publishOn": {
+            "label": "Publish on",
+            "schemaId": "date"
+        },
+        "unpublishOn": {
+            "label": "Unpublish on",
+            "schemaId": "date"
+        },
         "schemaId": {
             "label": "Schema",
             "schemaId": "contentSchemaReference",
