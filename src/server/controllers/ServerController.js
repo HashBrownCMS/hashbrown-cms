@@ -35,8 +35,9 @@ class ServerController extends ApiController {
         let from = {};
         let to = {};
 
-        debug.log('Starting migration from "' + data.from + '" to "' + data.to + '"...', this);
+        debug.log('Starting migration from "' + data.from + '" to "' + data.to + '" (replace: ' + (data.settings.replace || false) + ')...', this);
 
+        // Get resources individually
         debug.log('Getting "' + data.from + '" connections...', this);
         MongoHelper.find(project, data.from + '.connections', {})
         .then((result) => {
@@ -96,6 +97,7 @@ class ServerController extends ApiController {
         .then((result) => {
             to.schemas = result;
 
+            // Merge "from" resource into "to" resource
             function merge(resource) {
                 return new Promise((resolve, reject) => {
                     debug.log('Merging ' + resource + '...', this);
@@ -104,8 +106,51 @@ class ServerController extends ApiController {
                         let item = from[resource][num];
 
                         if(item) {
-                            debug.log('Updating ' + resource + ' with "' + item.id + '"...', this);
-                            MongoHelper.updateOne(project, data.to + '.' + resource, { id: item.id }, item, { upsert: true })
+                            let mongoPromise;
+                            
+                            // Overwrite
+                            if(data.settings.replace) {
+                                debug.log('Updating "' + item.id + '" into ' + resource + '...', this);
+                            
+                                mongoPromise = MongoHelper.updateOne(
+                                    project,
+                                    data.to + '.' + resource,
+                                    { id: item.id },
+                                    item,
+                                    { upsert: true }
+                                );
+                            
+                            // Don't overwrite, keep target resource
+                            } else {
+                                mongoPromise = MongoHelper.count(
+                                    project,
+                                    data.to + '.' + resource,
+                                    { id: item.id }
+                                ).then((amount) => {
+                                    // No matching documents were found, insert resource
+                                    if(amount < 1) {
+                                        debug.log('Inserting "' + item.id + '" into ' + resource + '...', this);
+                                        
+                                        return MongoHelper.insertOne(
+                                            project,
+                                            data.to + '.' + resource,
+                                            item
+                                        );
+                                    
+                                    // The document already exists
+                                    } else {
+                                        debug.log('"' + item.id + '" already exists in ' + resource + ', skipping...', this);
+                                        
+                                        return new Promise((resolve) => {
+                                            resolve();
+                                        });
+
+                                    }
+                                });
+                                    
+                            }
+                    
+                            mongoPromise        
                             .then(() => {
                                 if(num < from[resource].length - 1) {
                                     next(num + 1);

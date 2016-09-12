@@ -287,6 +287,37 @@ class MongoHelper {
     }
     
     /**
+     * Counts Mongo documents
+     *
+     * @param {String} databaseName
+     * @param {String} collectionName
+     * @param {Object} query
+     *
+     * @return {Promise} Number of matching documents
+     */
+    static count(databaseName, collectionName, query) {
+        return new Promise((resolve, reject) => {
+            debug.log(databaseName + '/' + collectionName + '::count ' + JSON.stringify(query) + '...', this, 3);
+
+            MongoHelper.getDatabase(databaseName)
+            .then((db) => {
+                db.collection(collectionName).count(query, (findErr, result) => {
+                    if(findErr) {
+                        reject(new Error(findErr));
+
+                    } else {
+                        resolve(result);
+                    
+                    }
+
+                    db.close();
+                });
+            })
+            .catch(reject);
+        });
+    }
+    
+    /**
      * Merges a single Mongo document
      *
      * @param {String} databaseName
