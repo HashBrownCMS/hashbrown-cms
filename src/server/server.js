@@ -177,8 +177,12 @@ app.get('/login/', function(req, res) {
 
 // Dashboard
 app.get('/', function(req, res) {
+    let user;
+
     ApiController.authenticate(req.cookies.token)
-    .then((user) => {
+    .then((result) => {
+        user = result;
+
         if(user.isAdmin) {
             return UpdateHelper.check();
         } else {
@@ -190,7 +194,8 @@ app.get('/', function(req, res) {
     .then((update) => {
         res.render('dashboard', {
             os: os,
-            update: update
+            update: update,
+            user: user
         });
     })
     .catch((e) => {

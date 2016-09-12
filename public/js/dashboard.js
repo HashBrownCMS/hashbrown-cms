@@ -29361,9 +29361,9 @@ class ProjectEditor extends View {
             return _.div({ class: 'environment' }, _.div({ class: 'btn-group' }, _.span({ class: 'environment-title' }, environment), _.a({ href: '/' + this.model.name + '/' + environment, class: 'btn btn-primary environment' }, 'cms'), _.if(this.isAdmin(), _.div({ class: 'dropdown' }, _.button({ class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, _.span({ class: 'fa fa-ellipsis-v' })), _.ul({ class: 'dropdown-menu' }, _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Delete').click(e => {
                 e.preventDefault();this.onClickRemoveEnvironment();
             })))))));
-        }), _.button({ class: 'btn btn-primary btn-add btn-raised btn-round' }, '+').click(() => {
+        }), _.if(this.isAdmin(), _.button({ class: 'btn btn-primary btn-add btn-raised btn-round' }, '+').click(() => {
             this.onClickAddEnvironment();
-        }))));
+        })))));
     }
 }
 

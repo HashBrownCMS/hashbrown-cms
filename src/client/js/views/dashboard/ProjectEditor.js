@@ -521,8 +521,10 @@ class ProjectEditor extends View {
                             )
                         );
                     }),
-                    _.button({class: 'btn btn-primary btn-add btn-raised btn-round'}, '+')
-                        .click(() => { this.onClickAddEnvironment(); })
+                    _.if(this.isAdmin(),
+                        _.button({class: 'btn btn-primary btn-add btn-raised btn-round'}, '+')
+                            .click(() => { this.onClickAddEnvironment(); })
+                    )
                 )
             )
         );
