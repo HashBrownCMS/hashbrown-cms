@@ -64,7 +64,7 @@ class MessageModal extends View {
                                     })
                                 });
 
-                            } else {
+                            } else if(view.model.onSubmit != false) {
                                 return _.button({class: 'btn btn-default'},
                                     'OK'
                                 ).click(function() { view.onClickOK(); })
@@ -74,6 +74,12 @@ class MessageModal extends View {
                 )
             )
         );
+
+        // Callback was set to false, disable dismissing
+        if(this.model.onSubmit == false) {
+            this.$element.attr('data-backdrop', 'static');
+            this.$element.attr('data-keyboard', 'false');
+        }
 
         $('body').append(this.$element);
 

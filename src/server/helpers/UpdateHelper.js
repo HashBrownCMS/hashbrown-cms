@@ -15,7 +15,11 @@ class UpdateHelper {
      */
     static check() {
         return new Promise((resolve, reject) => {
-            let resolveObj = {};
+            let resolveObj = {
+                behind: false,
+                amount: 0,
+                branch: 'origin/master'
+            };
             
             debug.log('Checking for updates...', this);
 
@@ -24,17 +28,13 @@ class UpdateHelper {
                 let upToDateMatches = data.match(/Your branch is up-to-date with '(.+)'/);
 
                 if(behindMatches && behindMatches.length > 1) {
-                    resolveObj = {
-                        behind: true,
-                        branch: behindMatches[1],
-                        amount: behindMatches[2]
-                    };
+                    resolveObj.behind = true;
+                    resolveObj.branch = behindMatches[1];
+                    resolveObj.amount = behindMatches[2];
                 }
                 
                 if(upToDateMatches && upToDateMatches.length > 1) {
-                    resolveObj = {
-                        branch: upToDateMatches[1]
-                    };
+                    resolveObj.branch = upToDateMatches[1];
                 }
             }
             
@@ -44,12 +44,12 @@ class UpdateHelper {
 
             git.stdout.on('data', (data) => {
                 checkOutput(data);
-                debug.log(data, this);
+                debug.log(data, this, 3);
             });
 
             git.stderr.on('data', (data) => {
                 checkOutput(data);
-                debug.log(data, this);
+                debug.log(data, this, 3);
             });
             
             git.on('exit', (code) => {

@@ -97,9 +97,40 @@ $('.btn-create-project').click(() => {
 
 // Set update hashbrown event
 $('.btn-update-hashbrown').click(() => {
+    messageModal('Update', 'HashBrown is updating...', false);
+
     apiCall('post', 'server/update/start')
     .then(() => {
-        messageModal('Success', 'HashBrown was updated successfully', () => { location.reload(); });
+        new MessageModal({
+            model: {
+                title: 'Success',
+                body: 'HashBrown was updated successfully'
+            },
+            buttons: [
+                {
+                    label: 'Cool!',
+                    class: 'btn-primary',
+                    callback: () => {
+                        messageModal('Success', 'HashBrown is restarting...', false);
+
+                        function poke() {
+                            $.ajax({
+                                type: 'get',
+                                url: '/',
+                                success: () => {
+                                    location.reload();
+                                },
+                                error: () => {
+                                    poke();
+                                }
+                            });
+                        }
+
+                        poke();
+                    }
+                }
+            ]
+        });
     })
     .catch(errorModal);
 });
