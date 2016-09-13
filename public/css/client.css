@@ -1071,6 +1071,14 @@ body > .dashboard-container {
   .date-editor .btn-edit {
     max-width: 110px; }
 
+.btn-array-editor-sort-items {
+  display: block;
+  margin-top: 1em; }
+  .btn-array-editor-sort-items .text-default {
+    display: inline; }
+  .btn-array-editor-sort-items .text-sorting {
+    display: none; }
+
 .array-editor {
   min-width: 100%; }
   .array-editor .array-editor .item.raised, .array-editor .array-editor .dropdown .item.dropdown-menu, .dropdown .array-editor .array-editor .item.dropdown-menu, .array-editor .array-editor .cms-container .item.menuspace, .cms-container .array-editor .array-editor .item.menuspace, .array-editor .array-editor .content-editor > .object .language-picker .item.dropdown-menu, .content-editor > .object .language-picker .array-editor .array-editor .item.dropdown-menu {
@@ -1079,10 +1087,6 @@ body > .dashboard-container {
     border-bottom: 1px solid #eeeeee; }
     .array-editor .array-editor .item.raised:last-of-type, .array-editor .array-editor .dropdown .item.dropdown-menu:last-of-type, .dropdown .array-editor .array-editor .item.dropdown-menu:last-of-type, .array-editor .array-editor .cms-container .item.menuspace:last-of-type, .cms-container .array-editor .array-editor .item.menuspace:last-of-type, .array-editor .array-editor .content-editor > .object .language-picker .item.dropdown-menu:last-of-type, .content-editor > .object .language-picker .array-editor .array-editor .item.dropdown-menu:last-of-type {
       border-bottom: 0px; }
-  .array-editor.sorting .btn-sort-items .text-default {
-    display: none; }
-  .array-editor.sorting .btn-sort-items .text-sorting {
-    display: inline; }
   .array-editor.sorting .btn-add-item {
     display: none; }
   .array-editor.sorting .items .item {
@@ -1104,10 +1108,6 @@ body > .dashboard-container {
     .array-editor.sorting .items .item .btn-remove {
       display: none; }
   .array-editor.sorting .btn-add {
-    display: none; }
-  .array-editor .btn-sort-items .text-default {
-    display: inline; }
-  .array-editor .btn-sort-items .text-sorting {
     display: none; }
   .array-editor .items {
     padding-top: 30px;

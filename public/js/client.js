@@ -37121,10 +37121,11 @@ class ContentEditor extends View {
      * @param {Object} fieldDefinition The field definition
      * @param {Function} onChange The change event
      * @param {Object} config The field config
+     * @param {HTMLElement} keyContent The key content container
      *
      * @return {Object} element
      */
-    renderField(fieldValue, fieldDefinition, onChange, config) {
+    renderField(fieldValue, fieldDefinition, onChange, config, $keyContent) {
         let fieldSchema = resources.schemas[fieldDefinition.schemaId];
 
         if (fieldSchema) {
@@ -37140,6 +37141,10 @@ class ContentEditor extends View {
                 });
 
                 fieldEditorInstance.on('change', onChange);
+
+                if (fieldEditorInstance.$keyContent) {
+                    $keyContent.append(fieldEditorInstance.$keyContent);
+                }
 
                 return fieldEditorInstance.$element;
             } else {
@@ -37191,9 +37196,11 @@ class ContentEditor extends View {
             fieldValues[key] = ContentHelper.fieldSanityCheck(fieldValues[key], fieldDefinition);
 
             // Render the field container
+            let $keyContent;
+
             return _.div({ class: 'field-container', 'data-key': key },
             // Render the label and icon
-            _.div({ class: 'field-key' }, _.div({ class: 'field-key-content' }, _.span({ class: 'field-key-icon fa fa-' + fieldSchema.icon }), _.span({ class: 'field-key-label' }, fieldDefinition.label || key))),
+            _.div({ class: 'field-key' }, $keyContent = _.div({ class: 'field-key-content' }, _.span({ class: 'field-key-icon fa fa-' + fieldSchema.icon }), _.span({ class: 'field-key-label' }, fieldDefinition.label || key))),
 
             // Render the field editor
             _.div({ class: 'field-value' }, view.renderField(
@@ -37217,7 +37224,10 @@ class ContentEditor extends View {
             },
 
             // Pass the field definition config, and use the field's schema config as fallback
-            fieldDefinition.config || fieldSchema.config)));
+            fieldDefinition.config || fieldSchema.config,
+
+            // Pass the key content container, so the field editor can populate it
+            $keyContent)));
         });
     }
 
@@ -38923,6 +38933,10 @@ class ArrayEditor extends View {
 
         this.$element = _.div({ class: 'array-editor field-editor' });
 
+        this.$keyContent = _.button({ class: 'btn btn-primary btn-array-editor-sort-items' }, _.span({ class: 'text-default' }, 'Sort'), _.span({ class: 'text-sorting', style: 'display: none' }, 'Done')).click(() => {
+            this.onClickSort();
+        });
+
         this.fetch();
     }
 
@@ -38976,7 +38990,12 @@ class ArrayEditor extends View {
     onClickSort() {
         this.$element.toggleClass('sorting');
 
-        if (this.$element.hasClass('sorting')) {
+        let isSorting = this.$element.hasClass('sorting');
+
+        this.$keyContent.find('.text-default').toggle(!isSorting);
+        this.$keyContent.find('.text-sorting').toggle(isSorting);
+
+        if (isSorting) {
             this.$element.find('.item').each((oldIndex, item) => {
                 $(item).exodragdrop({
                     lockX: true,
@@ -39042,9 +39061,7 @@ class ArrayEditor extends View {
         }
 
         // Render editor
-        _.append(this.$element.empty(), _.if(this.value.items.length > 1, _.button({ class: 'btn btn-primary btn-sort-items' }, _.span({ class: 'text-default' }, 'Sort'), _.span({ class: 'text-sorting' }, 'Done')).click(() => {
-            this.onClickSort();
-        })), _.div({ class: 'items' },
+        _.append(this.$element.empty(), _.div({ class: 'items' },
         // Loop through each array item
         _.each(this.value.items, (i, item) => {
             // Sanity check for item schema

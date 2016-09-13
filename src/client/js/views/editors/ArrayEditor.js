@@ -9,6 +9,13 @@ class ArrayEditor extends View {
 
         this.$element = _.div({class: 'array-editor field-editor'});
 
+        this.$keyContent = _.button({class: 'btn btn-primary btn-array-editor-sort-items'},
+            _.span({class: 'text-default'}, 'Sort'),
+            _.span({class: 'text-sorting', style: 'display: none'}, 'Done')
+        ).click(() => {
+            this.onClickSort();
+        });
+        
         this.fetch();
     }
 
@@ -62,8 +69,13 @@ class ArrayEditor extends View {
      */
     onClickSort() {
         this.$element.toggleClass('sorting');
+        
+        let isSorting = this.$element.hasClass('sorting');
 
-        if(this.$element.hasClass('sorting')) {
+        this.$keyContent.find('.text-default').toggle(!isSorting);
+        this.$keyContent.find('.text-sorting').toggle(isSorting);
+
+        if(isSorting) {
             this.$element.find('.item').each((oldIndex, item) => {
                 $(item).exodragdrop({
                     lockX: true,
@@ -136,14 +148,6 @@ class ArrayEditor extends View {
 
         // Render editor
         _.append(this.$element.empty(),
-            _.if(this.value.items.length > 1,
-                _.button({class: 'btn btn-primary btn-sort-items'},
-                    _.span({class: 'text-default'}, 'Sort'),
-                    _.span({class: 'text-sorting'}, 'Done')
-                ).click(() => {
-                    this.onClickSort();
-                })
-            ),
             _.div({class: 'items'},
                 // Loop through each array item
                 _.each(this.value.items, (i, item) => {

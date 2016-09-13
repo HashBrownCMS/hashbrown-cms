@@ -1,3 +1,16 @@
+.btn-array-editor-sort-items {
+    display: block;
+    margin-top: 1em;
+
+    .text-default {
+        display: inline;
+    }
+
+    .text-sorting {
+        display: none;
+    }
+}
+
 .array-editor {
     min-width: 100%;
 
@@ -14,16 +27,6 @@
     }
 
     &.sorting {
-        .btn-sort-items {
-            .text-default {
-                display: none;
-            }
-
-            .text-sorting {
-                display: inline;
-            }
-        }
-
         .btn-add-item {
             display: none;
         }
@@ -55,16 +58,6 @@
         }
 
         .btn-add {
-            display: none;
-        }
-    }
-
-    .btn-sort-items {
-        .text-default {
-            display: inline;
-        }
-
-        .text-sorting {
             display: none;
         }
     }
