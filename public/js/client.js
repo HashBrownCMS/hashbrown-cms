@@ -36922,6 +36922,28 @@ class ContentEditor extends View {
     }
 
     /**
+     * Event: Scroll
+     */
+    onScroll(e) {
+        let $follow;
+
+        this.$element.find('.field-container').each((i, field) => {
+            let $field = $(field);
+            $field.removeClass('following');
+
+            let top = $field.position().top;
+
+            if (top < 60 && top != 0 && $field.outerHeight() > 100) {
+                $follow = $field;
+            }
+        });
+
+        if ($follow) {
+            $follow.addClass('following');
+        }
+    }
+
+    /**
      * Event: Click advanced. Routes to the JSON editor
      */
     onClickAdvanced() {
@@ -37171,7 +37193,7 @@ class ContentEditor extends View {
             // Render the field container
             return _.div({ class: 'field-container', 'data-key': key },
             // Render the label and icon
-            _.div({ class: 'field-key' }, _.span({ class: 'field-key-icon fa fa-' + fieldSchema.icon }), _.span({ class: 'field-key-label' }, fieldDefinition.label || key)),
+            _.div({ class: 'field-key' }, _.div({ class: 'field-key-content' }, _.span({ class: 'field-key-icon fa fa-' + fieldSchema.icon }), _.span({ class: 'field-key-label' }, fieldDefinition.label || key))),
 
             // Render the field editor
             _.div({ class: 'field-value' }, view.renderField(
@@ -37233,14 +37255,16 @@ class ContentEditor extends View {
             }));
         }), _.li({ class: isTabActive('meta') ? 'active' : '' }, _.a({ 'data-toggle': 'tab', href: '#tab-meta' }, 'meta').click(() => {
             this.onClickTab('meta');
-        }))), _.div({ class: 'tab-content editor-body' },
+        }))), this.$body = _.div({ class: 'tab-content editor-body' },
         // Render content properties
         _.each(schema.tabs, (tabId, tab) => {
             return _.div({ id: 'tab-' + tabId, class: 'tab-pane' + (isTabActive(tabId) ? ' active' : '') }, this.renderFields(tabId, schema.fields.properties, content.properties));
         }),
 
         // Render meta properties
-        _.div({ id: 'tab-meta', class: 'tab-pane' + (isTabActive('meta') ? ' active' : '') }, this.renderFields('meta', schema.fields, content), this.renderFields('meta', schema.fields.properties, content.properties))), _.div({ class: 'editor-footer' }));
+        _.div({ id: 'tab-meta', class: 'tab-pane' + (isTabActive('meta') ? ' active' : '') }, this.renderFields('meta', schema.fields, content), this.renderFields('meta', schema.fields.properties, content.properties))).on('scroll', e => {
+            this.onScroll(e);
+        }), _.div({ class: 'editor-footer' }));
     }
 
     /**

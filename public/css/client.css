@@ -698,6 +698,9 @@ img.logo {
         .cms-container .workspace .editor .field-container .field-icon {
           width: 20px;
           flex-shrink: 0; }
+        .cms-container .workspace .editor .field-container.following .field-key .field-key-content {
+          position: fixed;
+          top: 70px; }
         .cms-container .workspace .editor .field-container .field-key {
           width: 200px;
           line-height: 30px;
