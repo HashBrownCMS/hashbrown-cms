@@ -39051,9 +39051,11 @@ class ArrayEditor extends View {
 
                     return _.option({ value: allowedSchemaId }, allowedSchema.name);
                 })).on('change', () => {
+                    let index = $element.attr('data-array-index');
+
                     itemSchemaId = $schemaSelector.find('select').val();
 
-                    this.value.schemaBindings[i] = itemSchemaId;
+                    this.value.schemaBindings[index] = itemSchemaId;
 
                     this.trigger('change', this.value);
 
@@ -39070,12 +39072,16 @@ class ArrayEditor extends View {
 
                 // Hook up the change event
                 fieldEditorInstance.on('change', newValue => {
-                    this.onChange(newValue, $element.attr('data-array-index'), itemSchema);
+                    let index = $element.attr('data-array-index');
+
+                    this.onChange(newValue, index, itemSchema);
                 });
 
                 // Return the DOM element
                 let $element = _.div({ class: 'item raised', 'data-array-index': i }, _.button({ class: 'btn btn-embedded btn-remove' }, _.span({ class: 'fa fa-remove' })).click(() => {
-                    this.onClickRemoveItem(i);
+                    let index = $element.attr('data-array-index');
+
+                    this.onClickRemoveItem(index);
                 }), this.config.allowedSchemas.length > 1 ? $schemaSelector : null, fieldEditorInstance.$element);
 
                 return $element;
