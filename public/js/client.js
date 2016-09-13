@@ -38931,8 +38931,6 @@ class ArrayEditor extends View {
      * @param {Schema} itemSchema
      */
     onChange(newValue, i, itemSchema) {
-        console.log(i);
-
         if (itemSchema.multilingual) {
             // Sanity check to make sure multilingual fields are accomodated for
             if (!this.value.items[i] || typeof this.value.items[i] !== 'object') {
