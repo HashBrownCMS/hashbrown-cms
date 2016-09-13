@@ -86,6 +86,9 @@ class ArrayEditor extends View {
                         bindingsClone.splice(newIndex, 0, schema);
                         this.value.schemaBindings = bindingsClone;
 
+                        // Change the index in the element
+                        $(instance.element).attr('data-array-index', newIndex);
+
                         oldIndex = newIndex;
                     }
                 });
@@ -208,7 +211,7 @@ class ArrayEditor extends View {
 
                         // Hook up the change event
                         fieldEditorInstance.on('change', (newValue) => {
-                            this.onChange(newValue, i, itemSchema);
+                            this.onChange(newValue, $element.attr('data-array-index'), itemSchema);
                         });
 
                         // Return the DOM element

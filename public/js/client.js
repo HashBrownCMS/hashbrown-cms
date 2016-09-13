@@ -38931,6 +38931,8 @@ class ArrayEditor extends View {
      * @param {Schema} itemSchema
      */
     onChange(newValue, i, itemSchema) {
+        console.log(i);
+
         if (itemSchema.multilingual) {
             // Sanity check to make sure multilingual fields are accomodated for
             if (!this.value.items[i] || typeof this.value.items[i] !== 'object') {
@@ -38974,6 +38976,9 @@ class ArrayEditor extends View {
                         bindingsClone.splice(oldIndex, 1);
                         bindingsClone.splice(newIndex, 0, schema);
                         this.value.schemaBindings = bindingsClone;
+
+                        // Change the index in the element
+                        $(instance.element).attr('data-array-index', newIndex);
 
                         oldIndex = newIndex;
                     }
@@ -39067,7 +39072,7 @@ class ArrayEditor extends View {
 
                 // Hook up the change event
                 fieldEditorInstance.on('change', newValue => {
-                    this.onChange(newValue, i, itemSchema);
+                    this.onChange(newValue, $element.attr('data-array-index'), itemSchema);
                 });
 
                 // Return the DOM element
