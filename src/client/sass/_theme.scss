@@ -531,7 +531,8 @@ select.form-control {
         min-width: 110px;
         height: 30px;
         line-height: 30px;
-        padding: 0px;
+        padding-top: 0px;
+        padding-bottom: 0px;
     } 
 
     @include set-button-color('primary', 'blue');
