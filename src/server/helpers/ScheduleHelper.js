@@ -29,25 +29,36 @@ class ScheduleHelper {
      * @returns {Promise} Promise
      */
     static checkTasks() {
-        debug.log('Checking scheduled tasks...', this);
+        debug.log('Checking scheduled tasks...', this, 3);
 
         return this.getTasks()
         .then((tasks) => {
             let noneFound = true;
 
             for(let i in tasks) {
-                if(tasks[i].isOverdue()) {
+                let task = tasks[i];
+
+                if(task.isOverdue()) {
                     noneFound = false;
 
-                    this.runTask(tasks[i])
+                    this.runTask(task)
                     .catch((e) => {
-                        debug.log(e.message, this);
+                        // If tasks will infinitely fail, they should be removed
+                        // It will take up the entire log, if these errors occur every minute
+                        if(e.message.indexOf('No connections defined') > -1) {
+                            debug.log(e.message + ', removing task...', this);
+
+                            this.removeTask(task.type, task.content, task.project, task.environment);
+
+                        } else {
+                            debug.log(e.message, this);
+                        }
                     });
                 }
             }
 
             if(noneFound) {
-                debug.log('No scheduled tasks are overdue.', this);
+                debug.log('No scheduled tasks are overdue.', this, 3);
             }
         });
     }

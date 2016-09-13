@@ -300,6 +300,13 @@ img.logo {
                 overflow: auto;
             }
 
+            >.field-container {
+                .field-editor {
+                    display: inline-block;
+                    position: relative;
+                }
+            }
+
             .field-container {
                 display: flex;
                 margin-bottom: 30px;
@@ -332,8 +339,6 @@ img.logo {
                 }
 
                 .field-editor {
-                    position: relative;
-
                     >.field-warning {
                         margin: 0px;
                         line-height: 30px;

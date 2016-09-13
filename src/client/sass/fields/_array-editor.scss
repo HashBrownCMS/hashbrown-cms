@@ -1,8 +1,15 @@
 .array-editor {
+    min-width: 100%;
+
     .array-editor {
         .item.raised {
-            padding: 0px;
+            padding: 0px 0px 30px 0px;
             box-shadow: none;
+            border-bottom: 1px solid material-color('grey', '200');
+
+            &:last-of-type {
+                border-bottom: 0px;
+            }
         }
     }
 
@@ -101,10 +108,6 @@
                     flex-grow: 1;
                 }
             }            
-
-            >.field-editor {
-                width: 100%;
-            }
 
             >.btn-remove {
                 position: absolute;

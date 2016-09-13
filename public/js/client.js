@@ -39181,7 +39181,7 @@ class ContentReferenceEditor extends View {
 
     render() {
         // Render main element
-        this.$element = _.div({ class: 'field-editor input-group content-reference-editor' }, [
+        this.$element = _.div({ class: 'field-editor content-reference-editor' }, [
 
         // Render picker
         this.$select = _.select({ class: 'form-control' }, _.each(this.getAllowedContent(), (i, node) => {
@@ -39197,7 +39197,7 @@ class ContentReferenceEditor extends View {
         }),
 
         // Render clear button
-        _.div({ class: 'input-group-btn' }, this.$clearBtn = _.button({ class: 'btn btn-primary' }, 'Clear'))]);
+        this.$clearBtn = _.button({ class: 'btn btn-primary' }, 'Clear')]);
 
         // Set the initial value
         this.$select.val(this.value);

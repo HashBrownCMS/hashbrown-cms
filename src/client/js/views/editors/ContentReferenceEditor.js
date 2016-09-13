@@ -44,7 +44,7 @@ class ContentReferenceEditor extends View {
 
     render() {
         // Render main element
-        this.$element = _.div({class: 'field-editor input-group content-reference-editor'}, [
+        this.$element = _.div({class: 'field-editor content-reference-editor'}, [
 
             // Render picker
             this.$select = _.select({class: 'form-control'},
@@ -62,10 +62,8 @@ class ContentReferenceEditor extends View {
             ).change(() => { this.onChange(); }),
 
             // Render clear button
-            _.div({class: 'input-group-btn'}, 
-                this.$clearBtn = _.button({class: 'btn btn-primary'},
-                    'Clear'
-                )
+            this.$clearBtn = _.button({class: 'btn btn-primary'},
+                'Clear'
             )
         ]);
 

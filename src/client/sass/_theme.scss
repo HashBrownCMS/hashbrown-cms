@@ -427,7 +427,13 @@ button, a {
     }
 }
 
+// Input
 .form-control {
+    &.disabled {
+        pointer-events: none;
+        opacity: 0.5;
+    }
+    
     &, &:active, &:focus, &[readonly] {
         background-color: transparent;
         border-radius: 0px;
@@ -444,6 +450,10 @@ button, a {
 
     &[type="text"], &:not([type]) {
         max-width: 400px;
+    }
+    
+    &[type="number"] {
+        max-width: 100px;
     }
 
     &[type="color"] {
@@ -471,6 +481,8 @@ select.form-control {
         background-size: auto 20px;
         background-repeat: no-repeat;
         background-position: top 50% right 10px;
+        height: 30px;
+        line-height: 30px;
 
         option {
             cursor: pointer;
@@ -517,6 +529,9 @@ select.form-control {
 
     &.btn-primary, &.btn-default, &.btn-danger, &.btn-success {
         min-width: 110px;
+        height: 30px;
+        line-height: 30px;
+        padding: 0px;
     } 
 
     @include set-button-color('primary', 'blue');
@@ -598,14 +613,6 @@ select.form-control {
     .btn-group-addon {
         min-width: 40px;
         padding: 6px;
-    }
-}
-
-// Input
-.form-control {
-    &.disabled {
-        pointer-events: none;
-        opacity: 0.5;
     }
 }
 
