@@ -21,6 +21,49 @@ class ConnectionEditor extends View {
             });
         });
     }
+   
+    /**
+     * Render local switch
+     */
+    renderLocalSwitch() {
+        let view = this;
+        
+        function onChange() {
+            view.model.isLocal = this.checked;
+
+            view.render();
+        }
+
+        return _.div({class: 'field-editor'},
+            _.div({class: 'switch'},
+                _.input({
+                    id: 'switch-is-local',
+                    class: 'form-control switch',
+                    type: 'checkbox',
+                    checked: this.model.isLocal == true
+                }).change(onChange),
+                _.label({for: 'switch-is-local'})
+            )
+        );
+    }
+
+    /**
+     * Render local path editor
+     */
+    renderLocalPathEditor() {
+        let view = this;
+        
+        function onChange() {
+            view.model.localPath = $(this).val();
+
+            view.render();
+        }
+
+        return _.div({class: 'field-editor'},
+            _.input({class: 'form-control', type: 'text', value: this.model.localPath, placeholder: 'Input local path'})
+                .change(onChange)
+        );
+    }
     
     /**
      * Render token editor
@@ -174,38 +217,54 @@ class ConnectionEditor extends View {
     }
 
     render() {
-        this.$element.empty();
-
-        _.append(this.$element,
-            // Token
-            _.div({class: 'field-container github-token'},
-                _.div({class: 'field-key'}, 'Token'),
+        _.append(this.$element.empty(),
+            // Local switch
+            _.div({class: 'field-container is-local'},
+                _.div({class: 'field-key'}, 'Local'),
                 _.div({class: 'field-value'},
-                    this.renderTokenEditor()
+                    this.renderLocalSwitch()
                 )
             ),
-            
-            // Org picker
-            _.div({class: 'field-container github-org'},
-                _.div({class: 'field-key'}, 'Organisation'),
-                _.div({class: 'field-value'},
-                    this.renderOrgPicker()
+            _.if(this.model.isLocal,
+                // Path
+                _.div({class: 'field-container local-path'},
+                    _.div({class: 'field-key'}, 'Local path'),
+                    _.div({class: 'field-value'},
+                        this.renderLocalPathEditor()
+                    )
                 )
             ),
-            
-            // Repo picker
-            _.div({class: 'field-container github-repo'},
-                _.div({class: 'field-key'}, 'Repository'),
-                _.div({class: 'field-value'},
-                    this.renderRepoPicker()
-                )
-            ),
-            
-            // Branch picker
-            _.div({class: 'field-container github-branch'},
-                _.div({class: 'field-key'}, 'Branch'),
-                _.div({class: 'field-value'},
-                    this.renderBranchPicker()
+            _.if(!this.model.isLocal,
+                // Token
+                _.div({class: 'field-container github-token'},
+                    _.div({class: 'field-key'}, 'Token'),
+                    _.div({class: 'field-value'},
+                        this.renderTokenEditor()
+                    )
+                ),
+                
+                // Org picker
+                _.div({class: 'field-container github-org'},
+                    _.div({class: 'field-key'}, 'Organisation'),
+                    _.div({class: 'field-value'},
+                        this.renderOrgPicker()
+                    )
+                ),
+                
+                // Repo picker
+                _.div({class: 'field-container github-repo'},
+                    _.div({class: 'field-key'}, 'Repository'),
+                    _.div({class: 'field-value'},
+                        this.renderRepoPicker()
+                    )
+                ),
+                
+                // Branch picker
+                _.div({class: 'field-container github-branch'},
+                    _.div({class: 'field-key'}, 'Branch'),
+                    _.div({class: 'field-value'},
+                        this.renderBranchPicker()
+                    )
                 )
             )
         );

@@ -38,6 +38,11 @@ class MediaController extends ApiController {
         .then((media) => {
             if(media) {
                 let contentType = media.getContentTypeHeader();
+                
+                if(media.isLocal) {
+                    res.sendFile(media.url);
+                
+                } else 
 
                 // TODO: Remplace this temporary hack with an actual file service
                 // The problem here is that SVG content is received fine through binary representation, but actual binary content isn't
@@ -56,7 +61,7 @@ class MediaController extends ApiController {
                         res.status(200).end(data, 'binary');
                     })
                     .on('fail', (data, response) => {
-                        res.status(404).send(e);   
+                        res.status(404).send(ApiController.error(response));   
                     });
                 }
             } else {
@@ -64,7 +69,7 @@ class MediaController extends ApiController {
             }
         })
         .catch((e) => {
-            res.status(400).end(e.message);  
+            res.status(400).end(ApiController.error(e));  
         });
     }
     

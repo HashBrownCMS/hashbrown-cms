@@ -357,7 +357,6 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
   .btn.btn-primary, .btn.btn-default, .btn.btn-danger, .btn.btn-success {
     min-width: 110px;
     height: 30px;
-    line-height: 30px;
     padding-top: 0px;
     padding-bottom: 0px; }
   .btn.btn-primary {

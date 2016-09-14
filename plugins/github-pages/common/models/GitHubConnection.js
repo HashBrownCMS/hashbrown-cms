@@ -4,6 +4,7 @@ let yamljs = require('../lib/yamljs/Yaml');
 let restler = require('restler');
 let fs = require('fs');
 let path = require('path');
+let glob = require('glob');
 
 let Connection = require(appRoot + '/src/common/models/Connection');
 let Content = require(appRoot + '/src/common/models/Content');
@@ -41,36 +42,152 @@ class GitHubConnection extends Connection {
 
         return frontMatter;
     }
-   
+  
+    /**
+     * Generic get contents method
+     *
+     * @param {String} path
+     * @param {String} type
+     *
+     * @return {Promise} Promise
+     */
+    getContents(path, type) {
+        return new Promise((resolve, reject) => {
+            let headers = {
+                'Accept': 'application/json'
+            };
+            
+            // Local is set, fetch using filesystem
+            if(this.settings.isLocal) {
+                switch(type) {
+                    default: case 'dir':
+                        fs.readdir(this.settings.localPath + path, (err, data) => {
+                            if(err) {
+                                reject(err);
+                            
+                            } else {
+                                resolve(data);
+
+                            }
+                        });
+                        break;
+
+                    case 'file':
+                        fs.readfile(this.settings.localPath + path, (err, data) => {
+                            if(err) {
+                                reject(err);
+                            
+                            } else {
+                                resolve(data);
+
+                            }
+                        });
+                        break;
+                }
+
+            // If not, proceed with REST call
+            } else {
+                restler.get('https://api.github.com/repos/' + this.settings.repo + '/contents/' + path + '?' + this.getAppendix(), {
+                    headers: headers
+                }).on('complete', (data, response) => {
+                    if(data) {
+                        if(data.message) {
+                            reject(new Error('Couldn\'t find "' + path + '". GitHub response: ' + JSON.stringify(data.message)));
+                        
+                        } else {
+                            resolve(data);
+                        }
+                    }
+                });
+            }
+        });
+    }
+    
+    /**
+     * Generic get tree method
+     *
+     * @param {String} root
+     * @param {String} mode
+     *
+     * @return {Promise} Promise
+     */
+    getTree(root, mode) {
+        return new Promise((resolve, reject) => {
+            let headers = {
+                'Accept': 'application/json'
+            };
+            
+            // Local is set, fetch using filesystem
+            if(this.settings.isLocal) {
+                let path = root + '/**/*';
+                
+                if(mode == 'dir') {
+                    path += '/';                
+                }
+
+                glob(
+                    path,
+                    {
+                        cwd: this.settings.localPath,
+                        nodir: mode != 'dir'
+                    }, 
+                    (err, files) => {
+                        if(err) {
+                            reject(err);
+                        
+                        } else {
+                            resolve(files);
+
+                        }     
+                    }
+                );
+
+            // If not, proceed with REST call
+            } else {
+                let headers = {
+                    'Accept': 'application/json'
+                };
+               
+                let getApiUrl = 'https://api.github.com/repos/' + this.settings.repo + '/git/trees/' + (this.settings.branch || 'gh-pages') + '?recursive=1&access_token=' + this.settings.token;
+
+                restler.get(getApiUrl, {
+                    headers: headers
+                }).on('complete', (data, response) => {
+                    if(data) {
+                        if(data.tree) {
+                            resolve(data.tree);    
+                        
+                        } else {
+                            reject(new Error('No tree in GitHub response'));
+
+                        }
+
+                    } else {
+                        reject(new Error('No data in GitHub response'));
+                    }
+                });
+            }
+        });
+    }
+
+
     /**
      * Gets templates
      *
      * @returns {Promise(Array)} templates
      */
     getTemplates() {
-        return new Promise((resolve, reject) => {
-            let headers = {
-                'Accept': 'application/json'
-            };
+        return this.getContents('_layouts')
+        .then((data) => {
+            let templates = [];
             
-            restler.get('https://api.github.com/repos/' + this.settings.repo + '/contents/_layouts?' + this.getAppendix(), {
-                headers: headers
-            }).on('complete', (data, response) => {
-                let templates = [];
+            for(let i  = 0; i < data.length; i++) {
+                let file = data[i];
 
-                if(data) {
-                    if(data.message) {
-                        reject(new Error('Couldn\'t find templates. GitHub response: ' + JSON.stringify(data.message)));
-                    
-                    } else {
-                        for(let i in data) {
-                            let file = data[i];
-
-                            templates[templates.length] = file.path.replace('_layouts/', '').replace('.html', '');
-                        }
-                    }
-                }
-
+                templates[templates.length] = (file.path || file).replace('_layouts/', '').replace('.html', '');
+            }
+               
+            return new Promise((resolve) => {
                 resolve(templates);
             });
         });
@@ -82,29 +199,17 @@ class GitHubConnection extends Connection {
      * @returns {Promise(Array)} sectionTemplates
      */
     getSectionTemplates() {
-        return new Promise((resolve, reject) => {
-            let headers = {
-                'Accept': 'application/json'
-            };
-            
-            restler.get('https://api.github.com/repos/' + this.settings.repo + '/contents/_includes/sections?' + this.getAppendix(), {
-                headers: headers
-            }).on('complete', (data, response) => {
-                let templates = [];
+        return this.getContents('_includes/sections')
+        .then((data) => {
+            let templates = [];
 
-                if(data) {
-                    if(data.message) {
-                        reject(new Error('Couldn\'t find section templates. GitHub response: ' + JSON.stringify(data.message)));
+            for(let i in data) {
+                let file = data[i];
 
-                    } else {
-                        for(let i in data) {
-                            let file = data[i];
+                templates[templates.length] = (file.path || file).replace('_includes/sections/', '').replace('.html', '');
+            }
 
-                            templates[templates.length] = file.path.replace('_includes/sections/', '').replace('.html', '');
-                        }
-                    }
-                }
-
+            return new Promise((resolve) => {
                 resolve(templates);
             });
         });
@@ -116,40 +221,27 @@ class GitHubConnection extends Connection {
      * @returns {Promise(Array)} media
      */
     getAllMedia() {
-        return new Promise((resolve, reject) => {
-            let headers = {
-                'Accept': 'application/json'
-            };
-           
-            let getApiUrl = 'https://api.github.com/repos/' + this.settings.repo + '/git/trees/' + (this.settings.branch || 'gh-pages') + '?recursive=1&access_token=' + this.settings.token;
+        return this.getTree('media', 'file')
+        .then((tree) => {
+            let media = [];
 
-            restler.get(getApiUrl, {
-                headers: headers
-            }).on('complete', (data, response) => {
-                if(data) {
-                    if(data.tree) {
-                        let media = [];
+            for(let node of tree) {
+                let nodePath = this.settings.isLocal ? node : node.path;
+                let isFile = this.settings.isLocal ? true : node.mode == '100644';
 
-                        for(let node of data.tree) {
-                            if(node.path.indexOf('media/') == 0 && node.mode == '100644') {
-                                media[media.length] = new Media({
-                                    name: path.basename(node.path),
-                                    id: path.dirname(node.path).replace('media/', ''),
-                                    url: '/' + node.path
-                                });
-                            }
-                        }
+                let isInMediaDir = nodePath.indexOf('media/') == 0;
 
-                        resolve(media);    
-                    
-                    } else {
-                        reject(new Error('No tree in GitHub response'));
-
-                    }
-
-                } else {
-                    reject(new Error('No data in GitHub response'));
+                if(isInMediaDir && isFile) {
+                    media[media.length] = new Media({
+                        name: path.basename(nodePath),
+                        id: path.dirname(nodePath).replace('media/', '').replace(this.settings.localPath, ''),
+                        url: nodePath
+                    });
                 }
+            }
+
+            return new Promise((resolve) => {
+                resolve(media);    
             });
         });
     }
@@ -162,45 +254,37 @@ class GitHubConnection extends Connection {
      * @returns {Promise(Media)} media
      */
     getMedia(id) {
-        return new Promise((resolve, reject) => {
-            if(id && id != 'undefined' && id != 'null') {
-                let headers = {
-                    'Accept': 'application/json'
-                };
+        if(id && id != 'undefined' && id != 'null') {
+            return this.getContents('media/' + id)
+            .then((data) => {
+                let media = null;
                 
-                restler.get('https://api.github.com/repos/' + this.settings.repo + '/contents/media/' + id + '?' + this.getAppendix(), {
-                    headers: headers
-                }).on('complete', (data, response) => {
-                    if(data) {
-                        if(data.message) {
-                            debug.log('Couldn\'t find media. GitHub response: ' + JSON.stringify(data.message), this);
-                            resolve(null);
+                if(data.length > 0) {
+                    let file = data[0];
+                   
+                    media = new Media({
+                        name: file.name || path.basename(file),
+                        id: id,
+                        url: file.download_url || this.settings.localPath + 'media/' + id + '/' + file,
+                        isLocal: this.settings.isLocal == true
+                    });
 
-                        } else {
-                            if(data.length > 0) {
-                                let file = data[0];
-                                
-                                resolve(new Media({
-                                    name: file.name,
-                                    id: path.dirname(file.path).replace('media/', ''),
-                                    url: file.download_url
-                                }));
+                } else {
+                    debug.log('Media folder "' + id + '" was present, but had no content.', this);
+        
+                }
 
-                            } else {
-                                debug.log('Media folder "' + id + '" was present, but had no content.', this);
-                                resolve(null);
-                    
-                            }
-                        }
-                    } else {
-                        debug.log('No data in GitHub response', this);
-                        resolve();
-                    }
+                return new Promise((resolve) => {
+                    resolve(media);
                 });
-            } else {
+            });
+        
+        } else {
+            return new Promise((resolve) => {
                 resolve(null);
-            }
-        });
+            });
+
+        }
     }
    
     /**

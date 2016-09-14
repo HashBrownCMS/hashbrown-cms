@@ -14,6 +14,7 @@ class Media extends Entity {
         this.def(String, 'name');
         this.def(String, 'url');
         this.def(String, 'folder');
+        this.def(Boolean, 'isLocal');
     }
 
     /**
