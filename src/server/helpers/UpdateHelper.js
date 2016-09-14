@@ -18,7 +18,7 @@ class UpdateHelper {
             let resolveObj = {
                 behind: false,
                 amount: 0,
-                branch: 'origin/master'
+                branch: 'origin/stable'
             };
             
             debug.log('Checking for updates...', this);
