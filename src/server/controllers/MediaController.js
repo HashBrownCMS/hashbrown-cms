@@ -198,19 +198,21 @@ class MediaController extends ApiController {
             })
             .then(() => {
                 // Remove temp file
-                fs.unlinkSync(file.path);
+                if(fs.existsSync(file.path)) {
+                    fs.unlinkSync(file.path);
+                }
 
                 // Return the id
                 res.send(id);
             })            
             .catch((e) => {
-                debug.warning(e);
-                res.status(400).send(e);
+                debug.warning(e.message);
+                res.status(400).send(ApiController.error(e));
             });            
 
         } else {
-            debug.warning(e);
-            res.status(400).send(e);
+            debug.warning(e.message);
+            res.status(400).send(ApiController.error(e));
         }
     }
 
