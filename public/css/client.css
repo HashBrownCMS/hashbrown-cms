@@ -1089,39 +1089,39 @@ body > .dashboard-container {
       border-bottom: 0px; }
   .array-editor.sorting .btn-add-item {
     display: none; }
-  .array-editor.sorting .items .item {
-    overflow-y: hidden;
-    height: 80px;
-    position: relative;
-    border: 0px; }
-    .array-editor.sorting .items .item:after {
-      content: '';
-      display: block;
-      position: absolute;
-      height: 30px;
-      background-image: linear-gradient(to top, white, rgba(255, 255, 255, 0));
-      bottom: 0px;
-      left: 0px;
-      width: 100%;
-      z-index: 20;
-      pointer-events: none; }
-    .array-editor.sorting .items .item .btn-remove {
-      display: none; }
+  .array-editor.sorting .items {
+    border: 2px dashed #bdbdbd;
+    padding: 30px; }
+    .array-editor.sorting .items .item {
+      height: 54px;
+      overflow-y: hidden;
+      position: relative;
+      border: 0px;
+      background-color: #1e88e5;
+      color: #fff; }
+      .array-editor.sorting .items .item .schema-label {
+        display: block;
+        font-weight: 700;
+        line-height: 2em; }
+      .array-editor.sorting .items .item .field-editor, .array-editor.sorting .items .item .item-schema-selector {
+        display: none; }
+      .array-editor.sorting .items .item .btn-remove {
+        display: none; }
   .array-editor.sorting .btn-add {
     display: none; }
   .array-editor .items {
-    padding-top: 30px;
-    padding-bottom: 30px; }
+    padding-bottom: 30px;
+    transition: padding 0.5s ease; }
     .array-editor .items .item {
       position: relative;
       margin-bottom: 30px;
-      margin-top: 30px; }
-      .array-editor .items .item:first-of-type {
-        margin-top: 0px; }
+      transition: background-color 0.5s ease, color 0.5s ease; }
       .array-editor .items .item:last-of-type {
-        margin-bottom: 30px; }
+        margin-bottom: 0px; }
+      .array-editor .items .item .schema-label {
+        display: none; }
       .array-editor .items .item .kvp .key {
-        padding: 1em 1em 0em 0em;
+        padding: 0.5em 1em 0em 0em;
         line-height: 1.25em; }
       .array-editor .items .item > .item-schema-selector {
         clear: both;

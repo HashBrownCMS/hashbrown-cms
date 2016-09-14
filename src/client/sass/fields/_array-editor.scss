@@ -32,23 +32,25 @@
         }
 
         .items {
+            border: 2px dashed material-color('grey', '400');
+            padding: 30px;
+
             .item {
+                height: 54px;
                 overflow-y: hidden;
-                height: 80px;
                 position: relative;
                 border: 0px;
-                
-                &:after {
-                    content: '';
+                background-color: material-color('blue', '600');
+                color: #fff;
+
+                .schema-label {
                     display: block;
-                    position: absolute;
-                    height: 30px;
-                    background-image: linear-gradient(to top, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0));
-                    bottom: 0px;
-                    left: 0px;
-                    width: 100%;
-                    z-index: 20;
-                    pointer-events: none;
+                    font-weight: 700;
+                    line-height: 2em;
+                }
+
+                .field-editor, .item-schema-selector {
+                    display: none;
                 }
 
                 .btn-remove {
@@ -63,25 +65,25 @@
     }
 
     .items {
-        padding-top: 30px;
         padding-bottom: 30px;
+        transition: padding 0.5s ease;
         
         .item {
             position: relative;
             margin-bottom: 30px;
-            margin-top: 30px;
-
-            &:first-of-type {
-                margin-top: 0px;
-            }
+            transition: background-color 0.5s ease, color 0.5s ease;
 
             &:last-of-type {
-                margin-bottom: 30px;
+                margin-bottom: 0px;
+            }
+
+            .schema-label {
+                display: none;
             }
 
             .kvp {
                 .key {
-                    padding: 1em 1em 0em 0em;
+                    padding: 0.5em 1em 0em 0em;
                     line-height: 1.25em;
                 }
             }

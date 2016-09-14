@@ -21136,6 +21136,7 @@ class DragDrop {
             let instance = instances[i];
 
             if(instance.element == element) {
+                instance.element.removeAttribute('data-dragdrop-enabled');
                 instance.removeListeners();            
                 instances.splice(i, 1);
                 break;
@@ -39103,6 +39104,9 @@ class ArrayEditor extends View {
                     this.render();
                 }).val(itemSchemaId)));
 
+                // Set schema label (used when sorting items)
+                let $schemaLabel = _.span({ class: 'schema-label' }, itemSchema.name);
+
                 // Init the field editor
                 let fieldEditorInstance = new fieldEditor({
                     value: itemSchema.multilingual ? item[window.language] : item,
@@ -39123,7 +39127,7 @@ class ArrayEditor extends View {
                     let index = $element.attr('data-array-index');
 
                     this.onClickRemoveItem(index);
-                }), this.config.allowedSchemas.length > 1 ? $schemaSelector : null, fieldEditorInstance.$element);
+                }), $schemaLabel, this.config.allowedSchemas.length > 1 ? $schemaSelector : null, fieldEditorInstance.$element);
 
                 return $element;
             } else {
