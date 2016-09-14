@@ -520,6 +520,12 @@ select.form-control {
 }
 
 // Buttons
+a.btn {
+    &.btn-primary, &.btn-default, &.btn-danger, &.btn-success {
+        line-height: 30px;
+    }
+}
+
 .btn {
     border-radius: 2px;
     letter-spacing: 0.1em;

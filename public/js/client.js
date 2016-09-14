@@ -41348,10 +41348,8 @@ class MediaPane extends Pane {
         let name = $('.context-menu-target-element').data('name');
 
         function onSuccess() {
-            debug.log('Removed media with id "' + id + '"', view);
-
             reloadResource('media').then(function () {
-                view.reload();
+                ViewHelper.get('NavbarMain').reload();
 
                 // Cancel the MediaViever view if it was displaying the deleted object
                 if (location.hash == '#/media/' + id) {

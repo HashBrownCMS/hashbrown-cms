@@ -66,25 +66,25 @@ class MediaHelper extends MediaHelperCommon {
      * @param {Function} callback
      */
     static mkdirRecursively(dirPath, callback) {
-        return new Promise((resolve, reject) => {
-            let parents = dirPath.split('/');
-            let finalPath = '/';
+        let parents = dirPath.split('/');
+        let finalPath = '/';
 
-            for(let i in parents) {
-                finalPath += parents[i];
+        for(let i in parents) {
+            finalPath += parents[i];
 
-                if(!fs.existsSync(finalPath)) {
-                    console.log('Creating parent ' + finalPath);
-                    fs.mkdirSync(finalPath);
-                }
-
-                if(i < parents.length - 1) {
-                    finalPath += '/';
-                }
+            if(!fs.existsSync(finalPath)) {
+                console.log('Creating parent ' + finalPath);
+                fs.mkdirSync(finalPath);
             }
-            
+
+            if(i < parents.length - 1) {
+                finalPath += '/';
+            }
+        }
+        
+        if(callback) {
             callback();
-        });
+        }
     }
 
     /**
