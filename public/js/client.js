@@ -35355,6 +35355,22 @@ window.errorModal = function errorModal(error) {
 };
 
 /**
+ * Gets a cookie by name
+ *
+ * @param {String} name
+ *
+ * @returns {String} value
+ */
+window.getCookie = function getCookie(name) {
+    let value = "; " + document.cookie;
+    let parts = value.split("; " + name + "=");
+
+    if (parts.length == 2) {
+        return parts.pop().split(";").shift();
+    }
+};
+
+/**
  * Logs out the current user
  */
 window.logout = function logout() {
@@ -36718,7 +36734,7 @@ Router.route('/schemas/json/:id', function () {
         model: resources.schemas[this.id],
         apiPath: 'schemas/' + this.id,
         onSuccess: () => {
-            reloadResource('schemas').then(() => {
+            return reloadResource('schemas').then(() => {
                 let navbar = ViewHelper.get('NavbarMain');
 
                 navbar.reload();
@@ -37858,10 +37874,26 @@ class JSONEditor extends View {
         this.debug();
     }
 
+    /**
+     * Event: Change theme
+     */
+    onChangeTheme() {
+        let currentTheme = this.$element.find('.CodeMirror')[0].className.replace('CodeMirror cm-s-', '') || 'default';
+        let newTheme = this.$element.find('.cm-theme select').val();
+
+        $('.cm-s-' + currentTheme).removeClass('cm-s-' + currentTheme).addClass('cm-s-' + newTheme);
+
+        document.cookie = 'cmtheme = ' + newTheme;
+    }
+
     render() {
         this.value = beautify(JSON.stringify(this.model));
 
-        this.$element.html([_.div({ class: 'editor-body' }, this.$textarea = _.textarea(), this.$error), _.div({ class: 'editor-footer' }, _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-embedded' }, 'Basic').click(() => {
+        this.$element.html([_.div({ class: 'editor-body' }, this.$textarea = _.textarea(), this.$error), _.div({ class: 'editor-footer' }, _.div({ class: 'btn-group pull-left cm-theme' }, _.span('Theme'), _.select({ class: 'form-control' }, _.each(['cobalt', 'default', 'night', 'railscasts'], (i, theme) => {
+            return _.option({ value: theme }, theme);
+        })).change(() => {
+            this.onChangeTheme();
+        }).val(getCookie('cmtheme') || 'default')), _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-embedded' }, 'Basic').click(() => {
             this.onClickBasic();
         }), _.if(!this.model.locked, _.button({ class: 'btn btn-raised btn-success' }, 'Save ').click(() => {
             this.onClickSave();
@@ -37876,10 +37908,13 @@ class JSONEditor extends View {
                 },
                 tabSize: 4,
                 indentWithTabs: true,
-                theme: 'neo'
+                theme: getCookie('cmtheme') || 'default',
+                value: this.value
             });
 
             this.editor.getDoc().setValue(this.value);
+
+            this.editor;
 
             this.editor.on('change', () => {
                 this.onChangeText();
@@ -41351,10 +41386,8 @@ class MediaPane extends Pane {
         let name = $('.context-menu-target-element').data('name');
 
         function onSuccess() {
-            debug.log('Removed media with id "' + id + '"', view);
-
             reloadResource('media').then(function () {
-                view.reload();
+                ViewHelper.get('NavbarMain').reload();
 
                 // Cancel the MediaViever view if it was displaying the deleted object
                 if (location.hash == '#/media/' + id) {

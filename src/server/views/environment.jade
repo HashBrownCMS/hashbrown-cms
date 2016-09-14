@@ -9,8 +9,10 @@ html
         link(href='/lib/bootstrap/css/bootstrap.min.css', rel='stylesheet')
         link(href='/lib/font-awesome/css/font-awesome.min.css', rel='stylesheet')
         link(href='/css/client.css', rel='stylesheet')
-        link(href='/lib/codemirror/codemirror.css', rel='stylesheet')
-        link(href='/lib/codemirror/theme/neo.css', rel='stylesheet')
+        link(href='/lib/codemirror/lib/codemirror.css', rel='stylesheet')
+        link(href='/lib/codemirror/theme/cobalt.css', rel='stylesheet')
+        link(href='/lib/codemirror/theme/railscasts.css', rel='stylesheet')
+        link(href='/lib/codemirror/theme/night.css', rel='stylesheet')
 
         title HashBrown CMS
     body
@@ -29,8 +31,8 @@ html
         script(src='/lib/jquery/jquery.min.js')
         script(src='/lib/bootstrap/js/bootstrap.min.js')
         script(src='/js/client.js')
-        script(src='/lib/codemirror/codemirror.js')
-        scrtip(src='/lib/codemirror/mode/javascript/javascript.js')
+        script(src='/lib/codemirror/lib/codemirror.js')
+        script(src='/lib/codemirror/mode/javascript/javascript.js')
         
         script.
             ProjectHelper.currentProject = '#{currentProject}';

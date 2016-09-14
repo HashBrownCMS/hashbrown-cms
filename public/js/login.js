@@ -70,6 +70,11 @@ $('.login').each(function() {
         .then(function() {
             let newLocation = location.href.replace(location.protocol + '//' + location.hostname + location.pathname, '');
             newLocation = newLocation.replace('?path=', '') || '';
+            
+            // Check for initial hash
+            if(newLocation[0] == '#') {
+                newLocation = newLocation.slice(1);
+            }
 
             // Check for initial slash
             if(newLocation[0] != '/') {

@@ -50,6 +50,22 @@ window.errorModal = function errorModal(error) {
 }
 
 /**
+ * Gets a cookie by name
+ *
+ * @param {String} name
+ *
+ * @returns {String} value
+ */
+window.getCookie = function getCookie(name) {
+    let value = "; " + document.cookie;
+    let parts = value.split("; " + name + "=");
+
+    if(parts.length == 2) {
+        return parts.pop().split(";").shift();
+    }
+}
+
+/**
  * Logs out the current user
  */
 window.logout = function logout() {

@@ -975,6 +975,12 @@ body > .dashboard-container {
     top: calc(100% - 1em);
     right: 1em;
     transform: translateY(-100%); }
+  .json-editor .cm-theme span {
+    line-height: 30px;
+    margin-right: 2em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: #bdbdbd; }
   .json-editor .panel-danger {
     position: absolute;
     bottom: 0rem;

@@ -213,8 +213,12 @@ app.get('/', function(req, res) {
 
 // Environment
 app.get('/:project/:environment/', function(req, res) {
+    let user;
+    
     ApiController.authenticate(req.cookies.token)
-    .then((user) => {
+    .then((authUser) => {
+        user = authUser;
+
         if(!user.scopes[req.params.project]) {
             debug.error('User "' + user.username + '" doesn\'t have project "' + req.params.project + '" in scopes');
         }  
@@ -224,11 +228,12 @@ app.get('/:project/:environment/', function(req, res) {
     .then(() => {
         res.render('environment', {
             currentProject: ProjectHelper.currentProject,
-            currentEnvironment: ProjectHelper.currentEnvironment
+            currentEnvironment: ProjectHelper.currentEnvironment,
+            user: user
         });
     })
     .catch((e) => {
         debug.log(e.message, this);
-        res.status(403).redirect('/login');  
+        res.status(403).redirect('/login?path=/' + req.params.project + '/' + req.params.environment);  
     });
 });

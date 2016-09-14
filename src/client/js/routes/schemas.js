@@ -29,7 +29,7 @@ Router.route('/schemas/json/:id', function() {
         model: resources.schemas[this.id],
         apiPath: 'schemas/' + this.id,
         onSuccess: () => {
-            reloadResource('schemas')
+            return reloadResource('schemas')
             .then(() => {
                 let navbar = ViewHelper.get('NavbarMain');
                 

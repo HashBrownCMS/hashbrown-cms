@@ -253,6 +253,20 @@ class JSONEditor extends View {
         this.debug();
     }
 
+    /**
+     * Event: Change theme
+     */
+    onChangeTheme() {
+        let currentTheme = this.$element.find('.CodeMirror')[0].className.replace('CodeMirror cm-s-', '') || 'default';
+        let newTheme = this.$element.find('.cm-theme select').val();
+
+        $('.cm-s-' + currentTheme)
+            .removeClass('cm-s-' + currentTheme)
+            .addClass('cm-s-' + newTheme);
+
+        document.cookie = 'cmtheme = ' + newTheme;
+    }
+
     render() {
         this.value = beautify(JSON.stringify(this.model));
 
@@ -262,6 +276,14 @@ class JSONEditor extends View {
                 this.$error
             ),
             _.div({class: 'editor-footer'}, 
+                _.div({class: 'btn-group pull-left cm-theme'},
+                    _.span('Theme'),
+                    _.select({class: 'form-control'},
+                        _.each([ 'cobalt', 'default', 'night', 'railscasts' ], (i, theme) => {
+                            return _.option({value: theme}, theme);
+                        })
+                    ).change(() => { this.onChangeTheme(); }).val(getCookie('cmtheme') || 'default')
+                ),
                 _.div({class: 'btn-group'},
                     _.button({class: 'btn btn-embedded'},
                         'Basic'
@@ -284,10 +306,13 @@ class JSONEditor extends View {
                 },
                 tabSize: 4,
                 indentWithTabs: true,
-                theme: 'neo'
+                theme: getCookie('cmtheme') || 'default',
+                value: this.value
             });
 
             this.editor.getDoc().setValue(this.value);
+
+            this.editor
 
             this.editor.on('change', () => { this.onChangeText(); });
 

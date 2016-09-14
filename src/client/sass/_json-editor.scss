@@ -19,6 +19,16 @@
         transform: translateY(-100%)
     }
 
+    .cm-theme {
+        span {
+            line-height: 30px;
+            margin-right: 2em;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: material-color('grey', '400');
+        }
+    } 
+
     .panel-danger {
         position: absolute;
         bottom: 0rem;
