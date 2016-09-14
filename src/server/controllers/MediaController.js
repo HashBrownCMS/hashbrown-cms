@@ -44,7 +44,7 @@ class MediaController extends ApiController {
                 
                 } else 
 
-                // TODO: Remplace this temporary hack with an actual file service
+                // TODO: Replace this temporary hack with an actual file service
                 // The problem here is that SVG content is received fine through binary representation, but actual binary content isn't
                 if(contentType != 'image/svg+xml') {
                     res.redirect(media.url);

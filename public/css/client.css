@@ -537,9 +537,12 @@ body {
 img.logo {
   width: 30px;
   height: 30px; }
-  img.logo.lg {
+  img.logo.md {
     width: 60px;
     height: 60px; }
+  img.logo.lg {
+    width: 120px;
+    height: 120px; }
 
 @keyframes spinner {
   0% {
