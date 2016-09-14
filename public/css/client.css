@@ -685,7 +685,8 @@ img.logo {
         padding: 15px;
         flex-grow: 1;
         max-height: calc(100% - 61px);
-        overflow: auto; }
+        overflow: auto;
+        position: relative; }
       .cms-container .workspace .editor > .field-container .field-editor {
         display: inline-block;
         position: relative; }
@@ -962,32 +963,18 @@ body > .dashboard-container {
   width: 100%;
   height: 100%;
   position: relative; }
-  .json-editor .editor-container {
-    flex-grow: 1;
-    display: flex;
-    position: relative; }
-    .json-editor .editor-container .line-numbers, .json-editor .editor-container textarea {
-      line-height: 1.25em;
-      font-family: 'Roboto Mono';
-      padding: 0px; }
-    .json-editor .editor-container .line-numbers {
-      flex-shrink: 0;
-      color: #e0e0e0;
-      background-color: #424242;
-      padding: 0px 10px; }
-    .json-editor .editor-container textarea {
-      color: #eeeeee;
-      background-color: #212121;
-      overflow: auto;
-      display: block;
-      border: 0px;
-      resize: none;
-      flex-grow: 1; }
-    .json-editor .editor-container .btn-prettify {
-      position: absolute;
-      top: calc(100% - 1em);
-      right: 1em;
-      transform: translateY(-100%); }
+  .json-editor .CodeMirror {
+    height: 100%;
+    display: block;
+    width: 100%;
+    position: absolute;
+    top: 0px;
+    left: 0px; }
+  .json-editor .btn-prettify {
+    position: absolute;
+    top: calc(100% - 1em);
+    right: 1em;
+    transform: translateY(-100%); }
   .json-editor .panel-danger {
     position: absolute;
     bottom: 0rem;

@@ -37853,15 +37853,7 @@ class JSONEditor extends View {
      * Event: Change text. Make sure the value is up to date
      */
     onChangeText() {
-        this.value = this.$element.find('textarea').val();
-
-        let $lineNumbers = this.$element.find('.line-numbers');
-
-        $lineNumbers.empty();
-
-        for (let i = 0; i < this.value.split(/\r\n|\r|\n/).length; i++) {
-            $lineNumbers.append(i + '<br />');
-        }
+        this.value = this.editor.getDoc().getValue();
 
         this.debug();
     }
@@ -37869,21 +37861,32 @@ class JSONEditor extends View {
     render() {
         this.value = beautify(JSON.stringify(this.model));
 
-        this.$element.html([_.div({ class: 'editor-container' }, _.div({ class: 'line-numbers' }), _.textarea({ class: 'flex-expand', disabled: this.model.locked }, this.value).on('keydown', e => {
-            if (e.which == 9) {
-                e.preventDefault();return false;
-            }
-        }).on('keyup change propertychange paste', e => {
-            return this.onChangeText();
-        }), this.$error, _.button({ class: 'btn btn-round btn-raised btn-prettify' }, '{ }').click(() => {
-            this.onClickBeautify();
-        })), _.div({ class: 'editor-footer' }, _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-embedded' }, 'Basic').click(() => {
+        this.$element.html([_.div({ class: 'editor-body' }, this.$textarea = _.textarea(), this.$error), _.div({ class: 'editor-footer' }, _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-embedded' }, 'Basic').click(() => {
             this.onClickBasic();
         }), _.if(!this.model.locked, _.button({ class: 'btn btn-raised btn-success' }, 'Save ').click(() => {
             this.onClickSave();
         }))))]);
 
-        this.onChangeText();
+        setTimeout(() => {
+            this.editor = CodeMirror.fromTextArea(this.$textarea[0], {
+                lineNumbers: true,
+                mode: {
+                    name: 'javascript',
+                    json: true
+                },
+                tabSize: 4,
+                indentWithTabs: true,
+                theme: 'neo'
+            });
+
+            this.editor.getDoc().setValue(this.value);
+
+            this.editor.on('change', () => {
+                this.onChangeText();
+            });
+
+            this.onChangeText();
+        }, 1);
     }
 }
 
@@ -41348,8 +41351,10 @@ class MediaPane extends Pane {
         let name = $('.context-menu-target-element').data('name');
 
         function onSuccess() {
+            debug.log('Removed media with id "' + id + '"', view);
+
             reloadResource('media').then(function () {
-                ViewHelper.get('NavbarMain').reload();
+                view.reload();
 
                 // Cancel the MediaViever view if it was displaying the deleted object
                 if (location.hash == '#/media/' + id) {

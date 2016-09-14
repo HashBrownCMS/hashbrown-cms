@@ -298,6 +298,7 @@ img.logo {
                 flex-grow: 1;
                 max-height: calc(100% - 61px);
                 overflow: auto;
+                position: relative;
             }
 
             >.field-container {
