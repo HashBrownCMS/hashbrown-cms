@@ -19,8 +19,9 @@ class ResourceReferenceEditor extends View {
 
             if(!value) {
                 for(let i in resource) {
-                    if(resource[i].id = this.value) {
+                    if(resource[i].id == this.value) {
                         value = resource[i];
+                        break;
                     }
                 }
             }
