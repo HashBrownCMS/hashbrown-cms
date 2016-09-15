@@ -20674,6 +20674,7 @@ class DragDrop {
             let instance = instances[i];
 
             if(instance.element == element) {
+                instance.element.removeAttribute('data-dragdrop-enabled');
                 instance.removeListeners();            
                 instances.splice(i, 1);
                 break;
@@ -20736,6 +20737,14 @@ class DragDrop {
      * @return {Array} ranking
      */
     static sortByZProximity(elements, x, y) {
+        if(!elements) {
+            throw new Error('sortByZProximity: Elements array is null');
+        }
+
+        if(elements instanceof NodeList) {
+            throw new Error('sortByZProximity: Elements array is a NodeList');
+        }
+
         let result = [];
         let stack = DragDrop.getElementStack(x, y);
 
@@ -20886,20 +20895,34 @@ class DragDrop {
 
         // A selector is specified
         } else if(this.config.dropContainerSelector) {
-            DragDrop.currentDropContainers = [].slice.call(document.querySelectorAll(this.config.dropContainerSelector));
+            DragDrop.currentDropContainers = document.querySelectorAll(this.config.dropContainerSelector);
 
-            // If the element itself was found, filter it out
-            DragDrop.currentDropContainers = DragDrop.currentDropContainers.filter((dropContainer) => {
-                let isSelf = dropContainer == this.element || dropContainer.parentElement == this.element;
-
-                if(isSelf) {
-                    return false;
-                } else {
-                    dropContainer.dataset.dragdropDropContainer = true;
-                    return true;
-                }
-            });
+        // Nothing was specified, use immediate parent
+        } else {
+            DragDrop.currentDropContainers = [ this.element.parentElement ];
         }
+
+        // Convert NodeList to Array
+        if(DragDrop.currentDropContainers instanceof NodeList) {
+            let array = [];
+            let nodeList = DragDrop.currentDropContainers;
+
+            for(let i = nodeList.length; i--; array.unshift(nodeList[i]));
+
+            DragDrop.currentDropContainers = array;
+        }
+                
+        // If the element itself was found, filter it out
+        DragDrop.currentDropContainers = DragDrop.currentDropContainers.filter((dropContainer) => {
+            let isSelf = dropContainer == this.element || dropContainer.parentElement == this.element;
+
+            if(isSelf) {
+                return false;
+            } else {
+                dropContainer.dataset.dragdropDropContainer = true;
+                return true;
+            }
+        });
     }
 
     /**
@@ -21079,6 +21102,7 @@ class DragDrop {
         let placeholder = document.getElementById('dragdrop-placeholder');
         
         // Set new parent
+        // NOTE: Somehow this can delete the inner HTML of an element. Why?
         placeholder.parentElement.insertBefore(this.element, placeholder);
 
         // Remove placeholder
@@ -21876,7 +21900,14 @@ class View {
         let element = (this.element || this.$element[0]);
         
         element.addEventListener('DOMNodeRemovedFromDocument', () => {
-            this.remove();
+            // Wait a few cycles before removing, as the element might just have been relocated
+            setTimeout(() => {
+                let element = (this.element || this.$element[0]);
+                
+                if(!element || !element.parentNode) {
+                    this.remove();
+                }
+            }, 10);
         });
 
         this.trigger('ready', this);
@@ -22060,12 +22091,12 @@ class View {
                         view.init();
                     } else {
                         // We reached our target server, but it returned an error
-                        throw 'Couldn\'t fetch model data';
+                        throw new Error('Couldn\'t fetch model data');
                     }
                 };
 
                 request.onerror = function(e) {
-                    throw e.toString();
+                    throw e;
                 };
 
                 request.send();
