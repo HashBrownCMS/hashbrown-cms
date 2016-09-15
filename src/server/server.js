@@ -80,49 +80,34 @@ TemplateController.init(app);
 UserController.init(app);
 
 // ----------
-// Ready callback
+// Check args
 // ----------
-function ready() {
-    // Start server
-    let port = 80;
-    let server = app.listen(port);
-
-    console.log('RESTART');
-   
-    // Start schedule helper
-    ScheduleHelper.startWatching();
-
-    // Startup arguments
-    let cmd;
+function checkArgs() {
+    let cmd = process.argv[2];
     let args = {};
-
+    
     for(let k in process.argv) {
         let v = process.argv[k];
 
-        if(/--\w+/.test(v)) {
-           cmd = v.replace('--', '');
-        
-        } else if(/\w=\w+/.test(v)) {
-            args[v.substring(0, 1)] = v.substring(2);
-        
+        let matches = v.match(/(\w+)=(\w+)/);
+
+        if(matches) {
+            args[matches[1]] = matches[2];
         }
     }
 
     switch(cmd) {
         case 'create-user':
-            UserHelper.createUser(args.u, args.p);
-            return;
+            return UserHelper.createUser(args.u, args.p, args.admin == 'true');
        
         case 'make-user-admin':
-            UserHelper.makeUserAdmin(args.u);
-            return;
+            return UserHelper.makeUserAdmin(args.u);
 
         case 'revoke-tokens':
-            UserHelper.revokeTokens(args.u, args.p);
-            return;
+            return UserHelper.revokeTokens(args.u, args.p);
     
         case 'set-user-scopes':
-            UserHelper.findUser(args.u)
+            return UserHelper.findUser(args.u)
             .then((user) => {
                 let obj = user.getObject();
                 
@@ -132,10 +117,41 @@ function ready() {
 
                 obj.scopes[args.p] = args.s.split(',');
 
-                UserHelper.updateUser(args.u, obj);
+                return UserHelper.updateUser(args.u, obj);
             });
-            return;
+
+        default:
+            return new Promise((resolve) => {
+                resolve('proceed');  
+            });
     }
+}
+
+// ----------
+// Ready callback
+// ----------
+function ready() {
+    // Check for args, and close the app if any were run
+    checkArgs()
+    .then((result) => {
+        if(result == 'proceed') {
+            // Start server
+            let port = 80;
+            let server = app.listen(port);
+
+            console.log('RESTART');
+           
+            // Start schedule helper
+            ScheduleHelper.startWatching();
+        
+        } else {
+            process.exit();
+
+        } 
+    })
+    .catch((e) => {
+        throw e;
+    });
 }
 
 // ----------
@@ -219,7 +235,7 @@ app.get('/:project/:environment/', function(req, res) {
     .then((authUser) => {
         user = authUser;
 
-        if(!user.scopes[req.params.project]) {
+        if(!user.isAdmin && !user.scopes[req.params.project]) {
             debug.error('User "' + user.username + '" doesn\'t have project "' + req.params.project + '" in scopes');
         }  
 

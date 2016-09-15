@@ -315,21 +315,27 @@ class ServerController extends ApiController {
      * Gets a list of all projects
      */
     static getAllProjects(req, res) {
-        let scopes = {};
+        let user;
 
         ApiController.authenticate(req.cookies.token)
-        .then((user) => {
-            scopes = user.scopes;
+        .then((authUser) => {
+            user = authUser;
 
             return ProjectHelper.getAllProjects();
         })
         .then((projects) => {
             let scopedProjects = [];
 
-            for(let scope in scopes) {
-                if(projects.indexOf(scope) > -1) {
-                    scopedProjects.push(scope);
+            if(!user.isAdmin) {
+                for(let scope in scopes) {
+                    if(projects.indexOf(scope) > -1) {
+                        scopedProjects.push(scope);
+                    }
                 }
+
+            } else {
+                scopedProjects = projects;
+                    
             }
 
             scopedProjects.sort((a, b) => {
@@ -359,7 +365,7 @@ class ServerController extends ApiController {
 
         ApiController.authenticate(req.cookies.token)
         .then((user) => {
-            if(user.scopes[project])  {
+            if(user.isAdmin || user.scopes[project])  {
                 return ProjectHelper.getProject(project);
             
             } else {

@@ -402,6 +402,7 @@ class NavbarMain extends View {
             url: '/api/user/scopes',
             success: (allScopes) => {
                 let scopes = allScopes[ProjectHelper.currentProject] || [];
+                let isAdmin = isCurrentUserAdmin();
 
                 // Render the "cms" pane
                 this.renderPane(CMSPane.getRenderSettings());
@@ -416,24 +417,24 @@ class NavbarMain extends View {
                 this.renderPane(FormsPane.getRenderSettings());
                 
                 // Render the "connections" pane
-                if(scopes.indexOf('connections') > -1) {
+                if(isAdmin || scopes.indexOf('connections') > -1) {
                     this.renderPane(ConnectionPane.getRenderSettings());
                 }
                 
                 // Render the "schemas" pane
-                if(scopes.indexOf('schemas') > -1) {
+                if(isAdmin || scopes.indexOf('schemas') > -1) {
                     this.renderPane(SchemaPane.getRenderSettings());
                 }
                 
                 // Render the "users" pane
-                if(scopes.indexOf('users') > -1) {
+                if(isAdmin || scopes.indexOf('users') > -1) {
                     this.renderPane(UserPane.getRenderSettings());
                 }
 
                 // ----------
                 // Render the "settings" pane
                 // ----------
-                if(scopes.indexOf('settings') > -1) {
+                if(isAdmin || scopes.indexOf('settings') > -1) {
                     this.renderPane({
                         label: 'Settings',
                         route: '/settings/',

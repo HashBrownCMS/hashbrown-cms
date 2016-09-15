@@ -28,8 +28,8 @@ class ApiController extends Controller {
                         // Set the currently authenticated user as a static variable
                         UserHelper.current = user;
 
-                        // If a scope is defined, check for it
-                        if(scope) {
+                        // If a scope is defined, and the user isn't an admin, check for it
+                        if(scope && !user.isAdmin) {
                             if(user.hasScope(ProjectHelper.currentProject, scope)) {
                                 resolve(user);
                     

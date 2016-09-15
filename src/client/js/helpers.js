@@ -12,6 +12,21 @@ window.debug = require('../../common/helpers/DebugHelper');
 window.debug.verbosity = 3;
 
 /**
+ * Checks if the currently logged in user is admin
+ *
+ * @resurns {Boolean} Is admin
+ */
+window.isCurrentUserAdmin = function isCurrentUserAdmin() {
+    for(let user of resources.users) {
+        if(user.isCurrent) {
+            return user.isAdmin;
+        }
+    }
+
+    return false;
+}
+
+/**
  * Brings up a message modal
  *
  * @param {String} title

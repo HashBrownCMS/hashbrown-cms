@@ -271,6 +271,29 @@ class UserEditor extends View {
                 change(onChange)
         );
     }
+    
+    /**
+     * Renders the admin editor
+     *
+     * @return {HTMLElement} Element
+     */
+    renderAdminEditor() {
+        let view = this;
+
+        function onChange() {
+            view.model.isAdmin = this.checked;
+        } 
+
+        return _.div({class: 'admin-editor switch'},
+            _.input({
+                id: 'switch-is-admin',
+                class: 'form-control switch',
+                type: 'checkbox',
+                checked: view.model.isAdmin == true
+            }),
+            _.label({for: 'switch-is-admin'})
+        );
+    }
 
     /**
      * Renders a single field
@@ -301,6 +324,7 @@ class UserEditor extends View {
         $element.append(this.renderField('Username', this.renderUserNameEditor()));
         $element.append(this.renderField('Full name', this.renderFullNameEditor()));
         $element.append(this.renderField('Email', this.renderEmailEditor()));
+        $element.append(this.renderField('Is admin', this.renderAdminEditor()));
         $element.append(this.renderField('Scopes', this.renderScopesEditor()));
 
         return $element;

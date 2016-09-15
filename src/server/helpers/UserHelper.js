@@ -176,82 +176,58 @@ class UserHelper {
      *
      * @param {String} username
      * @param {String} password
-     * @param {Object} scopes
+     * @param {Boolean} admin
      *
      * @returns {Promise} promise
      */
-    static createUser(username, password, scopes) {
+    static createUser(username, password, admin) {
+        if(!username) {
+            return new Promise((resolve, reject) => {
+                reject(new Error('Create user: Username was not provided'));
+            });
+        }
+        
+        if(!password) {
+            return new Promise((resolve, reject) => {
+                reject(new Error('Create user: Password was not provided'));
+            });
+        }
+        
         let user = User.create(username, password);
 
-        user.scopes = scopes;
+        user.isAdmin = admin || false;
 
-        return new Promise((resolve, reject) => {
-            MongoHelper.findOne(
-                'users',
-                'users',
-                {
-                    username: username
-                }
-            ).then((found) => {
-                let foundUser = new User(found);
+        return MongoHelper.findOne(
+            'users',
+            'users',
+            {
+                username: username
+            }
+        ).then((found) => {
+            let foundUser = new User(found);
 
-                // User wasn't found, create
-                if(!found) {
-                    debug.log('Creating user "' + username + '"...', this);
-                    
-                    MongoHelper.insertOne(
-                        'users',
-                        'users',
-                        user.getFields()
-                    ).then(() => {
-                        debug.log('Created user "' + username + '" successfully', this);
-                        
+            // User wasn't found, create
+            if(!found) {
+                debug.log('Creating user "' + username + '"...', this);
+                
+                return MongoHelper.insertOne(
+                    'users',
+                    'users',
+                    user.getFields()
+                ).then(() => {
+                    debug.log('Created user "' + username + '" successfully', this);
+                   
+                    return new Promise((resolve) => {
                         resolve(user);
-                    })
-                    .catch(reject);
+                    }); 
+                });
 
-                // If scopes are defined and credentials match
-                } else if(
-                    scopes &&
-                    user.username === found.username &&
-                    foundUser.validatePassword(password)
-                ) {
-                    for(let project in scopes) {
-                        let projectScopes = scopes[project] || [];
-
-                        // User already has project scope, merge them
-                        if(found.scopes[project]) {
-                            for(let projectScope in projectScopes) {
-                                if(found.scopes[project].indexOf(projectScope) < 0) {
-                                    found.scopes[project].push(projectScope);
-                                }
-                            }
-                        
-                        } else {
-                            found.scopes[project] = projectScopes;
-                        
-                        }
-                    }
-
-                    MongoHelper.updateOne(
-                        'users',
-                        'users',
-                        {
-                            username: username  
-                        },
-                        found
-                    ).then(() => {
-                        resolve(found);
-                    })
-                    .catch(reject);
-
-                // Scopes are not defined, user is a duplicate
-                } else {
-                    reject(new Error('User with username "' + username + '" already exists'))
-
-                }
-            })
-            .catch(reject);
+            // Username matches an existing user
+            } else {
+                return new Promise((resolve, reject) => {
+                    reject(new Error('Username already exists'));
+                });
+            }
         });
     }
 
@@ -285,7 +261,15 @@ class UserHelper {
             if(project) {
                 debug.log('Getting all users with project "' + project + '" in scope...', this, 3);
 
-                query['scopes.' + project] = { $exists: true };
+                let projectScopeQuery = {};
+                projectScopeQuery['scopes.' + project] = { $exists: true };
+
+                let isAdminQuery = { isAdmin: true };
+
+                query['$or'] = [
+                    projectScopeQuery,
+                    isAdminQuery
+                ];
 
             } else {
                 debug.log('Getting all users...', this);
