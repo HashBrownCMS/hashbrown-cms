@@ -28,7 +28,6 @@ class ArrayEditor extends View {
         this.value.schemaBindings.splice(i,1);
         this.value.items.splice(i,1);
        
-        this.$element. 
         this.updateDOMIndices();
     }
 
