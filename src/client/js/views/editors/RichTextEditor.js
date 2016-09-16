@@ -223,7 +223,7 @@ class RichTextEditor extends View {
 
             // Markdown editor
             _.div({class: 'panel-footer'},
-                this.$textarea = _.textarea({class: 'form-control', type: 'text'}, 
+                this.$textarea = _.textarea({class: 'form-control'}, 
                     this.value
                 ).on('change propertychange keyup paste', function() {
                     editor.onChange();
