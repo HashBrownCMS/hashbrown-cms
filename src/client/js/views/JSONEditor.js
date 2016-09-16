@@ -272,7 +272,7 @@ class JSONEditor extends View {
     render() {
         this.value = beautify(JSON.stringify(this.model));
 
-        this.$element.html([
+        _.append(this.$element.empty(),
             _.div({class: 'editor-body'},
                 this.$textarea = _.textarea(),
                 this.$error
@@ -299,7 +299,7 @@ class JSONEditor extends View {
                     )
                 )
             )
-        ]);
+        );
 
         setTimeout(() => {
             this.editor = CodeMirror.fromTextArea(this.$textarea[0], {

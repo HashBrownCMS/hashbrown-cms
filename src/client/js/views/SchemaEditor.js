@@ -520,34 +520,38 @@ class SchemaEditor extends View {
                                     _.button({class: 'dropdown-toggle', 'data-id': schemaId, 'data-toggle': 'dropdown'},
                                         resources.schemas[schemaId].name
                                     ),
-                                    _.ul({class: 'dropdown-menu'},
-                                        _.each(resources.schemas, (id, schema) => {
-                                            if(schema.type == 'content' && (id == schemaId || view.model.allowedChildSchemas.indexOf(schema.id) < 0)) {
-                                                return _.li(
-                                                    _.a({href: '#', 'data-id': id},
-                                                        schema.name
-                                                    ).click(function(e) {
-                                                        e.preventDefault();
+                                    _.if(!view.model.locked,
+                                        _.ul({class: 'dropdown-menu'},
+                                            _.each(resources.schemas, (id, schema) => {
+                                                if(schema.type == 'content' && (id == schemaId || view.model.allowedChildSchemas.indexOf(schema.id) < 0)) {
+                                                    return _.li(
+                                                        _.a({href: '#', 'data-id': id},
+                                                            schema.name
+                                                        ).click(function(e) {
+                                                            e.preventDefault();
+                                                                
+                                                            let $btn = $(this).parents('.dropdown').children('.dropdown-toggle');
                                                             
-                                                        let $btn = $(this).parents('.dropdown').children('.dropdown-toggle');
-                                                        
-                                                        $btn.text($(this).text());
-                                                        $btn.attr('data-id', $(this).attr('data-id'));
+                                                            $btn.text($(this).text());
+                                                            $btn.attr('data-id', $(this).attr('data-id'));
 
-                                                        onChange();
-                                                    })
-                                                );
-                                            }
-                                        })
+                                                            onChange();
+                                                        })
+                                                    );
+                                                }
+                                            })
+                                        )
                                     )
                                 ).change(onChange),
-                                _.button({class: 'btn chip-remove'},
-                                    _.span({class: 'fa fa-remove'})
-                                ).click(() => {
-                                    $schema.remove();        
+                                _.if(!view.model.locked,
+                                    _.button({class: 'btn chip-remove'},
+                                        _.span({class: 'fa fa-remove'})
+                                    ).click(() => {
+                                        $schema.remove();        
 
-                                    onChange();
-                                })
+                                        onChange();
+                                    })
+                                )
                             );
                             
                             return $schema;
@@ -556,9 +560,11 @@ class SchemaEditor extends View {
                             errorModal(e);
                         }
                     }),
-                    _.button({class: 'btn chip-add'},
-                        _.span({class: 'fa fa-plus'})
-                    ).click(onClickAdd)
+                    _.if(!view.model.locked,
+                        _.button({class: 'btn chip-add'},
+                            _.span({class: 'fa fa-plus'})
+                        ).click(onClickAdd)
+                    )
                 )
             );
         }
@@ -576,27 +582,43 @@ class SchemaEditor extends View {
      * @returns {HTMLElement} Editor element
      */
     renderFieldPropertiesEditor() {
-        if(!this.model.fields) {
-            this.model.fields = {};
-        }
+        let jsonEditor;
+
+        if(this.model.type == 'content') {
+            if(!this.model.fields) {
+                this.model.fields = {};
+            }
+            
+            if(!this.model.fields.properties) {
+                this.model.fields.properties = {};
+            }
         
-        if(!this.model.fields.properties) {
-            this.model.fields.properties = {};
+            jsonEditor = new JSONEditor({
+                model: this.model.fields.properties,
+                embedded: true
+            });
+
+            jsonEditor.on('change', (newValue) => {
+                this.model.fields.properties = newValue;
+            });
+        
+        } else if(this.model.type == 'field') {
+            if(!this.model.config) {
+                this.model.config = {};
+            }
+            
+            jsonEditor = new JSONEditor({
+                model: this.model.config,
+                embedded: true
+            });
+
+            jsonEditor.on('change', (newValue) => {
+                this.model.config = newValue;
+            });
         }
-
-        let jsonEditor = new JSONEditor({
-            model: this.model.fields.properties,
-            embedded: true
-        });
-
-        jsonEditor.on('change', (newValue) => {
-            this.model.fields.properties = newValue;
-        });
 
         let $element = _.div({class: 'field-properties-editor'},
-            _.if(!this.model.locked,
-                jsonEditor.$element
-            )
+            jsonEditor.$element
         );
 
         return $element;
@@ -640,14 +662,23 @@ class SchemaEditor extends View {
                 $element.append(this.renderField('Default tab', this.renderDefaultTabEditor()));
                 $element.append(this.renderField('Tabs', this.renderTabsEditor()));
                 $element.append(this.renderField('Allowed child Schemas', this.renderAllowedChildSchemasEditor()));
+                
+                if(!this.model.locked) {
+                    $element.append(this.renderField('Fields', this.renderFieldPropertiesEditor()));
+                }
+                
                 break;
 
             case 'field':
                 $element.append(this.renderField('Field editor', this.renderEditorPicker()));
+                
+                if(!this.model.locked) {
+                    $element.append(this.renderField('Config', this.renderFieldPropertiesEditor()));
+                }
+                    
                 break;
         }
 
-        $element.append(this.renderField('Field properties', this.renderFieldPropertiesEditor()));
 
         return $element;
     }
