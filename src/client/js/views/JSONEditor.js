@@ -250,7 +250,9 @@ class JSONEditor extends View {
     onChangeText() {
         this.value = this.editor.getDoc().getValue();
 
-        this.debug();
+        if(this.debug()) {
+            this.trigger('change', this.model);
+        }
     }
 
     /**
@@ -275,23 +277,25 @@ class JSONEditor extends View {
                 this.$textarea = _.textarea(),
                 this.$error
             ),
-            _.div({class: 'editor-footer'}, 
-                _.div({class: 'btn-group pull-left cm-theme'},
-                    _.span('Theme'),
-                    _.select({class: 'form-control'},
-                        _.each([ 'cobalt', 'default', 'night', 'railscasts' ], (i, theme) => {
-                            return _.option({value: theme}, theme);
-                        })
-                    ).change(() => { this.onChangeTheme(); }).val(getCookie('cmtheme') || 'default')
-                ),
-                _.div({class: 'btn-group'},
-                    _.button({class: 'btn btn-embedded'},
-                        'Basic'
-                    ).click(() => { this.onClickBasic(); }),
-                    _.if(!this.model.locked,
-                        _.button({class: 'btn btn-raised btn-success'},
-                            'Save '
-                        ).click(() => { this.onClickSave(); })
+            _.if(!this.embedded,
+                _.div({class: 'editor-footer'}, 
+                    _.div({class: 'btn-group pull-left cm-theme'},
+                        _.span('Theme'),
+                        _.select({class: 'form-control'},
+                            _.each([ 'cobalt', 'default', 'night', 'railscasts' ], (i, theme) => {
+                                return _.option({value: theme}, theme);
+                            })
+                        ).change(() => { this.onChangeTheme(); }).val(getCookie('cmtheme') || 'default')
+                    ),
+                    _.div({class: 'btn-group'},
+                        _.button({class: 'btn btn-embedded'},
+                            'Basic'
+                        ).click(() => { this.onClickBasic(); }),
+                        _.if(!this.model.locked,
+                            _.button({class: 'btn btn-raised btn-success'},
+                                'Save '
+                            ).click(() => { this.onClickSave(); })
+                        )
                     )
                 )
             )

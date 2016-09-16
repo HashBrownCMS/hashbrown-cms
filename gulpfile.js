@@ -26,7 +26,7 @@ var config = {
             './plugins/github-pages/client/js/client.js',
             './plugins/hashbrown-driver/client/js/client.js'
         ],
-        watch: [ './src/client/js/**/*.js', './node_modules/exomon/*.js' ],
+        watch: [ './plugins/**/*.js', './src/client/js/**/*.js', './node_modules/exomon/*.js' ],
         outputDir: './public/js/'
     },
     sass: {

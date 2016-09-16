@@ -214,7 +214,7 @@ class ConnectionEditor extends View {
                         _.button({class: 'btn btn-danger btn-raised'},
                             'Delete'
                         ).click(function() { view.onClickDelete(); }),
-                        view.$saveBtn = _.button({class: 'btn btn-success btn-raised btn-save'},
+                        view.$saveBtn = _.button({class: 'btn btn-primary btn-raised btn-save'},
                             _.span({class: 'text-default'}, 'Save '),
                             _.span({class: 'text-working'}, 'Saving ')
                         ).click(function() { view.onClickSave(); })

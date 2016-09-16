@@ -197,6 +197,7 @@ class MongoHelper {
                                     !database.empty &&
                                     database.name != 'local' &&
                                     database.name != 'users' &&
+                                    database.name != 'schedule' &&
                                     database.name != 'admin' &&
                                     database.name != 'undefined' && 
                                     database.name != 'false'

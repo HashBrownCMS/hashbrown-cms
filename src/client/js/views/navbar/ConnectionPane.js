@@ -8,9 +8,12 @@ class ConnectionPane extends Pane {
      */
     static onClickNewConnection() {
         let navbar = ViewHelper.get('NavbarMain');
+        let newConnection;
 
         apiCall('post', 'connections/new')
-        .then((newConnection) => {
+        .then((connection) => {
+            newConnection = connection;
+
             return reloadResource('connections');
         })
         .then(() => {

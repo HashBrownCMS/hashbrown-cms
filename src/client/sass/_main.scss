@@ -275,7 +275,7 @@ img.logo {
             height: 100%;
             flex-direction: column;
 
-            .editor-header {
+            >.editor-header {
                 padding: 20px 0px 0px 20px;
                 background-color: material-color('blue', '600');
                 color: #fff;
@@ -298,12 +298,65 @@ img.logo {
                 }
             }
 
-            .editor-body {
+            >.editor-body {
                 padding: 15px;
                 flex-grow: 1;
                 max-height: calc(100% - 61px);
                 overflow: auto;
                 position: relative;
+
+                .editor {
+                    height: auto;
+                }
+            }
+        
+            >.editor-footer {
+                flex-shrink: 0;
+                padding: 15px;
+                margin: 0px;
+                border-width: 0px;
+                border-top-width: 1px;
+                border-radius: 0px;
+                background-color: #fff;
+                border-top: 1px solid material-color('grey', '300');
+
+                .btn-group {
+                    float: right;
+
+                    .btn {
+                        line-height: 20px;
+                        text-transform: uppercase;
+                        font-weight: bold;
+                        margin-right: 15px;
+                        min-width: 110px;
+
+                        &:last-child {
+                            margin-right: 0px;
+                        }
+                        
+                        span {
+                            line-height: 20px;
+                        
+                            &.fa {
+                                font-size: 18px;
+                            }
+                        }
+                        
+                        .text-working {
+                            display: none;
+                        }
+
+                        &.working {
+                            .text-default {
+                                display: none;
+                            }
+
+                            .text-working {
+                                display: inline;
+                            }
+                        }
+                    }
+                }
             }
 
             >.field-container {
@@ -410,55 +463,6 @@ img.logo {
                             span {
                                 line-height: 20px;
                             }
-                        }
-                    }
-                }
-            }
-        }
-
-        .editor-footer {
-            flex-shrink: 0;
-            padding: 15px;
-            margin: 0px;
-            border-width: 0px;
-            border-top-width: 1px;
-            border-radius: 0px;
-            background-color: #fff;
-            border-top: 1px solid material-color('grey', '300');
-
-            .btn-group {
-                float: right;
-
-                .btn {
-                    line-height: 20px;
-                    text-transform: uppercase;
-                    font-weight: bold;
-                    margin-right: 15px;
-                    min-width: 110px;
-
-                    &:last-child {
-                        margin-right: 0px;
-                    }
-                    
-                    span {
-                        line-height: 20px;
-                    
-                        &.fa {
-                            font-size: 18px;
-                        }
-                    }
-                    
-                    .text-working {
-                        display: none;
-                    }
-
-                    &.working {
-                        .text-default {
-                            display: none;
-                        }
-
-                        .text-working {
-                            display: inline;
                         }
                     }
                 }

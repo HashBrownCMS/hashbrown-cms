@@ -571,9 +571,37 @@ class SchemaEditor extends View {
     }
 
     /**
+     * Renders the field properties editor
+     *
+     * @returns {HTMLElement} Editor element
+     */
+    renderFieldPropertiesEditor() {
+        if(!this.model.fields.properties) {
+            this.model.fields.properties = {};
+        }
+
+        let jsonEditor = new JSONEditor({
+            model: this.model.fields.properties,
+            embedded: true
+        });
+
+        jsonEditor.on('change', (newValue) => {
+            this.model.fields.properties = newValue;
+        });
+
+        let $element = _.div({class: 'field-properties-editor'},
+            _.if(!this.model.locked,
+                jsonEditor.$element
+            )
+        );
+
+        return $element;
+    }
+
+    /**
      * Renders a single field
      *
-     * @return {Object} element
+     * @return {HTMLElement} Editor element
      */
     renderField(label, $content) {
         return _.div({class: 'field-container'},
@@ -602,7 +630,7 @@ class SchemaEditor extends View {
         $element.append(this.renderField('Name', this.renderNameEditor())); 
         $element.append(this.renderField('Icon', this.renderIconEditor()));   
         $element.append(this.renderField('Parent', this.renderParentEditor()));
-
+        
         switch(this.model.type) {
             case 'content':
                 $element.append(this.renderField('Default tab', this.renderDefaultTabEditor()));
@@ -614,6 +642,8 @@ class SchemaEditor extends View {
                 $element.append(this.renderField('Field editor', this.renderEditorPicker()));
                 break;
         }
+
+        $element.append(this.renderField('Field properties', this.renderFieldPropertiesEditor()));
 
         return $element;
     }
@@ -643,7 +673,7 @@ class SchemaEditor extends View {
                             _.button({class: 'btn btn-danger btn-raised'},
                                 'Delete'
                             ).click(() => { this.onClickDelete(); }),
-                            this.$saveBtn = _.button({class: 'btn btn-success btn-raised btn-save'},
+                            this.$saveBtn = _.button({class: 'btn btn-primary btn-raised btn-save'},
                                 _.span({class: 'text-default'}, 'Save '),
                                 _.span({class: 'text-working'}, 'Saving ')
                             ).click(() => { this.onClickSave(); })
