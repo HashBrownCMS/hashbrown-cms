@@ -37362,12 +37362,12 @@ class ContentEditor extends View {
         }),
 
         // Unpublish
-        _.if(this.publishingSettings.connections && this.publishingSettings.connections.length > 0 && !this.model.unpublished, this.$unpublishBtn = _.button({ class: 'btn btn-primary btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Unpublish'), _.span({ class: 'text-working' }, 'Unpublishing')).click(() => {
+        _.if(this.publishingSettings.connections && this.publishingSettings.connections.length > 0 && !this.model.unpublished, this.$unpublishBtn = _.button({ class: 'btn btn-default btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Unpublish'), _.span({ class: 'text-working' }, 'Unpublishing')).click(() => {
             this.onClickUnthis.publish(this.publishing);
         })),
 
         // Save & this.publish
-        this.$saveBtn = _.button({ class: 'btn btn-success btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Save' + (this.publishingSettings.connections && this.publishingSettings.connections.length > 0 ? ' & publish' : '')), _.span({ class: 'text-working' }, 'Saving')).click(() => {
+        this.$saveBtn = _.button({ class: 'btn btn-primary btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Save' + (this.publishingSettings.connections && this.publishingSettings.connections.length > 0 ? ' & publish' : '')), _.span({ class: 'text-working' }, 'Saving')).click(() => {
             this.onClickSave(this.publishingSettings);
         })));
     }
@@ -40239,7 +40239,7 @@ class RichTextEditor extends View {
         })),
 
         // Markdown editor
-        _.div({ class: 'panel-footer' }, this.$textarea = _.textarea({ class: 'form-control', type: 'text' }, this.value).on('change propertychange keyup paste', function () {
+        _.div({ class: 'panel-footer' }, this.$textarea = _.textarea({ class: 'form-control' }, this.value).on('change propertychange keyup paste', function () {
             editor.onChange();
         }))]);
 
@@ -41230,7 +41230,7 @@ class ContentPane extends Pane {
             // Set item context menu
             itemContextMenu: {
                 'This content': '---',
-                'Create new': () => {
+                'New child content': () => {
                     this.onClickNewContent($('.context-menu-target-element').data('id'));
                 },
                 'Copy': () => {
@@ -41256,7 +41256,7 @@ class ContentPane extends Pane {
             // Set general context menu items
             paneContextMenu: {
                 'General': '---',
-                'Create new': () => {
+                'New content': () => {
                     this.onClickNewContent();
                 }
             },

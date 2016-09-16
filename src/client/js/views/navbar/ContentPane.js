@@ -364,7 +364,7 @@ class ContentPane extends Pane {
             // Set item context menu
             itemContextMenu: {
                 'This content': '---',
-                'Create new': () => { this.onClickNewContent($('.context-menu-target-element').data('id')); },
+                'New child content': () => { this.onClickNewContent($('.context-menu-target-element').data('id')); },
                 'Copy': () => { this.onClickCopyContent(); },
                 'Copy id': () => { this.onClickCopyItemId(); },
                 'Cut': () => { this.onClickCutContent(); },
@@ -376,7 +376,7 @@ class ContentPane extends Pane {
             // Set general context menu items
             paneContextMenu: {
                 'General': '---',
-                'Create new': () => { this.onClickNewContent(); }
+                'New content': () => { this.onClickNewContent(); }
             },
 
             // Sorting logic

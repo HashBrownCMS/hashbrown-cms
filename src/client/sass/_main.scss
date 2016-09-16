@@ -275,7 +275,7 @@ img.logo {
             height: 100%;
             flex-direction: column;
 
-            >.editor-header {
+            .editor-header {
                 padding: 20px 0px 0px 20px;
                 background-color: material-color('blue', '600');
                 color: #fff;
@@ -298,7 +298,7 @@ img.logo {
                 }
             }
 
-            >.editor-body {
+            .editor-body {
                 padding: 15px;
                 flex-grow: 1;
                 max-height: calc(100% - 61px);
@@ -310,7 +310,7 @@ img.logo {
                 }
             }
         
-            >.editor-footer {
+            .editor-footer {
                 flex-shrink: 0;
                 padding: 15px;
                 margin: 0px;

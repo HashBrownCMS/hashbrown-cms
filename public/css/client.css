@@ -667,32 +667,32 @@ img.logo {
       display: flex;
       height: 100%;
       flex-direction: column; }
-      .cms-container .workspace .editor > .editor-header {
+      .cms-container .workspace .editor .editor-header {
         padding: 20px 0px 0px 20px;
         background-color: #1e88e5;
         color: #fff;
         height: 61px;
         flex-shrink: 0;
         flex-basis: 61px; }
-        .cms-container .workspace .editor > .editor-header > h4 {
+        .cms-container .workspace .editor .editor-header > h4 {
           margin: 0px;
           display: inline-block; }
-        .cms-container .workspace .editor > .editor-header > .fa {
+        .cms-container .workspace .editor .editor-header > .fa {
           margin-right: 10px;
           font-size: 20px;
           width: 20px;
           display: inline-block;
           position: relative;
           top: 1px; }
-      .cms-container .workspace .editor > .editor-body {
+      .cms-container .workspace .editor .editor-body {
         padding: 15px;
         flex-grow: 1;
         max-height: calc(100% - 61px);
         overflow: auto;
         position: relative; }
-        .cms-container .workspace .editor > .editor-body .editor {
+        .cms-container .workspace .editor .editor-body .editor {
           height: auto; }
-      .cms-container .workspace .editor > .editor-footer {
+      .cms-container .workspace .editor .editor-footer {
         flex-shrink: 0;
         padding: 15px;
         margin: 0px;
@@ -701,25 +701,25 @@ img.logo {
         border-radius: 0px;
         background-color: #fff;
         border-top: 1px solid #e0e0e0; }
-        .cms-container .workspace .editor > .editor-footer .btn-group {
+        .cms-container .workspace .editor .editor-footer .btn-group {
           float: right; }
-          .cms-container .workspace .editor > .editor-footer .btn-group .btn {
+          .cms-container .workspace .editor .editor-footer .btn-group .btn {
             line-height: 20px;
             text-transform: uppercase;
             font-weight: bold;
             margin-right: 15px;
             min-width: 110px; }
-            .cms-container .workspace .editor > .editor-footer .btn-group .btn:last-child {
+            .cms-container .workspace .editor .editor-footer .btn-group .btn:last-child {
               margin-right: 0px; }
-            .cms-container .workspace .editor > .editor-footer .btn-group .btn span {
+            .cms-container .workspace .editor .editor-footer .btn-group .btn span {
               line-height: 20px; }
-              .cms-container .workspace .editor > .editor-footer .btn-group .btn span.fa {
+              .cms-container .workspace .editor .editor-footer .btn-group .btn span.fa {
                 font-size: 18px; }
-            .cms-container .workspace .editor > .editor-footer .btn-group .btn .text-working {
+            .cms-container .workspace .editor .editor-footer .btn-group .btn .text-working {
               display: none; }
-            .cms-container .workspace .editor > .editor-footer .btn-group .btn.working .text-default {
+            .cms-container .workspace .editor .editor-footer .btn-group .btn.working .text-default {
               display: none; }
-            .cms-container .workspace .editor > .editor-footer .btn-group .btn.working .text-working {
+            .cms-container .workspace .editor .editor-footer .btn-group .btn.working .text-working {
               display: inline; }
       .cms-container .workspace .editor > .field-container .field-editor {
         display: inline-block;

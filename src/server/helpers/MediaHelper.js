@@ -73,7 +73,7 @@ class MediaHelper extends MediaHelperCommon {
             finalPath += parents[i];
 
             if(!fs.existsSync(finalPath)) {
-                console.log('Creating parent ' + finalPath);
+                debug.log('Creating parent directory ' + finalPath + '...', this);
                 fs.mkdirSync(finalPath);
             }
 

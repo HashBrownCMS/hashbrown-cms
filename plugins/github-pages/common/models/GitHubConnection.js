@@ -117,7 +117,7 @@ class GitHubConnection extends Connection {
             if(this.settings.isLocal) {
                 let dirPath = path.slice(0, path.lastIndexOf('/'));
 
-                MediaHelper.mkdirRecursively(dirPath);
+                MediaHelper.mkdirRecursively(this.settings.localPath + dirPath);
 
                 fs.writeFile(this.settings.localPath + path, content, (err) => {
                     if(err) {
