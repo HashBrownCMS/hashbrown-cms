@@ -576,6 +576,10 @@ class SchemaEditor extends View {
      * @returns {HTMLElement} Editor element
      */
     renderFieldPropertiesEditor() {
+        if(!this.model.fields) {
+            this.model.fields = {};
+        }
+        
         if(!this.model.fields.properties) {
             this.model.fields.properties = {};
         }
