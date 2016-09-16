@@ -4,20 +4,34 @@
         max-width: 900px;
     }
 
-    .icon-search {
-        margin-bottom: 15px;
-    }
 
-    .btn-icon {
-        text-align: left;
-        padding: 10px 15px !important;
-        width: 25%;
-        overflow: hidden;
-        text-overflow: ellipsis;
+    .modal-body {
+        display: flex;
+        flex-wrap: wrap;
 
-        .fa {
-            font-size: 20px;
-            margin-right: 15px;
+        .icon-search {
+            margin-bottom: 15px;
+            width: 100%;
+            flex-basis: 100%;
+        }
+
+        .btn-icon {
+            text-align: center;
+            background-color: transparent;
+            width: 10%;
+
+            .fa {
+                font-size: 20px;
+            }
+
+            .icon-name {
+                width: 100%;
+                display: block;
+                font-size: 10px;
+                color: material-color('grey', '600');
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
         }
     }
 }

@@ -38537,7 +38537,7 @@ class SchemaEditor extends View {
                             modal.hide();
                         }
 
-                        return _.button({ class: 'btn btn-default btn-icon' }, _.span({ class: 'fa fa-' + icon }), _.span({ class: 'icon-name' }, icon)).click(onClickButton);
+                        return _.button({ class: 'btn btn-icon' }, _.span({ class: 'fa fa-' + icon }), _.span({ class: 'icon-name' }, icon)).click(onClickButton);
                     })]
                 }
             });
