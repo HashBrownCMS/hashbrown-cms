@@ -298,7 +298,7 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
   .form-control[readonly], .form-control:active[readonly], .form-control:focus[readonly], .form-control[readonly][readonly] {
     border-bottom: 0px; }
 
-.form-control[type="text"], .form-control:not([type]) {
+.form-control[type="text"] {
   max-width: 400px; }
 
 .form-control[type="number"] {

@@ -448,7 +448,7 @@ button, a {
         }
     }
 
-    &[type="text"], &:not([type]) {
+    &[type="text"] {
         max-width: 400px;
     }
     
