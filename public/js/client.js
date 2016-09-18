@@ -40774,10 +40774,20 @@ class UrlEditor extends View {
             if (node.id == Router.params.id) {
                 title = $('.field-container[data-key="title"] .field-editor input').val();
             } else {
+                // If title is set directly (unlikely), pass it
                 if (typeof node.title === 'string') {
                     title = node.title;
-                } else if (node.properties && node.properties.title && node.properties.title[window.language]) {
-                    title = node.properties.title[window.language];
+
+                    // If title is defined in properties (typical)
+                } else if (node.properties && node.properties.title) {
+                    // If title is multilingual
+                    if (node.properties.title[window.language]) {
+                        title = node.properties.title[window.language];
+
+                        // If title is not multilingual
+                    } else if (typeof node.properties.title === 'string') {
+                        title = node.properties.title;
+                    }
                 }
             }
 
