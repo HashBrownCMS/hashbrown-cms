@@ -456,7 +456,7 @@ class ContentEditor extends View {
         let contentSchema;
         let publishingSettings;
 
-        SchemaHelper.getSchemaWithParentFields(this.model.schemaId)
+        return SchemaHelper.getSchemaWithParentFields(this.model.schemaId)
         .then((schema) => {
             contentSchema = schema;
             

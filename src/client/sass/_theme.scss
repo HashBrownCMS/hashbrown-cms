@@ -62,6 +62,16 @@ button, a {
         }
     }
 
+    &.typeahead {
+        .form-control {
+            max-width: none;
+        }
+
+        .dropdown-menu {
+            width: 100%;
+        }
+    }
+
     .dropdown-toggle {
         color: material-color('grey', '400');
         border: 0px;

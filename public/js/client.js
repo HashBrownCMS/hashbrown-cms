@@ -35451,9 +35451,13 @@ window.apiUrl = function apiUrl(url) {
  * @returns {Promise(Object)} response
  */
 window.apiCall = function apiCall(method, url, data) {
+    return customApiCall(method, apiUrl(url), data);
+};
+
+window.customApiCall = function customApiCall(method, url, data) {
     return new Promise((resolve, reject) => {
         var xhr = new XMLHttpRequest();
-        xhr.open(method.toUpperCase(), apiUrl(url));
+        xhr.open(method.toUpperCase(), url);
         xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
 
         if (data) {
@@ -37385,7 +37389,7 @@ class ContentEditor extends View {
         let contentSchema;
         let publishingSettings;
 
-        SchemaHelper.getSchemaWithParentFields(this.model.schemaId).then(schema => {
+        return SchemaHelper.getSchemaWithParentFields(this.model.schemaId).then(schema => {
             contentSchema = schema;
 
             return this.model.getSettings('publishing');
@@ -39046,19 +39050,12 @@ class UserEditor extends View {
         apiCall('post', 'users/' + this.model.id, this.model).then(() => {
             this.$saveBtn.toggleClass('working', false);
 
-            reloadResource('users').then(() => {
-                let navbar = ViewHelper.get('NavbarMain');
+            return reloadResource('users');
+        }).then(() => {
+            let navbar = ViewHelper.get('NavbarMain');
 
-                navbar.reload();
-            });
-        }).catch(err => {
-            new MessageModal({
-                model: {
-                    title: 'Error',
-                    body: err
-                }
-            });
-        });
+            navbar.reload();
+        }).catch(errorModal);
     }
 
     /**
@@ -41232,9 +41229,9 @@ class ContentPane extends Pane {
 
         if (parentId) {
             ContentHelper.getContentById(parentId).then(parentContent => {
-                SchemaHelper.getSchemaById(parentContent.schemaId).then(parentSchema => {
-                    showModal(parentSchema.allowedChildSchemas);
-                }).catch(navbar.onError);
+                return SchemaHelper.getSchemaById(parentContent.schemaId);
+            }).then(parentSchema => {
+                showModal(parentSchema.allowedChildSchemas);
             }).catch(navbar.onError);
         } else {
             showModal();
@@ -41254,16 +41251,6 @@ class ContentPane extends Pane {
             } else {
                 // Get settings first
                 content.getSettings('publishing').then(publishing => {
-                    // Success event
-                    function onSuccess() {
-                        navbar.reload();
-
-                        if (Router.params.id == content.id) {
-                            ViewHelper.get('ContentEditor').model = content.getObject();
-                            ViewHelper.get('ContentEditor').render();
-                        }
-                    }
-
                     // Submit event
                     function onSubmit() {
                         if (!publishing.governedBy) {
@@ -41280,42 +41267,73 @@ class ContentPane extends Pane {
                             content.settings.publishing = publishing;
 
                             // Save model
-                            apiCall('post', 'content/' + content.id, content).then(onSuccess).catch(navbar.onError);
+                            apiCall('post', 'content/' + content.id, content).then(() => {
+                                navbar.reload();
+
+                                if (Router.params.id == content.id) {
+                                    let contentEditor = ViewHelper.get('ContentEditor');
+
+                                    contentEditor.model = content.getObject();
+                                    return contentEditor.render();
+                                } else {
+                                    return new Promise(resolve => {
+                                        resolve();
+                                    });
+                                }
+                            }).catch(errorModal);
                         }
                     }
 
-                    // Render modal 
-                    let modal = messageModal('Settings for "' + content.prop('title', window.language) + '"', [
-                    // Publishing
-                    _.h5('Publishing'), function () {
-                        if (publishing.governedBy) {
-                            return _.p('(Settings inherited from <a href="#/content/' + publishing.governedBy.id + '">' + publishing.governedBy.prop('title', window.language) + '</a>)');
-                        } else {
-                            publishing.applyToChildren = publishing.applyToChildren == true || publishing.applyToChildren == 'true';
+                    // Sanity check
+                    publishing.applyToChildren = publishing.applyToChildren == true || publishing.applyToChildren == 'true';
 
-                            return [
-                            // Heading
-                            _.div({ class: 'input-group' }, _.span('Apply to children'), _.div({ class: 'input-group-addon' }, _.div({ class: 'switch' }, _.input({
-                                id: 'switch-publishing-apply-to-children',
-                                class: 'form-control switch',
-                                type: 'checkbox',
-                                checked: publishing.applyToChildren == true
-                            }), _.label({ for: 'switch-publishing-apply-to-children' })))),
-                            // Connections
-                            _.each(window.resources.connections, (i, connection) => {
-                                return _.div({ class: 'input-group' }, _.span(connection.title), _.div({ class: 'input-group-addon' }, _.div({ class: 'switch' }, _.input({
-                                    id: 'switch-connection-' + i,
-                                    'data-connection-id': connection.id,
-                                    class: 'form-control switch switch-connection',
-                                    type: 'checkbox',
-                                    checked: publishing.connections.indexOf(connection.id) > -1
-                                }), _.label({
-                                    for: 'switch-connection-' + i
-                                }))));
-                            })];
+                    // Render modal 
+                    let modal = new MessageModal({
+                        model: {
+                            title: 'Settings for "' + content.prop('title', window.language) + '"'
+                        },
+                        buttons: [{
+                            label: 'Cancel',
+                            class: 'btn-default'
+                        }, {
+                            label: 'OK',
+                            class: 'btn-primary',
+                            callback: () => {
+                                onSubmit();
+                            }
+                        }],
+                        renderBody: () => {
+                            return _.div({ class: 'settings-publishing' },
+                            // Publishing
+                            _.h5('Publishing'), function () {
+                                if (publishing.governedBy) {
+                                    return _.p('(Settings inherited from <a href="#/content/' + publishing.governedBy.id + '">' + publishing.governedBy.prop('title', window.language) + '</a>)');
+                                } else {
+                                    return [
+                                    // Heading
+                                    _.div({ class: 'input-group' }, _.span('Apply to children'), _.div({ class: 'input-group-addon' }, _.div({ class: 'switch' }, _.input({
+                                        id: 'switch-publishing-apply-to-children',
+                                        class: 'form-control switch',
+                                        type: 'checkbox',
+                                        checked: publishing.applyToChildren == true
+                                    }), _.label({ for: 'switch-publishing-apply-to-children' })))),
+                                    // Connections
+                                    _.each(window.resources.connections, (i, connection) => {
+                                        return _.div({ class: 'input-group' }, _.span(connection.title), _.div({ class: 'input-group-addon' }, _.div({ class: 'switch' }, _.input({
+                                            id: 'switch-connection-' + i,
+                                            'data-connection-id': connection.id,
+                                            class: 'form-control switch switch-connection',
+                                            type: 'checkbox',
+                                            checked: publishing.connections.indexOf(connection.id) > -1
+                                        }), _.label({
+                                            for: 'switch-connection-' + i
+                                        }))));
+                                    })];
+                                }
+                            }());
                         }
-                    }()], onSubmit);
-                });
+                    });
+                }).catch(errorModal);
             }
         });
     }
@@ -42356,54 +42374,109 @@ let Pane = require('./Pane');
 
 class UserPane extends Pane {
     /**
-     * Event: Click create new User
+     * Event: Click add User
      */
-    static onClickNewUser() {
+    static onClickAddUser() {
         let navbar = ViewHelper.get('NavbarMain');
 
-        let onSubmit = () => {
-            let username = messageModal.$element.find('input.username').val();
-            let password = messageModal.$element.find('input.password').val();
+        customApiCall('get', '/api/users').then(users => {
+            /**
+             * Event: On submit user changes
+             */
+            function onSubmit() {
+                let username = addUserModal.$element.find('input.username').val();
+                let user = users.filter(user => {
+                    return user.username == username;
+                })[0];
 
-            let usernameValid = username != '';
-            let passwordValid = password != '';
+                // The user was found
+                if (user) {
+                    if (!user.scopes) {
+                        user.scopes = [];
+                    }
 
-            if (usernameValid && passwordValid) {
-                let scopes = {};
-                scopes[ProjectHelper.currentProject] = [];
+                    // The user already has scopes in this project
+                    if (user.scopes[ProjectHelper.currentProject]) {
+                        messageModal('Add user', 'This user is already part of this project (' + ProjectHelper.currentProject + ')');
+                        return;
+                    }
 
-                let user = {
-                    username: username,
-                    password: password,
-                    scopes: scopes
-                };
+                    // Set empty scope array for this project
+                    user.scopes[ProjectHelper.currentProject] = [];
 
-                apiCall('post', 'users/new', user).then(newUser => {
-                    reloadResource('users').then(() => {
+                    // Post changes to user
+                    apiCall('post', 'users/' + user.id, user).then(() => {
+                        return reloadResource('users');
+                    }).then(() => {
+                        let navbar = ViewHelper.get('NavbarMain');
+
                         navbar.reload();
 
-                        location.hash = '/users/' + newUser.id;
-                    });
-                }).catch(errorModal);
-            } else {
-                return false;
-            }
-        };
+                        addUserModal.hide();
 
-        let messageModal = new MessageModal({
-            model: {
-                title: 'Create new user',
-                body: _.div({}, _.input({ class: 'form-control username', placeholder: 'Username', type: 'text' }), _.input({ class: 'form-control password', placeholder: 'Password', type: 'password' }))
-            },
-            buttons: [{
-                label: 'Cancel',
-                class: 'btn-default'
-            }, {
-                label: 'OK',
-                class: 'btn-primary',
-                callback: onSubmit
-            }]
-        });
+                        location.hash = '/users/' + user.id;
+                    }).catch(errorModal);
+                } else {
+                    return false;
+                }
+            }
+
+            /**
+             * Updates user suggestions
+             */
+            function updateSuggestions() {
+                let input = $(this).val();
+
+                let $dropdown = addUserModal.$element.find('.dropdown');
+                let $list = addUserModal.$element.find('.dropdown-menu').empty();
+
+                // Only consider inputs equal to or more than 2 characters
+                if (input.length > 1) {
+                    // Filter search results
+                    let results = users.filter(user => {
+                        if (user.username.toLowerCase().indexOf(input) > -1) {
+                            return true;
+                        }
+
+                        if ((user.fullName || '').toLowerCase().indexOf(input) > -1) {
+                            return true;
+                        }
+
+                        return false;
+                    });
+
+                    // Only set dropdown to open if results are more than 0
+                    $dropdown.toggleClass('open', results.length > 0);
+
+                    // Render results
+                    _.append($list, _.each(results, (i, user) => {
+                        return _.li(_.a({ href: '#' }, user.username + (user.fullName ? ' (' + user.fullName + ')' : '')).click(e => {
+                            e.preventDefault();
+
+                            $(this).val(user.username);
+
+                            $dropdown.toggleClass('open', false);
+                        }));
+                    }));
+                }
+            }
+
+            // Renders the modal
+            let addUserModal = new MessageModal({
+                model: {
+                    title: 'Add user to project',
+                    body: _.div({ class: 'dropdown typeahead' }, _.input({ class: 'form-control username', placeholder: 'Username', type: 'text' }).on('change keyup paste propertychange input', updateSuggestions), _.ul({ class: 'dropdown-menu' }))
+                },
+                buttons: [{
+                    label: 'Cancel',
+                    class: 'btn-default'
+                }, {
+                    label: 'OK',
+                    class: 'btn-primary',
+                    callback: onSubmit
+                }]
+            });
+        }).catch(errorModal);
     }
 
     /**
@@ -42415,7 +42488,7 @@ class UserPane extends Pane {
         let name = $('.context-menu-target-element').data('name');
 
         function onSuccess() {
-            reloadResource('users').then(function () {
+            return reloadResource('users').then(function () {
                 navbar.reload();
 
                 // Cancel the UserEditor view if it was displaying the deleted user
@@ -42432,7 +42505,7 @@ class UserPane extends Pane {
         new MessageModal({
             model: {
                 title: 'Remove user',
-                body: 'Are you sure you want to remove the user "' + name + '"?'
+                body: 'Are you sure you want to remove the user "' + name + '" from this project (' + ProjectHelper.currentProject + ')?'
             },
             buttons: [{
                 label: 'Cancel',
@@ -42472,8 +42545,8 @@ class UserPane extends Pane {
             // General context menu
             paneContextMenu: {
                 'User': '---',
-                'New user': () => {
-                    this.onClickNewUser();
+                'Add user': () => {
+                    this.onClickAddUser();
                 }
             }
         };

@@ -148,11 +148,10 @@ class ContentPane extends Pane {
         if(parentId) {
             ContentHelper.getContentById(parentId)
             .then((parentContent) => {
-                SchemaHelper.getSchemaById(parentContent.schemaId)
-                .then((parentSchema) => {
-                    showModal(parentSchema.allowedChildSchemas);
-                })
-                .catch(navbar.onError);
+                return SchemaHelper.getSchemaById(parentContent.schemaId);
+            })
+            .then((parentSchema) => {
+                showModal(parentSchema.allowedChildSchemas);
             })
             .catch(navbar.onError);
 
@@ -177,16 +176,6 @@ class ContentPane extends Pane {
                 // Get settings first
                 content.getSettings('publishing')
                 .then((publishing) => {
-                    // Success event
-                    function onSuccess() {
-                        navbar.reload();
-
-                        if(Router.params.id == content.id) {
-                            ViewHelper.get('ContentEditor').model = content.getObject();
-                            ViewHelper.get('ContentEditor').render();
-                        }
-                    }
-                    
                     // Submit event
                     function onSubmit() {
                         if(!publishing.governedBy) {
@@ -206,62 +195,101 @@ class ContentPane extends Pane {
                     
                             // Save model
                             apiCall('post', 'content/' + content.id, content)
-                            .then(onSuccess)
-                            .catch(navbar.onError);
+                            .then(() => {
+                                navbar.reload();
+
+                                if(Router.params.id == content.id) {
+                                    let contentEditor = ViewHelper.get('ContentEditor');
+
+                                    contentEditor.model = content.getObject();
+                                    return contentEditor.render();
+                                
+                                } else {
+                                    return new Promise((resolve) => {
+                                        resolve();
+                                    });
+
+                                }
+                            })
+                            .catch(errorModal);
                         }
+
                     }
+                    
+                    // Sanity check
+                    publishing.applyToChildren = publishing.applyToChildren == true || publishing.applyToChildren == 'true';
 
                     // Render modal 
-                    let modal = messageModal('Settings for "' + content.prop('title', window.language) + '"', [
-                        // Publishing
-                        _.h5('Publishing'),
-                        function() {
-                            if(publishing.governedBy) {
-                                return _.p('(Settings inherited from <a href="#/content/' + publishing.governedBy.id + '">' + publishing.governedBy.prop('title', window.language) + '</a>)')
-                            } else {
-                                publishing.applyToChildren = publishing.applyToChildren == true || publishing.applyToChildren == 'true';
-
-                                return [
-                                    // Heading
-                                    _.div({class: 'input-group'},      
-                                        _.span('Apply to children'),
-                                        _.div({class: 'input-group-addon'},
-                                            _.div({class: 'switch'},
-                                                _.input({
-                                                    id: 'switch-publishing-apply-to-children',
-                                                    class: 'form-control switch',
-                                                    type: 'checkbox',
-                                                    checked: publishing.applyToChildren == true
-                                                }),
-                                                _.label({for: 'switch-publishing-apply-to-children'})
-                                            )
-                                        )
-                                    ),
-                                    // Connections
-                                    _.each(window.resources.connections, (i, connection) => { 
-                                        return _.div({class: 'input-group'},      
-                                            _.span(connection.title),
-                                            _.div({class: 'input-group-addon'},
-                                                _.div({class: 'switch'},
-                                                    _.input({
-                                                        id: 'switch-connection-' + i,
-                                                        'data-connection-id': connection.id,
-                                                        class: 'form-control switch switch-connection',
-                                                        type: 'checkbox',
-                                                        checked: publishing.connections.indexOf(connection.id) > -1
-                                                    }),
-                                                    _.label({
-                                                        for: 'switch-connection-' + i
-                                                    })
-                                                )
-                                            )
-                                        );
-                                    })
-                                ];
+                    let modal = new MessageModal({
+                        model: {
+                            title: 'Settings for "' + content.prop('title', window.language) + '"'
+                        },
+                        buttons: [
+                            {
+                                label: 'Cancel',
+                                class: 'btn-default'
+                            },
+                            {
+                                label: 'OK',
+                                class: 'btn-primary',
+                                callback: () => {
+                                    onSubmit();
+                                }
                             }
-                        }()
-                    ], onSubmit);
-                });
+                        ],
+                        renderBody: () => {
+                            return _.div({class: 'settings-publishing'},
+                                // Publishing
+                                _.h5('Publishing'),
+                                function() {
+                                    if(publishing.governedBy) {
+                                        return _.p('(Settings inherited from <a href="#/content/' + publishing.governedBy.id + '">' + publishing.governedBy.prop('title', window.language) + '</a>)')
+
+                                    } else {
+                                        return [
+                                            // Heading
+                                            _.div({class: 'input-group'},      
+                                                _.span('Apply to children'),
+                                                _.div({class: 'input-group-addon'},
+                                                    _.div({class: 'switch'},
+                                                        _.input({
+                                                            id: 'switch-publishing-apply-to-children',
+                                                            class: 'form-control switch',
+                                                            type: 'checkbox',
+                                                            checked: publishing.applyToChildren == true
+                                                        }),
+                                                        _.label({for: 'switch-publishing-apply-to-children'})
+                                                    )
+                                                )
+                                            ),
+                                            // Connections
+                                            _.each(window.resources.connections, (i, connection) => { 
+                                                return _.div({class: 'input-group'},      
+                                                    _.span(connection.title),
+                                                    _.div({class: 'input-group-addon'},
+                                                        _.div({class: 'switch'},
+                                                            _.input({
+                                                                id: 'switch-connection-' + i,
+                                                                'data-connection-id': connection.id,
+                                                                class: 'form-control switch switch-connection',
+                                                                type: 'checkbox',
+                                                                checked: publishing.connections.indexOf(connection.id) > -1
+                                                            }),
+                                                            _.label({
+                                                                for: 'switch-connection-' + i
+                                                            })
+                                                        )
+                                                    )
+                                                );
+                                            })
+                                        ];
+                                    }
+                                }()
+                            );
+                        }
+                    });
+                })
+                .catch(errorModal);
             }
         });
     }

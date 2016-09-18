@@ -19,21 +19,14 @@ class UserEditor extends View {
         .then(() => {
             this.$saveBtn.toggleClass('working', false);
         
-            reloadResource('users')
-            .then(() => {
-                let navbar = ViewHelper.get('NavbarMain');
-                
-                navbar.reload();
-            });
+            return reloadResource('users');
         })
-        .catch((err) => {
-            new MessageModal({
-                model: {
-                    title: 'Error',
-                    body: err
-                }
-            });
-        });
+        .then(() => {
+            let navbar = ViewHelper.get('NavbarMain');
+            
+            navbar.reload();
+        })
+        .catch(errorModal);
     }
     
     /**

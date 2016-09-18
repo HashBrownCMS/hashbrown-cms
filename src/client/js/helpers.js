@@ -145,9 +145,13 @@ window.apiUrl = function apiUrl(url) {
  * @returns {Promise(Object)} response
  */
 window.apiCall = function apiCall(method, url, data) {
+    return customApiCall(method, apiUrl(url), data);
+}
+    
+window.customApiCall = function customApiCall(method, url, data) {
     return new Promise((resolve, reject) => {
         var xhr = new XMLHttpRequest();
-        xhr.open(method.toUpperCase(), apiUrl(url));
+        xhr.open(method.toUpperCase(), url);
         xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
 
         if(data) {

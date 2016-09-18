@@ -4,67 +4,130 @@ let Pane = require('./Pane');
 
 class UserPane extends Pane {
     /**
-     * Event: Click create new User
+     * Event: Click add User
      */
-    static onClickNewUser() {
+    static onClickAddUser() {
         let navbar = ViewHelper.get('NavbarMain');
 
-        let onSubmit = () => {
-            let username = messageModal.$element.find('input.username').val();
-            let password = messageModal.$element.find('input.password').val();
+        customApiCall('get', '/api/users')
+        .then((users) => {
+            /**
+             * Event: On submit user changes
+             */
+            function onSubmit() {
+                let username = addUserModal.$element.find('input.username').val();
+                let user = users.filter((user) => {
+                    return user.username == username;
+                })[0];
 
-            let usernameValid = username != '';
-            let passwordValid = password != '';
+                // The user was found
+                if(user) {
+                    if(!user.scopes) {
+                        user.scopes = [];
+                    }
 
-            if(usernameValid && passwordValid) {
-                let scopes = {};
-                scopes[ProjectHelper.currentProject] = [];
-                
-                let user = {
-                    username: username,
-                    password: password,
-                    scopes: scopes
-                };
+                    // The user already has scopes in this project
+                    if(user.scopes[ProjectHelper.currentProject]) {
+                        messageModal('Add user', 'This user is already part of this project (' + ProjectHelper.currentProject + ')');
+                        return;
+                    }
 
-                apiCall('post', 'users/new', user)
-                .then((newUser) => {
-                    reloadResource('users')
+                    // Set empty scope array for this project
+                    user.scopes[ProjectHelper.currentProject] = [];
+
+                    // Post changes to user
+                    apiCall('post', 'users/' + user.id, user)
                     .then(() => {
-                        navbar.reload();
+                        return reloadResource('users');
+                    })
+                    .then(() => {
+                        let navbar = ViewHelper.get('NavbarMain');
                         
-                        location.hash = '/users/' + newUser.id;
-                    });
-                })
-                .catch(errorModal);
-           
-            } else {
-                return false;
-            
-            }
-        }
+                        navbar.reload();
 
-        let messageModal = new MessageModal({
-            model: {
-                title: 'Create new user',
-                body: _.div({},
-                    _.input({class: 'form-control username', placeholder: 'Username', type: 'text'}),
-                    _.input({class: 'form-control password', placeholder: 'Password', type: 'password'})
-                )
-            },
-            buttons: [
-                {
-                    label: 'Cancel',
-                    class: 'btn-default'
-                },
-                {
-                    label: 'OK',
-                    class: 'btn-primary',
-                    callback: onSubmit
+                        addUserModal.hide();
+
+                        location.hash = '/users/' + user.id;
+                    })
+                    .catch(errorModal);
+               
+                } else {
+                    return false;
+                
                 }
-            ]
-        });
+            }
+
+            /**
+             * Updates user suggestions
+             */
+            function updateSuggestions() {
+                let input = $(this).val();
+
+                let $dropdown = addUserModal.$element.find('.dropdown');
+                let $list = addUserModal.$element.find('.dropdown-menu').empty();
+
+                // Only consider inputs equal to or more than 2 characters
+                if(input.length > 1) {
+                    // Filter search results
+                    let results = users.filter((user) => {
+                        if(user.username.toLowerCase().indexOf(input) > -1) {
+                            return true;
+                        }
+
+                        if((user.fullName || '').toLowerCase().indexOf(input) > -1) {
+                            return true;
+                        }
+
+                        return false;
+                    });
+
+                    // Only set dropdown to open if results are more than 0
+                    $dropdown.toggleClass('open', results.length > 0);
+
+                    // Render results
+                    _.append($list,
+                        _.each(results, (i, user) => {
+                            return _.li(
+                                _.a({href: '#'}, user.username + (user.fullName ? ' (' + user.fullName + ')' : ''))
+                                    .click((e) => {
+                                        e.preventDefault();
+
+                                        $(this).val(user.username);
+
+                                        $dropdown.toggleClass('open', false);
+                                    })
+                            );
+                        })
+                    );
+                }
+            }
+
+            // Renders the modal
+            let addUserModal = new MessageModal({
+                model: {
+                    title: 'Add user to project',
+                    body: _.div({class: 'dropdown typeahead'},
+                        _.input({class: 'form-control username', placeholder: 'Username', type: 'text'})
+                            .on('change keyup paste propertychange input', updateSuggestions),
+                        _.ul({class: 'dropdown-menu'})
+                    )
+                },
+                buttons: [
+                    {
+                        label: 'Cancel',
+                        class: 'btn-default'
+                    },
+                    {
+                        label: 'OK',
+                        class: 'btn-primary',
+                        callback: onSubmit
+                    }
+                ]
+            });
+        })
+        .catch(errorModal);
     }
-    
+        
     /**
      * Event: On click remove User
      */
@@ -74,7 +137,7 @@ class UserPane extends Pane {
         let name = $('.context-menu-target-element').data('name');
         
         function onSuccess() {
-            reloadResource('users')
+            return reloadResource('users')
             .then(function() {
                 navbar.reload();
                 
@@ -94,7 +157,7 @@ class UserPane extends Pane {
         new MessageModal({
             model: {
                 title: 'Remove user',
-                body: 'Are you sure you want to remove the user "' + name + '"?'
+                body: 'Are you sure you want to remove the user "' + name + '" from this project (' + ProjectHelper.currentProject + ')?'
             },
             buttons: [
                 {
@@ -134,7 +197,7 @@ class UserPane extends Pane {
             // General context menu
             paneContextMenu: {
                 'User': '---',
-                'New user': () => { this.onClickNewUser(); }
+                'Add user': () => { this.onClickAddUser(); }
             }
         };
     }

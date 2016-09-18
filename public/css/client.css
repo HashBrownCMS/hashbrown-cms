@@ -40,6 +40,12 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
     position: relative;
     z-index: 2; }
 
+.dropdown.typeahead .form-control {
+  max-width: none; }
+
+.dropdown.typeahead .dropdown-menu {
+  width: 100%; }
+
 .dropdown .dropdown-toggle {
   color: #bdbdbd;
   border: 0px;
