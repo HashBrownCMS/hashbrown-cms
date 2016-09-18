@@ -37932,6 +37932,7 @@ class JSONEditor extends View {
                 },
                 viewportMargin: this.embedded ? Infinity : 10,
                 tabSize: 4,
+                indentUnit: 4,
                 indentWithTabs: true,
                 theme: getCookie('cmtheme') || 'default',
                 value: this.value
@@ -40116,10 +40117,10 @@ module.exports = MediaReferenceEditor;
 'use strict';
 
 /**
- * An editor for editing periods
+ * A simple number editor
  */
 
-class PeriodEditor extends View {
+class NumberEditor extends View {
     constructor(params) {
         super(params);
 
@@ -40127,55 +40128,25 @@ class PeriodEditor extends View {
     }
 
     /**
-     * Event: Change value
+     * Event: Change
      */
     onChange() {
-        var newValue = {
-            enabled: this.$toggle[0].checked,
-            from: this.$from.val(),
-            to: this.$to.val()
-        };
+        this.value = parseFloat(this.$input.val());
 
-        this.value = newValue;
-
-        this.trigger('change', newValue);
+        this.trigger('change', this.value);
     }
 
     render() {
         var editor = this;
 
-        editor.value = editor.value || {};
-        editor.value.enabled = editor.value.enabled == true || editor.value.enabled == "true";
-
-        var toDate = new Date(editor.value.to);
-        var fromDate = new Date(editor.value.from);
-        var switchId = 'switch-' + $('.switch').length;
-
-        this.$element = _.div({ class: 'field-editor period-editor' }, _.div({ class: 'input-group' }, [this.$from = _.input({ class: 'form-control' + (editor.value.enabled ? '' : ' disabled'), type: 'text', value: editor.value.from }), _.div({ class: 'arrow-middle input-group-addon' }, _.span({ class: 'fa fa-arrow-right' })), this.$to = _.input({ class: 'form-control' + (editor.value.enabled ? '' : ' disabled'), type: 'text', value: editor.value.to }), _.div({ class: 'input-group-addon' }, _.div({ class: 'switch' }, [this.$toggle = _.input({ id: switchId, class: 'form-control switch', type: 'checkbox' }), _.label({ for: switchId })]))]));
-
-        this.$from.datepicker();
-        this.$to.datepicker();
-
-        this.$toggle[0].checked = editor.value.enabled;
-
-        this.$from.on('changeDate', function () {
+        // Main element
+        this.$element = _.div({ class: 'field-editor string-editor' }, _.if(this.disabled, _.p(this.value || '(none)')), _.if(!this.disabled, this.$input = _.input({ class: 'form-control', value: this.value, type: 'number', step: this.config.step || 'any' }).on('change propertychange paste keyup', function () {
             editor.onChange();
-        });
-
-        this.$to.on('changeDate', function () {
-            editor.onChange();
-        });
-
-        this.$toggle.on('change', function () {
-            editor.$from.toggleClass('disabled', !this.checked);
-            editor.$to.toggleClass('disabled', !this.checked);
-
-            editor.onChange();
-        });
+        })));
     }
 }
 
-module.exports = PeriodEditor;
+module.exports = NumberEditor;
 
 },{}],202:[function(require,module,exports){
 'use strict';
@@ -40915,7 +40886,7 @@ window.resources.editors = {
     dropdown: require('./DropdownEditor'),
     language: require('./LanguageEditor'),
     mediaReference: require('./MediaReferenceEditor'),
-    period: require('./PeriodEditor'),
+    number: require('./NumberEditor'),
     resourceReference: require('./ResourceReferenceEditor'),
     richText: require('./RichTextEditor'),
     string: require('./StringEditor'),
@@ -40925,7 +40896,7 @@ window.resources.editors = {
     url: require('./UrlEditor')
 };
 
-},{"./ArrayEditor":193,"./BooleanEditor":194,"./ContentReferenceEditor":195,"./ContentSchemaReferenceEditor":196,"./DateEditor":197,"./DropdownEditor":198,"./LanguageEditor":199,"./MediaReferenceEditor":200,"./PeriodEditor":201,"./ResourceReferenceEditor":202,"./RichTextEditor":203,"./StringEditor":204,"./StructEditor":205,"./TagsEditor":206,"./TemplateReferenceEditor":207,"./UrlEditor":208}],210:[function(require,module,exports){
+},{"./ArrayEditor":193,"./BooleanEditor":194,"./ContentReferenceEditor":195,"./ContentSchemaReferenceEditor":196,"./DateEditor":197,"./DropdownEditor":198,"./LanguageEditor":199,"./MediaReferenceEditor":200,"./NumberEditor":201,"./ResourceReferenceEditor":202,"./RichTextEditor":203,"./StringEditor":204,"./StructEditor":205,"./TagsEditor":206,"./TemplateReferenceEditor":207,"./UrlEditor":208}],210:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');

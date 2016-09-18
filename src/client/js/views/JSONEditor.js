@@ -312,6 +312,7 @@ class JSONEditor extends View {
                 },
                 viewportMargin: this.embedded ? Infinity : 10,
                 tabSize: 4,
+                indentUnit: 4,
                 indentWithTabs: true,
                 theme: getCookie('cmtheme') || 'default',
                 value: this.value

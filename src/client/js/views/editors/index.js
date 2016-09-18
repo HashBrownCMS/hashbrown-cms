@@ -7,7 +7,7 @@ window.resources.editors = {
     dropdown: require('./DropdownEditor'),
     language: require('./LanguageEditor'),
     mediaReference: require('./MediaReferenceEditor'),
-    period: require('./PeriodEditor'),
+    number: require('./NumberEditor'),
     resourceReference: require('./ResourceReferenceEditor'),
     richText: require('./RichTextEditor'),
     string: require('./StringEditor'),
