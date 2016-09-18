@@ -34811,7 +34811,7 @@ module.exports = {
 module.exports={
   "name": "hashbrown-cms",
   "repository": "https://github.com/Putaitu/hashbrown-cms.git",
-  "version": "0.3.13",
+  "version": "0.3.14",
   "description": "The pluggable CMS",
   "main": "hashbrown.js",
   "scripts": {
@@ -40242,10 +40242,14 @@ class RichTextEditor extends View {
         this.$output.html(markdownToHtml(this.$textarea.val()));
 
         this.$output.find('img').each(function () {
-            let id = $(this).attr('alt');
-            let src = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + id;
+            let idMatches = ($(this).attr('src') || '').match(/[0-9a-z]{40}/);
 
-            $(this).attr('src', src);
+            // Only refactor the URL, if the id matches (it might be a remote image)
+            if (idMatches) {
+                let src = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + idMatches[0];
+
+                $(this).attr('src', src);
+            }
         });
 
         this.caret = this.getCaretCharacterOffsetWithin(this.$textarea[0]);
@@ -40299,7 +40303,7 @@ class RichTextEditor extends View {
 
         mediaBrowser.on('select', id => {
             MediaHelper.getMediaById(id).then(media => {
-                this.$textarea.val(this.$textarea.val() + '\n' + '![' + media.id + '](/' + media.url + ')');
+                this.$textarea.val(this.$textarea.val() + '\n' + '![' + media.name + '](/' + media.url + ')');
 
                 this.onChange();
             }).catch(errorModal);
