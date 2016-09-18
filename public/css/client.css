@@ -1532,36 +1532,67 @@ body > .dashboard-container {
         .navspace .navbar-main .tab-panes .pane-container.active[data-dragdrop-hovering="true"] .pane .pane-item-container:hover > .children {
           min-height: 60px;
           display: block; }
+      .navspace .navbar-main .tab-panes .pane-container.select-dir .pane-move-buttons .btn {
+        margin: 10px;
+        border: 2px dashed #757575;
+        height: 40px;
+        opacity: 1;
+        pointer-events: auto; }
+      .navspace .navbar-main .tab-panes .pane-container.select-dir .pane .pane-item-container.moving-content > .pane-item {
+        font-weight: 700; }
+      .navspace .navbar-main .tab-panes .pane-container.select-dir .pane .pane-item-container.active:before {
+        content: none; }
+      .navspace .navbar-main .tab-panes .pane-container.select-dir .pane .pane-item-container[data-is-directory="true"] > .pane-item {
+        background-color: #1e88e5;
+        color: #fff; }
+      .navspace .navbar-main .tab-panes .pane-container.select-dir .pane .pane-item-container:not([data-is-directory="true"]):not(.moving-content) > .pane-item {
+        pointer-events: none;
+        opacity: 0.5; }
+      .navspace .navbar-main .tab-panes .pane-container .pane-toolbar {
+        border-bottom: 1px solid #e0e0e0;
+        display: flex;
+        padding: 5px;
+        height: 61px; }
+        .navspace .navbar-main .tab-panes .pane-container .pane-toolbar > * {
+          margin: 5px;
+          flex-grow: 1;
+          max-width: 50%; }
+        .navspace .navbar-main .tab-panes .pane-container .pane-toolbar label {
+          text-transform: uppercase;
+          color: #757575;
+          font-size: 10px;
+          margin: 0px;
+          padding: 0px; }
+        .navspace .navbar-main .tab-panes .pane-container .pane-toolbar select, .navspace .navbar-main .tab-panes .pane-container .pane-toolbar button {
+          width: 100%;
+          display: block;
+          background-color: #1e88e5;
+          border: 0px;
+          padding: 5px 3px;
+          color: #fff;
+          text-transform: uppercase;
+          font-weight: 700; }
+      .navspace .navbar-main .tab-panes .pane-container .pane-move-buttons .btn {
+        padding: 0px;
+        background-color: transparent;
+        transition: height 0.5s ease, opacity 0.5s ease;
+        opacity: 0;
+        pointer-events: none;
+        height: 0px;
+        overflow-y: hidden;
+        width: calc(100% - 20px);
+        text-align: center;
+        font-weight: 700;
+        color: #757575; }
+        .navspace .navbar-main .tab-panes .pane-container .pane-move-buttons .btn:hover {
+          border-color: #1e88e5;
+          color: #1e88e5; }
       .navspace .navbar-main .tab-panes .pane-container .pane {
         margin: 0px;
-        height: 100%;
         width: 100%;
         border: none;
-        overflow-y: auto; }
-        .navspace .navbar-main .tab-panes .pane-container .pane .pane-toolbar {
-          border-bottom: 1px solid #e0e0e0;
-          display: flex;
-          padding: 5px;
-          height: 61px; }
-          .navspace .navbar-main .tab-panes .pane-container .pane .pane-toolbar > * {
-            margin: 5px;
-            flex-grow: 1;
-            max-width: 50%; }
-          .navspace .navbar-main .tab-panes .pane-container .pane .pane-toolbar label {
-            text-transform: uppercase;
-            color: #757575;
-            font-size: 10px;
-            margin: 0px;
-            padding: 0px; }
-          .navspace .navbar-main .tab-panes .pane-container .pane .pane-toolbar select, .navspace .navbar-main .tab-panes .pane-container .pane .pane-toolbar button {
-            width: 100%;
-            display: block;
-            background-color: #1e88e5;
-            border: 0px;
-            padding: 5px 3px;
-            color: #fff;
-            text-transform: uppercase;
-            font-weight: 700; }
+        overflow-y: auto;
+        transition: padding-top 0.5s ease; }
         .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container.active:before {
           content: '';
           display: block;

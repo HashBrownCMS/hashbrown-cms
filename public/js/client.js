@@ -38339,9 +38339,9 @@ class MediaViewer extends View {
             id: this.model.id,
             folder: newFolder
         } : null).then(() => {
-            reloadResource('media').then(() => {
-                ViewHelper.get('NavbarMain').reload();
-            }).catch(errorModal);
+            return reloadResource('media');
+        }).then(() => {
+            ViewHelper.get('NavbarMain').reload();
         }).catch(errorModal);
     }
 
@@ -41591,9 +41591,13 @@ class MediaPane extends Pane {
             id: id,
             folder: newFolder
         } : null).then(() => {
-            reloadResource('media').then(() => {
-                ViewHelper.get('NavbarMain').reload();
-            }).catch(errorModal);
+            return reloadResource('media');
+        }).then(() => {
+            ViewHelper.get('NavbarMain').reload();
+
+            let mediaViewer = ViewHelper.get('MediaViewer');
+
+            location.hash = '/media/' + id;
         }).catch(errorModal);
     }
 
@@ -41602,27 +41606,59 @@ class MediaPane extends Pane {
      */
     static onClickMoveMedia() {
         let id = $('.context-menu-target-element').data('id');
+        let navbar = ViewHelper.get('NavbarMain');
+        let $pane = navbar.$element.find('.pane-container.active');
 
-        MediaHelper.getMediaById(id).then(media => {
-            let messageModal = new MessageModal({
-                model: {
-                    title: 'Move media',
-                    body: _.div({}, 'Move the media object "' + media.name + '"', _.input({ class: 'form-control', value: media.folder, placeholder: 'Type folder path here' }))
-                },
-                buttons: [{
-                    label: 'Cancel',
-                    class: 'btn-default',
-                    callback: () => {}
-                }, {
-                    label: 'OK',
-                    class: 'btn-danger',
-                    callback: () => {
-                        let newPath = messageModal.$element.find('input.form-control').val();
+        $pane.find('.pane-item-container[data-media-id="' + id + '"]').toggleClass('moving-content', true);
+        $pane.toggleClass('select-dir', true);
 
-                        this.onChangeFolder(media.id, newPath);
-                    }
-                }]
+        // TODO: Generalise this logic so it works for all panes
+        $pane.find('.pane-item-container[data-is-directory="true"]').each((i, element) => {
+            $(element).children('.pane-item').on('click', e => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                let newPath = $(element).attr('data-media-folder');
+
+                $pane.find('.pane-move-buttons .btn').off('click');
+                $pane.find('.pane-item-container .pane-item').off('click');
+
+                this.onChangeFolder(id, newPath);
             });
+        });
+
+        $pane.find('.pane-move-buttons .btn-move-to-root').on('click', e => {
+            $pane.find('.pane-item-container .pane-item').off('click');
+            $pane.find('.pane-move-buttons .btn').off('click');
+
+            this.onChangeFolder(id, '/');
+        });
+
+        $pane.find('.pane-move-buttons .btn-new-folder').on('click', () => {
+            $pane.find('.pane-item-container .pane-item').off('click');
+            $pane.find('.pane-move-buttons .btn').off('click');
+
+            MediaHelper.getMediaById(id).then(media => {
+                let messageModal = new MessageModal({
+                    model: {
+                        title: 'Move media',
+                        body: _.div({}, 'Move the media object "' + media.name + '"', _.input({ class: 'form-control', value: media.folder, placeholder: 'Type folder path here' }))
+                    },
+                    buttons: [{
+                        label: 'Cancel',
+                        class: 'btn-default',
+                        callback: () => {}
+                    }, {
+                        label: 'OK',
+                        class: 'btn-danger',
+                        callback: () => {
+                            let newPath = messageModal.$element.find('input.form-control').val();
+
+                            this.onChangeFolder(media.id, newPath);
+                        }
+                    }]
+                });
+            }).catch(errorModal);
         });
     }
 
@@ -41899,11 +41935,6 @@ class NavbarMain extends View {
         let items = params.items;
         let sortingQueue = [];
 
-        // Append toolbar
-        if (params.toolbar) {
-            $pane.append(params.toolbar);
-        }
-
         // Attach item context menu
         if (params.paneContextMenu) {
             $pane.exocontext(params.paneContextMenu);
@@ -42020,7 +42051,7 @@ class NavbarMain extends View {
                         let $dir = $pane.find('[' + parentDirAttrKey + '="' + finalDirName + '"]');
 
                         if ($dir.length < 1) {
-                            $dir = _.div({ class: 'pane-item-container' }, _.a({
+                            $dir = _.div({ class: 'pane-item-container', 'data-is-directory': true }, _.a({
                                 class: 'pane-item'
                             }, _.span({ class: 'fa fa-folder' }), _.span(dirName)), _.div({ class: 'children' }));
 
@@ -42030,11 +42061,11 @@ class NavbarMain extends View {
                             let $prevDir = $pane.find('[' + parentDirAttrKey + '="' + prevFinalDirName + '"]');
 
                             if ($prevDir.length > 0) {
-                                $prevDir.children('.children').append($dir);
+                                $prevDir.children('.children').prepend($dir);
 
                                 // If no previous dir was found, append directly to pane
                             } else {
-                                $pane.append($dir);
+                                $pane.prepend($dir);
                             }
                         }
 
@@ -42054,7 +42085,7 @@ class NavbarMain extends View {
             }
         }
 
-        let $paneContainer = _.div({ class: 'pane-container', 'data-route': params.route }, $pane);
+        let $paneContainer = _.div({ class: 'pane-container', 'data-route': params.route }, _.if(params.toolbar, params.toolbar), _.div({ class: 'pane-move-buttons' }, _.button({ class: 'btn btn-move-to-root' }, 'Move to root'), _.button({ class: 'btn btn-new-folder' }, 'New folder')), $pane);
 
         // Add expand/collapse buttons to items if needed
         $paneContainer.find('.pane-item-container').each((i, element) => {

@@ -16,12 +16,16 @@ class MediaPane extends Pane {
                 id: id,
                 folder: newFolder
             } : null
-        ).then(() => {
-            reloadResource('media')
-            .then(() => {
-                ViewHelper.get('NavbarMain').reload();
-            })
-            .catch(errorModal);
+        )
+        .then(() => {
+            return reloadResource('media');
+        })
+        .then(() => {
+            ViewHelper.get('NavbarMain').reload();
+
+            let mediaViewer = ViewHelper.get('MediaViewer');
+
+            location.hash = '/media/' + id;
         })
         .catch(errorModal);
     }
@@ -31,35 +35,68 @@ class MediaPane extends Pane {
      */
     static onClickMoveMedia() {
         let id = $('.context-menu-target-element').data('id');
-        
-        MediaHelper.getMediaById(id)
-        .then((media) => {
-            let messageModal = new MessageModal({
-                model: {
-                    title: 'Move media',
-                    body: _.div({},
-                        'Move the media object "' + media.name + '"',
-                        _.input({class: 'form-control', value: media.folder, placeholder: 'Type folder path here'})
-                    )
-                },
-                buttons: [
-                    {
-                        label: 'Cancel',
-                        class: 'btn-default',
-                        callback: () => {
-                        }
-                    },
-                    {
-                        label: 'OK',
-                        class: 'btn-danger',
-                        callback: () => {
-                            let newPath = messageModal.$element.find('input.form-control').val();
-                            
-                            this.onChangeFolder(media.id, newPath);
-                        }
-                    }
-                ]
+        let navbar = ViewHelper.get('NavbarMain');
+        let $pane = navbar.$element.find('.pane-container.active');
+
+        $pane.find('.pane-item-container[data-media-id="' + id + '"]').toggleClass('moving-content', true);
+        $pane.toggleClass('select-dir', true);
+
+        // TODO: Generalise this logic so it works for all panes
+        $pane.find('.pane-item-container[data-is-directory="true"]').each((i, element) => {
+            $(element).children('.pane-item').on('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                let newPath = $(element).attr('data-media-folder');
+
+                $pane.find('.pane-move-buttons .btn').off('click');
+                $pane.find('.pane-item-container .pane-item').off('click');
+
+                this.onChangeFolder(id, newPath);
             });
+        }); 
+
+        $pane.find('.pane-move-buttons .btn-move-to-root').on('click', (e) => {
+            $pane.find('.pane-item-container .pane-item').off('click');
+            $pane.find('.pane-move-buttons .btn').off('click');
+
+            this.onChangeFolder(id, '/');
+        });
+        
+        $pane.find('.pane-move-buttons .btn-new-folder').on('click', () => {
+            $pane.find('.pane-item-container .pane-item').off('click');
+            $pane.find('.pane-move-buttons .btn').off('click');
+
+            MediaHelper.getMediaById(id)
+            .then((media) => {
+                let messageModal = new MessageModal({
+                    model: {
+                        title: 'Move media',
+                        body: _.div({},
+                            'Move the media object "' + media.name + '"',
+                            _.input({class: 'form-control', value: media.folder, placeholder: 'Type folder path here'})
+                        )
+                    },
+                    buttons: [
+                        {
+                            label: 'Cancel',
+                            class: 'btn-default',
+                            callback: () => {
+                            }
+                        },
+                        {
+                            label: 'OK',
+                            class: 'btn-danger',
+                            callback: () => {
+                                let newPath = messageModal.$element.find('input.form-control').val();
+                                
+                                this.onChangeFolder(media.id, newPath);
+                            }
+                        }
+                    ]
+                });
+            })
+            .catch(errorModal);
         });
     }
 

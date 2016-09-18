@@ -74,12 +74,12 @@ class MediaViewer extends View {
                 id: this.model.id,
                 folder: newFolder
             } : null
-        ).then(() => {
-            reloadResource('media')
-            .then(() => {
-                ViewHelper.get('NavbarMain').reload();
-            })
-            .catch(errorModal);
+        )
+        .then(() => {
+            return reloadResource('media');
+        })
+        .then(() => {
+            ViewHelper.get('NavbarMain').reload();
         })
         .catch(errorModal);
     }

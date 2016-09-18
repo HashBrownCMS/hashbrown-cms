@@ -97,11 +97,6 @@ class NavbarMain extends View {
         let items = params.items;
         let sortingQueue = [];
 
-        // Append toolbar
-        if(params.toolbar) {
-            $pane.append(params.toolbar);
-        }
-
         // Attach item context menu
         if(params.paneContextMenu) {
             $pane.exocontext(params.paneContextMenu);
@@ -229,7 +224,7 @@ class NavbarMain extends View {
                         let $dir = $pane.find('[' + parentDirAttrKey + '="' + finalDirName + '"]');
 
                         if($dir.length < 1) {
-                            $dir = _.div({class: 'pane-item-container'},
+                            $dir = _.div({class: 'pane-item-container', 'data-is-directory': true},
                                 _.a({
                                     class: 'pane-item'
                                 },
@@ -245,11 +240,11 @@ class NavbarMain extends View {
                             let $prevDir = $pane.find('[' + parentDirAttrKey + '="' + prevFinalDirName + '"]');
                             
                             if($prevDir.length > 0) {
-                                $prevDir.children('.children').append($dir);
+                                $prevDir.children('.children').prepend($dir);
 
                             // If no previous dir was found, append directly to pane
                             } else {
-                                $pane.append($dir); 
+                                $pane.prepend($dir); 
                             }
                         }
                        
@@ -271,6 +266,13 @@ class NavbarMain extends View {
         }
 
         let $paneContainer = _.div({class: 'pane-container', 'data-route': params.route},
+            _.if(params.toolbar,
+                params.toolbar
+            ),
+            _.div({class: 'pane-move-buttons'},
+                _.button({class: 'btn btn-move-to-root'}, 'Move to root'),
+                _.button({class: 'btn btn-new-folder'}, 'New folder')
+            ),
             $pane
         );
 
