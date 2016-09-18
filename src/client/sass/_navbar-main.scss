@@ -236,8 +236,6 @@
 
                     .pane-item-container {
                         &.active {
-                            position: relative;
-
                             &:before {
                                 content: '';
                                 display: block;
@@ -246,7 +244,6 @@
                                 background-color: material-color('blue', '600');
                                 position: absolute;
                                 left: 0px;
-                                top: 0px;
                             }
 
                             >.pane-item {

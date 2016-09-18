@@ -79,6 +79,10 @@ class SchemaEditor extends View {
      * Event: Click save. Posts the model to the modelUrl
      */
     onClickSave() {
+        if(this.jsonEditor && this.jsonEditor.isValid == false) {
+            return;
+        }
+
         this.$saveBtn.toggleClass('working', true);
 
         apiCall('post', 'schemas/' + this.model.id, this.model)
@@ -582,8 +586,6 @@ class SchemaEditor extends View {
      * @returns {HTMLElement} Editor element
      */
     renderFieldPropertiesEditor() {
-        let jsonEditor;
-
         if(this.model.type == 'content') {
             if(!this.model.fields) {
                 this.model.fields = {};
@@ -593,12 +595,12 @@ class SchemaEditor extends View {
                 this.model.fields.properties = {};
             }
         
-            jsonEditor = new JSONEditor({
+            this.jsonEditor = new JSONEditor({
                 model: this.model.fields.properties,
                 embedded: true
             });
 
-            jsonEditor.on('change', (newValue) => {
+            this.jsonEditor.on('change', (newValue) => {
                 this.model.fields.properties = newValue;
             });
         
@@ -607,18 +609,18 @@ class SchemaEditor extends View {
                 this.model.config = {};
             }
             
-            jsonEditor = new JSONEditor({
+            this.jsonEditor = new JSONEditor({
                 model: this.model.config,
                 embedded: true
             });
 
-            jsonEditor.on('change', (newValue) => {
+            this.jsonEditor.on('change', (newValue) => {
                 this.model.config = newValue;
             });
         }
 
         let $element = _.div({class: 'field-properties-editor'},
-            jsonEditor.$element
+            this.jsonEditor.$element
         );
 
         return $element;
@@ -627,10 +629,14 @@ class SchemaEditor extends View {
     /**
      * Renders a single field
      *
+     * @param {String} label
+     * @param {HTMLElement} content
+     * @param {Boolean} isVertical
+     *
      * @return {HTMLElement} Editor element
      */
-    renderField(label, $content) {
-        return _.div({class: 'field-container'},
+    renderField(label, $content, isVertical) {
+        return _.div({class: 'field-container ' + (isVertical ? 'vertical' : '')},
             _.div({class: 'field-key'},
                 label
             ),
@@ -664,7 +670,7 @@ class SchemaEditor extends View {
                 $element.append(this.renderField('Allowed child Schemas', this.renderAllowedChildSchemasEditor()));
                 
                 if(!this.model.locked) {
-                    $element.append(this.renderField('Fields', this.renderFieldPropertiesEditor()));
+                    $element.append(this.renderField('Fields', this.renderFieldPropertiesEditor(), true));
                 }
                 
                 break;

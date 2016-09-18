@@ -29,26 +29,20 @@
         }
     } 
 
-    .panel-danger {
+    .error {
         position: absolute;
-        bottom: 0rem;
-        width: calc(100% - 2rem);
-        left: 1rem;
-        border-radius: 0px;
-        border: 0px;
+        right: 0px;
+        top: 0px;
         z-index: 20;
+        color: #fff;
+        pointer-events: none;
+        background-color: material-color('red', '600');
+        padding: 15px;
+        border-bottom-left-radius: 2px;
 
-        .panel-heading {
-            border-radius: 0px;
-            border: 0px;
-            background-color: material-color('red', '500');
-            color: #fff;
+        .error-heading {
             font-weight: 700;
-        }
-
-        .panel-body {
-            border-radius: 0px;
-            border: 0px;
+            padding: 0px 0px 5px 0px;
         }
     }
 }

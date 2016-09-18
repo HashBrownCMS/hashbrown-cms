@@ -14,9 +14,9 @@ class JSONEditor extends View {
         super(params);
 
         this.$element = _.div({class: 'json-editor editor flex-vertical'});
-        this.$error = _.div({class: 'panel panel-danger'},
-            _.div({class: 'panel-heading'}),
-            _.div({class: 'panel-body'})
+        this.$error = _.div({class: 'error'},
+            _.div({class: 'error-heading'}),
+            _.div({class: 'error-body'})
         ).hide();
 
         if(!this.model && !this.modelUrl) {
@@ -84,8 +84,8 @@ class JSONEditor extends View {
             this.$element.find('textarea').val(this.value);
         
         } catch(e) {
-            this.$error.children('.panel-heading').html('JSON error');
-            this.$error.children('.panel-body').html(e);
+            this.$error.children('.error-heading').html('JSON error');
+            this.$error.children('.error-body').html(e);
             this.$error.show();
 
         }
@@ -211,8 +211,8 @@ class JSONEditor extends View {
                     let failMessage = check(k, v);
                     
                     if(failMessage) {
-                        this.$error.children('.panel-heading').html('Schema error');
-                        this.$error.children('.panel-body').html(failMessage);
+                        this.$error.children('.error-heading').html('Schema error');
+                        this.$error.children('.error-body').html(failMessage);
                         this.$error.show();
                     
                         isValid = false;
@@ -231,8 +231,8 @@ class JSONEditor extends View {
             this.model = JSON.parse(this.value);
 
         } catch(e) {
-            this.$error.children('.panel-heading').html('JSON error');
-            this.$error.children('.panel-body').html(e);
+            this.$error.children('.error-heading').html('JSON error');
+            this.$error.children('.error-body').html(e);
             this.$error.show();
 
             isValid = false;
@@ -240,6 +240,8 @@ class JSONEditor extends View {
 
         // Integrity check
         recurse(this.model);
+
+        this.isValid = isValid;
 
         return isValid;
     }
@@ -308,6 +310,7 @@ class JSONEditor extends View {
                     name: 'javascript',
                     json: true
                 },
+                viewportMargin: this.embedded ? Infinity : 10,
                 tabSize: 4,
                 indentWithTabs: true,
                 theme: getCookie('cmtheme') || 'default',

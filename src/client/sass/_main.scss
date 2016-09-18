@@ -360,7 +360,6 @@ img.logo {
             }
 
             >.field-container {
-
                 .field-editor {
                     display: inline-block;
                     position: relative;
@@ -371,6 +370,14 @@ img.logo {
                 display: flex;
                 margin-bottom: 30px;
              
+                &:last-child {
+                    margin-bottom: 0px;
+                }
+
+                &.vertical {
+                    display: block;
+                }
+
                 @media($sm) {
                     flex-direction: column;
                 }

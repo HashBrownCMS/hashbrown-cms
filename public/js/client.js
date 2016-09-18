@@ -37663,7 +37663,7 @@ class JSONEditor extends View {
         super(params);
 
         this.$element = _.div({ class: 'json-editor editor flex-vertical' });
-        this.$error = _.div({ class: 'panel panel-danger' }, _.div({ class: 'panel-heading' }), _.div({ class: 'panel-body' })).hide();
+        this.$error = _.div({ class: 'error' }, _.div({ class: 'error-heading' }), _.div({ class: 'error-body' })).hide();
 
         if (!this.model && !this.modelUrl) {
             this.modelUrl = apiUrl(this.apiPath);
@@ -37723,8 +37723,8 @@ class JSONEditor extends View {
             this.value = beautify(this.value);
             this.$element.find('textarea').val(this.value);
         } catch (e) {
-            this.$error.children('.panel-heading').html('JSON error');
-            this.$error.children('.panel-body').html(e);
+            this.$error.children('.error-heading').html('JSON error');
+            this.$error.children('.error-body').html(e);
             this.$error.show();
         }
     }
@@ -37849,8 +37849,8 @@ class JSONEditor extends View {
                     let failMessage = check(k, v);
 
                     if (failMessage) {
-                        this.$error.children('.panel-heading').html('Schema error');
-                        this.$error.children('.panel-body').html(failMessage);
+                        this.$error.children('.error-heading').html('Schema error');
+                        this.$error.children('.error-body').html(failMessage);
                         this.$error.show();
 
                         isValid = false;
@@ -37868,8 +37868,8 @@ class JSONEditor extends View {
         try {
             this.model = JSON.parse(this.value);
         } catch (e) {
-            this.$error.children('.panel-heading').html('JSON error');
-            this.$error.children('.panel-body').html(e);
+            this.$error.children('.error-heading').html('JSON error');
+            this.$error.children('.error-body').html(e);
             this.$error.show();
 
             isValid = false;
@@ -37877,6 +37877,8 @@ class JSONEditor extends View {
 
         // Integrity check
         recurse(this.model);
+
+        this.isValid = isValid;
 
         return isValid;
     }
@@ -37924,6 +37926,7 @@ class JSONEditor extends View {
                     name: 'javascript',
                     json: true
                 },
+                viewportMargin: this.embedded ? Infinity : 10,
                 tabSize: 4,
                 indentWithTabs: true,
                 theme: getCookie('cmtheme') || 'default',
@@ -38527,6 +38530,10 @@ class SchemaEditor extends View {
      * Event: Click save. Posts the model to the modelUrl
      */
     onClickSave() {
+        if (this.jsonEditor && this.jsonEditor.isValid == false) {
+            return;
+        }
+
         this.$saveBtn.toggleClass('working', true);
 
         apiCall('post', 'schemas/' + this.model.id, this.model).then(() => {
@@ -38905,8 +38912,6 @@ class SchemaEditor extends View {
      * @returns {HTMLElement} Editor element
      */
     renderFieldPropertiesEditor() {
-        let jsonEditor;
-
         if (this.model.type == 'content') {
             if (!this.model.fields) {
                 this.model.fields = {};
@@ -38916,12 +38921,12 @@ class SchemaEditor extends View {
                 this.model.fields.properties = {};
             }
 
-            jsonEditor = new JSONEditor({
+            this.jsonEditor = new JSONEditor({
                 model: this.model.fields.properties,
                 embedded: true
             });
 
-            jsonEditor.on('change', newValue => {
+            this.jsonEditor.on('change', newValue => {
                 this.model.fields.properties = newValue;
             });
         } else if (this.model.type == 'field') {
@@ -38929,17 +38934,17 @@ class SchemaEditor extends View {
                 this.model.config = {};
             }
 
-            jsonEditor = new JSONEditor({
+            this.jsonEditor = new JSONEditor({
                 model: this.model.config,
                 embedded: true
             });
 
-            jsonEditor.on('change', newValue => {
+            this.jsonEditor.on('change', newValue => {
                 this.model.config = newValue;
             });
         }
 
-        let $element = _.div({ class: 'field-properties-editor' }, jsonEditor.$element);
+        let $element = _.div({ class: 'field-properties-editor' }, this.jsonEditor.$element);
 
         return $element;
     }
@@ -38947,10 +38952,14 @@ class SchemaEditor extends View {
     /**
      * Renders a single field
      *
+     * @param {String} label
+     * @param {HTMLElement} content
+     * @param {Boolean} isVertical
+     *
      * @return {HTMLElement} Editor element
      */
-    renderField(label, $content) {
-        return _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, label), _.div({ class: 'field-value' }, $content));
+    renderField(label, $content, isVertical) {
+        return _.div({ class: 'field-container ' + (isVertical ? 'vertical' : '') }, _.div({ class: 'field-key' }, label), _.div({ class: 'field-value' }, $content));
     }
 
     /**
@@ -38977,7 +38986,7 @@ class SchemaEditor extends View {
                 $element.append(this.renderField('Allowed child Schemas', this.renderAllowedChildSchemasEditor()));
 
                 if (!this.model.locked) {
-                    $element.append(this.renderField('Fields', this.renderFieldPropertiesEditor()));
+                    $element.append(this.renderField('Fields', this.renderFieldPropertiesEditor(), true));
                 }
 
                 break;
