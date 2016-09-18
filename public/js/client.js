@@ -35164,6 +35164,7 @@ window.ConnectionEditor = require('./views/ConnectionEditor');
 window.SchemaEditor = require('./views/SchemaEditor');
 window.LanguageSettings = require('./views/LanguageSettings');
 window.UserEditor = require('./views/UserEditor');
+window.MediaBrowser = require('./views/MediaBrowser');
 
 // Models
 window.Content = require('./models/Content');
@@ -35301,7 +35302,7 @@ onReady('resources', function () {
     Router.init();
 });
 
-},{"../../../package.json":157,"./helpers":163,"./helpers/ConnectionHelper":164,"./helpers/ContentHelper":165,"./helpers/LanguageHelper":166,"./helpers/MediaHelper":167,"./helpers/SchemaHelper":169,"./helpers/SettingsHelper":170,"./models/Content":172,"./routes/index":177,"./views/ConnectionEditor":182,"./views/ContentEditor":183,"./views/FormEditor":184,"./views/JSONEditor":185,"./views/LanguageSettings":186,"./views/MainMenu":187,"./views/MediaViewer":188,"./views/SchemaEditor":190,"./views/UserEditor":191,"./views/editors":208,"./views/navbar/NavbarMain":214}],163:[function(require,module,exports){
+},{"../../../package.json":157,"./helpers":163,"./helpers/ConnectionHelper":164,"./helpers/ContentHelper":165,"./helpers/LanguageHelper":166,"./helpers/MediaHelper":167,"./helpers/SchemaHelper":169,"./helpers/SettingsHelper":170,"./models/Content":172,"./routes/index":177,"./views/ConnectionEditor":182,"./views/ContentEditor":183,"./views/FormEditor":184,"./views/JSONEditor":185,"./views/LanguageSettings":186,"./views/MainMenu":187,"./views/MediaBrowser":188,"./views/MediaViewer":189,"./views/SchemaEditor":191,"./views/UserEditor":192,"./views/editors":209,"./views/navbar/NavbarMain":215}],163:[function(require,module,exports){
 'use strict';
 
 // Libraries
@@ -35497,7 +35498,7 @@ window.apiCall = function apiCall(method, url, data) {
     });
 };
 
-},{"../../common/helpers/DebugHelper":221,"./helpers/ProjectHelper":168,"./views/MessageModal":189,"bluebird":17,"exomon":92}],164:[function(require,module,exports){
+},{"../../common/helpers/DebugHelper":222,"./helpers/ProjectHelper":168,"./views/MessageModal":190,"bluebird":17,"exomon":92}],164:[function(require,module,exports){
 'use strict';
 
 let ConnectionHelperCommon = require('../../../common/helpers/ConnectionHelper');
@@ -35541,7 +35542,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
 
 module.exports = ConnectionHelper;
 
-},{"../../../common/helpers/ConnectionHelper":219,"../../../common/models/Connection":226}],165:[function(require,module,exports){
+},{"../../../common/helpers/ConnectionHelper":220,"../../../common/models/Connection":227}],165:[function(require,module,exports){
 'use strict';
 
 let ContentHelperCommon = require('../../../common/helpers/ContentHelper');
@@ -35613,7 +35614,7 @@ class ContentHelper extends ContentHelperCommon {
 
 module.exports = ContentHelper;
 
-},{"../../../common/helpers/ContentHelper":220,"../models/Content":172}],166:[function(require,module,exports){
+},{"../../../common/helpers/ContentHelper":221,"../models/Content":172}],166:[function(require,module,exports){
 'use strict';
 
 let LanguageHelperCommon = require('../../../common/helpers/LanguageHelper');
@@ -35622,7 +35623,7 @@ class LanguageHelper extends LanguageHelperCommon {}
 
 module.exports = LanguageHelper;
 
-},{"../../../common/helpers/LanguageHelper":222}],167:[function(require,module,exports){
+},{"../../../common/helpers/LanguageHelper":223}],167:[function(require,module,exports){
 'use strict';
 
 let MediaHelperCommon = require('../../../common/helpers/MediaHelper');
@@ -35697,7 +35698,7 @@ class MediaHelper extends MediaHelperCommon {
 
 module.exports = MediaHelper;
 
-},{"../../../common/helpers/MediaHelper":223}],168:[function(require,module,exports){
+},{"../../../common/helpers/MediaHelper":224}],168:[function(require,module,exports){
 'use strict';
 
 /**
@@ -35765,7 +35766,7 @@ class SchemaHelper extends SchemaHelperCommon {
 
 module.exports = SchemaHelper;
 
-},{"../../../common/helpers/SchemaHelper":224}],170:[function(require,module,exports){
+},{"../../../common/helpers/SchemaHelper":225}],170:[function(require,module,exports){
 'use strict';
 
 let SettingsHelperCommon = require('../../../common/helpers/SettingsHelper');
@@ -35797,7 +35798,7 @@ class SettingsHelper extends SettingsHelperCommon {
 
 module.exports = SettingsHelper;
 
-},{"../../../common/helpers/SettingsHelper":225}],171:[function(require,module,exports){
+},{"../../../common/helpers/SettingsHelper":226}],171:[function(require,module,exports){
 module.exports={
     "icons": [    
         "500px",
@@ -36509,7 +36510,7 @@ class Content extends ContentCommon {}
 
 module.exports = Content;
 
-},{"../../../common/models/Content":227}],173:[function(require,module,exports){
+},{"../../../common/models/Content":228}],173:[function(require,module,exports){
 'use strict';
 
 // Root
@@ -36978,7 +36979,7 @@ class ConnectionEditor extends View {
 
 module.exports = ConnectionEditor;
 
-},{"./MessageModal":189}],183:[function(require,module,exports){
+},{"./MessageModal":190}],183:[function(require,module,exports){
 'use strict';
 
 class ContentEditor extends View {
@@ -37944,7 +37945,7 @@ class JSONEditor extends View {
 
 module.exports = JSONEditor;
 
-},{"./MessageModal":189,"js-beautify":104}],186:[function(require,module,exports){
+},{"./MessageModal":190,"js-beautify":104}],186:[function(require,module,exports){
 'use strict';
 
 /**
@@ -38053,6 +38054,215 @@ module.exports = MainMenu;
 },{}],188:[function(require,module,exports){
 'use strict';
 
+class MediaBrowser extends View {
+    constructor(params) {
+        super(params);
+
+        this.$element = _.div({ class: 'modal fade media-browser' });
+
+        this.init();
+
+        // Make sure the modal is removed when it's cancelled
+        this.$element.on('hidden.bs.modal', () => {
+            this.$element.remove();
+        });
+
+        // Show the modal
+        this.$element.modal('show');
+    }
+
+    /**
+     * Open the upload modal
+     *
+     * @param {Function} onSuccess
+     * @param {Function} onCancel
+     * @param {String} replaceId
+     */
+    static uploadModal(onSuccess, onCancel, replaceId) {
+        let navbar = ViewHelper.get('NavbarMain');
+
+        function onChangeFile() {
+            let input = $(this);
+            let numFiles = this.files ? this.files.length : 1;
+
+            if (numFiles > 0) {
+                let file = this.files[0];
+
+                let isImage = file.type == 'image/png' || file.type == 'image/jpeg' || file.type == 'image/gif';
+
+                let isVideo = file.type == 'video/mpeg' || file.type == 'video/mp4' || file.type == 'video/quicktime' || file.type == 'video/x-matroska';
+
+                let reader = new FileReader();
+
+                reader.onload = function (e) {
+                    if (isImage) {
+                        uploadModal.$element.find('.media-preview').html(_.img({ src: e.target.result }));
+                    }
+
+                    if (isVideo) {
+                        uploadModal.$element.find('.media-preview').html(_.video({ src: e.target.result }));
+                    }
+
+                    uploadModal.$element.find('.spinner-container').toggleClass('hidden', true);
+                };
+
+                uploadModal.$element.find('.spinner-container').toggleClass('hidden', false);
+
+                reader.readAsDataURL(file);
+                debug.log('Reading data of file type ' + file.type + '...', navbar);
+            }
+        }
+
+        function onClickUpload() {
+            uploadModal.$element.find('form').submit();
+
+            return false;
+        }
+
+        function onSubmit(e) {
+            e.preventDefault();
+
+            uploadModal.$element.find('.spinner-container').toggleClass('hidden', false);
+
+            let apiPath = 'media/' + (replaceId ? replaceId : 'new');
+
+            $.ajax({
+                url: apiUrl(apiPath),
+                type: 'POST',
+                data: new FormData(this),
+                processData: false,
+                contentType: false,
+                success: id => {
+                    reloadResource('media').then(() => {
+                        uploadModal.$element.find('.spinner-container').toggleClass('hidden', true);
+
+                        navbar.reload();
+
+                        if (onSuccess) {
+                            onSuccess(id);
+                        }
+
+                        uploadModal.hide();
+                    });
+                },
+                error: errorModal
+            });
+        }
+
+        let uploadModal = new MessageModal({
+            model: {
+                class: 'modal-upload-media',
+                title: 'Upload a file',
+                body: [_.div({ class: 'spinner-container hidden' }, _.span({ class: 'spinner fa fa-refresh' })), _.div({ class: 'media-preview' }), _.form({ class: 'form-control' }, _.input({ type: 'file', name: 'media' }).change(onChangeFile)).submit(onSubmit)]
+            },
+            buttons: [{
+                label: 'Cancel',
+                class: 'btn-default',
+                callback: onCancel
+            }, {
+                label: 'Upload',
+                class: 'btn-primary',
+                callback: onClickUpload
+            }]
+        });
+
+        uploadModal.on('close', () => {
+            if (onCancel) {
+                onCancel();
+            }
+        });
+    }
+
+    /**
+     * Event: Search media
+     */
+    onSearchMedia() {
+        let query = (this.$element.find('.input-search-media').val() || '').toLowerCase();
+
+        this.$element.find('.thumbnail').each(function (i) {
+            let isMatch = !query || ($(this).attr('data-name') || '').toLowerCase().indexOf(query) > -1;
+
+            $(this).toggleClass('hidden', !isMatch);
+        });
+    }
+
+    /** 
+     * Event: Click OK
+     */
+    onClickOK() {
+        this.value = this.$element.find('.thumbnail.active').attr('data-id');
+
+        this.trigger('select', this.value);
+
+        this.$element.modal('hide');
+    }
+
+    render() {
+        // Render the modal
+        let $folders = [];
+
+        _.append(this.$element.empty(), _.div({ class: 'modal-dialog' }, _.div({ class: 'modal-content' }, _.div({ class: 'modal-header' }, _.div({ class: 'input-group' }, _.input({ class: 'form-control input-search-media', placeholder: 'Search media' }).on('change keyup paste', () => {
+            this.onSearchMedia();
+        }), _.div({ class: 'input-group-btn' }, _.button({ class: 'btn btn-primary' }, 'Upload media').click(() => {
+            this.$element.toggleClass('disabled', true);
+
+            MediaBrowser.uploadModal(id => {
+                this.$element.toggleClass('disabled', false);
+
+                this.value = id;
+
+                this.render();
+            }, () => {
+                this.$element.toggleClass('disabled', false);
+            });
+        })))), _.div({ class: 'modal-body' }, _.div({ class: 'thumbnail-container' },
+        // Append all files
+        _.each(resources.media, (i, media) => {
+            let $media = _.button({
+                class: 'thumbnail raised',
+                'data-id': media.id,
+                'data-name': media.name,
+                style: 'background-image: url(\'/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + media.id + '\')'
+            }, _.label(media.name)).click(() => {
+                this.$element.find('.thumbnail').toggleClass('active', false);
+                $media.toggleClass('active', true);
+            });
+
+            if (media.folder) {
+                let $folder = $folders[media.folder];
+
+                if (!$folder) {
+                    $folder = _.div({ class: 'folder', 'data-path': media.folder }, _.div({ class: 'folder-heading' }, _.h4({}, _.span({ class: 'fa fa-folder' }), media.folder)), _.div({ class: 'folder-items' }));
+
+                    $folders[media.folder] = $folder;
+                }
+
+                // Wait 1 CPU cycle before appending to folders
+                setTimeout(() => {
+                    $folder.find('.folder-items').append($media);
+                }, 1);
+            }
+
+            return $media;
+        }),
+
+        // Append all folders
+        _.each(Object.keys($folders).sort(), (i, path) => {
+            return $folders[path];
+        }))), _.div({ class: 'modal-footer' }, _.button({ class: 'btn btn-primary' }, 'OK').click(() => {
+            this.onClickOK();
+        })))));
+
+        // Mark the selected media as active
+        this.$element.find('.thumbnail[data-id="' + this.value + '"]').toggleClass('active', true);
+    }
+}
+
+module.exports = MediaBrowser;
+
+},{}],189:[function(require,module,exports){
+'use strict';
+
 // Views
 
 let MessageModal = require('./MessageModal');
@@ -38145,7 +38355,7 @@ class MediaViewer extends View {
 
 module.exports = MediaViewer;
 
-},{"./MessageModal":189}],189:[function(require,module,exports){
+},{"./MessageModal":190}],190:[function(require,module,exports){
 'use strict';
 
 /**
@@ -38230,6 +38440,7 @@ class MessageModal extends View {
         this.$element.modal('show');
 
         this.$element.on('hidden.bs.modal', () => {
+            this.trigger('close');
             this.remove();
         });
     }
@@ -38237,7 +38448,7 @@ class MessageModal extends View {
 
 module.exports = MessageModal;
 
-},{}],190:[function(require,module,exports){
+},{}],191:[function(require,module,exports){
 'use strict';
 
 // Icons
@@ -38774,7 +38985,7 @@ class SchemaEditor extends View {
 
 module.exports = SchemaEditor;
 
-},{"../icons.json":171}],191:[function(require,module,exports){
+},{"../icons.json":171}],192:[function(require,module,exports){
 'use strict';
 
 class UserEditor extends View {
@@ -39060,7 +39271,7 @@ class UserEditor extends View {
 
 module.exports = UserEditor;
 
-},{}],192:[function(require,module,exports){
+},{}],193:[function(require,module,exports){
 'use strict';
 
 /**
@@ -39306,7 +39517,7 @@ class ArrayEditor extends View {
 
 module.exports = ArrayEditor;
 
-},{}],193:[function(require,module,exports){
+},{}],194:[function(require,module,exports){
 'use strict';
 
 /**
@@ -39354,7 +39565,7 @@ class BooleanEditor extends View {
 
 module.exports = BooleanEditor;
 
-},{}],194:[function(require,module,exports){
+},{}],195:[function(require,module,exports){
 'use strict';
 
 /**
@@ -39429,7 +39640,7 @@ class ContentReferenceEditor extends View {
 
 module.exports = ContentReferenceEditor;
 
-},{}],195:[function(require,module,exports){
+},{}],196:[function(require,module,exports){
 'use strict';
 
 /**
@@ -39521,7 +39732,7 @@ class ContentSchemaReferenceEditor extends View {
 
 module.exports = ContentSchemaReferenceEditor;
 
-},{}],196:[function(require,module,exports){
+},{}],197:[function(require,module,exports){
 'use strict';
 
 /**
@@ -39688,7 +39899,7 @@ class DateEditor extends View {
 
 module.exports = DateEditor;
 
-},{}],197:[function(require,module,exports){
+},{}],198:[function(require,module,exports){
 'use strict';
 
 /**
@@ -39739,7 +39950,7 @@ class DropdownEditor extends View {
 
 module.exports = DropdownEditor;
 
-},{}],198:[function(require,module,exports){
+},{}],199:[function(require,module,exports){
 'use strict';
 
 /**
@@ -39793,7 +40004,7 @@ class LanguageEditor extends View {
 
 module.exports = LanguageEditor;
 
-},{}],199:[function(require,module,exports){
+},{}],200:[function(require,module,exports){
 'use strict';
 
 /**
@@ -39835,85 +40046,14 @@ class MediaReferenceEditor extends View {
      * Event: Click browse
      */
     onClickBrowse() {
-        let editor = this;
-
-        /** 
-         * Event: Click OK
-         */
-        function onClickOK() {
-            editor.value = $modal.find('.thumbnail.active').attr('data-id');
-
-            editor.onChange();
-
-            $modal.modal('hide');
-        }
-
-        /**
-         * Event: Search media
-         */
-        function onSearchMedia() {
-            let query = ($(this).val() || '').toLowerCase();
-
-            $modal.find('.thumbnail').each(function (i) {
-                let isMatch = !query || ($(this).attr('data-name') || '').toLowerCase().indexOf(query) > -1;
-
-                $(this).toggleClass('hidden', !isMatch);
-            });
-        }
-
-        // Render the modal
-        let $folders = [];
-
-        let $modal = _.div({ class: 'modal fade media-modal' }, _.div({ class: 'modal-dialog' }, _.div({ class: 'modal-content' }, [_.div({ class: 'modal-body' }, _.div({ class: 'thumbnail-container' },
-        // Append all files
-        _.each(resources.media, function (i, media) {
-            function onClick() {
-                $modal.find('.thumbnail').toggleClass('active', false);
-                $(this).toggleClass('active', true);
-            }
-
-            let $media = _.button({
-                class: 'thumbnail raised',
-                'data-id': media.id,
-                'data-name': media.name,
-                style: 'background-image: url(\'/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + media.id + '\')'
-            }, _.label(media.name)).click(onClick);
-
-            if (media.folder) {
-                let $folder = $folders[media.folder];
-
-                if (!$folder) {
-                    $folder = _.div({ class: 'folder', 'data-path': media.folder }, _.div({ class: 'folder-heading' }, _.h4({}, _.span({ class: 'fa fa-folder' }), media.folder)), _.div({ class: 'folder-items' }));
-
-                    $folders[media.folder] = $folder;
-                }
-
-                // Wait 1 CPU cycle before appending to folders
-                setTimeout(() => {
-                    $folder.find('.folder-items').append($media);
-                }, 1);
-            }
-
-            return $media;
-        }),
-
-        // Append all folders
-        _.each(Object.keys($folders).sort(), (i, path) => {
-            return $folders[path];
-        }))), _.div({ class: 'modal-footer' }, _.input({ class: 'form-control', placeholder: 'Search media' }).on('change keyup paste', onSearchMedia), _.button({ class: 'btn btn-primary' }, 'OK').click(onClickOK))])));
-
-        // Mark the selected media as active
-        $modal.find('.thumbnail[data-id="' + editor.value + '"]').toggleClass('active', true);
-
-        // Make sure the modal is removed when it's cancelled
-        $modal.on('hidden.bs.modal', function () {
-            $modal.remove();
+        let mediaBrowser = new MediaBrowser({
+            value: this.value
         });
 
-        // Show the modal
-        $modal.modal('show');
-
-        return $modal;
+        mediaBrowser.on('select', id => {
+            this.value = id;
+            this.onChange();
+        });
     }
 
     render() {
@@ -39935,7 +40075,7 @@ class MediaReferenceEditor extends View {
 
 module.exports = MediaReferenceEditor;
 
-},{}],200:[function(require,module,exports){
+},{}],201:[function(require,module,exports){
 'use strict';
 
 /**
@@ -40000,7 +40140,7 @@ class PeriodEditor extends View {
 
 module.exports = PeriodEditor;
 
-},{}],201:[function(require,module,exports){
+},{}],202:[function(require,module,exports){
 'use strict';
 
 /**
@@ -40046,7 +40186,7 @@ class ResourceReferenceEditor extends View {
 
 module.exports = ResourceReferenceEditor;
 
-},{}],202:[function(require,module,exports){
+},{}],203:[function(require,module,exports){
 'use strict';
 
 // Lib
@@ -40124,43 +40264,15 @@ class RichTextEditor extends View {
      * Event: Click insert media
      */
     onClickInsertMedia() {
-        let editor = this;
+        let mediaBrowser = new MediaBrowser();
 
-        /** 
-         * Event: Click OK
-         */
-        function onClickOK() {
-            let id = $modal.find('.thumbnail.active').attr('data-id');
-
+        mediaBrowser.on('select', id => {
             MediaHelper.getMediaById(id).then(media => {
-                editor.$textarea.val(editor.$textarea.val() + '\n' + '![' + media.id + '](' + media.url + ')');
+                this.$textarea.val(this.$textarea.val() + '\n' + '![' + media.id + '](/' + media.url + ')');
 
-                editor.onChange();
-                $modal.modal('hide');
+                this.onChange();
             }).catch(errorModal);
-        }
-
-        // Render the modal
-        let $modal = _.div({ class: 'modal fade media-modal' }, _.div({ class: 'modal-dialog' }, _.div({ class: 'modal-content' }, [_.div({ class: 'modal-header' }, _.input({ class: 'form-control', placeholder: 'Search media' })), _.div({ class: 'modal-body' }, _.div({ class: 'thumbnail-container' }, _.each(resources.media, function (i, media) {
-            function onClick() {
-                $modal.find('.thumbnail').toggleClass('active', false);
-                $(this).toggleClass('active', true);
-            }
-
-            return _.button({
-                class: 'thumbnail raised',
-                'data-id': media.id,
-                style: 'background-image: url(\'/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + media.id + '\')'
-            }, _.label(media.name)).click(onClick);
-        }))), _.div({ class: 'modal-footer' }, _.button({ class: 'btn btn-primary' }, 'OK').click(onClickOK))])));
-
-        // Make sure the modal is removed when it's cancelled
-        $modal.on('hidden.bs.modal', function () {
-            $modal.remove();
         });
-
-        // Show the modal
-        $modal.modal('show');
     }
 
     /**
@@ -40252,7 +40364,7 @@ class RichTextEditor extends View {
 
 module.exports = RichTextEditor;
 
-},{"marked":108,"to-markdown":150}],203:[function(require,module,exports){
+},{"marked":108,"to-markdown":150}],204:[function(require,module,exports){
 'use strict';
 
 /**
@@ -40287,7 +40399,7 @@ class StringEditor extends View {
 
 module.exports = StringEditor;
 
-},{}],204:[function(require,module,exports){
+},{}],205:[function(require,module,exports){
 'use strict';
 
 /**
@@ -40365,7 +40477,7 @@ class StructEditor extends View {
 
 module.exports = StructEditor;
 
-},{}],205:[function(require,module,exports){
+},{}],206:[function(require,module,exports){
 'use strict';
 
 /**
@@ -40490,7 +40602,7 @@ class TagsEditor extends View {
 
 module.exports = TagsEditor;
 
-},{}],206:[function(require,module,exports){
+},{}],207:[function(require,module,exports){
 'use strict';
 
 /**
@@ -40556,7 +40668,7 @@ class TemplateReferenceEditor extends View {
 
 module.exports = TemplateReferenceEditor;
 
-},{}],207:[function(require,module,exports){
+},{}],208:[function(require,module,exports){
 'use strict';
 
 /**
@@ -40740,7 +40852,7 @@ class UrlEditor extends View {
 
 module.exports = UrlEditor;
 
-},{}],208:[function(require,module,exports){
+},{}],209:[function(require,module,exports){
 'use strict';
 
 window.resources.editors = {
@@ -40762,7 +40874,7 @@ window.resources.editors = {
     url: require('./UrlEditor')
 };
 
-},{"./ArrayEditor":192,"./BooleanEditor":193,"./ContentReferenceEditor":194,"./ContentSchemaReferenceEditor":195,"./DateEditor":196,"./DropdownEditor":197,"./LanguageEditor":198,"./MediaReferenceEditor":199,"./PeriodEditor":200,"./ResourceReferenceEditor":201,"./RichTextEditor":202,"./StringEditor":203,"./StructEditor":204,"./TagsEditor":205,"./TemplateReferenceEditor":206,"./UrlEditor":207}],209:[function(require,module,exports){
+},{"./ArrayEditor":193,"./BooleanEditor":194,"./ContentReferenceEditor":195,"./ContentSchemaReferenceEditor":196,"./DateEditor":197,"./DropdownEditor":198,"./LanguageEditor":199,"./MediaReferenceEditor":200,"./PeriodEditor":201,"./ResourceReferenceEditor":202,"./RichTextEditor":203,"./StringEditor":204,"./StructEditor":205,"./TagsEditor":206,"./TemplateReferenceEditor":207,"./UrlEditor":208}],210:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -40792,7 +40904,7 @@ class CMSPane extends Pane {
 
 module.exports = CMSPane;
 
-},{"./Pane":215}],210:[function(require,module,exports){
+},{"./Pane":216}],211:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -40938,7 +41050,7 @@ class ConnectionPane extends Pane {
 
 module.exports = ConnectionPane;
 
-},{"./Pane":215}],211:[function(require,module,exports){
+},{"./Pane":216}],212:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -41323,7 +41435,7 @@ class ContentPane extends Pane {
 
 module.exports = ContentPane;
 
-},{"./Pane":215}],212:[function(require,module,exports){
+},{"./Pane":216}],213:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -41391,7 +41503,7 @@ class FormsPane extends Pane {
 
 module.exports = FormsPane;
 
-},{"./Pane":215}],213:[function(require,module,exports){
+},{"./Pane":216}],214:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -41519,95 +41631,16 @@ class MediaPane extends Pane {
      * Event: Click upload media
      */
     static onClickUploadMedia(replaceId) {
-        let navbar = ViewHelper.get('NavbarMain');
+        MediaBrowser.uploadModal(id => {
+            location.hash = '/media/' + id;
 
-        function onChangeFile() {
-            let input = $(this);
-            let numFiles = this.files ? this.files.length : 1;
+            // Refresh on replace
+            if (replaceId) {
+                let src = $('.media-preview img').attr('src');
 
-            if (numFiles > 0) {
-                let file = this.files[0];
-
-                let isImage = file.type == 'image/png' || file.type == 'image/jpeg' || file.type == 'image/gif';
-
-                let isVideo = file.type == 'video/mpeg' || file.type == 'video/mp4' || file.type == 'video/quicktime' || file.type == 'video/x-matroska';
-
-                let reader = new FileReader();
-
-                reader.onload = function (e) {
-                    if (isImage) {
-                        uploadModal.$element.find('.media-preview').html(_.img({ src: e.target.result }));
-                    }
-
-                    if (isVideo) {
-                        uploadModal.$element.find('.media-preview').html(_.video({ src: e.target.result }));
-                    }
-
-                    uploadModal.$element.find('.spinner-container').toggleClass('hidden', true);
-                };
-
-                uploadModal.$element.find('.spinner-container').toggleClass('hidden', false);
-
-                reader.readAsDataURL(file);
-                debug.log('Reading data of file type ' + file.type + '...', navbar);
+                $('.media-preview img').attr('src', src + '?date=' + Date.now());
             }
-        }
-
-        function onClickUpload() {
-            uploadModal.$element.find('form').submit();
-
-            return false;
-        }
-
-        function onSubmit(e) {
-            e.preventDefault();
-
-            uploadModal.$element.find('.spinner-container').toggleClass('hidden', false);
-
-            let apiPath = 'media/' + (replaceId ? replaceId : 'new');
-
-            $.ajax({
-                url: apiUrl(apiPath),
-                type: 'POST',
-                data: new FormData(this),
-                processData: false,
-                contentType: false,
-                success: function success(id) {
-                    reloadResource('media').then(function () {
-                        uploadModal.$element.find('.spinner-container').toggleClass('hidden', true);
-
-                        navbar.reload();
-                        location.hash = '/media/' + id;
-
-                        // Refresh on replace
-                        if (replaceId) {
-                            let src = $('.media-preview img').attr('src');
-
-                            $('.media-preview img').attr('src', src + '?date=' + Date.now());
-                        }
-
-                        uploadModal.hide();
-                    });
-                },
-                error: errorModal
-            });
-        }
-
-        let uploadModal = new MessageModal({
-            model: {
-                class: 'modal-upload-media',
-                title: 'Upload a file',
-                body: [_.div({ class: 'spinner-container hidden' }, _.span({ class: 'spinner fa fa-refresh' })), _.div({ class: 'media-preview' }), _.form({ class: 'form-control' }, _.input({ type: 'file', name: 'media' }).change(onChangeFile)).submit(onSubmit)]
-            },
-            buttons: [{
-                label: 'Cancel',
-                class: 'btn-default'
-            }, {
-                label: 'Upload',
-                class: 'btn-primary',
-                callback: onClickUpload
-            }]
-        });
+        }, () => {}, replaceId);
     }
 
     /**
@@ -41706,7 +41739,7 @@ class MediaPane extends Pane {
 
 module.exports = MediaPane;
 
-},{"./Pane":215}],214:[function(require,module,exports){
+},{"./Pane":216}],215:[function(require,module,exports){
 'use strict';
 
 // Views
@@ -42127,7 +42160,7 @@ class NavbarMain extends View {
 
 module.exports = NavbarMain;
 
-},{"../../../../common/models/Content":227,"../MessageModal":189,"./CMSPane":209,"./ConnectionPane":210,"./ContentPane":211,"./FormsPane":212,"./MediaPane":213,"./SchemaPane":216,"./UserPane":217}],215:[function(require,module,exports){
+},{"../../../../common/models/Content":228,"../MessageModal":190,"./CMSPane":210,"./ConnectionPane":211,"./ContentPane":212,"./FormsPane":213,"./MediaPane":214,"./SchemaPane":217,"./UserPane":218}],216:[function(require,module,exports){
 'use strict';
 
 class Pane {
@@ -42143,7 +42176,7 @@ class Pane {
 
 module.exports = Pane;
 
-},{}],216:[function(require,module,exports){
+},{}],217:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -42262,7 +42295,7 @@ class SchemaPane extends Pane {
 
 module.exports = SchemaPane;
 
-},{"./Pane":215}],217:[function(require,module,exports){
+},{"./Pane":216}],218:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -42395,7 +42428,7 @@ class UserPane extends Pane {
 
 module.exports = UserPane;
 
-},{"./Pane":215}],218:[function(require,module,exports){
+},{"./Pane":216}],219:[function(require,module,exports){
 module.exports=[
     "aa",
     "ab",
@@ -42584,7 +42617,7 @@ module.exports=[
     "zu"
 ]
 
-},{}],219:[function(require,module,exports){
+},{}],220:[function(require,module,exports){
 'use strict';
 
 class ConnectionHelper {
@@ -42676,7 +42709,7 @@ class ConnectionHelper {
 
 module.exports = ConnectionHelper;
 
-},{}],220:[function(require,module,exports){
+},{}],221:[function(require,module,exports){
 'use strict';
 
 class ContentHelper {
@@ -42783,7 +42816,7 @@ class ContentHelper {
 
 module.exports = ContentHelper;
 
-},{}],221:[function(require,module,exports){
+},{}],222:[function(require,module,exports){
 'use strict';
 
 let lastSenderName = '';
@@ -42893,7 +42926,7 @@ class DebugHelper {
 
 module.exports = DebugHelper;
 
-},{}],222:[function(require,module,exports){
+},{}],223:[function(require,module,exports){
 'use strict';
 
 class LanguageHelper {
@@ -42985,7 +43018,7 @@ class LanguageHelper {
 
 module.exports = LanguageHelper;
 
-},{"../data/languages.json":218}],223:[function(require,module,exports){
+},{"../data/languages.json":219}],224:[function(require,module,exports){
 'use strict';
 
 // Models
@@ -43047,7 +43080,7 @@ class MediaHelper {
 
 module.exports = MediaHelper;
 
-},{"../models/Media":231}],224:[function(require,module,exports){
+},{"../models/Media":232}],225:[function(require,module,exports){
 'use strict';
 
 // Models
@@ -43092,7 +43125,7 @@ class SchemaHelper {
 
 module.exports = SchemaHelper;
 
-},{"../models/ContentSchema":228,"../models/FieldSchema":230}],225:[function(require,module,exports){
+},{"../models/ContentSchema":229,"../models/FieldSchema":231}],226:[function(require,module,exports){
 'use strict';
 
 class SettingsHelper {
@@ -43126,7 +43159,7 @@ class SettingsHelper {
 
 module.exports = SettingsHelper;
 
-},{}],226:[function(require,module,exports){
+},{}],227:[function(require,module,exports){
 'use strict';
 
 let Entity = require('./Entity');
@@ -43353,7 +43386,7 @@ class Connection extends Entity {
 
 module.exports = Connection;
 
-},{"./Entity":229}],227:[function(require,module,exports){
+},{"./Entity":230}],228:[function(require,module,exports){
 'use strict';
 
 let Entity = require('./Entity');
@@ -43673,7 +43706,7 @@ class Content extends Entity {
 
 module.exports = Content;
 
-},{"./Entity":229}],228:[function(require,module,exports){
+},{"./Entity":230}],229:[function(require,module,exports){
 'use strict';
 
 let Schema = require('./Schema');
@@ -43697,7 +43730,7 @@ class ContentSchema extends Schema {
 
 module.exports = ContentSchema;
 
-},{"./Schema":232}],229:[function(require,module,exports){
+},{"./Schema":233}],230:[function(require,module,exports){
 'use strict';
 
 let crypto = require('crypto');
@@ -43863,7 +43896,7 @@ class Entity {
 
 module.exports = Entity;
 
-},{"crypto":56}],230:[function(require,module,exports){
+},{"crypto":56}],231:[function(require,module,exports){
 'use strict';
 
 let Schema = require('./Schema');
@@ -43885,7 +43918,7 @@ class FieldSchema extends Schema {
 
 module.exports = FieldSchema;
 
-},{"./Schema":232}],231:[function(require,module,exports){
+},{"./Schema":233}],232:[function(require,module,exports){
 'use strict';
 
 // Libs
@@ -43991,7 +44024,7 @@ class Media extends Entity {
 
 module.exports = Media;
 
-},{"./Entity":229,"path":115}],232:[function(require,module,exports){
+},{"./Entity":230,"path":115}],233:[function(require,module,exports){
 'use strict';
 
 let Entity = require('./Entity');
@@ -44027,7 +44060,7 @@ class Schema extends Entity {
 
 module.exports = Schema;
 
-},{"./Entity":229}]},{},[162,158,160])
+},{"./Entity":230}]},{},[162,158,160])
 
 
 //# sourceMappingURL=maps/client.js.map

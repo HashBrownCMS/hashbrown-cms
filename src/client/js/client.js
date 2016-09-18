@@ -31,6 +31,7 @@ window.ConnectionEditor = require('./views/ConnectionEditor');
 window.SchemaEditor = require('./views/SchemaEditor');
 window.LanguageSettings = require('./views/LanguageSettings');
 window.UserEditor = require('./views/UserEditor');
+window.MediaBrowser = require('./views/MediaBrowser');
 
 // Models
 window.Content = require('./models/Content');

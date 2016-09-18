@@ -103,6 +103,7 @@ class MessageModal extends View {
         this.$element.modal('show');
 
         this.$element.on('hidden.bs.modal', () => {
+            this.trigger('close');
             this.remove();
         });
     }

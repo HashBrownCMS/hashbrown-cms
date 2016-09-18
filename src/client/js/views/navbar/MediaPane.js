@@ -154,119 +154,20 @@ class MediaPane extends Pane {
      * Event: Click upload media
      */
     static onClickUploadMedia(replaceId) {
-        let navbar = ViewHelper.get('NavbarMain');
+        MediaBrowser.uploadModal(
+            (id) => {
+                location.hash = '/media/' + id;
 
-        function onChangeFile() {
-            let input = $(this);
-            let numFiles = this.files ? this.files.length : 1;
-            
-            if(numFiles > 0) {
-                let file = this.files[0];
-
-                let isImage =
-                    file.type == 'image/png' ||
-                    file.type == 'image/jpeg' ||
-                    file.type == 'image/gif';
-
-                let isVideo =
-                    file.type == 'video/mpeg' ||
-                    file.type == 'video/mp4' ||
-                    file.type == 'video/quicktime' ||
-                    file.type == 'video/x-matroska';
-
-                let reader = new FileReader();
-
-                reader.onload = function(e) {
-                    if(isImage) {
-                        uploadModal.$element.find('.media-preview').html(
-                            _.img({src: e.target.result})
-                        );
-                    }
-
-                    if(isVideo) {
-                        uploadModal.$element.find('.media-preview').html(
-                            _.video({src: e.target.result })
-                        );
-                    }
-
-                    uploadModal.$element.find('.spinner-container').toggleClass('hidden', true);
+                // Refresh on replace
+                if(replaceId) {
+                    let src = $('.media-preview img').attr('src');
+                    
+                    $('.media-preview img').attr('src', src + '?date=' + Date.now());
                 }
-                        
-                uploadModal.$element.find('.spinner-container').toggleClass('hidden', false);
-
-                reader.readAsDataURL(file);
-                debug.log('Reading data of file type ' + file.type + '...', navbar);
-            }
-        }
-        
-        function onClickUpload() {
-            uploadModal.$element.find('form').submit();
-
-            return false;
-        }
-
-        function onSubmit(e) {
-            e.preventDefault();
-
-            uploadModal.$element.find('.spinner-container').toggleClass('hidden', false);
-            
-            let apiPath = 'media/' + (replaceId ? replaceId : 'new');
-
-            $.ajax({
-                url: apiUrl(apiPath),
-                type: 'POST',
-                data: new FormData(this),
-                processData: false,
-                contentType: false,
-                success: function(id) {
-                    reloadResource('media')
-                    .then(function() {
-                        uploadModal.$element.find('.spinner-container').toggleClass('hidden', true);
-
-                        navbar.reload();
-                        location.hash = '/media/' + id;
-
-                        // Refresh on replace
-                        if(replaceId) {
-                            let src = $('.media-preview img').attr('src');
-                            
-                            $('.media-preview img').attr('src', src + '?date=' + Date.now());
-                        }
-
-                        uploadModal.hide();
-                    });
-                },
-                error: errorModal
-            });
-        }
-
-        let uploadModal = new MessageModal({
-            model: {
-                class: 'modal-upload-media',
-                title: 'Upload a file',
-                body: [
-                    _.div({class: 'spinner-container hidden'},
-                        _.span({class: 'spinner fa fa-refresh'})
-                    ),
-                    _.div({class: 'media-preview'}),
-                    _.form({class: 'form-control'},
-                        _.input({type: 'file', name: 'media'})
-                            .change(onChangeFile)
-                    ).submit(onSubmit)
-                ]
             },
-            buttons: [
-                {
-                    label: 'Cancel',
-                    class: 'btn-default'
-                },
-                {
-                    label: 'Upload',
-                    class: 'btn-primary',
-                    callback: onClickUpload
-                }
-            ]
-        });
+            () => {},
+            replaceId
+        );
     }
     
     /**
