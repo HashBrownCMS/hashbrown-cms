@@ -162,7 +162,9 @@ class MediaBrowser extends View {
     onClickOK() {
         this.value = this.$element.find('.thumbnail.active').attr('data-id');
 
-        this.trigger('select', this.value);
+        if(this.value) {
+            this.trigger('select', this.value);
+        }
 
         this.$element.modal('hide');
     }
