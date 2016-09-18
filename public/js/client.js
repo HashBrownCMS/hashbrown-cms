@@ -41613,6 +41613,15 @@ class MediaPane extends Pane {
         $pane.toggleClass('select-dir', true);
 
         // TODO: Generalise this logic so it works for all panes
+        $(document).on('keyup', e => {
+            if (e.which == 27) {
+                $pane.find('.pane-item-container[data-media-id="' + id + '"]').toggleClass('moving-content', false);
+                $pane.toggleClass('select-dir', false);
+                $pane.find('.pane-move-buttons .btn').off('click');
+                $pane.find('.pane-item-container .pane-item').off('click');
+            }
+        });
+
         $pane.find('.pane-item-container[data-is-directory="true"]').each((i, element) => {
             $(element).children('.pane-item').on('click', e => {
                 e.preventDefault();

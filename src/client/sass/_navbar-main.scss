@@ -198,11 +198,7 @@
                 &.select-dir {
                     .pane-move-buttons {
                         .btn {
-                            margin: 10px;
-                            border: 2px dashed material-color('grey', '600');
-                            height: 40px;
-                            opacity: 1;
-                            pointer-events: auto;
+                            display: block;
                         }
                     }
 
@@ -271,18 +267,17 @@
 
                 .pane-move-buttons {
                     .btn {
+                        margin: 10px;
+                        border: 2px dashed material-color('grey', '600');
+                        height: 40px;
                         padding: 0px;
                         background-color: transparent;
-                        transition: height 0.5s ease, opacity 0.5s ease;
-                        opacity: 0;
-                        pointer-events: none;
-                        height: 0px;
-                        overflow-y: hidden;
                         width: calc(100% - 20px);
                         text-align: center;
                         font-weight: 700;
                         color: material-color('grey', '600');
-                        
+                        display: none;
+
                         &:hover {
                             border-color: material-color('blue', '600');
                             color: material-color('blue', '600');

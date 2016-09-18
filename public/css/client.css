@@ -1533,11 +1533,7 @@ body > .dashboard-container {
           min-height: 60px;
           display: block; }
       .navspace .navbar-main .tab-panes .pane-container.select-dir .pane-move-buttons .btn {
-        margin: 10px;
-        border: 2px dashed #757575;
-        height: 40px;
-        opacity: 1;
-        pointer-events: auto; }
+        display: block; }
       .navspace .navbar-main .tab-panes .pane-container.select-dir .pane .pane-item-container.moving-content > .pane-item {
         font-weight: 700; }
       .navspace .navbar-main .tab-panes .pane-container.select-dir .pane .pane-item-container.active:before {
@@ -1573,17 +1569,16 @@ body > .dashboard-container {
           text-transform: uppercase;
           font-weight: 700; }
       .navspace .navbar-main .tab-panes .pane-container .pane-move-buttons .btn {
+        margin: 10px;
+        border: 2px dashed #757575;
+        height: 40px;
         padding: 0px;
         background-color: transparent;
-        transition: height 0.5s ease, opacity 0.5s ease;
-        opacity: 0;
-        pointer-events: none;
-        height: 0px;
-        overflow-y: hidden;
         width: calc(100% - 20px);
         text-align: center;
         font-weight: 700;
-        color: #757575; }
+        color: #757575;
+        display: none; }
         .navspace .navbar-main .tab-panes .pane-container .pane-move-buttons .btn:hover {
           border-color: #1e88e5;
           color: #1e88e5; }
