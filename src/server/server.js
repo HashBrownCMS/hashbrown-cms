@@ -204,19 +204,10 @@ app.get('/', function(req, res) {
     ApiController.authenticate(req.cookies.token)
     .then((result) => {
         user = result;
-
-        if(user.isAdmin) {
-            return UpdateHelper.check();
-        } else {
-            return new Promise((resolve) => {
-                resolve({});
-            });
-        }
     })
     .then((update) => {
         res.render('dashboard', {
             os: os,
-            update: update,
             user: user,
             app: require(appRoot + '/package.json')
         });

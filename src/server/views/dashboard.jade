@@ -37,18 +37,6 @@ html
 
 
             .workspace
-                if(update.behind)
-                    section
-                        h4 
-                            a#update UPDATE
-                        
-                        .update
-                            p
-                                | You are #{update.amount} version#{update.amount != '1' ? 's' : ''} behind #{ update.branch }
-
-                            button.btn.btn-primary.btn-update-hashbrown
-                                | Update
-
                 section
                     h4 
                         a#welcome WELCOME

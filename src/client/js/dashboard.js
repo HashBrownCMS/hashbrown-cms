@@ -16,7 +16,7 @@ window.Project = require('../../common/models/Project');
 apiCall('get', 'server/projects')
 .then((projects) => {
     function renderNext(i) {
-        apiCall('get', 'server/projects/' + projects[i])
+        return apiCall('get', 'server/projects/' + projects[i])
         .then((project) => {
             let projectEditor = new ProjectEditor({
                 model: new Project(project)
@@ -25,14 +25,25 @@ apiCall('get', 'server/projects')
             $('.dashboard-container .workspace .projects .project-list').append(projectEditor.$element);
 
             if(i < projects.length - 1) {
-                renderNext(i + 1);
+                return renderNext(i + 1);
+            
+            } else {
+                return new Promise((resolve) => {
+                    resolve();
+                });
+
             }
         })
         .catch(errorModal);
     }
     
     if(projects.length > 0) {
-        renderNext(0);
+        return renderNext(0);
+    
+    } else {
+        return new Promise((resolve) => {
+            resolve();
+        });
     }
 })
 .catch(errorModal);
@@ -95,42 +106,56 @@ $('.btn-create-project').click(() => {
     });
 });
 
-// Set update hashbrown event
-$('.btn-update-hashbrown').click(() => {
-    messageModal('Update', 'HashBrown is updating...', false);
+// Check for updates
+apiCall('get', 'server/update/check')
+.then((update) => {
+    if(update.behind) {
+        $('.workspace').prepend(
+            _.section({},
+                _.div({class: 'update'},
+                    _.p('You are '  + update.amount + ' version' + (update.amount != '1' ? 's' : '') + ' behind ' + update.branch),
+                    _.button({class: 'btn btn-primary btn-update-hashbrown'}, 'Update')
+                        .click(() => {
+                            messageModal('Update', 'HashBrown is updating...', false);
 
-    apiCall('post', 'server/update/start')
-    .then(() => {
-        new MessageModal({
-            model: {
-                title: 'Success',
-                body: 'HashBrown was updated successfully'
-            },
-            buttons: [
-                {
-                    label: 'Cool!',
-                    class: 'btn-primary',
-                    callback: () => {
-                        messageModal('Success', 'HashBrown is restarting...', false);
+                            apiCall('post', 'server/update/start')
+                            .then(() => {
+                                new MessageModal({
+                                    model: {
+                                        title: 'Success',
+                                        body: 'HashBrown was updated successfully'
+                                    },
+                                    buttons: [
+                                        {
+                                            label: 'Cool!',
+                                            class: 'btn-primary',
+                                            callback: () => {
+                                                messageModal('Success', 'HashBrown is restarting...', false);
 
-                        function poke() {
-                            $.ajax({
-                                type: 'get',
-                                url: '/',
-                                success: () => {
-                                    location.reload();
-                                },
-                                error: () => {
-                                    poke();
-                                }
-                            });
-                        }
+                                                function poke() {
+                                                    $.ajax({
+                                                        type: 'get',
+                                                        url: '/',
+                                                        success: () => {
+                                                            location.reload();
+                                                        },
+                                                        error: () => {
+                                                            poke();
+                                                        }
+                                                    });
+                                                }
 
-                        poke();
-                    }
-                }
-            ]
-        });
-    })
-    .catch(errorModal);
+                                                poke();
+                                            }
+                                        }
+                                    ]
+                                });
+                            })
+                            .catch(errorModal);
+                        })
+                )
+            )
+        );
+    }
 });
+
