@@ -14,21 +14,20 @@ class UserHelper {
      * @returns {Promise(User)} user
      */
     static findUser(username) {
-        return new Promise((resolve, reject) => {
-            MongoHelper.findOne(
-                'users',
-                'users',
-                {
-                    username: username
-                }
-            ).then((user) => {
+        return MongoHelper.findOne(
+            'users',
+            'users',
+            {
+                username: username
+            }
+        ).then((user) => {
+            return new Promise((resolve, reject) => {
                 if(Object.keys(user).length < 1) {
                     reject(new Error('No user "' + username + '" found'));
                 } else {
                     resolve(new User(user));
                 }
-            })
-            .catch(reject);       
+            });
         });
     }
 
@@ -38,16 +37,11 @@ class UserHelper {
      * @returns {Promise} promise
      */
     static revokeTokens(username) {
-        return new Promise((resolve, reject) => {
-            findUser(username)
-            .then((user) => {
-                user.tokens = [];
+        return findUser(username)
+        .then((user) => {
+            user.tokens = [];
 
-                UserHelper.updateUser(username, user.getObject())
-                .then(resolve)
-                .catch(reject); 
-            })
-            .catch(reject);
+            UserHelper.updateUser(username, user.getObject());
         });
     }
 
@@ -60,26 +54,26 @@ class UserHelper {
      * @returns {Promise(String)} token
      */
     static loginUser(username, password) {
-        return new Promise((resolve, reject) => {
-            debug.log('Attempting login for user "' + username + '"...', this);
+        debug.log('Attempting login for user "' + username + '"...', this);
 
-            UserHelper.findUser(username)
-            .then((user) => {
-                if(user.validatePassword(password)) {
-                    let token = user.generateToken();
-                   
-                    user.cleanUpTokens();
+        return this.findUser(username)
+        .then((user) => {
+            if(user.validatePassword(password)) {
+                let token = user.generateToken();
+               
+                user.cleanUpTokens();
 
-                    UserHelper.updateUser(username, user.getFields())
-                    .then(() => {
+                return this.updateUser(username, user.getObject())
+                .then(() => {
+                    return new Promise((resolve) => {
                         resolve(token);
-                    })
-                    .catch(reject);
-                } else {
+                    });
+                });
+            } else {
+                return new Promise((resolve, reject) => {
                     reject(new Error('Invalid password'));
-                }
-            })
-            .catch(reject);
+                });
+            }
         });
     }
 
@@ -91,27 +85,27 @@ class UserHelper {
      * @returns {Promise(User)} user
      */
     static findToken(token) {
-        return new Promise((resolve, reject) => {
-            MongoHelper.find(
-                'users',
-                'users',
-                {}
-            )
-            .then((users) => {
-                for(let u of users) {
-                    let user = new User(u);
-                    
-                    let valid = user.validateToken(token);
+        return MongoHelper.find(
+            'users',
+            'users',
+            {}
+        )
+        .then((users) => {
+            for(let u of users) {
+                let user = new User(u);
+                
+                let valid = user.validateToken(token);
 
-                    if(valid) {
+                if(valid) {
+                    return new Promise((resolve) => {
                         resolve(user);
-                        return;
-                    }
+                    });
                 }
+            }
 
+            return new Promise((resolve) => {
                 resolve(null);
-            })
-            .catch(reject);
+            });
         });
     }
     
@@ -255,45 +249,44 @@ class UserHelper {
      * @returns {Promise} Array of User objects
      */
     static getAllUsers(project) {
-        return new Promise((resolve, reject) => {
-            let query = {};
+        let query = {};
 
-            if(project) {
-                debug.log('Getting all users with project "' + project + '" in scope...', this, 3);
+        if(project) {
+            debug.log('Getting all users with project "' + project + '" in scope...', this, 3);
 
-                let projectScopeQuery = {};
-                projectScopeQuery['scopes.' + project] = { $exists: true };
+            let projectScopeQuery = {};
+            projectScopeQuery['scopes.' + project] = { $exists: true };
 
-                let isAdminQuery = { isAdmin: true };
+            let isAdminQuery = { isAdmin: true };
 
-                query['$or'] = [
-                    projectScopeQuery,
-                    isAdminQuery
-                ];
+            query['$or'] = [
+                projectScopeQuery,
+                isAdminQuery
+            ];
 
-            } else {
-                debug.log('Getting all users...', this);
+        } else {
+            debug.log('Getting all users...', this);
+        }
+
+        return MongoHelper.find(
+            'users',
+            'users',
+            query,
+            {
+                tokens: 0,
+                password: 0
             }
+        )
+        .then((users) => {
+            let userModels = [];
 
-            MongoHelper.find(
-                'users',
-                'users',
-                query,
-                {
-                    tokens: 0,
-                    password: 0
-                }
-            )
-            .then((users) => {
-                let userModels = [];
+            for(let user of users) {
+                userModels.push(new User(user));
+            }  
 
-                for(let user of users) {
-                    userModels.push(new User(user));
-                }  
-
+            return new Promise((resolve) => {
                 resolve(userModels);
-            })
-            .catch(reject);
+            });
         });
     }
     
@@ -353,24 +346,19 @@ class UserHelper {
      * @returns {Promise} promise
      */
     static cleanUpTokens(username) {
-        return new Promise((resolve, reject) => {
-            this.findUser(username)
-            .then((user) => {
-                if(user) {
-                    user.cleanUpTokens();
+        return this.findUser(username)
+        .then((user) => {
+            if(user) {
+                user.cleanUpTokens();
 
-                    this.updateUser(username, user.getObject())
-                    .then(() => {
-                        resolve();
-                    })
-                    .catch(reject);
+                return this.updateUser(username, user.getObject());
 
-                } else {
-                    reject(new Error('No user by username "' + username + '"'))
-                
-                }
-            })
-            .catch(reject);
+            } else {
+                return new Promise((resolve, reject) => {
+                    reject(new Error('No user by username "' + username + '"'));
+                });
+            
+            }
         });
     }
     
@@ -383,19 +371,19 @@ class UserHelper {
      * @returns {Promise} Promise
      */
     static updateUserById(id, properties) {
-        return new Promise((callback) => {
-            MongoHelper.mergeOne(
-                'users',
-                'users',
-                {
-                    id: id
-                },
-                properties
-            ).then(() => {
-                debug.log('Updated user "' + id + '" successfully', this);
-                
-                callback();
-            });
+        if(typeof properties.password === 'string') {
+            properties.password = User.createPasswordHashSalt(properties.password);
+        }
+        
+        return MongoHelper.mergeOne(
+            'users',
+            'users',
+            {
+                id: id
+            },
+            properties
+        ).then(() => {
+            debug.log('Updated user "' + id + '" successfully', this);
         });
     }
 
@@ -408,19 +396,19 @@ class UserHelper {
      * @returns {Promise} promise
      */
     static updateUser(username, properties) {
-        return new Promise((callback) => {
-            MongoHelper.mergeOne(
-                'users',
-                'users',
-                {
-                    username: username
-                },
-                properties
-            ).then(() => {
-                debug.log('Updated "' + username + '" successfully', this);
-                
-                callback();
-            });
+        if(typeof properties.password === 'string') {
+            properties.password = User.createPasswordHashSalt(properties.password);
+        }
+
+        return MongoHelper.mergeOne(
+            'users',
+            'users',
+            {
+                username: username
+            },
+            properties
+        ).then(() => {
+            debug.log('Updated "' + username + '" successfully', this);
         });
     }
 }

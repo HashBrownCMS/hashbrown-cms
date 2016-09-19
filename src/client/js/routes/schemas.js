@@ -2,43 +2,61 @@
 
 // Dashboard
 Router.route('/schemas/', function() {
-    ViewHelper.get('NavbarMain').showTab('/schemas/');
+    if(currentUserHasScope('schemas')) {
+        ViewHelper.get('NavbarMain').showTab('/schemas/');
+        
+        $('.workspace').html(
+            _.div({class: 'dashboard-container'},
+                _.h1('Schemas dashboard'),
+                _.p('Please click on a schema to proceed')
+            )
+        );
     
-    $('.workspace').html(
-        _.div({class: 'dashboard-container'},
-            _.h1('Schemas dashboard'),
-            _.p('Please click on a schema to proceed')
-        )
-    );
+    } else {
+        location.hash = '/';
+
+    }
 });
 
 // Edit
 Router.route('/schemas/:id', function() {
-    let schemaEditor = new SchemaEditor({
-        model: resources.schemas[this.id]
-    });
+    if(currentUserHasScope('schemas')) {
+        let schemaEditor = new SchemaEditor({
+            model: resources.schemas[this.id]
+        });
+        
+        ViewHelper.get('NavbarMain').highlightItem(this.id);
+        
+        $('.workspace').html(schemaEditor.$element);
     
-    ViewHelper.get('NavbarMain').highlightItem(this.id);
-    
-    $('.workspace').html(schemaEditor.$element);
+    } else {
+        location.hash = '/';
+
+    }
 });
 
 // Edit (JSON editor)
 Router.route('/schemas/json/:id', function() {
-    let jsonEditor = new JSONEditor({
-        model: resources.schemas[this.id],
-        apiPath: 'schemas/' + this.id,
-        onSuccess: () => {
-            return reloadResource('schemas')
-            .then(() => {
-                let navbar = ViewHelper.get('NavbarMain');
-                
-                navbar.reload();
-            });
-        }
-    });
+    if(currentUserHasScope('schemas')) {
+        let jsonEditor = new JSONEditor({
+            model: resources.schemas[this.id],
+            apiPath: 'schemas/' + this.id,
+            onSuccess: () => {
+                return reloadResource('schemas')
+                .then(() => {
+                    let navbar = ViewHelper.get('NavbarMain');
+                    
+                    navbar.reload();
+                });
+            }
+        });
 
-    ViewHelper.get('NavbarMain').highlightItem(this.id);
+        ViewHelper.get('NavbarMain').highlightItem(this.id);
+        
+        $('.workspace').html(jsonEditor.$element);
     
-    $('.workspace').html(jsonEditor.$element);
+    } else {
+        location.hash = '/';
+
+    }
 });

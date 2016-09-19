@@ -29,6 +29,25 @@ window.isCurrentUserAdmin = function isCurrentUserAdmin() {
 }
 
 /**
+ * Checks if the currently logged in user has a particular scope
+ *
+ * @param {String} scope
+ *
+ * @resurns {Boolean} Has scope
+ */
+window.currentUserHasScope = function currentUserHasScope(scope) {
+    for(let user of resources.users) {
+        if(user.isCurrent) {
+            let currentScopes = user.scopes[ProjectHelper.currentProject];
+
+            return currentScopes && currentScopes.indexOf(scope) > -1;
+        }
+    }
+
+    return false;
+}
+
+/**
  * Brings up a message modal
  *
  * @param {String} title

@@ -120,6 +120,14 @@ function checkArgs() {
                 return UserHelper.updateUser(args.u, obj);
             });
 
+        case 'set-user-password':
+            return UserHelper.findUser(args.u)
+            .then((user) => {
+                user.setPassword(args.p);
+
+                return UserHelper.updateUser(args.u, user.getObject());
+            });
+
         default:
             return new Promise((resolve) => {
                 resolve('proceed');  

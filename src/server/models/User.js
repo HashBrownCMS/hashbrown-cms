@@ -160,6 +160,36 @@ class User extends Entity {
     }
 
     /**
+     * Set new password
+     *
+     * @param {String} password
+     */
+    setPassword(password) {
+        let salt = crypto.randomBytes(128).toString('hex');
+        let hashedPassword = User.sha512(password, salt);
+
+        this.password.salt = salt;
+        this.password.hash = hashedPassword;
+    }
+
+    /**
+     * Creates a password hash and salt
+     *
+     * @param {String} password
+     *
+     * @returns {Object} Hash and salt
+     */
+    static createPasswordHashSalt(password) {
+        let salt = crypto.randomBytes(128).toString('hex');
+        let hashedPassword = User.sha512(password, salt);
+
+        return {
+            salt: salt,
+            hash: hashedPassword
+        };
+    }
+
+    /**
      * Creates a sha512 hash
      *
      * @param {String} string

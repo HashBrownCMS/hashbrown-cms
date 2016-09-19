@@ -132,7 +132,7 @@ class ContentEditor extends View {
                     }
                 },
                 {
-                    label: 'OK',
+                    label: 'Delete',
                     class: 'btn-danger',
                     callback: function() {
                         apiCall('delete', 'content/' + view.model.id)
@@ -385,11 +385,6 @@ class ContentEditor extends View {
                     'Advanced'
                 ).click(() => { this.onClickAdvanced(); }),
 
-                // Delete
-                _.button({class: 'btn btn-danger btn-raised'},
-                    'Delete'
-                ).click(() => { this.onClickDelete(this.publishingSettings); }),
-
                 // Save & publish
                 _.div({class: 'btn-group-save-publish raised'},
                     this.$saveBtn = _.button({class: 'btn btn-save btn-primary'},
@@ -403,7 +398,12 @@ class ContentEditor extends View {
                             _.option({value: 'unpublish'}, 'Unpublish')
                         ).val(this.model.unpublished ? 'unpublish' : 'publish')
                     )
-                )
+                ),
+
+                // Delete
+                _.button({class: 'btn btn-embedded btn-embedded-danger'},
+                    _.span({class: 'fa fa-trash'})
+                ).click(() => { this.onClickDelete(this.publishingSettings); }),
             )
         );
     }

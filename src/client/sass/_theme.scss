@@ -458,7 +458,7 @@ button, a {
         }
     }
 
-    &[type="text"] {
+    &[type="text"], &[type="email"], &[type="password"] {
         max-width: 400px;
     }
     
@@ -599,6 +599,10 @@ a.btn {
         background-color: transparent;
         border: 0px;
         color: material-color('blue', '600');
+
+        &.btn-embedded-danger {
+            color: material-color('red', '600');
+        }
     }
     
     &.btn-remove {

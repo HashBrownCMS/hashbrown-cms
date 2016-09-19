@@ -266,6 +266,60 @@ class UserEditor extends View {
     }
     
     /**
+     * Renders the password
+     *
+     * @return {HTMLElement} Element
+     */
+    renderPasswordEditor() {
+        let view = this;
+
+        let password1;
+        let password2;
+
+        function onChange1() {
+            password1 = $(this).val();
+    
+            let isValid = password1 == password2;
+
+            $element.toggleClass('invalid', !isValid);
+
+            if(isValid) {
+                view.model.password = password1;
+            
+            } else {
+                view.model.password = null;
+
+            }
+        } 
+        
+        function onChange2() {
+            password2 = $(this).val();
+    
+            let isValid = password1 == password2;
+
+            $element.toggleClass('invalid', !isValid);
+
+            if(isValid) {
+                view.model.password = password1;
+            
+            } else {
+                view.model.password = null;
+
+            }
+        } 
+
+        let $element = _.div({class: 'password-editor'},
+            _.span({class: 'invalid-message'}, 'Passwords to not match'),
+            _.input({class: 'form-control', type: 'password', placeholder: 'Type new password'})
+                .on('change propertychange keyup paste input', onChange1),
+            _.input({class: 'form-control', type: 'password', placeholder: 'Confirm new password'})
+                .on('change propertychange keyup paste input', onChange2)
+        );
+
+        return $element;
+    }
+    
+    /**
      * Renders the admin editor
      *
      * @return {HTMLElement} Element
@@ -317,6 +371,7 @@ class UserEditor extends View {
         $element.append(this.renderField('Username', this.renderUserNameEditor()));
         $element.append(this.renderField('Full name', this.renderFullNameEditor()));
         $element.append(this.renderField('Email', this.renderEmailEditor()));
+        $element.append(this.renderField('Password', this.renderPasswordEditor()));
         $element.append(this.renderField('Is admin', this.renderAdminEditor()));
         $element.append(this.renderField('Scopes', this.renderScopesEditor()));
 
@@ -332,13 +387,13 @@ class UserEditor extends View {
             this.renderFields(),
             _.div({class: 'editor-footer'}, 
                 _.div({class: 'btn-group'},
-                    _.button({class: 'btn btn-danger btn-raised'},
-                        'Remove'
-                    ).click(() => { this.onClickRemove(); }),
-                    this.$saveBtn = _.button({class: 'btn btn-success btn-raised btn-save'},
+                    this.$saveBtn = _.button({class: 'btn btn-primary btn-raised btn-save'},
                         _.span({class: 'text-default'}, 'Save '),
                         _.span({class: 'text-working'}, 'Saving ')
-                    ).click(() => { this.onClickSave(); })
+                    ).click(() => { this.onClickSave(); }),
+                    _.button({class: 'btn btn-embedded btn-embedded-danger'},
+                        _.span({class: 'fa fa-trash'})
+                    ).click(() => { this.onClickRemove(); })
                 )
             )
         );

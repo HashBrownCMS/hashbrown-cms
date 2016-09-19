@@ -97,11 +97,6 @@ class NavbarMain extends View {
         let items = params.items;
         let sortingQueue = [];
 
-        // Attach item context menu
-        if(params.paneContextMenu) {
-            $pane.exocontext(params.paneContextMenu);
-        }
-
         // Items
         $pane.append(
             _.each(items, function(i, item) {
@@ -276,6 +271,11 @@ class NavbarMain extends View {
             $pane
         );
 
+        // Attach pane context menu
+        if(params.paneContextMenu) {
+            $paneContainer.exocontext(params.paneContextMenu);
+        }
+        
         // Add expand/collapse buttons to items if needed
         $paneContainer.find('.pane-item-container').each((i, element) => {
             let $paneItemContainer = $(element);

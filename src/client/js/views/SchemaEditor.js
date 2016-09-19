@@ -711,13 +711,13 @@ class SchemaEditor extends View {
                             'Advanced'
                         ).click(() => { this.onClickAdvanced(); }),
                         _.if(!this.model.locked,
-                            _.button({class: 'btn btn-danger btn-raised'},
-                                'Delete'
-                            ).click(() => { this.onClickDelete(); }),
                             this.$saveBtn = _.button({class: 'btn btn-primary btn-raised btn-save'},
                                 _.span({class: 'text-default'}, 'Save '),
                                 _.span({class: 'text-working'}, 'Saving ')
-                            ).click(() => { this.onClickSave(); })
+                            ).click(() => { this.onClickSave(); }),
+                            _.button({class: 'btn btn-embedded btn-embedded-danger'},
+                                _.span({class: 'fa fa-trash'})
+                            ).click(() => { this.onClickDelete(); })
                         )
                     )
                 )

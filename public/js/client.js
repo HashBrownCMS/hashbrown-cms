@@ -35336,6 +35336,25 @@ window.isCurrentUserAdmin = function isCurrentUserAdmin() {
 };
 
 /**
+ * Checks if the currently logged in user has a particular scope
+ *
+ * @param {String} scope
+ *
+ * @resurns {Boolean} Has scope
+ */
+window.currentUserHasScope = function currentUserHasScope(scope) {
+    for (let user of resources.users) {
+        if (user.isCurrent) {
+            let currentScopes = user.scopes[ProjectHelper.currentProject];
+
+            return currentScopes && currentScopes.indexOf(scope) > -1;
+        }
+    }
+
+    return false;
+};
+
+/**
  * Brings up a message modal
  *
  * @param {String} title
@@ -36601,31 +36620,43 @@ Router.route('/license/', function () {
 // Dashboard
 
 Router.route('/connections/', function () {
-    ViewHelper.get('NavbarMain').showTab('/connections/');
+    if (currentUserHasScope('connections')) {
+        ViewHelper.get('NavbarMain').showTab('/connections/');
 
-    $('.workspace').html(_.div({ class: 'dashboard-container' }, _.h1('Connections dashboard'), _.p('Please click on a connection to proceed')));
+        $('.workspace').html(_.div({ class: 'dashboard-container' }, _.h1('Connections dashboard'), _.p('Please click on a connection to proceed')));
+    } else {
+        location.hash = '/';
+    }
 });
 
 // Edit
 Router.route('/connections/:id', function () {
-    let connectionEditor = new ConnectionEditor({
-        modelUrl: apiUrl('connections/' + this.id)
-    });
+    if (currentUserHasScope('connections')) {
+        let connectionEditor = new ConnectionEditor({
+            modelUrl: apiUrl('connections/' + this.id)
+        });
 
-    ViewHelper.get('NavbarMain').highlightItem(this.id);
+        ViewHelper.get('NavbarMain').highlightItem(this.id);
 
-    $('.workspace').html(connectionEditor.$element);
+        $('.workspace').html(connectionEditor.$element);
+    } else {
+        location.hash = '/';
+    }
 });
 
 // Edit (JSON editor)
 Router.route('/connections/json/:id', function () {
-    let connectionEditor = new JSONEditor({
-        apiPath: 'connections/' + this.id
-    });
+    if (currentUserHasScope('connections')) {
+        let connectionEditor = new JSONEditor({
+            apiPath: 'connections/' + this.id
+        });
 
-    ViewHelper.get('NavbarMain').highlightItem(this.id);
+        ViewHelper.get('NavbarMain').highlightItem(this.id);
 
-    $('.workspace').html(connectionEditor.$element);
+        $('.workspace').html(connectionEditor.$element);
+    } else {
+        location.hash = '/';
+    }
 });
 
 },{}],175:[function(require,module,exports){
@@ -36761,39 +36792,51 @@ Router.route('/media/:id', function () {
 // Dashboard
 
 Router.route('/schemas/', function () {
-    ViewHelper.get('NavbarMain').showTab('/schemas/');
+    if (currentUserHasScope('schemas')) {
+        ViewHelper.get('NavbarMain').showTab('/schemas/');
 
-    $('.workspace').html(_.div({ class: 'dashboard-container' }, _.h1('Schemas dashboard'), _.p('Please click on a schema to proceed')));
+        $('.workspace').html(_.div({ class: 'dashboard-container' }, _.h1('Schemas dashboard'), _.p('Please click on a schema to proceed')));
+    } else {
+        location.hash = '/';
+    }
 });
 
 // Edit
 Router.route('/schemas/:id', function () {
-    let schemaEditor = new SchemaEditor({
-        model: resources.schemas[this.id]
-    });
+    if (currentUserHasScope('schemas')) {
+        let schemaEditor = new SchemaEditor({
+            model: resources.schemas[this.id]
+        });
 
-    ViewHelper.get('NavbarMain').highlightItem(this.id);
+        ViewHelper.get('NavbarMain').highlightItem(this.id);
 
-    $('.workspace').html(schemaEditor.$element);
+        $('.workspace').html(schemaEditor.$element);
+    } else {
+        location.hash = '/';
+    }
 });
 
 // Edit (JSON editor)
 Router.route('/schemas/json/:id', function () {
-    let jsonEditor = new JSONEditor({
-        model: resources.schemas[this.id],
-        apiPath: 'schemas/' + this.id,
-        onSuccess: () => {
-            return reloadResource('schemas').then(() => {
-                let navbar = ViewHelper.get('NavbarMain');
+    if (currentUserHasScope('schemas')) {
+        let jsonEditor = new JSONEditor({
+            model: resources.schemas[this.id],
+            apiPath: 'schemas/' + this.id,
+            onSuccess: () => {
+                return reloadResource('schemas').then(() => {
+                    let navbar = ViewHelper.get('NavbarMain');
 
-                navbar.reload();
-            });
-        }
-    });
+                    navbar.reload();
+                });
+            }
+        });
 
-    ViewHelper.get('NavbarMain').highlightItem(this.id);
+        ViewHelper.get('NavbarMain').highlightItem(this.id);
 
-    $('.workspace').html(jsonEditor.$element);
+        $('.workspace').html(jsonEditor.$element);
+    } else {
+        location.hash = '/';
+    }
 });
 
 },{}],180:[function(require,module,exports){
@@ -36802,16 +36845,24 @@ Router.route('/schemas/json/:id', function () {
 // Dashboard
 
 Router.route('/settings/', function () {
-    ViewHelper.get('NavbarMain').showTab('/settings/');
+    if (currentUserHasScope('settings')) {
+        ViewHelper.get('NavbarMain').showTab('/settings/');
 
-    $('.workspace').html(_.div({ class: 'dashboard-container' }, _.h1('Settings dashboard'), _.p('Please click on a settings item to proceed')));
+        $('.workspace').html(_.div({ class: 'dashboard-container' }, _.h1('Settings dashboard'), _.p('Please click on a settings item to proceed')));
+    } else {
+        location.hash = '/';
+    }
 });
 
 // Edit
 Router.route('/settings/languages/', function () {
-    ViewHelper.get('NavbarMain').highlightItem('languages');
+    if (currentUserHasScope('settings')) {
+        ViewHelper.get('NavbarMain').highlightItem('languages');
 
-    $('.workspace').html(new LanguageSettings().$element);
+        $('.workspace').html(new LanguageSettings().$element);
+    } else {
+        location.hash = '/';
+    }
 });
 
 },{}],181:[function(require,module,exports){
@@ -36820,22 +36871,30 @@ Router.route('/settings/languages/', function () {
 // Users
 
 Router.route('/users/', function () {
-    ViewHelper.get('NavbarMain').showTab('/users/');
+    if (currentUserHasScope('users')) {
+        ViewHelper.get('NavbarMain').showTab('/users/');
 
-    $('.workspace').html(_.div({ class: 'dashboard-container' }, _.h1('Users'), _.p('Please click on a user to continue')));
+        $('.workspace').html(_.div({ class: 'dashboard-container' }, _.h1('Users'), _.p('Please click on a user to continue')));
+    } else {
+        location.hash = '/';
+    }
 });
 
 // Edit
 Router.route('/users/:id', function () {
-    ViewHelper.get('NavbarMain').highlightItem(this.id);
+    if (currentUserHasScope('users')) {
+        ViewHelper.get('NavbarMain').highlightItem(this.id);
 
-    apiCall('get', 'users/' + this.id).then(user => {
-        let userEditor = new UserEditor({
-            model: user
-        });
+        apiCall('get', 'users/' + this.id).then(user => {
+            let userEditor = new UserEditor({
+                model: user
+            });
 
-        $('.workspace').html(userEditor.$element);
-    }).catch(errorModal);
+            $('.workspace').html(userEditor.$element);
+        }).catch(errorModal);
+    } else {
+        location.hash = '/';
+    }
 });
 
 },{}],182:[function(require,module,exports){
@@ -36920,7 +36979,7 @@ class ConnectionEditor extends View {
                 class: 'btn-default',
                 callback: function callback() {}
             }, {
-                label: 'OK',
+                label: 'Delete',
                 class: 'btn-danger',
                 callback: function callback() {
                     apiCall('delete', 'connections/' + view.model.id).then(onSuccess).catch(this.onError);
@@ -37002,10 +37061,10 @@ class ConnectionEditor extends View {
 
         this.$element.html(_.div({ class: 'object' }, _.div({ class: 'editor-header' }, _.span({ class: 'fa fa-exchange' }), _.h4(this.model.title)), _.div({ class: 'tab-content editor-body' }, _.div({ class: 'field-container connection-title' }, _.div({ class: 'field-key' }, 'Title'), _.div({ class: 'field-value' }, this.renderTitleEditor())), _.div({ class: 'field-container connection-type' }, _.div({ class: 'field-key' }, 'Type'), _.div({ class: 'field-value' }, this.renderTypeEditor())), _.div({ class: 'field-container connection-settings' }, _.div({ class: 'field-key' }, 'Settings'), _.div({ class: 'field-value' }, this.renderSettingsEditor()))), _.div({ class: 'editor-footer' }, _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-embedded' }, 'Advanced').click(function () {
             view.onClickAdvanced();
-        }), _.button({ class: 'btn btn-danger btn-raised' }, 'Delete').click(function () {
-            view.onClickDelete();
         }), view.$saveBtn = _.button({ class: 'btn btn-primary btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Save '), _.span({ class: 'text-working' }, 'Saving ')).click(function () {
             view.onClickSave();
+        }), _.button({ class: 'btn btn-embedded-danger btn-embedded' }, _.span({ class: 'fa fa-trash' })).click(function () {
+            view.onClickDelete();
         })))));
     }
 }
@@ -37137,7 +37196,7 @@ class ContentEditor extends View {
                 class: 'btn-default',
                 callback: function callback() {}
             }, {
-                label: 'OK',
+                label: 'Delete',
                 class: 'btn-danger',
                 callback: function callback() {
                     apiCall('delete', 'content/' + view.model.id).then(() => {
@@ -37354,15 +37413,15 @@ class ContentEditor extends View {
             this.onClickAdvanced();
         }),
 
-        // Delete
-        _.button({ class: 'btn btn-danger btn-raised' }, 'Delete').click(() => {
-            this.onClickDelete(this.publishingSettings);
-        }),
-
         // Save & publish
         _.div({ class: 'btn-group-save-publish raised' }, this.$saveBtn = _.button({ class: 'btn btn-save btn-primary' }, _.span({ class: 'text-default' }, 'Save'), _.span({ class: 'text-working' }, 'Saving')).click(() => {
             this.onClickSave(this.publishingSettings);
-        }), _.if(this.publishingSettings.connections && this.publishingSettings.connections.length > 0, _.span('&'), _.select({ class: 'form-control select-publishing' }, _.option({ value: 'publish' }, 'Publish'), _.option({ value: 'unpublish' }, 'Unpublish')).val(this.model.unpublished ? 'unpublish' : 'publish')))));
+        }), _.if(this.publishingSettings.connections && this.publishingSettings.connections.length > 0, _.span('&'), _.select({ class: 'form-control select-publishing' }, _.option({ value: 'publish' }, 'Publish'), _.option({ value: 'unpublish' }, 'Unpublish')).val(this.model.unpublished ? 'unpublish' : 'publish'))),
+
+        // Delete
+        _.button({ class: 'btn btn-embedded btn-embedded-danger' }, _.span({ class: 'fa fa-trash' })).click(() => {
+            this.onClickDelete(this.publishingSettings);
+        })));
     }
 
     render() {
@@ -37627,10 +37686,10 @@ class FormEditor extends View {
     render() {
         _.append(this.$element.empty(), _.div({ class: 'editor-header' }, _.span({ class: 'fa fa-wpforms' }), _.h4(this.model.title)), this.renderFields(), _.div({ class: 'editor-footer' }, _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-embedded' }, 'Advanced').click(() => {
             this.onClickAdvanced();
-        }), _.if(!this.model.locked, _.button({ class: 'btn btn-danger btn-raised' }, 'Delete').click(() => {
-            this.onClickDelete();
-        }), this.$saveBtn = _.button({ class: 'btn btn-success btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Save '), _.span({ class: 'text-working' }, 'Saving ')).click(() => {
+        }), _.if(!this.model.locked, this.$saveBtn = _.button({ class: 'btn btn-primary btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Save '), _.span({ class: 'text-working' }, 'Saving ')).click(() => {
             this.onClickSave();
+        }), _.button({ class: 'btn btn-embedded-danger btn-embedded' }, _.span({ class: 'fa fa-trash' })).click(() => {
+            this.onClickDelete();
         })))));
     }
 }
@@ -38305,7 +38364,7 @@ class MediaViewer extends View {
                 class: 'btn-default',
                 callback: function callback() {}
             }, {
-                label: 'OK',
+                label: 'Delete',
                 class: 'btn-danger',
                 callback: function callback() {
                     $.ajax({
@@ -38345,7 +38404,7 @@ class MediaViewer extends View {
             view.$element.find('.media-data').html('(' + img.width + 'x' + img.height + ')');
         })), _.div({ class: 'editor-footer' }, _.input({ class: 'form-control', value: this.model.folder, placeholder: 'Type folder path here' }).change(function () {
             view.onChangeFolder($(this).val());
-        }), _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-danger btn-raised' }, 'Delete').click(function () {
+        }), _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-embedded btn-embedded-danger' }, _.span({ class: 'fa fa-trash' })).click(function () {
             view.onClickDelete();
         }))));
     }
@@ -39007,10 +39066,10 @@ class SchemaEditor extends View {
 
             _.append(this.$element.empty(), _.div({ class: 'editor-header' }, _.span({ class: 'fa fa-' + this.compiledSchema.icon }), _.h4(this.model.name)), this.renderFields(), _.div({ class: 'editor-footer panel panel-default panel-buttons' }, _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-embedded' }, 'Advanced').click(() => {
                 this.onClickAdvanced();
-            }), _.if(!this.model.locked, _.button({ class: 'btn btn-danger btn-raised' }, 'Delete').click(() => {
-                this.onClickDelete();
-            }), this.$saveBtn = _.button({ class: 'btn btn-primary btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Save '), _.span({ class: 'text-working' }, 'Saving ')).click(() => {
+            }), _.if(!this.model.locked, this.$saveBtn = _.button({ class: 'btn btn-primary btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Save '), _.span({ class: 'text-working' }, 'Saving ')).click(() => {
                 this.onClickSave();
+            }), _.button({ class: 'btn btn-embedded btn-embedded-danger' }, _.span({ class: 'fa fa-trash' })).click(() => {
+                this.onClickDelete();
             })))));
         });
     }
@@ -39239,6 +39298,50 @@ class UserEditor extends View {
     }
 
     /**
+     * Renders the password
+     *
+     * @return {HTMLElement} Element
+     */
+    renderPasswordEditor() {
+        let view = this;
+
+        let password1;
+        let password2;
+
+        function onChange1() {
+            password1 = $(this).val();
+
+            let isValid = password1 == password2;
+
+            $element.toggleClass('invalid', !isValid);
+
+            if (isValid) {
+                view.model.password = password1;
+            } else {
+                view.model.password = null;
+            }
+        }
+
+        function onChange2() {
+            password2 = $(this).val();
+
+            let isValid = password1 == password2;
+
+            $element.toggleClass('invalid', !isValid);
+
+            if (isValid) {
+                view.model.password = password1;
+            } else {
+                view.model.password = null;
+            }
+        }
+
+        let $element = _.div({ class: 'password-editor' }, _.span({ class: 'invalid-message' }, 'Passwords to not match'), _.input({ class: 'form-control', type: 'password', placeholder: 'Type new password' }).on('change propertychange keyup paste input', onChange1), _.input({ class: 'form-control', type: 'password', placeholder: 'Confirm new password' }).on('change propertychange keyup paste input', onChange2));
+
+        return $element;
+    }
+
+    /**
      * Renders the admin editor
      *
      * @return {HTMLElement} Element
@@ -39280,6 +39383,7 @@ class UserEditor extends View {
         $element.append(this.renderField('Username', this.renderUserNameEditor()));
         $element.append(this.renderField('Full name', this.renderFullNameEditor()));
         $element.append(this.renderField('Email', this.renderEmailEditor()));
+        $element.append(this.renderField('Password', this.renderPasswordEditor()));
         $element.append(this.renderField('Is admin', this.renderAdminEditor()));
         $element.append(this.renderField('Scopes', this.renderScopesEditor()));
 
@@ -39287,10 +39391,10 @@ class UserEditor extends View {
     }
 
     render() {
-        _.append(this.$element.empty(), _.div({ class: 'editor-header' }, _.span({ class: 'fa fa-user' }), _.h4(this.model.username)), this.renderFields(), _.div({ class: 'editor-footer' }, _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-danger btn-raised' }, 'Remove').click(() => {
-            this.onClickRemove();
-        }), this.$saveBtn = _.button({ class: 'btn btn-success btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Save '), _.span({ class: 'text-working' }, 'Saving ')).click(() => {
+        _.append(this.$element.empty(), _.div({ class: 'editor-header' }, _.span({ class: 'fa fa-user' }), _.h4(this.model.username)), this.renderFields(), _.div({ class: 'editor-footer' }, _.div({ class: 'btn-group' }, this.$saveBtn = _.button({ class: 'btn btn-primary btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Save '), _.span({ class: 'text-working' }, 'Saving ')).click(() => {
             this.onClickSave();
+        }), _.button({ class: 'btn btn-embedded btn-embedded-danger' }, _.span({ class: 'fa fa-trash' })).click(() => {
+            this.onClickRemove();
         }))));
     }
 }
@@ -41862,11 +41966,6 @@ class NavbarMain extends View {
         let items = params.items;
         let sortingQueue = [];
 
-        // Attach item context menu
-        if (params.paneContextMenu) {
-            $pane.exocontext(params.paneContextMenu);
-        }
-
         // Items
         $pane.append(_.each(items, function (i, item) {
             let id = item.id || i;
@@ -42013,6 +42112,11 @@ class NavbarMain extends View {
         }
 
         let $paneContainer = _.div({ class: 'pane-container', 'data-route': params.route }, _.if(params.toolbar, params.toolbar), _.div({ class: 'pane-move-buttons' }, _.button({ class: 'btn btn-move-to-root' }, 'Move to root'), _.button({ class: 'btn btn-new-folder' }, 'New folder')), $pane);
+
+        // Attach pane context menu
+        if (params.paneContextMenu) {
+            $paneContainer.exocontext(params.paneContextMenu);
+        }
 
         // Add expand/collapse buttons to items if needed
         $paneContainer.find('.pane-item-container').each((i, element) => {

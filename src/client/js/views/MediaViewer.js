@@ -47,7 +47,7 @@ class MediaViewer extends View {
                     }
                 },
                 {
-                    label: 'OK',
+                    label: 'Delete',
                     class: 'btn-danger',
                     callback: function() {
                         $.ajax({
@@ -110,8 +110,8 @@ class MediaViewer extends View {
                 _.input({class: 'form-control', value: this.model.folder, placeholder: 'Type folder path here'})
                     .change(function() { view.onChangeFolder($(this).val()); }),
                 _.div({class: 'btn-group'},
-                    _.button({class: 'btn btn-danger btn-raised'},
-                        'Delete'
+                    _.button({class: 'btn btn-embedded btn-embedded-danger'},
+                        _.span({class: 'fa fa-trash'})
                     ).click(function() { view.onClickDelete(); })
                 )
             )

@@ -85,7 +85,7 @@ class ConnectionEditor extends View {
                     }
                 },
                 {
-                    label: 'OK',
+                    label: 'Delete',
                     class: 'btn-danger',
                     callback: function() {
                         apiCall('delete', 'connections/' + view.model.id)
@@ -211,13 +211,13 @@ class ConnectionEditor extends View {
                         _.button({class: 'btn btn-embedded'},
                             'Advanced'
                         ).click(function() { view.onClickAdvanced(); }),
-                        _.button({class: 'btn btn-danger btn-raised'},
-                            'Delete'
-                        ).click(function() { view.onClickDelete(); }),
                         view.$saveBtn = _.button({class: 'btn btn-primary btn-raised btn-save'},
                             _.span({class: 'text-default'}, 'Save '),
                             _.span({class: 'text-working'}, 'Saving ')
-                        ).click(function() { view.onClickSave(); })
+                        ).click(function() { view.onClickSave(); }),
+                        _.button({class: 'btn btn-embedded-danger btn-embedded'},
+                            _.span({class: 'fa fa-trash'})
+                        ).click(function() { view.onClickDelete(); })
                     )
                 )
             )
