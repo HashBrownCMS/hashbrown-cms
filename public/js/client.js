@@ -40250,10 +40250,6 @@ class RichTextEditor extends View {
         this.value = toMarkdown(data);
 
         this.trigger('change', this.value);
-        /* 
-          // Correct image paths to fit MediaController
-          data = data.replace(/src="\/media\/([0-9a-z]{40})\//g, 'src="/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/$1/');
-           this.editor.setData(data);*/
     }
 
     /**
@@ -40266,8 +40262,6 @@ class RichTextEditor extends View {
             MediaHelper.getMediaById(id).then(media => {
                 let html = '<img alt="' + media.name + '" src="/' + media.url + '">';
 
-                console.log(html);
-
                 this.editor.insertHtml(html);
 
                 this.onChange();
@@ -40279,23 +40273,41 @@ class RichTextEditor extends View {
         let $editable;
 
         // Main element
-        this.$element = _.div({ class: 'field-editor rich-text-editor panel panel-default' }, $editable = _.div({ 'contenteditable': true }, marked(this.value)));
+        this.$element = _.div({ class: 'field-editor rich-text-editor panel panel-default' }, $editable = _.div({ 'contenteditable': true }));
 
         this.editor = CKEDITOR.replace($editable[0], {
+            removePlugins: 'contextmenu,liststyle,tabletools',
             allowedContent: true,
             toolbarGroups: [{ name: 'styles' }, { name: 'basicstyles', groups: ['basicstyles', 'cleanup'] }, { name: 'paragraph', groups: ['list', 'indent', 'blocks', 'align', 'bidi'] }, { name: 'links' }, { name: 'insert' }, { name: 'forms' }, { name: 'tools' }, { name: 'document', groups: ['mode', 'document', 'doctools'] }, { name: 'others' }],
 
             extraPlugins: 'markdown',
 
-            removeButtons: 'Underline,Subscript,Superscript,Source,SpecialChar,HorizontalRule,Maximize,Table',
+            removeButtons: 'Anchor,Styles,Underline,Subscript,Superscript,Source,SpecialChar,HorizontalRule,Maximize,Table',
 
             format_tags: 'p;h1;h2;h3;pre',
 
             removeDialogTabs: 'image:advanced;link:advanced'
         });
 
-        this.editor.on('change', e => {
+        this.editor.on('change', () => {
             this.onChange();
+        });
+
+        // Init editor instance
+        this.editor.on('instanceReady', () => {
+
+            // Filtering rules
+            this.editor.dataProcessor.dataFilter.addRules({
+                elements: {
+                    // Refactor image src url to fit MediaController
+                    img: element => {
+                        element.attributes.src = element.attributes.src.replace(/\/media\/([0-9a-z]{40})\/.+/g, '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/$1/');
+                    }
+                }
+            });
+
+            // Insert text
+            this.editor.setData(marked(this.value));
         });
     }
 }
