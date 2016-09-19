@@ -35308,6 +35308,8 @@ onReady('resources', function () {
 // Libraries
 require('exomon');
 window.Promise = require('bluebird');
+window.marked = require('marked');
+window.toMarkdown = require('to-markdown');
 
 // Common views
 window.MessageModal = require('./views/MessageModal');
@@ -35502,7 +35504,7 @@ window.customApiCall = function customApiCall(method, url, data) {
     });
 };
 
-},{"../../common/helpers/DebugHelper":222,"./helpers/ProjectHelper":168,"./views/MessageModal":190,"bluebird":17,"exomon":92}],164:[function(require,module,exports){
+},{"../../common/helpers/DebugHelper":222,"./helpers/ProjectHelper":168,"./views/MessageModal":190,"bluebird":17,"exomon":92,"marked":108,"to-markdown":150}],164:[function(require,module,exports){
 'use strict';
 
 let ConnectionHelperCommon = require('../../../common/helpers/ConnectionHelper');
@@ -40197,10 +40199,38 @@ module.exports = ResourceReferenceEditor;
 },{}],203:[function(require,module,exports){
 'use strict';
 
-// Lib
+// Override CKEditor image plugin
 
-let markdownToHtml = require('marked');
-let htmlToMarkdown = require('to-markdown');
+CKEDITOR.plugins.registered.image.init = editor => {
+    // Button UI
+    editor.ui.addButton && editor.ui.addButton("Image", {
+        label: editor.lang.common.image,
+        command: "image",
+        toolbar: "insert,10"
+    });
+
+    // Add menu item
+    editor.addMenuItems && editor.addMenuItems({
+        image: {
+            label: editor.lang.image.menu,
+            command: "image",
+            group: "image"
+        }
+    });
+
+    // Handler
+    editor.addCommand('image', {
+        modes: { wysiwyg: 1, markdown: 1 },
+        exec: editor => {
+            for (let rte of ViewHelper.getAll('RichTextEditor')) {
+                if (rte.editor == editor) {
+                    rte.onClickInsertMedia();
+                    break;
+                }
+            }
+        }
+    });
+};
 
 /**
  * A rich text editor
@@ -40216,60 +40246,14 @@ class RichTextEditor extends View {
      * Event: Change input
      */
     onChange() {
-        this.$output.html(markdownToHtml(this.$textarea.val()));
+        let data = this.editor.getData();
+        this.value = toMarkdown(data);
 
-        this.$output.find('img').each(function () {
-            let idMatches = ($(this).attr('src') || '').match(/[0-9a-z]{40}/);
-
-            // Only refactor the URL, if the id matches (it might be a remote image)
-            if (idMatches) {
-                let src = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + idMatches[0];
-
-                $(this).attr('src', src);
-            }
-        });
-
-        this.caret = this.getCaretCharacterOffsetWithin(this.$textarea[0]);
-
-        this.trigger('change', this.$textarea.val());
-    }
-
-    /**
-     * Updates the textarea
-     */
-    updateTextArea() {
-        this.$textarea.val(htmlToMarkdown(this.$output.html()));
-
-        this.trigger('change', this.$textarea.val());
-    }
-
-    /**
-     * Event: Click bold
-     */
-    onClickBold() {
-        document.execCommand('bold', false, null);
-
-        this.updateTextArea();
-    }
-
-    /**
-     * Event: Click italic
-     */
-    onClickItalic() {
-        document.execCommand('italic', false, null);
-
-        this.updateTextArea();
-    }
-
-    /**
-     * Event: Change heading
-     */
-    onChangeHeading() {
-        let num = parseInt(this.$element.find('.panel-heading select').val());
-
-        document.execCommand('formatBlock', false, '<' + num + '>');
-
-        this.updateTextArea();
+        this.trigger('change', this.value);
+        /* 
+          // Correct image paths to fit MediaController
+          data = data.replace(/src="\/media\/([0-9a-z]{40})\//g, 'src="/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/$1/');
+           this.editor.setData(data);*/
     }
 
     /**
@@ -40280,103 +40264,45 @@ class RichTextEditor extends View {
 
         mediaBrowser.on('select', id => {
             MediaHelper.getMediaById(id).then(media => {
-                this.$textarea.val(this.$textarea.val() + '\n' + '![' + media.name + '](/' + media.url + ')');
+                let html = '<img alt="' + media.name + '" src="/' + media.url + '">';
+
+                console.log(html);
+
+                this.editor.insertHtml(html);
 
                 this.onChange();
             }).catch(errorModal);
         });
     }
 
-    /**
-     * Gets the caret offset within an element
-     *
-     * @param {HTMLElement} element
-     *
-     * @returns {Number} offset
-     */
-    getCaretCharacterOffsetWithin(element) {
-        var pos = 0;
-        if ('selectionStart' in element) {
-            pos = element.selectionStart;
-        } else if ('selection' in document) {
-            element.focus();
-            var Sel = document.selection.createRange();
-            var SelLength = document.selection.createRange().text.length;
-            Sel.moveStart('character', -element.value.length);
-            pos = Sel.text.length - SelLength;
-        }
-        return pos;
-    }
-
-    /**
-     * Sets the selection range in an input
-     *
-     * @param {HTMLElement} input
-     * @param {Number} selectionStart
-     * @param {Number} selectionEnd
-     */
-    setSelectionRange(input, selectionStart, selectionEnd) {
-        input.focus();
-
-        if (input.setSelectionRange) {
-            input.setSelectionRange(selectionStart, selectionEnd);
-        } else if (input.createTextRange) {
-            var range = input.createTextRange();
-            range.collapse(true);
-            range.moveEnd('character', selectionEnd);
-            range.moveStart('character', selectionStart);
-            range.select();
-        }
-    }
-
-    /**
-     * Sets the caret position in an input
-     *
-     * @param {HTMLElement} input
-     * @param {Number} pos
-     */
-    setCaretToPos(input, pos) {
-        this.setSelectionRange(input, pos, pos);
-    }
-
     render() {
-        let editor = this;
+        let $editable;
 
         // Main element
-        this.$element = _.div({ class: 'field-editor rich-text-editor panel panel-default' }, [
-        // Toolbar
-        _.div({ class: 'panel-heading' }, _.select({ class: 'form-control btn btn-primary' }, _.each([1, 2, 3, 4, 5, 6], (i, num) => {
-            return _.option({ value: 'h' + num }, 'H' + num);
-        })).change(e => {
-            this.onChangeHeading();
-        }), _.button({ class: 'btn btn-primary' }, _.span({ class: 'fa fa-bold' })).click(() => {
-            this.onClickBold();
-        }), _.button({ class: 'btn btn-primary' }, _.span({ class: 'fa fa-italic' })).click(() => {
-            this.onClickItalic();
-        }), _.button({ class: 'btn btn-primary' }, _.span({ class: 'fa fa-file-image-o' })).click(() => {
-            this.onClickInsertMedia();
-        })),
+        this.$element = _.div({ class: 'field-editor rich-text-editor panel panel-default' }, $editable = _.div({ 'contenteditable': true }, marked(this.value)));
 
-        // HTML output 
-        _.div({ class: 'panel-body' }, this.$output = _.div({ class: 'rte-output', contenteditable: true }).on('change propertychange keyup paste', function () {
-            editor.updateTextArea();
-        })),
+        this.editor = CKEDITOR.replace($editable[0], {
+            allowedContent: true,
+            toolbarGroups: [{ name: 'styles' }, { name: 'basicstyles', groups: ['basicstyles', 'cleanup'] }, { name: 'paragraph', groups: ['list', 'indent', 'blocks', 'align', 'bidi'] }, { name: 'links' }, { name: 'insert' }, { name: 'forms' }, { name: 'tools' }, { name: 'document', groups: ['mode', 'document', 'doctools'] }, { name: 'others' }],
 
-        // Markdown editor
-        _.div({ class: 'panel-footer' }, this.$textarea = _.textarea({ class: 'form-control' }, this.value).on('change propertychange keyup paste', function () {
-            editor.onChange();
-        }))]);
+            extraPlugins: 'markdown',
 
-        // Initial call to render markdown as HTML
-        this.$output.html(markdownToHtml(this.$textarea.val()));
+            removeButtons: 'Underline,Subscript,Superscript,Source,SpecialChar,HorizontalRule,Maximize,Table',
 
-        this.onChange();
+            format_tags: 'p;h1;h2;h3;pre',
+
+            removeDialogTabs: 'image:advanced;link:advanced'
+        });
+
+        this.editor.on('change', e => {
+            this.onChange();
+        });
     }
 }
 
 module.exports = RichTextEditor;
 
-},{"marked":108,"to-markdown":150}],204:[function(require,module,exports){
+},{}],204:[function(require,module,exports){
 'use strict';
 
 /**
@@ -44198,7 +44124,7 @@ class Schema extends Entity {
 
 module.exports = Schema;
 
-},{"./Entity":230}]},{},[162,158,160])
+},{"./Entity":230}]},{},[162,209,158,160])
 
 
 //# sourceMappingURL=maps/client.js.map

@@ -1,9 +1,44 @@
 .rich-text-editor {
     margin: 0px;
     min-width: 100%;
+    max-width: 100px; // A hack to prevent CodeMirror from exceeding boundaries
+
+    .cke {
+        padding: 0px;
+        background: none;
+        border: 0px;
+        
+        .cke_inner {
+            .cke_top, .cke_contents, .cke_bottom {
+                background-image: none;
+                border: 0px;
+                box-shadow: none;
+            }
+
+            .cke_top {
+                background-color: material-color('blue', '600');
+            }
+
+            .cke_bottom {
+                background-color: material-color('grey', '800');
+
+                .cke_path {
+                    a {
+                        color: material-color('grey', '300');
+                        text-shadow: none;
+                        cursor: pointer;
+
+                        &:hover {
+                            background: none;
+                            box-shadow: none;
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     .panel-heading {
-        background-color: material-color('blue', '600');
         padding: 5px;
 
         select, .btn, .dropdown {

@@ -1,6 +1,8 @@
 // Libraries
 require('exomon');
 window.Promise = require('bluebird');
+window.marked = require('marked');
+window.toMarkdown = require('to-markdown');
 
 // Common views
 window.MessageModal = require('./views/MessageModal');

@@ -1173,9 +1173,28 @@ body > .dashboard-container {
 
 .rich-text-editor {
   margin: 0px;
-  min-width: 100%; }
+  min-width: 100%;
+  max-width: 100px; }
+  .rich-text-editor .cke {
+    padding: 0px;
+    background: none;
+    border: 0px; }
+    .rich-text-editor .cke .cke_inner .cke_top, .rich-text-editor .cke .cke_inner .cke_contents, .rich-text-editor .cke .cke_inner .cke_bottom {
+      background-image: none;
+      border: 0px;
+      box-shadow: none; }
+    .rich-text-editor .cke .cke_inner .cke_top {
+      background-color: #1e88e5; }
+    .rich-text-editor .cke .cke_inner .cke_bottom {
+      background-color: #424242; }
+      .rich-text-editor .cke .cke_inner .cke_bottom .cke_path a {
+        color: #e0e0e0;
+        text-shadow: none;
+        cursor: pointer; }
+        .rich-text-editor .cke .cke_inner .cke_bottom .cke_path a:hover {
+          background: none;
+          box-shadow: none; }
   .rich-text-editor .panel-heading {
-    background-color: #1e88e5;
     padding: 5px; }
     .rich-text-editor .panel-heading select, .rich-text-editor .panel-heading .btn, .rich-text-editor .panel-heading .dropdown {
       line-height: 1em;

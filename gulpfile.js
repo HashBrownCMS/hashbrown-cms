@@ -23,6 +23,7 @@ var config = {
     js: {
         src: [
             './src/client/js/client.js',
+            './src/client/js/views/editors/index.js',
             './plugins/github-pages/client/js/client.js',
             './plugins/hashbrown-driver/client/js/client.js'
         ],
