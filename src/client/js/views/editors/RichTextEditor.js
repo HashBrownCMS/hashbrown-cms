@@ -85,6 +85,7 @@ class RichTextEditor extends View {
             {
                 removePlugins: 'contextmenu,liststyle,tabletools',
                 allowedContent: true,
+                height: 400,
                 toolbarGroups: [
                     { name: 'styles' },
                     { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ] },

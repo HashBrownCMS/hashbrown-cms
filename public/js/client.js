@@ -40278,6 +40278,7 @@ class RichTextEditor extends View {
         this.editor = CKEDITOR.replace($editable[0], {
             removePlugins: 'contextmenu,liststyle,tabletools',
             allowedContent: true,
+            height: 400,
             toolbarGroups: [{ name: 'styles' }, { name: 'basicstyles', groups: ['basicstyles', 'cleanup'] }, { name: 'paragraph', groups: ['list', 'indent', 'blocks', 'align', 'bidi'] }, { name: 'links' }, { name: 'insert' }, { name: 'forms' }, { name: 'tools' }, { name: 'document', groups: ['mode', 'document', 'doctools'] }, { name: 'others' }],
 
             extraPlugins: 'markdown',

@@ -1212,7 +1212,8 @@ body > .dashboard-container {
             margin: 0px;
             border: 1px solid transparent;
             background-image: none;
-            background-color: transparent; }
+            background-color: transparent;
+            box-shadow: none; }
             .rich-text-editor .cke .cke_inner .cke_top .cke_combo .cke_combo_button:hover {
               border: 1px solid #ccc;
               border-radius: 2px; }
