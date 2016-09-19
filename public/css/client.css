@@ -199,7 +199,7 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
     left: 50%;
     transform: translate(-50%, -50%); }
 
-.raised, .dropdown .dropdown-menu, .cms-container .menuspace, .content-editor > .object .language-picker .dropdown-menu {
+.raised, .dropdown .dropdown-menu, .cms-container .menuspace, .cms-container .workspace .content-editor > .object .language-picker .dropdown-menu {
   box-shadow: 0px 2px 3px 1px rgba(0, 0, 0, 0.2);
   background-color: #fff;
   padding: 15px 30px; }
@@ -418,10 +418,9 @@ a.btn.btn-primary, a.btn.btn-default, a.btn.btn-danger, a.btn.btn-success {
     font-weight: 100; }
   .btn.btn-raised {
     box-shadow: 0px 2px 3px 1px rgba(0, 0, 0, 0.2);
-    position: relative;
-    top: -2px; }
+    position: relative; }
     .btn.btn-raised:active {
-      top: 0px;
+      top: 2px;
       box-shadow: 0px 0px 1px 1px rgba(0, 0, 0, 0.2); }
   .btn.btn-embedded {
     background-color: transparent;
@@ -713,8 +712,7 @@ img.logo {
             line-height: 20px;
             text-transform: uppercase;
             font-weight: bold;
-            margin-right: 15px;
-            min-width: 110px; }
+            margin-right: 15px; }
             .cms-container .workspace .editor .editor-footer .btn-group .btn:last-child {
               margin-right: 0px; }
             .cms-container .workspace .editor .editor-footer .btn-group .btn span {
@@ -1097,11 +1095,11 @@ body > .dashboard-container {
 
 .array-editor {
   min-width: 100%; }
-  .array-editor .array-editor .item.raised, .array-editor .array-editor .dropdown .item.dropdown-menu, .dropdown .array-editor .array-editor .item.dropdown-menu, .array-editor .array-editor .cms-container .item.menuspace, .cms-container .array-editor .array-editor .item.menuspace, .array-editor .array-editor .content-editor > .object .language-picker .item.dropdown-menu, .content-editor > .object .language-picker .array-editor .array-editor .item.dropdown-menu {
+  .array-editor .array-editor .item.raised, .array-editor .array-editor .dropdown .item.dropdown-menu, .dropdown .array-editor .array-editor .item.dropdown-menu, .array-editor .array-editor .cms-container .item.menuspace, .cms-container .array-editor .array-editor .item.menuspace, .array-editor .array-editor .cms-container .workspace .content-editor > .object .language-picker .item.dropdown-menu, .cms-container .workspace .content-editor > .object .language-picker .array-editor .array-editor .item.dropdown-menu {
     padding: 0px 0px 30px 0px;
     box-shadow: none;
     border-bottom: 1px solid #eeeeee; }
-    .array-editor .array-editor .item.raised:last-of-type, .array-editor .array-editor .dropdown .item.dropdown-menu:last-of-type, .dropdown .array-editor .array-editor .item.dropdown-menu:last-of-type, .array-editor .array-editor .cms-container .item.menuspace:last-of-type, .cms-container .array-editor .array-editor .item.menuspace:last-of-type, .array-editor .array-editor .content-editor > .object .language-picker .item.dropdown-menu:last-of-type, .content-editor > .object .language-picker .array-editor .array-editor .item.dropdown-menu:last-of-type {
+    .array-editor .array-editor .item.raised:last-of-type, .array-editor .array-editor .dropdown .item.dropdown-menu:last-of-type, .dropdown .array-editor .array-editor .item.dropdown-menu:last-of-type, .array-editor .array-editor .cms-container .item.menuspace:last-of-type, .cms-container .array-editor .array-editor .item.menuspace:last-of-type, .array-editor .array-editor .cms-container .workspace .content-editor > .object .language-picker .item.dropdown-menu:last-of-type, .cms-container .workspace .content-editor > .object .language-picker .array-editor .array-editor .item.dropdown-menu:last-of-type {
       border-bottom: 0px; }
   .array-editor.sorting .btn-add-item {
     display: none; }
@@ -1324,21 +1322,21 @@ body > .dashboard-container {
   .content-reference-editor .btn {
     margin-left: 10px; }
 
-.content-editor {
+.cms-container .workspace .content-editor {
   height: 100%; }
-  .content-editor > .object {
+  .cms-container .workspace .content-editor > .object {
     display: flex;
     flex-direction: column;
     height: 100%; }
-    .content-editor > .object > .nav-tabs {
+    .cms-container .workspace .content-editor > .object > .nav-tabs {
       padding-top: 15px !important;
       padding-left: 15px !important; }
-    .content-editor > .object > .tab-content {
+    .cms-container .workspace .content-editor > .object > .tab-content {
       flex-grow: 1;
       overflow-y: auto; }
-      .content-editor > .object > .tab-content > .tab-pane {
+      .cms-container .workspace .content-editor > .object > .tab-content > .tab-pane {
         max-width: 1200px; }
-    .content-editor > .object .language-picker {
+    .cms-container .workspace .content-editor > .object .language-picker {
       position: absolute;
       top: 10px;
       right: 10px;
@@ -1346,18 +1344,18 @@ body > .dashboard-container {
       text-transform: uppercase;
       color: #bbdefb;
       font-weight: 700; }
-      .content-editor > .object .language-picker button {
+      .cms-container .workspace .content-editor > .object .language-picker button {
         text-transform: uppercase; }
-      .content-editor > .object .language-picker span {
+      .cms-container .workspace .content-editor > .object .language-picker span {
         margin-right: 1em; }
-      .content-editor > .object .language-picker .dropdown-toggle {
+      .cms-container .workspace .content-editor > .object .language-picker .dropdown-toggle {
         background-color: transparent;
         border: 0px;
         color: #fff; }
-        .content-editor > .object .language-picker .dropdown-toggle .fa {
+        .cms-container .workspace .content-editor > .object .language-picker .dropdown-toggle .fa {
           margin-left: 0.5em;
           margin-right: 0px; }
-      .content-editor > .object .language-picker .dropdown-menu {
+      .cms-container .workspace .content-editor > .object .language-picker .dropdown-menu {
         width: 100%;
         min-width: 0px;
         margin-top: -1px;
@@ -1365,17 +1363,43 @@ body > .dashboard-container {
         padding: 0px;
         border: 0px;
         background-color: #eeeeee; }
-        .content-editor > .object .language-picker .dropdown-menu li a {
+        .cms-container .workspace .content-editor > .object .language-picker .dropdown-menu li a {
           text-transform: uppercase;
           font-weight: bold;
           text-align: center;
           font-size: 12px;
           padding: 5px 0px;
           display: block; }
-          .content-editor > .object .language-picker .dropdown-menu li a:hover {
+          .cms-container .workspace .content-editor > .object .language-picker .dropdown-menu li a:hover {
             background-color: #e0e0e0; }
-  .content-editor .object .tab-content {
+  .cms-container .workspace .content-editor .object .tab-content {
     padding: 15px; }
+  .cms-container .workspace .content-editor .editor-footer .btn-group .btn-group-save-publish {
+    height: 30px;
+    padding: 0px;
+    color: #fff;
+    display: flex; }
+    .cms-container .workspace .content-editor .editor-footer .btn-group .btn-group-save-publish > span, .cms-container .workspace .content-editor .editor-footer .btn-group .btn-group-save-publish .form-control, .cms-container .workspace .content-editor .editor-footer .btn-group .btn-group-save-publish .btn {
+      margin: 0px;
+      display: block;
+      font-weight: 700;
+      text-transform: uppercase;
+      line-height: 30px;
+      font-size: 12px;
+      padding-top: 0px;
+      padding-bottom: 0px;
+      height: 30px; }
+    .cms-container .workspace .content-editor .editor-footer .btn-group .btn-group-save-publish .btn {
+      border-top-right-radius: 0px;
+      border-bottom-right-radius: 0px; }
+    .cms-container .workspace .content-editor .editor-footer .btn-group .btn-group-save-publish > span {
+      background-color: #1976d2;
+      color: #fff;
+      padding-left: 10px; }
+    .cms-container .workspace .content-editor .editor-footer .btn-group .btn-group-save-publish .form-control {
+      background-color: #1976d2;
+      border-top-left-radius: 0px;
+      border-bottom-left-radius: 0px; }
 
 .media-browser.disabled {
   pointer-events: none; }

@@ -33,15 +33,14 @@ class ScheduleHelper {
 
         return this.getTasks()
         .then((tasks) => {
-            let noneFound = true;
-
-            for(let i in tasks) {
+            let nextTask = (i) => {
                 let task = tasks[i];
 
-                if(task.isOverdue()) {
-                    noneFound = false;
-
-                    this.runTask(task)
+                if(task && task.isOverdue()) {
+                    return this.runTask(task)
+                    .then(() => {
+                        return nextTask(i + 1);
+                    })
                     .catch((e) => {
                         // If tasks will infinitely fail, they should be removed
                         // It will take up the entire log, if these errors occur every minute
@@ -54,12 +53,16 @@ class ScheduleHelper {
                             debug.log(e.message, this);
                         }
                     });
-                }
-            }
+                
+                } else {
+                    return new Promise((resolve) => {
+                        resolve();
+                    });
 
-            if(noneFound) {
-                debug.log('No scheduled tasks are overdue.', this, 3);
-            }
+                }
+            };
+
+            return nextTask(0);
         });
     }
 
@@ -149,6 +152,11 @@ class ScheduleHelper {
      * @returns {Promise} Promise
      */
     static updateTask(type, contentId, date, project, environment) {
+        // If the date is invalid, remove instead
+        if(!date || isNaN(new Date(date).getTime()) || new Date(date).getFullYear() == 1970) {
+            return this.removeTask(type, contentId, date, project, environment);
+        }
+
         let task = new Task({
             type: type,
             content: contentId,

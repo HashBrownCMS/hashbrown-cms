@@ -1,5 +1,8 @@
 'use strict';
 
+// Models
+let FieldSchema = require('../../../common/models/FieldSchema');
+
 // Helpers
 let SchemaHelperCommon = require('../../../common/helpers/SchemaHelper');
 
@@ -28,6 +31,31 @@ class SchemaHelper extends SchemaHelperCommon {
             });
         }
     }
+
+    /**
+     * Gets a FieldSchema with all parent configs
+     *
+     * @param {String} id
+     *
+     * @returns {FieldSchema} Compiled FieldSchema
+     */
+    static getFieldSchemaWithParentConfigs(id) {
+        let fieldSchema = resources.schemas[id];
+
+        if(fieldSchema) {
+            let nextSchema = resources.schemas[fieldSchema.parentSchemaId];
+            let compiledSchema = new FieldSchema(fieldSchema);
+           
+            while(nextSchema) {
+                compiledSchema.appendConfig(nextSchema.config);
+
+                nextSchema = resources.schemas[nextSchema.parentSchemaId];
+            }
+
+            return compiledSchema;
+        }
+    }
+
 
     /**
      * Gets a Schema by id

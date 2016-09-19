@@ -39,59 +39,22 @@ class ContentEditor extends View {
     }
 
     /**
-     * Event: Click unpublish. Removes remove content and sets "unpublished" flag
-     *
-     * @param {Object} publishing
-     */
-    onClickUnpublish(publishing) {
-        let view = this;
-
-        function unpublishConnections() {
-            apiCall('post', 'content/unpublish', view.model)
-            .then(onSuccess)
-            .catch(onError);
-        }
-        
-        function onSuccess() {
-            debug.log('Unpublished content with id "' + view.model.id + '"', this); 
-        
-            reloadResource('content')
-            .then(function() {
-                view.renderButtons();
-            });
-        }
-
-        function onError(err) {
-            new MessageModal({
-                model: {
-                    title: 'Error',
-                    body: err
-                }
-            });
-        }
-
-        view.$unpublishBtn.toggleClass('working', true);
-
-        // Set unpublished flag
-        view.model.unpublished = true;
-
-        // Save content to database
-        apiCall('post', 'content/' + view.model.id, view.model)
-        .then(unpublishConnections)
-        .catch(onError);
-    }
-    
-    /**
      * Event: Click save. Posts the model to the modelUrl
      *
      * @param {Object} publishing
      */
     onClickSave(publishing) {
-        this.model.unpublished = false;
+        let shouldUnpublish = this.$element.find('.editor-footer .select-publishing').val() == 'unpublish';
+
+        this.model.unpublished = shouldUnpublish;
 
         let publishConnections = () => {
             if(publishing.connections && publishing.connections.length > 0) {
-                return apiCall('post', 'content/publish', this.model);
+                if(shouldUnpublish) {
+                    return apiCall('post', 'content/unpublish', this.model);
+                } else {
+                    return apiCall('post', 'content/publish', this.model);
+                }
             } else {
                 return new Promise((resolve) => { resolve(); });
             }
@@ -108,8 +71,8 @@ class ContentEditor extends View {
 
         // Save content to database
         apiCall('post', 'content/' + this.model.id, this.model)
-        .then(() => { return publishConnections(); })
-        .then(() => { return reloadResource('content'); })
+        .then(publishConnections())
+        .then(reloadResource('content'))
         .then(reloadView)
         .catch(errorModal);
     }
@@ -230,17 +193,17 @@ class ContentEditor extends View {
      * @return {Object} element
      */
     renderField(fieldValue, fieldDefinition, onChange, config, $keyContent) {
-        let fieldSchema = resources.schemas[fieldDefinition.schemaId];
+        let compiledSchema = SchemaHelper.getFieldSchemaWithParentConfigs(fieldDefinition.schemaId);
 
-        if(fieldSchema) {
-            let fieldEditor = resources.editors[fieldSchema.editorId];
+        if(compiledSchema) {
+            let fieldEditor = resources.editors[compiledSchema.editorId];
             
             if(fieldEditor) {
                 let fieldEditorInstance = new fieldEditor({
                     value: fieldValue,
                     disabled: fieldDefinition.disabled || false,
                     config: config || {},
-                    schema: fieldSchema,
+                    schema: compiledSchema.getObject(),
                     multilingual: fieldDefinition.multilingual
                 });
 
@@ -427,19 +390,20 @@ class ContentEditor extends View {
                     'Delete'
                 ).click(() => { this.onClickDelete(this.publishingSettings); }),
 
-                // Unpublish
-                _.if(this.publishingSettings.connections && this.publishingSettings.connections.length > 0 && !this.model.unpublished,
-                    this.$unpublishBtn = _.button({class: 'btn btn-default btn-raised btn-save'},
-                        _.span({class: 'text-default'}, 'Unpublish'),
-                        _.span({class: 'text-working'}, 'Unpublishing')
-                    ).click(() => { this.onClickUnthis.publish(this.publishing); })
-                ),
-
-                // Save & this.publish
-                this.$saveBtn = _.button({class: 'btn btn-primary btn-raised btn-save'},
-                    _.span({class: 'text-default'}, 'Save' + (this.publishingSettings.connections && this.publishingSettings.connections.length > 0 ? ' & publish' : '')),
-                    _.span({class: 'text-working'}, 'Saving')
-                ).click(() => { this.onClickSave(this.publishingSettings); })
+                // Save & publish
+                _.div({class: 'btn-group-save-publish raised'},
+                    this.$saveBtn = _.button({class: 'btn btn-save btn-primary'},
+                        _.span({class: 'text-default'}, 'Save'),
+                        _.span({class: 'text-working'}, 'Saving')
+                    ).click(() => { this.onClickSave(this.publishingSettings); }),
+                    _.if(this.publishingSettings.connections && this.publishingSettings.connections.length > 0,
+                        _.span('&'),
+                        _.select({class: 'form-control select-publishing'},
+                            _.option({value: 'publish'}, 'Publish'),
+                            _.option({value: 'unpublish'}, 'Unpublish')
+                        ).val(this.model.unpublished ? 'unpublish' : 'publish')
+                    )
+                )
             )
         );
     }

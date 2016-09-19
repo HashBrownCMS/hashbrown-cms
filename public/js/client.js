@@ -35718,8 +35718,11 @@ module.exports = ProjectHelper;
 },{}],169:[function(require,module,exports){
 'use strict';
 
-// Helpers
+// Models
 
+let FieldSchema = require('../../../common/models/FieldSchema');
+
+// Helpers
 let SchemaHelperCommon = require('../../../common/helpers/SchemaHelper');
 
 /**
@@ -35748,6 +35751,30 @@ class SchemaHelper extends SchemaHelperCommon {
     }
 
     /**
+     * Gets a FieldSchema with all parent configs
+     *
+     * @param {String} id
+     *
+     * @returns {FieldSchema} Compiled FieldSchema
+     */
+    static getFieldSchemaWithParentConfigs(id) {
+        let fieldSchema = resources.schemas[id];
+
+        if (fieldSchema) {
+            let nextSchema = resources.schemas[fieldSchema.parentSchemaId];
+            let compiledSchema = new FieldSchema(fieldSchema);
+
+            while (nextSchema) {
+                compiledSchema.appendConfig(nextSchema.config);
+
+                nextSchema = resources.schemas[nextSchema.parentSchemaId];
+            }
+
+            return compiledSchema;
+        }
+    }
+
+    /**
      * Gets a Schema by id
      *
      * @param {String} id
@@ -35772,7 +35799,7 @@ class SchemaHelper extends SchemaHelperCommon {
 
 module.exports = SchemaHelper;
 
-},{"../../../common/helpers/SchemaHelper":225}],170:[function(require,module,exports){
+},{"../../../common/helpers/SchemaHelper":225,"../../../common/models/FieldSchema":231}],170:[function(require,module,exports){
 'use strict';
 
 let SettingsHelperCommon = require('../../../common/helpers/SettingsHelper');
@@ -37027,54 +37054,22 @@ class ContentEditor extends View {
     }
 
     /**
-     * Event: Click unpublish. Removes remove content and sets "unpublished" flag
-     *
-     * @param {Object} publishing
-     */
-    onClickUnpublish(publishing) {
-        let view = this;
-
-        function unpublishConnections() {
-            apiCall('post', 'content/unpublish', view.model).then(onSuccess).catch(onError);
-        }
-
-        function onSuccess() {
-            debug.log('Unpublished content with id "' + view.model.id + '"', this);
-
-            reloadResource('content').then(function () {
-                view.renderButtons();
-            });
-        }
-
-        function onError(err) {
-            new MessageModal({
-                model: {
-                    title: 'Error',
-                    body: err
-                }
-            });
-        }
-
-        view.$unpublishBtn.toggleClass('working', true);
-
-        // Set unpublished flag
-        view.model.unpublished = true;
-
-        // Save content to database
-        apiCall('post', 'content/' + view.model.id, view.model).then(unpublishConnections).catch(onError);
-    }
-
-    /**
      * Event: Click save. Posts the model to the modelUrl
      *
      * @param {Object} publishing
      */
     onClickSave(publishing) {
-        this.model.unpublished = false;
+        let shouldUnpublish = this.$element.find('.editor-footer .select-publishing').val() == 'unpublish';
+
+        this.model.unpublished = shouldUnpublish;
 
         let publishConnections = () => {
             if (publishing.connections && publishing.connections.length > 0) {
-                return apiCall('post', 'content/publish', this.model);
+                if (shouldUnpublish) {
+                    return apiCall('post', 'content/unpublish', this.model);
+                } else {
+                    return apiCall('post', 'content/publish', this.model);
+                }
             } else {
                 return new Promise(resolve => {
                     resolve();
@@ -37092,11 +37087,7 @@ class ContentEditor extends View {
         this.$saveBtn.toggleClass('working', true);
 
         // Save content to database
-        apiCall('post', 'content/' + this.model.id, this.model).then(() => {
-            return publishConnections();
-        }).then(() => {
-            return reloadResource('content');
-        }).then(reloadView).catch(errorModal);
+        apiCall('post', 'content/' + this.model.id, this.model).then(publishConnections()).then(reloadResource('content')).then(reloadView).catch(errorModal);
     }
 
     /**
@@ -37202,17 +37193,17 @@ class ContentEditor extends View {
      * @return {Object} element
      */
     renderField(fieldValue, fieldDefinition, onChange, config, $keyContent) {
-        let fieldSchema = resources.schemas[fieldDefinition.schemaId];
+        let compiledSchema = SchemaHelper.getFieldSchemaWithParentConfigs(fieldDefinition.schemaId);
 
-        if (fieldSchema) {
-            let fieldEditor = resources.editors[fieldSchema.editorId];
+        if (compiledSchema) {
+            let fieldEditor = resources.editors[compiledSchema.editorId];
 
             if (fieldEditor) {
                 let fieldEditorInstance = new fieldEditor({
                     value: fieldValue,
                     disabled: fieldDefinition.disabled || false,
                     config: config || {},
-                    schema: fieldSchema,
+                    schema: compiledSchema.getObject(),
                     multilingual: fieldDefinition.multilingual
                 });
 
@@ -37368,15 +37359,10 @@ class ContentEditor extends View {
             this.onClickDelete(this.publishingSettings);
         }),
 
-        // Unpublish
-        _.if(this.publishingSettings.connections && this.publishingSettings.connections.length > 0 && !this.model.unpublished, this.$unpublishBtn = _.button({ class: 'btn btn-default btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Unpublish'), _.span({ class: 'text-working' }, 'Unpublishing')).click(() => {
-            this.onClickUnthis.publish(this.publishing);
-        })),
-
-        // Save & this.publish
-        this.$saveBtn = _.button({ class: 'btn btn-primary btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Save' + (this.publishingSettings.connections && this.publishingSettings.connections.length > 0 ? ' & publish' : '')), _.span({ class: 'text-working' }, 'Saving')).click(() => {
+        // Save & publish
+        _.div({ class: 'btn-group-save-publish raised' }, this.$saveBtn = _.button({ class: 'btn btn-save btn-primary' }, _.span({ class: 'text-default' }, 'Save'), _.span({ class: 'text-working' }, 'Saving')).click(() => {
             this.onClickSave(this.publishingSettings);
-        })));
+        }), _.if(this.publishingSettings.connections && this.publishingSettings.connections.length > 0, _.span('&'), _.select({ class: 'form-control select-publishing' }, _.option({ value: 'publish' }, 'Publish'), _.option({ value: 'unpublish' }, 'Unpublish')).val(this.model.unpublished ? 'unpublish' : 'publish')))));
     }
 
     render() {
@@ -37921,7 +37907,7 @@ class JSONEditor extends View {
             this.onChangeTheme();
         }).val(getCookie('cmtheme') || 'default')), _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-embedded' }, 'Basic').click(() => {
             this.onClickBasic();
-        }), _.if(!this.model.locked, _.button({ class: 'btn btn-raised btn-success' }, 'Save ').click(() => {
+        }), _.if(!this.model.locked, _.button({ class: 'btn btn-raised btn-primary' }, 'Save ').click(() => {
             this.onClickSave();
         }))))));
 
@@ -39455,7 +39441,7 @@ class ArrayEditor extends View {
         }
 
         // Make sure we have the item schema and the editor we need for each array item
-        let itemSchema = resources.schemas[itemSchemaId];
+        let itemSchema = SchemaHelper.getFieldSchemaWithParentConfigs(itemSchemaId);
 
         if (itemSchema) {
             let fieldEditor = resources.editors[itemSchema.editorId];
@@ -39785,9 +39771,16 @@ class DateEditor extends View {
 
         // Ensure correct type
         if (typeof params.value === 'string' && !isNaN(params.value)) {
-            params.value = new Date(parseInt(params.value));
-        } else {
-            params.value = new Date(params.value);
+            this.value = new Date(parseInt(params.value));
+        } else if (params.value) {
+            this.value = new Date(params.value);
+        }
+
+        // Sanity check
+        if (!this.value || !params.value || this.value.getFullYear() == 1970 || isNaN(this.value.getTime())) {
+            this.value = null;
+
+            this.onChange();
         }
 
         this.init();
@@ -40400,7 +40393,7 @@ class StructEditor extends View {
         // Loop through each key in the struct
         _.each(this.config.struct, (k, schemaValue) => {
             let value = this.value[k];
-            let fieldSchema = resources.schemas[schemaValue.schemaId];
+            let fieldSchema = SchemaHelper.getFieldSchemaWithParentConfigs(schemaValue.schemaId);
             let fieldEditor = resources.editors[fieldSchema.editorId];
 
             // Sanity check
@@ -41523,15 +41516,29 @@ class MediaPane extends Pane {
         $pane.toggleClass('select-dir', true);
 
         // TODO: Generalise this logic so it works for all panes
+
+        // Reset
+        function reset(newPath) {
+            let mediaViewer = ViewHelper.get('MediaViewer');
+
+            $pane.find('.pane-item-container[data-media-id="' + id + '"]').toggleClass('moving-content', false);
+            $pane.toggleClass('select-dir', false);
+            $pane.find('.pane-move-buttons .btn').off('click');
+            $pane.find('.pane-item-container .pane-item').off('click');
+
+            if (id == Router.params.id && mediaViewer) {
+                mediaViewer.$element.find('.editor-footer input').val(newPath);
+            }
+        }
+
+        // Cancel
         $(document).on('keyup', e => {
             if (e.which == 27) {
-                $pane.find('.pane-item-container[data-media-id="' + id + '"]').toggleClass('moving-content', false);
-                $pane.toggleClass('select-dir', false);
-                $pane.find('.pane-move-buttons .btn').off('click');
-                $pane.find('.pane-item-container .pane-item').off('click');
+                reset();
             }
         });
 
+        // Click existing directory
         $pane.find('.pane-item-container[data-is-directory="true"]').each((i, element) => {
             $(element).children('.pane-item').on('click', e => {
                 e.preventDefault();
@@ -41539,24 +41546,23 @@ class MediaPane extends Pane {
 
                 let newPath = $(element).attr('data-media-folder');
 
-                $pane.find('.pane-move-buttons .btn').off('click');
-                $pane.find('.pane-item-container .pane-item').off('click');
+                reset(newPath);
 
                 this.onChangeFolder(id, newPath);
             });
         });
 
+        // Click "move to root" button
         $pane.find('.pane-move-buttons .btn-move-to-root').on('click', e => {
-            $pane.find('.pane-item-container .pane-item').off('click');
-            $pane.find('.pane-move-buttons .btn').off('click');
+            let newPath = '/';
 
-            this.onChangeFolder(id, '/');
+            reset(newPath);
+
+            this.onChangeFolder(id, newPath);
         });
 
+        // Click "new folder" button
         $pane.find('.pane-move-buttons .btn-new-folder').on('click', () => {
-            $pane.find('.pane-item-container .pane-item').off('click');
-            $pane.find('.pane-move-buttons .btn').off('click');
-
             MediaHelper.getMediaById(id).then(media => {
                 let messageModal = new MessageModal({
                     model: {
@@ -41572,6 +41578,8 @@ class MediaPane extends Pane {
                         class: 'btn-danger',
                         callback: () => {
                             let newPath = messageModal.$element.find('input.form-control').val();
+
+                            reset(newPath);
 
                             this.onChangeFolder(media.id, newPath);
                         }
@@ -43990,6 +43998,26 @@ class FieldSchema extends Schema {
 
         this.name = 'New field schema';
         this.type = 'field';
+    }
+
+    /**
+     * Appends properties to this config
+     *
+     * @param {Object} config
+     */
+    appendConfig(config) {
+        function recurse(source, target) {
+            for (let k in source) {
+                // If key doesn't exist, append immediately
+                if (!target[k]) {
+                    target[k] = source[k];
+                } else if (target[k] instanceof Object && source[k] instanceof Object || target[k] instanceof Array && source[k] instanceof Array) {
+                    recurse(source[k], target[k]);
+                }
+            }
+        }
+
+        recurse(config, this.config);
     }
 }
 

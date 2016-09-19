@@ -48,7 +48,7 @@ class StructEditor extends View {
             // Loop through each key in the struct
             _.each(this.config.struct, (k, schemaValue) => {
                 let value = this.value[k];
-                let fieldSchema = resources.schemas[schemaValue.schemaId];
+                let fieldSchema = SchemaHelper.getFieldSchemaWithParentConfigs(schemaValue.schemaId);
                 let fieldEditor = resources.editors[fieldSchema.editorId];
 
                 // Sanity check

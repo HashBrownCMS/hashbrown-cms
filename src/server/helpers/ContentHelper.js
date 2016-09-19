@@ -86,66 +86,65 @@ class ContentHelper extends ContentHelperCommon {
      * @return {Promise} Promise
      */
     static setContentById(id, content) {
-        return new Promise((resolve, reject) => {
-            debug.log('Updating content "' + id + '"...', this);
-            
-            let updateContent = () => {
+        debug.log('Updating content "' + id + '"...', this);
+        
+        let updateContent = () => {
+            if(UserHelper.current) {
                 content.updatedBy = UserHelper.current.id;
-                content.updateDate = Date.now();
-                
-                if(!content.createdBy) {
-                    content.createdBy = content.updatedBy;
-                }
-                
-                let collection = ProjectHelper.currentEnvironment + '.content';
-                
-                // Register publish dates centrally
-                if(content.publishOn) {
-                    ScheduleHelper.updateTask('publish', id, content.publishOn);
-                } else {
-                    ScheduleHelper.removeTask('publish', id, content.publishOn);
-                }
-
-                if(content.unpublishOn) {
-                    ScheduleHelper.updateTask('unpublish', id, content.unpublishOn);
-                } else {
-                    ScheduleHelper.removeTask('unpublish', id, content.unpublishOn);
-                }
-
-                // Remove inserted publish dates
-                content.publishOn = null;
-                content.unpublishOn = null;
-                
-                MongoHelper.updateOne(
-                    ProjectHelper.currentProject,
-                    collection,
-                    {
-                        id: id
-                    },
-                    content
-                )
-                .then(() => {
-                    debug.log('Done updating content.', this);
-
-                    resolve();
-                })
-                .catch(reject);
-            };
-
-            // Check for empty Content object
-            if(!content || Object.keys(content).length < 1) {
-                reject(new Error('Posted content with id "' + id + '" is empty'));
-
-            } else if(content.parentId) {
-                this.isSchemaAllowedAsChild(content.parentId, content.schemaId)
-                .then(updateContent)
-                .catch(reject);
-
-            } else {
-                updateContent();
-
             }
-        });
+
+            content.updateDate = Date.now();
+            
+            if(!content.createdBy) {
+                content.createdBy = content.updatedBy;
+            }
+            
+            let collection = ProjectHelper.currentEnvironment + '.content';
+            
+            // Register publish dates centrally
+            if(content.publishOn) {
+                ScheduleHelper.updateTask('publish', id, content.publishOn);
+            } else {
+                ScheduleHelper.removeTask('publish', id, content.publishOn);
+            }
+
+            if(content.unpublishOn) {
+                ScheduleHelper.updateTask('unpublish', id, content.unpublishOn);
+            } else {
+                ScheduleHelper.removeTask('unpublish', id, content.unpublishOn);
+            }
+
+            // Remove inserted publish dates
+            content.publishOn = null;
+            content.unpublishOn = null;
+            
+            return MongoHelper.updateOne(
+                ProjectHelper.currentProject,
+                collection,
+                {
+                    id: id
+                },
+                content
+            )
+            .then(() => {
+                debug.log('Done updating content.', this);
+            });
+        };
+
+        // Check for empty Content object
+        if(!content || Object.keys(content).length < 1) {
+            return new Promise((resolve, reject) => {
+                reject(new Error('Posted content with id "' + id + '" is empty'));
+            });
+
+        } else if(content.parentId) {
+            return this.isSchemaAllowedAsChild(content.parentId, content.schemaId)
+            .then(updateContent);
+
+        } else {
+            return updateContent();
+
+        }
     }
 
     /**

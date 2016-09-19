@@ -151,7 +151,7 @@ class ArrayEditor extends View {
         }
 
         // Make sure we have the item schema and the editor we need for each array item
-        let itemSchema = resources.schemas[itemSchemaId];
+        let itemSchema = SchemaHelper.getFieldSchemaWithParentConfigs(itemSchemaId);
 
         if(itemSchema) {
             let fieldEditor = resources.editors[itemSchema.editorId];

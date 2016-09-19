@@ -42,15 +42,29 @@ class MediaPane extends Pane {
         $pane.toggleClass('select-dir', true);
 
         // TODO: Generalise this logic so it works for all panes
+        
+        // Reset
+        function reset(newPath) {
+            let mediaViewer = ViewHelper.get('MediaViewer');
+
+            $pane.find('.pane-item-container[data-media-id="' + id + '"]').toggleClass('moving-content', false);
+            $pane.toggleClass('select-dir', false);
+            $pane.find('.pane-move-buttons .btn').off('click');
+            $pane.find('.pane-item-container .pane-item').off('click');
+
+            if(id == Router.params.id && mediaViewer) {
+                mediaViewer.$element.find('.editor-footer input').val(newPath);
+            }
+        }
+
+        // Cancel
         $(document).on('keyup', (e) => {
             if(e.which == 27) {
-                $pane.find('.pane-item-container[data-media-id="' + id + '"]').toggleClass('moving-content', false);
-                $pane.toggleClass('select-dir', false);
-                $pane.find('.pane-move-buttons .btn').off('click');
-                $pane.find('.pane-item-container .pane-item').off('click');
+                reset();
             }
         });
 
+        // Click existing directory
         $pane.find('.pane-item-container[data-is-directory="true"]').each((i, element) => {
             $(element).children('.pane-item').on('click', (e) => {
                 e.preventDefault();
@@ -58,24 +72,23 @@ class MediaPane extends Pane {
 
                 let newPath = $(element).attr('data-media-folder');
 
-                $pane.find('.pane-move-buttons .btn').off('click');
-                $pane.find('.pane-item-container .pane-item').off('click');
+                reset(newPath);
 
                 this.onChangeFolder(id, newPath);
             });
         }); 
 
+        // Click "move to root" button
         $pane.find('.pane-move-buttons .btn-move-to-root').on('click', (e) => {
-            $pane.find('.pane-item-container .pane-item').off('click');
-            $pane.find('.pane-move-buttons .btn').off('click');
+            let newPath = '/';
 
-            this.onChangeFolder(id, '/');
+            reset(newPath);
+
+            this.onChangeFolder(id, newPath);
         });
         
+        // Click "new folder" button
         $pane.find('.pane-move-buttons .btn-new-folder').on('click', () => {
-            $pane.find('.pane-item-container .pane-item').off('click');
-            $pane.find('.pane-move-buttons .btn').off('click');
-
             MediaHelper.getMediaById(id)
             .then((media) => {
                 let messageModal = new MessageModal({
@@ -99,6 +112,8 @@ class MediaPane extends Pane {
                             callback: () => {
                                 let newPath = messageModal.$element.find('input.form-control').val();
                                 
+                                reset(newPath);
+
                                 this.onChangeFolder(media.id, newPath);
                             }
                         }

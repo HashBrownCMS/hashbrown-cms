@@ -20,7 +20,12 @@ class Task extends Entity {
      * @returns {Boolean} Overdue
      */
     isOverdue() {
-        return this.date && this.date <= new Date();
+        if(!this.date || isNaN(this.date.getTime()) || this.date.getFullYear() == 1970) {
+            debug.log('Task in "' + this.project + '/' + this.environment + '" for content "' + this.content + '" has an invalid date', this);
+            return false;
+        }
+       
+        return this.date <= new Date();
     }
 }
 

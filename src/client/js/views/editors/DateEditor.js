@@ -9,9 +9,18 @@ class DateEditor extends View {
 
         // Ensure correct type
         if(typeof params.value === 'string' && !isNaN(params.value)) {
-            params.value = new Date(parseInt(params.value));
-        } else {
-            params.value = new Date(params.value);
+            this.value = new Date(parseInt(params.value));
+
+        } else if(params.value) {
+            this.value = new Date(params.value);
+        
+        }
+
+        // Sanity check
+        if(!this.value || !params.value || this.value.getFullYear() == 1970 || isNaN(this.value.getTime())) {
+            this.value = null;
+
+            this.onChange();
         }
 
         this.init();
@@ -200,7 +209,7 @@ class DateEditor extends View {
             }
 
             output = date.getFullYear() + '.' + month + '.' + day;
-        }
+        } 
 
         return output;
     }
