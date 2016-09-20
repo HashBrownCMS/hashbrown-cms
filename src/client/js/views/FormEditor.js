@@ -72,6 +72,58 @@ class FormEditor extends View {
 
         this.render();
     }
+    
+    /**
+     * Event: On click remove
+     */
+    onClickDelete() {
+        let view = this;
+
+        function onSuccess() {
+            debug.log('Removed Form with id "' + view.model.id + '"', view); 
+        
+            return reloadResource('forms')
+            .then(function() {
+                ViewHelper.get('NavbarMain').reload();
+                
+                // Cancel the FormEditor view
+                location.hash = '/forms/';
+            });
+        }
+
+        function onError(err) {
+            new MessageModal({
+                model: {
+                    title: 'Error',
+                    body: err.message
+                }
+            });
+        }
+
+        new MessageModal({
+            model: {
+                title: 'Delete form',
+                body: 'Are you sure you want to delete the form "' + view.model.title + '"?'
+            },
+            buttons: [
+                {
+                    label: 'Cancel',
+                    class: 'btn-default',
+                    callback: () => {
+                    }
+                },
+                {
+                    label: 'Delete',
+                    class: 'btn-danger',
+                    callback: () => {
+                        apiCall('delete', 'forms/' + view.model.id)
+                        .then(onSuccess)
+                        .catch(onError);
+                    }
+                }
+            ]
+        });
+    }
 
     /**
      * Renders the title editor
@@ -205,7 +257,7 @@ class FormEditor extends View {
 
                 return $input;
             }),
-            _.button({class: 'btn btn-primary btn-round'}, _.span({class: 'fa fa-plus'}))
+            _.button({class: 'btn btn-primary btn-add-input btn-round'}, '+')
                 .on('click', () => { this.onClickAddInput(); })
         );
 

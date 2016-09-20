@@ -20,6 +20,60 @@ class FormsPane extends Pane {
         })
         .catch(navbar.onError);
     }
+    
+    /**
+     * Event: On click remove
+     */
+    static onClickDeleteForm() {
+        let view = this;
+        let id = $('.context-menu-target-element').data('id');
+        let form = resources.forms.filter((form) => { return form.id == id; })[0];
+
+        function onSuccess() {
+            debug.log('Removed Form with id "' + form.id + '"', view); 
+        
+            return reloadResource('forms')
+            .then(function() {
+                ViewHelper.get('NavbarMain').reload();
+                
+                // Cancel the FormEditor view
+                location.hash = '/forms/';
+            });
+        }
+
+        function onError(err) {
+            new MessageModal({
+                model: {
+                    title: 'Error',
+                    body: err.message
+                }
+            });
+        }
+
+        new MessageModal({
+            model: {
+                title: 'Delete form',
+                body: 'Are you sure you want to delete the form "' + form.title + '"?'
+            },
+            buttons: [
+                {
+                    label: 'Cancel',
+                    class: 'btn-default',
+                    callback: () => {
+                    }
+                },
+                {
+                    label: 'Delete',
+                    class: 'btn-danger',
+                    callback: () => {
+                        apiCall('delete', 'forms/' + form.id)
+                        .then(onSuccess)
+                        .catch(onError);
+                    }
+                }
+            ]
+        });
+    }
 
     static getRenderSettings() {
         return {
@@ -43,7 +97,7 @@ class FormsPane extends Pane {
                 'This form': '---',
                 'Copy id': () => { this.onClickCopyItemId(); },
                 'Cut': () => { this.onClickCutForm(); },
-                'Remove': () => { this.onClickRemoveForm(); }
+                'Delete': () => { this.onClickDeleteForm(); }
             },
 
             // General context menu

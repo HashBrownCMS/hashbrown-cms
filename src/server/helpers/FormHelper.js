@@ -2,36 +2,57 @@
 
 let Form = require(appRoot + '/src/common/models/Form');
 
+/**
+ * The helper class for Forms
+ */
 class FormHelper {
     /**
-     * Gets form by id
+     * Gets Form by id
      *
      * @param {String} id
      *
-     * @returns {Promise(Form)} form
+     * @returns {Promise} Form
      */
     static getForm(id) {
-        return new Promise((resolve, reject) => {
-            let collection = ProjectHelper.currentEnvironment + '.forms';
-        
-            MongoHelper.findOne(
-                ProjectHelper.currentProject,
-                collection,
-                {
-                    id: id
-                }
-            )
-            .then((formData) => {
+        let collection = ProjectHelper.currentEnvironment + '.forms';
+    
+        return MongoHelper.findOne(
+            ProjectHelper.currentProject,
+            collection,
+            {
+                id: id
+            }
+        )
+        .then((formData) => {
+            return new Promise((resolve, reject) => {
                 resolve(new Form(formData));
-            })
-            .catch(reject);
+            });
         });
+    }
+    
+    /**
+     * Deletes Form by id
+     *
+     * @param {String} id
+     *
+     * @returns {Promise} Promise
+     */
+    static deleteForm(id) {
+        let collection = ProjectHelper.currentEnvironment + '.forms';
+    
+        return MongoHelper.removeOne(
+            ProjectHelper.currentProject,
+            collection,
+            {
+                id: id
+            }
+        );
     }
 
     /**
-     * Gets all forms
+     * Gets all Forms
      *
-     * @returns {Promise(Array)} forms
+     * @returns {Promise} Array of forms
      */
     static getAllForms() {
         let collection = ProjectHelper.currentEnvironment + '.forms';
@@ -49,71 +70,64 @@ class FormHelper {
      * @param {String} id
      * @param {Object} properties
      *
-     * @returns {Promise(Form)}
+     * @returns {Promise} Form
      */
     static setForm(id, properties) {
-        return new Promise((resolve, reject) => {
-            let collection = ProjectHelper.currentEnvironment + '.forms';
+        let collection = ProjectHelper.currentEnvironment + '.forms';
 
-            MongoHelper.updateOne(
-                ProjectHelper.currentProject,
-                collection,
-                {
-                    id: id
-                },
-                properties,
-                {
-                    upsert: true
-                }
-            )
-            .then(() => {
+        return MongoHelper.updateOne(
+            ProjectHelper.currentProject,
+            collection,
+            {
+                id: id
+            },
+            properties,
+            {
+                upsert: true
+            }
+        )
+        .then(() => {
+            return new Promise((resolve) => {
                 resolve(new Form(properties));
-            })
-            .catch(reject);
+            });
         });
     }
 
     /**
-     * Creates a new form
+     * Creates a new Form
      *
-     * @returns {Promise(Form)}
+     * @returns {Promise} Form
      */
     static createForm() {
-        return new Promise((resolve, reject) => {
-            let form = Form.create();
-            let collection = ProjectHelper.currentEnvironment + '.forms';
+        let form = Form.create();
+        let collection = ProjectHelper.currentEnvironment + '.forms';
 
-            MongoHelper.insertOne(
-                ProjectHelper.currentProject,
-                collection,
-                form.getObject()
-            )
-            .then(() => {
+        return MongoHelper.insertOne(
+            ProjectHelper.currentProject,
+            collection,
+            form.getObject()
+        )
+        .then(() => {
+            return new Promise((resolve) => {
                 resolve(form);
-            })
-            .catch(reject);
+            });
         });
     }
 
     /**
-     * Adds an entry by to a form by id
+     * Adds an entry by to a Form by id
      *
      * @param {String} id
      * @param {Object} entry
      *
-     * @returns {Promise} promise
+     * @returns {Promise} Promise
      */
     static addEntry(id, entry) {
-        return new Promise((resolve, reject) => {
-            this.getForm(id)
-            .then((form) => {
-                form.addEntry(entry);
+        return this.getForm(id)
+        .then((form) => {
+            form.addEntry(entry);
 
-                this.setForm(id, form.getObject())
-                .then(resolve)
-                .catch(reject);
-            })
-            .catch(reject);
+            return this.setForm(id, form.getObject())
         });
     }
 }

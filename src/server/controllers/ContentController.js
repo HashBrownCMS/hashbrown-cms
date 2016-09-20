@@ -14,10 +14,12 @@ class ContentController extends ApiController {
     static init(app) {
         app.get('/api/:project/:environment/content', this.middleware(), this.getAllContents);
         app.get('/api/:project/:environment/content/:id', this.middleware(), this.getContent);
+
         app.post('/api/:project/:environment/content/new/:schemaId', this.middleware(), this.createContent);
         app.post('/api/:project/:environment/content/publish', this.middleware(), this.publishContent);
         app.post('/api/:project/:environment/content/unpublish', this.middleware(), this.unpublishContent);
         app.post('/api/:project/:environment/content/:id', this.middleware(), this.postContent);
+
         app.delete('/api/:project/:environment/content/:id', this.middleware(), this.deleteContent);
     }
     

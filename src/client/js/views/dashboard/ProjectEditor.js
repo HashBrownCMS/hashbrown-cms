@@ -225,8 +225,8 @@ class ProjectEditor extends View {
      */ 
     onClickDeleteBackup(timestamp) {
         if(this.isAdmin()) {
-            let label = backup;
-            let date = new Date(parseInt(backup));
+            let label = timestamp;
+            let date = new Date(parseInt(timestamp));
 
             if(!isNaN(date.getTime())) {
                 label = date.toString();
@@ -235,7 +235,7 @@ class ProjectEditor extends View {
             let modal = new MessageModal({
                 model: {
                     title: 'Delete backup',
-                    body: 'Are you sure you want to delete the backup ' + label + '?'
+                    body: 'Are you sure you want to delete the backup "' + label + '"?'
                 },
                 buttons: [
                     {

@@ -30654,7 +30654,7 @@ module.exports = {
 module.exports={
   "name": "hashbrown-cms",
   "repository": "https://github.com/Putaitu/hashbrown-cms.git",
-  "version": "0.3.15",
+  "version": "0.4.0",
   "description": "The pluggable CMS",
   "main": "hashbrown.js",
   "scripts": {
@@ -30859,6 +30859,25 @@ window.isCurrentUserAdmin = function isCurrentUserAdmin() {
     for (let user of resources.users) {
         if (user.isCurrent) {
             return user.isAdmin;
+        }
+    }
+
+    return false;
+};
+
+/**
+ * Checks if the currently logged in user has a particular scope
+ *
+ * @param {String} scope
+ *
+ * @resurns {Boolean} Has scope
+ */
+window.currentUserHasScope = function currentUserHasScope(scope) {
+    for (let user of resources.users) {
+        if (user.isCurrent) {
+            let currentScopes = user.scopes[ProjectHelper.currentProject];
+
+            return currentScopes && currentScopes.indexOf(scope) > -1;
         }
     }
 
@@ -31345,8 +31364,8 @@ class ProjectEditor extends View {
      */
     onClickDeleteBackup(timestamp) {
         if (this.isAdmin()) {
-            let label = backup;
-            let date = new Date(parseInt(backup));
+            let label = timestamp;
+            let date = new Date(parseInt(timestamp));
 
             if (!isNaN(date.getTime())) {
                 label = date.toString();
@@ -31355,7 +31374,7 @@ class ProjectEditor extends View {
             let modal = new MessageModal({
                 model: {
                     title: 'Delete backup',
-                    body: 'Are you sure you want to delete the backup ' + label + '?'
+                    body: 'Are you sure you want to delete the backup "' + label + '"?'
                 },
                 buttons: [{
                     label: 'Cancel',

@@ -1495,6 +1495,9 @@ body > .dashboard-container {
     padding: 15px; }
     .form-editor > .form > .field-container {
       max-width: 800px; }
+    .form-editor > .form .btn-add-input {
+      display: block;
+      margin-left: auto; }
     .form-editor > .form form.preview {
       display: block;
       padding: 15px;

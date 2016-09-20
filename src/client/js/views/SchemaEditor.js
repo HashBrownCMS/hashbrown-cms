@@ -32,7 +32,7 @@ class SchemaEditor extends View {
         function onSuccess() {
             debug.log('Removed Schema with id "' + view.model.id + '"', view); 
         
-            reloadResource('schemas')
+            return reloadResource('schemas')
             .then(function() {
                 ViewHelper.get('NavbarMain').reload();
                 
@@ -63,7 +63,7 @@ class SchemaEditor extends View {
                     }
                 },
                 {
-                    label: 'OK',
+                    label: 'Delete',
                     class: 'btn-danger',
                     callback: () => {
                         apiCall('delete', 'schemas/' + view.model.id)

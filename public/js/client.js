@@ -37533,6 +37533,51 @@ class FormEditor extends View {
     }
 
     /**
+     * Event: On click remove
+     */
+    onClickDelete() {
+        let view = this;
+
+        function onSuccess() {
+            debug.log('Removed Form with id "' + view.model.id + '"', view);
+
+            return reloadResource('forms').then(function () {
+                ViewHelper.get('NavbarMain').reload();
+
+                // Cancel the FormEditor view
+                location.hash = '/forms/';
+            });
+        }
+
+        function onError(err) {
+            new MessageModal({
+                model: {
+                    title: 'Error',
+                    body: err.message
+                }
+            });
+        }
+
+        new MessageModal({
+            model: {
+                title: 'Delete form',
+                body: 'Are you sure you want to delete the form "' + view.model.title + '"?'
+            },
+            buttons: [{
+                label: 'Cancel',
+                class: 'btn-default',
+                callback: () => {}
+            }, {
+                label: 'Delete',
+                class: 'btn-danger',
+                callback: () => {
+                    apiCall('delete', 'forms/' + view.model.id).then(onSuccess).catch(onError);
+                }
+            }]
+        });
+    }
+
+    /**
      * Renders the title editor
      *
      * @return {Object} element
@@ -37602,7 +37647,7 @@ class FormEditor extends View {
             render();
 
             return $input;
-        }), _.button({ class: 'btn btn-primary btn-round' }, _.span({ class: 'fa fa-plus' })).on('click', () => {
+        }), _.button({ class: 'btn btn-primary btn-add-input btn-round' }, '+').on('click', () => {
             this.onClickAddInput();
         }));
 
@@ -38542,7 +38587,7 @@ class SchemaEditor extends View {
         function onSuccess() {
             debug.log('Removed Schema with id "' + view.model.id + '"', view);
 
-            reloadResource('schemas').then(function () {
+            return reloadResource('schemas').then(function () {
                 ViewHelper.get('NavbarMain').reload();
 
                 // Cancel the SchemaEditor view
@@ -38569,7 +38614,7 @@ class SchemaEditor extends View {
                 class: 'btn-default',
                 callback: () => {}
             }, {
-                label: 'OK',
+                label: 'Delete',
                 class: 'btn-danger',
                 callback: () => {
                     apiCall('delete', 'schemas/' + view.model.id).then(onSuccess).catch(onError);
@@ -41535,6 +41580,55 @@ class FormsPane extends Pane {
         }).catch(navbar.onError);
     }
 
+    /**
+     * Event: On click remove
+     */
+    static onClickDeleteForm() {
+        let view = this;
+        let id = $('.context-menu-target-element').data('id');
+        let form = resources.forms.filter(form => {
+            return form.id == id;
+        })[0];
+
+        function onSuccess() {
+            debug.log('Removed Form with id "' + form.id + '"', view);
+
+            return reloadResource('forms').then(function () {
+                ViewHelper.get('NavbarMain').reload();
+
+                // Cancel the FormEditor view
+                location.hash = '/forms/';
+            });
+        }
+
+        function onError(err) {
+            new MessageModal({
+                model: {
+                    title: 'Error',
+                    body: err.message
+                }
+            });
+        }
+
+        new MessageModal({
+            model: {
+                title: 'Delete form',
+                body: 'Are you sure you want to delete the form "' + form.title + '"?'
+            },
+            buttons: [{
+                label: 'Cancel',
+                class: 'btn-default',
+                callback: () => {}
+            }, {
+                label: 'Delete',
+                class: 'btn-danger',
+                callback: () => {
+                    apiCall('delete', 'forms/' + form.id).then(onSuccess).catch(onError);
+                }
+            }]
+        });
+    }
+
     static getRenderSettings() {
         return {
             label: 'Forms',
@@ -41561,8 +41655,8 @@ class FormsPane extends Pane {
                 'Cut': () => {
                     this.onClickCutForm();
                 },
-                'Remove': () => {
-                    this.onClickRemoveForm();
+                'Delete': () => {
+                    this.onClickDeleteForm();
                 }
             },
 

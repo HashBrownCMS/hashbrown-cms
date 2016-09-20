@@ -18,11 +18,14 @@ class FormsController extends ApiController {
      */
     static init(app) {
         app.get('/api/:project/:environment/forms/', this.middleware(), this.getAllForms);
-        app.post('/api/:project/:environment/forms/new', this.middleware(), this.postNew);
         app.get('/api/:project/:environment/forms/:id', this.middleware(), this.getForm);
+
+        app.post('/api/:project/:environment/forms/new', this.middleware(), this.postNew);
         app.post('/api/:project/:environment/forms/:id', this.middleware(), this.postForm);
         app.post('/api/:project/:environment/forms/:id/submit', this.middleware({ authenticate: false, allowCORS: true }), bodyparser.urlencoded({extended: true}), this.postSubmit);
 
+        app.delete('/api/:project/:environment/forms/:id', this.middleware(), this.deleteForm);
+        
         // Init spam prevention timer
         lastSubmission = Date.now();
     }
@@ -34,6 +37,19 @@ class FormsController extends ApiController {
         FormHelper.getAllForms()
         .then((forms) => {
             res.status(200).send(forms);
+        })
+        .catch((e) => {
+            res.status(502).send(e.message);
+        });
+    }
+    
+    /**
+     * Deletes a single Form by id
+     */
+    static deleteForm(req, res) {
+        FormHelper.deleteForm(req.params.id)
+        .then(() => {
+            res.status(200).send('OK');
         })
         .catch((e) => {
             res.status(502).send(e.message);
