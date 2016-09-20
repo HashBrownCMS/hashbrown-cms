@@ -7,13 +7,14 @@ let MessageModal = require('../MessageModal');
 let Content = require('../../../../common/models/Content');
 
 // Panes
+let CMSPane = require('./CMSPane');
 let ConnectionPane = require('./ConnectionPane');
 let ContentPane = require('./ContentPane');
 let FormsPane = require('./FormsPane');
 let MediaPane = require('./MediaPane');
 let SchemaPane = require('./SchemaPane');
+let SettingsPane = require('./SettingsPane');
 let UserPane = require('./UserPane');
-let CMSPane = require('./CMSPane');
 
 /**
  * The main navbar
@@ -140,7 +141,9 @@ class NavbarMain extends View {
 
                 // If this item has a schema id, fetch the appropriate icon
                 if(item.schemaId) {
-                    icon = resources.schemas[item.schemaId].icon;
+                    let schema = resources.schemas[item.schemaId];
+
+                    icon = schema.icon;
                 }
 
                 if(icon) {
@@ -437,18 +440,7 @@ class NavbarMain extends View {
                 // Render the "settings" pane
                 // ----------
                 if(isAdmin || scopes.indexOf('settings') > -1) {
-                    this.renderPane({
-                        label: 'Settings',
-                        route: '/settings/',
-                        icon: 'wrench',
-                        items: [
-                            {
-                                name: 'Languages',
-                                path: 'languages',
-                                icon: 'flag'
-                            }
-                        ]
-                    });
+                    this.renderPane(SettingsPane.getRenderSettings());
                 }
                 
                 triggerReady('navbar');

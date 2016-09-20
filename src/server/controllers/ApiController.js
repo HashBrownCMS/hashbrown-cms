@@ -108,6 +108,8 @@ class ApiController extends Controller {
         settings = settings || {};
 
         return function middleware(req, res, next) {
+            let token = req.cookies.token || req.query.token;
+
             // Make sure to clear double cookie values, if they occur
             if(!req.cookies.token) {
                 res.clearCookie('token');
@@ -128,7 +130,7 @@ class ApiController extends Controller {
                 .then(() => {
                     // Using authentication
                     if(settings.authenticate != false) {
-                        ApiController.authenticate(req.cookies.token, settings.scope)
+                        ApiController.authenticate(token, settings.scope)
                         .then(() => {
                             next();
                         })
@@ -181,7 +183,15 @@ class ApiController extends Controller {
         let errorString = '';
 
         if(error instanceof Error) {
-            errorString = error.message || error.stack || error;
+            errorString = error.message || '';
+           
+            if(error.stack) {
+                errorString += '\n\n' + error.stack;
+            }
+
+            if(!errorString) {
+                errorString = error.toString();
+            }
 
         } else if(typeof error !== 'object') {
             errorString = error.toString();

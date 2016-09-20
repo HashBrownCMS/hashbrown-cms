@@ -96,14 +96,7 @@ class SchemaEditor extends View {
                 navbar.reload();
             });
         })
-        .catch((err) => {
-            new MessageModal({
-                model: {
-                    title: 'Error',
-                    body: err
-                }
-            });
-        });
+        .catch(errorModal);
     }
 
     /**
@@ -656,7 +649,6 @@ class SchemaEditor extends View {
 
         let $element = _.div({class: 'schema editor-body'});
         
-        // Content type
         $element.empty();
 
         $element.append(this.renderField('Name', this.renderNameEditor())); 

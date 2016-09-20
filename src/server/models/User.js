@@ -87,8 +87,10 @@ class User extends Entity {
 
     /**
      * Creates a new access token
+     *
+     * @param {Boolean} persist
      */
-    generateToken(params) {
+    generateToken(persist) {
         let key = crypto.randomBytes(20).toString('hex');
         let validDuration =
             8 * // Hours
@@ -96,7 +98,7 @@ class User extends Entity {
             60 * // Seconds
             1000; // Milliseconds
 
-        let expires = Date.now() + validDuration;
+        let expires = persist ? false : Date.now() + validDuration;
         
         let token = {
             key: key,
@@ -120,7 +122,7 @@ class User extends Entity {
     validateToken(token) {
         for(let i = this.tokens.length - 1; i >= 0; i--) {
             let existingToken = this.tokens[i];
-            let isExpired = existingToken.expires < Date.now();
+            let isExpired = existingToken.expires != false && existingToken.expires < Date.now();
                 
             if(isExpired) {
                 this.tokens.splice(i, 1);

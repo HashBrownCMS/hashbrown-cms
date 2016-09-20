@@ -35163,6 +35163,7 @@ window.FormEditor = require('./views/FormEditor');
 window.ConnectionEditor = require('./views/ConnectionEditor');
 window.SchemaEditor = require('./views/SchemaEditor');
 window.LanguageSettings = require('./views/LanguageSettings');
+window.SyncSettings = require('./views/SyncSettings');
 window.UserEditor = require('./views/UserEditor');
 window.MediaBrowser = require('./views/MediaBrowser');
 
@@ -35302,7 +35303,7 @@ onReady('resources', function () {
     Router.init();
 });
 
-},{"../../../package.json":157,"./helpers":163,"./helpers/ConnectionHelper":164,"./helpers/ContentHelper":165,"./helpers/LanguageHelper":166,"./helpers/MediaHelper":167,"./helpers/SchemaHelper":169,"./helpers/SettingsHelper":170,"./models/Content":172,"./routes/index":177,"./views/ConnectionEditor":182,"./views/ContentEditor":183,"./views/FormEditor":184,"./views/JSONEditor":185,"./views/LanguageSettings":186,"./views/MainMenu":187,"./views/MediaBrowser":188,"./views/MediaViewer":189,"./views/SchemaEditor":191,"./views/UserEditor":192,"./views/editors":209,"./views/navbar/NavbarMain":215}],163:[function(require,module,exports){
+},{"../../../package.json":157,"./helpers":163,"./helpers/ConnectionHelper":164,"./helpers/ContentHelper":165,"./helpers/LanguageHelper":166,"./helpers/MediaHelper":167,"./helpers/SchemaHelper":169,"./helpers/SettingsHelper":170,"./models/Content":172,"./routes/index":177,"./views/ConnectionEditor":182,"./views/ContentEditor":183,"./views/FormEditor":184,"./views/JSONEditor":185,"./views/LanguageSettings":186,"./views/MainMenu":187,"./views/MediaBrowser":188,"./views/MediaViewer":189,"./views/SchemaEditor":191,"./views/SyncSettings":192,"./views/UserEditor":193,"./views/editors":210,"./views/navbar/NavbarMain":216}],163:[function(require,module,exports){
 'use strict';
 
 // Libraries
@@ -35523,7 +35524,7 @@ window.customApiCall = function customApiCall(method, url, data) {
     });
 };
 
-},{"../../common/helpers/DebugHelper":222,"./helpers/ProjectHelper":168,"./views/MessageModal":190,"bluebird":17,"exomon":92,"marked":108,"to-markdown":150}],164:[function(require,module,exports){
+},{"../../common/helpers/DebugHelper":224,"./helpers/ProjectHelper":168,"./views/MessageModal":190,"bluebird":17,"exomon":92,"marked":108,"to-markdown":150}],164:[function(require,module,exports){
 'use strict';
 
 let ConnectionHelperCommon = require('../../../common/helpers/ConnectionHelper');
@@ -35567,7 +35568,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
 
 module.exports = ConnectionHelper;
 
-},{"../../../common/helpers/ConnectionHelper":220,"../../../common/models/Connection":227}],165:[function(require,module,exports){
+},{"../../../common/helpers/ConnectionHelper":222,"../../../common/models/Connection":229}],165:[function(require,module,exports){
 'use strict';
 
 let ContentHelperCommon = require('../../../common/helpers/ContentHelper');
@@ -35639,7 +35640,7 @@ class ContentHelper extends ContentHelperCommon {
 
 module.exports = ContentHelper;
 
-},{"../../../common/helpers/ContentHelper":221,"../models/Content":172}],166:[function(require,module,exports){
+},{"../../../common/helpers/ContentHelper":223,"../models/Content":172}],166:[function(require,module,exports){
 'use strict';
 
 let LanguageHelperCommon = require('../../../common/helpers/LanguageHelper');
@@ -35648,7 +35649,7 @@ class LanguageHelper extends LanguageHelperCommon {}
 
 module.exports = LanguageHelper;
 
-},{"../../../common/helpers/LanguageHelper":223}],167:[function(require,module,exports){
+},{"../../../common/helpers/LanguageHelper":225}],167:[function(require,module,exports){
 'use strict';
 
 let MediaHelperCommon = require('../../../common/helpers/MediaHelper');
@@ -35723,7 +35724,7 @@ class MediaHelper extends MediaHelperCommon {
 
 module.exports = MediaHelper;
 
-},{"../../../common/helpers/MediaHelper":224}],168:[function(require,module,exports){
+},{"../../../common/helpers/MediaHelper":226}],168:[function(require,module,exports){
 'use strict';
 
 /**
@@ -35818,7 +35819,7 @@ class SchemaHelper extends SchemaHelperCommon {
 
 module.exports = SchemaHelper;
 
-},{"../../../common/helpers/SchemaHelper":225,"../../../common/models/FieldSchema":231}],170:[function(require,module,exports){
+},{"../../../common/helpers/SchemaHelper":227,"../../../common/models/FieldSchema":233}],170:[function(require,module,exports){
 'use strict';
 
 let SettingsHelperCommon = require('../../../common/helpers/SettingsHelper');
@@ -35850,7 +35851,7 @@ class SettingsHelper extends SettingsHelperCommon {
 
 module.exports = SettingsHelper;
 
-},{"../../../common/helpers/SettingsHelper":226}],171:[function(require,module,exports){
+},{"../../../common/helpers/SettingsHelper":228}],171:[function(require,module,exports){
 module.exports={
     "icons": [    
         "500px",
@@ -36562,7 +36563,7 @@ class Content extends ContentCommon {}
 
 module.exports = Content;
 
-},{"../../../common/models/Content":228}],173:[function(require,module,exports){
+},{"../../../common/models/Content":230}],173:[function(require,module,exports){
 'use strict';
 
 // Root
@@ -36854,12 +36855,23 @@ Router.route('/settings/', function () {
     }
 });
 
-// Edit
+// Languages
 Router.route('/settings/languages/', function () {
     if (currentUserHasScope('settings')) {
         ViewHelper.get('NavbarMain').highlightItem('languages');
 
         $('.workspace').html(new LanguageSettings().$element);
+    } else {
+        location.hash = '/';
+    }
+});
+
+// Sync
+Router.route('/settings/sync/', function () {
+    if (currentUserHasScope('settings')) {
+        ViewHelper.get('NavbarMain').highlightItem('sync');
+
+        $('.workspace').html(new SyncSettings().$element);
     } else {
         location.hash = '/';
     }
@@ -38641,14 +38653,7 @@ class SchemaEditor extends View {
 
                 navbar.reload();
             });
-        }).catch(err => {
-            new MessageModal({
-                model: {
-                    title: 'Error',
-                    body: err
-                }
-            });
-        });
+        }).catch(errorModal);
     }
 
     /**
@@ -39069,7 +39074,6 @@ class SchemaEditor extends View {
 
         let $element = _.div({ class: 'schema editor-body' });
 
-        // Content type
         $element.empty();
 
         $element.append(this.renderField('Name', this.renderNameEditor()));
@@ -39123,6 +39127,134 @@ class SchemaEditor extends View {
 module.exports = SchemaEditor;
 
 },{"../icons.json":171}],192:[function(require,module,exports){
+'use strict';
+
+/**
+ * The sync settings editor
+ *
+ * @class View SyncSettings
+ */
+
+class SyncSettings extends View {
+    constructor(params) {
+        super(params);
+
+        this.$element = _.div({ class: 'editor sync-settings' });
+
+        this.fetch();
+    }
+
+    /**
+     * Event: Click save. Posts the model to the modelUrl
+     */
+    onClickSave() {
+        if (this.jsonEditor && this.jsonEditor.isValid == false) {
+            return;
+        }
+
+        this.$saveBtn.toggleClass('working', true);
+
+        SettingsHelper.setSettings('sync', this.model).then(() => {
+            this.$saveBtn.toggleClass('working', false);
+        }).catch(errorModal);
+    }
+
+    /**
+     * Render enabled switch
+     */
+    renderEnabledSwitch() {
+        let view = this;
+
+        function onChange() {
+            view.model.enabled = this.checked;
+        }
+
+        return _.div({ class: 'field-editor' }, _.div({ class: 'switch' }, _.input({
+            id: 'switch-sync-enabled',
+            class: 'form-control switch',
+            type: 'checkbox',
+            checked: this.model.enabled == true
+        }).change(onChange), _.label({ for: 'switch-sync-enabled' })));
+    }
+
+    /**
+     * Renders the URL editor
+     *
+     * @returns {HTMLElement} Element
+     */
+    renderUrlEditor() {
+        let view = this;
+
+        function onInputChange() {
+            view.model.url = $(this).val();
+        }
+
+        let $element = _.div({ class: 'url-editor' }, _.input({ class: 'form-control', type: 'text', value: view.model.url, placeholder: 'Input the remote project URL here' }).on('change', onInputChange));
+
+        return $element;
+    }
+
+    /**
+     * Renders the token editor
+     *
+     * @returns {HTMLElement} Element
+     */
+    renderTokenEditor() {
+        let view = this;
+
+        function onInputChange() {
+            view.model.token = $(this).val();
+        }
+
+        let $element = _.div({ class: 'token-editor' }, _.input({ class: 'form-control', type: 'text', value: view.model.token, placeholder: 'Input the remote project token here' }).on('change', onInputChange));
+
+        return $element;
+    }
+
+    /**
+     * Render schema switch
+     */
+    renderSchemaSwitch() {
+        let view = this;
+
+        function onChange() {
+            view.model.schemas = this.checked;
+        }
+
+        return _.div({ class: 'field-editor' }, _.div({ class: 'switch' }, _.input({
+            id: 'switch-sync-schemas',
+            class: 'form-control switch',
+            type: 'checkbox',
+            checked: this.model.schemas == true
+        }).change(onChange), _.label({ for: 'switch-sync-schemas' })));
+    }
+
+    /**
+     * Renders a single field
+     *
+     * @param {String} label
+     * @param {HTMLElement} content
+     *
+     * @return {HTMLElement} Editor element
+     */
+    renderField(label, $content) {
+        return _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, label), _.div({ class: 'field-value' }, $content));
+    }
+
+    render() {
+        SettingsHelper.getSettings('sync').then(syncSettings => {
+            this.model = syncSettings || {};
+
+            _.append(this.$element.empty(), _.div({ class: 'editor-header' }, _.span({ class: 'fa fa-refresh' }), _.h4('Sync')), _.div({ class: 'editor-body' }, this.renderField('Enabled', this.renderEnabledSwitch()), this.renderField('URL', this.renderUrlEditor()), this.renderField('Token', this.renderTokenEditor()), this.renderField('Schemas', this.renderSchemaSwitch())), _.div({ class: 'editor-footer panel panel-default panel-buttons' }, _.div({ class: 'btn-group' }, this.$saveBtn = _.button({ class: 'btn btn-primary btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Save '), _.span({ class: 'text-working' }, 'Saving ')).click(() => {
+                this.onClickSave();
+            }))));
+        });
+    }
+}
+
+module.exports = SyncSettings;
+
+},{}],193:[function(require,module,exports){
 'use strict';
 
 class UserEditor extends View {
@@ -39446,7 +39578,7 @@ class UserEditor extends View {
 
 module.exports = UserEditor;
 
-},{}],193:[function(require,module,exports){
+},{}],194:[function(require,module,exports){
 'use strict';
 
 /**
@@ -39692,7 +39824,7 @@ class ArrayEditor extends View {
 
 module.exports = ArrayEditor;
 
-},{}],194:[function(require,module,exports){
+},{}],195:[function(require,module,exports){
 'use strict';
 
 /**
@@ -39740,7 +39872,7 @@ class BooleanEditor extends View {
 
 module.exports = BooleanEditor;
 
-},{}],195:[function(require,module,exports){
+},{}],196:[function(require,module,exports){
 'use strict';
 
 /**
@@ -39815,7 +39947,7 @@ class ContentReferenceEditor extends View {
 
 module.exports = ContentReferenceEditor;
 
-},{}],196:[function(require,module,exports){
+},{}],197:[function(require,module,exports){
 'use strict';
 
 /**
@@ -39907,7 +40039,7 @@ class ContentSchemaReferenceEditor extends View {
 
 module.exports = ContentSchemaReferenceEditor;
 
-},{}],197:[function(require,module,exports){
+},{}],198:[function(require,module,exports){
 'use strict';
 
 /**
@@ -40081,7 +40213,7 @@ class DateEditor extends View {
 
 module.exports = DateEditor;
 
-},{}],198:[function(require,module,exports){
+},{}],199:[function(require,module,exports){
 'use strict';
 
 /**
@@ -40132,7 +40264,7 @@ class DropdownEditor extends View {
 
 module.exports = DropdownEditor;
 
-},{}],199:[function(require,module,exports){
+},{}],200:[function(require,module,exports){
 'use strict';
 
 /**
@@ -40186,7 +40318,7 @@ class LanguageEditor extends View {
 
 module.exports = LanguageEditor;
 
-},{}],200:[function(require,module,exports){
+},{}],201:[function(require,module,exports){
 'use strict';
 
 /**
@@ -40257,7 +40389,7 @@ class MediaReferenceEditor extends View {
 
 module.exports = MediaReferenceEditor;
 
-},{}],201:[function(require,module,exports){
+},{}],202:[function(require,module,exports){
 'use strict';
 
 /**
@@ -40292,7 +40424,7 @@ class NumberEditor extends View {
 
 module.exports = NumberEditor;
 
-},{}],202:[function(require,module,exports){
+},{}],203:[function(require,module,exports){
 'use strict';
 
 /**
@@ -40338,7 +40470,7 @@ class ResourceReferenceEditor extends View {
 
 module.exports = ResourceReferenceEditor;
 
-},{}],203:[function(require,module,exports){
+},{}],204:[function(require,module,exports){
 'use strict';
 
 // Override CKEditor image plugin
@@ -40457,7 +40589,7 @@ class RichTextEditor extends View {
 
 module.exports = RichTextEditor;
 
-},{}],204:[function(require,module,exports){
+},{}],205:[function(require,module,exports){
 'use strict';
 
 /**
@@ -40492,7 +40624,7 @@ class StringEditor extends View {
 
 module.exports = StringEditor;
 
-},{}],205:[function(require,module,exports){
+},{}],206:[function(require,module,exports){
 'use strict';
 
 /**
@@ -40570,7 +40702,7 @@ class StructEditor extends View {
 
 module.exports = StructEditor;
 
-},{}],206:[function(require,module,exports){
+},{}],207:[function(require,module,exports){
 'use strict';
 
 /**
@@ -40695,7 +40827,7 @@ class TagsEditor extends View {
 
 module.exports = TagsEditor;
 
-},{}],207:[function(require,module,exports){
+},{}],208:[function(require,module,exports){
 'use strict';
 
 /**
@@ -40761,7 +40893,7 @@ class TemplateReferenceEditor extends View {
 
 module.exports = TemplateReferenceEditor;
 
-},{}],208:[function(require,module,exports){
+},{}],209:[function(require,module,exports){
 'use strict';
 
 /**
@@ -40955,7 +41087,7 @@ class UrlEditor extends View {
 
 module.exports = UrlEditor;
 
-},{}],209:[function(require,module,exports){
+},{}],210:[function(require,module,exports){
 'use strict';
 
 window.resources.editors = {
@@ -40977,7 +41109,7 @@ window.resources.editors = {
     url: require('./UrlEditor')
 };
 
-},{"./ArrayEditor":193,"./BooleanEditor":194,"./ContentReferenceEditor":195,"./ContentSchemaReferenceEditor":196,"./DateEditor":197,"./DropdownEditor":198,"./LanguageEditor":199,"./MediaReferenceEditor":200,"./NumberEditor":201,"./ResourceReferenceEditor":202,"./RichTextEditor":203,"./StringEditor":204,"./StructEditor":205,"./TagsEditor":206,"./TemplateReferenceEditor":207,"./UrlEditor":208}],210:[function(require,module,exports){
+},{"./ArrayEditor":194,"./BooleanEditor":195,"./ContentReferenceEditor":196,"./ContentSchemaReferenceEditor":197,"./DateEditor":198,"./DropdownEditor":199,"./LanguageEditor":200,"./MediaReferenceEditor":201,"./NumberEditor":202,"./ResourceReferenceEditor":203,"./RichTextEditor":204,"./StringEditor":205,"./StructEditor":206,"./TagsEditor":207,"./TemplateReferenceEditor":208,"./UrlEditor":209}],211:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -41007,7 +41139,7 @@ class CMSPane extends Pane {
 
 module.exports = CMSPane;
 
-},{"./Pane":216}],211:[function(require,module,exports){
+},{"./Pane":217}],212:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -41153,7 +41285,7 @@ class ConnectionPane extends Pane {
 
 module.exports = ConnectionPane;
 
-},{"./Pane":216}],212:[function(require,module,exports){
+},{"./Pane":217}],213:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -41559,7 +41691,7 @@ class ContentPane extends Pane {
 
 module.exports = ContentPane;
 
-},{"./Pane":216}],213:[function(require,module,exports){
+},{"./Pane":217}],214:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -41676,7 +41808,7 @@ class FormsPane extends Pane {
 
 module.exports = FormsPane;
 
-},{"./Pane":216}],214:[function(require,module,exports){
+},{"./Pane":217}],215:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -41972,7 +42104,7 @@ class MediaPane extends Pane {
 
 module.exports = MediaPane;
 
-},{"./Pane":216}],215:[function(require,module,exports){
+},{"./Pane":217}],216:[function(require,module,exports){
 'use strict';
 
 // Views
@@ -41983,13 +42115,14 @@ let MessageModal = require('../MessageModal');
 let Content = require('../../../../common/models/Content');
 
 // Panes
+let CMSPane = require('./CMSPane');
 let ConnectionPane = require('./ConnectionPane');
 let ContentPane = require('./ContentPane');
 let FormsPane = require('./FormsPane');
 let MediaPane = require('./MediaPane');
 let SchemaPane = require('./SchemaPane');
+let SettingsPane = require('./SettingsPane');
 let UserPane = require('./UserPane');
-let CMSPane = require('./CMSPane');
 
 /**
  * The main navbar
@@ -42097,7 +42230,9 @@ class NavbarMain extends View {
 
             // If this item has a schema id, fetch the appropriate icon
             if (item.schemaId) {
-                icon = resources.schemas[item.schemaId].icon;
+                let schema = resources.schemas[item.schemaId];
+
+                icon = schema.icon;
             }
 
             if (icon) {
@@ -42365,16 +42500,7 @@ class NavbarMain extends View {
                 // Render the "settings" pane
                 // ----------
                 if (isAdmin || scopes.indexOf('settings') > -1) {
-                    this.renderPane({
-                        label: 'Settings',
-                        route: '/settings/',
-                        icon: 'wrench',
-                        items: [{
-                            name: 'Languages',
-                            path: 'languages',
-                            icon: 'flag'
-                        }]
-                    });
+                    this.renderPane(SettingsPane.getRenderSettings());
                 }
 
                 triggerReady('navbar');
@@ -42388,7 +42514,7 @@ class NavbarMain extends View {
 
 module.exports = NavbarMain;
 
-},{"../../../../common/models/Content":228,"../MessageModal":190,"./CMSPane":210,"./ConnectionPane":211,"./ContentPane":212,"./FormsPane":213,"./MediaPane":214,"./SchemaPane":217,"./UserPane":218}],216:[function(require,module,exports){
+},{"../../../../common/models/Content":230,"../MessageModal":190,"./CMSPane":211,"./ConnectionPane":212,"./ContentPane":213,"./FormsPane":214,"./MediaPane":215,"./SchemaPane":218,"./SettingsPane":219,"./UserPane":220}],217:[function(require,module,exports){
 'use strict';
 
 class Pane {
@@ -42404,7 +42530,7 @@ class Pane {
 
 module.exports = Pane;
 
-},{}],217:[function(require,module,exports){
+},{}],218:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -42523,7 +42649,33 @@ class SchemaPane extends Pane {
 
 module.exports = SchemaPane;
 
-},{"./Pane":216}],218:[function(require,module,exports){
+},{"./Pane":217}],219:[function(require,module,exports){
+'use strict';
+
+let Pane = require('./Pane');
+
+class SettingsPane extends Pane {
+    static getRenderSettings() {
+        return {
+            label: 'Settings',
+            route: '/settings/',
+            icon: 'wrench',
+            items: [{
+                name: 'Languages',
+                path: 'languages',
+                icon: 'flag'
+            }, {
+                name: 'Sync',
+                path: 'sync',
+                icon: 'refresh'
+            }]
+        };
+    }
+}
+
+module.exports = SettingsPane;
+
+},{"./Pane":217}],220:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -42711,7 +42863,7 @@ class UserPane extends Pane {
 
 module.exports = UserPane;
 
-},{"./Pane":216}],219:[function(require,module,exports){
+},{"./Pane":217}],221:[function(require,module,exports){
 module.exports=[
     "aa",
     "ab",
@@ -42900,7 +43052,7 @@ module.exports=[
     "zu"
 ]
 
-},{}],220:[function(require,module,exports){
+},{}],222:[function(require,module,exports){
 'use strict';
 
 class ConnectionHelper {
@@ -42992,7 +43144,7 @@ class ConnectionHelper {
 
 module.exports = ConnectionHelper;
 
-},{}],221:[function(require,module,exports){
+},{}],223:[function(require,module,exports){
 'use strict';
 
 class ContentHelper {
@@ -43099,7 +43251,7 @@ class ContentHelper {
 
 module.exports = ContentHelper;
 
-},{}],222:[function(require,module,exports){
+},{}],224:[function(require,module,exports){
 'use strict';
 
 let lastSenderName = '';
@@ -43209,7 +43361,7 @@ class DebugHelper {
 
 module.exports = DebugHelper;
 
-},{}],223:[function(require,module,exports){
+},{}],225:[function(require,module,exports){
 'use strict';
 
 class LanguageHelper {
@@ -43301,7 +43453,7 @@ class LanguageHelper {
 
 module.exports = LanguageHelper;
 
-},{"../data/languages.json":219}],224:[function(require,module,exports){
+},{"../data/languages.json":221}],226:[function(require,module,exports){
 'use strict';
 
 // Models
@@ -43363,7 +43515,7 @@ class MediaHelper {
 
 module.exports = MediaHelper;
 
-},{"../models/Media":232}],225:[function(require,module,exports){
+},{"../models/Media":234}],227:[function(require,module,exports){
 'use strict';
 
 // Models
@@ -43408,7 +43560,7 @@ class SchemaHelper {
 
 module.exports = SchemaHelper;
 
-},{"../models/ContentSchema":229,"../models/FieldSchema":231}],226:[function(require,module,exports){
+},{"../models/ContentSchema":231,"../models/FieldSchema":233}],228:[function(require,module,exports){
 'use strict';
 
 class SettingsHelper {
@@ -43442,7 +43594,7 @@ class SettingsHelper {
 
 module.exports = SettingsHelper;
 
-},{}],227:[function(require,module,exports){
+},{}],229:[function(require,module,exports){
 'use strict';
 
 let Entity = require('./Entity');
@@ -43669,7 +43821,7 @@ class Connection extends Entity {
 
 module.exports = Connection;
 
-},{"./Entity":230}],228:[function(require,module,exports){
+},{"./Entity":232}],230:[function(require,module,exports){
 'use strict';
 
 let Entity = require('./Entity');
@@ -43989,7 +44141,7 @@ class Content extends Entity {
 
 module.exports = Content;
 
-},{"./Entity":230}],229:[function(require,module,exports){
+},{"./Entity":232}],231:[function(require,module,exports){
 'use strict';
 
 let Schema = require('./Schema');
@@ -44013,7 +44165,7 @@ class ContentSchema extends Schema {
 
 module.exports = ContentSchema;
 
-},{"./Schema":233}],230:[function(require,module,exports){
+},{"./Schema":235}],232:[function(require,module,exports){
 'use strict';
 
 let crypto = require('crypto');
@@ -44179,7 +44331,7 @@ class Entity {
 
 module.exports = Entity;
 
-},{"crypto":56}],231:[function(require,module,exports){
+},{"crypto":56}],233:[function(require,module,exports){
 'use strict';
 
 let Schema = require('./Schema');
@@ -44221,7 +44373,7 @@ class FieldSchema extends Schema {
 
 module.exports = FieldSchema;
 
-},{"./Schema":233}],232:[function(require,module,exports){
+},{"./Schema":235}],234:[function(require,module,exports){
 'use strict';
 
 // Libs
@@ -44327,7 +44479,7 @@ class Media extends Entity {
 
 module.exports = Media;
 
-},{"./Entity":230,"path":115}],233:[function(require,module,exports){
+},{"./Entity":232,"path":115}],235:[function(require,module,exports){
 'use strict';
 
 let Entity = require('./Entity');
@@ -44363,7 +44515,7 @@ class Schema extends Entity {
 
 module.exports = Schema;
 
-},{"./Entity":230}]},{},[162,209,158,160])
+},{"./Entity":232}]},{},[162,210,158,160])
 
 
 //# sourceMappingURL=maps/client.js.map

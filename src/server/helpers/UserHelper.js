@@ -50,10 +50,11 @@ class UserHelper {
      *
      * @param {String} username
      * @param {String} password
+     * @param {Boolean} persist
      *
      * @returns {Promise(String)} token
      */
-    static loginUser(username, password) {
+    static loginUser(username, password, persist) {
         debug.log('Attempting login for user "' + username + '"...', this);
 
         return this.findUser(username)

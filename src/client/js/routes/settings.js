@@ -18,13 +18,28 @@ Router.route('/settings/', function() {
     }
 });
 
-// Edit
+// Languages
 Router.route('/settings/languages/', function() {
     if(currentUserHasScope('settings')) {
         ViewHelper.get('NavbarMain').highlightItem('languages');
         
         $('.workspace').html(
             new LanguageSettings().$element
+        );
+    
+    } else {
+        location.hash = '/';
+
+    }
+});
+
+// Sync
+Router.route('/settings/sync/', function() {
+    if(currentUserHasScope('settings')) {
+        ViewHelper.get('NavbarMain').highlightItem('sync');
+        
+        $('.workspace').html(
+            new SyncSettings().$element
         );
     
     } else {

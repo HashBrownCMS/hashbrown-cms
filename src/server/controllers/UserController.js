@@ -24,8 +24,9 @@ class UserController extends ApiController {
     static login(req, res) {
         let username = req.body.username;
         let password = req.body.password;
+        let persist = req.query.persist == 'true' || req.query.persist == true;
 
-        UserHelper.loginUser(username, password)
+        UserHelper.loginUser(username, password, persist)
         .then((token) => {
             // The cookie doesn't handle token expiration client side, so just send the token string
             res.status(200).cookie('token', token).send('Token set in cookie');

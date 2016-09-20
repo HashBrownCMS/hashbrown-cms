@@ -45,6 +45,7 @@ global.BackupHelper = require('./helpers/BackupHelper');
 global.UpdateHelper = require('./helpers/UpdateHelper');
 global.ScheduleHelper = require('./helpers/ScheduleHelper');
 global.AppHelper = require('./helpers/AppHelper');
+global.SyncHelper = require('./helpers/SyncHelper');
 
 global.debug = require('./helpers/DebugHelper');
 global.debug.verbosity = 2;

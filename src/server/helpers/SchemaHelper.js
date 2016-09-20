@@ -102,27 +102,31 @@ class SchemaHelper extends SchemaHelperCommon {
      */
     static getCustomSchemas() {
         let collection = ProjectHelper.currentEnvironment + '.schemas';
-        
-        return new Promise((resolve, reject) => {
-            MongoHelper.find(
-                ProjectHelper.currentProject,
-                collection,
-                {}
-            ).then((result) => {
-                let schemas = {};
+        let result = [];
+       
+        return MongoHelper.find(
+            ProjectHelper.currentProject,
+            collection,
+            {}
+        ).then((result) => {
+            return SyncHelper.mergeResource('schemas', result);
+        })
+        .then((result) => {
+            let schemas = {};
 
-                for(let i in result) {
-                    let schema = SchemaHelper.getModel(result[i]);
+            for(let i in result) {
+                let schema = SchemaHelper.getModel(result[i]);
 
-                    if(schema) {
-                        schemas[schema.id] = schema;
-                    
-                    } else {
-                        reject(new Error('Schema data from DB is incorrect format: ' + JSON.stringify(result[i])));
-                        return;
-                    }
+                if(schema) {
+                    schemas[schema.id] = schema;
+                
+                } else {
+                    reject(new Error('Schema data from DB is incorrect format: ' + JSON.stringify(result[i])));
+                    return;
                 }
+            }
 
+            return new Promise((resolve) => {
                 resolve(schemas);
             });
         });
@@ -134,23 +138,30 @@ class SchemaHelper extends SchemaHelperCommon {
      * @returns {Promise} Array of Schemas
      */
     static getAllSchemas() {
-        return new Promise((callback) => {
-            SchemaHelper.getNativeSchemas()
-            .then((nativeSchemas) => {
-                SchemaHelper.getCustomSchemas()
-                .then((customSchemas) => {
-                    let allSchemas = {};
-                    
-                    for(let id in nativeSchemas) {
-                        allSchemas[id] = nativeSchemas[id];   
-                    }
-                    
-                    for(let id in customSchemas) {
-                        allSchemas[id] = customSchemas[id];
-                    }
+        let nativeSchemas;
+        let customSchemas;
 
-                    callback(allSchemas); 
-                });
+        return SchemaHelper.getNativeSchemas()
+        .then((result) => {
+            nativeSchemas = result;
+
+            return SchemaHelper.getCustomSchemas();
+        })
+        .then((result) => {
+            customSchemas = result;
+
+            let allSchemas = {};
+            
+            for(let id in nativeSchemas) {
+                allSchemas[id] = nativeSchemas[id];   
+            }
+            
+            for(let id in customSchemas) {
+                allSchemas[id] = customSchemas[id];
+            }
+
+            return new Promise((resolve) => {
+                resolve(allSchemas);
             });
         });
     }

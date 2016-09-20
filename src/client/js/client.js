@@ -30,6 +30,7 @@ window.FormEditor = require('./views/FormEditor');
 window.ConnectionEditor = require('./views/ConnectionEditor');
 window.SchemaEditor = require('./views/SchemaEditor');
 window.LanguageSettings = require('./views/LanguageSettings');
+window.SyncSettings = require('./views/SyncSettings');
 window.UserEditor = require('./views/UserEditor');
 window.MediaBrowser = require('./views/MediaBrowser');
 
