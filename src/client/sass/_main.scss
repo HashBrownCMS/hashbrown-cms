@@ -275,6 +275,14 @@ img.logo {
             height: 100%;
             flex-direction: column;
 
+            &.locked {
+                .field-container {
+                    pointer-events: none;
+                    opacity: 0.75;
+                    user-select: none;
+                }
+            }
+
             .editor-header {
                 padding: 20px 0px 0px 20px;
                 background-color: material-color('blue', '600');

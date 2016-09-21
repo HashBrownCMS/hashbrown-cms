@@ -385,25 +385,27 @@ class ContentEditor extends View {
                     'Advanced'
                 ).click(() => { this.onClickAdvanced(); }),
 
-                // Save & publish
-                _.div({class: 'btn-group-save-publish raised'},
-                    this.$saveBtn = _.button({class: 'btn btn-save btn-primary'},
-                        _.span({class: 'text-default'}, 'Save'),
-                        _.span({class: 'text-working'}, 'Saving')
-                    ).click(() => { this.onClickSave(this.publishingSettings); }),
-                    _.if(this.publishingSettings.connections && this.publishingSettings.connections.length > 0,
-                        _.span('&'),
-                        _.select({class: 'form-control select-publishing'},
-                            _.option({value: 'publish'}, 'Publish'),
-                            _.option({value: 'unpublish'}, 'Unpublish')
-                        ).val(this.model.unpublished ? 'unpublish' : 'publish')
-                    )
-                ),
-
-                // Delete
-                _.button({class: 'btn btn-embedded btn-embedded-danger'},
-                    _.span({class: 'fa fa-trash'})
-                ).click(() => { this.onClickDelete(this.publishingSettings); }),
+                _.if(!this.model.locked, 
+                    // Save & publish
+                    _.div({class: 'btn-group-save-publish raised'},
+                        this.$saveBtn = _.button({class: 'btn btn-save btn-primary'},
+                            _.span({class: 'text-default'}, 'Save'),
+                            _.span({class: 'text-working'}, 'Saving')
+                        ).click(() => { this.onClickSave(this.publishingSettings); }),
+                        _.if(this.publishingSettings.connections && this.publishingSettings.connections.length > 0,
+                            _.span('&'),
+                            _.select({class: 'form-control select-publishing'},
+                                _.option({value: 'publish'}, 'Publish'),
+                                _.option({value: 'unpublish'}, 'Unpublish')
+                            ).val(this.model.unpublished ? 'unpublish' : 'publish')
+                        )
+                    ),
+                    
+                    // Delete
+                    _.button({class: 'btn btn-embedded btn-embedded-danger'},
+                        _.span({class: 'fa fa-trash'})
+                    ).click(() => { this.onClickDelete(this.publishingSettings); })
+                )
             )
         );
     }
@@ -416,6 +418,8 @@ class ContentEditor extends View {
 
         this.model = new Content(this.model);
         
+        this.$element.toggleClass('locked', this.model.locked);
+
         // Fetch information
         let contentSchema;
         let publishingSettings;

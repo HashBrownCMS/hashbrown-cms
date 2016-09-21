@@ -683,6 +683,8 @@ class SchemaEditor extends View {
     }
 
     render() {
+        this.$element.toggleClass('locked', this.model.locked);
+
         SchemaHelper.getSchemaWithParentFields(this.model.id)
         .then((compiledSchema) => {
             this.compiledSchema = compiledSchema;

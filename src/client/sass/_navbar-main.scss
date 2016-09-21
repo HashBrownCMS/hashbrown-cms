@@ -342,6 +342,19 @@
                             }
                         }
 
+                        &[data-remote="true"] {
+                            >.pane-item {
+                                .pane-item-label {
+                                    &:after {
+                                        content: '\f14c';
+                                        font-family: 'FontAwesome';
+                                        opacity: 0.25;
+                                        margin-left: 10px;
+                                    }
+                                }
+                            }
+                        }
+
                         &[data-locked="true"] {
                             >.pane-item {
                                 .pane-item-label {
@@ -357,8 +370,13 @@
                             &[data-remote="true"] {
                                 >.pane-item {
                                     .pane-item-label {
-                                        &:after {
+                                        &:before {
                                             content: '\f14c';
+                                            font-family: 'FontAwesome';
+                                            opacity: 0.25;
+                                            margin-left: 10px;
+                                            position: absolute;
+                                            right: -20px;
                                         }
                                     }
                                 }
@@ -384,6 +402,10 @@
                             &:hover {
                                 font-weight: 700;
                                 color: material-color('grey', '800');
+                            }
+
+                            .pane-item-label {
+                                position: relative;
                             }
 
                             .btn-children-toggle {

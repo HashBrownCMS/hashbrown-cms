@@ -58,6 +58,14 @@ class ContentHelper extends ContentHelperCommon {
                 id: id
             }
         ).then((result) => {
+            if(!result) {
+                return SyncHelper.getResourceItem('content', id);
+            } else {
+                return new Promise((resolve) => {
+                    resolve(result);
+                });
+            }
+        }).then((result) => {
             content = new Content(result);
 
             // Make sure runaway publish dates are not included

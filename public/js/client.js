@@ -37423,8 +37423,7 @@ class ContentEditor extends View {
         // JSON editor
         _.button({ class: 'btn btn-embedded' }, 'Advanced').click(() => {
             this.onClickAdvanced();
-        }),
-
+        }), _.if(!this.model.locked,
         // Save & publish
         _.div({ class: 'btn-group-save-publish raised' }, this.$saveBtn = _.button({ class: 'btn btn-save btn-primary' }, _.span({ class: 'text-default' }, 'Save'), _.span({ class: 'text-working' }, 'Saving')).click(() => {
             this.onClickSave(this.publishingSettings);
@@ -37433,7 +37432,7 @@ class ContentEditor extends View {
         // Delete
         _.button({ class: 'btn btn-embedded btn-embedded-danger' }, _.span({ class: 'fa fa-trash' })).click(() => {
             this.onClickDelete(this.publishingSettings);
-        })));
+        }))));
     }
 
     render() {
@@ -37443,6 +37442,8 @@ class ContentEditor extends View {
         }
 
         this.model = new Content(this.model);
+
+        this.$element.toggleClass('locked', this.model.locked);
 
         // Fetch information
         let contentSchema;
@@ -39105,6 +39106,8 @@ class SchemaEditor extends View {
     }
 
     render() {
+        this.$element.toggleClass('locked', this.model.locked);
+
         SchemaHelper.getSchemaWithParentFields(this.model.id).then(compiledSchema => {
             this.compiledSchema = compiledSchema;
 

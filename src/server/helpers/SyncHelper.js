@@ -82,6 +82,10 @@ class SyncHelper {
                             reject(new Error(data));
                         
                         } else {
+                            if(data instanceof Object) {
+                                data.locked = true;
+                            }
+
                             resolve(data);
                         
                         }
