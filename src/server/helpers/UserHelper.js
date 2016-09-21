@@ -22,7 +22,7 @@ class UserHelper {
             }
         ).then((user) => {
             return new Promise((resolve, reject) => {
-                if(Object.keys(user).length < 1) {
+                if(!user || Object.keys(user).length < 1) {
                     reject(new Error('No user "' + username + '" found'));
                 } else {
                     resolve(new User(user));
