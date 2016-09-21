@@ -27,6 +27,8 @@ class SyncSettings extends View {
         SettingsHelper.setSettings('sync', this.model)
         .then(() => {
             this.$saveBtn.toggleClass('working', false);
+
+            location.reload();
         })
         .catch(errorModal);
     }
