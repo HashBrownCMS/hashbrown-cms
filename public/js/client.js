@@ -39219,7 +39219,7 @@ class SyncSettings extends View {
                     label: 'Renew',
                     class: 'btn-primary',
                     callback: () => {
-                        customApiCall('post', view.model.url + 'user/login?remote=true', {
+                        apiCall('post', 'sync/login', {
                             username: modal.$element.find('input[type="text"]').val(),
                             password: modal.$element.find('input[type="password"]').val()
                         }).then(token => {
@@ -43328,7 +43328,37 @@ class DebugHelper {
     static getDateString() {
         let date = new Date();
 
-        let output = '(' + date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate() + '-' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds() + ')';
+        let monthString = date.getMonth() + 1;
+
+        if (monthString < 10) {
+            monthString = '0' + monthString;
+        }
+
+        let dateString = date.getDate();
+
+        if (dateString < 10) {
+            dateString = '0' + dateString;
+        }
+
+        let hoursString = date.getHours();
+
+        if (hoursString < 10) {
+            hoursString = '0' + hoursString;
+        }
+
+        let minutesString = date.getMinutes();
+
+        if (minutesString < 10) {
+            minutesString = '0' + minutesString;
+        }
+
+        let secondsString = date.getSeconds();
+
+        if (secondsString < 10) {
+            secondsString = '0' + secondsString;
+        }
+
+        let output = date.getFullYear() + '.' + monthString + '.' + dateString + ' ' + hoursString + ':' + minutesString + ':' + secondsString + ' |';
 
         return output;
     }

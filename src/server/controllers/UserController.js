@@ -7,7 +7,7 @@ class UserController extends ApiController {
      * Initialises this controller
      */
     static init(app) {
-        app.post('/api/user/login', this.middleware({setProject: false, authenticate: false, allowCORS: true}), this.login);
+        app.post('/api/user/login', this.login);
         app.get('/api/user/scopes', this.getScopes);
         app.get('/api/users', this.middleware({scope: 'users', setProject: false}), this.getUsers);
         
@@ -28,14 +28,7 @@ class UserController extends ApiController {
 
         UserHelper.loginUser(username, password, persist)
         .then((token) => {
-            // If the request was remote, don't set cookie
-            if(req.params.remote) {
-                res.status(200).send(token);
-            
-            // If the request was local, set the cookie
-            } else {
-                res.status(200).cookie('token', token).send(token);
-            }
+            res.status(200).cookie('token', token).send(token);
         })
         .catch((e) => {
             res.status(403).send(e.message);   

@@ -16,6 +16,41 @@ class SyncHelper {
     }
 
     /**
+     * Gets a new token
+     *
+     * @param {String} username
+     * @param {String} password
+     *
+     * @returns {Promise} New token
+     */
+    static renewToken(username, password) {
+        return this.getSettings()
+        .then((settings) => {
+            debug.log('Renewing token for sync...', this);
+
+            return new Promise((resolve, reject) => {
+                let headers = {
+                    'Accept': 'application/json'
+                };
+                    
+                restler.post(settings.url + 'user/login?persist=true', {
+                    headers: headers
+                }).on('complete', (data, response) => {
+                    debug.log('Reponse from remote: ' + data, this);
+                    
+                    if(data instanceof Error) {
+                        reject(data);
+                    
+                    } else {
+                        resolve(data);
+                    
+                    }
+                });
+            });
+        });
+    }
+
+    /**
      * GET request
      *
      * @param {String} remoteResourceName
@@ -31,7 +66,7 @@ class SyncHelper {
                         'Accept': 'application/json'
                     };
                     
-                    restler.get(settings.url + remoteResourceName + '?token=' + settings.token, {
+                    restler.get(settings.url + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + remoteResourceName + '?token=' + settings.token, {
                         headers: headers
                     }).on('complete', (data, response) => {
                         if(data instanceof Error) {

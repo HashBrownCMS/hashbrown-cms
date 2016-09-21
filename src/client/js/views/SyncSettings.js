@@ -104,9 +104,9 @@ class SyncSettings extends View {
                         label: 'Renew',
                         class: 'btn-primary',
                         callback: () => {
-                            customApiCall(
+                            apiCall(
                                 'post',
-                                view.model.url + 'user/login?remote=true',
+                                'sync/login',
                                 {
                                     username: modal.$element.find('input[type="text"]').val(),
                                     password: modal.$element.find('input[type="password"]').val()

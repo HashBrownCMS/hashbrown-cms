@@ -46,15 +46,44 @@ class DebugHelper {
     static getDateString() {
         let date = new Date();
 
+        let monthString = (date.getMonth() + 1);
+
+        if(monthString < 10) {
+            monthString = '0' + monthString;
+        }
+
+        let dateString = date.getDate();
+
+        if(dateString < 10) {
+            dateString = '0' + dateString;
+        }
+        
+        let hoursString = date.getHours();
+
+        if(hoursString < 10) {
+            hoursString = '0' + hoursString;
+        }
+        
+        let minutesString = date.getMinutes();
+
+        if(minutesString < 10) {
+            minutesString = '0' + minutesString;
+        }
+        
+        let secondsString = date.getSeconds();
+
+        if(secondsString < 10) {
+            secondsString = '0' + secondsString;
+        }
+
         let output =
-            '(' +
-            date.getFullYear() + '/' +
-            (date.getMonth() + 1) + '/' +
-            date.getDate() + '-' +
-            date.getHours() + ':' + 
-            date.getMinutes() + ':' + 
-            date.getSeconds() +
-            ')';
+            date.getFullYear() + '.' +
+            monthString + '.' +
+            dateString + ' ' +
+            hoursString + ':' + 
+            minutesString + ':' + 
+            secondsString +
+            ' |';
 
         return output;
     }

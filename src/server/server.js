@@ -65,6 +65,7 @@ let ServerController = require('./controllers/ServerController');
 let SettingsController = require('./controllers/SettingsController');
 let ScheduleController = require('./controllers/ScheduleController');
 let SchemaController = require('./controllers/SchemaController');
+let SyncController = require('./controllers/SyncController');
 let TemplateController = require('./controllers/TemplateController');
 let UserController = require('./controllers/UserController');
 
@@ -77,6 +78,7 @@ ScheduleController.init(app);
 SchemaController.init(app);
 ServerController.init(app);
 SettingsController.init(app);
+SyncController.init(app);
 TemplateController.init(app);
 UserController.init(app);
 
