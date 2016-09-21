@@ -155,7 +155,8 @@ class NavbarMain extends View {
                 // Item element
                 let $element = _.div({
                     class: 'pane-item-container',
-                    'data-routing-path': routingPath
+                    'data-routing-path': routingPath,
+                    'data-locked': item.locked
                 },
                     _.a({
                         'data-id': id,
@@ -164,7 +165,7 @@ class NavbarMain extends View {
                         class: 'pane-item'
                     },
                         $icon,
-                        _.span(name)
+                        _.span({class: 'pane-item-label'}, name)
                     ),
                     _.div({class: 'children'})
                 );

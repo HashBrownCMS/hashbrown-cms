@@ -1758,6 +1758,11 @@ body > .dashboard-container {
           display: none; }
         .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container:not(.open) > .children {
           display: none; }
+        .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container[data-locked="true"] > .pane-item .pane-item-label:after {
+          content: '\f023';
+          font-family: 'FontAwesome';
+          opacity: 0.5;
+          margin-left: 10px; }
         .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item {
           color: #616161;
           display: block;

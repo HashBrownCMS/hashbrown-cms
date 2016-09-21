@@ -217,6 +217,7 @@ class SchemaHelper extends SchemaHelperCommon {
                             // Generated values, will be overwritten every time
                             properties.id = id;
                             properties.type = parentDirName;
+                            properties.locked = true;
 
                             resolve(properties);
                         }
@@ -249,14 +250,16 @@ class SchemaHelper extends SchemaHelperCommon {
             
             return promise
             .then((schemaData) => {
-                return new Promise((resolve, reject) => {
-                    if(schemaData && Object.keys(schemaData).length > 0) {
+                if(schemaData && Object.keys(schemaData).length > 0) {
+                    return new Promise((resolve, reject) => {
                         let schema = SchemaHelper.getModel(schemaData);
                         resolve(schema);
-                    } else {
-                        reject(new Error('Schema with id "' + id + '" does not exist'));
-                    }
-                });
+                    });
+                
+                } else {
+                    return SyncHelper.getResourceItem('schemas', id);
+
+                }
             });
 
         } else {

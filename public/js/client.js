@@ -38788,19 +38788,18 @@ class SchemaEditor extends View {
         }
 
         function render() {
-            let parentTabs = {};
+            // Prepend parent tabs if applicable
+            SchemaHelper.getSchemaWithParentFields(this.model.parentSchemaId).then(parentSchema => {
+                parentTabs = parentSchema.tabs;
 
-            if (view.parentSchema) {
-                parentTabs = view.parentSchema.tabs;
-            }
+                $tabs.prepend(_.each(parentTabs, function (id, label) {
+                    return _.div({ class: 'tab chip' }, _.p({ class: 'chip-label' }, label + ' (inherited)'));
+                }));
+            }).catch(errorModal);
 
             let $tabs = _.div({ class: 'chip-group' });
 
             $element.html($tabs);
-
-            $tabs.append(_.each(parentTabs, function (id, label) {
-                return _.div({ class: 'tab chip' }, _.p({ class: 'chip-label' }, label + ' (inherited)'));
-            }));
 
             $tabs.append(_.each(view.model.tabs, (id, label) => {
                 return _.div({ class: 'tab chip', 'data-id': id }, _.input({ type: 'text', class: 'chip-label' + (view.model.locked ? ' disabled' : ''), value: label }).change(function (e) {
@@ -39106,11 +39105,7 @@ class SchemaEditor extends View {
     }
 
     render() {
-        SchemaHelper.getSchemaWithParentFields(this.model.parentSchemaId).then(parentSchema => {
-            this.parentSchema = parentSchema;
-
-            return SchemaHelper.getSchemaWithParentFields(this.model.id);
-        }).then(compiledSchema => {
+        SchemaHelper.getSchemaWithParentFields(this.model.id).then(compiledSchema => {
             this.compiledSchema = compiledSchema;
 
             _.append(this.$element.empty(), _.div({ class: 'editor-header' }, _.span({ class: 'fa fa-' + this.compiledSchema.icon }), _.h4(this.model.name)), this.renderFields(), _.div({ class: 'editor-footer panel panel-default panel-buttons' }, _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-embedded' }, 'Advanced').click(() => {
@@ -42273,13 +42268,14 @@ class NavbarMain extends View {
             // Item element
             let $element = _.div({
                 class: 'pane-item-container',
-                'data-routing-path': routingPath
+                'data-routing-path': routingPath,
+                'data-locked': item.locked
             }, _.a({
                 'data-id': id,
                 'data-name': name,
                 href: '#' + params.route + routingPath,
                 class: 'pane-item'
-            }, $icon, _.span(name)), _.div({ class: 'children' }));
+            }, $icon, _.span({ class: 'pane-item-label' }, name)), _.div({ class: 'children' }));
 
             // Attach item context menu
             if (params.itemContextMenu) {

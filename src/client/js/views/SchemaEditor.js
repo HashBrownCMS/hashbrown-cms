@@ -256,26 +256,27 @@ class SchemaEditor extends View {
         }
 
         function render() {
-            let parentTabs = {};
-            
-            if(view.parentSchema) {
-                parentTabs = view.parentSchema.tabs;
-            }
+            // Prepend parent tabs if applicable
+            SchemaHelper.getSchemaWithParentFields(this.model.parentSchemaId)
+            .then((parentSchema) => {
+                parentTabs = parentSchema.tabs;
+                
+                $tabs.prepend(
+                    _.each(parentTabs, function(id, label) {
+                        return _.div({class: 'tab chip'},
+                            _.p({class: 'chip-label'},
+                                label + ' (inherited)'
+                            )
+                        );
+                    })
+                );
+            })
+            .catch(errorModal);
 
             let $tabs = _.div({class: 'chip-group'});
 
             $element.html($tabs);
             
-            $tabs.append(
-                _.each(parentTabs, function(id, label) {
-                    return _.div({class: 'tab chip'},
-                        _.p({class: 'chip-label'},
-                            label + ' (inherited)'
-                        )
-                    );
-                })
-            );
-
             $tabs.append(
                 _.each(view.model.tabs, (id, label) => {
                     return _.div({class: 'tab chip', 'data-id': id},
@@ -682,12 +683,7 @@ class SchemaEditor extends View {
     }
 
     render() {
-        SchemaHelper.getSchemaWithParentFields(this.model.parentSchemaId)
-        .then((parentSchema) => {
-            this.parentSchema = parentSchema;
-
-            return SchemaHelper.getSchemaWithParentFields(this.model.id);
-        })
+        SchemaHelper.getSchemaWithParentFields(this.model.id)
         .then((compiledSchema) => {
             this.compiledSchema = compiledSchema;
            

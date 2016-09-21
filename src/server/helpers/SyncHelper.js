@@ -30,11 +30,18 @@ class SyncHelper {
 
             return new Promise((resolve, reject) => {
                 let headers = {
-                    'Accept': 'application/json'
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json; charset=utf-8'
+                };
+                
+                let postData = {
+                    username: username,
+                    password: password
                 };
                     
                 restler.post(settings.url + 'user/login?persist=true', {
-                    headers: headers
+                    headers: headers,
+                    data: JSON.stringify(postData)
                 }).on('complete', (data, response) => {
                     if(typeof data !== 'string' || data.length !== 40) {
                         reject(data);
@@ -47,9 +54,48 @@ class SyncHelper {
             });
         });
     }
+    
+    /**
+     * Get resource item
+     *
+     * @param {String} remoteResourceName
+     * @param {String} remoteItemName
+     *
+     * @returns {Promise} Resource
+     */
+    static getResourceItem(remoteResourceName, remoteItemName) {
+        return this.getSettings()
+        .then((settings) => {
+            return new Promise((resolve, reject) => {
+                if(settings && settings.enabled) {
+                    let headers = {
+                        'Accept': 'application/json'
+                    };
+                    
+                    restler.get(settings.url + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + remoteResourceName + '/' + remoteItemName + '?token=' + settings.token, {
+                        headers: headers
+                    }).on('complete', (data, response) => {
+                        if(data instanceof Error) {
+                            reject(data);
+
+                        } else if(typeof data === 'string') {
+                            reject(new Error(data));
+                        
+                        } else {
+                            resolve(data);
+                        
+                        }
+                    });
+
+                } else {
+                    resolve(null);
+                }
+            });
+        });
+    }
 
     /**
-     * GET request
+     * Get resource
      *
      * @param {String} remoteResourceName
      *
@@ -98,19 +144,29 @@ class SyncHelper {
 
             if(remoteResource) {
                 // Look for duplicates
+                let ids = {};
+                
+                for(let r in remoteResource) {
+                    let remoteItem = remoteResource[r];
+
+                    if(!remoteItem) {
+                        debug.log('"' + r + '" is null in remote resource "' + remoteResourceName + '"', this);
+
+                    } else {
+                        remoteItem.locked = true;
+
+                        ids[remoteItem.id] = true;
+
+                    }
+                }
+
                 for(let l in localResource) {
                     let localItem = localResource[l];
 
-                    for(let r in remoteResource) {
-                        let remoteItem = remoteResource[r];
-
-                        remoteItem.locked = true;
-
-                        if(localItem.id == remoteItem.id) {
-                            return new Promise((resolve, reject) => {
-                                reject(new Error('Resource "' + remoteItem.id + '" in "' + remoteResourceName + '" is a duplicate. Please resolve by removing local item.'));
-                            });
-                        }
+                    if(ids[localItem.id] == true) {
+                        return new Promise((resolve, reject) => {
+                            reject(new Error('Resource "' + remoteItem.id + '" in "' + remoteResourceName + '" is a duplicate. Please resolve by removing local item.'));
+                        });
                     }
                 }
 

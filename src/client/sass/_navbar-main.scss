@@ -342,6 +342,19 @@
                             }
                         }
 
+                        &[data-locked="true"] {
+                            >.pane-item {
+                                .pane-item-label {
+                                    &:after {
+                                        content: '\f023';
+                                        font-family: 'FontAwesome';
+                                        opacity: 0.5;
+                                        margin-left: 10px;
+                                    }
+                                }
+                            }
+                        }
+
                         .pane-item {
                             color: material-color('grey', '700');
                             display: block;
