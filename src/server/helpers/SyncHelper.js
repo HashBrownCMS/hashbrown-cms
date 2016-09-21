@@ -107,10 +107,10 @@ class SyncHelper {
 
         return this.getSettings()
         .then((settings) => {
-            params.token = settings.token;
-
             return new Promise((resolve, reject) => {
                 if(settings && settings.enabled && settings[remoteResourceName]) {
+                    params.token = settings.token;
+
                     let headers = {
                         'Accept': 'application/json'
                     };
