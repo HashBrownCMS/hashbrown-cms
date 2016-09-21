@@ -470,6 +470,7 @@ a.btn.btn-primary, a.btn.btn-default, a.btn.btn-danger, a.btn.btn-success {
 .switch {
   width: 30px;
   height: 10px;
+  margin: 10px 0px;
   background-color: #bdbdbd;
   position: relative;
   border-radius: 50px; }
@@ -1761,7 +1762,7 @@ body > .dashboard-container {
         .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container[data-locked="true"] > .pane-item .pane-item-label:after {
           content: '\f023';
           font-family: 'FontAwesome';
-          opacity: 0.5;
+          opacity: 0.25;
           margin-left: 10px; }
         .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container[data-locked="true"][data-remote="true"] > .pane-item .pane-item-label:after {
           content: '\f14c'; }

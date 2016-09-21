@@ -36,9 +36,7 @@ class ContentHelper extends ContentHelperCommon {
 
             }
 
-            return new Promise((resolve) => {
-                resolve(contentList);
-            });
+            return SyncHelper.mergeResource('content', contentList);
         });
     }
 

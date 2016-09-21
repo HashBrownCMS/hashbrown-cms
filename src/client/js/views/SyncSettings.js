@@ -67,7 +67,55 @@ class SyncSettings extends View {
         }
 
         let $element = _.div({class: 'url-editor'},
-            _.input({class: 'form-control', type: 'text', value: view.model.url, placeholder: 'Input the remote project URL here'})
+            _.input({class: 'form-control', type: 'text', value: view.model.url, placeholder: 'Input the remote API URL here, e.g. "https://myserver.com/api/"'})
+                .on('change', onInputChange)
+        );
+
+        return $element;
+    }
+    
+    /**
+     * Renders the project name editor
+     *
+     * @returns {HTMLElement} Element
+     */
+    renderProjectNameEditor() {
+        let view = this;
+        
+        if(!view.model.project) {
+            view.model.project = ProjectHelper.currentProject;
+        }
+
+        function onInputChange() {
+            view.model.project = $(this).val();
+        }
+
+        let $element = _.div({class: 'project-name-editor'},
+            _.input({class: 'form-control', type: 'text', value: view.model.project, placeholder: 'Input the remote project name here, e.g. "' + ProjectHelper.currentProject + '"'})
+                .on('change', onInputChange)
+        );
+
+        return $element;
+    }
+    
+    /**
+     * Renders the environment name editor
+     *
+     * @returns {HTMLElement} Element
+     */
+    renderEnvironmentNameEditor() {
+        let view = this;
+
+        if(!view.model.environment) {
+            view.model.environment = ProjectHelper.currentEnvironment;
+        }
+
+        function onInputChange() {
+            view.model.environment = $(this).val();
+        }
+
+        let $element = _.div({class: 'project-name-editor'},
+            _.input({class: 'form-control', type: 'text', value: view.model.environment, placeholder: 'Input the remote environment name here, e.g. "' + ProjectHelper.currentEnvironment + '"'})
                 .on('change', onInputChange)
         );
 
@@ -127,7 +175,7 @@ class SyncSettings extends View {
         }
 
         let $element = _.div({class: 'token-editor input-group'},
-            _.input({class: 'form-control', type: 'text', value: view.model.token, placeholder: 'Input the remote project token here'})
+            _.input({class: 'form-control', type: 'text', value: view.model.token, placeholder: 'Input the remote API token here'})
                 .on('change', onInputChange),
             _.div({class: 'input-group-btn'},
                 _.button({class: 'btn btn-primary'}, 'Renew')
@@ -137,15 +185,48 @@ class SyncSettings extends View {
 
         return $element;
     }
+    
+    /**
+     * Render Content switch
+     */
+    renderContentSwitch() {
+        let view = this;
+        
+        function onChange() {
+            view.model.content = this.checked;
+
+            if(view.model.content) {
+                view.model.schemas = true;
+                view.$element.find('#switch-sync-schemas')[0].checked = true;
+            }
+        }
+
+        return _.div({class: 'field-editor'},
+            _.div({class: 'switch'},
+                _.input({
+                    id: 'switch-sync-content',
+                    class: 'form-control switch',
+                    type: 'checkbox',
+                    checked: this.model.content == true
+                }).change(onChange),
+                _.label({for: 'switch-sync-content'})
+            )
+        );
+    }
 
     /**
-     * Render schema switch
+     * Render Schema switch
      */
     renderSchemaSwitch() {
         let view = this;
         
         function onChange() {
             view.model.schemas = this.checked;
+
+            if(!view.model.schemas) {
+                view.model.content = false;
+                view.$element.find('#switch-sync-content')[0].checked = false;
+            }
         }
 
         return _.div({class: 'field-editor'},
@@ -157,6 +238,29 @@ class SyncSettings extends View {
                     checked: this.model.schemas == true
                 }).change(onChange),
                 _.label({for: 'switch-sync-schemas'})
+            )
+        );
+    }
+    
+    /**
+     * Render Media tree switch
+     */
+    renderMediaTreeSwitch() {
+        let view = this;
+        
+        function onChange() {
+            view.model['media/tree'] = this.checked;
+        }
+
+        return _.div({class: 'field-editor'},
+            _.div({class: 'switch'},
+                _.input({
+                    id: 'switch-sync-media-tree',
+                    class: 'form-control switch',
+                    type: 'checkbox',
+                    checked: this.model['media/tree'] == true
+                }).change(onChange),
+                _.label({for: 'switch-sync-media-tree'})
             )
         );
     }
@@ -192,9 +296,13 @@ class SyncSettings extends View {
                 ),
                 _.div({class: 'editor-body'},
                     this.renderField('Enabled', this.renderEnabledSwitch()),
-                    this.renderField('URL', this.renderUrlEditor()),
-                    this.renderField('Token', this.renderTokenEditor()),
-                    this.renderField('Schemas', this.renderSchemaSwitch())
+                    this.renderField('API URL', this.renderUrlEditor()),
+                    this.renderField('API Token', this.renderTokenEditor()),
+                    this.renderField('Project', this.renderProjectNameEditor()),
+                    this.renderField('Environment', this.renderEnvironmentNameEditor()),
+                    this.renderField('Content<br/>(Dependant on Schemas)', this.renderContentSwitch()),
+                    this.renderField('Schemas', this.renderSchemaSwitch()),
+                    this.renderField('Media tree', this.renderMediaTreeSwitch())
                 ),
                 _.div({class: 'editor-footer panel panel-default panel-buttons'}, 
                     _.div({class: 'btn-group'},

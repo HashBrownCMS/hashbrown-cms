@@ -67,12 +67,12 @@ class SyncHelper {
         return this.getSettings()
         .then((settings) => {
             return new Promise((resolve, reject) => {
-                if(settings && settings.enabled) {
+                if(settings && settings.enabled && settings[remoteResourceName]) {
                     let headers = {
                         'Accept': 'application/json'
                     };
                     
-                    restler.get(settings.url + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + remoteResourceName + '/' + remoteItemName + '?token=' + settings.token, {
+                    restler.get(settings.url + settings.project + '/' + settings.environment + '/' + remoteResourceName + '/' + remoteItemName + '?token=' + settings.token, {
                         headers: headers
                     }).on('complete', (data, response) => {
                         if(data instanceof Error) {
@@ -103,15 +103,19 @@ class SyncHelper {
      * @returns {Promise} Resource
      */
     static getResource(remoteResourceName, params) {
+        params = params || {};
+
         return this.getSettings()
         .then((settings) => {
+            params.token = settings.token;
+
             return new Promise((resolve, reject) => {
-                if(settings && settings.enabled) {
+                if(settings && settings.enabled && settings[remoteResourceName]) {
                     let headers = {
                         'Accept': 'application/json'
                     };
                     
-                    restler.get(settings.url + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + remoteResourceName + '?token=' + settings.token, {
+                    restler.get(settings.url + settings.project + '/' + settings.environment + '/' + remoteResourceName, {
                         headers: headers,
                         query: params
                     }).on('complete', (data, response) => {
