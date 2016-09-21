@@ -31,7 +31,7 @@ class UserController extends ApiController {
             res.status(200).cookie('token', token).send(token);
         })
         .catch((e) => {
-            res.status(403).send(e.message);   
+            res.status(403).send(ApiController.error(e));   
         });
     }
 

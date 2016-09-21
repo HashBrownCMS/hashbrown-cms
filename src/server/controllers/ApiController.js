@@ -173,7 +173,7 @@ class ApiController extends Controller {
      *
      * @param {Error} error
      *
-     * @returns {String} Pretty print fo the error message
+     * @returns {String} Pretty print for the error message
      */
      static error(error) {
         if(!error) {

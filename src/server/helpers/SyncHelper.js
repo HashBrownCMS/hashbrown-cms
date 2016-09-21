@@ -36,9 +36,7 @@ class SyncHelper {
                 restler.post(settings.url + 'user/login?persist=true', {
                     headers: headers
                 }).on('complete', (data, response) => {
-                    debug.log('Reponse from remote: ' + data, this);
-                    
-                    if(data instanceof Error) {
+                    if(typeof data !== 'string' || data.length !== 40) {
                         reject(data);
                     
                     } else {
