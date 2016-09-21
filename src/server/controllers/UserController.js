@@ -7,7 +7,7 @@ class UserController extends ApiController {
      * Initialises this controller
      */
     static init(app) {
-        app.post('/api/user/login', this.login);
+        app.post('/api/user/login', this.middleware({setProject: false, authenticate: false, allowCORS: true}), this.login);
         app.get('/api/user/scopes', this.getScopes);
         app.get('/api/users', this.middleware({scope: 'users', setProject: false}), this.getUsers);
         

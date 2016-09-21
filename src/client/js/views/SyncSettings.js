@@ -131,7 +131,7 @@ class SyncSettings extends View {
                 .on('change', onInputChange),
             _.div({class: 'input-group-btn'},
                 _.button({class: 'btn btn-primary'}, 'Renew')
-                    .on('click', onCLickRenew)
+                    .on('click', onClickRenew)
             )
         );
 

@@ -39235,7 +39235,7 @@ class SyncSettings extends View {
             });
         }
 
-        let $element = _.div({ class: 'token-editor input-group' }, _.input({ class: 'form-control', type: 'text', value: view.model.token, placeholder: 'Input the remote project token here' }).on('change', onInputChange), _.div({ class: 'input-group-btn' }, _.button({ class: 'btn btn-primary' }, 'Renew').on('click', onCLickRenew)));
+        let $element = _.div({ class: 'token-editor input-group' }, _.input({ class: 'form-control', type: 'text', value: view.model.token, placeholder: 'Input the remote project token here' }).on('change', onInputChange), _.div({ class: 'input-group-btn' }, _.button({ class: 'btn btn-primary' }, 'Renew').on('click', onClickRenew)));
 
         return $element;
     }
