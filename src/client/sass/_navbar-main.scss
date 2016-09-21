@@ -353,8 +353,18 @@
                                     }
                                 }
                             }
+                            
+                            &[data-remote="true"] {
+                                >.pane-item {
+                                    .pane-item-label {
+                                        &:after {
+                                            content: '\f14c';
+                                        }
+                                    }
+                                }
+                            }
                         }
-
+                        
                         .pane-item {
                             color: material-color('grey', '700');
                             display: block;

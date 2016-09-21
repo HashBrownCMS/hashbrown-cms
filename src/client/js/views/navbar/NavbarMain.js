@@ -156,7 +156,8 @@ class NavbarMain extends View {
                 let $element = _.div({
                     class: 'pane-item-container',
                     'data-routing-path': routingPath,
-                    'data-locked': item.locked
+                    'data-locked': item.locked,
+                    'data-remote': item.remote
                 },
                     _.a({
                         'data-id': id,

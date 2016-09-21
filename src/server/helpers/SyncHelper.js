@@ -98,10 +98,11 @@ class SyncHelper {
      * Get resource
      *
      * @param {String} remoteResourceName
+     * @param {Object} params
      *
      * @returns {Promise} Resource
      */
-    static getResource(remoteResourceName) {
+    static getResource(remoteResourceName, params) {
         return this.getSettings()
         .then((settings) => {
             return new Promise((resolve, reject) => {
@@ -111,7 +112,8 @@ class SyncHelper {
                     };
                     
                     restler.get(settings.url + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + remoteResourceName + '?token=' + settings.token, {
-                        headers: headers
+                        headers: headers,
+                        query: params
                     }).on('complete', (data, response) => {
                         if(data instanceof Error) {
                             reject(data);
@@ -134,11 +136,12 @@ class SyncHelper {
      *
      * @param {String} remoteResourceName
      * @param {Array} localResource
+     * @param {Object} params
      *
      * @return {Promise} Merged resource
      */
-    static mergeResource(remoteResourceName, localResource) {
-        return this.getResource(remoteResourceName)
+    static mergeResource(remoteResourceName, localResource, params) {
+        return this.getResource(remoteResourceName, params)
         .then((remoteResource) => {
             let mergedResource;
 
@@ -154,6 +157,7 @@ class SyncHelper {
 
                     } else {
                         remoteItem.locked = true;
+                        remoteItem.remote = true;
 
                         ids[remoteItem.id] = true;
 

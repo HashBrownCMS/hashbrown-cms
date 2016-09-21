@@ -11,10 +11,12 @@ class SchemaController extends ApiController {
      * Initialises this controller
      */
     static init(app) {
-        app.post('/api/:project/:environment/schemas/new', this.middleware({scope: 'schemas'}), this.createSchema);
         app.get('/api/:project/:environment/schemas', this.middleware(), this.getSchemas);
         app.get('/api/:project/:environment/schemas/:id', this.middleware(), this.getSchema);
+        
+        app.post('/api/:project/:environment/schemas/new', this.middleware({scope: 'schemas'}), this.createSchema);
         app.post('/api/:project/:environment/schemas/:id', this.middleware({scope: 'schemas'}), this.setSchema);
+        
         app.delete('/api/:project/:environment/schemas/:id', this.middleware({scope: 'schemas'}), this.deleteSchema);
     }        
     
@@ -22,7 +24,11 @@ class SchemaController extends ApiController {
      * Get a list of all Schemas
      */
     static getSchemas(req, res) {
-        SchemaHelper.getAllSchemas()
+        let getter = req.query.customOnly ? 
+            SchemaHelper.getCustomSchemas :
+            SchemaHelper.getAllSchemas;
+
+        getter()
         .then((schemas) => {
             res.status(200).send(schemas);
         })

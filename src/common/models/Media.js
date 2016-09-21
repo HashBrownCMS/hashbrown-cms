@@ -11,6 +11,7 @@ let Entity = require('./Entity');
 class Media extends Entity {
     structure() {
         this.def(Boolean, 'locked');
+        this.def(Boolean, 'remote');
         this.def(String, 'id');
         this.def(String, 'name');
         this.def(String, 'url');

@@ -8,6 +8,7 @@ let Entity = require('./Entity');
 class Schema extends Entity {
     structure() {
         this.def(Boolean, 'locked');
+        this.def(Boolean, 'remote');
         this.def(String, 'id');
         this.def(String, 'name');
         this.def(String, 'icon');

@@ -38789,8 +38789,8 @@ class SchemaEditor extends View {
 
         function render() {
             // Prepend parent tabs if applicable
-            SchemaHelper.getSchemaWithParentFields(this.model.parentSchemaId).then(parentSchema => {
-                parentTabs = parentSchema.tabs;
+            SchemaHelper.getSchemaWithParentFields(view.model.parentSchemaId).then(parentSchema => {
+                let parentTabs = parentSchema.tabs;
 
                 $tabs.prepend(_.each(parentTabs, function (id, label) {
                     return _.div({ class: 'tab chip' }, _.p({ class: 'chip-label' }, label + ' (inherited)'));
@@ -42269,7 +42269,8 @@ class NavbarMain extends View {
             let $element = _.div({
                 class: 'pane-item-container',
                 'data-routing-path': routingPath,
-                'data-locked': item.locked
+                'data-locked': item.locked,
+                'data-remote': item.remote
             }, _.a({
                 'data-id': id,
                 'data-name': name,
@@ -43911,6 +43912,7 @@ class Content extends Entity {
     structure() {
         // Fundamental fields
         this.def(Boolean, 'locked');
+        this.def(Boolean, 'remote');
         this.def(String, 'id');
         this.def(String, 'parentId');
         this.def(String, 'createdBy');
@@ -44447,6 +44449,7 @@ let Entity = require('./Entity');
 class Media extends Entity {
     structure() {
         this.def(Boolean, 'locked');
+        this.def(Boolean, 'remote');
         this.def(String, 'id');
         this.def(String, 'name');
         this.def(String, 'url');
@@ -44550,6 +44553,7 @@ let Entity = require('./Entity');
 class Schema extends Entity {
     structure() {
         this.def(Boolean, 'locked');
+        this.def(Boolean, 'remote');
         this.def(String, 'id');
         this.def(String, 'name');
         this.def(String, 'icon');

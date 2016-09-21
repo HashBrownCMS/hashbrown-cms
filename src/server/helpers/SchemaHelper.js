@@ -124,7 +124,7 @@ class SchemaHelper extends SchemaHelperCommon {
                 }
             }
 
-            return SyncHelper.mergeResource('schemas', schemas);
+            return SyncHelper.mergeResource('schemas', schemas, { customOnly: true });
         });
     }
 

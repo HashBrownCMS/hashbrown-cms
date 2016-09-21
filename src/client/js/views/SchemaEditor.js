@@ -257,9 +257,9 @@ class SchemaEditor extends View {
 
         function render() {
             // Prepend parent tabs if applicable
-            SchemaHelper.getSchemaWithParentFields(this.model.parentSchemaId)
+            SchemaHelper.getSchemaWithParentFields(view.model.parentSchemaId)
             .then((parentSchema) => {
-                parentTabs = parentSchema.tabs;
+                let parentTabs = parentSchema.tabs;
                 
                 $tabs.prepend(
                     _.each(parentTabs, function(id, label) {
