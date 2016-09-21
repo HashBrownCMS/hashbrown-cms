@@ -143,7 +143,9 @@ class NavbarMain extends View {
                 if(item.schemaId) {
                     let schema = resources.schemas[item.schemaId];
 
-                    icon = schema.icon;
+                    if(schema) {
+                        icon = schema.icon;
+                    }
                 }
 
                 if(icon) {

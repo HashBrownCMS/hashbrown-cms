@@ -28,6 +28,7 @@ class Content extends Entity {
     
     structure() {
         // Fundamental fields
+        this.def(Boolean, 'locked');
         this.def(String, 'id');
         this.def(String, 'parentId');
         this.def(String, 'createdBy');

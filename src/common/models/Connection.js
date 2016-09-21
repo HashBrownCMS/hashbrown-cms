@@ -14,6 +14,7 @@ class Connection extends Entity {
 
     structure() {
         // Fundamental fields
+        this.def(Boolean, 'locked');
         this.def(String, 'id');
         this.def(String, 'title');
         this.def(String, 'type');

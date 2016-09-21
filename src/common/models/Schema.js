@@ -7,11 +7,11 @@ let Entity = require('./Entity');
  */
 class Schema extends Entity {
     structure() {
+        this.def(Boolean, 'locked');
         this.def(String, 'id');
         this.def(String, 'name');
         this.def(String, 'icon');
         this.def(String, 'parentSchemaId');
-        this.def(Boolean, 'locked');
     }
 
     /**

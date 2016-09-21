@@ -25,17 +25,15 @@ class SyncHelper {
     static getResource(remoteResourceName) {
         return this.getSettings()
         .then((settings) => {
-            if(settings) {
-                let headers = {
-                    'Accept': 'application/json'
-                };
-                
-                restler.get(settings.url + remoteResourceName + '?token=' + settings.token, {
-                    headers: headers
-                }).on('complete', (data, response) => {
-                    console.log(data);
-
-                    return new Promise((resolve) => {
+            return new Promise((resolve, reject) => {
+                if(settings && settings.enabled) {
+                    let headers = {
+                        'Accept': 'application/json'
+                    };
+                    
+                    restler.get(settings.url + remoteResourceName + '?token=' + settings.token, {
+                        headers: headers
+                    }).on('complete', (data, response) => {
                         if(data instanceof Error) {
                             reject(data);
                         
@@ -44,13 +42,11 @@ class SyncHelper {
                         
                         }
                     });
-                });
 
-            } else {
-                return new Promise((resolve) => {
+                } else {
                     resolve([]);
-                });
-            }
+                }
+            });
         });
     }
 
@@ -75,16 +71,29 @@ class SyncHelper {
                     for(let r in remoteResource) {
                         let remoteItem = remoteResource[r];
 
-                        if(localResource.id == remoteResource.id) {
+                        remoteItem.locked = true;
+
+                        if(localItem.id == remoteItem.id) {
                             return new Promise((resolve, reject) => {
-                                reject(new Error('Resource "' + remoteResource.id + '" in "' + remoteResourceName + '" is a duplicate. Please resolve by removing local item.'));
+                                reject(new Error('Resource "' + remoteItem.id + '" in "' + remoteResourceName + '" is a duplicate. Please resolve by removing local item.'));
                             });
                         }
                     }
                 }
 
                 // Merge resources
-                mergedResource = remoteResource.concat(localResource);
+                if(remoteResource instanceof Array && localResource instanceof Array) {
+                    mergedResource = remoteResource.concat(localResource);
+                
+                } else if(remoteResource instanceof Object && localResource instanceof Object) {
+                    mergedResource = Object.assign(localResource, remoteResource);
+                
+                } else {
+                    debug.log('Local and remote resources in "' + remoteResourceName + '" are not of same type', this);
+                    debug.log('Response from remote: ' + remoteResource, this);
+
+                    mergedResource = localResource;
+                }
             
             } else {
                 mergedResource = localResource;

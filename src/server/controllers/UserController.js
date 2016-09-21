@@ -28,8 +28,14 @@ class UserController extends ApiController {
 
         UserHelper.loginUser(username, password, persist)
         .then((token) => {
-            // The cookie doesn't handle token expiration client side, so just send the token string
-            res.status(200).cookie('token', token).send('Token set in cookie');
+            // If the request was remote, don't set cookie
+            if(req.params.remote) {
+                res.status(200).send(token);
+            
+            // If the request was local, set the cookie
+            } else {
+                res.status(200).cookie('token', token).send(token);
+            }
         })
         .catch((e) => {
             res.status(403).send(e.message);   

@@ -108,9 +108,7 @@ class SchemaHelper extends SchemaHelperCommon {
             ProjectHelper.currentProject,
             collection,
             {}
-        ).then((result) => {
-            return SyncHelper.mergeResource('schemas', result);
-        })
+        )
         .then((result) => {
             let schemas = {};
 
@@ -126,9 +124,7 @@ class SchemaHelper extends SchemaHelperCommon {
                 }
             }
 
-            return new Promise((resolve) => {
-                resolve(schemas);
-            });
+            return SyncHelper.mergeResource('schemas', schemas);
         });
     }
 
@@ -240,34 +236,35 @@ class SchemaHelper extends SchemaHelperCommon {
     static getSchemaById(id) {
         let collection = ProjectHelper.currentEnvironment + '.schemas';
 
-        return new Promise(function(resolve, reject) {
-            if(id) {
-                let promise = SchemaHelper.isNativeSchema(id) ?
-                    SchemaHelper.getNativeSchema(id) :
-                    MongoHelper.findOne(
-                        ProjectHelper.currentProject,
-                        collection,
-                        {
-                            id: id
-                        }
-                    );
-                
-                promise
-                .then((schemaData) => {
+        if(id) {
+            let promise = SchemaHelper.isNativeSchema(id) ?
+                SchemaHelper.getNativeSchema(id) :
+                MongoHelper.findOne(
+                    ProjectHelper.currentProject,
+                    collection,
+                    {
+                        id: id
+                    }
+                );
+            
+            return promise
+            .then((schemaData) => {
+                return new Promise((resolve, reject) => {
                     if(schemaData && Object.keys(schemaData).length > 0) {
                         let schema = SchemaHelper.getModel(schemaData);
                         resolve(schema);
                     } else {
                         reject(new Error('Schema with id "' + id + '" does not exist'));
                     }
-                })
-                .catch(reject);
+                });
+            });
 
-            } else {
+        } else {
+            return new Promise((resolve, reject) => {
                 reject(new Error('Schema id is null'));
+            });
 
-            }
-        });
+        }
     }
    
     /**
@@ -404,10 +401,7 @@ class SchemaHelper extends SchemaHelperCommon {
             {
                 id: id
             },
-            schema,
-            {
-                upsert: true
-            }
+            schema
         );
     }
 
@@ -422,12 +416,12 @@ class SchemaHelper extends SchemaHelperCommon {
         let collection = ProjectHelper.currentEnvironment + '.schemas';
         let newSchema = Schema.create(parentSchema);
 
-        return new Promise((resolve) => {
-            MongoHelper.insertOne(
-                ProjectHelper.currentProject,
-                collection,
-                newSchema.getFields() 
-            ).then(() => {
+        return MongoHelper.insertOne(
+            ProjectHelper.currentProject,
+            collection,
+            newSchema.getFields() 
+        ).then(() => {
+            return new Promise((resolve) => {
                 resolve(newSchema);
             });
         });

@@ -39206,7 +39206,36 @@ class SyncSettings extends View {
             view.model.token = $(this).val();
         }
 
-        let $element = _.div({ class: 'token-editor' }, _.input({ class: 'form-control', type: 'text', value: view.model.token, placeholder: 'Input the remote project token here' }).on('change', onInputChange));
+        function onClickRenew() {
+            let modal = new MessageModal({
+                model: {
+                    title: 'Renew token',
+                    body: _.div({}, _.input({ class: 'form-control', type: 'text', placeholder: 'Username' }), _.input({ class: 'form-control', type: 'password', placeholder: 'Password' }))
+                },
+                buttons: [{
+                    label: 'Cancel',
+                    class: 'btn-default'
+                }, {
+                    label: 'Renew',
+                    class: 'btn-primary',
+                    callback: () => {
+                        customApiCall('post', view.model.url + 'user/login?remote=true', {
+                            username: modal.$element.find('input[type="text"]').val(),
+                            password: modal.$element.find('input[type="password"]').val()
+                        }).then(token => {
+                            view.model.token = token;
+                            $element.children('input').val(token);
+
+                            modal.hide();
+                        }).catch(errorModal);
+
+                        return false;
+                    }
+                }]
+            });
+        }
+
+        let $element = _.div({ class: 'token-editor input-group' }, _.input({ class: 'form-control', type: 'text', value: view.model.token, placeholder: 'Input the remote project token here' }).on('change', onInputChange), _.div({ class: 'input-group-btn' }, _.button({ class: 'btn btn-primary' }, 'Renew').on('click', onCLickRenew)));
 
         return $element;
     }
@@ -42232,7 +42261,9 @@ class NavbarMain extends View {
             if (item.schemaId) {
                 let schema = resources.schemas[item.schemaId];
 
-                icon = schema.icon;
+                if (schema) {
+                    icon = schema.icon;
+                }
             }
 
             if (icon) {
@@ -43611,6 +43642,7 @@ class Connection extends Entity {
 
     structure() {
         // Fundamental fields
+        this.def(Boolean, 'locked');
         this.def(String, 'id');
         this.def(String, 'title');
         this.def(String, 'type');
@@ -43852,6 +43884,7 @@ class Content extends Entity {
 
     structure() {
         // Fundamental fields
+        this.def(Boolean, 'locked');
         this.def(String, 'id');
         this.def(String, 'parentId');
         this.def(String, 'createdBy');
@@ -44387,6 +44420,7 @@ let Entity = require('./Entity');
  */
 class Media extends Entity {
     structure() {
+        this.def(Boolean, 'locked');
         this.def(String, 'id');
         this.def(String, 'name');
         this.def(String, 'url');
@@ -44489,11 +44523,11 @@ let Entity = require('./Entity');
  */
 class Schema extends Entity {
     structure() {
+        this.def(Boolean, 'locked');
         this.def(String, 'id');
         this.def(String, 'name');
         this.def(String, 'icon');
         this.def(String, 'parentSchemaId');
-        this.def(Boolean, 'locked');
     }
 
     /**
