@@ -176,14 +176,23 @@ class SyncSettings extends View {
             });
         }
 
-        let $element = _.div({class: 'token-editor input-group'},
-            _.input({class: 'form-control', type: 'text', value: view.model.token, placeholder: 'Input the remote API token here'})
-                .on('change', onInputChange),
-            _.div({class: 'input-group-btn'},
-                _.button({class: 'btn btn-primary'}, 'Renew')
-                    .on('click', onClickRenew)
-            )
-        );
+
+        let $element;
+       
+        if(this.model.url) {
+            $element = _.div({class: 'token-editor input-group'},
+                _.input({class: 'form-control', type: 'text', value: view.model.token, placeholder: 'Input the remote API token here'})
+                    .on('change', onInputChange),
+                _.div({class: 'input-group-btn'},
+                    _.button({class: 'btn btn-primary'}, 'Renew')
+                        .on('click', onClickRenew)
+                )
+            );
+        
+        } else {
+            $element = _.div('Please input the API URL and save first');
+
+        }
 
         return $element;
     }

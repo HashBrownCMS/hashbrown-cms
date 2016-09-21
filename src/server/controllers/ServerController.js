@@ -241,7 +241,7 @@ class ServerController extends ApiController {
             process.exit(1);
         })
         .catch((e) => {
-            res.status(502).send(e.message);  
+            res.status(502).send(ApiController.error(e));  
         });
     }
 
@@ -268,7 +268,7 @@ class ServerController extends ApiController {
             res.status(200).send('OK');
         })
         .catch((e) => {
-            res.status(502).send(e.message);
+            res.status(502).send(ApiController.error(e));
         });
     }
     
@@ -281,7 +281,7 @@ class ServerController extends ApiController {
             res.status(200).sendFile(path);
         })
         .catch((e) => {
-            res.status(502).send(e.message);
+            res.status(502).send(ApiController.error(e));
         });
     }
     
@@ -294,7 +294,7 @@ class ServerController extends ApiController {
             res.status(200).send(data);
         })
         .catch((e) => {
-            res.status(502).send(e.message);
+            res.status(502).send(ApiController.error(e));
         });
     }
 
@@ -307,7 +307,7 @@ class ServerController extends ApiController {
             res.status(200).send(data);
         })
         .catch((e) => {
-            res.status(502).send(e.message);
+            res.status(502).send(ApiController.error(e));
         });
     }
 
@@ -353,7 +353,7 @@ class ServerController extends ApiController {
             res.status(200).send(scopedProjects);
         })
         .catch((e) => {
-            res.status(404).send(e.message);   
+            res.status(404).send(ApiController.error(e));   
         });
     }
     
@@ -377,7 +377,7 @@ class ServerController extends ApiController {
             res.status(200).send(project);
         })
         .catch((e) => {
-            res.status(404).send(e.message);
+            res.status(404).send(ApiController.error(e));
         });
     }
     
@@ -401,7 +401,7 @@ class ServerController extends ApiController {
             res.status(200).send(environments);
         })
         .catch((e) => {
-            res.status(404).send(e.message);
+            res.status(404).send(ApiController.error(e));
         });
     }
 
@@ -414,7 +414,9 @@ class ServerController extends ApiController {
         ApiController.authenticate(req.cookies.token)
         .then((user) => {
             if(!user.isAdmin) {
-                throw new Error('Only admins can delete projects');
+                return new Promise((resolve, reject) => {
+                    reject(new Error('Only admins can delete projects'));
+                });
 
             } else {
                 return MongoHelper.dropDatabase(project);
@@ -424,7 +426,7 @@ class ServerController extends ApiController {
             res.status(200).send('OK');
         })
         .catch((e) => {
-            res.status(502).send(e.message);  
+            res.status(502).send(ApiController.error(e));  
         });
     }
 
@@ -447,7 +449,7 @@ class ServerController extends ApiController {
             res.status(200).send(project);
         })
         .catch((e) => {
-            res.status(502).send(e.message);
+            res.status(502).send(ApiController.error(e));
         });
     }
 }
