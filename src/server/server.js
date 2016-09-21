@@ -148,7 +148,8 @@ function ready() {
         if(result == 'proceed') {
             // Start server
             let port = 80;
-            let server = app.listen(port);
+
+            global.server = app.listen(port);
 
             console.log('RESTART');
            
@@ -205,7 +206,18 @@ app.get('/text/:name', function(req, res) {
 
 // Login
 app.get('/login/', function(req, res) {
-    res.render('login');
+    if(req.query.inviteToken) {
+        UserHelper.findInviteToken(req.query.inviteToken)
+        .then((user) => {
+            res.render('login', {
+                invitedUser: user
+            });
+        });
+
+    } else {
+        res.render('login');
+
+    }
 });
 
 // Dashboard

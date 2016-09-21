@@ -95,6 +95,10 @@ class ContentHelper extends ContentHelperCommon {
         debug.log('Updating content "' + id + '"...', this);
         
         let updateContent = () => {
+            // Unset automatic flags
+            content.locked = false;
+            content.remote = false;
+
             if(UserHelper.current) {
                 content.updatedBy = UserHelper.current.id;
             }

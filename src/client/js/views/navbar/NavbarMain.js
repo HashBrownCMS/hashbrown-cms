@@ -115,14 +115,17 @@ class NavbarMain extends View {
                         name = '(error)';
                     }
                 
-                } else if(typeof item.title === 'string') {
+                } else if(item.title && typeof item.title === 'string') {
                     name = item.title;
 
-                } else if(typeof item.name === 'string') {
+                } else if(item.name && typeof item.name === 'string') {
                     name = item.name;
 
-                } else if(typeof item.username === 'string') {
+                } else if(item.username && typeof item.username === 'string') {
                     name = item.username;
+                
+                } else if(item.email && typeof item.email === 'string') {
+                    name = item.email;
 
                 } else {
                     name = id;

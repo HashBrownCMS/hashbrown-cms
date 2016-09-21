@@ -16,8 +16,12 @@ class UserPane extends Pane {
              */
             function onSubmit() {
                 let username = addUserModal.$element.find('input.username').val();
+
+                let emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                let isEmail = emailRegex.test(username);
+
                 let user = users.filter((user) => {
-                    return user.username == username;
+                    return user.username == username || user.email == username;
                 })[0];
 
                 // The user was found
@@ -28,7 +32,7 @@ class UserPane extends Pane {
 
                     // The user already has scopes in this project
                     if(user.scopes[ProjectHelper.currentProject]) {
-                        messageModal('Add user', 'This user is already part of this project (' + ProjectHelper.currentProject + ')');
+                        messageModal('Add user', 'The user  "' + username + '" is already part of this project (' + ProjectHelper.currentProject + ')');
                         return;
                     }
 
@@ -50,9 +54,39 @@ class UserPane extends Pane {
                         location.hash = '/users/' + user.id;
                     })
                     .catch(errorModal);
+                
+                } else if(isEmail) {
+                    let modal = new MessageModal({
+                        model: {
+                            title: 'Add user',
+                            body: 'Do you want to invite a new user with email "' + username + '"?'
+                        },
+                        buttons: [
+                            {
+                                label: 'Cancel',
+                                class: 'btn-default'
+                            },
+                            {
+                                label: 'Invite',
+                                class: 'btn-primary',
+                                callback: () => {
+                                    customApiCall('post', '/api/user/invite', {
+                                        email: username,
+                                        project: ProjectHelper.currentProject
+                                    })
+                                    .then(() => {
+                                        messageModal('Invite user', 'Invitation was sent to ' + username);
+                                    })
+                                    .catch(errorModal);
+
+                                    return false;
+                                }
+                            }
+                        ]
+                    });
                
                 } else {
-                    return false;
+                    errorModal('Add user', 'The user "' + username + '" could not be found');
                 
                 }
             }

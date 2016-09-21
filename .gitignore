@@ -6,5 +6,8 @@ node_modules/*
 # Storage directories
 storage/*
 
+# Config directories
+config/*
+
 # Database dumps
 dump/*

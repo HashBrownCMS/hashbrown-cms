@@ -47,7 +47,7 @@ class RichTextEditor extends View {
      */
     onChange() {
         let data = this.editor.getData();
-        this.value = toMarkdown(data);
+        this.value = toMarkdown(data || '');
         
         this.trigger('change', this.value);
     }
@@ -126,7 +126,7 @@ class RichTextEditor extends View {
             });
 
             // Insert text
-            this.editor.setData(marked(this.value));
+            this.editor.setData(marked(this.value || ''));
         });
     }
 }

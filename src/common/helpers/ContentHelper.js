@@ -20,7 +20,7 @@ class ContentHelper {
      * @param {String} slug
      */
     static getSlug(string) {
-        return string
+        return (string || '')
             .toLowerCase()
             .replace(/[æ|ä]/g, 'ae')
             .replace(/[ø|ö]/g, 'oe')

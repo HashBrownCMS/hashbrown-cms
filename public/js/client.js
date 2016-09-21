@@ -34843,6 +34843,7 @@ module.exports={
     "marked": "^0.3.5",
     "mongodb": "^2.1.7",
     "multer": "^1.1.0",
+    "nodemailer": "^2.6.1",
     "path-to-regexp": "^1.2.1",
     "react": "^15.0.1",
     "react-dom": "^15.0.1",
@@ -34853,7 +34854,8 @@ module.exports={
     "utils-merge": "^1.0.0",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
-    "watchify": "^3.7.0"
+    "watchify": "^3.7.0",
+    "xoauth2": "^1.2.0"
   }
 }
 
@@ -37330,6 +37332,11 @@ class ContentEditor extends View {
             // Fetch field schema
             let fieldSchema = resources.schemas[fieldDefinition.schemaId];
 
+            if (!fieldSchema) {
+                debug.log('FieldSchema "' + fieldDefinition.schemaId + '" for key "' + key + '" not found', this);
+                return null;
+            }
+
             // Field value sanity check
             fieldValues[key] = ContentHelper.fieldSanityCheck(fieldValues[key], fieldDefinition);
 
@@ -38790,13 +38797,15 @@ class SchemaEditor extends View {
 
         function render() {
             // Prepend parent tabs if applicable
-            SchemaHelper.getSchemaWithParentFields(view.model.parentSchemaId).then(parentSchema => {
-                let parentTabs = parentSchema.tabs;
+            if (view.model.parentSchemaId) {
+                SchemaHelper.getSchemaWithParentFields(view.model.parentSchemaId).then(parentSchema => {
+                    let parentTabs = parentSchema.tabs;
 
-                $tabs.prepend(_.each(parentTabs, function (id, label) {
-                    return _.div({ class: 'tab chip' }, _.p({ class: 'chip-label' }, label + ' (inherited)'));
-                }));
-            }).catch(errorModal);
+                    $tabs.prepend(_.each(parentTabs, function (id, label) {
+                        return _.div({ class: 'tab chip' }, _.p({ class: 'chip-label' }, label + ' (inherited)'));
+                    }));
+                }).catch(errorModal);
+            }
 
             let $tabs = _.div({ class: 'chip-group' });
 
@@ -39691,7 +39700,7 @@ class UserEditor extends View {
     }
 
     render() {
-        _.append(this.$element.empty(), _.div({ class: 'editor-header' }, _.span({ class: 'fa fa-user' }), _.h4(this.model.username)), this.renderFields(), _.div({ class: 'editor-footer' }, _.div({ class: 'btn-group' }, this.$saveBtn = _.button({ class: 'btn btn-primary btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Save '), _.span({ class: 'text-working' }, 'Saving ')).click(() => {
+        _.append(this.$element.empty(), _.div({ class: 'editor-header' }, _.span({ class: 'fa fa-user' }), _.h4(this.model.username || this.model.email)), this.renderFields(), _.div({ class: 'editor-footer' }, _.div({ class: 'btn-group' }, this.$saveBtn = _.button({ class: 'btn btn-primary btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Save '), _.span({ class: 'text-working' }, 'Saving ')).click(() => {
             this.onClickSave();
         }), _.button({ class: 'btn btn-embedded btn-embedded-danger' }, _.span({ class: 'fa fa-trash' })).click(() => {
             this.onClickRemove();
@@ -40644,7 +40653,7 @@ class RichTextEditor extends View {
      */
     onChange() {
         let data = this.editor.getData();
-        this.value = toMarkdown(data);
+        this.value = toMarkdown(data || '');
 
         this.trigger('change', this.value);
     }
@@ -40705,7 +40714,7 @@ class RichTextEditor extends View {
             });
 
             // Insert text
-            this.editor.setData(marked(this.value));
+            this.editor.setData(marked(this.value || ''));
         });
     }
 }
@@ -42331,12 +42340,14 @@ class NavbarMain extends View {
                 } else {
                     name = '(error)';
                 }
-            } else if (typeof item.title === 'string') {
+            } else if (item.title && typeof item.title === 'string') {
                 name = item.title;
-            } else if (typeof item.name === 'string') {
+            } else if (item.name && typeof item.name === 'string') {
                 name = item.name;
-            } else if (typeof item.username === 'string') {
+            } else if (item.username && typeof item.username === 'string') {
                 name = item.username;
+            } else if (item.email && typeof item.email === 'string') {
+                name = item.email;
             } else {
                 name = id;
             }
@@ -42820,8 +42831,12 @@ class UserPane extends Pane {
              */
             function onSubmit() {
                 let username = addUserModal.$element.find('input.username').val();
+
+                let emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                let isEmail = emailRegex.test(username);
+
                 let user = users.filter(user => {
-                    return user.username == username;
+                    return user.username == username || user.email == username;
                 })[0];
 
                 // The user was found
@@ -42832,7 +42847,7 @@ class UserPane extends Pane {
 
                     // The user already has scopes in this project
                     if (user.scopes[ProjectHelper.currentProject]) {
-                        messageModal('Add user', 'This user is already part of this project (' + ProjectHelper.currentProject + ')');
+                        messageModal('Add user', 'The user  "' + username + '" is already part of this project (' + ProjectHelper.currentProject + ')');
                         return;
                     }
 
@@ -42851,8 +42866,32 @@ class UserPane extends Pane {
 
                         location.hash = '/users/' + user.id;
                     }).catch(errorModal);
+                } else if (isEmail) {
+                    let modal = new MessageModal({
+                        model: {
+                            title: 'Add user',
+                            body: 'Do you want to invite a new user with email "' + username + '"?'
+                        },
+                        buttons: [{
+                            label: 'Cancel',
+                            class: 'btn-default'
+                        }, {
+                            label: 'Invite',
+                            class: 'btn-primary',
+                            callback: () => {
+                                customApiCall('post', '/api/user/invite', {
+                                    email: username,
+                                    project: ProjectHelper.currentProject
+                                }).then(() => {
+                                    messageModal('Invite user', 'Invitation was sent to ' + username);
+                                }).catch(errorModal);
+
+                                return false;
+                            }
+                        }]
+                    });
                 } else {
-                    return false;
+                    errorModal('Add user', 'The user "' + username + '" could not be found');
                 }
             }
 
@@ -43294,7 +43333,7 @@ class ContentHelper {
      * @param {String} slug
      */
     static getSlug(string) {
-        return string.toLowerCase().replace(/[æ|ä]/g, 'ae').replace(/[ø|ö]/g, 'oe').replace(/å/g, 'aa').replace(/ü/g, 'ue').replace(/ß/g, 'ss').replace(/[^\w ]+/g, '').replace(/ +/g, '-');
+        return (string || '').toLowerCase().replace(/[æ|ä]/g, 'ae').replace(/[ø|ö]/g, 'oe').replace(/å/g, 'aa').replace(/ü/g, 'ue').replace(/ß/g, 'ss').replace(/[^\w ]+/g, '').replace(/ +/g, '-');
     }
 
     /**
@@ -43706,7 +43745,7 @@ class SchemaHelper {
      */
     static getModel(properties) {
         switch (properties.type) {
-            case 'content':
+            case 'content':default:
                 return new ContentSchema(properties);
 
             case 'field':

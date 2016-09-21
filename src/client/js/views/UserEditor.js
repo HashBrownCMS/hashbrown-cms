@@ -382,7 +382,7 @@ class UserEditor extends View {
         _.append(this.$element.empty(),
             _.div({class: 'editor-header'},
                 _.span({class: 'fa fa-user'}),
-                _.h4(this.model.username)
+                _.h4(this.model.username || this.model.email)
             ),
             this.renderFields(),
             _.div({class: 'editor-footer'}, 

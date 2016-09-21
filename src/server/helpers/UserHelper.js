@@ -1,11 +1,85 @@
 'use strict';
 
+// Config
+let mailConfig = require(appRoot + '/config/mail.json');
+
+// Libs
+let nodemailer = require('nodemailer');
+let crypto = require('crypto');
+
 let User = require('../models/User');
+
+// Set up nodemailer
+let generator = require('xoauth2').createXOAuth2Generator({
+    user: mailConfig.username,
+    clientId: mailConfig.clientId,
+    clientSecret: mailConfig.clientSecret,
+    refreshToken: mailConfig.refreshToken,
+    accessToken: mailConfig.accessToken
+});
+
+let transport = nodemailer.createTransport({
+    service: mailConfig.service,
+    auth: {
+        xoauth2: generator
+    }
+});
+
+generator.on('token', (token) => {
+    debug.log('New email token generated', UserHelper);
+});
 
 /**
  * A helper class for managing and getting information about CMS users
  */
 class UserHelper {
+    /**
+     * Sends a welcome message
+     *
+     * @param {String} email
+     * @param {String} project
+     *
+     * @returns {Promise} Promise
+     */
+    static invite(email, project) {
+        let token = crypto.randomBytes(10).toString('hex');
+
+        let mailOptions = {
+            from: '"' + mailConfig.displayName + '" <' + mailConfig.email + '>',
+            to: email,
+            subject: 'Welcome to HashBrown',
+            html: '<p>You have been kindly invited to join the HashBrown project "' + project + '".</p><p>Please go to this URL to activate your account: <br />' + mailConfig.host + '/login?inviteToken=' + token
+        };
+
+        let user = User.create();
+
+        user.inviteToken = token;
+        user.email = email;
+        user.scopes = {};
+
+        user.scopes[project] = [];
+        
+        return MongoHelper.insertOne(
+            'users',
+            'users',
+            user.getObject()
+        ).then(() => {
+            debug.log('Created new user "' + email + '" successfully', this);
+           
+            return new Promise((resolve, reject) => {
+                transport.sendMail(mailOptions, (err, info) => {
+                    if(err){
+                        reject(new Error(err));
+                    
+                    } else {
+                        resolve('Welcome message sent: ' + info.response);
+                    
+                    }
+                });
+            }); 
+        });
+    }
+
     /**
      * Finds a User by username
      *  
@@ -83,7 +157,7 @@ class UserHelper {
      *  
      * @param {String} token
      *
-     * @returns {Promise(User)} user
+     * @returns {Promise} User
      */
     static findToken(token) {
         return MongoHelper.find(
@@ -107,6 +181,27 @@ class UserHelper {
             return new Promise((resolve) => {
                 resolve(null);
             });
+        });
+    }
+    
+    /**
+     * Finds an invite token
+     *  
+     * @param {String} inviteToken
+     *
+     * @returns {Promise} User
+     */
+    static findInviteToken(inviteToken) {
+        return MongoHelper.findOne(
+            'users',
+            'users',
+            {
+                inviteToken: inviteToken
+            }
+        ).then((user) => {
+            return new Promise((resolve, reject) => {
+                resolve(new User(user));
+            });  
         });
     }
     
@@ -163,6 +258,29 @@ class UserHelper {
             user.scopes[project] = scopes || [];
 
             return this.updateUserById(id, user);
+        });
+    }
+
+    /**
+     * Activates an invited User
+     *
+     * @param {String} username
+     * @param {String} password
+     * @param {String} inviteToken
+     *
+     * @returns {Promise} Login token
+     */
+    static activateUser(username, password, inviteToken) {
+        UserHelper.findInviteToken(inviteToken)
+        .then((user) => {
+            user.username = username;
+            user.setPassword(password);
+            user.inviteToken = '';
+
+            return UserHelper.updateUserById(user.id, user.getObject());
+        })
+        .then(() => {
+            return UserHelper.loginUser(username, password);
         });
     }
 

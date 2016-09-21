@@ -257,21 +257,23 @@ class SchemaEditor extends View {
 
         function render() {
             // Prepend parent tabs if applicable
-            SchemaHelper.getSchemaWithParentFields(view.model.parentSchemaId)
-            .then((parentSchema) => {
-                let parentTabs = parentSchema.tabs;
-                
-                $tabs.prepend(
-                    _.each(parentTabs, function(id, label) {
-                        return _.div({class: 'tab chip'},
-                            _.p({class: 'chip-label'},
-                                label + ' (inherited)'
-                            )
-                        );
-                    })
-                );
-            })
-            .catch(errorModal);
+            if(view.model.parentSchemaId) {
+                SchemaHelper.getSchemaWithParentFields(view.model.parentSchemaId)
+                .then((parentSchema) => {
+                    let parentTabs = parentSchema.tabs;
+                    
+                    $tabs.prepend(
+                        _.each(parentTabs, function(id, label) {
+                            return _.div({class: 'tab chip'},
+                                _.p({class: 'chip-label'},
+                                    label + ' (inherited)'
+                                )
+                            );
+                        })
+                    );
+                })
+                .catch(errorModal);
+            }
 
             let $tabs = _.div({class: 'chip-group'});
 

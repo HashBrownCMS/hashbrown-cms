@@ -37,6 +37,7 @@ class User extends Entity {
         this.def(String, 'email');
         this.def(Password, 'password', new Password());
         this.def(Array, 'tokens', []);
+        this.def(String, 'inviteToken');
         this.def(Object, 'scopes', {});
     }
     
@@ -218,16 +219,22 @@ class User extends Entity {
      * @returns {User} user
      */
     static create(username, password) {
-        let salt = crypto.randomBytes(128).toString('hex');
-        let hashedPassword = User.sha512(password, salt);
+        let passwordObj = {};
+        
+        if(password) {
+            let salt = crypto.randomBytes(128).toString('hex');
+            let hash = User.sha512(password, salt);
+
+            passwordObj = {
+                hash: hash,
+                salt: salt
+            }
+        }
         
         let user = new User({
             id: Entity.createId(),
             username: username,
-            password: {
-                hash: hashedPassword,
-                salt: salt
-            }
+            password: passwordObj
         });
 
         return user;

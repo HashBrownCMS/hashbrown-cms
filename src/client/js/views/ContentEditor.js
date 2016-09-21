@@ -263,6 +263,11 @@ class ContentEditor extends View {
             // Fetch field schema
             let fieldSchema = resources.schemas[fieldDefinition.schemaId];
 
+            if(!fieldSchema) {
+                debug.log('FieldSchema "' + fieldDefinition.schemaId + '" for key "' + key + '" not found', this);
+                return null;
+            }
+
             // Field value sanity check
             fieldValues[key] = ContentHelper.fieldSanityCheck(fieldValues[key], fieldDefinition);
 

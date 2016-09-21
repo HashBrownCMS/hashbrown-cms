@@ -7,17 +7,50 @@ class UserController extends ApiController {
      * Initialises this controller
      */
     static init(app) {
-        app.post('/api/user/login', this.login);
         app.get('/api/user/scopes', this.getScopes);
         app.get('/api/users', this.middleware({scope: 'users', setProject: false}), this.getUsers);
-        
         app.get('/api/:project/:environment/users', this.middleware(), this.getUsers);
-        app.post('/api/:project/:environment/users/new', this.middleware({scope: 'users'}), this.createUser);
         app.get('/api/:project/:environment/users/:id', this.middleware(), this.getUser);
+        
+        app.post('/api/user/invite', this.postInvite);
+        app.post('/api/user/activate', this.postActivate);
+        app.post('/api/user/login', this.login);
+        app.post('/api/:project/:environment/users/new', this.middleware({scope: 'users'}), this.createUser);
         app.post('/api/:project/:environment/users/:id', this.middleware({scope: 'users'}), this.postUser);
+        
         app.delete('/api/:project/:environment/users/:id', this.middleware({scope: 'users'}), this.deleteUser);
     }    
     
+    /**
+     * Activates an invited user
+     */
+    static postActivate(req, res) {
+        let username = req.body.username;
+        let password = req.body.password;
+        let inviteToken = req.body.inviteToken;
+
+        UserHelper.activateUser(username, password, inviteToken)
+        .then((token) => {
+            res.status(200).cookie('token', token).send(token);
+        })
+        .catch((e) => {
+            res.status(403).send(ApiController.error(e));
+        });
+    }
+
+    /**
+     * Invites a user
+     */
+    static postInvite(req, res) {
+        UserHelper.invite(req.body.email, req.body.project)
+        .then((msg) => {
+            res.status(200).send(msg);
+        })
+        .catch((e) => {
+            res.status(502).send(ApiController.error(e));
+        });
+    } 
+
     /** 
      * Logs in a user
      */

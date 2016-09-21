@@ -119,8 +119,9 @@ class SchemaHelper extends SchemaHelperCommon {
                     schemas[schema.id] = schema;
                 
                 } else {
-                    reject(new Error('Schema data from DB is incorrect format: ' + JSON.stringify(result[i])));
-                    return;
+                    return new Promise((resolve, reject) => {
+                        reject(new Error('Schema data from DB is incorrect format: ' + JSON.stringify(result[i])));
+                    });
                 }
             }
 
@@ -398,6 +399,12 @@ class SchemaHelper extends SchemaHelperCommon {
     static setSchema(id, schema) {
         let collection = ProjectHelper.currentEnvironment + '.schemas';
        
+        schema = schema || {};
+
+        // Unset automatic flags
+        schema.locked = false;
+        schema.remote = false;
+
         return MongoHelper.updateOne(
             ProjectHelper.currentProject,
             collection,

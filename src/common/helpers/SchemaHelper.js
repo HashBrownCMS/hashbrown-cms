@@ -30,7 +30,7 @@ class SchemaHelper {
      */
     static getModel(properties) {
         switch(properties.type) {
-            case 'content':
+            case 'content': default:
                 return new ContentSchema(properties);
         
             case 'field':

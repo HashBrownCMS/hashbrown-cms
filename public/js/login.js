@@ -66,7 +66,16 @@ $('.login').each(function() {
             password: password
         };
 
-        apiCall('post', '/api/user/login', data)
+        let apiPath = '/api/user/login';
+        let inviteToken = $login.attr('data-invite-token');
+
+        if(inviteToken) {
+            apiPath = '/api/user/activate';
+            
+            data.inviteToken = inviteToken;
+        }
+
+        apiCall('post', apiPath, data)
         .then(function() {
             let newLocation = location.href.replace(location.protocol + '//' + location.hostname + location.pathname, '');
             newLocation = newLocation.replace('?path=', '') || '';

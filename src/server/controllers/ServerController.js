@@ -327,7 +327,7 @@ class ServerController extends ApiController {
             let scopedProjects = [];
 
             if(!user.isAdmin) {
-                for(let scope in scopes) {
+                for(let scope in (user.scopes || {})) {
                     if(projects.indexOf(scope) > -1) {
                         scopedProjects.push(scope);
                     }

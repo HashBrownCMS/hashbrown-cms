@@ -13,14 +13,17 @@ html
         title HashBrown CMS
     body
         .login-container
-            form.panel-login.login.btn-raised
+            form.panel-login.login.btn-raised(data-invite-token="#{(invitedUser ? invitedUser.inviteToken : '')}")
                 .panel-heading
                     img.lg.logo(src='/svg/logo_grey.svg')
                     h2 HashBrown
                 .panel-body
+                        if(invitedUser)
+                            p
+                                | Activate the account for #{invitedUser.email}
                         input(type='text', class='form-control', placeholder='Username')
                         input(type='password', class='form-control', placeholder='Password')
-                        input.btn.btn-primary(type='submit', value='Login')
+                        input.btn.btn-primary(type='submit', value=(invitedUser ? 'Create' : 'Login'))
     
         script(src='/lib/jquery/jquery.min.js')
         script(src='/js/login.js')
