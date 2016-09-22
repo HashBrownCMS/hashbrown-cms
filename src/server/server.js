@@ -212,6 +212,11 @@ app.get('/login/', function(req, res) {
             res.render('login', {
                 invitedUser: user
             });
+        })
+        .catch((e) => {
+            res.render('login', {
+                message: e.message   
+            });
         });
 
     } else {

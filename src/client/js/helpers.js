@@ -78,7 +78,7 @@ window.errorModal = function errorModal(error) {
         }
     }
 
-    let modal = messageModal('<span class="fa fa-warning"></span> Error', error.message);
+    let modal = messageModal('<span class="fa fa-warning"></span> Error', error.message + '<br /><br />Please check server log for details');
 
     modal.$element.toggleClass('error-modal', true);
 

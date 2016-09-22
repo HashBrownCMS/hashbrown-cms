@@ -1,38 +1,68 @@
 'use strict';
 
-// Config
-let mailConfig = require(appRoot + '/config/mail.json');
-
 // Libs
 let nodemailer = require('nodemailer');
 let crypto = require('crypto');
+let fs = require('fs');
+let xoauth2 = require('xoauth2');
 
 let User = require('../models/User');
-
-// Set up nodemailer
-let generator = require('xoauth2').createXOAuth2Generator({
-    user: mailConfig.username,
-    clientId: mailConfig.clientId,
-    clientSecret: mailConfig.clientSecret,
-    refreshToken: mailConfig.refreshToken,
-    accessToken: mailConfig.accessToken
-});
-
-let transport = nodemailer.createTransport({
-    service: mailConfig.service,
-    auth: {
-        xoauth2: generator
-    }
-});
-
-generator.on('token', (token) => {
-    debug.log('New email token generated', UserHelper);
-});
 
 /**
  * A helper class for managing and getting information about CMS users
  */
 class UserHelper {
+    /**
+     * Initialises this helper
+     */
+    static init() {
+        let mailConfigPath = appRoot + '/config/mail.cfg';
+
+        fs.exists(mailConfigPath, (exists) => {
+            if(exists) {
+                fs.readFile(mailConfigPath, (err, data) => {
+                    if(err) {
+                        debug.log('There was an error reading /config/mail.cfg, please check permissions', this);
+
+                    } else {
+                        try {
+                            this.mailConfig = JSON.parse(data);
+                            
+                            // Set up nodemailer
+                            let generator = xoauth2.createXOAuth2Generator({
+                                user: this.mailConfig.user,
+                                clientId: this.mailConfig.clientId,
+                                clientSecret: this.mailConfig.clientSecret,
+                                refreshToken: this.mailConfig.refreshToken,
+                                accessToken: this.mailConfig.accessToken
+                            });
+                            
+                            generator.on('token', (token) => {
+                                debug.log('New email token generated', this);
+                            });
+
+                            this.mailTransport = nodemailer.createTransport({
+                                service: this.mailConfig.service,
+                                auth: {
+                                    xoauth2: generator
+                                }
+                            });
+
+                        } catch(e) {
+                            debug.log('There was a problem parsing /config/mail.cfg', this);
+                            debug.log(e.message, this);
+                        
+                        }
+                    }
+                });
+        
+            } else {
+                debug.log('/config/mail.cfg could not be found, email services will be unavailable', this);
+
+            }
+        });
+    }
+
     /**
      * Sends a welcome message
      *
@@ -42,32 +72,26 @@ class UserHelper {
      * @returns {Promise} Promise
      */
     static invite(email, project) {
-        let token = crypto.randomBytes(10).toString('hex');
+        if(this.mailTransport) {
+            let token = crypto.randomBytes(10).toString('hex');
 
-        let mailOptions = {
-            from: '"' + mailConfig.displayName + '" <' + mailConfig.email + '>',
-            to: email,
-            subject: 'Welcome to HashBrown',
-            html: '<p>You have been kindly invited to join the HashBrown project "' + project + '".</p><p>Please go to this URL to activate your account: <br />' + mailConfig.host + '/login?inviteToken=' + token
-        };
+            let mailOptions = {
+                from: '"' + this.mailConfig.displayName + '" <' + this.mailConfig.email + '>',
+                to: email,
+                subject: 'Welcome to HashBrown',
+                html: '<p>You have been kindly invited to join the HashBrown project "' + project + '".</p><p>Please go to this URL to activate your account: <br />' + this.mailConfig.host + '/login?inviteToken=' + token
+            };
 
-        let user = User.create();
+            let user = User.create();
 
-        user.inviteToken = token;
-        user.email = email;
-        user.scopes = {};
+            user.inviteToken = token;
+            user.email = email;
+            user.scopes = {};
 
-        user.scopes[project] = [];
-        
-        return MongoHelper.insertOne(
-            'users',
-            'users',
-            user.getObject()
-        ).then(() => {
-            debug.log('Created new user "' + email + '" successfully', this);
-           
+            user.scopes[project] = [];
+            
             return new Promise((resolve, reject) => {
-                transport.sendMail(mailOptions, (err, info) => {
+                this.mailTransport.sendMail(mailOptions, (err, info) => {
                     if(err){
                         reject(new Error(err));
                     
@@ -76,8 +100,26 @@ class UserHelper {
                     
                     }
                 });
-            }); 
-        });
+            }).then((msg) => { 
+                return MongoHelper.insertOne(
+                    'users',
+                    'users',
+                    user.getObject()
+                ).then(() => {
+                    debug.log('Created new user "' + email + '" successfully', this);
+                     
+                    return new Promise((resolve) => {
+                        resolve(msg);
+                    });
+                });
+            });
+        
+        } else {
+            return new Promise((resolve, reject) => {
+                reject(new Error('Email services are not configured for this instance'));
+            });
+
+        }
     }
 
     /**
@@ -200,7 +242,13 @@ class UserHelper {
             }
         ).then((user) => {
             return new Promise((resolve, reject) => {
-                resolve(new User(user));
+                if(user && Object.keys(user).length > 0) {
+                    resolve(new User(user));
+                
+                } else {
+                    reject(new Error('Invite token "' + inviteToken + '" could not be found'));
+
+                }
             });  
         });
     }
@@ -531,5 +579,7 @@ class UserHelper {
         });
     }
 }
+
+UserHelper.init();
 
 module.exports = UserHelper;

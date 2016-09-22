@@ -51,6 +51,15 @@ body {
     background-color: #fff;
     height: 100%;
 
+    .message {
+        position: relative;
+        top: 4em;
+        margin: 0px auto;
+        width: 374px;
+        background-color: material-color('red', '600');
+        color: #fff;
+    }
+
     .login {
         position: fixed;
         top: 50%;

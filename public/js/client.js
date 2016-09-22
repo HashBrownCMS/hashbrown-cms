@@ -35387,7 +35387,7 @@ window.errorModal = function errorModal(error) {
         }
     }
 
-    let modal = messageModal('<span class="fa fa-warning"></span> Error', error.message);
+    let modal = messageModal('<span class="fa fa-warning"></span> Error', error.message + '<br /><br />Please check server log for details');
 
     modal.$element.toggleClass('error-modal', true);
 
@@ -42885,6 +42885,8 @@ class UserPane extends Pane {
                                 }).then(() => {
                                     messageModal('Invite user', 'Invitation was sent to ' + username);
                                 }).catch(errorModal);
+
+                                let $buttons = modal.$element.find('button').attr('disabled', true).addClass('disabled');
 
                                 return false;
                             }

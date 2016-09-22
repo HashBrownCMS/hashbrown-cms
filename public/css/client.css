@@ -524,6 +524,13 @@ body {
 .login-container {
   background-color: #fff;
   height: 100%; }
+  .login-container .message {
+    position: relative;
+    top: 4em;
+    margin: 0px auto;
+    width: 374px;
+    background-color: #e53935;
+    color: #fff; }
   .login-container .login {
     position: fixed;
     top: 50%;

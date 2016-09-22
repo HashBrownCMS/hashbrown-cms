@@ -180,27 +180,30 @@ class ApiController extends Controller {
             return 'Unspecified error';
         }
 
-        let errorString = '';
+        let fullErrorString = '';
+        let shortErrorString = '';
 
         if(error instanceof Error) {
-            errorString = error.message || '';
+            shortErrorString = error.message || '';
+            fullErrorString = shortErrorString;
            
             if(error.stack) {
-                errorString += '\n\n' + error.stack;
+                fullErrorString += '\n\n' + error.stack;
             }
 
-            if(!errorString) {
-                errorString = error.toString();
+            if(!fullErrorString) {
+                fullErrorString = error.toString();
             }
 
         } else if(typeof error !== 'object') {
-            errorString = error.toString();
+            shortErrorString = error.toString();
+            fullErrorString = shortErrorString;
 
         }
 
-        debug.log(errorString, this);
+        debug.log(fullErrorString, this);
 
-        return errorString;
+        return shortErrorString;
      }
 }
 

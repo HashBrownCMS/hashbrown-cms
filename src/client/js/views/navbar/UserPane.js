@@ -79,6 +79,8 @@ class UserPane extends Pane {
                                     })
                                     .catch(errorModal);
 
+                                    let $buttons = modal.$element.find('button').attr('disabled', true).addClass('disabled');
+
                                     return false;
                                 }
                             }
