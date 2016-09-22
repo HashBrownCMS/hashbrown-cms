@@ -27,26 +27,7 @@ class UserHelper {
                     } else {
                         try {
                             this.mailConfig = JSON.parse(data);
-                            
-                            // Set up nodemailer
-                            let generator = xoauth2.createXOAuth2Generator({
-                                user: this.mailConfig.user,
-                                clientId: this.mailConfig.clientId,
-                                clientSecret: this.mailConfig.clientSecret,
-                                refreshToken: this.mailConfig.refreshToken,
-                                accessToken: this.mailConfig.accessToken
-                            });
-                            
-                            generator.on('token', (token) => {
-                                debug.log('New email token generated', this);
-                            });
-
-                            this.mailTransport = nodemailer.createTransport({
-                                service: this.mailConfig.service,
-                                auth: {
-                                    xoauth2: generator
-                                }
-                            });
+                            this.cachedAccessToken = this.mailConfig.accessToken;
 
                         } catch(e) {
                             debug.log('There was a problem parsing /config/mail.cfg', this);
@@ -64,6 +45,52 @@ class UserHelper {
     }
 
     /**
+     * Sends an email
+     *
+     * @param {Object} mailOptions
+     *
+     * @returns {Promise} Promise
+     */
+    static sendEmail(mailOptions) {
+        return new Promise((resolve, reject) => {
+            if(this.mailConfig) {
+                let generator = xoauth2.createXOAuth2Generator({
+                    user: this.mailConfig.user,
+                    clientId: this.mailConfig.clientId,
+                    clientSecret: this.mailConfig.clientSecret,
+                    refreshToken: this.mailConfig.refreshToken,
+                    accessToken: this.cachedAccessToken
+                });
+                
+                generator.on('token', (res) => {
+                    this.cachedAccessToken = res.accessToken;
+                });
+
+                let mailTransport = nodemailer.createTransport({
+                    service: this.mailConfig.service,
+                    auth: {
+                        xoauth2: generator
+                    }
+                });
+
+                mailTransport.sendMail(mailOptions, (err, info) => {
+                    if(err){
+                        reject(new Error(err));
+                    
+                    } else {
+                        resolve('Message sent: ' + info.response);
+                    
+                    }
+                });
+
+            } else {
+                reject(new Error('Email services are not configured for this instance'));
+            }
+        });
+    }
+
+
+    /**
      * Sends a welcome message
      *
      * @param {String} email
@@ -72,54 +99,37 @@ class UserHelper {
      * @returns {Promise} Promise
      */
     static invite(email, project) {
-        if(this.mailTransport) {
-            let token = crypto.randomBytes(10).toString('hex');
+        let token = crypto.randomBytes(10).toString('hex');
 
-            let mailOptions = {
-                from: '"' + this.mailConfig.displayName + '" <' + this.mailConfig.email + '>',
-                to: email,
-                subject: 'Welcome to HashBrown',
-                html: '<p>You have been kindly invited to join the HashBrown project "' + project + '".</p><p>Please go to this URL to activate your account: <br />' + this.mailConfig.host + '/login?inviteToken=' + token
-            };
+        let mailOptions = {
+            from: '"' + this.mailConfig.displayName + '" <' + this.mailConfig.email + '>',
+            to: email,
+            subject: 'Welcome to HashBrown',
+            html: '<p>You have been kindly invited to join the HashBrown project "' + project + '".</p><p>Please go to this URL to activate your account: <br />' + this.mailConfig.host + '/login?inviteToken=' + token
+        };
 
-            let user = User.create();
+        let user = User.create();
 
-            user.inviteToken = token;
-            user.email = email;
-            user.scopes = {};
+        user.inviteToken = token;
+        user.email = email;
+        user.scopes = {};
 
-            user.scopes[project] = [];
-            
-            return new Promise((resolve, reject) => {
-                this.mailTransport.sendMail(mailOptions, (err, info) => {
-                    if(err){
-                        reject(new Error(err));
-                    
-                    } else {
-                        resolve('Welcome message sent: ' + info.response);
-                    
-                    }
-                });
-            }).then((msg) => { 
-                return MongoHelper.insertOne(
-                    'users',
-                    'users',
-                    user.getObject()
-                ).then(() => {
-                    debug.log('Created new user "' + email + '" successfully', this);
-                     
-                    return new Promise((resolve) => {
-                        resolve(msg);
-                    });
-                });
-            });
+        user.scopes[project] = [];
         
-        } else {
-            return new Promise((resolve, reject) => {
-                reject(new Error('Email services are not configured for this instance'));
+        return this.sendEmail(mailOptions)
+        .then((msg) => { 
+            return MongoHelper.insertOne(
+                'users',
+                'users',
+                user.getObject()
+            ).then(() => {
+                debug.log('Created new user "' + email + '" successfully', this);
+                 
+                return new Promise((resolve) => {
+                    resolve(msg);
+                });
             });
-
-        }
+        });
     }
 
     /**
@@ -314,18 +324,40 @@ class UserHelper {
      *
      * @param {String} username
      * @param {String} password
+     * @param {String} fullName
      * @param {String} inviteToken
      *
      * @returns {Promise} Login token
      */
-    static activateUser(username, password, inviteToken) {
-        UserHelper.findInviteToken(inviteToken)
+    static activateUser(username, password, fullName, inviteToken) {
+        let newUser;
+
+        return UserHelper.findInviteToken(inviteToken)
         .then((user) => {
+            user.fullName = user.fullName || fullName;
             user.username = username;
             user.setPassword(password);
             user.inviteToken = '';
 
-            return UserHelper.updateUserById(user.id, user.getObject());
+            newUser = user;
+
+            return MongoHelper.findOne(
+                'users',
+                'users',
+                {
+                    username: username
+                }
+            );
+        }).then((existingUser) => {
+            if(!existingUser) {
+                return UserHelper.updateUserById(newUser.id, newUser.getObject());
+            
+            } else {
+                return new Promise((resolve, reject) => {
+                    reject(new Error('Username "' + username + '" is taken'));
+                });
+
+            }
         })
         .then(() => {
             return UserHelper.loginUser(username, password);
@@ -344,13 +376,13 @@ class UserHelper {
     static createUser(username, password, admin) {
         if(!username) {
             return new Promise((resolve, reject) => {
-                reject(new Error('Create user: Username was not provided'));
+                reject(new Error('Username was not provided'));
             });
         }
         
         if(!password) {
             return new Promise((resolve, reject) => {
-                reject(new Error('Create user: Password was not provided'));
+                reject(new Error('Password was not provided'));
             });
         }
         
@@ -386,7 +418,7 @@ class UserHelper {
             // Username matches an existing user
             } else {
                 return new Promise((resolve, reject) => {
-                    reject(new Error('Username already exists'));
+                    reject(new Error('Username "' + username + '" is taken'));
                 });
             }
         });

@@ -59,11 +59,14 @@ $('.login').each(function() {
     $login.submit(function(e) {
         e.preventDefault();
 
-        var username = $login.find('input[type="text"]').val();
-        var password = $login.find('input[type="password"]').val();
+        var username = $login.find('input#username').val();
+        var fullName = $login.find('input#full-name').val();
+        var password = $login.find('input#password').val();
+
         var data = {
             username: username,
-            password: password
+            password: password,
+            fullName: fullName
         };
 
         let apiPath = '/api/user/login';

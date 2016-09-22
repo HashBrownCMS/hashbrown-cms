@@ -26,10 +26,11 @@ class UserController extends ApiController {
      */
     static postActivate(req, res) {
         let username = req.body.username;
+        let fullName = req.body.fullName;
         let password = req.body.password;
         let inviteToken = req.body.inviteToken;
 
-        UserHelper.activateUser(username, password, inviteToken)
+        UserHelper.activateUser(username, password, fullName, inviteToken)
         .then((token) => {
             res.status(200).cookie('token', token).send(token);
         })
