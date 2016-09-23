@@ -136,6 +136,21 @@ class ProjectHelper {
     }
 
     /**
+     * Deletes a project
+     *
+     * @param {String} name
+     *
+     * @returns {Promise} Promise
+     */
+    static deleteProject(name) {
+        // Make backup first
+        return BackupHelper.createBackup(name)
+        .then(() => {
+            return MongoHelper.dropDatabase(name, 1000);
+        });
+    }
+
+    /**
      * Creates a new Project
      *
      * @param {String} name

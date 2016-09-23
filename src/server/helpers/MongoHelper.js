@@ -56,8 +56,8 @@ class MongoHelper {
     static restore(databaseName, timestamp) {
         return new Promise((resolve, reject) => {
             let args = [];
-            let basePath = appRoot + '/dump';
-            let projectPath = basePath + '/' + databaseName;
+            let basePath = appRoot + '/storage';
+            let projectPath = basePath + '/' + databaseName + '/dump';
             let archivePath = projectPath + '/' + timestamp + '.hba';
 
             // Drop existing
@@ -73,20 +73,21 @@ class MongoHelper {
                 let mongorestore = spawn('mongorestore', args);
 
                 mongorestore.stdout.on('data', (data) => {
-                    resolve(data);
+                    debug.log(data.toString(), this);
                 });
 
                 mongorestore.stderr.on('data', (data) => {
-                    // For some odd reason, this success message is written to stderr
-                    if(data.toString().match(/creating intents for archive/)) {
-                        resolve(data);
-                    } else {
-                        reject(new Error(data));
-                    }
+                    debug.log(data.toString(), this);
                 });
                 
                 mongorestore.on('exit', (code) => {
-                    reject(new Error('mongorestore exited with status code ' + code));
+                    if(code != 0) {
+                        reject(new Error('mongorestore exited with status code ' + code));
+                    
+                    } else {
+                        resolve();
+
+                    }
                 });
             }
         });
@@ -102,8 +103,9 @@ class MongoHelper {
     static dump(databaseName) {
         return new Promise((resolve, reject) => {
             let args = [];
-            let basePath = appRoot + '/dump';
-            let projectPath = basePath + '/' + databaseName;
+            let basePath = appRoot + '/storage';
+            let projectPath = basePath + '/' + databaseName + '/';
+            let dumpPath = projectPath + 'dump/';
 
             if(databaseName) {
                 args.push('--db');
@@ -118,26 +120,31 @@ class MongoHelper {
             if(!fs.existsSync(projectPath)) {
                 fs.mkdirSync(projectPath);
             }
+            
+            if(!fs.existsSync(dumpPath)) {
+                fs.mkdirSync(dumpPath);
+            }
 
-            args.push('--archive=' + projectPath + '/' + Date.now() + '.hba');
+            args.push('--archive=' + dumpPath + '/' + Date.now() + '.hba');
 
             let mongodump = spawn('mongodump', args);
 
             mongodump.stdout.on('data', (data) => {
-                resolve(data);
+                debug.log(data.toString(), this);
             });
 
             mongodump.stderr.on('data', (data) => {
-                // For some odd reason, this success message is written to stderr
-                if(data.toString().match(/writing .+ to archive/)) {
-                    resolve(data);
-                } else {
-                    reject(new Error(data));
-                }
+                debug.log(data.toString(), this);
             });
             
             mongodump.on('exit', (code) => {
-                reject(new Error('mongodump exited with status code ' + code));
+                if(code != 0) {
+                    reject(new Error('mongodump exited with status code ' + code));
+                
+                } else {
+                    resolve();
+
+                }
             });
         });
     }
@@ -515,12 +522,12 @@ class MongoHelper {
      * @return {Promise} promise
      */
     static dropDatabase(databaseName) {
-        return new Promise((resolve, reject) => {
-            debug.log(databaseName + '::dropDatabase...', this, 3);
+        debug.log(databaseName + '::dropDatabase...', this, 3);
 
-            MongoHelper.getDatabase(databaseName)
-            .then(function(db) {
-                db.dropDatabase(function(err) {
+        return MongoHelper.getDatabase(databaseName)
+        .then((db) => {
+            return new Promise((resolve, reject) => {
+                db.dropDatabase((err) => {
                     if(err) {
                         reject(new Error(err));
                     
@@ -530,8 +537,7 @@ class MongoHelper {
 
                     db.close();
                 });
-            })
-            .catch(reject);
+            });
         });
     }
 }

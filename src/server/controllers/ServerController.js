@@ -419,7 +419,7 @@ class ServerController extends ApiController {
                 });
 
             } else {
-                return MongoHelper.dropDatabase(project);
+                return ProjectHelper.deleteProject(project);
             }
         })
         .then(() => {

@@ -18,7 +18,7 @@ class BackupHelper {
         let handler = multer({
             storage: multer.diskStorage({
                 destination: (req, file, resolve) => {
-                    let path = appRoot + '/dump/' + req.params.project + '/';
+                    let path = appRoot + '/storage/' + req.params.project + '/dump/';
                    
                     debug.log('Handling file upload to dump storage...', this);
 
@@ -50,12 +50,12 @@ class BackupHelper {
      */
     static getBackupsForProject(projectName) {
         return new Promise((resolve, reject) => {
-            glob(appRoot + '/dump/' + projectName + '/*.hba', (err, files) => {
+            glob(appRoot + '/storage/' + projectName + '/dump/*.hba', (err, files) => {
                 if(err) {
                     reject(new Error(err));
                 } else {
                     for(let i in files) {
-                        files[i] = files[i].replace(appRoot + '/dump/' + projectName + '/', '').replace('.hba', '');
+                        files[i] = files[i].replace(appRoot + '/storage/' + projectName + '/dump/', '').replace('.hba', '');
                     }
 
                     resolve(files);
@@ -98,7 +98,7 @@ class BackupHelper {
      */
     static deleteBackup(projectName, timestamp) {
         return new Promise((resolve, reject) => {
-            let path = appRoot + '/dump/' + projectName + '/' + timestamp + '.hba';
+            let path = appRoot + '/storage/' + projectName + '/dump/' + timestamp + '.hba';
 
             if(fs.existsSync(path)) {
                 fs.unlinkSync(path);
@@ -120,7 +120,7 @@ class BackupHelper {
      */
     static getBackupPath(projectName, timestamp) {
         return new Promise((resolve, reject) => {
-            let path = appRoot + '/dump/' + projectName + '/' + timestamp + '.hba';
+            let path = appRoot + '/storage/' + projectName + '/dump/' + timestamp + '.hba';
 
             if(fs.existsSync(path)) {
                 resolve(path);
