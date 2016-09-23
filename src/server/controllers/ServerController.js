@@ -20,6 +20,7 @@ class ServerController extends ApiController {
         app.post('/api/server/backups/:project/:timestamp/restore', this.middleware({ setProject: false }), this.postRestoreProjectBackup);
         app.post('/api/server/settings/:project/:section', this.middleware({ setProject: false }), this.postProjectSettings);
         app.post('/api/server/migrate/:project/', this.middleware({ setProject: false }), this.postMigrateContent);
+        app.post('/api/server/rename/:project/', this.middleware({ setProject: false }), this.postRenameProject);
 
         app.delete('/api/server/backups/:project/:timestamp', this.middleware({ setProject: false }), this.deleteBackup);
         app.delete('/api/server/projects/:project', this.middleware({ authenticate: false, setProject: false }), this.deleteProject);
@@ -447,6 +448,22 @@ class ServerController extends ApiController {
         })
         .then((project) => {
             res.status(200).send(project);
+        })
+        .catch((e) => {
+            res.status(502).send(ServerController.printError(e));
+        });
+    }
+
+    /**
+     * Renames a project
+     */
+    static postRenameProject(req, res) {
+        let oldName = req.params.project;
+        let newName = req.body.name;
+
+        MongoHelper.renameDatabase(oldName, newName)
+        .then((msg) => {
+            res.status(200).send(msg);
         })
         .catch((e) => {
             res.status(502).send(ServerController.printError(e));

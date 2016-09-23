@@ -25,6 +25,7 @@ window.MediaViewer = require('./views/MediaViewer');
 // Editor views
 require('./views/editors');
 window.JSONEditor = require('./views/JSONEditor');
+window.InfoSettings = require('./views/InfoSettings');
 window.ContentEditor = require('./views/ContentEditor');
 window.FormEditor = require('./views/FormEditor');
 window.ConnectionEditor = require('./views/ConnectionEditor');

@@ -47,3 +47,18 @@ Router.route('/settings/sync/', function() {
 
     }
 });
+
+// Info
+Router.route('/settings/info/', function() {
+    if(currentUserHasScope('settings')) {
+        ViewHelper.get('NavbarMain').highlightItem('info');
+        
+        $('.workspace').html(
+            new InfoSettings().$element
+        );
+    
+    } else {
+        location.hash = '/';
+
+    }
+});

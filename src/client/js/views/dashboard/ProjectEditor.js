@@ -493,7 +493,7 @@ class ProjectEditor extends View {
                     )
                 ),
                 _.div({class: 'info'},
-                    _.h2(this.model.name),
+                    _.h2(this.model.settings.info.name || this.model.id),
                     _.p(userCount + ' user' + (userCount != 1 ? 's' : '')),
                     _.p(languageCount + ' language' + (languageCount != 1 ? 's' : '') + ' (' + this.model.settings.language.selected.join(', ') + ')')
                 ),
@@ -503,7 +503,7 @@ class ProjectEditor extends View {
                         return _.div({class: 'environment'},
                             _.div({class: 'btn-group'},
                                 _.span({class: 'environment-title'}, environment),
-                                _.a({href: '/' + this.model.name + '/' + environment, class: 'btn btn-primary environment'}, 'cms'),
+                                _.a({href: '/' + this.model.id + '/' + environment, class: 'btn btn-primary environment'}, 'cms'),
                                 _.if(this.isAdmin(),
                                     _.div({class: 'dropdown'},
                                         _.button({class: 'dropdown-toggle', 'data-toggle': 'dropdown'},

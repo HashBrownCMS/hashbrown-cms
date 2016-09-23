@@ -30654,7 +30654,7 @@ module.exports = {
 module.exports={
   "name": "hashbrown-cms",
   "repository": "https://github.com/Putaitu/hashbrown-cms.git",
-  "version": "0.4.0",
+  "version": "0.4.3",
   "description": "The pluggable CMS",
   "main": "hashbrown.js",
   "scripts": {
@@ -30686,6 +30686,7 @@ module.exports={
     "marked": "^0.3.5",
     "mongodb": "^2.1.7",
     "multer": "^1.1.0",
+    "nodemailer": "^2.6.1",
     "path-to-regexp": "^1.2.1",
     "react": "^15.0.1",
     "react-dom": "^15.0.1",
@@ -30696,7 +30697,8 @@ module.exports={
     "utils-merge": "^1.0.0",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
-    "watchify": "^3.7.0"
+    "watchify": "^3.7.0",
+    "xoauth2": "^1.2.0"
   }
 }
 
@@ -30914,7 +30916,7 @@ window.errorModal = function errorModal(error) {
         }
     }
 
-    let modal = messageModal('<span class="fa fa-warning"></span> Error', error.message);
+    let modal = messageModal('<span class="fa fa-warning"></span> Error', error.message + '<br /><br />Please check server log for details');
 
     modal.$element.toggleClass('error-modal', true);
 
@@ -31545,8 +31547,8 @@ class ProjectEditor extends View {
             e.preventDefault();this.onClickMigrate();
         }))), _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Delete').click(e => {
             e.preventDefault();this.onClickRemove();
-        }))))), _.div({ class: 'info' }, _.h2(this.model.name), _.p(userCount + ' user' + (userCount != 1 ? 's' : '')), _.p(languageCount + ' language' + (languageCount != 1 ? 's' : '') + ' (' + this.model.settings.language.selected.join(', ') + ')')), _.div({ class: 'environments' }, _.h4('Environments'), _.each(this.model.settings.environments.names, (i, environment) => {
-            return _.div({ class: 'environment' }, _.div({ class: 'btn-group' }, _.span({ class: 'environment-title' }, environment), _.a({ href: '/' + this.model.name + '/' + environment, class: 'btn btn-primary environment' }, 'cms'), _.if(this.isAdmin(), _.div({ class: 'dropdown' }, _.button({ class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, _.span({ class: 'fa fa-ellipsis-v' })), _.ul({ class: 'dropdown-menu' }, _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Delete').click(e => {
+        }))))), _.div({ class: 'info' }, _.h2(this.model.settings.info.name || this.model.id), _.p(userCount + ' user' + (userCount != 1 ? 's' : '')), _.p(languageCount + ' language' + (languageCount != 1 ? 's' : '') + ' (' + this.model.settings.language.selected.join(', ') + ')')), _.div({ class: 'environments' }, _.h4('Environments'), _.each(this.model.settings.environments.names, (i, environment) => {
+            return _.div({ class: 'environment' }, _.div({ class: 'btn-group' }, _.span({ class: 'environment-title' }, environment), _.a({ href: '/' + this.model.id + '/' + environment, class: 'btn btn-primary environment' }, 'cms'), _.if(this.isAdmin(), _.div({ class: 'dropdown' }, _.button({ class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, _.span({ class: 'fa fa-ellipsis-v' })), _.ul({ class: 'dropdown-menu' }, _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Delete').click(e => {
                 e.preventDefault();this.onClickRemoveEnvironment();
             })))))));
         }), _.if(this.isAdmin(), _.button({ class: 'btn btn-primary btn-add btn-raised btn-round' }, '+').click(() => {
@@ -31603,7 +31605,37 @@ class DebugHelper {
     static getDateString() {
         let date = new Date();
 
-        let output = '(' + date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate() + '-' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds() + ')';
+        let monthString = date.getMonth() + 1;
+
+        if (monthString < 10) {
+            monthString = '0' + monthString;
+        }
+
+        let dateString = date.getDate();
+
+        if (dateString < 10) {
+            dateString = '0' + dateString;
+        }
+
+        let hoursString = date.getHours();
+
+        if (hoursString < 10) {
+            hoursString = '0' + hoursString;
+        }
+
+        let minutesString = date.getMinutes();
+
+        if (minutesString < 10) {
+            minutesString = '0' + minutesString;
+        }
+
+        let secondsString = date.getSeconds();
+
+        if (secondsString < 10) {
+            secondsString = '0' + secondsString;
+        }
+
+        let output = date.getFullYear() + '.' + monthString + '.' + dateString + ' ' + hoursString + ':' + minutesString + ':' + secondsString + ' |';
 
         return output;
     }
@@ -31840,10 +31872,23 @@ let Entity = require('./Entity');
 
 class Project extends Entity {
     structure() {
-        this.def(String, 'name', 'noname');
+        this.def(String, 'id');
         this.def(Array, 'users', []);
         this.def(Array, 'backups', []);
         this.def(Object, 'settings', {});
+    }
+
+    static create(name) {
+        let project = new Project();
+
+        let id = name.toLowerCase();
+        id = id.replace(/[^a-z_.]/g, '');
+
+        project.id = id;
+        project.settings.info = {
+            section: 'info',
+            name: name
+        };
     }
 }
 

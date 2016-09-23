@@ -9,17 +9,17 @@ class ProjectHelper {
     /**
      * Sets the current project and environment
      *
-     * @param {String} projectName
+     * @param {String} projectId
      * @param {String} environmentName
      *
      * @returns {Promise} Promise
      */
-    static setCurrent(projectName, environmentName) {
+    static setCurrent(projectId, environmentName) {
         return new Promise((resolve, reject) => {
             // First check if the project exists
-            this.getProject(projectName)
+            this.getProject(projectId)
             .then((project) => {
-                this.currentProject = project.name;
+                this.currentProject = project.id;
 
                 // Environment is optional
                 if(environmentName) {
@@ -30,7 +30,7 @@ class ProjectHelper {
                         resolve();
 
                     } else {
-                        reject(new Error('Environment "' + environmentName + '" does not exist in project "' + project.name + '"'));
+                        reject(new Error('Environment "' + environmentName + '" does not exist in project "' + project.id + '"'));
 
                     }
                 
@@ -59,32 +59,32 @@ class ProjectHelper {
     /**
      * Gets a Project object
      *
-     * @param {String} name
+     * @param {String} id
      *
      * @returns {Promise} Project object
      */
-    static getProject(name) {
+    static getProject(id) {
         let settings;
         let users;
         let backups;
 
-        return MongoHelper.find(name, 'settings', {})
+        return MongoHelper.find(id, 'settings', {})
         .then((foundSettings) => {
             settings = foundSettings;
 
-            return UserHelper.getAllUsers(name);
+            return UserHelper.getAllUsers(id);
         })
         .then((foundUsers) => {
             users = foundUsers;
 
-            return BackupHelper.getBackupsForProject(name);
+            return BackupHelper.getBackupsForProject(id);
         })
         .then((foundBackups) => {
             backups = foundBackups;
 
             let project = new Project();
 
-            project.name = name;
+            project.id = id;
             project.backups = backups;
 
             for(let section of (settings || [])) {
@@ -106,6 +106,12 @@ class ProjectHelper {
                 };
             }
         
+            if(!project.settings.info) {
+                project.settings.info = {
+                    section: 'info',
+                    name: id
+                };
+            }
             project.users = users;
 
             return new Promise((resolve) => {
@@ -161,10 +167,9 @@ class ProjectHelper {
     static createProject(name, userId) {
         return new Promise((resolve, reject) => {
             if(name && userId) {
-                name = (name || '').toLowerCase();
-                name = name.replace(/[^a-z_.]/g, '');
+                let project = new Project(name);
 
-                MongoHelper.insertOne(name, 'settings', {})
+                MongoHelper.insertOne(project.id, 'settings', project.settings.info)
                 .then(() => {
                     // The user that creates a project gets all scopes
                     return UserHelper.addUserProjectScope(userId, name, [ 'users', 'settings', 'connections', 'schemas' ]);

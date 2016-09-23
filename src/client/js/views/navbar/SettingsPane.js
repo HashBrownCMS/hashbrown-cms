@@ -10,6 +10,11 @@ class SettingsPane extends Pane {
             icon: 'wrench',
             items: [
                 {
+                    name: 'Info',
+                    path: 'info',
+                    icon: 'info'
+                },
+                {
                     name: 'Languages',
                     path: 'languages',
                     icon: 'flag'
