@@ -20,7 +20,7 @@ class SettingsController extends ApiController {
             res.status(200).send(settings);
         })
         .catch((e) => {
-            res.status(502).send(e);
+            res.status(502).send(SettingsController.printError(e));
         });
     }
     
@@ -35,7 +35,7 @@ class SettingsController extends ApiController {
             res.status(200).send(settings);
         })
         .catch((e) => {
-            res.status(502).send(e);
+            res.status(502).send(SettingsController.printError(e));
         });
     }
 }

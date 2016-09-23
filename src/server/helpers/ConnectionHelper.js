@@ -28,12 +28,15 @@ class ConnectionHelper extends ConnectionHelperCommon {
      */
     static initConnection(data) {
         let constructor = ConnectionHelper.connectionTypes[data.type];
+        let connection;
            
         if(typeof constructor === 'function') {
-            return new constructor(data);
+            connection = new constructor(data);
         } else {
-            return new Connection(data);
+            connection = new Connection(data);
         }
+
+        return connection;
     }
 
     /**

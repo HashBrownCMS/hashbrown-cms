@@ -27,7 +27,7 @@ class ConnectionController extends ApiController {
             res.send(connections);
         })
         .catch((e) => {
-            res.status(502).send(e);
+            res.status(502).send(ConnectionController.printError(e));
         });
     }
 
@@ -43,7 +43,7 @@ class ConnectionController extends ApiController {
             res.status(200).send(connection);
         })
         .catch((e) => {
-            res.status(502).send(e);
+            res.status(502).send(ConnectionController.printError(e));
         });
     }
     
@@ -59,7 +59,7 @@ class ConnectionController extends ApiController {
                 res.send(connection);
             })
             .catch((e) => {
-                res.status(502).send(e);
+                res.status(502).send(ConnectionController.printError(e));
             });
         
         } else {
@@ -79,7 +79,7 @@ class ConnectionController extends ApiController {
             res.status(200).send(connection);
         })
         .catch((e) => {
-            res.status(502).send(e);
+            res.status(502).send(ConnectionController.printError(e));
         });
     }
 
@@ -94,7 +94,7 @@ class ConnectionController extends ApiController {
             res.status(200).send(id);
         })
         .catch((e) => {
-            res.status(502).send(e);
+            res.status(502).send(ConnectionController.printError(e));
         });
     }
 }

@@ -61,7 +61,7 @@ class MediaController extends ApiController {
                         res.status(200).end(data, 'binary');
                     })
                     .on('fail', (data, response) => {
-                        res.status(404).send(ApiController.error(response));   
+                        res.status(404).send(response);   
                     });
                 }
             } else {
@@ -69,7 +69,7 @@ class MediaController extends ApiController {
             }
         })
         .catch((e) => {
-            res.status(400).end(ApiController.error(e));  
+            res.status(404).end(e.message);  
         });
     }
     
@@ -207,12 +207,12 @@ class MediaController extends ApiController {
             })            
             .catch((e) => {
                 debug.warning(e.message);
-                res.status(400).send(ApiController.error(e));
+                res.status(400).send(MediaController.printError(e));
             });            
 
         } else {
             debug.warning(e.message);
-            res.status(400).send(ApiController.error(e));
+            res.status(400).send(MediaController.printError(e));
         }
     }
 
@@ -234,7 +234,7 @@ class MediaController extends ApiController {
             })
             .catch((e) => {
                 debug.warning(e);
-                res.status(400).send(ApiController.error(e));    
+                res.status(400).send(MediaController.printError(e));    
             });
 
         } else {

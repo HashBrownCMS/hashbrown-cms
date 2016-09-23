@@ -10,6 +10,10 @@ class Connection extends Entity {
         params.provideTemplates = params.provideTemplates == 'true' || params.provideTemplates == true || false;
 
         super(params);
+        
+        if(!this.url) {
+            this.url = this.getRemoteUrl();
+        }
     }
 
     structure() {
@@ -18,6 +22,7 @@ class Connection extends Entity {
         this.def(String, 'id');
         this.def(String, 'title');
         this.def(String, 'type');
+        this.def(String, 'url');
         this.def(Boolean, 'provideTemplates');
         this.def(Boolean, 'provideMedia');
         
@@ -60,6 +65,15 @@ class Connection extends Entity {
         return new Promise((resolve, reject) => {
             resolve([]);
         });
+    }
+
+    /**
+     * Gets the remote URL
+     *
+     * @returns {String} URL
+     */
+    getRemoteUrl() {
+        return this.url;
     }
 
     /**

@@ -188,7 +188,7 @@ class ServerController extends ApiController {
             res.status(200).send('OK');
         })
         .catch((e) => {
-            res.status(502).send(ApiController.error(e));  
+            res.status(502).send(ServerController.printError(e));  
         });
     }
 
@@ -205,7 +205,7 @@ class ServerController extends ApiController {
             res.status(200).send(settings);
         })
         .catch((e) => {
-            res.status(502).send(ApiController.error(e));
+            res.status(502).send(ServerController.printError(e));
         });
     }
         
@@ -218,7 +218,7 @@ class ServerController extends ApiController {
             res.status(200).send(statusObj);
         })
         .catch((e) => {
-            res.status(502).send(ApiController.error(e));
+            res.status(502).send(ServerController.printError(e));
         });
     }
 
@@ -241,7 +241,7 @@ class ServerController extends ApiController {
             process.exit(1);
         })
         .catch((e) => {
-            res.status(502).send(ApiController.error(e));  
+            res.status(502).send(ServerController.printError(e));  
         });
     }
 
@@ -268,7 +268,7 @@ class ServerController extends ApiController {
             res.status(200).send('OK');
         })
         .catch((e) => {
-            res.status(502).send(ApiController.error(e));
+            res.status(502).send(ServerController.printError(e));
         });
     }
     
@@ -281,7 +281,7 @@ class ServerController extends ApiController {
             res.status(200).sendFile(path);
         })
         .catch((e) => {
-            res.status(502).send(ApiController.error(e));
+            res.status(502).send(ServerController.printError(e));
         });
     }
     
@@ -294,7 +294,7 @@ class ServerController extends ApiController {
             res.status(200).send(data);
         })
         .catch((e) => {
-            res.status(502).send(ApiController.error(e));
+            res.status(502).send(ServerController.printError(e));
         });
     }
 
@@ -307,7 +307,7 @@ class ServerController extends ApiController {
             res.status(200).send(data);
         })
         .catch((e) => {
-            res.status(502).send(ApiController.error(e));
+            res.status(502).send(ServerController.printError(e));
         });
     }
 
@@ -353,7 +353,7 @@ class ServerController extends ApiController {
             res.status(200).send(scopedProjects);
         })
         .catch((e) => {
-            res.status(404).send(ApiController.error(e));   
+            res.status(404).send(ServerController.printError(e));   
         });
     }
     
@@ -377,7 +377,7 @@ class ServerController extends ApiController {
             res.status(200).send(project);
         })
         .catch((e) => {
-            res.status(404).send(ApiController.error(e));
+            res.status(404).send(ServerController.printError(e));
         });
     }
     
@@ -401,7 +401,7 @@ class ServerController extends ApiController {
             res.status(200).send(environments);
         })
         .catch((e) => {
-            res.status(404).send(ApiController.error(e));
+            res.status(404).send(ServerController.printError(e));
         });
     }
 
@@ -426,7 +426,7 @@ class ServerController extends ApiController {
             res.status(200).send('OK');
         })
         .catch((e) => {
-            res.status(502).send(ApiController.error(e));  
+            res.status(502).send(ServerController.printError(e));  
         });
     }
 
@@ -449,7 +449,7 @@ class ServerController extends ApiController {
             res.status(200).send(project);
         })
         .catch((e) => {
-            res.status(502).send(ApiController.error(e));
+            res.status(502).send(ServerController.printError(e));
         });
     }
 }

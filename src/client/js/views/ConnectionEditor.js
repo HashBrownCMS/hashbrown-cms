@@ -126,6 +126,24 @@ class ConnectionEditor extends View {
         return $editor;
     }
     
+    /**
+     * Renders the URL editor
+     */
+    renderUrlEditor() {
+        let view = this;
+
+        function onChange() {
+            view.model.url = $(this).val();
+        } 
+
+        let $editor = _.div({class: 'field-editor string-editor'},
+            _.input({class: 'form-control', value: this.model.url, type: 'text', placeholder: 'Input the remote URL here, e.g. http://awesomeproject.com'})
+                .change(onChange)
+        );
+
+        return $editor;
+    }
+    
     
     /**
      * Renders the settings editor
@@ -191,6 +209,12 @@ class ConnectionEditor extends View {
                         _.div({class: 'field-key'}, 'Title'),
                         _.div({class: 'field-value'},
                             this.renderTitleEditor()
+                        )
+                    ),
+                    _.div({class: 'field-container connection-url'},
+                        _.div({class: 'field-key'}, 'URL'),
+                        _.div({class: 'field-value'},
+                            this.renderUrlEditor()
                         )
                     ),
                     _.div({class: 'field-container connection-type'},

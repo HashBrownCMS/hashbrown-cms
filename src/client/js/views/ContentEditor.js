@@ -390,6 +390,16 @@ class ContentEditor extends View {
                     'Advanced'
                 ).click(() => { this.onClickAdvanced(); }),
 
+                // View remote
+                _.if(this.model.properties.url && !this.model.unpublished,
+                    _.each(this.publishingSettings.connections, (i, connectionId) => {
+                        let connection = resources.connections.filter((connection) => {
+                            return connection.id == connectionId;
+                        })[0];
+
+                        return _.a({target: '_blank', href: connection.url + this.model.properties.url, class: 'btn btn-embedded'}, 'View on ' + connection.title)
+                    })
+                ),
                 _.if(!this.model.locked, 
                     // Save & publish
                     _.div({class: 'btn-group-save-publish raised'},

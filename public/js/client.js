@@ -37029,6 +37029,21 @@ class ConnectionEditor extends View {
     }
 
     /**
+     * Renders the URL editor
+     */
+    renderUrlEditor() {
+        let view = this;
+
+        function onChange() {
+            view.model.url = $(this).val();
+        }
+
+        let $editor = _.div({ class: 'field-editor string-editor' }, _.input({ class: 'form-control', value: this.model.url, type: 'text', placeholder: 'Input the remote URL here, e.g. http://awesomeproject.com' }).change(onChange));
+
+        return $editor;
+    }
+
+    /**
      * Renders the settings editor
      */
     renderSettingsEditor() {
@@ -37073,7 +37088,7 @@ class ConnectionEditor extends View {
     render() {
         let view = this;
 
-        this.$element.html(_.div({ class: 'object' }, _.div({ class: 'editor-header' }, _.span({ class: 'fa fa-exchange' }), _.h4(this.model.title)), _.div({ class: 'tab-content editor-body' }, _.div({ class: 'field-container connection-title' }, _.div({ class: 'field-key' }, 'Title'), _.div({ class: 'field-value' }, this.renderTitleEditor())), _.div({ class: 'field-container connection-type' }, _.div({ class: 'field-key' }, 'Type'), _.div({ class: 'field-value' }, this.renderTypeEditor())), _.div({ class: 'field-container connection-settings' }, _.div({ class: 'field-key' }, 'Settings'), _.div({ class: 'field-value' }, this.renderSettingsEditor()))), _.div({ class: 'editor-footer' }, _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-embedded' }, 'Advanced').click(function () {
+        this.$element.html(_.div({ class: 'object' }, _.div({ class: 'editor-header' }, _.span({ class: 'fa fa-exchange' }), _.h4(this.model.title)), _.div({ class: 'tab-content editor-body' }, _.div({ class: 'field-container connection-title' }, _.div({ class: 'field-key' }, 'Title'), _.div({ class: 'field-value' }, this.renderTitleEditor())), _.div({ class: 'field-container connection-url' }, _.div({ class: 'field-key' }, 'URL'), _.div({ class: 'field-value' }, this.renderUrlEditor())), _.div({ class: 'field-container connection-type' }, _.div({ class: 'field-key' }, 'Type'), _.div({ class: 'field-value' }, this.renderTypeEditor())), _.div({ class: 'field-container connection-settings' }, _.div({ class: 'field-key' }, 'Settings'), _.div({ class: 'field-value' }, this.renderSettingsEditor()))), _.div({ class: 'editor-footer' }, _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-embedded' }, 'Advanced').click(function () {
             view.onClickAdvanced();
         }), view.$saveBtn = _.button({ class: 'btn btn-primary btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Save '), _.span({ class: 'text-working' }, 'Saving ')).click(function () {
             view.onClickSave();
@@ -37430,7 +37445,16 @@ class ContentEditor extends View {
         // JSON editor
         _.button({ class: 'btn btn-embedded' }, 'Advanced').click(() => {
             this.onClickAdvanced();
-        }), _.if(!this.model.locked,
+        }),
+
+        // View remote
+        _.if(this.model.properties.url && !this.model.unpublished, _.each(this.publishingSettings.connections, (i, connectionId) => {
+            let connection = resources.connections.filter(connection => {
+                return connection.id == connectionId;
+            })[0];
+
+            return _.a({ target: '_blank', href: connection.url + this.model.properties.url, class: 'btn btn-embedded' }, 'View on ' + connection.title);
+        })), _.if(!this.model.locked,
         // Save & publish
         _.div({ class: 'btn-group-save-publish raised' }, this.$saveBtn = _.button({ class: 'btn btn-save btn-primary' }, _.span({ class: 'text-default' }, 'Save'), _.span({ class: 'text-working' }, 'Saving')).click(() => {
             this.onClickSave(this.publishingSettings);
@@ -43805,6 +43829,10 @@ class Connection extends Entity {
         params.provideTemplates = params.provideTemplates == 'true' || params.provideTemplates == true || false;
 
         super(params);
+
+        if (!this.url) {
+            this.url = this.getRemoteUrl();
+        }
     }
 
     structure() {
@@ -43813,6 +43841,7 @@ class Connection extends Entity {
         this.def(String, 'id');
         this.def(String, 'title');
         this.def(String, 'type');
+        this.def(String, 'url');
         this.def(Boolean, 'provideTemplates');
         this.def(Boolean, 'provideMedia');
 
@@ -43855,6 +43884,15 @@ class Connection extends Entity {
         return new Promise((resolve, reject) => {
             resolve([]);
         });
+    }
+
+    /**
+     * Gets the remote URL
+     *
+     * @returns {String} URL
+     */
+    getRemoteUrl() {
+        return this.url;
     }
 
     /**

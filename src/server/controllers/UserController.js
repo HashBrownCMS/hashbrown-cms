@@ -35,7 +35,7 @@ class UserController extends ApiController {
             res.status(200).cookie('token', token).send(token);
         })
         .catch((e) => {
-            res.status(403).send(ApiController.error(e));
+            res.status(403).send(UserController.printError(e));
         });
     }
 
@@ -48,7 +48,7 @@ class UserController extends ApiController {
             res.status(200).send(msg);
         })
         .catch((e) => {
-            res.status(502).send(ApiController.error(e));
+            res.status(502).send(UserController.printError(e));
         });
     } 
 
@@ -65,7 +65,7 @@ class UserController extends ApiController {
             res.status(200).cookie('token', token).send(token);
         })
         .catch((e) => {
-            res.status(403).send(ApiController.error(e));   
+            res.status(403).send(UserController.printError(e));   
         });
     }
 
@@ -78,7 +78,7 @@ class UserController extends ApiController {
             res.send(user.scopes);
         })
         .catch((e) => {
-            res.status(403).send(ApiController.error(e));   
+            res.status(403).send(UserController.printError(e));   
         });
     }
     
@@ -93,7 +93,7 @@ class UserController extends ApiController {
             res.status(200).send(users);
         })
         .catch((e) => {
-            res.status(403).send(ApiController.error(e));   
+            res.status(403).send(UserController.printError(e));   
         });
     }
     
@@ -108,7 +108,7 @@ class UserController extends ApiController {
             res.status(200).send(user);
         })
         .catch((e) => {
-            res.status(403).send(ApiController.error(e));   
+            res.status(403).send(UserController.printError(e));   
         });
     }
 
@@ -124,7 +124,7 @@ class UserController extends ApiController {
             res.status(200).send(user);
         })
         .catch((e) => {
-            res.status(403).send(ApiController.error(e));   
+            res.status(403).send(UserController.printError(e));   
         });
     }
     
@@ -140,7 +140,7 @@ class UserController extends ApiController {
             res.status(200).send(user);
         })
         .catch((e) => {
-            res.status(502).send(ApiController.error(e));
+            res.status(502).send(UserController.printError(e));
         });
     }
     
@@ -157,7 +157,7 @@ class UserController extends ApiController {
             res.status(200).send(user);
         })
         .catch((e) => {
-            res.status(403).send(ApiController.error(e));   
+            res.status(403).send(UserController.printError(e));   
         });
     }
 }

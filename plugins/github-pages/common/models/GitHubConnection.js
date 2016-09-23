@@ -17,6 +17,28 @@ class GitHubConnection extends Connection {
     }
 
     /**
+     * Gets the remote URL based on exisintg information
+     *
+     * @returns {String} URL
+     */
+    getRemoteUrl() {
+        if(this.url) {
+            return url;
+        }
+
+        if(this.settings.isLocal) {
+            return 'http://localhost:4000';
+        }
+
+        this.settings.repo = this.settings.repo || '';
+
+        let user = this.settings.repo.slice(0, this.settings.repo.indexOf('/'));
+        let repo = this.settings.repo.slice(this.settings.repo.indexOf('/') + 1);
+
+        return 'http://' + user + '.github.io/' + repo;
+    }
+
+    /**
      * Gets API URL appendix
      *
      * @returns {String} Appendix

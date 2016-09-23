@@ -23,7 +23,7 @@ class ScheduleController extends ApiController {
             res.status(200).send(tasks);
         })
         .catch((e) => {
-            res.status(400).send(ApiController.error(e));
+            res.status(400).send(ScheduleController.printError(e));
         });
     }
 }

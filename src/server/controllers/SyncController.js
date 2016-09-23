@@ -20,7 +20,7 @@ class SyncController extends ApiController {
             res.status(200).send(token);
         })
         .catch((e) => {
-            res.status(402).send(ApiController.error(e));
+            res.status(402).send(SyncController.printError(e));
         });
     }
 }

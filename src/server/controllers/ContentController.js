@@ -32,7 +32,7 @@ class ContentController extends ApiController {
             res.send(nodes);
         })
         .catch((e) => {
-            res.status(502).send(ApiController.error(e));
+            res.status(502).send(ContentController.printError(e));
         });
     }
 
@@ -50,7 +50,7 @@ class ContentController extends ApiController {
                 res.status(200).send(node);
             })
             .catch((e) => {
-                res.status(502).send(ApiController.error(e));
+                res.status(502).send(ContentController.printError(e));
             });
         
         } else {
@@ -73,7 +73,7 @@ class ContentController extends ApiController {
             res.status(200).send(node);
         })
         .catch((e) => {
-            res.status(502).send(ApiController.error(e));
+            res.status(502).send(ContentController.printError(e));
         });
     }
 
@@ -89,7 +89,7 @@ class ContentController extends ApiController {
             res.status(200).send(node);
         })
         .catch((e) => {
-            res.status(502).send(ApiController.error(e));   
+            res.status(502).send(ContentController.printError(e));   
         });
     }
    
@@ -104,7 +104,7 @@ class ContentController extends ApiController {
             res.status(200).send(req.body);
         })
         .catch((e) => {
-            res.status(502).send(ApiController.error(e));   
+            res.status(502).send(ContentController.printError(e));   
         });
     }
     
@@ -119,7 +119,7 @@ class ContentController extends ApiController {
             res.status(200).send(content);
         })
         .catch((e) => {
-            res.status(502).send(ApiController.error(e));
+            res.status(502).send(ContentController.printError(e));
         });
     }
 
@@ -135,7 +135,7 @@ class ContentController extends ApiController {
             res.status(200).send(id);
         })
         .catch((e) => {
-            res.status(502).send(ApiController.error(e));
+            res.status(502).send(ContentController.printError(e));
         });
     }
 }

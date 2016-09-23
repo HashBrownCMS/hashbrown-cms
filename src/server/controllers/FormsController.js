@@ -39,7 +39,7 @@ class FormsController extends ApiController {
             res.status(200).send(forms);
         })
         .catch((e) => {
-            res.status(502).send(e.message);
+            res.status(502).send(FormsController.printError(e));
         });
     }
     
@@ -52,7 +52,7 @@ class FormsController extends ApiController {
             res.status(200).send('OK');
         })
         .catch((e) => {
-            res.status(502).send(e.message);
+            res.status(502).send(FormsController.printError(e));
         });
     }
 
@@ -65,7 +65,7 @@ class FormsController extends ApiController {
             res.status(200).send(form.getObject());
         })
         .catch((e) => {
-            res.status(502).send(e.message);
+            res.status(502).send(FormsController.printError(e));
         });
     }
     
@@ -78,7 +78,7 @@ class FormsController extends ApiController {
             res.status(200).send(form.getObject());
         })
         .catch((e) => {
-            res.status(502).send(e.message);
+            res.status(502).send(FormsController.printError(e));
         });
     }
 
@@ -91,7 +91,7 @@ class FormsController extends ApiController {
             res.status(200).send(form.id);
         })
         .catch((e) => {
-            res.status(502).send(e.message);
+            res.status(502).send(FormsController.printError(e));
         });
     }
 
@@ -112,7 +112,7 @@ class FormsController extends ApiController {
                 }
             })
             .catch((e) => {
-                res.status(400).send(e.message);
+                res.status(400).send(FormsController.printError(e));
             });
         } else {
             res.status(400).send('Submission spam prevention timeout not yet passed');

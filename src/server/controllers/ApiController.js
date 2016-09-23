@@ -169,13 +169,13 @@ class ApiController extends Controller {
     }
 
     /**
-     * Error reporting
+     * Prints a formatted error and logs it
      *
      * @param {Error} error
      *
      * @returns {String} Pretty print for the error message
      */
-     static error(error) {
+     static printError(error) {
         if(!error) {
             return 'Unspecified error';
         }
