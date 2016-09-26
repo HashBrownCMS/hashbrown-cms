@@ -31202,7 +31202,7 @@ class ProjectEditor extends View {
                     title: 'Delete project',
                     body: _.div({}, _.p('Please type in the project name to confirm'), _.input({ class: 'form-control', type: 'text', placeholder: 'Project name' }).on('change propertychange input keyup paste', function () {
                         let $btn = modal.$element.find('.btn-danger');
-                        let isMatch = $(this).val() == view.model.name;
+                        let isMatch = $(this).val() == view.model.settings.info.name;
 
                         $btn.attr('disabled', !isMatch);
                         $btn.toggleClass('disabled', !isMatch);
@@ -31216,7 +31216,7 @@ class ProjectEditor extends View {
                     class: 'btn-danger disabled',
                     disabled: true,
                     callback: () => {
-                        apiCall('delete', 'server/projects/' + this.model.name).then(() => {
+                        apiCall('delete', 'server/projects/' + this.model.id).then(() => {
                             location.reload();
                         }).catch(errorModal);
                     }
@@ -31882,13 +31882,16 @@ class Project extends Entity {
         let project = new Project();
 
         let id = name.toLowerCase();
-        id = id.replace(/[^a-z_.]/g, '');
+        id = id.replace('.', '_');
+        id = id.replace(/[^a-z_]/g, '');
 
         project.id = id;
         project.settings.info = {
             section: 'info',
             name: name
         };
+
+        return project;
     }
 }
 

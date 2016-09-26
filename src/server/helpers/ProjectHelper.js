@@ -167,12 +167,12 @@ class ProjectHelper {
     static createProject(name, userId) {
         return new Promise((resolve, reject) => {
             if(name && userId) {
-                let project = new Project(name);
+                let project = Project.create(name);
 
                 MongoHelper.insertOne(project.id, 'settings', project.settings.info)
                 .then(() => {
                     // The user that creates a project gets all scopes
-                    return UserHelper.addUserProjectScope(userId, name, [ 'users', 'settings', 'connections', 'schemas' ]);
+                    return UserHelper.addUserProjectScope(userId, project.id, [ 'users', 'settings', 'connections', 'schemas' ]);
                 })
                 .then(resolve)
                 .catch(reject);

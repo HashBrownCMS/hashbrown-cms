@@ -14,13 +14,16 @@ class Project extends Entity {
         let project = new Project();
 
         let id = name.toLowerCase();
-        id = id.replace(/[^a-z_.]/g, '');
+        id = id.replace('.', '_');
+        id = id.replace(/[^a-z_]/g, '');
         
         project.id = id;
         project.settings.info = {
             section: 'info',
             name: name
         };
+
+        return project;
     }
 }
 

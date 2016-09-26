@@ -42,7 +42,7 @@ class ProjectEditor extends View {
                         _.input({class: 'form-control', type: 'text', placeholder: 'Project name'})
                             .on('change propertychange input keyup paste', function() {
                                 let $btn = modal.$element.find('.btn-danger');
-                                let isMatch = $(this).val() == view.model.name;
+                                let isMatch = $(this).val() == view.model.settings.info.name;
                                 
                                 $btn.attr('disabled', !isMatch);
                                 $btn.toggleClass('disabled', !isMatch);
@@ -59,7 +59,7 @@ class ProjectEditor extends View {
                         class: 'btn-danger disabled',
                         disabled: true,
                         callback: () => {
-                            apiCall('delete', 'server/projects/' + this.model.name)
+                            apiCall('delete', 'server/projects/' + this.model.id)
                             .then(() => {
                                 location.reload();
                             })

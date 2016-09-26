@@ -727,8 +727,6 @@ img.logo {
             text-transform: uppercase;
             font-weight: bold;
             margin-right: 15px; }
-            .cms-container .workspace .editor .editor-footer .btn-group .btn:last-child {
-              margin-right: 0px; }
             .cms-container .workspace .editor .editor-footer .btn-group .btn span {
               line-height: 20px; }
               .cms-container .workspace .editor .editor-footer .btn-group .btn span.fa {

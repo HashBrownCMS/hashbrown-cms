@@ -37460,12 +37460,20 @@ class ContentEditor extends View {
         }),
 
         // View remote
-        _.if(this.model.properties.url && !this.model.unpublished, _.each(this.publishingSettings.connections, (i, connectionId) => {
+        _.if(this.model.properties && this.model.properties.url && !this.model.unpublished, _.each(this.publishingSettings.connections, (i, connectionId) => {
             let connection = resources.connections.filter(connection => {
                 return connection.id == connectionId;
             })[0];
 
-            return _.a({ target: '_blank', href: connection.url + this.model.properties.url, class: 'btn btn-embedded' }, 'View on ' + connection.title);
+            let url = this.model.properties.url;
+
+            if (url instanceof Object) {
+                url = url[window.language];
+            }
+
+            if (connection) {
+                return _.a({ target: '_blank', href: connection.url + url, class: 'btn btn-embedded' }, 'View on ' + connection.title);
+            }
         })), _.if(!this.model.locked,
         // Save & publish
         _.div({ class: 'btn-group-save-publish raised' }, this.$saveBtn = _.button({ class: 'btn btn-save btn-primary' }, _.span({ class: 'text-default' }, 'Save'), _.span({ class: 'text-working' }, 'Saving')).click(() => {
@@ -43719,23 +43727,23 @@ class LanguageHelper {
      * @returns {Promise} promise
      */
     static toggleLanguage(language, state) {
-        return new Promise(callback => {
-            SettingsHelper.getSettings('language').then(settings => {
-                if (!settings.selected || settings.selected.length < 1) {
-                    settings.selected = ['en'];
-                }
+        return SettingsHelper.getSettings('language').then(settings => {
+            if (!(settings instanceof Object)) {
+                settings = {};
+            }
 
-                if (!state && settings.selected.indexOf(language) > -1) {
-                    settings.selected.splice(settings.selected.indexOf(language), 1);
-                } else if (state && settings.selected.indexOf(language) < 0) {
-                    settings.selected.push(language);
-                    settings.selected.sort();
-                }
+            if (!settings.selected || settings.selected.length < 1) {
+                settings.selected = ['en'];
+            }
 
-                SettingsHelper.setSettings('language', settings).then(() => {
-                    callback();
-                });
-            });
+            if (!state && settings.selected.indexOf(language) > -1) {
+                settings.selected.splice(settings.selected.indexOf(language), 1);
+            } else if (state && settings.selected.indexOf(language) < 0) {
+                settings.selected.push(language);
+                settings.selected.sort();
+            }
+
+            return SettingsHelper.setSettings('language', settings);
         });
     }
 

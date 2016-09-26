@@ -44,28 +44,27 @@ class LanguageHelper {
      * @returns {Promise} promise
      */
     static toggleLanguage(language, state) {
-        return new Promise((callback) => {
-            SettingsHelper.getSettings('language')
-            .then((settings) => {
-                if(!settings.selected || settings.selected.length < 1) {
-                    settings.selected = ['en'];
-                }
-            
-                if(!state && settings.selected.indexOf(language) > -1) {
-                    settings.selected.splice(settings.selected.indexOf(language), 1);
+        return SettingsHelper.getSettings('language')
+        .then((settings) => {
+            if(!(settings instanceof Object)) {
+                settings = {};
+            }
 
-                } else if(state && settings.selected.indexOf(language) < 0) {
-                    settings.selected.push(language);
-                    settings.selected.sort();
+            if(!settings.selected || settings.selected.length < 1) {
+                settings.selected = ['en'];
+            }
+        
+            if(!state && settings.selected.indexOf(language) > -1) {
+                settings.selected.splice(settings.selected.indexOf(language), 1);
 
-                }
+            } else if(state && settings.selected.indexOf(language) < 0) {
+                settings.selected.push(language);
+                settings.selected.sort();
 
-                SettingsHelper.setSettings('language', settings)
-                .then(() => {
-                    callback()
-                });
-            });  
-        });
+            }
+
+            return SettingsHelper.setSettings('language', settings);
+        });  
     }
 
     /**
