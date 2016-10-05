@@ -148,12 +148,12 @@ class ProjectEditor extends View {
      */
     onClickCreateBackup() {
         if(this.isAdmin()) {
-            apiCall('post', 'server/backups/' + this.model.name + '/new')
+            apiCall('post', 'server/backups/' + this.model.id + '/new')
             .then((data) => {
                 new MessageModal({
                     model: {
                         title: 'Success',
-                        body: 'Project "' + this.model.name + '" was backed up successfully'
+                        body: 'Project "' + this.model.id + '" was backed up successfully'
                     },
                     buttons: [
                         {
@@ -196,12 +196,12 @@ class ProjectEditor extends View {
                         label: 'Restore',
                         class: 'btn-danger',
                         callback: () => {
-                            apiCall('post', 'server/backups/' + this.model.name + '/' + timestamp + '/restore')
+                            apiCall('post', 'server/backups/' + this.model.id + '/' + timestamp + '/restore')
                             .then(() => {
                                 new MessageModal({
                                     model: {
                                         title: 'Success',
-                                        body: 'Project "' + this.model.name + '" was restored successfully to ' + label
+                                        body: 'Project "' + this.model.id + '" was restored successfully to ' + label
                                     },
                                     buttons: [
                                         {
@@ -246,7 +246,7 @@ class ProjectEditor extends View {
                         label: 'Delete',
                         class: 'btn-danger',
                         callback: () => {
-                            apiCall('delete', 'server/backups/' + this.model.name + '/' + timestamp)
+                            apiCall('delete', 'server/backups/' + this.model.id + '/' + timestamp)
                             .then(() => {
                                 location.reload();
                             })
@@ -266,7 +266,7 @@ class ProjectEditor extends View {
             new MessageModal({
                 model: {
                     class: 'modal-project-admin',
-                    title: this.model.name + ' backups',
+                    title: this.model.id + ' backups',
                     body: _.div({},
                         // List existing backups
                         _.if(this.model.backups.length > 0,
@@ -292,7 +292,7 @@ class ProjectEditor extends View {
                                             ),
                                             _.li(
                                                 // Download backup
-                                                _.a({class: 'dropdown-item', href: apiUrl('server/backups/' + this.model.name + '/' + backup + '.hba')},
+                                                _.a({class: 'dropdown-item', href: apiUrl('server/backups/' + this.model.id + '/' + backup + '.hba')},
                                                     'Download'
                                                 )
                                             ),
@@ -352,7 +352,7 @@ class ProjectEditor extends View {
 
             data.settings.replace = modal.$element.find('#switch-migration-replace').is(':checked');
             
-            apiCall('post', 'server/migrate/' + this.model.name, data)
+            apiCall('post', 'server/migrate/' + this.model.id, data)
             .then(() => {
                 messageModal('Success', 'Successfully migrated content from "' + data.from + '" to "' + data.to + '"');
             })
@@ -435,7 +435,7 @@ class ProjectEditor extends View {
     onClickAddEnvironment() {
         let modal = new MessageModal({
             model: {
-                title: 'New environment for "' + this.model.name + '"',
+                title: 'New environment for "' + this.model.id + '"',
                 body: _.input({class: 'form-control', type: 'text', placeholder: 'Type environment name here'})
             },
             buttons: [
@@ -447,7 +447,7 @@ class ProjectEditor extends View {
 
                         this.model.settings.environments.names.push(newName);
 
-                        apiCall('post', 'server/settings/' + this.model.name + '/environments', this.model.settings.environments)
+                        apiCall('post', 'server/settings/' + this.model.id + '/environments', this.model.settings.environments)
                         .then(() => {
                             messageModal('Succes', 'The new environment "' + newName + '" was created successfully', () => { location.reload(); });
                         })

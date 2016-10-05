@@ -44,18 +44,18 @@ class BackupHelper {
     /**
      * Gets a list of backups for a project
      *
-     * @param {String} projectName
+     * @param {String} id
      *
      * @returns {Array} List of backup names as strings
      */
-    static getBackupsForProject(projectName) {
+    static getBackupsForProject(id) {
         return new Promise((resolve, reject) => {
-            glob(appRoot + '/storage/' + projectName + '/dump/*.hba', (err, files) => {
+            glob(appRoot + '/storage/' + id + '/dump/*.hba', (err, files) => {
                 if(err) {
                     reject(new Error(err));
                 } else {
                     for(let i in files) {
-                        files[i] = files[i].replace(appRoot + '/storage/' + projectName + '/dump/', '').replace('.hba', '');
+                        files[i] = files[i].replace(appRoot + '/storage/' + id + '/dump/', '').replace('.hba', '');
                     }
 
                     resolve(files);
