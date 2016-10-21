@@ -99,7 +99,7 @@ class ProjectEditor extends View {
         function onSubmit(e) {
             e.preventDefault();
 
-            let apiPath = 'server/backups/' + view.model.name + '/upload';
+            let apiPath = 'server/backups/' + view.model.id + '/upload';
 
             $.ajax({
                 url: apiUrl(apiPath),
