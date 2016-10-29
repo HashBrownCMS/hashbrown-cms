@@ -12,6 +12,19 @@ class UserPane extends Pane {
         customApiCall('get', '/api/users')
         .then((users) => {
             /**
+             * Generate password
+             */
+            function generatePassword() {
+                var length = 8,
+                charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+                retVal = "";
+                for (var i = 0, n = charset.length; i < length; ++i) {
+                    retVal += charset.charAt(Math.floor(Math.random() * n));
+                }
+                return retVal;
+            }
+
+            /**
              * Event: On submit user changes
              */
             function onSubmit() {
@@ -54,7 +67,8 @@ class UserPane extends Pane {
                         location.hash = '/users/' + user.id;
                     })
                     .catch(errorModal);
-                
+            
+                // An email was provided, send invitation    
                 } else if(isEmail) {
                     let modal = new MessageModal({
                         model: {
@@ -87,8 +101,48 @@ class UserPane extends Pane {
                         ]
                     });
                
+                // User doesn't exist, create it
                 } else {
-                    errorModal('Add user', 'The user "' + username + '" could not be found');
+                    let $passwd;
+
+                    let modal = new MessageModal({
+                        model: {
+                            title: 'Add user',
+                            body: _.div({},
+                                _.p('Set password for new user "' + username + '"'),
+                                $passwd = _.input({required: true, pattern: '.{6,}', class: 'form-control', type: 'text', value: generatePassword(), placeholder: 'Type new password'})
+                            )
+                        },
+                        buttons: [
+                            {
+                                label: 'Cancel',
+                                class: 'btn-default'
+                            },
+                            {
+                                label: 'Create',
+                                class: 'btn-primary',
+                                callback: () => {
+                                    let password = $passwd.val() || '';
+                                    let scopes = {};
+                                    scopes[ProjectHelper.currentProject] = [];
+
+                                    apiCall('post', 'users/new', {
+                                        username: username,
+                                        password: password,
+                                        scopes: scopes
+                                    })
+                                    .then(() => {
+                                        messageModal('Create user', 'User "' + username + '" was created with password "' + password + '".', () => { location.reload(); });
+                                    })
+                                    .catch(errorModal);
+
+                                    let $buttons = modal.$element.find('button').attr('disabled', true).addClass('disabled');
+
+                                    return false;
+                                }
+                            }
+                        ]
+                    });
                 
                 }
             }

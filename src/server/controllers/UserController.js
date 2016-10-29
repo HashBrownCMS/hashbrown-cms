@@ -152,7 +152,7 @@ class UserController extends ApiController {
         let password = req.body.password;
         let scopes = req.body.scopes;
 
-        UserHelper.createUser(username, password, scopes)
+        UserHelper.createUser(username, password, false, scopes)
         .then((user) => {
             res.status(200).send(user);
         })
