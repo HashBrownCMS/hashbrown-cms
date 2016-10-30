@@ -81,7 +81,7 @@ class InfoSettings extends View {
                     _.h4('Info')
                 ),
                 _.div({class: 'editor-body'},
-                    this.renderField('Project name', this.renderProjectNameEditor()),
+                    this.renderField('Project name', this.renderProjectNameEditor())
                 ),
                 _.div({class: 'editor-footer panel panel-default panel-buttons'}, 
                     _.div({class: 'btn-group'},

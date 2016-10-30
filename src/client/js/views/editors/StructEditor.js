@@ -20,8 +20,8 @@ class StructEditor extends View {
      * @param {String} key
      * @param {Object} keySchema
      */
-    onChange(newValue, key, schemaValue) {
-        if(schemaValue.multilingual) {
+    onChange(newValue, key, keySchema) {
+        if(keySchema.multilingual) {
             // Sanity check to make sure multilingual fields are accomodated for
             if(!this.value[key] || typeof this.value[key] !== 'object') {
                 this.value[key] = {};
@@ -46,32 +46,42 @@ class StructEditor extends View {
         // Render editor
         _.append(this.$element.empty(),
             // Loop through each key in the struct
-            _.each(this.config.struct, (k, schemaValue) => {
+            _.each(this.config.struct, (k, keySchema) => {
                 let value = this.value[k];
-                let fieldSchema = SchemaHelper.getFieldSchemaWithParentConfigs(schemaValue.schemaId);
+
+                if(!keySchema.schemaId) {
+                    errorModal(new Error('Schema id not set for key "' + k + '"'));
+                }
+
+                let fieldSchema = SchemaHelper.getFieldSchemaWithParentConfigs(keySchema.schemaId);
+
+                if(!fieldSchema) {
+                    errorModal(new Error('Field schema "' + keySchema.schemaId + '" could not be found for key " + k + "'));
+                }
+
                 let fieldEditor = resources.editors[fieldSchema.editorId];
 
                 // Sanity check
-                value = ContentHelper.fieldSanityCheck(value, schemaValue);
+                value = ContentHelper.fieldSanityCheck(value, keySchema);
                 this.value[k] = value;
 
                 // Init the field editor
                 let fieldEditorInstance = new fieldEditor({
-                    value: schemaValue.multilingual ? value[window.language] : value,
-                    disabled: schemaValue.disabled || false,
-                    config: schemaValue.config || fieldSchema.config || {},
-                    schema: schemaValue
+                    value: keySchema.multilingual ? value[window.language] : value,
+                    disabled: keySchema.disabled || false,
+                    config: keySchema.config || fieldSchema.config || {},
+                    schema: keySchema
                 });
 
                 // Hook up the change event
                 fieldEditorInstance.on('change', (newValue) => {
-                    this.onChange(newValue, k, schemaValue);
+                    this.onChange(newValue, k, keySchema);
                 });
 
                 // Return the DOM element
                 return _.div({class: 'kvp'},
                     _.div({class: 'key'},
-                        schemaValue.label
+                        keySchema.label
                     ),
                     _.div({class: 'value'},
                         fieldEditorInstance.$element
