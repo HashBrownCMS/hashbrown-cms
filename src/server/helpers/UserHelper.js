@@ -370,10 +370,11 @@ class UserHelper {
      * @param {String} username
      * @param {String} password
      * @param {Boolean} admin
+     * @param {Object} scopes
      *
      * @returns {Promise} promise
      */
-    static createUser(username, password, admin) {
+    static createUser(username, password, admin, scopes) {
         if(!username) {
             return new Promise((resolve, reject) => {
                 reject(new Error('Username was not provided'));
@@ -389,6 +390,7 @@ class UserHelper {
         let user = User.create(username, password);
 
         user.isAdmin = admin || false;
+        user.scopes = scopes || {};
 
         return MongoHelper.findOne(
             'users',
