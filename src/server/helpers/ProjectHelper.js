@@ -15,32 +15,52 @@ class ProjectHelper {
      * @returns {Promise} Promise
      */
     static setCurrent(projectId, environmentName) {
-        return new Promise((resolve, reject) => {
-            // First check if the project exists
-            this.getProject(projectId)
-            .then((project) => {
-                this.currentProject = project.id;
+        // First check if the project exists
+        return this.getProject(projectId)
+        .then((project) => {
+            this.currentProject = project.id;
 
-                // Environment is optional
-                if(environmentName) {
-                    // Then check if the environment is enabled
-                    if(project.settings.environments.names.indexOf(environmentName) > -1) {
-                        this.currentEnvironment = environmentName;
+            // Environment is optional
+            if(environmentName) {
+                // Then check if the environment is enabled
+                if(project.settings.environments.names.indexOf(environmentName) > -1) {
+                    this.currentEnvironment = environmentName;
 
-                        resolve();
+                    return Promise.resolve();
 
-                    } else {
-                        reject(new Error('Environment "' + environmentName + '" does not exist in project "' + project.id + '"'));
-
-                    }
-                
                 } else {
-                    resolve();
+                    return Promise.reject(new Error('Environment "' + environmentName + '" does not exist in project "' + project.id + '"'));
 
                 }
-            })
-            .catch(reject);
+            
+            } else {
+                return Promise.resolve();
+
+            }
         });
+    }
+
+    /**
+     * Gets current project and environment names
+     *
+     * @returns {Object} Project and environment names
+     */
+    static getCurrentNames() {
+        return {
+            project: ProjectHelper.currentProject,
+            environment: ProjectHelper.currentEnvironment
+        };
+    }
+    
+    /**
+     * Sets current project and environment names without checking
+     *
+     * @param {String} projectName
+     * @param {String} environmentName
+     */
+    static setCurrentNames(projectName, environmentName) {
+        ProjectHelper.currentProject = projectName;
+        ProjectHelper.currentEnvironment = environmentName;
     }
 
     /**

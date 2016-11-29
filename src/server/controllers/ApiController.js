@@ -59,44 +59,40 @@ class ApiController extends Controller {
      * @param {String} url
      */
     static setProjectVariables(url) {
-        return new Promise((resolve, reject) => {
-            let keys = [];
-            let re = pathToRegexp('/:root/:project/:environment/*', keys);
-            let values = re.exec(url);
-            let project = null;
-            let environment = null;
+        let keys = [];
+        let re = pathToRegexp('/:root/:project/:environment/*', keys);
+        let values = re.exec(url);
+        let project = null;
+        let environment = null;
 
-            if(values) {
-                // The first array item is the entire url, so remove it
-                values.shift();
+        if(values) {
+            // The first array item is the entire url, so remove it
+            values.shift();
 
-                for(let i in keys) {
-                    let key = keys[i];
+            for(let i in keys) {
+                let key = keys[i];
 
-                    switch(key.name) {
-                        case 'project':
-                            project = values[i];
-                            break;
+                switch(key.name) {
+                    case 'project':
+                        project = values[i];
+                        break;
 
-                        case 'environment':
-                            environment = values[i];
-                            break;
-                    }
+                    case 'environment':
+                        environment = values[i];
+                        break;
                 }
             }
+        }
 
-            // We have project (environment optional), we'll set them as current
-            if(project) {
-                ProjectHelper.setCurrent(project, environment)
-                .then(resolve)
-                .catch(reject);
-            
-            // The parameters weren't provided, so just move on
-            } else {
-                resolve();
+        // We have project (environment optional), we'll set them as current
+        if(project) {
+            return ProjectHelper.setCurrent(project, environment);
+        
+        // The parameters weren't provided, so just move on
+        } else {
+            return Promise.resolve();
 
-            }
-        });
+        }
     }
         
     /**
@@ -130,19 +126,15 @@ class ApiController extends Controller {
                 .then(() => {
                     // Using authentication
                     if(settings.authenticate != false) {
-                        ApiController.authenticate(token, settings.scope)
-                        .then(() => {
-                            next();
-                        })
-                        .catch((e) => {
-                            res.status(403).send(e.message);   
-                            debug.log(e.message, ApiController);
-                        });    
+                        return ApiController.authenticate(token, settings.scope);
                     
                     // No authentication needed
                     } else {
-                        next();
+                        return Promise.resolve();
                     }
+                })
+                .then(() => {
+                    next();
                 })
                 .catch((e) => {
                     res.status(400).send(e.message);

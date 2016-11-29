@@ -143,13 +143,13 @@ class ContentHelper extends ContentHelperCommon {
 
         // Check for empty Content object
         if(!content || Object.keys(content).length < 1) {
-            return new Promise((resolve, reject) => {
-                reject(new Error('Posted content with id "' + id + '" is empty'));
-            });
+            return Promise.reject(new Error('Posted content with id "' + id + '" is empty'));
 
         } else if(content.parentId) {
             return this.isSchemaAllowedAsChild(content.parentId, content.schemaId)
-            .then(updateContent);
+            .then(() => {
+                return updateContent();
+            });
 
         } else {
             return updateContent();
@@ -166,32 +166,33 @@ class ContentHelper extends ContentHelperCommon {
      * @return {Promise} New Content object
      */
     static createContent(schemaId, parentId) {
-        return new Promise((resolve, reject) => {
-            this.isSchemaAllowedAsChild(parentId, schemaId)
+        return this.isSchemaAllowedAsChild(parentId, schemaId)
+        .then(() => {
+            return SchemaHelper.getSchemaById(schemaId);
+        })
+        .then((schema) => {
+            let content = Content.create(schema.id);
+            let collection = ProjectHelper.currentEnvironment + '.content';
+
+            debug.log('Creating content "' + content.id + '"...', this);
+
+            content.createdBy = UserHelper.current.id;
+            content.updatedBy = content.createdBy;
+
+            if(parentId) {
+                content.parentId = parentId;
+            }
+
+            return MongoHelper.insertOne(
+                ProjectHelper.currentProject,
+                collection,
+                content.getFields()
+            )
             .then(() => {
-                SchemaHelper.getSchemaById(schemaId)
-                .then((schema) => {
-                    let content = Content.create(schema.id);
-                    let collection = ProjectHelper.currentEnvironment + '.content';
+                debug.log('Content "' + content.id + '" created and inserted into "' + ProjectHelper.currentProject + '.' + collection + '"', this);
 
-                    content.createdBy = UserHelper.current.id;
-                    content.updatedBy = content.createdBy;
-
-                    if(parentId) {
-                        content.parentId = parentId;
-                    }
-
-                    MongoHelper.insertOne(
-                        ProjectHelper.currentProject,
-                        collection,
-                        content.getFields()
-                    )
-                    .then(resolve)
-                    .catch(reject);
-                })
-                .catch(reject);
-            })
-            .catch(reject);
+                return Promise.resolve(content);
+            });
         });
     }
     
