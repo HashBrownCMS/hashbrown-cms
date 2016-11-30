@@ -311,7 +311,7 @@ class SyncSettings extends View {
                     this.renderField('API Token', this.renderTokenEditor()),
                     this.renderField('Project', this.renderProjectNameEditor()),
                     this.renderField('Environment', this.renderEnvironmentNameEditor()),
-                    this.renderField('Content<br/>(Depends on Schemas)', this.renderContentSwitch()),
+                    this.renderField('Content', this.renderContentSwitch()),
                     this.renderField('Schemas', this.renderSchemaSwitch()),
                     this.renderField('Media tree', this.renderMediaTreeSwitch())
                 ),
