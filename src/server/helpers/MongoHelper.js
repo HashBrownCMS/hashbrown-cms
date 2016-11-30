@@ -69,6 +69,7 @@ class MongoHelper {
             
             } else {
                 args.push('--archive=' + archivePath);
+                args.push('--db=' + databaseName);
 
                 let mongorestore = spawn('mongorestore', args);
 

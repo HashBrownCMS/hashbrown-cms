@@ -130,8 +130,7 @@ class MediaController extends ApiController {
             res.status(200).send(media);
         })
         .catch((e) => {
-            debug.log(e.message, MediaController);
-            res.status(404).send([]);    
+            res.status(404).send(ApiController.printError(e));    
         });            
     }
     

@@ -152,7 +152,7 @@ class ApiController extends Controller {
                     debug.log(e.message, ApiController);
                 });    
 
-            // Neither project parameter not authentication needed
+            // Neither project parameter nor authentication needed
             } else {
                 next();
             
