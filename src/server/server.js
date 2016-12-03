@@ -147,7 +147,7 @@ function ready() {
     .then((result) => {
         if(result == 'proceed') {
             // Start server
-            let port = 80;
+            let port = process.env.PORT || 80;
 
             global.server = app.listen(port);
 

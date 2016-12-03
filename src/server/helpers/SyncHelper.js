@@ -144,6 +144,9 @@ class SyncHelper {
                         if(data instanceof Error) {
                             reject(data);
                         
+                        } else if(typeof data === 'string') {
+                            reject(new Error(data));
+           
                         } else {
                             resolve(data);
                         
@@ -182,7 +185,10 @@ class SyncHelper {
                     let remoteItem = remoteResource[r];
 
                     if(!remoteItem) {
-                        debug.log('"' + r + '" is null in remote resource "' + remoteResourceName + '"', this);
+                        debug.log('"' + r + '" in remote resource "' + remoteResourceName + '" is null', this);
+
+                    } else if(typeof remoteItem !== 'object') {
+                        debug.log('"' + r + '" in remote resource "' + remoteResourceName + '" is not an object: ' + remoteItem, this);
 
                     } else {
                         remoteItem.locked = true;

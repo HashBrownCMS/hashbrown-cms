@@ -157,9 +157,7 @@ class SchemaHelper extends SchemaHelperCommon {
                 allSchemas[id] = customSchemas[id];
             }
 
-            return new Promise((resolve) => {
-                resolve(allSchemas);
-            });
+            return Promise.resolve(allSchemas);
         });
     }
 

@@ -61,21 +61,23 @@ window.clearWorkspace = function clearWorkspace() {
  * Reloads a resource
  */
 window.reloadResource = function reloadResource(name) {
-    return new Promise(function(callback) {
+    return new Promise((resolve, reject) => {
         $.ajax({
             type: 'GET',
             url: apiUrl(name),
             success: function(result) {
                 window.resources[name] = result;
 
-                callback(result);
+                resolve(result);
             },
             error: function(e) {
                 if(e.status == 403) {
                     location = '/login/?path=' + location.pathname + location.hash;
-                }
                 
-                callback(null);
+                } else {
+                    reject(new Error(e.responseText));
+                
+                }
             }
         });
     });
@@ -87,39 +89,39 @@ window.reloadResource = function reloadResource(name) {
 window.reloadAllResources = function reloadAllResources() {
     $('.loading-messages').empty();
     
-    return new Promise(function(resolve) {
-        let queue = [
-            'content',
-            'schemas',
-            'media',
-            'connections',
-            'templates',
-            'sectionTemplates',
-            'forms',
-            'users'
-        ];
+    let queue = [
+        'content',
+        'schemas',
+        'media',
+        'connections',
+        'templates',
+        'sectionTemplates',
+        'forms',
+        'users'
+    ];
 
-        function processQueue(name) {
-            let $msg = _.div({'data-name': name}, 'Loading ' + name + '...');
+    function processQueue() {
+        let name = queue.pop();
 
-            $('.loading-messages').append($msg);
+        let $msg = _.div({'data-name': name}, 'Loading ' + name + '...');
 
-            window.reloadResource(name)
-            .then(function() {
-                $msg.append(' OK');
-                
-                queue.pop();
+        $('.loading-messages').append($msg);
 
-                if(queue.length < 1) {
-                    resolve();
-                }
-            });
-        }
+        return window.reloadResource(name)
+        .then(() => {
+            $msg.append(' OK');
+            
+            if(queue.length < 1) {
+                return Promise.resolve();
+            
+            } else {
+                return processQueue();
 
-        for(let name of queue) {
-            processQueue(name);
-        }
-    });
+            }
+        });
+    }
+
+    return processQueue();
 };
 
 /**
@@ -165,8 +167,13 @@ window.app = require('../../../package.json');
 // Preload resources 
 $(document).ready(() => {
     reloadAllResources()
-    .then(function() {
+    .then(() => {
         triggerReady('resources');
+    })
+    .catch((e) => {
+        triggerReady('resources');
+        
+        errorModal(e);
     });
 });
 
