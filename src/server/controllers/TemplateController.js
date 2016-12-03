@@ -23,8 +23,7 @@ class TemplateController extends ApiController {
             res.status(200).send(templates);
         })
         .catch((e) => {
-            // No template provider was found
-            res.status(404).send([]);
+            res.status(404).send(ApiController.printError(e, false));
         });            
     }
     
@@ -40,8 +39,7 @@ class TemplateController extends ApiController {
             res.status(200).send(templates);
         })
         .catch((e) => {
-            // No template provider was found
-            res.status(404).send([]);
+            res.status(404).send(ApiController.printError(e, false));
         });            
     }
 }

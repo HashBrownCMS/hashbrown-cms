@@ -45,9 +45,15 @@ class RichTextEditor extends View {
     /**
      * Event: Change input
      */
-    onChange() {
-        let data = this.editor.getData();
-        this.value = toMarkdown(data || '');
+    onChange(value) {
+        if(!value) {
+            let data = this.editor.getData();
+            this.value = toMarkdown(data || '');
+        
+        } else {
+            this.value = value;
+
+        }
         
         this.trigger('change', this.value);
     }
@@ -70,7 +76,6 @@ class RichTextEditor extends View {
             .catch(errorModal);
         });
     }
-
 
     render() {
         let $editable;
@@ -102,7 +107,7 @@ class RichTextEditor extends View {
 
                 removeButtons: 'Anchor,Styles,Underline,Subscript,Superscript,Source,SpecialChar,HorizontalRule,Maximize,Table',
 
-                format_tags: 'p;h1;h2;h3;pre',
+                format_tags: 'p;h1;h2;h3;h4;h5;h6;pre',
 
                 removeDialogTabs: 'image:advanced;link:advanced'
             }
@@ -127,6 +132,17 @@ class RichTextEditor extends View {
 
             // Insert text
             this.editor.setData(marked(this.value || ''));
+
+            // Find markdown editor button and attach events
+            this.$element.find('.cke_button__markdown').click(() => {
+                setTimeout(() => {
+                    let codeMirror = this.$element.find('.CodeMirror')[0].CodeMirror;
+
+                    codeMirror.on('change', () => {
+                        this.onChange(codeMirror.getValue());
+                    });
+                }, 50);
+            });
         });
     }
 }

@@ -56,7 +56,7 @@ class ContentEditor extends View {
                     return apiCall('post', 'content/publish', this.model);
                 }
             } else {
-                return new Promise((resolve) => { resolve(); });
+                return Promise.resolve();
             }
         }
 
@@ -71,9 +71,15 @@ class ContentEditor extends View {
 
         // Save content to database
         apiCall('post', 'content/' + this.model.id, this.model)
-        .then(publishConnections())
-        .then(reloadResource('content'))
-        .then(reloadView)
+        .then(() => {
+            return publishConnections();
+        })
+        .then(() => {
+            return reloadResource('content');
+        })
+        .then(() => {
+            reloadView();
+        })
         .catch(errorModal);
     }
 

@@ -69,7 +69,7 @@ class MediaController extends ApiController {
             }
         })
         .catch((e) => {
-            res.status(404).end(e.message);  
+            res.status(404).end(ApiController.printError(e, false));  
         });
     }
     
@@ -82,8 +82,7 @@ class MediaController extends ApiController {
             res.status(200).send(tree);
         })
         .catch((e) => {
-            res.status(404).send([]);
-            debug.log(e, ApiController);
+            res.status(404).send(ApiController.printError(e));
         });            
     }
     
@@ -99,8 +98,7 @@ class MediaController extends ApiController {
             res.status(200).send(item);
         })
         .catch((e) => {
-            res.status(502).send(e);
-            debug.log(e, ApiController);
+            res.status(502).send(ApiController.printError(e));
         });            
     }
     
@@ -130,7 +128,7 @@ class MediaController extends ApiController {
             res.status(200).send(media);
         })
         .catch((e) => {
-            res.status(404).send(ApiController.printError(e));    
+            res.status(404).send(ApiController.printError(e, false));    
         });            
     }
     
@@ -159,8 +157,7 @@ class MediaController extends ApiController {
             res.status(200).send(media);
         })
         .catch((e) => {
-            debug.log(e, MediaController);
-            res.status(404).send(e.message);    
+            res.status(404).send(ApiController.printError(e));    
         });            
     }
     
@@ -178,8 +175,7 @@ class MediaController extends ApiController {
             res.sendStatus(200);
         })
         .catch((e) => {
-            res.status(404).send(e.message);
-            debug.warning(e, MediaController);
+            res.status(404).send(ApiController.printError(e));
         });            
     }
 
@@ -205,12 +201,10 @@ class MediaController extends ApiController {
                 res.send(id);
             })            
             .catch((e) => {
-                debug.warning(e.message);
                 res.status(400).send(MediaController.printError(e));
             });            
 
         } else {
-            debug.warning(e.message);
             res.status(400).send(MediaController.printError(e));
         }
     }
@@ -232,7 +226,6 @@ class MediaController extends ApiController {
                 res.status(200).send(media.id);
             })
             .catch((e) => {
-                debug.warning(e);
                 res.status(400).send(MediaController.printError(e));    
             });
 

@@ -83,9 +83,8 @@ class ConnectionHelper extends ConnectionHelperCommon {
                 return nextConnection(0);
             
             } else {
-                return new Promise((resolve, reject) => {
-                    reject(new Error('No connections defined for content "' + content.id + '"'));
-                });
+                return Promise.reject(new Error('No connections defined for content "' + content.id + '"'));
+
             }
         });
     }

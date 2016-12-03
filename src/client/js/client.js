@@ -74,6 +74,9 @@ window.reloadResource = function reloadResource(name) {
                 if(e.status == 403) {
                     location = '/login/?path=' + location.pathname + location.hash;
                 
+                } else if(e.status == 404) {
+                    resolve([]);
+
                 } else {
                     reject(new Error(e.responseText));
                 

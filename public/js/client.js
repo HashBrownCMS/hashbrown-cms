@@ -35380,6 +35380,8 @@ window.reloadResource = function reloadResource(name) {
             error: function error(e) {
                 if (e.status == 403) {
                     location = '/login/?path=' + location.pathname + location.hash;
+                } else if (e.status == 404) {
+                    resolve([]);
                 } else {
                     reject(new Error(e.responseText));
                 }
@@ -37345,9 +37347,7 @@ class ContentEditor extends View {
                     return apiCall('post', 'content/publish', this.model);
                 }
             } else {
-                return new Promise(resolve => {
-                    resolve();
-                });
+                return Promise.resolve();
             }
         };
 
@@ -37361,7 +37361,13 @@ class ContentEditor extends View {
         this.$saveBtn.toggleClass('working', true);
 
         // Save content to database
-        apiCall('post', 'content/' + this.model.id, this.model).then(publishConnections()).then(reloadResource('content')).then(reloadView).catch(errorModal);
+        apiCall('post', 'content/' + this.model.id, this.model).then(() => {
+            return publishConnections();
+        }).then(() => {
+            return reloadResource('content');
+        }).then(() => {
+            reloadView();
+        }).catch(errorModal);
     }
 
     /**
@@ -40944,9 +40950,13 @@ class RichTextEditor extends View {
     /**
      * Event: Change input
      */
-    onChange() {
-        let data = this.editor.getData();
-        this.value = toMarkdown(data || '');
+    onChange(value) {
+        if (!value) {
+            let data = this.editor.getData();
+            this.value = toMarkdown(data || '');
+        } else {
+            this.value = value;
+        }
 
         this.trigger('change', this.value);
     }
@@ -40984,7 +40994,7 @@ class RichTextEditor extends View {
 
             removeButtons: 'Anchor,Styles,Underline,Subscript,Superscript,Source,SpecialChar,HorizontalRule,Maximize,Table',
 
-            format_tags: 'p;h1;h2;h3;pre',
+            format_tags: 'p;h1;h2;h3;h4;h5;h6;pre',
 
             removeDialogTabs: 'image:advanced;link:advanced'
         });
@@ -41008,6 +41018,17 @@ class RichTextEditor extends View {
 
             // Insert text
             this.editor.setData(marked(this.value || ''));
+
+            // Find markdown editor button and attach events
+            this.$element.find('.cke_button__markdown').click(() => {
+                setTimeout(() => {
+                    let codeMirror = this.$element.find('.CodeMirror')[0].CodeMirror;
+
+                    codeMirror.on('change', () => {
+                        this.onChange(codeMirror.getValue());
+                    });
+                }, 50);
+            });
         });
     }
 }
