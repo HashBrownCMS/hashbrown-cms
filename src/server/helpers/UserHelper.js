@@ -186,7 +186,7 @@ class UserHelper {
         return this.findUser(username)
         .then((user) => {
             if(user.validatePassword(password)) {
-                let token = user.generateToken();
+                let token = user.generateToken(persist);
                
                 user.cleanUpTokens();
 
