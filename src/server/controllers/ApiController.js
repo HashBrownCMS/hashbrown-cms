@@ -167,7 +167,9 @@ class ApiController extends Controller {
      *
      * @returns {String} Pretty print for the error message
      */
-     static printError(error, printToLog = true) {
+     static printError(error, printToLog) {
+        printToLog = printToLog != false;
+
         if(!error) {
             return 'Unspecified error';
         }
