@@ -150,7 +150,7 @@ class RichTextEditor extends View {
                     codeMirror.on('change', () => {
                         this.onChange(codeMirror.getValue());
                     });
-                }, 50);
+                }, 1000);
             });
         });
     }
