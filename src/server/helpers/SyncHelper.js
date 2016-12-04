@@ -178,8 +178,9 @@ class SyncHelper {
             let mergedResource;
 
             if(remoteResource) {
-                // Look for duplicates
-                let ids = {};
+                // Cache ids to look for duplicates
+                let remoteIds = {};
+                let duplicateIds = {};
                 
                 for(let r in remoteResource) {
                     let remoteItem = remoteResource[r];
@@ -194,36 +195,49 @@ class SyncHelper {
                         remoteItem.locked = true;
                         remoteItem.remote = true;
 
-                        ids[remoteItem.id] = true;
+                        remoteIds[remoteItem.id] = true;
 
                     }
                 }
 
+                // Look for duplicates and flag local nodes
                 for(let l in localResource) {
                     let localItem = localResource[l];
 
-                    if(ids[localItem.id] == true) {
-                        // Restore local project names
-                        ProjectHelper.setCurrentNames(localProjectNames.project, localProjectNames.environment);
-                        
-                        return new Promise((resolve, reject) => {
-                            reject(new Error('Resource "' + remoteItem.id + '" in "' + remoteResourceName + '" is a duplicate. Please resolve by removing local item.'));
-                        });
+                    if(remoteIds[localItem.id] == true) {
+                        localItem.local = true;
+                        duplicateIds[localItem.id] = true;
                     }
                 }
 
                 // Merge resources
                 if(remoteResource instanceof Array && localResource instanceof Array) {
-                    mergedResource = remoteResource.concat(localResource);
+                    mergedResource = [];
+                    
+                    for(let v of remoteResource) {
+                        if(duplicateIds[v.id] == true) { continue; }
+
+                        mergedResource[mergedResource.length] = v;
+                    }
+                    
+                    for(let v of localResource) {
+                        mergedResource[mergedResource.length] = v;
+                    }
                 
                 } else if(remoteResource instanceof Object && localResource instanceof Object) {
-                    mergedResource = Object.assign(localResource, remoteResource);
+                    mergedResource = {};
+                    
+                    for(let k in remoteResource) {
+                        mergedResource[k] = remoteResource[k];
+                    }
+                    
+                    for(let k in localResource) {
+                        mergedResource[k] = localResource[k];
+                    }
                 
                 } else {
-                    debug.log('Local and remote resources in "' + remoteResourceName + '" are not of same type', this);
-                    debug.log('Response from remote: ' + remoteResource, this);
-
-                    mergedResource = localResource;
+                    return Promise.reject(new Error('Local and remote resources in "' + remoteResourceName + '" are not of same type'));
+                
                 }
             
             } else {

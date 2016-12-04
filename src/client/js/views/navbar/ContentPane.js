@@ -389,16 +389,36 @@ class ContentPane extends Pane {
             icon: 'file',
             items: resources.content,
 
-            // Set item context menu
-            itemContextMenu: {
-                'This content': '---',
-                'New child content': () => { this.onClickNewContent($('.context-menu-target-element').data('id')); },
-                'Copy': () => { this.onClickCopyContent(); },
-                'Copy id': () => { this.onClickCopyItemId(); },
-                'Cut': () => { this.onClickCutContent(); },
-                'Paste': () => { this.onClickPasteContent(); },
-                'Remove': () => { this.onClickRemoveContent(); },
-                'Settings': () => { this.onClickContentSettings(); },
+            // Item context menu
+            getItemContextMenu: (item) => {
+                let menu = {};
+                
+                menu['This content'] = '---';
+                menu['New child content'] = () => { this.onClickNewContent($('.context-menu-target-element').data('id')); };
+                menu['Copy'] = () => { this.onClickCopyContent(); };
+                menu['Copy id'] = () => { this.onClickCopyItemId(); };
+                menu['Paste'] = () => { this.onClickPasteContent(); };
+
+                if(item.local) {
+                    menu['Commit to remote'] = () => { console.log('TODO: Implement pushing to remote'); };
+                }
+                
+                if(item.remote) {
+                    menu['Pull from remote'] = () => { console.log('TODO: Implement pulling from remote'); };
+                }
+
+                if(!item.remote && !item.locked) {
+                   menu['Settings'] = () => { this.onClickContentSettings(); };
+                    
+                    if(item.local) {
+                        menu['Remove local copy'] = () => { this.onClickRemoveContent(); };
+                    } else {
+                        menu['Cut'] = () => { this.onClickCutContent(); };
+                        menu['Remove'] = () => { this.onClickRemoveContent(); };
+                    }
+                }
+                
+                return menu;
             },
 
             // Set general context menu items

@@ -100,11 +100,30 @@ class SchemaPane extends Pane {
             items: resources.schemas,
 
             // Item context menu
-            itemContextMenu: {
-                'This schema': '---',
-                'New child schema': () => { this.onClickNewSchema(); },
-                'Copy id': () => { this.onClickCopyItemId(); },
-                'Remove': () => { this.onClickRemoveSchema(); }
+            getItemContextMenu: (item) => {
+                let menu = {};
+                
+                menu['This schema'] = '---';
+                menu['New child schema'] = () => { this.onClickNewSchema(); };
+                menu['Copy id'] = () => { this.onClickCopyItemId(); };
+
+                if(item.local) {
+                    menu['Commit to remote'] = () => { console.log('TODO: Implement pushing to remote'); };
+                }
+                
+                if(item.remote) {
+                    menu['Pull from remote'] = () => { console.log('TODO: Implement pulling from remote'); };
+                }
+
+                if(!item.remote && !item.locked) {
+                    if(item.local) {
+                        menu['Remove local copy'] = () => { this.onClickRemoveSchema(); };
+                    } else {
+                        menu['Remove'] = () => { this.onClickRemoveSchema(); };
+                    }
+                }
+                
+                return menu;
             },
 
             // Sorting logic

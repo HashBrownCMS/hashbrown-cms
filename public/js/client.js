@@ -40969,7 +40969,7 @@ class RichTextEditor extends View {
 
         mediaBrowser.on('select', id => {
             MediaHelper.getMediaById(id).then(media => {
-                let html = '<img alt="' + media.name + '" src="/' + media.url + '">';
+                let html = '<img data-id="' + id + '" alt="' + media.name + '" src="/' + media.url + '">';
 
                 this.editor.insertHtml(html);
 
@@ -41011,7 +41011,14 @@ class RichTextEditor extends View {
                 elements: {
                     // Refactor image src url to fit MediaController
                     img: element => {
-                        element.attributes.src = element.attributes.src.replace(/\/media\/([0-9a-z]{40})\/.+/g, '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/$1/');
+                        // Fetch from data attribute
+                        if (element.attributes['data-id']) {
+                            element.attributes.src = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + element.attributes['data-id'];
+
+                            // Failing that, use regex
+                        } else {
+                            element.attributes.src = element.attributes.src.replace(/\/media\/([0-9a-z]{40})\/.+/g, '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/$1/');
+                        }
                     }
                 }
             });
@@ -42051,30 +42058,56 @@ class ContentPane extends Pane {
             icon: 'file',
             items: resources.content,
 
-            // Set item context menu
-            itemContextMenu: {
-                'This content': '---',
-                'New child content': () => {
+            // Item context menu
+            getItemContextMenu: item => {
+                let menu = {};
+
+                menu['This content'] = '---';
+                menu['New child content'] = () => {
                     this.onClickNewContent($('.context-menu-target-element').data('id'));
-                },
-                'Copy': () => {
+                };
+                menu['Copy'] = () => {
                     this.onClickCopyContent();
-                },
-                'Copy id': () => {
+                };
+                menu['Copy id'] = () => {
                     this.onClickCopyItemId();
-                },
-                'Cut': () => {
-                    this.onClickCutContent();
-                },
-                'Paste': () => {
+                };
+                menu['Paste'] = () => {
                     this.onClickPasteContent();
-                },
-                'Remove': () => {
-                    this.onClickRemoveContent();
-                },
-                'Settings': () => {
-                    this.onClickContentSettings();
+                };
+
+                if (item.local) {
+                    menu['Commit to remote'] = () => {
+                        console.log('TODO: Implement pushing to remote');
+                    };
                 }
+
+                if (item.remote) {
+                    menu['Pull from remote'] = () => {
+                        console.log('TODO: Implement pulling from remote');
+                    };
+                }
+
+                if (!item.remote && !item.locked) {
+                    menu['Settings'] = () => {
+                        this.onClickContentSettings();
+                    };
+
+                    if (item.local) {
+                        menu['Remove local copy'] = () => {
+                            this.onClickRemoveContent();
+                        };
+                    } else {
+                        menu['Cut'] = () => {
+                            this.onClickCutContent();
+                        };
+                        menu['Remove'] = () => {
+                            this.onClickRemoveContent();
+                        };
+                    }
+                }
+
+                return menu;
             },
 
             // Set general context menu items
@@ -42657,12 +42690,27 @@ class NavbarMain extends View {
             let name = '';
 
             if (item.properties && item.properties.title) {
+                // Use title directly if available
                 if (typeof item.properties.title === 'string') {
                     name = item.properties.title;
-                } else if (typeof item.properties.title === 'object' && item.properties.title[window.language]) {
-                    name = item.properties.title[window.language];
-                } else {
-                    name = '(error)';
+                } else if (item.properties.title && typeof item.properties.title === 'object') {
+                    // Use the current language title
+                    if (item.properties.title[window.language]) {
+                        name = item.properties.title[window.language];
+
+                        // If no title was found, searh in other languages
+                    } else {
+                        name = '(Untitled)';
+
+                        for (let language in item.properties.title) {
+                            let languageTitle = item.properties.title[language];
+
+                            if (languageTitle) {
+                                name += ' - (' + language + ': ' + languageTitle + ')';
+                                break;
+                            }
+                        }
+                    }
                 }
             } else if (item.title && typeof item.title === 'string') {
                 name = item.title;
@@ -42704,7 +42752,8 @@ class NavbarMain extends View {
                 class: 'pane-item-container',
                 'data-routing-path': routingPath,
                 'data-locked': item.locked,
-                'data-remote': item.remote
+                'data-remote': item.remote,
+                'data-local': item.local
             }, _.a({
                 'data-id': id,
                 'data-name': name,
@@ -42713,7 +42762,9 @@ class NavbarMain extends View {
             }, $icon, _.span({ class: 'pane-item-label' }, name)), _.div({ class: 'children' }));
 
             // Attach item context menu
-            if (params.itemContextMenu) {
+            if (params.getItemContextMenu) {
+                $element.find('a').exocontext(params.getItemContextMenu(item));
+            } else if (params.itemContextMenu) {
                 $element.find('a').exocontext(params.itemContextMenu);
             }
 
@@ -43082,17 +43133,42 @@ class SchemaPane extends Pane {
             items: resources.schemas,
 
             // Item context menu
-            itemContextMenu: {
-                'This schema': '---',
-                'New child schema': () => {
+            getItemContextMenu: item => {
+                let menu = {};
+
+                menu['This schema'] = '---';
+                menu['New child schema'] = () => {
                     this.onClickNewSchema();
-                },
-                'Copy id': () => {
+                };
+                menu['Copy id'] = () => {
                     this.onClickCopyItemId();
-                },
-                'Remove': () => {
-                    this.onClickRemoveSchema();
+                };
+
+                if (item.local) {
+                    menu['Commit to remote'] = () => {
+                        console.log('TODO: Implement pushing to remote');
+                    };
                 }
+
+                if (item.remote) {
+                    menu['Pull from remote'] = () => {
+                        console.log('TODO: Implement pulling from remote');
+                    };
+                }
+
+                if (!item.remote && !item.locked) {
+                    if (item.local) {
+                        menu['Remove local copy'] = () => {
+                            this.onClickRemoveSchema();
+                        };
+                    } else {
+                        menu['Remove'] = () => {
+                            this.onClickRemoveSchema();
+                        };
+                    }
+                }
+
+                return menu;
             },
 
             // Sorting logic
@@ -44444,6 +44520,7 @@ class Content extends Entity {
     structure() {
         // Fundamental fields
         this.def(Boolean, 'locked');
+        this.def(Boolean, 'local');
         this.def(Boolean, 'remote');
         this.def(String, 'id');
         this.def(String, 'parentId');
@@ -44981,6 +45058,7 @@ let Entity = require('./Entity');
 class Media extends Entity {
     structure() {
         this.def(Boolean, 'locked');
+        this.def(Boolean, 'local');
         this.def(Boolean, 'remote');
         this.def(String, 'id');
         this.def(String, 'name');
@@ -45085,6 +45163,7 @@ let Entity = require('./Entity');
 class Schema extends Entity {
     structure() {
         this.def(Boolean, 'locked');
+        this.def(Boolean, 'local');
         this.def(Boolean, 'remote');
         this.def(String, 'id');
         this.def(String, 'name');

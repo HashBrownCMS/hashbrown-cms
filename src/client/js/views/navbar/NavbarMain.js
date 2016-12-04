@@ -107,12 +107,28 @@ class NavbarMain extends View {
                 let name = '';
 
                 if(item.properties && item.properties.title) {
+                    // Use title directly if available
                     if(typeof item.properties.title === 'string') {
                         name = item.properties.title;
-                    } else if(typeof item.properties.title === 'object' && item.properties.title[window.language]) {
-                        name = item.properties.title[window.language];
-                    } else {
-                        name = '(error)';
+
+                    } else if(item.properties.title && typeof item.properties.title === 'object') {
+                        // Use the current language title
+                        if(item.properties.title[window.language]) {
+                            name = item.properties.title[window.language];
+
+                        // If no title was found, searh in other languages
+                        } else {
+                            name = '(Untitled)';
+
+                            for(let language in item.properties.title) {
+                                let languageTitle = item.properties.title[language];
+
+                                if(languageTitle) {
+                                    name += ' - (' + language + ': ' + languageTitle + ')';
+                                    break;
+                                }
+                            }
+                        }
                     }
                 
                 } else if(item.title && typeof item.title === 'string') {
@@ -160,7 +176,8 @@ class NavbarMain extends View {
                     class: 'pane-item-container',
                     'data-routing-path': routingPath,
                     'data-locked': item.locked,
-                    'data-remote': item.remote
+                    'data-remote': item.remote,
+                    'data-local': item.local
                 },
                     _.a({
                         'data-id': id,
@@ -175,8 +192,12 @@ class NavbarMain extends View {
                 );
 
                 // Attach item context menu
-                if(params.itemContextMenu) {
+                if(params.getItemContextMenu) {
+                    $element.find('a').exocontext(params.getItemContextMenu(item));
+
+                } else if(params.itemContextMenu) {
                     $element.find('a').exocontext(params.itemContextMenu);
+
                 }
                 
                 // Add element to queue item

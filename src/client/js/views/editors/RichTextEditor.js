@@ -67,7 +67,7 @@ class RichTextEditor extends View {
         mediaBrowser.on('select', (id) => {
             MediaHelper.getMediaById(id)
             .then((media) => {
-                let html = '<img alt="' + media.name + '" src="/' + media.url + '">';
+                let html = '<img data-id="' + id + '" alt="' + media.name + '" src="/' + media.url + '">';
 
                 this.editor.insertHtml(html);
 
@@ -125,7 +125,16 @@ class RichTextEditor extends View {
                 elements: {
                     // Refactor image src url to fit MediaController
                     img: (element) => {
-                        element.attributes.src = element.attributes.src.replace(/\/media\/([0-9a-z]{40})\/.+/g, '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/$1/');
+                        // Fetch from data attribute
+                        if(element.attributes['data-id']) {
+                            element.attributes.src = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + element.attributes['data-id'];
+                        
+                        // Failing that, use regex
+                        } else {
+                            element.attributes.src = element.attributes.src.replace(/\/media\/([0-9a-z]{40})\/.+/g, '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/$1');
+                        
+                        }
+                        
                     }
                 }
             });

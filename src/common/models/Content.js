@@ -29,6 +29,7 @@ class Content extends Entity {
     structure() {
         // Fundamental fields
         this.def(Boolean, 'locked');
+        this.def(Boolean, 'local');
         this.def(Boolean, 'remote');
         this.def(String, 'id');
         this.def(String, 'parentId');
