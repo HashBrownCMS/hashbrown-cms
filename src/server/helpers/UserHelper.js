@@ -192,14 +192,11 @@ class UserHelper {
 
                 return this.updateUser(username, user.getObject())
                 .then(() => {
-                    return new Promise((resolve) => {
-                        resolve(token);
-                    });
+                    debug.log('User "' + username + '" logged in with token "' + token + '"', this);
+                    return Promise.resolve(token);
                 });
             } else {
-                return new Promise((resolve, reject) => {
-                    reject(new Error('Invalid password'));
-                });
+                return Promise.reject(new Error('Invalid password'));
             }
         });
     }
@@ -221,18 +218,14 @@ class UserHelper {
             for(let u of users) {
                 let user = new User(u);
                 
-                let valid = user.validateToken(token);
+                let isValid = user.validateToken(token);
 
-                if(valid) {
-                    return new Promise((resolve) => {
-                        resolve(user);
-                    });
+                if(isValid) {
+                    return Promise.resolve(user);
                 }
             }
 
-            return new Promise((resolve) => {
-                resolve(null);
-            });
+            return Promise.resolve(null);
         });
     }
     

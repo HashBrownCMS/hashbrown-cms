@@ -106,8 +106,6 @@ class User extends Entity {
             expires: expires
         };
 
-        this.cleanUpTokens();
-        
         this.tokens.push(token);
 
         return key;
@@ -124,7 +122,7 @@ class User extends Entity {
         for(let i = this.tokens.length - 1; i >= 0; i--) {
             let existingToken = this.tokens[i];
             let isExpired = existingToken.expires != false && existingToken.expires < Date.now();
-                
+
             if(isExpired) {
                 this.tokens.splice(i, 1);
             } else if(existingToken.key == token) {
@@ -141,7 +139,7 @@ class User extends Entity {
     cleanUpTokens() {
         for(let i = this.tokens.length - 1; i >= 0; i--) {
             let existingToken = this.tokens[i];
-            let isExpired = existingToken.expires < Date.now();
+            let isExpired = existingToken.expires != false && existingToken.expires < Date.now();
             
             if(isExpired) {
                 this.tokens.splice(i, 1);
