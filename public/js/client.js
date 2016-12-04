@@ -41017,7 +41017,7 @@ class RichTextEditor extends View {
 
                             // Failing that, use regex
                         } else {
-                            element.attributes.src = element.attributes.src.replace(/\/media\/([0-9a-z]{40})\/.+/g, '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/$1/');
+                            element.attributes.src = element.attributes.src.replace(/.+media\/([0-9a-z]{40})\/.+/g, '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/$1');
                         }
                     }
                 }
