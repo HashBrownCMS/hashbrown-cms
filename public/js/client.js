@@ -37379,26 +37379,19 @@ class ContentEditor extends View {
         let view = this;
 
         function unpublishConnections() {
-            apiCall('post', 'content/unpublish', view.model).then(onSuccess).catch(onError);
+            return apiCall('post', 'content/unpublish', view.model).then(() => {
+                return onSuccess();
+            });
         }
 
         function onSuccess() {
             debug.log('Removed content with id "' + view.model.id + '"', this);
 
-            reloadResource('content').then(function () {
+            return reloadResource('content').then(() => {
                 ViewHelper.get('NavbarMain').reload();
 
                 // Cancel the ContentEditor view
                 location.hash = '/content/';
-            });
-        }
-
-        function onError(err) {
-            new MessageModal({
-                model: {
-                    title: 'Error',
-                    body: err
-                }
             });
         }
 
@@ -37410,18 +37403,18 @@ class ContentEditor extends View {
             buttons: [{
                 label: 'Cancel',
                 class: 'btn-default',
-                callback: function callback() {}
+                callback: () => {}
             }, {
                 label: 'Delete',
                 class: 'btn-danger',
-                callback: function callback() {
-                    apiCall('delete', 'content/' + view.model.id).then(() => {
-                        if (publishing.connections && publishing.connections.length > 0) {
-                            unpublishConnections();
+                callback: () => {
+                    apiCall('delete', 'content/' + this.model.id).then(() => {
+                        if (!this.model.local && publishing.connections && publishing.connections.length > 0) {
+                            return unpublishConnections();
                         } else {
-                            onSuccess();
+                            return onSuccess();
                         }
-                    }).catch(onError);
+                    }).catch(errorModal);
                 }
             }]
         });
@@ -43169,6 +43162,34 @@ class SchemaPane extends Pane {
     }
 
     /**
+     * Event: Click pull Schema
+     */
+    static onClickPullSchema() {
+        let navbar = ViewHelper.get('NavbarMain');
+        let pullId = $('.context-menu-target-element').data('id');
+
+        apiCall('post', 'schemas/pull/' + pullId, {}).then(() => {
+            return reloadResource('schemas');
+        }).then(() => {
+            navbar.reload();
+        }).catch(errorModal);
+    }
+
+    /**
+     * Event: Click push Schema
+     */
+    static onClickPushSchema() {
+        let navbar = ViewHelper.get('NavbarMain');
+        let pushId = $('.context-menu-target-element').data('id');
+
+        apiCall('post', 'schemas/push/' + pushId).then(() => {
+            return reloadResource('schemas');
+        }).then(() => {
+            navbar.reload();
+        }).catch(errorModal);
+    }
+
+    /**
      * Gets the render settings
      *
      * @returns {Object} settings
@@ -43192,28 +43213,29 @@ class SchemaPane extends Pane {
                     this.onClickCopyItemId();
                 };
 
+                if (!item.local && !item.remote && !item.locked) {
+                    menu['Remove'] = () => {
+                        this.onClickRemoveSchema();
+                    };
+                }
+
+                if (item.local || item.remote) {
+                    menu['Sync'] = '---';
+                }
+
                 if (item.local) {
-                    menu['Commit to remote'] = () => {
-                        console.log('TODO: Implement pushing to remote');
+                    menu['Push to remote'] = () => {
+                        this.onClickPushSchema();
+                    };
+                    menu['Remove local copy'] = () => {
+                        this.onClickRemoveSchema();
                     };
                 }
 
                 if (item.remote) {
                     menu['Pull from remote'] = () => {
-                        console.log('TODO: Implement pulling from remote');
+                        this.onClickPullSchema();
                     };
-                }
-
-                if (!item.remote && !item.locked) {
-                    if (item.local) {
-                        menu['Remove local copy'] = () => {
-                            this.onClickRemoveSchema();
-                        };
-                    } else {
-                        menu['Remove'] = () => {
-                            this.onClickRemoveSchema();
-                        };
-                    }
                 }
 
                 return menu;

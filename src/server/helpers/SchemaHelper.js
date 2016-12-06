@@ -391,10 +391,11 @@ class SchemaHelper extends SchemaHelperCommon {
      *
      * @param {Number} id
      * @param {Object} schema
+     * @param {Boolean} create
      *
      * @return {Promise} Promise
      */
-    static setSchema(id, schema) {
+    static setSchema(id, schema, create) {
         let collection = ProjectHelper.currentEnvironment + '.schemas';
        
         schema = schema || {};
@@ -409,7 +410,10 @@ class SchemaHelper extends SchemaHelperCommon {
             {
                 id: id
             },
-            schema
+            schema,
+            {
+                upsert: create // Creates a schema if none existed
+            }
         );
     }
 

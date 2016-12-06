@@ -14,6 +14,8 @@ class SchemaController extends ApiController {
         app.get('/api/:project/:environment/schemas', this.middleware(), this.getSchemas);
         app.get('/api/:project/:environment/schemas/:id', this.middleware(), this.getSchema);
         
+        app.post('/api/:project/:environment/schemas/pull/:id', this.middleware(), this.pullSchema);
+        app.post('/api/:project/:environment/schemas/push/:id', this.middleware(), this.pushSchema);
         app.post('/api/:project/:environment/schemas/new', this.middleware({scope: 'schemas'}), this.createSchema);
         app.post('/api/:project/:environment/schemas/:id', this.middleware({scope: 'schemas'}), this.setSchema);
         
@@ -69,6 +71,47 @@ class SchemaController extends ApiController {
         .catch((e) => {
             res.status(502).send(SchemaController.printError(e));
         });
+    }
+    
+    /**
+     * Pulls Schema by id
+     */
+    static pullSchema(req, res) {
+        let id = req.params.id;
+
+        SyncHelper.getResourceItem('schemas', id)
+        .then((resourceItem) => {
+            if(!resourceItem) { return Promise.reject(new Error('Couldn\'t find remote Schema "' + id + '"')); }
+        
+            return SchemaHelper.setSchema(id, resourceItem, true)
+            .then(() => {
+                res.status(200).send(resourceItem);
+            });
+        })
+        .catch((e) => {
+            res.status(404).send(SchemaController.printError(e));   
+        }); 
+    }
+    
+    /**
+     * Pushes Schema by id
+     */
+    static pushSchema(req, res) {
+        let id = req.params.id;
+
+        SchemaHelper.getSchemaById(id)
+        .then((localSchema) => {
+            return SyncHelper.setResourceItem('schemas', id, localSchema);
+        })
+        .then(() => {
+            return SchemaHelper.removeSchemaById(id);
+        })
+        .then(() => {
+            res.status(200).send(id);
+        })
+        .catch((e) => {
+            res.status(404).send(SchemaController.printError(e));   
+        }); 
     }
     
     /**

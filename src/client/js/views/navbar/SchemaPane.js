@@ -86,6 +86,40 @@ class SchemaPane extends Pane {
         })
         .catch(navbar.onError);
     }
+    
+    /**
+     * Event: Click pull Schema
+     */
+    static onClickPullSchema() {
+        let navbar = ViewHelper.get('NavbarMain');
+        let pullId = $('.context-menu-target-element').data('id');
+
+        apiCall('post', 'schemas/pull/' + pullId, {})
+        .then(() => {
+            return reloadResource('schemas');
+        })
+        .then(() => {
+            navbar.reload();
+        }) 
+        .catch(errorModal);
+    }
+    
+    /**
+     * Event: Click push Schema
+     */
+    static onClickPushSchema() {
+        let navbar = ViewHelper.get('NavbarMain');
+        let pushId = $('.context-menu-target-element').data('id');
+
+        apiCall('post', 'schemas/push/' + pushId)
+        .then(() => {
+            return reloadResource('schemas');
+        })
+        .then(() => {
+            navbar.reload();
+        }) 
+        .catch(errorModal);
+    }
 
     /**
      * Gets the render settings
@@ -106,23 +140,24 @@ class SchemaPane extends Pane {
                 menu['This schema'] = '---';
                 menu['New child schema'] = () => { this.onClickNewSchema(); };
                 menu['Copy id'] = () => { this.onClickCopyItemId(); };
+                
+                if(!item.local && !item.remote && !item.locked) {
+                    menu['Remove'] = () => { this.onClickRemoveSchema(); };
+                }
+                
+                if(item.local || item.remote) {
+                    menu['Sync'] = '---';
+                }
 
                 if(item.local) {
-                    menu['Commit to remote'] = () => { console.log('TODO: Implement pushing to remote'); };
+                    menu['Push to remote'] = () => { this.onClickPushSchema(); };
+                    menu['Remove local copy'] = () => { this.onClickRemoveSchema(); };
                 }
                 
                 if(item.remote) {
-                    menu['Pull from remote'] = () => { console.log('TODO: Implement pulling from remote'); };
+                    menu['Pull from remote'] = () => { this.onClickPullSchema(); };
                 }
 
-                if(!item.remote && !item.locked) {
-                    if(item.local) {
-                        menu['Remove local copy'] = () => { this.onClickRemoveSchema(); };
-                    } else {
-                        menu['Remove'] = () => { this.onClickRemoveSchema(); };
-                    }
-                }
-                
                 return menu;
             },
 

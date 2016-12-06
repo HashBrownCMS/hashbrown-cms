@@ -99,29 +99,21 @@ class ContentEditor extends View {
         let view = this;
 
         function unpublishConnections() {
-            apiCall('post', 'content/unpublish', view.model)
-            .then(onSuccess)
-            .catch(onError);
+            return apiCall('post', 'content/unpublish', view.model)
+            .then(() => {
+                return onSuccess();
+            });
         }
         
         function onSuccess() {
             debug.log('Removed content with id "' + view.model.id + '"', this); 
         
-            reloadResource('content')
-            .then(function() {
+            return reloadResource('content')
+            .then(() => {
                 ViewHelper.get('NavbarMain').reload();
                 
                 // Cancel the ContentEditor view
                 location.hash = '/content/';
-            });
-        }
-
-        function onError(err) {
-            new MessageModal({
-                model: {
-                    title: 'Error',
-                    body: err
-                }
             });
         }
 
@@ -134,23 +126,22 @@ class ContentEditor extends View {
                 {
                     label: 'Cancel',
                     class: 'btn-default',
-                    callback: function() {
-                    }
+                    callback: () => {}
                 },
                 {
                     label: 'Delete',
                     class: 'btn-danger',
-                    callback: function() {
-                        apiCall('delete', 'content/' + view.model.id)
+                    callback: () => {
+                        apiCall('delete', 'content/' + this.model.id)
                         .then(() => {
-                            if(publishing.connections && publishing.connections.length > 0) {
-                                unpublishConnections();
+                            if(!this.model.local && publishing.connections && publishing.connections.length > 0) {
+                                return unpublishConnections();
                             
                             } else {
-                                onSuccess();
+                                return onSuccess();
                             }
                         })
-                        .catch(onError);
+                        .catch(errorModal);
                     }
                 }
             ]
