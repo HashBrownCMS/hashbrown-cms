@@ -224,6 +224,29 @@ class SyncSettings extends View {
             )
         );
     }
+    
+    /**
+     * Render Connections switch
+     */
+    renderConnectionsSwitch() {
+        let view = this;
+        
+        function onChange() {
+            view.model.connections = this.checked;
+        }
+
+        return _.div({class: 'field-editor'},
+            _.div({class: 'switch'},
+                _.input({
+                    id: 'switch-sync-connections',
+                    class: 'form-control switch',
+                    type: 'checkbox',
+                    checked: this.model.connections == true
+                }).change(onChange),
+                _.label({for: 'switch-sync-connections'})
+            )
+        );
+    }
 
     /**
      * Render Schema switch
@@ -312,6 +335,7 @@ class SyncSettings extends View {
                     this.renderField('Project', this.renderProjectNameEditor()),
                     this.renderField('Environment', this.renderEnvironmentNameEditor()),
                     this.renderField('Content', this.renderContentSwitch()),
+                    this.renderField('Connections', this.renderConnectionsSwitch()),
                     this.renderField('Schemas', this.renderSchemaSwitch()),
                     this.renderField('Media tree', this.renderMediaTreeSwitch())
                 ),

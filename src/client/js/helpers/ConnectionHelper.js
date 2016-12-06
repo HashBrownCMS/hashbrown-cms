@@ -11,9 +11,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
      * @return {Promise(Connection[])} promise
      */
     static getAllConnections() {
-        return new Promise((resolve, reject) => {
-            resolve(resources.connections);
-        });
+        return Promise.resolve(resources.connections);
     }
     
     /**
@@ -24,18 +22,15 @@ class ConnectionHelper extends ConnectionHelperCommon {
      * @return {Promise(Connection)} promise
      */
     static getConnectionById(id) {
-        return new Promise((resolve, reject) => {
-            for(let i in resources.connections) {
-                let connection = resources.connections[i];
+        for(let i in resources.connections) {
+            let connection = resources.connections[i];
 
-                if(connection.id == id) {
-                    resolve(connection);
-                    return;
-                }
+            if(connection.id == id) {
+                return Promise.resolve(connection);
             }
+        }
 
-            reject(new Error('No Connection by id "' + id + '" was found'));
-        });
+        return Promise.reject(new Error('No Connection by id "' + id + '" was found'));
     }
 }
 

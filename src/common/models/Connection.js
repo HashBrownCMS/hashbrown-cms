@@ -19,6 +19,8 @@ class Connection extends Entity {
     structure() {
         // Fundamental fields
         this.def(Boolean, 'locked');
+        this.def(Boolean, 'remote');
+        this.def(Boolean, 'local');
         this.def(String, 'id');
         this.def(String, 'title');
         this.def(String, 'type');
@@ -51,9 +53,7 @@ class Connection extends Entity {
      * @returns {Promise(Array)} templates
      */
     getTemplates() {
-        return new Promise((resolve, reject) => {
-            resolve([]);
-        });
+        return Promise.resolve([]);
     }
 
     /**
@@ -62,9 +62,7 @@ class Connection extends Entity {
      * @returns {Promise(Array)} sectionTemplates
      */
     getSectionTemplates() {
-        return new Promise((resolve, reject) => {
-            resolve([]);
-        });
+        return Promise.resolve([]);
     }
 
     /**
@@ -91,9 +89,7 @@ class Connection extends Entity {
      * @returns {Promise(Array)} media
      */
     getAllMedia() {
-        return new Promise((resolve, reject) => {
-            resolve([]);
-        });
+        return Promise.resolve([]);
     }
     
     /**
@@ -104,9 +100,7 @@ class Connection extends Entity {
      * @returns {Promise(Media)} media
      */
     getMedia(id) {
-        return new Promise((resolve, reject) => {
-            resolve(null);
-        });
+        return Promise.resolve(null);
     }
     
     /**
@@ -118,9 +112,7 @@ class Connection extends Entity {
      * @returns {Promise(Array)} media
      */
     setMedia(id, file) {
-        return new Promise((resolve, reject) => {
-            resolve();
-        });
+        return Promise.resolve();
     }
     
     /**
@@ -131,9 +123,7 @@ class Connection extends Entity {
      * @returns {Promise(Array)} media
      */
     removeMedia(id) {
-        return new Promise((resolve, reject) => {
-            resolve();
-        });
+        return Promise.resolve();
     }
     
     /**
@@ -144,34 +134,30 @@ class Connection extends Entity {
     unpublishContent(id) {
         let connection = this;
 
-        return new Promise((resolve, reject) => {
-            debug.log('Unpublishing all localised property sets...', this);
+        debug.log('Unpublishing all localised property sets...', this);
 
-            LanguageHelper.getSelectedLanguages()
-            .then((languages) => {
-                function next(i) {
-                    let language = languages[i];
+        return LanguageHelper.getSelectedLanguages()
+        .then((languages) => {
+            function next(i) {
+                let language = languages[i];
 
-                    connection.deleteContentProperties(id, language)
-                    .then(() => {
-                        i++;
+                return connection.deleteContentProperties(id, language)
+                .then(() => {
+                    i++;
 
-                        if(i < languages.length) {
-                            next(i);
-                        
-                        } else {
-                            debug.log('Unpublished all localised property sets successfully!', connection);
-                                
-                            resolve();
-                        
-                        }
-                    })
-                    .catch(reject);
-                }
+                    if(i < languages.length) {
+                        return next(i);
+                    
+                    } else {
+                        debug.log('Unpublished all localised property sets successfully!', connection);
+                            
+                        return Promise.resolve();
+                    
+                    }
+                });
+            }
 
-                next(0);
-            })
-            .catch(reject);
+            return next(0);
         });
     }
 
@@ -185,37 +171,33 @@ class Connection extends Entity {
     publishContent(content) {
         let connection = this;
 
-        return new Promise((resolve, reject) => {
-            debug.log('Publishing all localised property sets...', this);
+        debug.log('Publishing all localised property sets...', this);
 
-            LanguageHelper.getAllLocalizedPropertySets(content)
-            .then((sets) => {
-                let languages = Object.keys(sets);
-                
-                function next(i) {
-                    let language = languages[i];
-                    let properties = sets[language];
+        return LanguageHelper.getAllLocalizedPropertySets(content)
+        .then((sets) => {
+            let languages = Object.keys(sets);
+            
+            function next(i) {
+                let language = languages[i];
+                let properties = sets[language];
 
-                    connection.postContentProperties(properties, content.id, language, content.getMeta())
-                    .then(() => {
-                        i++;
+                return connection.postContentProperties(properties, content.id, language, content.getMeta())
+                .then(() => {
+                    i++;
 
-                        if(i < languages.length) {
-                            next(i);
-                        
-                        } else {
-                            debug.log('Published all localised property sets successfully!', connection);
-                                
-                            resolve();
-                        
-                        }
-                    })
-                    .catch(reject);
-                }
+                    if(i < languages.length) {
+                        return next(i);
+                    
+                    } else {
+                        debug.log('Published all localised property sets successfully!', connection);
+                            
+                        return Promise.resolve();
+                    
+                    }
+                })
+            }
 
-                next(0);
-            })
-            .catch(reject);
+            return next(0);
         });
     }
     
@@ -228,9 +210,7 @@ class Connection extends Entity {
      * @returns {Promise} promise
      */
     deleteContentProperties(id, language) {
-        return new Promise((callback) => {
-            callback();
-        });
+        return Promise.callback();
     }
 
     /**
@@ -243,9 +223,7 @@ class Connection extends Entity {
      * @returns {Promise} promise
      */
     postContentProperties(properties, id, language) {
-        return new Promise((callback) => {
-            callback();
-        });
+        return Promise.callback();
     }
 }
 

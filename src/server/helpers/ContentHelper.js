@@ -60,11 +60,10 @@ class ContentHelper extends ContentHelperCommon {
         ).then((result) => {
             if(!result) {
                 return SyncHelper.getResourceItem('content', id);
-            } else {
-                return new Promise((resolve) => {
-                    resolve(result);
-                });
             }
+            
+            return Promise.resolve(result);
+
         }).then((result) => {
             content = new Content(result);
 

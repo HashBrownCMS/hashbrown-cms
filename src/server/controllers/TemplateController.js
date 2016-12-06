@@ -17,6 +17,8 @@ class TemplateController extends ApiController {
     static getTemplates(req, res) {
         ConnectionHelper.getTemplateProvider()
         .then((connection) => {
+            if(!connection) { return Promise.reject(new Error('No template provider found')); }
+            
             return connection.getTemplates();
         })
         .then((templates) => {
@@ -33,6 +35,8 @@ class TemplateController extends ApiController {
     static getSectionTemplates(req, res) {
         ConnectionHelper.getTemplateProvider()
         .then((connection) => {
+            if(!connection) { return Promise.reject(new Error('No template provider found')); }
+
             return connection.getSectionTemplates();
         })
         .then((templates) => {

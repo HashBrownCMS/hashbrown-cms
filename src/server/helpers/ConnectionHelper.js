@@ -143,26 +143,23 @@ class ConnectionHelper extends ConnectionHelperCommon {
     /**
      * Gets all connections
      *
-     * @return {Promise(Connection[])} promise
+     * @return {Promise} Array of Connections
      */
     static getAllConnections() {
         let collection = ProjectHelper.currentEnvironment + '.connections';
         
-        return new Promise((callback) => {
-            MongoHelper.find(
-                ProjectHelper.currentProject,
-                collection,
-                {}
-            ).then((array) => {
-                let connections = [];
-
-                for(let data of array) {
-                    let connection = ConnectionHelper.initConnection(data);
-
-                    connections.push(connection);
+        return MongoHelper.find(
+            ProjectHelper.currentProject,
+            collection,
+            {}
+        ).then((array) => {
+            return SyncHelper.mergeResource('connections', array)
+            .then((connections) => {
+                for(let i in connections) {
+                    connections[i] = ConnectionHelper.initConnection(connections[i]);
                 }
 
-                callback(connections);
+                return Promise.resolve(connections);
             });
         });
     }
@@ -172,28 +169,26 @@ class ConnectionHelper extends ConnectionHelperCommon {
      *
      * @param {string} id
      *
-     * @return {Promise(Connection)} promise
+     * @return {Promise} Connection
      */
     static getConnectionById(id) {
         let collection = ProjectHelper.currentEnvironment + '.connections';
         
-        return new Promise((resolve, reject) => {
-            MongoHelper.findOne(
-                ProjectHelper.currentProject,
-                collection,
-                {
-                    id: id
-                }
-            ).then((data) => {
-                if(data) {
-                    let connection = ConnectionHelper.initConnection(data);
-
-                    resolve(connection);
-                } else {
-                    reject(new Error('Found no connection with id "' + id + '"'));
-
-                }
-            });
+        return MongoHelper.findOne(
+            ProjectHelper.currentProject,
+            collection,
+            {
+                id: id
+            }
+        ).then((data) => {
+            if(!data) {
+                return SyncHelper.getResourceItem('connections', id)
+                .then((resourceItem) => {
+                      return Promise.resolve(ConnectionHelper.initConnection(resourceItem));
+                });
+            } 
+            
+            return Promise.resolve(ConnectionHelper.initConnection(data));
         });
     }
     
@@ -227,39 +222,36 @@ class ConnectionHelper extends ConnectionHelperCommon {
     static setConnectionSettingById(id, newSettings) {
         let collection = ProjectHelper.currentEnvironment + '.connections';
         
-        return new Promise(function(callback) {
-            // First find the connection
-            MongoHelper.findOne(
+        // First find the connection
+        return MongoHelper.findOne(
+            ProjectHelper.currentProject,
+            collection,
+            {
+                id: id
+            }
+        )
+        .then(function(oldConnection) {
+            let newConnection = oldConnection;
+
+            // Make sure the settings object exists
+            if(!newConnection.settings) {
+                newConnection.settings = {};
+            }
+
+            // Adopt values at top level
+            for(let k in newSettings) {
+                newConnection.settings[k] = newSettings[k];
+            }
+
+            // Update the Mongo document
+            return MongoHelper.updateOne(
                 ProjectHelper.currentProject,
-                collection,
+                'connections',
                 {
                     id: id
-                }
-            )
-            .then(function(oldConnection) {
-                let newConnection = oldConnection;
-
-                // Make sure the settings object exists
-                if(!newConnection.settings) {
-                    newConnection.settings = {};
-                }
-
-                // Adopt values at top level
-                for(let k in newSettings) {
-                    newConnection.settings[k] = newSettings[k];
-                }
-
-                // Update the Mongo document
-                MongoHelper.updateOne(
-                    ProjectHelper.currentProject,
-                    'connections',
-                    {
-                        id: id
-                    },
-                    newConnection
-                )
-                .then(callback);
-            });
+                },
+                newConnection
+            );
         });
     }
 

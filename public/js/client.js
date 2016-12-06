@@ -1725,7 +1725,6 @@ PEMEncoder.prototype.encode = function encode(data, options) {
 },{"./der":12,"inherits":101}],15:[function(require,module,exports){
 'use strict'
 
-exports.byteLength = byteLength
 exports.toByteArray = toByteArray
 exports.fromByteArray = fromByteArray
 
@@ -1733,17 +1732,23 @@ var lookup = []
 var revLookup = []
 var Arr = typeof Uint8Array !== 'undefined' ? Uint8Array : Array
 
-var code = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
-for (var i = 0, len = code.length; i < len; ++i) {
-  lookup[i] = code[i]
-  revLookup[code.charCodeAt(i)] = i
+function init () {
+  var code = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
+  for (var i = 0, len = code.length; i < len; ++i) {
+    lookup[i] = code[i]
+    revLookup[code.charCodeAt(i)] = i
+  }
+
+  revLookup['-'.charCodeAt(0)] = 62
+  revLookup['_'.charCodeAt(0)] = 63
 }
 
-revLookup['-'.charCodeAt(0)] = 62
-revLookup['_'.charCodeAt(0)] = 63
+init()
 
-function placeHoldersCount (b64) {
+function toByteArray (b64) {
+  var i, j, l, tmp, placeHolders, arr
   var len = b64.length
+
   if (len % 4 > 0) {
     throw new Error('Invalid string. Length must be a multiple of 4')
   }
@@ -1753,19 +1758,9 @@ function placeHoldersCount (b64) {
   // represent one byte
   // if there is only one, then the three characters before it represent 2 bytes
   // this is just a cheap hack to not do indexOf twice
-  return b64[len - 2] === '=' ? 2 : b64[len - 1] === '=' ? 1 : 0
-}
+  placeHolders = b64[len - 2] === '=' ? 2 : b64[len - 1] === '=' ? 1 : 0
 
-function byteLength (b64) {
   // base64 is 4/3 + up to two characters of the original data
-  return b64.length * 3 / 4 - placeHoldersCount(b64)
-}
-
-function toByteArray (b64) {
-  var i, j, l, tmp, placeHolders, arr
-  var len = b64.length
-  placeHolders = placeHoldersCount(b64)
-
   arr = new Arr(len * 3 / 4 - placeHolders)
 
   // if there are placeholders, only get up to the last complete 4 chars
@@ -20565,21 +20560,14 @@ utils.intFromLE = intFromLE;
 module.exports={
   "_args": [
     [
-      {
-        "raw": "elliptic@^6.0.0",
-        "scope": null,
-        "escapedName": "elliptic",
-        "name": "elliptic",
-        "rawSpec": "^6.0.0",
-        "spec": ">=6.0.0 <7.0.0",
-        "type": "range"
-      },
+      "elliptic@^6.0.0",
       "/home/mrzapp/Development/Web/hashbrown-cms/node_modules/browserify-sign"
     ]
   ],
   "_from": "elliptic@>=6.0.0 <7.0.0",
   "_id": "elliptic@6.3.2",
   "_inCache": true,
+  "_installable": true,
   "_location": "/elliptic",
   "_nodeVersion": "6.3.0",
   "_npmOperationalInternal": {
@@ -20587,17 +20575,16 @@ module.exports={
     "tmp": "tmp/elliptic-6.3.2.tgz_1473938837205_0.3108903462998569"
   },
   "_npmUser": {
-    "name": "indutny",
-    "email": "fedor@indutny.com"
+    "email": "fedor@indutny.com",
+    "name": "indutny"
   },
   "_npmVersion": "3.10.3",
   "_phantomChildren": {},
   "_requested": {
-    "raw": "elliptic@^6.0.0",
-    "scope": null,
-    "escapedName": "elliptic",
     "name": "elliptic",
+    "raw": "elliptic@^6.0.0",
     "rawSpec": "^6.0.0",
+    "scope": null,
     "spec": ">=6.0.0 <7.0.0",
     "type": "range"
   },
@@ -20611,8 +20598,8 @@ module.exports={
   "_spec": "elliptic@^6.0.0",
   "_where": "/home/mrzapp/Development/Web/hashbrown-cms/node_modules/browserify-sign",
   "author": {
-    "name": "Fedor Indutny",
-    "email": "fedor@indutny.com"
+    "email": "fedor@indutny.com",
+    "name": "Fedor Indutny"
   },
   "bugs": {
     "url": "https://github.com/indutny/elliptic/issues"
@@ -20659,8 +20646,8 @@ module.exports={
   "main": "lib/elliptic.js",
   "maintainers": [
     {
-      "name": "indutny",
-      "email": "fedor@indutny.com"
+      "email": "fedor@indutny.com",
+      "name": "indutny"
     }
   ],
   "name": "elliptic",
@@ -29903,16 +29890,14 @@ var PATH_REGEXP = new RegExp([
 /**
  * Parse a string for the raw tokens.
  *
- * @param  {string}  str
- * @param  {Object=} options
+ * @param  {string} str
  * @return {!Array}
  */
-function parse (str, options) {
+function parse (str) {
   var tokens = []
   var key = 0
   var index = 0
   var path = ''
-  var defaultDelimiter = options && options.delimiter || '/'
   var res
 
   while ((res = PATH_REGEXP.exec(str)) != null) {
@@ -29945,8 +29930,8 @@ function parse (str, options) {
     var partial = prefix != null && next != null && next !== prefix
     var repeat = modifier === '+' || modifier === '*'
     var optional = modifier === '?' || modifier === '*'
-    var delimiter = res[2] || defaultDelimiter
-    var pattern = capture || group
+    var delimiter = res[2] || '/'
+    var pattern = capture || group || (asterisk ? '.*' : '[^' + delimiter + ']+?')
 
     tokens.push({
       name: name || key++,
@@ -29956,7 +29941,7 @@ function parse (str, options) {
       repeat: repeat,
       partial: partial,
       asterisk: !!asterisk,
-      pattern: pattern ? escapeGroup(pattern) : (asterisk ? '.*' : '[^' + escapeString(delimiter) + ']+?')
+      pattern: escapeGroup(pattern)
     })
   }
 
@@ -29977,11 +29962,10 @@ function parse (str, options) {
  * Compile a string to a template function for the path.
  *
  * @param  {string}             str
- * @param  {Object=}            options
  * @return {!function(Object=, Object=)}
  */
-function compile (str, options) {
-  return tokensToFunction(parse(str, options))
+function compile (str) {
+  return tokensToFunction(parse(str))
 }
 
 /**
@@ -30192,23 +30176,27 @@ function arrayToRegexp (path, keys, options) {
  * @return {!RegExp}
  */
 function stringToRegexp (path, keys, options) {
-  return tokensToRegExp(parse(path, options), keys, options)
+  var tokens = parse(path)
+  var re = tokensToRegExp(tokens, options)
+
+  // Attach keys back to the regexp.
+  for (var i = 0; i < tokens.length; i++) {
+    if (typeof tokens[i] !== 'string') {
+      keys.push(tokens[i])
+    }
+  }
+
+  return attachKeys(re, keys)
 }
 
 /**
  * Expose a function for taking tokens and returning a RegExp.
  *
- * @param  {!Array}          tokens
- * @param  {(Array|Object)=} keys
- * @param  {Object=}         options
+ * @param  {!Array}  tokens
+ * @param  {Object=} options
  * @return {!RegExp}
  */
-function tokensToRegExp (tokens, keys, options) {
-  if (!isarray(keys)) {
-    options = /** @type {!Object} */ (keys || options)
-    keys = []
-  }
-
+function tokensToRegExp (tokens, options) {
   options = options || {}
 
   var strict = options.strict
@@ -30226,8 +30214,6 @@ function tokensToRegExp (tokens, keys, options) {
     } else {
       var prefix = escapeString(token.prefix)
       var capture = '(?:' + token.pattern + ')'
-
-      keys.push(token)
 
       if (token.repeat) {
         capture += '(?:' + prefix + capture + ')*'
@@ -30263,7 +30249,7 @@ function tokensToRegExp (tokens, keys, options) {
     route += strict && endsWithSlash ? '' : '(?=\\/|$)'
   }
 
-  return attachKeys(new RegExp('^' + route, flags(options)), keys)
+  return new RegExp('^' + route, flags(options))
 }
 
 /**
@@ -30279,12 +30265,14 @@ function tokensToRegExp (tokens, keys, options) {
  * @return {!RegExp}
  */
 function pathToRegexp (path, keys, options) {
-  if (!isarray(keys)) {
-    options = /** @type {!Object} */ (keys || options)
-    keys = []
-  }
+  keys = keys || []
 
-  options = options || {}
+  if (!isarray(keys)) {
+    options = /** @type {!Object} */ (keys)
+    keys = []
+  } else if (!options) {
+    options = {}
+  }
 
   if (path instanceof RegExp) {
     return regexpToRegexp(path, /** @type {!Array} */ (keys))
@@ -35717,9 +35705,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
      * @return {Promise(Connection[])} promise
      */
     static getAllConnections() {
-        return new Promise((resolve, reject) => {
-            resolve(resources.connections);
-        });
+        return Promise.resolve(resources.connections);
     }
 
     /**
@@ -35730,18 +35716,15 @@ class ConnectionHelper extends ConnectionHelperCommon {
      * @return {Promise(Connection)} promise
      */
     static getConnectionById(id) {
-        return new Promise((resolve, reject) => {
-            for (let i in resources.connections) {
-                let connection = resources.connections[i];
+        for (let i in resources.connections) {
+            let connection = resources.connections[i];
 
-                if (connection.id == id) {
-                    resolve(connection);
-                    return;
-                }
+            if (connection.id == id) {
+                return Promise.resolve(connection);
             }
+        }
 
-            reject(new Error('No Connection by id "' + id + '" was found'));
-        });
+        return Promise.reject(new Error('No Connection by id "' + id + '" was found'));
     }
 }
 
@@ -39620,6 +39603,24 @@ class SyncSettings extends View {
     }
 
     /**
+     * Render Connections switch
+     */
+    renderConnectionsSwitch() {
+        let view = this;
+
+        function onChange() {
+            view.model.connections = this.checked;
+        }
+
+        return _.div({ class: 'field-editor' }, _.div({ class: 'switch' }, _.input({
+            id: 'switch-sync-connections',
+            class: 'form-control switch',
+            type: 'checkbox',
+            checked: this.model.connections == true
+        }).change(onChange), _.label({ for: 'switch-sync-connections' })));
+    }
+
+    /**
      * Render Schema switch
      */
     renderSchemaSwitch() {
@@ -39676,7 +39677,7 @@ class SyncSettings extends View {
         SettingsHelper.getSettings('sync').then(syncSettings => {
             this.model = syncSettings || {};
 
-            _.append(this.$element.empty(), _.div({ class: 'editor-header' }, _.span({ class: 'fa fa-refresh' }), _.h4('Sync')), _.div({ class: 'editor-body' }, this.renderField('Enabled', this.renderEnabledSwitch()), this.renderField('API URL', this.renderUrlEditor()), this.renderField('API Token', this.renderTokenEditor()), this.renderField('Project', this.renderProjectNameEditor()), this.renderField('Environment', this.renderEnvironmentNameEditor()), this.renderField('Content', this.renderContentSwitch()), this.renderField('Schemas', this.renderSchemaSwitch()), this.renderField('Media tree', this.renderMediaTreeSwitch())), _.div({ class: 'editor-footer panel panel-default panel-buttons' }, _.div({ class: 'btn-group' }, this.$saveBtn = _.button({ class: 'btn btn-primary btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Save '), _.span({ class: 'text-working' }, 'Saving ')).click(() => {
+            _.append(this.$element.empty(), _.div({ class: 'editor-header' }, _.span({ class: 'fa fa-refresh' }), _.h4('Sync')), _.div({ class: 'editor-body' }, this.renderField('Enabled', this.renderEnabledSwitch()), this.renderField('API URL', this.renderUrlEditor()), this.renderField('API Token', this.renderTokenEditor()), this.renderField('Project', this.renderProjectNameEditor()), this.renderField('Environment', this.renderEnvironmentNameEditor()), this.renderField('Content', this.renderContentSwitch()), this.renderField('Connections', this.renderConnectionsSwitch()), this.renderField('Schemas', this.renderSchemaSwitch()), this.renderField('Media tree', this.renderMediaTreeSwitch())), _.div({ class: 'editor-footer panel panel-default panel-buttons' }, _.div({ class: 'btn-group' }, this.$saveBtn = _.button({ class: 'btn btn-primary btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Save '), _.span({ class: 'text-working' }, 'Saving ')).click(() => {
                 this.onClickSave();
             }))));
         });
@@ -43718,9 +43719,7 @@ class ConnectionHelper {
                 if (providers.template) {
                     return this.getConnectionById(providers.template);
                 } else {
-                    return new Promise((resolve, reject) => {
-                        reject(new Error('Template provider is not defined'));
-                    });
+                    return Promise.reject(new Error('Template provider is not defined'));
                 }
             }).then(resolve).catch(reject);
         });
@@ -43755,9 +43754,7 @@ class ConnectionHelper {
                 if (providers.media) {
                     return this.getConnectionById(providers.media);
                 } else {
-                    return new Promise((resolve, reject) => {
-                        reject(new Error('Media provider is not defined'));
-                    });
+                    return Promise.reject(new Error('Media provider is not defined'));
                 }
             }).then(resolve).catch(reject);
         });
@@ -44268,6 +44265,8 @@ class Connection extends Entity {
     structure() {
         // Fundamental fields
         this.def(Boolean, 'locked');
+        this.def(Boolean, 'remote');
+        this.def(Boolean, 'local');
         this.def(String, 'id');
         this.def(String, 'title');
         this.def(String, 'type');
@@ -44300,9 +44299,7 @@ class Connection extends Entity {
      * @returns {Promise(Array)} templates
      */
     getTemplates() {
-        return new Promise((resolve, reject) => {
-            resolve([]);
-        });
+        return Promise.resolve([]);
     }
 
     /**
@@ -44311,9 +44308,7 @@ class Connection extends Entity {
      * @returns {Promise(Array)} sectionTemplates
      */
     getSectionTemplates() {
-        return new Promise((resolve, reject) => {
-            resolve([]);
-        });
+        return Promise.resolve([]);
     }
 
     /**
@@ -44340,9 +44335,7 @@ class Connection extends Entity {
      * @returns {Promise(Array)} media
      */
     getAllMedia() {
-        return new Promise((resolve, reject) => {
-            resolve([]);
-        });
+        return Promise.resolve([]);
     }
 
     /**
@@ -44353,9 +44346,7 @@ class Connection extends Entity {
      * @returns {Promise(Media)} media
      */
     getMedia(id) {
-        return new Promise((resolve, reject) => {
-            resolve(null);
-        });
+        return Promise.resolve(null);
     }
 
     /**
@@ -44367,9 +44358,7 @@ class Connection extends Entity {
      * @returns {Promise(Array)} media
      */
     setMedia(id, file) {
-        return new Promise((resolve, reject) => {
-            resolve();
-        });
+        return Promise.resolve();
     }
 
     /**
@@ -44380,9 +44369,7 @@ class Connection extends Entity {
      * @returns {Promise(Array)} media
      */
     removeMedia(id) {
-        return new Promise((resolve, reject) => {
-            resolve();
-        });
+        return Promise.resolve();
     }
 
     /**
@@ -44393,28 +44380,26 @@ class Connection extends Entity {
     unpublishContent(id) {
         let connection = this;
 
-        return new Promise((resolve, reject) => {
-            debug.log('Unpublishing all localised property sets...', this);
+        debug.log('Unpublishing all localised property sets...', this);
 
-            LanguageHelper.getSelectedLanguages().then(languages => {
-                function next(i) {
-                    let language = languages[i];
+        return LanguageHelper.getSelectedLanguages().then(languages => {
+            function next(i) {
+                let language = languages[i];
 
-                    connection.deleteContentProperties(id, language).then(() => {
-                        i++;
+                return connection.deleteContentProperties(id, language).then(() => {
+                    i++;
 
-                        if (i < languages.length) {
-                            next(i);
-                        } else {
-                            debug.log('Unpublished all localised property sets successfully!', connection);
+                    if (i < languages.length) {
+                        return next(i);
+                    } else {
+                        debug.log('Unpublished all localised property sets successfully!', connection);
 
-                            resolve();
-                        }
-                    }).catch(reject);
-                }
+                        return Promise.resolve();
+                    }
+                });
+            }
 
-                next(0);
-            }).catch(reject);
+            return next(0);
         });
     }
 
@@ -44428,31 +44413,29 @@ class Connection extends Entity {
     publishContent(content) {
         let connection = this;
 
-        return new Promise((resolve, reject) => {
-            debug.log('Publishing all localised property sets...', this);
+        debug.log('Publishing all localised property sets...', this);
 
-            LanguageHelper.getAllLocalizedPropertySets(content).then(sets => {
-                let languages = Object.keys(sets);
+        return LanguageHelper.getAllLocalizedPropertySets(content).then(sets => {
+            let languages = Object.keys(sets);
 
-                function next(i) {
-                    let language = languages[i];
-                    let properties = sets[language];
+            function next(i) {
+                let language = languages[i];
+                let properties = sets[language];
 
-                    connection.postContentProperties(properties, content.id, language, content.getMeta()).then(() => {
-                        i++;
+                return connection.postContentProperties(properties, content.id, language, content.getMeta()).then(() => {
+                    i++;
 
-                        if (i < languages.length) {
-                            next(i);
-                        } else {
-                            debug.log('Published all localised property sets successfully!', connection);
+                    if (i < languages.length) {
+                        return next(i);
+                    } else {
+                        debug.log('Published all localised property sets successfully!', connection);
 
-                            resolve();
-                        }
-                    }).catch(reject);
-                }
+                        return Promise.resolve();
+                    }
+                });
+            }
 
-                next(0);
-            }).catch(reject);
+            return next(0);
         });
     }
 
@@ -44465,9 +44448,7 @@ class Connection extends Entity {
      * @returns {Promise} promise
      */
     deleteContentProperties(id, language) {
-        return new Promise(callback => {
-            callback();
-        });
+        return Promise.callback();
     }
 
     /**
@@ -44480,9 +44461,7 @@ class Connection extends Entity {
      * @returns {Promise} promise
      */
     postContentProperties(properties, id, language) {
-        return new Promise(callback => {
-            callback();
-        });
+        return Promise.callback();
     }
 }
 
