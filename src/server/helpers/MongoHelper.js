@@ -365,27 +365,24 @@ class MongoHelper {
      * @return {Promise} promise
      */
     static updateOne(databaseName, collectionName, query, doc, options) {
-        return new Promise((resolve, reject) => {
-            // Make sure the MongoId isn't included
-            delete doc['_id'];
+        // Make sure the MongoId isn't included
+        delete doc['_id'];
 
-            debug.log(databaseName + '/' + collectionName + '::updateOne ' + JSON.stringify(query) + ' with options ' + JSON.stringify(options || {}) + '...', this, 3);
-        
-            MongoHelper.getDatabase(databaseName)
-            .then(function(db) {
-                db.collection(collectionName).updateOne(query, doc, options || {}, function(findErr) {
-                    if(findErr) {
-                        reject(new Error(findErr));
-                    
-                    } else {
-                        resolve();
+        debug.log(databaseName + '/' + collectionName + '::updateOne ' + JSON.stringify(query) + ' with options ' + JSON.stringify(options || {}) + '...', this, 3);
+    
+        return MongoHelper.getDatabase(databaseName)
+        .then(function(db) {
+            db.collection(collectionName).updateOne(query, doc, options || {}, function(findErr) {
+                db.close();
+                
+                if(findErr) {
+                    return Promise.reject(new Error(findErr));
+                
+                } else {
+                    return Promise.resolve();
 
-                    }
-
-                    db.close();
-                });
-            })
-            .catch(reject);
+                }
+            });
         });
     }
     

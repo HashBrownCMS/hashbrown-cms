@@ -87,10 +87,11 @@ class ContentHelper extends ContentHelperCommon {
      *
      * @param {String} id
      * @param {Object} content
+     * @param {Boolean} create
      *
      * @return {Promise} Promise
      */
-    static setContentById(id, content) {
+    static setContentById(id, content, create) {
         debug.log('Updating content "' + id + '"...', this);
         
         let updateContent = () => {
@@ -126,17 +127,16 @@ class ContentHelper extends ContentHelperCommon {
             // Remove inserted publish dates
             content.publishOn = null;
             content.unpublishOn = null;
-            
+           
             return MongoHelper.updateOne(
                 ProjectHelper.currentProject,
                 collection,
-                {
-                    id: id
-                },
-                content
+                { id: id },
+                content,
+                { upsert: create } // Whether or not to create the node if it doesn't already exist
             )
             .then(() => {
-                debug.log('Done updating content.', this);
+                debug.log('Done updating content "' + id + '"', this);
             });
         };
 

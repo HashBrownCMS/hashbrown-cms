@@ -16,6 +16,8 @@ class ContentController extends ApiController {
         app.get('/api/:project/:environment/content/:id', this.middleware(), this.getContent);
 
         app.post('/api/:project/:environment/content/new/:schemaId', this.middleware(), this.createContent);
+        app.post('/api/:project/:environment/content/pull/:id', this.middleware(), this.pullContent);
+        app.post('/api/:project/:environment/content/push/:id', this.middleware(), this.pushContent);
         app.post('/api/:project/:environment/content/publish', this.middleware(), this.publishContent);
         app.post('/api/:project/:environment/content/unpublish', this.middleware(), this.unpublishContent);
         app.post('/api/:project/:environment/content/:id', this.middleware(), this.postContent);
@@ -29,7 +31,7 @@ class ContentController extends ApiController {
     static getAllContents(req, res) {
         ContentHelper.getAllContents()
         .then(function(nodes) {
-            res.send(nodes);
+            res.status(200).send(nodes);
         })
         .catch((e) => {
             res.status(502).send(ContentController.printError(e));
@@ -93,6 +95,47 @@ class ContentController extends ApiController {
         });
     }
    
+    /**
+     * Pulls Content by id
+     */
+    static pullContent(req, res) {
+        let id = req.params.id;
+
+        SyncHelper.getResourceItem('content', id)
+        .then((resourceItem) => {
+            if(!resourceItem) { return Promise.reject(new Error('Couldn\'t find remote Content "' + id + '"')); }
+        
+            return ContentHelper.setContentById(id, resourceItem, true)
+            .then(() => {
+                res.status(200).send(resourceItem);
+            });
+        })
+        .catch((e) => {
+            res.status(404).send(ContentController.printError(e));   
+        }); 
+    }
+    
+    /**
+     * Pushes Content by id
+     */
+    static pushContent(req, res) {
+        let id = req.params.id;
+
+        ContentHelper.getContentById(id)
+        .then((localContent) => {
+            return SyncHelper.setResourceItem('content', id, localContent);
+        })
+        .then(() => {
+            return ContentHelper.removeContentById(id);
+        })
+        .then(() => {
+            res.status(200).send(id);
+        })
+        .catch((e) => {
+            res.status(404).send(ContentController.printError(e));   
+        }); 
+    }
+
     /**
      * Publishes a Content node
      */

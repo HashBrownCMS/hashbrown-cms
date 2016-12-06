@@ -41783,6 +41783,34 @@ class ContentPane extends Pane {
     }
 
     /**
+     * Event: Click pull content
+     */
+    static onClickPullContent() {
+        let navbar = ViewHelper.get('NavbarMain');
+        let pullId = $('.context-menu-target-element').data('id');
+
+        apiCall('post', 'content/pull/' + pullId, {}).then(() => {
+            return reloadResource('content');
+        }).then(() => {
+            navbar.reload();
+        }).catch(errorModal);
+    }
+
+    /**
+     * Event: Click push content
+     */
+    static onClickPushContent() {
+        let navbar = ViewHelper.get('NavbarMain');
+        let pushId = $('.context-menu-target-element').data('id');
+
+        apiCall('post', 'content/push/' + pushId).then(() => {
+            return reloadResource('content');
+        }).then(() => {
+            navbar.reload();
+        }).catch(errorModal);
+    }
+
+    /**
      * Event: Click cut content
      */
     static onClickCutContent() {
@@ -42077,15 +42105,12 @@ class ContentPane extends Pane {
                     this.onClickPasteContent();
                 };
 
-                if (item.local) {
-                    menu['Commit to remote'] = () => {
-                        console.log('TODO: Implement pushing to remote');
+                if (!item.local && !item.remote && !item.locked) {
+                    menu['Cut'] = () => {
+                        this.onClickCutContent();
                     };
-                }
-
-                if (item.remote) {
-                    menu['Pull from remote'] = () => {
-                        console.log('TODO: Implement pulling from remote');
+                    menu['Remove'] = () => {
+                        this.onClickRemoveContent();
                     };
                 }
 
@@ -42093,19 +42118,25 @@ class ContentPane extends Pane {
                     menu['Settings'] = () => {
                         this.onClickContentSettings();
                     };
+                }
 
-                    if (item.local) {
-                        menu['Remove local copy'] = () => {
-                            this.onClickRemoveContent();
-                        };
-                    } else {
-                        menu['Cut'] = () => {
-                            this.onClickCutContent();
-                        };
-                        menu['Remove'] = () => {
-                            this.onClickRemoveContent();
-                        };
-                    }
+                if (item.local || item.remote) {
+                    menu['Sync'] = '---';
+                }
+
+                if (item.local) {
+                    menu['Push to remote'] = () => {
+                        this.onClickPushContent();
+                    };
+                    menu['Remove local copy'] = () => {
+                        this.onClickRemoveContent();
+                    };
+                }
+
+                if (item.remote) {
+                    menu['Pull from remote'] = () => {
+                        this.onClickPullContent();
+                    };
                 }
 
                 return menu;

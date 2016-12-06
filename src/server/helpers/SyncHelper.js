@@ -111,6 +111,53 @@ class SyncHelper {
     }
 
     /**
+     * Set resource item
+     *
+     * @param {String} remoteResourceName
+     * @param {String} remoteItemName
+     * @param {Object} remoteItemData
+     *
+     * @returns {Promise} Promise
+     */
+    static setResourceItem(remoteResourceName, remoteItemName, remoteItemData) {
+        // Cache local project names
+        let localProjectNames = ProjectHelper.getCurrentNames();
+        
+        return this.getSettings()
+        .then((settings) => {
+            return new Promise((resolve, reject) => {
+                if(settings && settings.enabled && settings[remoteResourceName]) {
+                    let headers = {
+                        'Content-Type': 'application/json'
+                    };
+                    
+                    restler.post(settings.url + settings.project + '/' + settings.environment + '/' + remoteResourceName + '/' + remoteItemName + '?token=' + settings.token, {
+                        headers: headers,
+                        data: JSON.stringify(remoteItemData)
+                    }).on('complete', (data, response) => {
+                        // Restore local project names
+                        ProjectHelper.setCurrentNames(localProjectNames.project, localProjectNames.environment);
+                        
+                        if(data instanceof Error) {
+                            reject(data);
+
+                        } else if(typeof data === 'string') {
+                            reject(new Error(data));
+                        
+                        } else {
+                            resolve();
+                        
+                        }
+                    });
+
+                } else {
+                    reject(new Error('Sync isn\'t enabled for "' + remoteResourceName + '"'));
+                }
+            });
+        });
+    }
+
+    /**
      * Get resource
      *
      * @param {String} remoteResourceName
