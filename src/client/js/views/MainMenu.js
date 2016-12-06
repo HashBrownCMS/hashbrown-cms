@@ -58,7 +58,7 @@ class MainMenu extends View {
                 // Dashboard link
                 _.div({class: 'main-menu-item'},
                     _.a({title: 'Dashboard', href: '/', class: 'main-menu-dashboard'},
-                        _.span({class: 'fa fa-dashboard'})
+                        _.span({class: 'fa fa-home'})
                     )
                 ),
 

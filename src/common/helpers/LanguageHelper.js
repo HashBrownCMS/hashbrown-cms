@@ -16,22 +16,19 @@ class LanguageHelper {
      * @returns {String[]} languages
      */
     static getSelectedLanguages() {
-        return new Promise((resolve, reject) => {
-            SettingsHelper.getSettings('language')
-            .then((settings) => {
-                if(!settings) {
-                    settings = {};
-                }
+        return SettingsHelper.getSettings('language')
+        .then((settings) => {
+            if(!settings) {
+                settings = {};
+            }
 
-                if(!settings.selected || settings.selected.length < 1) {
-                    settings.selected = ['en'];
-                }
-          
-                settings.selected.sort();
+            if(!settings.selected || settings.selected.length < 1) {
+                settings.selected = ['en'];
+            }
+      
+            settings.selected.sort();
 
-                resolve(settings.selected);
-            })
-            .catch(reject);  
+            return Promise.resolve(settings.selected);
         });
     }
 

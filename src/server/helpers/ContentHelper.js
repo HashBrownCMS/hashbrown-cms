@@ -36,6 +36,10 @@ class ContentHelper extends ContentHelperCommon {
 
             }
 
+            contentList.sort((a, b) => {
+                return a.sort > b.sort;
+            });
+
             return SyncHelper.mergeResource('content', contentList);
         });
     }

@@ -20,18 +20,16 @@ class ContentPane extends Pane {
 
                 copiedContent.parentId = parentId;
                 
-                apiCall('post', 'content/new', copiedContent)
-                .then(() => {
-                    reloadResource('content')
-                    .then(function() {
-                        navbar.reload();
-                    });
-
-                    navbar.onClickPasteContent = null;
-                })
-                .catch(navbar.onError);
+                return apiCall('post', 'content/new', copiedContent);
             })
-            .catch(navbar.onError);
+            .then(() => {
+                return reloadResource('content');
+            })
+            .then(() => {
+                navbar.reload();
+                navbar.onClickPasteContent = null;
+            })
+            .catch(errorModal);
         }
     }
     
@@ -84,19 +82,18 @@ class ContentPane extends Pane {
             .then((cutContent) => {
                 cutContent.parentId = parentId;
               
-                apiCall('post', 'content/' + cutId, cutContent)
-                .then(() => {
-                    reloadResource('content')
-                    .then(() => {
-                        navbar.reload();
+                return apiCall('post', 'content/' + cutId, cutContent);
+            })
+            .then(() => {
+                return reloadResource('content');
+            })
+            .then(() => {
+                navbar.reload();
+                navbar.onClickPasteContent = null;
 
-                        location.hash = '/content/' + cutId;
-                    });
-
-                    navbar.onClickPasteContent = null;
-                })
-                .catch(navbar.onError);
-            }); 
+                location.hash = '/content/' + cutId;
+            })
+            .catch(navbar.onError);
         }
     }
 
@@ -330,8 +327,10 @@ class ContentPane extends Pane {
 
     /**
      * Event: Click remove content
+     *
+     * @param {Boolean} shouldUnpublish
      */
-    static onClickRemoveContent() {
+    static onClickRemoveContent(shouldUnpublish) {
         let navbar = ViewHelper.get('NavbarMain');
         let id = $('.context-menu-target-element').data('id');
         let name = $('.context-menu-target-element').data('name');
@@ -341,22 +340,25 @@ class ContentPane extends Pane {
             content.getSettings('publishing')
             .then((publishing) => {
                 function unpublishConnections() {
-                    apiCall('post', 'content/unpublish', content)
-                    .then(onSuccess)
-                    .catch(navbar.onError);
+                    return apiCall('post', 'content/unpublish', content)
+                    .then(() => {
+                        return onSuccess();
+                    });
                 }
                 
                 function onSuccess() {
                     debug.log('Removed content with id "' + id + '"', navbar); 
                 
-                    reloadResource('content')
-                    .then(function() {
+                    return reloadResource('content')
+                    .then(() => {
                         navbar.reload();
                         
                         // Cancel the ContentEditor view if it was displaying the deleted content
                         if(location.hash.indexOf('#/content/' + id) > -1) {
                             location.hash = '/content/';
                         }
+
+                        return Promise.resolve();
                     });
                 }
 
@@ -394,13 +396,13 @@ class ContentPane extends Pane {
                             callback: function() {
                                 apiCall('delete', 'content/' + id + '?removeChildren=' + messageModal.$element.find('.switch input')[0].checked)
                                 .then(() => {
-                                    if(publishing.connections && publishing.connections.length > 0) {
-                                        unpublishConnections();
+                                    if(shouldUnpublish && publishing.connections && publishing.connections.length > 0) {
+                                        return unpublishConnections();
                                     } else {
-                                        onSuccess();
+                                        return onSuccess();
                                     }
                                 })
-                                .catch(navbar.onError);
+                                .catch(errorModal);
                             }
                         }
                     ]
@@ -435,7 +437,7 @@ class ContentPane extends Pane {
 
                 if(!item.local && !item.remote && !item.locked) {
                     menu['Cut'] = () => { this.onClickCutContent(); };
-                    menu['Remove'] = () => { this.onClickRemoveContent(); };
+                    menu['Remove'] = () => { this.onClickRemoveContent(true); };
                 }
 
                 if(!item.remote && !item.locked) {

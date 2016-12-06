@@ -9,9 +9,7 @@ class SettingsHelper {
      * @return {Promise(Object)}  settings
      */
     static getSettings(section) {
-        return new Promise((resolve, reject) => {
-            reject();
-        });
+        return Promise.reject();
     }
     
     /**
@@ -23,9 +21,7 @@ class SettingsHelper {
      * @return {Promise} promise
      */
     static setSettings(section, settings) {
-        return new Promise((resolve, reject) => {
-            reject();
-        });
+        return Promise.reject();
     }
 }
 

@@ -1725,6 +1725,7 @@ PEMEncoder.prototype.encode = function encode(data, options) {
 },{"./der":12,"inherits":101}],15:[function(require,module,exports){
 'use strict'
 
+exports.byteLength = byteLength
 exports.toByteArray = toByteArray
 exports.fromByteArray = fromByteArray
 
@@ -1732,23 +1733,17 @@ var lookup = []
 var revLookup = []
 var Arr = typeof Uint8Array !== 'undefined' ? Uint8Array : Array
 
-function init () {
-  var code = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
-  for (var i = 0, len = code.length; i < len; ++i) {
-    lookup[i] = code[i]
-    revLookup[code.charCodeAt(i)] = i
-  }
-
-  revLookup['-'.charCodeAt(0)] = 62
-  revLookup['_'.charCodeAt(0)] = 63
+var code = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
+for (var i = 0, len = code.length; i < len; ++i) {
+  lookup[i] = code[i]
+  revLookup[code.charCodeAt(i)] = i
 }
 
-init()
+revLookup['-'.charCodeAt(0)] = 62
+revLookup['_'.charCodeAt(0)] = 63
 
-function toByteArray (b64) {
-  var i, j, l, tmp, placeHolders, arr
+function placeHoldersCount (b64) {
   var len = b64.length
-
   if (len % 4 > 0) {
     throw new Error('Invalid string. Length must be a multiple of 4')
   }
@@ -1758,9 +1753,19 @@ function toByteArray (b64) {
   // represent one byte
   // if there is only one, then the three characters before it represent 2 bytes
   // this is just a cheap hack to not do indexOf twice
-  placeHolders = b64[len - 2] === '=' ? 2 : b64[len - 1] === '=' ? 1 : 0
+  return b64[len - 2] === '=' ? 2 : b64[len - 1] === '=' ? 1 : 0
+}
 
+function byteLength (b64) {
   // base64 is 4/3 + up to two characters of the original data
+  return b64.length * 3 / 4 - placeHoldersCount(b64)
+}
+
+function toByteArray (b64) {
+  var i, j, l, tmp, placeHolders, arr
+  var len = b64.length
+  placeHolders = placeHoldersCount(b64)
+
   arr = new Arr(len * 3 / 4 - placeHolders)
 
   // if there are placeholders, only get up to the last complete 4 chars
@@ -20560,14 +20565,21 @@ utils.intFromLE = intFromLE;
 module.exports={
   "_args": [
     [
-      "elliptic@^6.0.0",
+      {
+        "raw": "elliptic@^6.0.0",
+        "scope": null,
+        "escapedName": "elliptic",
+        "name": "elliptic",
+        "rawSpec": "^6.0.0",
+        "spec": ">=6.0.0 <7.0.0",
+        "type": "range"
+      },
       "/home/mrzapp/Development/Web/hashbrown-cms/node_modules/browserify-sign"
     ]
   ],
   "_from": "elliptic@>=6.0.0 <7.0.0",
   "_id": "elliptic@6.3.2",
   "_inCache": true,
-  "_installable": true,
   "_location": "/elliptic",
   "_nodeVersion": "6.3.0",
   "_npmOperationalInternal": {
@@ -20575,16 +20587,17 @@ module.exports={
     "tmp": "tmp/elliptic-6.3.2.tgz_1473938837205_0.3108903462998569"
   },
   "_npmUser": {
-    "email": "fedor@indutny.com",
-    "name": "indutny"
+    "name": "indutny",
+    "email": "fedor@indutny.com"
   },
   "_npmVersion": "3.10.3",
   "_phantomChildren": {},
   "_requested": {
-    "name": "elliptic",
     "raw": "elliptic@^6.0.0",
-    "rawSpec": "^6.0.0",
     "scope": null,
+    "escapedName": "elliptic",
+    "name": "elliptic",
+    "rawSpec": "^6.0.0",
     "spec": ">=6.0.0 <7.0.0",
     "type": "range"
   },
@@ -20598,8 +20611,8 @@ module.exports={
   "_spec": "elliptic@^6.0.0",
   "_where": "/home/mrzapp/Development/Web/hashbrown-cms/node_modules/browserify-sign",
   "author": {
-    "email": "fedor@indutny.com",
-    "name": "Fedor Indutny"
+    "name": "Fedor Indutny",
+    "email": "fedor@indutny.com"
   },
   "bugs": {
     "url": "https://github.com/indutny/elliptic/issues"
@@ -20646,8 +20659,8 @@ module.exports={
   "main": "lib/elliptic.js",
   "maintainers": [
     {
-      "email": "fedor@indutny.com",
-      "name": "indutny"
+      "name": "indutny",
+      "email": "fedor@indutny.com"
     }
   ],
   "name": "elliptic",
@@ -29890,14 +29903,16 @@ var PATH_REGEXP = new RegExp([
 /**
  * Parse a string for the raw tokens.
  *
- * @param  {string} str
+ * @param  {string}  str
+ * @param  {Object=} options
  * @return {!Array}
  */
-function parse (str) {
+function parse (str, options) {
   var tokens = []
   var key = 0
   var index = 0
   var path = ''
+  var defaultDelimiter = options && options.delimiter || '/'
   var res
 
   while ((res = PATH_REGEXP.exec(str)) != null) {
@@ -29930,8 +29945,8 @@ function parse (str) {
     var partial = prefix != null && next != null && next !== prefix
     var repeat = modifier === '+' || modifier === '*'
     var optional = modifier === '?' || modifier === '*'
-    var delimiter = res[2] || '/'
-    var pattern = capture || group || (asterisk ? '.*' : '[^' + delimiter + ']+?')
+    var delimiter = res[2] || defaultDelimiter
+    var pattern = capture || group
 
     tokens.push({
       name: name || key++,
@@ -29941,7 +29956,7 @@ function parse (str) {
       repeat: repeat,
       partial: partial,
       asterisk: !!asterisk,
-      pattern: escapeGroup(pattern)
+      pattern: pattern ? escapeGroup(pattern) : (asterisk ? '.*' : '[^' + escapeString(delimiter) + ']+?')
     })
   }
 
@@ -29962,10 +29977,11 @@ function parse (str) {
  * Compile a string to a template function for the path.
  *
  * @param  {string}             str
+ * @param  {Object=}            options
  * @return {!function(Object=, Object=)}
  */
-function compile (str) {
-  return tokensToFunction(parse(str))
+function compile (str, options) {
+  return tokensToFunction(parse(str, options))
 }
 
 /**
@@ -30176,27 +30192,23 @@ function arrayToRegexp (path, keys, options) {
  * @return {!RegExp}
  */
 function stringToRegexp (path, keys, options) {
-  var tokens = parse(path)
-  var re = tokensToRegExp(tokens, options)
-
-  // Attach keys back to the regexp.
-  for (var i = 0; i < tokens.length; i++) {
-    if (typeof tokens[i] !== 'string') {
-      keys.push(tokens[i])
-    }
-  }
-
-  return attachKeys(re, keys)
+  return tokensToRegExp(parse(path, options), keys, options)
 }
 
 /**
  * Expose a function for taking tokens and returning a RegExp.
  *
- * @param  {!Array}  tokens
- * @param  {Object=} options
+ * @param  {!Array}          tokens
+ * @param  {(Array|Object)=} keys
+ * @param  {Object=}         options
  * @return {!RegExp}
  */
-function tokensToRegExp (tokens, options) {
+function tokensToRegExp (tokens, keys, options) {
+  if (!isarray(keys)) {
+    options = /** @type {!Object} */ (keys || options)
+    keys = []
+  }
+
   options = options || {}
 
   var strict = options.strict
@@ -30214,6 +30226,8 @@ function tokensToRegExp (tokens, options) {
     } else {
       var prefix = escapeString(token.prefix)
       var capture = '(?:' + token.pattern + ')'
+
+      keys.push(token)
 
       if (token.repeat) {
         capture += '(?:' + prefix + capture + ')*'
@@ -30249,7 +30263,7 @@ function tokensToRegExp (tokens, options) {
     route += strict && endsWithSlash ? '' : '(?=\\/|$)'
   }
 
-  return new RegExp('^' + route, flags(options))
+  return attachKeys(new RegExp('^' + route, flags(options)), keys)
 }
 
 /**
@@ -30265,14 +30279,12 @@ function tokensToRegExp (tokens, options) {
  * @return {!RegExp}
  */
 function pathToRegexp (path, keys, options) {
-  keys = keys || []
-
   if (!isarray(keys)) {
-    options = /** @type {!Object} */ (keys)
+    options = /** @type {!Object} */ (keys || options)
     keys = []
-  } else if (!options) {
-    options = {}
   }
+
+  options = options || {}
 
   if (path instanceof RegExp) {
     return regexpToRegexp(path, /** @type {!Array} */ (keys))
@@ -38441,7 +38453,7 @@ class MainMenu extends View {
             })))),
 
             // Dashboard link
-            _.div({ class: 'main-menu-item' }, _.a({ title: 'Dashboard', href: '/', class: 'main-menu-dashboard' }, _.span({ class: 'fa fa-dashboard' }))),
+            _.div({ class: 'main-menu-item' }, _.a({ title: 'Dashboard', href: '/', class: 'main-menu-dashboard' }, _.span({ class: 'fa fa-home' }))),
 
             // User dropdown
             _.div({ class: 'main-menu-item main-menu-user dropdown' }, _.button({ title: 'User', class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, _.span({ class: 'fa fa-user' })), _.ul({ class: 'dropdown-menu' }, _.li(_.a({ class: 'dropdown-item', href: '#/users/' + this.user.id }, 'User settings')), _.li(_.a({ class: 'dropdown-item', href: '#' }, 'Log out').click(e => {
@@ -41771,14 +41783,13 @@ class ContentPane extends Pane {
 
                 copiedContent.parentId = parentId;
 
-                apiCall('post', 'content/new', copiedContent).then(() => {
-                    reloadResource('content').then(function () {
-                        navbar.reload();
-                    });
-
-                    navbar.onClickPasteContent = null;
-                }).catch(navbar.onError);
-            }).catch(navbar.onError);
+                return apiCall('post', 'content/new', copiedContent);
+            }).then(() => {
+                return reloadResource('content');
+            }).then(() => {
+                navbar.reload();
+                navbar.onClickPasteContent = null;
+            }).catch(errorModal);
         };
     }
 
@@ -41824,16 +41835,15 @@ class ContentPane extends Pane {
             ContentHelper.getContentById(cutId).then(cutContent => {
                 cutContent.parentId = parentId;
 
-                apiCall('post', 'content/' + cutId, cutContent).then(() => {
-                    reloadResource('content').then(() => {
-                        navbar.reload();
+                return apiCall('post', 'content/' + cutId, cutContent);
+            }).then(() => {
+                return reloadResource('content');
+            }).then(() => {
+                navbar.reload();
+                navbar.onClickPasteContent = null;
 
-                        location.hash = '/content/' + cutId;
-                    });
-
-                    navbar.onClickPasteContent = null;
-                }).catch(navbar.onError);
-            });
+                location.hash = '/content/' + cutId;
+            }).catch(navbar.onError);
         };
     }
 
@@ -42016,8 +42026,10 @@ class ContentPane extends Pane {
 
     /**
      * Event: Click remove content
+     *
+     * @param {Boolean} shouldUnpublish
      */
-    static onClickRemoveContent() {
+    static onClickRemoveContent(shouldUnpublish) {
         let navbar = ViewHelper.get('NavbarMain');
         let id = $('.context-menu-target-element').data('id');
         let name = $('.context-menu-target-element').data('name');
@@ -42025,19 +42037,23 @@ class ContentPane extends Pane {
         ContentHelper.getContentById(id).then(content => {
             content.getSettings('publishing').then(publishing => {
                 function unpublishConnections() {
-                    apiCall('post', 'content/unpublish', content).then(onSuccess).catch(navbar.onError);
+                    return apiCall('post', 'content/unpublish', content).then(() => {
+                        return onSuccess();
+                    });
                 }
 
                 function onSuccess() {
                     debug.log('Removed content with id "' + id + '"', navbar);
 
-                    reloadResource('content').then(function () {
+                    return reloadResource('content').then(() => {
                         navbar.reload();
 
                         // Cancel the ContentEditor view if it was displaying the deleted content
                         if (location.hash.indexOf('#/content/' + id) > -1) {
                             location.hash = '/content/';
                         }
+
+                        return Promise.resolve();
                     });
                 }
 
@@ -42060,12 +42076,12 @@ class ContentPane extends Pane {
                         class: 'btn-danger',
                         callback: function callback() {
                             apiCall('delete', 'content/' + id + '?removeChildren=' + messageModal.$element.find('.switch input')[0].checked).then(() => {
-                                if (publishing.connections && publishing.connections.length > 0) {
-                                    unpublishConnections();
+                                if (shouldUnpublish && publishing.connections && publishing.connections.length > 0) {
+                                    return unpublishConnections();
                                 } else {
-                                    onSuccess();
+                                    return onSuccess();
                                 }
-                            }).catch(navbar.onError);
+                            }).catch(errorModal);
                         }
                     }]
                 });
@@ -42110,7 +42126,7 @@ class ContentPane extends Pane {
                         this.onClickCutContent();
                     };
                     menu['Remove'] = () => {
-                        this.onClickRemoveContent();
+                        this.onClickRemoveContent(true);
                     };
                 }
 
@@ -44060,20 +44076,18 @@ class LanguageHelper {
      * @returns {String[]} languages
      */
     static getSelectedLanguages() {
-        return new Promise((resolve, reject) => {
-            SettingsHelper.getSettings('language').then(settings => {
-                if (!settings) {
-                    settings = {};
-                }
+        return SettingsHelper.getSettings('language').then(settings => {
+            if (!settings) {
+                settings = {};
+            }
 
-                if (!settings.selected || settings.selected.length < 1) {
-                    settings.selected = ['en'];
-                }
+            if (!settings.selected || settings.selected.length < 1) {
+                settings.selected = ['en'];
+            }
 
-                settings.selected.sort();
+            settings.selected.sort();
 
-                resolve(settings.selected);
-            }).catch(reject);
+            return Promise.resolve(settings.selected);
         });
     }
 
@@ -44252,9 +44266,7 @@ class SettingsHelper {
      * @return {Promise(Object)}  settings
      */
     static getSettings(section) {
-        return new Promise((resolve, reject) => {
-            reject();
-        });
+        return Promise.reject();
     }
 
     /**
@@ -44266,9 +44278,7 @@ class SettingsHelper {
      * @return {Promise} promise
      */
     static setSettings(section, settings) {
-        return new Promise((resolve, reject) => {
-            reject();
-        });
+        return Promise.reject();
     }
 }
 
