@@ -94,6 +94,40 @@ class UpdateHelper {
                     reject(new Error('git exited with status code ' + code));
                 }
             });
+        })
+        .then(this.installDependencies);
+    }
+
+    /**
+     * Install dependencies
+     *
+     * @returns {Promise} Status info
+     */
+    installDependencies() {
+        return new Promise((resolve, reject) => {
+            debug.log('Installing dependencies...', this);
+            
+            let npm = exec('npm install', {
+                cwd: appRoot
+            });
+
+            npm.stdout.on('data', (data) => {
+                debug.log(data, this, 3);
+            });
+
+            npm.stderr.on('data', (data) => {
+                debug.log(data, this, 3);
+            });
+            
+            npm.on('exit', (code) => {
+                if(code == 0 || code == '0') {
+                    debug.log('Install successful', this);
+                    resolve();
+                } else {
+                    debug.log('Update failed', this);
+                    reject(new Error('npm exited with status code ' + code));
+                }
+            });
         });
     }
 }
