@@ -362,51 +362,28 @@ class ContentPane extends Pane {
                     });
                 }
 
-                let messageModal = new MessageModal({
-                    model: {
-                        title: 'Remove content',
-                        body: _.div({},
-                            _.p('Are you sure you want to remove the content "' + name + '"?'),
-                            _.div({class: 'input-group'},      
-                                _.span('Remove child content too'),
-                                _.div({class: 'input-group-addon'},
-                                    _.div({class: 'switch'},
-                                        _.input({
-                                            id: 'switch-content-delete-children',
-                                            class: 'form-control switch',
-                                            type: 'checkbox',
-                                            checked: true
-                                        }),
-                                        _.label({for: 'switch-content-delete-children'})
-                                    )
-                                )
-                            )
+                let $deleteChildrenSwitch;
+                let modal = confirmModal(
+                    'Remove',
+                    'Remove the content "' + name + '"?',
+                    _.div({class: 'input-group'},      
+                        _.span('Remove child content too'),
+                        _.div({class: 'input-group-addon'},
+                            $deleteChildrenSwitch = UIHelper.renderSwitch(true)
                         )
-                    },
-                    buttons: [
-                        {
-                            label: 'Cancel',
-                            class: 'btn-default',
-                            callback: function() {
+                    ),
+                    () => {
+                        apiCall('delete', 'content/' + id + '?removeChildren=' + $deleteChildrenSwitch.data('checked'))
+                        .then(() => {
+                            if(shouldUnpublish && publishing.connections && publishing.connections.length > 0) {
+                                return unpublishConnections();
+                            } else {
+                                return onSuccess();
                             }
-                        },
-                        {
-                            label: 'OK',
-                            class: 'btn-danger',
-                            callback: function() {
-                                apiCall('delete', 'content/' + id + '?removeChildren=' + messageModal.$element.find('.switch input')[0].checked)
-                                .then(() => {
-                                    if(shouldUnpublish && publishing.connections && publishing.connections.length > 0) {
-                                        return unpublishConnections();
-                                    } else {
-                                        return onSuccess();
-                                    }
-                                })
-                                .catch(errorModal);
-                            }
-                        }
-                    ]
-                });
+                        })
+                        .catch(errorModal);
+                    }
+                );
             });
         });
     }

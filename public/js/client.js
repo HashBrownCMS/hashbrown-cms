@@ -1725,6 +1725,7 @@ PEMEncoder.prototype.encode = function encode(data, options) {
 },{"./der":12,"inherits":101}],15:[function(require,module,exports){
 'use strict'
 
+exports.byteLength = byteLength
 exports.toByteArray = toByteArray
 exports.fromByteArray = fromByteArray
 
@@ -1732,23 +1733,17 @@ var lookup = []
 var revLookup = []
 var Arr = typeof Uint8Array !== 'undefined' ? Uint8Array : Array
 
-function init () {
-  var code = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
-  for (var i = 0, len = code.length; i < len; ++i) {
-    lookup[i] = code[i]
-    revLookup[code.charCodeAt(i)] = i
-  }
-
-  revLookup['-'.charCodeAt(0)] = 62
-  revLookup['_'.charCodeAt(0)] = 63
+var code = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
+for (var i = 0, len = code.length; i < len; ++i) {
+  lookup[i] = code[i]
+  revLookup[code.charCodeAt(i)] = i
 }
 
-init()
+revLookup['-'.charCodeAt(0)] = 62
+revLookup['_'.charCodeAt(0)] = 63
 
-function toByteArray (b64) {
-  var i, j, l, tmp, placeHolders, arr
+function placeHoldersCount (b64) {
   var len = b64.length
-
   if (len % 4 > 0) {
     throw new Error('Invalid string. Length must be a multiple of 4')
   }
@@ -1758,9 +1753,19 @@ function toByteArray (b64) {
   // represent one byte
   // if there is only one, then the three characters before it represent 2 bytes
   // this is just a cheap hack to not do indexOf twice
-  placeHolders = b64[len - 2] === '=' ? 2 : b64[len - 1] === '=' ? 1 : 0
+  return b64[len - 2] === '=' ? 2 : b64[len - 1] === '=' ? 1 : 0
+}
 
+function byteLength (b64) {
   // base64 is 4/3 + up to two characters of the original data
+  return b64.length * 3 / 4 - placeHoldersCount(b64)
+}
+
+function toByteArray (b64) {
+  var i, j, l, tmp, placeHolders, arr
+  var len = b64.length
+  placeHolders = placeHoldersCount(b64)
+
   arr = new Arr(len * 3 / 4 - placeHolders)
 
   // if there are placeholders, only get up to the last complete 4 chars
@@ -20560,14 +20565,21 @@ utils.intFromLE = intFromLE;
 module.exports={
   "_args": [
     [
-      "elliptic@^6.0.0",
+      {
+        "raw": "elliptic@^6.0.0",
+        "scope": null,
+        "escapedName": "elliptic",
+        "name": "elliptic",
+        "rawSpec": "^6.0.0",
+        "spec": ">=6.0.0 <7.0.0",
+        "type": "range"
+      },
       "/home/mrzapp/Development/Web/hashbrown-cms/node_modules/browserify-sign"
     ]
   ],
   "_from": "elliptic@>=6.0.0 <7.0.0",
   "_id": "elliptic@6.3.2",
   "_inCache": true,
-  "_installable": true,
   "_location": "/elliptic",
   "_nodeVersion": "6.3.0",
   "_npmOperationalInternal": {
@@ -20575,16 +20587,17 @@ module.exports={
     "tmp": "tmp/elliptic-6.3.2.tgz_1473938837205_0.3108903462998569"
   },
   "_npmUser": {
-    "email": "fedor@indutny.com",
-    "name": "indutny"
+    "name": "indutny",
+    "email": "fedor@indutny.com"
   },
   "_npmVersion": "3.10.3",
   "_phantomChildren": {},
   "_requested": {
-    "name": "elliptic",
     "raw": "elliptic@^6.0.0",
-    "rawSpec": "^6.0.0",
     "scope": null,
+    "escapedName": "elliptic",
+    "name": "elliptic",
+    "rawSpec": "^6.0.0",
     "spec": ">=6.0.0 <7.0.0",
     "type": "range"
   },
@@ -20598,8 +20611,8 @@ module.exports={
   "_spec": "elliptic@^6.0.0",
   "_where": "/home/mrzapp/Development/Web/hashbrown-cms/node_modules/browserify-sign",
   "author": {
-    "email": "fedor@indutny.com",
-    "name": "Fedor Indutny"
+    "name": "Fedor Indutny",
+    "email": "fedor@indutny.com"
   },
   "bugs": {
     "url": "https://github.com/indutny/elliptic/issues"
@@ -20646,8 +20659,8 @@ module.exports={
   "main": "lib/elliptic.js",
   "maintainers": [
     {
-      "email": "fedor@indutny.com",
-      "name": "indutny"
+      "name": "indutny",
+      "email": "fedor@indutny.com"
     }
   ],
   "name": "elliptic",
@@ -29890,14 +29903,16 @@ var PATH_REGEXP = new RegExp([
 /**
  * Parse a string for the raw tokens.
  *
- * @param  {string} str
+ * @param  {string}  str
+ * @param  {Object=} options
  * @return {!Array}
  */
-function parse (str) {
+function parse (str, options) {
   var tokens = []
   var key = 0
   var index = 0
   var path = ''
+  var defaultDelimiter = options && options.delimiter || '/'
   var res
 
   while ((res = PATH_REGEXP.exec(str)) != null) {
@@ -29930,8 +29945,8 @@ function parse (str) {
     var partial = prefix != null && next != null && next !== prefix
     var repeat = modifier === '+' || modifier === '*'
     var optional = modifier === '?' || modifier === '*'
-    var delimiter = res[2] || '/'
-    var pattern = capture || group || (asterisk ? '.*' : '[^' + delimiter + ']+?')
+    var delimiter = res[2] || defaultDelimiter
+    var pattern = capture || group
 
     tokens.push({
       name: name || key++,
@@ -29941,7 +29956,7 @@ function parse (str) {
       repeat: repeat,
       partial: partial,
       asterisk: !!asterisk,
-      pattern: escapeGroup(pattern)
+      pattern: pattern ? escapeGroup(pattern) : (asterisk ? '.*' : '[^' + escapeString(delimiter) + ']+?')
     })
   }
 
@@ -29962,10 +29977,11 @@ function parse (str) {
  * Compile a string to a template function for the path.
  *
  * @param  {string}             str
+ * @param  {Object=}            options
  * @return {!function(Object=, Object=)}
  */
-function compile (str) {
-  return tokensToFunction(parse(str))
+function compile (str, options) {
+  return tokensToFunction(parse(str, options))
 }
 
 /**
@@ -30176,27 +30192,23 @@ function arrayToRegexp (path, keys, options) {
  * @return {!RegExp}
  */
 function stringToRegexp (path, keys, options) {
-  var tokens = parse(path)
-  var re = tokensToRegExp(tokens, options)
-
-  // Attach keys back to the regexp.
-  for (var i = 0; i < tokens.length; i++) {
-    if (typeof tokens[i] !== 'string') {
-      keys.push(tokens[i])
-    }
-  }
-
-  return attachKeys(re, keys)
+  return tokensToRegExp(parse(path, options), keys, options)
 }
 
 /**
  * Expose a function for taking tokens and returning a RegExp.
  *
- * @param  {!Array}  tokens
- * @param  {Object=} options
+ * @param  {!Array}          tokens
+ * @param  {(Array|Object)=} keys
+ * @param  {Object=}         options
  * @return {!RegExp}
  */
-function tokensToRegExp (tokens, options) {
+function tokensToRegExp (tokens, keys, options) {
+  if (!isarray(keys)) {
+    options = /** @type {!Object} */ (keys || options)
+    keys = []
+  }
+
   options = options || {}
 
   var strict = options.strict
@@ -30214,6 +30226,8 @@ function tokensToRegExp (tokens, options) {
     } else {
       var prefix = escapeString(token.prefix)
       var capture = '(?:' + token.pattern + ')'
+
+      keys.push(token)
 
       if (token.repeat) {
         capture += '(?:' + prefix + capture + ')*'
@@ -30249,7 +30263,7 @@ function tokensToRegExp (tokens, options) {
     route += strict && endsWithSlash ? '' : '(?=\\/|$)'
   }
 
-  return new RegExp('^' + route, flags(options))
+  return attachKeys(new RegExp('^' + route, flags(options)), keys)
 }
 
 /**
@@ -30265,14 +30279,12 @@ function tokensToRegExp (tokens, options) {
  * @return {!RegExp}
  */
 function pathToRegexp (path, keys, options) {
-  keys = keys || []
-
   if (!isarray(keys)) {
-    options = /** @type {!Object} */ (keys)
+    options = /** @type {!Object} */ (keys || options)
     keys = []
-  } else if (!options) {
-    options = {}
   }
+
+  options = options || {}
 
   if (path instanceof RegExp) {
     return regexpToRegexp(path, /** @type {!Array} */ (keys))
@@ -35340,6 +35352,7 @@ window.ContentHelper = require('./helpers/ContentHelper');
 window.LanguageHelper = require('./helpers/LanguageHelper');
 window.SchemaHelper = require('./helpers/SchemaHelper');
 window.SettingsHelper = require('./helpers/SettingsHelper');
+window.UIHelper = require('./helpers/UIHelper');
 
 // Ready callback containers
 let onReadyCallbacks = {};
@@ -35470,7 +35483,7 @@ onReady('resources', function () {
     Router.init();
 });
 
-},{"../../../package.json":158,"./helpers":164,"./helpers/ConnectionHelper":165,"./helpers/ContentHelper":166,"./helpers/LanguageHelper":167,"./helpers/MediaHelper":168,"./helpers/SchemaHelper":170,"./helpers/SettingsHelper":171,"./models/Content":173,"./routes/index":178,"./views/ConnectionEditor":183,"./views/ContentEditor":184,"./views/FormEditor":185,"./views/InfoSettings":186,"./views/JSONEditor":187,"./views/LanguageSettings":188,"./views/MainMenu":189,"./views/MediaBrowser":190,"./views/MediaViewer":191,"./views/SchemaEditor":193,"./views/SyncSettings":194,"./views/UserEditor":195,"./views/editors":212,"./views/navbar/NavbarMain":218}],164:[function(require,module,exports){
+},{"../../../package.json":158,"./helpers":164,"./helpers/ConnectionHelper":165,"./helpers/ContentHelper":166,"./helpers/LanguageHelper":167,"./helpers/MediaHelper":168,"./helpers/SchemaHelper":170,"./helpers/SettingsHelper":171,"./helpers/UIHelper":172,"./models/Content":174,"./routes/index":179,"./views/ConnectionEditor":184,"./views/ContentEditor":185,"./views/FormEditor":186,"./views/InfoSettings":187,"./views/JSONEditor":188,"./views/LanguageSettings":189,"./views/MainMenu":190,"./views/MediaBrowser":191,"./views/MediaViewer":192,"./views/SchemaEditor":194,"./views/SyncSettings":195,"./views/UserEditor":196,"./views/editors":213,"./views/navbar/NavbarMain":219}],164:[function(require,module,exports){
 'use strict';
 
 // Libraries
@@ -35563,11 +35576,38 @@ window.errorModal = function errorModal(error) {
  * Brings up a confirm modal
  *
  * @param {String} type
- * @param {String} heading
+ * @param {String} title
  * @param {String} body
- * @param {Function} callback
+ * @param {Function} onSubmit
  */
-window.confirmModal = function confirmModal(type, heading, body, onClickOK) {};
+window.confirmModal = function confirmModal(type, title, body, onSubmit) {
+    let submitClass = 'btn-primary';
+
+    type = (type || '').toLowerCase();
+
+    switch (type) {
+        case 'delete':case 'remove':
+            submitClass = 'btn-danger';
+            break;
+    }
+
+    return new MessageModal({
+        model: {
+            title: title,
+            body: body,
+            onSubmit: onSubmit
+        },
+        buttons: [{
+            label: 'Cancel',
+            class: 'btn-default',
+            callback: () => {}
+        }, {
+            label: type,
+            class: submitClass,
+            callback: onSubmit
+        }]
+    });
+};
 
 /**
  * Gets a cookie by name
@@ -35701,7 +35741,7 @@ window.customApiCall = function customApiCall(method, url, data) {
     });
 };
 
-},{"../../common/helpers/DebugHelper":226,"./helpers/ProjectHelper":169,"./views/MessageModal":192,"bluebird":17,"exomon":92,"marked":108,"to-markdown":151}],165:[function(require,module,exports){
+},{"../../common/helpers/DebugHelper":227,"./helpers/ProjectHelper":169,"./views/MessageModal":193,"bluebird":17,"exomon":92,"marked":108,"to-markdown":151}],165:[function(require,module,exports){
 'use strict';
 
 let ConnectionHelperCommon = require('../../../common/helpers/ConnectionHelper');
@@ -35740,7 +35780,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
 
 module.exports = ConnectionHelper;
 
-},{"../../../common/helpers/ConnectionHelper":224,"../../../common/models/Connection":231}],166:[function(require,module,exports){
+},{"../../../common/helpers/ConnectionHelper":225,"../../../common/models/Connection":232}],166:[function(require,module,exports){
 'use strict';
 
 let ContentHelperCommon = require('../../../common/helpers/ContentHelper');
@@ -35812,7 +35852,7 @@ class ContentHelper extends ContentHelperCommon {
 
 module.exports = ContentHelper;
 
-},{"../../../common/helpers/ContentHelper":225,"../models/Content":173}],167:[function(require,module,exports){
+},{"../../../common/helpers/ContentHelper":226,"../models/Content":174}],167:[function(require,module,exports){
 'use strict';
 
 let LanguageHelperCommon = require('../../../common/helpers/LanguageHelper');
@@ -35821,7 +35861,7 @@ class LanguageHelper extends LanguageHelperCommon {}
 
 module.exports = LanguageHelper;
 
-},{"../../../common/helpers/LanguageHelper":227}],168:[function(require,module,exports){
+},{"../../../common/helpers/LanguageHelper":228}],168:[function(require,module,exports){
 'use strict';
 
 let MediaHelperCommon = require('../../../common/helpers/MediaHelper');
@@ -35896,7 +35936,7 @@ class MediaHelper extends MediaHelperCommon {
 
 module.exports = MediaHelper;
 
-},{"../../../common/helpers/MediaHelper":228}],169:[function(require,module,exports){
+},{"../../../common/helpers/MediaHelper":229}],169:[function(require,module,exports){
 'use strict';
 
 /**
@@ -35991,7 +36031,7 @@ class SchemaHelper extends SchemaHelperCommon {
 
 module.exports = SchemaHelper;
 
-},{"../../../common/helpers/SchemaHelper":229,"../../../common/models/FieldSchema":235}],171:[function(require,module,exports){
+},{"../../../common/helpers/SchemaHelper":230,"../../../common/models/FieldSchema":236}],171:[function(require,module,exports){
 'use strict';
 
 let SettingsHelperCommon = require('../../../common/helpers/SettingsHelper');
@@ -36023,7 +36063,34 @@ class SettingsHelper extends SettingsHelperCommon {
 
 module.exports = SettingsHelper;
 
-},{"../../../common/helpers/SettingsHelper":230}],172:[function(require,module,exports){
+},{"../../../common/helpers/SettingsHelper":231}],172:[function(require,module,exports){
+'use strict';
+
+class UIHelper {
+    /**
+     * Creates a switch
+     *
+     * @param {Boolean} initialValue
+     *
+     * @returns {HTMLElement} Switch element
+     */
+    static renderSwitch(initialValue) {
+        let id = 'switch' + (10000 + Math.floor(Math.random() * 10000));
+
+        return _.div({ class: 'switch', 'data-checked': initialValue }, _.input({
+            id: id,
+            class: 'form-control switch',
+            type: 'checkbox',
+            checked: initialValue
+        }).change(function () {
+            this.parentElement.dataset = this.checked;
+        }), _.label({ for: id }));
+    }
+}
+
+module.exports = UIHelper;
+
+},{}],173:[function(require,module,exports){
 module.exports={
     "icons": [    
         "500px",
@@ -36723,7 +36790,7 @@ module.exports={
     ]
 }
 
-},{}],173:[function(require,module,exports){
+},{}],174:[function(require,module,exports){
 'use strict';
 
 let ContentCommon = require('../../../common/models/Content');
@@ -36735,7 +36802,7 @@ class Content extends ContentCommon {}
 
 module.exports = Content;
 
-},{"../../../common/models/Content":232}],174:[function(require,module,exports){
+},{"../../../common/models/Content":233}],175:[function(require,module,exports){
 'use strict';
 
 // Root
@@ -36787,7 +36854,7 @@ Router.route('/license/', function () {
     });
 });
 
-},{}],175:[function(require,module,exports){
+},{}],176:[function(require,module,exports){
 'use strict';
 
 // Dashboard
@@ -36832,7 +36899,7 @@ Router.route('/connections/json/:id', function () {
     }
 });
 
-},{}],176:[function(require,module,exports){
+},{}],177:[function(require,module,exports){
 'use strict';
 
 // Dashboard
@@ -36889,7 +36956,7 @@ Router.route('/content/:id/:tab', function () {
     }
 });
 
-},{}],177:[function(require,module,exports){
+},{}],178:[function(require,module,exports){
 'use strict';
 
 // Dashboard
@@ -36923,7 +36990,7 @@ Router.route('/forms/json/:id', function () {
     $('.workspace').html(formEditor.$element);
 });
 
-},{}],178:[function(require,module,exports){
+},{}],179:[function(require,module,exports){
 'use strict';
 
 require('./cms');
@@ -36935,7 +37002,7 @@ require('./settings');
 require('./forms');
 require('./users');
 
-},{"./cms":174,"./connections":175,"./content":176,"./forms":177,"./media":179,"./schemas":180,"./settings":181,"./users":182}],179:[function(require,module,exports){
+},{"./cms":175,"./connections":176,"./content":177,"./forms":178,"./media":180,"./schemas":181,"./settings":182,"./users":183}],180:[function(require,module,exports){
 'use strict';
 
 // Dashboard
@@ -36959,7 +37026,7 @@ Router.route('/media/:id', function () {
     $('.workspace').html(mediaViewer.$element);
 });
 
-},{}],180:[function(require,module,exports){
+},{}],181:[function(require,module,exports){
 'use strict';
 
 // Dashboard
@@ -37012,7 +37079,7 @@ Router.route('/schemas/json/:id', function () {
     }
 });
 
-},{}],181:[function(require,module,exports){
+},{}],182:[function(require,module,exports){
 'use strict';
 
 // Dashboard
@@ -37060,7 +37127,7 @@ Router.route('/settings/info/', function () {
     }
 });
 
-},{}],182:[function(require,module,exports){
+},{}],183:[function(require,module,exports){
 'use strict';
 
 // Users
@@ -37092,7 +37159,7 @@ Router.route('/users/:id', function () {
     }
 });
 
-},{}],183:[function(require,module,exports){
+},{}],184:[function(require,module,exports){
 'use strict';
 
 // Views
@@ -37281,7 +37348,7 @@ class ConnectionEditor extends View {
 
 module.exports = ConnectionEditor;
 
-},{"./MessageModal":192}],184:[function(require,module,exports){
+},{"./MessageModal":193}],185:[function(require,module,exports){
 'use strict';
 'strict';
 
@@ -37685,7 +37752,7 @@ class ContentEditor extends View {
 
 module.exports = ContentEditor;
 
-},{}],185:[function(require,module,exports){
+},{}],186:[function(require,module,exports){
 'use strict';
 
 /**
@@ -37968,7 +38035,7 @@ class FormEditor extends View {
 
 module.exports = FormEditor;
 
-},{}],186:[function(require,module,exports){
+},{}],187:[function(require,module,exports){
 'use strict';
 
 /**
@@ -38043,7 +38110,7 @@ class InfoSettings extends View {
 
 module.exports = InfoSettings;
 
-},{}],187:[function(require,module,exports){
+},{}],188:[function(require,module,exports){
 'use strict';
 
 // Lib
@@ -38347,7 +38414,7 @@ class JSONEditor extends View {
 
 module.exports = JSONEditor;
 
-},{"./MessageModal":192,"js-beautify":104}],188:[function(require,module,exports){
+},{"./MessageModal":193,"js-beautify":104}],189:[function(require,module,exports){
 'use strict';
 
 /**
@@ -38396,7 +38463,7 @@ class LanguageSettings extends View {
 
 module.exports = LanguageSettings;
 
-},{}],189:[function(require,module,exports){
+},{}],190:[function(require,module,exports){
 'use strict';
 
 class MainMenu extends View {
@@ -38453,7 +38520,7 @@ class MainMenu extends View {
 
 module.exports = MainMenu;
 
-},{}],190:[function(require,module,exports){
+},{}],191:[function(require,module,exports){
 'use strict';
 
 class MediaBrowser extends View {
@@ -38664,7 +38731,7 @@ class MediaBrowser extends View {
 
 module.exports = MediaBrowser;
 
-},{}],191:[function(require,module,exports){
+},{}],192:[function(require,module,exports){
 'use strict';
 
 // Views
@@ -38759,7 +38826,7 @@ class MediaViewer extends View {
 
 module.exports = MediaViewer;
 
-},{"./MessageModal":192}],192:[function(require,module,exports){
+},{"./MessageModal":193}],193:[function(require,module,exports){
 'use strict';
 
 /**
@@ -38852,7 +38919,7 @@ class MessageModal extends View {
 
 module.exports = MessageModal;
 
-},{}],193:[function(require,module,exports){
+},{}],194:[function(require,module,exports){
 'use strict';
 
 // Icons
@@ -39415,7 +39482,7 @@ class SchemaEditor extends View {
 
 module.exports = SchemaEditor;
 
-},{"../icons.json":172}],194:[function(require,module,exports){
+},{"../icons.json":173}],195:[function(require,module,exports){
 'use strict';
 
 /**
@@ -39686,7 +39753,7 @@ class SyncSettings extends View {
 
 module.exports = SyncSettings;
 
-},{}],195:[function(require,module,exports){
+},{}],196:[function(require,module,exports){
 'use strict';
 
 class UserEditor extends View {
@@ -40010,7 +40077,7 @@ class UserEditor extends View {
 
 module.exports = UserEditor;
 
-},{}],196:[function(require,module,exports){
+},{}],197:[function(require,module,exports){
 'use strict';
 
 /**
@@ -40256,7 +40323,7 @@ class ArrayEditor extends View {
 
 module.exports = ArrayEditor;
 
-},{}],197:[function(require,module,exports){
+},{}],198:[function(require,module,exports){
 'use strict';
 
 /**
@@ -40304,7 +40371,7 @@ class BooleanEditor extends View {
 
 module.exports = BooleanEditor;
 
-},{}],198:[function(require,module,exports){
+},{}],199:[function(require,module,exports){
 'use strict';
 
 /**
@@ -40379,7 +40446,7 @@ class ContentReferenceEditor extends View {
 
 module.exports = ContentReferenceEditor;
 
-},{}],199:[function(require,module,exports){
+},{}],200:[function(require,module,exports){
 'use strict';
 
 /**
@@ -40471,7 +40538,7 @@ class ContentSchemaReferenceEditor extends View {
 
 module.exports = ContentSchemaReferenceEditor;
 
-},{}],200:[function(require,module,exports){
+},{}],201:[function(require,module,exports){
 'use strict';
 
 /**
@@ -40645,7 +40712,7 @@ class DateEditor extends View {
 
 module.exports = DateEditor;
 
-},{}],201:[function(require,module,exports){
+},{}],202:[function(require,module,exports){
 'use strict';
 
 /**
@@ -40696,7 +40763,7 @@ class DropdownEditor extends View {
 
 module.exports = DropdownEditor;
 
-},{}],202:[function(require,module,exports){
+},{}],203:[function(require,module,exports){
 'use strict';
 
 /**
@@ -40750,7 +40817,7 @@ class LanguageEditor extends View {
 
 module.exports = LanguageEditor;
 
-},{}],203:[function(require,module,exports){
+},{}],204:[function(require,module,exports){
 'use strict';
 
 /**
@@ -40821,7 +40888,7 @@ class MediaReferenceEditor extends View {
 
 module.exports = MediaReferenceEditor;
 
-},{}],204:[function(require,module,exports){
+},{}],205:[function(require,module,exports){
 'use strict';
 
 /**
@@ -40856,7 +40923,7 @@ class NumberEditor extends View {
 
 module.exports = NumberEditor;
 
-},{}],205:[function(require,module,exports){
+},{}],206:[function(require,module,exports){
 'use strict';
 
 /**
@@ -40902,7 +40969,7 @@ class ResourceReferenceEditor extends View {
 
 module.exports = ResourceReferenceEditor;
 
-},{}],206:[function(require,module,exports){
+},{}],207:[function(require,module,exports){
 'use strict';
 
 // Override CKEditor image plugin
@@ -41043,7 +41110,7 @@ class RichTextEditor extends View {
 
 module.exports = RichTextEditor;
 
-},{}],207:[function(require,module,exports){
+},{}],208:[function(require,module,exports){
 'use strict';
 
 /**
@@ -41078,7 +41145,7 @@ class StringEditor extends View {
 
 module.exports = StringEditor;
 
-},{}],208:[function(require,module,exports){
+},{}],209:[function(require,module,exports){
 'use strict';
 
 /**
@@ -41166,7 +41233,7 @@ class StructEditor extends View {
 
 module.exports = StructEditor;
 
-},{}],209:[function(require,module,exports){
+},{}],210:[function(require,module,exports){
 'use strict';
 
 /**
@@ -41291,7 +41358,7 @@ class TagsEditor extends View {
 
 module.exports = TagsEditor;
 
-},{}],210:[function(require,module,exports){
+},{}],211:[function(require,module,exports){
 'use strict';
 
 /**
@@ -41357,7 +41424,7 @@ class TemplateReferenceEditor extends View {
 
 module.exports = TemplateReferenceEditor;
 
-},{}],211:[function(require,module,exports){
+},{}],212:[function(require,module,exports){
 'use strict';
 
 /**
@@ -41551,7 +41618,7 @@ class UrlEditor extends View {
 
 module.exports = UrlEditor;
 
-},{}],212:[function(require,module,exports){
+},{}],213:[function(require,module,exports){
 'use strict';
 
 window.resources.editors = {
@@ -41573,7 +41640,7 @@ window.resources.editors = {
     url: require('./UrlEditor')
 };
 
-},{"./ArrayEditor":196,"./BooleanEditor":197,"./ContentReferenceEditor":198,"./ContentSchemaReferenceEditor":199,"./DateEditor":200,"./DropdownEditor":201,"./LanguageEditor":202,"./MediaReferenceEditor":203,"./NumberEditor":204,"./ResourceReferenceEditor":205,"./RichTextEditor":206,"./StringEditor":207,"./StructEditor":208,"./TagsEditor":209,"./TemplateReferenceEditor":210,"./UrlEditor":211}],213:[function(require,module,exports){
+},{"./ArrayEditor":197,"./BooleanEditor":198,"./ContentReferenceEditor":199,"./ContentSchemaReferenceEditor":200,"./DateEditor":201,"./DropdownEditor":202,"./LanguageEditor":203,"./MediaReferenceEditor":204,"./NumberEditor":205,"./ResourceReferenceEditor":206,"./RichTextEditor":207,"./StringEditor":208,"./StructEditor":209,"./TagsEditor":210,"./TemplateReferenceEditor":211,"./UrlEditor":212}],214:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -41603,7 +41670,7 @@ class CMSPane extends Pane {
 
 module.exports = CMSPane;
 
-},{"./Pane":219}],214:[function(require,module,exports){
+},{"./Pane":220}],215:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -41749,7 +41816,7 @@ class ConnectionPane extends Pane {
 
 module.exports = ConnectionPane;
 
-},{"./Pane":219}],215:[function(require,module,exports){
+},{"./Pane":220}],216:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -42045,33 +42112,15 @@ class ContentPane extends Pane {
                     });
                 }
 
-                let messageModal = new MessageModal({
-                    model: {
-                        title: 'Remove content',
-                        body: _.div({}, _.p('Are you sure you want to remove the content "' + name + '"?'), _.div({ class: 'input-group' }, _.span('Remove child content too'), _.div({ class: 'input-group-addon' }, _.div({ class: 'switch' }, _.input({
-                            id: 'switch-content-delete-children',
-                            class: 'form-control switch',
-                            type: 'checkbox',
-                            checked: true
-                        }), _.label({ for: 'switch-content-delete-children' })))))
-                    },
-                    buttons: [{
-                        label: 'Cancel',
-                        class: 'btn-default',
-                        callback: function callback() {}
-                    }, {
-                        label: 'OK',
-                        class: 'btn-danger',
-                        callback: function callback() {
-                            apiCall('delete', 'content/' + id + '?removeChildren=' + messageModal.$element.find('.switch input')[0].checked).then(() => {
-                                if (shouldUnpublish && publishing.connections && publishing.connections.length > 0) {
-                                    return unpublishConnections();
-                                } else {
-                                    return onSuccess();
-                                }
-                            }).catch(errorModal);
+                let $deleteChildrenSwitch;
+                let modal = confirmModal('Remove', 'Remove the content "' + name + '"?', _.div({ class: 'input-group' }, _.span('Remove child content too'), _.div({ class: 'input-group-addon' }, $deleteChildrenSwitch = UIHelper.renderSwitch(true))), () => {
+                    apiCall('delete', 'content/' + id + '?removeChildren=' + $deleteChildrenSwitch.data('checked')).then(() => {
+                        if (shouldUnpublish && publishing.connections && publishing.connections.length > 0) {
+                            return unpublishConnections();
+                        } else {
+                            return onSuccess();
                         }
-                    }]
+                    }).catch(errorModal);
                 });
             });
         });
@@ -42216,7 +42265,7 @@ class ContentPane extends Pane {
 
 module.exports = ContentPane;
 
-},{"./Pane":219}],216:[function(require,module,exports){
+},{"./Pane":220}],217:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -42333,7 +42382,7 @@ class FormsPane extends Pane {
 
 module.exports = FormsPane;
 
-},{"./Pane":219}],217:[function(require,module,exports){
+},{"./Pane":220}],218:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -42629,7 +42678,7 @@ class MediaPane extends Pane {
 
 module.exports = MediaPane;
 
-},{"./Pane":219}],218:[function(require,module,exports){
+},{"./Pane":220}],219:[function(require,module,exports){
 'use strict';
 
 // Views
@@ -43058,7 +43107,7 @@ class NavbarMain extends View {
 
 module.exports = NavbarMain;
 
-},{"../../../../common/models/Content":232,"../MessageModal":192,"./CMSPane":213,"./ConnectionPane":214,"./ContentPane":215,"./FormsPane":216,"./MediaPane":217,"./SchemaPane":220,"./SettingsPane":221,"./UserPane":222}],219:[function(require,module,exports){
+},{"../../../../common/models/Content":233,"../MessageModal":193,"./CMSPane":214,"./ConnectionPane":215,"./ContentPane":216,"./FormsPane":217,"./MediaPane":218,"./SchemaPane":221,"./SettingsPane":222,"./UserPane":223}],220:[function(require,module,exports){
 'use strict';
 
 class Pane {
@@ -43074,7 +43123,7 @@ class Pane {
 
 module.exports = Pane;
 
-},{}],220:[function(require,module,exports){
+},{}],221:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -43247,7 +43296,7 @@ class SchemaPane extends Pane {
 
 module.exports = SchemaPane;
 
-},{"./Pane":219}],221:[function(require,module,exports){
+},{"./Pane":220}],222:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -43277,7 +43326,7 @@ class SettingsPane extends Pane {
 
 module.exports = SettingsPane;
 
-},{"./Pane":219}],222:[function(require,module,exports){
+},{"./Pane":220}],223:[function(require,module,exports){
 'use strict';
 
 let Pane = require('./Pane');
@@ -43545,7 +43594,7 @@ class UserPane extends Pane {
 
 module.exports = UserPane;
 
-},{"./Pane":219}],223:[function(require,module,exports){
+},{"./Pane":220}],224:[function(require,module,exports){
 module.exports=[
     "aa",
     "ab",
@@ -43734,7 +43783,7 @@ module.exports=[
     "zu"
 ]
 
-},{}],224:[function(require,module,exports){
+},{}],225:[function(require,module,exports){
 'use strict';
 
 class ConnectionHelper {
@@ -43822,7 +43871,7 @@ class ConnectionHelper {
 
 module.exports = ConnectionHelper;
 
-},{}],225:[function(require,module,exports){
+},{}],226:[function(require,module,exports){
 'use strict';
 
 class ContentHelper {
@@ -43929,7 +43978,7 @@ class ContentHelper {
 
 module.exports = ContentHelper;
 
-},{}],226:[function(require,module,exports){
+},{}],227:[function(require,module,exports){
 'use strict';
 
 let lastSenderName = '';
@@ -44069,7 +44118,7 @@ class DebugHelper {
 
 module.exports = DebugHelper;
 
-},{}],227:[function(require,module,exports){
+},{}],228:[function(require,module,exports){
 'use strict';
 
 class LanguageHelper {
@@ -44159,7 +44208,7 @@ class LanguageHelper {
 
 module.exports = LanguageHelper;
 
-},{"../data/languages.json":223}],228:[function(require,module,exports){
+},{"../data/languages.json":224}],229:[function(require,module,exports){
 'use strict';
 
 // Models
@@ -44221,7 +44270,7 @@ class MediaHelper {
 
 module.exports = MediaHelper;
 
-},{"../models/Media":236}],229:[function(require,module,exports){
+},{"../models/Media":237}],230:[function(require,module,exports){
 'use strict';
 
 // Models
@@ -44266,7 +44315,7 @@ class SchemaHelper {
 
 module.exports = SchemaHelper;
 
-},{"../models/ContentSchema":233,"../models/FieldSchema":235}],230:[function(require,module,exports){
+},{"../models/ContentSchema":234,"../models/FieldSchema":236}],231:[function(require,module,exports){
 'use strict';
 
 class SettingsHelper {
@@ -44296,7 +44345,7 @@ class SettingsHelper {
 
 module.exports = SettingsHelper;
 
-},{}],231:[function(require,module,exports){
+},{}],232:[function(require,module,exports){
 'use strict';
 
 let Entity = require('./Entity');
@@ -44520,7 +44569,7 @@ class Connection extends Entity {
 
 module.exports = Connection;
 
-},{"./Entity":234}],232:[function(require,module,exports){
+},{"./Entity":235}],233:[function(require,module,exports){
 'use strict';
 
 let Entity = require('./Entity');
@@ -44843,7 +44892,7 @@ class Content extends Entity {
 
 module.exports = Content;
 
-},{"./Entity":234}],233:[function(require,module,exports){
+},{"./Entity":235}],234:[function(require,module,exports){
 'use strict';
 
 let Schema = require('./Schema');
@@ -44867,7 +44916,7 @@ class ContentSchema extends Schema {
 
 module.exports = ContentSchema;
 
-},{"./Schema":237}],234:[function(require,module,exports){
+},{"./Schema":238}],235:[function(require,module,exports){
 'use strict';
 
 let crypto = require('crypto');
@@ -45033,7 +45082,7 @@ class Entity {
 
 module.exports = Entity;
 
-},{"crypto":56}],235:[function(require,module,exports){
+},{"crypto":56}],236:[function(require,module,exports){
 'use strict';
 
 let Schema = require('./Schema');
@@ -45075,7 +45124,7 @@ class FieldSchema extends Schema {
 
 module.exports = FieldSchema;
 
-},{"./Schema":237}],236:[function(require,module,exports){
+},{"./Schema":238}],237:[function(require,module,exports){
 'use strict';
 
 // Libs
@@ -45184,7 +45233,7 @@ class Media extends Entity {
 
 module.exports = Media;
 
-},{"./Entity":234,"path":115}],237:[function(require,module,exports){
+},{"./Entity":235,"path":115}],238:[function(require,module,exports){
 'use strict';
 
 let Entity = require('./Entity');
@@ -45222,7 +45271,7 @@ class Schema extends Entity {
 
 module.exports = Schema;
 
-},{"./Entity":234}]},{},[163,212,159,161])
+},{"./Entity":235}]},{},[163,213,159,161])
 
 
 //# sourceMappingURL=maps/client.js.map

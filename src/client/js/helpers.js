@@ -89,12 +89,40 @@ window.errorModal = function errorModal(error) {
  * Brings up a confirm modal
  *
  * @param {String} type
- * @param {String} heading
+ * @param {String} title
  * @param {String} body
- * @param {Function} callback
+ * @param {Function} onSubmit
  */
-window.confirmModal = function confirmModal(type, heading, body, onClickOK) {
+window.confirmModal = function confirmModal(type, title, body, onSubmit) {
+    let submitClass = 'btn-primary';
 
+    type = (type || '').toLowerCase();
+
+    switch(type) {
+        case 'delete': case 'remove':
+            submitClass = 'btn-danger';
+            break;
+    }
+
+    return new MessageModal({
+        model: {
+            title: title,
+            body: body,
+            onSubmit: onSubmit
+        },
+        buttons: [
+            {
+                label: 'Cancel',
+                class: 'btn-default',
+                callback: () => {}
+            },
+            {
+                label: type,
+                class: submitClass,
+                callback: onSubmit
+            }
+        ]
+    });
 }
 
 /**
