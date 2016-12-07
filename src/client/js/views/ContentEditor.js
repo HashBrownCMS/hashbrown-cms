@@ -1,4 +1,4 @@
-'use strict';
+'strict';
 
 class ContentEditor extends View {
     constructor(params) {
@@ -60,13 +60,6 @@ class ContentEditor extends View {
             }
         }
 
-        let reloadView = () => {
-            this.$saveBtn.toggleClass('saving', false);
-            
-            this.reload();
-            ViewHelper.get('NavbarMain').reload();
-        }
-
         this.$saveBtn.toggleClass('working', true);
 
         // Save content to database
@@ -78,7 +71,10 @@ class ContentEditor extends View {
             return reloadResource('content');
         })
         .then(() => {
-            reloadView();
+            this.$saveBtn.toggleClass('saving', false);
+            
+            this.reload();
+            ViewHelper.get('NavbarMain').reload();
         })
         .catch(errorModal);
     }

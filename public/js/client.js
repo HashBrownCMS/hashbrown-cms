@@ -35560,6 +35560,16 @@ window.errorModal = function errorModal(error) {
 };
 
 /**
+ * Brings up a confirm modal
+ *
+ * @param {String} type
+ * @param {String} heading
+ * @param {String} body
+ * @param {Function} callback
+ */
+window.confirmModal = function confirmModal(type, heading, body, onClickOK) {};
+
+/**
  * Gets a cookie by name
  *
  * @param {String} name
@@ -37273,6 +37283,7 @@ module.exports = ConnectionEditor;
 
 },{"./MessageModal":192}],184:[function(require,module,exports){
 'use strict';
+'strict';
 
 class ContentEditor extends View {
     constructor(params) {
@@ -37334,13 +37345,6 @@ class ContentEditor extends View {
             }
         };
 
-        let reloadView = () => {
-            this.$saveBtn.toggleClass('saving', false);
-
-            this.reload();
-            ViewHelper.get('NavbarMain').reload();
-        };
-
         this.$saveBtn.toggleClass('working', true);
 
         // Save content to database
@@ -37349,7 +37353,10 @@ class ContentEditor extends View {
         }).then(() => {
             return reloadResource('content');
         }).then(() => {
-            reloadView();
+            this.$saveBtn.toggleClass('saving', false);
+
+            this.reload();
+            ViewHelper.get('NavbarMain').reload();
         }).catch(errorModal);
     }
 
@@ -42666,12 +42673,7 @@ class NavbarMain extends View {
      * Event: Error was returned
      */
     onError(err) {
-        new MessageModal({
-            model: {
-                title: 'Error',
-                body: err
-            }
-        });
+        errorModal(err);
     }
 
     /**

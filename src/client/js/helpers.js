@@ -86,6 +86,18 @@ window.errorModal = function errorModal(error) {
 }
 
 /**
+ * Brings up a confirm modal
+ *
+ * @param {String} type
+ * @param {String} heading
+ * @param {String} body
+ * @param {Function} callback
+ */
+window.confirmModal = function confirmModal(type, heading, body, onClickOK) {
+
+}
+
+/**
  * Gets a cookie by name
  *
  * @param {String} name

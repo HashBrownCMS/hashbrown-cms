@@ -43,12 +43,7 @@ class NavbarMain extends View {
      * Event: Error was returned
      */
     onError(err) {
-        new MessageModal({
-            model: {
-                title: 'Error',
-                body: err
-            }
-        });
+        errorModal(err);
     }
     
     /**
