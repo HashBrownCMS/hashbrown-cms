@@ -3,6 +3,23 @@
     min-width: 100%;
     max-width: 100px; // A hack to prevent CodeMirror from exceeding boundaries
 
+    .nav-tabs {
+        padding: 5px 0px 0px 0px;
+        position: relative;
+
+        .btn {
+            position: absolute;
+            right: 5px;
+            top: 10px;
+            min-width: 30px;
+            padding: 0px;
+        }
+    }
+
+    .tab-content {
+        padding: 0px !important;
+    }   
+
     .cke {
         padding: 0px;
         background: none;
@@ -176,52 +193,6 @@
                     }
                 }
             }
-        }
-    }
-
-    .panel-heading {
-        padding: 5px;
-
-        select, .btn, .dropdown {
-            line-height: 1em;
-            height: 26px;
-            min-width: 0px;
-            display: inline-block;
-            color: #fff;
-        }
-    }
-
-    .rte-output {
-        h1, h2, h3, h4, h5, h6 {
-            &:first-child {
-                margin-top: 0px;
-            }   
-        }   
-
-        img {
-            max-width: 100px;
-            max-height: 100px;
-        }
-
-        height: 300px;
-        overflow-y: auto;
-    }
-
-    .panel-footer {
-        background-color: material-color('grey', '900');        
-
-        textarea {
-            padding: 0px;
-            color: material-color('grey', '200');        
-            font-family: 'Roboto Mono';
-            overflow: auto;
-            display: block;
-            border: 0px;
-            resize: none;
-            line-height: 1.25em;  
-            height: 5em;
-            resize: none;
-            overflow: hidden;
         }
     }
 }

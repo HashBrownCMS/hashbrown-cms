@@ -24,8 +24,6 @@ CKEDITOR.editorConfig = function( config ) {
 		{ name: 'about' }
 	];
 
-    config.extraPlugins = 'markdown';
-
 	// Remove some buttons provided by the standard plugins, which are
 	// not needed in the Standard(s) toolbar.
 	config.removeButtons = 'Underline,Subscript,Superscript';

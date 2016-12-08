@@ -320,8 +320,6 @@ class JSONEditor extends View {
 
             this.editor.getDoc().setValue(this.value);
 
-            this.editor
-
             this.editor.on('change', () => { this.onChangeText(); });
 
             this.onChangeText();

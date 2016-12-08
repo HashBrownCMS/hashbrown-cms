@@ -1185,6 +1185,17 @@ body > .dashboard-container {
   margin: 0px;
   min-width: 100%;
   max-width: 100px; }
+  .rich-text-editor .nav-tabs {
+    padding: 5px 0px 0px 0px;
+    position: relative; }
+    .rich-text-editor .nav-tabs .btn {
+      position: absolute;
+      right: 5px;
+      top: 10px;
+      min-width: 30px;
+      padding: 0px; }
+  .rich-text-editor .tab-content {
+    padding: 0px !important; }
   .rich-text-editor .cke {
     padding: 0px;
     background: none;
@@ -1292,36 +1303,6 @@ body > .dashboard-container {
           .rich-text-editor .cke .cke_inner .cke_bottom .cke_path a:hover {
             background: none;
             box-shadow: none; }
-  .rich-text-editor .panel-heading {
-    padding: 5px; }
-    .rich-text-editor .panel-heading select, .rich-text-editor .panel-heading .btn, .rich-text-editor .panel-heading .dropdown {
-      line-height: 1em;
-      height: 26px;
-      min-width: 0px;
-      display: inline-block;
-      color: #fff; }
-  .rich-text-editor .rte-output {
-    height: 300px;
-    overflow-y: auto; }
-    .rich-text-editor .rte-output h1:first-child, .rich-text-editor .rte-output h2:first-child, .rich-text-editor .rte-output h3:first-child, .rich-text-editor .rte-output h4:first-child, .rich-text-editor .rte-output h5:first-child, .rich-text-editor .rte-output h6:first-child {
-      margin-top: 0px; }
-    .rich-text-editor .rte-output img {
-      max-width: 100px;
-      max-height: 100px; }
-  .rich-text-editor .panel-footer {
-    background-color: #212121; }
-    .rich-text-editor .panel-footer textarea {
-      padding: 0px;
-      color: #eeeeee;
-      font-family: 'Roboto Mono';
-      overflow: auto;
-      display: block;
-      border: 0px;
-      resize: none;
-      line-height: 1.25em;
-      height: 5em;
-      resize: none;
-      overflow: hidden; }
 
 .tags-editor {
   display: flex; }
