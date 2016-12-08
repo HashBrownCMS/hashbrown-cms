@@ -45,7 +45,7 @@ window.ContentHelper = require('./helpers/ContentHelper');
 window.LanguageHelper = require('./helpers/LanguageHelper');
 window.SchemaHelper = require('./helpers/SchemaHelper');
 window.SettingsHelper = require('./helpers/SettingsHelper');
-window.UIHelper = require('./helpers/UIHelper');
+window.UI = require('./helpers/UIHelper');
 
 // Ready callback containers
 let onReadyCallbacks = {};

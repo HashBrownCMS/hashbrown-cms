@@ -369,7 +369,7 @@ class ContentPane extends Pane {
                     _.div({class: 'input-group'},      
                         _.span('Remove child content too'),
                         _.div({class: 'input-group-addon'},
-                            $deleteChildrenSwitch = UIHelper.renderSwitch(true)
+                            $deleteChildrenSwitch = UI.inputSwitch(true)
                         )
                     ),
                     () => {

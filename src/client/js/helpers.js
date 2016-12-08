@@ -13,6 +13,10 @@ window.ProjectHelper = require('./helpers/ProjectHelper');
 window.debug = require('../../common/helpers/DebugHelper');
 window.debug.verbosity = 3;
 
+// ----------------------
+// TODO: Move the below 3 methods into a SessionHelper
+// ----------------------
+
 /**
  * Checks if the currently logged in user is admin
  *
@@ -48,81 +52,12 @@ window.currentUserHasScope = function currentUserHasScope(scope) {
 }
 
 /**
- * Brings up a message modal
- *
- * @param {String} title
- * @param {String} body
+ * Logs out the current user
  */
-window.messageModal = function messageModal(title, body, onSubmit) {
-    return new MessageModal({
-        model: {
-            title: title,
-            body: body,
-            onSubmit: onSubmit
-        }
-    });
-}
-
-/**
- * Brings up an error modal
- *
- * @param {String|Error} error
- */
-window.errorModal = function errorModal(error) {
-    if(error instanceof String) {
-        error = new Error(error);
+window.logout = function logout() {
+    document.cookie = 'token=; Path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
     
-    } else if (error && error instanceof Object) {
-        if(error.responseText) {
-            error = new Error(error.responseText);
-        }
-    }
-
-    let modal = messageModal('<span class="fa fa-warning"></span> Error', error.message + '<br /><br />Please check server log for details');
-
-    modal.$element.toggleClass('error-modal', true);
-
-    throw error;
-}
-
-/**
- * Brings up a confirm modal
- *
- * @param {String} type
- * @param {String} title
- * @param {String} body
- * @param {Function} onSubmit
- */
-window.confirmModal = function confirmModal(type, title, body, onSubmit) {
-    let submitClass = 'btn-primary';
-
-    type = (type || '').toLowerCase();
-
-    switch(type) {
-        case 'delete': case 'remove':
-            submitClass = 'btn-danger';
-            break;
-    }
-
-    return new MessageModal({
-        model: {
-            title: title,
-            body: body,
-            onSubmit: onSubmit
-        },
-        buttons: [
-            {
-                label: 'Cancel',
-                class: 'btn-default',
-                callback: () => {}
-            },
-            {
-                label: type,
-                class: submitClass,
-                callback: onSubmit
-            }
-        ]
-    });
+    location.reload();
 }
 
 /**
@@ -139,15 +74,6 @@ window.getCookie = function getCookie(name) {
     if(parts.length == 2) {
         return parts.pop().split(";").shift();
     }
-}
-
-/**
- * Logs out the current user
- */
-window.logout = function logout() {
-    document.cookie = 'token=; Path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-    
-    location.reload();
 }
 
 /**
@@ -181,6 +107,8 @@ window.copyToClipboard = function copyToClipboard(string) {
  * Wraps an API URL
  *
  * @param {String} url
+ *
+ * @returns {String} API URL
  */
 window.apiUrl = function apiUrl(url) {
     let newUrl = '/api/';
@@ -202,13 +130,24 @@ window.apiUrl = function apiUrl(url) {
  * Wraps an API call
  *
  * @param {String} method
+ * @param {String} url
+ * @param {Object} data
  *
- * @returns {Promise(Object)} response
+ * @returns {Promise} Response
  */
 window.apiCall = function apiCall(method, url, data) {
     return customApiCall(method, apiUrl(url), data);
 }
     
+/**
+ * Wraps an API call with a custom path
+ *
+ * @param {String} method
+ * @param {String} url
+ * @param {Object} data
+ *
+ * @returns {Promise} Response
+ */
 window.customApiCall = function customApiCall(method, url, data) {
     return new Promise((resolve, reject) => {
         var xhr = new XMLHttpRequest();
