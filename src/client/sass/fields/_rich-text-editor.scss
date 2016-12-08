@@ -176,6 +176,22 @@
                         &.cke_button__image_icon:after {
                             content: '\f1c5';
                         }
+                        
+                        &.cke_button__justifyleft_icon:after {
+                            content: '\f036';
+                        }
+                        
+                        &.cke_button__justifycenter_icon:after {
+                            content: '\f037';
+                        }
+                        
+                        &.cke_button__justifyright_icon:after {
+                            content: '\f038';
+                        }
+                        
+                        &.cke_button__justifyblock_icon:after {
+                            content: '\f039';
+                        }
                     }
                 }
             }

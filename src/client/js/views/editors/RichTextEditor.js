@@ -188,10 +188,10 @@ class RichTextEditor extends View {
                     { name: 'document',	   groups: [ 'mode', 'document', 'doctools' ] },
                     { name: 'others' },
                 ],
+           
+                extraPlugins: 'justify',
 
-                removeButtons: 'Image,Anchor,Styles,Underline,Subscript,Superscript,Source,SpecialChar,HorizontalRule,Maximize,Table',
-
-                format_tags: 'p;h1;h2;h3;h4;h5;h6;pre',
+                removeButtons: 'Image,Styles,Underline,Subscript,Superscript,Source,SpecialChar,HorizontalRule,Maximize,Table',
 
                 removeDialogTabs: 'image:advanced;link:advanced'
             }

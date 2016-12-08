@@ -20,6 +20,7 @@ class ApiController extends Controller {
         return new Promise((resolve, reject) => {
             if(!token) {
                 reject(new Error('No token was provided'));
+                debug.trace();
 
             } else {
                 UserHelper.findToken(token)

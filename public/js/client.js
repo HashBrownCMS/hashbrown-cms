@@ -41142,9 +41142,9 @@ class RichTextEditor extends View {
             height: 400,
             toolbarGroups: [{ name: 'styles' }, { name: 'basicstyles', groups: ['basicstyles', 'cleanup'] }, { name: 'paragraph', groups: ['list', 'indent', 'blocks', 'align', 'bidi'] }, { name: 'links' }, { name: 'insert' }, { name: 'forms' }, { name: 'tools' }, { name: 'document', groups: ['mode', 'document', 'doctools'] }, { name: 'others' }],
 
-            removeButtons: 'Image,Anchor,Styles,Underline,Subscript,Superscript,Source,SpecialChar,HorizontalRule,Maximize,Table',
+            extraPlugins: 'justify',
 
-            format_tags: 'p;h1;h2;h3;h4;h5;h6;pre',
+            removeButtons: 'Image,Styles,Underline,Subscript,Superscript,Source,SpecialChar,HorizontalRule,Maximize,Table',
 
             removeDialogTabs: 'image:advanced;link:advanced'
         });
