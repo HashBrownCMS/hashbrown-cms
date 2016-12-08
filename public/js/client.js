@@ -40995,14 +40995,20 @@ class RichTextEditor extends View {
 
         if (source != this.wysiwyg) {
             this.wysiwyg.setData(value);
+        } else {
+            document.cookie = 'rteview = wysiwyg';
         }
 
         if (source != this.html) {
             this.html.getDoc().setValue(value);
+        } else {
+            document.cookie = 'rteview = html';
         }
 
         if (source != this.markdown) {
             this.markdown.getDoc().setValue(toMarkdown(value));
+        } else {
+            document.cookie = 'rteview = markdown';
         }
 
         this.trigger('change', this.value);
@@ -41035,10 +41041,12 @@ class RichTextEditor extends View {
         let $markdown;
         let $html;
 
+        let activeView = getCookie('rteview') || 'wysiwyg';
+
         // Main element
-        this.$element = _.div({ class: 'field-editor rich-text-editor panel panel-default' }, _.ul({ class: 'nav nav-tabs' }, _.li({ class: 'active' }, _.a({ 'data-toggle': 'tab', href: '#' + this.guid + '-wysiwyg' }, 'Wysiwyg')), _.li(_.a({ 'data-toggle': 'tab', href: '#' + this.guid + '-markdown' }, 'Markdown')), _.li(_.a({ 'data-toggle': 'tab', href: '#' + this.guid + '-html' }, 'HTML')), _.button({ class: 'btn btn-primary btn-insert-media' }, _.span({ class: 'fa fa-file-image-o' })).click(() => {
+        this.$element = _.div({ class: 'field-editor rich-text-editor panel panel-default' }, _.ul({ class: 'nav nav-tabs' }, _.li({ class: activeView == 'wysiwyg' ? 'active' : '' }, _.a({ 'data-toggle': 'tab', href: '#' + this.guid + '-wysiwyg' }, 'Wysiwyg')), _.li({ class: activeView == 'markdown' ? 'active' : '' }, _.a({ 'data-toggle': 'tab', href: '#' + this.guid + '-markdown' }, 'Markdown')), _.li({ class: activeView == 'html' ? 'active' : '' }, _.a({ 'data-toggle': 'tab', href: '#' + this.guid + '-html' }, 'HTML')), _.button({ class: 'btn btn-primary btn-insert-media' }, _.span({ class: 'fa fa-file-image-o' })).click(() => {
             this.onClickInsertMedia();
-        })), _.div({ class: 'tab-content' }, _.div({ id: this.guid + '-wysiwyg', class: 'tab-pane active wysiwyg' }, $wysiwyg = _.div({ 'contenteditable': true })), _.div({ id: this.guid + '-markdown', class: 'tab-pane markdown' }, $markdown = _.textarea({})), _.div({ id: this.guid + '-html', class: 'tab-pane html' }, $html = _.textarea({}))));
+        })), _.div({ class: 'tab-content' }, _.div({ id: this.guid + '-wysiwyg', class: 'tab-pane wysiwyg ' + (activeView == 'wysiwyg' ? 'active' : '') }, $wysiwyg = _.div({ 'contenteditable': true })), _.div({ id: this.guid + '-markdown', class: 'tab-pane markdown ' + (activeView == 'markdown' ? 'active' : '') }, $markdown = _.textarea({})), _.div({ id: this.guid + '-html', class: 'tab-pane html ' + (activeView == 'html' ? 'active' : '') }, $html = _.textarea({}))));
 
         // Init HTML editor
         setTimeout(() => {
