@@ -208,7 +208,7 @@ class UserEditor extends View {
                             return $scope;
 
                         } catch(e) {
-                            errorModal(e);
+                            UI.errorModal(e);
                         }
                     }),
                     _.button({class: 'btn chip-add'},

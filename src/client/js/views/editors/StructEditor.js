@@ -50,13 +50,13 @@ class StructEditor extends View {
                 let value = this.value[k];
 
                 if(!keySchema.schemaId) {
-                    errorModal(new Error('Schema id not set for key "' + k + '"'));
+                    UI.errorModal(new Error('Schema id not set for key "' + k + '"'));
                 }
 
                 let fieldSchema = SchemaHelper.getFieldSchemaWithParentConfigs(keySchema.schemaId);
 
                 if(!fieldSchema) {
-                    errorModal(new Error('Field schema "' + keySchema.schemaId + '" could not be found for key " + k + "'));
+                    UI.errorModal(new Error('Field schema "' + keySchema.schemaId + '" could not be found for key " + k + "'));
                 }
 
                 let fieldEditor = resources.editors[fieldSchema.editorId];

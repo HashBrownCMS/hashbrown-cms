@@ -10,11 +10,14 @@ class ContentPane extends Pane {
         let navbar = ViewHelper.get('NavbarMain');
         let id = $('.context-menu-target-element').data('id');
 
-        // This function should only exist if an item has been copied
+        // Event when psating the copied Content
         this.onClickPasteContent = function onClickPasteContent() {
             let parentId = $('.context-menu-target-element').data('id');
-           
+          
+            // API call to get copied Content model 
             apiCall('get', 'content/' + id)
+
+            // Remove the id and call the API to create a new Content node
             .then((copiedContent) => {
                 delete copiedContent['id'];
 
@@ -22,14 +25,18 @@ class ContentPane extends Pane {
                 
                 return apiCall('post', 'content/new', copiedContent);
             })
+
+            // Upoen success, reload all Content models
             .then(() => {
                 return reloadResource('content');
             })
+
+            // Reload the UI
             .then(() => {
                 navbar.reload();
                 navbar.onClickPasteContent = null;
             })
-            .catch(errorModal);
+            .catch(UI.errorModal);
         }
     }
     
@@ -40,14 +47,19 @@ class ContentPane extends Pane {
         let navbar = ViewHelper.get('NavbarMain');
         let pullId = $('.context-menu-target-element').data('id');
 
+        // API call to pull the Content by id
         apiCall('post', 'content/pull/' + pullId, {})
+        
+        // Upon success, reload all Content models    
         .then(() => {
             return reloadResource('content');
         })
+
+        // Reload the UI
         .then(() => {
             navbar.reload();
         }) 
-        .catch(errorModal);
+        .catch(UI.errorModal);
     }
     
     /**
@@ -57,14 +69,19 @@ class ContentPane extends Pane {
         let navbar = ViewHelper.get('NavbarMain');
         let pushId = $('.context-menu-target-element').data('id');
 
+        // API call to push the Content by id
         apiCall('post', 'content/push/' + pushId)
+
+        // Upon success, reload all Content models
         .then(() => {
             return reloadResource('content');
         })
+
+        // Reload the UI
         .then(() => {
             navbar.reload();
         }) 
-        .catch(errorModal);
+        .catch(UI.errorModal);
     }
 
     /**
@@ -74,26 +91,33 @@ class ContentPane extends Pane {
         let navbar = ViewHelper.get('NavbarMain');
         let cutId = $('.context-menu-target-element').data('id');
 
-        // This function should only exist if an item has been cut
+        // Event when pasting the cut content
         this.onClickPasteContent = function onClickPasteContent() {
             let parentId = $('.context-menu-target-element').data('id');
            
+            // Get the Content model
             ContentHelper.getContentById(cutId)
+
+            // API call to apply changes to Content parent
             .then((cutContent) => {
                 cutContent.parentId = parentId;
               
                 return apiCall('post', 'content/' + cutId, cutContent);
             })
+
+            // Reload all Content models
             .then(() => {
                 return reloadResource('content');
             })
+
+            // Reload UI
             .then(() => {
                 navbar.reload();
                 navbar.onClickPasteContent = null;
 
                 location.hash = '/content/' + cutId;
             })
-            .catch(navbar.onError);
+            .catch(UI.errorModal);
         }
     }
 
@@ -104,224 +128,213 @@ class ContentPane extends Pane {
      */
     static onClickNewContent(parentId) {
         let navbar = ViewHelper.get('NavbarMain');
-        let messageModal;
 
-        // Event fired when clicking "OK"
-        let onPickedSchema = () => {
-            let schemaId = messageModal.$element.find('.content-schema-reference-editor select').val();
-
-            if(schemaId) {
-                let apiUrl = 'content/new/' + schemaId;
-                
-                if(parentId) {
-                    apiUrl += '?parent=' + parentId;
-                }
-
-                apiCall('post', apiUrl)
-                .then((newContent) => {
-                    reloadResource('content')
-                    .then(() => {
-                        navbar.reload();
-                        
-                        location.hash = '/content/' + newContent.id;
-                    });
-                })
-                .catch(navbar.onError);
-           
+        // Try to get a parent Schema if it exists
+        return function getParentSchema() {
+            if(parentId) {
+                return ContentHelper.getContentById(parentId)
+                .then((parentContent) => {
+                    return SchemaHelper.getSchemaById(parentContent.schemaId);
+                });
             } else {
-                return false;
-        
+                return Promise.resolve();
             }
-        };
+        }()
 
-        // Shows the Schema picker modal
-        let showModal = (allowedSchemas) => {
+        // Parent Schema logic resolved, move on
+        .then((parentSchema) => {
+            let allowedSchemas = parentSchema ? parentSchema.allowedChildSchemas : null;
+
+            // If allowed child Schemas were found, but none were provided, don't create the Content node
             if(allowedSchemas && allowedSchemas.length < 1) {
-                messageModal = new MessageModal({
-                    model: {
-                        title: 'Can\'t create new content',
-                        body: 'No child content schemas are allowed under this parent'
-                    }
-                });
+                return Promise.reject(new Error('No child content schemas are allowed under this parent'));
             
+            // Some child Schemas were provided, or no restrictions were defined
             } else {
-                let contentSchemaReferenceEditor = new resources.editors.contentSchemaReference({
-                    config: {
-                        allowedSchemas: allowedSchemas   
-                    }
-                });
+                let $schemaReference;
 
-                messageModal = new MessageModal({
-                    model: {
-                        title: 'Create new content',
-                        body: _.div({},
-                            _.p('Please pick a schema'),
-                            contentSchemaReferenceEditor.$element
-                        )
-                    },
-                    buttons: [
-                        {
-                            label: 'Cancel',
-                            class: 'btn-default',
-                            callback: function() {
+                // Render the confirmation modal
+                UI.confirmModal(
+                    'OK',
+                    'Create new content',
+                    _.div({},
+                        _.p('Please pick a schema'),
+                        
+                        // Instatiate a new Content Schema reference editor
+                        $schemaReference = new resources.editors.contentSchemaReference({
+                            config: {
+                                allowedSchemas: allowedSchemas   
                             }
-                        },
-                        {
-                            label: 'OK',
-                            class: 'btn-primary',
-                            callback: onPickedSchema
+                        }).$element
+                    ),
+
+                    // Event fired when clicking "OK"
+                    () => {
+                        let schemaId = $schemaReference.find('select').val();
+
+                        // A Schema was picked, move on
+                        if(schemaId) {
+                            let apiUrl = 'content/new/' + schemaId;
+                            let newContent;
+
+                            if(parentId) {
+                                apiUrl += '?parent=' + parentId;
+                            }
+
+                            // API call to create new Content node
+                            apiCall('post', apiUrl)
+                            
+                            // Upon success, reload resource and UI elements    
+                            .then((result) => {
+                                newContent = result;
+
+                                return reloadResource('content');
+                            })
+                            .then(() => {
+                                navbar.reload();
+                                
+                                location.hash = '/content/' + newContent.id;
+                            })
+                            .catch(UI.errorModal);
+                       
+                        // No Schema was picked yet
+                        } else {
+                            return false;
+                    
                         }
-                    ]
-                });
+                    }
+                );
             }
-        };
-
-        if(parentId) {
-            ContentHelper.getContentById(parentId)
-            .then((parentContent) => {
-                return SchemaHelper.getSchemaById(parentContent.schemaId);
-            })
-            .then((parentSchema) => {
-                showModal(parentSchema.allowedChildSchemas);
-            })
-            .catch(navbar.onError);
-
-        } else {
-            showModal();
-        }
+        })
+        .catch(UI.errorModal);
     }
 
     /**
-     * Event: Click content settings
+     * Render Content settings modal
+     *
+     * @param {Content} content
+     * @param {Object} publishing
+     */
+    static renderContentSettingsModal(content, publishing) {
+        // Event on clicking OK
+        function onSubmit() {
+            if(!publishing.governedBy) {
+                publishing.connections = [];
+               
+                // Loop through each input switch and add the corresponding Connection id to the connections list 
+                modal.$element.find('.switch[data-connection-id] input').each(function(i) {
+                    if(this.checked) {
+                        publishing.connections.push(
+                            this.parentElement.dataset.connectionId
+                        );
+                    }
+                });
+                
+                // Apply to children flag
+                publishing.applyToChildren = modal.$element.find('#switch-publishing-apply-to-children input')[0].checked;
+
+                // Commit publishing settings to Content model
+                content.settings.publishing = publishing;
+        
+                // API call to save the Content model
+                apiCall('post', 'content/' + content.id, content)
+                
+                // Upon success, reload the UI    
+                .then(() => {
+                    NavbarMain.reload();
+
+                    if(Router.params.id == content.id) {
+                        let contentEditor = ViewHelper.get('ContentEditor');
+
+                        contentEditor.model = content.getObject();
+                        return contentEditor.render();
+                    
+                    } else {
+                        return Promise.resolve();
+
+                    }
+                })
+                .catch(UI.errorModal);
+            }
+
+        }
+        
+        let modal = new MessageModal({
+            model: {
+                title: 'Publishing settings for "' + content.prop('title', window.language) + '"'
+            },
+            buttons: [
+                {
+                    label: 'Cancel',
+                    class: 'btn-default'
+                },
+                {
+                    label: 'OK',
+                    class: 'btn-primary',
+                    callback: () => {
+                        onSubmit();
+                    }
+                }
+            ],
+            renderBody: () => {
+                if(publishing.governedBy) {
+                    return _.div({class: 'settings-publishing'},
+                        _.p('(Settings inherited from <a href="#/content/' + publishing.governedBy.id + '">' + publishing.governedBy.prop('title', window.language) + '</a>)')
+                    );
+                
+                } else {
+                    return _.div({class: 'settings-publishing'},
+                        // Apply to children switch
+                        _.div({class: 'input-group'},      
+                            _.span('Apply to children'),
+                            _.div({class: 'input-group-addon'},
+                                UI.inputSwitch(publishing.applyToChildren == true).attr('id', 'switch-publishing-apply-to-children')
+                            )
+                        ),
+
+                        // Connections list
+                        _.each(window.resources.connections, (i, connection) => { 
+                            return _.div({class: 'input-group'},      
+                                _.span(connection.title),
+                                _.div({class: 'input-group-addon'},
+                                    UI.inputSwitch(publishing.connections.indexOf(connection.id) > -1).attr('data-connection-id', connection.id)
+                                )
+                            );
+                        })
+                    );
+                }
+            }
+        });
+    }
+
+    /**
+     * Event: Click Content settings
      */
     static onClickContentSettings() {
         let id = $('.context-menu-target-element').data('id');
         let navbar = ViewHelper.get('NavbarMain');
+        let content;
 
+        // Get Content model
         ContentHelper.getContentById(id)
-        .then((content) => {
+        .then((result) => {
+            content = result;
+
             if(!content) {
-                messageModal('Error', 'Couldn\'t find content with id "' + id + '"'); 
+                return Promise.reject(new Error('Couldn\'t find content with id "' + id + '"')); 
 
             } else {
                 // Get settings first
-                content.getSettings('publishing')
-                .then((publishing) => {
-                    // Submit event
-                    function onSubmit() {
-                        if(!publishing.governedBy) {
-                            publishing.connections = [];
-                            
-                            $('.switch-connection').each(function(i) {
-                                if(this.checked) {
-                                    publishing.connections.push(
-                                        $(this).attr('data-connection-id')
-                                    );
-                                }
-                            });
-                            
-                            publishing.applyToChildren = $('#switch-publishing-apply-to-children')[0].checked;
-
-                            content.settings.publishing = publishing;
-                    
-                            // Save model
-                            apiCall('post', 'content/' + content.id, content)
-                            .then(() => {
-                                navbar.reload();
-
-                                if(Router.params.id == content.id) {
-                                    let contentEditor = ViewHelper.get('ContentEditor');
-
-                                    contentEditor.model = content.getObject();
-                                    return contentEditor.render();
-                                
-                                } else {
-                                    return new Promise((resolve) => {
-                                        resolve();
-                                    });
-
-                                }
-                            })
-                            .catch(errorModal);
-                        }
-
-                    }
-                    
-                    // Sanity check
-                    publishing.applyToChildren = publishing.applyToChildren == true || publishing.applyToChildren == 'true';
-
-                    // Render modal 
-                    let modal = new MessageModal({
-                        model: {
-                            title: 'Settings for "' + content.prop('title', window.language) + '"'
-                        },
-                        buttons: [
-                            {
-                                label: 'Cancel',
-                                class: 'btn-default'
-                            },
-                            {
-                                label: 'OK',
-                                class: 'btn-primary',
-                                callback: () => {
-                                    onSubmit();
-                                }
-                            }
-                        ],
-                        renderBody: () => {
-                            return _.div({class: 'settings-publishing'},
-                                // Publishing
-                                _.h5('Publishing'),
-                                function() {
-                                    if(publishing.governedBy) {
-                                        return _.p('(Settings inherited from <a href="#/content/' + publishing.governedBy.id + '">' + publishing.governedBy.prop('title', window.language) + '</a>)')
-
-                                    } else {
-                                        return [
-                                            // Heading
-                                            _.div({class: 'input-group'},      
-                                                _.span('Apply to children'),
-                                                _.div({class: 'input-group-addon'},
-                                                    _.div({class: 'switch'},
-                                                        _.input({
-                                                            id: 'switch-publishing-apply-to-children',
-                                                            class: 'form-control switch',
-                                                            type: 'checkbox',
-                                                            checked: publishing.applyToChildren == true
-                                                        }),
-                                                        _.label({for: 'switch-publishing-apply-to-children'})
-                                                    )
-                                                )
-                                            ),
-                                            // Connections
-                                            _.each(window.resources.connections, (i, connection) => { 
-                                                return _.div({class: 'input-group'},      
-                                                    _.span(connection.title),
-                                                    _.div({class: 'input-group-addon'},
-                                                        _.div({class: 'switch'},
-                                                            _.input({
-                                                                id: 'switch-connection-' + i,
-                                                                'data-connection-id': connection.id,
-                                                                class: 'form-control switch switch-connection',
-                                                                type: 'checkbox',
-                                                                checked: publishing.connections.indexOf(connection.id) > -1
-                                                            }),
-                                                            _.label({
-                                                                for: 'switch-connection-' + i
-                                                            })
-                                                        )
-                                                    )
-                                                );
-                                            })
-                                        ];
-                                    }
-                                }()
-                            );
-                        }
-                    });
-                })
-                .catch(errorModal);
+                return content.getSettings('publishing');
             }
+        })
+        
+        // Upon success, render Content settings modal
+        .then((publishing) => {
+            // Sanity check
+            publishing.applyToChildren = publishing.applyToChildren == true || publishing.applyToChildren == 'true';
+
+            this.renderContentSettingsModal(content, publishing);
         });
     }
 
@@ -363,7 +376,7 @@ class ContentPane extends Pane {
                 }
 
                 let $deleteChildrenSwitch;
-                let modal = confirmModal(
+                UI.confirmModal(
                     'Remove',
                     'Remove the content "' + name + '"?',
                     _.div({class: 'input-group'},      

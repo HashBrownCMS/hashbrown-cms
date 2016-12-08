@@ -35,12 +35,12 @@ Router.route('/content/:id', function() {
             location.hash = '/content/' + this.id + '/' + (contentSchema.defaultTabId || 'meta');
         
         } else {
-            errorModal(new Error('Schema by id "' + content.schemaId + '" not found'));
+            UI.errorModal(new Error('Schema by id "' + content.schemaId + '" not found'));
 
         }
     
     } else {
-        errorModal(new Error('Content by id "' + this.id + '" not found'));
+        UI.errorModal(new Error('Content by id "' + this.id + '" not found'));
 
     }
 });

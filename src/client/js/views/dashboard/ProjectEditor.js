@@ -354,7 +354,7 @@ class ProjectEditor extends View {
             
             apiCall('post', 'server/migrate/' + this.model.id, data)
             .then(() => {
-                messageModal('Success', 'Successfully migrated content from "' + data.from + '" to "' + data.to + '"');
+                UI.messageModal('Success', 'Successfully migrated content from "' + data.from + '" to "' + data.to + '"');
             })
             .catch(errorModal);
         };
@@ -449,7 +449,7 @@ class ProjectEditor extends View {
 
                         apiCall('post', 'server/settings/' + this.model.id + '/environments', this.model.settings.environments)
                         .then(() => {
-                            messageModal('Succes', 'The new environment "' + newName + '" was created successfully', () => { location.reload(); });
+                            UI.messageModal('Succes', 'The new environment "' + newName + '" was created successfully', () => { location.reload(); });
                         })
                         .catch(errorModal);
 

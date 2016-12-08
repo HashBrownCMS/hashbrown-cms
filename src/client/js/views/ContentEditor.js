@@ -92,56 +92,46 @@ class ContentEditor extends View {
      * @param {Object} publishing
      */
     onClickDelete(publishing) {
-        let view = this;
-
-        function unpublishConnections() {
-            return apiCall('post', 'content/unpublish', view.model)
-            .then(() => {
-                return onSuccess();
-            });
-        }
-        
-        function onSuccess() {
-            debug.log('Removed content with id "' + view.model.id + '"', this); 
-        
+        // Event on API success response 
+        let onSuccess = () => {
             return reloadResource('content')
             .then(() => {
-                ViewHelper.get('NavbarMain').reload();
+                NavbarMain.reload();
                 
                 // Cancel the ContentEditor view
                 location.hash = '/content/';
             });
         }
 
-        new MessageModal({
-            model: {
-                title: 'Delete content',
-                body: 'Are you sure you want to delete the content "' + view.model.prop('title', window.language) + '"?'
-            },
-            buttons: [
-                {
-                    label: 'Cancel',
-                    class: 'btn-default',
-                    callback: () => {}
-                },
-                {
-                    label: 'Delete',
-                    class: 'btn-danger',
-                    callback: () => {
-                        apiCall('delete', 'content/' + this.model.id)
+        // Render the confirmation modal
+        let $deleteChildrenSwitch;
+        UI.confirmModal(
+            'Delete',
+            'Delete the content "' + view.model.prop('title', window.language) + '"?',
+            _.div({class: 'input-group'},      
+                _.span('Remove child content too'),
+                _.div({class: 'input-group-addon'},
+                    $deleteChildrenSwitch = UI.inputSwitch(true)
+                )
+            ),
+            () => {
+                apiCall('delete', 'content/' + this.model.id + '?removeChildren=' + $deleteChildrenSwitch.data('checked'))
+                .then(() => {
+                    // Unpublish through connections if applicable
+                    if(!this.model.local && publishing.connections && publishing.connections.length > 0) {
+                        return apiCall('post', 'content/unpublish', this.model)
                         .then(() => {
-                            if(!this.model.local && publishing.connections && publishing.connections.length > 0) {
-                                return unpublishConnections();
-                            
-                            } else {
-                                return onSuccess();
-                            }
-                        })
-                        .catch(errorModal);
+                            return onSuccess();
+                        });
+                        
+                    // If not, just continue
+                    } else {
+                        return onSuccess();
                     }
-                }
-            ]
-        });
+                })
+                .catch(UI.errorModal);
+            }
+        );
     }
 
     /**
@@ -459,7 +449,7 @@ class ContentEditor extends View {
             this.onFieldEditorsReady();
         })
         .catch((e) => {
-            errorModal(e);
+            UI.errorModal(e);
         });
     }
 }

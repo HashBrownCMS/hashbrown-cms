@@ -116,7 +116,7 @@ apiCall('get', 'server/update/check')
                     _.p('You are '  + update.amount + ' version' + (update.amount != '1' ? 's' : '') + ' behind ' + update.branch),
                     _.button({class: 'btn btn-primary btn-update-hashbrown'}, 'Update')
                         .click(() => {
-                            messageModal('Update', 'HashBrown is updating...', false);
+                            UI.messageModal('Update', 'HashBrown is updating...', false);
 
                             apiCall('post', 'server/update/start')
                             .then(() => {
@@ -130,7 +130,7 @@ apiCall('get', 'server/update/check')
                                             label: 'Cool!',
                                             class: 'btn-primary',
                                             callback: () => {
-                                                messageModal('Success', 'HashBrown is restarting...', false);
+                                                UI.messageModal('Success', 'HashBrown is restarting...', false);
 
                                                 function poke() {
                                                     $.ajax({

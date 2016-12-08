@@ -18,7 +18,7 @@ class UIHelper {
                 type: 'checkbox',
                 checked: initialValue
             }).change(function() {
-                this.parentElement.dataset = this.checked;
+                this.parentElement.dataset.checked = this.checked;
             }),
             _.label({for: id})
         );

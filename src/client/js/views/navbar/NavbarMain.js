@@ -43,7 +43,7 @@ class NavbarMain extends View {
      * Event: Error was returned
      */
     onError(err) {
-        errorModal(err);
+        UI.errorModal(err);
     }
     
     /**
@@ -381,6 +381,10 @@ class NavbarMain extends View {
         }
     }
     
+    static reload() {
+        let view = ViewHelper.get('NavbarMain').reload();
+    }
+
     /**
      * Highlights an item
      */

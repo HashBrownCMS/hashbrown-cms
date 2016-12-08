@@ -45,7 +45,7 @@ class UserPane extends Pane {
 
                     // The user already has scopes in this project
                     if(user.scopes[ProjectHelper.currentProject]) {
-                        messageModal('Add user', 'The user  "' + username + '" is already part of this project (' + ProjectHelper.currentProject + ')');
+                        UI.messageModal('Add user', 'The user  "' + username + '" is already part of this project (' + ProjectHelper.currentProject + ')');
                         return;
                     }
 
@@ -89,7 +89,7 @@ class UserPane extends Pane {
                                         project: ProjectHelper.currentProject
                                     })
                                     .then(() => {
-                                        messageModal('Invite user', 'Invitation was sent to ' + username);
+                                        UI.messageModal('Invite user', 'Invitation was sent to ' + username);
                                     })
                                     .catch(errorModal);
 
@@ -132,7 +132,7 @@ class UserPane extends Pane {
                                         scopes: scopes
                                     })
                                     .then(() => {
-                                        messageModal('Create user', 'User "' + username + '" was created with password "' + password + '".', () => { location.reload(); });
+                                        UI.messageModal('Create user', 'User "' + username + '" was created with password "' + password + '".', () => { location.reload(); });
                                     })
                                     .catch(errorModal);
 

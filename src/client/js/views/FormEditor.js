@@ -297,7 +297,7 @@ class FormEditor extends View {
         let view = this;
         
         function onClick() {
-            messageModal(
+            UI.messageModal(
                 'Entries',
                 _.div({class: 'form-entries-list'},
                     _.each(view.model.entries.reverse(), (i, entry) => {

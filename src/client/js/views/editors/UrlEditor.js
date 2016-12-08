@@ -116,7 +116,7 @@ class UrlEditor extends View {
 
             message += 'the same URL "' + url + '". Appending "-' + sameUrls + '".';
 
-            messageModal('Duplicate URLs', message);
+            UI.messageModal('Duplicate URLs', message);
 
             url = url.replace(/\/$/, '-' + sameUrls + '/');
         }

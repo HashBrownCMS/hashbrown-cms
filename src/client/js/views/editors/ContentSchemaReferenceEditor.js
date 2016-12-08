@@ -14,19 +14,19 @@ class ContentSchemaReferenceEditor extends View {
             let thisContent = resources.content.filter((c) => { return c.id == Router.params.id; })[0];
 
             if(!thisContent) {
-                errorModal(new Error('Content by id "' + Router.params.id + '" not found'));
+                UI.errorModal(new Error('Content by id "' + Router.params.id + '" not found'));
 
             } else if(thisContent.parentId) {
                 let parentContent = resources.content.filter((c) => { return c.id == thisContent.parentId; })[0];
 
                 if(!parentContent) {
-                    errorModal(new Error('Content by id "' + thisContent.parentId + '" not found'));
+                    UI.errorModal(new Error('Content by id "' + thisContent.parentId + '" not found'));
 
                 } else {
                     let parentSchema = resources.schemas[parentContent.schemaId];
                         
                     if(!parentSchema) {
-                        errorModal(new Error('Schema by id "' + parentContent.schematId + '" not found'));
+                        UI.errorModal(new Error('Schema by id "' + parentContent.schematId + '" not found'));
 
                     } else {
                         this.config.allowedSchemas = parentSchema.allowedChildSchemas;                            

@@ -497,7 +497,14 @@ class SchemaEditor extends View {
             let newSchemaId = '';
 
             for(let id in resources.schemas) {
-                if(resources.schemas[id].type == 'content' && view.model.allowedChildSchemas.indexOf(id) < 0) {
+                let schema = resources.schemas[id];
+                
+                if(
+                    schema.type == 'content' &&
+                    view.model.allowedChildSchemas.indexOf(id) < 0 &&
+                    schema.id != 'contentBase' &&
+                    schema.id != 'page'
+                ) {
                     newSchemaId = id;
                     break;
                 }
@@ -523,7 +530,12 @@ class SchemaEditor extends View {
                                     _.if(!view.model.locked,
                                         _.ul({class: 'dropdown-menu'},
                                             _.each(resources.schemas, (id, schema) => {
-                                                if(schema.type == 'content' && (id == schemaId || view.model.allowedChildSchemas.indexOf(schema.id) < 0)) {
+                                                if(
+                                                    schema.type == 'content' &&
+                                                    (id == schemaId || view.model.allowedChildSchemas.indexOf(schema.id) < 0) &&
+                                                    schema.id != 'contentBase' &&
+                                                    schema.id != 'page'
+                                                ) {
                                                     return _.li(
                                                         _.a({href: '#', 'data-id': id},
                                                             schema.name
@@ -557,7 +569,7 @@ class SchemaEditor extends View {
                             return $schema;
 
                         } catch(e) {
-                            errorModal(e);
+                            UI.errorModal(e);
                         }
                     }),
                     _.if(!view.model.locked,

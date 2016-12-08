@@ -177,7 +177,7 @@ $(document).ready(() => {
     .catch((e) => {
         triggerReady('resources');
         
-        errorModal(e);
+        UI.errorModal(e);
     });
 });
 
