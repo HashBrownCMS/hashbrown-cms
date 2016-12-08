@@ -21956,6 +21956,28 @@ FunctionTemplating.each = function(array, callback) {
 };
 
 /**
+ * Loops a given number of times, rendering elements for each pass
+ *
+ * @param {Number} iterations
+ * @param {Function} callback
+ *
+ * @returns {HTMLElement} elements
+ */
+FunctionTemplating.loop = function(iterations, callback) {
+    var elements = [];
+
+    for(var i = 0; i <= iterations; i++) {
+        var element = callback(i);
+
+        if(element) {
+            elements.push(element);
+        }
+    }
+     
+    return elements;
+};
+
+/**
  * A shorthand for document.querySelector
  *
  * @param {String} query
@@ -22269,6 +22291,12 @@ class Router {
         if(trimmed) {
             url = trimmed;
         }
+
+        if(typeof Router.check === 'function' && Router.check(url) == false) {
+            location.hash = Router.url;
+            return;
+        }
+
         // Look for route
         let context = {};
         let route;
@@ -35480,6 +35508,22 @@ onReady('resources', function () {
     new NavbarMain();
     new MainMenu();
 
+    Router.check = newRoute => {
+        let contentEditor = ViewHelper.get('ContentEditor');
+
+        if (!contentEditor || !contentEditor.model) {
+            return true;
+        }
+        if (newRoute.indexOf(contentEditor.model.id) > -1) {
+            return true;
+        }
+        if (!contentEditor.dirty) {
+            return true;
+        }
+
+        return confirm('You have unsaved changes. Do you want to discard them?');
+    };
+
     Router.init();
 });
 
@@ -37377,6 +37421,8 @@ class ContentEditor extends View {
     constructor(params) {
         super(params);
 
+        this.dirty = false;
+
         this.$element = _.div({ class: 'editor content-editor' });
 
         this.fetch();
@@ -37445,6 +37491,8 @@ class ContentEditor extends View {
 
             this.reload();
             ViewHelper.get('NavbarMain').reload();
+
+            this.dirty = false;
         }).catch(errorModal);
     }
 
@@ -37463,6 +37511,8 @@ class ContentEditor extends View {
         let onSuccess = () => {
             return reloadResource('content').then(() => {
                 NavbarMain.reload();
+
+                this.dirty = false;
 
                 // Cancel the ContentEditor view
                 location.hash = '/content/';
@@ -37619,6 +37669,8 @@ class ContentEditor extends View {
 
             // On change function
             function (newValue) {
+                view.dirty = true;
+
                 // If field definition is set to multilingual, assign flag and value onto object...
                 if (fieldDefinition.multilingual) {
                     fieldValues[key]._multilingual = true;

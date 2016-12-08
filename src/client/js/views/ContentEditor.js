@@ -4,6 +4,8 @@ class ContentEditor extends View {
     constructor(params) {
         super(params);
 
+        this.dirty = false;
+
         this.$element = _.div({class: 'editor content-editor'});
 
         this.fetch();
@@ -75,6 +77,8 @@ class ContentEditor extends View {
             
             this.reload();
             ViewHelper.get('NavbarMain').reload();
+
+            this.dirty = false;
         })
         .catch(errorModal);
     }
@@ -97,6 +101,8 @@ class ContentEditor extends View {
             return reloadResource('content')
             .then(() => {
                 NavbarMain.reload();
+                
+                this.dirty = false;
                 
                 // Cancel the ContentEditor view
                 location.hash = '/content/';
@@ -277,6 +283,8 @@ class ContentEditor extends View {
 
                         // On change function
                         function(newValue) {
+                            view.dirty = true;
+
                             // If field definition is set to multilingual, assign flag and value onto object...
                             if(fieldDefinition.multilingual) {
                                 fieldValues[key]._multilingual = true;

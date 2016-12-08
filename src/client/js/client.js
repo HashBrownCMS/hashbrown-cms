@@ -192,5 +192,15 @@ onReady('resources', function() {
     new NavbarMain();
     new MainMenu();
 
+    Router.check = (newRoute) => {
+        let contentEditor = ViewHelper.get('ContentEditor');
+
+        if(!contentEditor || !contentEditor.model) { return true; }
+        if(newRoute.indexOf(contentEditor.model.id) > -1) { return true; }
+        if(!contentEditor.dirty) { return true; }
+
+        return confirm('You have unsaved changes. Do you want to discard them?');
+    };
+
     Router.init();
 });
