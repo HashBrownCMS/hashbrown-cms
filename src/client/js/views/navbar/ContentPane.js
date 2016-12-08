@@ -45,6 +45,7 @@ class ContentPane extends Pane {
      */
     static onClickPullContent() {
         let navbar = ViewHelper.get('NavbarMain');
+        let contentEditor = ViewHelper.get('ContentEditor');
         let pullId = $('.context-menu-target-element').data('id');
 
         // API call to pull the Content by id
@@ -58,6 +59,10 @@ class ContentPane extends Pane {
         // Reload the UI
         .then(() => {
             navbar.reload();
+
+            if(contentEditor && contentEditor.model.id == pullId) {
+                contentEditor.fetch();
+            }
         }) 
         .catch(UI.errorModal);
     }

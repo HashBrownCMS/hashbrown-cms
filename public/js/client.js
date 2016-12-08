@@ -1725,6 +1725,7 @@ PEMEncoder.prototype.encode = function encode(data, options) {
 },{"./der":12,"inherits":101}],15:[function(require,module,exports){
 'use strict'
 
+exports.byteLength = byteLength
 exports.toByteArray = toByteArray
 exports.fromByteArray = fromByteArray
 
@@ -1732,23 +1733,17 @@ var lookup = []
 var revLookup = []
 var Arr = typeof Uint8Array !== 'undefined' ? Uint8Array : Array
 
-function init () {
-  var code = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
-  for (var i = 0, len = code.length; i < len; ++i) {
-    lookup[i] = code[i]
-    revLookup[code.charCodeAt(i)] = i
-  }
-
-  revLookup['-'.charCodeAt(0)] = 62
-  revLookup['_'.charCodeAt(0)] = 63
+var code = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
+for (var i = 0, len = code.length; i < len; ++i) {
+  lookup[i] = code[i]
+  revLookup[code.charCodeAt(i)] = i
 }
 
-init()
+revLookup['-'.charCodeAt(0)] = 62
+revLookup['_'.charCodeAt(0)] = 63
 
-function toByteArray (b64) {
-  var i, j, l, tmp, placeHolders, arr
+function placeHoldersCount (b64) {
   var len = b64.length
-
   if (len % 4 > 0) {
     throw new Error('Invalid string. Length must be a multiple of 4')
   }
@@ -1758,9 +1753,19 @@ function toByteArray (b64) {
   // represent one byte
   // if there is only one, then the three characters before it represent 2 bytes
   // this is just a cheap hack to not do indexOf twice
-  placeHolders = b64[len - 2] === '=' ? 2 : b64[len - 1] === '=' ? 1 : 0
+  return b64[len - 2] === '=' ? 2 : b64[len - 1] === '=' ? 1 : 0
+}
 
+function byteLength (b64) {
   // base64 is 4/3 + up to two characters of the original data
+  return b64.length * 3 / 4 - placeHoldersCount(b64)
+}
+
+function toByteArray (b64) {
+  var i, j, l, tmp, placeHolders, arr
+  var len = b64.length
+  placeHolders = placeHoldersCount(b64)
+
   arr = new Arr(len * 3 / 4 - placeHolders)
 
   // if there are placeholders, only get up to the last complete 4 chars
@@ -20560,14 +20565,21 @@ utils.intFromLE = intFromLE;
 module.exports={
   "_args": [
     [
-      "elliptic@^6.0.0",
+      {
+        "raw": "elliptic@^6.0.0",
+        "scope": null,
+        "escapedName": "elliptic",
+        "name": "elliptic",
+        "rawSpec": "^6.0.0",
+        "spec": ">=6.0.0 <7.0.0",
+        "type": "range"
+      },
       "/home/mrzapp/Development/Web/hashbrown-cms/node_modules/browserify-sign"
     ]
   ],
   "_from": "elliptic@>=6.0.0 <7.0.0",
   "_id": "elliptic@6.3.2",
   "_inCache": true,
-  "_installable": true,
   "_location": "/elliptic",
   "_nodeVersion": "6.3.0",
   "_npmOperationalInternal": {
@@ -20575,16 +20587,17 @@ module.exports={
     "tmp": "tmp/elliptic-6.3.2.tgz_1473938837205_0.3108903462998569"
   },
   "_npmUser": {
-    "email": "fedor@indutny.com",
-    "name": "indutny"
+    "name": "indutny",
+    "email": "fedor@indutny.com"
   },
   "_npmVersion": "3.10.3",
   "_phantomChildren": {},
   "_requested": {
-    "name": "elliptic",
     "raw": "elliptic@^6.0.0",
-    "rawSpec": "^6.0.0",
     "scope": null,
+    "escapedName": "elliptic",
+    "name": "elliptic",
+    "rawSpec": "^6.0.0",
     "spec": ">=6.0.0 <7.0.0",
     "type": "range"
   },
@@ -20598,8 +20611,8 @@ module.exports={
   "_spec": "elliptic@^6.0.0",
   "_where": "/home/mrzapp/Development/Web/hashbrown-cms/node_modules/browserify-sign",
   "author": {
-    "email": "fedor@indutny.com",
-    "name": "Fedor Indutny"
+    "name": "Fedor Indutny",
+    "email": "fedor@indutny.com"
   },
   "bugs": {
     "url": "https://github.com/indutny/elliptic/issues"
@@ -20646,8 +20659,8 @@ module.exports={
   "main": "lib/elliptic.js",
   "maintainers": [
     {
-      "email": "fedor@indutny.com",
-      "name": "indutny"
+      "name": "indutny",
+      "email": "fedor@indutny.com"
     }
   ],
   "name": "elliptic",
@@ -29890,14 +29903,16 @@ var PATH_REGEXP = new RegExp([
 /**
  * Parse a string for the raw tokens.
  *
- * @param  {string} str
+ * @param  {string}  str
+ * @param  {Object=} options
  * @return {!Array}
  */
-function parse (str) {
+function parse (str, options) {
   var tokens = []
   var key = 0
   var index = 0
   var path = ''
+  var defaultDelimiter = options && options.delimiter || '/'
   var res
 
   while ((res = PATH_REGEXP.exec(str)) != null) {
@@ -29930,8 +29945,8 @@ function parse (str) {
     var partial = prefix != null && next != null && next !== prefix
     var repeat = modifier === '+' || modifier === '*'
     var optional = modifier === '?' || modifier === '*'
-    var delimiter = res[2] || '/'
-    var pattern = capture || group || (asterisk ? '.*' : '[^' + delimiter + ']+?')
+    var delimiter = res[2] || defaultDelimiter
+    var pattern = capture || group
 
     tokens.push({
       name: name || key++,
@@ -29941,7 +29956,7 @@ function parse (str) {
       repeat: repeat,
       partial: partial,
       asterisk: !!asterisk,
-      pattern: escapeGroup(pattern)
+      pattern: pattern ? escapeGroup(pattern) : (asterisk ? '.*' : '[^' + escapeString(delimiter) + ']+?')
     })
   }
 
@@ -29962,10 +29977,11 @@ function parse (str) {
  * Compile a string to a template function for the path.
  *
  * @param  {string}             str
+ * @param  {Object=}            options
  * @return {!function(Object=, Object=)}
  */
-function compile (str) {
-  return tokensToFunction(parse(str))
+function compile (str, options) {
+  return tokensToFunction(parse(str, options))
 }
 
 /**
@@ -30176,27 +30192,23 @@ function arrayToRegexp (path, keys, options) {
  * @return {!RegExp}
  */
 function stringToRegexp (path, keys, options) {
-  var tokens = parse(path)
-  var re = tokensToRegExp(tokens, options)
-
-  // Attach keys back to the regexp.
-  for (var i = 0; i < tokens.length; i++) {
-    if (typeof tokens[i] !== 'string') {
-      keys.push(tokens[i])
-    }
-  }
-
-  return attachKeys(re, keys)
+  return tokensToRegExp(parse(path, options), keys, options)
 }
 
 /**
  * Expose a function for taking tokens and returning a RegExp.
  *
- * @param  {!Array}  tokens
- * @param  {Object=} options
+ * @param  {!Array}          tokens
+ * @param  {(Array|Object)=} keys
+ * @param  {Object=}         options
  * @return {!RegExp}
  */
-function tokensToRegExp (tokens, options) {
+function tokensToRegExp (tokens, keys, options) {
+  if (!isarray(keys)) {
+    options = /** @type {!Object} */ (keys || options)
+    keys = []
+  }
+
   options = options || {}
 
   var strict = options.strict
@@ -30214,6 +30226,8 @@ function tokensToRegExp (tokens, options) {
     } else {
       var prefix = escapeString(token.prefix)
       var capture = '(?:' + token.pattern + ')'
+
+      keys.push(token)
 
       if (token.repeat) {
         capture += '(?:' + prefix + capture + ')*'
@@ -30249,7 +30263,7 @@ function tokensToRegExp (tokens, options) {
     route += strict && endsWithSlash ? '' : '(?=\\/|$)'
   }
 
-  return new RegExp('^' + route, flags(options))
+  return attachKeys(new RegExp('^' + route, flags(options)), keys)
 }
 
 /**
@@ -30265,14 +30279,12 @@ function tokensToRegExp (tokens, options) {
  * @return {!RegExp}
  */
 function pathToRegexp (path, keys, options) {
-  keys = keys || []
-
   if (!isarray(keys)) {
-    options = /** @type {!Object} */ (keys)
+    options = /** @type {!Object} */ (keys || options)
     keys = []
-  } else if (!options) {
-    options = {}
   }
+
+  options = options || {}
 
   if (path instanceof RegExp) {
     return regexpToRegexp(path, /** @type {!Array} */ (keys))
@@ -40200,73 +40212,78 @@ class ArrayEditor extends View {
      * @returns {HTMLElement} Item
      */
     renderItem(index, item) {
-        // Sanity check for item schema
-        if (!this.config.allowedSchemas) {
-            this.config.allowedSchemas = [];
-        }
+        let $element = _.div({ class: 'item raised' });
 
-        let itemSchemaId = this.value.schemaBindings[index];
+        // Wait a frame, so large arrays can be rendered without delay
+        setTimeout(() => {
+            // Sanity check for item schema
+            if (!this.config.allowedSchemas) {
+                this.config.allowedSchemas = [];
+            }
 
-        // Schema could not be found, assign first allowed schema
-        if (this.config.allowedSchemas.length > 0 && (!itemSchemaId || this.config.allowedSchemas.indexOf(itemSchemaId) < 0)) {
-            itemSchemaId = this.config.allowedSchemas[0];
-            this.value.schemaBindings[index] = itemSchemaId;
-        }
+            let itemSchemaId = this.value.schemaBindings[index];
 
-        // Make sure we have the item schema and the editor we need for each array item
-        let itemSchema = SchemaHelper.getFieldSchemaWithParentConfigs(itemSchemaId);
+            // Schema could not be found, assign first allowed schema
+            if (this.config.allowedSchemas.length > 0 && (!itemSchemaId || this.config.allowedSchemas.indexOf(itemSchemaId) < 0)) {
+                itemSchemaId = this.config.allowedSchemas[0];
+                this.value.schemaBindings[index] = itemSchemaId;
+            }
 
-        if (itemSchema) {
-            let fieldEditor = resources.editors[itemSchema.editorId];
+            // Make sure we have the item schema and the editor we need for each array item
+            let itemSchema = SchemaHelper.getFieldSchemaWithParentConfigs(itemSchemaId);
 
-            // Perform sanity check and reassign the item into the array
-            item = ContentHelper.fieldSanityCheck(item, itemSchema);
-            this.value.items[index] = item;
+            if (itemSchema) {
+                let fieldEditor = resources.editors[itemSchema.editorId];
 
-            // Returns the correct index, even if it's updated
-            let getIndex = () => {
-                return $element.attr('data-index');
-            };
+                // Perform sanity check and reassign the item into the array
+                item = ContentHelper.fieldSanityCheck(item, itemSchema);
+                this.value.items[index] = item;
 
-            // Init the schema selector
-            let $schemaSelector = _.div({ class: 'item-schema-selector kvp' }, _.div({ class: 'key' }, 'Schema'), _.div({ class: 'value' }, _.select({ class: 'form-control' }, _.each(this.config.allowedSchemas, (allowedSchemaIndex, allowedSchemaId) => {
-                let allowedSchema = resources.schemas[allowedSchemaId];
+                // Returns the correct index, even if it's updated
+                let getIndex = () => {
+                    return $element.attr('data-index');
+                };
 
-                return _.option({ value: allowedSchemaId }, allowedSchema.name);
-            })).on('change', () => {
-                itemSchemaId = $schemaSelector.find('select').val();
+                // Init the schema selector
+                let $schemaSelector = _.div({ class: 'item-schema-selector kvp' }, _.div({ class: 'key' }, 'Schema'), _.div({ class: 'value' }, _.select({ class: 'form-control' }, _.each(this.config.allowedSchemas, (allowedSchemaIndex, allowedSchemaId) => {
+                    let allowedSchema = resources.schemas[allowedSchemaId];
 
-                this.value.schemaBindings[getIndex()] = itemSchemaId;
+                    return _.option({ value: allowedSchemaId }, allowedSchema.name);
+                })).on('change', () => {
+                    itemSchemaId = $schemaSelector.find('select').val();
 
-                this.render();
-            }).val(itemSchemaId)));
+                    this.value.schemaBindings[getIndex()] = itemSchemaId;
 
-            // Set schema label (used when sorting items)
-            let $schemaLabel = _.span({ class: 'schema-label' }, itemSchema.name);
+                    this.render();
+                }).val(itemSchemaId)));
 
-            // Init the field editor
-            let fieldEditorInstance = new fieldEditor({
-                value: itemSchema.multilingual ? item[window.language] : item,
-                disabled: itemSchema.disabled || false,
-                config: itemSchema.config || {},
-                schema: itemSchema
-            });
+                // Set schema label (used when sorting items)
+                let $schemaLabel = _.span({ class: 'schema-label' }, itemSchema.name);
 
-            // Hook up the change event
-            fieldEditorInstance.on('change', newValue => {
-                this.onChange(newValue, getIndex(), itemSchema);
-            });
+                // Init the field editor
+                let fieldEditorInstance = new fieldEditor({
+                    value: itemSchema.multilingual ? item[window.language] : item,
+                    disabled: itemSchema.disabled || false,
+                    config: itemSchema.config || {},
+                    schema: itemSchema
+                });
 
-            // Return the DOM element
-            let $element = _.div({ class: 'item raised' }, _.button({ class: 'btn btn-embedded btn-remove' }, _.span({ class: 'fa fa-remove' })).click(() => {
-                this.onClickRemoveItem(getIndex());
-                $element.remove();
-            }), $schemaLabel, this.config.allowedSchemas.length > 1 ? $schemaSelector : null, fieldEditorInstance.$element);
+                // Hook up the change event
+                fieldEditorInstance.on('change', newValue => {
+                    this.onChange(newValue, getIndex(), itemSchema);
+                });
 
-            return $element;
-        } else {
-            debug.warning('Schema by id "' + itemSchemaId + '" not found', this);
-        }
+                // Return the DOM element
+                _.append($element, _.button({ class: 'btn btn-embedded btn-remove' }, _.span({ class: 'fa fa-remove' })).click(() => {
+                    this.onClickRemoveItem(getIndex());
+                    $element.remove();
+                }), $schemaLabel, this.config.allowedSchemas.length > 1 ? $schemaSelector : null, fieldEditorInstance.$element);
+            } else {
+                debug.warning('Schema by id "' + itemSchemaId + '" not found', this);
+            }
+        }, index);
+
+        return $element;
     }
 
     render() {
@@ -40310,7 +40327,9 @@ class ArrayEditor extends View {
         }));
 
         // Update indices
-        this.updateDOMIndices();
+        setTimeout(() => {
+            this.updateDOMIndices();
+        }, this.value.items.length + 5);
     }
 }
 
@@ -40973,7 +40992,11 @@ class RichTextEditor extends View {
     constructor(params) {
         super(params);
 
-        this.canChange = true;
+        // Sanity check of value
+        this.value = this.value || '';
+
+        // Make sure convert is HTML
+        this.value = marked(this.value);
 
         this.init();
     }
@@ -40982,40 +41005,39 @@ class RichTextEditor extends View {
      * Event: Change input
      *
      * @param {String} value
-     * @param {Object} source
+     * @param {String} source
      */
-    onChange(value, source) {
-        if (!this.canChange || this.value == value) {
+    onChange(value) {
+        if (this.value == value) {
             return;
         }
 
-        this.canChange = false;
-
         this.value = value;
 
-        if (source != this.wysiwyg) {
-            this.wysiwyg.setData(value);
-        } else {
-            document.cookie = 'rteview = wysiwyg';
-        }
-
-        if (source != this.html) {
-            this.html.getDoc().setValue(value);
-        } else {
-            document.cookie = 'rteview = html';
-        }
-
-        if (source != this.markdown) {
-            this.markdown.getDoc().setValue(toMarkdown(value));
-        } else {
-            document.cookie = 'rteview = markdown';
-        }
-
         this.trigger('change', this.value);
+    }
 
-        setTimeout(() => {
-            this.canChange = true;
-        }, 1);
+    /**
+     * Event: On click tab
+     *
+     * @param {String} source
+     */
+    onClickTab(source) {
+        switch (source) {
+            case 'wysiwyg':
+                this.wysiwyg.setData(this.value);
+                break;
+
+            case 'html':
+                this.html.getDoc().setValue(this.value);
+                break;
+
+            case 'markdown':
+                this.markdown.getDoc().setValue(toMarkdown(this.value));
+                break;
+        }
+
+        document.cookie = 'rteview = ' + source;
     }
 
     /**
@@ -41028,10 +41050,21 @@ class RichTextEditor extends View {
             MediaHelper.getMediaById(id).then(media => {
                 let html = '<img data-id="' + id + '" alt="' + media.name + '" src="/' + media.url + '">';
 
-                // TODO: Conditional logic for which editor is active
-                this.wysiwyg.insertHtml(html);
+                let source = getCookie('rteview');
 
-                this.onChange(this.wysiwyg.getData(), this.wysiwyg);
+                switch (source) {
+                    case 'wysiwyg':
+                        this.wysiwyg.insertHtml(html);
+                        break;
+
+                    case 'html':
+                        this.html.replaceSelection(html, 'end');
+                        break;
+
+                    case 'markdown':
+                        this.markdown.replaceSelection(toMarkdown(html), 'end');
+                        break;
+                }
             }).catch(errorModal);
         });
     }
@@ -41044,16 +41077,20 @@ class RichTextEditor extends View {
         let activeView = getCookie('rteview') || 'wysiwyg';
 
         // Main element
-        this.$element = _.div({ class: 'field-editor rich-text-editor panel panel-default' }, _.ul({ class: 'nav nav-tabs' }, _.li({ class: activeView == 'wysiwyg' ? 'active' : '' }, _.a({ 'data-toggle': 'tab', href: '#' + this.guid + '-wysiwyg' }, 'Wysiwyg')), _.li({ class: activeView == 'markdown' ? 'active' : '' }, _.a({ 'data-toggle': 'tab', href: '#' + this.guid + '-markdown' }, 'Markdown')), _.li({ class: activeView == 'html' ? 'active' : '' }, _.a({ 'data-toggle': 'tab', href: '#' + this.guid + '-html' }, 'HTML')), _.button({ class: 'btn btn-primary btn-insert-media' }, _.span({ class: 'fa fa-file-image-o' })).click(() => {
+        this.$element = _.div({ class: 'field-editor rich-text-editor panel panel-default' }, _.ul({ class: 'nav nav-tabs' }, _.each(['wysiwyg', 'markdown', 'html'], (i, label) => {
+            return _.li({ class: activeView == label ? 'active' : '' }, _.a({ 'data-toggle': 'tab', href: '#' + this.guid + '-' + label }, label).click(() => {
+                this.onClickTab(label);
+            }));
+        }), _.button({ class: 'btn btn-primary btn-insert-media' }, _.span({ class: 'fa fa-file-image-o' })).click(() => {
             this.onClickInsertMedia();
         })), _.div({ class: 'tab-content' }, _.div({ id: this.guid + '-wysiwyg', class: 'tab-pane wysiwyg ' + (activeView == 'wysiwyg' ? 'active' : '') }, $wysiwyg = _.div({ 'contenteditable': true })), _.div({ id: this.guid + '-markdown', class: 'tab-pane markdown ' + (activeView == 'markdown' ? 'active' : '') }, $markdown = _.textarea({})), _.div({ id: this.guid + '-html', class: 'tab-pane html ' + (activeView == 'html' ? 'active' : '') }, $html = _.textarea({}))));
 
         // Init HTML editor
         setTimeout(() => {
             this.html = CodeMirror.fromTextArea($html[0], {
-                lineNumbers: true,
+                lineNumbers: false,
                 mode: {
-                    name: 'html'
+                    name: 'xml'
                 },
                 viewportMargin: Infinity,
                 tabSize: 4,
@@ -41063,11 +41100,14 @@ class RichTextEditor extends View {
                 value: this.value
             });
 
-            this.html.getDoc().setValue(this.value);
-
             this.html.on('change', () => {
-                this.onChange(this.html.getDoc().getValue(), this.html);
+                this.onChange(this.html.getDoc().getValue());
             });
+
+            // Set value
+            if (activeView == 'html') {
+                this.html.getDoc().setValue(this.value);
+            }
         }, 1);
 
         // Init markdown editor
@@ -41085,11 +41125,14 @@ class RichTextEditor extends View {
                 value: toMarkdown(this.value)
             });
 
-            this.markdown.getDoc().setValue(toMarkdown(this.value));
-
             this.markdown.on('change', () => {
-                this.onChange(marked(this.markdown.getDoc().getValue()), this.markdown);
+                this.onChange(marked(this.markdown.getDoc().getValue()));
             });
+
+            // Set value
+            if (activeView == 'markdown') {
+                this.markdown.getDoc().setValue(toMarkdown(this.value));
+            }
         }, 1);
 
         // Init WYSIWYG editor
@@ -41107,7 +41150,7 @@ class RichTextEditor extends View {
         });
 
         this.wysiwyg.on('change', () => {
-            this.onChange(this.wysiwyg.getData(), this.wysiwyg);
+            this.onChange(this.wysiwyg.getData());
         });
 
         this.wysiwyg.on('instanceReady', () => {
@@ -41128,8 +41171,10 @@ class RichTextEditor extends View {
                 }
             });
 
-            // Insert text
-            this.wysiwyg.setData(this.value || '');
+            // Set data
+            if (activeView == 'wysiwyg') {
+                this.wysiwyg.setData(this.value);
+            }
         });
     }
 }
@@ -41889,6 +41934,7 @@ class ContentPane extends Pane {
      */
     static onClickPullContent() {
         let navbar = ViewHelper.get('NavbarMain');
+        let contentEditor = ViewHelper.get('ContentEditor');
         let pullId = $('.context-menu-target-element').data('id');
 
         // API call to pull the Content by id
@@ -41902,6 +41948,10 @@ class ContentPane extends Pane {
         // Reload the UI
         .then(() => {
             navbar.reload();
+
+            if (contentEditor && contentEditor.model.id == pullId) {
+                contentEditor.fetch();
+            }
         }).catch(UI.errorModal);
     }
 

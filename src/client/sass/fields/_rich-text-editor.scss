@@ -20,6 +20,12 @@
         padding: 0px !important;
     }   
 
+    .CodeMirror {
+        p, pre, span, .cke_editable {
+            font-size: 14px;
+        }
+    }
+
     .cke {
         padding: 0px;
         background: none;

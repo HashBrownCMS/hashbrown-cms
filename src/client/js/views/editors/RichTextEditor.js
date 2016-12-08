@@ -7,7 +7,11 @@ class RichTextEditor extends View {
     constructor(params) {
         super(params);
 
-        this.canChange = true;
+        // Sanity check of value
+        this.value = this.value || '';
+
+        // Make sure convert is HTML
+        this.value = marked(this.value);
 
         this.init();
     }
@@ -16,38 +20,37 @@ class RichTextEditor extends View {
      * Event: Change input
      *
      * @param {String} value
-     * @param {Object} source
+     * @param {String} source
      */
-    onChange(value, source) {
-        if(!this.canChange || this.value == value) { return; }
-
-        this.canChange = false;
+    onChange(value) {
+        if(this.value == value) { return; }
 
         this.value = value;
 
-        if(source != this.wysiwyg) {
-            this.wysiwyg.setData(value);
-        } else {
-            document.cookie = 'rteview = wysiwyg';
-        }
-        
-        if(source != this.html) {
-            this.html.getDoc().setValue(value);
-        } else {
-            document.cookie = 'rteview = html';
-        }
-            
-        if(source != this.markdown) {
-            this.markdown.getDoc().setValue(toMarkdown(value));
-        } else {
-            document.cookie = 'rteview = markdown';
-        }
-        
         this.trigger('change', this.value);
+    }
 
-        setTimeout(() => {
-            this.canChange = true;
-        }, 1);
+    /**
+     * Event: On click tab
+     *
+     * @param {String} source
+     */
+    onClickTab(source) {
+        switch(source) {
+            case 'wysiwyg':
+                this.wysiwyg.setData(this.value);
+                break;
+            
+            case 'html':
+                this.html.getDoc().setValue(this.value);
+                break;
+            
+            case 'markdown':
+                this.markdown.getDoc().setValue(toMarkdown(this.value));
+                break;
+        }
+        
+        document.cookie = 'rteview = ' + source;
     }
 
     /**
@@ -61,10 +64,21 @@ class RichTextEditor extends View {
             .then((media) => {
                 let html = '<img data-id="' + id + '" alt="' + media.name + '" src="/' + media.url + '">';
 
-                // TODO: Conditional logic for which editor is active
-                this.wysiwyg.insertHtml(html);
+                let source = getCookie('rteview');
 
-                this.onChange(this.wysiwyg.getData(), this.wysiwyg);
+                switch(source) {
+                    case 'wysiwyg':
+                        this.wysiwyg.insertHtml(html);
+                        break;
+                    
+                    case 'html':
+                        this.html.replaceSelection(html, 'end');
+                        break;
+                    
+                    case 'markdown':
+                        this.markdown.replaceSelection(toMarkdown(html), 'end');
+                        break;
+                }
             })
             .catch(errorModal);
         });
@@ -80,21 +94,13 @@ class RichTextEditor extends View {
         // Main element
         this.$element = _.div({class: 'field-editor rich-text-editor panel panel-default'},
             _.ul({class: 'nav nav-tabs'},
-                _.li({class: activeView == 'wysiwyg' ? 'active' : ''},
-                    _.a({'data-toggle': 'tab', href: '#' + this.guid + '-wysiwyg'},
-                        'Wysiwyg'
-                    )
-                ),
-                _.li({class: activeView == 'markdown' ? 'active' : ''},
-                    _.a({'data-toggle': 'tab', href: '#' + this.guid + '-markdown'},
-                        'Markdown'
-                    )
-                ),
-                _.li({class: activeView == 'html' ? 'active' : ''},
-                    _.a({'data-toggle': 'tab', href: '#' + this.guid + '-html'},
-                        'HTML'
-                    )
-                ),
+                _.each(['wysiwyg', 'markdown', 'html'], (i, label) => {
+                    return _.li({class: activeView == label ? 'active' : ''},
+                        _.a({'data-toggle': 'tab', href: '#' + this.guid + '-' + label},
+                            label
+                        ).click(() => { this.onClickTab(label); })
+                    );
+                }),
                 _.button({class: 'btn btn-primary btn-insert-media'},
                     _.span({class: 'fa fa-file-image-o'})                                        
                 ).click(() => { this.onClickInsertMedia(); })
@@ -115,9 +121,9 @@ class RichTextEditor extends View {
         // Init HTML editor
         setTimeout(() => {
             this.html = CodeMirror.fromTextArea($html[0], {
-                lineNumbers: true,
+                lineNumbers: false,
                 mode: {
-                    name: 'html'
+                    name: 'xml'
                 },
                 viewportMargin: Infinity,
                 tabSize: 4,
@@ -127,11 +133,14 @@ class RichTextEditor extends View {
                 value: this.value
             });
 
-            this.html.getDoc().setValue(this.value);
-
             this.html.on('change', () => {
-                this.onChange(this.html.getDoc().getValue(), this.html);
+                this.onChange(this.html.getDoc().getValue());
             });
+            
+            // Set value
+            if(activeView == 'html') {
+                this.html.getDoc().setValue(this.value);
+            }
         }, 1);
 
         // Init markdown editor
@@ -149,12 +158,17 @@ class RichTextEditor extends View {
                 value: toMarkdown(this.value)
             });
 
-            this.markdown.getDoc().setValue(toMarkdown(this.value));
-
             this.markdown.on('change', () => {
-                this.onChange(marked(this.markdown.getDoc().getValue()), this.markdown);
+                this.onChange(marked(this.markdown.getDoc().getValue()));
             });
+
+            // Set value
+            if(activeView == 'markdown') {
+                this.markdown.getDoc().setValue(toMarkdown(this.value));
+            }
         }, 1);
+
+        
 
         // Init WYSIWYG editor
         this.wysiwyg = CKEDITOR.replace(
@@ -184,7 +198,7 @@ class RichTextEditor extends View {
         );
 
         this.wysiwyg.on('change', () => {
-            this.onChange(this.wysiwyg.getData(), this.wysiwyg);
+            this.onChange(this.wysiwyg.getData());
         });
 
         this.wysiwyg.on('instanceReady', () => {
@@ -207,8 +221,10 @@ class RichTextEditor extends View {
                 }
             });
 
-            // Insert text
-            this.wysiwyg.setData(this.value || '');
+            // Set data
+            if(activeView == 'wysiwyg') {
+                this.wysiwyg.setData(this.value);
+            }
         });
     }
 }

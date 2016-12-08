@@ -131,99 +131,104 @@ class ArrayEditor extends View {
      * @returns {HTMLElement} Item
      */
     renderItem(index, item) {
-        // Sanity check for item schema
-        if(!this.config.allowedSchemas) {
-            this.config.allowedSchemas = []
-        }
-        
-        let itemSchemaId = this.value.schemaBindings[index];
+        let $element = _.div({class: 'item raised'});
 
-        // Schema could not be found, assign first allowed schema
-        if(
-            this.config.allowedSchemas.length > 0 &&
-            (
-                !itemSchemaId ||
-                this.config.allowedSchemas.indexOf(itemSchemaId) < 0
-            )
-        ) {
-            itemSchemaId = this.config.allowedSchemas[0];                    
-            this.value.schemaBindings[index] = itemSchemaId;
-        }
+        // Wait a frame, so large arrays can be rendered without delay
+        setTimeout(() => {         
+            // Sanity check for item schema
+            if(!this.config.allowedSchemas) {
+                this.config.allowedSchemas = []
+            }
+            
+            let itemSchemaId = this.value.schemaBindings[index];
 
-        // Make sure we have the item schema and the editor we need for each array item
-        let itemSchema = SchemaHelper.getFieldSchemaWithParentConfigs(itemSchemaId);
-
-        if(itemSchema) {
-            let fieldEditor = resources.editors[itemSchema.editorId];
-
-            // Perform sanity check and reassign the item into the array
-            item = ContentHelper.fieldSanityCheck(item, itemSchema);
-            this.value.items[index] = item;
-
-            // Returns the correct index, even if it's updated
-            let getIndex = () => {
-                return $element.attr('data-index');
-            };
-
-            // Init the schema selector
-            let $schemaSelector = _.div({class: 'item-schema-selector kvp'},
-                _.div({class: 'key'},
-                    'Schema'
-                ),
-                _.div({class: 'value'},
-                    _.select({class: 'form-control'},
-                        _.each(this.config.allowedSchemas, (allowedSchemaIndex, allowedSchemaId) => {
-                            let allowedSchema = resources.schemas[allowedSchemaId];
-
-                            return _.option({ value: allowedSchemaId },
-                                allowedSchema.name
-                            );
-                        })
-                    ).on('change', () => {
-                        itemSchemaId = $schemaSelector.find('select').val();
-
-                        this.value.schemaBindings[getIndex()] = itemSchemaId;
-
-                        this.render();
-                    }).val(itemSchemaId)
+            // Schema could not be found, assign first allowed schema
+            if(
+                this.config.allowedSchemas.length > 0 &&
+                (
+                    !itemSchemaId ||
+                    this.config.allowedSchemas.indexOf(itemSchemaId) < 0
                 )
-            );
+            ) {
+                itemSchemaId = this.config.allowedSchemas[0];                    
+                this.value.schemaBindings[index] = itemSchemaId;
+            }
 
-            // Set schema label (used when sorting items)
-            let $schemaLabel = _.span({class: 'schema-label'}, itemSchema.name);
+            // Make sure we have the item schema and the editor we need for each array item
+            let itemSchema = SchemaHelper.getFieldSchemaWithParentConfigs(itemSchemaId);
 
-            // Init the field editor
-            let fieldEditorInstance = new fieldEditor({
-                value: itemSchema.multilingual ? item[window.language] : item,
-                disabled: itemSchema.disabled || false,
-                config: itemSchema.config || {},
-                schema: itemSchema
-            });
+            if(itemSchema) {
+                let fieldEditor = resources.editors[itemSchema.editorId];
 
-            // Hook up the change event
-            fieldEditorInstance.on('change', (newValue) => {
-                this.onChange(newValue, getIndex(), itemSchema);
-            });
+                // Perform sanity check and reassign the item into the array
+                item = ContentHelper.fieldSanityCheck(item, itemSchema);
+                this.value.items[index] = item;
 
-            // Return the DOM element
-            let $element = _.div({class: 'item raised'},
-                _.button({class: 'btn btn-embedded btn-remove'},
-                    _.span({class: 'fa fa-remove'})
-                ).click(() => {
-                    this.onClickRemoveItem(getIndex());
-                    $element.remove();
-                }),
-                $schemaLabel,
-                this.config.allowedSchemas.length > 1 ? $schemaSelector : null,
-                fieldEditorInstance.$element
-            );
+                // Returns the correct index, even if it's updated
+                let getIndex = () => {
+                    return $element.attr('data-index');
+                };
 
-            return $element;
-        
-        } else {
-            debug.warning('Schema by id "' + itemSchemaId + '" not found', this);
+                // Init the schema selector
+                let $schemaSelector = _.div({class: 'item-schema-selector kvp'},
+                    _.div({class: 'key'},
+                        'Schema'
+                    ),
+                    _.div({class: 'value'},
+                        _.select({class: 'form-control'},
+                            _.each(this.config.allowedSchemas, (allowedSchemaIndex, allowedSchemaId) => {
+                                let allowedSchema = resources.schemas[allowedSchemaId];
 
-        }
+                                return _.option({ value: allowedSchemaId },
+                                    allowedSchema.name
+                                );
+                            })
+                        ).on('change', () => {
+                            itemSchemaId = $schemaSelector.find('select').val();
+
+                            this.value.schemaBindings[getIndex()] = itemSchemaId;
+
+                            this.render();
+                        }).val(itemSchemaId)
+                    )
+                );
+
+                // Set schema label (used when sorting items)
+                let $schemaLabel = _.span({class: 'schema-label'}, itemSchema.name);
+
+                // Init the field editor
+                let fieldEditorInstance = new fieldEditor({
+                    value: itemSchema.multilingual ? item[window.language] : item,
+                    disabled: itemSchema.disabled || false,
+                    config: itemSchema.config || {},
+                    schema: itemSchema
+                });
+
+                // Hook up the change event
+                fieldEditorInstance.on('change', (newValue) => {
+                    this.onChange(newValue, getIndex(), itemSchema);
+                });
+
+                // Return the DOM element
+                _.append($element,
+                    _.button({class: 'btn btn-embedded btn-remove'},
+                        _.span({class: 'fa fa-remove'})
+                    ).click(() => {
+                        this.onClickRemoveItem(getIndex());
+                        $element.remove();
+                    }),
+                    $schemaLabel,
+                    this.config.allowedSchemas.length > 1 ? $schemaSelector : null,
+                    fieldEditorInstance.$element
+                );
+            
+            } else {
+                debug.warning('Schema by id "' + itemSchemaId + '" not found', this);
+
+            }
+        }, index);
+
+        return $element;
     }
 
     render() {
@@ -274,7 +279,9 @@ class ArrayEditor extends View {
         );
 
         // Update indices
-        this.updateDOMIndices();
+        setTimeout(() => {
+            this.updateDOMIndices();
+        }, this.value.items.length + 5);
     }    
 }
 

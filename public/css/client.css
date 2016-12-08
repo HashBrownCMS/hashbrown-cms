@@ -1196,6 +1196,8 @@ body > .dashboard-container {
       padding: 0px; }
   .rich-text-editor .tab-content {
     padding: 0px !important; }
+  .rich-text-editor .CodeMirror p, .rich-text-editor .CodeMirror pre, .rich-text-editor .CodeMirror span, .rich-text-editor .CodeMirror .cke_editable {
+    font-size: 14px; }
   .rich-text-editor .cke {
     padding: 0px;
     background: none;
