@@ -20,13 +20,22 @@ class RichTextEditor extends View {
      * Event: Change input
      *
      * @param {String} value
-     * @param {String} source
      */
     onChange(value) {
-        if(this.value == value) { return; }
+        value = value || '';
+
+        let trimmedOldValue = this.value.trim().replace(/\n/g, '').replace(/ /g, '');
+        let trimmedNewValue = value.trim().replace(/\n/g, '').replace(/ /g, '');
+
+        if(trimmedOldValue == trimmedNewValue) { return; }
 
         this.value = value;
 
+        if(this.silentChange === true) {
+            this.silentChange = false;
+            return;
+        }
+        
         this.trigger('change', this.value);
     }
 
@@ -139,6 +148,7 @@ class RichTextEditor extends View {
             
             // Set value
             if(activeView == 'html') {
+                this.silentChange = true;
                 this.html.getDoc().setValue(this.value);
             }
         }, 1);
@@ -164,6 +174,7 @@ class RichTextEditor extends View {
 
             // Set value
             if(activeView == 'markdown') {
+                this.silentChange = true;
                 this.markdown.getDoc().setValue(toMarkdown(this.value));
             }
         }, 1);
@@ -221,8 +232,9 @@ class RichTextEditor extends View {
                 }
             });
 
-            // Set data
+            // Set value
             if(activeView == 'wysiwyg') {
+                this.silentChange = true;
                 this.wysiwyg.setData(this.value);
             }
         });

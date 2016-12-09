@@ -192,14 +192,28 @@ onReady('resources', function() {
     new NavbarMain();
     new MainMenu();
 
-    Router.check = (newRoute) => {
+    Router.check = (newRoute, cancel, proceed) => {
         let contentEditor = ViewHelper.get('ContentEditor');
 
-        if(!contentEditor || !contentEditor.model) { return true; }
-        if(newRoute.indexOf(contentEditor.model.id) > -1) { return true; }
-        if(!contentEditor.dirty) { return true; }
+        if(
+            (!contentEditor || !contentEditor.model) ||
+            (newRoute.indexOf(contentEditor.model.id) > -1) ||
+            (!contentEditor.dirty)
+        ) {
+            proceed();
+            return;
+        }
 
-        return confirm('You have unsaved changes. Do you want to discard them?');
+        UI.confirmModal(
+            'Discard',
+            'Discard unsaved changes?',
+            'You have made changes to "' + contentEditor.model.prop('title', window.language) + '"',
+            () => {
+                contentEditor.dirty = false;
+                proceed();
+            },
+            cancel
+        );
     };
 
     Router.init();

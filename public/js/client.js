@@ -22281,22 +22281,7 @@ class Router {
         return decodeURIComponent(results[2].replace(/\+/g, " "));
     }
 
-    static init() {
-        // Get the url
-        let url = location.hash.slice(1) || '/';
-        let trimmed = url.substring(0, url.indexOf('?'));
-       
-        Router.params = {};                    
-
-        if(trimmed) {
-            url = trimmed;
-        }
-
-        if(typeof Router.check === 'function' && Router.check(url) == false) {
-            location.hash = Router.url;
-            return;
-        }
-
+    static directToRoute(url) {
         // Look for route
         let context = {};
         let route;
@@ -22340,6 +22325,41 @@ class Router {
         }
 
         Router.url = url;
+    }
+
+    static init() {
+        // Get the url
+        let url = location.hash.slice(1) || '/';
+        let trimmed = url.substring(0, url.indexOf('?'));
+       
+        Router.params = {};                    
+
+        if(trimmed) {
+            url = trimmed;
+        }
+
+        // If a check is implemented, execute it
+        if(typeof Router.check === 'function') {
+            Router.check(
+                // Pass the proposed route
+                url,
+
+                // Cancel method
+                () => {
+                    location.hash = Router.url;
+                },
+
+                // Proceed method
+                () => {
+                    Router.directToRoute(url);
+                }
+            );
+
+        // If not, proceed as normal
+        } else {
+            Router.directToRoute(url);
+
+        }
     }
 }
 
@@ -35508,20 +35528,18 @@ onReady('resources', function () {
     new NavbarMain();
     new MainMenu();
 
-    Router.check = newRoute => {
+    Router.check = (newRoute, cancel, proceed) => {
         let contentEditor = ViewHelper.get('ContentEditor');
 
-        if (!contentEditor || !contentEditor.model) {
-            return true;
-        }
-        if (newRoute.indexOf(contentEditor.model.id) > -1) {
-            return true;
-        }
-        if (!contentEditor.dirty) {
-            return true;
+        if (!contentEditor || !contentEditor.model || newRoute.indexOf(contentEditor.model.id) > -1 || !contentEditor.dirty) {
+            proceed();
+            return;
         }
 
-        return confirm('You have unsaved changes. Do you want to discard them?');
+        UI.confirmModal('Discard', 'Discard unsaved changes?', 'You have made changes to "' + contentEditor.model.prop('title', window.language) + '"', () => {
+            contentEditor.dirty = false;
+            proceed();
+        }, cancel);
     };
 
     Router.init();
@@ -36119,13 +36137,13 @@ class UIHelper {
      * @param {String} body
      * @param {Function} onSubmit
      */
-    static confirmModal(type, title, body, onSubmit) {
+    static confirmModal(type, title, body, onSubmit, onCancel) {
         let submitClass = 'btn-primary';
 
         type = (type || '').toLowerCase();
 
         switch (type) {
-            case 'delete':case 'remove':
+            case 'delete':case 'remove':case 'discard':
                 submitClass = 'btn-danger';
                 break;
         }
@@ -36139,7 +36157,7 @@ class UIHelper {
             buttons: [{
                 label: 'Cancel',
                 class: 'btn-default',
-                callback: () => {}
+                callback: onCancel
             }, {
                 label: type,
                 class: submitClass,
@@ -41057,14 +41075,23 @@ class RichTextEditor extends View {
      * Event: Change input
      *
      * @param {String} value
-     * @param {String} source
      */
     onChange(value) {
-        if (this.value == value) {
+        value = value || '';
+
+        let trimmedOldValue = this.value.trim().replace(/\n/g, '').replace(/ /g, '');
+        let trimmedNewValue = value.trim().replace(/\n/g, '').replace(/ /g, '');
+
+        if (trimmedOldValue == trimmedNewValue) {
             return;
         }
 
         this.value = value;
+
+        if (this.silentChange === true) {
+            this.silentChange = false;
+            return;
+        }
 
         this.trigger('change', this.value);
     }
@@ -41158,6 +41185,7 @@ class RichTextEditor extends View {
 
             // Set value
             if (activeView == 'html') {
+                this.silentChange = true;
                 this.html.getDoc().setValue(this.value);
             }
         }, 1);
@@ -41183,6 +41211,7 @@ class RichTextEditor extends View {
 
             // Set value
             if (activeView == 'markdown') {
+                this.silentChange = true;
                 this.markdown.getDoc().setValue(toMarkdown(this.value));
             }
         }, 1);
@@ -41223,8 +41252,9 @@ class RichTextEditor extends View {
                 }
             });
 
-            // Set data
+            // Set value
             if (activeView == 'wysiwyg') {
+                this.silentChange = true;
                 this.wysiwyg.setData(this.value);
             }
         });

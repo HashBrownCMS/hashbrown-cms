@@ -70,13 +70,13 @@ class UIHelper {
      * @param {String} body
      * @param {Function} onSubmit
      */
-    static confirmModal(type, title, body, onSubmit) {
+    static confirmModal(type, title, body, onSubmit, onCancel) {
         let submitClass = 'btn-primary';
 
         type = (type || '').toLowerCase();
 
         switch(type) {
-            case 'delete': case 'remove':
+            case 'delete': case 'remove': case 'discard':
                 submitClass = 'btn-danger';
                 break;
         }
@@ -91,7 +91,7 @@ class UIHelper {
                 {
                     label: 'Cancel',
                     class: 'btn-default',
-                    callback: () => {}
+                    callback: onCancel
                 },
                 {
                     label: type,
