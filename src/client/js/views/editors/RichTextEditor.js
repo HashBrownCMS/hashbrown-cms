@@ -45,6 +45,8 @@ class RichTextEditor extends View {
      * @param {String} source
      */
     onClickTab(source) {
+        this.silentChane = true;
+
         switch(source) {
             case 'wysiwyg':
                 this.wysiwyg.setData(this.value);
