@@ -241,7 +241,6 @@ app.get('/', function(req, res) {
         });
     })
     .catch((e) => {
-        debug.log(e.message, this);
         res.status(403).redirect('/login');  
     });
 });
@@ -268,7 +267,6 @@ app.get('/:project/:environment/', function(req, res) {
         });
     })
     .catch((e) => {
-        debug.log(e.message, this);
         res.status(403).redirect('/login?path=/' + req.params.project + '/' + req.params.environment);  
     });
 });
