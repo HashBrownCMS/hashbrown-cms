@@ -24,7 +24,7 @@ class UpdateHelper {
             debug.log('Checking for updates...', this);
 
             function checkOutput(data) {
-                let behindMatches = data.match(/Your branch is behind '(.+)' by (\d) commit/);
+                let behindMatches = data.match(/Your branch is behind '(.+)' by (\d+) commit/);
                 let upToDateMatches = data.match(/Your branch is up-to-date with '(.+)'/);
 
                 if(behindMatches && behindMatches.length > 1) {
