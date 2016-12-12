@@ -202,7 +202,7 @@ class RichTextEditor extends View {
                     { name: 'others' },
                 ],
            
-                extraPlugins: 'justify',
+                extraPlugins: 'justify,divarea',
 
                 removeButtons: 'Image,Styles,Underline,Subscript,Superscript,Source,SpecialChar,HorizontalRule,Maximize,Table',
 
