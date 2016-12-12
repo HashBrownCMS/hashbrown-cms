@@ -133,6 +133,11 @@ class ArrayEditor extends View {
     renderItem(index, item) {
         let $element = _.div({class: 'item raised'});
 
+        // Account for large arrays
+        if(this.value.items.length > 20) {
+            $element.addClass('collapsed');
+        }
+
         // Wait a frame, so large arrays can be rendered without delay
         setTimeout(() => {         
             // Sanity check for item schema
@@ -198,9 +203,11 @@ class ArrayEditor extends View {
                 let $schemaLabel = _.span({class: 'schema-label'}, schemaLabel);
 
                 // Expanding/collapsing an item
-                let $toggle = _.button({class: 'btn-toggle'}).on('click', () => {
-                    $element.siblings().removeClass('expanded');
-                    $element.addClass('expanded', true);
+                let $btnToggle = _.button({class: 'btn btn-embedded btn-toggle'},
+                    _.span({class: 'fa fa-window-maximize'}),
+                    _.span({class: 'fa fa-window-minimize'})
+                ).on('click', () => {
+                    $element.toggleClass('collapsed');
                 });
 
                 // Init the field editor
@@ -218,6 +225,7 @@ class ArrayEditor extends View {
 
                 // Return the DOM element
                 _.append($element,
+                    $btnToggle,
                     _.button({class: 'btn btn-embedded btn-remove'},
                         _.span({class: 'fa fa-remove'})
                     ).click(() => {
@@ -268,11 +276,6 @@ class ArrayEditor extends View {
 
         if(!this.value.schemaBindings) {
             this.value.schemaBindings = [];
-        }
-
-        // Account for large arrays
-        if(this.value.items.length > 20) {
-            this.$element.addClass('collapsed');
         }
 
         // Render editor
