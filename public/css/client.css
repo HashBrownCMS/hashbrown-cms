@@ -1137,7 +1137,7 @@ body > .dashboard-container {
     .array-editor.sorting > .items > .item {
       background-color: #1e88e5;
       color: #fff; }
-      .array-editor.sorting > .items > .item .btn-remove {
+      .array-editor.sorting > .items > .item .btn-remove, .array-editor.sorting > .items > .item .btn-toggle {
         display: none; }
   .array-editor.sorting .btn-add {
     display: none; }
