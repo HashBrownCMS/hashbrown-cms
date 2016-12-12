@@ -169,11 +169,11 @@ class UrlEditor extends View {
 
     render() {
         this.$element = _.div({class: 'field-editor url-editor input-group'},
-            this.$input = _.input({class: 'form-control', value: this.value})
+            this.$input = _.input({class: 'form-control', type: 'text', value: this.value})
                 .on('change', () => { this.onChange(); }),
             _.div({class: 'input-group-btn'},
-                _.button({class: 'btn btn-primary'},
-                    'Regenerate '
+                _.button({class: 'btn btn-primary btn-small'},
+                    _.span({class: 'fa fa-refresh'})
                 ).click(() => { this.regenerate(); })
             )
         );

@@ -62,8 +62,8 @@ class ContentReferenceEditor extends View {
             ).change(() => { this.onChange(); }),
 
             // Render clear button
-            this.$clearBtn = _.button({class: 'btn btn-primary'},
-                'Clear'
+            this.$clearBtn = _.button({class: 'btn btn-small btn-primary'},
+                _.span({class: 'fa fa-remove'})
             )
         ]);
 

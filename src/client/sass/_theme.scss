@@ -443,6 +443,8 @@ button, a {
 
 // Input
 .form-control {
+    min-width: 110px;
+
     &.disabled {
         pointer-events: none;
         opacity: 0.5;
@@ -509,6 +511,8 @@ select.form-control {
 }
 
 .input-group {
+    display: flex;
+
     .input-group-addon {
         background-color: transparent;
         border-radius: 0px;
@@ -553,6 +557,10 @@ a.btn {
         padding-top: 0px;
         padding-bottom: 0px;
     } 
+
+    &.btn-small {
+        min-width: 0px;
+    }
 
     @include set-button-color('primary', 'blue');
     @include set-button-color('danger', 'red');

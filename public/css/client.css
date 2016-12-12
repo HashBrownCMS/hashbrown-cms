@@ -292,33 +292,31 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
     .modal .modal-dialog .modal-content .modal-footer {
       border-top: 0px; }
 
-.form-control.disabled {
-  pointer-events: none;
-  opacity: 0.5; }
-
-.form-control, .form-control:active, .form-control:focus, .form-control[readonly] {
-  background-color: transparent;
-  border-radius: 0px;
-  box-shadow: none;
-  border: 0px;
-  border-bottom: 2px solid #1e88e5;
-  padding-left: 0px;
-  padding-right: 0px; }
-  .form-control[readonly], .form-control:active[readonly], .form-control:focus[readonly], .form-control[readonly][readonly] {
-    border-bottom: 0px; }
-
-.form-control[type="text"], .form-control[type="email"], .form-control[type="password"] {
-  max-width: 400px; }
-
-.form-control[type="number"] {
-  max-width: 100px; }
-
-.form-control[type="color"] {
-  max-width: 110px;
-  padding: 0px;
-  border-bottom: 0px;
-  cursor: pointer;
-  border-radius: 2px; }
+.form-control {
+  min-width: 110px; }
+  .form-control.disabled {
+    pointer-events: none;
+    opacity: 0.5; }
+  .form-control, .form-control:active, .form-control:focus, .form-control[readonly] {
+    background-color: transparent;
+    border-radius: 0px;
+    box-shadow: none;
+    border: 0px;
+    border-bottom: 2px solid #1e88e5;
+    padding-left: 0px;
+    padding-right: 0px; }
+    .form-control[readonly], .form-control:active[readonly], .form-control:focus[readonly], .form-control[readonly][readonly] {
+      border-bottom: 0px; }
+  .form-control[type="text"], .form-control[type="email"], .form-control[type="password"] {
+    max-width: 400px; }
+  .form-control[type="number"] {
+    max-width: 100px; }
+  .form-control[type="color"] {
+    max-width: 110px;
+    padding: 0px;
+    border-bottom: 0px;
+    cursor: pointer;
+    border-radius: 2px; }
 
 select.form-control, select.form-control:active, select.form-control:focus, select.form-control[readonly] {
   border-bottom: 0px;
@@ -342,16 +340,17 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
     select.form-control option:hover, select.form-control:active option:hover, select.form-control:focus option:hover, select.form-control[readonly] option:hover {
       background-color: #42a5f5; }
 
-.input-group .input-group-addon {
-  background-color: transparent;
-  border-radius: 0px;
-  box-shadow: none;
-  border: 0px; }
-
-.input-group .input-group-btn {
-  padding-left: 15px; }
-  .input-group .input-group-btn:last-child > .btn {
-    border-radius: 2px; }
+.input-group {
+  display: flex; }
+  .input-group .input-group-addon {
+    background-color: transparent;
+    border-radius: 0px;
+    box-shadow: none;
+    border: 0px; }
+  .input-group .input-group-btn {
+    padding-left: 15px; }
+    .input-group .input-group-btn:last-child > .btn {
+      border-radius: 2px; }
 
 .context-menu {
   border-radius: 0px;
@@ -371,6 +370,8 @@ a.btn.btn-primary, a.btn.btn-default, a.btn.btn-danger, a.btn.btn-success {
     height: 30px;
     padding-top: 0px;
     padding-bottom: 0px; }
+  .btn.btn-small {
+    min-width: 0px; }
   .btn.btn-primary {
     background-color: #2196f3;
     border-color: #2196f3; }

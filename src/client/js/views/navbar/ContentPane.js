@@ -61,6 +61,7 @@ class ContentPane extends Pane {
             navbar.reload();
 
             if(contentEditor && contentEditor.model.id == pullId) {
+                contentEditor.model = null;
                 contentEditor.fetch();
             }
         }) 

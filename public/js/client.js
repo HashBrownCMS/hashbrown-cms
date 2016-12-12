@@ -40523,7 +40523,7 @@ class ContentReferenceEditor extends View {
         }),
 
         // Render clear button
-        this.$clearBtn = _.button({ class: 'btn btn-primary' }, 'Clear')]);
+        this.$clearBtn = _.button({ class: 'btn btn-small btn-primary' }, _.span({ class: 'fa fa-remove' }))]);
 
         // Set the initial value
         this.$select.val(this.value);
@@ -41759,9 +41759,9 @@ class UrlEditor extends View {
     }
 
     render() {
-        this.$element = _.div({ class: 'field-editor url-editor input-group' }, this.$input = _.input({ class: 'form-control', value: this.value }).on('change', () => {
+        this.$element = _.div({ class: 'field-editor url-editor input-group' }, this.$input = _.input({ class: 'form-control', type: 'text', value: this.value }).on('change', () => {
             this.onChange();
-        }), _.div({ class: 'input-group-btn' }, _.button({ class: 'btn btn-primary' }, 'Regenerate ').click(() => {
+        }), _.div({ class: 'input-group-btn' }, _.button({ class: 'btn btn-primary btn-small' }, _.span({ class: 'fa fa-refresh' })).click(() => {
             this.regenerate();
         })));
 
@@ -42045,6 +42045,7 @@ class ContentPane extends Pane {
             navbar.reload();
 
             if (contentEditor && contentEditor.model.id == pullId) {
+                contentEditor.model = null;
                 contentEditor.fetch();
             }
         }).catch(UI.errorModal);
