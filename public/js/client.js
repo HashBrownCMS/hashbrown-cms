@@ -1725,6 +1725,7 @@ PEMEncoder.prototype.encode = function encode(data, options) {
 },{"./der":12,"inherits":101}],15:[function(require,module,exports){
 'use strict'
 
+exports.byteLength = byteLength
 exports.toByteArray = toByteArray
 exports.fromByteArray = fromByteArray
 
@@ -1732,23 +1733,17 @@ var lookup = []
 var revLookup = []
 var Arr = typeof Uint8Array !== 'undefined' ? Uint8Array : Array
 
-function init () {
-  var code = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
-  for (var i = 0, len = code.length; i < len; ++i) {
-    lookup[i] = code[i]
-    revLookup[code.charCodeAt(i)] = i
-  }
-
-  revLookup['-'.charCodeAt(0)] = 62
-  revLookup['_'.charCodeAt(0)] = 63
+var code = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
+for (var i = 0, len = code.length; i < len; ++i) {
+  lookup[i] = code[i]
+  revLookup[code.charCodeAt(i)] = i
 }
 
-init()
+revLookup['-'.charCodeAt(0)] = 62
+revLookup['_'.charCodeAt(0)] = 63
 
-function toByteArray (b64) {
-  var i, j, l, tmp, placeHolders, arr
+function placeHoldersCount (b64) {
   var len = b64.length
-
   if (len % 4 > 0) {
     throw new Error('Invalid string. Length must be a multiple of 4')
   }
@@ -1758,9 +1753,19 @@ function toByteArray (b64) {
   // represent one byte
   // if there is only one, then the three characters before it represent 2 bytes
   // this is just a cheap hack to not do indexOf twice
-  placeHolders = b64[len - 2] === '=' ? 2 : b64[len - 1] === '=' ? 1 : 0
+  return b64[len - 2] === '=' ? 2 : b64[len - 1] === '=' ? 1 : 0
+}
 
+function byteLength (b64) {
   // base64 is 4/3 + up to two characters of the original data
+  return b64.length * 3 / 4 - placeHoldersCount(b64)
+}
+
+function toByteArray (b64) {
+  var i, j, l, tmp, placeHolders, arr
+  var len = b64.length
+  placeHolders = placeHoldersCount(b64)
+
   arr = new Arr(len * 3 / 4 - placeHolders)
 
   // if there are placeholders, only get up to the last complete 4 chars
@@ -20560,14 +20565,21 @@ utils.intFromLE = intFromLE;
 module.exports={
   "_args": [
     [
-      "elliptic@^6.0.0",
+      {
+        "raw": "elliptic@^6.0.0",
+        "scope": null,
+        "escapedName": "elliptic",
+        "name": "elliptic",
+        "rawSpec": "^6.0.0",
+        "spec": ">=6.0.0 <7.0.0",
+        "type": "range"
+      },
       "/home/mrzapp/Development/Web/hashbrown-cms/node_modules/browserify-sign"
     ]
   ],
   "_from": "elliptic@>=6.0.0 <7.0.0",
   "_id": "elliptic@6.3.2",
   "_inCache": true,
-  "_installable": true,
   "_location": "/elliptic",
   "_nodeVersion": "6.3.0",
   "_npmOperationalInternal": {
@@ -20575,16 +20587,17 @@ module.exports={
     "tmp": "tmp/elliptic-6.3.2.tgz_1473938837205_0.3108903462998569"
   },
   "_npmUser": {
-    "email": "fedor@indutny.com",
-    "name": "indutny"
+    "name": "indutny",
+    "email": "fedor@indutny.com"
   },
   "_npmVersion": "3.10.3",
   "_phantomChildren": {},
   "_requested": {
-    "name": "elliptic",
     "raw": "elliptic@^6.0.0",
-    "rawSpec": "^6.0.0",
     "scope": null,
+    "escapedName": "elliptic",
+    "name": "elliptic",
+    "rawSpec": "^6.0.0",
     "spec": ">=6.0.0 <7.0.0",
     "type": "range"
   },
@@ -20598,8 +20611,8 @@ module.exports={
   "_spec": "elliptic@^6.0.0",
   "_where": "/home/mrzapp/Development/Web/hashbrown-cms/node_modules/browserify-sign",
   "author": {
-    "email": "fedor@indutny.com",
-    "name": "Fedor Indutny"
+    "name": "Fedor Indutny",
+    "email": "fedor@indutny.com"
   },
   "bugs": {
     "url": "https://github.com/indutny/elliptic/issues"
@@ -20646,8 +20659,8 @@ module.exports={
   "main": "lib/elliptic.js",
   "maintainers": [
     {
-      "email": "fedor@indutny.com",
-      "name": "indutny"
+      "name": "indutny",
+      "email": "fedor@indutny.com"
     }
   ],
   "name": "elliptic",
@@ -21943,6 +21956,28 @@ FunctionTemplating.each = function(array, callback) {
 };
 
 /**
+ * Loops a given number of times, rendering elements for each pass
+ *
+ * @param {Number} iterations
+ * @param {Function} callback
+ *
+ * @returns {HTMLElement} elements
+ */
+FunctionTemplating.loop = function(iterations, callback) {
+    var elements = [];
+
+    for(var i = 0; i <= iterations; i++) {
+        var element = callback(i);
+
+        if(element) {
+            elements.push(element);
+        }
+    }
+     
+    return elements;
+};
+
+/**
  * A shorthand for document.querySelector
  *
  * @param {String} query
@@ -22246,16 +22281,7 @@ class Router {
         return decodeURIComponent(results[2].replace(/\+/g, " "));
     }
 
-    static init() {
-        // Get the url
-        let url = location.hash.slice(1) || '/';
-        let trimmed = url.substring(0, url.indexOf('?'));
-       
-        Router.params = {};                    
-
-        if(trimmed) {
-            url = trimmed;
-        }
+    static directToRoute(url) {
         // Look for route
         let context = {};
         let route;
@@ -22299,6 +22325,41 @@ class Router {
         }
 
         Router.url = url;
+    }
+
+    static init() {
+        // Get the url
+        let url = location.hash.slice(1) || '/';
+        let trimmed = url.substring(0, url.indexOf('?'));
+       
+        Router.params = {};                    
+
+        if(trimmed) {
+            url = trimmed;
+        }
+
+        // If a check is implemented, execute it
+        if(typeof Router.check === 'function') {
+            Router.check(
+                // Pass the proposed route
+                url,
+
+                // Cancel method
+                () => {
+                    location.hash = Router.url;
+                },
+
+                // Proceed method
+                () => {
+                    Router.directToRoute(url);
+                }
+            );
+
+        // If not, proceed as normal
+        } else {
+            Router.directToRoute(url);
+
+        }
     }
 }
 
@@ -29890,14 +29951,16 @@ var PATH_REGEXP = new RegExp([
 /**
  * Parse a string for the raw tokens.
  *
- * @param  {string} str
+ * @param  {string}  str
+ * @param  {Object=} options
  * @return {!Array}
  */
-function parse (str) {
+function parse (str, options) {
   var tokens = []
   var key = 0
   var index = 0
   var path = ''
+  var defaultDelimiter = options && options.delimiter || '/'
   var res
 
   while ((res = PATH_REGEXP.exec(str)) != null) {
@@ -29930,8 +29993,8 @@ function parse (str) {
     var partial = prefix != null && next != null && next !== prefix
     var repeat = modifier === '+' || modifier === '*'
     var optional = modifier === '?' || modifier === '*'
-    var delimiter = res[2] || '/'
-    var pattern = capture || group || (asterisk ? '.*' : '[^' + delimiter + ']+?')
+    var delimiter = res[2] || defaultDelimiter
+    var pattern = capture || group
 
     tokens.push({
       name: name || key++,
@@ -29941,7 +30004,7 @@ function parse (str) {
       repeat: repeat,
       partial: partial,
       asterisk: !!asterisk,
-      pattern: escapeGroup(pattern)
+      pattern: pattern ? escapeGroup(pattern) : (asterisk ? '.*' : '[^' + escapeString(delimiter) + ']+?')
     })
   }
 
@@ -29962,10 +30025,11 @@ function parse (str) {
  * Compile a string to a template function for the path.
  *
  * @param  {string}             str
+ * @param  {Object=}            options
  * @return {!function(Object=, Object=)}
  */
-function compile (str) {
-  return tokensToFunction(parse(str))
+function compile (str, options) {
+  return tokensToFunction(parse(str, options))
 }
 
 /**
@@ -30176,27 +30240,23 @@ function arrayToRegexp (path, keys, options) {
  * @return {!RegExp}
  */
 function stringToRegexp (path, keys, options) {
-  var tokens = parse(path)
-  var re = tokensToRegExp(tokens, options)
-
-  // Attach keys back to the regexp.
-  for (var i = 0; i < tokens.length; i++) {
-    if (typeof tokens[i] !== 'string') {
-      keys.push(tokens[i])
-    }
-  }
-
-  return attachKeys(re, keys)
+  return tokensToRegExp(parse(path, options), keys, options)
 }
 
 /**
  * Expose a function for taking tokens and returning a RegExp.
  *
- * @param  {!Array}  tokens
- * @param  {Object=} options
+ * @param  {!Array}          tokens
+ * @param  {(Array|Object)=} keys
+ * @param  {Object=}         options
  * @return {!RegExp}
  */
-function tokensToRegExp (tokens, options) {
+function tokensToRegExp (tokens, keys, options) {
+  if (!isarray(keys)) {
+    options = /** @type {!Object} */ (keys || options)
+    keys = []
+  }
+
   options = options || {}
 
   var strict = options.strict
@@ -30214,6 +30274,8 @@ function tokensToRegExp (tokens, options) {
     } else {
       var prefix = escapeString(token.prefix)
       var capture = '(?:' + token.pattern + ')'
+
+      keys.push(token)
 
       if (token.repeat) {
         capture += '(?:' + prefix + capture + ')*'
@@ -30249,7 +30311,7 @@ function tokensToRegExp (tokens, options) {
     route += strict && endsWithSlash ? '' : '(?=\\/|$)'
   }
 
-  return new RegExp('^' + route, flags(options))
+  return attachKeys(new RegExp('^' + route, flags(options)), keys)
 }
 
 /**
@@ -30265,14 +30327,12 @@ function tokensToRegExp (tokens, options) {
  * @return {!RegExp}
  */
 function pathToRegexp (path, keys, options) {
-  keys = keys || []
-
   if (!isarray(keys)) {
-    options = /** @type {!Object} */ (keys)
+    options = /** @type {!Object} */ (keys || options)
     keys = []
-  } else if (!options) {
-    options = {}
   }
+
+  options = options || {}
 
   if (path instanceof RegExp) {
     return regexpToRegexp(path, /** @type {!Array} */ (keys))
@@ -40225,7 +40285,7 @@ class ArrayEditor extends View {
         let $element = _.div({ class: 'item raised' });
 
         // Account for large arrays
-        if (this.value.items.length > 20) {
+        if (this.value.items.length >= 6) {
             $element.addClass('collapsed');
         }
 
@@ -40273,7 +40333,7 @@ class ArrayEditor extends View {
                 }).val(itemSchemaId)));
 
                 // Set schema label (used when sorting items)
-                let schemaLabel = item.name || item.title || item.description || item.id || itemSchema.name;
+                let schemaLabel = (item ? item.name || item.title || item.description || item.type || item.id : null) || (itemSchema ? itemSchema.name : null) || 'Item #' + index;
                 let $schemaLabel = _.span({ class: 'schema-label' }, schemaLabel);
 
                 // Expanding/collapsing an item

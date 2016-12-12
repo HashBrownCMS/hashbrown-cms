@@ -311,6 +311,10 @@ button, a {
     padding: 15px 30px;
 }
 
+.sunken {
+    box-shadow: inset 0px 2px 3px 1px rgba(0, 0, 0, 0.2);
+}
+
 // Thumbnails
 .thumbnail {
     background-position: center;

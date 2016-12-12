@@ -204,6 +204,9 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
   background-color: #fff;
   padding: 15px 30px; }
 
+.sunken, .array-editor .array-editor .items {
+  box-shadow: inset 0px 2px 3px 1px rgba(0, 0, 0, 0.2); }
+
 .thumbnail {
   background-position: center;
   background-size: cover;
@@ -1107,15 +1110,12 @@ body > .dashboard-container {
 
 .array-editor {
   min-width: 100%; }
-  .array-editor .array-editor .item.raised, .array-editor .array-editor .dropdown .item.dropdown-menu, .dropdown .array-editor .array-editor .item.dropdown-menu, .array-editor .array-editor .cms-container .item.menuspace, .cms-container .array-editor .array-editor .item.menuspace, .array-editor .array-editor .cms-container .workspace .content-editor > .object .language-picker .item.dropdown-menu, .cms-container .workspace .content-editor > .object .language-picker .array-editor .array-editor .item.dropdown-menu {
-    box-shadow: none;
-    border-bottom: 1px solid #eeeeee; }
-    .array-editor .array-editor .item.raised:not(.collapsed), .array-editor .array-editor .dropdown .item.dropdown-menu:not(.collapsed), .dropdown .array-editor .array-editor .item.dropdown-menu:not(.collapsed), .array-editor .array-editor .cms-container .item.menuspace:not(.collapsed), .cms-container .array-editor .array-editor .item.menuspace:not(.collapsed), .array-editor .array-editor .cms-container .workspace .content-editor > .object .language-picker .item.dropdown-menu:not(.collapsed), .cms-container .workspace .content-editor > .object .language-picker .array-editor .array-editor .item.dropdown-menu:not(.collapsed) {
-      padding: 0px 0px 30px 0px; }
-    .array-editor .array-editor .item.raised:last-of-type, .array-editor .array-editor .dropdown .item.dropdown-menu:last-of-type, .dropdown .array-editor .array-editor .item.dropdown-menu:last-of-type, .array-editor .array-editor .cms-container .item.menuspace:last-of-type, .cms-container .array-editor .array-editor .item.menuspace:last-of-type, .array-editor .array-editor .cms-container .workspace .content-editor > .object .language-picker .item.dropdown-menu:last-of-type, .cms-container .workspace .content-editor > .object .language-picker .array-editor .array-editor .item.dropdown-menu:last-of-type {
-      border-bottom: 0px; }
+  .array-editor .array-editor .items {
+    background-color: #eeeeee;
+    padding: 10px;
+    margin-bottom: 10px; }
   .array-editor.sorting > .items > .item, .array-editor > .items > .item.collapsed {
-    height: 54px;
+    height: 44px;
     overflow-y: hidden;
     position: relative;
     border: 0px; }
@@ -1142,12 +1142,13 @@ body > .dashboard-container {
   .array-editor.sorting .btn-add {
     display: none; }
   .array-editor .items {
-    padding-bottom: 30px;
+    padding-bottom: 15px;
     transition: padding 0.5s ease; }
     .array-editor .items .item {
       position: relative;
-      margin-bottom: 30px;
-      transition: background-color 0.5s ease, color 0.5s ease; }
+      margin-bottom: 15px;
+      transition: background-color 0.5s ease, color 0.5s ease;
+      padding: 10px 15px; }
       .array-editor .items .item:last-of-type {
         margin-bottom: 0px; }
       .array-editor .items .item > .btn-toggle, .array-editor .items .item > .btn-remove {

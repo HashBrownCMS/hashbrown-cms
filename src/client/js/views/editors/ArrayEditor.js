@@ -134,7 +134,7 @@ class ArrayEditor extends View {
         let $element = _.div({class: 'item raised'});
 
         // Account for large arrays
-        if(this.value.items.length > 20) {
+        if(this.value.items.length >= 6) {
             $element.addClass('collapsed');
         }
 
@@ -199,7 +199,10 @@ class ArrayEditor extends View {
                 );
 
                 // Set schema label (used when sorting items)
-                let schemaLabel = item.name || item.title || item.description || item.id || itemSchema.name;
+                let schemaLabel =
+                    (item ? (item.name || item.title || item.description || item.type || item.id) : null) ||
+                    (itemSchema ? (itemSchema.name) : null) ||
+                    'Item #' + index;
                 let $schemaLabel = _.span({class: 'schema-label'}, schemaLabel);
 
                 // Expanding/collapsing an item
