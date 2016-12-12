@@ -194,7 +194,14 @@ class ArrayEditor extends View {
                 );
 
                 // Set schema label (used when sorting items)
-                let $schemaLabel = _.span({class: 'schema-label'}, itemSchema.name);
+                let schemaLabel = item.name || item.title || item.description || item.id || itemSchema.name;
+                let $schemaLabel = _.span({class: 'schema-label'}, schemaLabel);
+
+                // Expanding/collapsing an item
+                let $toggle = _.button({class: 'btn-toggle'}).on('click', () => {
+                    $element.siblings().removeClass('expanded');
+                    $element.addClass('expanded', true);
+                });
 
                 // Init the field editor
                 let fieldEditorInstance = new fieldEditor({
@@ -261,6 +268,11 @@ class ArrayEditor extends View {
 
         if(!this.value.schemaBindings) {
             this.value.schemaBindings = [];
+        }
+
+        // Account for large arrays
+        if(this.value.items.length > 20) {
+            this.$element.addClass('collapsed');
         }
 
         // Render editor
