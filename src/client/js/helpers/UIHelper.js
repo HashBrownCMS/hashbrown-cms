@@ -81,7 +81,7 @@ class UIHelper {
         type = (type || '').toLowerCase();
 
         switch(type) {
-            case 'delete': case 'remove': case 'discard':
+            case 'delete': case 'remove': case 'discard': case 'clear':
                 submitClass = 'btn-danger';
                 break;
         }

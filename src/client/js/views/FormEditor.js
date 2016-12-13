@@ -374,12 +374,14 @@ class FormEditor extends View {
                         class: 'btn-danger pull-left',
                         label: 'Clear',
                         callback: () => {
-                            apiCall('post', 'forms/clear/' + view.model.id)
-                            .then(() => {
-                                view.model.entries = [];
-                                modal.hide();
-                            })
-                            .catch(UI.errorModal);
+                            UI.confirmModal('Clear', 'Clear "' + view.model.title + '"', 'Are you sure you want to clear all entries?', () => {
+                                apiCall('post', 'forms/clear/' + view.model.id)
+                                .then(() => {
+                                    view.model.entries = [];
+                                    modal.hide();
+                                })
+                                .catch(UI.errorModal);
+                            });
                             
                             return false;
                         }
