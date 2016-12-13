@@ -96,6 +96,7 @@ class SyncHelper {
                         } else {
                             if(data instanceof Object) {
                                 data.locked = true;
+                                data.remote = true;
                             }
 
                             resolve(data);

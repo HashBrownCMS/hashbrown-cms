@@ -12,9 +12,13 @@ class Form extends Entity {
 
     structure() {
         // Fundamental fields
+        this.def(Boolean, 'locked');
+        this.def(Boolean, 'remote');
+        this.def(Boolean, 'local');
         this.def(String, 'id');
         this.def(String, 'title');
         this.def(String, 'redirect');
+        this.def(Boolean, 'appendRedirect');
         
         // Mutable fields
         this.def(Object, 'inputs', {});
@@ -35,6 +39,13 @@ class Form extends Entity {
         });
         
         return form;
+    }
+
+    /**
+     * Clears all entries
+     */
+    clearAllEntries() {
+        this.entries = [];
     }
 
     /**

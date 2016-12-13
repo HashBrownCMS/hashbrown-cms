@@ -30,7 +30,9 @@ class MessageModal extends View {
 
     onClickOK() {
         if(this.model.onSubmit) {
-            this.model.onSubmit();
+            if(this.model.onSubmit() == false) {
+                return;   
+            }
         }
         
         this.hide();

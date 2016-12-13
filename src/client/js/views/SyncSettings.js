@@ -247,6 +247,23 @@ class SyncSettings extends View {
             )
         );
     }
+    
+    /**
+     * Render Forms switch
+     */
+    renderFormsSwitch() {
+        let view = this;
+        
+        function onChange(isActive) {
+            view.model.forms = isActive;
+        }
+
+        return _.div({class: 'field-editor'},
+            UI.inputSwitch(this.model.forms == true, (isActive) => {
+                this.model.forms = isActive;   
+            })
+        );
+    }
 
     /**
      * Render Schema switch
@@ -335,8 +352,9 @@ class SyncSettings extends View {
                     this.renderField('Project', this.renderProjectNameEditor()),
                     this.renderField('Environment', this.renderEnvironmentNameEditor()),
                     this.renderField('Content', this.renderContentSwitch()),
-                    this.renderField('Connections', this.renderConnectionsSwitch()),
                     this.renderField('Schemas', this.renderSchemaSwitch()),
+                    this.renderField('Connections', this.renderConnectionsSwitch()),
+                    this.renderField('Forms', this.renderFormsSwitch()),
                     this.renderField('Media tree', this.renderMediaTreeSwitch())
                 ),
                 _.div({class: 'editor-footer panel panel-default panel-buttons'}, 

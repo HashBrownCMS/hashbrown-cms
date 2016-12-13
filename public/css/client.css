@@ -1492,7 +1492,6 @@ body > .dashboard-container {
       line-height: 30px; }
 
 .modal .form-entries-list {
-  height: 100%;
   overflow-y: scroll; }
   .modal .form-entries-list .entry {
     padding: 15px 0px;

@@ -5,10 +5,11 @@ class UIHelper {
      * Creates a switch
      *
      * @param {Boolean} initialValue
+     * @param {Function} onChange
      *
      * @returns {HTMLElement} Switch element
      */
-    static inputSwitch(initialValue) {
+    static inputSwitch(initialValue, onChange) {
         let id = 'switch' + (10000 + Math.floor(Math.random() * 10000));
 
         return _.div({class: 'switch', 'data-checked': initialValue},
@@ -19,6 +20,10 @@ class UIHelper {
                 checked: initialValue
             }).change(function() {
                 this.parentElement.dataset.checked = this.checked;
+
+                if(onChange) {
+                    onChange(this.checked);
+                }
             }),
             _.label({for: id})
         );

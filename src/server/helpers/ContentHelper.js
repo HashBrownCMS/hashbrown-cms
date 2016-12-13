@@ -14,7 +14,6 @@ class ContentHelper extends ContentHelperCommon {
      */
     static getAllContents() {
         let collection = ProjectHelper.currentEnvironment + '.content';
-        let contentList = [];
 
         return MongoHelper.find(
             ProjectHelper.currentProject,
@@ -25,6 +24,8 @@ class ContentHelper extends ContentHelperCommon {
                 sort: 1
             }
         ).then((results) => {
+            let contentList = [];
+
             for(let i in results) {
                 let content = new Content(results[i]);
 
@@ -80,9 +81,7 @@ class ContentHelper extends ContentHelperCommon {
         .then((tasks) => {
             content.adoptTasks(tasks);
 
-            return new Promise((resolve) => {
-                resolve(content);
-            });  
+            return Promise.resolve(content);
         });
     }
     

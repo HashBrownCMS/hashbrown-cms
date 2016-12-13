@@ -144,6 +144,39 @@ class FormEditor extends View {
 
         return $element;
     }
+    
+    /**
+     * Renders the redirect editor
+     *
+     * @return {Object} element
+     */
+    renderRedirectEditor() {
+        let view = this;
+
+        function onInputChange() {
+            view.model.redirect = $(this).val();
+        }
+
+        let $element = _.div({class: 'redirect-editor'},
+            _.input({class: 'form-control', type: 'text', value: view.model.redirect, placeholder: 'Type the redirect URL here'})
+                .on('change', onInputChange)
+        );
+
+        return $element;
+    }
+
+    /**
+     * Renders the redirect append editor
+     *
+     * @return {HTMLElement} Element
+     */
+    renderAppendRedirectEditor() {
+        return _.div({class: 'append-redirect-editor'},
+            UI.inputSwitch(this.model.appendRedirect, (isActive) => {
+                this.model.appendRedirect = isActive;
+            })
+        );
+    }
 
     /**
      * Renders the inputs editor
@@ -295,23 +328,77 @@ class FormEditor extends View {
      */
     renderEntries() {
         let view = this;
-        
+       
+        function onDownload() {
+            let items = view.model.entries;
+
+            // Convert to CSV
+            const replacer = (key, value) => value === null ? '' : value;
+            const header = Object.keys(items[0])
+            let csv = items.map(row => header.map(fieldName => JSON.stringify(row[fieldName], replacer)).join(','))
+            csv.unshift(header.join(','))
+            csv = csv.join('\r\n')
+
+            // Force download
+            let element = document.createElement('a');
+            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(csv));
+            element.setAttribute('download', view.model.id + '.csv');
+
+            element.style.display = 'none';
+            document.body.appendChild(element);
+
+            element.click();
+
+            document.body.removeChild(element);
+        }
+
         function onClick() {
-            UI.messageModal(
-                'Entries',
-                _.div({class: 'form-entries-list'},
-                    _.each(view.model.entries.reverse(), (i, entry) => {
-                        return _.div({class: 'entry'},
-                            _.each(entry, (key, value) => {
-                                return _.div({class: 'kvp'},
-                                    _.div({class: 'key'}, key),
-                                    _.div({class: 'value'}, value)
-                                );
+            let modal = new MessageModal({
+                model: {
+                    title: 'Entries',
+                    body: _.div({class: 'form-entries-list'},
+                        _.each(view.model.entries.reverse(), (i, entry) => {
+                            return _.div({class: 'entry'},
+                                _.each(entry, (key, value) => {
+                                    return _.div({class: 'kvp'},
+                                        _.div({class: 'key'}, key),
+                                        _.div({class: 'value'}, value)
+                                    );
+                                })
+                            );
+                        })  
+                    )
+                },
+                buttons: [
+                    {
+                        class: 'btn-danger pull-left',
+                        label: 'Clear',
+                        callback: () => {
+                            apiCall('post', 'forms/clear/' + view.model.id)
+                            .then(() => {
+                                view.model.entries = [];
+                                modal.hide();
                             })
-                        );
-                    })  
-                )
-            ).$element.addClass('large');
+                            .catch(UI.errorModal);
+                            
+                            return false;
+                        }
+                    },
+                    {
+                        class: 'btn-primary',
+                        label: 'Download',
+                        callback: () => {
+                            onDownload();
+                            
+                            return false;
+                        }
+                    },
+                    {
+                        class: 'btn-default',
+                        label: 'OK'
+                    }
+                ]
+            });
         }
 
         return _.button({class: 'btn btn-primary'}, 'View entries').click(onClick);
@@ -364,6 +451,8 @@ class FormEditor extends View {
             )
         ));
         $element.append(this.renderField('Title', this.renderTitleEditor())); 
+        $element.append(this.renderField('Redirect URL', this.renderRedirectEditor())); 
+        $element.append(this.renderField('Redirect URL is appended', this.renderAppendRedirectEditor())); 
         $element.append(this.renderField('Inputs', this.renderInputsEditor())); 
         $element.append(this.renderField('Test', this.$preview));
 
@@ -371,6 +460,8 @@ class FormEditor extends View {
     }
 
     render() {
+        this.$element.toggleClass('locked', this.model.locked);
+
         _.append(this.$element.empty(),
             _.div({class: 'editor-header'},
                 _.span({class: 'fa fa-wpforms'}),

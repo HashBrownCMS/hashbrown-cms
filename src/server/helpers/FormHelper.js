@@ -23,10 +23,15 @@ class FormHelper {
                 id: id
             }
         )
-        .then((formData) => {
-            return new Promise((resolve, reject) => {
-                resolve(new Form(formData));
-            });
+        .then((result) => {
+            if(!result) {
+                return SyncHelper.getResourceItem('forms', id);
+            }
+
+            return Promise.resolve(result);
+        })
+        .then((result) => {
+            return Promise.resolve(new Form(result));
         });
     }
     
@@ -61,7 +66,10 @@ class FormHelper {
             ProjectHelper.currentProject,
             collection,
             {}
-        );
+        )
+        .then((results) => {
+            return SyncHelper.mergeResource('forms', results); 
+        });
     }
     
     /**
@@ -75,6 +83,10 @@ class FormHelper {
     static setForm(id, properties) {
         let collection = ProjectHelper.currentEnvironment + '.forms';
 
+        // Unset automatic flags
+        properties.locked = false;
+        properties.remote = false;
+        
         return MongoHelper.updateOne(
             ProjectHelper.currentProject,
             collection,
@@ -126,6 +138,22 @@ class FormHelper {
         return this.getForm(id)
         .then((form) => {
             form.addEntry(entry);
+
+            return this.setForm(id, form.getObject())
+        });
+    }
+
+    /**
+     * Clears all entries in a Form by id
+     *
+     * @param {String} id
+     *
+     * @returns {Promise} Promise
+     */
+    static clearAllEntries(id) {
+        return this.getForm(id)
+        .then((form) => {
+            form.clearAllEntries();
 
             return this.setForm(id, form.getObject())
         });
