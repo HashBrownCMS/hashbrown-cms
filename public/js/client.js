@@ -42592,7 +42592,7 @@ class FormsPane extends Pane {
     static onClickNewForm() {
         let navbar = ViewHelper.get('NavbarMain');
 
-        apiCall('post', 'forms/new').then(newContent => {
+        apiCall('post', 'forms/new').then(newForm => {
             reloadResource('forms').then(() => {
                 navbar.reload();
 
