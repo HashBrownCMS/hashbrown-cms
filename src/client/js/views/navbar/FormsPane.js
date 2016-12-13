@@ -10,12 +10,12 @@ class FormsPane extends Pane {
         let navbar = ViewHelper.get('NavbarMain');
 
         apiCall('post', 'forms/new')
-        .then((newForm) => {
+        .then((newFormId) => {
             reloadResource('forms')
             .then(() => {
                 navbar.reload();
                 
-                location.hash = '/forms/' + newForm.id;
+                location.hash = '/forms/' + newFormId;
             });
         })
         .catch(navbar.onError);
