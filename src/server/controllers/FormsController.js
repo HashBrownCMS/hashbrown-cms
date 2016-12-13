@@ -86,7 +86,7 @@ class FormsController extends ApiController {
     static pushForm(req, res) {
         let id = req.params.id;
 
-        FormHelper.getFormById(id)
+        FormHelper.getForm(id)
         .then((localForm) => {
             return SyncHelper.setResourceItem('forms', id, localForm);
         })

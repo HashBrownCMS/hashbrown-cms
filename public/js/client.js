@@ -42697,7 +42697,7 @@ class FormsPane extends Pane {
         .then(() => {
             navbar.reload();
 
-            if (formEditor && formEditor.model.id == pullId) {
+            if (formEditor && formEditor.model.id == pushId) {
                 formEditor.model = null;
                 formEditor.fetch();
             }
