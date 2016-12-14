@@ -24,7 +24,7 @@ class FormsController extends ApiController {
 
         app.post('/api/:project/:environment/forms/new', this.middleware(), this.postNew);
         app.post('/api/:project/:environment/forms/:id', this.middleware(), this.postForm);
-        app.post('/api/:project/:environment/forms/:id/submit', this.middleware({ authenticate: false, allowCORS: true }), bodyparser.urlencoded({extended: true}), this.postSubmit);
+        app.post('/api/:project/:environment/forms/:id/submit', this.middleware({ authenticate: false, allowCORS: this.checkCORS }), bodyparser.urlencoded({extended: true}), this.postSubmit);
         app.post('/api/:project/:environment/forms/pull/:id', this.middleware(), this.pullForm);
         app.post('/api/:project/:environment/forms/push/:id', this.middleware(), this.pushForm);
         app.post('/api/:project/:environment/forms/clear/:id', this.middleware(), this.postClearAllEntries);
@@ -34,7 +34,19 @@ class FormsController extends ApiController {
         // Init spam prevention timer
         lastSubmission = Date.now();
     }
-        
+      
+    /**
+     * Check CORS
+     *
+     * @returns {Promise} Result
+     */
+    static checkCORS(req, res) {
+        return FormHelper.getForm(req.params.id)
+        .then((form) => {
+            return Promise.resolve(form.allowedOrigin || '*');
+        });
+    }
+
     /**
      * Gets all forms
      */
@@ -188,12 +200,13 @@ class FormsController extends ApiController {
             lastSubmission = Date.now();
             lastIp = req.connection.remoteAddress;
 
+            if(!req.headers.referer) {
+                res.status(400).send(FormsController.printError(new Error('Request header has no referer')));
+                return;    
+            }
+            
             FormHelper.addEntry(req.params.id, req.body)
             .then((form) => {
-                if(!req.headers.referer) {
-                    return Promise.reject(new Error('Request header has no referer'));
-                }
-
                 if(form.redirect) {
                     let redirectUrl = form.redirect;
 

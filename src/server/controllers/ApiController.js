@@ -96,6 +96,53 @@ class ApiController extends Controller {
     }
         
     /**
+     * Check CORS
+     *
+     * @param {Object} settings
+     * @param {Request} req
+     * @param {Response} req
+     *
+     * @returns {Promise} Result
+     */
+    static checkCORS(settings, req, res) {
+        function getPromise() {
+            // If a string was specified, use it directly
+            if(typeof settings.allowCORS === 'string') {
+                return Promise.resolve(settings.allowCORS);
+            }
+
+            // a boolean value of true was specified, allow all origins
+            if(settings.allowCORS == true) {
+                return Promise.resolve('*');
+            }
+            
+            // If a function value was specified, run it
+            if(typeof settings.allowCORS === 'function') {
+                return Promise.resolve(settings.allowCORS(req, res));
+            
+            }
+
+            // Nothing was specified, move on
+            return Promise.resolve();
+        };
+
+        return getPromise()
+        .then((allowedOrigin) => {
+            if(allowedOrigin) {
+                res.header('Access-Control-Allow-Origin', allowedOrigin);
+                res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+            
+                // Allowed origin host did not match
+                if(allowedOrigin != '*' && allowedOrigin != req.headers.origin) {
+                    return Promise.reject(new Error('Unauthorized'));
+                }
+            }
+           
+            return Promise.resolve();
+        });
+    }
+
+    /**
      * Middleware
      *
      * @param {Object} settings
@@ -111,52 +158,41 @@ class ApiController extends Controller {
                 res.clearCookie('token');
             }
 
-            // Allow CORS if specified
-            if(settings.allowCORS == true) {
-                res.header('Access-Control-Allow-Origin', '*');
-                res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-            
-                debug.log('Allowing CORS for API call "' + req.originalUrl + '"', this);
-            }
+            // Check CORS settings first
+            ApiController.checkCORS(settings, req, res)
+            .then(() => {
+                // Using project parameter
+                if(settings.setProject != false) {
+                    // Set the project variables
+                    return ApiController.setProjectVariables(req.originalUrl)
+                    .then(() => {
+                        // Using authentication
+                        if(settings.authenticate != false) {
+                            return ApiController.authenticate(token, settings.scope);
+                        
+                        // No authentication needed
+                        } else {
+                            return Promise.resolve();
+                        }
+                    });
+                
+                // Disregarding project parameter, but using authentication
+                } else if(settings.authenticate != false) {
+                    return ApiController.authenticate(req.cookies.token, settings.scope);
 
-            // Using project parameter
-            if(settings.setProject != false) {
-                // Set the project variables
-                ApiController.setProjectVariables(req.originalUrl)
-                .then(() => {
-                    // Using authentication
-                    if(settings.authenticate != false) {
-                        return ApiController.authenticate(token, settings.scope);
-                    
-                    // No authentication needed
-                    } else {
-                        return Promise.resolve();
-                    }
-                })
-                .then(() => {
-                    next();
-                })
-                .catch((e) => {
-                    res.status(400).send(e.message);
-                    debug.log(e.message, ApiController);
-                });
-            
-            // Disregarding project parameter, but using authentication
-            } else if(settings.authenticate != false) {
-                ApiController.authenticate(req.cookies.token, settings.scope)
-                .then(() => {
-                    next();
-                })
-                .catch((e) => {
-                    res.status(403).send(e.message);   
-                    debug.log(e.message, ApiController);
-                });    
-
-            // Neither project parameter nor authentication needed
-            } else {
+                // Neither project parameter nor authentication needed
+                } else {
+                    return Promise.resolve();
+                
+                }
+            })
+            .then(() => {
                 next();
-            
-            }
+            })
+            .catch((e) => {
+                res.status(400).send(e.message);
+                debug.log(e.message, ApiController);
+            });
         }
     }
 

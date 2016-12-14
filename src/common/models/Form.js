@@ -17,6 +17,7 @@ class Form extends Entity {
         this.def(Boolean, 'local');
         this.def(String, 'id');
         this.def(String, 'title');
+        this.def(String, 'allowedOrigin');
         this.def(String, 'redirect');
         this.def(Boolean, 'appendRedirect');
         

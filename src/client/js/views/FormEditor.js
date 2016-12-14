@@ -124,6 +124,26 @@ class FormEditor extends View {
             ]
         });
     }
+    
+    /**
+     * Renders the allowed origin editor
+     *
+     * @return {Object} element
+     */
+    renderAllowedOriginEditor() {
+        let view = this;
+
+        function onInputChange() {
+            view.model.allowedOrigin = $(this).val();
+        }
+
+        let $element = _.div({class: 'allowed-origin-editor'},
+            _.input({class: 'form-control', type: 'text', value: view.model.allowedOrigin, placeholder: 'Type the allowed origin URL here'})
+                .on('change', onInputChange)
+        );
+
+        return $element;
+    }
 
     /**
      * Renders the title editor
@@ -442,6 +462,7 @@ class FormEditor extends View {
             )
         ));
         $element.append(this.renderField('Title', this.renderTitleEditor())); 
+        $element.append(this.renderField('Allowed origin', this.renderAllowedOriginEditor())); 
         $element.append(this.renderField('Redirect URL', this.renderRedirectEditor())); 
         $element.append(this.renderField('Redirect URL is appended', this.renderAppendRedirectEditor())); 
         $element.append(this.renderField('Inputs', this.renderInputsEditor())); 
