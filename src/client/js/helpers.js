@@ -8,6 +8,7 @@ window.toMarkdown = require('to-markdown');
 window.MessageModal = require('./views/MessageModal');
 
 // Common helpers
+window.UI = require('./helpers/UIHelper');
 window.ProjectHelper = require('./helpers/ProjectHelper');
 
 window.debug = require('../../common/helpers/DebugHelper');

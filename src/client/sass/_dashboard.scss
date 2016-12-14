@@ -92,20 +92,13 @@ body >.dashboard-container {
         background-color: material-color('grey', '100');
 
         section {
-            display: flex;
             margin-bottom: 30px;
-            max-width: 480px;
+            width: 100%;
+            max-width: 960px;
             margin-left: auto;
             margin-right: auto;
 
             >h4 {
-                flex-shrink: 0;
-                flex-basis: 200px;
-                width: 200px;
-                white-space: pre;
-                margin: 0px;
-                margin-left: -200px;
-
                 a {
                     color: material-color('grey', '800');
                 }
@@ -114,10 +107,6 @@ body >.dashboard-container {
                     display: block;
                     margin-top: 15px;
                 }
-            }
-
-            >div, >table {
-                flex-grow: 1;
             }
         }
 
@@ -144,13 +133,24 @@ body >.dashboard-container {
             .btn-create-project {
                 display: block;
                 margin-left: auto;
-                margin-right: 12px;
+                margin-top: 30px;
+            }
+
+            .project-list {
+                display: flex;
+                flex-wrap: wrap;
+                margin: -15px;
             }
 
             .project-editor {
                 padding: 15px;
-                margin-bottom: 30px;
+                margin: 15px;
                 position: relative;
+                flex-grow: 1;
+                flex-basis: 300px;
+                width: 300px;
+                min-width: 300px;
+                max-width: 300px;
                 
                 .btn-remove {
                     padding: 0rem;
@@ -181,7 +181,7 @@ body >.dashboard-container {
                     }
 
                     .environments {
-                        margin: 0px -2px;
+                        margin: 15px -2px 0px 0px;
                    
                         .btn-add {
                             display: block;

@@ -20,6 +20,7 @@ class FormsController extends ApiController {
     static init(app) {
         app.get('/api/:project/:environment/forms/', this.middleware(), this.getAllForms);
         app.get('/api/:project/:environment/forms/:id', this.middleware(), this.getForm);
+        app.get('/api/:project/:environment/forms/:id/entries', this.middleware(), this.getAllEntries);
 
         app.post('/api/:project/:environment/forms/new', this.middleware(), this.postNew);
         app.post('/api/:project/:environment/forms/:id', this.middleware(), this.postForm);
@@ -108,6 +109,41 @@ class FormsController extends ApiController {
         FormHelper.getForm(req.params.id)
         .then((form) => {
             res.status(200).send(form.getObject());
+        })
+        .catch((e) => {
+            res.status(502).send(FormsController.printError(e));
+        });
+    }
+    
+    /**
+     * Gets all entries from a Form as CSV
+     */
+    static getAllEntries(req, res) {
+        FormHelper.getForm(req.params.id)
+        .then((form) => {
+            let csv = '';
+
+            for(let inputKey in form.inputs) {
+                csv += '"' + inputKey + '",';
+            }
+
+            // Remove last comma
+            csv = csv.slice(0, -1);
+            csv += '\r\n';
+
+            for(let entry of form.entries) {
+                for(let inputKey in form.inputs) {
+                    csv += '"' + (entry[inputKey] || ' ') + '",';
+                }
+                
+                // Remove last comma
+                csv = csv.slice(0, -1);
+                csv += '\r\n';
+            }
+
+            res.attachment('entries-' + form.id + '.csv');
+
+            res.status(200).send(csv);
         })
         .catch((e) => {
             res.status(502).send(FormsController.printError(e));

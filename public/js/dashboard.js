@@ -21956,6 +21956,28 @@ FunctionTemplating.each = function(array, callback) {
 };
 
 /**
+ * Loops a given number of times, rendering elements for each pass
+ *
+ * @param {Number} iterations
+ * @param {Function} callback
+ *
+ * @returns {HTMLElement} elements
+ */
+FunctionTemplating.loop = function(iterations, callback) {
+    var elements = [];
+
+    for(var i = 0; i <= iterations; i++) {
+        var element = callback(i);
+
+        if(element) {
+            elements.push(element);
+        }
+    }
+     
+    return elements;
+};
+
+/**
  * A shorthand for document.querySelector
  *
  * @param {String} query
@@ -22259,16 +22281,7 @@ class Router {
         return decodeURIComponent(results[2].replace(/\+/g, " "));
     }
 
-    static init() {
-        // Get the url
-        let url = location.hash.slice(1) || '/';
-        let trimmed = url.substring(0, url.indexOf('?'));
-       
-        Router.params = {};                    
-
-        if(trimmed) {
-            url = trimmed;
-        }
+    static directToRoute(url) {
         // Look for route
         let context = {};
         let route;
@@ -22312,6 +22325,41 @@ class Router {
         }
 
         Router.url = url;
+    }
+
+    static init() {
+        // Get the url
+        let url = location.hash.slice(1) || '/';
+        let trimmed = url.substring(0, url.indexOf('?'));
+       
+        Router.params = {};                    
+
+        if(trimmed) {
+            url = trimmed;
+        }
+
+        // If a check is implemented, execute it
+        if(typeof Router.check === 'function') {
+            Router.check(
+                // Pass the proposed route
+                url,
+
+                // Cancel method
+                () => {
+                    location.hash = Router.url;
+                },
+
+                // Proceed method
+                () => {
+                    Router.directToRoute(url);
+                }
+            );
+
+        // If not, proceed as normal
+        } else {
+            Router.directToRoute(url);
+
+        }
     }
 }
 
@@ -30747,7 +30795,7 @@ module.exports = {
 module.exports={
   "name": "hashbrown-cms",
   "repository": "https://github.com/Putaitu/hashbrown-cms.git",
-  "version": "0.4.3",
+  "version": "0.4.14",
   "description": "The pluggable CMS",
   "main": "hashbrown.js",
   "scripts": {
@@ -30828,7 +30876,7 @@ apiCall('get', 'server/projects').then(projects => {
                     resolve();
                 });
             }
-        }).catch(errorModal);
+        }).catch(UI.errorModal);
     }
 
     if (projects.length > 0) {
@@ -30838,7 +30886,7 @@ apiCall('get', 'server/projects').then(projects => {
             resolve();
         });
     }
-}).catch(errorModal);
+}).catch(UI.errorModal);
 
 // Set navbar button events
 $('.navbar-main a').click(function () {
@@ -30856,7 +30904,7 @@ $('.btn-create-project').click(() => {
                 project: project
             }).then(() => {
                 location.reload();
-            }).catch(errorModal);
+            }).catch(UI.errorModal);
         } else {
             return false;
         }
@@ -30891,7 +30939,7 @@ $('.btn-create-project').click(() => {
 apiCall('get', 'server/update/check').then(update => {
     if (update.behind) {
         $('.workspace').prepend(_.section({}, _.div({ class: 'update' }, _.p('You are ' + update.amount + ' version' + (update.amount != '1' ? 's' : '') + ' behind ' + update.branch), _.button({ class: 'btn btn-primary btn-update-hashbrown' }, 'Update').click(() => {
-            messageModal('Update', 'HashBrown is updating...', false);
+            UI.messageModal('Update', 'HashBrown is updating...', false);
 
             apiCall('post', 'server/update/start').then(() => {
                 new MessageModal({
@@ -30903,7 +30951,7 @@ apiCall('get', 'server/update/check').then(update => {
                         label: 'Cool!',
                         class: 'btn-primary',
                         callback: () => {
-                            messageModal('Success', 'HashBrown is restarting...', false);
+                            UI.messageModal('Success', 'HashBrown is restarting...', false);
 
                             function poke() {
                                 $.ajax({
@@ -30922,12 +30970,12 @@ apiCall('get', 'server/update/check').then(update => {
                         }
                     }]
                 });
-            }).catch(errorModal);
+            }).catch(UI.errorModal);
         }))));
     }
 });
 
-},{"../../../package.json":153,"../../common/models/Project":161,"./helpers":155,"./views/dashboard/ProjectEditor":158}],155:[function(require,module,exports){
+},{"../../../package.json":153,"../../common/models/Project":162,"./helpers":155,"./views/dashboard/ProjectEditor":159}],155:[function(require,module,exports){
 'use strict';
 
 // Libraries
@@ -30940,10 +30988,15 @@ window.toMarkdown = require('to-markdown');
 window.MessageModal = require('./views/MessageModal');
 
 // Common helpers
+window.UI = require('./helpers/UIHelper');
 window.ProjectHelper = require('./helpers/ProjectHelper');
 
 window.debug = require('../../common/helpers/DebugHelper');
 window.debug.verbosity = 3;
+
+// ----------------------
+// TODO: Move the below 3 methods into a SessionHelper
+// ----------------------
 
 /**
  * Checks if the currently logged in user is admin
@@ -30980,40 +31033,12 @@ window.currentUserHasScope = function currentUserHasScope(scope) {
 };
 
 /**
- * Brings up a message modal
- *
- * @param {String} title
- * @param {String} body
+ * Logs out the current user
  */
-window.messageModal = function messageModal(title, body, onSubmit) {
-    return new MessageModal({
-        model: {
-            title: title,
-            body: body,
-            onSubmit: onSubmit
-        }
-    });
-};
+window.logout = function logout() {
+    document.cookie = 'token=; Path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
 
-/**
- * Brings up an error modal
- *
- * @param {String|Error} error
- */
-window.errorModal = function errorModal(error) {
-    if (error instanceof String) {
-        error = new Error(error);
-    } else if (error && error instanceof Object) {
-        if (error.responseText) {
-            error = new Error(error.responseText);
-        }
-    }
-
-    let modal = messageModal('<span class="fa fa-warning"></span> Error', error.message + '<br /><br />Please check server log for details');
-
-    modal.$element.toggleClass('error-modal', true);
-
-    throw error;
+    location.reload();
 };
 
 /**
@@ -31030,15 +31055,6 @@ window.getCookie = function getCookie(name) {
     if (parts.length == 2) {
         return parts.pop().split(";").shift();
     }
-};
-
-/**
- * Logs out the current user
- */
-window.logout = function logout() {
-    document.cookie = 'token=; Path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-
-    location.reload();
 };
 
 /**
@@ -31059,10 +31075,10 @@ window.copyToClipboard = function copyToClipboard(string) {
         let success = document.execCommand('copy');
 
         if (!success) {
-            errorModal('Your browser does not yet support copying to clipboard');
+            UI.errorModal('Your browser does not yet support copying to clipboard');
         }
     } catch (e) {
-        errorModal(e.toString());
+        UI.errorModal(e.toString());
     }
 
     document.body.removeChild(text);
@@ -31072,6 +31088,8 @@ window.copyToClipboard = function copyToClipboard(string) {
  * Wraps an API URL
  *
  * @param {String} url
+ *
+ * @returns {String} API URL
  */
 window.apiUrl = function apiUrl(url) {
     let newUrl = '/api/';
@@ -31093,13 +31111,24 @@ window.apiUrl = function apiUrl(url) {
  * Wraps an API call
  *
  * @param {String} method
+ * @param {String} url
+ * @param {Object} data
  *
- * @returns {Promise(Object)} response
+ * @returns {Promise} Response
  */
 window.apiCall = function apiCall(method, url, data) {
     return customApiCall(method, apiUrl(url), data);
 };
 
+/**
+ * Wraps an API call with a custom path
+ *
+ * @param {String} method
+ * @param {String} url
+ * @param {Object} data
+ *
+ * @returns {Promise} Response
+ */
 window.customApiCall = function customApiCall(method, url, data) {
     return new Promise((resolve, reject) => {
         var xhr = new XMLHttpRequest();
@@ -31148,7 +31177,7 @@ window.customApiCall = function customApiCall(method, url, data) {
     });
 };
 
-},{"../../common/helpers/DebugHelper":159,"./helpers/ProjectHelper":156,"./views/MessageModal":157,"bluebird":17,"exomon":92,"marked":104,"to-markdown":146}],156:[function(require,module,exports){
+},{"../../common/helpers/DebugHelper":160,"./helpers/ProjectHelper":156,"./helpers/UIHelper":157,"./views/MessageModal":158,"bluebird":17,"exomon":92,"marked":104,"to-markdown":146}],156:[function(require,module,exports){
 'use strict';
 
 /**
@@ -31160,6 +31189,116 @@ class ProjectHelper {}
 module.exports = ProjectHelper;
 
 },{}],157:[function(require,module,exports){
+'use strict';
+
+class UIHelper {
+    /**
+     * Creates a switch
+     *
+     * @param {Boolean} initialValue
+     * @param {Function} onChange
+     *
+     * @returns {HTMLElement} Switch element
+     */
+    static inputSwitch(initialValue, onChange) {
+        let id = 'switch' + (10000 + Math.floor(Math.random() * 10000));
+
+        return _.div({ class: 'switch', 'data-checked': initialValue }, _.input({
+            id: id,
+            class: 'form-control switch',
+            type: 'checkbox',
+            checked: initialValue
+        }).change(function () {
+            this.parentElement.dataset.checked = this.checked;
+
+            if (onChange) {
+                onChange.call(this);
+            }
+        }), _.label({ for: id }));
+    }
+
+    /**
+     * Brings up an error modal
+     *
+     * @param {String|Error} error
+     */
+    static errorModal(error) {
+        if (error instanceof String) {
+            error = new Error(error);
+        } else if (error && error instanceof Object) {
+            if (error.responseText) {
+                error = new Error(error.responseText);
+            }
+        }
+
+        let modal = messageModal('<span class="fa fa-warning"></span> Error', error.message + '<br /><br />Please check server log for details');
+
+        modal.$element.toggleClass('error-modal', true);
+
+        throw error;
+    }
+
+    /**
+     * Brings up a message modal
+     *
+     * @param {String} title
+     * @param {String} body
+     */
+    static messageModal(title, body, onSubmit) {
+        return new MessageModal({
+            model: {
+                title: title,
+                body: body,
+                onSubmit: onSubmit
+            }
+        });
+    }
+
+    /**
+     * Brings up a confirm modal
+     *
+     * @param {String} type
+     * @param {String} title
+     * @param {String} body
+     * @param {Function} onSubmit
+     */
+    static confirmModal(type, title, body, onSubmit, onCancel) {
+        let submitClass = 'btn-primary';
+
+        type = (type || '').toLowerCase();
+
+        switch (type) {
+            case 'delete':case 'remove':case 'discard':case 'clear':
+                submitClass = 'btn-danger';
+                break;
+        }
+
+        return new MessageModal({
+            model: {
+                title: title,
+                body: body,
+                onSubmit: onSubmit
+            },
+            buttons: [{
+                label: 'Cancel',
+                class: 'btn-default',
+                callback: onCancel
+            }, {
+                label: type,
+                class: submitClass,
+                callback: onSubmit
+            }]
+        });
+    }
+}
+
+window.errorModal = UIHelper.errorModal;
+window.messageModal = UIHelper.messageModal;
+window.confirmModal = UIHelper.confirmModal;
+
+module.exports = UIHelper;
+
+},{}],158:[function(require,module,exports){
 'use strict';
 
 /**
@@ -31193,7 +31332,9 @@ class MessageModal extends View {
 
     onClickOK() {
         if (this.model.onSubmit) {
-            this.model.onSubmit();
+            if (this.model.onSubmit() == false) {
+                return;
+            }
         }
 
         this.hide();
@@ -31252,7 +31393,7 @@ class MessageModal extends View {
 
 module.exports = MessageModal;
 
-},{}],158:[function(require,module,exports){
+},{}],159:[function(require,module,exports){
 'use strict';
 
 /**
@@ -31311,7 +31452,7 @@ class ProjectEditor extends View {
                     callback: () => {
                         apiCall('delete', 'server/projects/' + this.model.id).then(() => {
                             location.reload();
-                        }).catch(errorModal);
+                        }).catch(UI.errorModal);
                     }
                 }]
             });
@@ -31403,7 +31544,7 @@ class ProjectEditor extends View {
                         class: 'btn-primary'
                     }]
                 });
-            }).catch(errorModal);
+            }).catch(UI.errorModal);
         }
     }
 
@@ -31447,7 +31588,7 @@ class ProjectEditor extends View {
                                     class: 'btn-primary'
                                 }]
                             });
-                        }).catch(errorModal);
+                        }).catch(UI.errorModal);
                     }
                 }]
             });
@@ -31480,7 +31621,7 @@ class ProjectEditor extends View {
                     callback: () => {
                         apiCall('delete', 'server/backups/' + this.model.id + '/' + timestamp).then(() => {
                             location.reload();
-                        }).catch(errorModal);
+                        }).catch(UI.errorModal);
                     }
                 }]
             });
@@ -31553,8 +31694,8 @@ class ProjectEditor extends View {
             data.settings.replace = modal.$element.find('#switch-migration-replace').is(':checked');
 
             apiCall('post', 'server/migrate/' + this.model.id, data).then(() => {
-                messageModal('Success', 'Successfully migrated content from "' + data.from + '" to "' + data.to + '"');
-            }).catch(errorModal);
+                UI.messageModal('Success', 'Successfully migrated content from "' + data.from + '" to "' + data.to + '"');
+            }).catch(UI.errorModal);
         };
 
         let data = {
@@ -31619,10 +31760,10 @@ class ProjectEditor extends View {
                     this.model.settings.environments.names.push(newName);
 
                     apiCall('post', 'server/settings/' + this.model.id + '/environments', this.model.settings.environments).then(() => {
-                        messageModal('Succes', 'The new environment "' + newName + '" was created successfully', () => {
+                        UI.messageModal('Succes', 'The new environment "' + newName + '" was created successfully', () => {
                             location.reload();
                         });
-                    }).catch(errorModal);
+                    }).catch(UI.errorModal);
 
                     return false;
                 }
@@ -31640,7 +31781,7 @@ class ProjectEditor extends View {
             e.preventDefault();this.onClickMigrate();
         }))), _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Delete').click(e => {
             e.preventDefault();this.onClickRemove();
-        }))))), _.div({ class: 'info' }, _.h2(this.model.settings.info.name || this.model.id), _.p(userCount + ' user' + (userCount != 1 ? 's' : '')), _.p(languageCount + ' language' + (languageCount != 1 ? 's' : '') + ' (' + this.model.settings.language.selected.join(', ') + ')')), _.div({ class: 'environments' }, _.h4('Environments'), _.each(this.model.settings.environments.names, (i, environment) => {
+        }))))), _.div({ class: 'info' }, _.h4(this.model.settings.info.name || this.model.id), _.p(userCount + ' user' + (userCount != 1 ? 's' : '')), _.p(languageCount + ' language' + (languageCount != 1 ? 's' : '') + ' (' + this.model.settings.language.selected.join(', ') + ')')), _.div({ class: 'environments' }, _.each(this.model.settings.environments.names, (i, environment) => {
             return _.div({ class: 'environment' }, _.div({ class: 'btn-group' }, _.span({ class: 'environment-title' }, environment), _.a({ href: '/' + this.model.id + '/' + environment, class: 'btn btn-primary environment' }, 'cms'), _.if(this.isAdmin(), _.div({ class: 'dropdown' }, _.button({ class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, _.span({ class: 'fa fa-ellipsis-v' })), _.ul({ class: 'dropdown-menu' }, _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Delete').click(e => {
                 e.preventDefault();this.onClickRemoveEnvironment();
             })))))));
@@ -31652,7 +31793,7 @@ class ProjectEditor extends View {
 
 module.exports = ProjectEditor;
 
-},{}],159:[function(require,module,exports){
+},{}],160:[function(require,module,exports){
 'use strict';
 
 let lastSenderName = '';
@@ -31792,7 +31933,7 @@ class DebugHelper {
 
 module.exports = DebugHelper;
 
-},{}],160:[function(require,module,exports){
+},{}],161:[function(require,module,exports){
 'use strict';
 
 let crypto = require('crypto');
@@ -31958,7 +32099,7 @@ class Entity {
 
 module.exports = Entity;
 
-},{"crypto":56}],161:[function(require,module,exports){
+},{"crypto":56}],162:[function(require,module,exports){
 'use strict';
 
 let Entity = require('./Entity');
@@ -31990,7 +32131,7 @@ class Project extends Entity {
 
 module.exports = Project;
 
-},{"./Entity":160}]},{},[154])
+},{"./Entity":161}]},{},[154])
 
 
 //# sourceMappingURL=maps/dashboard.js.map

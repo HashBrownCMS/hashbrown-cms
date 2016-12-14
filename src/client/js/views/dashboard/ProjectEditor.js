@@ -63,7 +63,7 @@ class ProjectEditor extends View {
                             .then(() => {
                                 location.reload();
                             })
-                            .catch(errorModal);
+                            .catch(UI.errorModal);
                         }
                     }
                 ]
@@ -164,7 +164,7 @@ class ProjectEditor extends View {
                     ]
                 });
             })
-            .catch(errorModal);
+            .catch(UI.errorModal);
         }
     }
 
@@ -212,7 +212,7 @@ class ProjectEditor extends View {
                                     ]
                                 });
                             })
-                            .catch(errorModal);
+                            .catch(UI.errorModal);
                         }
                     }
                 ]
@@ -250,7 +250,7 @@ class ProjectEditor extends View {
                             .then(() => {
                                 location.reload();
                             })
-                            .catch(errorModal);
+                            .catch(UI.errorModal);
                         }
                     }
                 ]
@@ -356,7 +356,7 @@ class ProjectEditor extends View {
             .then(() => {
                 UI.messageModal('Success', 'Successfully migrated content from "' + data.from + '" to "' + data.to + '"');
             })
-            .catch(errorModal);
+            .catch(UI.errorModal);
         };
 
         let data = {
@@ -451,7 +451,7 @@ class ProjectEditor extends View {
                         .then(() => {
                             UI.messageModal('Succes', 'The new environment "' + newName + '" was created successfully', () => { location.reload(); });
                         })
-                        .catch(errorModal);
+                        .catch(UI.errorModal);
 
                         return false;
                     }
@@ -493,12 +493,11 @@ class ProjectEditor extends View {
                     )
                 ),
                 _.div({class: 'info'},
-                    _.h2(this.model.settings.info.name || this.model.id),
+                    _.h4(this.model.settings.info.name || this.model.id),
                     _.p(userCount + ' user' + (userCount != 1 ? 's' : '')),
                     _.p(languageCount + ' language' + (languageCount != 1 ? 's' : '') + ' (' + this.model.settings.language.selected.join(', ') + ')')
                 ),
                 _.div({class: 'environments'},
-                    _.h4('Environments'),
                     _.each(this.model.settings.environments.names, (i, environment) => {
                         return _.div({class: 'environment'},
                             _.div({class: 'btn-group'},

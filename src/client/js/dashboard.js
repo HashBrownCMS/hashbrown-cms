@@ -34,7 +34,7 @@ apiCall('get', 'server/projects')
 
             }
         })
-        .catch(errorModal);
+        .catch(UI.errorModal);
     }
     
     if(projects.length > 0) {
@@ -46,7 +46,7 @@ apiCall('get', 'server/projects')
         });
     }
 })
-.catch(errorModal);
+.catch(UI.errorModal);
 
 // Set navbar button events
 $('.navbar-main a').click(function() {
@@ -66,7 +66,7 @@ $('.btn-create-project').click(() => {
             .then(() => {
                 location.reload();
             })
-            .catch(errorModal);
+            .catch(UI.errorModal);
         
         } else {
             return false;
@@ -151,7 +151,7 @@ apiCall('get', 'server/update/check')
                                     ]
                                 });
                             })
-                            .catch(errorModal);
+                            .catch(UI.errorModal);
                         })
                 )
             )

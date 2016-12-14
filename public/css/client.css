@@ -892,25 +892,16 @@ body > .dashboard-container {
     overflow-y: auto;
     background-color: #f5f5f5; }
     body > .dashboard-container .workspace section {
-      display: flex;
       margin-bottom: 30px;
-      max-width: 480px;
+      width: 100%;
+      max-width: 960px;
       margin-left: auto;
       margin-right: auto; }
-      body > .dashboard-container .workspace section > h4 {
-        flex-shrink: 0;
-        flex-basis: 200px;
-        width: 200px;
-        white-space: pre;
-        margin: 0px;
-        margin-left: -200px; }
-        body > .dashboard-container .workspace section > h4 a {
-          color: #424242; }
-        body > .dashboard-container .workspace section > h4 button {
-          display: block;
-          margin-top: 15px; }
-      body > .dashboard-container .workspace section > div, body > .dashboard-container .workspace section > table {
-        flex-grow: 1; }
+      body > .dashboard-container .workspace section > h4 a {
+        color: #424242; }
+      body > .dashboard-container .workspace section > h4 button {
+        display: block;
+        margin-top: 15px; }
     body > .dashboard-container .workspace .diagnostics tr {
       font-size: 14px; }
       body > .dashboard-container .workspace .diagnostics tr td {
@@ -921,11 +912,20 @@ body > .dashboard-container {
     body > .dashboard-container .workspace .projects .btn-create-project {
       display: block;
       margin-left: auto;
-      margin-right: 12px; }
+      margin-top: 30px; }
+    body > .dashboard-container .workspace .projects .project-list {
+      display: flex;
+      flex-wrap: wrap;
+      margin: -15px; }
     body > .dashboard-container .workspace .projects .project-editor {
       padding: 15px;
-      margin-bottom: 30px;
-      position: relative; }
+      margin: 15px;
+      position: relative;
+      flex-grow: 1;
+      flex-basis: 300px;
+      width: 300px;
+      min-width: 300px;
+      max-width: 300px; }
       body > .dashboard-container .workspace .projects .project-editor .btn-remove {
         padding: 0rem;
         position: absolute;
@@ -946,7 +946,7 @@ body > .dashboard-container {
           top: 0px;
           right: 0px; }
         body > .dashboard-container .workspace .projects .project-editor .body .environments {
-          margin: 0px -2px; }
+          margin: 15px -2px 0px 0px; }
           body > .dashboard-container .workspace .projects .project-editor .body .environments .btn-add {
             display: block;
             margin-top: 1em;

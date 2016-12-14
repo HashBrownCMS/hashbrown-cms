@@ -35558,6 +35558,7 @@ window.toMarkdown = require('to-markdown');
 window.MessageModal = require('./views/MessageModal');
 
 // Common helpers
+window.UI = require('./helpers/UIHelper');
 window.ProjectHelper = require('./helpers/ProjectHelper');
 
 window.debug = require('../../common/helpers/DebugHelper');
@@ -35746,7 +35747,7 @@ window.customApiCall = function customApiCall(method, url, data) {
     });
 };
 
-},{"../../common/helpers/DebugHelper":227,"./helpers/ProjectHelper":169,"./views/MessageModal":193,"bluebird":17,"exomon":92,"marked":108,"to-markdown":151}],165:[function(require,module,exports){
+},{"../../common/helpers/DebugHelper":227,"./helpers/ProjectHelper":169,"./helpers/UIHelper":172,"./views/MessageModal":193,"bluebird":17,"exomon":92,"marked":108,"to-markdown":151}],165:[function(require,module,exports){
 'use strict';
 
 let ConnectionHelperCommon = require('../../../common/helpers/ConnectionHelper');
@@ -38083,36 +38084,11 @@ class FormEditor extends View {
      * @return {Object} element
      */
     renderEntries() {
-        let view = this;
-
-        function onDownload() {
-            let items = view.model.entries;
-
-            // Convert to CSV
-            const replacer = (key, value) => value === null ? '' : value;
-            const header = Object.keys(items[0]);
-            let csv = items.map(row => header.map(fieldName => JSON.stringify(row[fieldName], replacer)).join(','));
-            csv.unshift(header.join(','));
-            csv = csv.join('\r\n');
-
-            // Force download
-            let element = document.createElement('a');
-            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(csv));
-            element.setAttribute('download', view.model.id + '.csv');
-
-            element.style.display = 'none';
-            document.body.appendChild(element);
-
-            element.click();
-
-            document.body.removeChild(element);
-        }
-
-        function onClick() {
+        return _.button({ class: 'btn btn-primary' }, 'View entries').click(() => {
             let modal = new MessageModal({
                 model: {
                     title: 'Entries',
-                    body: _.table({}, _.each(view.model.entries.reverse(), (i, entry) => {
+                    body: _.table({}, _.each(this.model.entries.reverse(), (i, entry) => {
                         return _.tbody({ class: 'entry' }, _.each(entry, (key, value) => {
                             return _.tr({ class: 'kvp' }, _.td({ class: 'key' }, key), _.td({ class: 'value' }, value));
                         }));
@@ -38122,9 +38098,9 @@ class FormEditor extends View {
                     class: 'btn-danger pull-left',
                     label: 'Clear',
                     callback: () => {
-                        UI.confirmModal('Clear', 'Clear "' + view.model.title + '"', 'Are you sure you want to clear all entries?', () => {
-                            apiCall('post', 'forms/clear/' + view.model.id).then(() => {
-                                view.model.entries = [];
+                        UI.confirmModal('Clear', 'Clear "' + this.model.title + '"', 'Are you sure you want to clear all entries?', () => {
+                            apiCall('post', 'forms/clear/' + this.model.id).then(() => {
+                                this.model.entries = [];
                                 modal.hide();
                             }).catch(UI.errorModal);
                         });
@@ -38133,9 +38109,9 @@ class FormEditor extends View {
                     }
                 }, {
                     class: 'btn-primary',
-                    label: 'Download',
+                    label: 'Get .csv',
                     callback: () => {
-                        onDownload();
+                        location = apiUrl('forms/' + this.model.id + '/entries');
 
                         return false;
                     }
@@ -38146,9 +38122,7 @@ class FormEditor extends View {
             });
 
             modal.$element.addClass('form-entries-list-modal');
-        }
-
-        return _.button({ class: 'btn btn-primary' }, 'View entries').click(onClick);
+        });
     }
 
     /**
