@@ -1491,19 +1491,18 @@ body > .dashboard-container {
     .schema-editor > .schema .icon-editor > .fa {
       line-height: 30px; }
 
-.modal .form-entries-list {
-  overflow-y: scroll; }
-  .modal .form-entries-list .entry {
-    padding: 15px 0px;
-    border-bottom: 1px solid #9e9e9e; }
-    .modal .form-entries-list .entry .kvp {
-      display: flex; }
-      .modal .form-entries-list .entry .kvp .key {
-        flex-basis: 30%; }
-      .modal .form-entries-list .entry .kvp .value {
-        flex-basis: 70%; }
-      .modal .form-entries-list .entry .kvp .key, .modal .form-entries-list .entry .kvp .value {
-        flex-grow: 1; }
+.form-entries-list-modal .modal-body {
+  overflow-y: scroll;
+  max-height: 300px; }
+  .form-entries-list-modal .modal-body table {
+    width: 100%; }
+    .form-entries-list-modal .modal-body table tbody {
+      border-bottom: 1px solid #9e9e9e; }
+      .form-entries-list-modal .modal-body table tbody tr {
+        line-height: 30px; }
+        .form-entries-list-modal .modal-body table tbody tr .key {
+          color: #9e9e9e;
+          padding-right: 15px; }
 
 .form-editor {
   height: 100%;

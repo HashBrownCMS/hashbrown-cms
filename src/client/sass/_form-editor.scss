@@ -1,24 +1,21 @@
-.modal {
-    .form-entries-list {
+.form-entries-list-modal {
+    .modal-body {
         overflow-y: scroll;
+        max-height: 300px;
 
-        .entry {
-            padding: 15px 0px;
-            border-bottom: 1px solid material-color('grey', '500');
+        table {
+            width: 100%;
 
-            .kvp {
-                display: flex;
-               
-                .key {
-                    flex-basis: 30%;
-                }
-                
-                .value {
-                    flex-basis: 70%;
-                }
+            tbody {
+                border-bottom: 1px solid material-color('grey', '500');
 
-                .key, .value {
-                    flex-grow: 1;
+                tr {
+                    line-height: 30px;
+
+                    .key {
+                        color: material-color('grey', '500');
+                        padding-right: 15px;
+                    }
                 }
             }
         }

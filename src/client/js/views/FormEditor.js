@@ -370,13 +370,13 @@ class FormEditor extends View {
             let modal = new MessageModal({
                 model: {
                     title: 'Entries',
-                    body: _.div({class: 'form-entries-list'},
+                    body: _.table({},
                         _.each(view.model.entries.reverse(), (i, entry) => {
-                            return _.div({class: 'entry'},
+                            return _.tbody({class: 'entry'},
                                 _.each(entry, (key, value) => {
-                                    return _.div({class: 'kvp'},
-                                        _.div({class: 'key'}, key),
-                                        _.div({class: 'value'}, value)
+                                    return _.tr({class: 'kvp'},
+                                        _.td({class: 'key'}, key),
+                                        _.td({class: 'value'}, value)
                                     );
                                 })
                             );
@@ -415,6 +415,8 @@ class FormEditor extends View {
                     }
                 ]
             });
+
+            modal.$element.addClass('form-entries-list-modal');
         }
 
         return _.button({class: 'btn btn-primary'}, 'View entries').click(onClick);
