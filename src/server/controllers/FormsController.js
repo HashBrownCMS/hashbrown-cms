@@ -154,17 +154,23 @@ class FormsController extends ApiController {
 
             FormHelper.addEntry(req.params.id, req.body)
             .then((form) => {
-                let redirectUrl = req.headers.referer;
+                if(!req.headers.referer) {
+                    return Promise.reject(new Error('Request header has no referer'));
+                }
 
                 if(form.redirect) {
-                    redirectUrl = form.redirect;
+                    let redirectUrl = form.redirect;
 
                     if(form.appendRedirect) {
                         redirectUrl = req.headers.referer + redirectUrl;
                     }
-                }
+                    
+                    res.status(302).redirect(redirectUrl);
+                
+                } else {
+                    res.sendStatus(200);
 
-                res.status(302).redirect(redirectUrl);
+                }
             })
             .catch((e) => {
                 res.status(400).send(FormsController.printError(e));

@@ -22,7 +22,7 @@ class UIHelper {
                 this.parentElement.dataset.checked = this.checked;
 
                 if(onChange) {
-                    onChange(this.checked);
+                    onChange.call(this);
                 }
             }),
             _.label({for: id})

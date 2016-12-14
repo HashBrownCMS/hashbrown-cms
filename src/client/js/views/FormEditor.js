@@ -230,22 +230,28 @@ class FormEditor extends View {
                     } else {
                         if(this.dataset.key == 'required') {
                             input.required = this.checked;
+
+                        } else if(this.dataset.key == 'checkDuplicates') {
+                            input.checkDuplicates = this.checked;
+
                         } else if(this.dataset.key == 'options') {
                             input.options = $(this).val().replace(/, /g, ',').split(',');
+
                         } else {
                             input[this.dataset.key] = $(this).val();
+
                         }
 
                         render();
+                        
                         let $newPreview = view.renderPreview();
+                        
                         view.$preview.replaceWith($newPreview);
                         view.$preview = $newPreview;
                     }
                 };
 
                 function render() {
-                    let switchId = 'switch-' + key;
-
                     _.append($input.empty(),
                         _.button({class: 'btn btn-embedded btn-remove'},
                             _.span({class: 'fa fa-remove'})
@@ -273,9 +279,17 @@ class FormEditor extends View {
                         view.renderField(
                             'Required',
                             _.div({class: 'switch'},
-                                _.input({'data-key': 'required', id: switchId, class: 'form-control switch', type: 'checkbox', checked: input.required == true})
+                                _.input({'data-key': 'required', id: 'switch-' + key + '-required', class: 'form-control switch', type: 'checkbox', checked: input.required == true})
                                 .on('change', onChange),
-                                _.label({for: switchId})
+                                _.label({for: 'switch-' + key + '-required'})
+                            )
+                        ),
+                        view.renderField(
+                            'Check duplicates',
+                            _.div({class: 'switch'},
+                                _.input({'data-key': 'checkDuplicates', id: 'switch-' + key + '-check-duplicates', class: 'form-control switch', type: 'checkbox', checked: input.checkDuplicates == true})
+                                .on('change', onChange),
+                                _.label({for: 'switch-' + key + '-check-duplicates'})
                             )
                         ),
                         view.renderField(

@@ -36092,7 +36092,7 @@ class UIHelper {
             this.parentElement.dataset.checked = this.checked;
 
             if (onChange) {
-                onChange(this.checked);
+                onChange.call(this);
             }
         }), _.label({ for: id }));
     }
@@ -38023,6 +38023,8 @@ class FormEditor extends View {
                 } else {
                     if (this.dataset.key == 'required') {
                         input.required = this.checked;
+                    } else if (this.dataset.key == 'checkDuplicates') {
+                        input.checkDuplicates = this.checked;
                     } else if (this.dataset.key == 'options') {
                         input.options = $(this).val().replace(/, /g, ',').split(',');
                     } else {
@@ -38030,20 +38032,20 @@ class FormEditor extends View {
                     }
 
                     render();
+
                     let $newPreview = view.renderPreview();
+
                     view.$preview.replaceWith($newPreview);
                     view.$preview = $newPreview;
                 }
             };
 
             function render() {
-                let switchId = 'switch-' + key;
-
                 _.append($input.empty(), _.button({ class: 'btn btn-embedded btn-remove' }, _.span({ class: 'fa fa-remove' })).click(() => {
                     view.onClickRemoveInput(key);
                 }), view.renderField('Name', _.input({ class: 'form-control', 'data-key': 'name', type: 'text', value: key, placeholder: 'Type the input name here' }).on('change', onChange)), view.renderField('Type', _.select({ class: 'form-control', 'data-key': 'type' }, _.each(types, (i, option) => {
                     return _.option({ value: option }, option);
-                })).val(input.type).on('change', onChange)), _.if(input.type == 'select', view.renderField('Select options (CSV)', _.input({ class: 'form-control', 'data-key': 'options', type: 'text', value: (input.options || []).join(','), placeholder: 'Type the select options here, separated by comma' }).on('change', onChange))), view.renderField('Required', _.div({ class: 'switch' }, _.input({ 'data-key': 'required', id: switchId, class: 'form-control switch', type: 'checkbox', checked: input.required == true }).on('change', onChange), _.label({ for: switchId }))), view.renderField('Pattern', _.input({ class: 'form-control', 'data-key': 'pattern', type: 'text', value: input.pattern, placeholder: 'Type a RegEx pattern here' }).on('change', onChange)));
+                })).val(input.type).on('change', onChange)), _.if(input.type == 'select', view.renderField('Select options (CSV)', _.input({ class: 'form-control', 'data-key': 'options', type: 'text', value: (input.options || []).join(','), placeholder: 'Type the select options here, separated by comma' }).on('change', onChange))), view.renderField('Required', _.div({ class: 'switch' }, _.input({ 'data-key': 'required', id: 'switch-' + key + '-required', class: 'form-control switch', type: 'checkbox', checked: input.required == true }).on('change', onChange), _.label({ for: 'switch-' + key + '-required' }))), view.renderField('Check duplicates', _.div({ class: 'switch' }, _.input({ 'data-key': 'checkDuplicates', id: 'switch-' + key + '-check-duplicates', class: 'form-control switch', type: 'checkbox', checked: input.checkDuplicates == true }).on('change', onChange), _.label({ for: 'switch-' + key + '-check-duplicates' }))), view.renderField('Pattern', _.input({ class: 'form-control', 'data-key': 'pattern', type: 'text', value: input.pattern, placeholder: 'Type a RegEx pattern here' }).on('change', onChange)));
             }
 
             render();
