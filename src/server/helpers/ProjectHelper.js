@@ -172,10 +172,68 @@ class ProjectHelper {
         // Make backup first
         return BackupHelper.createBackup(name)
         .then(() => {
-            return MongoHelper.dropDatabase(name, 1000);
+            return MongoHelper.dropDatabase(name);
         });
     }
 
+    /**
+     * Deletes an environment
+     *
+     * @param {String} project
+     * @param {String} environment
+     *
+     * @returns {Promise} Promise
+     */
+    static deleteEnvironment(project, environment) {
+        debug.log('Deleting environment "' + environment + '" from project "' + project + '"...', this);
+
+        // Make backup first
+        return BackupHelper.createBackup(project)
+
+        // Get all collections with the environment prefix
+        .then(() => {
+            return MongoHelper.listCollections(project);
+        })
+
+        // Iterate through collections and match them with the environemtn name
+        .then((collections) => {
+            function next() {
+                let collection = collections.pop();
+
+                // No more collections, resolve
+                if(!collection) {
+                    debug.log('Deleted environment "' + environment + '" from project "' + project + '" successfully', ProjectHelper);
+                    return Promise.resolve();
+                }
+
+                // This collection matches the environment name, drop it
+                if(collection.name.indexOf(environment + '.') == 0) {
+                    return MongoHelper.dropCollection(project, collection.name)
+                    .then(() => {
+                        return next();
+                    });
+                }
+
+                // This collection does not match the environment name, iterate again 
+                return next();
+            }
+
+            return next();
+        })
+        
+        // Remove listing from settings
+        .then(() => {
+            return SettingsHelper.getSettings('environments', project);
+        })
+        .then((environments) => {
+            let index = environments.names.indexOf(environment);
+
+            environments.names.splice(index, 1);
+
+            return SettingsHelper.setSettings('environments', environments, project);
+        });
+    }
+    
     /**
      * Creates a new Project
      *

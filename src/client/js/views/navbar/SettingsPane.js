@@ -5,7 +5,7 @@ let Pane = require('./Pane');
 class SettingsPane extends Pane {
     static getRenderSettings() {
         return {
-            label: 'Settings',
+            label: 'Project settings',
             route: '/settings/',
             icon: 'wrench',
             items: [

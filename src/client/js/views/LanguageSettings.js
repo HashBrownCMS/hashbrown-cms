@@ -8,56 +8,48 @@
 class LanguageSettings extends View {
     constructor(params) {
         super(params);
-
-        this.fetch();
-    }
-
-    /**
-     * Event: Flipped a switch
-     *
-     * @param {Object} element
-     */
-    onClickSwitch(element) {
-        let checked = this.checked;
-        let language = this.getAttribute('data-language');
-            
-        LanguageHelper.toggleLanguage(language, checked)
-        .then(() => {
-            debug.log('Language "' + language + '" set to ' + checked, this);
-        });
-    }
-
-    render() {
+        
         this.$element = _.div({class: 'editor language-settings'});
 
         LanguageHelper.getSelectedLanguages()
         .then((selectedLanguages) => {
-            _.append(this.$element.empty(),
-                _.div({class: 'editor-header'},
-                    _.span({class: 'fa fa-flag'}),
-                    _.h4('Languages')
-                ),
-                _.div({class: 'editor-body'},
-                    _.each(LanguageHelper.getLanguages(), (i, language) => {
-                        return _.div({class: 'input-group'},      
-                            _.span(language),
-                            _.div({class: 'input-group-addon'},
-                                _.div({class: 'switch'},
-                                    _.input({
-                                        id: 'switch-' + language,
-                                        'data-language': language,
-                                        class: 'form-control switch',
-                                        type: 'checkbox',
-                                        checked: selectedLanguages.indexOf(language) > -1
-                                    }).change(this.onClickSwitch),
-                                    _.label({for: 'switch-' + language})
-                                )
-                            )
-                        );
-                    })
-                )
-            );
+            this.model = selectedLanguages;
+
+            this.fetch();
         });
+    }
+
+    /**
+     * Event: Click save
+     */
+    onClickSave() {
+        this.$saveBtn.toggleClass('working', true);
+
+        LanguageHelper.setLanguages(this.model)
+        .then(() => {
+            this.$saveBtn.toggleClass('working', false);
+        })
+        .catch(UI.errorModal);
+    }
+
+    render() {
+        _.append(this.$element.empty(),
+            _.div({class: 'editor-header'},
+                _.span({class: 'fa fa-flag'}),
+                _.h4('Languages')
+            ),
+            _.div({class: 'editor-body'},
+                UI.inputChipGroup(this.model, LanguageHelper.getLanguages(), true)
+            ),
+            _.div({class: 'editor-footer panel panel-default panel-buttons'}, 
+                _.div({class: 'btn-group'},
+                    this.$saveBtn = _.button({class: 'btn btn-primary btn-raised btn-save'},
+                        _.span({class: 'text-default'}, 'Save '),
+                        _.span({class: 'text-working'}, 'Saving ')
+                    ).click(() => { this.onClickSave(); }),
+                )
+            )
+        );
     } 
 }
 

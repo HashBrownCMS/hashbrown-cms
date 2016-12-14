@@ -31,6 +31,30 @@ class LanguageHelper {
             return Promise.resolve(settings.selected);
         });
     }
+    
+    /**
+     * Sets all languages
+     *
+     * @param {Array} languages
+     *
+     * @returns {Promise} promise
+     */
+    static setLanguages(languages) {
+        return SettingsHelper.getSettings('language')
+        .then((settings) => {
+            if(!(settings instanceof Object)) {
+                settings = {};
+            }
+
+            if(!Array.isArray(languages)) {
+                return Promise.reject(new Error('Language array cannot be of type "' + typeof languages + '"'));
+            }
+
+            settings.selected = languages;
+
+            return SettingsHelper.setSettings('language', settings);
+        });  
+    }
 
     /**
      * Toggle a language

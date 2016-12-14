@@ -10,7 +10,7 @@ class UIHelper {
      * @returns {HTMLElement} Switch element
      */
     static inputSwitch(initialValue, onChange) {
-        let id = 'switch' + (10000 + Math.floor(Math.random() * 10000));
+        let id = 'switch-' + (10000 + Math.floor(Math.random() * 10000));
 
         return _.div({class: 'switch', 'data-checked': initialValue},
             _.input({
@@ -22,11 +22,123 @@ class UIHelper {
                 this.parentElement.dataset.checked = this.checked;
 
                 if(onChange) {
-                    onChange.call(this);
+                    onChange(this.checked);
                 }
             }),
             _.label({for: id})
         );
+    }
+
+    /**
+     * Creates a group of chips
+     *
+     * @param {Array} items
+     * @param {Array} dropdownItems
+     * @param {Function} onChange
+     *
+     * @returns {HtmlElement} Chip group element
+     */
+    static inputChipGroup(items, dropdownItems, onChange) {
+        let $element = _.div({class: 'chip-group'});
+
+        function render() {
+            _.append($element.empty(),
+
+                // Render individual chips
+                _.each(items, (itemIndex, item) => {
+                    let $chip = _.div({class: 'chip'},
+
+                        // Dropdown
+                        _.if(Array.isArray(dropdownItems),
+                            _.div({class: 'chip-label dropdown'},
+                                _.button({class: 'dropdown-toggle', 'data-toggle': 'dropdown'},
+                                    item.label || item.name || item.title || item 
+                                ),
+                                _.if(onChange,
+                                    _.ul({class: 'dropdown-menu'},
+                                        _.each(dropdownItems, (dropdownItemIndex, dropdownItem) => {
+                                            return _.li(
+                                                _.a({href: '#'},
+                                                    dropdownItem.label || dropdownItem.name || dropdownItem.title || dropdownItem
+                                                ).click(function(e) {
+                                                    e.preventDefault();
+                                                        
+                                                    items[itemIndex] = dropdownItem;
+
+                                                    render();
+                                
+                                                    if(typeof onChange === 'function') {
+                                                        onChange(items);
+                                                    }
+                                                })
+                                            );
+                                        })
+                                    )
+                                )
+                            )
+                        ),
+
+                        // Regular string
+                        _.if(!Array.isArray(dropdownItems),
+                            _.if(!onChange,
+                                _.p({class: 'chip-label'}, item)
+                            ),
+                            _.if(onChange,
+                                _.input({type: 'text', class: 'chip-label', value: item})
+                                    .change((e) => {
+                                        items[itemIndex] = e.target.value;
+                                    })
+                            )
+                        ),
+
+                        // Remove button
+                        _.if(onChange,
+                            _.button({class: 'btn chip-remove'},
+                                _.span({class: 'fa fa-remove'})
+                            ).click(() => {
+                                items.splice(itemIndex, 1);
+
+                                render();
+
+                                if(typeof onChange === 'function') {
+                                    onChange(items);
+                                }
+                            })
+                        )
+                    );
+                    
+                    return $chip;
+                }),
+
+                // Add button
+                _.if(onChange,
+                    _.button({class: 'btn chip-add'},
+                        _.span({class: 'fa fa-plus'})
+                    ).click(() => {
+                        if(Array.isArray(dropdownItems)) {
+                            items.push(dropdownItems[0]);
+                        
+                        } else if(typeof dropdownItems === 'string') {
+                            items.push(dropdownItems);
+
+                        } else {
+                            items.push('New item');
+
+                        }
+
+                        render(); 
+
+                        if(typeof onChange === 'function') {
+                            onChange(items);
+                        }
+                    })
+                )
+            );
+        };
+
+        render();
+
+        return $element;
     }
 
     /**

@@ -31460,6 +31460,19 @@ class ProjectEditor extends View {
     }
 
     /**
+     * Event: Click remove environment
+     *
+     * @param {String} environmentName
+     */
+    onClickRemoveEnvironment(environmentName) {
+        let modal = UI.confirmModal('Remove', 'Remove environment "' + environmentName + '"', 'Are you sure want to remove the environment "' + environmentName + '" from the project "' + (this.model.title || this.model.id) + '"?', () => {
+            apiCall('delete', 'server/projects/' + this.model.id + '/' + environmentName).then(() => {
+                location.reload();
+            }).catch(UI.errorModal);
+        });
+    }
+
+    /**
      * Event: Click upload button
      */
     onClickUploadBackup() {
@@ -31783,7 +31796,7 @@ class ProjectEditor extends View {
             e.preventDefault();this.onClickRemove();
         }))))), _.div({ class: 'info' }, _.h4(this.model.settings.info.name || this.model.id), _.p(userCount + ' user' + (userCount != 1 ? 's' : '')), _.p(languageCount + ' language' + (languageCount != 1 ? 's' : '') + ' (' + this.model.settings.language.selected.join(', ') + ')')), _.div({ class: 'environments' }, _.each(this.model.settings.environments.names, (i, environment) => {
             return _.div({ class: 'environment' }, _.div({ class: 'btn-group' }, _.span({ class: 'environment-title' }, environment), _.a({ href: '/' + this.model.id + '/' + environment, class: 'btn btn-primary environment' }, 'cms'), _.if(this.isAdmin(), _.div({ class: 'dropdown' }, _.button({ class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, _.span({ class: 'fa fa-ellipsis-v' })), _.ul({ class: 'dropdown-menu' }, _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Delete').click(e => {
-                e.preventDefault();this.onClickRemoveEnvironment();
+                e.preventDefault();this.onClickRemoveEnvironment(environment);
             })))))));
         }), _.if(this.isAdmin(), _.button({ class: 'btn btn-primary btn-add btn-raised btn-round' }, '+').click(() => {
             this.onClickAddEnvironment();

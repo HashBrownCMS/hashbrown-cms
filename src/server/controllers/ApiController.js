@@ -17,40 +17,37 @@ class ApiController extends Controller {
      * @param {String} scope
      */
     static authenticate(token, scope) {
-        return new Promise((resolve, reject) => {
-            if(!token) {
-                reject(new Error('No token was provided'));
+        if(!token) {
+            return Promise.reject(new Error('No token was provided'));
 
-            } else {
-                UserHelper.findToken(token)
-                .then((user) => {
-                    if(user) {
-                        // Set the currently authenticated user as a static variable
-                        UserHelper.current = user;
+        } else {
+            return UserHelper.findToken(token)
+            .then((user) => {
+                if(user) {
+                    // Set the currently authenticated user as a static variable
+                    UserHelper.current = user;
 
-                        // If a scope is defined, and the user isn't an admin, check for it
-                        if(scope && !user.isAdmin) {
-                            if(user.hasScope(ProjectHelper.currentProject, scope)) {
-                                resolve(user);
-                    
-                            } else {
-                                reject(new Error('User "' + user.username + '" with token "' + token + '" doesn\'t have scope "' + scope + '"'));
-
-                            }
-                       
-                        // If no scope is required, return as normal 
+                    // If a scope is defined, and the user isn't an admin, check for it
+                    if(scope && !user.isAdmin) {
+                        if(user.hasScope(ProjectHelper.currentProject, scope)) {
+                            return Promise.resolve(user);
+                
                         } else {
-                            resolve(user);
+                            return Promise.reject(new Error('User "' + user.username + '" with token "' + token + '" doesn\'t have scope "' + scope + '"'));
 
                         }
-
+                   
+                    // If no scope is required, return as normal 
                     } else {
-                        reject(new Error('Found no user with token "' + token + '"'));
+                        return Promise.resolve(user);
+
                     }
-                })
-                .catch(reject);
-            }
-        });
+
+                } else {
+                    return Promise.reject(new Error('Found no user with token "' + token + '"'));
+                }
+            });
+        }
     }
 
     /**
@@ -132,7 +129,7 @@ class ApiController extends Controller {
                 res.header('Access-Control-Allow-Origin', allowedOrigin);
                 res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
             
-                // Allowed origin host did not match
+                // Allowed origin did not match
                 if(allowedOrigin != '*' && allowedOrigin != req.headers.origin) {
                     return Promise.reject(new Error('Unauthorized'));
                 }

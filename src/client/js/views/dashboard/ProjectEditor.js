@@ -72,6 +72,21 @@ class ProjectEditor extends View {
     }
 
     /**
+     * Event: Click remove environment
+     *
+     * @param {String} environmentName
+     */
+    onClickRemoveEnvironment(environmentName) {
+        let modal = UI.confirmModal('Remove', 'Remove environment "' + environmentName + '"', 'Are you sure want to remove the environment "' + environmentName + '" from the project "' + (this.model.title || this.model.id) + '"?', () => {
+            apiCall('delete', 'server/projects/' + this.model.id + '/' + environmentName)
+            .then(() => {
+                location.reload();
+            })
+            .catch(UI.errorModal);
+        });
+    }
+
+    /**
      * Event: Click upload button
      */
     onClickUploadBackup() {
@@ -512,7 +527,7 @@ class ProjectEditor extends View {
                                             _.li(
                                                 _.a({href: '#', class: 'dropdown-item'},
                                                     'Delete'
-                                                ).click((e) => { e.preventDefault(); this.onClickRemoveEnvironment(); })
+                                                ).click((e) => { e.preventDefault(); this.onClickRemoveEnvironment(environment); })
                                             )
                                         )
                                     )

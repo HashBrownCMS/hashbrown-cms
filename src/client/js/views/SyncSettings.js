@@ -201,27 +201,14 @@ class SyncSettings extends View {
      * Render Content switch
      */
     renderContentSwitch() {
-        let view = this;
-        
-        function onChange() {
-            view.model.content = this.checked;
+        return _.div({class: 'field-editor content'},
+            UI.inputSwitch(this.model.content == true, (isActive) => {
+                this.model.content = isActive;  
 
-            if(view.model.content) {
-                view.model.schemas = true;
-                view.$element.find('#switch-sync-schemas')[0].checked = true;
-            }
-        }
-
-        return _.div({class: 'field-editor'},
-            _.div({class: 'switch'},
-                _.input({
-                    id: 'switch-sync-content',
-                    class: 'form-control switch',
-                    type: 'checkbox',
-                    checked: this.model.content == true
-                }).change(onChange),
-                _.label({for: 'switch-sync-content'})
-            )
+                if(isActive) {
+                    this.$element.find('.field-editor.schemas input')[0].checked = true;
+                }
+            })
         );
     }
     
@@ -229,22 +216,10 @@ class SyncSettings extends View {
      * Render Connections switch
      */
     renderConnectionsSwitch() {
-        let view = this;
-        
-        function onChange() {
-            view.model.connections = this.checked;
-        }
-
-        return _.div({class: 'field-editor'},
-            _.div({class: 'switch'},
-                _.input({
-                    id: 'switch-sync-connections',
-                    class: 'form-control switch',
-                    type: 'checkbox',
-                    checked: this.model.connections == true
-                }).change(onChange),
-                _.label({for: 'switch-sync-connections'})
-            )
+        return _.div({class: 'field-editor connections'},
+            UI.inputSwitch(this.model.connections == true, (isActive) => {
+                this.model.connections = isActive;  
+            })
         );
     }
     
@@ -252,15 +227,9 @@ class SyncSettings extends View {
      * Render Forms switch
      */
     renderFormsSwitch() {
-        let view = this;
-        
-        function onChange(isActive) {
-            view.model.forms = isActive;
-        }
-
-        return _.div({class: 'field-editor'},
+        return _.div({class: 'field-editor forms'},
             UI.inputSwitch(this.model.forms == true, (isActive) => {
-                this.model.forms = isActive;   
+                this.model.forms = isActive;  
             })
         );
     }
@@ -269,27 +238,14 @@ class SyncSettings extends View {
      * Render Schema switch
      */
     renderSchemaSwitch() {
-        let view = this;
-        
-        function onChange() {
-            view.model.schemas = this.checked;
+        return _.div({class: 'field-editor schemas'},
+            UI.inputSwitch(this.model.content == true, (isActive) => {
+                this.model.content = isActive;  
 
-            if(!view.model.schemas) {
-                view.model.content = false;
-                view.$element.find('#switch-sync-content')[0].checked = false;
-            }
-        }
-
-        return _.div({class: 'field-editor'},
-            _.div({class: 'switch'},
-                _.input({
-                    id: 'switch-sync-schemas',
-                    class: 'form-control switch',
-                    type: 'checkbox',
-                    checked: this.model.schemas == true
-                }).change(onChange),
-                _.label({for: 'switch-sync-schemas'})
-            )
+                if(!isActive) {
+                    this.$element.find('.field-editor.content input')[0].checked = false;
+                }
+            })
         );
     }
     
@@ -297,22 +253,10 @@ class SyncSettings extends View {
      * Render Media tree switch
      */
     renderMediaTreeSwitch() {
-        let view = this;
-        
-        function onChange() {
-            view.model['media/tree'] = this.checked;
-        }
-
-        return _.div({class: 'field-editor'},
-            _.div({class: 'switch'},
-                _.input({
-                    id: 'switch-sync-media-tree',
-                    class: 'form-control switch',
-                    type: 'checkbox',
-                    checked: this.model['media/tree'] == true
-                }).change(onChange),
-                _.label({for: 'switch-sync-media-tree'})
-            )
+        return _.div({class: 'field-editor forms'},
+            UI.inputSwitch(this.model['media/tree'] == true, (isActive) => {
+                this.model['media/tree'] = isActive;  
+            })
         );
     }
     

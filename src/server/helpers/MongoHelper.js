@@ -511,6 +511,34 @@ class MongoHelper {
             .catch(reject);
         });
     }    
+    
+    /**
+     * Drops an entire collection
+     *
+     * @param {String} databaseName
+     * @param {String} collectionName
+     *
+     * @return {Promise} promise
+     */
+    static dropCollection(databaseName, collectionName) {
+        debug.log(databaseName + '::dropCollection...', this, 3);
+
+        return MongoHelper.getDatabase(databaseName)
+        .then((db) => {
+            return new Promise((resolve, reject) => {
+                db.dropCollection(collectionName, (err) => {
+                    if(err) {
+                        reject(new Error(err));
+                    
+                    } else {
+                        resolve();
+                    }
+
+                    db.close();
+                });
+            });
+        });
+    }
 
     /**
      * Drops an entire database

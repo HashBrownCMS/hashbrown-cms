@@ -36082,7 +36082,7 @@ class UIHelper {
      * @returns {HTMLElement} Switch element
      */
     static inputSwitch(initialValue, onChange) {
-        let id = 'switch' + (10000 + Math.floor(Math.random() * 10000));
+        let id = 'switch-' + (10000 + Math.floor(Math.random() * 10000));
 
         return _.div({ class: 'switch', 'data-checked': initialValue }, _.input({
             id: id,
@@ -36093,9 +36093,85 @@ class UIHelper {
             this.parentElement.dataset.checked = this.checked;
 
             if (onChange) {
-                onChange.call(this);
+                onChange(this.checked);
             }
         }), _.label({ for: id }));
+    }
+
+    /**
+     * Creates a group of chips
+     *
+     * @param {Array} items
+     * @param {Array} dropdownItems
+     * @param {Function} onChange
+     *
+     * @returns {HtmlElement} Chip group element
+     */
+    static inputChipGroup(items, dropdownItems, onChange) {
+        let $element = _.div({ class: 'chip-group' });
+
+        function render() {
+            _.append($element.empty(),
+
+            // Render individual chips
+            _.each(items, (itemIndex, item) => {
+                let $chip = _.div({ class: 'chip' },
+
+                // Dropdown
+                _.if(Array.isArray(dropdownItems), _.div({ class: 'chip-label dropdown' }, _.button({ class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, item.label || item.name || item.title || item), _.if(onChange, _.ul({ class: 'dropdown-menu' }, _.each(dropdownItems, (dropdownItemIndex, dropdownItem) => {
+                    return _.li(_.a({ href: '#' }, dropdownItem.label || dropdownItem.name || dropdownItem.title || dropdownItem).click(function (e) {
+                        e.preventDefault();
+
+                        items[itemIndex] = dropdownItem;
+
+                        render();
+
+                        if (typeof onChange === 'function') {
+                            onChange(items);
+                        }
+                    }));
+                }))))),
+
+                // Regular string
+                _.if(!Array.isArray(dropdownItems), _.if(!onChange, _.p({ class: 'chip-label' }, item)), _.if(onChange, _.input({ type: 'text', class: 'chip-label', value: item }).change(e => {
+                    items[itemIndex] = e.target.value;
+                }))),
+
+                // Remove button
+                _.if(onChange, _.button({ class: 'btn chip-remove' }, _.span({ class: 'fa fa-remove' })).click(() => {
+                    items.splice(itemIndex, 1);
+
+                    render();
+
+                    if (typeof onChange === 'function') {
+                        onChange(items);
+                    }
+                })));
+
+                return $chip;
+            }),
+
+            // Add button
+            _.if(onChange, _.button({ class: 'btn chip-add' }, _.span({ class: 'fa fa-plus' })).click(() => {
+                if (Array.isArray(dropdownItems)) {
+                    items.push(dropdownItems[0]);
+                } else if (typeof dropdownItems === 'string') {
+                    items.push(dropdownItems);
+                } else {
+                    items.push('New item');
+                }
+
+                render();
+
+                if (typeof onChange === 'function') {
+                    onChange(items);
+                }
+            })));
+        };
+
+        render();
+
+        return $element;
     }
 
     /**
@@ -38586,37 +38662,30 @@ class LanguageSettings extends View {
     constructor(params) {
         super(params);
 
-        this.fetch();
-    }
-
-    /**
-     * Event: Flipped a switch
-     *
-     * @param {Object} element
-     */
-    onClickSwitch(element) {
-        let checked = this.checked;
-        let language = this.getAttribute('data-language');
-
-        LanguageHelper.toggleLanguage(language, checked).then(() => {
-            debug.log('Language "' + language + '" set to ' + checked, this);
-        });
-    }
-
-    render() {
         this.$element = _.div({ class: 'editor language-settings' });
 
         LanguageHelper.getSelectedLanguages().then(selectedLanguages => {
-            _.append(this.$element.empty(), _.div({ class: 'editor-header' }, _.span({ class: 'fa fa-flag' }), _.h4('Languages')), _.div({ class: 'editor-body' }, _.each(LanguageHelper.getLanguages(), (i, language) => {
-                return _.div({ class: 'input-group' }, _.span(language), _.div({ class: 'input-group-addon' }, _.div({ class: 'switch' }, _.input({
-                    id: 'switch-' + language,
-                    'data-language': language,
-                    class: 'form-control switch',
-                    type: 'checkbox',
-                    checked: selectedLanguages.indexOf(language) > -1
-                }).change(this.onClickSwitch), _.label({ for: 'switch-' + language }))));
-            })));
+            this.model = selectedLanguages;
+
+            this.fetch();
         });
+    }
+
+    /**
+     * Event: Click save
+     */
+    onClickSave() {
+        this.$saveBtn.toggleClass('working', true);
+
+        LanguageHelper.setLanguages(this.model).then(() => {
+            this.$saveBtn.toggleClass('working', false);
+        }).catch(UI.errorModal);
+    }
+
+    render() {
+        _.append(this.$element.empty(), _.div({ class: 'editor-header' }, _.span({ class: 'fa fa-flag' }), _.h4('Languages')), _.div({ class: 'editor-body' }, UI.inputChipGroup(this.model, LanguageHelper.getLanguages(), true)), _.div({ class: 'editor-footer panel panel-default panel-buttons' }, _.div({ class: 'btn-group' }, this.$saveBtn = _.button({ class: 'btn btn-primary btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Save '), _.span({ class: 'text-working' }, 'Saving ')).click(() => {
+            this.onClickSave();
+        }))));
     }
 }
 
@@ -39813,54 +39882,29 @@ class SyncSettings extends View {
      * Render Content switch
      */
     renderContentSwitch() {
-        let view = this;
+        return _.div({ class: 'field-editor content' }, UI.inputSwitch(this.model.content == true, isActive => {
+            this.model.content = isActive;
 
-        function onChange() {
-            view.model.content = this.checked;
-
-            if (view.model.content) {
-                view.model.schemas = true;
-                view.$element.find('#switch-sync-schemas')[0].checked = true;
+            if (isActive) {
+                this.$element.find('.field-editor.schemas input')[0].checked = true;
             }
-        }
-
-        return _.div({ class: 'field-editor' }, _.div({ class: 'switch' }, _.input({
-            id: 'switch-sync-content',
-            class: 'form-control switch',
-            type: 'checkbox',
-            checked: this.model.content == true
-        }).change(onChange), _.label({ for: 'switch-sync-content' })));
+        }));
     }
 
     /**
      * Render Connections switch
      */
     renderConnectionsSwitch() {
-        let view = this;
-
-        function onChange() {
-            view.model.connections = this.checked;
-        }
-
-        return _.div({ class: 'field-editor' }, _.div({ class: 'switch' }, _.input({
-            id: 'switch-sync-connections',
-            class: 'form-control switch',
-            type: 'checkbox',
-            checked: this.model.connections == true
-        }).change(onChange), _.label({ for: 'switch-sync-connections' })));
+        return _.div({ class: 'field-editor connections' }, UI.inputSwitch(this.model.connections == true, isActive => {
+            this.model.connections = isActive;
+        }));
     }
 
     /**
      * Render Forms switch
      */
     renderFormsSwitch() {
-        let view = this;
-
-        function onChange(isActive) {
-            view.model.forms = isActive;
-        }
-
-        return _.div({ class: 'field-editor' }, UI.inputSwitch(this.model.forms == true, isActive => {
+        return _.div({ class: 'field-editor forms' }, UI.inputSwitch(this.model.forms == true, isActive => {
             this.model.forms = isActive;
         }));
     }
@@ -39869,41 +39913,22 @@ class SyncSettings extends View {
      * Render Schema switch
      */
     renderSchemaSwitch() {
-        let view = this;
+        return _.div({ class: 'field-editor schemas' }, UI.inputSwitch(this.model.content == true, isActive => {
+            this.model.content = isActive;
 
-        function onChange() {
-            view.model.schemas = this.checked;
-
-            if (!view.model.schemas) {
-                view.model.content = false;
-                view.$element.find('#switch-sync-content')[0].checked = false;
+            if (!isActive) {
+                this.$element.find('.field-editor.content input')[0].checked = false;
             }
-        }
-
-        return _.div({ class: 'field-editor' }, _.div({ class: 'switch' }, _.input({
-            id: 'switch-sync-schemas',
-            class: 'form-control switch',
-            type: 'checkbox',
-            checked: this.model.schemas == true
-        }).change(onChange), _.label({ for: 'switch-sync-schemas' })));
+        }));
     }
 
     /**
      * Render Media tree switch
      */
     renderMediaTreeSwitch() {
-        let view = this;
-
-        function onChange() {
-            view.model['media/tree'] = this.checked;
-        }
-
-        return _.div({ class: 'field-editor' }, _.div({ class: 'switch' }, _.input({
-            id: 'switch-sync-media-tree',
-            class: 'form-control switch',
-            type: 'checkbox',
-            checked: this.model['media/tree'] == true
-        }).change(onChange), _.label({ for: 'switch-sync-media-tree' })));
+        return _.div({ class: 'field-editor forms' }, UI.inputSwitch(this.model['media/tree'] == true, isActive => {
+            this.model['media/tree'] = isActive;
+        }));
     }
 
     /**
@@ -43701,7 +43726,7 @@ let Pane = require('./Pane');
 class SettingsPane extends Pane {
     static getRenderSettings() {
         return {
-            label: 'Settings',
+            label: 'Project settings',
             route: '/settings/',
             icon: 'wrench',
             items: [{
@@ -44546,6 +44571,29 @@ class LanguageHelper {
             settings.selected.sort();
 
             return Promise.resolve(settings.selected);
+        });
+    }
+
+    /**
+     * Sets all languages
+     *
+     * @param {Array} languages
+     *
+     * @returns {Promise} promise
+     */
+    static setLanguages(languages) {
+        return SettingsHelper.getSettings('language').then(settings => {
+            if (!(settings instanceof Object)) {
+                settings = {};
+            }
+
+            if (!Array.isArray(languages)) {
+                return Promise.reject(new Error('Language array cannot be of type "' + typeof languages + '"'));
+            }
+
+            settings.selected = languages;
+
+            return SettingsHelper.setSettings('language', settings);
         });
     }
 
