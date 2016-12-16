@@ -1,5 +1,11 @@
 'use strict';
 
+// NOTE: a temporary fix for webpack
+window._crypto = null;
+
+// Style
+require('../sass/client');
+
 // Resource cache
 window.resources = {
     editors: {},

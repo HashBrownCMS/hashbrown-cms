@@ -366,15 +366,24 @@ class ContentPane extends Pane {
                 }
                 
                 function onSuccess() {
-                    debug.log('Removed content with id "' + id + '"', navbar); 
-                
                     return reloadResource('content')
                     .then(() => {
                         navbar.reload();
-                        
-                        // Cancel the ContentEditor view if it was displaying the deleted content
-                        if(location.hash.indexOf('#/content/' + id) > -1) {
-                            location.hash = '/content/';
+                                
+                        let contentEditor = ViewHelper.get('ContentEditor');
+                       
+                        // Change the ContentEditor view if it was displaying the deleted content
+                        if(contentEditor && contentEditor.model.id == id) {
+                            // The Content was actually deleted
+                            if(shouldUnpublish) {
+                                location.hash = '/content/';
+                            
+                            // The Content still has a synced remote
+                            } else {
+                                contentEditor.model = null;
+                                contentEditor.fetch();
+
+                            }
                         }
 
                         return Promise.resolve();

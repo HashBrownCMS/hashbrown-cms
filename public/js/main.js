@@ -46,9 +46,7 @@
 
 	'use strict';
 
-	// NOTE: a temporary fix for webpack
-
-	window._crypto = null;
+	window._crypto;
 
 	// Style
 	__webpack_require__(1);
@@ -20466,13 +20464,15 @@
 	                    }
 
 	                    function onSuccess() {
+	                        debug.log('Removed content with id "' + id + '"', navbar);
+
 	                        return reloadResource('content').then(function () {
 	                            navbar.reload();
 
-	                            var contentEditor = ViewHelper.get('ContentEditor');
+	                            var contentEditor = ViewHelper.get('ContentEditor').reload();
 
 	                            // Change the ContentEditor view if it was displaying the deleted content
-	                            if (contentEditor && contentEditor.model.id == id) {
+	                            if (contentEditor && contentEditor.model.id == pullId) {
 	                                // The Content was actually deleted
 	                                if (shouldUnpublish) {
 	                                    location.hash = '/content/';
@@ -20481,6 +20481,8 @@
 	                                } else {
 	                                    contentEditor.model = null;
 	                                    contentEditor.fetch();
+
+	                                    console.log('refreshing!');
 	                                }
 	                            }
 

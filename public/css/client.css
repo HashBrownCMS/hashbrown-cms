@@ -1,4 +1,4 @@
-/**
+@import url(https://fonts.googleapis.com/css?family=Roboto);@import url(https://fonts.googleapis.com/css?family=Roboto+Mono);/**
  * Retrieves a color value from the $material-colors Sass map
  * Inspired by https://github.com/nilskaspersson/Google-Material-UI-Color-Palette/
  *
@@ -8,8 +8,6 @@
  * @param {string} [color-variant='500']  - quoted, lowercase color variant (e.g.
  *                                          '200', 'a100')
  */
-@import url(https://fonts.googleapis.com/css?family=Roboto);
-@import url(https://fonts.googleapis.com/css?family=Roboto+Mono);
 html, body {
   height: 100%;
   font-family: 'Roboto';
@@ -69,7 +67,7 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
       background-color: #eeeeee; }
     .dropdown .dropdown-menu > li.active > a:after {
       font-family: 'FontAwesome';
-      content: '\f00c';
+      content: '\F00C';
       margin-left: 10px; }
   .dropdown .dropdown-menu > li > a {
     padding: 3px 20px; }
@@ -219,7 +217,7 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
   background-color: #e0e0e0;
   position: relative; }
   .thumbnail:not([style]):before, .thumbnail[style=""]:before {
-    content: '\f1c5';
+    content: '\F1C5';
     transform: translate(-50%, -50%);
     display: block;
     position: absolute;
@@ -780,7 +778,7 @@ img.logo {
           border-radius: 2px; }
           .cms-container .workspace .editor .field-container .field-editor > .field-warning:before {
             font-family: 'FontAwesome';
-            content: '\f071';
+            content: '\F071';
             margin-right: 5px; }
         .cms-container .workspace .editor .field-container .field-value {
           flex-grow: 1; }
@@ -1293,37 +1291,37 @@ body > .dashboard-container {
               background-image: none !important;
               margin-top: 2px; }
             .rich-text-editor .cke .cke_inner .cke_top .cke_button .cke_button_icon.cke_button__bold_icon:after {
-              content: '\f032'; }
+              content: '\F032'; }
             .rich-text-editor .cke .cke_inner .cke_top .cke_button .cke_button_icon.cke_button__italic_icon:after {
-              content: '\f033'; }
+              content: '\F033'; }
             .rich-text-editor .cke .cke_inner .cke_top .cke_button .cke_button_icon.cke_button__strike_icon:after {
-              content: '\f0cc'; }
+              content: '\F0CC'; }
             .rich-text-editor .cke .cke_inner .cke_top .cke_button .cke_button_icon.cke_button__removeformat_icon:after {
-              content: '\f00d'; }
+              content: '\F00D'; }
             .rich-text-editor .cke .cke_inner .cke_top .cke_button .cke_button_icon.cke_button__numberedlist_icon:after {
-              content: '\f0cb'; }
+              content: '\F0CB'; }
             .rich-text-editor .cke .cke_inner .cke_top .cke_button .cke_button_icon.cke_button__bulletedlist_icon:after {
-              content: '\f0ca'; }
+              content: '\F0CA'; }
             .rich-text-editor .cke .cke_inner .cke_top .cke_button .cke_button_icon.cke_button__outdent_icon:after {
-              content: '\f03b'; }
+              content: '\F03B'; }
             .rich-text-editor .cke .cke_inner .cke_top .cke_button .cke_button_icon.cke_button__indent_icon:after {
-              content: '\f03c'; }
+              content: '\F03C'; }
             .rich-text-editor .cke .cke_inner .cke_top .cke_button .cke_button_icon.cke_button__blockquote_icon:after {
-              content: '\f10e'; }
+              content: '\F10E'; }
             .rich-text-editor .cke .cke_inner .cke_top .cke_button .cke_button_icon.cke_button__link_icon:after {
-              content: '\f0c1'; }
+              content: '\F0C1'; }
             .rich-text-editor .cke .cke_inner .cke_top .cke_button .cke_button_icon.cke_button__unlink_icon:after {
-              content: '\f127'; }
+              content: '\F127'; }
             .rich-text-editor .cke .cke_inner .cke_top .cke_button .cke_button_icon.cke_button__image_icon:after {
-              content: '\f1c5'; }
+              content: '\F1C5'; }
             .rich-text-editor .cke .cke_inner .cke_top .cke_button .cke_button_icon.cke_button__justifyleft_icon:after {
-              content: '\f036'; }
+              content: '\F036'; }
             .rich-text-editor .cke .cke_inner .cke_top .cke_button .cke_button_icon.cke_button__justifycenter_icon:after {
-              content: '\f037'; }
+              content: '\F037'; }
             .rich-text-editor .cke .cke_inner .cke_top .cke_button .cke_button_icon.cke_button__justifyright_icon:after {
-              content: '\f038'; }
+              content: '\F038'; }
             .rich-text-editor .cke .cke_inner .cke_top .cke_button .cke_button_icon.cke_button__justifyblock_icon:after {
-              content: '\f039'; }
+              content: '\F039'; }
       .rich-text-editor .cke .cke_inner .cke_bottom {
         background-color: #424242; }
         .rich-text-editor .cke .cke_inner .cke_bottom .cke_path a {
@@ -1778,17 +1776,17 @@ body > .dashboard-container {
         .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container:not(.open) > .children {
           display: none; }
         .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container[data-remote="true"] > .pane-item .pane-item-label:after {
-          content: '\f14c';
+          content: '\F14C';
           font-family: 'FontAwesome';
           opacity: 0.25;
           margin-left: 10px; }
         .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container[data-locked="true"] > .pane-item .pane-item-label:after {
-          content: '\f023';
+          content: '\F023';
           font-family: 'FontAwesome';
           opacity: 0.25;
           margin-left: 10px; }
         .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container[data-locked="true"][data-remote="true"] > .pane-item .pane-item-label:before {
-          content: '\f14c';
+          content: '\F14C';
           font-family: 'FontAwesome';
           opacity: 0.25;
           margin-left: 10px;
@@ -1861,5 +1859,3 @@ body > .dashboard-container {
 
 .language-settings .input-group {
   width: 100px; }
-
-/*# sourceMappingURL=maps/client.css.map */
