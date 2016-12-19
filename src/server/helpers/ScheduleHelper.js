@@ -73,7 +73,9 @@ class ScheduleHelper {
      *
      * @return {Promise} Promise
      */
-    static runTask(task) {
+    static runTask(
+        task = requiredParam('task')
+    ) {
         debug.log('Running ' + task.type + ' task for "' + task.content + '"...', this);    
 
         return ContentHelper.getContentById(task.project, task.environment, task.content)

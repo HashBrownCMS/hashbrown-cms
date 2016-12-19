@@ -34,13 +34,6 @@ class JSONEditor extends View {
     }
 
     /**
-     * Event: Failed API call
-     */
-    onError(e) {
-        alert(e);
-    }
-
-    /**
      * Event: Click basic. Returns to the regular editor
      */
     onClickBasic() {
@@ -62,15 +55,10 @@ class JSONEditor extends View {
         if(this.debug()) {
             apiCall('post', this.apiPath, this.model)
             .then(this.onSuccess)
-            .catch(this.onError);
+            .catch(UI.errorModal);
        
         } else {
-            new MessageModal({
-                model: {
-                    title: 'Unable to save',
-                    body: 'Please refer to the error prompt for details'
-                }
-            });
+            UI.errorModal('Unable to save', 'Please refer to the error prompt for details');
 
         }
     }
@@ -231,6 +219,9 @@ class JSONEditor extends View {
         // Syntax check
         try {
             this.model = JSON.parse(this.value);
+            
+            // Sanity check
+            recurse(this.model);
 
         } catch(e) {
             this.$error.children('.error-heading').html('Syntax error');
@@ -239,9 +230,6 @@ class JSONEditor extends View {
 
             isValid = false;
         }
-
-        // Integrity check
-        recurse(this.model);
 
         this.isValid = isValid;
 

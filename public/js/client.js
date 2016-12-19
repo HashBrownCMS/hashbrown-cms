@@ -24635,16 +24635,6 @@
 	        value: function onSuccess() {}
 
 	        /**
-	         * Event: Failed API call
-	         */
-
-	    }, {
-	        key: 'onError',
-	        value: function onError(e) {
-	            alert(e);
-	        }
-
-	        /**
 	         * Event: Click basic. Returns to the regular editor
 	         */
 
@@ -24670,14 +24660,9 @@
 	            var view = this;
 
 	            if (this.debug()) {
-	                apiCall('post', this.apiPath, this.model).then(this.onSuccess).catch(this.onError);
+	                apiCall('post', this.apiPath, this.model).then(this.onSuccess).catch(UI.errorModal);
 	            } else {
-	                new MessageModal({
-	                    model: {
-	                        title: 'Unable to save',
-	                        body: 'Please refer to the error prompt for details'
-	                    }
-	                });
+	                UI.errorModal('Unable to save', 'Please refer to the error prompt for details');
 	            }
 	        }
 
@@ -24887,6 +24872,9 @@
 	            // Syntax check
 	            try {
 	                this.model = JSON.parse(this.value);
+
+	                // Sanity check
+	                recurse(this.model);
 	            } catch (e) {
 	                this.$error.children('.error-heading').html('Syntax error');
 	                this.$error.children('.error-body').html(e);
@@ -24894,9 +24882,6 @@
 
 	                isValid = false;
 	            }
-
-	            // Integrity check
-	            recurse(this.model);
 
 	            this.isValid = isValid;
 
