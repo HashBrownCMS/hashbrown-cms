@@ -528,7 +528,7 @@ class ContentPane extends Pane {
                         // Save model
                         apiCall('post', 'content/' + thisContent.id, thisContent.getObject())
                         .then(onSuccess)
-                        .catch(navbar.onError);
+                        .catch(UI.erroroModal);
                         
                         dragdropItem.element.dataset.sort = thisContent.sort;
                     }

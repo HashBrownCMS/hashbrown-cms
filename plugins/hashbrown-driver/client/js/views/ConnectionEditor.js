@@ -1,4 +1,4 @@
-class HashBrownDriverConnectionEditor extends View {
+class ConnectionEditor extends View {
     constructor(params) {
         super(params);
 
@@ -62,4 +62,4 @@ class HashBrownDriverConnectionEditor extends View {
     }
 }
 
-resources.connectionEditors['HashBrown Driver'] = HashBrownDriverConnectionEditor;
+resources.connectionEditors['HashBrown Driver'] = ConnectionEditor;

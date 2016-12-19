@@ -1,5 +1,7 @@
 'use strict';
 
+window._crypto = null;
+
 // Helper functions
 require('./helpers');
 

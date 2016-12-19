@@ -28,8 +28,15 @@ window.MainMenu = require('./views/MainMenu');
 window.NavbarMain = require('./views/navbar/NavbarMain');
 window.MediaViewer = require('./views/MediaViewer');
 
+// Plugins
+// TODO: Make this a glob pattern if possible
+require('../../../plugins/github-pages/client/js/views/ConnectionEditor.js');
+require('../../../plugins/hashbrown-driver/client/js/views/ConnectionEditor.js');
+
+// Field editors
+require('./views/fields');
+
 // Editor views
-require('./views/editors');
 window.JSONEditor = require('./views/JSONEditor');
 window.InfoSettings = require('./views/InfoSettings');
 window.ContentEditor = require('./views/ContentEditor');

@@ -22,10 +22,6 @@ class User extends Entity {
         }
 
         super(params);
-
-        if(UserHelper.current) {
-            this.isCurrent = UserHelper.current.id == this.id;
-        }
     }
     
     structure() {
@@ -79,6 +75,8 @@ class User extends Entity {
      * @returns {Boolean} hasScope
      */
     hasScope(project, scope) {
+        if(!scope && !this.scopes[project]) { return false; }
+
         if(!this.scopes[project]) {
             this.scopes[project] = [];
         }

@@ -5,6 +5,7 @@ let ContentHelperCommon = require('../../common/helpers/ContentHelper');
 
 // Models
 let Content = require('../../common/models/Content');
+let User = require('../models/User');
 
 class ContentHelper extends ContentHelperCommon {
     /**
@@ -90,11 +91,14 @@ class ContentHelper extends ContentHelperCommon {
      *
      * @param {String} id
      * @param {Object} content
+     * @param {User} user
      * @param {Boolean} create
      *
      * @return {Promise} Promise
      */
-    static setContentById(id, content, create) {
+    static setContentById(id, content, user, create) {
+        if(!user || user instanceof User === false) { return Promise.reject(new Error('User not specified')); }
+
         debug.log('Updating content "' + id + '"...', this);
         
         let updateContent = () => {
@@ -102,9 +106,7 @@ class ContentHelper extends ContentHelperCommon {
             content.locked = false;
             content.remote = false;
 
-            if(UserHelper.current) {
-                content.updatedBy = UserHelper.current.id;
-            }
+            content.updatedBy = user.id;
 
             content.updateDate = Date.now();
             
@@ -164,10 +166,13 @@ class ContentHelper extends ContentHelperCommon {
      *
      * @param {String} schemaId
      * @param {String} parentId
+     * @param {User} user
      *
      * @return {Promise} New Content object
      */
-    static createContent(schemaId, parentId) {
+    static createContent(schemaId, parentId, user) {
+        if(!user || user instanceof User === false) { return Promise.reject(new Error('User not specified')); }
+
         return this.isSchemaAllowedAsChild(parentId, schemaId)
         .then(() => {
             return SchemaHelper.getSchemaById(schemaId);
@@ -178,7 +183,7 @@ class ContentHelper extends ContentHelperCommon {
 
             debug.log('Creating content "' + content.id + '"...', this);
 
-            content.createdBy = UserHelper.current.id;
+            content.createdBy = user.id;
             content.updatedBy = content.createdBy;
 
             if(parentId) {

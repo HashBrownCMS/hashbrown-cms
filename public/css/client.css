@@ -1019,7 +1019,7 @@ body > .dashboard-container {
   .json-editor .error {
     position: absolute;
     right: 0px;
-    top: 0px;
+    bottom: 0px;
     z-index: 20;
     color: #fff;
     pointer-events: none;

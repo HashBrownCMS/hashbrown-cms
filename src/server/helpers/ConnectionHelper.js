@@ -43,10 +43,13 @@ class ConnectionHelper extends ConnectionHelperCommon {
      * Publishes content
      *
      * @param {Content} content
+     * @param {User} user
      *
      * @returns {Promise} promise
      */
-    static publishContent(content) {
+    static publishContent(content, user) {
+        if(!user || user instanceof User === false) { return Promise.reject(new Error('User not specified')); }
+        
         let helper = this;
 
         debug.log('Publishing content "' + content.id + '"...', this);
@@ -75,7 +78,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
                             // Update unpublished flag
                             content.unpublished = false;
 
-                            return ContentHelper.setContentById(content.id, content);
+                            return ContentHelper.setContentById(content.id, content, user);
                         }
                     })
                 }
@@ -93,10 +96,13 @@ class ConnectionHelper extends ConnectionHelperCommon {
      * Unpublishes content
      *
      * @param {Content} content
+     * @param {User} user
      *
      * @returns {Promise} promise
      */
-    static unpublishContent(content) {
+    static unpublishContent(content, user) {
+        if(!user || user instanceof User === false) { return Promise.reject(new Error('User not specified')); }
+        
         let helper = this;
 
         debug.log('Unpublishing content "' + content.id + '"...', this);
@@ -125,7 +131,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
                             // Update unpublished flag
                             content.unpublished = true;
 
-                            return ContentHelper.setContentById(content.id, content);
+                            return ContentHelper.setContentById(content.id, content, user);
                         }
                     });
                 }
@@ -259,12 +265,17 @@ class ConnectionHelper extends ConnectionHelperCommon {
      * Sets a connection by id
      *
      * @param {string} id
-     * @param {Object} content
+     * @param {Connection} connection
+     * @param {Boolean} create
      *
      * @return {Promise} promise
      */
-    static setConnectionById(id, content) {
+    static setConnectionById(id, connection, create) {
         let collection = ProjectHelper.currentEnvironment + '.connections';
+       
+        // Unset automatic flags
+        connection.locked = false;
+        connection.remote = false;
         
         return MongoHelper.updateOne(
             ProjectHelper.currentProject,
@@ -272,7 +283,10 @@ class ConnectionHelper extends ConnectionHelperCommon {
             {
                 id: id
             },
-            content
+            connection,
+            {
+                upsert: create
+            }
         );
     }
     

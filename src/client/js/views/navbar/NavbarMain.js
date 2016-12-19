@@ -207,7 +207,7 @@ class NavbarMain extends View {
                 sortingQueue.push(queueItem);
 
                 // Add drag/drop event
-                if(typeof params.onEndDrag === 'function') {
+                if(!item.locked && typeof params.onEndDrag === 'function') {
                     $element.exodragdrop({
                         lockX: true,
                         onEndDrag: params.onEndDrag

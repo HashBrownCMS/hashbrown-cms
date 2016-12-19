@@ -13,8 +13,12 @@ class ConnectionController extends ApiController {
     static init(app) {
         app.get('/api/:project/:environment/connections', this.middleware(), this.getConnections);
         app.get('/api/:project/:environment/connections/:id', this.middleware(), this.getConnection);
+        
         app.post('/api/:project/:environment/connections/new', this.middleware({scope: 'connections'}), this.createConnection);
+        app.post('/api/:project/:environment/connections/pull/:id', this.middleware(), this.pullConnection);
+        app.post('/api/:project/:environment/connections/push/:id', this.middleware(), this.pushConnection);
         app.post('/api/:project/:environment/connections/:id', this.middleware({scope: 'connections'}), this.postConnection);
+        
         app.delete('/api/:project/:environment/connections/:id', this.middleware({scope: 'connections'}), this.deleteConnection);
     }        
     
@@ -46,6 +50,48 @@ class ConnectionController extends ApiController {
             res.status(502).send(ConnectionController.printError(e));
         });
     }
+    
+    /**
+     * Pulls Connection by id
+     */
+    static pullConnection(req, res) {
+        let id = req.params.id;
+
+        SyncHelper.getResourceItem('connections', id)
+        .then((resourceItem) => {
+            if(!resourceItem) { return Promise.reject(new Error('Couldn\'t find remote Connection "' + id + '"')); }
+        
+            return ConnectionHelper.setConnectionById(id, resourceItem, true)
+            .then((newConnection) => {
+                res.status(200).send(id);
+            });
+        })
+        .catch((e) => {
+            res.status(404).send(ConnectionController.printError(e));   
+        }); 
+    }
+    
+    /**
+     * Pushes Connection by id
+     */
+    static pushConnection(req, res) {
+        let id = req.params.id;
+
+        ConnectionHelper.getConnectionById(id)
+        .then((localConnection) => {
+            return SyncHelper.setResourceItem('connection', id, localConnection);
+        })
+        .then(() => {
+            return ConnectionHelper.removeConnectionById(id);
+        })
+        .then(() => {
+            res.status(200).send(id);
+        })
+        .catch((e) => {
+            res.status(404).send(ConnectionController.printError(e));   
+        }); 
+    }
+
     
     /**
      * Gets a connection by id

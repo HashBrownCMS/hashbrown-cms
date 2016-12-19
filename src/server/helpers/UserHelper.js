@@ -445,6 +445,7 @@ class UserHelper {
     static getAllUsers(project) {
         let query = {};
 
+        // Build query for project scope
         if(project) {
             debug.log('Getting all users with project "' + project + '" in scope...', this, 3);
 
@@ -459,7 +460,7 @@ class UserHelper {
             ];
 
         } else {
-            debug.log('Getting all users...', this);
+            debug.log('Getting all users...', this, 3);
         }
 
         return MongoHelper.find(

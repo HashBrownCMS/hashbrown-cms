@@ -90,6 +90,10 @@ class UserController extends ApiController {
 
         UserHelper.getAllUsers(project)
         .then((users) => {
+            for(let user of users) {
+                user.isCurrent = user.id == req.user.id;
+            }
+
             res.status(200).send(users);
         })
         .catch((e) => {

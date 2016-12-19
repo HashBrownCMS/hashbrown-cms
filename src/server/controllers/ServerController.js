@@ -228,9 +228,7 @@ class ServerController extends ApiController {
      * Updates the server
      */
     static postUpdateServer(req, res) {
-        let user = UserHelper.current;
-
-        if(!user.isAdmin) {
+        if(!req.user.isAdmin) {
             res.status(403).send('Only admins can update HashBrown');
 
         } else {
@@ -316,13 +314,11 @@ class ServerController extends ApiController {
      * Gets a list of all projects
      */
     static getAllProjects(req, res) {
-        let user = UserHelper.current;
-
         ProjectHelper.getAllProjects()
         .then((projects) => {
             let scopedProjects = [];
 
-            if(!user.isAdmin) {
+            if(!req.user.isAdmin) {
                 for(let scope in (user.scopes || {})) {
                     if(projects.indexOf(scope) > -1) {
                         scopedProjects.push(scope);
@@ -358,9 +354,8 @@ class ServerController extends ApiController {
      */
     static getProject(req, res) {
         let project = req.params.project;
-        let user = UserHelper.current;
 
-        if(user.isAdmin || user.scopes[project])  {
+        if(req.user.isAdmin || req.user.scopes[project])  {
             ProjectHelper.getProject(project)
             .then((project) => {
                 res.status(200).send(project);
@@ -370,7 +365,7 @@ class ServerController extends ApiController {
             });
         
         } else {
-            res.status(403).send('User "' + user.username + '" doesn\'t have project "' + project + '" in scopes');
+            res.status(403).send('User "' + req.user.username + '" doesn\'t have project "' + project + '" in scopes');
 
         }
     }
@@ -380,9 +375,8 @@ class ServerController extends ApiController {
      */
     static getAllEnvironments(req, res) {
         let project = req.params.project;
-        let user = UserHelper.current;
 
-        if(user.scopes[project])  {
+        if(req.user.hasScope(project))  {
             ProjectHelper.getAllEnvironments(project)
             .then((environments) => {
                 res.status(200).send(environments);
@@ -392,7 +386,7 @@ class ServerController extends ApiController {
             });
 
         } else {
-            res.status(403).send('User "' + user.username + '" doesn\'t have project "' + project + '" in scopes');
+            res.status(403).send('User "' + req.user.username + '" doesn\'t have project "' + project + '" in scopes');
 
         }
     }
@@ -403,7 +397,7 @@ class ServerController extends ApiController {
     static deleteProject(req, res) {
         let project = req.params.project;
 
-        if(!UserHelper.current.isAdmin) {
+        if(!req.user.isAdmin) {
             res.status(403).send('Only admins can delete projects');  
 
         } else {
@@ -424,7 +418,7 @@ class ServerController extends ApiController {
         let project = req.params.project;
         let environment = req.params.environment;
 
-        if(!UserHelper.current.isAdmin) {
+        if(!req.user.isAdmin) {
             res.status(403).send('Only admins can delete environments');  
 
         } else {
@@ -445,11 +439,11 @@ class ServerController extends ApiController {
     static createProject(req, res) {
         let project = req.body.project;
         
-        if(!UserHelper.current.isAdmin) {
+        if(!req.user.isAdmin) {
             res.status(403).send('Only admins can create projects');  
 
         } else {
-            ProjectHelper.createProject(project, UserHelper.current.id)
+            ProjectHelper.createProject(project, req.user.id)
             .then((project) => {
                 res.status(200).send(project);
             })

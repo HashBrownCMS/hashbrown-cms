@@ -283,7 +283,9 @@ class ContentEditor extends View {
 
                         // On change function
                         function(newValue) {
-                            view.dirty = true;
+                            if(!view.model.locked) {
+                                view.dirty = true;
+                            }
 
                             // If field definition is set to multilingual, assign flag and value onto object...
                             if(fieldDefinition.multilingual) {

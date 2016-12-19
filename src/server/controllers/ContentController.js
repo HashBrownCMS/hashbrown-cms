@@ -86,7 +86,7 @@ class ContentController extends ApiController {
         let id = req.params.id;
         let node = req.body;
         
-        ContentHelper.setContentById(id, node)
+        ContentHelper.setContentById(id, node, req.user)
         .then(() => {
             res.status(200).send(node);
         })
@@ -105,7 +105,7 @@ class ContentController extends ApiController {
         .then((resourceItem) => {
             if(!resourceItem) { return Promise.reject(new Error('Couldn\'t find remote Content "' + id + '"')); }
         
-            return ContentHelper.setContentById(id, resourceItem, true)
+            return ContentHelper.setContentById(id, resourceItem, req.user, true)
             .then(() => {
                 res.status(200).send(resourceItem);
             });
@@ -142,7 +142,7 @@ class ContentController extends ApiController {
     static publishContent(req, res) {
         let content = new Content(req.body);
 
-        ConnectionHelper.publishContent(content)
+        ConnectionHelper.publishContent(content, req.user)
         .then(() => {
             res.status(200).send(req.body);
         })
@@ -157,7 +157,7 @@ class ContentController extends ApiController {
     static unpublishContent(req, res) {
         let content = new Content(req.body);
 
-        ConnectionHelper.unpublishContent(content)
+        ConnectionHelper.unpublishContent(content, req.user)
         .then(() => {
             res.status(200).send(content);
         })

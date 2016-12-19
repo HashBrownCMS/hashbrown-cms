@@ -198,6 +198,7 @@ class ConnectionEditor extends View {
     render() {
         let view = this;
 
+        this.$element.toggleClass('locked', this.model.locked);
         this.$element.html(
             _.div({class: 'object'},
                 _.div({class: 'editor-header'},
@@ -235,13 +236,15 @@ class ConnectionEditor extends View {
                         _.button({class: 'btn btn-embedded'},
                             'Advanced'
                         ).click(function() { view.onClickAdvanced(); }),
-                        view.$saveBtn = _.button({class: 'btn btn-primary btn-raised btn-save'},
-                            _.span({class: 'text-default'}, 'Save '),
-                            _.span({class: 'text-working'}, 'Saving ')
-                        ).click(function() { view.onClickSave(); }),
-                        _.button({class: 'btn btn-embedded-danger btn-embedded'},
-                            _.span({class: 'fa fa-trash'})
-                        ).click(function() { view.onClickDelete(); })
+                        _.if(!this.model.locked, 
+                            view.$saveBtn = _.button({class: 'btn btn-primary btn-raised btn-save'},
+                                _.span({class: 'text-default'}, 'Save '),
+                                _.span({class: 'text-working'}, 'Saving ')
+                            ).click(function() { view.onClickSave(); }),
+                            _.button({class: 'btn btn-embedded-danger btn-embedded'},
+                                _.span({class: 'fa fa-trash'})
+                            ).click(function() { view.onClickDelete(); })
+                        )
                     )
                 )
             )

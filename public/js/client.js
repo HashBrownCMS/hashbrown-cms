@@ -75,29 +75,36 @@
 	window.NavbarMain = __webpack_require__(30);
 	window.MediaViewer = __webpack_require__(98);
 
-	// Editor views
+	// Plugins
+	// TODO: Make this a glob pattern if possible
 	__webpack_require__(99);
-	window.JSONEditor = __webpack_require__(116);
-	window.InfoSettings = __webpack_require__(121);
-	window.ContentEditor = __webpack_require__(122);
-	window.FormEditor = __webpack_require__(123);
-	window.ConnectionEditor = __webpack_require__(124);
-	window.SchemaEditor = __webpack_require__(125);
-	window.LanguageSettings = __webpack_require__(127);
-	window.SyncSettings = __webpack_require__(128);
-	window.UserEditor = __webpack_require__(129);
-	window.MediaBrowser = __webpack_require__(130);
+	__webpack_require__(100);
+
+	// Field editors
+	__webpack_require__(101);
+
+	// Editor views
+	window.JSONEditor = __webpack_require__(118);
+	window.InfoSettings = __webpack_require__(123);
+	window.ContentEditor = __webpack_require__(124);
+	window.FormEditor = __webpack_require__(125);
+	window.ConnectionEditor = __webpack_require__(126);
+	window.SchemaEditor = __webpack_require__(127);
+	window.LanguageSettings = __webpack_require__(129);
+	window.SyncSettings = __webpack_require__(130);
+	window.UserEditor = __webpack_require__(131);
+	window.MediaBrowser = __webpack_require__(132);
 
 	// Models
-	window.Content = __webpack_require__(131);
+	window.Content = __webpack_require__(133);
 
 	// Helpers
-	window.MediaHelper = __webpack_require__(132);
-	window.ConnectionHelper = __webpack_require__(136);
-	window.ContentHelper = __webpack_require__(139);
-	window.LanguageHelper = __webpack_require__(141);
-	window.SchemaHelper = __webpack_require__(144);
-	window.SettingsHelper = __webpack_require__(149);
+	window.MediaHelper = __webpack_require__(134);
+	window.ConnectionHelper = __webpack_require__(138);
+	window.ContentHelper = __webpack_require__(141);
+	window.LanguageHelper = __webpack_require__(143);
+	window.SchemaHelper = __webpack_require__(146);
+	window.SettingsHelper = __webpack_require__(151);
 	window.UI = __webpack_require__(26);
 
 	// Ready callback containers
@@ -223,7 +230,7 @@
 	};
 
 	// Get package file
-	window.app = __webpack_require__(151);
+	window.app = __webpack_require__(153);
 
 	// Preload resources 
 	$(document).ready(function () {
@@ -240,7 +247,7 @@
 	window.language = localStorage.getItem('language') || 'en';
 
 	// Get routes
-	__webpack_require__(152);
+	__webpack_require__(154);
 
 	// Init
 	onReady('resources', function () {
@@ -11363,7 +11370,7 @@
 	                sortingQueue.push(queueItem);
 
 	                // Add drag/drop event
-	                if (typeof params.onEndDrag === 'function') {
+	                if (!item.locked && typeof params.onEndDrag === 'function') {
 	                    $element.exodragdrop({
 	                        lockX: true,
 	                        onEndDrag: params.onEndDrag
@@ -19990,10 +19997,64 @@
 	                    label: 'OK',
 	                    class: 'btn-danger',
 	                    callback: function callback() {
-	                        apiCall('delete', 'connections/' + id).then(onSuccess).catch(navbar.onError);
+	                        apiCall('delete', 'connections/' + id).then(onSuccess).catch(UI.erroroModal);
 	                    }
 	                }]
 	            });
+	        }
+
+	        /**
+	         * Event: Click pull connection
+	         */
+
+	    }, {
+	        key: 'onClickPullConnection',
+	        value: function onClickPullConnection() {
+	            var navbar = ViewHelper.get('NavbarMain');
+	            var connectionEditor = ViewHelper.get('ConnectionEditor');
+	            var pullId = $('.context-menu-target-element').data('id');
+
+	            // API call to pull the Connection by id
+	            apiCall('post', 'connections/pull/' + pullId, {})
+
+	            // Upon success, reload all Connection models    
+	            .then(function () {
+	                return reloadResource('connections');
+	            })
+
+	            // Reload the UI
+	            .then(function () {
+	                navbar.reload();
+
+	                if (connectionEditor && connectionEditor.model.id == pullId) {
+	                    connectionEditor.model = null;
+	                    connectionEditor.fetch();
+	                }
+	            }).catch(UI.errorModal);
+	        }
+
+	        /**
+	         * Event: Click push connection
+	         */
+
+	    }, {
+	        key: 'onClickPushConnection',
+	        value: function onClickPushConnection() {
+	            var navbar = ViewHelper.get('NavbarMain');
+	            var pushId = $('.context-menu-target-element').data('id');
+
+	            // API call to push the Connection by id
+	            apiCall('post', 'connections/push/' + pushId)
+
+	            // Upon success, reload all Connection models
+	            .then(function () {
+	                return reloadResource('connections');
+	            })
+
+	            // Reload the UI
+	            .then(function () {
+	                navbar.reload();
+	            }).catch(UI.errorModal);
 	        }
 
 	        /**
@@ -20065,14 +20126,40 @@
 	                toolbar: this.renderToolbar(),
 
 	                // Item context menu
-	                itemContextMenu: {
-	                    'This connection': '---',
-	                    'Copy id': function CopyId() {
+	                getItemContextMenu: function getItemContextMenu(item) {
+	                    var menu = {};
+
+	                    menu['This connection'] = '---';
+	                    menu['Copy id'] = function () {
 	                        _this3.onClickCopyItemId();
-	                    },
-	                    'Remove': function Remove() {
-	                        _this3.onClickRemoveConnection();
+	                    };
+
+	                    if (!item.local && !item.remote && !item.locked) {
+	                        menu['Remove'] = function () {
+	                            _this3.onClickRemoveConnection();
+	                        };
 	                    }
+
+	                    if (item.local || item.remote) {
+	                        menu['Sync'] = '---';
+	                    }
+
+	                    if (item.local) {
+	                        menu['Push to remote'] = function () {
+	                            _this3.onClickPushConnection();
+	                        };
+	                        menu['Remove local copy'] = function () {
+	                            _this3.onClickRemoveConnection();
+	                        };
+	                    }
+
+	                    if (item.remote) {
+	                        menu['Pull from remote'] = function () {
+	                            _this3.onClickPullConnection();
+	                        };
+	                    }
+
+	                    return menu;
 	                },
 
 	                // General context menu
@@ -20634,7 +20721,7 @@
 	                            thisContent.sort = newSort;
 
 	                            // Save model
-	                            apiCall('post', 'content/' + thisContent.id, thisContent.getObject()).then(onSuccess).catch(navbar.onError);
+	                            apiCall('post', 'content/' + thisContent.id, thisContent.getObject()).then(onSuccess).catch(UI.erroroModal);
 
 	                            dragdropItem.element.dataset.sort = thisContent.sort;
 	                        }
@@ -21928,31 +22015,364 @@
 
 /***/ },
 /* 99 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var ConnectionEditor = function (_View) {
+	    _inherits(ConnectionEditor, _View);
+
+	    function ConnectionEditor(params) {
+	        _classCallCheck(this, ConnectionEditor);
+
+	        var _this = _possibleConstructorReturn(this, (ConnectionEditor.__proto__ || Object.getPrototypeOf(ConnectionEditor)).call(this, params));
+
+	        _this.$element = _.div({ class: 'github-editor' });
+
+	        _this.fetch();
+	        return _this;
+	    }
+
+	    /**
+	     * Get organisations
+	     */
+
+
+	    _createClass(ConnectionEditor, [{
+	        key: 'getOrgs',
+	        value: function getOrgs() {
+	            return new Promise(function (callback) {
+	                $.ajax({
+	                    type: 'get',
+	                    url: '/api/github/orgs/?connectionId=' + Router.params.id,
+	                    success: function success(orgs) {
+	                        callback(orgs);
+	                    }
+	                });
+	            });
+	        }
+
+	        /**
+	         * Render local switch
+	         */
+
+	    }, {
+	        key: 'renderLocalSwitch',
+	        value: function renderLocalSwitch() {
+	            var view = this;
+
+	            function onChange() {
+	                view.model.isLocal = this.checked;
+
+	                view.render();
+	            }
+
+	            return _.div({ class: 'field-editor' }, _.div({ class: 'switch' }, _.input({
+	                id: 'switch-is-local',
+	                class: 'form-control switch',
+	                type: 'checkbox',
+	                checked: this.model.isLocal == true
+	            }).change(onChange), _.label({ for: 'switch-is-local' })));
+	        }
+
+	        /**
+	         * Render local path editor
+	         */
+
+	    }, {
+	        key: 'renderLocalPathEditor',
+	        value: function renderLocalPathEditor() {
+	            var view = this;
+
+	            function onChange() {
+	                view.model.localPath = $(this).val();
+
+	                view.render();
+	            }
+
+	            return _.div({ class: 'field-editor' }, _.input({ class: 'form-control', type: 'text', value: this.model.localPath, placeholder: 'Input local path' }).change(onChange));
+	        }
+
+	        /**
+	         * Render token editor
+	         */
+
+	    }, {
+	        key: 'renderTokenEditor',
+	        value: function renderTokenEditor() {
+	            var view = this;
+
+	            function onChange() {
+	                view.model.token = $(this).val();
+
+	                view.render();
+	            }
+
+	            this.model.token = Router.query('token') || this.model.token;
+
+	            return _.div({ class: 'field-editor' }, _.input({ class: 'form-control', type: 'text', value: this.model.token, placeholder: 'Input GitHub API token' }).change(onChange));
+	        }
+
+	        /**
+	         * Render organisation picker
+	         */
+
+	    }, {
+	        key: 'renderOrgPicker',
+	        value: function renderOrgPicker() {
+	            var view = this;
+
+	            var $editor = _.div({ class: 'field-editor dropdown-editor' }, _.select({ class: 'form-control' }, _.option({ value: this.model.org }, this.model.org)).change(onChange));
+
+	            function onChange() {
+	                var org = $(this).val();
+
+	                view.model.org = org;
+
+	                view.render();
+	            }
+
+	            $editor.children('select').val(view.model.org);
+
+	            if (this.model.token) {
+	                $.ajax({
+	                    type: 'get',
+	                    url: '/api/github/orgs?token=' + this.model.token,
+	                    success: function success(orgs) {
+	                        _.append($editor.children('select').empty(), _.option({ value: '' }, '(none)'), _.if((typeof orgs === 'undefined' ? 'undefined' : _typeof(orgs)) === 'object', _.each(orgs, function (i, org) {
+	                            return _.option({ value: org.login }, org.login);
+	                        })));
+
+	                        $editor.children('select').val(view.model.org);
+	                    }
+	                });
+	            }
+
+	            return $editor;
+	        }
+
+	        /**
+	         * Render repository picker
+	         */
+
+	    }, {
+	        key: 'renderRepoPicker',
+	        value: function renderRepoPicker() {
+	            var view = this;
+
+	            var $editor = _.div({ class: 'field-editor dropdown-editor' }, _.select({ class: 'form-control' }, _.option({ value: this.model.repo }, this.model.repo)).change(onChange));
+
+	            function onChange() {
+	                var repo = $(this).val();
+
+	                view.model.repo = repo;
+
+	                view.render();
+	            }
+
+	            $editor.children('select').val(view.model.repo);
+
+	            if (this.model.token) {
+	                $.ajax({
+	                    type: 'get',
+	                    url: '/api/github/repos?token=' + this.model.token + '&org=' + this.model.org,
+	                    success: function success(repos) {
+	                        if ((typeof repos === 'undefined' ? 'undefined' : _typeof(repos)) === 'object') {
+	                            $editor.children('select').html(_.each(repos, function (i, repo) {
+	                                return _.option({ value: repo.full_name }, repo.full_name);
+	                            }));
+
+	                            $editor.children('select').val(view.model.repo);
+	                        }
+	                    }
+	                });
+	            }
+
+	            return $editor;
+	        }
+
+	        /**
+	         * Render branch picker
+	         */
+
+	    }, {
+	        key: 'renderBranchPicker',
+	        value: function renderBranchPicker() {
+	            var view = this;
+
+	            var $editor = _.div({ class: 'field-editor dropdown-editor' }, _.select({ class: 'form-control' }, _.option({ value: this.model.branch }, this.model.branch)).change(onChange));
+
+	            function onChange() {
+	                var branch = $(this).val();
+
+	                view.model.branch = branch;
+
+	                view.render();
+	            }
+
+	            $editor.children('select').val(view.model.branch);
+
+	            if (this.model.token && this.model.repo) {
+	                $.ajax({
+	                    type: 'get',
+	                    url: '/api/github/' + this.model.repo + '/branches?token=' + this.model.token + '&org=' + this.model.org,
+	                    success: function success(branches) {
+	                        if ((typeof branches === 'undefined' ? 'undefined' : _typeof(branches)) === 'object') {
+	                            $editor.children('select').html(_.each(branches, function (i, branch) {
+	                                return _.option({ value: branch.name }, branch.name);
+	                            }));
+
+	                            $editor.children('select').val(view.model.branch);
+	                        }
+	                    }
+	                });
+	            }
+
+	            return $editor;
+	        }
+	    }, {
+	        key: 'render',
+	        value: function render() {
+	            _.append(this.$element.empty(),
+	            // Local switch
+	            _.div({ class: 'field-container is-local' }, _.div({ class: 'field-key' }, 'Local'), _.div({ class: 'field-value' }, this.renderLocalSwitch())), _.if(this.model.isLocal,
+	            // Path
+	            _.div({ class: 'field-container local-path' }, _.div({ class: 'field-key' }, 'Local path'), _.div({ class: 'field-value' }, this.renderLocalPathEditor()))), _.if(!this.model.isLocal,
+	            // Token
+	            _.div({ class: 'field-container github-token' }, _.div({ class: 'field-key' }, 'Token'), _.div({ class: 'field-value' }, this.renderTokenEditor())),
+
+	            // Org picker
+	            _.div({ class: 'field-container github-org' }, _.div({ class: 'field-key' }, 'Organisation'), _.div({ class: 'field-value' }, this.renderOrgPicker())),
+
+	            // Repo picker
+	            _.div({ class: 'field-container github-repo' }, _.div({ class: 'field-key' }, 'Repository'), _.div({ class: 'field-value' }, this.renderRepoPicker())),
+
+	            // Branch picker
+	            _.div({ class: 'field-container github-branch' }, _.div({ class: 'field-key' }, 'Branch'), _.div({ class: 'field-value' }, this.renderBranchPicker()))));
+	        }
+	    }]);
+
+	    return ConnectionEditor;
+	}(View);
+
+	resources.connectionEditors['GitHub Pages'] = ConnectionEditor;
+
+/***/ },
+/* 100 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var ConnectionEditor = function (_View) {
+	    _inherits(ConnectionEditor, _View);
+
+	    function ConnectionEditor(params) {
+	        _classCallCheck(this, ConnectionEditor);
+
+	        var _this = _possibleConstructorReturn(this, (ConnectionEditor.__proto__ || Object.getPrototypeOf(ConnectionEditor)).call(this, params));
+
+	        _this.$element = _.div({ class: 'hashbrown-driver-editor' });
+
+	        _this.fetch();
+	        return _this;
+	    }
+
+	    /**
+	     * Render URL editor
+	     */
+
+
+	    _createClass(ConnectionEditor, [{
+	        key: 'renderURLEditor',
+	        value: function renderURLEditor() {
+	            var view = this;
+
+	            function onChange() {
+	                view.model.url = $(this).val();
+	            }
+
+	            return _.div({ class: 'field-editor' }, _.input({ class: 'form-control', type: 'text', value: this.model.url, placeholder: 'Input HashBrown Driver URL' }).change(onChange));
+	        }
+
+	        /**
+	         * Render token editor
+	         */
+
+	    }, {
+	        key: 'renderTokenEditor',
+	        value: function renderTokenEditor() {
+	            var view = this;
+
+	            function onChange() {
+	                view.model.token = $(this).val();
+	            }
+
+	            return _.div({ class: 'field-editor' }, _.input({ class: 'form-control', type: 'text', value: this.model.token, placeholder: 'Input HashBrown Driver token' }).change(onChange));
+	        }
+	    }, {
+	        key: 'render',
+	        value: function render() {
+	            this.$element.empty();
+
+	            _.append(this.$element,
+	            // URL
+	            _.div({ class: 'field-container hashbrown-url' }, _.div({ class: 'field-key' }, 'URL'), _.div({ class: 'field-value' }, this.renderURLEditor())),
+
+	            // Token
+	            _.div({ class: 'field-container hashbrown-token' }, _.div({ class: 'field-key' }, 'Token'), _.div({ class: 'field-value' }, this.renderTokenEditor())));
+	        }
+	    }]);
+
+	    return ConnectionEditor;
+	}(View);
+
+	resources.connectionEditors['HashBrown Driver'] = ConnectionEditor;
+
+/***/ },
+/* 101 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	window.resources.editors = {
-	    array: __webpack_require__(100),
-	    boolean: __webpack_require__(101),
-	    contentReference: __webpack_require__(102),
-	    contentSchemaReference: __webpack_require__(103),
-	    date: __webpack_require__(104),
-	    dropdown: __webpack_require__(105),
-	    language: __webpack_require__(106),
-	    mediaReference: __webpack_require__(107),
-	    number: __webpack_require__(108),
-	    resourceReference: __webpack_require__(109),
-	    richText: __webpack_require__(110),
-	    string: __webpack_require__(111),
-	    struct: __webpack_require__(112),
-	    tags: __webpack_require__(113),
-	    templateReference: __webpack_require__(114),
-	    url: __webpack_require__(115)
+	    array: __webpack_require__(102),
+	    boolean: __webpack_require__(103),
+	    contentReference: __webpack_require__(104),
+	    contentSchemaReference: __webpack_require__(105),
+	    date: __webpack_require__(106),
+	    dropdown: __webpack_require__(107),
+	    language: __webpack_require__(108),
+	    mediaReference: __webpack_require__(109),
+	    number: __webpack_require__(110),
+	    resourceReference: __webpack_require__(111),
+	    richText: __webpack_require__(112),
+	    string: __webpack_require__(113),
+	    struct: __webpack_require__(114),
+	    tags: __webpack_require__(115),
+	    templateReference: __webpack_require__(116),
+	    url: __webpack_require__(117)
 	};
 
 /***/ },
-/* 100 */
+/* 102 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -22265,7 +22685,7 @@
 	module.exports = ArrayEditor;
 
 /***/ },
-/* 101 */
+/* 103 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -22339,7 +22759,7 @@
 	module.exports = BooleanEditor;
 
 /***/ },
-/* 102 */
+/* 104 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -22445,7 +22865,7 @@
 	module.exports = ContentReferenceEditor;
 
 /***/ },
-/* 103 */
+/* 105 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -22568,7 +22988,7 @@
 	module.exports = ContentSchemaReferenceEditor;
 
 /***/ },
-/* 104 */
+/* 106 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -22782,7 +23202,7 @@
 	module.exports = DateEditor;
 
 /***/ },
-/* 105 */
+/* 107 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -22859,7 +23279,7 @@
 	module.exports = DropdownEditor;
 
 /***/ },
-/* 106 */
+/* 108 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -22939,7 +23359,7 @@
 	module.exports = LanguageEditor;
 
 /***/ },
-/* 107 */
+/* 109 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -23044,7 +23464,7 @@
 	module.exports = MediaReferenceEditor;
 
 /***/ },
-/* 108 */
+/* 110 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -23103,7 +23523,7 @@
 	module.exports = NumberEditor;
 
 /***/ },
-/* 109 */
+/* 111 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -23191,7 +23611,7 @@
 	module.exports = ResourceReferenceEditor;
 
 /***/ },
-/* 110 */
+/* 112 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -23439,7 +23859,7 @@
 	module.exports = RichTextEditor;
 
 /***/ },
-/* 111 */
+/* 113 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -23498,7 +23918,7 @@
 	module.exports = StringEditor;
 
 /***/ },
-/* 112 */
+/* 114 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -23614,7 +24034,7 @@
 	module.exports = StructEditor;
 
 /***/ },
-/* 113 */
+/* 115 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -23788,7 +24208,7 @@
 	module.exports = TagsEditor;
 
 /***/ },
-/* 114 */
+/* 116 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -23880,7 +24300,7 @@
 	module.exports = TemplateReferenceEditor;
 
 /***/ },
-/* 115 */
+/* 117 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -24154,7 +24574,7 @@
 	module.exports = UrlEditor;
 
 /***/ },
-/* 116 */
+/* 118 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -24169,7 +24589,7 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var beautify = __webpack_require__(117).js_beautify;
+	var beautify = __webpack_require__(119).js_beautify;
 
 	// Views
 	var MessageModal = __webpack_require__(25);
@@ -24283,6 +24703,10 @@
 
 	            // Function for checking model integrity
 	            var check = function check(k, v) {
+	                if (!v) {
+	                    return;
+	                }
+
 	                switch (k) {
 	                    case 'schemaId':case 'parentSchemaId':
 	                        for (var id in resources.schemas) {
@@ -24548,7 +24972,7 @@
 	module.exports = JSONEditor;
 
 /***/ },
-/* 117 */
+/* 119 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;"use strict";
@@ -24590,7 +25014,7 @@
 
 	if (true) {
 	    // Add support for AMD ( https://github.com/amdjs/amdjs-api/wiki/AMD#defineamd-property- )
-	    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(118), __webpack_require__(119), __webpack_require__(120)], __WEBPACK_AMD_DEFINE_RESULT__ = function (js_beautify, css_beautify, html_beautify) {
+	    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(120), __webpack_require__(121), __webpack_require__(122)], __WEBPACK_AMD_DEFINE_RESULT__ = function (js_beautify, css_beautify, html_beautify) {
 	        return get_beautify(js_beautify, css_beautify, html_beautify);
 	    }.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 	} else {
@@ -24604,7 +25028,7 @@
 	}
 
 /***/ },
-/* 118 */
+/* 120 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;"use strict";
@@ -26906,7 +27330,7 @@
 	})();
 
 /***/ },
-/* 119 */
+/* 121 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;'use strict';
@@ -27429,7 +27853,7 @@
 	})();
 
 /***/ },
-/* 120 */
+/* 122 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;'use strict';
@@ -28431,9 +28855,9 @@
 
 	    if (true) {
 	        // Add support for AMD ( https://github.com/amdjs/amdjs-api/wiki/AMD#defineamd-property- )
-	        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__, __webpack_require__(118), __webpack_require__(119)], __WEBPACK_AMD_DEFINE_RESULT__ = function (requireamd) {
-	            var js_beautify = __webpack_require__(118);
-	            var css_beautify = __webpack_require__(119);
+	        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__, __webpack_require__(120), __webpack_require__(121)], __WEBPACK_AMD_DEFINE_RESULT__ = function (requireamd) {
+	            var js_beautify = __webpack_require__(120);
+	            var css_beautify = __webpack_require__(121);
 
 	            return {
 	                html_beautify: function html_beautify(html_source, options) {
@@ -28464,7 +28888,7 @@
 	})();
 
 /***/ },
-/* 121 */
+/* 123 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -28573,7 +28997,7 @@
 	module.exports = InfoSettings;
 
 /***/ },
-/* 122 */
+/* 124 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -28899,7 +29323,9 @@
 
 	                // On change function
 	                function (newValue) {
-	                    view.dirty = true;
+	                    if (!view.model.locked) {
+	                        view.dirty = true;
+	                    }
 
 	                    // If field definition is set to multilingual, assign flag and value onto object...
 	                    if (fieldDefinition.multilingual) {
@@ -29059,7 +29485,7 @@
 	module.exports = ContentEditor;
 
 /***/ },
-/* 123 */
+/* 125 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -29495,7 +29921,7 @@
 	module.exports = FormEditor;
 
 /***/ },
-/* 124 */
+/* 126 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -29716,13 +30142,14 @@
 	        value: function render() {
 	            var view = this;
 
+	            this.$element.toggleClass('locked', this.model.locked);
 	            this.$element.html(_.div({ class: 'object' }, _.div({ class: 'editor-header' }, _.span({ class: 'fa fa-exchange' }), _.h4(this.model.title)), _.div({ class: 'tab-content editor-body' }, _.div({ class: 'field-container connection-title' }, _.div({ class: 'field-key' }, 'Title'), _.div({ class: 'field-value' }, this.renderTitleEditor())), _.div({ class: 'field-container connection-url' }, _.div({ class: 'field-key' }, 'URL'), _.div({ class: 'field-value' }, this.renderUrlEditor())), _.div({ class: 'field-container connection-type' }, _.div({ class: 'field-key' }, 'Type'), _.div({ class: 'field-value' }, this.renderTypeEditor())), _.div({ class: 'field-container connection-settings' }, _.div({ class: 'field-key' }, 'Settings'), _.div({ class: 'field-value' }, this.renderSettingsEditor()))), _.div({ class: 'editor-footer' }, _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-embedded' }, 'Advanced').click(function () {
 	                view.onClickAdvanced();
-	            }), view.$saveBtn = _.button({ class: 'btn btn-primary btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Save '), _.span({ class: 'text-working' }, 'Saving ')).click(function () {
+	            }), _.if(!this.model.locked, view.$saveBtn = _.button({ class: 'btn btn-primary btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Save '), _.span({ class: 'text-working' }, 'Saving ')).click(function () {
 	                view.onClickSave();
 	            }), _.button({ class: 'btn btn-embedded-danger btn-embedded' }, _.span({ class: 'fa fa-trash' })).click(function () {
 	                view.onClickDelete();
-	            })))));
+	            }))))));
 	        }
 	    }]);
 
@@ -29732,7 +30159,7 @@
 	module.exports = ConnectionEditor;
 
 /***/ },
-/* 125 */
+/* 127 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -29748,7 +30175,7 @@
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 	// Icons
-	var icons = __webpack_require__(126).icons;
+	var icons = __webpack_require__(128).icons;
 
 	/**
 	 * The editor for schemas
@@ -30372,7 +30799,7 @@
 	module.exports = SchemaEditor;
 
 /***/ },
-/* 126 */
+/* 128 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -31075,7 +31502,7 @@
 	};
 
 /***/ },
-/* 127 */
+/* 129 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -31145,7 +31572,7 @@
 	module.exports = LanguageSettings;
 
 /***/ },
-/* 128 */
+/* 130 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -31458,7 +31885,7 @@
 	module.exports = SyncSettings;
 
 /***/ },
-/* 129 */
+/* 131 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -31872,7 +32299,7 @@
 	module.exports = UserEditor;
 
 /***/ },
-/* 130 */
+/* 132 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -32121,7 +32548,7 @@
 	module.exports = MediaBrowser;
 
 /***/ },
-/* 131 */
+/* 133 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -32153,7 +32580,7 @@
 	module.exports = Content;
 
 /***/ },
-/* 132 */
+/* 134 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -32166,7 +32593,7 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var MediaHelperCommon = __webpack_require__(133);
+	var MediaHelperCommon = __webpack_require__(135);
 
 	var MediaHelper = function (_MediaHelperCommon) {
 	    _inherits(MediaHelper, _MediaHelperCommon);
@@ -32259,7 +32686,7 @@
 	module.exports = MediaHelper;
 
 /***/ },
-/* 133 */
+/* 135 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -32270,7 +32697,7 @@
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var Media = __webpack_require__(134);
+	var Media = __webpack_require__(136);
 
 	var MediaHelper = function () {
 	    function MediaHelper() {
@@ -32347,7 +32774,7 @@
 	module.exports = MediaHelper;
 
 /***/ },
-/* 134 */
+/* 136 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -32362,7 +32789,7 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var path = __webpack_require__(135);
+	var path = __webpack_require__(137);
 
 	var Entity = __webpack_require__(32);
 
@@ -32493,7 +32920,7 @@
 	module.exports = Media;
 
 /***/ },
-/* 135 */
+/* 137 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
@@ -32720,7 +33147,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(13)))
 
 /***/ },
-/* 136 */
+/* 138 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -32733,9 +33160,9 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var ConnectionHelperCommon = __webpack_require__(137);
+	var ConnectionHelperCommon = __webpack_require__(139);
 
-	var Connection = __webpack_require__(138);
+	var Connection = __webpack_require__(140);
 
 	var ConnectionHelper = function (_ConnectionHelperComm) {
 	    _inherits(ConnectionHelper, _ConnectionHelperComm);
@@ -32787,7 +33214,7 @@
 	module.exports = ConnectionHelper;
 
 /***/ },
-/* 137 */
+/* 139 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -32908,7 +33335,7 @@
 	module.exports = ConnectionHelper;
 
 /***/ },
-/* 138 */
+/* 140 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -33193,7 +33620,7 @@
 	module.exports = Connection;
 
 /***/ },
-/* 139 */
+/* 141 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -33208,9 +33635,9 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var ContentHelperCommon = __webpack_require__(140);
+	var ContentHelperCommon = __webpack_require__(142);
 
-	var Content = __webpack_require__(131);
+	var Content = __webpack_require__(133);
 
 	var ContentHelper = function (_ContentHelperCommon) {
 	    _inherits(ContentHelper, _ContentHelperCommon);
@@ -33316,7 +33743,7 @@
 	module.exports = ContentHelper;
 
 /***/ },
-/* 140 */
+/* 142 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -33460,7 +33887,7 @@
 	module.exports = ContentHelper;
 
 /***/ },
-/* 141 */
+/* 143 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -33471,7 +33898,7 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var LanguageHelperCommon = __webpack_require__(142);
+	var LanguageHelperCommon = __webpack_require__(144);
 
 	var LanguageHelper = function (_LanguageHelperCommon) {
 	    _inherits(LanguageHelper, _LanguageHelperCommon);
@@ -33488,7 +33915,7 @@
 	module.exports = LanguageHelper;
 
 /***/ },
-/* 142 */
+/* 144 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -33513,7 +33940,7 @@
 	         * @returns {String[]} languages
 	         */
 	        value: function getLanguages() {
-	            return __webpack_require__(143);
+	            return __webpack_require__(145);
 	        }
 
 	        /**
@@ -33653,7 +34080,7 @@
 	module.exports = LanguageHelper;
 
 /***/ },
-/* 143 */
+/* 145 */
 /***/ function(module, exports) {
 
 	module.exports = [
@@ -33845,7 +34272,7 @@
 	];
 
 /***/ },
-/* 144 */
+/* 146 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -33860,10 +34287,10 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var FieldSchema = __webpack_require__(145);
+	var FieldSchema = __webpack_require__(147);
 
 	// Helpers
-	var SchemaHelperCommon = __webpack_require__(147);
+	var SchemaHelperCommon = __webpack_require__(149);
 
 	/**
 	 * Schema helper
@@ -33961,7 +34388,7 @@
 	module.exports = SchemaHelper;
 
 /***/ },
-/* 145 */
+/* 147 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -33976,7 +34403,7 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var Schema = __webpack_require__(146);
+	var Schema = __webpack_require__(148);
 
 	/**
 	 * Schema for content fields
@@ -34033,7 +34460,7 @@
 	module.exports = FieldSchema;
 
 /***/ },
-/* 146 */
+/* 148 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -34099,7 +34526,7 @@
 	module.exports = Schema;
 
 /***/ },
-/* 147 */
+/* 149 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -34110,8 +34537,8 @@
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var FieldSchema = __webpack_require__(145);
-	var ContentSchema = __webpack_require__(148);
+	var FieldSchema = __webpack_require__(147);
+	var ContentSchema = __webpack_require__(150);
 
 	/**
 	 * The common base for SchemaHelper
@@ -34165,7 +34592,7 @@
 	module.exports = SchemaHelper;
 
 /***/ },
-/* 148 */
+/* 150 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -34180,7 +34607,7 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var Schema = __webpack_require__(146);
+	var Schema = __webpack_require__(148);
 
 	/**
 	 * Schema for content nodes
@@ -34216,7 +34643,7 @@
 	module.exports = ContentSchema;
 
 /***/ },
-/* 149 */
+/* 151 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -34229,7 +34656,7 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var SettingsHelperCommon = __webpack_require__(150);
+	var SettingsHelperCommon = __webpack_require__(152);
 
 	var SettingsHelper = function (_SettingsHelperCommon) {
 	    _inherits(SettingsHelper, _SettingsHelperCommon);
@@ -34276,7 +34703,7 @@
 	module.exports = SettingsHelper;
 
 /***/ },
-/* 150 */
+/* 152 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -34326,7 +34753,7 @@
 	module.exports = SettingsHelper;
 
 /***/ },
-/* 151 */
+/* 153 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -34376,22 +34803,22 @@
 	};
 
 /***/ },
-/* 152 */
+/* 154 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	__webpack_require__(153);
-	__webpack_require__(154);
 	__webpack_require__(155);
 	__webpack_require__(156);
 	__webpack_require__(157);
 	__webpack_require__(158);
 	__webpack_require__(159);
 	__webpack_require__(160);
+	__webpack_require__(161);
+	__webpack_require__(162);
 
 /***/ },
-/* 153 */
+/* 155 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -34446,7 +34873,7 @@
 	});
 
 /***/ },
-/* 154 */
+/* 156 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -34508,7 +34935,7 @@
 	});
 
 /***/ },
-/* 155 */
+/* 157 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -34556,7 +34983,7 @@
 	});
 
 /***/ },
-/* 156 */
+/* 158 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -34583,7 +35010,7 @@
 	});
 
 /***/ },
-/* 157 */
+/* 159 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -34639,7 +35066,7 @@
 	});
 
 /***/ },
-/* 158 */
+/* 160 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -34690,7 +35117,7 @@
 	});
 
 /***/ },
-/* 159 */
+/* 161 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -34727,7 +35154,7 @@
 	});
 
 /***/ },
-/* 160 */
+/* 162 */
 /***/ function(module, exports) {
 
 	'use strict';

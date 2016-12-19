@@ -64,11 +64,61 @@ class ConnectionPane extends Pane {
                     callback: function() {
                         apiCall('delete', 'connections/' + id)
                         .then(onSuccess)
-                        .catch(navbar.onError);
+                        .catch(UI.erroroModal);
                     }
                 }
             ]
         });
+    }
+    
+    /**
+     * Event: Click pull connection
+     */
+    static onClickPullConnection() {
+        let navbar = ViewHelper.get('NavbarMain');
+        let connectionEditor = ViewHelper.get('ConnectionEditor');
+        let pullId = $('.context-menu-target-element').data('id');
+
+        // API call to pull the Connection by id
+        apiCall('post', 'connections/pull/' + pullId, {})
+        
+        // Upon success, reload all Connection models    
+        .then(() => {
+            return reloadResource('connections');
+        })
+
+        // Reload the UI
+        .then(() => {
+            navbar.reload();
+
+            if(connectionEditor && connectionEditor.model.id == pullId) {
+                connectionEditor.model = null;
+                connectionEditor.fetch();
+            }
+        }) 
+        .catch(UI.errorModal);
+    }
+    
+    /**
+     * Event: Click push connection
+     */
+    static onClickPushConnection() {
+        let navbar = ViewHelper.get('NavbarMain');
+        let pushId = $('.context-menu-target-element').data('id');
+
+        // API call to push the Connection by id
+        apiCall('post', 'connections/push/' + pushId)
+
+        // Upon success, reload all Connection models
+        .then(() => {
+            return reloadResource('connections');
+        })
+
+        // Reload the UI
+        .then(() => {
+            navbar.reload();
+        }) 
+        .catch(UI.errorModal);
     }
 
     /**
@@ -159,12 +209,32 @@ class ConnectionPane extends Pane {
             toolbar: this.renderToolbar(),
 
             // Item context menu
-            itemContextMenu: {
-                'This connection': '---',
-                'Copy id': () => { this.onClickCopyItemId(); },
-                'Remove': () => { this.onClickRemoveConnection(); }
-            },
+            getItemContextMenu: (item) => {
+                let menu = {};
+                
+                menu['This connection'] = '---';
+                menu['Copy id'] = () => { this.onClickCopyItemId(); };
 
+                if(!item.local && !item.remote && !item.locked) {
+                    menu['Remove'] = () => { this.onClickRemoveConnection(); };
+                }
+
+                if(item.local || item.remote) {
+                    menu['Sync'] = '---';
+                }
+
+                if(item.local) {
+                    menu['Push to remote'] = () => { this.onClickPushConnection(); };
+                    menu['Remove local copy'] = () => { this.onClickRemoveConnection(); };
+                }
+                
+                if(item.remote) {
+                    menu['Pull from remote'] = () => { this.onClickPullConnection(); };
+                }
+
+                return menu;
+            },
+            
             // General context menu
             paneContextMenu: {
                 'General': '---',

@@ -24,9 +24,6 @@ class ApiController extends Controller {
             return UserHelper.findToken(token)
             .then((user) => {
                 if(user) {
-                    // Set the currently authenticated user as a static variable
-                    UserHelper.current = user;
-
                     // If a scope is defined, and the user isn't an admin, check for it
                     if(scope && !user.isAdmin) {
                         if(user.hasScope(ProjectHelper.currentProject, scope)) {
@@ -183,12 +180,13 @@ class ApiController extends Controller {
                 
                 }
             })
-            .then(() => {
+            .then((user) => {
+                req.user = user;
+
                 next();
             })
             .catch((e) => {
-                res.status(400).send(e.message);
-                debug.log(e.message, ApiController);
+                res.status(400).send(ApiController.printError(e));
             });
         }
     }

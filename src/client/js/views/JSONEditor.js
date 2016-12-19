@@ -99,6 +99,8 @@ class JSONEditor extends View {
         
         // Function for checking model integrity
         let check = (k, v) => {
+            if(!v) { return; }
+
             switch(k) {
                 case 'schemaId': case 'parentSchemaId':
                     for(let id in resources.schemas) {
