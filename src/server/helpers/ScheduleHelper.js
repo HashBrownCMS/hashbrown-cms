@@ -76,21 +76,18 @@ class ScheduleHelper {
     static runTask(task) {
         debug.log('Running ' + task.type + ' task for "' + task.content + '"...', this);    
 
-        ProjectHelper.currentProject = task.project;
-        ProjectHelper.currentEnvironment = task.environment;
-
-        return ContentHelper.getContentById(task.content)
+        return ContentHelper.getContentById(task.project, task.environment, task.content)
         .then((content) => {
             switch(task.type) {
                 case 'publish':
-                    return ConnectionHelper.publishContent(content)
+                    return ConnectionHelper.publishContent(task.project, task.environment, content)
                     .then(() => {
                         return this.removeTask(task.type, task.content, task.project, task.environment);
                     });
                     break;
 
                 case 'unpublish':
-                    return ConnectionHelper.unpublishContent(content)
+                    return ConnectionHelper.unpublishContent(task.project, task.environment, content)
                     .then(() => {
                         return this.removeTask(task.type, task.content, task.project, task.environment);
                     });
@@ -151,7 +148,13 @@ class ScheduleHelper {
      *
      * @returns {Promise} Promise
      */
-    static updateTask(type, contentId, date, project, environment) {
+    static updateTask(
+        type = requiredParam('type'),
+        contentId = requiredParam('contentId'),
+        date = requiredParam('date'),
+        project = requiredParam('project'),
+        environment = requiredParam('environment')
+    ) {
         // If the date is invalid, remove instead
         if(!date || isNaN(new Date(date).getTime()) || new Date(date).getFullYear() == 1970) {
             return this.removeTask(type, contentId, date, project, environment);
@@ -161,15 +164,15 @@ class ScheduleHelper {
             type: type,
             content: contentId,
             date: date,
-            project: project || ProjectHelper.currentProject,
-            environment: environment || ProjectHelper.currentEnvironment
+            project: project,
+            environment: environment
         });
 
         let query = {
             type: type,
             content: contentId,
-            project: project || ProjectHelper.currentProject,
-            environment: environment || ProjectHelper.currentEnvironment
+            project: project,
+            environment: environment
         };
 
         debug.log('Updating ' + type + ' task for "' + contentId + '" to ' + date + '...', this);
@@ -195,12 +198,18 @@ class ScheduleHelper {
      *
      * @returns {Promise} Promise
      */
-    static removeTask(type, contentId, project, environment) {
+    static removeTask(
+        type = requiredParam('type'),
+        contentId = requiredParam('contentId'),
+        date = requiredParam('date'),
+        project = requiredParam('project'),
+        environment = requiredParam('environment')
+    ) {
         let query = {
             type: type,
             content: contentId,
-            project: project || ProjectHelper.currentProject,
-            environment: environment || ProjectHelper.currentEnvironment
+            project: project,
+            environment: environment
         };
         
         debug.log('Removing ' + type + ' task for "' + contentId + '"...', this);

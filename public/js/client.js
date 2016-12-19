@@ -111,6 +111,14 @@
 	var onReadyCallbacks = {};
 	var isReady = {};
 
+	// ----------
+	// Global methods
+	// ----------
+	// Handles a required parameter
+	window.requiredParam = function (name) {
+	    throw new Error('Parameter "' + name + '" is required');
+	};
+
 	/**
 	 * Clears the workspace
 	 */
@@ -24861,7 +24869,7 @@
 	                        var failMessage = check(k, v);
 
 	                        if (failMessage) {
-	                            _this2.$error.children('.error-heading').html('Schema error');
+	                            _this2.$error.children('.error-heading').html('Input error');
 	                            _this2.$error.children('.error-body').html(failMessage);
 	                            _this2.$error.show();
 
@@ -24880,7 +24888,7 @@
 	            try {
 	                this.model = JSON.parse(this.value);
 	            } catch (e) {
-	                this.$error.children('.error-heading').html('JSON error');
+	                this.$error.children('.error-heading').html('Syntax error');
 	                this.$error.children('.error-body').html(e);
 	                this.$error.show();
 
@@ -32710,15 +32718,13 @@
 	        /**
 	         * Gets the media root path
 	         *
-	         * @returns {Promise(String)} path
+	         * @returns {Promise} Path
 	         */
 	        value: function getRootPath() {
-	            return new Promise(function (resolve, reject) {
-	                ConnectionHelper.getMediaProvider().then(function (connection) {
-	                    resolve(connection.getMediaPath());
-	                }).catch(function () {
-	                    resolve('');
-	                });
+	            return ConnectionHelper.getMediaProvider().then(function (connection) {
+	                resolve(connection.getMediaPath());
+	            }).catch(function () {
+	                resolve('');
 	            });
 	        }
 
@@ -32731,9 +32737,7 @@
 	    }, {
 	        key: 'getTree',
 	        value: function getTree() {
-	            return new Promise(function (resolve, reject) {
-	                resolve({});
-	            });
+	            return Promise.resolve({});
 	        }
 
 	        /**
@@ -32748,20 +32752,22 @@
 	    }, {
 	        key: 'setTreeItem',
 	        value: function setTreeItem(id, item) {
-	            return new Promise(function (resolve, reject) {
-	                resolve();
-	            });
+	            return Promise.resolve();
 	        }
 
 	        /**
 	         * Gets the media temp path
 	         *
-	         * @returns {String} path
+	         * @param {String} project
+	         *
+	         * @returns {String} Path
 	         */
 
 	    }, {
 	        key: 'getTempPath',
 	        value: function getTempPath() {
+	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+
 	            var path = '/storage/' + ProjectHelper.currentProject + '/temp';
 
 	            return path;

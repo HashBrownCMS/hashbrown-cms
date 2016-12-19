@@ -6,14 +6,17 @@ class SettingsHelper extends SettingsHelperCommon {
     /**
      * Gets all settings
      *
+     * @param {String} project
      * @param {String} section
-     * @param {String} projectName
      *
      * @return {Promise} promise
      */
-    static getSettings(section, projectName) {
+    static getSettings(
+        project = requiredParam('project'),
+        section = requiredParam('section')
+    ) {
         return MongoHelper.findOne(
-            projectName || ProjectHelper.currentProject,
+            project,
             'settings',
             {
                 section: section
@@ -24,13 +27,17 @@ class SettingsHelper extends SettingsHelperCommon {
     /**
      * Sets all settings
      *
+     * @param {String} project
      * @param {String} section
      * @param {Object} settings
-     * @param {String} projectName
      *
      * @return {Promise} promise
      */
-    static setSettings(section, settings, projectName) {
+    static setSettings(
+        project = requiredParam('project'),
+        section = requiredParam('section'),
+        settings = requiredParam('settings')
+    ) {
         let newSettings = { section: section };
 
         debug.log('Setting "' + section + '" to ' + JSON.stringify(settings), this);
@@ -40,7 +47,7 @@ class SettingsHelper extends SettingsHelperCommon {
         }
 
         return MongoHelper.updateOne(
-            projectName || ProjectHelper.currentProject,
+            project,
             'settings',
             { 
                 section: section

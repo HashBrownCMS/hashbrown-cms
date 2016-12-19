@@ -26,7 +26,7 @@ class ConnectionController extends ApiController {
      * Gets all connections
      */
     static getConnections(req, res) {
-        ConnectionHelper.getAllConnections()
+        ConnectionHelper.getAllConnections(req.project, req.environment)
         .then((connections) => {
             res.send(connections);
         })
@@ -42,7 +42,7 @@ class ConnectionController extends ApiController {
         let id = req.params.id;
         let connection = req.body;
 
-        ConnectionHelper.setConnectionById(id, connection)
+        ConnectionHelper.setConnectionById(req.project, req.environment, id, connection)
         .then(() => {
             res.status(200).send(connection);
         })
@@ -57,11 +57,11 @@ class ConnectionController extends ApiController {
     static pullConnection(req, res) {
         let id = req.params.id;
 
-        SyncHelper.getResourceItem('connections', id)
+        SyncHelper.getResourceItem(req.project, 'connections', id)
         .then((resourceItem) => {
             if(!resourceItem) { return Promise.reject(new Error('Couldn\'t find remote Connection "' + id + '"')); }
         
-            return ConnectionHelper.setConnectionById(id, resourceItem, true)
+            return ConnectionHelper.setConnectionById(req.project, req.environment, id, resourceItem, true)
             .then((newConnection) => {
                 res.status(200).send(id);
             });
@@ -77,12 +77,12 @@ class ConnectionController extends ApiController {
     static pushConnection(req, res) {
         let id = req.params.id;
 
-        ConnectionHelper.getConnectionById(id)
+        ConnectionHelper.getConnectionById(req.project, req.environment, id)
         .then((localConnection) => {
-            return SyncHelper.setResourceItem('connection', id, localConnection);
+            return SyncHelper.setResourceItem(req.project, 'connection', id, localConnection);
         })
         .then(() => {
-            return ConnectionHelper.removeConnectionById(id);
+            return ConnectionHelper.removeConnectionById(req.project, req.environment, id);
         })
         .then(() => {
             res.status(200).send(id);
@@ -100,7 +100,7 @@ class ConnectionController extends ApiController {
         let id = req.params.id;
    
         if(id && id != 'undefined') {
-            ConnectionHelper.getConnectionById(id)
+            ConnectionHelper.getConnectionById(req.project, req.environment, id)
             .then((connection) => {
                 res.send(connection);
             })
@@ -120,7 +120,7 @@ class ConnectionController extends ApiController {
      * @return {Object} Content
      */
     static createConnection(req, res) {
-        ConnectionHelper.createConnection()
+        ConnectionHelper.createConnection(req.project, req.environment)
         .then((connection) => {
             res.status(200).send(connection);
         })
@@ -135,7 +135,7 @@ class ConnectionController extends ApiController {
     static deleteConnection(req, res) {
         let id = req.params.id;
         
-        ConnectionHelper.removeConnectionById(id)
+        ConnectionHelper.removeConnectionById(req.project, req.environment, id)
         .then(() => {
             res.status(200).send(id);
         })

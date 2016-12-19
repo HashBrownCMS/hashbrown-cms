@@ -30,7 +30,7 @@ class SchemaController extends ApiController {
             SchemaHelper.getCustomSchemas :
             SchemaHelper.getAllSchemas;
 
-        getter()
+        getter(req.project, req.environment)
         .then((schemas) => {
             res.status(200).send(schemas);
         })
@@ -48,7 +48,7 @@ class SchemaController extends ApiController {
             SchemaHelper.getSchemaWithParentFields :
             SchemaHelper.getSchemaById;
 
-        getter(id)    
+        getter(req.project, req.environment, id)    
         .then((schema) => {
             res.status(200).send(schema);
         })
@@ -64,7 +64,7 @@ class SchemaController extends ApiController {
         let id = req.params.id;
         let schema = req.body;
 
-        SchemaHelper.setSchema(id, schema)
+        SchemaHelper.setSchema(req.project, req.environment, id, schema)
         .then(() => {
             res.status(200).send(schema);
         })
@@ -79,11 +79,11 @@ class SchemaController extends ApiController {
     static pullSchema(req, res) {
         let id = req.params.id;
 
-        SyncHelper.getResourceItem('schemas', id)
+        SyncHelper.getResourceItem(req.project, 'schemas', id)
         .then((resourceItem) => {
             if(!resourceItem) { return Promise.reject(new Error('Couldn\'t find remote Schema "' + id + '"')); }
         
-            return SchemaHelper.setSchema(id, resourceItem, true)
+            return SchemaHelper.setSchema(req.project, req.environment, id, resourceItem, true)
             .then(() => {
                 res.status(200).send(resourceItem);
             });
@@ -99,12 +99,12 @@ class SchemaController extends ApiController {
     static pushSchema(req, res) {
         let id = req.params.id;
 
-        SchemaHelper.getSchemaById(id)
+        SchemaHelper.getSchemaById(req.project, req.environment, id)
         .then((localSchema) => {
-            return SyncHelper.setResourceItem('schemas', id, localSchema);
+            return SyncHelper.setResourceItem(req.project, 'schemas', id, localSchema);
         })
         .then(() => {
-            return SchemaHelper.removeSchemaById(id);
+            return SchemaHelper.removeSchemaById(req.project, req.environment, id);
         })
         .then(() => {
             res.status(200).send(id);
@@ -120,7 +120,7 @@ class SchemaController extends ApiController {
     static createSchema(req, res) {
         let parentSchema = req.body;
 
-        SchemaHelper.createSchema(parentSchema)
+        SchemaHelper.createSchema(req.project, req.environment, parentSchema)
         .then((newSchema) => {
             res.status(200).send(newSchema.getObject());
         })
@@ -135,7 +135,7 @@ class SchemaController extends ApiController {
     static deleteSchema(req, res) {
         let id = req.params.id;
         
-        SchemaHelper.removeSchema(id)
+        SchemaHelper.removeSchema(req.project, req.environment, id)
         .then(() => {
             res.status(200).send('Schema with id "' + id + '" deleted successfully');
         })

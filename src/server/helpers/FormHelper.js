@@ -9,15 +9,21 @@ class FormHelper {
     /**
      * Gets Form by id
      *
+     * @param {String} project
+     * @param {String} environment
      * @param {String} id
      *
      * @returns {Promise} Form
      */
-    static getForm(id) {
-        let collection = ProjectHelper.currentEnvironment + '.forms';
+    static getForm(
+        project = requiredParam('project'),
+        environment = requiredParam('environment'),
+        id = requiredParam('id')
+    ) {
+        let collection = environment + '.forms';
     
         return MongoHelper.findOne(
-            ProjectHelper.currentProject,
+            project,
             collection,
             {
                 id: id
@@ -25,7 +31,7 @@ class FormHelper {
         )
         .then((result) => {
             if(!result) {
-                return SyncHelper.getResourceItem('forms', id);
+                return SyncHelper.getResourceItem(project, 'forms', id);
             }
 
             return Promise.resolve(result);
@@ -38,15 +44,21 @@ class FormHelper {
     /**
      * Deletes Form by id
      *
+     * @param {String} project
+     * @param {String} environment
      * @param {String} id
      *
      * @returns {Promise} Promise
      */
-    static deleteForm(id) {
-        let collection = ProjectHelper.currentEnvironment + '.forms';
+    static deleteForm(
+        project = requiredParam('project'),
+        environment = requiredParam('environment'),
+        id = requiredParam('id')
+    ) {
+        let collection = environment + '.forms';
     
         return MongoHelper.removeOne(
-            ProjectHelper.currentProject,
+            project,
             collection,
             {
                 id: id
@@ -57,38 +69,51 @@ class FormHelper {
     /**
      * Gets all Forms
      *
+     * @param {String} project
+     * @param {String} environment
+     *
      * @returns {Promise} Array of forms
      */
-    static getAllForms() {
-        let collection = ProjectHelper.currentEnvironment + '.forms';
+    static getAllForms(
+        project = requiredParam('project'),
+        environment = requiredParam('environment')
+    ) {
+        let collection = environment + '.forms';
         
         return MongoHelper.find(
-            ProjectHelper.currentProject,
+            project,
             collection,
             {}
         )
         .then((results) => {
-            return SyncHelper.mergeResource('forms', results); 
+            return SyncHelper.mergeResource(project, 'forms', results); 
         });
     }
     
     /**
      * Sets a Form by id
      *
+     * @param {String} project
+     * @param {String} environment
      * @param {String} id
      * @param {Object} properties
      *
      * @returns {Promise} Form
      */
-    static setForm(id, properties) {
-        let collection = ProjectHelper.currentEnvironment + '.forms';
+    static setForm(
+        project = requiredParam('project'),
+        environment = requiredParam('environment'),
+        id = requiredParam('id'),
+        properties = requiredParam('properties')
+    ) {
+        let collection = environment + '.forms';
 
         // Unset automatic flags
         properties.locked = false;
         properties.remote = false;
         
         return MongoHelper.updateOne(
-            ProjectHelper.currentProject,
+            project,
             collection,
             {
                 id: id
@@ -108,14 +133,20 @@ class FormHelper {
     /**
      * Creates a new Form
      *
+     * @param {String} project
+     * @param {String} environment
+     *
      * @returns {Promise} Form
      */
-    static createForm() {
+    static createForm(
+        project = requiredParam('project'),
+        environment = requiredParam('environment')
+    ) {
         let form = Form.create();
-        let collection = ProjectHelper.currentEnvironment + '.forms';
+        let collection = environment + '.forms';
 
         return MongoHelper.insertOne(
-            ProjectHelper.currentProject,
+            project,
             collection,
             form.getObject()
         )
@@ -129,33 +160,46 @@ class FormHelper {
     /**
      * Adds an entry by to a Form by id
      *
+     * @param {String} project
+     * @param {String} environment
      * @param {String} id
      * @param {Object} entry
      *
      * @returns {Promise} Promise
      */
-    static addEntry(id, entry) {
-        return this.getForm(id)
+    static addEntry(
+        project = requiredParam('project'),
+        environment = requiredParam('environment'),
+        id = requiredParam('id'),
+        entry = requiredParam('entry')
+    ) {
+        return this.getForm(project, environment, id)
         .then((form) => {
             form.addEntry(entry);
 
-            return this.setForm(id, form.getObject())
+            return this.setForm(project, environment, id, form.getObject())
         });
     }
 
     /**
      * Clears all entries in a Form by id
      *
+     * @param {String} project
+     * @param {String} environment
      * @param {String} id
      *
      * @returns {Promise} Promise
      */
-    static clearAllEntries(id) {
-        return this.getForm(id)
+    static clearAllEntries(
+        project = requiredParam('project'),
+        environment = requiredParam('environment'),
+        id = requiredParam('id')
+    ) {
+        return this.getForm(project, environment, id)
         .then((form) => {
             form.clearAllEntries();
 
-            return this.setForm(id, form.getObject())
+            return this.setForm(project, environment, id, form.getObject())
         });
     }
 }

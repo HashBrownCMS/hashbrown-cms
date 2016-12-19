@@ -11,13 +11,21 @@ class ContentHelper extends ContentHelperCommon {
     /**
      * Gets all Content objects
      *
+     * @param {String} project
+     * @param {String} environment
+     *
      * @return {Promise} promise
      */
-    static getAllContents() {
-        let collection = ProjectHelper.currentEnvironment + '.content';
+    static getAllContents(
+        project = requiredParam('project'),
+        environment = requiredParam('environment')
+    ) {
+        if(!project || !environment) { return Promise.reject(new Error('Project and environment not specified')); }
+
+        let collection = environment + '.content';
 
         return MongoHelper.find(
-            ProjectHelper.currentProject,
+            project,
             collection,
             {},
             {},
@@ -42,30 +50,36 @@ class ContentHelper extends ContentHelperCommon {
                 return a.sort > b.sort;
             });
 
-            return SyncHelper.mergeResource('content', contentList);
+            return SyncHelper.mergeResource(project, 'content', contentList);
         });
     }
 
     /**
      * Gets a Content object by id
      *
+     * @param {String} project
+     * @param {String} environment
      * @param {Number} id
      *
      * @return {Promise} promise
      */
-    static getContentById(id) {
-        let collection = ProjectHelper.currentEnvironment + '.content';
+    static getContentById(
+        project = requiredParam('project'),
+        environment = requiredParam('environment'),
+        id = requiredParam('id')
+    ) {
+        let collection = environment + '.content';
         let content;
 
         return MongoHelper.findOne(
-            ProjectHelper.currentProject,
+            project,
             collection,
             {
                 id: id
             }
         ).then((result) => {
             if(!result) {
-                return SyncHelper.getResourceItem('content', id);
+                return SyncHelper.getResourceItem(project, 'content', id);
             }
             
             return Promise.resolve(result);
@@ -89,6 +103,8 @@ class ContentHelper extends ContentHelperCommon {
     /**
      * Sets a Content object by id
      *
+     * @param {String} project
+     * @param {String} environment
      * @param {String} id
      * @param {Object} content
      * @param {User} user
@@ -96,9 +112,14 @@ class ContentHelper extends ContentHelperCommon {
      *
      * @return {Promise} Promise
      */
-    static setContentById(id, content, user, create) {
-        if(!user || user instanceof User === false) { return Promise.reject(new Error('User not specified')); }
-
+    static setContentById(
+        project = requiredParam('project'),
+        environment = requiredParam('environment'),
+        id = requiredParam('id'),
+        content = requiredParam('content'),
+        user = requiredParam('user'),
+        create = false
+    ) {
         debug.log('Updating content "' + id + '"...', this);
         
         let updateContent = () => {
@@ -114,19 +135,19 @@ class ContentHelper extends ContentHelperCommon {
                 content.createdBy = content.updatedBy;
             }
             
-            let collection = ProjectHelper.currentEnvironment + '.content';
+            let collection = environment + '.content';
             
             // Register publish dates centrally
             if(content.publishOn) {
-                ScheduleHelper.updateTask('publish', id, content.publishOn);
+                ScheduleHelper.updateTask(project, environment, 'publish', id, content.publishOn);
             } else {
-                ScheduleHelper.removeTask('publish', id, content.publishOn);
+                ScheduleHelper.removeTask(project, environment, 'publish', id, content.publishOn);
             }
 
             if(content.unpublishOn) {
-                ScheduleHelper.updateTask('unpublish', id, content.unpublishOn);
+                ScheduleHelper.updateTask(project, environment, 'unpublish', id, content.unpublishOn);
             } else {
-                ScheduleHelper.removeTask('unpublish', id, content.unpublishOn);
+                ScheduleHelper.removeTask(project, environment, 'unpublish', id, content.unpublishOn);
             }
 
             // Remove inserted publish dates
@@ -134,7 +155,7 @@ class ContentHelper extends ContentHelperCommon {
             content.unpublishOn = null;
            
             return MongoHelper.updateOne(
-                ProjectHelper.currentProject,
+                project,
                 collection,
                 { id: id },
                 content,
@@ -170,16 +191,20 @@ class ContentHelper extends ContentHelperCommon {
      *
      * @return {Promise} New Content object
      */
-    static createContent(schemaId, parentId, user) {
-        if(!user || user instanceof User === false) { return Promise.reject(new Error('User not specified')); }
-
+    static createContent(
+        project = requiredParam('project'),
+        environment = requiredParam('environment'),
+        schemaId = requiredParam('schemaId'),
+        parentId = requiredParam('parentId'),
+        user = requiredParam('user')
+    ) {
         return this.isSchemaAllowedAsChild(parentId, schemaId)
         .then(() => {
-            return SchemaHelper.getSchemaById(schemaId);
+            return SchemaHelper.getSchemaById(project, environment, schemaId);
         })
         .then((schema) => {
             let content = Content.create(schema.id);
-            let collection = ProjectHelper.currentEnvironment + '.content';
+            let collection = environment + '.content';
 
             debug.log('Creating content "' + content.id + '"...', this);
 
@@ -191,12 +216,12 @@ class ContentHelper extends ContentHelperCommon {
             }
 
             return MongoHelper.insertOne(
-                ProjectHelper.currentProject,
+                project,
                 collection,
                 content.getFields()
             )
             .then(() => {
-                debug.log('Content "' + content.id + '" created and inserted into "' + ProjectHelper.currentProject + '.' + collection + '"', this);
+                debug.log('Content "' + content.id + '" created and inserted into "' + project + '.' + collection + '"', this);
 
                 return Promise.resolve(content);
             });
@@ -206,17 +231,24 @@ class ContentHelper extends ContentHelperCommon {
     /**
      * Removes a content object
      *
+     * @param {String} project
+     * @param {String} environment
      * @param {String} id
      * @param {Boolean} removeChildren
      *
      * @return {Promise} promise
      */
-    static removeContentById(id, removeChildren) {
-        let collection = ProjectHelper.currentEnvironment + '.content';
+    static removeContentById(
+        project = requiredParam('project'),
+        environment = requiredParam('environment'),
+        id = requiredParam('id'),
+        removeChildren = false
+    ) {
+        let collection = environment + '.content';
         
         return new Promise((resolve, reject) => {
             MongoHelper.removeOne(
-                ProjectHelper.currentProject,
+                project,
                 collection,
                 {
                     id: id
@@ -225,7 +257,7 @@ class ContentHelper extends ContentHelperCommon {
             .then(() => {
                 if(removeChildren) {
                     MongoHelper.remove(
-                        ProjectHelper.currentProject,
+                        project,
                         collection,
                         {
                             parentId: id
@@ -238,7 +270,7 @@ class ContentHelper extends ContentHelperCommon {
                 
                 } else {
                     MongoHelper.update(
-                        ProjectHelper.currentProject,
+                        project,
                         collection,
                         {
                             parentId: id

@@ -77,7 +77,7 @@ class MediaController extends ApiController {
      * Gets the Media tree
      */
     static getMediaTree(req, res) {
-        MediaHelper.getTree()
+        MediaHelper.getTree(req.project, req.environment)
         .then((tree) => {
             res.status(200).send(tree);
         })
@@ -93,7 +93,7 @@ class MediaController extends ApiController {
         let id = req.params.id;
         let item = req.body;
 
-        MediaHelper.setTreeItem(id, item)
+        MediaHelper.setTreeItem(req.project, req.environment, id, item)
         .then(() => {
             res.status(200).send(item);
         })

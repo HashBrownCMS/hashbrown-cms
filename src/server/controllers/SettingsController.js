@@ -15,7 +15,7 @@ class SettingsController extends ApiController {
      * Get settings object
      */
     static getSettings(req, res) {
-        SettingsHelper.getSettings(req.params.section)
+        SettingsHelper.getSettings(req.params.project, req.params.section)
         .then((settings) => {
             res.status(200).send(settings);
         })
@@ -30,7 +30,7 @@ class SettingsController extends ApiController {
     static setSettings(req, res) {
         let settings = req.body;
 
-        SettingsHelper.setSettings(req.params.section, settings)
+        SettingsHelper.setSettings(req.params.project, req.params.section, settings)
         .then(() => {
             res.status(200).send(settings);
         })

@@ -213,7 +213,7 @@ class JSONEditor extends View {
                     let failMessage = check(k, v);
                     
                     if(failMessage) {
-                        this.$error.children('.error-heading').html('Schema error');
+                        this.$error.children('.error-heading').html('Input error');
                         this.$error.children('.error-body').html(failMessage);
                         this.$error.show();
                     
@@ -233,7 +233,7 @@ class JSONEditor extends View {
             this.model = JSON.parse(this.value);
 
         } catch(e) {
-            this.$error.children('.error-heading').html('JSON error');
+            this.$error.children('.error-heading').html('Syntax error');
             this.$error.children('.error-body').html(e);
             this.$error.show();
 

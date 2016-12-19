@@ -16,13 +16,15 @@ class MediaHelper extends MediaHelperCommon {
     /**
      * Gets the upload handler
      *
+     * @param {String} mode
+     *
      * @return {Function} handler
      */
     static getUploadHandler(mode) {
         let handler = multer({
             storage: multer.diskStorage({
                 destination: (req, file, resolve) => {
-                    let path = MediaHelper.getTempPath();
+                    let path = MediaHelper.getTempPath(req.project);
                    
                     debug.log('Handling file upload to temp storage...', this);
 
@@ -65,7 +67,10 @@ class MediaHelper extends MediaHelperCommon {
      * @param {String} dirPath
      * @param {Function} callback
      */
-    static mkdirRecursively(dirPath, callback) {
+    static mkdirRecursively(
+        dirPath = requiredParam('dirPath'),
+        callback = requiredParam('callback')
+    ) {
         let parents = dirPath.split('/');
         let finalPath = '/';
 
@@ -95,7 +100,10 @@ class MediaHelper extends MediaHelperCommon {
      *
      * @return {Promise} promise
      */
-    static setMediaData(id, file) {
+    static setMediaData(
+        id = requiredParam('id'),
+        file = requiredParam('file')
+    ) {
         return new Promise((resolve, reject) => {
             let oldPath = file.path;
             let name = path.basename(oldPath);
@@ -154,35 +162,48 @@ class MediaHelper extends MediaHelperCommon {
     /**
      * Gets the Media tree
      *
+     * @param {String} project
+     * @param {String} environment
+     *
      * @return {Promise(Object)} tree
      */
-    static getTree() {
-        let collection = ProjectHelper.currentEnvironment + '.media';
+    static getTree(
+        project = requiredParam('project'),
+        environment = requiredParam('environment')
+    ) {
+        let collection = environment + '.media';
         
         return MongoHelper.find(
-            ProjectHelper.currentProject,
+            project,
             collection,
             {}
         ).then((tree) => {
-            return SyncHelper.mergeResource('media/tree', tree);
+            return SyncHelper.mergeResource(project, 'media/tree', tree);
         });
     }
     
     /**
      * Sets a Media tree parent
      *
+     * @param {String} project
+     * @param {String} environment
      * @param {String} id
      * @param {Object} item
      *
      * @return {Promise} promise
      */
-    static setTreeItem(id, item) {
-        let collection = ProjectHelper.currentEnvironment + '.media';
+    static setTreeItem(
+        project = requiredParam('project'),
+        environment = requiredParam('environment'),       
+        id = requiredParam('id'),
+        item = requiredParam('item')
+    ) {
+        let collection = environment + '.media';
 
         // Remove the item if it's null
         if(!item) {
             return MongoHelper.removeOne(
-                ProjectHelper.currentProject,
+                project,
                 collection,
                 {
                     id: id
@@ -194,7 +215,7 @@ class MediaHelper extends MediaHelperCommon {
             item.id = id;
 
             return MongoHelper.updateOne(
-                ProjectHelper.currentProject,
+                project,
                 collection,
                 {
                     id: id
@@ -210,13 +231,17 @@ class MediaHelper extends MediaHelperCommon {
     /**
      * Gets the media temp path
      *
+     * @param {String} project
+     *
      * @returns {String} path
      */
-    static getTempPath() {
+    static getTempPath(
+        project = requiredParam('project')
+    ) {
         let path = 
             appRoot +
             '/storage/' +
-            ProjectHelper.currentProject +
+            project +
             '/temp';
 
         return path;

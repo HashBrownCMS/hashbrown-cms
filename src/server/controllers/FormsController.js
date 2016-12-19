@@ -41,7 +41,7 @@ class FormsController extends ApiController {
      * @returns {Promise} Result
      */
     static checkCORS(req, res) {
-        return FormHelper.getForm(req.params.id)
+        return FormHelper.getForm(req.project, req.environment, req.params.id)
         .then((form) => {
             return Promise.resolve(form.allowedOrigin || '*');
         });
@@ -51,7 +51,7 @@ class FormsController extends ApiController {
      * Gets all forms
      */
     static getAllForms(req, res) {
-        FormHelper.getAllForms()
+        FormHelper.getAllForms(req.project, req.environment)
         .then((forms) => {
             res.status(200).send(forms);
         })
@@ -64,7 +64,7 @@ class FormsController extends ApiController {
      * Deletes a single Form by id
      */
     static deleteForm(req, res) {
-        FormHelper.deleteForm(req.params.id)
+        FormHelper.deleteForm(req.project, req.environment, req.params.id)
         .then(() => {
             res.status(200).send('OK');
         })
@@ -79,11 +79,11 @@ class FormsController extends ApiController {
     static pullForm(req, res) {
         let id = req.params.id;
 
-        SyncHelper.getResourceItem('forms', id)
+        SyncHelper.getResourceItem(req.project, 'forms', id)
         .then((resourceItem) => {
             if(!resourceItem) { return Promise.reject(new Error('Couldn\'t find remote Form "' + id + '"')); }
        
-            return FormHelper.setForm(id, resourceItem)
+            return FormHelper.setForm(req.project, req.environment, id, resourceItem)
             .then(() => {
                 res.status(200).send(resourceItem);
             });
@@ -99,12 +99,12 @@ class FormsController extends ApiController {
     static pushForm(req, res) {
         let id = req.params.id;
 
-        FormHelper.getForm(id)
+        FormHelper.getForm(req.project, req.environment, id)
         .then((localForm) => {
-            return SyncHelper.setResourceItem('forms', id, localForm);
+            return SyncHelper.setResourceItem(req.project, 'forms', id, localForm);
         })
         .then(() => {
-            return FormHelper.deleteForm(id);
+            return FormHelper.deleteForm(req.project, req.environment, id);
         })
         .then(() => {
             res.status(200).send(id);
@@ -118,7 +118,7 @@ class FormsController extends ApiController {
      * Gets a single form by id
      */
     static getForm(req, res) {
-        FormHelper.getForm(req.params.id)
+        FormHelper.getForm(req.project, req.environment, req.params.id)
         .then((form) => {
             res.status(200).send(form.getObject());
         })
@@ -131,7 +131,7 @@ class FormsController extends ApiController {
      * Gets all entries from a Form as CSV
      */
     static getAllEntries(req, res) {
-        FormHelper.getForm(req.params.id)
+        FormHelper.getForm(req.project, req.environment, req.params.id)
         .then((form) => {
             let csv = '';
 
@@ -166,7 +166,7 @@ class FormsController extends ApiController {
      * Sets a single form by id
      */
     static postForm(req, res) {
-        FormHelper.setForm(req.params.id, req.body)
+        FormHelper.setForm(req.project, req.environment, req.params.id, req.body)
         .then((form) => {
             res.status(200).send(form.getObject());
         })
@@ -179,7 +179,7 @@ class FormsController extends ApiController {
      * Creates a form
      */
     static postNew(req, res) {
-        FormHelper.createForm()
+        FormHelper.createForm(req.project, req.environment)
         .then((form) => {
             res.status(200).send(form.id);
         })
@@ -205,7 +205,7 @@ class FormsController extends ApiController {
                 return;    
             }
             
-            FormHelper.addEntry(req.params.id, req.body)
+            FormHelper.addEntry(req.project, req.environment, req.params.id, req.body)
             .then((form) => {
                 if(form.redirect) {
                     let redirectUrl = form.redirect;
@@ -235,7 +235,7 @@ class FormsController extends ApiController {
      * Clears all form entries
      */
     static postClearAllEntries(req, res) {
-        FormHelper.clearAllEntries(req.params.id)
+        FormHelper.clearAllEntries(req.project, req.environment, req.params.id)
         .then(() => {
             res.sendStatus(200);
         })

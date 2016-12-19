@@ -27,6 +27,13 @@ app.use(bodyparser.json({limit: '50mb'}));
 app.use(express.static(appRoot + '/public'));
 
 // ----------
+// Global methods
+// ----------
+global.requiredParam = function(name) {
+    throw new Error('Parameter "' + name + '" is required');
+}
+
+// ----------
 // Helpers
 // ----------
 global.UserHelper = require('./helpers/UserHelper');
@@ -40,7 +47,6 @@ global.PluginHelper = require('./helpers/PluginHelper');
 global.ProjectHelper = require('./helpers/ProjectHelper');
 global.SchemaHelper = require('./helpers/SchemaHelper');
 global.SettingsHelper = require('./helpers/SettingsHelper');
-global.LogHelper = require('./helpers/LogHelper');
 global.BackupHelper = require('./helpers/BackupHelper');
 global.UpdateHelper = require('./helpers/UpdateHelper');
 global.ScheduleHelper = require('./helpers/ScheduleHelper');
@@ -256,13 +262,10 @@ app.get('/:project/:environment/', function(req, res) {
         if(!user.isAdmin && !user.scopes[req.params.project]) {
             debug.error('User "' + user.username + '" doesn\'t have project "' + req.params.project + '" in scopes');
         }  
-
-        return ProjectHelper.setCurrent(req.params.project, req.params.environment);
-    })
-    .then(() => {
+        
         res.render('environment', {
-            currentProject: ProjectHelper.currentProject,
-            currentEnvironment: ProjectHelper.currentEnvironment,
+            currentProject: req.params.project,
+            currentEnvironment: req.params.environment,
             user: user
         });
     })

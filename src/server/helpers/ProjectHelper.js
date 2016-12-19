@@ -7,73 +7,12 @@ let Project = require('../../common/models/Project');
  */
 class ProjectHelper {
     /**
-     * Sets the current project and environment
-     *
-     * @param {String} projectId
-     * @param {String} environmentName
-     *
-     * @returns {Promise} Promise
-     */
-    static setCurrent(projectId, environmentName) {
-        // First check if the project exists
-        return this.getProject(projectId)
-        .then((project) => {
-            this.currentProject = project.id;
-
-            // Environment is optional
-            if(environmentName) {
-                // Then check if the environment is enabled
-                if(project.settings.environments.names.indexOf(environmentName) > -1) {
-                    this.currentEnvironment = environmentName;
-
-                    return Promise.resolve();
-
-                } else {
-                    return Promise.reject(new Error('Environment "' + environmentName + '" does not exist in project "' + project.id + '"'));
-
-                }
-            
-            } else {
-                return Promise.resolve();
-
-            }
-        });
-    }
-
-    /**
-     * Gets current project and environment names
-     *
-     * @returns {Object} Project and environment names
-     */
-    static getCurrentNames() {
-        return {
-            project: ProjectHelper.currentProject,
-            environment: ProjectHelper.currentEnvironment
-        };
-    }
-    
-    /**
-     * Sets current project and environment names without checking
-     *
-     * @param {String} projectName
-     * @param {String} environmentName
-     */
-    static setCurrentNames(projectName, environmentName) {
-        ProjectHelper.currentProject = projectName;
-        ProjectHelper.currentEnvironment = environmentName;
-    }
-
-    /**
      * Gets a list of all available projects
      *
      * @returns {Promise} Array of Project objects
      */
     static getAllProjects() {
-        return new Promise((resolve, reject) => {
-            MongoHelper.listDatabases()
-            .then(resolve)
-            .catch(reject); 
-        });
+        return MongoHelper.listDatabases();
     }
 
     /**
@@ -149,7 +88,7 @@ class ProjectHelper {
      */
     static getAllEnvironments(project) {
         return new Promise((resolve, reject) => {
-            SettingsHelper.getSettings('environments')
+            SettingsHelper.getSettings(project, 'environments')
             .then((environments) => {
                 // There should always be at least one environment available
                 if(!environments) {
@@ -223,14 +162,14 @@ class ProjectHelper {
         
         // Remove listing from settings
         .then(() => {
-            return SettingsHelper.getSettings('environments', project);
+            return SettingsHelper.getSettings(project, 'environments');
         })
         .then((environments) => {
             let index = environments.names.indexOf(environment);
 
             environments.names.splice(index, 1);
 
-            return SettingsHelper.setSettings('environments', environments, project);
+            return SettingsHelper.setSettings(project, 'environments', environments);
         });
     }
     

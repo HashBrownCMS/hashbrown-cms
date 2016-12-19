@@ -15,7 +15,7 @@ class SyncController extends ApiController {
      * Logs in a user remotely
      */
     static postLogin(req, res) {
-        SyncHelper.renewToken(req.body.username, req.body.password)
+        SyncHelper.renewToken(req.project, req.body.username, req.body.password)
         .then((token) => {
             res.status(200).send(token);
         })

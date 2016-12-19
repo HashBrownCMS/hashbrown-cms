@@ -29,7 +29,7 @@ class ContentController extends ApiController {
      * Gets a list of all Content objects
      */
     static getAllContents(req, res) {
-        ContentHelper.getAllContents()
+        ContentHelper.getAllContents(req.project, req.environment)
         .then(function(nodes) {
             res.status(200).send(nodes);
         })
@@ -47,7 +47,7 @@ class ContentController extends ApiController {
         let id = req.params.id;
    
         if(id && id != 'undefined') {
-            ContentHelper.getContentById(id)
+            ContentHelper.getContentById(req.project, req.environment, id)
             .then(function(node) {
                 res.status(200).send(node);
             })
@@ -70,7 +70,7 @@ class ContentController extends ApiController {
         let parentId = req.query.parent;
         let schemaId = req.params.schemaId;
 
-        ContentHelper.createContent(schemaId, parentId)
+        ContentHelper.createContent(req.project, req.environment, schemaId, parentId)
         .then((node) => {
             res.status(200).send(node);
         })
@@ -86,7 +86,7 @@ class ContentController extends ApiController {
         let id = req.params.id;
         let node = req.body;
         
-        ContentHelper.setContentById(id, node, req.user)
+        ContentHelper.setContentById(req.project, req.environment, id, node, req.user)
         .then(() => {
             res.status(200).send(node);
         })
@@ -101,11 +101,11 @@ class ContentController extends ApiController {
     static pullContent(req, res) {
         let id = req.params.id;
 
-        SyncHelper.getResourceItem('content', id)
+        SyncHelper.getResourceItem(req.project, 'content', id)
         .then((resourceItem) => {
             if(!resourceItem) { return Promise.reject(new Error('Couldn\'t find remote Content "' + id + '"')); }
         
-            return ContentHelper.setContentById(id, resourceItem, req.user, true)
+            return ContentHelper.setContentById(req.project, req.environment, id, resourceItem, req.user, true)
             .then(() => {
                 res.status(200).send(resourceItem);
             });
@@ -121,12 +121,12 @@ class ContentController extends ApiController {
     static pushContent(req, res) {
         let id = req.params.id;
 
-        ContentHelper.getContentById(id)
+        ContentHelper.getContentById(req.project, req.environment, id)
         .then((localContent) => {
-            return SyncHelper.setResourceItem('content', id, localContent);
+            return SyncHelper.setResourceItem(req.project, 'content', id, localContent);
         })
         .then(() => {
-            return ContentHelper.removeContentById(id);
+            return ContentHelper.removeContentById(req.project, req.environment, id);
         })
         .then(() => {
             res.status(200).send(id);
@@ -142,7 +142,7 @@ class ContentController extends ApiController {
     static publishContent(req, res) {
         let content = new Content(req.body);
 
-        ConnectionHelper.publishContent(content, req.user)
+        ConnectionHelper.publishContent(req.project, req.environment, content, req.user)
         .then(() => {
             res.status(200).send(req.body);
         })
@@ -157,7 +157,7 @@ class ContentController extends ApiController {
     static unpublishContent(req, res) {
         let content = new Content(req.body);
 
-        ConnectionHelper.unpublishContent(content, req.user)
+        ConnectionHelper.unpublishContent(req.project, req.environment, content, req.user)
         .then(() => {
             res.status(200).send(content);
         })
@@ -173,7 +173,7 @@ class ContentController extends ApiController {
         let id = req.params.id;
         let removeChildren = req.query.removeChildren == true || req.query.removeChildren == 'true';
 
-        ContentHelper.removeContentById(id, removeChildren)
+        ContentHelper.removeContentById(req.project, req.environment, id, removeChildren)
         .then(() => {
             res.status(200).send(id);
         })

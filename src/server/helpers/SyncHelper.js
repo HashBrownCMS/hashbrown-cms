@@ -9,25 +9,29 @@ class SyncHelper {
     /**
      * Gets the sync settings
      *
+     * @param {String} project
+     *
      * @returns Promise
      */
-    static getSettings() {
-        return SettingsHelper.getSettings('sync');
+    static getSettings(project) {
+        return SettingsHelper.getSettings(project, 'sync');
     }
 
     /**
      * Gets a new token
      *
+     * @param {String} project
      * @param {String} username
      * @param {String} password
      *
      * @returns {Promise} New token
      */
-    static renewToken(username, password) {
-        // Cache local project names
-        let localProjectNames = ProjectHelper.getCurrentNames();
-
-        return this.getSettings()
+    static renewToken(
+        project = requiredParam('project'),
+        username = requiredParam('username'),
+        password = requiredParam('password')
+    ) {
+        return this.getSettings(project)
         .then((settings) => {
             debug.log('Renewing token for sync...', this);
 
@@ -46,9 +50,6 @@ class SyncHelper {
                     headers: headers,
                     data: JSON.stringify(postData)
                 }).on('complete', (data, response) => {
-                    // Restore local project names
-                    ProjectHelper.setCurrentNames(localProjectNames.project, localProjectNames.environment);
-
                     if(typeof data !== 'string' || data.length !== 40) {
                         reject(data);
                     
@@ -64,16 +65,18 @@ class SyncHelper {
     /**
      * Get resource item
      *
+     * @param {String} project
      * @param {String} remoteResourceName
      * @param {String} remoteItemName
      *
      * @returns {Promise} Resource
      */
-    static getResourceItem(remoteResourceName, remoteItemName) {
-        // Cache local project names
-        let localProjectNames = ProjectHelper.getCurrentNames();
-        
-        return this.getSettings()
+    static getResourceItem(
+        project = requiredParam('project'),
+        remoteResourceName = requiredParam('remoteResourceName'),
+        remoteItemName = requiredParam('remoteItemName')
+    ) {
+        return this.getSettings(project)
         .then((settings) => {
             return new Promise((resolve, reject) => {
                 if(settings && settings.enabled && settings[remoteResourceName]) {
@@ -84,9 +87,6 @@ class SyncHelper {
                     restler.get(settings.url + settings.project + '/' + settings.environment + '/' + remoteResourceName + '/' + remoteItemName + '?token=' + settings.token, {
                         headers: headers
                     }).on('complete', (data, response) => {
-                        // Restore local project names
-                        ProjectHelper.setCurrentNames(localProjectNames.project, localProjectNames.environment);
-                        
                         if(data instanceof Error) {
                             reject(data);
 
@@ -114,17 +114,20 @@ class SyncHelper {
     /**
      * Set resource item
      *
+     * @param {String} project
      * @param {String} remoteResourceName
      * @param {String} remoteItemName
      * @param {Object} remoteItemData
      *
      * @returns {Promise} Promise
      */
-    static setResourceItem(remoteResourceName, remoteItemName, remoteItemData) {
-        // Cache local project names
-        let localProjectNames = ProjectHelper.getCurrentNames();
-        
-        return this.getSettings()
+    static setResourceItem(
+        project = requiredParam('project'),
+        remoteResourceName = requiredParam('remoteResourceName'),
+        remoteItemName = requiredParam('remoteItemName'),
+        remoteItemData = requiredParam('remoteItemData')
+    ) {
+        return this.getSettings(project)
         .then((settings) => {
             return new Promise((resolve, reject) => {
                 if(settings && settings.enabled && settings[remoteResourceName]) {
@@ -136,9 +139,6 @@ class SyncHelper {
                         headers: headers,
                         data: JSON.stringify(remoteItemData)
                     }).on('complete', (data, response) => {
-                        // Restore local project names
-                        ProjectHelper.setCurrentNames(localProjectNames.project, localProjectNames.environment);
-                        
                         if(data instanceof Error) {
                             reject(data);
 
@@ -161,18 +161,18 @@ class SyncHelper {
     /**
      * Get resource
      *
+     * @param {String} project
      * @param {String} remoteResourceName
      * @param {Object} params
      *
      * @returns {Promise} Resource
      */
-    static getResource(remoteResourceName, params) {
-        // Cache local project names
-        let localProjectNames = ProjectHelper.getCurrentNames();
-
-        params = params || {};
-
-        return this.getSettings()
+    static getResource(
+        project = requiredParam('project'),
+        remoteResourceName = requiredParam('remoteResourceName'),
+        params = {}
+    ) {
+        return this.getSettings(project)
         .then((settings) => {
             return new Promise((resolve, reject) => {
                 if(settings && settings.enabled && settings[remoteResourceName]) {
@@ -186,9 +186,6 @@ class SyncHelper {
                         headers: headers,
                         query: params
                     }).on('complete', (data, response) => {
-                        // Restore local project names
-                        ProjectHelper.setCurrentNames(localProjectNames.project, localProjectNames.environment);
-                        
                         if(data instanceof Error) {
                             reject(data);
                         
@@ -211,17 +208,20 @@ class SyncHelper {
     /**
      * Merges a resource with a synced one
      *
+     * @param {String} project
      * @param {String} remoteResourceName
      * @param {Array} localResource
      * @param {Object} params
      *
      * @return {Promise} Merged resource
      */
-    static mergeResource(remoteResourceName, localResource, params) {
-        // Cache local project names
-        let localProjectNames = ProjectHelper.getCurrentNames();
-
-        return this.getResource(remoteResourceName, params)
+    static mergeResource(
+        project = requiredParam('project'),
+        remoteResourceName = requiredParam('remoteResourceName'),
+        localResource = requiredParam('localResource'),
+        params = {}
+    ) {
+        return this.getResource(project, remoteResourceName, params)
         .then((remoteResource) => {
             let mergedResource;
 
@@ -293,9 +293,6 @@ class SyncHelper {
 
             }
 
-            // Restore local project names
-            ProjectHelper.setCurrentNames(localProjectNames.project, localProjectNames.environment);
-                        
             return new Promise((resolve) => {
                 resolve(mergedResource);
             });

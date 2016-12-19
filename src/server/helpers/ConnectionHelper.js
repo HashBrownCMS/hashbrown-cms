@@ -42,14 +42,19 @@ class ConnectionHelper extends ConnectionHelperCommon {
     /**
      * Publishes content
      *
+     * @param {String} project
+     * @param {String} environment
      * @param {Content} content
      * @param {User} user
      *
-     * @returns {Promise} promise
+     * @returns {Promise} Promise
      */
-    static publishContent(content, user) {
-        if(!user || user instanceof User === false) { return Promise.reject(new Error('User not specified')); }
-        
+    static publishContent(
+        project = requiredParam('project'),
+        environment = requiredParam('environment'),
+        content = requiredParam('content'),
+        user = requiredParam('user')
+    ) {
         let helper = this;
 
         debug.log('Publishing content "' + content.id + '"...', this);
@@ -60,7 +65,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
                 debug.log('Looping through ' + settings.connections.length + ' connections...', this);
                 
                 function nextConnection(i) {
-                    return ConnectionHelper.getConnectionById(settings.connections[i])
+                    return ConnectionHelper.getConnectionById(project, environment, settings.connections[i])
                     .then((connection) => {
                         debug.log('Publishing through connection "' + settings.connections[i] + '" of type "' + connection.type + '"...', helper);
 
@@ -78,7 +83,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
                             // Update unpublished flag
                             content.unpublished = false;
 
-                            return ContentHelper.setContentById(content.id, content, user);
+                            return ContentHelper.setContentById(project, environment, content.id, content, user);
                         }
                     })
                 }
@@ -95,14 +100,19 @@ class ConnectionHelper extends ConnectionHelperCommon {
     /**
      * Unpublishes content
      *
+     * @param {String} project
+     * @param {String} environment
      * @param {Content} content
      * @param {User} user
      *
      * @returns {Promise} promise
      */
-    static unpublishContent(content, user) {
-        if(!user || user instanceof User === false) { return Promise.reject(new Error('User not specified')); }
-        
+    static unpublishContent(
+        project = requiredParam('project'),
+        environment = requiredParam('environment'),
+        content = requiredParam('content'),
+        user = requiredParam('user')
+    ) {
         let helper = this;
 
         debug.log('Unpublishing content "' + content.id + '"...', this);
@@ -113,7 +123,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
                 debug.log('Looping through ' + settings.connections.length + ' connections...', this);
                 
                 function nextConnection(i) {
-                    return ConnectionHelper.getConnectionById(settings.connections[i])
+                    return ConnectionHelper.getConnectionById(project, environment, settings.connections[i])
                     .then((connection) => {
                         debug.log('Unpublishing through connection "' + settings.connections[i] + '" of type "' + connection.type + '"...', helper);
 
@@ -131,7 +141,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
                             // Update unpublished flag
                             content.unpublished = true;
 
-                            return ContentHelper.setContentById(content.id, content, user);
+                            return ContentHelper.setContentById(project, environment, content.id, content, user);
                         }
                     });
                 }
@@ -149,17 +159,23 @@ class ConnectionHelper extends ConnectionHelperCommon {
     /**
      * Gets all connections
      *
+     * @param {String} project
+     * @param {String} environment
+     *
      * @return {Promise} Array of Connections
      */
-    static getAllConnections() {
-        let collection = ProjectHelper.currentEnvironment + '.connections';
+    static getAllConnections(
+        project = requiredParam('project'),
+        environment = requiredParam('environment')
+    ) {
+        let collection = environment + '.connections';
         
         return MongoHelper.find(
-            ProjectHelper.currentProject,
+            project,
             collection,
             {}
         ).then((array) => {
-            return SyncHelper.mergeResource('connections', array)
+            return SyncHelper.mergeResource(project, 'connections', array)
             .then((connections) => {
                 for(let i in connections) {
                     connections[i] = ConnectionHelper.initConnection(connections[i]);
@@ -173,22 +189,28 @@ class ConnectionHelper extends ConnectionHelperCommon {
     /**
      * Gets a connection by id
      *
+     * @param {String} project
+     * @param {String} environment
      * @param {string} id
      *
      * @return {Promise} Connection
      */
-    static getConnectionById(id) {
-        let collection = ProjectHelper.currentEnvironment + '.connections';
+    static getConnectionById(
+        project = requiredParam('project'),
+        environment = requiredParam('environment'),
+        id = requiredParam('id')
+    ) {
+        let collection = environment + '.connections';
         
         return MongoHelper.findOne(
-            ProjectHelper.currentProject,
+            project,
             collection,
             {
                 id: id
             }
         ).then((data) => {
             if(!data) {
-                return SyncHelper.getResourceItem('connections', id)
+                return SyncHelper.getResourceItem(project, 'connections', id)
                 .then((resourceItem) => {
                       return Promise.resolve(ConnectionHelper.initConnection(resourceItem));
                 });
@@ -201,15 +223,21 @@ class ConnectionHelper extends ConnectionHelperCommon {
     /**
      * Removes a connection by id
      *
+     * @param {String} project
+     * @param {String} environment
      * @param {string} id
      *
      * @return {Promise} promise
      */
-    static removeConnectionById(id) {
-        let collection = ProjectHelper.currentEnvironment + '.connections';
+    static removeConnectionById(
+        project = requiredParam('project'),
+        environment = requiredParam('environment'),
+        id = requiredParam('id')
+    ) {
+        let collection = environment + '.connections';
         
         return MongoHelper.removeOne(
-            ProjectHelper.currentProject,
+            project,
             collection,
             {
                 id: id
@@ -220,17 +248,24 @@ class ConnectionHelper extends ConnectionHelperCommon {
     /**
      * Sets a connection setting by id
      *
+     * @param {String} project
+     * @param {String} environment
      * @param {string} id
      * @param {Object} newSettings
      *
      * @return {Promise} promise
      */
-    static setConnectionSettingById(id, newSettings) {
-        let collection = ProjectHelper.currentEnvironment + '.connections';
+    static setConnectionSettingById(
+        project = requiredParam('project'),
+        environment = requiredParam('environment'),
+        id = requiredParam('id'),
+        newSettings = requiredParam('newSwettings')
+    ) {
+        let collection = environment + '.connections';
         
         // First find the connection
         return MongoHelper.findOne(
-            ProjectHelper.currentProject,
+            project,
             collection,
             {
                 id: id
@@ -251,7 +286,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
 
             // Update the Mongo document
             return MongoHelper.updateOne(
-                ProjectHelper.currentProject,
+                project,
                 'connections',
                 {
                     id: id
@@ -264,21 +299,29 @@ class ConnectionHelper extends ConnectionHelperCommon {
     /**
      * Sets a connection by id
      *
+     * @param {String} project
+     * @param {String} environment
      * @param {string} id
      * @param {Connection} connection
      * @param {Boolean} create
      *
      * @return {Promise} promise
      */
-    static setConnectionById(id, connection, create) {
-        let collection = ProjectHelper.currentEnvironment + '.connections';
+    static setConnectionById(
+        project = requiredParam('project'),
+        environment = requiredParam('environment'),
+        id = requiredParam('id'),
+        connection = requiredParam('connection'),
+        create = false
+    ) {
+        let collection = environment + '.connections';
        
         // Unset automatic flags
         connection.locked = false;
         connection.remote = false;
         
         return MongoHelper.updateOne(
-            ProjectHelper.currentProject,
+            project,
             collection,
             {
                 id: id
@@ -293,14 +336,20 @@ class ConnectionHelper extends ConnectionHelperCommon {
     /**
      * Creates a new connection
      *
+     * @param {String} project
+     * @param {String} environment
+     *
      * @return {Promise} promise
      */
-    static createConnection() {
+    static createConnection(
+        project = requiredParam('project'),
+        environment = requiredParam('environment')
+    ) {
         let connection = Connection.create();
-        let collection = ProjectHelper.currentEnvironment + '.connections';
+        let collection = environment + '.connections';
 
         return MongoHelper.insertOne(
-            ProjectHelper.currentProject,
+            project,
             collection,
             connection.getFields()
         );

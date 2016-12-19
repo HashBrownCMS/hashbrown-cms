@@ -98,14 +98,20 @@ class SchemaHelper extends SchemaHelperCommon {
     /**
      * Gets a list of all custom schema objects
      *
+     * @param {String} project
+     * @param {String} environment
+     *
      * @returns {Promise} Array of Schemas
      */
-    static getCustomSchemas() {
-        let collection = ProjectHelper.currentEnvironment + '.schemas';
+    static getCustomSchemas(
+        project = requiredParam('project'),
+        environment = requiredParam('environment')
+    ) {
+        let collection = environment + '.schemas';
         let result = [];
        
         return MongoHelper.find(
-            ProjectHelper.currentProject,
+            project,
             collection,
             {}
         )
@@ -125,16 +131,22 @@ class SchemaHelper extends SchemaHelperCommon {
                 }
             }
 
-            return SyncHelper.mergeResource('schemas', schemas, { customOnly: true });
+            return SyncHelper.mergeResource(project, 'schemas', schemas, { customOnly: true });
         });
     }
 
     /**
      * Gets a list of all schema objects
      *
+     * @param {String} project
+     * @param {String} environment
+     *
      * @returns {Promise} Array of Schemas
      */
-    static getAllSchemas() {
+    static getAllSchemas(
+        project = requiredParam('project'),
+        environment = requiredParam('environment')
+    ) {
         let nativeSchemas;
         let customSchemas;
 
@@ -142,7 +154,7 @@ class SchemaHelper extends SchemaHelperCommon {
         .then((result) => {
             nativeSchemas = result;
 
-            return SchemaHelper.getCustomSchemas();
+            return SchemaHelper.getCustomSchemas(project, environment);
         })
         .then((result) => {
             customSchemas = result;
@@ -162,7 +174,7 @@ class SchemaHelper extends SchemaHelperCommon {
     }
 
     /**
-     * Checks whether a Schema id belongs to a ntive schema
+     * Checks whether a Schema id belongs to a native schema
      *
      * @param {String} id
      *
@@ -229,18 +241,24 @@ class SchemaHelper extends SchemaHelperCommon {
     /**
      * Gets a Schema by id
      *
+     * @param {String} project
+     * @param {String} environment
      * @param {Number} id
      *
      * @return {Promise} Schema
      */
-    static getSchemaById(id) {
-        let collection = ProjectHelper.currentEnvironment + '.schemas';
+    static getSchemaById(
+        project = requiredParam('project'),
+        environment = requiredParam('environment'),
+        id = requiredParam('id')
+    ) {
+        let collection = environment + '.schemas';
 
         if(id) {
             let promise = SchemaHelper.isNativeSchema(id) ?
                 SchemaHelper.getNativeSchema(id) :
                 MongoHelper.findOne(
-                    ProjectHelper.currentProject,
+                    project,
                     collection,
                     {
                         id: id
@@ -256,7 +274,7 @@ class SchemaHelper extends SchemaHelperCommon {
                     });
                 
                 } else {
-                    return SyncHelper.getResourceItem('schemas', id);
+                    return SyncHelper.getResourceItem(project, 'schemas', id);
 
                 }
             });
@@ -277,7 +295,10 @@ class SchemaHelper extends SchemaHelperCommon {
      *
      * @returns {Schema} Merged Schema
      */
-    static mergeSchemas(childSchema, parentSchema) {
+    static mergeSchemas(
+        childSchema = requiredParam('childSchema'),
+        parentSchema = requiredParam('parentSchema')
+    ) {
         let mergedSchema = parentSchema;
 
         // Recursive merge
@@ -335,17 +356,23 @@ class SchemaHelper extends SchemaHelperCommon {
     /**
      * Gets all parent fields
      *
+     * @param {String} project
+     * @param {String} environment
      * @param {String} id
      *
      * @returns {Promise} Schema with all aprent fields
      */
-    static getSchemaWithParentFields(id) {
+    static getSchemaWithParentFields(
+        project = requiredParam('project'),
+        environment = requiredParam('environment'),
+        id = requiredParam('id')
+    ) {
         return new Promise((resolve, reject) => {
-            SchemaHelper.getSchemaById(id)
+            SchemaHelper.getSchemaById(project, environment, id)
             .then((schema) => {
                 // If this Schema has a parent, merge fields with it
                 if(schema.parentSchemaId) {
-                    SchemaHelper.getSchemaWithParentFields(schema.parentSchemaId)
+                    SchemaHelper.getSchemaWithParentFields(project, environment, schema.parentSchemaId)
                     .then((parentSchema) => {
                         let mergedSchema = SchemaHelper.mergeSchemas(schema, parentSchema);
                         let model = SchemaHelper.getModel(mergedSchema);
@@ -370,15 +397,21 @@ class SchemaHelper extends SchemaHelperCommon {
     /**
      * Removes a schema object by id
      *
+     * @param {String} project
+     * @param {String} environment
      * @param {Number} id
      *
      * @return {Promise} Promise
      */
-    static removeSchema(id) {
-        let collection = ProjectHelper.currentEnvironment + '.schemas';
+    static removeSchema(
+        project = requiredParam('project'),
+        environment = requiredParam('environment'),
+        id = requiredParam('id')
+    ) {
+        let collection = environment + '.schemas';
        
         return MongoHelper.removeOne(
-            ProjectHelper.currentProject,
+            project,
             collection,
             {
                 id: id
@@ -389,14 +422,22 @@ class SchemaHelper extends SchemaHelperCommon {
     /**
      * Sets a schema object by id
      *
+     * @param {String} project
+     * @param {String} environment
      * @param {Number} id
      * @param {Object} schema
      * @param {Boolean} create
      *
      * @return {Promise} Promise
      */
-    static setSchema(id, schema, create) {
-        let collection = ProjectHelper.currentEnvironment + '.schemas';
+    static setSchema(
+        project = requiredParam('project'),
+        environment = requiredParam('environment'),
+        id = requiredParam('id'),
+        schema = requiredParam('schema'),
+        create = false
+    ) {
+        let collection = environment + '.schemas';
        
         schema = schema || {};
 
@@ -405,7 +446,7 @@ class SchemaHelper extends SchemaHelperCommon {
         schema.remote = false;
 
         return MongoHelper.updateOne(
-            ProjectHelper.currentProject,
+            project,
             collection,
             {
                 id: id
@@ -420,16 +461,22 @@ class SchemaHelper extends SchemaHelperCommon {
     /**
      * Creates a new Schema
      *
+     * @param {String} project
+     * @param {String} environment
      * @param {Schema} parentSchema
      *
      * @returns {Promise} Created Schema
      */
-    static createSchema(parentSchema) {
-        let collection = ProjectHelper.currentEnvironment + '.schemas';
+    static createSchema(
+        project = requiredParam('project'),
+        environment = requiredParam('environment'),
+        parentSchema
+    ) {
+        let collection = environment + '.schemas';
         let newSchema = Schema.create(parentSchema);
 
         return MongoHelper.insertOne(
-            ProjectHelper.currentProject,
+            project,
             collection,
             newSchema.getFields() 
         ).then(() => {

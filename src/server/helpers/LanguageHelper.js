@@ -6,62 +6,58 @@ class LanguageHelper extends LanguageHelperCommon {
     /**
      * Gets all selected languages
      *
-     * @returns {String[]} languages
+     * @param {String} project
+     *
+     * @returns {Array} Array of language names
      */
-    static getSelectedLanguages() {
-        return new Promise((callback) => {
-            SettingsHelper.getSettings('language')
-            .then((settings) => {
-                if(!settings) {
-                    settings = {};
-                }
-                
-                if(!settings.selected || settings.selected.length < 1) {
-                    settings.selected = ['en'];
-                }
-          
-                settings.selected.sort();
+    static getSelectedLanguages(project) {
+        return SettingsHelper.getSettings(project, 'language')
+        .then((settings) => {
+            if(!settings) {
+                settings = {};
+            }
+            
+            if(!settings.selected || settings.selected.length < 1) {
+                settings.selected = ['en'];
+            }
+      
+            settings.selected.sort();
 
-                callback(settings.selected);
-            });  
-        });
+            return Promise.resolve(settings.selected);
+        });  
     }
 
     /**
      * Toggle a language
      *
+     * @param {String} project
      * @param {String} language
      * @param {Boolean} state
      *
-     * @returns {Promise} promise
+     * @returns {Promise} Promise
      */
-    static toggleLanguage(language, state) {
-        return new Promise((callback) => {
-            SettingsHelper.getSettings('language')
-            .then((settings) => {
-                if(!settings) {
-                    settings = {};
-                }
-                
-                if(!settings.selected || settings.selected.length < 1) {
-                    settings.selected = ['en'];
-                }
+    static toggleLanguage(project, language, state) {
+        return SettingsHelper.getSettings(project, 'language')
+        .then((settings) => {
+            if(!settings) {
+                settings = {};
+            }
             
-                if(!state && settings.selected.indexOf(language) > -1) {
-                    settings.selected.splice(settings.selected.indexOf(language), 1);
+            if(!settings.selected || settings.selected.length < 1) {
+                settings.selected = ['en'];
+            }
+        
+            if(!state && settings.selected.indexOf(language) > -1) {
+                settings.selected.splice(settings.selected.indexOf(language), 1);
 
-                } else if(state && settings.selected.indexOf(language) < 0) {
-                    settings.selected.push(language);
-                    settings.selected.sort();
+            } else if(state && settings.selected.indexOf(language) < 0) {
+                settings.selected.push(language);
+                settings.selected.sort();
 
-                }
+            }
 
-                SettingsHelper.setSettings('language', settings)
-                .then(() => {
-                    callback()
-                });
-            });  
-        });
+            return SettingsHelper.setSettings(project, 'language', settings);
+        });  
     }
 }
 

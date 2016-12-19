@@ -7,17 +7,15 @@ class MediaHelper {
     /**
      * Gets the media root path
      *
-     * @returns {Promise(String)} path
+     * @returns {Promise} Path
      */
     static getRootPath() {
-        return new Promise((resolve, reject) => {
-            ConnectionHelper.getMediaProvider()
-            .then((connection) => {
-                resolve(connection.getMediaPath());   
-            })
-            .catch(() => {
-                resolve('');  
-            });
+        return ConnectionHelper.getMediaProvider()
+        .then((connection) => {
+            resolve(connection.getMediaPath());   
+        })
+        .catch(() => {
+            resolve('');  
         });
     }
 
@@ -27,9 +25,7 @@ class MediaHelper {
      * @returns {Promise(Object)} tree
      */
     static getTree() {
-        return new Promise((resolve, reject) => {
-            resolve({});
-        });
+        return Promise.resolve({});
     }
     
     /**
@@ -41,17 +37,19 @@ class MediaHelper {
      * @returns {Promise} promise
      */
     static setTreeItem(id, item) {
-        return new Promise((resolve, reject) => {
-            resolve();
-        });
+        return Promise.resolve();
     }
 
     /**
      * Gets the media temp path
      *
-     * @returns {String} path
+     * @param {String} project
+     *
+     * @returns {String} Path
      */
-    static getTempPath() {
+    static getTempPath(
+        project = requiredParam('project')
+    ) {
         let path = 
             '/storage/' +
             ProjectHelper.currentProject +

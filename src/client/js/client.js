@@ -64,6 +64,14 @@ window.UI = require('./helpers/UIHelper');
 let onReadyCallbacks = {};
 let isReady = {};
 
+// ----------
+// Global methods
+// ----------
+// Handles a required parameter
+window.requiredParam = function(name) {
+    throw new Error('Parameter "' + name + '" is required');
+}
+
 /**
  * Clears the workspace
  */

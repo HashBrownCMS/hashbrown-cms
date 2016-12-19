@@ -14,9 +14,10 @@ class ApiController extends Controller {
      * Authenticates an API call
      *
      * @param {String} token
+     * @param {String} project
      * @param {String} scope
      */
-    static authenticate(token, scope) {
+    static authenticate(token, project, scope) {
         if(!token) {
             return Promise.reject(new Error('No token was provided'));
 
@@ -25,8 +26,8 @@ class ApiController extends Controller {
             .then((user) => {
                 if(user) {
                     // If a scope is defined, and the user isn't an admin, check for it
-                    if(scope && !user.isAdmin) {
-                        if(user.hasScope(ProjectHelper.currentProject, scope)) {
+                    if(project && scope && !user.isAdmin) {
+                        if(user.hasScope(project, scope)) {
                             return Promise.resolve(user);
                 
                         } else {
@@ -50,12 +51,12 @@ class ApiController extends Controller {
     /**
      * Sets project variables
      * 
-     * @param {String} url
+     * @param {Object} req
      */
-    static setProjectVariables(url) {
+    static setProjectVariables(req) {
         let keys = [];
         let re = pathToRegexp('/:root/:project/:environment/*', keys);
-        let values = re.exec(url);
+        let values = re.exec(req.originalUrl);
         let project = null;
         let environment = null;
 
@@ -68,24 +69,14 @@ class ApiController extends Controller {
 
                 switch(key.name) {
                     case 'project':
-                        project = values[i];
+                        req.project = values[i];
                         break;
 
                     case 'environment':
-                        environment = values[i];
+                        req.environment = values[i];
                         break;
                 }
             }
-        }
-
-        // We have project (environment optional), we'll set them as current
-        if(project) {
-            return ProjectHelper.setCurrent(project, environment);
-        
-        // The parameters weren't provided, so just move on
-        } else {
-            return Promise.resolve();
-
         }
     }
         
@@ -158,17 +149,16 @@ class ApiController extends Controller {
                 // Using project parameter
                 if(settings.setProject != false) {
                     // Set the project variables
-                    return ApiController.setProjectVariables(req.originalUrl)
-                    .then(() => {
-                        // Using authentication
-                        if(settings.authenticate != false) {
-                            return ApiController.authenticate(token, settings.scope);
-                        
-                        // No authentication needed
-                        } else {
-                            return Promise.resolve();
-                        }
-                    });
+                    ApiController.setProjectVariables(req);
+
+                    // Using authentication
+                    if(settings.authenticate != false) {
+                        return ApiController.authenticate(token, req.project, settings.scope);
+                    
+                    // No authentication needed
+                    } else {
+                        return Promise.resolve();
+                    }
                 
                 // Disregarding project parameter, but using authentication
                 } else if(settings.authenticate != false) {
