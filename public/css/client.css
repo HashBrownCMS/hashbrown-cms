@@ -30,8 +30,8 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    width: 40px;
-    height: 40px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
     background-color: #e0e0e0; }
   .dropdown.open .dropdown-toggle span {
@@ -623,6 +623,17 @@ img.logo {
     width: 32px;
     height: 32px; }
 
+.content-settings-modal .modal-dialog {
+  max-width: 400px; }
+  .content-settings-modal .modal-dialog .input-group {
+    display: flex; }
+    .content-settings-modal .modal-dialog .input-group span {
+      flex-grow: 1;
+      line-height: 30px; }
+    .content-settings-modal .modal-dialog .input-group .input-group-addon {
+      padding: 0px;
+      flex-basis: 30px; }
+
 .error-modal .modal-dialog .fa-warning {
   margin-right: 10px; }
 
@@ -668,8 +679,10 @@ img.logo {
   .cms-container .menuspace {
     position: absolute;
     right: 0px;
-    top: 0px;
-    padding: 15px 10px;
+    top: 10px;
+    border-top-left-radius: 2px;
+    border-bottom-left-radius: 2px;
+    padding: 8px;
     flex-basis: 100%;
     flex-grow: 1;
     z-index: 50; }
@@ -806,7 +819,7 @@ img.logo {
     flex-grow: 1; }
   .main-menu .main-menu-item {
     position: relative;
-    margin: 0px 5px;
+    margin: 0px;
     width: 30px; }
     .main-menu .main-menu-item > a, .main-menu .main-menu-item > button {
       text-decoration: none;

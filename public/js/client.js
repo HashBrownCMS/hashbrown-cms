@@ -20428,15 +20428,15 @@
 	        }
 
 	        /**
-	         * Render Content settings modal
+	         * Render Content publishing modal
 	         *
 	         * @param {Content} content
 	         * @param {Object} publishing
 	         */
 
 	    }, {
-	        key: 'renderContentSettingsModal',
-	        value: function renderContentSettingsModal(content, publishing) {
+	        key: 'renderContentPublishingModal',
+	        value: function renderContentPublishingModal(content, publishing) {
 	            // Event on clicking OK
 	            function onSubmit() {
 	                if (!publishing.governedBy) {
@@ -20503,6 +20503,8 @@
 	                    }
 	                }
 	            });
+
+	            modal.$element.toggleClass('content-settings-modal');
 	        }
 
 	        /**
@@ -20510,8 +20512,8 @@
 	         */
 
 	    }, {
-	        key: 'onClickContentSettings',
-	        value: function onClickContentSettings() {
+	        key: 'onClickContentPublishing',
+	        value: function onClickContentPublishing() {
 	            var _this2 = this;
 
 	            var id = $('.context-menu-target-element').data('id');
@@ -20535,7 +20537,7 @@
 	                // Sanity check
 	                publishing.applyToChildren = publishing.applyToChildren == true || publishing.applyToChildren == 'true';
 
-	                _this2.renderContentSettingsModal(content, publishing);
+	                _this2.renderContentPublishingModal(content, publishing);
 	            });
 	        }
 
@@ -20644,8 +20646,9 @@
 	                    }
 
 	                    if (!item.remote && !item.locked) {
-	                        menu['Settings'] = function () {
-	                            _this3.onClickContentSettings();
+	                        menu['Settings'] = '---';
+	                        menu['Publishing'] = function () {
+	                            _this3.onClickContentPublishing();
 	                        };
 	                    }
 

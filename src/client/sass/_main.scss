@@ -189,6 +189,27 @@ img.logo {
     }
 }
 
+// Content settings modal
+.content-settings-modal {
+    .modal-dialog {
+        max-width: 400px;
+
+        .input-group {
+            display: flex;
+
+            span {
+                flex-grow: 1;
+                line-height: 30px;
+            }
+
+            .input-group-addon {
+                padding: 0px;
+                flex-basis: 30px;
+            }
+        }
+    }
+}
+
 // Error modal
 .error-modal {
     .modal-dialog {
@@ -260,8 +281,10 @@ img.logo {
     .menuspace {
         position: absolute;
         right: 0px;
-        top: 0px;
-        padding: 15px 10px;
+        top: 10px;
+        border-top-left-radius: 2px;
+        border-bottom-left-radius: 2px;
+        padding: 8px;
         flex-basis: 100%;
         flex-grow: 1;
         z-index: 50;

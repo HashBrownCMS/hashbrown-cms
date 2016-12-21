@@ -216,12 +216,12 @@ class ContentPane extends Pane {
     }
 
     /**
-     * Render Content settings modal
+     * Render Content publishing modal
      *
      * @param {Content} content
      * @param {Object} publishing
      */
-    static renderContentSettingsModal(content, publishing) {
+    static renderContentPublishingModal(content, publishing) {
         // Event on clicking OK
         function onSubmit() {
             if(!publishing.governedBy) {
@@ -311,12 +311,14 @@ class ContentPane extends Pane {
                 }
             }
         });
+
+        modal.$element.toggleClass('content-settings-modal');
     }
 
     /**
      * Event: Click Content settings
      */
-    static onClickContentSettings() {
+    static onClickContentPublishing() {
         let id = $('.context-menu-target-element').data('id');
         let navbar = ViewHelper.get('NavbarMain');
         let content;
@@ -340,7 +342,7 @@ class ContentPane extends Pane {
             // Sanity check
             publishing.applyToChildren = publishing.applyToChildren == true || publishing.applyToChildren == 'true';
 
-            this.renderContentSettingsModal(content, publishing);
+            this.renderContentPublishingModal(content, publishing);
         });
     }
 
@@ -446,7 +448,8 @@ class ContentPane extends Pane {
                 }
 
                 if(!item.remote && !item.locked) {
-                    menu['Settings'] = () => { this.onClickContentSettings(); };
+                    menu['Settings'] = '---';
+                    menu['Publishing'] = () => { this.onClickContentPublishing(); };
                 }
                 
                 if(item.local || item.remote) {
