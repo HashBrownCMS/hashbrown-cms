@@ -195,7 +195,7 @@ class ContentHelper extends ContentHelperCommon {
         project = requiredParam('project'),
         environment = requiredParam('environment'),
         schemaId = requiredParam('schemaId'),
-        parentId = requiredParam('parentId'),
+        parentId = null,
         user = requiredParam('user')
     ) {
         return this.isSchemaAllowedAsChild(parentId, schemaId)

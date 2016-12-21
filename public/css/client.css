@@ -321,7 +321,7 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
   background-color: #1e88e5;
   color: #fff;
   cursor: pointer;
-  width: auto;
+  width: auto !important;
   padding: 0px 30px 0px 10px;
   border-radius: 2px;
   appearance: none;

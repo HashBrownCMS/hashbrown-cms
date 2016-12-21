@@ -70,7 +70,7 @@ class ContentController extends ApiController {
         let parentId = req.query.parent;
         let schemaId = req.params.schemaId;
 
-        ContentHelper.createContent(req.project, req.environment, schemaId, parentId)
+        ContentHelper.createContent(req.project, req.environment, schemaId, parentId, req.user)
         .then((node) => {
             res.status(200).send(node);
         })
