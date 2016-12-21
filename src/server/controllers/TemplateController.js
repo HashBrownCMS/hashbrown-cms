@@ -15,7 +15,7 @@ class TemplateController extends ApiController {
      * Gets an array of all templates
      */
     static getTemplates(req, res) {
-        ConnectionHelper.getTemplateProvider()
+        ConnectionHelper.getTemplateProvider(req.project, req.environment)
         .then((connection) => {
             if(!connection) { return Promise.reject(new Error('No template provider found')); }
             
@@ -33,7 +33,7 @@ class TemplateController extends ApiController {
      * Gets an array of all section templates
      */
     static getSectionTemplates(req, res) {
-        ConnectionHelper.getTemplateProvider()
+        ConnectionHelper.getTemplateProvider(req.project, req.environment)
         .then((connection) => {
             if(!connection) { return Promise.reject(new Error('No template provider found')); }
 

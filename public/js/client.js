@@ -33228,17 +33228,23 @@
 	        /**
 	         * Gets all connections
 	         *
+	         * @param {String} project
+	         * @param {String} environment
+	         *
 	         * @returns {Promise(Array)} connections
 	         */
 	        value: function getAllConnections() {
-	            return new Promise(function (resolve, reject) {
-	                resolve([]);
-	            });
+	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+
+	            return Promise.resolve();
 	        }
 
 	        /**
 	         * Sets the Template provider
 	         *
+	         * @param {String} project
+	         * @param {String} environment
 	         * @param {String} id
 	         *
 	         * @return {Promise} Promise
@@ -33246,17 +33252,24 @@
 
 	    }, {
 	        key: 'setTemplateProvider',
-	        value: function setTemplateProvider(id) {
-	            return SettingsHelper.getSettings('providers').then(function (providers) {
+	        value: function setTemplateProvider() {
+	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+	            var id = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('id');
+
+	            return SettingsHelper.getSettings(project, 'providers').then(function (providers) {
 	                providers = providers || {};
 	                providers.template = id;
 
-	                SettingsHelper.setSettings('providers', providers);
+	                SettingsHelper.setSettings(project, 'providers', providers);
 	            });
 	        }
 
 	        /**
 	         * Gets the Template provider
+	         *
+	         * @param {String} project
+	         * @param {String} environment
 	         *
 	         * @return {Promise} Connection object
 	         */
@@ -33266,22 +33279,25 @@
 	        value: function getTemplateProvider() {
 	            var _this = this;
 
-	            return new Promise(function (resolve, reject) {
-	                SettingsHelper.getSettings('providers').then(function (providers) {
-	                    providers = providers || {};
+	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
 
-	                    if (providers.template) {
-	                        return _this.getConnectionById(providers.template);
-	                    } else {
-	                        return Promise.reject(new Error('Template provider is not defined'));
-	                    }
-	                }).then(resolve).catch(reject);
+	            return SettingsHelper.getSettings(project, 'providers').then(function (providers) {
+	                providers = providers || {};
+
+	                if (providers.template) {
+	                    return _this.getConnectionById(project, environment, providers.template);
+	                } else {
+	                    return Promise.reject(new Error('Template provider is not defined'));
+	                }
 	            });
 	        }
 
 	        /**
 	         * Sets the Media provider
 	         *
+	         * @param {String} project
+	         * @param {String} environment
 	         * @param {String} id
 	         *
 	         * @return {Promise} Promise
@@ -33289,17 +33305,24 @@
 
 	    }, {
 	        key: 'setMediaProvider',
-	        value: function setMediaProvider(id) {
-	            return SettingsHelper.getSettings('providers').then(function (providers) {
+	        value: function setMediaProvider() {
+	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+	            var id = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('id');
+
+	            return SettingsHelper.getSettings(project, 'providers').then(function (providers) {
 	                providers = providers || {};
 	                providers.media = id;
 
-	                SettingsHelper.setSettings('providers', providers);
+	                SettingsHelper.setSettings(project, 'providers', providers);
 	            });
 	        }
 
 	        /**
 	         * Gets the Media provider
+	         *
+	         * @param {String} project
+	         * @param {String} environment
 	         *
 	         * @return {Promise} Connection object
 	         */
@@ -33309,16 +33332,17 @@
 	        value: function getMediaProvider() {
 	            var _this2 = this;
 
-	            return new Promise(function (resolve, reject) {
-	                SettingsHelper.getSettings('providers').then(function (providers) {
-	                    providers = providers || {};
+	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
 
-	                    if (providers.media) {
-	                        return _this2.getConnectionById(providers.media);
-	                    } else {
-	                        return Promise.reject(new Error('Media provider is not defined'));
-	                    }
-	                }).then(resolve).catch(reject);
+	            return SettingsHelper.getSettings(project, 'providers').then(function (providers) {
+	                providers = providers || {};
+
+	                if (providers.media) {
+	                    return _this2.getConnectionById(project, environment, providers.media);
+	                } else {
+	                    return Promise.reject(new Error('Media provider is not defined'));
+	                }
 	            });
 	        }
 	    }]);

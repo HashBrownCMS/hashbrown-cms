@@ -31,7 +31,7 @@ class MediaController extends ApiController {
     static serveMedia(req, res) {
         let id = req.params.id;
 
-        ConnectionHelper.getMediaProvider()
+        ConnectionHelper.getMediaProvider(req.project, req.environment)
         .then((connection) => {
             return connection.getMedia(id);
         })
@@ -109,14 +109,14 @@ class MediaController extends ApiController {
         let media;
         let tree;
 
-        ConnectionHelper.getMediaProvider()
+        ConnectionHelper.getMediaProvider(req.project, req.environment)
         .then((connection) => {
             return connection.getAllMedia();
         })
         .then((result) => {
             media = result;
 
-            return MediaHelper.getTree();
+            return MediaHelper.getTree(req.project, req.environment);
         })
         .then((result) => {
             let tree = result;
@@ -140,7 +140,7 @@ class MediaController extends ApiController {
         let media;
         let tree;
 
-        ConnectionHelper.getMediaProvider()
+        ConnectionHelper.getMediaProvider(req.project, req.environment)
         .then((connection) => {
             return connection.getMedia(id);
         })
@@ -167,7 +167,7 @@ class MediaController extends ApiController {
     static deleteMedia(req, res) {
         let id = req.params.id;
 
-        ConnectionHelper.getMediaProvider()
+        ConnectionHelper.getMediaProvider(req.project, req.environment)
         .then((connection) => {
             return connection.removeMedia(id);
         })
@@ -187,7 +187,7 @@ class MediaController extends ApiController {
         let id = req.params.id;
 
         if(file) {
-            ConnectionHelper.getMediaProvider()
+            ConnectionHelper.getMediaProvider(req.project, req.environment)
             .then((connection) => {
                 return connection.setMedia(id, file);
             })
@@ -218,7 +218,7 @@ class MediaController extends ApiController {
         if(file) {
             let media = Media.create();
 
-            ConnectionHelper.getMediaProvider()
+            ConnectionHelper.getMediaProvider(req.project, req.environment)
             .then((connection) => {
                 return connection.setMedia(media.id, file);
             })

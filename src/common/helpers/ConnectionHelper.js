@@ -4,89 +4,109 @@ class ConnectionHelper {
     /**
      * Gets all connections
      *
+     * @param {String} project
+     * @param {String} environment
+     *
      * @returns {Promise(Array)} connections
      */
-    static getAllConnections() {
-        return new Promise((resolve, reject) => {
-            resolve([]);
-        });
+    static getAllConnections(
+        project = requiredParam('project'),
+        environment = requiredParam('environment')
+    ) {
+        return Promise.resolve();
     }
     
     /**
      * Sets the Template provider
      *
+     * @param {String} project
+     * @param {String} environment
      * @param {String} id
      *
      * @return {Promise} Promise
      */
-    static setTemplateProvider(id) {
-        return SettingsHelper.getSettings('providers')
+    static setTemplateProvider(
+        project = requiredParam('project'),
+        environment = requiredParam('environment'),
+        id = requiredParam('id')
+    ) {
+        return SettingsHelper.getSettings(project, 'providers')
         .then((providers) => {
             providers = providers || {};
             providers.template = id;
 
-            SettingsHelper.setSettings('providers', providers)
+            SettingsHelper.setSettings(project, 'providers', providers)
         });
     }
 
     /**
      * Gets the Template provider
      *
+     * @param {String} project
+     * @param {String} environment
+     *
      * @return {Promise} Connection object
      */
-    static getTemplateProvider() {
-        return new Promise((resolve, reject) => {
-            SettingsHelper.getSettings('providers')
-            .then((providers) => {
-                providers = providers || {};
+    static getTemplateProvider(
+        project = requiredParam('project'),
+        environment = requiredParam('environment')
+    ) {
+        return SettingsHelper.getSettings(project, 'providers')
+        .then((providers) => {
+            providers = providers || {};
 
-                if(providers.template) {
-                    return this.getConnectionById(providers.template);  
-                } else {
-                    return Promise.reject(new Error('Template provider is not defined'));
-                }
-            })
-            .then(resolve)
-            .catch(reject);
+            if(providers.template) {
+                return this.getConnectionById(project, environment, providers.template);  
+            } else {
+                return Promise.reject(new Error('Template provider is not defined'));
+            }
         });
     }
 
     /**
      * Sets the Media provider
      *
+     * @param {String} project
+     * @param {String} environment
      * @param {String} id
      *
      * @return {Promise} Promise
      */
-    static setMediaProvider(id) {
-        return SettingsHelper.getSettings('providers')
+    static setMediaProvider(
+        project = requiredParam('project'),
+        environment = requiredParam('environment'),
+        id = requiredParam('id')
+    ) {
+        return SettingsHelper.getSettings(project, 'providers')
         .then((providers) => {
             providers = providers || {};
             providers.media = id;
 
-            SettingsHelper.setSettings('providers', providers)
+            SettingsHelper.setSettings(project, 'providers', providers)
         });
     }
 
     /**
      * Gets the Media provider
      *
+     * @param {String} project
+     * @param {String} environment
+     *
      * @return {Promise} Connection object
      */
-    static getMediaProvider() {
-        return new Promise((resolve, reject) => {
-            SettingsHelper.getSettings('providers')
-            .then((providers) => {
-                providers = providers || {};
+    static getMediaProvider(
+        project = requiredParam('project'),
+        environment = requiredParam('environment')
+    ) {
+        return SettingsHelper.getSettings(project, 'providers')
+        .then((providers) => {
+            providers = providers || {};
 
-                if(providers.media) {
-                    return this.getConnectionById(providers.media);
-                } else {
-                    return Promise.reject(new Error('Media provider is not defined'));
-                }
-            })
-            .then(resolve)
-            .catch(reject);
+            if(providers.media) {
+                return this.getConnectionById(project, environment, providers.media);
+            } else {
+                return Promise.reject(new Error('Media provider is not defined'));
+            }
         });
     }
 }

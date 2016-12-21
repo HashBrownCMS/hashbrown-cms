@@ -220,7 +220,7 @@ class ApiController extends Controller {
             debug.log(fullErrorString, this);
         }
 
-        return shortErrorString;
+        return fullErrorString;
      }
 }
 
