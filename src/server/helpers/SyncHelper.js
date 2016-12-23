@@ -178,7 +178,7 @@ class SyncHelper {
                     let headers = {
                         'Accept': 'application/json'
                     };
-                   
+                  
                     let now = Date.now();
 
                     restler.get(settings.url + settings.project + '/' + settings.environment + '/' + remoteResourceName, {

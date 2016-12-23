@@ -85,12 +85,16 @@ class ApiController extends Controller {
         }
 
         // Check if project and environment exist
-        return ProjectHelper.getProject(req.project)
-        .then((project) => {
+        return ProjectHelper.projectExists(req.project)
+        .then((projectExists) => {
+            if(!projectExists) {
+                return Promise.reject('Project "' + req.project + '" could not be found');
+            }
+
             if(req.environment) {
-                return ProjectHelper.getAllEnvironments(req.project)
-                .then((environments) => {
-                    if(!environments || environments.indexOf(req.environment) < 0) {
+                return ProjectHelper.environmentExists(req.project, req.environment)
+                .then((environmentExists) => {
+                    if(!environmentExists) {
                         return Promise.reject(new Error('Environment "' + req.environment + '" was not found for project "' + req.project + '"'));
                     }
 

@@ -227,6 +227,35 @@ class MongoHelper {
     }
 
     /**
+     * Check if a database exists
+     *
+     * @param {String} databaseName
+     *
+     * returns {Promise} Promise
+     */
+    static databaseExists(databaseName) {
+        return MongoHelper.listDatabases()
+        .then((databases) => {
+            return Promise.resolve(databases.indexOf(databaseName) > -1);
+        });
+    }
+    
+    /**
+     * Check if a collection exists
+     *
+     * @param {String} databaseName
+     * @param {String} collectionName
+     *
+     * returns {Promise} Promise
+     */
+    static collectionExists(databaseName, collectionName) {
+        return MongoHelper.listCollections(databaseName)
+        .then((collections) => {
+            return Promise.resolve(collections.indexOf(collectionName) > -1);
+        });
+    }
+
+    /**
      * Finds a single Mongo document
      *
      * @param {String} databaseName

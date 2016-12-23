@@ -16,6 +16,32 @@ class ProjectHelper {
     }
 
     /**
+     * Checks if a project exists
+     *
+     * @param {String} project
+     *
+     * returns {Promise} Promise
+     */
+    static projectExists(project) {
+        return MongoHelper.databaseExists(project);
+    }
+    
+    /**
+     * Checks if an environment exists
+     *
+     * @param {String} project
+     * @param {String} environment
+     *
+     * returns {Promise} Promise
+     */
+    static environmentExists(project, environment) {
+        return ProjectHelper.getAllEnvironments(project)
+        .then((environments) => {
+            return Promise.resolve(environments.indexOf(environment) > -1);
+        });
+    }
+
+    /**
      * Gets a Project object
      *
      * @param {String} id
@@ -89,11 +115,9 @@ class ProjectHelper {
     static getAllEnvironments(project) {
         return new Promise((resolve, reject) => {
             SettingsHelper.getSettings(project, null, 'environments')
-            .then((environments) => {
+            .then((settings) => {
                 // There should always be at least one environment available
-                if(!environments) {
-                    environments = [ 'live' ];
-                }
+                let environments = settings && settings.names ? settings.names : [ 'live' ];
 
                 resolve(environments);
             });
