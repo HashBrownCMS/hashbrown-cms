@@ -78,16 +78,30 @@ class ApiController extends Controller {
                 }
             }
         }
-
-        // Project sanity check
-        if(req.project == 'settings') {
-            req.project = null;
-        }
         
         // Environment sanity check
         if(req.environment == 'settings') {
             req.environment = null;
         }
+
+        // Check if project and environment exist
+        return ProjectHelper.getProject(req.project)
+        .then((project) => {
+            if(req.environment) {
+                return ProjectHelper.getAllEnvironments(req.project)
+                .then((environments) => {
+                    if(!environments || environments.indexOf(req.environment) < 0) {
+                        return Promise.reject(new Error('Environment "' + req.environment + '" was not found for project "' + req.project + '"'));
+                    }
+
+                    return Promise.resolve();
+                });
+
+            } else {
+                return Promise.resolve();
+
+            }
+        });
     }
         
     /**
@@ -159,16 +173,17 @@ class ApiController extends Controller {
                 // Using project parameter
                 if(settings.setProject != false) {
                     // Set the project variables
-                    ApiController.setProjectVariables(req);
-
-                    // Using authentication
-                    if(settings.authenticate != false) {
-                        return ApiController.authenticate(token, req.project, settings.scope);
-                    
-                    // No authentication needed
-                    } else {
-                        return Promise.resolve();
-                    }
+                    return ApiController.setProjectVariables(req)
+                    .then(() => {
+                        // Using authentication
+                        if(settings.authenticate != false) {
+                            return ApiController.authenticate(token, req.project, settings.scope);
+                        
+                        // No authentication needed
+                        } else {
+                            return Promise.resolve();
+                        }
+                    });
                 
                 // Disregarding project parameter, but using authentication
                 } else if(settings.authenticate != false) {

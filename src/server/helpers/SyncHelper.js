@@ -172,23 +172,19 @@ class SyncHelper {
         return SettingsHelper.getSettings(project, environment, 'sync')
         .then((settings) => {
             return new Promise((resolve, reject) => {
-                console.log('DUDE', remoteResourceName);
-
                 if(settings && settings.enabled && settings[remoteResourceName]) {
                     params.token = settings.token;
 
-                    console.log('SWEET');
-                            
                     let headers = {
                         'Accept': 'application/json'
                     };
-                    
+                   
+                    let now = Date.now();
+
                     restler.get(settings.url + settings.project + '/' + settings.environment + '/' + remoteResourceName, {
                         headers: headers,
                         query: params
                     }).on('complete', (data, response) => {
-                        console.log(data);
-
                         if(data instanceof Error) {
                             reject(data);
                         
