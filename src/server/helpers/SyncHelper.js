@@ -7,20 +7,10 @@ let restler = require('restler');
  */
 class SyncHelper {
     /**
-     * Gets the sync settings
-     *
-     * @param {String} project
-     *
-     * @returns Promise
-     */
-    static getSettings(project) {
-        return SettingsHelper.getSettings(project, 'sync');
-    }
-
-    /**
      * Gets a new token
      *
      * @param {String} project
+     * @param {String} environment
      * @param {String} username
      * @param {String} password
      *
@@ -28,10 +18,11 @@ class SyncHelper {
      */
     static renewToken(
         project = requiredParam('project'),
+        environment = requiredParam('environment'),
         username = requiredParam('username'),
         password = requiredParam('password')
     ) {
-        return this.getSettings(project)
+        return SettingsHelper.getSettings(project, environment, 'sync')
         .then((settings) => {
             debug.log('Renewing token for sync...', this);
 
@@ -66,6 +57,7 @@ class SyncHelper {
      * Get resource item
      *
      * @param {String} project
+     * @param {String} environment
      * @param {String} remoteResourceName
      * @param {String} remoteItemName
      *
@@ -73,10 +65,11 @@ class SyncHelper {
      */
     static getResourceItem(
         project = requiredParam('project'),
+        environment = requiredParam('environment'),
         remoteResourceName = requiredParam('remoteResourceName'),
         remoteItemName = requiredParam('remoteItemName')
     ) {
-        return this.getSettings(project)
+        return SettingsHelper.getSettings(project, environment, 'sync')
         .then((settings) => {
             return new Promise((resolve, reject) => {
                 if(settings && settings.enabled && settings[remoteResourceName]) {
@@ -115,6 +108,7 @@ class SyncHelper {
      * Set resource item
      *
      * @param {String} project
+     * @param {String} environment
      * @param {String} remoteResourceName
      * @param {String} remoteItemName
      * @param {Object} remoteItemData
@@ -123,11 +117,12 @@ class SyncHelper {
      */
     static setResourceItem(
         project = requiredParam('project'),
+        environment = requiredParam('environment'),
         remoteResourceName = requiredParam('remoteResourceName'),
         remoteItemName = requiredParam('remoteItemName'),
         remoteItemData = requiredParam('remoteItemData')
     ) {
-        return this.getSettings(project)
+        return SettingsHelper.getSettings(project, environment, 'sync')
         .then((settings) => {
             return new Promise((resolve, reject) => {
                 if(settings && settings.enabled && settings[remoteResourceName]) {
@@ -162,6 +157,7 @@ class SyncHelper {
      * Get resource
      *
      * @param {String} project
+     * @param {String} environment
      * @param {String} remoteResourceName
      * @param {Object} params
      *
@@ -169,15 +165,20 @@ class SyncHelper {
      */
     static getResource(
         project = requiredParam('project'),
+        environment = requiredParam('environment'),
         remoteResourceName = requiredParam('remoteResourceName'),
         params = {}
     ) {
-        return this.getSettings(project)
+        return SettingsHelper.getSettings(project, environment, 'sync')
         .then((settings) => {
             return new Promise((resolve, reject) => {
+                console.log('DUDE', remoteResourceName);
+
                 if(settings && settings.enabled && settings[remoteResourceName]) {
                     params.token = settings.token;
 
+                    console.log('SWEET');
+                            
                     let headers = {
                         'Accept': 'application/json'
                     };
@@ -186,6 +187,8 @@ class SyncHelper {
                         headers: headers,
                         query: params
                     }).on('complete', (data, response) => {
+                        console.log(data);
+
                         if(data instanceof Error) {
                             reject(data);
                         
@@ -209,6 +212,7 @@ class SyncHelper {
      * Merges a resource with a synced one
      *
      * @param {String} project
+     * @param {String} environment
      * @param {String} remoteResourceName
      * @param {Array} localResource
      * @param {Object} params
@@ -217,11 +221,12 @@ class SyncHelper {
      */
     static mergeResource(
         project = requiredParam('project'),
+        environment = requiredParam('environment'),
         remoteResourceName = requiredParam('remoteResourceName'),
         localResource = requiredParam('localResource'),
         params = {}
     ) {
-        return this.getResource(project, remoteResourceName, params)
+        return this.getResource(project, environment, remoteResourceName, params)
         .then((remoteResource) => {
             let mergedResource;
 

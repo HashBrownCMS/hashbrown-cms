@@ -56,6 +56,10 @@
 
 	// Views
 	window.ProjectEditor = __webpack_require__(163);
+	window.BackupEditor = __webpack_require__(165);
+	window.MigrationEditor = __webpack_require__(166);
+	window.InfoEditor = __webpack_require__(167);
+	window.LanguageEditor = __webpack_require__(168);
 
 	// Models
 	window.Project = __webpack_require__(164);
@@ -197,6 +201,8 @@
 	// Common helpers
 	window.UI = __webpack_require__(26);
 	window.ProjectHelper = __webpack_require__(27);
+	window.LanguageHelper = __webpack_require__(143);
+	window.SettingsHelper = __webpack_require__(151);
 
 	window.debug = __webpack_require__(28);
 	window.debug.verbosity = 3;
@@ -288,6 +294,13 @@
 	    document.cookie = 'token=; Path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
 
 	    location.reload();
+	};
+
+	/**
+	 * Handles a required parameter
+	 */
+	window.requiredParam = function requiredParam(name) {
+	    throw new Error('Parameter "' + name + '" is required');
 	};
 
 	/**
@@ -18773,16 +18786,556 @@
 /* 140 */,
 /* 141 */,
 /* 142 */,
-/* 143 */,
-/* 144 */,
-/* 145 */,
+/* 143 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var LanguageHelperCommon = __webpack_require__(144);
+
+	var LanguageHelper = function (_LanguageHelperCommon) {
+	    _inherits(LanguageHelper, _LanguageHelperCommon);
+
+	    function LanguageHelper() {
+	        _classCallCheck(this, LanguageHelper);
+
+	        return _possibleConstructorReturn(this, (LanguageHelper.__proto__ || Object.getPrototypeOf(LanguageHelper)).apply(this, arguments));
+	    }
+
+	    return LanguageHelper;
+	}(LanguageHelperCommon);
+
+	module.exports = LanguageHelper;
+
+/***/ },
+/* 144 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var LanguageHelper = function () {
+	    function LanguageHelper() {
+	        _classCallCheck(this, LanguageHelper);
+	    }
+
+	    _createClass(LanguageHelper, null, [{
+	        key: 'getLanguages',
+
+	        /**
+	         * Gets all languages
+	         *
+	         * @returns {Array} List of language names
+	         */
+	        value: function getLanguages() {
+	            return __webpack_require__(145);
+	        }
+
+	        /**
+	         * Gets all selected languages
+	         *
+	         * @param {String} project
+	         *
+	         * @returns {Array} List of language names
+	         */
+
+	    }, {
+	        key: 'getSelectedLanguages',
+	        value: function getSelectedLanguages() {
+	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+
+	            return SettingsHelper.getSettings(project, null, 'language').then(function (settings) {
+	                if (!settings) {
+	                    settings = {};
+	                }
+
+	                if (!settings.selected || settings.selected.length < 1) {
+	                    settings.selected = ['en'];
+	                }
+
+	                settings.selected.sort();
+
+	                return Promise.resolve(settings.selected);
+	            });
+	        }
+
+	        /**
+	         * Sets all languages
+	         *
+	         * @param {String} project
+	         * @param {Array} languages
+	         *
+	         * @returns {Promise} promise
+	         */
+
+	    }, {
+	        key: 'setLanguages',
+	        value: function setLanguages() {
+	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+	            var languages = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('languages');
+
+	            return SettingsHelper.getSettings(project, null, 'language').then(function (settings) {
+	                if (!(settings instanceof Object)) {
+	                    settings = {};
+	                }
+
+	                if (!Array.isArray(languages)) {
+	                    return Promise.reject(new Error('Language array cannot be of type "' + (typeof languages === 'undefined' ? 'undefined' : _typeof(languages)) + '"'));
+	                }
+
+	                settings.selected = languages;
+
+	                return SettingsHelper.setSettings(project, null, 'language', settings);
+	            });
+	        }
+
+	        /**
+	         * Toggle a language
+	         *
+	         * @param {String} project
+	         * @param {String} language
+	         * @param {Boolean} state
+	         *
+	         * @returns {Promise} promise
+	         */
+
+	    }, {
+	        key: 'toggleLanguage',
+	        value: function toggleLanguage() {
+	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+	            var language = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('language');
+	            var state = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('state');
+
+	            return SettingsHelper.getSettings(project, 'language').then(function (settings) {
+	                if (!(settings instanceof Object)) {
+	                    settings = {};
+	                }
+
+	                if (!settings.selected || settings.selected.length < 1) {
+	                    settings.selected = ['en'];
+	                }
+
+	                if (!state && settings.selected.indexOf(language) > -1) {
+	                    settings.selected.splice(settings.selected.indexOf(language), 1);
+	                } else if (state && settings.selected.indexOf(language) < 0) {
+	                    settings.selected.push(language);
+	                    settings.selected.sort();
+	                }
+
+	                return SettingsHelper.setSettings(project, null, 'language', settings);
+	            });
+	        }
+
+	        /**
+	         * Gets localised sets of properties for a Content object
+	         *
+	         * @param {String} project
+	         * @param {String} environment
+	         * @param {Content} content
+	         *
+	         * @return {Promise} Properties
+	         */
+
+	    }, {
+	        key: 'getAllLocalizedPropertySets',
+	        value: function getAllLocalizedPropertySets() {
+	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+	            var content = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('content');
+
+	            return LanguageHelper.getSelectedLanguages(project).then(function (languages) {
+	                var sets = {};
+
+	                var _iteratorNormalCompletion = true;
+	                var _didIteratorError = false;
+	                var _iteratorError = undefined;
+
+	                try {
+	                    for (var _iterator = languages[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	                        var language = _step.value;
+
+	                        var properties = content.getLocalizedProperties(language);
+
+	                        sets[language] = properties;
+	                    }
+	                } catch (err) {
+	                    _didIteratorError = true;
+	                    _iteratorError = err;
+	                } finally {
+	                    try {
+	                        if (!_iteratorNormalCompletion && _iterator.return) {
+	                            _iterator.return();
+	                        }
+	                    } finally {
+	                        if (_didIteratorError) {
+	                            throw _iteratorError;
+	                        }
+	                    }
+	                }
+
+	                return Promise.resolve(sets);
+	            });
+	        }
+	    }]);
+
+	    return LanguageHelper;
+	}();
+
+	module.exports = LanguageHelper;
+
+/***/ },
+/* 145 */
+/***/ function(module, exports) {
+
+	module.exports = [
+		"aa",
+		"ab",
+		"ae",
+		"af",
+		"ak",
+		"am",
+		"an",
+		"ar",
+		"as",
+		"av",
+		"ay",
+		"az",
+		"ba",
+		"be",
+		"bg",
+		"bh",
+		"bi",
+		"bm",
+		"bn",
+		"bo",
+		"br",
+		"bs",
+		"ca",
+		"ce",
+		"ch",
+		"co",
+		"cr",
+		"cs",
+		"cu",
+		"cv",
+		"cy",
+		"da",
+		"de",
+		"dv",
+		"dz",
+		"ee",
+		"el",
+		"en",
+		"eo",
+		"es",
+		"et",
+		"eu",
+		"fa",
+		"ff",
+		"fi",
+		"fj",
+		"fo",
+		"fr",
+		"fy",
+		"ga",
+		"gd",
+		"gl",
+		"gn",
+		"gu",
+		"gv",
+		"ha",
+		"he",
+		"hi",
+		"ho",
+		"hr",
+		"ht",
+		"hu",
+		"hy",
+		"hz",
+		"ia",
+		"id",
+		"ie",
+		"ig",
+		"ii",
+		"ik",
+		"io",
+		"is",
+		"it",
+		"iu",
+		"ja",
+		"jv",
+		"ka",
+		"kg",
+		"ki",
+		"kj",
+		"kk",
+		"kl",
+		"km",
+		"kn",
+		"ko",
+		"kr",
+		"ks",
+		"ku",
+		"kv",
+		"kw",
+		"ky",
+		"la",
+		"lb",
+		"lg",
+		"li",
+		"ln",
+		"lo",
+		"lt",
+		"lu",
+		"lv",
+		"mg",
+		"mh",
+		"mi",
+		"mk",
+		"ml",
+		"mn",
+		"mr",
+		"ms",
+		"mt",
+		"my",
+		"na",
+		"nb",
+		"nd",
+		"ne",
+		"ng",
+		"nl",
+		"nn",
+		"no",
+		"nr",
+		"nv",
+		"ny",
+		"oc",
+		"oj",
+		"om",
+		"or",
+		"os",
+		"pa",
+		"pi",
+		"pl",
+		"ps",
+		"pt",
+		"qu",
+		"rc",
+		"rm",
+		"rn",
+		"ro",
+		"ru",
+		"rw",
+		"sa",
+		"sc",
+		"sd",
+		"se",
+		"sg",
+		"si",
+		"sk",
+		"sl",
+		"sm",
+		"sn",
+		"so",
+		"sq",
+		"sr",
+		"ss",
+		"st",
+		"su",
+		"sv",
+		"sw",
+		"ta",
+		"te",
+		"tg",
+		"th",
+		"ti",
+		"tk",
+		"tl",
+		"tn",
+		"to",
+		"tr",
+		"ts",
+		"tt",
+		"tw",
+		"ty",
+		"ug",
+		"uk",
+		"ur",
+		"uz",
+		"ve",
+		"vi",
+		"vo",
+		"wa",
+		"wo",
+		"xh",
+		"yi",
+		"yo",
+		"za",
+		"zh",
+		"zu"
+	];
+
+/***/ },
 /* 146 */,
 /* 147 */,
 /* 148 */,
 /* 149 */,
 /* 150 */,
-/* 151 */,
-/* 152 */,
+/* 151 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var SettingsHelperCommon = __webpack_require__(152);
+
+	var SettingsHelper = function (_SettingsHelperCommon) {
+	    _inherits(SettingsHelper, _SettingsHelperCommon);
+
+	    function SettingsHelper() {
+	        _classCallCheck(this, SettingsHelper);
+
+	        return _possibleConstructorReturn(this, (SettingsHelper.__proto__ || Object.getPrototypeOf(SettingsHelper)).apply(this, arguments));
+	    }
+
+	    _createClass(SettingsHelper, null, [{
+	        key: 'getSettings',
+
+	        /**
+	         * Gets all settings
+	         *
+	         * @param {String} project
+	         * @param {String} environment
+	         * @param {String} section
+	         *
+	         * @return {Promise(Object)}  settings
+	         */
+	        value: function getSettings() {
+	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+	            var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('section');
+
+	            if (!environment || environment == '*') {
+	                return customApiCall('get', '/api/' + project + '/settings/' + section);
+	            } else {
+	                return customApiCall('get', '/api/' + project + '/' + environment + '/settings/' + section);
+	            }
+	        }
+
+	        /**
+	         * Sets all settings
+	         *
+	         * @param {String} project
+	         * @param {String} environment
+	         * @param {String} section
+	         * @param {Object} settings
+	         *
+	         * @return {Promise} promise
+	         */
+
+	    }, {
+	        key: 'setSettings',
+	        value: function setSettings() {
+	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+	            var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('section');
+	            var settings = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : requiredParam('settings');
+
+	            if (!environment || environment == '*') {
+	                return customApiCall('post', '/api/' + project + '/settings/' + section, settings);
+	            } else {
+	                return customApiCall('post', '/api/' + project + '/' + environment + '/settings/' + section, settings);
+	            }
+	        }
+	    }]);
+
+	    return SettingsHelper;
+	}(SettingsHelperCommon);
+
+	module.exports = SettingsHelper;
+
+/***/ },
+/* 152 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var SettingsHelper = function () {
+	    function SettingsHelper() {
+	        _classCallCheck(this, SettingsHelper);
+	    }
+
+	    _createClass(SettingsHelper, null, [{
+	        key: 'getSettings',
+
+	        /**
+	         * Gets all settings
+	         *
+	         * @param {String} project
+	         * @param {String} environment
+	         * @param {String} section
+	         *
+	         * @return {Promise(Object)}  settings
+	         */
+	        value: function getSettings() {
+	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+	            var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('section');
+
+	            return Promise.resolve({});
+	        }
+
+	        /**
+	         * Sets all settings
+	         *
+	         * @param {String} project
+	         * @param {String} environment
+	         * @param {String} section
+	         * @param {Object} settings
+	         *
+	         * @return {Promise} promise
+	         */
+
+	    }, {
+	        key: 'setSettings',
+	        value: function setSettings() {
+	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+	            var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('section');
+	            var settings = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : requiredParam('settings');
+
+	            return Promise.resolve();
+	        }
+	    }]);
+
+	    return SettingsHelper;
+	}();
+
+	module.exports = SettingsHelper;
+
+/***/ },
 /* 153 */
 /***/ function(module, exports) {
 
@@ -18866,6 +19419,8 @@
 	        _classCallCheck(this, ProjectEditor);
 
 	        var _this = _possibleConstructorReturn(this, (ProjectEditor.__proto__ || Object.getPrototypeOf(ProjectEditor)).call(this, params));
+
+	        _this.$element = _.div({ class: 'raised project-editor' });
 
 	        _this.init();
 	        return _this;
@@ -18953,6 +19508,281 @@
 	        }
 
 	        /**
+	         * Event: Click info button
+	         */
+
+	    }, {
+	        key: 'onClickInfo',
+	        value: function onClickInfo() {
+	            var _this4 = this;
+
+	            if (this.isAdmin()) {
+	                var infoEditor = new InfoEditor({ projectId: this.model.id });
+
+	                infoEditor.on('change', function (newInfo) {
+	                    _this4.model.settings.info = newInfo;
+
+	                    _this4.fetch();
+	                });
+	            }
+	        }
+
+	        /**
+	         * Event: Click languages button
+	         */
+
+	    }, {
+	        key: 'onClickLanguages',
+	        value: function onClickLanguages() {
+	            var _this5 = this;
+
+	            if (this.isAdmin()) {
+	                var languageEditor = new LanguageEditor({ projectId: this.model.id });
+
+	                languageEditor.on('change', function (newLanguages) {
+	                    _this5.model.settings.language.selected = newLanguages;
+
+	                    _this5.fetch();
+	                });
+	            }
+	        }
+
+	        /**
+	         * Event: Click backups button
+	         */
+
+	    }, {
+	        key: 'onClickBackups',
+	        value: function onClickBackups() {
+	            if (this.isAdmin()) {
+	                new BackupEditor({ model: this.model });
+	            }
+	        }
+
+	        /**
+	         * Event: Click migration button
+	         */
+
+	    }, {
+	        key: 'onClickMigrate',
+	        value: function onClickMigrate() {
+	            if (this.isAdmin()) {
+	                new MigrationEditor({ model: this.model });
+	            }
+	        }
+
+	        /**
+	         * Event: Click add environment button
+	         */
+
+	    }, {
+	        key: 'onClickAddEnvironment',
+	        value: function onClickAddEnvironment() {
+	            var _this6 = this;
+
+	            var modal = new MessageModal({
+	                model: {
+	                    title: 'New environment for "' + this.model.id + '"',
+	                    body: _.input({ class: 'form-control', type: 'text', placeholder: 'Type environment name here' })
+	                },
+	                buttons: [{
+	                    label: 'Create',
+	                    class: 'btn-primary',
+	                    callback: function callback() {
+	                        var newName = modal.$element.find('input').val();
+
+	                        _this6.model.settings.environments.names.push(newName);
+
+	                        apiCall('post', 'server/settings/' + _this6.model.id + '/environments', _this6.model.settings.environments).then(function () {
+	                            UI.messageModal('Succes', 'The new environment "' + newName + '" was created successfully', function () {
+	                                location.reload();
+	                            });
+	                        }).catch(UI.errorModal);
+
+	                        return false;
+	                    }
+	                }]
+	            });
+	        }
+	    }, {
+	        key: 'render',
+	        value: function render() {
+	            var _this7 = this;
+
+	            var languageCount = this.model.settings.language.selected.length;
+	            var userCount = this.model.users.length;
+
+	            _.append(this.$element.empty(), _.div({ class: 'body' }, _.if(this.isAdmin(), _.div({ class: 'admin dropdown' }, _.button({ class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, _.span({ class: 'fa fa-ellipsis-v' })), _.ul({ class: 'dropdown-menu' }, _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Info').click(function (e) {
+	                e.preventDefault();_this7.onClickInfo();
+	            })), _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Languages').click(function (e) {
+	                e.preventDefault();_this7.onClickLanguages();
+	            })), _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Backups').click(function (e) {
+	                e.preventDefault();_this7.onClickBackups();
+	            })), _.if(this.model.settings.environments.names.length > 1, _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Migrate content').click(function (e) {
+	                e.preventDefault();_this7.onClickMigrate();
+	            }))), _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Delete').click(function (e) {
+	                e.preventDefault();_this7.onClickRemove();
+	            }))))), _.div({ class: 'info' }, _.h4(this.model.settings.info.name || this.model.id), _.p(userCount + ' user' + (userCount != 1 ? 's' : '')), _.p(languageCount + ' language' + (languageCount != 1 ? 's' : '') + ' (' + this.model.settings.language.selected.join(', ') + ')')), _.div({ class: 'environments' }, _.each(this.model.settings.environments.names, function (i, environment) {
+	                return _.div({ class: 'environment' }, _.div({ class: 'btn-group' }, _.span({ class: 'environment-title' }, environment), _.a({ href: '/' + _this7.model.id + '/' + environment, class: 'btn btn-primary environment' }, 'cms'), _.if(_this7.isAdmin(), _.div({ class: 'dropdown' }, _.button({ class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, _.span({ class: 'fa fa-ellipsis-v' })), _.ul({ class: 'dropdown-menu' }, _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Delete').click(function (e) {
+	                    e.preventDefault();_this7.onClickRemoveEnvironment(environment);
+	                })))))));
+	            }), _.if(this.isAdmin(), _.button({ class: 'btn btn-primary btn-add btn-raised btn-round' }, '+').click(function () {
+	                _this7.onClickAddEnvironment();
+	            })))));
+	        }
+	    }]);
+
+	    return ProjectEditor;
+	}(View);
+
+	module.exports = ProjectEditor;
+
+/***/ },
+/* 164 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var Entity = __webpack_require__(32);
+
+	var Project = function (_Entity) {
+	    _inherits(Project, _Entity);
+
+	    function Project() {
+	        _classCallCheck(this, Project);
+
+	        return _possibleConstructorReturn(this, (Project.__proto__ || Object.getPrototypeOf(Project)).apply(this, arguments));
+	    }
+
+	    _createClass(Project, [{
+	        key: 'structure',
+	        value: function structure() {
+	            this.def(String, 'id');
+	            this.def(Array, 'users', []);
+	            this.def(Array, 'backups', []);
+	            this.def(Object, 'settings', {});
+	        }
+	    }], [{
+	        key: 'create',
+	        value: function create(name) {
+	            var project = new Project();
+
+	            var id = name.toLowerCase();
+	            id = id.replace('.', '_');
+	            id = id.replace(/[^a-z_]/g, '');
+
+	            project.id = id;
+	            project.settings.info = {
+	                section: 'info',
+	                name: name
+	            };
+
+	            return project;
+	        }
+	    }]);
+
+	    return Project;
+	}(Entity);
+
+	module.exports = Project;
+
+/***/ },
+/* 165 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var BackupEditor = function (_View) {
+	    _inherits(BackupEditor, _View);
+
+	    function BackupEditor(params) {
+	        _classCallCheck(this, BackupEditor);
+
+	        var _this = _possibleConstructorReturn(this, (BackupEditor.__proto__ || Object.getPrototypeOf(BackupEditor)).call(this, params));
+
+	        _this.modal = new MessageModal({
+	            model: {
+	                class: 'modal-project-admin',
+	                title: _this.model.id + ' backups',
+	                body: _.div({},
+	                // List existing backups
+	                _.if(_this.model.backups.length > 0, _.each(_this.model.backups, function (i, backup) {
+	                    var label = backup;
+	                    var date = new Date(parseInt(backup));
+
+	                    if (!isNaN(date.getTime())) {
+	                        label = date.toString();
+	                    }
+
+	                    return _.div({ class: 'project-backup' }, _.p({ class: 'project-backup-name' }, label), _.div({ class: 'dropdown' }, _.button({ class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, _.span({ class: 'fa fa-ellipsis-v' })), _.ul({ class: 'dropdown-menu' }, _.li(
+	                    // Restore backup
+	                    _.a({ href: '#', class: 'dropdown-item' }, 'Restore').click(function (e) {
+	                        e.preventDefault();_this.onClickRestoreBackup(backup);
+	                    })), _.li(
+	                    // Download backup
+	                    _.a({ class: 'dropdown-item', href: apiUrl('server/backups/' + _this.model.id + '/' + backup + '.hba') }, 'Download')), _.li(
+	                    // Delete backup
+	                    _.a({ href: '#', class: 'dropdown-item' }, 'Delete').click(function (e) {
+	                        e.preventDefault();_this.onClickDeleteBackup(backup);
+	                    })))));
+	                })),
+
+	                // Empty message
+	                _.if(_this.model.backups.length < 1, _.p('No backups here')),
+
+	                // Create backup
+	                _.div({ class: 'btn-round-group' }, _.button({ class: 'btn btn-round btn-raised btn-default btn-group-addon btn-upload-backup' }, _.span({ class: 'fa fa-upload' }), _.label('Upload')).click(function () {
+	                    _this.onClickUploadBackup();
+	                }), _.button({ class: 'btn btn-round btn-raised btn-primary btn-create-backup' }, _.span({ class: 'btn-icon-initial' }, '+'), _.span({ class: 'btn-icon-display fa fa-save' }), _.label('Create')).click(function () {
+	                    _this.onClickCreateBackup();
+	                })))
+	            }
+	        });
+
+	        _this.$element = _this.modal.$element;
+
+	        _this.fetch();
+	        return _this;
+	    }
+
+	    /**
+	     * Checks whether the current user is admin
+	     *
+	     * @returns {Boolean} Is the current user admin
+	     */
+
+
+	    _createClass(BackupEditor, [{
+	        key: 'isAdmin',
+	        value: function isAdmin() {
+	            for (var i in this.model.users) {
+	                var user = this.model.users[i];
+
+	                if (user.isCurrent && user.isAdmin) {
+	                    return true;
+	                }
+	            }
+
+	            return false;
+	        }
+
+	        /**
 	         * Event: Click upload button
 	         */
 
@@ -19028,14 +19858,14 @@
 	    }, {
 	        key: 'onClickCreateBackup',
 	        value: function onClickCreateBackup() {
-	            var _this4 = this;
+	            var _this2 = this;
 
 	            if (this.isAdmin()) {
 	                apiCall('post', 'server/backups/' + this.model.id + '/new').then(function (data) {
 	                    new MessageModal({
 	                        model: {
 	                            title: 'Success',
-	                            body: 'Project "' + _this4.model.id + '" was backed up successfully'
+	                            body: 'Project "' + _this2.model.id + '" was backed up successfully'
 	                        },
 	                        buttons: [{
 	                            callback: function callback() {
@@ -19058,7 +19888,7 @@
 	    }, {
 	        key: 'onClickRestoreBackup',
 	        value: function onClickRestoreBackup(timestamp) {
-	            var _this5 = this;
+	            var _this3 = this;
 
 	            if (this.isAdmin()) {
 	                (function () {
@@ -19081,11 +19911,11 @@
 	                            label: 'Restore',
 	                            class: 'btn-danger',
 	                            callback: function callback() {
-	                                apiCall('post', 'server/backups/' + _this5.model.id + '/' + timestamp + '/restore').then(function () {
+	                                apiCall('post', 'server/backups/' + _this3.model.id + '/' + timestamp + '/restore').then(function () {
 	                                    new MessageModal({
 	                                        model: {
 	                                            title: 'Success',
-	                                            body: 'Project "' + _this5.model.id + '" was restored successfully to ' + label
+	                                            body: 'Project "' + _this3.model.id + '" was restored successfully to ' + label
 	                                        },
 	                                        buttons: [{
 	                                            callback: function callback() {
@@ -19110,7 +19940,7 @@
 	    }, {
 	        key: 'onClickDeleteBackup',
 	        value: function onClickDeleteBackup(timestamp) {
-	            var _this6 = this;
+	            var _this4 = this;
 
 	            if (this.isAdmin()) {
 	                var label = timestamp;
@@ -19120,7 +19950,7 @@
 	                    label = date.toString();
 	                }
 
-	                var _modal = new MessageModal({
+	                var modal = new MessageModal({
 	                    model: {
 	                        title: 'Delete backup',
 	                        body: 'Are you sure you want to delete the backup "' + label + '"?'
@@ -19132,7 +19962,7 @@
 	                        label: 'Delete',
 	                        class: 'btn-danger',
 	                        callback: function callback() {
-	                            apiCall('delete', 'server/backups/' + _this6.model.id + '/' + timestamp).then(function () {
+	                            apiCall('delete', 'server/backups/' + _this4.model.id + '/' + timestamp).then(function () {
 	                                location.reload();
 	                            }).catch(UI.errorModal);
 	                        }
@@ -19140,196 +19970,16 @@
 	                });
 	            }
 	        }
-
-	        /**
-	         * Event: Click backups button
-	         */
-
-	    }, {
-	        key: 'onClickBackups',
-	        value: function onClickBackups() {
-	            var _this7 = this;
-
-	            if (this.isAdmin()) {
-	                new MessageModal({
-	                    model: {
-	                        class: 'modal-project-admin',
-	                        title: this.model.id + ' backups',
-	                        body: _.div({},
-	                        // List existing backups
-	                        _.if(this.model.backups.length > 0, _.each(this.model.backups, function (i, backup) {
-	                            var label = backup;
-	                            var date = new Date(parseInt(backup));
-
-	                            if (!isNaN(date.getTime())) {
-	                                label = date.toString();
-	                            }
-
-	                            return _.div({ class: 'project-backup' }, _.p({ class: 'project-backup-name' }, label), _.div({ class: 'dropdown' }, _.button({ class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, _.span({ class: 'fa fa-ellipsis-v' })), _.ul({ class: 'dropdown-menu' }, _.li(
-	                            // Restore backup
-	                            _.a({ href: '#', class: 'dropdown-item' }, 'Restore').click(function (e) {
-	                                e.preventDefault();_this7.onClickRestoreBackup(backup);
-	                            })), _.li(
-	                            // Download backup
-	                            _.a({ class: 'dropdown-item', href: apiUrl('server/backups/' + _this7.model.id + '/' + backup + '.hba') }, 'Download')), _.li(
-	                            // Delete backup
-	                            _.a({ href: '#', class: 'dropdown-item' }, 'Delete').click(function (e) {
-	                                e.preventDefault();_this7.onClickDeleteBackup(backup);
-	                            })))));
-	                        })),
-
-	                        // Empty message
-	                        _.if(this.model.backups.length < 1, _.p('No backups here')),
-
-	                        // Create backup
-	                        _.div({ class: 'btn-round-group' }, _.button({ class: 'btn btn-round btn-raised btn-default btn-group-addon btn-upload-backup' }, _.span({ class: 'fa fa-upload' }), _.label('Upload')).click(function () {
-	                            _this7.onClickUploadBackup();
-	                        }), _.button({ class: 'btn btn-round btn-raised btn-primary btn-create-backup' }, _.span({ class: 'btn-icon-initial' }, '+'), _.span({ class: 'btn-icon-display fa fa-save' }), _.label('Create')).click(function () {
-	                            _this7.onClickCreateBackup();
-	                        })))
-	                    }
-	                });
-	            }
-	        }
-
-	        /**
-	         * Event: Click migration button
-	         */
-
-	    }, {
-	        key: 'onClickMigrate',
-	        value: function onClickMigrate() {
-	            var _this8 = this;
-
-	            var updateOptions = function updateOptions() {
-	                _.append(modal.$element.find('.environment-to').empty(), _.each(_this8.model.settings.environments.names, function (i, environment) {
-	                    // Filter out "from" environment
-	                    if (environment != modal.$element.find('.environment-from').val()) {
-	                        return _.option({ value: environment }, environment);
-	                    }
-	                }));
-	            };
-
-	            var onSubmit = function onSubmit() {
-	                data.from = modal.$element.find('.environment-from').val();
-	                data.to = modal.$element.find('.environment-to').val();
-
-	                data.settings.replace = modal.$element.find('#switch-migration-replace').is(':checked');
-
-	                apiCall('post', 'server/migrate/' + _this8.model.id, data).then(function () {
-	                    UI.messageModal('Success', 'Successfully migrated content from "' + data.from + '" to "' + data.to + '"');
-	                }).catch(UI.errorModal);
-	            };
-
-	            var data = {
-	                from: '',
-	                to: '',
-	                settings: {
-	                    replace: true
-	                }
-	            };
-
-	            var modal = new MessageModal({
-	                model: {
-	                    class: 'modal-migrate-content',
-	                    title: 'Migrate content',
-	                    body: [_.div({ class: 'migration-message' }, _.span({ class: 'fa fa-warning' }), _.span('It might be a good idea to make a project backup before you proceed')), _.div({ class: 'migration-operation' }, _.select({ class: 'form-control environment-from' }, _.each(this.model.settings.environments.names, function (i, environment) {
-	                        return _.option({ value: environment }, environment);
-	                    })).change(function () {
-	                        updateOptions();
-	                    }), _.span({ class: 'fa fa-arrow-right' }), _.select({ class: 'form-control environment-to' })), _.div({ class: 'migration-settings' }, _.each({
-	                        replace: 'Replace content on target'
-	                    }, function (value, label) {
-	                        return _.div({ class: 'input-group' }, _.span(label), _.div({ class: 'input-group-addon' }, _.div({ class: 'switch' }, _.input({
-	                            id: 'switch-migration-' + value,
-	                            class: 'form-control switch',
-	                            type: 'checkbox',
-	                            checked: data.settings[value]
-	                        }), _.label({ for: 'switch-migration-' + value }))));
-	                    }))]
-	                },
-	                buttons: [{
-	                    label: 'Cancel',
-	                    class: 'btn-default'
-	                }, {
-	                    label: 'Migrate',
-	                    class: 'btn-primary',
-	                    callback: function callback() {
-	                        onSubmit();
-
-	                        return false;
-	                    }
-	                }]
-	            });
-
-	            updateOptions();
-	        }
-
-	        /**
-	         * Event: Click add environment button
-	         */
-
-	    }, {
-	        key: 'onClickAddEnvironment',
-	        value: function onClickAddEnvironment() {
-	            var _this9 = this;
-
-	            var modal = new MessageModal({
-	                model: {
-	                    title: 'New environment for "' + this.model.id + '"',
-	                    body: _.input({ class: 'form-control', type: 'text', placeholder: 'Type environment name here' })
-	                },
-	                buttons: [{
-	                    label: 'Create',
-	                    class: 'btn-primary',
-	                    callback: function callback() {
-	                        var newName = modal.$element.find('input').val();
-
-	                        _this9.model.settings.environments.names.push(newName);
-
-	                        apiCall('post', 'server/settings/' + _this9.model.id + '/environments', _this9.model.settings.environments).then(function () {
-	                            UI.messageModal('Succes', 'The new environment "' + newName + '" was created successfully', function () {
-	                                location.reload();
-	                            });
-	                        }).catch(UI.errorModal);
-
-	                        return false;
-	                    }
-	                }]
-	            });
-	        }
-	    }, {
-	        key: 'render',
-	        value: function render() {
-	            var _this10 = this;
-
-	            var languageCount = this.model.settings.language.selected.length;
-	            var userCount = this.model.users.length;
-
-	            this.$element = _.div({ class: 'raised project-editor' }, _.div({ class: 'body' }, _.if(this.isAdmin(), _.div({ class: 'admin dropdown' }, _.button({ class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, _.span({ class: 'fa fa-ellipsis-v' })), _.ul({ class: 'dropdown-menu' }, _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Backups').click(function (e) {
-	                e.preventDefault();_this10.onClickBackups();
-	            })), _.if(this.model.settings.environments.names.length > 1, _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Migrate content').click(function (e) {
-	                e.preventDefault();_this10.onClickMigrate();
-	            }))), _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Delete').click(function (e) {
-	                e.preventDefault();_this10.onClickRemove();
-	            }))))), _.div({ class: 'info' }, _.h4(this.model.settings.info.name || this.model.id), _.p(userCount + ' user' + (userCount != 1 ? 's' : '')), _.p(languageCount + ' language' + (languageCount != 1 ? 's' : '') + ' (' + this.model.settings.language.selected.join(', ') + ')')), _.div({ class: 'environments' }, _.each(this.model.settings.environments.names, function (i, environment) {
-	                return _.div({ class: 'environment' }, _.div({ class: 'btn-group' }, _.span({ class: 'environment-title' }, environment), _.a({ href: '/' + _this10.model.id + '/' + environment, class: 'btn btn-primary environment' }, 'cms'), _.if(_this10.isAdmin(), _.div({ class: 'dropdown' }, _.button({ class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, _.span({ class: 'fa fa-ellipsis-v' })), _.ul({ class: 'dropdown-menu' }, _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Delete').click(function (e) {
-	                    e.preventDefault();_this10.onClickRemoveEnvironment(environment);
-	                })))))));
-	            }), _.if(this.isAdmin(), _.button({ class: 'btn btn-primary btn-add btn-raised btn-round' }, '+').click(function () {
-	                _this10.onClickAddEnvironment();
-	            })))));
-	        }
 	    }]);
 
-	    return ProjectEditor;
+	    return BackupEditor;
 	}(View);
 
-	module.exports = ProjectEditor;
+	module.exports = BackupEditor;
 
 /***/ },
-/* 164 */
-/***/ function(module, exports, __webpack_require__) {
+/* 166 */
+/***/ function(module, exports) {
 
 	'use strict';
 
@@ -19341,48 +19991,312 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var Entity = __webpack_require__(32);
+	var MigrationEditor = function (_View) {
+	    _inherits(MigrationEditor, _View);
 
-	var Project = function (_Entity) {
-	    _inherits(Project, _Entity);
+	    function MigrationEditor(params) {
+	        _classCallCheck(this, MigrationEditor);
 
-	    function Project() {
-	        _classCallCheck(this, Project);
+	        var _this = _possibleConstructorReturn(this, (MigrationEditor.__proto__ || Object.getPrototypeOf(MigrationEditor)).call(this, params));
 
-	        return _possibleConstructorReturn(this, (Project.__proto__ || Object.getPrototypeOf(Project)).apply(this, arguments));
+	        _this.data = {
+	            from: '',
+	            to: '',
+	            settings: {
+	                replace: true
+	            }
+	        };
+
+	        _this.modal = new MessageModal({
+	            model: {
+	                class: 'modal-migrate-content settings-modal',
+	                title: 'Migrate content',
+	                body: [_.div({ class: 'migration-message' }, _.span({ class: 'fa fa-warning' }), _.span('It might be a good idea to make a project backup before you proceed')), _.div({ class: 'migration-operation' }, _.select({ class: 'form-control environment-from' }, _.each(_this.model.settings.environments.names, function (i, environment) {
+	                    return _.option({ value: environment }, environment);
+	                })).change(function () {
+	                    _this.updateOptions();
+	                }), _.span({ class: 'fa fa-arrow-right' }), _.select({ class: 'form-control environment-to' })), _.div({ class: 'migration-settings' }, _.each({
+	                    replace: 'Replace content on target'
+	                }, function (value, label) {
+	                    return _.div({ class: 'input-group' }, _.span(label), _.div({ class: 'input-group-addon' }, _.div({ class: 'switch' }, _.input({
+	                        id: 'switch-migration-' + value,
+	                        class: 'form-control switch',
+	                        type: 'checkbox',
+	                        checked: _this.data.settings[value]
+	                    }), _.label({ for: 'switch-migration-' + value }))));
+	                }))]
+	            },
+	            buttons: [{
+	                label: 'Cancel',
+	                class: 'btn-default'
+	            }, {
+	                label: 'Migrate',
+	                class: 'btn-primary',
+	                callback: function callback() {
+	                    _this.onSubmit();
+
+	                    return false;
+	                }
+	            }]
+	        });
+
+	        _this.$element = _this.modal.$element;
+
+	        _this.fetch();
+
+	        _this.updateOptions();
+	        return _this;
 	    }
 
-	    _createClass(Project, [{
-	        key: 'structure',
-	        value: function structure() {
-	            this.def(String, 'id');
-	            this.def(Array, 'users', []);
-	            this.def(Array, 'backups', []);
-	            this.def(Object, 'settings', {});
+	    /**
+	     * Updates the displayed options
+	     */
+
+
+	    _createClass(MigrationEditor, [{
+	        key: 'updateOptions',
+	        value: function updateOptions() {
+	            var _this2 = this;
+
+	            _.append(this.modal.$element.find('.environment-to').empty(), _.each(this.model.settings.environments.names, function (i, environment) {
+	                // Filter out "from" environment
+	                if (environment != _this2.modal.$element.find('.environment-from').val()) {
+	                    return _.option({ value: environment }, environment);
+	                }
+	            }));
 	        }
-	    }], [{
-	        key: 'create',
-	        value: function create(name) {
-	            var project = new Project();
 
-	            var id = name.toLowerCase();
-	            id = id.replace('.', '_');
-	            id = id.replace(/[^a-z_]/g, '');
+	        /**
+	         * Event: Clicked submit
+	         */
 
-	            project.id = id;
-	            project.settings.info = {
-	                section: 'info',
-	                name: name
-	            };
+	    }, {
+	        key: 'onSubmit',
+	        value: function onSubmit() {
+	            var _this3 = this;
 
-	            return project;
+	            this.data.from = this.modal.$element.find('.environment-from').val();
+	            this.data.to = this.modal.$element.find('.environment-to').val();
+
+	            this.data.settings.replace = this.modal.$element.find('#switch-migration-replace').is(':checked');
+
+	            apiCall('post', 'server/migrate/' + this.model.id, this.data).then(function () {
+	                UI.messageModal('Success', 'Successfully migrated content from "' + _this3.data.from + '" to "' + _this3.data.to + '"');
+	            }).catch(UI.errorModal);
 	        }
 	    }]);
 
-	    return Project;
-	}(Entity);
+	    return MigrationEditor;
+	}(View);
 
-	module.exports = Project;
+	module.exports = MigrationEditor;
+
+/***/ },
+/* 167 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	/**
+	 * The info settings editor
+	 *
+	 * @class View InfoEditor
+	 */
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var InfoEditor = function (_View) {
+	    _inherits(InfoEditor, _View);
+
+	    function InfoEditor(params) {
+	        _classCallCheck(this, InfoEditor);
+
+	        var _this = _possibleConstructorReturn(this, (InfoEditor.__proto__ || Object.getPrototypeOf(InfoEditor)).call(this, params));
+
+	        _this.modal = new MessageModal({
+	            model: {
+	                class: 'info-settings settings-modal',
+	                title: 'Project info'
+	            },
+	            buttons: [{
+	                label: 'Cancel',
+	                class: 'btn-default'
+	            }, {
+	                label: 'Save',
+	                class: 'btn-primary',
+	                callback: function callback() {
+	                    _this.onClickSave();
+
+	                    return false;
+	                }
+	            }]
+	        });
+
+	        _this.$element = _this.modal.$element;
+
+	        _this.fetch();
+	        return _this;
+	    }
+
+	    /**
+	     * Event: Click save. Posts the model to the modelUrl
+	     */
+
+
+	    _createClass(InfoEditor, [{
+	        key: 'onClickSave',
+	        value: function onClickSave() {
+	            var _this2 = this;
+
+	            SettingsHelper.setSettings(this.projectId, null, 'info', this.model).then(function () {
+	                _this2.modal.hide();
+
+	                _this2.trigger('change', _this2.model);
+	            }).catch(UI.errorModal);
+	        }
+
+	        /**
+	         * Renders the project name editor
+	         *
+	         * @returns {HTMLElement} Element
+	         */
+
+	    }, {
+	        key: 'renderProjectNameEditor',
+	        value: function renderProjectNameEditor() {
+	            var view = this;
+
+	            function onInputChange() {
+	                view.model.name = $(this).val();
+	            }
+
+	            var $element = _.div({ class: 'project-name-editor' }, _.input({ class: 'form-control', type: 'text', value: view.model.name, placeholder: 'Input the project name here' }).on('change', onInputChange));
+
+	            return $element;
+	        }
+
+	        /**
+	         * Renders a single field
+	         *
+	         * @param {String} label
+	         * @param {HTMLElement} content
+	         *
+	         * @return {HTMLElement} Editor element
+	         */
+
+	    }, {
+	        key: 'renderField',
+	        value: function renderField(label, $content) {
+	            return _.div({ class: 'input-group' }, _.span(label), _.div({ class: 'input-group-addon' }, $content));
+	        }
+	    }, {
+	        key: 'render',
+	        value: function render() {
+	            var _this3 = this;
+
+	            SettingsHelper.getSettings(this.projectId, null, 'info').then(function (infoSettings) {
+	                _this3.model = infoSettings || {};
+
+	                _.append(_this3.$element.find('.modal-body').empty(), _this3.renderField('Project name', _this3.renderProjectNameEditor()));
+	            });
+	        }
+	    }]);
+
+	    return InfoEditor;
+	}(View);
+
+	module.exports = InfoEditor;
+
+/***/ },
+/* 168 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	/**
+	 * The language settings editor
+	 *
+	 * @class View LanguageEditor
+	 */
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var LanguageEditor = function (_View) {
+	    _inherits(LanguageEditor, _View);
+
+	    function LanguageEditor(params) {
+	        _classCallCheck(this, LanguageEditor);
+
+	        var _this = _possibleConstructorReturn(this, (LanguageEditor.__proto__ || Object.getPrototypeOf(LanguageEditor)).call(this, params));
+
+	        _this.modal = new MessageModal({
+	            model: {
+	                class: 'language-settings settings-modal',
+	                title: 'Languages'
+	            },
+	            buttons: [{
+	                label: 'Cancel',
+	                class: 'btn-default'
+	            }, {
+	                label: 'Save',
+	                class: 'btn-primary',
+	                callback: function callback() {
+	                    _this.onClickSave();
+
+	                    return false;
+	                }
+	            }]
+	        });
+
+	        _this.$element = _this.modal.$element;
+
+	        LanguageHelper.getSelectedLanguages(_this.projectId).then(function (selectedLanguages) {
+	            _this.model = selectedLanguages;
+
+	            _this.fetch();
+	        });
+	        return _this;
+	    }
+
+	    /**
+	     * Event: Click save
+	     */
+
+
+	    _createClass(LanguageEditor, [{
+	        key: 'onClickSave',
+	        value: function onClickSave() {
+	            var _this2 = this;
+
+	            LanguageHelper.setLanguages(this.projectId, this.model).then(function () {
+	                _this2.modal.hide();
+
+	                _this2.trigger('change', _this2.model);
+	            }).catch(UI.errorModal);
+	        }
+	    }, {
+	        key: 'render',
+	        value: function render() {
+	            _.append(this.$element.find('.modal-body').empty(), UI.inputChipGroup(this.model, LanguageHelper.getLanguages(this.projectId), true));
+	        }
+	    }]);
+
+	    return LanguageEditor;
+	}(View);
+
+	module.exports = LanguageEditor;
 
 /***/ }
 /******/ ]);

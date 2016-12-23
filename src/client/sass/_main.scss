@@ -189,8 +189,8 @@ img.logo {
     }
 }
 
-// Content settings modal
-.content-settings-modal {
+// Settings modal
+.settings-modal {
     .modal-dialog {
         max-width: 400px;
 
@@ -203,8 +203,8 @@ img.logo {
             }
 
             .input-group-addon {
+                width: auto;
                 padding: 0px;
-                flex-basis: 30px;
             }
         }
     }

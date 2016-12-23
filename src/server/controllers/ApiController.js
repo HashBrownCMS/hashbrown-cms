@@ -78,6 +78,16 @@ class ApiController extends Controller {
                 }
             }
         }
+
+        // Project sanity check
+        if(req.project == 'settings') {
+            req.project = null;
+        }
+        
+        // Environment sanity check
+        if(req.environment == 'settings') {
+            req.environment = null;
+        }
     }
         
     /**

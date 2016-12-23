@@ -31,7 +31,7 @@ class FormHelper {
         )
         .then((result) => {
             if(!result) {
-                return SyncHelper.getResourceItem(project, 'forms', id);
+                return SyncHelper.getResourceItem(project, environment, 'forms', id);
             }
 
             return Promise.resolve(result);
@@ -86,7 +86,7 @@ class FormHelper {
             {}
         )
         .then((results) => {
-            return SyncHelper.mergeResource(project, 'forms', results); 
+            return SyncHelper.mergeResource(project, environment, 'forms', results); 
         });
     }
     

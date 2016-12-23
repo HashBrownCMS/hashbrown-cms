@@ -10,6 +10,8 @@ window.MessageModal = require('./views/MessageModal');
 // Common helpers
 window.UI = require('./helpers/UIHelper');
 window.ProjectHelper = require('./helpers/ProjectHelper');
+window.LanguageHelper = require('./helpers/LanguageHelper');
+window.SettingsHelper = require('./helpers/SettingsHelper');
 
 window.debug = require('../../common/helpers/DebugHelper');
 window.debug.verbosity = 3;
@@ -59,6 +61,13 @@ window.logout = function logout() {
     document.cookie = 'token=; Path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
     
     location.reload();
+}
+
+/**
+ * Handles a required parameter
+ */
+window.requiredParam = function requiredParam(name) {
+    throw new Error('Parameter "' + name + '" is required');
 }
 
 /**

@@ -11,7 +11,7 @@ class LanguageHelper extends LanguageHelperCommon {
      * @returns {Array} Array of language names
      */
     static getSelectedLanguages(project) {
-        return SettingsHelper.getSettings(project, 'language')
+        return SettingsHelper.getSettings(project, null, 'language')
         .then((settings) => {
             if(!settings) {
                 settings = {};
@@ -37,7 +37,7 @@ class LanguageHelper extends LanguageHelperCommon {
      * @returns {Promise} Promise
      */
     static toggleLanguage(project, language, state) {
-        return SettingsHelper.getSettings(project, 'language')
+        return SettingsHelper.getSettings(project, null, 'language')
         .then((settings) => {
             if(!settings) {
                 settings = {};
@@ -56,7 +56,7 @@ class LanguageHelper extends LanguageHelperCommon {
 
             }
 
-            return SettingsHelper.setSettings(project, 'language', settings);
+            return SettingsHelper.setSettings(project, null, 'language', settings);
         });  
     }
 }

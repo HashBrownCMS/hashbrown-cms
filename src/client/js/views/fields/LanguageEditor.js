@@ -24,7 +24,7 @@ class LanguageEditor extends View {
             this.$select = _.select({class: 'form-control'}).change(() => { this.onChange(); })
         );
 
-        LanguageHelper.getSelectedLanguages()
+        LanguageHelper.getSelectedLanguages(ProjectHelper.currentProject)
         .then((languages) => {
             _.append(this.$select,
                 _.each(languages, (i, language) => {

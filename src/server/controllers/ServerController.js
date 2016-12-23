@@ -200,7 +200,7 @@ class ServerController extends ApiController {
     static postProjectSettings(req, res) {
         let settings = req.body;
     
-        SettingsHelper.setSettings(req.params.project, req.params.section, settings)
+        SettingsHelper.setSettings(req.params.project, null, req.params.section, settings)
         .then(() => {
             res.status(200).send(settings);
         })

@@ -88,7 +88,7 @@ class ProjectHelper {
      */
     static getAllEnvironments(project) {
         return new Promise((resolve, reject) => {
-            SettingsHelper.getSettings(project, 'environments')
+            SettingsHelper.getSettings(project, null, 'environments')
             .then((environments) => {
                 // There should always be at least one environment available
                 if(!environments) {
@@ -162,14 +162,14 @@ class ProjectHelper {
         
         // Remove listing from settings
         .then(() => {
-            return SettingsHelper.getSettings(project, 'environments');
+            return SettingsHelper.getSettings(project, null, 'environments');
         })
         .then((environments) => {
             let index = environments.names.indexOf(environment);
 
             environments.names.splice(index, 1);
 
-            return SettingsHelper.setSettings(project, 'environments', environments);
+            return SettingsHelper.setSettings(project, null, 'environments', environments);
         });
     }
     

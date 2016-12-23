@@ -69,7 +69,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
                     .then((connection) => {
                         debug.log('Publishing through connection "' + settings.connections[i] + '" of type "' + connection.type + '"...', helper);
 
-                        return connection.publishContent(content);
+                        return connection.publishContent(project, environment, content);
                     })
                     .then(() => {
                         i++;
@@ -175,7 +175,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
             collection,
             {}
         ).then((array) => {
-            return SyncHelper.mergeResource(project, 'connections', array)
+            return SyncHelper.mergeResource(project, environment, 'connections', array)
             .then((connections) => {
                 for(let i in connections) {
                     connections[i] = ConnectionHelper.initConnection(connections[i]);
@@ -210,7 +210,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
             }
         ).then((data) => {
             if(!data) {
-                return SyncHelper.getResourceItem(project, 'connections', id)
+                return SyncHelper.getResourceItem(project, environment, 'connections', id)
                 .then((resourceItem) => {
                       return Promise.resolve(ConnectionHelper.initConnection(resourceItem));
                 });

@@ -20,8 +20,6 @@ class ContentHelper extends ContentHelperCommon {
         project = requiredParam('project'),
         environment = requiredParam('environment')
     ) {
-        if(!project || !environment) { return Promise.reject(new Error('Project and environment not specified')); }
-
         let collection = environment + '.content';
 
         return MongoHelper.find(
@@ -50,7 +48,7 @@ class ContentHelper extends ContentHelperCommon {
                 return a.sort > b.sort;
             });
 
-            return SyncHelper.mergeResource(project, 'content', contentList);
+            return SyncHelper.mergeResource(project, environment, 'content', contentList);
         });
     }
 
@@ -79,7 +77,7 @@ class ContentHelper extends ContentHelperCommon {
             }
         ).then((result) => {
             if(!result) {
-                return SyncHelper.getResourceItem(project, 'content', id);
+                return SyncHelper.getResourceItem(project, environment, 'content', id);
             }
             
             return Promise.resolve(result);

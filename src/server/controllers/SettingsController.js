@@ -7,7 +7,10 @@ class SettingsController extends ApiController {
      * Initialises this controller
      */
     static init(app) {
+        app.get('/api/:project/settings/:section', this.middleware(), this.getSettings);
         app.get('/api/:project/:environment/settings/:section', this.middleware(), this.getSettings);
+        
+        app.post('/api/:project/settings/:section', this.middleware({scope: 'settings'}), this.setSettings);
         app.post('/api/:project/:environment/settings/:section', this.middleware({scope: 'settings'}), this.setSettings);
     }
     
@@ -15,7 +18,7 @@ class SettingsController extends ApiController {
      * Get settings object
      */
     static getSettings(req, res) {
-        SettingsHelper.getSettings(req.params.project, req.params.section)
+        SettingsHelper.getSettings(req.project, req.environment, req.params.section)
         .then((settings) => {
             res.status(200).send(settings);
         })
@@ -30,7 +33,7 @@ class SettingsController extends ApiController {
     static setSettings(req, res) {
         let settings = req.body;
 
-        SettingsHelper.setSettings(req.params.project, req.params.section, settings)
+        SettingsHelper.setSettings(req.project, req.environment, req.params.section, settings)
         .then(() => {
             res.status(200).send(settings);
         })

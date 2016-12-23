@@ -7,17 +7,25 @@ class SettingsHelper extends SettingsHelperCommon {
      * Gets all settings
      *
      * @param {String} project
+     * @param {String} environment
      * @param {String} section
      *
      * @return {Promise} promise
      */
     static getSettings(
         project = requiredParam('project'),
+        environment = requiredParam('environment'),
         section = requiredParam('section')
     ) {
+        let collection = 'settings';
+
+        if(environment && environment != '*') {
+            collection = environment + '.' + collection;
+        }
+
         return MongoHelper.findOne(
             project,
-            'settings',
+            collection,
             {
                 section: section
             }
@@ -28,6 +36,7 @@ class SettingsHelper extends SettingsHelperCommon {
      * Sets all settings
      *
      * @param {String} project
+     * @param {String} environment
      * @param {String} section
      * @param {Object} settings
      *
@@ -35,12 +44,19 @@ class SettingsHelper extends SettingsHelperCommon {
      */
     static setSettings(
         project = requiredParam('project'),
+        environment = requiredParam('environment'),
         section = requiredParam('section'),
         settings = requiredParam('settings')
     ) {
-        let newSettings = { section: section };
+        debug.log('Setting "' + section + '" to ' + JSON.stringify(settings), this, 3);
+        
+        let collection = 'settings';
 
-        debug.log('Setting "' + section + '" to ' + JSON.stringify(settings), this);
+        if(environment && environment != '*') {
+            collection = environment + '.' + collection;
+        }
+        
+        let newSettings = { section: section };
 
         for(let k in settings) {
             newSettings[k] = settings[k];
@@ -48,7 +64,7 @@ class SettingsHelper extends SettingsHelperCommon {
 
         return MongoHelper.updateOne(
             project,
-            'settings',
+            collection,
             { 
                 section: section
             },

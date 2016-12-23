@@ -85,12 +85,10 @@
 
 	// Editor views
 	window.JSONEditor = __webpack_require__(118);
-	window.InfoSettings = __webpack_require__(123);
 	window.ContentEditor = __webpack_require__(124);
 	window.FormEditor = __webpack_require__(125);
 	window.ConnectionEditor = __webpack_require__(126);
 	window.SchemaEditor = __webpack_require__(127);
-	window.LanguageSettings = __webpack_require__(129);
 	window.SyncSettings = __webpack_require__(130);
 	window.UserEditor = __webpack_require__(131);
 	window.MediaBrowser = __webpack_require__(132);
@@ -102,9 +100,7 @@
 	window.MediaHelper = __webpack_require__(134);
 	window.ConnectionHelper = __webpack_require__(138);
 	window.ContentHelper = __webpack_require__(141);
-	window.LanguageHelper = __webpack_require__(143);
 	window.SchemaHelper = __webpack_require__(146);
-	window.SettingsHelper = __webpack_require__(151);
 	window.UI = __webpack_require__(26);
 
 	// Ready callback containers
@@ -114,11 +110,6 @@
 	// ----------
 	// Global methods
 	// ----------
-	// Handles a required parameter
-	window.requiredParam = function (name) {
-	    throw new Error('Parameter "' + name + '" is required');
-	};
-
 	/**
 	 * Clears the workspace
 	 */
@@ -305,6 +296,8 @@
 	// Common helpers
 	window.UI = __webpack_require__(26);
 	window.ProjectHelper = __webpack_require__(27);
+	window.LanguageHelper = __webpack_require__(143);
+	window.SettingsHelper = __webpack_require__(151);
 
 	window.debug = __webpack_require__(28);
 	window.debug.verbosity = 3;
@@ -396,6 +389,13 @@
 	    document.cookie = 'token=; Path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
 
 	    location.reload();
+	};
+
+	/**
+	 * Handles a required parameter
+	 */
+	window.requiredParam = function requiredParam(name) {
+	    throw new Error('Parameter "' + name + '" is required');
 	};
 
 	/**
@@ -11141,7 +11141,7 @@
 	                }
 	            }
 
-	            LanguageHelper.getSelectedLanguages().then(function (languages) {
+	            LanguageHelper.getSelectedLanguages(ProjectHelper.currentProject).then(function (languages) {
 	                _this2.languages = languages;
 
 	                // Render menu
@@ -20074,27 +20074,25 @@
 	    }, {
 	        key: 'renderToolbar',
 	        value: function renderToolbar() {
-	            var _this2 = this;
-
 	            var $mediaProvider = void 0;
 	            var $templateProvider = void 0;
 
 	            function onChangeMediaProvider() {
-	                ConnectionHelper.setMediaProvider($(this).val()).then(function () {
+	                ConnectionHelper.setMediaProvider(ProjectHelper.currentProject, ProjectHelper.currentEnvironment, $(this).val()).then(function () {
 	                    return reloadResource('media');
 	                }).then(function () {
 	                    ViewHelper.get('NavbarMain').reload();
-	                }).catch(errorModal);
+	                }).catch(UI.errorModal);
 	            }
 
 	            function onChangeTemplateProvider() {
-	                ConnectionHelper.setTemplateProvider($(this).val()).then(function () {
+	                ConnectionHelper.setTemplateProvider(ProjectHelper.currentProject, ProjectHelper.currentEnvironment, $(this).val()).then(function () {
 	                    return reloadResource('templates');
 	                }).then(function () {
 	                    return reloadResource('sectionTemplates');
 	                }).then(function () {
 	                    ViewHelper.get('NavbarMain').reload();
-	                }).catch(errorModal);
+	                }).catch(UI.errorModal);
 	            }
 
 	            var $toolbar = _.div({ class: 'pane-toolbar' }, _.div({}, _.label('Media provider'), $mediaProvider = _.select({ class: 'btn btn-primary' }, _.option({ value: null }, '(none)'), _.each(resources.connections, function (i, connection) {
@@ -20103,14 +20101,24 @@
 	                return _.option({ value: connection.id }, connection.title);
 	            })).change(onChangeTemplateProvider)));
 
-	            SettingsHelper.getSettings('providers').then(function (providers) {
+	            SettingsHelper.getSettings(ProjectHelper.currentProject, ProjectHelper.currentEnvironment, 'providers')
+
+	            // Previously, providers were set project-wide, so retrieve automatically if needed
+	            .then(function (providers) {
+	                if (!providers) {
+	                    return SettingsHelper.getSettings(ProjectHelper.currentProject, null, 'providers');
+	                } else {
+	                    return Promise.resolve(providers);
+	                }
+	            })
+
+	            // Set providers values
+	            .then(function (providers) {
 	                providers = providers || {};
 
 	                $mediaProvider.val(providers.media);
 	                $templateProvider.val(providers.template);
-	            }).catch(function (e) {
-	                debug.log(e.message, _this2);
-	            });
+	            }).catch(UI.errorModal);
 
 	            return $toolbar;
 	        }
@@ -20124,7 +20132,7 @@
 	    }, {
 	        key: 'getRenderSettings',
 	        value: function getRenderSettings() {
-	            var _this3 = this;
+	            var _this2 = this;
 
 	            return {
 	                label: 'Connections',
@@ -20139,12 +20147,12 @@
 
 	                    menu['This connection'] = '---';
 	                    menu['Copy id'] = function () {
-	                        _this3.onClickCopyItemId();
+	                        _this2.onClickCopyItemId();
 	                    };
 
 	                    if (!item.local && !item.remote && !item.locked) {
 	                        menu['Remove'] = function () {
-	                            _this3.onClickRemoveConnection();
+	                            _this2.onClickRemoveConnection();
 	                        };
 	                    }
 
@@ -20154,16 +20162,16 @@
 
 	                    if (item.local) {
 	                        menu['Push to remote'] = function () {
-	                            _this3.onClickPushConnection();
+	                            _this2.onClickPushConnection();
 	                        };
 	                        menu['Remove local copy'] = function () {
-	                            _this3.onClickRemoveConnection();
+	                            _this2.onClickRemoveConnection();
 	                        };
 	                    }
 
 	                    if (item.remote) {
 	                        menu['Pull from remote'] = function () {
-	                            _this3.onClickPullConnection();
+	                            _this2.onClickPullConnection();
 	                        };
 	                    }
 
@@ -20174,7 +20182,7 @@
 	                paneContextMenu: {
 	                    'General': '---',
 	                    'New connection': function NewConnection() {
-	                        _this3.onClickNewConnection();
+	                        _this2.onClickNewConnection();
 	                    }
 	                }
 	            };
@@ -20504,7 +20512,7 @@
 	                }
 	            });
 
-	            modal.$element.toggleClass('content-settings-modal');
+	            modal.$element.toggleClass('settings-modal content-settings-modal');
 	        }
 
 	        /**
@@ -21570,18 +21578,10 @@
 	        key: 'getRenderSettings',
 	        value: function getRenderSettings() {
 	            return {
-	                label: 'Project settings',
+	                label: 'Settings',
 	                route: '/settings/',
 	                icon: 'wrench',
 	                items: [{
-	                    name: 'Info',
-	                    path: 'info',
-	                    icon: 'info'
-	                }, {
-	                    name: 'Languages',
-	                    path: 'languages',
-	                    icon: 'flag'
-	                }, {
 	                    name: 'Sync',
 	                    path: 'sync',
 	                    icon: 'refresh'
@@ -23340,7 +23340,7 @@
 	                _this2.onChange();
 	            }));
 
-	            LanguageHelper.getSelectedLanguages().then(function (languages) {
+	            LanguageHelper.getSelectedLanguages(ProjectHelper.currentProject).then(function (languages) {
 	                _.append(_this2.$select, _.each(languages, function (i, language) {
 	                    return _.option({ value: language }, language);
 	                }));
@@ -28884,115 +28884,7 @@
 	})();
 
 /***/ },
-/* 123 */
-/***/ function(module, exports) {
-
-	'use strict';
-
-	/**
-	 * The info settings editor
-	 *
-	 * @class View InfoSettings
-	 */
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var InfoSettings = function (_View) {
-	    _inherits(InfoSettings, _View);
-
-	    function InfoSettings(params) {
-	        _classCallCheck(this, InfoSettings);
-
-	        var _this = _possibleConstructorReturn(this, (InfoSettings.__proto__ || Object.getPrototypeOf(InfoSettings)).call(this, params));
-
-	        _this.$element = _.div({ class: 'editor info-settings' });
-
-	        _this.fetch();
-	        return _this;
-	    }
-
-	    /**
-	     * Event: Click save. Posts the model to the modelUrl
-	     */
-
-
-	    _createClass(InfoSettings, [{
-	        key: 'onClickSave',
-	        value: function onClickSave() {
-	            var _this2 = this;
-
-	            if (this.jsonEditor && this.jsonEditor.isValid == false) {
-	                return;
-	            }
-
-	            this.$saveBtn.toggleClass('working', true);
-
-	            SettingsHelper.setSettings('info', this.model).then(function () {
-	                _this2.$saveBtn.toggleClass('working', false);
-	            }).catch(errorModal);
-	        }
-
-	        /**
-	         * Renders the project name editor
-	         *
-	         * @returns {HTMLElement} Element
-	         */
-
-	    }, {
-	        key: 'renderProjectNameEditor',
-	        value: function renderProjectNameEditor() {
-	            var view = this;
-
-	            function onInputChange() {
-	                view.model.name = $(this).val();
-	            }
-
-	            var $element = _.div({ class: 'project-name-editor' }, _.input({ class: 'form-control', type: 'text', value: view.model.name, placeholder: 'Input the project name here' }).on('change', onInputChange));
-
-	            return $element;
-	        }
-
-	        /**
-	         * Renders a single field
-	         *
-	         * @param {String} label
-	         * @param {HTMLElement} content
-	         *
-	         * @return {HTMLElement} Editor element
-	         */
-
-	    }, {
-	        key: 'renderField',
-	        value: function renderField(label, $content) {
-	            return _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, label), _.div({ class: 'field-value' }, $content));
-	        }
-	    }, {
-	        key: 'render',
-	        value: function render() {
-	            var _this3 = this;
-
-	            SettingsHelper.getSettings('info').then(function (infoSettings) {
-	                _this3.model = infoSettings || {};
-
-	                _.append(_this3.$element.empty(), _.div({ class: 'editor-header' }, _.span({ class: 'fa fa-info' }), _.h4('Info')), _.div({ class: 'editor-body' }, _this3.renderField('Project name', _this3.renderProjectNameEditor())), _.div({ class: 'editor-footer panel panel-default panel-buttons' }, _.div({ class: 'btn-group' }, _this3.$saveBtn = _.button({ class: 'btn btn-primary btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Save '), _.span({ class: 'text-working' }, 'Saving ')).click(function () {
-	                    _this3.onClickSave();
-	                }))));
-	            });
-	        }
-	    }]);
-
-	    return InfoSettings;
-	}(View);
-
-	module.exports = InfoSettings;
-
-/***/ },
+/* 123 */,
 /* 124 */
 /***/ function(module, exports) {
 
@@ -31498,76 +31390,7 @@
 	};
 
 /***/ },
-/* 129 */
-/***/ function(module, exports) {
-
-	'use strict';
-
-	/**
-	 * The language settings editor
-	 *
-	 * @class View LanguageSettings
-	 */
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var LanguageSettings = function (_View) {
-	    _inherits(LanguageSettings, _View);
-
-	    function LanguageSettings(params) {
-	        _classCallCheck(this, LanguageSettings);
-
-	        var _this = _possibleConstructorReturn(this, (LanguageSettings.__proto__ || Object.getPrototypeOf(LanguageSettings)).call(this, params));
-
-	        _this.$element = _.div({ class: 'editor language-settings' });
-
-	        LanguageHelper.getSelectedLanguages().then(function (selectedLanguages) {
-	            _this.model = selectedLanguages;
-
-	            _this.fetch();
-	        });
-	        return _this;
-	    }
-
-	    /**
-	     * Event: Click save
-	     */
-
-
-	    _createClass(LanguageSettings, [{
-	        key: 'onClickSave',
-	        value: function onClickSave() {
-	            var _this2 = this;
-
-	            this.$saveBtn.toggleClass('working', true);
-
-	            LanguageHelper.setLanguages(this.model).then(function () {
-	                _this2.$saveBtn.toggleClass('working', false);
-	            }).catch(UI.errorModal);
-	        }
-	    }, {
-	        key: 'render',
-	        value: function render() {
-	            var _this3 = this;
-
-	            _.append(this.$element.empty(), _.div({ class: 'editor-header' }, _.span({ class: 'fa fa-flag' }), _.h4('Languages')), _.div({ class: 'editor-body' }, UI.inputChipGroup(this.model, LanguageHelper.getLanguages(), true)), _.div({ class: 'editor-footer panel panel-default panel-buttons' }, _.div({ class: 'btn-group' }, this.$saveBtn = _.button({ class: 'btn btn-primary btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Save '), _.span({ class: 'text-working' }, 'Saving ')).click(function () {
-	                _this3.onClickSave();
-	            }))));
-	        }
-	    }]);
-
-	    return LanguageSettings;
-	}(View);
-
-	module.exports = LanguageSettings;
-
-/***/ },
+/* 129 */,
 /* 130 */
 /***/ function(module, exports) {
 
@@ -31617,7 +31440,7 @@
 
 	            this.$saveBtn.toggleClass('working', true);
 
-	            SettingsHelper.setSettings('sync', this.model).then(function () {
+	            SettingsHelper.setSettings(ProjectHelper.currentProject, ProjectHelper.currentEnvironment, 'sync', this.model).then(function () {
 	                _this2.$saveBtn.toggleClass('working', false);
 
 	                location.reload();
@@ -31865,7 +31688,7 @@
 	        value: function render() {
 	            var _this8 = this;
 
-	            SettingsHelper.getSettings('sync').then(function (syncSettings) {
+	            SettingsHelper.getSettings(ProjectHelper.currentProject, ProjectHelper.currentEnvironment, 'sync').then(function (syncSettings) {
 	                _this8.model = syncSettings || {};
 
 	                _.append(_this8.$element.empty(), _.div({ class: 'editor-header' }, _.span({ class: 'fa fa-refresh' }), _.h4('Sync')), _.div({ class: 'editor-body' }, _this8.renderField('Enabled', _this8.renderEnabledSwitch()), _this8.renderField('API URL', _this8.renderUrlEditor()), _this8.renderField('API Token', _this8.renderTokenEditor()), _this8.renderField('Project', _this8.renderProjectNameEditor()), _this8.renderField('Environment', _this8.renderEnvironmentNameEditor()), _this8.renderField('Content', _this8.renderContentSwitch()), _this8.renderField('Schemas', _this8.renderSchemaSwitch()), _this8.renderField('Connections', _this8.renderConnectionsSwitch()), _this8.renderField('Forms', _this8.renderFormsSwitch()), _this8.renderField('Media tree', _this8.renderMediaTreeSwitch())), _.div({ class: 'editor-footer panel panel-default panel-buttons' }, _.div({ class: 'btn-group' }, _this8.$saveBtn = _.button({ class: 'btn btn-primary btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Save '), _.span({ class: 'text-working' }, 'Saving ')).click(function () {
@@ -33182,6 +33005,8 @@
 	        /**
 	         * Gets a Connection by id
 	         *
+	         * @param {String} project
+	         * @param {String} environment
 	         * @param {string} id
 	         *
 	         * @return {Promise(Connection)} promise
@@ -33189,7 +33014,11 @@
 
 	    }, {
 	        key: 'getConnectionById',
-	        value: function getConnectionById(id) {
+	        value: function getConnectionById() {
+	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+	            var id = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('id');
+
 	            for (var i in resources.connections) {
 	                var connection = resources.connections[i];
 
@@ -33257,11 +33086,11 @@
 	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
 	            var id = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('id');
 
-	            return SettingsHelper.getSettings(project, 'providers').then(function (providers) {
+	            return SettingsHelper.getSettings(project, environment, 'providers').then(function (providers) {
 	                providers = providers || {};
 	                providers.template = id;
 
-	                SettingsHelper.setSettings(project, 'providers', providers);
+	                SettingsHelper.setSettings(project, environment, 'providers', providers);
 	            });
 	        }
 
@@ -33282,7 +33111,19 @@
 	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
 	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
 
-	            return SettingsHelper.getSettings(project, 'providers').then(function (providers) {
+	            return SettingsHelper.getSettings(project, environment, 'providers')
+
+	            // Previously, providers were set project-wide, so retrieve automatically if needed
+	            .then(function (providers) {
+	                if (!providers) {
+	                    return SettingsHelper.getSettings(project, null, 'providers');
+	                } else {
+	                    return Promise.resolve(providers);
+	                }
+	            })
+
+	            // Return requested provider
+	            .then(function (providers) {
 	                providers = providers || {};
 
 	                if (providers.template) {
@@ -33310,11 +33151,11 @@
 	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
 	            var id = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('id');
 
-	            return SettingsHelper.getSettings(project, 'providers').then(function (providers) {
+	            return SettingsHelper.getSettings(project, environment, 'providers').then(function (providers) {
 	                providers = providers || {};
 	                providers.media = id;
 
-	                SettingsHelper.setSettings(project, 'providers', providers);
+	                SettingsHelper.setSettings(project, environment, 'providers', providers);
 	            });
 	        }
 
@@ -33335,7 +33176,19 @@
 	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
 	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
 
-	            return SettingsHelper.getSettings(project, 'providers').then(function (providers) {
+	            return SettingsHelper.getSettings(project, environment, 'providers')
+
+	            // Previously, providers were set project-wide, so retrieve automatically if needed
+	            .then(function (providers) {
+	                if (!providers) {
+	                    return SettingsHelper.getSettings(project, null, 'providers');
+	                } else {
+	                    return Promise.resolve(providers);
+	                }
+	            })
+
+	            // Return requested provider
+	            .then(function (providers) {
 	                providers = providers || {};
 
 	                if (providers.media) {
@@ -33553,6 +33406,8 @@
 	        /**
 	         * Publishes content
 	         *
+	         * @param {String} project
+	         * @param {String} environment
 	         * @param {Content} content
 	         *
 	         * @returns {Promise} promise
@@ -33560,12 +33415,16 @@
 
 	    }, {
 	        key: 'publishContent',
-	        value: function publishContent(content) {
+	        value: function publishContent() {
+	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+	            var content = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('content');
+
 	            var connection = this;
 
 	            debug.log('Publishing all localised property sets...', this);
 
-	            return LanguageHelper.getAllLocalizedPropertySets(content).then(function (sets) {
+	            return LanguageHelper.getAllLocalizedPropertySets(project, environment, content).then(function (sets) {
 	                var languages = Object.keys(sets);
 
 	                function next(i) {
@@ -33955,7 +33814,7 @@
 	        /**
 	         * Gets all languages
 	         *
-	         * @returns {String[]} languages
+	         * @returns {Array} List of language names
 	         */
 	        value: function getLanguages() {
 	            return __webpack_require__(145);
@@ -33964,13 +33823,17 @@
 	        /**
 	         * Gets all selected languages
 	         *
-	         * @returns {String[]} languages
+	         * @param {String} project
+	         *
+	         * @returns {Array} List of language names
 	         */
 
 	    }, {
 	        key: 'getSelectedLanguages',
 	        value: function getSelectedLanguages() {
-	            return SettingsHelper.getSettings('language').then(function (settings) {
+	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+
+	            return SettingsHelper.getSettings(project, null, 'language').then(function (settings) {
 	                if (!settings) {
 	                    settings = {};
 	                }
@@ -33988,6 +33851,7 @@
 	        /**
 	         * Sets all languages
 	         *
+	         * @param {String} project
 	         * @param {Array} languages
 	         *
 	         * @returns {Promise} promise
@@ -33995,8 +33859,11 @@
 
 	    }, {
 	        key: 'setLanguages',
-	        value: function setLanguages(languages) {
-	            return SettingsHelper.getSettings('language').then(function (settings) {
+	        value: function setLanguages() {
+	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+	            var languages = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('languages');
+
+	            return SettingsHelper.getSettings(project, null, 'language').then(function (settings) {
 	                if (!(settings instanceof Object)) {
 	                    settings = {};
 	                }
@@ -34007,13 +33874,14 @@
 
 	                settings.selected = languages;
 
-	                return SettingsHelper.setSettings('language', settings);
+	                return SettingsHelper.setSettings(project, null, 'language', settings);
 	            });
 	        }
 
 	        /**
 	         * Toggle a language
 	         *
+	         * @param {String} project
 	         * @param {String} language
 	         * @param {Boolean} state
 	         *
@@ -34022,8 +33890,12 @@
 
 	    }, {
 	        key: 'toggleLanguage',
-	        value: function toggleLanguage(language, state) {
-	            return SettingsHelper.getSettings('language').then(function (settings) {
+	        value: function toggleLanguage() {
+	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+	            var language = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('language');
+	            var state = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('state');
+
+	            return SettingsHelper.getSettings(project, 'language').then(function (settings) {
 	                if (!(settings instanceof Object)) {
 	                    settings = {};
 	                }
@@ -34039,55 +33911,58 @@
 	                    settings.selected.sort();
 	                }
 
-	                return SettingsHelper.setSettings('language', settings);
+	                return SettingsHelper.setSettings(project, null, 'language', settings);
 	            });
 	        }
 
 	        /**
 	         * Gets localised sets of properties for a Content object
 	         *
-	         * @param {String} language
+	         * @param {String} project
+	         * @param {String} environment
 	         * @param {Content} content
 	         *
-	         * @return {Promise(Object[])} properties
+	         * @return {Promise} Properties
 	         */
 
 	    }, {
 	        key: 'getAllLocalizedPropertySets',
-	        value: function getAllLocalizedPropertySets(content) {
-	            return new Promise(function (callback) {
-	                LanguageHelper.getSelectedLanguages().then(function (languages) {
-	                    var sets = {};
+	        value: function getAllLocalizedPropertySets() {
+	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+	            var content = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('content');
 
-	                    var _iteratorNormalCompletion = true;
-	                    var _didIteratorError = false;
-	                    var _iteratorError = undefined;
+	            return LanguageHelper.getSelectedLanguages(project).then(function (languages) {
+	                var sets = {};
 
+	                var _iteratorNormalCompletion = true;
+	                var _didIteratorError = false;
+	                var _iteratorError = undefined;
+
+	                try {
+	                    for (var _iterator = languages[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	                        var language = _step.value;
+
+	                        var properties = content.getLocalizedProperties(language);
+
+	                        sets[language] = properties;
+	                    }
+	                } catch (err) {
+	                    _didIteratorError = true;
+	                    _iteratorError = err;
+	                } finally {
 	                    try {
-	                        for (var _iterator = languages[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-	                            var language = _step.value;
-
-	                            var properties = content.getLocalizedProperties(language);
-
-	                            sets[language] = properties;
+	                        if (!_iteratorNormalCompletion && _iterator.return) {
+	                            _iterator.return();
 	                        }
-	                    } catch (err) {
-	                        _didIteratorError = true;
-	                        _iteratorError = err;
 	                    } finally {
-	                        try {
-	                            if (!_iteratorNormalCompletion && _iterator.return) {
-	                                _iterator.return();
-	                            }
-	                        } finally {
-	                            if (_didIteratorError) {
-	                                throw _iteratorError;
-	                            }
+	                        if (_didIteratorError) {
+	                            throw _iteratorError;
 	                        }
 	                    }
+	                }
 
-	                    callback(sets);
-	                });
+	                return Promise.resolve(sets);
 	            });
 	        }
 	    }]);
@@ -34691,17 +34566,29 @@
 	        /**
 	         * Gets all settings
 	         *
+	         * @param {String} project
+	         * @param {String} environment
 	         * @param {String} section
 	         *
-	         * @return {Promise} promise
+	         * @return {Promise(Object)}  settings
 	         */
-	        value: function getSettings(section) {
-	            return apiCall('get', 'settings/' + section);
+	        value: function getSettings() {
+	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+	            var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('section');
+
+	            if (!environment || environment == '*') {
+	                return customApiCall('get', '/api/' + project + '/settings/' + section);
+	            } else {
+	                return customApiCall('get', '/api/' + project + '/' + environment + '/settings/' + section);
+	            }
 	        }
 
 	        /**
 	         * Sets all settings
 	         *
+	         * @param {String} project
+	         * @param {String} environment
 	         * @param {String} section
 	         * @param {Object} settings
 	         *
@@ -34710,8 +34597,17 @@
 
 	    }, {
 	        key: 'setSettings',
-	        value: function setSettings(section, settings) {
-	            return apiCall('post', 'settings/' + section, settings);
+	        value: function setSettings() {
+	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+	            var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('section');
+	            var settings = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : requiredParam('settings');
+
+	            if (!environment || environment == '*') {
+	                return customApiCall('post', '/api/' + project + '/settings/' + section, settings);
+	            } else {
+	                return customApiCall('post', '/api/' + project + '/' + environment + '/settings/' + section, settings);
+	            }
 	        }
 	    }]);
 
@@ -34741,17 +34637,25 @@
 	        /**
 	         * Gets all settings
 	         *
+	         * @param {String} project
+	         * @param {String} environment
 	         * @param {String} section
 	         *
 	         * @return {Promise(Object)}  settings
 	         */
-	        value: function getSettings(section) {
-	            return Promise.reject();
+	        value: function getSettings() {
+	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+	            var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('section');
+
+	            return Promise.resolve({});
 	        }
 
 	        /**
 	         * Sets all settings
 	         *
+	         * @param {String} project
+	         * @param {String} environment
 	         * @param {String} section
 	         * @param {Object} settings
 	         *
@@ -34760,8 +34664,13 @@
 
 	    }, {
 	        key: 'setSettings',
-	        value: function setSettings(section, settings) {
-	            return Promise.reject();
+	        value: function setSettings() {
+	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+	            var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('section');
+	            var settings = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : requiredParam('settings');
+
+	            return Promise.resolve();
 	        }
 	    }]);
 

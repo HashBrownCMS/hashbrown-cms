@@ -178,7 +178,7 @@ class MediaHelper extends MediaHelperCommon {
             collection,
             {}
         ).then((tree) => {
-            return SyncHelper.mergeResource(project, 'media/tree', tree);
+            return SyncHelper.mergeResource(project, environment, 'media/tree', tree);
         });
     }
     

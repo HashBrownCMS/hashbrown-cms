@@ -147,7 +147,7 @@ class MediaController extends ApiController {
         .then((result) => {
             media = result;
 
-            return MediaHelper.getTree();
+            return MediaHelper.getTree(req.project, req.environment);
         })
         .then((result) => {
             tree = result;

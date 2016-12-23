@@ -131,7 +131,7 @@ class SchemaHelper extends SchemaHelperCommon {
                 }
             }
 
-            return SyncHelper.mergeResource(project, 'schemas', schemas, { customOnly: true });
+            return SyncHelper.mergeResource(project, environment, 'schemas', schemas, { customOnly: true });
         });
     }
 
@@ -274,7 +274,7 @@ class SchemaHelper extends SchemaHelperCommon {
                     });
                 
                 } else {
-                    return SyncHelper.getResourceItem(project, 'schemas', id);
+                    return SyncHelper.getResourceItem(project, environment, 'schemas', id);
 
                 }
             });

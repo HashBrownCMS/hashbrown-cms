@@ -38,12 +38,10 @@ require('./views/fields');
 
 // Editor views
 window.JSONEditor = require('./views/JSONEditor');
-window.InfoSettings = require('./views/InfoSettings');
 window.ContentEditor = require('./views/ContentEditor');
 window.FormEditor = require('./views/FormEditor');
 window.ConnectionEditor = require('./views/ConnectionEditor');
 window.SchemaEditor = require('./views/SchemaEditor');
-window.LanguageSettings = require('./views/LanguageSettings');
 window.SyncSettings = require('./views/SyncSettings');
 window.UserEditor = require('./views/UserEditor');
 window.MediaBrowser = require('./views/MediaBrowser');
@@ -55,9 +53,7 @@ window.Content = require('./models/Content');
 window.MediaHelper = require('./helpers/MediaHelper');
 window.ConnectionHelper = require('./helpers/ConnectionHelper');
 window.ContentHelper = require('./helpers/ContentHelper');
-window.LanguageHelper = require('./helpers/LanguageHelper');
 window.SchemaHelper = require('./helpers/SchemaHelper');
-window.SettingsHelper = require('./helpers/SettingsHelper');
 window.UI = require('./helpers/UIHelper');
 
 // Ready callback containers
@@ -67,11 +63,6 @@ let isReady = {};
 // ----------
 // Global methods
 // ----------
-// Handles a required parameter
-window.requiredParam = function(name) {
-    throw new Error('Parameter "' + name + '" is required');
-}
-
 /**
  * Clears the workspace
  */

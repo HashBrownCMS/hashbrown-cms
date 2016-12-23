@@ -79,7 +79,7 @@ class FormsController extends ApiController {
     static pullForm(req, res) {
         let id = req.params.id;
 
-        SyncHelper.getResourceItem(req.project, 'forms', id)
+        SyncHelper.getResourceItem(req.project, req.environment, 'forms', id)
         .then((resourceItem) => {
             if(!resourceItem) { return Promise.reject(new Error('Couldn\'t find remote Form "' + id + '"')); }
        
@@ -101,7 +101,7 @@ class FormsController extends ApiController {
 
         FormHelper.getForm(req.project, req.environment, id)
         .then((localForm) => {
-            return SyncHelper.setResourceItem(req.project, 'forms', id, localForm);
+            return SyncHelper.setResourceItem(req.project, req.environment, 'forms', id, localForm);
         })
         .then(() => {
             return FormHelper.deleteForm(req.project, req.environment, id);

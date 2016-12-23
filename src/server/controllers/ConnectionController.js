@@ -57,7 +57,7 @@ class ConnectionController extends ApiController {
     static pullConnection(req, res) {
         let id = req.params.id;
 
-        SyncHelper.getResourceItem(req.project, 'connections', id)
+        SyncHelper.getResourceItem(req.project, req.environment, 'connections', id)
         .then((resourceItem) => {
             if(!resourceItem) { return Promise.reject(new Error('Couldn\'t find remote Connection "' + id + '"')); }
         
@@ -79,7 +79,7 @@ class ConnectionController extends ApiController {
 
         ConnectionHelper.getConnectionById(req.project, req.environment, id)
         .then((localConnection) => {
-            return SyncHelper.setResourceItem(req.project, 'connection', id, localConnection);
+            return SyncHelper.setResourceItem(req.project, req.environment, 'connection', id, localConnection);
         })
         .then(() => {
             return ConnectionHelper.removeConnectionById(req.project, req.environment, id);

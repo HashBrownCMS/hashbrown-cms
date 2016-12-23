@@ -10,6 +10,10 @@ window.app = require('../../../package.json');
 
 // Views
 window.ProjectEditor = require('./views/dashboard/ProjectEditor');
+window.BackupEditor = require('./views/dashboard/BackupEditor');
+window.MigrationEditor = require('./views/dashboard/MigrationEditor');
+window.InfoEditor = require('./views/dashboard/InfoEditor');
+window.LanguageEditor = require('./views/dashboard/LanguageEditor');
 
 // Models
 window.Project = require('../../common/models/Project');

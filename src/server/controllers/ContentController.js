@@ -101,7 +101,7 @@ class ContentController extends ApiController {
     static pullContent(req, res) {
         let id = req.params.id;
 
-        SyncHelper.getResourceItem(req.project, 'content', id)
+        SyncHelper.getResourceItem(req.project, req.environment, 'content', id)
         .then((resourceItem) => {
             if(!resourceItem) { return Promise.reject(new Error('Couldn\'t find remote Content "' + id + '"')); }
         
@@ -123,7 +123,7 @@ class ContentController extends ApiController {
 
         ContentHelper.getContentById(req.project, req.environment, id)
         .then((localContent) => {
-            return SyncHelper.setResourceItem(req.project, 'content', id, localContent);
+            return SyncHelper.setResourceItem(req.project, req.environment, 'content', id, localContent);
         })
         .then(() => {
             return ContentHelper.removeContentById(req.project, req.environment, id);

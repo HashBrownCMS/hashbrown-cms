@@ -31,7 +31,7 @@ class MainMenu extends View {
         }
 
         // Get selected languages
-        LanguageHelper.getSelectedLanguages()
+        LanguageHelper.getSelectedLanguages(ProjectHelper.currentProject)
         .then((languages) => {
             this.languages = languages;
 

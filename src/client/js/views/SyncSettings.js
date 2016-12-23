@@ -24,7 +24,7 @@ class SyncSettings extends View {
 
         this.$saveBtn.toggleClass('working', true);
 
-        SettingsHelper.setSettings('sync', this.model)
+        SettingsHelper.setSettings(ProjectHelper.currentProject, ProjectHelper.currentEnvironment, 'sync', this.model)
         .then(() => {
             this.$saveBtn.toggleClass('working', false);
 
@@ -280,7 +280,7 @@ class SyncSettings extends View {
     }
 
     render() {
-        SettingsHelper.getSettings('sync')
+        SettingsHelper.getSettings(ProjectHelper.currentProject, ProjectHelper.currentEnvironment, 'sync')
         .then((syncSettings) => {
             this.model = syncSettings || {};
 

@@ -17,11 +17,17 @@ class ConnectionHelper extends ConnectionHelperCommon {
     /**
      * Gets a Connection by id
      *
+     * @param {String} project
+     * @param {String} environment
      * @param {string} id
      *
      * @return {Promise(Connection)} promise
      */
-    static getConnectionById(id) {
+    static getConnectionById(
+        project = requiredParam('project'),
+        environment = requiredParam('environment'),
+        id = requiredParam('id')
+    ) {
         for(let i in resources.connections) {
             let connection = resources.connections[i];
 

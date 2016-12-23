@@ -4,7 +4,7 @@ class LanguageHelper {
     /**
      * Gets all languages
      *
-     * @returns {String[]} languages
+     * @returns {Array} List of language names
      */
     static getLanguages() {
         return require('../data/languages.json');
@@ -13,10 +13,14 @@ class LanguageHelper {
     /**
      * Gets all selected languages
      *
-     * @returns {String[]} languages
+     * @param {String} project
+     *
+     * @returns {Array} List of language names
      */
-    static getSelectedLanguages() {
-        return SettingsHelper.getSettings('language')
+    static getSelectedLanguages(
+        project = requiredParam('project')
+    ) {
+        return SettingsHelper.getSettings(project, null, 'language')
         .then((settings) => {
             if(!settings) {
                 settings = {};
@@ -35,12 +39,16 @@ class LanguageHelper {
     /**
      * Sets all languages
      *
+     * @param {String} project
      * @param {Array} languages
      *
      * @returns {Promise} promise
      */
-    static setLanguages(languages) {
-        return SettingsHelper.getSettings('language')
+    static setLanguages(
+        project = requiredParam('project'),
+        languages = requiredParam('languages')
+    ) {
+        return SettingsHelper.getSettings(project, null, 'language')
         .then((settings) => {
             if(!(settings instanceof Object)) {
                 settings = {};
@@ -52,20 +60,25 @@ class LanguageHelper {
 
             settings.selected = languages;
 
-            return SettingsHelper.setSettings('language', settings);
+            return SettingsHelper.setSettings(project, null, 'language', settings);
         });  
     }
 
     /**
      * Toggle a language
      *
+     * @param {String} project
      * @param {String} language
      * @param {Boolean} state
      *
      * @returns {Promise} promise
      */
-    static toggleLanguage(language, state) {
-        return SettingsHelper.getSettings('language')
+    static toggleLanguage(
+        project = requiredParam('project'),
+        language = requiredParam('language'),
+        state = requiredParam('state')
+    ) {
+        return SettingsHelper.getSettings(project, 'language')
         .then((settings) => {
             if(!(settings instanceof Object)) {
                 settings = {};
@@ -84,32 +97,35 @@ class LanguageHelper {
 
             }
 
-            return SettingsHelper.setSettings('language', settings);
+            return SettingsHelper.setSettings(project, null, 'language', settings);
         });  
     }
 
     /**
      * Gets localised sets of properties for a Content object
      *
-     * @param {String} language
+     * @param {String} project
+     * @param {String} environment
      * @param {Content} content
      *
-     * @return {Promise(Object[])} properties
+     * @return {Promise} Properties
      */
-    static getAllLocalizedPropertySets(content) {
-        return new Promise((callback) => {
-            LanguageHelper.getSelectedLanguages()
-            .then((languages) => {
-                let sets = {};
+    static getAllLocalizedPropertySets(
+        project = requiredParam('project'),
+        environment = requiredParam('environment'),
+        content = requiredParam('content')
+    ) {
+        return LanguageHelper.getSelectedLanguages(project)
+        .then((languages) => {
+            let sets = {};
 
-                for(let language of languages) {
-                    let properties = content.getLocalizedProperties(language);
-                    
-                    sets[language] = properties;
-                }
+            for(let language of languages) {
+                let properties = content.getLocalizedProperties(language);
+                
+                sets[language] = properties;
+            }
 
-                callback(sets);
-            });
+            return Promise.resolve(sets);
         });
     }
 }

@@ -164,16 +164,22 @@ class Connection extends Entity {
     /**
      * Publishes content
      *
+     * @param {String} project
+     * @param {String} environment
      * @param {Content} content
      *
      * @returns {Promise} promise
      */
-    publishContent(content) {
+    publishContent(
+        project = requiredParam('project'),
+        environment = requiredParam('environment'),
+        content = requiredParam('content')
+    ) {
         let connection = this;
 
         debug.log('Publishing all localised property sets...', this);
 
-        return LanguageHelper.getAllLocalizedPropertySets(content)
+        return LanguageHelper.getAllLocalizedPropertySets(project, environment, content)
         .then((sets) => {
             let languages = Object.keys(sets);
             

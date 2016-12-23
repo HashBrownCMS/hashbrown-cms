@@ -30,12 +30,12 @@ class ConnectionHelper {
         environment = requiredParam('environment'),
         id = requiredParam('id')
     ) {
-        return SettingsHelper.getSettings(project, 'providers')
+        return SettingsHelper.getSettings(project, environment, 'providers')
         .then((providers) => {
             providers = providers || {};
             providers.template = id;
 
-            SettingsHelper.setSettings(project, 'providers', providers)
+            SettingsHelper.setSettings(project, environment, 'providers', providers)
         });
     }
 
@@ -51,7 +51,19 @@ class ConnectionHelper {
         project = requiredParam('project'),
         environment = requiredParam('environment')
     ) {
-        return SettingsHelper.getSettings(project, 'providers')
+        return SettingsHelper.getSettings(project, environment, 'providers')
+        
+        // Previously, providers were set project-wide, so retrieve automatically if needed
+        .then((providers) => {
+            if(!providers) {
+                return SettingsHelper.getSettings(project, null, 'providers');
+            
+            } else {
+                return Promise.resolve(providers);
+            }
+        })
+
+        // Return requested provider
         .then((providers) => {
             providers = providers || {};
 
@@ -77,12 +89,12 @@ class ConnectionHelper {
         environment = requiredParam('environment'),
         id = requiredParam('id')
     ) {
-        return SettingsHelper.getSettings(project, 'providers')
+        return SettingsHelper.getSettings(project, environment, 'providers')
         .then((providers) => {
             providers = providers || {};
             providers.media = id;
 
-            SettingsHelper.setSettings(project, 'providers', providers)
+            SettingsHelper.setSettings(project, environment, 'providers', providers)
         });
     }
 
@@ -98,7 +110,19 @@ class ConnectionHelper {
         project = requiredParam('project'),
         environment = requiredParam('environment')
     ) {
-        return SettingsHelper.getSettings(project, 'providers')
+        return SettingsHelper.getSettings(project, environment, 'providers')
+        
+        // Previously, providers were set project-wide, so retrieve automatically if needed
+        .then((providers) => {
+            if(!providers) {
+                return SettingsHelper.getSettings(project, null, 'providers');
+            
+            } else {
+                return Promise.resolve(providers);
+            }
+        })
+
+        // Return requested provider
         .then((providers) => {
             providers = providers || {};
 

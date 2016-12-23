@@ -91,6 +91,7 @@ class ConnectionPane extends Pane {
         .then(() => {
             navbar.reload();
 
+
             if(connectionEditor && connectionEditor.model.id == pullId) {
                 connectionEditor.model = null;
                 connectionEditor.fetch();
@@ -131,18 +132,18 @@ class ConnectionPane extends Pane {
         let $templateProvider;
 
         function onChangeMediaProvider() {
-            ConnectionHelper.setMediaProvider($(this).val())
+            ConnectionHelper.setMediaProvider(ProjectHelper.currentProject, ProjectHelper.currentEnvironment, $(this).val())
             .then(() => {
                 return reloadResource('media');
             })
             .then(() => {
                 ViewHelper.get('NavbarMain').reload();
             })
-            .catch(errorModal);
+            .catch(UI.errorModal);
         }
 
         function onChangeTemplateProvider() {
-            ConnectionHelper.setTemplateProvider($(this).val())
+            ConnectionHelper.setTemplateProvider(ProjectHelper.currentProject, ProjectHelper.currentEnvironment, $(this).val())
             .then(() => {
                 return reloadResource('templates');
             })
@@ -152,7 +153,7 @@ class ConnectionPane extends Pane {
             .then(() => {
                 ViewHelper.get('NavbarMain').reload();
             })
-            .catch(errorModal);
+            .catch(UI.errorModal);
         }
 
         let $toolbar = _.div({class: 'pane-toolbar'},
@@ -180,17 +181,26 @@ class ConnectionPane extends Pane {
             )
         );
         
-        SettingsHelper.getSettings('providers')
+        SettingsHelper.getSettings(ProjectHelper.currentProject, ProjectHelper.currentEnvironment, 'providers')
+        
+        // Previously, providers were set project-wide, so retrieve automatically if needed
+        .then((providers) => {
+            if(!providers) {
+                return SettingsHelper.getSettings(ProjectHelper.currentProject, null, 'providers');
+            
+            } else {
+                return Promise.resolve(providers);
+            }
+        })
+
+        // Set providers values
         .then((providers) => {
             providers = providers || {};
 
             $mediaProvider.val(providers.media);
             $templateProvider.val(providers.template);
         })
-        .catch((e) => {
-            debug.log(e.message, this);
-        });
-
+        .catch(UI.errorModal);
 
         return $toolbar;
     }

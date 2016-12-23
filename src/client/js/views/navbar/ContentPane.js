@@ -312,7 +312,7 @@ class ContentPane extends Pane {
             }
         });
 
-        modal.$element.toggleClass('content-settings-modal');
+        modal.$element.toggleClass('settings-modal content-settings-modal');
     }
 
     /**

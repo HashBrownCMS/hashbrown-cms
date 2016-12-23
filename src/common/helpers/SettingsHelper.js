@@ -4,24 +4,37 @@ class SettingsHelper {
     /**
      * Gets all settings
      *
+     * @param {String} project
+     * @param {String} environment
      * @param {String} section
      *
      * @return {Promise(Object)}  settings
      */
-    static getSettings(section) {
-        return Promise.reject();
+    static getSettings(
+        project = requiredParam('project'),
+        environment = requiredParam('environment'),
+        section = requiredParam('section')
+    ) {
+        return Promise.resolve({});
     }
     
     /**
      * Sets all settings
      *
+     * @param {String} project
+     * @param {String} environment
      * @param {String} section
      * @param {Object} settings
      *
      * @return {Promise} promise
      */
-    static setSettings(section, settings) {
-        return Promise.reject();
+    static setSettings(
+        project = requiredParam('project'),
+        environment = requiredParam('environment'),
+        section = requiredParam('section'),
+        settings = requiredParam('settings')
+    ) {
+        return Promise.resolve();
     }
 }
 

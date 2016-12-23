@@ -79,7 +79,7 @@ class SchemaController extends ApiController {
     static pullSchema(req, res) {
         let id = req.params.id;
 
-        SyncHelper.getResourceItem(req.project, 'schemas', id)
+        SyncHelper.getResourceItem(req.project, req.environment, 'schemas', id)
         .then((resourceItem) => {
             if(!resourceItem) { return Promise.reject(new Error('Couldn\'t find remote Schema "' + id + '"')); }
         
@@ -101,7 +101,7 @@ class SchemaController extends ApiController {
 
         SchemaHelper.getSchemaById(req.project, req.environment, id)
         .then((localSchema) => {
-            return SyncHelper.setResourceItem(req.project, 'schemas', id, localSchema);
+            return SyncHelper.setResourceItem(req.project, req.environment, 'schemas', id, localSchema);
         })
         .then(() => {
             return SchemaHelper.removeSchemaById(req.project, req.environment, id);

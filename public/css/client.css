@@ -623,16 +623,16 @@ img.logo {
     width: 32px;
     height: 32px; }
 
-.content-settings-modal .modal-dialog {
+.settings-modal .modal-dialog {
   max-width: 400px; }
-  .content-settings-modal .modal-dialog .input-group {
+  .settings-modal .modal-dialog .input-group {
     display: flex; }
-    .content-settings-modal .modal-dialog .input-group span {
+    .settings-modal .modal-dialog .input-group span {
       flex-grow: 1;
       line-height: 30px; }
-    .content-settings-modal .modal-dialog .input-group .input-group-addon {
-      padding: 0px;
-      flex-basis: 30px; }
+    .settings-modal .modal-dialog .input-group .input-group-addon {
+      width: auto;
+      padding: 0px; }
 
 .error-modal .modal-dialog .fa-warning {
   margin-right: 10px; }
@@ -885,8 +885,6 @@ img.logo {
     .modal-migrate-content .modal-body .migration-settings .input-group {
       width: 50%;
       margin: 0px auto; }
-      .modal-migrate-content .modal-body .migration-settings .input-group > span {
-        line-height: 22px; }
 
 body > .dashboard-container {
   display: flex;
