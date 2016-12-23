@@ -206,6 +206,7 @@ class SyncSettings extends View {
                 this.model.content = isActive;  
 
                 if(isActive) {
+                    this.model.schemas = true;
                     this.$element.find('.field-editor.schemas input')[0].checked = true;
                 }
             })
@@ -239,10 +240,11 @@ class SyncSettings extends View {
      */
     renderSchemaSwitch() {
         return _.div({class: 'field-editor schemas'},
-            UI.inputSwitch(this.model.content == true, (isActive) => {
-                this.model.content = isActive;  
+            UI.inputSwitch(this.model.schemas == true, (isActive) => {
+                this.model.schemas = isActive;  
 
                 if(!isActive) {
+                    this.model.content = false;
                     this.$element.find('.field-editor.content input')[0].checked = false;
                 }
             })

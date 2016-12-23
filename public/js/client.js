@@ -31604,6 +31604,7 @@
 	                _this3.model.content = isActive;
 
 	                if (isActive) {
+	                    _this3.model.schemas = true;
 	                    _this3.$element.find('.field-editor.schemas input')[0].checked = true;
 	                }
 	            }));
@@ -31646,10 +31647,11 @@
 	        value: function renderSchemaSwitch() {
 	            var _this6 = this;
 
-	            return _.div({ class: 'field-editor schemas' }, UI.inputSwitch(this.model.content == true, function (isActive) {
-	                _this6.model.content = isActive;
+	            return _.div({ class: 'field-editor schemas' }, UI.inputSwitch(this.model.schemas == true, function (isActive) {
+	                _this6.model.schemas = isActive;
 
 	                if (!isActive) {
+	                    _this6.model.content = false;
 	                    _this6.$element.find('.field-editor.content input')[0].checked = false;
 	                }
 	            }));
@@ -34686,7 +34688,7 @@
 	module.exports = {
 		"name": "hashbrown-cms",
 		"repository": "https://github.com/Putaitu/hashbrown-cms.git",
-		"version": "0.5.0",
+		"version": "0.5.1",
 		"description": "The pluggable CMS",
 		"main": "hashbrown.js",
 		"scripts": {
