@@ -203,7 +203,6 @@ img.logo {
             }
 
             .input-group-addon {
-                width: auto;
                 padding: 0px;
             }
         }
@@ -364,10 +363,11 @@ img.logo {
                     float: right;
 
                     .btn {
-                        line-height: 20px;
-                        text-transform: uppercase;
-                        font-weight: bold;
                         margin-right: 15px;
+
+                        &:last-child {
+                            margin-right: 0px;
+                        }
 
                         span {
                             line-height: 20px;

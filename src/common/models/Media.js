@@ -58,6 +58,22 @@ class Media extends Entity {
             return 'image/gif';
         } else if(this.name.match(/\.bmp/)) {
             return 'image/bmp';
+        
+        // Video types
+        } else if(this.name.match(/\.mp4/)) {
+            return 'video/mp4';
+        } else if(this.name.match(/\.avi/)) {
+            return 'video/avi';
+        } else if(this.name.match(/\.mov/)) {
+            return 'video/quicktime';
+        } else if(this.name.match(/\.bmp/)) {
+            return 'video/bmp';
+        } else if(this.name.match(/\.wmv/)) {
+            return 'video/x-ms-wmv';
+        } else if(this.name.match(/\.3gp/)) {
+            return 'video/3gpp';
+        } else if(this.name.match(/\.mkv/)) {
+            return 'video/x-matroska';
 
         // SVG
         } else if(this.name.match(/\.svg/)) {
@@ -68,6 +84,25 @@ class Media extends Entity {
             return 'application/octet-stream';
         }
     }
+
+    /**
+     * Gets whether this is a video
+     *
+     * @returns {Boolean} Is video
+     */
+    isVideo() {
+        return this.getContentTypeHeader().indexOf('video') > -1;
+    }
+    
+    /**
+     * Gets whether this is an image
+     *
+     * @returns {Boolean} Is image
+     */
+    isImage() {
+        return this.getContentTypeHeader().indexOf('image') > -1;
+    }
+
 
     /**
      * Applies folder string from tree

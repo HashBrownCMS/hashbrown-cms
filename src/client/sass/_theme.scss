@@ -514,6 +514,7 @@ select.form-control {
     display: flex;
 
     .input-group-addon {
+        width: auto;
         background-color: transparent;
         border-radius: 0px;
         box-shadow: none;
@@ -522,6 +523,7 @@ select.form-control {
     
     .input-group-btn {
         padding-left: 15px;
+        width: auto;
 
         &:last-child {
             >.btn {

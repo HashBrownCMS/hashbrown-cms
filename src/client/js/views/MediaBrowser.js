@@ -45,28 +45,30 @@ class MediaBrowser extends View {
                     file.type == 'video/quicktime' ||
                     file.type == 'video/x-matroska';
 
-                let reader = new FileReader();
+                if(isImage) {
+                    let reader = new FileReader();
+                    
+                    uploadModal.$element.find('.spinner-container').toggleClass('hidden', false);
 
-                reader.onload = function(e) {
-                    if(isImage) {
+                    reader.onload = function(e) {
                         uploadModal.$element.find('.media-preview').html(
                             _.img({src: e.target.result})
                         );
-                    }
 
-                    if(isVideo) {
-                        uploadModal.$element.find('.media-preview').html(
-                            _.video({src: e.target.result })
-                        );
-                    }
 
-                    uploadModal.$element.find('.spinner-container').toggleClass('hidden', true);
+                        uploadModal.$element.find('.spinner-container').toggleClass('hidden', true);
+                    }
+                    
+                    reader.readAsDataURL(file);
                 }
                         
-                uploadModal.$element.find('.spinner-container').toggleClass('hidden', false);
+                if(isVideo) {
+                    uploadModal.$element.find('.media-preview').html(
+                        _.video({src: window.URL.createObjectURL(file), controls: 'controls'})
+                    );
+                }
 
-                reader.readAsDataURL(file);
-                debug.log('Reading data of file type ' + file.type + '...', navbar);
+                debug.log('Previewing data of file type ' + file.type + '...', navbar);
             }
         }
         
@@ -168,6 +170,13 @@ class MediaBrowser extends View {
 
         this.$element.modal('hide');
     }
+    
+    /** 
+     * Event: Click cancel
+     */
+    onClickCancel() {
+        this.$element.modal('hide');
+    }
 
     render() {
         // Render the modal
@@ -208,13 +217,20 @@ class MediaBrowser extends View {
                         _.div({class: 'thumbnail-container'},
                             // Append all files
                             _.each(resources.media, (i, media) => {
+                                media = new Media(media);
+
                                 let $media = _.button(
                                     {
                                         class: 'thumbnail raised',
                                         'data-id': media.id,
                                         'data-name': media.name,
-                                        style: 'background-image: url(\'/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + media.id + '\')'
                                     },
+                                    _.if(media.isVideo(),
+                                        _.video({src: '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + media.id})
+                                    ),
+                                    _.if(media.isImage(),
+                                        _.img({src: '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + media.id})
+                                    ),
                                     _.label(media.name)  
                                 ).click(() => {
                                     this.$element.find('.thumbnail').toggleClass('active', false);
@@ -254,6 +270,11 @@ class MediaBrowser extends View {
                         )
                     ),
                     _.div({class: 'modal-footer'},
+                        _.button({class: 'btn btn-default'},
+                            'Cancel'
+                        ).click(() => {
+                            this.onClickCancel();
+                        }),
                         _.button({class: 'btn btn-primary'},
                             'OK'
                         ).click(() => {

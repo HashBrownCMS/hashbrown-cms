@@ -69,7 +69,7 @@ class MediaHelper extends MediaHelperCommon {
      */
     static mkdirRecursively(
         dirPath = requiredParam('dirPath'),
-        callback = requiredParam('callback')
+        callback = null
     ) {
         let parents = dirPath.split('/');
         let finalPath = '/';

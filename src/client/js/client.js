@@ -48,6 +48,7 @@ window.MediaBrowser = require('./views/MediaBrowser');
 
 // Models
 window.Content = require('./models/Content');
+window.Media = require('../../common/models/Media');
 
 // Helpers
 window.MediaHelper = require('./helpers/MediaHelper');

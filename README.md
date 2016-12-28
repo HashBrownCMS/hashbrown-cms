@@ -6,7 +6,7 @@ Ever wonder why you have to run a completely separate CMS for every single proje
 
 ## Building and running HashBrown from source  
 Dependencies:  
-- node.js v4  
+- node.js v6 
 - mongodb v3.2  
 
 Commands:  

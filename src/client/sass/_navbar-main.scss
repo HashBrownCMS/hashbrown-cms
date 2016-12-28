@@ -255,6 +255,7 @@
 
                     select, button {
                         width: 100%;
+                        max-width: 155px;
                         display: block;
                         background-color: material-color('blue', '600');     
                         border: 0px;

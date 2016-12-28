@@ -397,7 +397,7 @@ class ContentEditor extends View {
                         }
 
                         if(connection) {
-                            return _.a({target: '_blank', href: connection.url + url, class: 'btn btn-embedded'}, 'View on ' + connection.title)
+                            return _.a({target: '_blank', href: connection.url + url, class: 'btn btn-primary'}, 'View page')
                         }
                     })
                 ),
@@ -459,7 +459,7 @@ class ContentEditor extends View {
             this.onFieldEditorsReady();
         })
         .catch((e) => {
-            UI.errorModal(e);
+            UI.errorModal(e, () => { location.hash = '/content/json/' + this.model.id; });
         });
     }
 }

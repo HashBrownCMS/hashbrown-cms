@@ -91,7 +91,6 @@ class ConnectionPane extends Pane {
         .then(() => {
             navbar.reload();
 
-
             if(connectionEditor && connectionEditor.model.id == pullId) {
                 connectionEditor.model = null;
                 connectionEditor.fetch();

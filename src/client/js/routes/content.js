@@ -35,7 +35,7 @@ Router.route('/content/:id', function() {
             location.hash = '/content/' + this.id + '/' + (contentSchema.defaultTabId || 'meta');
         
         } else {
-            UI.errorModal(new Error('Schema by id "' + content.schemaId + '" not found'));
+            UI.errorModal(new Error('Schema by id "' + content.schemaId + '" not found'), () => { location.hash = '/content/json/' + this.id; });
 
         }
     

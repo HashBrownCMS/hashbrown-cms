@@ -341,12 +341,14 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
 .input-group {
   display: flex; }
   .input-group .input-group-addon {
+    width: auto;
     background-color: transparent;
     border-radius: 0px;
     box-shadow: none;
     border: 0px; }
   .input-group .input-group-btn {
-    padding-left: 15px; }
+    padding-left: 15px;
+    width: auto; }
     .input-group .input-group-btn:last-child > .btn {
       border-radius: 2px; }
 
@@ -631,7 +633,6 @@ img.logo {
       flex-grow: 1;
       line-height: 30px; }
     .settings-modal .modal-dialog .input-group .input-group-addon {
-      width: auto;
       padding: 0px; }
 
 .error-modal .modal-dialog .fa-warning {
@@ -738,10 +739,9 @@ img.logo {
         .cms-container .workspace .editor .editor-footer .btn-group {
           float: right; }
           .cms-container .workspace .editor .editor-footer .btn-group .btn {
-            line-height: 20px;
-            text-transform: uppercase;
-            font-weight: bold;
             margin-right: 15px; }
+            .cms-container .workspace .editor .editor-footer .btn-group .btn:last-child {
+              margin-right: 0px; }
             .cms-container .workspace .editor .editor-footer .btn-group .btn span {
               line-height: 20px; }
               .cms-container .workspace .editor .editor-footer .btn-group .btn span.fa {
@@ -1209,6 +1209,19 @@ body > .dashboard-container {
   width: 200px;
   display: block;
   position: relative; }
+  .media-reference-editor .thumbnail {
+    position: relative;
+    overflow: hidden; }
+    .media-reference-editor .thumbnail img, .media-reference-editor .thumbnail video {
+      object-fit: cover;
+      position: absolute;
+      min-width: 100%;
+      min-height: 100%;
+      max-width: 150%;
+      max-height: 150%;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%); }
 
 .rich-text-editor {
   margin: 0px;
@@ -1478,7 +1491,19 @@ body > .dashboard-container {
     .media-browser .modal-dialog .thumbnail-container .thumbnail {
       width: 224px;
       flex-grow: 0;
-      margin: 1em; }
+      margin: 1em;
+      position: relative;
+      overflow: hidden; }
+      .media-browser .modal-dialog .thumbnail-container .thumbnail img, .media-browser .modal-dialog .thumbnail-container .thumbnail video {
+        object-fit: cover;
+        position: absolute;
+        min-width: 100%;
+        min-height: 100%;
+        max-width: 150%;
+        max-height: 150%;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%); }
 
 .schema-editor {
   height: 100%;
@@ -1738,6 +1763,7 @@ body > .dashboard-container {
           padding: 0px; }
         .navspace .navbar-main .tab-panes .pane-container .pane-toolbar select, .navspace .navbar-main .tab-panes .pane-container .pane-toolbar button {
           width: 100%;
+          max-width: 155px;
           display: block;
           background-color: #1e88e5;
           border: 0px;

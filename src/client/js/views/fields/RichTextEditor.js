@@ -54,10 +54,18 @@ class RichTextEditor extends View {
             
             case 'html':
                 this.html.getDoc().setValue(this.value);
+
+                setTimeout(() => {
+                    this.html.refresh();
+                }, 1);
                 break;
             
             case 'markdown':
                 this.markdown.getDoc().setValue(toMarkdown(this.value));
+                
+                setTimeout(() => {
+                    this.markdown.refresh();
+                }, 1);
                 break;
         }
         
@@ -105,11 +113,11 @@ class RichTextEditor extends View {
         // Main element
         this.$element = _.div({class: 'field-editor rich-text-editor panel panel-default'},
             _.ul({class: 'nav nav-tabs'},
-                _.each(['wysiwyg', 'markdown', 'html'], (i, label) => {
-                    return _.li({class: activeView == label ? 'active' : ''},
-                        _.a({'data-toggle': 'tab', href: '#' + this.guid + '-' + label},
+                _.each({wysiwyg: 'Visual', markdown: 'Markdown', html: 'HTML'}, (alias, label) => {
+                    return _.li({class: activeView == alias ? 'active' : ''},
+                        _.a({'data-toggle': 'tab', href: '#' + this.guid + '-' + alias},
                             label
-                        ).click(() => { this.onClickTab(label); })
+                        ).click(() => { this.onClickTab(alias); })
                     );
                 }),
                 _.button({class: 'btn btn-primary btn-insert-media'},

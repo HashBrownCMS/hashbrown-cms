@@ -51,27 +51,31 @@ class MediaReferenceEditor extends View {
     }
 
     render() {
-        if(this.value) {
-            let mediaObject = (resources.media || []).filter((m) => {
-                return m.id == this.value;
-            })[0];
-
-            if(mediaObject) {
-                this.$body
-                    .attr('style', 'background-image: url(\'/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + this.value + '\')')
-                    .html(
-                        _.label(mediaObject.name)
-                    );
-            } else {
-                this.$body
-                    .removeAttr('style')
-                    .empty();
-            }
-        } else {
-            this.$body
-                .removeAttr('style')
-                .empty();
+        if(!this.value) {
+            this.$body.empty();
+            return;
         }
+
+        let media = (resources.media || []).filter((m) => {
+            return m.id == this.value;
+        })[0];
+        
+        if(!media) {
+            this.$body.empty();
+            return;
+        }
+
+        media = new Media(media);
+
+        _.append(this.$body.empty(),
+            _.if(media.isVideo(),
+                _.video({src: '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + media.id})
+            ),
+            _.if(media.isImage(),
+                _.img({src: '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + media.id})
+            ),
+            _.label(media.name)
+        );
     }
 }
 

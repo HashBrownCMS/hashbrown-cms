@@ -145,8 +145,9 @@ class UIHelper {
      * Brings up an error modal
      *
      * @param {String|Error} error
+     * @param {Function} onClickOK
      */
-    static errorModal(error) {
+    static errorModal(error, onClickOK) {
         if(error instanceof String) {
             error = new Error(error);
         
@@ -156,7 +157,7 @@ class UIHelper {
             }
         }
 
-        let modal = messageModal('<span class="fa fa-warning"></span> Error', error.message + '<br /><br />Please check server log for details');
+        let modal = messageModal('<span class="fa fa-warning"></span> Error', error.message + '<br /><br />Please check server log for details', onClickOK);
 
         modal.$element.toggleClass('error-modal', true);
 
