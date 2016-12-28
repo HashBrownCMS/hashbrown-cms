@@ -1,7 +1,10 @@
 .content-reference-editor {
-    display: flex;
+    position: relative;
+    width: auto;
+    display: inline-block;
+    padding-right: 30px;
 
-    .btn {
-        margin-left: 10px;
+    .btn-remove {
+        padding-top: 0px;
     }
 }

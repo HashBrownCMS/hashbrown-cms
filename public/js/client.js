@@ -23403,7 +23403,7 @@
 	            }),
 
 	            // Render clear button
-	            this.$clearBtn = _.button({ class: 'btn btn-small btn-primary' }, _.span({ class: 'fa fa-remove' }))]);
+	            this.$clearBtn = _.button({ class: 'btn btn-remove' }, _.span({ class: 'fa fa-remove' }))]);
 
 	            // Set the initial value
 	            this.$select.val(this.value);

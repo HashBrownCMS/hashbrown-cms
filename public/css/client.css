@@ -1363,9 +1363,12 @@ body > .dashboard-container {
     margin-right: 10px; }
 
 .content-reference-editor {
-  display: flex; }
-  .content-reference-editor .btn {
-    margin-left: 10px; }
+  position: relative;
+  width: auto;
+  display: inline-block;
+  padding-right: 30px; }
+  .content-reference-editor .btn-remove {
+    padding-top: 0px; }
 
 .cms-container .workspace .content-editor {
   height: 100%; }
