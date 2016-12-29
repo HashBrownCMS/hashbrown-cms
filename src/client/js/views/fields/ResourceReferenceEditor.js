@@ -34,6 +34,15 @@ class ResourceReferenceEditor extends View {
                     }
                 }
 
+            } else if(this.value) {
+                let singularResourceName = this.config.resource;
+
+                if(singularResourceName[singularResourceName.length - 1] == 's') {
+                    singularResourceName = singularResourceName.substring(0, singularResourceName.length - 1);
+                }
+
+                value = '(' + singularResourceName + ' not found)';
+
             }
         }
         
