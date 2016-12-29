@@ -21,8 +21,9 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
  * Colour a button
  */
 .dropdown.open .dropdown-toggle {
-  color: #757575;
   position: relative; }
+  .dropdown.open .dropdown-toggle, .dropdown.open .dropdown-toggle:focus {
+    color: #757575; }
   .dropdown.open .dropdown-toggle:before {
     content: '';
     display: block;
@@ -60,18 +61,20 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
   left: auto;
   right: 0px;
   min-width: auto; }
-  .dropdown .dropdown-menu > li.active > a {
+  .dropdown .dropdown-menu > li.active > a, .dropdown .dropdown-menu > li.active > button {
     background-color: transparent;
     color: #424242; }
-    .dropdown .dropdown-menu > li.active > a:hover {
+    .dropdown .dropdown-menu > li.active > a:hover, .dropdown .dropdown-menu > li.active > button:hover {
       background-color: #eeeeee; }
-    .dropdown .dropdown-menu > li.active > a:after {
+    .dropdown .dropdown-menu > li.active > a:after, .dropdown .dropdown-menu > li.active > button:after {
       font-family: 'FontAwesome';
       content: '\F00C';
       margin-left: 10px; }
-  .dropdown .dropdown-menu > li > a {
-    padding: 3px 20px; }
-    .dropdown .dropdown-menu > li > a:hover {
+  .dropdown .dropdown-menu > li > a, .dropdown .dropdown-menu > li > button {
+    padding: 3px 20px;
+    border: 0px;
+    color: #757575; }
+    .dropdown .dropdown-menu > li > a:hover, .dropdown .dropdown-menu > li > button:hover {
       background-color: #eeeeee; }
 
 .btn-round-group {
@@ -1100,15 +1103,40 @@ body > .dashboard-container {
         background-color: #1e88e5;
         border-radius: 50%;
         color: #fff; }
+  .modal.date-picker .modal-dialog .modal-body .date-picker-time {
+    padding: 15px 0px;
+    display: flex; }
+    .modal.date-picker .modal-dialog .modal-body .date-picker-time .date-picker-time-separator {
+      font-size: 18px;
+      color: #bdbdbd;
+      font-weight: bold;
+      line-height: 40px; }
+    .modal.date-picker .modal-dialog .modal-body .date-picker-time .dropdown {
+      display: block;
+      flex-grow: 1;
+      width: 50%;
+      flex-basis: 50%; }
+      .modal.date-picker .modal-dialog .modal-body .date-picker-time .dropdown.open .dropdown-toggle:before {
+        display: none; }
+      .modal.date-picker .modal-dialog .modal-body .date-picker-time .dropdown button .fa, .modal.date-picker .modal-dialog .modal-body .date-picker-time .dropdown button .caret {
+        display: none; }
+      .modal.date-picker .modal-dialog .modal-body .date-picker-time .dropdown button, .modal.date-picker .modal-dialog .modal-body .date-picker-time .dropdown li {
+        line-height: 40px;
+        height: 40px;
+        width: 100%;
+        background-color: #fff; }
+      .modal.date-picker .modal-dialog .modal-body .date-picker-time .dropdown ul {
+        max-height: 100px;
+        overflow-y: auto; }
 
 .date-editor {
   min-width: 130px;
   position: relative;
-  max-width: 130px; }
+  max-width: 160px; }
   .date-editor .btn-remove {
     top: 5px; }
   .date-editor .btn-edit {
-    max-width: 110px; }
+    max-width: 140px; }
 
 .btn-array-editor-sort-items {
   display: block;

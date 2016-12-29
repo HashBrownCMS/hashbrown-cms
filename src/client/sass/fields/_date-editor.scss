@@ -68,6 +68,51 @@
                     }
                 }
             }
+
+            .date-picker-time {
+                padding: 15px 0px;
+                display: flex;
+
+                .date-picker-time-separator {
+                    font-size: 18px;
+                    color: material-color('grey', '400');
+                    font-weight: bold;
+                    line-height: 40px;
+                }
+
+                .dropdown {
+                    display: block;
+                    flex-grow: 1;
+                    width: 50%;
+                    flex-basis: 50%;
+
+                    &.open {
+                        .dropdown-toggle {
+                            &:before {
+                                display: none;
+                            }
+                        }
+                    }
+
+                    button {
+                        .fa, .caret {
+                            display: none;
+                        }
+                    }
+                            
+                    button, li {
+                        line-height: 40px;
+                        height: 40px;
+                        width: 100%;
+                        background-color: #fff;
+                    }
+
+                    ul {
+                        max-height: 100px;
+                        overflow-y: auto;
+                    }
+                }
+            }
         }
     }
 }
@@ -75,13 +120,13 @@
 .date-editor {
     min-width: 130px;
     position: relative;
-    max-width: 130px;
+    max-width: 160px;
 
     .btn-remove {
         top: 5px;
     }
 
     .btn-edit {
-        max-width: 110px;
+        max-width: 140px;
     }
 }

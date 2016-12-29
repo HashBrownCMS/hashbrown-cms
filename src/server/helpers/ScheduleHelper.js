@@ -47,7 +47,7 @@ class ScheduleHelper {
                         if(e.message.indexOf('No connections defined') > -1) {
                             debug.log(e.message + ', removing task...', this);
 
-                            this.removeTask(task.type, task.content, task.project, task.environment);
+                            this.removeTask(task.project, task.environment, task.type, task.content);
 
                         } else {
                             debug.log(e.message, this);
@@ -76,27 +76,34 @@ class ScheduleHelper {
     static runTask(
         task = requiredParam('task')
     ) {
-        debug.log('Running ' + task.type + ' task for "' + task.content + '"...', this);    
+        debug.log('Running ' + task.type + ' task for "' + task.content + '"...', this);
 
-        return ContentHelper.getContentById(task.project, task.environment, task.content)
+        let user;
+
+        return UserHelper.getUserById(task.user)
+        .then((taskUser) => {
+            user = taskUser;
+
+            return ContentHelper.getContentById(task.project, task.environment, task.content);
+        })
         .then((content) => {
             switch(task.type) {
                 case 'publish':
-                    return ConnectionHelper.publishContent(task.project, task.environment, content)
+                    return ConnectionHelper.publishContent(task.project, task.environment, content, user)
                     .then(() => {
-                        return this.removeTask(task.type, task.content, task.project, task.environment);
+                        return this.removeTask(task.project, task.environment, task.type, task.content);
                     });
                     break;
 
                 case 'unpublish':
-                    return ConnectionHelper.unpublishContent(task.project, task.environment, content)
+                    return ConnectionHelper.unpublishContent(task.project, task.environment, content, user)
                     .then(() => {
-                        return this.removeTask(task.type, task.content, task.project, task.environment);
+                        return this.removeTask(task.project, task.environment, task.type, task.content);
                     });
                     break;
             }
 
-            return new Promise((resolve) => { resolve(); });
+            return Promise.resolve();
         });
     }
 
@@ -133,33 +140,33 @@ class ScheduleHelper {
                 tasks[i] = new Task(tasks[i]);
             }
 
-            return new Promise((resolve) => {
-                resolve(tasks);
-            });
+            return Promise.resolve(tasks);
         });
     }
 
     /**
      * Updates a task
      *
+     * @param {String} project
+     * @param {String} environment
      * @param {String} type
      * @param {String} contentId
      * @param {Date} date
-     * @param {String} project
-     * @param {String} environment
+     * @param {User} user
      *
      * @returns {Promise} Promise
      */
     static updateTask(
+        project = requiredParam('project'),
+        environment = requiredParam('environment'),
         type = requiredParam('type'),
         contentId = requiredParam('contentId'),
         date = requiredParam('date'),
-        project = requiredParam('project'),
-        environment = requiredParam('environment')
+        user = requiredParam('user')
     ) {
         // If the date is invalid, remove instead
         if(!date || isNaN(new Date(date).getTime()) || new Date(date).getFullYear() == 1970) {
-            return this.removeTask(type, contentId, date, project, environment);
+            return Promise.reject(new Error('Date "' + date + '" is invalid'));
         }
 
         let task = new Task({
@@ -167,7 +174,8 @@ class ScheduleHelper {
             content: contentId,
             date: date,
             project: project,
-            environment: environment
+            environment: environment,
+            user: user.id
         });
 
         let query = {
@@ -193,19 +201,18 @@ class ScheduleHelper {
     /**
      * Removes a task
      *
-     * @param {String} type
-     * @param {String} contentId
      * @param {String} project
      * @param {String} environment
+     * @param {String} type
+     * @param {String} contentId
      *
      * @returns {Promise} Promise
      */
     static removeTask(
-        type = requiredParam('type'),
-        contentId = requiredParam('contentId'),
-        date = requiredParam('date'),
         project = requiredParam('project'),
-        environment = requiredParam('environment')
+        environment = requiredParam('environment'),
+        type = requiredParam('type'),
+        contentId = requiredParam('contentId')
     ) {
         let query = {
             type: type,
@@ -214,13 +221,22 @@ class ScheduleHelper {
             environment: environment
         };
         
-        debug.log('Removing ' + type + ' task for "' + contentId + '"...', this);
-
-        return MongoHelper.remove(
+        return MongoHelper.findOne(
             'schedule',
             'tasks',
             query
-        );
+        )
+        .then((task) => {
+            if(!task) { return Promise.resolve(); }
+           
+            debug.log('Removing ' + type + ' task for "' + contentId + '"...', this);
+
+            return MongoHelper.remove(
+                'schedule',
+                'tasks',
+                query
+            );
+        });
     }
 }
 

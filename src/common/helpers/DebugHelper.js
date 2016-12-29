@@ -1,32 +1,6 @@
 'use strict';
 
-let lastSenderName = '';
-
 class DebugHelper {
-    /**
-     * Logs a message
-     *
-     * @param {String} message
-     * @param {Object} sender
-     * @param {Number} verbosity
-     */
-    static log(message, sender, verbosity) {
-        if(verbosity == 0) {
-            this.error('Verbosity cannot be set to 0', this);
-
-        } else if(!verbosity) {
-            verbosity = 1;
-        }
-
-        if(this.verbosity >= verbosity) {
-            let senderString = this.parseSender(sender);
-            let dateString = this.getDateString();
-            
-            console.log(senderString, dateString, message);
-            this.onLog(senderString, dateString, message);
-        }
-    }
-
     /**
      * Event: Log
      *
@@ -100,29 +74,42 @@ class DebugHelper {
 
         if(sender) {
             if(typeof sender === 'function') {
-                senderName += sender.name;
+                senderName = sender.name;
 
             } else if(sender.constructor) {
-                senderName += sender.constructor.name;
+                senderName = sender.constructor.name;
             
             } else {
-                senderName += sender.toString();
+                senderName = sender.toString();
 
             }
-
-            senderName;
         }
 
-        if(senderName == lastSenderName) {
-            senderName = '';
+        return senderName + ' |';
+    }
+    
+    /**
+     * Logs a message
+     *
+     * @param {String} message
+     * @param {Object} sender
+     * @param {Number} verbosity
+     */
+    static log(message, sender, verbosity) {
+        if(verbosity == 0) {
+            this.error('Verbosity cannot be set to 0', this);
 
-        } else {
-            lastSenderName = senderName;
-            senderName = '\n' + senderName + '\n----------\n';
-
+        } else if(!verbosity) {
+            verbosity = 1;
         }
 
-        return senderName;
+        if(this.verbosity >= verbosity) {
+            let senderString = this.parseSender(sender);
+            let dateString = this.getDateString();
+            
+            console.log(dateString, senderString, message);
+            this.onLog(dateString, senderString, message);
+        }
     }
 
     /**
@@ -136,7 +123,7 @@ class DebugHelper {
             message = message.message || message.trace;
         }
 
-        console.log(this.parseSender(sender), this.getDateString(), message);
+        console.log(this.getDateString(), this.parseSender(sender), message);
 
         throw new Error(message);
     }
@@ -145,7 +132,7 @@ class DebugHelper {
      * Shows a warning
      */
     static warning(message, sender) {
-        console.log(this.parseSender(sender), this.getDateString(), message);
+        console.log(this.getDateString(), this.parseSender(sender), message);
         console.trace();
     }
 }

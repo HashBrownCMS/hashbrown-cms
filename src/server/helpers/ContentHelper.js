@@ -104,7 +104,7 @@ class ContentHelper extends ContentHelperCommon {
      * @param {String} project
      * @param {String} environment
      * @param {String} id
-     * @param {Object} content
+     * @param {Content} content
      * @param {User} user
      * @param {Boolean} create
      *
@@ -121,44 +121,50 @@ class ContentHelper extends ContentHelperCommon {
         debug.log('Updating content "' + id + '"...', this);
         
         let updateContent = () => {
+            // Handle scheduled publish task
+            let handlePublishTask = () => {
+                if(content.publishOn) {
+                    return ScheduleHelper.updateTask(project, environment, 'publish', id, content.publishOn, user);
+                } else {
+                    return ScheduleHelper.removeTask(project, environment, 'publish', id);
+                }
+            };
+
+            // Handle scheduled unpublish task
+            let handleUnpublishTask = () => {
+                if(content.unpublishOn) {
+                    return ScheduleHelper.updateTask(project, environment, 'unpublish', id, content.unpublishOn, user);
+                } else {
+                    return ScheduleHelper.removeTask(project, environment, 'unpublish', id);
+                }
+            };
+
             // Unset automatic flags
             content.locked = false;
             content.remote = false;
 
+            // Content update data
             content.updatedBy = user.id;
-
             content.updateDate = Date.now();
             
+            // Fallback in case of no "created by" user
             if(!content.createdBy) {
                 content.createdBy = content.updatedBy;
             }
             
             let collection = environment + '.content';
-            
-            // Register publish dates centrally
-            if(content.publishOn) {
-                ScheduleHelper.updateTask(project, environment, 'publish', id, content.publishOn);
-            } else {
-                ScheduleHelper.removeTask(project, environment, 'publish', id, content.publishOn);
-            }
 
-            if(content.unpublishOn) {
-                ScheduleHelper.updateTask(project, environment, 'unpublish', id, content.unpublishOn);
-            } else {
-                ScheduleHelper.removeTask(project, environment, 'unpublish', id, content.unpublishOn);
-            }
-
-            // Remove inserted publish dates
-            content.publishOn = null;
-            content.unpublishOn = null;
-           
-            return MongoHelper.updateOne(
-                project,
-                collection,
-                { id: id },
-                content,
-                { upsert: create } // Whether or not to create the node if it doesn't already exist
-            )
+            return handlePublishTask()
+            .then(handleUnpublishTask())
+            .then(() => {
+                return MongoHelper.updateOne(
+                    project,
+                    collection,
+                    { id: id },
+                    content,
+                    { upsert: create } // Whether or not to create the node if it doesn't already exist
+                );
+            })
             .then(() => {
                 debug.log('Done updating content "' + id + '"', this);
             });
@@ -170,9 +176,7 @@ class ContentHelper extends ContentHelperCommon {
 
         } else if(content.parentId) {
             return this.isSchemaAllowedAsChild(content.parentId, content.schemaId)
-            .then(() => {
-                return updateContent();
-            });
+            .then(updateContent);
 
         } else {
             return updateContent();

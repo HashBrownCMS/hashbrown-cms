@@ -142,6 +142,57 @@ class UIHelper {
     }
 
     /**
+     * Renders a dropdown
+     *
+     * @param {String} label
+     * @param {Array|Number} options
+     * @param {Function} onClick
+     *
+     * @returns {HtmlElement} Dropdown element
+     */
+    static inputDropdown(label, options, onClick) {
+        let $button;
+
+        if(typeof options === 'number') {
+            let amount = options;
+
+            options = [];
+
+            for(let i = 0; i < amount; i++) {
+                options[options.length] = { label: i.toString(), value: i };
+            }
+        }
+
+        let $element = _.div({class: 'dropdown'},
+            $button = _.button({class: 'btn btn-primary dropdown-toggle', type: 'button', 'data-toggle': 'dropdown'},
+                label,
+                _.span({class: 'caret'})
+            ),
+            _.ul({class: 'dropdown-menu'}, 
+                _.each(options, (i, option) => {
+                    let optionLabel = option.label || option.id || option.name || option.toString();
+
+                    return _.li(
+                        _.button(optionLabel)
+                            .on('click', (e) => {
+                                onClick(option.value || optionLabel);
+
+                                _.append($button.empty(),
+                                    optionLabel,
+                                    _.span({class: 'caret'})
+                                );
+
+                                $button.click();
+                            })
+                    );
+                })
+            )
+        );
+
+        return $element;
+    }
+
+    /**
      * Brings up an error modal
      *
      * @param {String|Error} error

@@ -79,6 +79,9 @@ class DateEditor extends View {
             'Dec'
         ];
 
+        let hours = [ '00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23' ];
+        let minutes = [ '00', '05', '10', '15', '20', '25', '30', '35', '40', '45', '50', '55' ];
+
         let messageModal = new MessageModal({
             model: {
                 class: 'date-picker'   
@@ -143,6 +146,15 @@ class DateEditor extends View {
 
                             return $button;
                         })
+                    ),
+                    _.div({class: 'date-picker-time'},
+                        UI.inputDropdown(date.getHours() < 10 ? '0' + date.getHours() : date.getHours().toString(), hours, (hour) => {
+                            date.setHours(parseInt(hour));
+                        }),
+                        _.div({class: 'date-picker-time-separator'}, ':'),
+                        UI.inputDropdown(date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes().toString(), minutes, (minute) => {
+                            date.setMinutes(parseInt(minute));
+                        })
                     )
                 ];
             },
@@ -199,6 +211,8 @@ class DateEditor extends View {
         if(input && !isNaN(date.getTime())) {
             let day = date.getDate();
             let month = date.getMonth() + 1;
+            let hours = date.getHours();
+            let minutes = date.getMinutes();
 
             if(day < 10) {
                 day = '0' + day;
@@ -207,8 +221,16 @@ class DateEditor extends View {
             if(month < 10) {
                 month = '0' + month;
             }
+            
+            if(hours < 10) {
+                hours = '0' + hours;
+            }
+            
+            if(minutes < 10) {
+                minutes = '0' + minutes;
+            }
 
-            output = date.getFullYear() + '.' + month + '.' + day;
+            output = date.getFullYear() + '.' + month + '.' + day + ' - ' + hours + ':' + minutes;
         } 
 
         return output;

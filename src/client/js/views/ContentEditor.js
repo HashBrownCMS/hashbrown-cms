@@ -50,25 +50,29 @@ class ContentEditor extends View {
 
         this.model.unpublished = shouldUnpublish;
 
-        let publishConnections = () => {
+        let setContent = () => {
+            // Use publishing API
             if(publishing.connections && publishing.connections.length > 0) {
+                // Unpublish
                 if(shouldUnpublish) {
                     return apiCall('post', 'content/unpublish', this.model);
+
+                // Publish
                 } else {
                     return apiCall('post', 'content/publish', this.model);
+                
                 }
+
+            // Just save normally
             } else {
-                return Promise.resolve();
+                return apiCall('post', 'content/' + this.model.id, this.model);
             }
         }
 
         this.$saveBtn.toggleClass('working', true);
 
         // Save content to database
-        apiCall('post', 'content/' + this.model.id, this.model)
-        .then(() => {
-            return publishConnections();
-        })
+        setContent()
         .then(() => {
             return reloadResource('content');
         })

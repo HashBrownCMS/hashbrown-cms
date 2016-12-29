@@ -95,10 +95,10 @@
 
 	// Models
 	window.Content = __webpack_require__(136);
-	window.Media = __webpack_require__(139);
+	window.Media = __webpack_require__(137);
 
 	// Helpers
-	window.MediaHelper = __webpack_require__(137);
+	window.MediaHelper = __webpack_require__(139);
 	window.ConnectionHelper = __webpack_require__(141);
 	window.ContentHelper = __webpack_require__(144);
 	window.SchemaHelper = __webpack_require__(146);
@@ -10781,6 +10781,46 @@
 	        }
 
 	        /**
+	         * Renders a dropdown
+	         *
+	         * @param {String} label
+	         * @param {Array|Number} options
+	         * @param {Function} onClick
+	         *
+	         * @returns {HtmlElement} Dropdown element
+	         */
+
+	    }, {
+	        key: 'inputDropdown',
+	        value: function inputDropdown(label, options, onClick) {
+	            var $button = void 0;
+
+	            if (typeof options === 'number') {
+	                var amount = options;
+
+	                options = [];
+
+	                for (var i = 0; i < amount; i++) {
+	                    options[options.length] = { label: i.toString(), value: i };
+	                }
+	            }
+
+	            var $element = _.div({ class: 'dropdown' }, $button = _.button({ class: 'btn btn-primary dropdown-toggle', type: 'button', 'data-toggle': 'dropdown' }, label, _.span({ class: 'caret' })), _.ul({ class: 'dropdown-menu' }, _.each(options, function (i, option) {
+	                var optionLabel = option.label || option.id || option.name || option.toString();
+
+	                return _.li(_.button(optionLabel).on('click', function (e) {
+	                    onClick(option.value || optionLabel);
+
+	                    _.append($button.empty(), optionLabel, _.span({ class: 'caret' }));
+
+	                    $button.click();
+	                }));
+	            })));
+
+	            return $element;
+	        }
+
+	        /**
 	         * Brings up an error modal
 	         *
 	         * @param {String|Error} error
@@ -11447,38 +11487,13 @@
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var lastSenderName = '';
-
 	var DebugHelper = function () {
 	    function DebugHelper() {
 	        _classCallCheck(this, DebugHelper);
 	    }
 
 	    _createClass(DebugHelper, null, [{
-	        key: 'log',
-
-	        /**
-	         * Logs a message
-	         *
-	         * @param {String} message
-	         * @param {Object} sender
-	         * @param {Number} verbosity
-	         */
-	        value: function log(message, sender, verbosity) {
-	            if (verbosity == 0) {
-	                this.error('Verbosity cannot be set to 0', this);
-	            } else if (!verbosity) {
-	                verbosity = 1;
-	            }
-
-	            if (this.verbosity >= verbosity) {
-	                var senderString = this.parseSender(sender);
-	                var dateString = this.getDateString();
-
-	                console.log(senderString, dateString, message);
-	                this.onLog(senderString, dateString, message);
-	            }
-	        }
+	        key: 'onLog',
 
 	        /**
 	         * Event: Log
@@ -11487,9 +11502,6 @@
 	         * @param {String} dateString
 	         * @param {String} message
 	         */
-
-	    }, {
-	        key: 'onLog',
 	        value: function onLog(senderString, dateString, message) {}
 
 	        /**
@@ -11553,24 +11565,41 @@
 
 	            if (sender) {
 	                if (typeof sender === 'function') {
-	                    senderName += sender.name;
+	                    senderName = sender.name;
 	                } else if (sender.constructor) {
-	                    senderName += sender.constructor.name;
+	                    senderName = sender.constructor.name;
 	                } else {
-	                    senderName += sender.toString();
+	                    senderName = sender.toString();
 	                }
-
-	                senderName;
 	            }
 
-	            if (senderName == lastSenderName) {
-	                senderName = '';
-	            } else {
-	                lastSenderName = senderName;
-	                senderName = '\n' + senderName + '\n----------\n';
+	            return senderName + ' |';
+	        }
+
+	        /**
+	         * Logs a message
+	         *
+	         * @param {String} message
+	         * @param {Object} sender
+	         * @param {Number} verbosity
+	         */
+
+	    }, {
+	        key: 'log',
+	        value: function log(message, sender, verbosity) {
+	            if (verbosity == 0) {
+	                this.error('Verbosity cannot be set to 0', this);
+	            } else if (!verbosity) {
+	                verbosity = 1;
 	            }
 
-	            return senderName;
+	            if (this.verbosity >= verbosity) {
+	                var senderString = this.parseSender(sender);
+	                var dateString = this.getDateString();
+
+	                console.log(dateString, senderString, message);
+	                this.onLog(dateString, senderString, message);
+	            }
 	        }
 
 	        /**
@@ -11587,7 +11616,7 @@
 	                message = message.message || message.trace;
 	            }
 
-	            console.log(this.parseSender(sender), this.getDateString(), message);
+	            console.log(this.getDateString(), this.parseSender(sender), message);
 
 	            throw new Error(message);
 	        }
@@ -11599,7 +11628,7 @@
 	    }, {
 	        key: 'warning',
 	        value: function warning(message, sender) {
-	            console.log(this.parseSender(sender), this.getDateString(), message);
+	            console.log(this.getDateString(), this.parseSender(sender), message);
 	            console.trace();
 	        }
 	    }]);
@@ -12278,8 +12307,8 @@
 	            this.def(String, 'updatedBy');
 	            this.def(Date, 'createDate');
 	            this.def(Date, 'updateDate');
-	            this.def(Date, 'publishOn', new Date('xyz'));
-	            this.def(Date, 'unpublishOn', new Date('xyz'));
+	            this.def(Date, 'publishOn');
+	            this.def(Date, 'unpublishOn');
 	            this.def(String, 'schemaId');
 	            this.def(Boolean, 'unpublished');
 	            this.def(Number, 'sort', -1);
@@ -23633,6 +23662,9 @@
 
 	            var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
+	            var hours = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23'];
+	            var minutes = ['00', '05', '10', '15', '20', '25', '30', '35', '40', '45', '50', '55'];
+
 	            var messageModal = new MessageModal({
 	                model: {
 	                    class: 'date-picker'
@@ -23669,6 +23701,10 @@
 	                        });
 
 	                        return $button;
+	                    })), _.div({ class: 'date-picker-time' }, UI.inputDropdown(date.getHours() < 10 ? '0' + date.getHours() : date.getHours().toString(), hours, function (hour) {
+	                        date.setHours(parseInt(hour));
+	                    }), _.div({ class: 'date-picker-time-separator' }, ':'), UI.inputDropdown(date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes().toString(), minutes, function (minute) {
+	                        date.setMinutes(parseInt(minute));
 	                    }))];
 	                },
 	                buttons: [{
@@ -23727,6 +23763,8 @@
 	            if (input && !isNaN(date.getTime())) {
 	                var day = date.getDate();
 	                var month = date.getMonth() + 1;
+	                var hours = date.getHours();
+	                var minutes = date.getMinutes();
 
 	                if (day < 10) {
 	                    day = '0' + day;
@@ -23736,7 +23774,15 @@
 	                    month = '0' + month;
 	                }
 
-	                output = date.getFullYear() + '.' + month + '.' + day;
+	                if (hours < 10) {
+	                    hours = '0' + hours;
+	                }
+
+	                if (minutes < 10) {
+	                    minutes = '0' + minutes;
+	                }
+
+	                output = date.getFullYear() + '.' + month + '.' + day + ' - ' + hours + ':' + minutes;
 	            }
 
 	            return output;
@@ -29526,24 +29572,28 @@
 
 	            this.model.unpublished = shouldUnpublish;
 
-	            var publishConnections = function publishConnections() {
+	            var setContent = function setContent() {
+	                // Use publishing API
 	                if (publishing.connections && publishing.connections.length > 0) {
+	                    // Unpublish
 	                    if (shouldUnpublish) {
 	                        return apiCall('post', 'content/unpublish', _this2.model);
+
+	                        // Publish
 	                    } else {
 	                        return apiCall('post', 'content/publish', _this2.model);
 	                    }
+
+	                    // Just save normally
 	                } else {
-	                    return Promise.resolve();
+	                    return apiCall('post', 'content/' + _this2.model.id, _this2.model);
 	                }
 	            };
 
 	            this.$saveBtn.toggleClass('working', true);
 
 	            // Save content to database
-	            apiCall('post', 'content/' + this.model.id, this.model).then(function () {
-	                return publishConnections();
-	            }).then(function () {
+	            setContent().then(function () {
 	                return reloadResource('content');
 	            }).then(function () {
 	                _this2.$saveBtn.toggleClass('saving', false);
@@ -32977,198 +33027,6 @@
 
 	'use strict';
 
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var MediaHelperCommon = __webpack_require__(138);
-
-	var MediaHelper = function (_MediaHelperCommon) {
-	    _inherits(MediaHelper, _MediaHelperCommon);
-
-	    function MediaHelper() {
-	        _classCallCheck(this, MediaHelper);
-
-	        return _possibleConstructorReturn(this, (MediaHelper.__proto__ || Object.getPrototypeOf(MediaHelper)).apply(this, arguments));
-	    }
-
-	    _createClass(MediaHelper, null, [{
-	        key: 'getTree',
-
-	        /**
-	         * Gets the Media tree
-	         *
-	         * @returns {Promise(Object)} tree
-	         */
-	        value: function getTree() {
-	            return new Promise(function (resolve, reject) {
-	                $.ajax({
-	                    url: apiUrl('media/tree'),
-	                    type: 'GET',
-	                    success: function success(tree) {
-	                        resolve(tree);
-	                    },
-	                    error: function error() {
-	                        reject();
-	                    }
-	                });
-	            });
-	        }
-
-	        /**
-	         * Gets Media object by id
-	         *
-	         * @param {String} id
-	         *
-	         * @return {Promise(Media)}
-	         */
-
-	    }, {
-	        key: 'getMediaById',
-	        value: function getMediaById(id) {
-	            return new Promise(function (resolve, reject) {
-	                for (var i = 0; i < resources.media.length; i++) {
-	                    var media = resources.media[i];
-
-	                    if (media.id == id) {
-	                        resolve(media);
-	                        return;
-	                    }
-	                }
-
-	                reject(new Error('Media with id "' + id + '" not found'));
-	            });
-	        }
-
-	        /**
-	         * Sets a Media tree item
-	         *
-	         * @param {String} id
-	         * @param {Object} item
-	         *
-	         * @returns {Promise} promise
-	         */
-
-	    }, {
-	        key: 'setTreeItem',
-	        value: function setTreeItem(id, item) {
-	            return new Promise(function (resolve, reject) {
-	                $.ajax({
-	                    url: apiUrl('media/tree/' + id),
-	                    data: item,
-	                    type: 'POST',
-	                    success: function success() {
-	                        resolve();
-	                    },
-	                    error: function error() {
-	                        reject();
-	                    }
-	                });
-	            });
-	        }
-	    }]);
-
-	    return MediaHelper;
-	}(MediaHelperCommon);
-
-	module.exports = MediaHelper;
-
-/***/ },
-/* 138 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	// Models
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	var Media = __webpack_require__(139);
-
-	var MediaHelper = function () {
-	    function MediaHelper() {
-	        _classCallCheck(this, MediaHelper);
-	    }
-
-	    _createClass(MediaHelper, null, [{
-	        key: 'getRootPath',
-
-	        /**
-	         * Gets the media root path
-	         *
-	         * @returns {Promise} Path
-	         */
-	        value: function getRootPath() {
-	            return ConnectionHelper.getMediaProvider().then(function (connection) {
-	                resolve(connection.getMediaPath());
-	            }).catch(function () {
-	                resolve('');
-	            });
-	        }
-
-	        /**
-	         * Gets the Media tree
-	         *
-	         * @returns {Promise(Object)} tree
-	         */
-
-	    }, {
-	        key: 'getTree',
-	        value: function getTree() {
-	            return Promise.resolve({});
-	        }
-
-	        /**
-	         * Sets a Media tree item
-	         *
-	         * @param {String} id
-	         * @param {Object} item
-	         *
-	         * @returns {Promise} promise
-	         */
-
-	    }, {
-	        key: 'setTreeItem',
-	        value: function setTreeItem(id, item) {
-	            return Promise.resolve();
-	        }
-
-	        /**
-	         * Gets the media temp path
-	         *
-	         * @param {String} project
-	         *
-	         * @returns {String} Path
-	         */
-
-	    }, {
-	        key: 'getTempPath',
-	        value: function getTempPath() {
-	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
-
-	            var path = '/storage/' + ProjectHelper.currentProject + '/temp';
-
-	            return path;
-	        }
-	    }]);
-
-	    return MediaHelper;
-	}();
-
-	module.exports = MediaHelper;
-
-/***/ },
-/* 139 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
 	// Libs
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -33179,7 +33037,7 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var path = __webpack_require__(140);
+	var path = __webpack_require__(138);
 
 	var Entity = __webpack_require__(37);
 
@@ -33350,7 +33208,7 @@
 	module.exports = Media;
 
 /***/ },
-/* 140 */
+/* 138 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
@@ -33575,6 +33433,198 @@
 	  return str.substr(start, len);
 	};
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(13)))
+
+/***/ },
+/* 139 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var MediaHelperCommon = __webpack_require__(140);
+
+	var MediaHelper = function (_MediaHelperCommon) {
+	    _inherits(MediaHelper, _MediaHelperCommon);
+
+	    function MediaHelper() {
+	        _classCallCheck(this, MediaHelper);
+
+	        return _possibleConstructorReturn(this, (MediaHelper.__proto__ || Object.getPrototypeOf(MediaHelper)).apply(this, arguments));
+	    }
+
+	    _createClass(MediaHelper, null, [{
+	        key: 'getTree',
+
+	        /**
+	         * Gets the Media tree
+	         *
+	         * @returns {Promise(Object)} tree
+	         */
+	        value: function getTree() {
+	            return new Promise(function (resolve, reject) {
+	                $.ajax({
+	                    url: apiUrl('media/tree'),
+	                    type: 'GET',
+	                    success: function success(tree) {
+	                        resolve(tree);
+	                    },
+	                    error: function error() {
+	                        reject();
+	                    }
+	                });
+	            });
+	        }
+
+	        /**
+	         * Gets Media object by id
+	         *
+	         * @param {String} id
+	         *
+	         * @return {Promise(Media)}
+	         */
+
+	    }, {
+	        key: 'getMediaById',
+	        value: function getMediaById(id) {
+	            return new Promise(function (resolve, reject) {
+	                for (var i = 0; i < resources.media.length; i++) {
+	                    var media = resources.media[i];
+
+	                    if (media.id == id) {
+	                        resolve(media);
+	                        return;
+	                    }
+	                }
+
+	                reject(new Error('Media with id "' + id + '" not found'));
+	            });
+	        }
+
+	        /**
+	         * Sets a Media tree item
+	         *
+	         * @param {String} id
+	         * @param {Object} item
+	         *
+	         * @returns {Promise} promise
+	         */
+
+	    }, {
+	        key: 'setTreeItem',
+	        value: function setTreeItem(id, item) {
+	            return new Promise(function (resolve, reject) {
+	                $.ajax({
+	                    url: apiUrl('media/tree/' + id),
+	                    data: item,
+	                    type: 'POST',
+	                    success: function success() {
+	                        resolve();
+	                    },
+	                    error: function error() {
+	                        reject();
+	                    }
+	                });
+	            });
+	        }
+	    }]);
+
+	    return MediaHelper;
+	}(MediaHelperCommon);
+
+	module.exports = MediaHelper;
+
+/***/ },
+/* 140 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	// Models
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var Media = __webpack_require__(137);
+
+	var MediaHelper = function () {
+	    function MediaHelper() {
+	        _classCallCheck(this, MediaHelper);
+	    }
+
+	    _createClass(MediaHelper, null, [{
+	        key: 'getRootPath',
+
+	        /**
+	         * Gets the media root path
+	         *
+	         * @returns {Promise} Path
+	         */
+	        value: function getRootPath() {
+	            return ConnectionHelper.getMediaProvider().then(function (connection) {
+	                resolve(connection.getMediaPath());
+	            }).catch(function () {
+	                resolve('');
+	            });
+	        }
+
+	        /**
+	         * Gets the Media tree
+	         *
+	         * @returns {Promise(Object)} tree
+	         */
+
+	    }, {
+	        key: 'getTree',
+	        value: function getTree() {
+	            return Promise.resolve({});
+	        }
+
+	        /**
+	         * Sets a Media tree item
+	         *
+	         * @param {String} id
+	         * @param {Object} item
+	         *
+	         * @returns {Promise} promise
+	         */
+
+	    }, {
+	        key: 'setTreeItem',
+	        value: function setTreeItem(id, item) {
+	            return Promise.resolve();
+	        }
+
+	        /**
+	         * Gets the media temp path
+	         *
+	         * @param {String} project
+	         *
+	         * @returns {String} Path
+	         */
+
+	    }, {
+	        key: 'getTempPath',
+	        value: function getTempPath() {
+	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+
+	            var path = '/storage/' + ProjectHelper.currentProject + '/temp';
+
+	            return path;
+	        }
+	    }]);
+
+	    return MediaHelper;
+	}();
+
+	module.exports = MediaHelper;
 
 /***/ },
 /* 141 */
@@ -33858,15 +33908,17 @@
 	        key: 'structure',
 	        value: function structure() {
 	            // Fundamental fields
-	            this.def(Boolean, 'locked');
-	            this.def(Boolean, 'remote');
-	            this.def(Boolean, 'local');
 	            this.def(String, 'id');
 	            this.def(String, 'title');
 	            this.def(String, 'type');
 	            this.def(String, 'url');
 	            this.def(Boolean, 'provideTemplates');
 	            this.def(Boolean, 'provideMedia');
+
+	            // Sync
+	            this.def(Boolean, 'locked');
+	            this.def(Boolean, 'remote');
+	            this.def(Boolean, 'local');
 
 	            // Extensible settings
 	            this.def(Object, 'settings', {});
@@ -33985,21 +34037,29 @@
 	        /**
 	         *  Unpublishes content
 	         *
-	         * @param {String} id
+	         * @param {String} project
+	         * @param {String} environment
+	         * @param {Content} content
+	         *
+	         * @returns {Promise} Promise
 	         */
 
 	    }, {
 	        key: 'unpublishContent',
-	        value: function unpublishContent(id) {
+	        value: function unpublishContent() {
+	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+	            var content = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('content');
+
 	            var connection = this;
 
 	            debug.log('Unpublishing all localised property sets...', this);
 
-	            return LanguageHelper.getSelectedLanguages().then(function (languages) {
+	            return LanguageHelper.getSelectedLanguages(project).then(function (languages) {
 	                function next(i) {
 	                    var language = languages[i];
 
-	                    return connection.deleteContentProperties(id, language).then(function () {
+	                    return connection.deleteContentProperties(content.id, language).then(function () {
 	                        i++;
 
 	                        if (i < languages.length) {
@@ -34023,7 +34083,7 @@
 	         * @param {String} environment
 	         * @param {Content} content
 	         *
-	         * @returns {Promise} promise
+	         * @returns {Promise} Promise
 	         */
 
 	    }, {

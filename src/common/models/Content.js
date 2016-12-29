@@ -37,8 +37,8 @@ class Content extends Entity {
         this.def(String, 'updatedBy');
         this.def(Date, 'createDate');
         this.def(Date, 'updateDate');
-        this.def(Date, 'publishOn', new Date('xyz'));
-        this.def(Date, 'unpublishOn', new Date('xyz'));
+        this.def(Date, 'publishOn');
+        this.def(Date, 'unpublishOn');
         this.def(String, 'schemaId');
         this.def(Boolean, 'unpublished');
         this.def(Number, 'sort', -1);

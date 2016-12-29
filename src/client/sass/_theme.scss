@@ -39,8 +39,11 @@ button, a {
 .dropdown {
     &.open {
         .dropdown-toggle {
-            color: material-color('grey', '600');
             position: relative;
+
+            &, &:focus {
+                color: material-color('grey', '600');
+            }
 
             &:before {
                 content: '';
@@ -95,7 +98,7 @@ button, a {
 
         >li {
             &.active {
-                >a {
+                >a, >button {
                     background-color: transparent;
                     color: material-color('grey', '800');
                     
@@ -111,8 +114,10 @@ button, a {
                 }
             }
 
-            >a {
+            >a, >button {
                 padding: 3px 20px;
+                border: 0px;
+                color: material-color('grey', '600');
 
                 &:hover {
                     background-color: material-color('grey', '200');

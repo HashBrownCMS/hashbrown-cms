@@ -391,9 +391,7 @@ class GitHubConnection extends Connection {
                 }
             }
 
-            return new Promise((resolve) => {
-                resolve(media);    
-            });
+            return Promise.resolve(media);    
         });
     }
     

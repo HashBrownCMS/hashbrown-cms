@@ -10685,6 +10685,46 @@
 	        }
 
 	        /**
+	         * Renders a dropdown
+	         *
+	         * @param {String} label
+	         * @param {Array|Number} options
+	         * @param {Function} onClick
+	         *
+	         * @returns {HtmlElement} Dropdown element
+	         */
+
+	    }, {
+	        key: 'inputDropdown',
+	        value: function inputDropdown(label, options, onClick) {
+	            var $button = void 0;
+
+	            if (typeof options === 'number') {
+	                var amount = options;
+
+	                options = [];
+
+	                for (var i = 0; i < amount; i++) {
+	                    options[options.length] = { label: i.toString(), value: i };
+	                }
+	            }
+
+	            var $element = _.div({ class: 'dropdown' }, $button = _.button({ class: 'btn btn-primary dropdown-toggle', type: 'button', 'data-toggle': 'dropdown' }, label, _.span({ class: 'caret' })), _.ul({ class: 'dropdown-menu' }, _.each(options, function (i, option) {
+	                var optionLabel = option.label || option.id || option.name || option.toString();
+
+	                return _.li(_.button(optionLabel).on('click', function (e) {
+	                    onClick(option.value || optionLabel);
+
+	                    _.append($button.empty(), optionLabel, _.span({ class: 'caret' }));
+
+	                    $button.click();
+	                }));
+	            })));
+
+	            return $element;
+	        }
+
+	        /**
 	         * Brings up an error modal
 	         *
 	         * @param {String|Error} error
@@ -11351,38 +11391,13 @@
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var lastSenderName = '';
-
 	var DebugHelper = function () {
 	    function DebugHelper() {
 	        _classCallCheck(this, DebugHelper);
 	    }
 
 	    _createClass(DebugHelper, null, [{
-	        key: 'log',
-
-	        /**
-	         * Logs a message
-	         *
-	         * @param {String} message
-	         * @param {Object} sender
-	         * @param {Number} verbosity
-	         */
-	        value: function log(message, sender, verbosity) {
-	            if (verbosity == 0) {
-	                this.error('Verbosity cannot be set to 0', this);
-	            } else if (!verbosity) {
-	                verbosity = 1;
-	            }
-
-	            if (this.verbosity >= verbosity) {
-	                var senderString = this.parseSender(sender);
-	                var dateString = this.getDateString();
-
-	                console.log(senderString, dateString, message);
-	                this.onLog(senderString, dateString, message);
-	            }
-	        }
+	        key: 'onLog',
 
 	        /**
 	         * Event: Log
@@ -11391,9 +11406,6 @@
 	         * @param {String} dateString
 	         * @param {String} message
 	         */
-
-	    }, {
-	        key: 'onLog',
 	        value: function onLog(senderString, dateString, message) {}
 
 	        /**
@@ -11457,24 +11469,41 @@
 
 	            if (sender) {
 	                if (typeof sender === 'function') {
-	                    senderName += sender.name;
+	                    senderName = sender.name;
 	                } else if (sender.constructor) {
-	                    senderName += sender.constructor.name;
+	                    senderName = sender.constructor.name;
 	                } else {
-	                    senderName += sender.toString();
+	                    senderName = sender.toString();
 	                }
-
-	                senderName;
 	            }
 
-	            if (senderName == lastSenderName) {
-	                senderName = '';
-	            } else {
-	                lastSenderName = senderName;
-	                senderName = '\n' + senderName + '\n----------\n';
+	            return senderName + ' |';
+	        }
+
+	        /**
+	         * Logs a message
+	         *
+	         * @param {String} message
+	         * @param {Object} sender
+	         * @param {Number} verbosity
+	         */
+
+	    }, {
+	        key: 'log',
+	        value: function log(message, sender, verbosity) {
+	            if (verbosity == 0) {
+	                this.error('Verbosity cannot be set to 0', this);
+	            } else if (!verbosity) {
+	                verbosity = 1;
 	            }
 
-	            return senderName;
+	            if (this.verbosity >= verbosity) {
+	                var senderString = this.parseSender(sender);
+	                var dateString = this.getDateString();
+
+	                console.log(dateString, senderString, message);
+	                this.onLog(dateString, senderString, message);
+	            }
 	        }
 
 	        /**
@@ -11491,7 +11520,7 @@
 	                message = message.message || message.trace;
 	            }
 
-	            console.log(this.parseSender(sender), this.getDateString(), message);
+	            console.log(this.getDateString(), this.parseSender(sender), message);
 
 	            throw new Error(message);
 	        }
@@ -11503,7 +11532,7 @@
 	    }, {
 	        key: 'warning',
 	        value: function warning(message, sender) {
-	            console.log(this.parseSender(sender), this.getDateString(), message);
+	            console.log(this.getDateString(), this.parseSender(sender), message);
 	            console.trace();
 	        }
 	    }]);

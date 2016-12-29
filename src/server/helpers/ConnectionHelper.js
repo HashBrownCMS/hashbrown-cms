@@ -127,7 +127,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
                     .then((connection) => {
                         debug.log('Unpublishing through connection "' + settings.connections[i] + '" of type "' + connection.type + '"...', helper);
 
-                        return connection.unpublishContent(content.id);
+                        return connection.unpublishContent(project, environment, content);
                     })
                     .then(() => {
                         i++;

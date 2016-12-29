@@ -10,6 +10,7 @@ class Task extends Entity {
         this.def(String, 'type');
         this.def(Date, 'date');
         this.def(String, 'content');
+        this.def(String, 'user');
         this.def(String, 'project');
         this.def(String, 'environment');
     }

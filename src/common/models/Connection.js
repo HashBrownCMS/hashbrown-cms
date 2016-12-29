@@ -18,15 +18,17 @@ class Connection extends Entity {
 
     structure() {
         // Fundamental fields
-        this.def(Boolean, 'locked');
-        this.def(Boolean, 'remote');
-        this.def(Boolean, 'local');
         this.def(String, 'id');
         this.def(String, 'title');
         this.def(String, 'type');
         this.def(String, 'url');
         this.def(Boolean, 'provideTemplates');
         this.def(Boolean, 'provideMedia');
+        
+        // Sync
+        this.def(Boolean, 'locked');
+        this.def(Boolean, 'remote');
+        this.def(Boolean, 'local');
         
         // Extensible settings
         this.def(Object, 'settings', {});
@@ -129,19 +131,27 @@ class Connection extends Entity {
     /**
      *  Unpublishes content
      *
-     * @param {String} id
+     * @param {String} project
+     * @param {String} environment
+     * @param {Content} content
+     *
+     * @returns {Promise} Promise
      */
-    unpublishContent(id) {
+    unpublishContent(
+        project = requiredParam('project'),
+        environment = requiredParam('environment'),
+        content = requiredParam('content')
+    ) {
         let connection = this;
 
         debug.log('Unpublishing all localised property sets...', this);
 
-        return LanguageHelper.getSelectedLanguages()
+        return LanguageHelper.getSelectedLanguages(project)
         .then((languages) => {
             function next(i) {
                 let language = languages[i];
 
-                return connection.deleteContentProperties(id, language)
+                return connection.deleteContentProperties(content.id, language)
                 .then(() => {
                     i++;
 
@@ -168,7 +178,7 @@ class Connection extends Entity {
      * @param {String} environment
      * @param {Content} content
      *
-     * @returns {Promise} promise
+     * @returns {Promise} Promise
      */
     publishContent(
         project = requiredParam('project'),
