@@ -1231,6 +1231,8 @@ body > .dashboard-container {
   .array-editor.sorting > .items {
     border: 2px dashed #bdbdbd;
     padding: 30px; }
+    .array-editor.sorting > .items #dragdrop-placeholder:not(:last-child) {
+      margin-bottom: 15px; }
     .array-editor.sorting > .items > .item {
       background-color: #1e88e5;
       color: #fff; }
