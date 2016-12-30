@@ -146,13 +146,16 @@ class UIHelper {
      *
      * @param {String} label
      * @param {Array|Number} options
-     * @param {Function} onClick
+     * @param {Function} onChange
+     * @param {Boolean} useClearButton
      *
      * @returns {HtmlElement} Dropdown element
      */
-    static inputDropdown(label, options, onClick) {
-        let $button;
+    static inputDropdown(label, options, onChange, useClearButton) {
+        let $toggle;
+        let $clear;
 
+        // If "options" parameter is a number, convert to array
         if(typeof options === 'number') {
             let amount = options;
 
@@ -163,29 +166,112 @@ class UIHelper {
             }
         }
 
+        // Change event
+        let onClick = (e, element) => {
+            let $button = $(e.target);
+            let $li = $button.parents('li');
+
+            $li
+            .addClass('active')
+            .siblings()
+            .removeClass('active');
+
+            $toggle.html($button.html());
+            $toggle.click();
+            
+            onChange($li.attr('data-value'));
+        };
+
+        // Clear event
+        let onClear = () => {
+            $toggle.html(label);
+            $element.find('ul li').removeClass('active');
+
+            onChange(null);
+        };
+
         let $element = _.div({class: 'dropdown'},
-            $button = _.button({class: 'btn btn-primary dropdown-toggle', type: 'button', 'data-toggle': 'dropdown'},
-                label,
-                _.span({class: 'caret'})
+            $toggle = _.button({class: 'btn btn-primary dropdown-toggle', type: 'button', 'data-toggle': 'dropdown'},
+                label
             ),
-            _.ul({class: 'dropdown-menu'}, 
-                _.each(options, (i, option) => {
-                    let optionLabel = option.label || option.id || option.name || option.toString();
+            _.if(useClearButton,
+                $clear = _.button({class: 'btn btn-embedded dropdown-clear'},
+                    _.span({class: 'fa fa-remove'})
+                ).on('click', onClear)
+            ),
+            _.div({class: 'dropdown-menu'}, 
+                _.ul({class: 'dropdown-menu-items'},
+                    _.each(options, (i, option) => {
+                        let optionLabel = option.label || option.id || option.name || option.toString();
 
-                    return _.li(
-                        _.button(optionLabel)
-                            .on('click', (e) => {
-                                onClick(option.value || optionLabel);
+                        if(option.selected) {
+                            $toggle.html(optionLabel);
+                        }
 
-                                _.append($button.empty(),
-                                    optionLabel,
-                                    _.span({class: 'caret'})
-                                );
+                        let $li = _.li({'data-value': option.value || optionLabel, class: option.selected ? 'active' : ''},
+                            _.button(optionLabel).on('click', onClick)
+                        );
 
-                                $button.click();
-                            })
-                    );
-                })
+                        return $li;
+                    })
+                )
+            )
+        );
+
+        return $element;
+    }
+    
+    /**
+     * Renders a dropdown with typeahead
+     *
+     * @param {String} label
+     * @param {Array|Number} options
+     * @param {Function} onClick
+     * @param {Boolean} useClearButton
+     *
+     * @returns {HtmlElement} Dropdown element
+     */
+    static inputDropdownTypeAhead(label, options, onClick, useClearButton) {
+        let $element = this.inputDropdown(label, options, onClick, useClearButton);
+        let inputTimeout;
+
+        // Change input event
+        let onChangeInput = () => {
+            if(inputTimeout) { clearTimeout(inputTimeout); }    
+
+            let query = ($element.find('.dropdown-typeahead input').val() || '').toLowerCase();
+            let isQueryEmpty = !query || query.length < 2;
+
+            inputTimeout = setTimeout(() => {
+                $element.find('ul li button').each((i, button) => {
+                    let $button = $(button);
+                    let label = ($button.html() || '').toLowerCase();
+                    let isMatch = label.indexOf(query) > -1;
+
+                    $button.toggle(isMatch || isQueryEmpty);
+                });
+            }, 250);
+        };
+
+        // Clear input event
+        let onClearInput = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            $element.find('.dropdown-typeahead input').val('');
+
+            onChangeInput();
+        };
+
+        $element.addClass('typeahead');
+
+        $element.find('.dropdown-menu').prepend(
+            _.div({class: 'dropdown-typeahead'},
+                _.input({class: 'form-control', placeholder: 'Search...'})
+                    .on('keyup paste change propertychange', onChangeInput),
+                _.button({class: 'dropdown-typeahead-btn-clear'},
+                    _.span({class: 'fa fa-remove'})
+                ).on('click', onClearInput)
             )
         );
 
@@ -254,7 +340,8 @@ class UIHelper {
             model: {
                 title: title,
                 body: body,
-                onSubmit: onSubmit
+                onSubmit: onSubmit,
+                class: 'confirm-modal'
             },
             buttons: [
                 {

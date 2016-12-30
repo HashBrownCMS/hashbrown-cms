@@ -10689,16 +10689,19 @@
 	         *
 	         * @param {String} label
 	         * @param {Array|Number} options
-	         * @param {Function} onClick
+	         * @param {Function} onChange
+	         * @param {Boolean} useClearButton
 	         *
 	         * @returns {HtmlElement} Dropdown element
 	         */
 
 	    }, {
 	        key: 'inputDropdown',
-	        value: function inputDropdown(label, options, onClick) {
-	            var $button = void 0;
+	        value: function inputDropdown(label, options, onChange, useClearButton) {
+	            var $toggle = void 0;
+	            var $clear = void 0;
 
+	            // If "options" parameter is a number, convert to array
 	            if (typeof options === 'number') {
 	                var amount = options;
 
@@ -10709,17 +10712,92 @@
 	                }
 	            }
 
-	            var $element = _.div({ class: 'dropdown' }, $button = _.button({ class: 'btn btn-primary dropdown-toggle', type: 'button', 'data-toggle': 'dropdown' }, label, _.span({ class: 'caret' })), _.ul({ class: 'dropdown-menu' }, _.each(options, function (i, option) {
+	            // Change event
+	            var onClick = function onClick(e, element) {
+	                var $button = $(e.target);
+	                var $li = $button.parents('li');
+
+	                $li.addClass('active').siblings().removeClass('active');
+
+	                $toggle.html($button.html());
+	                $toggle.click();
+
+	                onChange($li.attr('data-value'));
+	            };
+
+	            // Clear event
+	            var onClear = function onClear() {
+	                $toggle.html(label);
+	                $element.find('ul li').removeClass('active');
+
+	                onChange(null);
+	            };
+
+	            var $element = _.div({ class: 'dropdown' }, $toggle = _.button({ class: 'btn btn-primary dropdown-toggle', type: 'button', 'data-toggle': 'dropdown' }, label), _.if(useClearButton, $clear = _.button({ class: 'btn btn-embedded dropdown-clear' }, _.span({ class: 'fa fa-remove' })).on('click', onClear)), _.div({ class: 'dropdown-menu' }, _.ul({ class: 'dropdown-menu-items' }, _.each(options, function (i, option) {
 	                var optionLabel = option.label || option.id || option.name || option.toString();
 
-	                return _.li(_.button(optionLabel).on('click', function (e) {
-	                    onClick(option.value || optionLabel);
+	                if (option.selected) {
+	                    $toggle.html(optionLabel);
+	                }
 
-	                    _.append($button.empty(), optionLabel, _.span({ class: 'caret' }));
+	                var $li = _.li({ 'data-value': option.value || optionLabel, class: option.selected ? 'active' : '' }, _.button(optionLabel).on('click', onClick));
 
-	                    $button.click();
-	                }));
-	            })));
+	                return $li;
+	            }))));
+
+	            return $element;
+	        }
+
+	        /**
+	         * Renders a dropdown with typeahead
+	         *
+	         * @param {String} label
+	         * @param {Array|Number} options
+	         * @param {Function} onClick
+	         * @param {Boolean} useClearButton
+	         *
+	         * @returns {HtmlElement} Dropdown element
+	         */
+
+	    }, {
+	        key: 'inputDropdownTypeAhead',
+	        value: function inputDropdownTypeAhead(label, options, onClick, useClearButton) {
+	            var $element = this.inputDropdown(label, options, onClick, useClearButton);
+	            var inputTimeout = void 0;
+
+	            // Change input event
+	            var onChangeInput = function onChangeInput() {
+	                if (inputTimeout) {
+	                    clearTimeout(inputTimeout);
+	                }
+
+	                var query = ($element.find('.dropdown-typeahead input').val() || '').toLowerCase();
+	                var isQueryEmpty = !query || query.length < 2;
+
+	                inputTimeout = setTimeout(function () {
+	                    $element.find('ul li button').each(function (i, button) {
+	                        var $button = $(button);
+	                        var label = ($button.html() || '').toLowerCase();
+	                        var isMatch = label.indexOf(query) > -1;
+
+	                        $button.toggle(isMatch || isQueryEmpty);
+	                    });
+	                }, 250);
+	            };
+
+	            // Clear input event
+	            var onClearInput = function onClearInput(e) {
+	                e.preventDefault();
+	                e.stopPropagation();
+
+	                $element.find('.dropdown-typeahead input').val('');
+
+	                onChangeInput();
+	            };
+
+	            $element.addClass('typeahead');
+
+	            $element.find('.dropdown-menu').prepend(_.div({ class: 'dropdown-typeahead' }, _.input({ class: 'form-control', placeholder: 'Search...' }).on('keyup paste change propertychange', onChangeInput), _.button({ class: 'dropdown-typeahead-btn-clear' }, _.span({ class: 'fa fa-remove' })).on('click', onClearInput)));
 
 	            return $element;
 	        }
@@ -10794,7 +10872,8 @@
 	                model: {
 	                    title: title,
 	                    body: body,
-	                    onSubmit: onSubmit
+	                    onSubmit: onSubmit,
+	                    class: 'confirm-modal'
 	                },
 	                buttons: [{
 	                    label: 'Cancel',

@@ -39,11 +39,54 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
     position: relative;
     z-index: 2; }
 
-.dropdown.typeahead .form-control {
-  max-width: none; }
-
-.dropdown.typeahead .dropdown-menu {
-  width: 100%; }
+.dropdown.typeahead {
+  display: inline-block; }
+  .dropdown.typeahead.open .dropdown-toggle:before {
+    display: none; }
+  .dropdown.typeahead .form-control {
+    max-width: none; }
+  .dropdown.typeahead .dropdown-toggle {
+    font-size: 1em;
+    text-transform: none;
+    font-weight: normal;
+    text-align: left;
+    padding: 0px 24px 0px 10px;
+    position: relative; }
+    .dropdown.typeahead .dropdown-toggle, .dropdown.typeahead .dropdown-toggle:hover, .dropdown.typeahead .dropdown-toggle:focus {
+      color: #fff; }
+    .dropdown.typeahead .dropdown-toggle:after {
+      font-family: 'FontAwesome';
+      content: '\F0D7';
+      position: absolute;
+      right: 10px; }
+    .dropdown.typeahead .dropdown-toggle .fa, .dropdown.typeahead .dropdown-toggle .caret {
+      position: absolute;
+      right: 10px;
+      top: 13px; }
+  .dropdown.typeahead .dropdown-typeahead {
+    position: relative;
+    margin-bottom: 5px; }
+    .dropdown.typeahead .dropdown-typeahead .dropdown-typeahead-btn-clear {
+      border: 0px;
+      background-color: transparent;
+      opacity: 0.5;
+      position: absolute;
+      right: 0px;
+      top: 8px;
+      padding: 0px; }
+  .dropdown.typeahead .dropdown-menu {
+    left: 0px;
+    right: auto;
+    padding: 10px !important;
+    min-width: 200px; }
+    .dropdown.typeahead .dropdown-menu ul {
+      max-height: 200px;
+      overflow-y: auto; }
+      .dropdown.typeahead .dropdown-menu ul li button {
+        background-color: transparent;
+        padding: 0px 20px 0px 0px;
+        line-height: 30px;
+        white-space: nowrap; }
 
 .dropdown .dropdown-toggle {
   color: #bdbdbd;
@@ -52,6 +95,12 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
   font-size: 1.5rem; }
   .dropdown .dropdown-toggle:hover {
     color: #757575; }
+  .dropdown .dropdown-toggle .fa, .dropdown .dropdown-toggle .caret {
+    margin-left: 5px; }
+
+.dropdown .btn.dropdown-clear {
+  color: #e53935;
+  padding: 6px; }
 
 .dropdown .dropdown-menu {
   padding: 10px 0px !important;
@@ -61,21 +110,31 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
   left: auto;
   right: 0px;
   min-width: auto; }
-  .dropdown .dropdown-menu > li.active > a, .dropdown .dropdown-menu > li.active > button {
-    background-color: transparent;
-    color: #424242; }
-    .dropdown .dropdown-menu > li.active > a:hover, .dropdown .dropdown-menu > li.active > button:hover {
-      background-color: #eeeeee; }
-    .dropdown .dropdown-menu > li.active > a:after, .dropdown .dropdown-menu > li.active > button:after {
-      font-family: 'FontAwesome';
-      content: '\F00C';
-      margin-left: 10px; }
-  .dropdown .dropdown-menu > li > a, .dropdown .dropdown-menu > li > button {
-    padding: 3px 20px;
-    border: 0px;
-    color: #757575; }
-    .dropdown .dropdown-menu > li > a:hover, .dropdown .dropdown-menu > li > button:hover {
-      background-color: #eeeeee; }
+  .dropdown .dropdown-menu > li, .dropdown .dropdown-menu ul > li {
+    list-style-type: none; }
+    .dropdown .dropdown-menu > li.active > a, .dropdown .dropdown-menu > li.active > button, .dropdown .dropdown-menu ul > li.active > a, .dropdown .dropdown-menu ul > li.active > button {
+      background-color: transparent;
+      color: #424242;
+      position: relative; }
+      .dropdown .dropdown-menu > li.active > a:hover, .dropdown .dropdown-menu > li.active > button:hover, .dropdown .dropdown-menu ul > li.active > a:hover, .dropdown .dropdown-menu ul > li.active > button:hover {
+        background-color: #eeeeee; }
+      .dropdown .dropdown-menu > li.active > a:after, .dropdown .dropdown-menu > li.active > button:after, .dropdown .dropdown-menu ul > li.active > a:after, .dropdown .dropdown-menu ul > li.active > button:after {
+        font-family: 'FontAwesome';
+        content: '\F00C';
+        position: absolute;
+        right: 10px; }
+    .dropdown .dropdown-menu > li > a, .dropdown .dropdown-menu > li > button, .dropdown .dropdown-menu ul > li > a, .dropdown .dropdown-menu ul > li > button {
+      padding: 3px 20px;
+      border: 0px;
+      color: #757575;
+      display: block;
+      width: 100%;
+      text-align: left; }
+      .dropdown .dropdown-menu > li > a:hover, .dropdown .dropdown-menu > li > button:hover, .dropdown .dropdown-menu ul > li > a:hover, .dropdown .dropdown-menu ul > li > button:hover {
+        background-color: #eeeeee; }
+  .dropdown .dropdown-menu ul {
+    padding: 0px;
+    margin: 0px -10px 0px 0px; }
 
 .btn-round-group {
   width: 45px; }
@@ -628,14 +687,14 @@ img.logo {
     width: 32px;
     height: 32px; }
 
-.settings-modal .modal-dialog {
+.settings-modal .modal-dialog, .confirm-modal .modal-dialog {
   max-width: 400px; }
-  .settings-modal .modal-dialog .input-group {
+  .settings-modal .modal-dialog .input-group, .confirm-modal .modal-dialog .input-group {
     display: flex; }
-    .settings-modal .modal-dialog .input-group span {
+    .settings-modal .modal-dialog .input-group span, .confirm-modal .modal-dialog .input-group span {
       flex-grow: 1;
       line-height: 30px; }
-    .settings-modal .modal-dialog .input-group .input-group-addon {
+    .settings-modal .modal-dialog .input-group .input-group-addon, .confirm-modal .modal-dialog .input-group .input-group-addon {
       padding: 0px; }
 
 .error-modal .modal-dialog .fa-warning {

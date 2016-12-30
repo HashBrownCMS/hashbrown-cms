@@ -54,6 +54,9 @@ class DateEditor extends View {
             date = new Date();
         }
 
+        // Make sure minutes are rounded to nearest multiple of 5
+        date.setMinutes(Math.floor(date.getMinutes()/5)*5);
+        
         let days = [
             'Mon',
             'Tue',

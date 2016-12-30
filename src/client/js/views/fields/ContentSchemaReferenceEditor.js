@@ -9,47 +9,48 @@ class ContentSchemaReferenceEditor extends View {
        
         this.$element = _.div({class: 'field-editor content-schema-reference-editor'});
         
-        // Fetch allowed Schemas from parent if needed 
-        if(this.config && this.config.allowedSchemas == 'fromParent') {
-            let thisContent = resources.content.filter((c) => { return c.id == Router.params.id; })[0];
+        // Fetch current Content model
+        let thisContent = resources.content.filter((c) => { return c.id == Router.params.id; })[0];
 
-            if(!thisContent) {
-                UI.errorModal(new Error('Content by id "' + Router.params.id + '" not found'));
-
-            } else if(thisContent.parentId) {
-                let parentContent = resources.content.filter((c) => { return c.id == thisContent.parentId; })[0];
-
-                if(!parentContent) {
-                    UI.errorModal(new Error('Content by id "' + thisContent.parentId + '" not found'));
-
-                } else {
-                    let parentSchema = resources.schemas[parentContent.schemaId];
-                        
-                    if(!parentSchema) {
-                        UI.errorModal(new Error('Schema by id "' + parentContent.schematId + '" not found'));
-
-                    } else {
-                        this.config.allowedSchemas = parentSchema.allowedChildSchemas;                            
-                        this.init();
-                    }
-                }
-
-            } else {
-                this.init();
-            
-            }
-
-        } else {
-            this.init();
-        
+        if(!thisContent) {
+            UI.errorModal(new Error('Content by id "' + Router.params.id + '" not found'));
+            return;
         }
+        
+        // If no allowed Schemas are referred to by parent, proceed as normal
+        if(!thisContent.parentId || !this.config || !this.config.allowedSchemas == 'fromParent') {
+            this.init();
+            return;
+        }
+
+        // Fetch parent Content
+        let parentContent = resources.content.filter((c) => { return c.id == thisContent.parentId; })[0];
+
+        if(!parentContent) {
+            UI.errorModal(new Error('Content by id "' + thisContent.parentId + '" not found'));
+            return;
+        }
+
+        // Fetch parent Schema
+        let parentSchema = resources.schemas[parentContent.schemaId];
+            
+        if(!parentSchema) {
+            UI.errorModal(new Error('Schema by id "' + parentContent.schematId + '" not found'));
+            return;
+        }
+
+        // Adopt allowed Schemas from parent
+        this.config.allowedSchemas = parentSchema.allowedChildSchemas;                            
+        this.init();
     }
 
     /**
      * Event: Change input
+     *
+     * @param {String} newValue
      */
-    onChange() {
-        this.value = this.$select.val();
+    onChange(newValue) {
+        this.value = newValue;
         this.trigger('change', this.value);
 
         // Only re-render if the ContentEditor is the parent
@@ -62,8 +63,10 @@ class ContentSchemaReferenceEditor extends View {
 
     /**
      * Gets schema types
+     *
+     * @returns {Array} List of options
      */
-    getContentSchemas() {
+    getDropdownOptions() {
         let contentSchemas = [];
 
         for(let id in window.resources.schemas) {
@@ -80,7 +83,11 @@ class ContentSchemaReferenceEditor extends View {
                     this.config.allowedSchemas.indexOf(schema.id) > -1
                 )
             ) {
-                contentSchemas[contentSchemas.length] = schema;
+                contentSchemas[contentSchemas.length] = {
+                    label: schema.name,
+                    value: schema.id,
+                    selected: schema.id == this.value
+                };
             }
         }
 
@@ -89,13 +96,9 @@ class ContentSchemaReferenceEditor extends View {
 
     render() {
         this.$element.html(
-            this.$select = _.select({class: 'form-control'},
-                _.each(this.getContentSchemas(), (i, schema) => {
-                    let selected = !this.value ? i == 0 : schema.id == this.value;
-
-                    return _.option({value: schema.id, selected: selected}, schema.name);
-                })
-            ).change(() => { this.onChange(); })
+            UI.inputDropdownTypeAhead('(none)', this.getDropdownOptions(), (newValue) => {
+                this.onChange(newValue);
+            }, true)
         );
     }
 }

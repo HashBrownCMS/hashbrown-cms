@@ -10785,16 +10785,19 @@
 	         *
 	         * @param {String} label
 	         * @param {Array|Number} options
-	         * @param {Function} onClick
+	         * @param {Function} onChange
+	         * @param {Boolean} useClearButton
 	         *
 	         * @returns {HtmlElement} Dropdown element
 	         */
 
 	    }, {
 	        key: 'inputDropdown',
-	        value: function inputDropdown(label, options, onClick) {
-	            var $button = void 0;
+	        value: function inputDropdown(label, options, onChange, useClearButton) {
+	            var $toggle = void 0;
+	            var $clear = void 0;
 
+	            // If "options" parameter is a number, convert to array
 	            if (typeof options === 'number') {
 	                var amount = options;
 
@@ -10805,17 +10808,92 @@
 	                }
 	            }
 
-	            var $element = _.div({ class: 'dropdown' }, $button = _.button({ class: 'btn btn-primary dropdown-toggle', type: 'button', 'data-toggle': 'dropdown' }, label, _.span({ class: 'caret' })), _.ul({ class: 'dropdown-menu' }, _.each(options, function (i, option) {
+	            // Change event
+	            var onClick = function onClick(e, element) {
+	                var $button = $(e.target);
+	                var $li = $button.parents('li');
+
+	                $li.addClass('active').siblings().removeClass('active');
+
+	                $toggle.html($button.html());
+	                $toggle.click();
+
+	                onChange($li.attr('data-value'));
+	            };
+
+	            // Clear event
+	            var onClear = function onClear() {
+	                $toggle.html(label);
+	                $element.find('ul li').removeClass('active');
+
+	                onChange(null);
+	            };
+
+	            var $element = _.div({ class: 'dropdown' }, $toggle = _.button({ class: 'btn btn-primary dropdown-toggle', type: 'button', 'data-toggle': 'dropdown' }, label), _.if(useClearButton, $clear = _.button({ class: 'btn btn-embedded dropdown-clear' }, _.span({ class: 'fa fa-remove' })).on('click', onClear)), _.div({ class: 'dropdown-menu' }, _.ul({ class: 'dropdown-menu-items' }, _.each(options, function (i, option) {
 	                var optionLabel = option.label || option.id || option.name || option.toString();
 
-	                return _.li(_.button(optionLabel).on('click', function (e) {
-	                    onClick(option.value || optionLabel);
+	                if (option.selected) {
+	                    $toggle.html(optionLabel);
+	                }
 
-	                    _.append($button.empty(), optionLabel, _.span({ class: 'caret' }));
+	                var $li = _.li({ 'data-value': option.value || optionLabel, class: option.selected ? 'active' : '' }, _.button(optionLabel).on('click', onClick));
 
-	                    $button.click();
-	                }));
-	            })));
+	                return $li;
+	            }))));
+
+	            return $element;
+	        }
+
+	        /**
+	         * Renders a dropdown with typeahead
+	         *
+	         * @param {String} label
+	         * @param {Array|Number} options
+	         * @param {Function} onClick
+	         * @param {Boolean} useClearButton
+	         *
+	         * @returns {HtmlElement} Dropdown element
+	         */
+
+	    }, {
+	        key: 'inputDropdownTypeAhead',
+	        value: function inputDropdownTypeAhead(label, options, onClick, useClearButton) {
+	            var $element = this.inputDropdown(label, options, onClick, useClearButton);
+	            var inputTimeout = void 0;
+
+	            // Change input event
+	            var onChangeInput = function onChangeInput() {
+	                if (inputTimeout) {
+	                    clearTimeout(inputTimeout);
+	                }
+
+	                var query = ($element.find('.dropdown-typeahead input').val() || '').toLowerCase();
+	                var isQueryEmpty = !query || query.length < 2;
+
+	                inputTimeout = setTimeout(function () {
+	                    $element.find('ul li button').each(function (i, button) {
+	                        var $button = $(button);
+	                        var label = ($button.html() || '').toLowerCase();
+	                        var isMatch = label.indexOf(query) > -1;
+
+	                        $button.toggle(isMatch || isQueryEmpty);
+	                    });
+	                }, 250);
+	            };
+
+	            // Clear input event
+	            var onClearInput = function onClearInput(e) {
+	                e.preventDefault();
+	                e.stopPropagation();
+
+	                $element.find('.dropdown-typeahead input').val('');
+
+	                onChangeInput();
+	            };
+
+	            $element.addClass('typeahead');
+
+	            $element.find('.dropdown-menu').prepend(_.div({ class: 'dropdown-typeahead' }, _.input({ class: 'form-control', placeholder: 'Search...' }).on('keyup paste change propertychange', onChangeInput), _.button({ class: 'dropdown-typeahead-btn-clear' }, _.span({ class: 'fa fa-remove' })).on('click', onClearInput)));
 
 	            return $element;
 	        }
@@ -10890,7 +10968,8 @@
 	                model: {
 	                    title: title,
 	                    body: body,
-	                    onSubmit: onSubmit
+	                    onSubmit: onSubmit,
+	                    class: 'confirm-modal'
 	                },
 	                buttons: [{
 	                    label: 'Cancel',
@@ -23087,10 +23166,8 @@
 	                            _this2.value.items.splice(oldIndex, 1);
 	                            _this2.value.items.splice(newIndex, 0, item);
 
-	                            // Change the index in the schema bindings array
-	                            var schema = _this2.value.schemaBindings[oldIndex];
-	                            _this2.value.schemaBindings.splice(oldIndex, 1);
-	                            _this2.value.schemaBindings.splice(newIndex, 0, schema);
+	                            // Rebuild Schema bindings array
+	                            _this2.rebuildSchemaBindings();
 	                        }
 	                    });
 	                });
@@ -23101,6 +23178,22 @@
 	                    $(this).exodragdrop('destroy');
 	                });
 	            }
+	        }
+
+	        /**
+	         * Rebuild Schema bindings
+	         */
+
+	    }, {
+	        key: 'rebuildSchemaBindings',
+	        value: function rebuildSchemaBindings() {
+	            var _this3 = this;
+
+	            this.value.schemaBindings = [];
+
+	            this.$element.find('.item').each(function (i, element) {
+	                _this3.value.schemaBindings[element.dataset.index] = element.dataset.schema;
+	            });
 	        }
 
 	        /**
@@ -23127,98 +23220,128 @@
 	    }, {
 	        key: 'renderItem',
 	        value: function renderItem(index, item) {
-	            var _this3 = this;
+	            var _this4 = this;
 
-	            var $element = _.div({ class: 'item raised' });
+	            var $element = _.div({ class: 'item raised', 'data-index': index });
 
-	            // Account for large arrays
-	            if (this.value.items.length >= 6) {
-	                $element.addClass('collapsed');
-	            }
+	            // Returns the correct index, even if it's updated
+	            var getIndex = function getIndex() {
+	                return $element.attr('data-index');
+	            };
 
-	            // Wait a frame, so large arrays can be rendered without delay
-	            setTimeout(function () {
-	                // Sanity check for item schema
-	                if (!_this3.config.allowedSchemas) {
-	                    _this3.config.allowedSchemas = [];
+	            // Renders this item
+	            var rerenderItem = function rerenderItem() {
+	                // Account for large arrays
+	                if (_this4.value.items.length >= 6) {
+	                    $element.addClass('collapsed');
 	                }
 
-	                var itemSchemaId = _this3.value.schemaBindings[index];
+	                var itemSchemaId = _this4.value.schemaBindings[getIndex()];
 
 	                // Schema could not be found, assign first allowed schema
-	                if (_this3.config.allowedSchemas.length > 0 && (!itemSchemaId || _this3.config.allowedSchemas.indexOf(itemSchemaId) < 0)) {
-	                    itemSchemaId = _this3.config.allowedSchemas[0];
-	                    _this3.value.schemaBindings[index] = itemSchemaId;
+	                if (_this4.config.allowedSchemas.length > 0 && (!itemSchemaId || _this4.config.allowedSchemas.indexOf(itemSchemaId) < 0)) {
+	                    itemSchemaId = _this4.config.allowedSchemas[0];
+	                    _this4.value.schemaBindings[getIndex()] = itemSchemaId;
 	                }
+
+	                // Assign the Schema id as a DOM attribute
+	                $element.attr('data-schema', itemSchemaId);
 
 	                // Make sure we have the item schema and the editor we need for each array item
 	                var itemSchema = SchemaHelper.getFieldSchemaWithParentConfigs(itemSchemaId);
 
-	                if (itemSchema) {
-	                    (function () {
-	                        var fieldEditor = resources.editors[itemSchema.editorId];
-
-	                        // Perform sanity check and reassign the item into the array
-	                        item = ContentHelper.fieldSanityCheck(item, itemSchema);
-	                        _this3.value.items[index] = item;
-
-	                        // Returns the correct index, even if it's updated
-	                        var getIndex = function getIndex() {
-	                            return $element.attr('data-index');
-	                        };
-
-	                        // Init the schema selector
-	                        var $schemaSelector = _.div({ class: 'item-schema-selector kvp' }, _.div({ class: 'key' }, 'Schema'), _.div({ class: 'value' }, _.select({ class: 'form-control' }, _.each(_this3.config.allowedSchemas, function (allowedSchemaIndex, allowedSchemaId) {
-	                            var allowedSchema = resources.schemas[allowedSchemaId];
-
-	                            return _.option({ value: allowedSchemaId }, allowedSchema.name);
-	                        })).on('change', function () {
-	                            itemSchemaId = $schemaSelector.find('select').val();
-
-	                            _this3.value.schemaBindings[getIndex()] = itemSchemaId;
-
-	                            _this3.render();
-	                        }).val(itemSchemaId)));
-
-	                        // Set schema label (used when sorting items)
-	                        var schemaLabel = (item ? item.name || item.title || item.description || item.type || item.id : null) || (itemSchema ? itemSchema.name : null) || 'Item #' + index;
-	                        var $schemaLabel = _.span({ class: 'schema-label' }, schemaLabel);
-
-	                        // Expanding/collapsing an item
-	                        var $btnToggle = _.button({ class: 'btn btn-embedded btn-toggle' }, _.span({ class: 'fa fa-window-maximize' }), _.span({ class: 'fa fa-window-minimize' })).on('click', function () {
-	                            $element.toggleClass('collapsed');
-	                        });
-
-	                        // Init the field editor
-	                        var fieldEditorInstance = new fieldEditor({
-	                            value: itemSchema.multilingual ? item[window.language] : item,
-	                            disabled: itemSchema.disabled || false,
-	                            config: itemSchema.config || {},
-	                            schema: itemSchema
-	                        });
-
-	                        // Hook up the change event
-	                        fieldEditorInstance.on('change', function (newValue) {
-	                            _this3.onChange(newValue, getIndex(), itemSchema);
-	                        });
-
-	                        // Return the DOM element
-	                        _.append($element, $btnToggle, _.button({ class: 'btn btn-embedded btn-remove' }, _.span({ class: 'fa fa-remove' })).click(function () {
-	                            _this3.onClickRemoveItem(getIndex());
-	                            $element.remove();
-	                        }), $schemaLabel, _this3.config.allowedSchemas.length > 1 ? $schemaSelector : null, fieldEditorInstance.$element);
-	                    })();
-	                } else {
-	                    debug.warning('Schema by id "' + itemSchemaId + '" not found', _this3);
+	                if (!itemSchema) {
+	                    UI.errorModal(new Error('Schema by id "' + itemSchemaId + '" not found'));
+	                    return;
 	                }
-	            }, index);
+
+	                var fieldEditor = resources.editors[itemSchema.editorId];
+
+	                // Perform sanity check and reassign the item into the array
+	                item = ContentHelper.fieldSanityCheck(item, itemSchema);
+	                _this4.value.items[getIndex()] = item;
+
+	                // Create dropdown array for Schema selector
+	                var dropdownOptions = [];
+
+	                var _iteratorNormalCompletion = true;
+	                var _didIteratorError = false;
+	                var _iteratorError = undefined;
+
+	                try {
+	                    for (var _iterator = _this4.config.allowedSchemas[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	                        var allowedSchemaId = _step.value;
+
+	                        var allowedSchema = resources.schemas[allowedSchemaId];
+
+	                        dropdownOptions[dropdownOptions.length] = {
+	                            value: allowedSchema.id,
+	                            label: allowedSchema.name,
+	                            selected: allowedSchema.id == itemSchemaId
+	                        };
+	                    }
+
+	                    // Render the Schema selector
+	                } catch (err) {
+	                    _didIteratorError = true;
+	                    _iteratorError = err;
+	                } finally {
+	                    try {
+	                        if (!_iteratorNormalCompletion && _iterator.return) {
+	                            _iterator.return();
+	                        }
+	                    } finally {
+	                        if (_didIteratorError) {
+	                            throw _iteratorError;
+	                        }
+	                    }
+	                }
+
+	                var $schemaSelector = _.div({ class: 'item-schema-selector kvp' }, _.div({ class: 'key' }, 'Schema'), _.div({ class: 'value' }, UI.inputDropdownTypeAhead('(none)', dropdownOptions, function (newValue) {
+	                    // Set new value in Schema bindings
+	                    _this4.value.schemaBindings[getIndex()] = newValue;
+
+	                    // Re-render this item
+	                    rerenderItem();
+	                })));
+
+	                // Set schema label (used when sorting items)
+	                var schemaLabel = (item ? item.name || item.title || item.description || item.type || item.id : null) || (itemSchema ? itemSchema.name : null) || 'Item #' + getIndex();
+	                var $schemaLabel = _.span({ class: 'schema-label' }, schemaLabel);
+
+	                // Expanding/collapsing an item
+	                var $btnToggle = _.button({ class: 'btn btn-embedded btn-toggle' }, _.span({ class: 'fa fa-window-maximize' }), _.span({ class: 'fa fa-window-minimize' })).on('click', function () {
+	                    $element.toggleClass('collapsed');
+	                });
+
+	                // Init the field editor
+	                var fieldEditorInstance = new fieldEditor({
+	                    value: itemSchema.multilingual ? item[window.language] : item,
+	                    disabled: itemSchema.disabled || false,
+	                    config: itemSchema.config || {},
+	                    schema: itemSchema
+	                });
+
+	                // Hook up the change event
+	                fieldEditorInstance.on('change', function (newValue) {
+	                    _this4.onChange(newValue, getIndex(), itemSchema);
+	                });
+
+	                // Render the DOM element
+	                _.append($element.empty(), $btnToggle, _.button({ class: 'btn btn-embedded btn-remove' }, _.span({ class: 'fa fa-remove' })).click(function () {
+	                    _this4.onClickRemoveItem(getIndex());
+	                    $element.remove();
+	                }), $schemaLabel, _this4.config.allowedSchemas.length > 1 ? $schemaSelector : null, fieldEditorInstance.$element);
+	            };
+
+	            rerenderItem();
 
 	            return $element;
 	        }
 	    }, {
 	        key: 'render',
 	        value: function render() {
-	            var _this4 = this;
+	            var _this5 = this;
 
 	            // Recover flat arrays
 	            if (Array.isArray(this.value)) {
@@ -23239,30 +23362,47 @@
 	                };
 	            }
 
+	            // Sanity check for items array
 	            if (!this.value.items) {
 	                this.value.items = [];
 	            }
 
+	            // Sanity check for Schema bindings array
 	            if (!this.value.schemaBindings) {
 	                this.value.schemaBindings = [];
 	            }
 
+	            // Sanity check for allowed Schemas array
+	            if (!this.config.allowedSchemas) {
+	                this.config.allowedSchemas = [];
+	            }
+
 	            // Render editor
-	            _.append(this.$element.empty(), _.div({ class: 'items' },
-	            // Loop through each array item
-	            _.each(this.value.items, function (i, item) {
-	                return _this4.renderItem(i, item);
-	            })),
+	            _.append(this.$element.empty(), _.div({ class: 'items' }),
 
 	            // Render the add item button
 	            _.button({ class: 'btn btn-primary btn-raised btn-add-item btn-round' }, '+').click(function () {
-	                _this4.onClickAddItem();
+	                _this5.onClickAddItem();
 	            }));
 
-	            // Update indices
-	            setTimeout(function () {
-	                _this4.updateDOMIndices();
-	            }, this.value.items.length + 5);
+	            // Render items asynchronously to accommodate for large arrays
+	            var renderNextItem = function renderNextItem(i) {
+	                // Update DOM indices after all items have been rendered
+	                if (i >= _this5.value.items.length) {
+	                    _this5.updateDOMIndices();
+	                    return;
+	                }
+
+	                // Append the item to the DOM
+	                _this5.$element.children('.items').append(_this5.renderItem(i, _this5.value.items[i]));
+
+	                // Render next item in the next CPU cycle
+	                setTimeout(function () {
+	                    renderNextItem(i + 1);
+	                }, 1);
+	            };
+
+	            renderNextItem(0);
 	        }
 	    }]);
 
@@ -23382,67 +23522,77 @@
 
 	    _createClass(ContentReferenceEditor, [{
 	        key: 'onChange',
-	        value: function onChange() {
-	            this.value = this.$select.val();
+	        value: function onChange(newValue) {
+	            this.value = newValue;
 
 	            this.trigger('change', this.value);
 	        }
 
 	        /**
-	         * Gets a list of allowed Content nodes
+	         * Gets a list of allowed Content options
 	         *
-	         * @returns {Array} Allowed Content nodes
+	         * @returns {Array} List of options
 	         */
 
 	    }, {
-	        key: 'getAllowedContent',
-	        value: function getAllowedContent() {
-	            var _this2 = this;
+	        key: 'getDropdownOptions',
+	        value: function getDropdownOptions() {
+	            var allowedContent = [];
+	            var areRulesDefined = this.config && Array.isArray(this.config.allowedSchemas) && this.config.allowedSchemas.length > 0;
 
-	            // If rules are defined, filter the Content node list
-	            if (this.config && Array.isArray(this.config.allowedSchemas) && this.config.allowedSchemas.length > 0) {
-	                return window.resources.content.filter(function (content) {
-	                    return _this2.config.allowedSchemas.indexOf(content.schemaId) > -1;
-	                });
+	            var _iteratorNormalCompletion = true;
+	            var _didIteratorError = false;
+	            var _iteratorError = undefined;
 
-	                // If no rules are defined, return all content
-	            } else {
-	                return window.resources.content;
+	            try {
+	                for (var _iterator = resources.content[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	                    var content = _step.value;
+
+	                    content = new Content(content);
+
+	                    if (areRulesDefined) {
+	                        var isContentAllowed = this.config.allowedSchemas.indexOf(content.schemaId) > -1;
+
+	                        if (!isContentAllowed) {
+	                            continue;
+	                        }
+	                    }
+
+	                    allowedContent[allowedContent.length] = {
+	                        label: content.prop('title', window.language),
+	                        value: content.id,
+	                        selected: content.id == this.value
+	                    };
+	                }
+	            } catch (err) {
+	                _didIteratorError = true;
+	                _iteratorError = err;
+	            } finally {
+	                try {
+	                    if (!_iteratorNormalCompletion && _iterator.return) {
+	                        _iterator.return();
+	                    }
+	                } finally {
+	                    if (_didIteratorError) {
+	                        throw _iteratorError;
+	                    }
+	                }
 	            }
+
+	            return allowedContent;
 	        }
 	    }, {
 	        key: 'render',
 	        value: function render() {
-	            var _this3 = this;
+	            var _this2 = this;
 
 	            // Render main element
 	            this.$element = _.div({ class: 'field-editor content-reference-editor' }, [
 
 	            // Render picker
-	            this.$select = _.select({ class: 'form-control' }, _.each(this.getAllowedContent(), function (i, node) {
-	                var content = new Content(node);
-
-	                if (content.id == Router.params.id) {
-	                    return;
-	                }
-
-	                return _.option({ value: content.id }, content.prop('title', window.language));
-	            })).change(function () {
-	                _this3.onChange();
-	            }),
-
-	            // Render clear button
-	            this.$clearBtn = _.button({ class: 'btn btn-remove' }, _.span({ class: 'fa fa-remove' }))]);
-
-	            // Set the initial value
-	            this.$select.val(this.value);
-
-	            // Hook up the change event to the clear button
-	            this.$clearBtn.click(function () {
-	                _this3.$select.val(null);
-
-	                _this3.onChange();
-	            });
+	            this.$dropdown = UI.inputDropdownTypeAhead('(none)', this.getDropdownOptions(), function (newValue) {
+	                _this2.onChange(newValue);
+	            }, true)]);
 	        }
 	    }]);
 
@@ -23479,51 +23629,57 @@
 
 	        _this.$element = _.div({ class: 'field-editor content-schema-reference-editor' });
 
-	        // Fetch allowed Schemas from parent if needed 
-	        if (_this.config && _this.config.allowedSchemas == 'fromParent') {
-	            (function () {
-	                var thisContent = resources.content.filter(function (c) {
-	                    return c.id == Router.params.id;
-	                })[0];
+	        // Fetch current Content model
+	        var thisContent = resources.content.filter(function (c) {
+	            return c.id == Router.params.id;
+	        })[0];
 
-	                if (!thisContent) {
-	                    UI.errorModal(new Error('Content by id "' + Router.params.id + '" not found'));
-	                } else if (thisContent.parentId) {
-	                    var parentContent = resources.content.filter(function (c) {
-	                        return c.id == thisContent.parentId;
-	                    })[0];
-
-	                    if (!parentContent) {
-	                        UI.errorModal(new Error('Content by id "' + thisContent.parentId + '" not found'));
-	                    } else {
-	                        var parentSchema = resources.schemas[parentContent.schemaId];
-
-	                        if (!parentSchema) {
-	                            UI.errorModal(new Error('Schema by id "' + parentContent.schematId + '" not found'));
-	                        } else {
-	                            _this.config.allowedSchemas = parentSchema.allowedChildSchemas;
-	                            _this.init();
-	                        }
-	                    }
-	                } else {
-	                    _this.init();
-	                }
-	            })();
-	        } else {
-	            _this.init();
+	        if (!thisContent) {
+	            UI.errorModal(new Error('Content by id "' + Router.params.id + '" not found'));
+	            return _possibleConstructorReturn(_this);
 	        }
+
+	        // If no allowed Schemas are referred to by parent, proceed as normal
+	        if (!thisContent.parentId || !_this.config || !_this.config.allowedSchemas == 'fromParent') {
+	            _this.init();
+	            return _possibleConstructorReturn(_this);
+	        }
+
+	        // Fetch parent Content
+	        var parentContent = resources.content.filter(function (c) {
+	            return c.id == thisContent.parentId;
+	        })[0];
+
+	        if (!parentContent) {
+	            UI.errorModal(new Error('Content by id "' + thisContent.parentId + '" not found'));
+	            return _possibleConstructorReturn(_this);
+	        }
+
+	        // Fetch parent Schema
+	        var parentSchema = resources.schemas[parentContent.schemaId];
+
+	        if (!parentSchema) {
+	            UI.errorModal(new Error('Schema by id "' + parentContent.schematId + '" not found'));
+	            return _possibleConstructorReturn(_this);
+	        }
+
+	        // Adopt allowed Schemas from parent
+	        _this.config.allowedSchemas = parentSchema.allowedChildSchemas;
+	        _this.init();
 	        return _this;
 	    }
 
 	    /**
 	     * Event: Change input
+	     *
+	     * @param {String} newValue
 	     */
 
 
 	    _createClass(ContentSchemaReferenceEditor, [{
 	        key: 'onChange',
-	        value: function onChange() {
-	            this.value = this.$select.val();
+	        value: function onChange(newValue) {
+	            this.value = newValue;
 	            this.trigger('change', this.value);
 
 	            // Only re-render if the ContentEditor is the parent
@@ -23536,11 +23692,13 @@
 
 	        /**
 	         * Gets schema types
+	         *
+	         * @returns {Array} List of options
 	         */
 
 	    }, {
-	        key: 'getContentSchemas',
-	        value: function getContentSchemas() {
+	        key: 'getDropdownOptions',
+	        value: function getDropdownOptions() {
 	            var contentSchemas = [];
 
 	            for (var id in window.resources.schemas) {
@@ -23548,7 +23706,11 @@
 	                var isNative = schema.id == 'page' || schema.id == 'contentBase';
 
 	                if (schema.type == 'content' && !isNative && (!this.config || !this.config.allowedSchemas || !Array.isArray(this.config.allowedSchemas) || this.config.allowedSchemas.indexOf(schema.id) > -1)) {
-	                    contentSchemas[contentSchemas.length] = schema;
+	                    contentSchemas[contentSchemas.length] = {
+	                        label: schema.name,
+	                        value: schema.id,
+	                        selected: schema.id == this.value
+	                    };
 	                }
 	            }
 
@@ -23559,13 +23721,9 @@
 	        value: function render() {
 	            var _this2 = this;
 
-	            this.$element.html(this.$select = _.select({ class: 'form-control' }, _.each(this.getContentSchemas(), function (i, schema) {
-	                var selected = !_this2.value ? i == 0 : schema.id == _this2.value;
-
-	                return _.option({ value: schema.id, selected: selected }, schema.name);
-	            })).change(function () {
-	                _this2.onChange();
-	            }));
+	            this.$element.html(UI.inputDropdownTypeAhead('(none)', this.getDropdownOptions(), function (newValue) {
+	                _this2.onChange(newValue);
+	            }, true));
 	        }
 	    }]);
 
@@ -23657,6 +23815,9 @@
 	            if (isNaN(date.getDate())) {
 	                date = new Date();
 	            }
+
+	            // Make sure minutes are rounded to nearest multiple of 5
+	            date.setMinutes(Math.floor(date.getMinutes() / 5) * 5);
 
 	            var days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
@@ -24865,13 +25026,15 @@
 
 	    /**
 	     * Event: Change value
+	     *
+	     * @param {String} newValue
 	     */
 
 
 	    _createClass(TemplateReferenceEditor, [{
 	        key: 'onChange',
-	        value: function onChange() {
-	            this.value = this.$element.find('select').val();
+	        value: function onChange(newValue) {
+	            this.value = newValue;
 
 	            this.trigger('change', this.value);
 	        }
@@ -24880,43 +25043,83 @@
 	        value: function render() {
 	            var _this2 = this;
 
+	            this.$element = _.div({ class: 'field-editor template-reference-editor' });
+
 	            var resource = window.resources[this.config.resource || 'templates'];
+	            var dropdownOptions = [];
 
 	            // Sanity check for allowed templates
 	            if (!this.config.allowedTemplates) {
 	                this.config.allowedTemplates = [];
 	            }
 
-	            // Filter out non-allowed templates
-	            resource = resource.filter(function (template) {
-	                return _this2.config.allowedTemplates.indexOf(template) > -1;
-	            });
-
-	            this.$element = _.div({ class: 'field-editor template-reference-editor' }, _.select({ class: 'form-control' }, _.each(resource, function (i, template) {
-	                return _.option({
-	                    value: template
-	                }, template);
-	            })).change(function () {
-	                _this2.onChange();
-	            }));
-
-	            // If no value is set, apply the first of the allowed templates
-	            if (!this.value || resource.indexOf(this.value) < 0) {
-	                if (resource.length > 0) {
-	                    this.value = resource[0];
-
-	                    this.$element.find('select').val(this.value);
-
-	                    // Apply changes on next CPU cycle
-	                    setTimeout(function () {
-	                        _this2.trigger('change', _this2.value);
-	                    }, 1);
-	                } else {
-	                    this.$element.html(_.span({ class: 'field-warning' }, 'No allowed templates configured'));
-	                }
-	            } else {
-	                this.$element.find('select').val(this.value);
+	            // If no templates are available, display a warning
+	            if (resource.length < 1) {
+	                this.$element.html(_.span({ class: 'field-warning' }, 'No templates configured'));
+	                return;
 	            }
+
+	            // If no allowed templates are configured, display a warning
+	            if (this.config.allowedTemplates.length < 1) {
+	                this.$element.html(_.span({ class: 'field-warning' }, 'No allowed templates configured'));
+	                return;
+	            }
+
+	            // If no allowed template is set, apply the first of the allowed templates
+	            if (!this.value || this.config.allowedTemplates.indexOf(this.value) < 0) {
+	                this.value = this.config.allowedTemplates[0];
+
+	                // Set values in dropdown element    
+	                this.$element.find('.dropdown-menu-toggle').html(this.value);
+	                this.$element.find('.dropdown-menu li[data-value="' + this.value + '"]').addClass('active');
+
+	                // Apply changes on next CPU cycle
+	                setTimeout(function () {
+	                    _this2.trigger('change', _this2.value);
+	                }, 1);
+	            }
+
+	            // Generate dropdown options
+	            var _iteratorNormalCompletion = true;
+	            var _didIteratorError = false;
+	            var _iteratorError = undefined;
+
+	            try {
+	                for (var _iterator = resource[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	                    var template = _step.value;
+
+	                    var isAllowed = this.config.allowedTemplates.indexOf(template) > -1;
+
+	                    if (!isAllowed) {
+	                        continue;
+	                    }
+
+	                    dropdownOptions[dropdownOptions.length] = {
+	                        label: template,
+	                        value: template,
+	                        selected: template == this.value
+	                    };
+	                }
+
+	                // Render picker
+	            } catch (err) {
+	                _didIteratorError = true;
+	                _iteratorError = err;
+	            } finally {
+	                try {
+	                    if (!_iteratorNormalCompletion && _iterator.return) {
+	                        _iterator.return();
+	                    }
+	                } finally {
+	                    if (_didIteratorError) {
+	                        throw _iteratorError;
+	                    }
+	                }
+	            }
+
+	            _.append(this.$element, UI.inputDropdownTypeAhead('(none)', dropdownOptions, function (newValue) {
+	                _this2.onChange(newValue);
+	            }, true));
 	        }
 	    }]);
 

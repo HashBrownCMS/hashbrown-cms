@@ -13,33 +13,38 @@ class ContentReferenceEditor extends View {
     /**
      * Event: Change value
      */
-    onChange() {
-        this.value = this.$select.val();
+    onChange(newValue) {
+        this.value = newValue;
 
         this.trigger('change', this.value);
     }
 
     /**
-     * Gets a list of allowed Content nodes
+     * Gets a list of allowed Content options
      *
-     * @returns {Array} Allowed Content nodes
+     * @returns {Array} List of options
      */
-    getAllowedContent() {
-        // If rules are defined, filter the Content node list
-        if(
-            this.config &&
-            Array.isArray(this.config.allowedSchemas) &&
-            this.config.allowedSchemas.length > 0)
-        {
-            return window.resources.content.filter((content) => {
-                return this.config.allowedSchemas.indexOf(content.schemaId) > -1;
-            });
-        
-        // If no rules are defined, return all content
-        } else {
-            return window.resources.content;
+    getDropdownOptions() {
+        let allowedContent = [];
+        let areRulesDefined = this.config && Array.isArray(this.config.allowedSchemas) && this.config.allowedSchemas.length > 0;
+
+        for(let content of resources.content) {
+            content = new Content(content);
+
+            if(areRulesDefined) {
+                let isContentAllowed = this.config.allowedSchemas.indexOf(content.schemaId) > -1;
+                
+                if(!isContentAllowed) { continue; }
+            }
+
+            allowedContent[allowedContent.length] = {
+                label: content.prop('title', window.language),
+                value: content.id,
+                selected: content.id == this.value
+            };
         }
 
+        return allowedContent;
     }
 
     render() {
@@ -47,35 +52,10 @@ class ContentReferenceEditor extends View {
         this.$element = _.div({class: 'field-editor content-reference-editor'}, [
 
             // Render picker
-            this.$select = _.select({class: 'form-control'},
-                _.each(this.getAllowedContent(), (i, node) => {
-                    let content = new Content(node);
-
-                    if(content.id == Router.params.id) {
-                        return;
-                    }
-
-                    return _.option({ value: content.id },
-                        content.prop('title', window.language)
-                    );
-                })
-            ).change(() => { this.onChange(); }),
-
-            // Render clear button
-            this.$clearBtn = _.button({class: 'btn btn-remove'},
-                _.span({class: 'fa fa-remove'})
-            )
+            this.$dropdown = UI.inputDropdownTypeAhead('(none)', this.getDropdownOptions(), (newValue) => {
+                this.onChange(newValue);             
+            }, true)
         ]);
-
-        // Set the initial value
-        this.$select.val(this.value);
-
-        // Hook up the change event to the clear button
-        this.$clearBtn.click(() => {
-            this.$select.val(null);
-            
-            this.onChange();
-        });
     }
 }
 

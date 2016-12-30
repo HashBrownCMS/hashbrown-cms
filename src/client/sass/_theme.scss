@@ -66,12 +66,80 @@ button, a {
     }
 
     &.typeahead {
+        display: inline-block;
+
+        &.open {
+            .dropdown-toggle {
+                &:before {
+                    display: none;
+                }
+            }
+        }
+
         .form-control {
             max-width: none;
         }
 
+        .dropdown-toggle {
+            font-size: 1em;
+            text-transform: none;
+            font-weight: normal;
+            text-align: left;
+            padding: 0px 24px 0px 10px;
+            position: relative;
+
+            &, &:hover, &:focus {
+                color: #fff;
+            }
+
+            &:after {
+                font-family: 'FontAwesome';
+                content: '\f0d7';
+                position: absolute;
+                right: 10px;
+            }
+
+            .fa, .caret {
+                position: absolute;
+                right: 10px;
+                top: 13px;
+            }
+        }
+
+        .dropdown-typeahead {
+            position: relative;
+            margin-bottom: 5px;
+
+            .dropdown-typeahead-btn-clear {
+                border: 0px;
+                background-color: transparent;
+                opacity: 0.5;
+                position: absolute;
+                right: 0px;
+                top: 8px;
+                padding: 0px;
+            }
+        }
+
         .dropdown-menu {
-            width: 100%;
+            left: 0px;
+            right: auto;
+            padding: 10px !important;
+            min-width: 200px;
+            
+            ul {
+                max-height: 200px;
+                overflow-y: auto;
+                
+                li {
+                    button {
+                        background-color: transparent;
+                        padding: 0px 20px 0px 0px;
+                        line-height: 30px;
+                        white-space: nowrap;
+                    }
+                }
+            }
         }
     }
 
@@ -84,6 +152,15 @@ button, a {
         &:hover {
             color: material-color('grey', '600');
         }
+
+        .fa, .caret {
+            margin-left: 5px;
+        }
+    }
+
+    .btn.dropdown-clear {
+        color: material-color('red', '600');
+        padding: 6px;
     }
 
     .dropdown-menu {
@@ -96,33 +173,47 @@ button, a {
         right: 0px;
         min-width: auto;
 
-        >li {
-            &.active {
+        &, ul {
+            >li {
+                list-style-type: none;
+
+                &.active {
+                    >a, >button {
+                        background-color: transparent;
+                        color: material-color('grey', '800');
+                        position: relative;
+                        
+                        &:hover {
+                            background-color: material-color('grey', '200');
+                        }
+
+                        &:after {
+                            font-family: 'FontAwesome';
+                            content: '\f00c';
+                            position: absolute;
+                            right: 10px;
+                        }
+                    }
+                }
+
                 >a, >button {
-                    background-color: transparent;
-                    color: material-color('grey', '800');
-                    
+                    padding: 3px 20px;
+                    border: 0px;
+                    color: material-color('grey', '600');
+                    display: block;
+                    width: 100%;
+                    text-align: left;
+
                     &:hover {
                         background-color: material-color('grey', '200');
                     }
-
-                    &:after {
-                        font-family: 'FontAwesome';
-                        content: '\f00c';
-                        margin-left: 10px;
-                    }
                 }
             }
-
-            >a, >button {
-                padding: 3px 20px;
-                border: 0px;
-                color: material-color('grey', '600');
-
-                &:hover {
-                    background-color: material-color('grey', '200');
-                }
-            }
+        }
+        
+        ul {
+            padding: 0px;
+            margin: 0px -10px 0px 0px;
         }
     }
 }
