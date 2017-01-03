@@ -3,10 +3,14 @@
         @extend .raised;
         padding: 0px;
         margin: 30px auto;
-        max-width: 800px;
 
         .item {
+            &.active, &.next, &.prev {
+                display: flex;
+            }
+
             >div {
+                width: 50%;
                 display: flex;
                 flex-direction: column;
                 align-items: center;
@@ -14,21 +18,19 @@
                 position: relative;
                 overflow: hidden;
                 height: 100%;
-                background-color: material-color('blue', '600');
-                color: #fff;
+                background-color: material-color('grey', '100');
 
                 img {
                     position: absolute;
                     height: 100%;
                     top: 0px;
                     left: 0px;
-                    opacity: 0.25;
                 }
 
                 p, h2 {
                     position: relative;
                     z-index: 20;
-                    max-width: 300px;
+                    width: calc(100% - 100px);
                     text-align: justify;
                 }
             }

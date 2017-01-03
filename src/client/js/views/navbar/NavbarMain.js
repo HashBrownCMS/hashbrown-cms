@@ -147,7 +147,7 @@ class NavbarMain extends View {
 
                 }
 
-                let routingPath = item.shortPath || item.path || id;
+                let routingPath = item.shortPath || item.path || item.id || null;
                 let queueItem = {};
                 let icon = item.icon;
                 let $icon;
@@ -173,15 +173,12 @@ class NavbarMain extends View {
                 // Item element
                 let $element = _.div({
                     class: 'pane-item-container',
-                    'data-routing-path': routingPath,
-                    'data-locked': item.locked,
-                    'data-remote': item.remote,
-                    'data-local': item.local
+                    'data-routing-path': routingPath
                 },
                     _.a({
                         'data-id': id,
                         'data-name': name,
-                        href: '#' + params.route + routingPath,
+                        href: '#' + (routingPath ? params.route + routingPath : params.route),
                         class: 'pane-item'
                     },
                         $icon,
@@ -189,6 +186,19 @@ class NavbarMain extends View {
                     ),
                     _.div({class: 'children'})
                 );
+
+                // Set sync attributes
+                if(typeof item.locked !== 'undefined') {
+                    $element.attr('data-locked', item.locked);
+                }
+                
+                if(typeof item.remote !== 'undefined') {
+                    $element.attr('data-remote', item.remote);
+                }
+                
+                if(typeof item.local !== 'undefined') {
+                    $element.attr('data-local', item.local);
+                }
 
                 // Attach item context menu
                 if(params.getItemContextMenu) {
@@ -350,14 +360,12 @@ class NavbarMain extends View {
      * @param {String} tabName
      */
     showTab(tabRoute) {
-        onReady('navbar', () => {
-            this.$element.find('.tab-panes .pane-container').each(function(i) {
-                $(this).toggleClass('active', $(this).attr('data-route') == tabRoute);
-            });
-            
-            this.$element.find('.tab-buttons button').each(function(i) {
-                $(this).toggleClass('active', $(this).attr('data-route') == tabRoute);
-            });
+        this.$element.find('.tab-panes .pane-container').each(function(i) {
+            $(this).toggleClass('active', $(this).attr('data-route') == tabRoute);
+        });
+        
+        this.$element.find('.tab-buttons button').each(function(i) {
+            $(this).toggleClass('active', $(this).attr('data-route') == tabRoute);
         });
     }
 
@@ -395,25 +403,23 @@ class NavbarMain extends View {
     highlightItem(route) {
         let view = this;
 
-        onReady('navbar', () => {
-            this.$element.find('.pane-item-container').each(function(i) {
-                let $item = $(this);
-                let id = ($item.children('a').attr('data-id') || '').toLowerCase();
-                let routingPath = ($item.attr('data-routing-path') || '').toLowerCase();
+        this.$element.find('.pane-item-container').each(function(i) {
+            let $item = $(this);
+            let id = ($item.children('a').attr('data-id') || '').toLowerCase();
+            let routingPath = ($item.attr('data-routing-path') || '').toLowerCase();
 
-                $item.toggleClass('active', false);
-                
-                if(
-                    id == route.toLowerCase() ||
-                    routingPath == route.toLowerCase()
-                ) {
-                    $item.toggleClass('active', true);
+            $item.toggleClass('active', false);
+            
+            if(
+                id == route.toLowerCase() ||
+                routingPath == route.toLowerCase()
+            ) {
+                $item.toggleClass('active', true);
 
-                    $item.parents('.pane-item-container').toggleClass('open', true);
+                $item.parents('.pane-item-container').toggleClass('open', true);
 
-                    view.showTab($item.parents('.pane-container').attr('data-route'));
-                }
-            });
+                view.showTab($item.parents('.pane-container').attr('data-route'));
+            }
         });
     }
 
@@ -425,63 +431,45 @@ class NavbarMain extends View {
     render() {
         let view = this;
 
-        resetReady('navbar');
-
         this.clear();
 
-        // ----------
-        // Render main content
-        // ----------
-        // Get user scopes
-        $.ajax({
-            type: 'GET',
-            url: '/api/user/scopes',
-            success: (allScopes) => {
-                let scopes = allScopes[ProjectHelper.currentProject] || [];
-                let isAdmin = isCurrentUserAdmin();
+        let isAdmin = User.current.isAdmin;
+        let hasConnectionsScope = User.current.hasScope(ProjectHelper.currentProject, 'connections');
+        let hasSchemasScope = User.current.hasScope(ProjectHelper.currentProject, 'schemas');
+        let hasUsersScope = User.current.hasScope(ProjectHelper.currentProject, 'users');
+        let hasSettingsScope = User.current.hasScope(ProjectHelper.currentProject, 'settings');
+        
+        // Render the "cms" pane
+        this.renderPane(CMSPane.getRenderSettings());
 
-                // Render the "cms" pane
-                this.renderPane(CMSPane.getRenderSettings());
+        // Render the "content" pane
+        this.renderPane(ContentPane.getRenderSettings());
+        
+        // Render the "media" pane
+        this.renderPane(MediaPane.getRenderSettings());
+        
+        // Render the "forms" pane
+        this.renderPane(FormsPane.getRenderSettings());
+        
+        // Render the "connections" pane
+        if(isAdmin || hasConnectionsScope) {
+            this.renderPane(ConnectionPane.getRenderSettings());
+        }
+        
+        // Render the "schemas" pane
+        if(isAdmin || hasSchemasScope) {
+            this.renderPane(SchemaPane.getRenderSettings());
+        }
+        
+        // Render the "users" pane
+        if(isAdmin || hasUsersScope) {
+            this.renderPane(UserPane.getRenderSettings());
+        }
 
-                // Render the "content" pane
-                this.renderPane(ContentPane.getRenderSettings());
-                
-                // Render the "media" pane
-                this.renderPane(MediaPane.getRenderSettings());
-                
-                // Render the "forms" pane
-                this.renderPane(FormsPane.getRenderSettings());
-                
-                // Render the "connections" pane
-                if(isAdmin || scopes.indexOf('connections') > -1) {
-                    this.renderPane(ConnectionPane.getRenderSettings());
-                }
-                
-                // Render the "schemas" pane
-                if(isAdmin || scopes.indexOf('schemas') > -1) {
-                    this.renderPane(SchemaPane.getRenderSettings());
-                }
-                
-                // Render the "users" pane
-                if(isAdmin || scopes.indexOf('users') > -1) {
-                    this.renderPane(UserPane.getRenderSettings());
-                }
-
-                // ----------
-                // Render the "settings" pane
-                // ----------
-                if(isAdmin || scopes.indexOf('settings') > -1) {
-                    this.renderPane(SettingsPane.getRenderSettings());
-                }
-                
-                triggerReady('navbar');
-
-                $('.cms-container').removeClass('faded');
-            },
-            error: () => {
-
-            }
-        });
+        // Render the "settings" pane
+        if(isAdmin || hasSettingsScope) {
+            this.renderPane(SettingsPane.getRenderSettings());
+        }
     }
 }
 

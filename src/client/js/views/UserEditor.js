@@ -325,21 +325,9 @@ class UserEditor extends View {
      * @return {HTMLElement} Element
      */
     renderAdminEditor() {
-        let view = this;
-
-        function onChange() {
-            view.model.isAdmin = this.checked;
-        } 
-
-        return _.div({class: 'admin-editor switch'},
-            _.input({
-                id: 'switch-is-admin',
-                class: 'form-control switch',
-                type: 'checkbox',
-                checked: view.model.isAdmin == true
-            }),
-            _.label({for: 'switch-is-admin'})
-        );
+        return UI.inputSwitch(this.model.isAdmin == true, (newValue) => {
+            this.model.isAdmin = newValue;
+        }).addClass('admin-editor');
     }
 
     /**

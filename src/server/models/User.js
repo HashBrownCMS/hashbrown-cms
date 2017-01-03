@@ -3,6 +3,7 @@
 let crypto = require('crypto');
 
 let Entity = require('../../common/models/Entity');
+let UserCommon = require('../../common/models/User');
 
 class Password extends Entity {
     structure() {
@@ -11,7 +12,7 @@ class Password extends Entity {
     }
 }
 
-class User extends Entity {
+class User extends UserCommon {
     constructor(params) {
         if(params && params.password) {
             // Ensure correct object type
@@ -25,18 +26,22 @@ class User extends Entity {
     }
     
     structure() {
-        this.def(String, 'id');
-        this.def(Boolean, 'isAdmin', false);
-        this.def(Boolean, 'isCurrent', false);
-        this.def(String, 'username');
-        this.def(String, 'fullName');
-        this.def(String, 'email');
+        super.structure();
+
         this.def(Password, 'password', new Password());
         this.def(Array, 'tokens', []);
         this.def(String, 'inviteToken');
-        this.def(Object, 'scopes', {});
     }
     
+    /**
+     * Clears all sensitive data
+     */
+    clearSensitiveData() {
+        this.password = null;
+        this.tokens = null;
+        this.inviteToken = null;
+    }
+
     /**
      * Sets all project scopes
      *
@@ -51,39 +56,6 @@ class User extends Entity {
         this.scopes[project] = scopes;
     }
     
-    /**
-     * Gets all project scopes
-     *
-     * @param {String} project
-     *
-     * @returns {Array} scopes
-     */
-    getScopes(project) {
-        if(!this.scopes[project]) {
-            this.scopes[project] = [];
-        }
-
-        return this.scopes[project];
-    }
-
-    /**
-     * Checks if a user has a project scope
-     *
-     * @param {String} project
-     * @param {String} scope
-     *
-     * @returns {Boolean} hasScope
-     */
-    hasScope(project, scope) {
-        if(!scope && !this.scopes[project]) { return false; }
-
-        if(!this.scopes[project]) {
-            this.scopes[project] = [];
-        }
-
-        return this.scopes[project].indexOf(scope) > -1;
-    }
-
     /**
      * Creates a new access token
      *

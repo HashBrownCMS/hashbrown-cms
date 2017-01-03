@@ -7,6 +7,7 @@ class UserController extends ApiController {
      * Initialises this controller
      */
     static init(app) {
+        app.get('/api/user', this.getCurrentUser);
         app.get('/api/user/scopes', this.getScopes);
         app.get('/api/users', this.middleware({scope: 'users', setProject: false}), this.getUsers);
         app.get('/api/:project/:environment/users', this.middleware(), this.getUsers);
@@ -68,6 +69,25 @@ class UserController extends ApiController {
             res.status(403).send(UserController.printError(e));   
         });
     }
+    
+    /**
+     * Gets current user
+     */
+    static getCurrentUser(req, res) {
+        ApiController.authenticate(req.cookies.token)
+        .then((user) => {
+            user = user.getObject();
+
+            delete user.tokens;
+            delete user.inviteToken;
+            delete user.password;
+
+            res.status(200).send(user);
+        })
+        .catch((e) => {
+            res.status(403).send(UserController.printError(e));   
+        });
+    }
 
     /**
      * Get current scopes
@@ -90,8 +110,13 @@ class UserController extends ApiController {
 
         UserHelper.getAllUsers(project)
         .then((users) => {
-            for(let user of users) {
-                user.isCurrent = user.id == req.user.id;
+            for(let i in users) {
+                users[i] = users[i].getObject();
+                users[i].isCurrent = users[i].id == req.user.id;
+
+                delete users[i].tokens;
+                delete users[i].inviteToken;
+                delete users[i].password;
             }
 
             res.status(200).send(users);

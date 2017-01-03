@@ -15,6 +15,9 @@ class CMSPane extends Pane {
             $icon: _.img({src: '/svg/logo_grey.svg', class: 'logo'}),
             items: [
                 {
+                    name: 'Welcome'
+                },
+                {
                     name: 'Readme',
                     path: 'readme'
                 },

@@ -39,19 +39,21 @@ button, a {
 .carousel {
     .carousel-indicators {
         bottom: 20px;
+        opacity: 0.75;
 
         li {
-            opacity: 0.25;
             border: 0px;
-            background-color: material-color('blue', '200');
+            background-color: material-color('grey', '200');
             margin: 5px;
-            transition: background-color 1s ease;
+            transition: background-color 0.25s ease;
+            width: 14px;
+            height: 14px;
             
             &.active {
-                background-color: material-color('blue', '900');
+                background-color: material-color('grey', '600');
                 margin: 5px;
-                width: 10px;
-                height: 10px;
+                width: 14px;
+                height: 14px;
             }
         }
     }
@@ -88,13 +90,9 @@ button, a {
 
         .fa {
             width: 60px;
-            background-color: material-color('blue', '600');
             padding: 15px;
             text-shadow: none;
-
-            &:hover {
-                background-color: material-color('blue', '800');
-            }
+            color: material-color('blue', '600');
         }
     }
 }

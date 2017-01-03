@@ -299,6 +299,11 @@ img.logo {
             padding: 15px 30px;
             height: 100%;
             overflow-y: auto;
+
+            &.centered {
+                max-width: 800px;
+                margin: 0px auto;
+            }
         }
 
         .editor {
