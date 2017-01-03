@@ -11,7 +11,7 @@
 html, body {
   height: 100%;
   font-family: 'Roboto';
-  font-size: 12px;
+  font-size: 13px;
   background-color: #eeeeee; }
 
 button, button:focus, button:hover, button:active, button:active:focus, a, a:focus, a:hover, a:active, a:active:focus {
@@ -20,6 +20,47 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
 /**
  * Colour a button
  */
+.carousel .carousel-indicators {
+  bottom: 20px; }
+  .carousel .carousel-indicators li {
+    opacity: 0.25;
+    border: 0px;
+    background-color: #90caf9;
+    margin: 5px;
+    transition: background-color 1s ease; }
+    .carousel .carousel-indicators li.active {
+      background-color: #0d47a1;
+      margin: 5px;
+      width: 10px;
+      height: 10px; }
+
+.carousel .carousel-control {
+  background: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  opacity: 0; }
+  .carousel .carousel-control:hover {
+    opacity: 1; }
+  .carousel .carousel-control.left {
+    align-items: flex-start; }
+    .carousel .carousel-control.left .fa {
+      border-top-right-radius: 2px;
+      border-bottom-right-radius: 2px; }
+  .carousel .carousel-control.right {
+    align-items: flex-end; }
+    .carousel .carousel-control.right .fa {
+      border-top-left-radius: 2px;
+      border-bottom-left-radius: 2px; }
+  .carousel .carousel-control .fa {
+    width: 60px;
+    background-color: #1e88e5;
+    padding: 15px;
+    text-shadow: none; }
+    .carousel .carousel-control .fa:hover {
+      background-color: #1565c0; }
+
 .dropdown.open .dropdown-toggle {
   position: relative; }
   .dropdown.open .dropdown-toggle, .dropdown.open .dropdown-toggle:focus {
@@ -259,7 +300,7 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
     left: 50%;
     transform: translate(-50%, -50%); }
 
-.raised, .dropdown .dropdown-menu, .cms-container .menuspace, .cms-container .workspace .content-editor > .object .language-picker .dropdown-menu {
+.raised, .dropdown .dropdown-menu, .cms-container .menuspace, .dashboard-container.welcome .carousel, .cms-container .workspace .content-editor > .object .language-picker .dropdown-menu {
   box-shadow: 0px 2px 3px 1px rgba(0, 0, 0, 0.2);
   background-color: #fff;
   padding: 15px 30px; }
@@ -900,6 +941,32 @@ img.logo {
         height: 20px;
         display: block;
         font-size: 20px; }
+
+.dashboard-container.welcome .carousel {
+  padding: 0px;
+  margin: 30px auto;
+  max-width: 800px; }
+  .dashboard-container.welcome .carousel .item > div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    height: 100%;
+    background-color: #1e88e5;
+    color: #fff; }
+    .dashboard-container.welcome .carousel .item > div img {
+      position: absolute;
+      height: 100%;
+      top: 0px;
+      left: 0px;
+      opacity: 0.25; }
+    .dashboard-container.welcome .carousel .item > div p, .dashboard-container.welcome .carousel .item > div h2 {
+      position: relative;
+      z-index: 20;
+      max-width: 300px;
+      text-align: justify; }
 
 .modal-project-admin .modal-body {
   position: relative;

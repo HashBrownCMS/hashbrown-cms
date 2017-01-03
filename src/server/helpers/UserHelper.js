@@ -495,7 +495,7 @@ class UserHelper {
     static getUserById(id) {
         let query = {};
 
-        debug.log('Getting user "' + id + '"...', this);
+        debug.log('Getting user "' + id + '"...', this, 3);
 
         return MongoHelper.findOne(
             'users',
@@ -520,7 +520,7 @@ class UserHelper {
     static getUser(username) {
         let query = {};
 
-        debug.log('Getting user "' + username + '"...', this);
+        debug.log('Getting user "' + username + '"...', this, 3);
 
         return MongoHelper.findOne(
             'users',

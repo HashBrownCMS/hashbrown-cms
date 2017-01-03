@@ -11,13 +11,13 @@ class UIHelper {
      */
     static inputSwitch(initialValue, onChange) {
         let id = 'switch-' + (10000 + Math.floor(Math.random() * 10000));
+        let $input;
 
-        return _.div({class: 'switch', 'data-checked': initialValue},
-            _.input({
+        let $element = _.div({class: 'switch', 'data-checked': initialValue},
+            $input = _.input({
                 id: id,
                 class: 'form-control switch',
-                type: 'checkbox',
-                checked: initialValue
+                type: 'checkbox'
             }).change(function() {
                 this.parentElement.dataset.checked = this.checked;
 
@@ -27,6 +27,12 @@ class UIHelper {
             }),
             _.label({for: id})
         );
+
+        if(initialValue) {
+            $input.attr('checked', true);
+        }
+
+        return $element;
     }
 
     /**
@@ -276,6 +282,45 @@ class UIHelper {
         );
 
         return $element;
+    }
+
+    /**
+     * Renders a carousel
+     *
+     * @param {Array} items
+     * @param {Boolean} useIndicators
+     * @param {Boolean} useControls
+     * @param {String} height
+     *
+     * @returns {HtmlElement} Carousel element
+     */
+    static carousel(items, useIndicators, useControls, height) {
+        let id = 'carousel-' + (10000 + Math.floor(Math.random() * 10000));
+        
+        return _.div({class: 'carousel slide', id: id, 'data-ride': 'carousel', 'data-interval': 0},
+            _.if(useIndicators,
+                _.ol({class: 'carousel-indicators'},
+                    _.each(items, (i, item) => {
+                        return _.li({'data-target': '#' + id, 'data-slide-to': i, class: i == 0 ? 'active' : ''});
+                    })
+                )
+            ),
+            _.div({class: 'carousel-inner', role: 'listbox'},
+                _.each(items, (i, item) => {
+                    return _.div({class: 'item' + (i == 0? ' active': ''), style: 'height:' + (height || '500px')},
+                        item
+                    );
+                })
+            ),
+            _.if(useControls,
+                _.a({href: '#' + id, role: 'button', class: 'left carousel-control', 'data-slide': 'prev'},
+                    _.span({class: 'fa fa-arrow-left'})
+                ),
+                _.a({href: '#' + id, role: 'button', class: 'right carousel-control', 'data-slide': 'next'},
+                    _.span({class: 'fa fa-arrow-right'})
+                )
+            )
+        );
     }
 
     /**

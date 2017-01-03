@@ -11,7 +11,6 @@ class CMSPane extends Pane {
     static getRenderSettings() {
         return {
             label: 'HashBrown',
-            sublabel: 'v' + app.version,
             route: '/',
             $icon: _.img({src: '/svg/logo_grey.svg', class: 'logo'}),
             items: [

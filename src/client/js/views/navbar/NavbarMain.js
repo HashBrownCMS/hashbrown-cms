@@ -101,6 +101,7 @@ class NavbarMain extends View {
                 // Get item name
                 let name = '';
 
+                // This is likely a Content node
                 if(item.properties && item.properties.title) {
                     // Use title directly if available
                     if(typeof item.properties.title === 'string') {
@@ -132,6 +133,9 @@ class NavbarMain extends View {
                 } else if(item.name && typeof item.name === 'string') {
                     name = item.name;
 
+                } else if(item.fullName && typeof item.fullName === 'string') {
+                    name = item.fullName;
+                
                 } else if(item.username && typeof item.username === 'string') {
                     name = item.username;
                 

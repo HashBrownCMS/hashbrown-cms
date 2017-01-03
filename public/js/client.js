@@ -1176,7 +1176,11 @@
 	        }
 	    } else if (content) {
 	        // jQuery logic
-	        if (typeof jQuery !== 'undefined' && element instanceof jQuery) {
+	        if (typeof jQuery !== 'undefined') {
+	            if (element instanceof jQuery == false) {
+	                element = $(element);
+	            }
+
 	            element.append(content);
 
 	            // Native JavaScript logic
@@ -1235,7 +1239,7 @@
 	        var _loop = function _loop() {
 	            var shorthand = _step.value;
 
-	            element[shorthand] = function click(callback) {
+	            element[shorthand] = function (callback) {
 	                return element.on(shorthand, callback);
 	            };
 	        };
@@ -1271,37 +1275,34 @@
 	function create(tag, attr, contents) {
 	    var element = document.createElement(tag.toUpperCase());
 
+	    // If the attribute parameter is a jQuery instance, just reassign the parameter values
+	    if (attr instanceof jQuery || typeof attr === 'string') {
+	        if (contents instanceof Array) {
+	            contents.unshift(attr);
+	        } else if (contents instanceof jQuery || typeof contents === 'string') {
+	            contents = [attr, contents];
+	        } else {
+	            contents = attr;
+	        }
+	    } else {
+	        for (var k in attr) {
+	            element.setAttribute(k, attr[k]);
+	        }
+	    }
+
+	    append(element, contents);
+
 	    // jQuery logic
 	    if (typeof jQuery !== 'undefined') {
-	        element = $(element);
-
-	        // If the attribute parameter is a jQuery instance, just reassign the parameter values
-	        if (attr instanceof jQuery || typeof attr === 'string') {
-	            contents = attr;
-	        } else {
-	            for (var k in attr) {
-	                element.attr(k, attr[k]);
-	            }
-	        }
+	        return $(element);
 
 	        // Native JavaScript logic
 	    } else {
 	        // Assign custom event functions to element instead of extending the prototype
 	        assignEvents(element);
 
-	        // If the attribute parameter is a HTMLElement instance, just reassign the parameter values
-	        if (attr instanceof HTMLElement || typeof attr === 'string') {
-	            contents = attr;
-	        } else {
-	            for (var k in attr) {
-	                element.setAttribute(k, attr[k]);
-	            }
-	        }
+	        return element;
 	    }
-
-	    append(element, contents);
-
-	    return element;
 	}
 
 	/**
@@ -10619,7 +10620,7 @@
 	            var view = this;
 
 	            this.$element = _.div({ class: 'modal fade ' + (this.model.class ? this.model.class : '') }, _.div({ class: 'modal-dialog' }, _.div({ class: 'modal-content' }, _.div({ class: 'modal-header' }, _.h4({ class: 'modal-title' }, this.renderTitle())), _.div({ class: 'modal-body' }, this.renderBody()), _.div({ class: 'modal-footer' }, _.if(this.buttons, _.each(this.buttons, function (i, button) {
-	                return _.button({ class: 'btn ' + button.class, disabled: button.disabled }, button.label).click(function () {
+	                var $button = _.button({ class: 'btn ' + button.class }, button.label).click(function () {
 	                    if (button.callback) {
 	                        if (button.callback() != false) {
 	                            _this2.hide();
@@ -10628,6 +10629,12 @@
 	                        _this2.hide();
 	                    }
 	                });
+
+	                if (button.disabled) {
+	                    $button.attr('disabled', true);
+	                }
+
+	                return $button;
 	            })), _.if(!this.buttons && this.model.onSubmit != false, _.button({ class: 'btn btn-default' }, 'OK').click(function () {
 	                _this2.onClickOK();
 	            }))))));
@@ -10686,12 +10693,12 @@
 	         */
 	        value: function inputSwitch(initialValue, onChange) {
 	            var id = 'switch-' + (10000 + Math.floor(Math.random() * 10000));
+	            var $input = void 0;
 
-	            return _.div({ class: 'switch', 'data-checked': initialValue }, _.input({
+	            var $element = _.div({ class: 'switch', 'data-checked': initialValue }, $input = _.input({
 	                id: id,
 	                class: 'form-control switch',
-	                type: 'checkbox',
-	                checked: initialValue
+	                type: 'checkbox'
 	            }).change(function () {
 	                this.parentElement.dataset.checked = this.checked;
 
@@ -10699,6 +10706,12 @@
 	                    onChange(this.checked);
 	                }
 	            }), _.label({ for: id }));
+
+	            if (initialValue) {
+	                $input.attr('checked', true);
+	            }
+
+	            return $element;
 	        }
 
 	        /**
@@ -10896,6 +10909,29 @@
 	            $element.find('.dropdown-menu').prepend(_.div({ class: 'dropdown-typeahead' }, _.input({ class: 'form-control', placeholder: 'Search...' }).on('keyup paste change propertychange', onChangeInput), _.button({ class: 'dropdown-typeahead-btn-clear' }, _.span({ class: 'fa fa-remove' })).on('click', onClearInput)));
 
 	            return $element;
+	        }
+
+	        /**
+	         * Renders a carousel
+	         *
+	         * @param {Array} items
+	         * @param {Boolean} useIndicators
+	         * @param {Boolean} useControls
+	         * @param {String} height
+	         *
+	         * @returns {HtmlElement} Carousel element
+	         */
+
+	    }, {
+	        key: 'carousel',
+	        value: function carousel(items, useIndicators, useControls, height) {
+	            var id = 'carousel-' + (10000 + Math.floor(Math.random() * 10000));
+
+	            return _.div({ class: 'carousel slide', id: id, 'data-ride': 'carousel', 'data-interval': 0 }, _.if(useIndicators, _.ol({ class: 'carousel-indicators' }, _.each(items, function (i, item) {
+	                return _.li({ 'data-target': '#' + id, 'data-slide-to': i, class: i == 0 ? 'active' : '' });
+	            }))), _.div({ class: 'carousel-inner', role: 'listbox' }, _.each(items, function (i, item) {
+	                return _.div({ class: 'item' + (i == 0 ? ' active' : ''), style: 'height:' + (height || '500px') }, item);
+	            })), _.if(useControls, _.a({ href: '#' + id, role: 'button', class: 'left carousel-control', 'data-slide': 'prev' }, _.span({ class: 'fa fa-arrow-left' })), _.a({ href: '#' + id, role: 'button', class: 'right carousel-control', 'data-slide': 'next' }, _.span({ class: 'fa fa-arrow-right' }))));
 	        }
 
 	        /**
@@ -11942,6 +11978,7 @@
 	                // Get item name
 	                var name = '';
 
+	                // This is likely a Content node
 	                if (item.properties && item.properties.title) {
 	                    // Use title directly if available
 	                    if (typeof item.properties.title === 'string') {
@@ -11969,6 +12006,8 @@
 	                    name = item.title;
 	                } else if (item.name && typeof item.name === 'string') {
 	                    name = item.name;
+	                } else if (item.fullName && typeof item.fullName === 'string') {
+	                    name = item.fullName;
 	                } else if (item.username && typeof item.username === 'string') {
 	                    name = item.username;
 	                } else if (item.email && typeof item.email === 'string') {
@@ -20525,7 +20564,6 @@
 	        value: function getRenderSettings() {
 	            return {
 	                label: 'HashBrown',
-	                sublabel: 'v' + app.version,
 	                route: '/',
 	                $icon: _.img({ src: '/svg/logo_grey.svg', class: 'logo' }),
 	                items: [{
@@ -30441,8 +30479,13 @@
 	                var view = _this4;
 	                var $input = _.div({ class: 'input raised' });
 
-	                function onChange() {
-	                    if (this.dataset.key == 'name') {
+	                function onChange(inputKey, inputValue) {
+	                    var useDirectValue = !(this && this.dataset);
+	                    inputKey = useDirectValue ? inputKey : this.dataset.key;
+
+	                    if (inputKey == 'name') {
+	                        input = view.model.inputs[key];
+
 	                        delete view.model.inputs[key];
 
 	                        key = $(this).val();
@@ -30450,18 +30493,19 @@
 	                        view.model.inputs[key] = input;
 
 	                        render();
+
 	                        var $newPreview = view.renderPreview();
 	                        view.$preview.replaceWith($newPreview);
 	                        view.$preview = $newPreview;
 	                    } else {
-	                        if (this.dataset.key == 'required') {
-	                            input.required = this.checked;
-	                        } else if (this.dataset.key == 'checkDuplicates') {
-	                            input.checkDuplicates = this.checked;
-	                        } else if (this.dataset.key == 'options') {
-	                            input.options = $(this).val().replace(/, /g, ',').split(',');
+	                        if (inputKey == 'required') {
+	                            input.required = useDirectValue ? inputValue : this.checked;
+	                        } else if (inputKey == 'checkDuplicates') {
+	                            input.checkDuplicates = useDirectValue ? inputValue : this.checked;
+	                        } else if (inputKey == 'options') {
+	                            input.options = (useDirectValue ? inputValue : $(this).val()).replace(/, /g, ',').split(',');
 	                        } else {
-	                            input[this.dataset.key] = $(this).val();
+	                            input[inputKey] = useDirectValue ? inputValue : $(this).val();
 	                        }
 
 	                        render();
@@ -30478,7 +30522,11 @@
 	                        view.onClickRemoveInput(key);
 	                    }), view.renderField('Name', _.input({ class: 'form-control', 'data-key': 'name', type: 'text', value: key, placeholder: 'Type the input name here' }).on('change', onChange)), view.renderField('Type', _.select({ class: 'form-control', 'data-key': 'type' }, _.each(types, function (i, option) {
 	                        return _.option({ value: option }, option);
-	                    })).val(input.type).on('change', onChange)), _.if(input.type == 'select', view.renderField('Select options (CSV)', _.input({ class: 'form-control', 'data-key': 'options', type: 'text', value: (input.options || []).join(','), placeholder: 'Type the select options here, separated by comma' }).on('change', onChange))), view.renderField('Required', _.div({ class: 'switch' }, _.input({ 'data-key': 'required', id: 'switch-' + key + '-required', class: 'form-control switch', type: 'checkbox', checked: input.required == true }).on('change', onChange), _.label({ for: 'switch-' + key + '-required' }))), view.renderField('Check duplicates', _.div({ class: 'switch' }, _.input({ 'data-key': 'checkDuplicates', id: 'switch-' + key + '-check-duplicates', class: 'form-control switch', type: 'checkbox', checked: input.checkDuplicates == true }).on('change', onChange), _.label({ for: 'switch-' + key + '-check-duplicates' }))), view.renderField('Pattern', _.input({ class: 'form-control', 'data-key': 'pattern', type: 'text', value: input.pattern, placeholder: 'Type a RegEx pattern here' }).on('change', onChange)));
+	                    })).val(input.type).on('change', onChange)), _.if(input.type == 'select', view.renderField('Select options (CSV)', _.input({ class: 'form-control', 'data-key': 'options', type: 'text', value: (input.options || []).join(','), placeholder: 'Type the select options here, separated by comma' }).on('change', onChange))), view.renderField('Required', UI.inputSwitch(input.required == true, function (newValue) {
+	                        onChange('required', newValue);
+	                    })), view.renderField('Check duplicates', UI.inputSwitch(input.checkDuplicates == true, function (newValue) {
+	                        onChange('checkDuplicates', newValue);
+	                    })), view.renderField('Pattern', _.input({ class: 'form-control', 'data-key': 'pattern', type: 'text', value: input.pattern || '', placeholder: 'Type a RegEx pattern here' }).on('change', onChange)));
 	                }
 
 	                render();
@@ -35094,22 +35142,7 @@
 	Router.route('/', function () {
 	    ViewHelper.get('NavbarMain').showTab('/');
 
-	    $.ajax({
-	        type: 'GET',
-	        url: '/text/welcome',
-	        success: function success(html) {
-	            $('.workspace').html(_.div({ class: 'dashboard-container readme' }, html));
-	        }
-	    });
-	});
-
-	// User
-	Router.route('/user/', function () {
-	    ViewHelper.get('NavbarMain').highlightItem('user');
-
-	    $('.workspace').html(_.div({ class: 'dashboard-container user' }, _.div({ class: 'btn btn-danger' }, 'Log out').click(function () {
-	        location = '/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment;
-	    })));
+	    _.append($('.workspace').empty(), _.div({ class: 'dashboard-container welcome' }, _.h1('Welcome to HashBrown'), _.p('If you\'re unfamiliar with HashBrown, please take a moment to look through the introduction below. It\'ll only take a minute'), _.h2('Introduction'), UI.carousel([_.div(_.img({ src: '/img/welcome/intro-content.jpg' }), _.h2('Content'), _.p('In the content section you will find all of your authored work. The content is a hierarchical tree of nodes that can contain text and media, in simple or complex structures.')), _.div(_.img({ src: '/img/welcome/intro-media.jpg' }), _.h2('Media'), _.p('An asset library for your hosted files, such as images, videos, PDFs and whatnot.')), _.div(_.img({ src: '/img/welcome/intro-forms.jpg' }), _.h2('Forms'), _.p('If you need an input form on your website, you can create the model for it here and see a list of the user submitted input.')), _.div(_.img({ src: '/img/welcome/intro-connections.jpg' }), _.h2('Connections'), _.p('A list of endpoints and resources for your content. Connections can be set up to publish your content to other servers, provide statically hosted media and serve rendering templates.')), _.div(_.img({ src: '/img/welcome/intro-schemas.jpg' }), _.h2('Schemas'), _.p('A library of content structures. Here you define how your editable content looks and behaves. You can define schemas for both content nodes and fields.')), _.div(_.img({ src: '/img/welcome/intro-users.jpg' }), _.h2('Users'), _.p('All of the users connected to this project. Here you can edit scopes and remove/add new users.')), _.div(_.img({ src: '/img/welcome/intro-settings.jpg' }), _.h2('Settings'), _.p('The environment settings, such as synchronisation setup'))], true, true, '400px')));
 	});
 
 	// Readme

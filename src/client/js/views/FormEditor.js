@@ -234,8 +234,13 @@ class FormEditor extends View {
                 let view = this;
                 let $input = _.div({class: 'input raised'});
                 
-                function onChange() {
-                    if(this.dataset.key == 'name') {
+                function onChange(inputKey, inputValue) {
+                    let useDirectValue = !(this && this.dataset);
+                    inputKey = useDirectValue ? inputKey : this.dataset.key;
+
+                    if(inputKey == 'name') {
+                        input = view.model.inputs[key];
+
                         delete view.model.inputs[key];
 
                         key = $(this).val();
@@ -243,22 +248,23 @@ class FormEditor extends View {
                         view.model.inputs[key] = input;
                         
                         render();
+
                         let $newPreview = view.renderPreview();
                         view.$preview.replaceWith($newPreview);
                         view.$preview = $newPreview;
 
                     } else {
-                        if(this.dataset.key == 'required') {
-                            input.required = this.checked;
+                        if(inputKey == 'required') {
+                            input.required = useDirectValue ? inputValue : this.checked;
 
-                        } else if(this.dataset.key == 'checkDuplicates') {
-                            input.checkDuplicates = this.checked;
+                        } else if(inputKey == 'checkDuplicates') {
+                            input.checkDuplicates = useDirectValue ? inputValue : this.checked;
 
-                        } else if(this.dataset.key == 'options') {
-                            input.options = $(this).val().replace(/, /g, ',').split(',');
+                        } else if(inputKey == 'options') {
+                            input.options = (useDirectValue ? inputValue : $(this).val()).replace(/, /g, ',').split(',');
 
                         } else {
-                            input[this.dataset.key] = $(this).val();
+                            input[inputKey] = useDirectValue ? inputValue : $(this).val();
 
                         }
 
@@ -298,23 +304,19 @@ class FormEditor extends View {
                         ),
                         view.renderField(
                             'Required',
-                            _.div({class: 'switch'},
-                                _.input({'data-key': 'required', id: 'switch-' + key + '-required', class: 'form-control switch', type: 'checkbox', checked: input.required == true})
-                                .on('change', onChange),
-                                _.label({for: 'switch-' + key + '-required'})
-                            )
+                            UI.inputSwitch(input.required == true, (newValue) => {
+                                onChange('required', newValue);
+                            })
                         ),
                         view.renderField(
                             'Check duplicates',
-                            _.div({class: 'switch'},
-                                _.input({'data-key': 'checkDuplicates', id: 'switch-' + key + '-check-duplicates', class: 'form-control switch', type: 'checkbox', checked: input.checkDuplicates == true})
-                                .on('change', onChange),
-                                _.label({for: 'switch-' + key + '-check-duplicates'})
-                            )
+                            UI.inputSwitch(input.checkDuplicates == true, (newValue) => {
+                                onChange('checkDuplicates', newValue);
+                            })
                         ),
                         view.renderField(
                             'Pattern',
-                            _.input({class: 'form-control', 'data-key': 'pattern', type: 'text', value: input.pattern, placeholder: 'Type a RegEx pattern here'})
+                            _.input({class: 'form-control', 'data-key': 'pattern', type: 'text', value: input.pattern || '', placeholder: 'Type a RegEx pattern here'})
                                 .on('change', onChange)
                         )
                     );

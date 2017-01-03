@@ -4,7 +4,7 @@
 html, body {
     height: 100%;
     font-family: 'Roboto';
-    font-size: 12px;
+    font-size: 13px;
     background-color: material-color('grey', '200');
 }
 
@@ -31,6 +31,70 @@ button, a {
         &:active {
             background-color: material-color($color, '600');
             border-color: material-color($color, '600');
+        }
+    }
+}
+
+// Carousel
+.carousel {
+    .carousel-indicators {
+        bottom: 20px;
+
+        li {
+            opacity: 0.25;
+            border: 0px;
+            background-color: material-color('blue', '200');
+            margin: 5px;
+            transition: background-color 1s ease;
+            
+            &.active {
+                background-color: material-color('blue', '900');
+                margin: 5px;
+                width: 10px;
+                height: 10px;
+            }
+        }
+    }
+
+    .carousel-control {
+        background: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        opacity: 0; 
+
+        &:hover {
+            opacity: 1;
+        }
+       
+        &.left {
+            align-items: flex-start;
+
+            .fa {
+                border-top-right-radius: 2px;
+                border-bottom-right-radius: 2px;
+            }
+        }
+        
+        &.right {
+            align-items: flex-end;
+
+            .fa {
+                border-top-left-radius: 2px;
+                border-bottom-left-radius: 2px;
+            }
+        }
+
+        .fa {
+            width: 60px;
+            background-color: material-color('blue', '600');
+            padding: 15px;
+            text-shadow: none;
+
+            &:hover {
+                background-color: material-color('blue', '800');
+            }
         }
     }
 }

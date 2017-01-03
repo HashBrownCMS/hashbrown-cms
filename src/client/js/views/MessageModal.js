@@ -66,7 +66,7 @@ class MessageModal extends View {
                     _.div({class: 'modal-footer'},
                         _.if(this.buttons,
                             _.each(this.buttons, (i, button) => {
-                                return _.button({class: 'btn ' + button.class, disabled: button.disabled},
+                                let $button = _.button({class: 'btn ' + button.class},
                                     button.label
                                 ).click(() => {
                                     if(button.callback) {
@@ -77,7 +77,13 @@ class MessageModal extends View {
                                     } else {
                                         this.hide();
                                     }
-                                })
+                                });
+
+                                if(button.disabled) {
+                                    $button.attr('disabled', true);
+                                }
+
+                                return $button;
                             })
                         ),
                         _.if(!this.buttons && this.model.onSubmit != false,
