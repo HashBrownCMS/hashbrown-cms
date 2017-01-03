@@ -198,7 +198,7 @@ class ProjectEditor extends View {
                             _.if(this.model.settings.environments.names.length > 1,
                                 _.li(
                                     _.a({href: '#', class: 'dropdown-item'}, 
-                                        'Migrate content'
+                                        'Migrate'
                                     ).click((e) => { e.preventDefault(); this.onClickMigrate(); })
                                 )
                             ),

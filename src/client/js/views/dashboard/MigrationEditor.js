@@ -8,6 +8,7 @@ class MigrationEditor extends View {
             from: '',
             to: '',
             settings: {
+                schemas: true,
                 replace: true
             }
         }
@@ -34,20 +35,19 @@ class MigrationEditor extends View {
                     ),
                     _.div({class: 'migration-settings'},
                         _.each({
-                            replace: 'Replace content on target'
-                        }, (value, label) => {
+                            replace: 'Overwrite on target',
+                            schemas: 'Migrate schemas',
+                            content: 'Migrate content',
+                            media: 'Migrate media',
+                            connections: 'Migrate connections',
+                            settings: 'Migrate settings'
+                        }, (key, label) => {
                             return _.div({class: 'input-group'},      
                                 _.span(label),
                                 _.div({class: 'input-group-addon'},
-                                    _.div({class: 'switch'},
-                                        _.input({
-                                            id: 'switch-migration-' + value,
-                                            class: 'form-control switch',
-                                            type: 'checkbox',
-                                            checked: this.data.settings[value]
-                                        }),
-                                        _.label({for: 'switch-migration-' + value})
-                                    )
+                                    UI.inputSwitch(this.data.settings[key], (newValue) => {
+                                        this.data.settings[key] = newValue;
+                                    })
                                 )
                             );
                         })
@@ -99,8 +99,6 @@ class MigrationEditor extends View {
         this.data.from = this.modal.$element.find('.environment-from').val();
         this.data.to = this.modal.$element.find('.environment-to').val();
 
-        this.data.settings.replace = this.modal.$element.find('#switch-migration-replace').is(':checked');
-        
         apiCall('post', 'server/migrate/' + this.model.id, this.data)
         .then(() => {
             UI.messageModal('Success', 'Successfully migrated content from "' + this.data.from + '" to "' + this.data.to + '"');

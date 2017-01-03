@@ -19762,7 +19762,7 @@
 	                e.preventDefault();_this7.onClickLanguages();
 	            })), _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Backups').click(function (e) {
 	                e.preventDefault();_this7.onClickBackups();
-	            })), _.if(this.model.settings.environments.names.length > 1, _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Migrate content').click(function (e) {
+	            })), _.if(this.model.settings.environments.names.length > 1, _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Migrate').click(function (e) {
 	                e.preventDefault();_this7.onClickMigrate();
 	            }))), _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Delete').click(function (e) {
 	                e.preventDefault();_this7.onClickRemove();
@@ -20090,6 +20090,7 @@
 	            from: '',
 	            to: '',
 	            settings: {
+	                schemas: true,
 	                replace: true
 	            }
 	        };
@@ -20103,14 +20104,16 @@
 	                })).change(function () {
 	                    _this.updateOptions();
 	                }), _.span({ class: 'fa fa-arrow-right' }), _.select({ class: 'form-control environment-to' })), _.div({ class: 'migration-settings' }, _.each({
-	                    replace: 'Replace content on target'
-	                }, function (value, label) {
-	                    return _.div({ class: 'input-group' }, _.span(label), _.div({ class: 'input-group-addon' }, _.div({ class: 'switch' }, _.input({
-	                        id: 'switch-migration-' + value,
-	                        class: 'form-control switch',
-	                        type: 'checkbox',
-	                        checked: _this.data.settings[value]
-	                    }), _.label({ for: 'switch-migration-' + value }))));
+	                    replace: 'Overwrite on target',
+	                    schemas: 'Migrate schemas',
+	                    content: 'Migrate content',
+	                    media: 'Migrate media',
+	                    connections: 'Migrate connections',
+	                    settings: 'Migrate settings'
+	                }, function (key, label) {
+	                    return _.div({ class: 'input-group' }, _.span(label), _.div({ class: 'input-group-addon' }, UI.inputSwitch(_this.data.settings[key], function (newValue) {
+	                        _this.data.settings[key] = newValue;
+	                    })));
 	                }))]
 	            },
 	            buttons: [{
@@ -20164,8 +20167,6 @@
 
 	            this.data.from = this.modal.$element.find('.environment-from').val();
 	            this.data.to = this.modal.$element.find('.environment-to').val();
-
-	            this.data.settings.replace = this.modal.$element.find('#switch-migration-replace').is(':checked');
 
 	            apiCall('post', 'server/migrate/' + this.model.id, this.data).then(function () {
 	                UI.messageModal('Success', 'Successfully migrated content from "' + _this3.data.from + '" to "' + _this3.data.to + '"');

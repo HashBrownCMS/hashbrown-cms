@@ -32380,7 +32380,7 @@
 	                view.model.url = $(this).val();
 	            }
 
-	            var $element = _.div({ class: 'url-editor' }, _.input({ class: 'form-control', type: 'text', value: view.model.url, placeholder: 'Input the remote API URL here, e.g. "https://myserver.com/api/"' }).on('change', onInputChange));
+	            var $element = _.div({ class: 'url-editor' }, _.input({ class: 'form-control', type: 'text', value: view.model.url || '', placeholder: 'Input the remote API URL here, e.g. "https://myserver.com/api/"' }).on('change', onInputChange));
 
 	            return $element;
 	        }
@@ -32404,7 +32404,7 @@
 	                view.model.project = $(this).val();
 	            }
 
-	            var $element = _.div({ class: 'project-name-editor' }, _.input({ class: 'form-control', type: 'text', value: view.model.project, placeholder: 'Input the remote project name here, e.g. "' + ProjectHelper.currentProject + '"' }).on('change', onInputChange));
+	            var $element = _.div({ class: 'project-name-editor' }, _.input({ class: 'form-control', type: 'text', value: view.model.project || '', placeholder: 'Input the remote project name here, e.g. "' + ProjectHelper.currentProject + '"' }).on('change', onInputChange));
 
 	            return $element;
 	        }
@@ -32428,7 +32428,7 @@
 	                view.model.environment = $(this).val();
 	            }
 
-	            var $element = _.div({ class: 'project-name-editor' }, _.input({ class: 'form-control', type: 'text', value: view.model.environment, placeholder: 'Input the remote environment name here, e.g. "' + ProjectHelper.currentEnvironment + '"' }).on('change', onInputChange));
+	            var $element = _.div({ class: 'project-name-editor' }, _.input({ class: 'form-control', type: 'text', value: view.model.environment || '', placeholder: 'Input the remote environment name here, e.g. "' + ProjectHelper.currentEnvironment + '"' }).on('change', onInputChange));
 
 	            return $element;
 	        }
@@ -32480,7 +32480,7 @@
 	            var $element = void 0;
 
 	            if (this.model.url) {
-	                $element = _.div({ class: 'token-editor input-group' }, _.input({ class: 'form-control', type: 'text', value: view.model.token, placeholder: 'Input the remote API token here' }).on('change', onInputChange), _.div({ class: 'input-group-btn' }, _.button({ class: 'btn btn-primary' }, 'Renew').on('click', onClickRenew)));
+	                $element = _.div({ class: 'token-editor input-group' }, _.input({ class: 'form-control', type: 'text', value: view.model.token || '', placeholder: 'Input the remote API token here' }).on('change', onInputChange), _.div({ class: 'input-group-btn' }, _.button({ class: 'btn btn-primary' }, 'Renew').on('click', onClickRenew)));
 	            } else {
 	                $element = _.div('Please input the API URL and save first');
 	            }

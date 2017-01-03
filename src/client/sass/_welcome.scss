@@ -18,7 +18,8 @@
                 position: relative;
                 overflow: hidden;
                 height: 100%;
-                background-color: material-color('grey', '100');
+                background-color: material-color('grey', '800');
+                color: material-color('grey', '100'); 
 
                 img {
                     position: absolute;

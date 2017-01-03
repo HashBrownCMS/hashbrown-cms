@@ -103,7 +103,8 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
     .dropdown.typeahead .dropdown-toggle .fa, .dropdown.typeahead .dropdown-toggle .caret {
       position: absolute;
       right: 10px;
-      top: 13px; }
+      top: 13px;
+      margin-left: 5px; }
   .dropdown.typeahead .dropdown-typeahead {
     position: relative;
     margin-bottom: 5px; }
@@ -136,8 +137,6 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
   font-size: 1.5rem; }
   .dropdown .dropdown-toggle:hover {
     color: #757575; }
-  .dropdown .dropdown-toggle .fa, .dropdown .dropdown-toggle .caret {
-    margin-left: 5px; }
 
 .dropdown .btn.dropdown-clear {
   color: #e53935;
@@ -959,7 +958,8 @@ img.logo {
     position: relative;
     overflow: hidden;
     height: 100%;
-    background-color: #f5f5f5; }
+    background-color: #424242;
+    color: #f5f5f5; }
     .dashboard-container.welcome .carousel .item > div img {
       position: absolute;
       height: 100%;

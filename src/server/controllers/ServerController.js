@@ -37,158 +37,160 @@ class ServerController extends ApiController {
         let from = {};
         let to = {};
 
-        debug.log('Starting migration from "' + data.from + '" to "' + data.to + '" (replace: ' + (data.settings.replace || false) + ')...', this);
+        debug.log('Starting migration from "' + data.from + '" to "' + data.to + '" (replace: ' + (data.settings.replace || false) + ')...', ServerController);
 
-        // Get resources individually
-        debug.log('Getting "' + data.from + '" connections...', this);
-        MongoHelper.find(project, data.from + '.connections', {})
-        .then((result) => {
-            from.connections = result;
+        // Gets resource if specified in settings
+        let getResource = (source, name, query) => {
+            if(!data.settings[name]) { return Promise.resolve(); }
 
-            debug.log('Getting "' + data.from + '" content...', this);
-            return MongoHelper.find(project, data.from + '.content');
-        })
-        .then((result) => {
-            from.content = result;
+            debug.log('Getting "' + data[source] + '" ' + name + '...', ServerController);
+        
+            return MongoHelper.find(project, data[source] + '.' + name, query)
+            .then((result) => {
+                if(source === 'from') { 
+                    from[name] = result;
+                } else {
+                    to[name] = result;
+                }
 
-            debug.log('Getting "' + data.from + '" forms...', this);
-            return MongoHelper.find(project, data.from + '.forms');
-        })
-        .then((result) => {
-            from.forms = result;
+                return Promise.resolve();
+            });
+        };
+            
+        // Merge "from" resource into "to" resource
+        let mergeResource = (resource) => {
+            if(!from[resource]) { return Promise.resolve(); }
+            
+            debug.log('Merging ' + resource + '...', ServerController);
 
-            debug.log('Getting "' + data.from + '" media...', this);
-            return MongoHelper.find(project, data.from + '.media');
-        })
-        .then((result) => {
-            from.media = result;
+            let next = (num) => {
+                if(!from[resource][num]) { return Promise.resolve(); }
 
-            debug.log('Getting "' + data.from + '" schemas...', this);
-            return MongoHelper.find(project, data.from + '.schemas');
-        })
-        .then((result) => {
-            from.schemas = result;
+                let item = from[resource][num];
 
-            debug.log('Getting "' + data.to + '" connections...', this);
-            return MongoHelper.find(project, data.to + '.connections', {})
-        })
-        .then((result) => {
-            to.connections = result;
-
-            debug.log('Getting "' + data.to + '" content...', this);
-            return MongoHelper.find(project, data.to + '.content', {})
-        })
-        .then((result) => {
-            to.content = result;
-
-            debug.log('Getting "' + data.to + '" forms...', this);
-            return MongoHelper.find(project, data.to + '.forms');
-        })
-        .then((result) => {
-            to.forms = result;
-
-            debug.log('Getting "' + data.to + '" media...', this);
-            return MongoHelper.find(project, data.to + '.media');
-        })
-        .then((result) => {
-            to.media = result;
-
-            debug.log('Getting "' + data.to + '" schemas...', this);
-            return MongoHelper.find(project, data.to + '.schemas');
-        })
-        .then((result) => {
-            to.schemas = result;
-
-            // Merge "from" resource into "to" resource
-            function merge(resource) {
-                return new Promise((resolve, reject) => {
-                    debug.log('Merging ' + resource + '...', this);
-
-                    function next(num) {
-                        let item = from[resource][num];
-
-                        if(item) {
-                            let mongoPromise;
+                let mongoPromise;
+                
+                // Overwrite
+                if(data.settings.replace) {
+                    debug.log('Updating "' + (item.id || item.section || item) + '" into ' + resource + '...', ServerController);
+                
+                    mongoPromise = MongoHelper.updateOne(
+                        project,
+                        data.to + '.' + resource,
+                        { id: item.id },
+                        item,
+                        { upsert: true }
+                    );
+                
+                // Don't overwrite, keep target resource
+                } else {
+                    mongoPromise = MongoHelper.count(
+                        project,
+                        data.to + '.' + resource,
+                        { id: item.id }
+                    ).then((amount) => {
+                        // No matching documents were found, insert resource
+                        if(amount < 1) {
+                            debug.log('Inserting "' + item.id + '" into ' + resource + '...', this);
                             
-                            // Overwrite
-                            if(data.settings.replace) {
-                                debug.log('Updating "' + item.id + '" into ' + resource + '...', this);
-                            
-                                mongoPromise = MongoHelper.updateOne(
-                                    project,
-                                    data.to + '.' + resource,
-                                    { id: item.id },
-                                    item,
-                                    { upsert: true }
-                                );
-                            
-                            // Don't overwrite, keep target resource
-                            } else {
-                                mongoPromise = MongoHelper.count(
-                                    project,
-                                    data.to + '.' + resource,
-                                    { id: item.id }
-                                ).then((amount) => {
-                                    // No matching documents were found, insert resource
-                                    if(amount < 1) {
-                                        debug.log('Inserting "' + item.id + '" into ' + resource + '...', this);
-                                        
-                                        return MongoHelper.insertOne(
-                                            project,
-                                            data.to + '.' + resource,
-                                            item
-                                        );
-                                    
-                                    // The document already exists
-                                    } else {
-                                        debug.log('"' + item.id + '" already exists in ' + resource + ', skipping...', this);
-                                        
-                                        return new Promise((resolve) => {
-                                            resolve();
-                                        });
-
-                                    }
-                                });
-                                    
-                            }
-                    
-                            mongoPromise        
-                            .then(() => {
-                                if(num < from[resource].length - 1) {
-                                    next(num + 1);
-                                } else {
-                                    resolve();
-                                }
-                            })
-                            .catch(reject);
+                            return MongoHelper.insertOne(
+                                project,
+                                data.to + '.' + resource,
+                                item
+                            );
                         
+                        // The document already exists
                         } else {
-                            resolve();
+                            debug.log('"' + item.id + '" already exists in ' + resource + ', skipping...', this);
+                            
+                            return new Promise((resolve) => {
+                                resolve();
+                            });
 
                         }
-                    } 
-
-                    next(0);
+                    });
+                        
+                }
+        
+                return mongoPromise        
+                .then(() => {
+                    if(num < from[resource].length - 1) {
+                        return next(num + 1);
+                    } else {
+                        return Promise.resolve();
+                    }
                 });
-            }
+            }; 
 
-            return merge('connections')
-            .then(() => {
-                return merge('content')
-            })
-            .then(() => {
-                return merge('forms');
-            })
-            .then(() => {
-                return merge('media');
-            })
-            .then(() => {
-                return merge('schemas');
-            });
+            return next(0);
+        };
+
+        // From
+        return getResource('from', 'connections', {})
+        .then(() => {
+            return getResource('from', 'content');
         })
         .then(() => {
+            return getResource('from', 'forms');
+        })
+        .then(() => {
+            return getResource('from', 'media');
+        })
+        .then(() => {
+            return getResource('from', 'schemas');
+        })
+        .then(() => {
+            return getResource('from', 'settings');
+        })
+
+        // To
+        .then(() => {
+            return getResource('to', 'connections');
+        })
+        .then(() => {
+            return getResource('to', 'content');
+        })
+        .then(() => {
+            return getResource('to', 'forms');
+        })
+        .then(() => {
+            return getResource('to', 'media');
+        })
+        .then(() => {
+            return getResource('to', 'schemas');
+        })
+        .then(() => {
+            return getResource('to', 'settings');
+        })
+
+        // Merge "from" and "to"
+        .then(() => {
+            return mergeResource('connections');
+        })
+        .then(() => {
+            return mergeResource('content');
+        })
+        .then(() => {
+            return mergeResource('forms');
+        })
+        .then(() => {
+            return mergeResource('media');
+        })
+        .then(() => {
+            return mergeResource('schemas');
+        })
+        .then(() => {
+            return mergeResource('settings');
+        })
+
+        // Success
+        .then(() => {
+            debug.log('Successfully migrated "' + data.from + '" to "' + data.to + '"', ServerController);
+
             res.status(200).send('OK');
         })
+
+        // Fail
         .catch((e) => {
             res.status(502).send(ServerController.printError(e));  
         });

@@ -69,7 +69,7 @@ class SyncSettings extends View {
         }
 
         let $element = _.div({class: 'url-editor'},
-            _.input({class: 'form-control', type: 'text', value: view.model.url, placeholder: 'Input the remote API URL here, e.g. "https://myserver.com/api/"'})
+            _.input({class: 'form-control', type: 'text', value: view.model.url || '', placeholder: 'Input the remote API URL here, e.g. "https://myserver.com/api/"'})
                 .on('change', onInputChange)
         );
 
@@ -93,7 +93,7 @@ class SyncSettings extends View {
         }
 
         let $element = _.div({class: 'project-name-editor'},
-            _.input({class: 'form-control', type: 'text', value: view.model.project, placeholder: 'Input the remote project name here, e.g. "' + ProjectHelper.currentProject + '"'})
+            _.input({class: 'form-control', type: 'text', value: view.model.project || '', placeholder: 'Input the remote project name here, e.g. "' + ProjectHelper.currentProject + '"'})
                 .on('change', onInputChange)
         );
 
@@ -117,7 +117,7 @@ class SyncSettings extends View {
         }
 
         let $element = _.div({class: 'project-name-editor'},
-            _.input({class: 'form-control', type: 'text', value: view.model.environment, placeholder: 'Input the remote environment name here, e.g. "' + ProjectHelper.currentEnvironment + '"'})
+            _.input({class: 'form-control', type: 'text', value: view.model.environment || '', placeholder: 'Input the remote environment name here, e.g. "' + ProjectHelper.currentEnvironment + '"'})
                 .on('change', onInputChange)
         );
 
@@ -181,7 +181,7 @@ class SyncSettings extends View {
        
         if(this.model.url) {
             $element = _.div({class: 'token-editor input-group'},
-                _.input({class: 'form-control', type: 'text', value: view.model.token, placeholder: 'Input the remote API token here'})
+                _.input({class: 'form-control', type: 'text', value: view.model.token || '', placeholder: 'Input the remote API token here'})
                     .on('change', onInputChange),
                 _.div({class: 'input-group-btn'},
                     _.button({class: 'btn btn-primary'}, 'Renew')

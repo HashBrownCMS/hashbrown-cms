@@ -165,6 +165,7 @@ button, a {
                 position: absolute;
                 right: 10px;
                 top: 13px;
+                margin-left: 5px;
             }
         }
 
@@ -213,10 +214,6 @@ button, a {
 
         &:hover {
             color: material-color('grey', '600');
-        }
-
-        .fa, .caret {
-            margin-left: 5px;
         }
     }
 
