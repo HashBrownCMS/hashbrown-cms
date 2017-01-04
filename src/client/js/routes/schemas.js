@@ -22,7 +22,7 @@ Router.route('/schemas/', function() {
 Router.route('/schemas/:id', function() {
     if(currentUserHasScope('schemas')) {
         let schemaEditor = new SchemaEditor({
-            model: resources.schemas[this.id]
+            modelUrl: apiUrl('schemas/' + this.id)
         });
         
         ViewHelper.get('NavbarMain').highlightItem(this.id);

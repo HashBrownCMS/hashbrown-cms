@@ -42,7 +42,7 @@ Router.route('/', function() {
             ),
             _.div(
                 _.h2('Connections'),
-                _.p('A list of endpoints and resources for your content. Connections can be set up to publish your content to other servers, provide statically hosted media and serve rendering templates.')
+                _.p('A list of endpoints and resources for your content. Connections can be set up to publish your content to remote servers, provide statically hosted media and serve rendering templates.')
             )
         ]);
     }
@@ -54,7 +54,7 @@ Router.route('/', function() {
             ),
             _.div(
                 _.h2('Schemas'),
-                _.p('A library of content structures. Here you define how your editable content looks and behaves. You can define schemas for both content nodes and fields.')
+                _.p('A library of content structures. Here you define how your editable content looks and behaves. You can define schemas for both content nodes and property fields.')
             )
         ]);
     }
@@ -66,7 +66,7 @@ Router.route('/', function() {
             ),
             _.div(
                 _.h2('Users'),
-                _.p('All of the users connected to this project. Here you can edit scopes and remove/add new users.')
+                _.p('All of the users connected to this project. Here you can edit permissions and personal information and remove/add new users.')
             )
         ]);
     }
@@ -78,7 +78,7 @@ Router.route('/', function() {
             ),
             _.div(
                 _.h2('Settings'),
-                _.p('The environment settings, such as synchronisation setup')
+                _.p('Here you can set up synchronisation with other HashBrown instances.')
             )
         ]);
     }

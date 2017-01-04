@@ -105,13 +105,14 @@ class SchemaEditor extends View {
      * @return {Object} element
      */
     renderEditorPicker() {
-        let view = this;
+        let editorOptions = [];
 
-        function onChange() {
-            view.model.editorId = $(this).val();
+        for(let editorId in resources.editors) {
+            editorOptions[editorOptions.length] = {
+                value: editorId,
+                label: resources.editors[editorId].name
+            };
         }
-
-        let $select;
 
         let editorName = '(none)';
         
@@ -121,11 +122,9 @@ class SchemaEditor extends View {
 
         let $element = _.div({class: 'editor-picker'},
             _.if(!this.model.locked,
-                $select = _.select({class: 'form-control'},
-                    _.each(resources.editors, function(id, view) {
-                        return _.option({value: id}, view.name);
-                    })
-                ).change(onChange)
+                UI.inputDropdownTypeAhead(this.model.editorId, editorOptions, (newValue) => {
+                    this.model.editorId = newValue;
+                })
             ),
             _.if(this.model.locked,
                 _.p({class: 'read-only'},
@@ -133,10 +132,6 @@ class SchemaEditor extends View {
                 )
             )
         );
-
-        if(!this.model.locked && this.model.editorId) {
-            $select.val(view.model.editorId);
-        }
 
         return $element;
     }
@@ -385,47 +380,56 @@ class SchemaEditor extends View {
      * @return {Object} element
      */
     renderParentEditor() {
-        let view = this;
+        let schemaOptions = [];
 
-        function onChange() {
-            view.model.parentSchemaId = $element.find('select').val();
-        }
+        // Filter out irrelevant schemas, self and children of self
+        let excludedParents = {};
+        excludedParents[this.model.id] = true;
 
-        function onClear() {
-            view.model.parentSchemaId = null;
-           
-            $element.find('select').val(null);
-        }
-
-        let schemas = {};
-
-        // TODO: Filter out irrelevant schemas and self
         for(let id in resources.schemas) {
-            if(resources.schemas[id].type == view.model.type) {
-                schemas[id] = resources.schemas[id];
+            let schema = resources.schemas[id];
+
+            // Check if this Schema has a parent in the excluded list
+            // If so, add this id to the excluded list
+            // This is to prevent making a Schema a child of its own children
+            if(excludedParents[schema.parentSchemaId] == true) {
+                excludedParents[schema.id] = true;
+                continue;
             }
+
+            // If this Schema is not of the same type as the model, or has the same id, exclude it
+            if(
+                schema.type != this.model.type ||
+                schema.id == this.model.id
+            ) {
+                continue;
+            }
+
+            schemaOptions[schemaOptions.length] = {
+                label: schema.name,
+                value: id
+            };
         }
 
+        // Assign fallback schema name
         let parentName = '(none)';
 
-        if(schemas[this.model.parentSchemaId]) {
-            parentName = schemas[this.model.parentSchemaId].name;
+        if(schemaOptions[this.model.parentSchemaId]) {
+            parentName = schemaOptions[this.model.parentSchemaId].name;
         }
 
+        // Render element
         let $element = _.div({class: 'parent-editor input-group'},
             _.if(!this.model.locked,
-                _.select({class: 'form-control'}, 
-                    _.each(schemas, function(id, schema) {
-                        return _.option({value: id}, schema.name);
-                    })
-                ).val(this.model.parentSchemaId).change(onChange),
-                _.if(!this.model.locked,
-                    _.div({class: 'input-group-btn'},
-                        _.button({class: 'btn btn-primary'},
-                            'Clear'
-                        ).click(onClear)
-                    )
-                )
+                UI.inputDropdownTypeAhead(this.model.parentSchemaId, schemaOptions, (newValue) => {
+                    if(!newValue) {
+                        newValue = this.model.type == 'field' ? 'fieldBase' : 'contentBase'; 
+                    }
+
+                    this.model.parentSchemaId = newValue;
+
+                    return newValue;
+                }, true)
             ),
             _.if(this.model.locked,
                 _.p({class: 'read-only'},
@@ -443,31 +447,26 @@ class SchemaEditor extends View {
      * @return {Object} element
      */
     renderDefaultTabEditor() {
-        let view = this;
+        let tabOptions = [
+            { value: 'meta', label: 'Meta' }
+        ];
         
-        function onChange() {
-            view.model.defaultTabId = $element.find('select').val();
-        }
+        // Sanity check
+        this.model.defaultTabId = this.model.defaultTabId || 'meta';
 
-        let tabs = {
-            meta: 'Meta'
-        };
-        
-        for(let k in view.compiledSchema.tabs) {
-            tabs[k] = view.compiledSchema.tabs[k];
+        for(let k in this.compiledSchema.tabs) {
+            tabOptions[tabOptions.length] = { value: k, label: this.compiledSchema.tabs[k] };
         }
 
         let $element = _.div({class: 'default-tab-editor'},
             _.if(!this.model.locked,
-                _.select({class: 'form-control'}, 
-                    _.each(tabs, function(id, label) {
-                        return _.option({value: id}, label);
-                    })
-                ).val(this.model.defaultTabId).change(onChange)
+                UI.inputDropdownTypeAhead(this.model.defaultTabId, tabOptions, (newValue) => {
+                    this.model.defaultTabId = newValue;
+                })
             ),
             _.if(this.model.locked,
                 _.p({class: 'read-only'},
-                    tabs[this.model.defaultTabId]
+                    this.compiledSchema.tabs[this.model.defaultTabId] || '(none)'
                 )
             )
         );
@@ -686,7 +685,7 @@ class SchemaEditor extends View {
                 $element.append(this.renderField('Field editor', this.renderEditorPicker()));
                 
                 if(!this.model.locked) {
-                    $element.append(this.renderField('Config', this.renderFieldPropertiesEditor()));
+                    $element.append(this.renderField('Config', this.renderFieldPropertiesEditor(), true));
                 }
                     
                 break;

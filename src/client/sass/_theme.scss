@@ -143,7 +143,7 @@ button, a {
         }
 
         .dropdown-toggle {
-            font-size: 1em;
+            font-size: 14px;
             text-transform: none;
             font-weight: normal;
             text-align: left;
@@ -181,6 +181,7 @@ button, a {
                 right: 0px;
                 top: 8px;
                 padding: 0px;
+                z-index: 20;
             }
         }
 
@@ -193,6 +194,7 @@ button, a {
             ul {
                 max-height: 200px;
                 overflow-y: auto;
+                width: 100%;
                 
                 li {
                     button {
@@ -207,6 +209,7 @@ button, a {
     }
 
     .dropdown-toggle {
+        letter-spacing: normal;
         color: material-color('grey', '400');
         border: 0px;
         background-color: transparent;
@@ -396,6 +399,8 @@ button, a {
             color: #fff;
 
             &.dropdown {
+                margin-right: 0px;
+
                 &.open {
                     .dropdown-toggle {
                         &:before {
@@ -405,12 +410,19 @@ button, a {
                 }
 
                 .dropdown-toggle {
+                    letter-spacing: normal;
                     background: none;
                     border: 0px;
                     padding: 0px;
                     margin: 0px;
                     font-size: 14px;
                     color: #fff;
+
+                    &:after {
+                        content: '\f0d7';
+                        font-family: 'FontAwesome';
+                        margin-left: 5px;
+                    }
 
                     .fa {
                         margin-left: 0.5em;
@@ -420,20 +432,26 @@ button, a {
         }
 
         .chip-remove {
-            margin: 0px 0px 0px 4px;
+            margin: 0px 2px 0px 4px;
             background-color: transparent;
             padding: 0px !important;
-            height: 32px;
-            width: 24px;
+            height: 16px;
+            line-height: 16px;
+            width: 16px;
             position: relative;
             top: -2px;
+            border-radius: 50%;
+
+            &:hover {
+                background-color: #fff;
+
+                .fa {
+                    color: material-color('blue', '600');
+                }
+            }
 
            .fa {
                 color: #fff;
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
            } 
         }
     }

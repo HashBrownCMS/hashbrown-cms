@@ -92,6 +92,7 @@ class SchemaPane extends Pane {
      */
     static onClickPullSchema() {
         let navbar = ViewHelper.get('NavbarMain');
+        let schemaEditor = ViewHelper.get('SchemaEditor');
         let pullId = $('.context-menu-target-element').data('id');
 
         apiCall('post', 'schemas/pull/' + pullId, {})
@@ -100,6 +101,11 @@ class SchemaPane extends Pane {
         })
         .then(() => {
             navbar.reload();
+            
+            if(schemaEditor && schemaEditor.model.id == pullId) {
+                schemaEditor.model = null;
+                schemaEditor.fetch();
+            }
         }) 
         .catch(errorModal);
     }

@@ -10837,7 +10837,7 @@
 	        /**
 	         * Renders a dropdown
 	         *
-	         * @param {String} label
+	         * @param {String|Number} defaultValue
 	         * @param {Array|Number} options
 	         * @param {Function} onChange
 	         * @param {Boolean} useClearButton
@@ -10847,7 +10847,7 @@
 
 	    }, {
 	        key: 'inputDropdown',
-	        value: function inputDropdown(label, options, onChange, useClearButton) {
+	        value: function inputDropdown(defaultValue, options, onChange, useClearButton) {
 	            var $toggle = void 0;
 	            var $clear = void 0;
 
@@ -10875,22 +10875,61 @@
 	                onChange($li.attr('data-value'));
 	            };
 
-	            // Clear event
-	            var onClear = function onClear() {
-	                $toggle.html(label);
+	            // Highlight selected value
+	            var highlightSelectedValue = function highlightSelectedValue() {
 	                $element.find('ul li').removeClass('active');
+	                $toggle.html('(none)');
 
-	                onChange(null);
+	                if (!defaultValue) {
+	                    return;
+	                }
+
+	                var _iteratorNormalCompletion = true;
+	                var _didIteratorError = false;
+	                var _iteratorError = undefined;
+
+	                try {
+	                    for (var _iterator = options[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	                        var option = _step.value;
+
+	                        if (option.value == defaultValue) {
+	                            $toggle.html(option.label);
+	                            $element.find('ul li[data-value="' + option.value + '"]').addClass('active');
+	                            break;
+	                        }
+	                    }
+	                } catch (err) {
+	                    _didIteratorError = true;
+	                    _iteratorError = err;
+	                } finally {
+	                    try {
+	                        if (!_iteratorNormalCompletion && _iterator.return) {
+	                            _iterator.return();
+	                        }
+	                    } finally {
+	                        if (_didIteratorError) {
+	                            throw _iteratorError;
+	                        }
+	                    }
+	                }
 	            };
 
-	            var $element = _.div({ class: 'dropdown' }, $toggle = _.button({ class: 'btn btn-primary dropdown-toggle', type: 'button', 'data-toggle': 'dropdown' }, label), _.if(useClearButton, $clear = _.button({ class: 'btn btn-embedded dropdown-clear' }, _.span({ class: 'fa fa-remove' })).on('click', onClear)), _.div({ class: 'dropdown-menu' }, _.ul({ class: 'dropdown-menu-items' }, _.each(options, function (i, option) {
-	                var optionLabel = option.label || option.id || option.name || option.toString();
+	            // Clear event
+	            var onClear = function onClear() {
+	                defaultValue = onChange(null);
 
-	                if (option.selected) {
+	                highlightSelectedValue();
+	            };
+
+	            var $element = _.div({ class: 'dropdown' }, $toggle = _.button({ class: 'btn btn-primary dropdown-toggle', type: 'button', 'data-toggle': 'dropdown' }, '(none)'), _.if(useClearButton, $clear = _.button({ class: 'btn btn-embedded dropdown-clear' }, _.span({ class: 'fa fa-remove' })).on('click', onClear)), _.div({ class: 'dropdown-menu' }, _.ul({ class: 'dropdown-menu-items' }, _.each(options, function (i, option) {
+	                var optionLabel = option.label || option.id || option.name || option.toString();
+	                var isSelected = option.selected || option.value == defaultValue;
+
+	                if (isSelected) {
 	                    $toggle.html(optionLabel);
 	                }
 
-	                var $li = _.li({ 'data-value': option.value || optionLabel, class: option.selected ? 'active' : '' }, _.button(optionLabel).on('click', onClick));
+	                var $li = _.li({ 'data-value': option.value || optionLabel, class: isSelected ? 'active' : '' }, _.button(optionLabel).on('click', onClick));
 
 	                return $li;
 	            }))));
@@ -22167,12 +22206,18 @@
 	        key: 'onClickPullSchema',
 	        value: function onClickPullSchema() {
 	            var navbar = ViewHelper.get('NavbarMain');
+	            var schemaEditor = ViewHelper.get('SchemaEditor');
 	            var pullId = $('.context-menu-target-element').data('id');
 
 	            apiCall('post', 'schemas/pull/' + pullId, {}).then(function () {
 	                return reloadResource('schemas');
 	            }).then(function () {
 	                navbar.reload();
+
+	                if (schemaEditor && schemaEditor.model.id == pullId) {
+	                    schemaEditor.model = null;
+	                    schemaEditor.fetch();
+	                }
 	            }).catch(errorModal);
 	        }
 
@@ -31078,13 +31123,16 @@
 	    }, {
 	        key: 'renderEditorPicker',
 	        value: function renderEditorPicker() {
-	            var view = this;
+	            var _this3 = this;
 
-	            function onChange() {
-	                view.model.editorId = $(this).val();
+	            var editorOptions = [];
+
+	            for (var editorId in resources.editors) {
+	                editorOptions[editorOptions.length] = {
+	                    value: editorId,
+	                    label: resources.editors[editorId].name
+	                };
 	            }
-
-	            var $select = void 0;
 
 	            var editorName = '(none)';
 
@@ -31092,13 +31140,9 @@
 	                editorName = resources.editors[this.model.editorId].name;
 	            }
 
-	            var $element = _.div({ class: 'editor-picker' }, _.if(!this.model.locked, $select = _.select({ class: 'form-control' }, _.each(resources.editors, function (id, view) {
-	                return _.option({ value: id }, view.name);
-	            })).change(onChange)), _.if(this.model.locked, _.p({ class: 'read-only' }, editorName)));
-
-	            if (!this.model.locked && this.model.editorId) {
-	                $select.val(view.model.editorId);
-	            }
+	            var $element = _.div({ class: 'editor-picker' }, _.if(!this.model.locked, UI.inputDropdownTypeAhead(this.model.editorId, editorOptions, function (newValue) {
+	                _this3.model.editorId = newValue;
+	            })), _.if(this.model.locked, _.p({ class: 'read-only' }, editorName)));
 
 	            return $element;
 	        }
@@ -31305,36 +31349,53 @@
 	    }, {
 	        key: 'renderParentEditor',
 	        value: function renderParentEditor() {
-	            var view = this;
+	            var _this4 = this;
 
-	            function onChange() {
-	                view.model.parentSchemaId = $element.find('select').val();
-	            }
+	            var schemaOptions = [];
 
-	            function onClear() {
-	                view.model.parentSchemaId = null;
+	            // Filter out irrelevant schemas, self and children of self
+	            var excludedParents = {};
+	            excludedParents[this.model.id] = true;
 
-	                $element.find('select').val(null);
-	            }
-
-	            var schemas = {};
-
-	            // TODO: Filter out irrelevant schemas and self
 	            for (var id in resources.schemas) {
-	                if (resources.schemas[id].type == view.model.type) {
-	                    schemas[id] = resources.schemas[id];
+	                var schema = resources.schemas[id];
+
+	                // Check if this Schema has a parent in the excluded list
+	                // If so, add this id to the excluded list
+	                // This is to prevent making a Schema a child of its own children
+	                if (excludedParents[schema.parentSchemaId] == true) {
+	                    excludedParents[schema.id] = true;
+	                    continue;
 	                }
+
+	                // If this Schema is not of the same type as the model, or has the same id, exclude it
+	                if (schema.type != this.model.type || schema.id == this.model.id) {
+	                    continue;
+	                }
+
+	                schemaOptions[schemaOptions.length] = {
+	                    label: schema.name,
+	                    value: id
+	                };
 	            }
 
+	            // Assign fallback schema name
 	            var parentName = '(none)';
 
-	            if (schemas[this.model.parentSchemaId]) {
-	                parentName = schemas[this.model.parentSchemaId].name;
+	            if (schemaOptions[this.model.parentSchemaId]) {
+	                parentName = schemaOptions[this.model.parentSchemaId].name;
 	            }
 
-	            var $element = _.div({ class: 'parent-editor input-group' }, _.if(!this.model.locked, _.select({ class: 'form-control' }, _.each(schemas, function (id, schema) {
-	                return _.option({ value: id }, schema.name);
-	            })).val(this.model.parentSchemaId).change(onChange), _.if(!this.model.locked, _.div({ class: 'input-group-btn' }, _.button({ class: 'btn btn-primary' }, 'Clear').click(onClear)))), _.if(this.model.locked, _.p({ class: 'read-only' }, parentName)));
+	            // Render element
+	            var $element = _.div({ class: 'parent-editor input-group' }, _.if(!this.model.locked, UI.inputDropdownTypeAhead(this.model.parentSchemaId, schemaOptions, function (newValue) {
+	                if (!newValue) {
+	                    newValue = _this4.model.type == 'field' ? 'fieldBase' : 'contentBase';
+	                }
+
+	                _this4.model.parentSchemaId = newValue;
+
+	                return newValue;
+	            }, true)), _.if(this.model.locked, _.p({ class: 'read-only' }, parentName)));
 
 	            return $element;
 	        }
@@ -31348,23 +31409,20 @@
 	    }, {
 	        key: 'renderDefaultTabEditor',
 	        value: function renderDefaultTabEditor() {
-	            var view = this;
+	            var _this5 = this;
 
-	            function onChange() {
-	                view.model.defaultTabId = $element.find('select').val();
+	            var tabOptions = [{ value: 'meta', label: 'Meta' }];
+
+	            // Sanity check
+	            this.model.defaultTabId = this.model.defaultTabId || 'meta';
+
+	            for (var k in this.compiledSchema.tabs) {
+	                tabOptions[tabOptions.length] = { value: k, label: this.compiledSchema.tabs[k] };
 	            }
 
-	            var tabs = {
-	                meta: 'Meta'
-	            };
-
-	            for (var k in view.compiledSchema.tabs) {
-	                tabs[k] = view.compiledSchema.tabs[k];
-	            }
-
-	            var $element = _.div({ class: 'default-tab-editor' }, _.if(!this.model.locked, _.select({ class: 'form-control' }, _.each(tabs, function (id, label) {
-	                return _.option({ value: id }, label);
-	            })).val(this.model.defaultTabId).change(onChange)), _.if(this.model.locked, _.p({ class: 'read-only' }, tabs[this.model.defaultTabId])));
+	            var $element = _.div({ class: 'default-tab-editor' }, _.if(!this.model.locked, UI.inputDropdownTypeAhead(this.model.defaultTabId, tabOptions, function (newValue) {
+	                _this5.model.defaultTabId = newValue;
+	            })), _.if(this.model.locked, _.p({ class: 'read-only' }, this.compiledSchema.tabs[this.model.defaultTabId] || '(none)')));
 
 	            return $element;
 	        }
@@ -31460,7 +31518,7 @@
 	    }, {
 	        key: 'renderFieldPropertiesEditor',
 	        value: function renderFieldPropertiesEditor() {
-	            var _this3 = this;
+	            var _this6 = this;
 
 	            if (this.model.type == 'content') {
 	                if (!this.model.fields) {
@@ -31477,7 +31535,7 @@
 	                });
 
 	                this.jsonEditor.on('change', function (newValue) {
-	                    _this3.model.fields.properties = newValue;
+	                    _this6.model.fields.properties = newValue;
 	                });
 	            } else if (this.model.type == 'field') {
 	                if (!this.model.config) {
@@ -31490,7 +31548,7 @@
 	                });
 
 	                this.jsonEditor.on('change', function (newValue) {
-	                    _this3.model.config = newValue;
+	                    _this6.model.config = newValue;
 	                });
 	            }
 
@@ -31550,7 +31608,7 @@
 	                    $element.append(this.renderField('Field editor', this.renderEditorPicker()));
 
 	                    if (!this.model.locked) {
-	                        $element.append(this.renderField('Config', this.renderFieldPropertiesEditor()));
+	                        $element.append(this.renderField('Config', this.renderFieldPropertiesEditor(), true));
 	                    }
 
 	                    break;
@@ -31561,19 +31619,19 @@
 	    }, {
 	        key: 'render',
 	        value: function render() {
-	            var _this4 = this;
+	            var _this7 = this;
 
 	            this.$element.toggleClass('locked', this.model.locked);
 
 	            SchemaHelper.getSchemaWithParentFields(this.model.id).then(function (compiledSchema) {
-	                _this4.compiledSchema = compiledSchema;
+	                _this7.compiledSchema = compiledSchema;
 
-	                _.append(_this4.$element.empty(), _.div({ class: 'editor-header' }, _.span({ class: 'fa fa-' + _this4.compiledSchema.icon }), _.h4(_this4.model.name)), _this4.renderFields(), _.div({ class: 'editor-footer panel panel-default panel-buttons' }, _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-embedded' }, 'Advanced').click(function () {
-	                    _this4.onClickAdvanced();
-	                }), _.if(!_this4.model.locked, _this4.$saveBtn = _.button({ class: 'btn btn-primary btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Save '), _.span({ class: 'text-working' }, 'Saving ')).click(function () {
-	                    _this4.onClickSave();
+	                _.append(_this7.$element.empty(), _.div({ class: 'editor-header' }, _.span({ class: 'fa fa-' + _this7.compiledSchema.icon }), _.h4(_this7.model.name)), _this7.renderFields(), _.div({ class: 'editor-footer panel panel-default panel-buttons' }, _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-embedded' }, 'Advanced').click(function () {
+	                    _this7.onClickAdvanced();
+	                }), _.if(!_this7.model.locked, _this7.$saveBtn = _.button({ class: 'btn btn-primary btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Save '), _.span({ class: 'text-working' }, 'Saving ')).click(function () {
+	                    _this7.onClickSave();
 	                }), _.button({ class: 'btn btn-embedded btn-embedded-danger' }, _.span({ class: 'fa fa-trash' })).click(function () {
-	                    _this4.onClickDelete();
+	                    _this7.onClickDelete();
 	                })))));
 	            });
 	        }
@@ -35270,19 +35328,19 @@
 	    var carouselItems = [[_.div(_.img({ src: '/img/welcome/intro-content.jpg' })), _.div(_.h2('Content'), _.p('In the content section you will find all of your authored work. The content is a hierarchical tree of nodes that can contain text and media, in simple or complex structures.'))], [_.div(_.img({ src: '/img/welcome/intro-media.jpg' })), _.div(_.h2('Media'), _.p('An asset library for your hosted files, such as images, videos, PDFs and whatnot.'))], [_.div(_.img({ src: '/img/welcome/intro-forms.jpg' })), _.div(_.h2('Forms'), _.p('If you need an input form on your website, you can create the model for it here and see a list of the user submitted input.'))]];
 
 	    if (User.current.hasScope(ProjectHelper.currentProject, 'connections')) {
-	        carouselItems.push([_.div(_.img({ src: '/img/welcome/intro-connections.jpg' })), _.div(_.h2('Connections'), _.p('A list of endpoints and resources for your content. Connections can be set up to publish your content to other servers, provide statically hosted media and serve rendering templates.'))]);
+	        carouselItems.push([_.div(_.img({ src: '/img/welcome/intro-connections.jpg' })), _.div(_.h2('Connections'), _.p('A list of endpoints and resources for your content. Connections can be set up to publish your content to remote servers, provide statically hosted media and serve rendering templates.'))]);
 	    }
 
 	    if (User.current.hasScope(ProjectHelper.currentProject, 'schemas')) {
-	        carouselItems.push([_.div(_.img({ src: '/img/welcome/intro-schemas.jpg' })), _.div(_.h2('Schemas'), _.p('A library of content structures. Here you define how your editable content looks and behaves. You can define schemas for both content nodes and fields.'))]);
+	        carouselItems.push([_.div(_.img({ src: '/img/welcome/intro-schemas.jpg' })), _.div(_.h2('Schemas'), _.p('A library of content structures. Here you define how your editable content looks and behaves. You can define schemas for both content nodes and property fields.'))]);
 	    }
 
 	    if (User.current.hasScope(ProjectHelper.currentProject, 'users')) {
-	        carouselItems.push([_.div(_.img({ src: '/img/welcome/intro-users.jpg' })), _.div(_.h2('Users'), _.p('All of the users connected to this project. Here you can edit scopes and remove/add new users.'))]);
+	        carouselItems.push([_.div(_.img({ src: '/img/welcome/intro-users.jpg' })), _.div(_.h2('Users'), _.p('All of the users connected to this project. Here you can edit permissions and personal information and remove/add new users.'))]);
 	    }
 
 	    if (User.current.hasScope(ProjectHelper.currentProject, 'settings')) {
-	        carouselItems.push([_.div(_.img({ src: '/img/welcome/intro-settings.jpg' })), _.div(_.h2('Settings'), _.p('The environment settings, such as synchronisation setup'))]);
+	        carouselItems.push([_.div(_.img({ src: '/img/welcome/intro-settings.jpg' })), _.div(_.h2('Settings'), _.p('Here you can set up synchronisation with other HashBrown instances.'))]);
 	    }
 
 	    _.append($('.workspace').empty(), _.div({ class: 'dashboard-container welcome centered' }, _.h1('Welcome to HashBrown'), _.p('If you\'re unfamiliar with HashBrown, please take a moment to look through the introduction below.'), _.p('It\'ll only take a minute.'), _.h2('Introduction'), UI.carousel(carouselItems, true, true, '400px'), _.h2('Guides'), _.p('If you\'d like a more in-depth walkthrough of the features, please check out the guides.'), _.a({ class: 'btn btn-primary', href: 'http://hashbrown.rocks/guides', target: '_blank' }, 'Guides')));
@@ -35475,7 +35533,7 @@
 	Router.route('/schemas/:id', function () {
 	    if (currentUserHasScope('schemas')) {
 	        var schemaEditor = new SchemaEditor({
-	            model: resources.schemas[this.id]
+	            modelUrl: apiUrl('schemas/' + this.id)
 	        });
 
 	        ViewHelper.get('NavbarMain').highlightItem(this.id);

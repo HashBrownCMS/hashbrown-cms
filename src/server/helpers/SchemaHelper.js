@@ -395,7 +395,7 @@ class SchemaHelper extends SchemaHelperCommon {
 
     
     /**
-     * Removes a schema object by id
+     * Removes a Schema object by id
      *
      * @param {String} project
      * @param {String} environment
@@ -409,14 +409,58 @@ class SchemaHelper extends SchemaHelperCommon {
         id = requiredParam('id')
     ) {
         let collection = environment + '.schemas';
-       
-        return MongoHelper.removeOne(
-            project,
-            collection,
-            {
-                id: id
-            }
-        );
+        let thisSchema;
+      
+        // First get the Schema object
+        return this.getSchemaById(project, environment, id)
+
+        // Then get all custom Schemas
+        .then((result) => {
+            thisSchema = result;
+
+            return this.getCustomSchemas(project, environment);
+        })
+        
+        // Then check if any custom Schemas use this one as a parent
+        .then((customSchemas) => {
+            let checkNext = () => {
+                // Get next Schema
+                let customSchema;
+                
+                for(let id in customSchemas) {
+                    customSchema = customSchemas[id];
+                    delete customSchemas[id];
+                    break;
+                }
+
+                // If there are no more Schemas to check, resolve
+                if(!customSchema) { return Promise.resolve(); }
+
+                // If this custom Schema does not use the parent Schema, proceed to next
+                if(customSchema.parentSchemaId != thisSchema.id) { return checkNext(); }
+
+                // If it does use this parent, make it use its grandparent instead
+                customSchema.parentSchemaId = thisSchema.parentSchemaId;
+
+                return this.setSchema(project, environment, customSchema.id, customSchema)
+                .then(() => {
+                    return checkNext();  
+                });
+            };
+
+            return checkNext();
+        })
+
+        // Then remove the requested Schema
+        .then(() => {
+            return MongoHelper.removeOne(
+                project,
+                collection,
+                {
+                    id: id
+                }
+            );
+        });
     }
     
     /**

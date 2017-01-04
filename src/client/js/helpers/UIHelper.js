@@ -150,14 +150,14 @@ class UIHelper {
     /**
      * Renders a dropdown
      *
-     * @param {String} label
+     * @param {String|Number} defaultValue
      * @param {Array|Number} options
      * @param {Function} onChange
      * @param {Boolean} useClearButton
      *
      * @returns {HtmlElement} Dropdown element
      */
-    static inputDropdown(label, options, onChange, useClearButton) {
+    static inputDropdown(defaultValue, options, onChange, useClearButton) {
         let $toggle;
         let $clear;
 
@@ -188,17 +188,32 @@ class UIHelper {
             onChange($li.attr('data-value'));
         };
 
+        // Highlight selected value
+        let highlightSelectedValue = () => {
+            $element.find('ul li').removeClass('active');
+            $toggle.html('(none)');       
+            
+            if(!defaultValue) { return; }
+
+            for(let option of options) {
+                if(option.value == defaultValue) {
+                    $toggle.html(option.label);
+                    $element.find('ul li[data-value="' + option.value + '"]').addClass('active');
+                    break;
+                }
+            }
+        };
+
         // Clear event
         let onClear = () => {
-            $toggle.html(label);
-            $element.find('ul li').removeClass('active');
+            defaultValue = onChange(null);
 
-            onChange(null);
+            highlightSelectedValue();
         };
 
         let $element = _.div({class: 'dropdown'},
             $toggle = _.button({class: 'btn btn-primary dropdown-toggle', type: 'button', 'data-toggle': 'dropdown'},
-                label
+                '(none)'
             ),
             _.if(useClearButton,
                 $clear = _.button({class: 'btn btn-embedded dropdown-clear'},
@@ -209,12 +224,13 @@ class UIHelper {
                 _.ul({class: 'dropdown-menu-items'},
                     _.each(options, (i, option) => {
                         let optionLabel = option.label || option.id || option.name || option.toString();
+                        let isSelected = option.selected || option.value == defaultValue;
 
-                        if(option.selected) {
+                        if(isSelected) {
                             $toggle.html(optionLabel);
                         }
 
-                        let $li = _.li({'data-value': option.value || optionLabel, class: option.selected ? 'active' : ''},
+                        let $li = _.li({'data-value': option.value || optionLabel, class: isSelected ? 'active' : ''},
                             _.button(optionLabel).on('click', onClick)
                         );
 

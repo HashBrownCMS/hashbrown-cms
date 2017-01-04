@@ -87,7 +87,7 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
   .dropdown.typeahead .form-control {
     max-width: none; }
   .dropdown.typeahead .dropdown-toggle {
-    font-size: 1em;
+    font-size: 14px;
     text-transform: none;
     font-weight: normal;
     text-align: left;
@@ -115,7 +115,8 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
       position: absolute;
       right: 0px;
       top: 8px;
-      padding: 0px; }
+      padding: 0px;
+      z-index: 20; }
   .dropdown.typeahead .dropdown-menu {
     left: 0px;
     right: auto;
@@ -123,7 +124,8 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
     min-width: 200px; }
     .dropdown.typeahead .dropdown-menu ul {
       max-height: 200px;
-      overflow-y: auto; }
+      overflow-y: auto;
+      width: 100%; }
       .dropdown.typeahead .dropdown-menu ul li button {
         background-color: transparent;
         padding: 0px 20px 0px 0px;
@@ -131,6 +133,7 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
         white-space: nowrap; }
 
 .dropdown .dropdown-toggle {
+  letter-spacing: normal;
   color: #bdbdbd;
   border: 0px;
   background-color: transparent;
@@ -256,31 +259,40 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
     -moz-appearance: none;
     appearance: none;
     color: #fff; }
-    .chip-group .chip .chip-label.dropdown.open .dropdown-toggle:before {
-      content: none; }
-    .chip-group .chip .chip-label.dropdown .dropdown-toggle {
-      background: none;
-      border: 0px;
-      padding: 0px;
-      margin: 0px;
-      font-size: 14px;
-      color: #fff; }
-      .chip-group .chip .chip-label.dropdown .dropdown-toggle .fa {
-        margin-left: 0.5em; }
+    .chip-group .chip .chip-label.dropdown {
+      margin-right: 0px; }
+      .chip-group .chip .chip-label.dropdown.open .dropdown-toggle:before {
+        content: none; }
+      .chip-group .chip .chip-label.dropdown .dropdown-toggle {
+        letter-spacing: normal;
+        background: none;
+        border: 0px;
+        padding: 0px;
+        margin: 0px;
+        font-size: 14px;
+        color: #fff; }
+        .chip-group .chip .chip-label.dropdown .dropdown-toggle:after {
+          content: '\F0D7';
+          font-family: 'FontAwesome';
+          margin-left: 5px; }
+        .chip-group .chip .chip-label.dropdown .dropdown-toggle .fa {
+          margin-left: 0.5em; }
   .chip-group .chip .chip-remove {
-    margin: 0px 0px 0px 4px;
+    margin: 0px 2px 0px 4px;
     background-color: transparent;
     padding: 0px !important;
-    height: 32px;
-    width: 24px;
+    height: 16px;
+    line-height: 16px;
+    width: 16px;
     position: relative;
-    top: -2px; }
+    top: -2px;
+    border-radius: 50%; }
+    .chip-group .chip .chip-remove:hover {
+      background-color: #fff; }
+      .chip-group .chip .chip-remove:hover .fa {
+        color: #1e88e5; }
     .chip-group .chip .chip-remove .fa {
-      color: #fff;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%); }
+      color: #fff; }
 
 .chip-group .chip-add {
   margin: 0px 0px 4px 8px;

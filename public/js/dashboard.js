@@ -10700,7 +10700,7 @@
 	        /**
 	         * Renders a dropdown
 	         *
-	         * @param {String} label
+	         * @param {String|Number} defaultValue
 	         * @param {Array|Number} options
 	         * @param {Function} onChange
 	         * @param {Boolean} useClearButton
@@ -10710,7 +10710,7 @@
 
 	    }, {
 	        key: 'inputDropdown',
-	        value: function inputDropdown(label, options, onChange, useClearButton) {
+	        value: function inputDropdown(defaultValue, options, onChange, useClearButton) {
 	            var $toggle = void 0;
 	            var $clear = void 0;
 
@@ -10738,22 +10738,61 @@
 	                onChange($li.attr('data-value'));
 	            };
 
-	            // Clear event
-	            var onClear = function onClear() {
-	                $toggle.html(label);
+	            // Highlight selected value
+	            var highlightSelectedValue = function highlightSelectedValue() {
 	                $element.find('ul li').removeClass('active');
+	                $toggle.html('(none)');
 
-	                onChange(null);
+	                if (!defaultValue) {
+	                    return;
+	                }
+
+	                var _iteratorNormalCompletion = true;
+	                var _didIteratorError = false;
+	                var _iteratorError = undefined;
+
+	                try {
+	                    for (var _iterator = options[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	                        var option = _step.value;
+
+	                        if (option.value == defaultValue) {
+	                            $toggle.html(option.label);
+	                            $element.find('ul li[data-value="' + option.value + '"]').addClass('active');
+	                            break;
+	                        }
+	                    }
+	                } catch (err) {
+	                    _didIteratorError = true;
+	                    _iteratorError = err;
+	                } finally {
+	                    try {
+	                        if (!_iteratorNormalCompletion && _iterator.return) {
+	                            _iterator.return();
+	                        }
+	                    } finally {
+	                        if (_didIteratorError) {
+	                            throw _iteratorError;
+	                        }
+	                    }
+	                }
 	            };
 
-	            var $element = _.div({ class: 'dropdown' }, $toggle = _.button({ class: 'btn btn-primary dropdown-toggle', type: 'button', 'data-toggle': 'dropdown' }, label), _.if(useClearButton, $clear = _.button({ class: 'btn btn-embedded dropdown-clear' }, _.span({ class: 'fa fa-remove' })).on('click', onClear)), _.div({ class: 'dropdown-menu' }, _.ul({ class: 'dropdown-menu-items' }, _.each(options, function (i, option) {
-	                var optionLabel = option.label || option.id || option.name || option.toString();
+	            // Clear event
+	            var onClear = function onClear() {
+	                defaultValue = onChange(null);
 
-	                if (option.selected) {
+	                highlightSelectedValue();
+	            };
+
+	            var $element = _.div({ class: 'dropdown' }, $toggle = _.button({ class: 'btn btn-primary dropdown-toggle', type: 'button', 'data-toggle': 'dropdown' }, '(none)'), _.if(useClearButton, $clear = _.button({ class: 'btn btn-embedded dropdown-clear' }, _.span({ class: 'fa fa-remove' })).on('click', onClear)), _.div({ class: 'dropdown-menu' }, _.ul({ class: 'dropdown-menu-items' }, _.each(options, function (i, option) {
+	                var optionLabel = option.label || option.id || option.name || option.toString();
+	                var isSelected = option.selected || option.value == defaultValue;
+
+	                if (isSelected) {
 	                    $toggle.html(optionLabel);
 	                }
 
-	                var $li = _.li({ 'data-value': option.value || optionLabel, class: option.selected ? 'active' : '' }, _.button(optionLabel).on('click', onClick));
+	                var $li = _.li({ 'data-value': option.value || optionLabel, class: isSelected ? 'active' : '' }, _.button(optionLabel).on('click', onClick));
 
 	                return $li;
 	            }))));
