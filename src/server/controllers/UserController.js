@@ -146,17 +146,26 @@ class UserController extends ApiController {
      */
     static postUser(req, res) {
         let id = req.params.id;
+        let properties = req.body;
 
         ApiController.authenticate(req.cookies.token, req.params.project)
         .then((user) => {
-            if(user.id == id || user.hasScope(req.params.project, 'users')) {
+            let hasScope = user.hasScope(req.params.project, 'users');
+
+            if(user.id == id || hasScope) {
+                // If the current user does not have the "users" scope, revert any sensitive properties
+                if(!hasScope) {
+                    properties.scopes = user.scopes;
+                    properties.isAdmin = false;
+                }
+
                 return Promise.resolve();
             }
 
             return Promise.reject(new Error('User "' + user.name + '" does not have scope "users"'));
         })
         .then(() => {
-            UserHelper.updateUserById(id, req.body);
+            UserHelper.updateUserById(id, properties);
         })
         .then((user) => {
             res.status(200).send(user);

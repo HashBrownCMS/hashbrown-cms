@@ -361,8 +361,11 @@ class UserEditor extends View {
         $element.append(this.renderField('Full name', this.renderFullNameEditor()));
         $element.append(this.renderField('Email', this.renderEmailEditor()));
         $element.append(this.renderField('Password', this.renderPasswordEditor()));
-        $element.append(this.renderField('Is admin', this.renderAdminEditor()));
-        $element.append(this.renderField('Scopes', this.renderScopesEditor()));
+
+        if(User.current.hasScope('users')) {
+            $element.append(this.renderField('Is admin', this.renderAdminEditor()));
+            $element.append(this.renderField('Scopes', this.renderScopesEditor()));
+        }
 
         return $element;
     }
@@ -380,9 +383,11 @@ class UserEditor extends View {
                         _.span({class: 'text-default'}, 'Save '),
                         _.span({class: 'text-working'}, 'Saving ')
                     ).click(() => { this.onClickSave(); }),
-                    _.button({class: 'btn btn-embedded btn-embedded-danger'},
-                        _.span({class: 'fa fa-trash'})
-                    ).click(() => { this.onClickRemove(); })
+                    _.if(User.current.hasScope('users'), 
+                        _.button({class: 'btn btn-embedded btn-embedded-danger'},
+                            _.span({class: 'fa fa-trash'})
+                        ).click(() => { this.onClickRemove(); })
+                    )
                 )
             )
         );
