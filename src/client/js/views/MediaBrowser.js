@@ -6,15 +6,35 @@ class MediaBrowser extends View {
         
         this.$element = _.div({class: 'modal fade media-browser'});
 
-        this.init();
-        
-        // Make sure the modal is removed when it's cancelled
-        this.$element.on('hidden.bs.modal', () => {
-           this.$element.remove(); 
-        });
+        MediaBrowser.checkMediaProvider()
+        .then(() => {
+            this.init();
+            
+            // Make sure the modal is removed when it's cancelled
+            this.$element.on('hidden.bs.modal', () => {
+               this.$element.remove(); 
+            });
 
-        // Show the modal
-        this.$element.modal('show');
+            // Show the modal
+            this.$element.modal('show');
+        })
+        .catch(UI.errorModal);
+    }
+
+    /**
+     * Gets whether the media provider exists
+     *
+     * @returns {Promise} Promise
+     */
+    static checkMediaProvider() {
+        return SettingsHelper.getSettings(ProjectHelper.currentProject, ProjectHelper.currentEnvironment, 'providers')
+        .then((result) => {
+            if(!result || !result.media) {
+                return Promise.reject(new Error('No Media provider has been set for this project. Please check providers settings.'));
+            }  
+
+            return Promise.resolve();
+        }); 
     }
 
     /**
@@ -25,124 +45,128 @@ class MediaBrowser extends View {
      * @param {String} replaceId
      */
     static uploadModal(onSuccess, onCancel, replaceId) {
-        let navbar = ViewHelper.get('NavbarMain');
+        MediaBrowser.checkMediaProvider()
+        .then(() => {
+            let navbar = ViewHelper.get('NavbarMain');
 
-        function onChangeFile() {
-            let input = $(this);
-            let numFiles = this.files ? this.files.length : 1;
-            
-            if(numFiles > 0) {
-                let file = this.files[0];
+            function onChangeFile() {
+                let input = $(this);
+                let numFiles = this.files ? this.files.length : 1;
+                
+                if(numFiles > 0) {
+                    let file = this.files[0];
 
-                let isImage =
-                    file.type == 'image/png' ||
-                    file.type == 'image/jpeg' ||
-                    file.type == 'image/gif';
+                    let isImage =
+                        file.type == 'image/png' ||
+                        file.type == 'image/jpeg' ||
+                        file.type == 'image/gif';
 
-                let isVideo =
-                    file.type == 'video/mpeg' ||
-                    file.type == 'video/mp4' ||
-                    file.type == 'video/quicktime' ||
-                    file.type == 'video/x-matroska';
+                    let isVideo =
+                        file.type == 'video/mpeg' ||
+                        file.type == 'video/mp4' ||
+                        file.type == 'video/quicktime' ||
+                        file.type == 'video/x-matroska';
 
-                if(isImage) {
-                    let reader = new FileReader();
-                    
-                    uploadModal.$element.find('.spinner-container').toggleClass('hidden', false);
-
-                    reader.onload = function(e) {
-                        uploadModal.$element.find('.media-preview').html(
-                            _.img({src: e.target.result})
-                        );
-
-
-                        uploadModal.$element.find('.spinner-container').toggleClass('hidden', true);
-                    }
-                    
-                    reader.readAsDataURL(file);
-                }
+                    if(isImage) {
+                        let reader = new FileReader();
                         
-                if(isVideo) {
-                    uploadModal.$element.find('.media-preview').html(
-                        _.video({src: window.URL.createObjectURL(file), controls: 'controls'})
-                    );
-                }
+                        uploadModal.$element.find('.spinner-container').toggleClass('hidden', false);
 
-                debug.log('Previewing data of file type ' + file.type + '...', navbar);
-            }
-        }
-        
-        function onClickUpload() {
-            uploadModal.$element.find('form').submit();
+                        reader.onload = function(e) {
+                            uploadModal.$element.find('.media-preview').html(
+                                _.img({src: e.target.result})
+                            );
 
-            return false;
-        }
 
-        function onSubmit(e) {
-            e.preventDefault();
-
-            uploadModal.$element.find('.spinner-container').toggleClass('hidden', false);
-            
-            let apiPath = 'media/' + (replaceId ? replaceId : 'new');
-
-            $.ajax({
-                url: apiUrl(apiPath),
-                type: 'POST',
-                data: new FormData(this),
-                processData: false,
-                contentType: false,
-                success: (id) => {
-                    reloadResource('media')
-                    .then(() => {
-                        uploadModal.$element.find('.spinner-container').toggleClass('hidden', true);
-
-                        navbar.reload();
-
-                        if(onSuccess) {
-                            onSuccess(id);
+                            uploadModal.$element.find('.spinner-container').toggleClass('hidden', true);
                         }
                         
-                        uploadModal.hide();
-                    });
-                },
-                error: errorModal
-            });
-        }
+                        reader.readAsDataURL(file);
+                    }
+                            
+                    if(isVideo) {
+                        uploadModal.$element.find('.media-preview').html(
+                            _.video({src: window.URL.createObjectURL(file), controls: 'controls'})
+                        );
+                    }
 
-        let uploadModal = new MessageModal({
-            model: {
-                class: 'modal-upload-media',
-                title: 'Upload a file',
-                body: [
-                    _.div({class: 'spinner-container hidden'},
-                        _.span({class: 'spinner fa fa-refresh'})
-                    ),
-                    _.div({class: 'media-preview'}),
-                    _.form({class: 'form-control'},
-                        _.input({type: 'file', name: 'media'})
-                            .change(onChangeFile)
-                    ).submit(onSubmit)
-                ]
-            },
-            buttons: [
-                {
-                    label: 'Cancel',
-                    class: 'btn-default',
-                    callback: onCancel
-                },
-                {
-                    label: 'Upload',
-                    class: 'btn-primary',
-                    callback: onClickUpload
+                    debug.log('Previewing data of file type ' + file.type + '...', navbar);
                 }
-            ]
-        });
+            }
+            
+            function onClickUpload() {
+                uploadModal.$element.find('form').submit();
 
-        uploadModal.on('close', () => {
-            if(onCancel) {
-                onCancel();
-            } 
-        });
+                return false;
+            }
+
+            function onSubmit(e) {
+                e.preventDefault();
+
+                uploadModal.$element.find('.spinner-container').toggleClass('hidden', false);
+                
+                let apiPath = 'media/' + (replaceId ? replaceId : 'new');
+
+                $.ajax({
+                    url: apiUrl(apiPath),
+                    type: 'POST',
+                    data: new FormData(this),
+                    processData: false,
+                    contentType: false,
+                    success: (id) => {
+                        reloadResource('media')
+                        .then(() => {
+                            uploadModal.$element.find('.spinner-container').toggleClass('hidden', true);
+
+                            navbar.reload();
+
+                            if(onSuccess) {
+                                onSuccess(id);
+                            }
+                            
+                            uploadModal.hide();
+                        });
+                    },
+                    error: errorModal
+                });
+            }
+
+            let uploadModal = new MessageModal({
+                model: {
+                    class: 'modal-upload-media',
+                    title: 'Upload a file',
+                    body: [
+                        _.div({class: 'spinner-container hidden'},
+                            _.span({class: 'spinner fa fa-refresh'})
+                        ),
+                        _.div({class: 'media-preview'}),
+                        _.form({class: 'form-control'},
+                            _.input({type: 'file', name: 'media'})
+                                .change(onChangeFile)
+                        ).submit(onSubmit)
+                    ]
+                },
+                buttons: [
+                    {
+                        label: 'Cancel',
+                        class: 'btn-default',
+                        callback: onCancel
+                    },
+                    {
+                        label: 'Upload',
+                        class: 'btn-primary',
+                        callback: onClickUpload
+                    }
+                ]
+            });
+
+            uploadModal.on('close', () => {
+                if(onCancel) {
+                    onCancel();
+                } 
+            });
+        })
+        .catch(UI.errorModal);
     }
 
     /**
@@ -237,7 +261,7 @@ class MediaBrowser extends View {
                                     $media.toggleClass('active', true);
                                 });
                                 
-                                if(media.folder) {
+                                if(media.folder && media.folder != '/') {
                                     let $folder = $folders[media.folder];
 
                                     if(!$folder) {

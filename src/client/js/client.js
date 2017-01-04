@@ -29,7 +29,7 @@ window.NavbarMain = require('./views/navbar/NavbarMain');
 window.MediaViewer = require('./views/MediaViewer');
 
 // Plugins
-// TODO: Make this a glob pattern if possible
+// TODO: Make these independent from the main file
 require('../../../plugins/github-pages/client/js/views/ConnectionEditor.js');
 require('../../../plugins/hashbrown-driver/client/js/views/ConnectionEditor.js');
 
@@ -43,6 +43,7 @@ window.FormEditor = require('./views/FormEditor');
 window.ConnectionEditor = require('./views/ConnectionEditor');
 window.SchemaEditor = require('./views/SchemaEditor');
 window.SyncSettings = require('./views/SyncSettings');
+window.ProvidersSettings = require('./views/ProvidersSettings');
 window.UserEditor = require('./views/UserEditor');
 window.MediaBrowser = require('./views/MediaBrowser');
 
@@ -69,7 +70,23 @@ let isReady = {};
  * Clears the workspace
  */
 window.clearWorkspace = function clearWorkspace() {
-    $('.workspace > div').remove();
+    $('.workspace').empty();
+};
+
+/**
+ * Sets workspace content
+ */
+window.populateWorkspace = function populateWorkspace($html, classes) {
+    let $workspace = $('.workspace');
+
+    $workspace.empty();
+    $workspace.attr('class', 'workspace');
+    
+    _.append($workspace, $html);
+
+    if(classes) {
+        $workspace.addClass(classes);
+    }
 };
 
 /**

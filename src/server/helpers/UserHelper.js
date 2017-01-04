@@ -579,6 +579,8 @@ class UserHelper {
             properties
         ).then(() => {
             debug.log('Updated user "' + id + '" successfully', this);
+            
+            return Promise.resolve(new User(properties));
         });
     }
 

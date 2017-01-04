@@ -264,9 +264,7 @@
 	            var user = _step2.value;
 
 	            if (user.isCurrent) {
-	                var currentScopes = user.scopes[ProjectHelper.currentProject];
-
-	                return currentScopes && currentScopes.indexOf(scope) > -1;
+	                return user.hasScope(scope);
 	            }
 	        }
 	    } catch (err) {
@@ -10503,8 +10501,8 @@
 	    }, {
 	        key: 'reload',
 	        value: function reload() {
-	            this.$element.find('.modal-title').html(this.renderTitle());
-	            this.$element.find('.modal-body').html(this.renderBody());
+	            _.append(this.$element.find('.modal-title').empty(), this.renderTitle());
+	            _.append(this.$element.find('.modal-body').empty(), this.renderBody());
 	        }
 	    }, {
 	        key: 'renderTitle',
@@ -19525,7 +19523,7 @@
 	module.exports = {
 		"name": "hashbrown-cms",
 		"repository": "https://github.com/Putaitu/hashbrown-cms.git",
-		"version": "0.5.1",
+		"version": "0.5.4",
 		"description": "The pluggable CMS",
 		"main": "hashbrown.js",
 		"scripts": {

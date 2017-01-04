@@ -83,17 +83,20 @@ Router.route('/', function() {
         ]);
     }
 
-    _.append($('.workspace').empty(),
-        _.div({class: 'dashboard-container welcome centered'},
+    populateWorkspace(
+        _.div({class: 'dashboard-container welcome'},
             _.h1('Welcome to HashBrown'),
             _.p('If you\'re unfamiliar with HashBrown, please take a moment to look through the introduction below.'),
             _.p('It\'ll only take a minute.'),
             _.h2('Introduction'), 
             UI.carousel(carouselItems, true, true, '400px'),
+            _.h2('Contextual help'),
+            _.p('You can always click the <span class="fa fa-question-circle"></span> icon in the upper right to get information about the screen you\'re currently on.'),
             _.h2('Guides'),
             _.p('If you\'d like a more in-depth walkthrough of the features, please check out the guides.'),
             _.a({class: 'btn btn-primary', href: 'http://hashbrown.rocks/guides', target: '_blank'}, 'Guides')
-        )
+        ),
+        'presentation'
     );
 });
 
@@ -105,10 +108,11 @@ Router.route('/readme/', function() {
         type: 'GET',
         url: '/text/readme',
         success: (html) => {
-            $('.workspace').html(
-                _.div({class: 'dashboard-container readme centered'},
+            populateWorkspace(
+                _.div({class: 'dashboard-container readme'},
                     html
-                )
+                ),
+                'presentation'
             );
         }
     });
@@ -122,10 +126,11 @@ Router.route('/license/', function() {
         type: 'GET',
         url: '/text/license',
         success: (html) => {
-            $('.workspace').html(
-                _.div({class: 'dashboard-container license centered'},
+            populateWorkspace(
+                _.div({class: 'dashboard-container license'},
                     html
-                )
+                ),
+                'presentation presentation-center'
             );
         }
     });

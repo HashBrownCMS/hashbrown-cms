@@ -5,11 +5,12 @@ Router.route('/connections/', function() {
     if(currentUserHasScope('connections')) {
         ViewHelper.get('NavbarMain').showTab('/connections/');
         
-        $('.workspace').html(
+        populateWorkspace(
             _.div({class: 'dashboard-container'},
-                _.h1('Connections dashboard'),
+                _.h1('Connections'),
                 _.p('Please click on a connection to proceed')
-            )
+            ),
+            'presentation presentation-center'
         );
     
     } else {
@@ -27,7 +28,7 @@ Router.route('/connections/:id', function() {
        
         ViewHelper.get('NavbarMain').highlightItem(this.id);
         
-        $('.workspace').html(connectionEditor.$element);
+        populateWorkspace(connectionEditor.$element);
     
     } else {
         location.hash = '/';
@@ -44,7 +45,7 @@ Router.route('/connections/json/:id', function() {
          
         ViewHelper.get('NavbarMain').highlightItem(this.id);
         
-        $('.workspace').html(connectionEditor.$element);
+        populateWorkspace(connectionEditor.$element);
     
     } else {
         location.hash = '/';

@@ -45,9 +45,7 @@ window.isCurrentUserAdmin = function isCurrentUserAdmin() {
 window.currentUserHasScope = function currentUserHasScope(scope) {
     for(let user of resources.users) {
         if(user.isCurrent) {
-            let currentScopes = user.scopes[ProjectHelper.currentProject];
-
-            return currentScopes && currentScopes.indexOf(scope) > -1;
+            return user.hasScope(scope);
         }
     }
 

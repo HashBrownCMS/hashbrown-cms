@@ -4,11 +4,12 @@
 Router.route('/forms/', function() {
     ViewHelper.get('NavbarMain').showTab('/forms/');
     
-    $('.workspace').html(
+    populateWorkspace(
         _.div({class: 'dashboard-container'},
-            _.h1('Forms dashboard'),
+            _.h1('Forms'),
             _.p('Please click on a form to proceed')
-        )
+        ),
+        'presentation presentation-center'
     );
 });
 
@@ -20,7 +21,7 @@ Router.route('/forms/:id', function() {
         modelUrl: apiUrl('forms/' + this.id)
     });
    
-    $('.workspace').html(formEditor.$element);
+    populateWorkspace(formEditor.$element);
 });
 
 // Edit (JSON editor)
@@ -32,5 +33,5 @@ Router.route('/forms/json/:id', function() {
      
     ViewHelper.get('NavbarMain').highlightItem(this.id);
     
-    $('.workspace').html(formEditor.$element);
+    populateWorkspace(formEditor.$element);
 });

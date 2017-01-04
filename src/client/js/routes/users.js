@@ -5,11 +5,12 @@ Router.route('/users/', function() {
     if(currentUserHasScope('users')) {
         ViewHelper.get('NavbarMain').showTab('/users/');
 
-        $('.workspace').html(
+        populateWorkspace(
             _.div({class: 'dashboard-container'},
                 _.h1('Users'),
                 _.p('Please click on a user to continue')
-            )
+            ),
+            'presentation presentation-center'
         );
     
     } else {
@@ -20,7 +21,7 @@ Router.route('/users/', function() {
 
 // Edit
 Router.route('/users/:id', function() {
-    if(currentUserHasScope('users')) {
+    if(User.current.id == this.id || currentUserHasScope('users')) {
         ViewHelper.get('NavbarMain').highlightItem(this.id);
         
         apiCall('get', 'users/' + this.id)
@@ -29,7 +30,7 @@ Router.route('/users/:id', function() {
                 model: user
             });
 
-            $('.workspace').html(userEditor.$element);
+            populateWorkspace(userEditor.$element);
         })
         .catch(errorModal);
     

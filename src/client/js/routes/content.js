@@ -4,11 +4,12 @@
 Router.route('/content/', function() {
     ViewHelper.get('NavbarMain').showTab('/content/');
     
-    $('.workspace').html(
+    populateWorkspace(
         _.div({class: 'dashboard-container'},
-            _.h1('Content dashboard'),
+            _.h1('Content'),
             _.p('Please click on a content node to proceed')
-        )
+        ),
+        'presentation presentation-center'
     );
 });
 
@@ -21,7 +22,7 @@ Router.route('/content/json/:id', function() {
         apiPath: 'content/' + this.id
     });
 
-    $('.workspace').html(contentEditor.$element);
+    populateWorkspace(contentEditor.$element);
 });
 
 // Edit (redirect to default tab)
@@ -56,7 +57,7 @@ Router.route('/content/:id/:tab', function() {
             modelUrl: apiUrl('content/' + this.id)
         });
         
-        $('.workspace').html(contentEditor.$element);
+        populateWorkspace(contentEditor.$element);
     }
 });
 

@@ -78,7 +78,7 @@
 	window.MediaViewer = __webpack_require__(103);
 
 	// Plugins
-	// TODO: Make this a glob pattern if possible
+	// TODO: Make these independent from the main file
 	__webpack_require__(104);
 	__webpack_require__(105);
 
@@ -92,6 +92,7 @@
 	window.ConnectionEditor = __webpack_require__(130);
 	window.SchemaEditor = __webpack_require__(131);
 	window.SyncSettings = __webpack_require__(133);
+	window.ProvidersSettings = __webpack_require__(168);
 	window.UserEditor = __webpack_require__(134);
 	window.MediaBrowser = __webpack_require__(135);
 
@@ -118,7 +119,23 @@
 	 * Clears the workspace
 	 */
 	window.clearWorkspace = function clearWorkspace() {
-	    $('.workspace > div').remove();
+	    $('.workspace').empty();
+	};
+
+	/**
+	 * Sets workspace content
+	 */
+	window.populateWorkspace = function populateWorkspace($html, classes) {
+	    var $workspace = $('.workspace');
+
+	    $workspace.empty();
+	    $workspace.attr('class', 'workspace');
+
+	    _.append($workspace, $html);
+
+	    if (classes) {
+	        $workspace.addClass(classes);
+	    }
 	};
 
 	/**
@@ -401,9 +418,7 @@
 	            var user = _step2.value;
 
 	            if (user.isCurrent) {
-	                var currentScopes = user.scopes[ProjectHelper.currentProject];
-
-	                return currentScopes && currentScopes.indexOf(scope) > -1;
+	                return user.hasScope(scope);
 	            }
 	        }
 	    } catch (err) {
@@ -10640,8 +10655,8 @@
 	    }, {
 	        key: 'reload',
 	        value: function reload() {
-	            this.$element.find('.modal-title').html(this.renderTitle());
-	            this.$element.find('.modal-body').html(this.renderBody());
+	            _.append(this.$element.find('.modal-title').empty(), this.renderTitle());
+	            _.append(this.$element.find('.modal-body').empty(), this.renderBody());
 	        }
 	    }, {
 	        key: 'renderTitle',
@@ -11877,6 +11892,72 @@
 
 	            location.reload();
 	        }
+
+	        /**
+	         * Event: Click question
+	         */
+
+	    }, {
+	        key: 'onClickQuestion',
+	        value: function onClickQuestion() {
+	            var path = location.hash.replace('#', '').split('/');
+
+	            if (!path || path.length < 1) {
+	                return;
+	            }
+
+	            var level1 = path[1];
+	            var level2 = path[2];
+
+	            switch (level1) {
+	                default:
+	                    UI.messageModal('The help modal', [_.p('To get help for any particular screen, click the <span class="fa fa-question-circle"></span> button to bring up this modal.'), _.p('There\'s nothing worth explaining on this screen, though.')]);
+	                    break;
+
+	                case 'content':
+	                    UI.messageModal('Content', [_.p('This sections contains all of your authored work. The content is a hierarchical tree of nodes that can contain text and media, in simple or complex structures.')]);
+	                    break;
+
+	                case 'media':
+	                    UI.messageModal('Media', [_.p('This is a gallery of your statically hosted files, such as images, videos and PDFs.'), _.if(User.current.hasScope('settings'), _.p('The contents of this gallery depends on which Connection has been set up as the Media provider in the <a href="#/settings/providers/">providers settings</a>'))]);
+	                    break;
+
+	                case 'forms':
+	                    UI.messageModal('Forms', 'If you need an input form on your website, you can create the model for it here and see a list of the user submitted input.');
+	                    break;
+
+	                case 'templates':
+	                    UI.messageModal('Templates', [_.p('This section containse markup rendering Templates for your authored Content.'), _.if(User.current.hasScope('settings'), _.p('Templates are served through the Connection assigned as the Template provider in the <a href="#/settings/providers/">providers settings</a>.'))]);
+	                    break;
+
+	                case 'connections':
+	                    UI.messageModal('Connections', [_.p('Connections are endpoints and resources for your content. Connections can be set up to publish your Content and Media to remote servers.'), _.p('Through the <a href="#/settings/providers/">providers settings</a>, they can also be set up to provide statically hosted media and serve rendering templates.')]);
+	                    break;
+
+	                case 'schemas':
+	                    UI.messageModal('Schemas', 'This is a library of content structures. Here you define how your editable content looks and behaves. You can define schemas for both content nodes and property fields.');
+	                    break;
+
+	                case 'users':
+	                    UI.messageModal('Users', 'Here you can add and remove users, edit personal information and scopes and change passwords');
+	                    break;
+
+	                case 'settings':
+	                    switch (level2) {
+	                        case 'sync':
+	                            UI.messageModal('Sync settings', 'Syncing lets you connect this HashBrown instance to another. When syncing is active, you can pull or push Content, Schemas, Forms and Connections between the local and the remote instance.');
+	                            break;
+	                        case 'providers':
+	                            UI.messageModal('Providers settings', [_.p('Providers are Connections set up to serve static Media and Templates.'), _.p('For example, when a Connection is assigned as the Media provider, the images and other content in the Media library are pulled from that connection.'), _.p('Similarly, if a Connection is assigned as the Template provider, the available templates in dropdown menus will be pulled from that Connection.')]);
+	                            break;
+	                        default:
+	                            UI.messageModal('Settings', 'Here you can edit environment-specific settings');
+	                            break;
+	                    }
+
+	                    break;
+	            }
+	        }
 	    }, {
 	        key: 'render',
 	        value: function render() {
@@ -11928,7 +12009,12 @@
 	                // User dropdown
 	                _.div({ class: 'main-menu-item main-menu-user dropdown' }, _.button({ title: 'User', class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, _.span({ class: 'fa fa-user' })), _.ul({ class: 'dropdown-menu' }, _.li(_.a({ class: 'dropdown-item', href: '#/users/' + _this2.user.id }, 'User settings')), _.li(_.a({ class: 'dropdown-item', href: '#' }, 'Log out').click(function (e) {
 	                    e.preventDefault();logout();
-	                })))));
+	                })))),
+
+	                // Help
+	                _.div({ class: 'main-menu-item' }, _.button({ title: 'Help', class: 'main-menu-help' }, _.span({ class: 'fa fa-question-circle' })).click(function () {
+	                    _this2.onClickQuestion();
+	                })));
 	            });
 	        }
 	    }]);
@@ -11970,6 +12056,7 @@
 	var SchemaPane = __webpack_require__(100);
 	var SettingsPane = __webpack_require__(101);
 	var UserPane = __webpack_require__(102);
+	var TemplatePane = __webpack_require__(169);
 
 	/**
 	 * The main navbar
@@ -12383,6 +12470,7 @@
 	            var hasConnectionsScope = User.current.hasScope(ProjectHelper.currentProject, 'connections');
 	            var hasSchemasScope = User.current.hasScope(ProjectHelper.currentProject, 'schemas');
 	            var hasUsersScope = User.current.hasScope(ProjectHelper.currentProject, 'users');
+	            var hasTemplatesScope = User.current.hasScope(ProjectHelper.currentProject, 'templates');
 	            var hasSettingsScope = User.current.hasScope(ProjectHelper.currentProject, 'settings');
 
 	            // Render the "cms" pane
@@ -12396,6 +12484,11 @@
 
 	            // Render the "forms" pane
 	            this.renderPane(FormsPane.getRenderSettings());
+
+	            // Render the "templates" pane
+	            if (isAdmin || hasTemplatesScope) {
+	                this.renderPane(TemplatePane.getRenderSettings());
+	            }
 
 	            // Render the "connections" pane
 	            if (isAdmin || hasConnectionsScope) {
@@ -20825,64 +20918,6 @@
 	        }
 
 	        /**
-	         * Renders the toolbar
-	         *
-	         * @returns {HTMLElement} The toolbar element
-	         */
-
-	    }, {
-	        key: 'renderToolbar',
-	        value: function renderToolbar() {
-	            var $mediaProvider = void 0;
-	            var $templateProvider = void 0;
-
-	            function onChangeMediaProvider() {
-	                ConnectionHelper.setMediaProvider(ProjectHelper.currentProject, ProjectHelper.currentEnvironment, $(this).val()).then(function () {
-	                    return reloadResource('media');
-	                }).then(function () {
-	                    ViewHelper.get('NavbarMain').reload();
-	                }).catch(UI.errorModal);
-	            }
-
-	            function onChangeTemplateProvider() {
-	                ConnectionHelper.setTemplateProvider(ProjectHelper.currentProject, ProjectHelper.currentEnvironment, $(this).val()).then(function () {
-	                    return reloadResource('templates');
-	                }).then(function () {
-	                    return reloadResource('sectionTemplates');
-	                }).then(function () {
-	                    ViewHelper.get('NavbarMain').reload();
-	                }).catch(UI.errorModal);
-	            }
-
-	            var $toolbar = _.div({ class: 'pane-toolbar' }, _.div({}, _.label('Media provider'), $mediaProvider = _.select({ class: 'btn btn-primary' }, _.option({ value: null }, '(none)'), _.each(resources.connections, function (i, connection) {
-	                return _.option({ value: connection.id }, connection.title);
-	            })).change(onChangeMediaProvider)), _.div({}, _.label('Template provider'), $templateProvider = _.select({ class: 'btn btn-primary' }, _.option({ value: null }, '(none)'), _.each(resources.connections, function (i, connection) {
-	                return _.option({ value: connection.id }, connection.title);
-	            })).change(onChangeTemplateProvider)));
-
-	            SettingsHelper.getSettings(ProjectHelper.currentProject, ProjectHelper.currentEnvironment, 'providers')
-
-	            // Previously, providers were set project-wide, so retrieve automatically if needed
-	            .then(function (providers) {
-	                if (!providers) {
-	                    return SettingsHelper.getSettings(ProjectHelper.currentProject, null, 'providers');
-	                } else {
-	                    return Promise.resolve(providers);
-	                }
-	            })
-
-	            // Set providers values
-	            .then(function (providers) {
-	                providers = providers || {};
-
-	                $mediaProvider.val(providers.media);
-	                $templateProvider.val(providers.template);
-	            }).catch(UI.errorModal);
-
-	            return $toolbar;
-	        }
-
-	        /**
 	         * Gets render settings
 	         *
 	         * @returns {Object} settings
@@ -20898,7 +20933,6 @@
 	                route: '/connections/',
 	                icon: 'exchange',
 	                items: resources.connections,
-	                toolbar: this.renderToolbar(),
 
 	                // Item context menu
 	                getItemContextMenu: function getItemContextMenu(item) {
@@ -21988,6 +22022,16 @@
 	        }
 
 	        /**
+	         * Event: Click browse media
+	         */
+
+	    }, {
+	        key: 'onClickBrowseMedia',
+	        value: function onClickBrowseMedia() {
+	            new MediaBrowser();
+	        }
+
+	        /**
 	         * Renders the toolbar
 	         *
 	         * @returns {HTMLElement} Toolbar
@@ -21998,8 +22042,10 @@
 	        value: function renderToolbar() {
 	            var _this3 = this;
 
-	            var $toolbar = _.div({ class: 'pane-toolbar' }, _.div({}, _.label('Library'), _.button({ class: 'btn btn-primary' }, 'Upload media').click(function () {
+	            var $toolbar = _.div({ class: 'pane-toolbar' }, _.div(_.button({ class: 'btn btn-primary' }, 'Upload media').click(function () {
 	                _this3.onClickUploadMedia();
+	            })), _.div(_.button({ class: 'btn btn-primary' }, 'Browse').click(function () {
+	                _this3.onClickBrowseMedia();
 	            })));
 
 	            return $toolbar;
@@ -22350,6 +22396,10 @@
 	                    name: 'Sync',
 	                    path: 'sync',
 	                    icon: 'refresh'
+	                }, {
+	                    name: 'Providers',
+	                    path: 'providers',
+	                    icon: 'exchange'
 	                }]
 	            };
 	        }
@@ -32761,7 +32811,7 @@
 	    }, {
 	        key: 'getScopes',
 	        value: function getScopes() {
-	            return ['connections', 'schemas', 'settings', 'users'];
+	            return ['connections', 'schemas', 'settings', 'templates', 'users'];
 	        }
 
 	        /**
@@ -33091,24 +33141,24 @@
 
 	        _this.$element = _.div({ class: 'modal fade media-browser' });
 
-	        _this.init();
+	        MediaBrowser.checkMediaProvider().then(function () {
+	            _this.init();
 
-	        // Make sure the modal is removed when it's cancelled
-	        _this.$element.on('hidden.bs.modal', function () {
-	            _this.$element.remove();
-	        });
+	            // Make sure the modal is removed when it's cancelled
+	            _this.$element.on('hidden.bs.modal', function () {
+	                _this.$element.remove();
+	            });
 
-	        // Show the modal
-	        _this.$element.modal('show');
+	            // Show the modal
+	            _this.$element.modal('show');
+	        }).catch(UI.errorModal);
 	        return _this;
 	    }
 
 	    /**
-	     * Open the upload modal
+	     * Gets whether the media provider exists
 	     *
-	     * @param {Function} onSuccess
-	     * @param {Function} onCancel
-	     * @param {String} replaceId
+	     * @returns {Promise} Promise
 	     */
 
 
@@ -33190,7 +33240,7 @@
 	                    $media.toggleClass('active', true);
 	                });
 
-	                if (media.folder) {
+	                if (media.folder && media.folder != '/') {
 	                    (function () {
 	                        var $folder = $folders[media.folder];
 
@@ -33223,101 +33273,123 @@
 	            this.$element.find('.thumbnail[data-id="' + this.value + '"]').toggleClass('active', true);
 	        }
 	    }], [{
+	        key: 'checkMediaProvider',
+	        value: function checkMediaProvider() {
+	            return SettingsHelper.getSettings(ProjectHelper.currentProject, ProjectHelper.currentEnvironment, 'providers').then(function (result) {
+	                if (!result || !result.media) {
+	                    return Promise.reject(new Error('No Media provider has been set for this project. Please check providers settings.'));
+	                }
+
+	                return Promise.resolve();
+	            });
+	        }
+
+	        /**
+	         * Open the upload modal
+	         *
+	         * @param {Function} onSuccess
+	         * @param {Function} onCancel
+	         * @param {String} replaceId
+	         */
+
+	    }, {
 	        key: 'uploadModal',
 	        value: function uploadModal(onSuccess, onCancel, replaceId) {
-	            var navbar = ViewHelper.get('NavbarMain');
+	            MediaBrowser.checkMediaProvider().then(function () {
+	                var navbar = ViewHelper.get('NavbarMain');
 
-	            function onChangeFile() {
-	                var input = $(this);
-	                var numFiles = this.files ? this.files.length : 1;
+	                function onChangeFile() {
+	                    var input = $(this);
+	                    var numFiles = this.files ? this.files.length : 1;
 
-	                if (numFiles > 0) {
-	                    var file = this.files[0];
+	                    if (numFiles > 0) {
+	                        var file = this.files[0];
 
-	                    var isImage = file.type == 'image/png' || file.type == 'image/jpeg' || file.type == 'image/gif';
+	                        var isImage = file.type == 'image/png' || file.type == 'image/jpeg' || file.type == 'image/gif';
 
-	                    var isVideo = file.type == 'video/mpeg' || file.type == 'video/mp4' || file.type == 'video/quicktime' || file.type == 'video/x-matroska';
+	                        var isVideo = file.type == 'video/mpeg' || file.type == 'video/mp4' || file.type == 'video/quicktime' || file.type == 'video/x-matroska';
 
-	                    if (isImage) {
-	                        var reader = new FileReader();
+	                        if (isImage) {
+	                            var reader = new FileReader();
 
-	                        uploadModal.$element.find('.spinner-container').toggleClass('hidden', false);
+	                            uploadModal.$element.find('.spinner-container').toggleClass('hidden', false);
 
-	                        reader.onload = function (e) {
-	                            uploadModal.$element.find('.media-preview').html(_.img({ src: e.target.result }));
+	                            reader.onload = function (e) {
+	                                uploadModal.$element.find('.media-preview').html(_.img({ src: e.target.result }));
 
-	                            uploadModal.$element.find('.spinner-container').toggleClass('hidden', true);
-	                        };
+	                                uploadModal.$element.find('.spinner-container').toggleClass('hidden', true);
+	                            };
 
-	                        reader.readAsDataURL(file);
+	                            reader.readAsDataURL(file);
+	                        }
+
+	                        if (isVideo) {
+	                            uploadModal.$element.find('.media-preview').html(_.video({ src: window.URL.createObjectURL(file), controls: 'controls' }));
+	                        }
+
+	                        debug.log('Previewing data of file type ' + file.type + '...', navbar);
 	                    }
-
-	                    if (isVideo) {
-	                        uploadModal.$element.find('.media-preview').html(_.video({ src: window.URL.createObjectURL(file), controls: 'controls' }));
-	                    }
-
-	                    debug.log('Previewing data of file type ' + file.type + '...', navbar);
 	                }
-	            }
 
-	            function onClickUpload() {
-	                uploadModal.$element.find('form').submit();
+	                function onClickUpload() {
+	                    uploadModal.$element.find('form').submit();
 
-	                return false;
-	            }
+	                    return false;
+	                }
 
-	            function onSubmit(e) {
-	                e.preventDefault();
+	                function onSubmit(e) {
+	                    e.preventDefault();
 
-	                uploadModal.$element.find('.spinner-container').toggleClass('hidden', false);
+	                    uploadModal.$element.find('.spinner-container').toggleClass('hidden', false);
 
-	                var apiPath = 'media/' + (replaceId ? replaceId : 'new');
+	                    var apiPath = 'media/' + (replaceId ? replaceId : 'new');
 
-	                $.ajax({
-	                    url: apiUrl(apiPath),
-	                    type: 'POST',
-	                    data: new FormData(this),
-	                    processData: false,
-	                    contentType: false,
-	                    success: function success(id) {
-	                        reloadResource('media').then(function () {
-	                            uploadModal.$element.find('.spinner-container').toggleClass('hidden', true);
+	                    $.ajax({
+	                        url: apiUrl(apiPath),
+	                        type: 'POST',
+	                        data: new FormData(this),
+	                        processData: false,
+	                        contentType: false,
+	                        success: function success(id) {
+	                            reloadResource('media').then(function () {
+	                                uploadModal.$element.find('.spinner-container').toggleClass('hidden', true);
 
-	                            navbar.reload();
+	                                navbar.reload();
 
-	                            if (onSuccess) {
-	                                onSuccess(id);
-	                            }
+	                                if (onSuccess) {
+	                                    onSuccess(id);
+	                                }
 
-	                            uploadModal.hide();
-	                        });
+	                                uploadModal.hide();
+	                            });
+	                        },
+	                        error: errorModal
+	                    });
+	                }
+
+	                var uploadModal = new MessageModal({
+	                    model: {
+	                        class: 'modal-upload-media',
+	                        title: 'Upload a file',
+	                        body: [_.div({ class: 'spinner-container hidden' }, _.span({ class: 'spinner fa fa-refresh' })), _.div({ class: 'media-preview' }), _.form({ class: 'form-control' }, _.input({ type: 'file', name: 'media' }).change(onChangeFile)).submit(onSubmit)]
 	                    },
-	                    error: errorModal
+	                    buttons: [{
+	                        label: 'Cancel',
+	                        class: 'btn-default',
+	                        callback: onCancel
+	                    }, {
+	                        label: 'Upload',
+	                        class: 'btn-primary',
+	                        callback: onClickUpload
+	                    }]
 	                });
-	            }
 
-	            var uploadModal = new MessageModal({
-	                model: {
-	                    class: 'modal-upload-media',
-	                    title: 'Upload a file',
-	                    body: [_.div({ class: 'spinner-container hidden' }, _.span({ class: 'spinner fa fa-refresh' })), _.div({ class: 'media-preview' }), _.form({ class: 'form-control' }, _.input({ type: 'file', name: 'media' }).change(onChangeFile)).submit(onSubmit)]
-	                },
-	                buttons: [{
-	                    label: 'Cancel',
-	                    class: 'btn-default',
-	                    callback: onCancel
-	                }, {
-	                    label: 'Upload',
-	                    class: 'btn-primary',
-	                    callback: onClickUpload
-	                }]
-	            });
-
-	            uploadModal.on('close', function () {
-	                if (onCancel) {
-	                    onCancel();
-	                }
-	            });
+	                uploadModal.on('close', function () {
+	                    if (onCancel) {
+	                        onCancel();
+	                    }
+	                });
+	            }).catch(UI.errorModal);
 	        }
 	    }]);
 
@@ -33858,6 +33930,9 @@
 	    }, {
 	        key: 'hasScope',
 	        value: function hasScope(project, scope) {
+	            if (this.isAdmin) {
+	                return true;
+	            }
 	            if (!scope && !this.scopes[project]) {
 	                return false;
 	            }
@@ -35255,7 +35330,7 @@
 	module.exports = {
 		"name": "hashbrown-cms",
 		"repository": "https://github.com/Putaitu/hashbrown-cms.git",
-		"version": "0.5.1",
+		"version": "0.5.4",
 		"description": "The pluggable CMS",
 		"main": "hashbrown.js",
 		"scripts": {
@@ -35310,6 +35385,7 @@
 	__webpack_require__(157);
 	__webpack_require__(158);
 	__webpack_require__(159);
+	__webpack_require__(170);
 	__webpack_require__(160);
 	__webpack_require__(161);
 
@@ -35343,7 +35419,7 @@
 	        carouselItems.push([_.div(_.img({ src: '/img/welcome/intro-settings.jpg' })), _.div(_.h2('Settings'), _.p('Here you can set up synchronisation with other HashBrown instances.'))]);
 	    }
 
-	    _.append($('.workspace').empty(), _.div({ class: 'dashboard-container welcome centered' }, _.h1('Welcome to HashBrown'), _.p('If you\'re unfamiliar with HashBrown, please take a moment to look through the introduction below.'), _.p('It\'ll only take a minute.'), _.h2('Introduction'), UI.carousel(carouselItems, true, true, '400px'), _.h2('Guides'), _.p('If you\'d like a more in-depth walkthrough of the features, please check out the guides.'), _.a({ class: 'btn btn-primary', href: 'http://hashbrown.rocks/guides', target: '_blank' }, 'Guides')));
+	    populateWorkspace(_.div({ class: 'dashboard-container welcome' }, _.h1('Welcome to HashBrown'), _.p('If you\'re unfamiliar with HashBrown, please take a moment to look through the introduction below.'), _.p('It\'ll only take a minute.'), _.h2('Introduction'), UI.carousel(carouselItems, true, true, '400px'), _.h2('Contextual help'), _.p('You can always click the <span class="fa fa-question-circle"></span> icon in the upper right to get information about the screen you\'re currently on.'), _.h2('Guides'), _.p('If you\'d like a more in-depth walkthrough of the features, please check out the guides.'), _.a({ class: 'btn btn-primary', href: 'http://hashbrown.rocks/guides', target: '_blank' }, 'Guides')), 'presentation');
 	});
 
 	// Readme
@@ -35354,7 +35430,7 @@
 	        type: 'GET',
 	        url: '/text/readme',
 	        success: function success(html) {
-	            $('.workspace').html(_.div({ class: 'dashboard-container readme centered' }, html));
+	            populateWorkspace(_.div({ class: 'dashboard-container readme' }, html), 'presentation');
 	        }
 	    });
 	});
@@ -35367,7 +35443,7 @@
 	        type: 'GET',
 	        url: '/text/license',
 	        success: function success(html) {
-	            $('.workspace').html(_.div({ class: 'dashboard-container license centered' }, html));
+	            populateWorkspace(_.div({ class: 'dashboard-container license' }, html), 'presentation presentation-center');
 	        }
 	    });
 	});
@@ -35383,7 +35459,7 @@
 	Router.route('/content/', function () {
 	    ViewHelper.get('NavbarMain').showTab('/content/');
 
-	    $('.workspace').html(_.div({ class: 'dashboard-container' }, _.h1('Content dashboard'), _.p('Please click on a content node to proceed')));
+	    populateWorkspace(_.div({ class: 'dashboard-container' }, _.h1('Content'), _.p('Please click on a content node to proceed')), 'presentation presentation-center');
 	});
 
 	// Edit (JSON editor)
@@ -35395,7 +35471,7 @@
 	        apiPath: 'content/' + this.id
 	    });
 
-	    $('.workspace').html(contentEditor.$element);
+	    populateWorkspace(contentEditor.$element);
 	});
 
 	// Edit (redirect to default tab)
@@ -35432,7 +35508,7 @@
 	            modelUrl: apiUrl('content/' + this.id)
 	        });
 
-	        $('.workspace').html(contentEditor.$element);
+	        populateWorkspace(contentEditor.$element);
 	    }
 	});
 
@@ -35448,7 +35524,7 @@
 	    if (currentUserHasScope('connections')) {
 	        ViewHelper.get('NavbarMain').showTab('/connections/');
 
-	        $('.workspace').html(_.div({ class: 'dashboard-container' }, _.h1('Connections dashboard'), _.p('Please click on a connection to proceed')));
+	        populateWorkspace(_.div({ class: 'dashboard-container' }, _.h1('Connections'), _.p('Please click on a connection to proceed')), 'presentation presentation-center');
 	    } else {
 	        location.hash = '/';
 	    }
@@ -35463,7 +35539,7 @@
 
 	        ViewHelper.get('NavbarMain').highlightItem(this.id);
 
-	        $('.workspace').html(connectionEditor.$element);
+	        populateWorkspace(connectionEditor.$element);
 	    } else {
 	        location.hash = '/';
 	    }
@@ -35478,7 +35554,7 @@
 
 	        ViewHelper.get('NavbarMain').highlightItem(this.id);
 
-	        $('.workspace').html(connectionEditor.$element);
+	        populateWorkspace(connectionEditor.$element);
 	    } else {
 	        location.hash = '/';
 	    }
@@ -35495,9 +35571,7 @@
 	Router.route('/media/', function () {
 	    ViewHelper.get('NavbarMain').showTab('/media/');
 
-	    $('.workspace').html(_.div({ class: 'dashboard-container' }, _.h1('Media dashboard'), _.p('Please click on a media object to proceed'), _.button({ class: 'btn btn-primary' }, 'Upload media').click(function () {
-	        ViewHelper.get('NavbarMain').mediaPane.onClickUploadMedia();
-	    })));
+	    populateWorkspace(_.div({ class: 'dashboard-container' }, _.h1('Media'), _.p('Please click on a media object to proceed')), 'presentation presentation-center');
 	});
 
 	// Preview
@@ -35508,7 +35582,7 @@
 
 	    ViewHelper.get('NavbarMain').highlightItem(this.id);
 
-	    $('.workspace').html(mediaViewer.$element);
+	    populateWorkspace(mediaViewer.$element);
 	});
 
 /***/ },
@@ -35523,7 +35597,7 @@
 	    if (currentUserHasScope('schemas')) {
 	        ViewHelper.get('NavbarMain').showTab('/schemas/');
 
-	        $('.workspace').html(_.div({ class: 'dashboard-container' }, _.h1('Schemas dashboard'), _.p('Please click on a schema to proceed')));
+	        populateWorkspace(_.div({ class: 'dashboard-container' }, _.h1('Schemas'), _.p('Please click on a schema to proceed')), 'presentation presentation-center');
 	    } else {
 	        location.hash = '/';
 	    }
@@ -35538,7 +35612,7 @@
 
 	        ViewHelper.get('NavbarMain').highlightItem(this.id);
 
-	        $('.workspace').html(schemaEditor.$element);
+	        populateWorkspace(schemaEditor.$element);
 	    } else {
 	        location.hash = '/';
 	    }
@@ -35561,7 +35635,7 @@
 
 	        ViewHelper.get('NavbarMain').highlightItem(this.id);
 
-	        $('.workspace').html(jsonEditor.$element);
+	        populateWorkspace(jsonEditor.$element);
 	    } else {
 	        location.hash = '/';
 	    }
@@ -35579,18 +35653,7 @@
 	    if (currentUserHasScope('settings')) {
 	        ViewHelper.get('NavbarMain').showTab('/settings/');
 
-	        $('.workspace').html(_.div({ class: 'dashboard-container' }, _.h1('Settings dashboard'), _.p('Please click on a settings item to proceed')));
-	    } else {
-	        location.hash = '/';
-	    }
-	});
-
-	// Languages
-	Router.route('/settings/languages/', function () {
-	    if (currentUserHasScope('settings')) {
-	        ViewHelper.get('NavbarMain').highlightItem('languages');
-
-	        $('.workspace').html(new LanguageSettings().$element);
+	        populateWorkspace(_.div({ class: 'dashboard-container' }, _.h1('Settings'), _.p('Please click on a section to proceed')), 'presentation presentation-center');
 	    } else {
 	        location.hash = '/';
 	    }
@@ -35601,18 +35664,18 @@
 	    if (currentUserHasScope('settings')) {
 	        ViewHelper.get('NavbarMain').highlightItem('sync');
 
-	        $('.workspace').html(new SyncSettings().$element);
+	        populateWorkspace(new SyncSettings().$element);
 	    } else {
 	        location.hash = '/';
 	    }
 	});
 
-	// Info
-	Router.route('/settings/info/', function () {
+	// Providers
+	Router.route('/settings/providers/', function () {
 	    if (currentUserHasScope('settings')) {
-	        ViewHelper.get('NavbarMain').highlightItem('info');
+	        ViewHelper.get('NavbarMain').highlightItem('providers');
 
-	        $('.workspace').html(new InfoSettings().$element);
+	        populateWorkspace(new ProvidersSettings().$element);
 	    } else {
 	        location.hash = '/';
 	    }
@@ -35629,7 +35692,7 @@
 	Router.route('/forms/', function () {
 	    ViewHelper.get('NavbarMain').showTab('/forms/');
 
-	    $('.workspace').html(_.div({ class: 'dashboard-container' }, _.h1('Forms dashboard'), _.p('Please click on a form to proceed')));
+	    populateWorkspace(_.div({ class: 'dashboard-container' }, _.h1('Forms'), _.p('Please click on a form to proceed')), 'presentation presentation-center');
 	});
 
 	// Edit
@@ -35640,7 +35703,7 @@
 	        modelUrl: apiUrl('forms/' + this.id)
 	    });
 
-	    $('.workspace').html(formEditor.$element);
+	    populateWorkspace(formEditor.$element);
 	});
 
 	// Edit (JSON editor)
@@ -35652,7 +35715,7 @@
 
 	    ViewHelper.get('NavbarMain').highlightItem(this.id);
 
-	    $('.workspace').html(formEditor.$element);
+	    populateWorkspace(formEditor.$element);
 	});
 
 /***/ },
@@ -35667,7 +35730,7 @@
 	    if (currentUserHasScope('users')) {
 	        ViewHelper.get('NavbarMain').showTab('/users/');
 
-	        $('.workspace').html(_.div({ class: 'dashboard-container' }, _.h1('Users'), _.p('Please click on a user to continue')));
+	        populateWorkspace(_.div({ class: 'dashboard-container' }, _.h1('Users'), _.p('Please click on a user to continue')), 'presentation presentation-center');
 	    } else {
 	        location.hash = '/';
 	    }
@@ -35675,7 +35738,7 @@
 
 	// Edit
 	Router.route('/users/:id', function () {
-	    if (currentUserHasScope('users')) {
+	    if (User.current.id == this.id || currentUserHasScope('users')) {
 	        ViewHelper.get('NavbarMain').highlightItem(this.id);
 
 	        apiCall('get', 'users/' + this.id).then(function (user) {
@@ -35683,8 +35746,324 @@
 	                model: user
 	            });
 
-	            $('.workspace').html(userEditor.$element);
+	            populateWorkspace(userEditor.$element);
 	        }).catch(errorModal);
+	    } else {
+	        location.hash = '/';
+	    }
+	});
+
+/***/ },
+/* 162 */,
+/* 163 */,
+/* 164 */,
+/* 165 */,
+/* 166 */,
+/* 167 */,
+/* 168 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	/**
+	 * The providers settings editor
+	 *
+	 * @class View ProvidersSettings
+	 */
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var ProvidersSettings = function (_View) {
+	    _inherits(ProvidersSettings, _View);
+
+	    function ProvidersSettings(params) {
+	        _classCallCheck(this, ProvidersSettings);
+
+	        var _this = _possibleConstructorReturn(this, (ProvidersSettings.__proto__ || Object.getPrototypeOf(ProvidersSettings)).call(this, params));
+
+	        _this.$element = _.div({ class: 'editor providers-settings' });
+
+	        _this.fetch();
+	        return _this;
+	    }
+
+	    /**
+	     * Event: Click save. Posts the model to the modelUrl
+	     */
+
+
+	    _createClass(ProvidersSettings, [{
+	        key: 'onClickSave',
+	        value: function onClickSave() {
+	            var _this2 = this;
+
+	            this.$saveBtn.toggleClass('working', true);
+
+	            SettingsHelper.setSettings(ProjectHelper.currentProject, ProjectHelper.currentEnvironment, 'providers', this.model).then(function () {
+	                _this2.$saveBtn.toggleClass('working', false);
+
+	                location.reload();
+	            }).catch(errorModal);
+	        }
+
+	        /**
+	         * Renders a single field
+	         *
+	         * @param {String} label
+	         * @param {HTMLElement} content
+	         *
+	         * @return {HTMLElement} Editor element
+	         */
+
+	    }, {
+	        key: 'renderField',
+	        value: function renderField(label, $content) {
+	            return _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, label), _.div({ class: 'field-value' }, $content));
+	        }
+	    }, {
+	        key: 'render',
+	        value: function render() {
+	            var _this3 = this;
+
+	            // Fetch providers settings
+	            SettingsHelper.getSettings(ProjectHelper.currentProject, ProjectHelper.currentEnvironment, 'providers')
+
+	            // Previously, providers were set project-wide, so retrieve automatically if needed
+	            .then(function (providersSettings) {
+	                if (!providersSettings) {
+	                    return SettingsHelper.getSettings(ProjectHelper.currentProject, null, 'providers');
+	                } else {
+	                    return Promise.resolve(providersSettings);
+	                }
+	            }).then(function (providersSettings) {
+	                var connectionOptions = [];
+
+	                var _iteratorNormalCompletion = true;
+	                var _didIteratorError = false;
+	                var _iteratorError = undefined;
+
+	                try {
+	                    for (var _iterator = resources.connections[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	                        var connection = _step.value;
+
+	                        connectionOptions.push({
+	                            label: connection.title,
+	                            value: connection.id
+	                        });
+	                    }
+	                } catch (err) {
+	                    _didIteratorError = true;
+	                    _iteratorError = err;
+	                } finally {
+	                    try {
+	                        if (!_iteratorNormalCompletion && _iterator.return) {
+	                            _iterator.return();
+	                        }
+	                    } finally {
+	                        if (_didIteratorError) {
+	                            throw _iteratorError;
+	                        }
+	                    }
+	                }
+
+	                _this3.model = providersSettings || {};
+
+	                _.append(_this3.$element.empty(), _.div({ class: 'editor-header' }, _.span({ class: 'fa fa-exchange' }), _.h4('Providers')), _.div({ class: 'editor-body' }, _this3.renderField('Media', UI.inputDropdownTypeAhead(_this3.model.media, connectionOptions, function (newValue) {
+	                    _this3.model.media = newValue;
+	                }, true)), _this3.renderField('Templates', UI.inputDropdownTypeAhead(_this3.model.template, connectionOptions, function (newValue) {
+	                    _this3.model.template = newValue;
+	                }, true))), _.div({ class: 'editor-footer panel panel-default panel-buttons' }, _.div({ class: 'btn-group' }, _this3.$saveBtn = _.button({ class: 'btn btn-primary btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Save '), _.span({ class: 'text-working' }, 'Saving ')).click(function () {
+	                    _this3.onClickSave();
+	                }))));
+	            });
+	        }
+	    }]);
+
+	    return ProvidersSettings;
+	}(View);
+
+	module.exports = ProvidersSettings;
+
+/***/ },
+/* 169 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var Pane = __webpack_require__(95);
+
+	var TemplatePane = function (_Pane) {
+	    _inherits(TemplatePane, _Pane);
+
+	    function TemplatePane() {
+	        _classCallCheck(this, TemplatePane);
+
+	        return _possibleConstructorReturn(this, (TemplatePane.__proto__ || Object.getPrototypeOf(TemplatePane)).apply(this, arguments));
+	    }
+
+	    _createClass(TemplatePane, null, [{
+	        key: 'onClickAddTemplate',
+
+	        /**
+	         * Event: Click add Template
+	         */
+	        value: function onClickAddTemplate() {}
+
+	        /**
+	         * Event: On click remove Template
+	         */
+
+	    }, {
+	        key: 'onClickRemoveTemplate',
+	        value: function onClickRemoveTemplate() {}
+
+	        /**
+	         * Gets the render settings
+	         *
+	         * @returns {Object} Settings
+	         */
+
+	    }, {
+	        key: 'getRenderSettings',
+	        value: function getRenderSettings() {
+	            var _this2 = this;
+
+	            var templateItems = [];
+
+	            var _iteratorNormalCompletion = true;
+	            var _didIteratorError = false;
+	            var _iteratorError = undefined;
+
+	            try {
+	                for (var _iterator = resources.templates[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	                    var templateId = _step.value;
+
+	                    templateItems[templateItems.length] = {
+	                        id: templateId,
+	                        name: templateId
+	                    };
+	                }
+	            } catch (err) {
+	                _didIteratorError = true;
+	                _iteratorError = err;
+	            } finally {
+	                try {
+	                    if (!_iteratorNormalCompletion && _iterator.return) {
+	                        _iterator.return();
+	                    }
+	                } finally {
+	                    if (_didIteratorError) {
+	                        throw _iteratorError;
+	                    }
+	                }
+	            }
+
+	            var _iteratorNormalCompletion2 = true;
+	            var _didIteratorError2 = false;
+	            var _iteratorError2 = undefined;
+
+	            try {
+	                for (var _iterator2 = resources.sectionTemplates[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+	                    var _templateId = _step2.value;
+
+	                    templateItems[templateItems.length] = {
+	                        id: _templateId,
+	                        name: _templateId
+	                    };
+	                }
+	            } catch (err) {
+	                _didIteratorError2 = true;
+	                _iteratorError2 = err;
+	            } finally {
+	                try {
+	                    if (!_iteratorNormalCompletion2 && _iterator2.return) {
+	                        _iterator2.return();
+	                    }
+	                } finally {
+	                    if (_didIteratorError2) {
+	                        throw _iteratorError2;
+	                    }
+	                }
+	            }
+
+	            return {
+	                label: 'Templates',
+	                route: '/templates/',
+	                icon: 'code',
+	                items: templateItems,
+
+	                // Item context menu
+	                itemContextMenu: {
+	                    'This template': '---',
+	                    'Copy id': function CopyId() {
+	                        _this2.onClickCopyItemId();
+	                    },
+	                    'Remove': function Remove() {
+	                        _this2.onClickRemoveTemplate();
+	                    }
+	                },
+
+	                // General context menu
+	                paneContextMenu: {
+	                    'Template': '---',
+	                    'Add user': function AddUser() {
+	                        _this2.onClickAddTemplate();
+	                    }
+	                }
+	            };
+	        }
+	    }]);
+
+	    return TemplatePane;
+	}(Pane);
+
+	module.exports = TemplatePane;
+
+/***/ },
+/* 170 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	// Templates
+
+	Router.route('/templates/', function () {
+	    if (currentUserHasScope('templates')) {
+	        ViewHelper.get('NavbarMain').showTab('/templates/');
+
+	        populateWorkspace(_.div({ class: 'dashboard-container' }, _.h1('Templates'), _.p('Please click on a template to continue')), 'presentation presentation-center');
+	    } else {
+	        location.hash = '/';
+	    }
+	});
+
+	// Edit
+	Router.route('/templates/:id', function () {
+	    if (currentUserHasScope('templates')) {
+	        ViewHelper.get('NavbarMain').highlightItem(this.id);
+
+	        /*apiCall('get', 'templates/' + this.id)
+	        .then((template) => {
+	            let templateEditor = new TemplateEditor({
+	                model: template
+	            });
+	             populateWorkspace(templateEditor.$element);
+	        })
+	        .catch(errorModal);*/
 	    } else {
 	        location.hash = '/';
 	    }

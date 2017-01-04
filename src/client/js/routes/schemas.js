@@ -5,11 +5,12 @@ Router.route('/schemas/', function() {
     if(currentUserHasScope('schemas')) {
         ViewHelper.get('NavbarMain').showTab('/schemas/');
         
-        $('.workspace').html(
+        populateWorkspace(
             _.div({class: 'dashboard-container'},
-                _.h1('Schemas dashboard'),
+                _.h1('Schemas'),
                 _.p('Please click on a schema to proceed')
-            )
+            ),
+            'presentation presentation-center'
         );
     
     } else {
@@ -27,7 +28,7 @@ Router.route('/schemas/:id', function() {
         
         ViewHelper.get('NavbarMain').highlightItem(this.id);
         
-        $('.workspace').html(schemaEditor.$element);
+        populateWorkspace(schemaEditor.$element);
     
     } else {
         location.hash = '/';
@@ -53,7 +54,7 @@ Router.route('/schemas/json/:id', function() {
 
         ViewHelper.get('NavbarMain').highlightItem(this.id);
         
-        $('.workspace').html(jsonEditor.$element);
+        populateWorkspace(jsonEditor.$element);
     
     } else {
         location.hash = '/';

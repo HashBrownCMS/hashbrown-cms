@@ -15,6 +15,7 @@ let MediaPane = require('./MediaPane');
 let SchemaPane = require('./SchemaPane');
 let SettingsPane = require('./SettingsPane');
 let UserPane = require('./UserPane');
+let TemplatePane = require('./TemplatePane');
 
 /**
  * The main navbar
@@ -437,6 +438,7 @@ class NavbarMain extends View {
         let hasConnectionsScope = User.current.hasScope(ProjectHelper.currentProject, 'connections');
         let hasSchemasScope = User.current.hasScope(ProjectHelper.currentProject, 'schemas');
         let hasUsersScope = User.current.hasScope(ProjectHelper.currentProject, 'users');
+        let hasTemplatesScope = User.current.hasScope(ProjectHelper.currentProject, 'templates');
         let hasSettingsScope = User.current.hasScope(ProjectHelper.currentProject, 'settings');
         
         // Render the "cms" pane
@@ -450,6 +452,11 @@ class NavbarMain extends View {
         
         // Render the "forms" pane
         this.renderPane(FormsPane.getRenderSettings());
+        
+        // Render the "templates" pane
+        if(isAdmin || hasTemplatesScope) {
+            this.renderPane(TemplatePane.getRenderSettings());
+        }
         
         // Render the "connections" pane
         if(isAdmin || hasConnectionsScope) {

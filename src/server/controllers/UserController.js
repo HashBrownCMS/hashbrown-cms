@@ -17,7 +17,7 @@ class UserController extends ApiController {
         app.post('/api/user/activate', this.postActivate);
         app.post('/api/user/login', this.login);
         app.post('/api/:project/:environment/users/new', this.middleware({scope: 'users'}), this.createUser);
-        app.post('/api/:project/:environment/users/:id', this.middleware({scope: 'users'}), this.postUser);
+        app.post('/api/:project/:environment/users/:id', this.postUser);
         
         app.delete('/api/:project/:environment/users/:id', this.middleware({scope: 'users'}), this.deleteUser);
     }    
@@ -146,10 +146,19 @@ class UserController extends ApiController {
      */
     static postUser(req, res) {
         let id = req.params.id;
-        let user = req.body;
 
-        UserHelper.updateUserById(id, user)
+        ApiController.authenticate(req.cookies.token, req.params.project)
+        .then((user) => {
+            if(user.id == id || user.hasScope(req.params.project, 'users')) {
+                return Promise.resolve();
+            }
+
+            return Promise.reject(new Error('User "' + user.name + '" does not have scope "users"'));
+        })
         .then(() => {
+            UserHelper.updateUserById(id, req.body);
+        })
+        .then((user) => {
             res.status(200).send(user);
         })
         .catch((e) => {

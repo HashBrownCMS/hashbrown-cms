@@ -39,8 +39,8 @@ class MessageModal extends View {
     }
 
     reload() {
-        this.$element.find('.modal-title').html(this.renderTitle());
-        this.$element.find('.modal-body').html(this.renderBody());
+        _.append(this.$element.find('.modal-title').empty(), this.renderTitle());
+        _.append(this.$element.find('.modal-body').empty(), this.renderBody());
     }
 
     renderTitle() {

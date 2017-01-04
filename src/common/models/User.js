@@ -48,6 +48,7 @@ class User extends Entity {
      * @returns {Boolean} hasScope
      */
     hasScope(project, scope) {
+        if(this.isAdmin) { return true; }
         if(!scope && !this.scopes[project]) { return false; }
 
         if(!this.scopes[project]) {

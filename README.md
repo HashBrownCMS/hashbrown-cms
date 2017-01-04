@@ -4,14 +4,14 @@ A free and open-source CMS built with Node.js and MongoDB
 ## The centralised approach
 Ever wonder why you have to run a completely separate CMS for every single project? We did too, and that's why HashBrown exists today. This is the new central brain for your extended project structure.
 
-## Building and running HashBrown from source  
-Dependencies:  
-- node.js v6 
-- mongodb v3.2  
+## Installing and running HashBrown
+First make sure you have these dependencies met:  
+- node.js >= v6 
+- mongodb >= v3.2  
 
-Commands:  
+Then checkout and run HashBrown:
 ```
-git clone https://github.com/Putaitu/hashbrown-cms.git
+git clone https://github.com/Putaitu/hashbrown-cms.git -b stable --single-branch
 cd ./hashbrown-cms
 npm install
 node hashbrown.js

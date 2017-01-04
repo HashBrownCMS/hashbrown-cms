@@ -16,6 +16,8 @@ class ApiController extends Controller {
      * @param {String} token
      * @param {String} project
      * @param {String} scope
+     *
+     * @returns {Promise} User object
      */
     static authenticate(token, project, scope) {
         if(!token) {

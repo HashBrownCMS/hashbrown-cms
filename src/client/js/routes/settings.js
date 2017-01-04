@@ -5,26 +5,12 @@ Router.route('/settings/', function() {
     if(currentUserHasScope('settings')) {
         ViewHelper.get('NavbarMain').showTab('/settings/');
         
-        $('.workspace').html(
+        populateWorkspace(
             _.div({class: 'dashboard-container'},
-                _.h1('Settings dashboard'),
-                _.p('Please click on a settings item to proceed')
-            )
-        );
-    
-    } else {
-        location.hash = '/';
-
-    }
-});
-
-// Languages
-Router.route('/settings/languages/', function() {
-    if(currentUserHasScope('settings')) {
-        ViewHelper.get('NavbarMain').highlightItem('languages');
-        
-        $('.workspace').html(
-            new LanguageSettings().$element
+                _.h1('Settings'),
+                _.p('Please click on a section to proceed')
+            ),
+            'presentation presentation-center'
         );
     
     } else {
@@ -38,7 +24,7 @@ Router.route('/settings/sync/', function() {
     if(currentUserHasScope('settings')) {
         ViewHelper.get('NavbarMain').highlightItem('sync');
         
-        $('.workspace').html(
+        populateWorkspace(
             new SyncSettings().$element
         );
     
@@ -48,13 +34,13 @@ Router.route('/settings/sync/', function() {
     }
 });
 
-// Info
-Router.route('/settings/info/', function() {
+// Providers
+Router.route('/settings/providers/', function() {
     if(currentUserHasScope('settings')) {
-        ViewHelper.get('NavbarMain').highlightItem('info');
+        ViewHelper.get('NavbarMain').highlightItem('providers');
         
-        $('.workspace').html(
-            new InfoSettings().$element
+        populateWorkspace(
+            new ProvidersSettings().$element
         );
     
     } else {

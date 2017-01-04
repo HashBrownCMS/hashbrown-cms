@@ -4,16 +4,12 @@
 Router.route('/media/', function() {
     ViewHelper.get('NavbarMain').showTab('/media/');
     
-    $('.workspace').html(
+    populateWorkspace(
         _.div({class: 'dashboard-container'},
-            _.h1('Media dashboard'),
-            _.p('Please click on a media object to proceed'),
-            _.button({class: 'btn btn-primary'},
-                'Upload media'
-            ).click(() => {
-                ViewHelper.get('NavbarMain').mediaPane.onClickUploadMedia();
-            })
-        )
+            _.h1('Media'),
+            _.p('Please click on a media object to proceed')
+        ),
+        'presentation presentation-center'
     );
 });
 
@@ -25,5 +21,5 @@ Router.route('/media/:id', function() {
     
     ViewHelper.get('NavbarMain').highlightItem(this.id);
     
-    $('.workspace').html(mediaViewer.$element);
+    populateWorkspace(mediaViewer.$element);
 });

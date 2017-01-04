@@ -232,16 +232,26 @@ class MediaPane extends Pane {
     }
     
     /**
+     * Event: Click browse media
+     */
+    static onClickBrowseMedia() {
+        new MediaBrowser();
+    }
+
+    /**
      * Renders the toolbar
      *
      * @returns {HTMLElement} Toolbar
      */
     static renderToolbar() {
         let $toolbar = _.div({class: 'pane-toolbar'},
-            _.div({},
-                _.label('Library'),
+            _.div(
                 _.button({class: 'btn btn-primary'}, 'Upload media')
                     .click(() => { this.onClickUploadMedia(); })
+            ),
+            _.div(
+                _.button({class: 'btn btn-primary'}, 'Browse')
+                    .click(() => { this.onClickBrowseMedia(); })
             )
         );
 

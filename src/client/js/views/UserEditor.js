@@ -83,6 +83,7 @@ class UserEditor extends View {
             'connections',
             'schemas',
             'settings',
+            'templates',
             'users'
         ];
     }

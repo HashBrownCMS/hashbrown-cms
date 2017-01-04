@@ -122,89 +122,6 @@ class ConnectionPane extends Pane {
     }
 
     /**
-     * Renders the toolbar
-     *
-     * @returns {HTMLElement} The toolbar element
-     */
-    static renderToolbar() {
-        let $mediaProvider;
-        let $templateProvider;
-
-        function onChangeMediaProvider() {
-            ConnectionHelper.setMediaProvider(ProjectHelper.currentProject, ProjectHelper.currentEnvironment, $(this).val())
-            .then(() => {
-                return reloadResource('media');
-            })
-            .then(() => {
-                ViewHelper.get('NavbarMain').reload();
-            })
-            .catch(UI.errorModal);
-        }
-
-        function onChangeTemplateProvider() {
-            ConnectionHelper.setTemplateProvider(ProjectHelper.currentProject, ProjectHelper.currentEnvironment, $(this).val())
-            .then(() => {
-                return reloadResource('templates');
-            })
-            .then(() => {
-                return reloadResource('sectionTemplates');
-            })
-            .then(() => {
-                ViewHelper.get('NavbarMain').reload();
-            })
-            .catch(UI.errorModal);
-        }
-
-        let $toolbar = _.div({class: 'pane-toolbar'},
-            _.div({},
-                _.label('Media provider'),
-                $mediaProvider = _.select({class: 'btn btn-primary'},
-                    _.option({value: null}, '(none)'),
-                    _.each(resources.connections, (i, connection) => {
-                        return _.option({value: connection.id},
-                            connection.title
-                        );
-                    })
-                ).change(onChangeMediaProvider)
-            ),
-            _.div({},
-                _.label('Template provider'),
-                $templateProvider = _.select({class: 'btn btn-primary'},
-                    _.option({value: null}, '(none)'),
-                    _.each(resources.connections, (i, connection) => {
-                        return _.option({value: connection.id},
-                            connection.title
-                        );
-                    })
-                ).change(onChangeTemplateProvider)
-            )
-        );
-        
-        SettingsHelper.getSettings(ProjectHelper.currentProject, ProjectHelper.currentEnvironment, 'providers')
-        
-        // Previously, providers were set project-wide, so retrieve automatically if needed
-        .then((providers) => {
-            if(!providers) {
-                return SettingsHelper.getSettings(ProjectHelper.currentProject, null, 'providers');
-            
-            } else {
-                return Promise.resolve(providers);
-            }
-        })
-
-        // Set providers values
-        .then((providers) => {
-            providers = providers || {};
-
-            $mediaProvider.val(providers.media);
-            $templateProvider.val(providers.template);
-        })
-        .catch(UI.errorModal);
-
-        return $toolbar;
-    }
-
-    /**
      * Gets render settings
      *
      * @returns {Object} settings
@@ -215,7 +132,6 @@ class ConnectionPane extends Pane {
             route: '/connections/',
             icon: 'exchange',
             items: resources.connections,
-            toolbar: this.renderToolbar(),
 
             // Item context menu
             getItemContextMenu: (item) => {

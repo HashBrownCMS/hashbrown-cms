@@ -13,6 +13,11 @@ class SettingsPane extends Pane {
                     name: 'Sync',
                     path: 'sync',
                     icon: 'refresh'
+                },
+                {
+                    name: 'Providers',
+                    path: 'providers',
+                    icon: 'exchange'
                 }
             ]
         };
