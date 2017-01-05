@@ -20,19 +20,15 @@ Router.route('/templates/', function() {
 });
 
 // Edit
-Router.route('/templates/:id', function() {
+Router.route('/templates/:type/:id', function() {
     if(currentUserHasScope('templates')) {
         ViewHelper.get('NavbarMain').highlightItem(this.id);
         
-        /*apiCall('get', 'templates/' + this.id)
-        .then((template) => {
-            let templateEditor = new TemplateEditor({
-                model: template
-            });
+        let templateEditor = new TemplateEditor({
+            modelUrl: apiUrl('templates/' + this.type + '/' + this.id)
+        });
 
-            populateWorkspace(templateEditor.$element);
-        })
-        .catch(errorModal);*/
+        populateWorkspace(templateEditor.$element);
     
     } else {
         location.hash = '/';

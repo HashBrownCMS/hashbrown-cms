@@ -1190,29 +1190,29 @@ body > .dashboard-container {
       overflow: hidden;
       text-overflow: ellipsis; }
 
-.json-editor {
+.template-editor, .json-editor {
   width: 100%;
   height: 100%;
   position: relative; }
-  .json-editor .CodeMirror {
+  .template-editor .CodeMirror, .json-editor .CodeMirror {
     height: 100%;
     display: block;
     width: 100%;
     position: absolute;
     top: 0px;
     left: 0px; }
-  .json-editor .btn-prettify {
+  .template-editor .btn-prettify, .json-editor .btn-prettify {
     position: absolute;
     top: calc(100% - 1em);
     right: 1em;
     transform: translateY(-100%); }
-  .json-editor .cm-theme span {
+  .template-editor .cm-theme span, .json-editor .cm-theme span {
     line-height: 30px;
     margin-right: 2em;
     text-transform: uppercase;
     font-weight: 700;
     color: #bdbdbd; }
-  .json-editor .error {
+  .template-editor .error, .json-editor .error {
     position: absolute;
     right: 0px;
     bottom: 0px;
@@ -1222,7 +1222,7 @@ body > .dashboard-container {
     background-color: #e53935;
     padding: 15px;
     border-bottom-left-radius: 2px; }
-    .json-editor .error .error-heading {
+    .template-editor .error .error-heading, .json-editor .error .error-heading {
       font-weight: 700;
       padding: 0px 0px 5px 0px; }
 

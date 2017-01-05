@@ -4,12 +4,16 @@ class ContentHelper {
     /**
      * Gets all Content objects
      *
+     * @param {String} project
+     * @param {String} environment
+     *
      * @return {Promise} promise
      */
-    static getAllContents() {
-        return new Promise((resolve, reject) => {
-            resolve();
-        });
+    static getAllContents(
+        project = requiredParam('project'),
+        environment = requiredParam('environment')
+    ) {
+        return Promise.resolve();
     }
 
     /**
@@ -35,25 +39,36 @@ class ContentHelper {
     /**
      * Gets a Content object by id
      *
+     * @param {String} project
+     * @param {String} environment
      * @param {Number} id
      *
      * @return {Promise} promise
      */
-    static getContentById(id) {
-        return new Promise((resolve, reject) => {
-            resolve();
-        });
+    static getContentById(
+        project = requiredParam('project'),
+        environment = requiredParam('environment'),
+        id = requiredParam('id')
+    ) {
+        return Promise.resolve();
     }
     
     /**
      * Sets a Content object by id
      *
+     * @param {String} project
+     * @param {String} environment
      * @param {Number} id
      * @param {Object} content
      *
      * @return {Promise} promise
      */
-    static setContentById(id, content) {
+    static setContentById(
+        project = requiredParam('project'),
+        environment = requiredParam('environment'),
+        id = requiredParam('id'),
+        content = requiredParam('content')
+    ) {
         return new Promise((resolve, reject) => {
             resolve();
         });
@@ -62,37 +77,38 @@ class ContentHelper {
     /**
      * Checks if a Schema type is allowed as a child of a Content object
      *
+     * @param {String} project
+     * @param {String} environment
      * @param {String} parentId
      * @param {String} childSchemaId
      *
      * @returns {Promise} Is the Content node allowed as a child
      */
-    static isSchemaAllowedAsChild(parentId, childSchemaId) {
-        return new Promise((resolve, reject) => {
-            // No parent ID means root, and all Schemas are allowed there
-            if(!parentId) {
-                resolve();
+    static isSchemaAllowedAsChild(
+        project = requiredParam('project'),
+        environment = requiredParam('environment'),
+        parentId = requiredParam('parentId'),
+        childSchemaId = requiredParam('childSchemaId')
+    ) {
+        // No parent ID means root, and all Schemas are allowed there
+        if(!parentId) {
+            return Promise.resolve();
 
-            } else {
-                this.getContentById(parentId)
-                .then((parentContent) => {
-                    SchemaHelper.getSchemaById(parentContent.schemaId)
-                    .then((parentSchema) => {
-                        if(
-                            parentSchema.allowedChildSchemas.indexOf(childSchemaId) < 0
-                        ) {
-                            reject(new Error('Content with Schema "' + childSchemaId + '" is not an allowed child of Content with Schema "' + parentSchema.id + '"'));
-                        
-                        } else {
-                            resolve();
+        } else {
+            return this.getContentById(project, environment, parentId)
+            .then((parentContent) => {
+                return SchemaHelper.getSchemaById(project, environment, parentContent.schemaId);
+            })
+            .then((parentSchema) => {
+                if(parentSchema.allowedChildSchemas.indexOf(childSchemaId) < 0) {
+                    return Promise.reject(new Error('Content with Schema "' + childSchemaId + '" is not an allowed child of Content with Schema "' + parentSchema.id + '"'));
+                
+                } else {
+                    return Promise.resolve();
 
-                        }
-                    })
-                    .catch(reject);
-                })
-                .catch(reject);
-            }
-        });
+                }
+            });
+        }
     }
 
     /**

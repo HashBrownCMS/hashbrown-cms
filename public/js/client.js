@@ -48,8 +48,6 @@
 
 	// NOTE: a temporary fix for webpack
 
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
 	window._crypto = null;
 
 	// Style
@@ -64,7 +62,6 @@
 	    schemas: [],
 	    media: [],
 	    templates: [],
-	    sectionTemplates: [],
 	    forms: [],
 	    users: []
 	};
@@ -87,6 +84,7 @@
 
 	// Editor views
 	window.JSONEditor = __webpack_require__(124);
+	window.TemplateEditor = __webpack_require__(171);
 	window.ContentEditor = __webpack_require__(129);
 	window.FormEditor = __webpack_require__(130);
 	window.ConnectionEditor = __webpack_require__(131);
@@ -100,6 +98,7 @@
 	window.Content = __webpack_require__(138);
 	window.Media = __webpack_require__(139);
 	window.User = __webpack_require__(141);
+	window.Template = __webpack_require__(172);
 
 	// Helpers
 	window.MediaHelper = __webpack_require__(142);
@@ -141,7 +140,19 @@
 	/**
 	 * Reloads a resource
 	 */
-	window.reloadResource = function reloadResource(name, model) {
+	window.reloadResource = function reloadResource(name) {
+	    var model = null;
+
+	    switch (name) {
+	        case 'templates':
+	            model = Template;
+	            break;
+
+	        case 'users':
+	            model = User;
+	            break;
+	    }
+
 	    return new Promise(function (resolve, reject) {
 	        $.ajax({
 	            type: 'GET',
@@ -164,7 +175,9 @@
 	                } else if (e.status == 404) {
 	                    resolve([]);
 	                } else {
-	                    reject(new Error(e.responseText));
+	                    resolve([]);
+
+	                    UI.errorModal(new Error(e.responseText));
 	                }
 	            }
 	        });
@@ -177,25 +190,16 @@
 	window.reloadAllResources = function reloadAllResources() {
 	    $('.loading-messages').empty();
 
-	    var queue = ['content', 'schemas', 'media', 'connections', 'templates', 'sectionTemplates', 'forms', ['users', User]];
+	    var queue = ['content', 'schemas', 'media', 'connections', 'templates', 'forms', 'users'];
 
 	    function processQueue() {
-	        var entry = queue.pop();
-	        var name = void 0;
-	        var model = void 0;
-
-	        if ((typeof entry === 'undefined' ? 'undefined' : _typeof(entry)) === 'object') {
-	            name = entry[0];
-	            model = entry[1];
-	        } else {
-	            name = entry;
-	        }
+	        var name = queue.pop();
 
 	        var $msg = _.div({ 'data-name': name }, 'Loading ' + name + '...');
 
 	        $('.loading-messages').append($msg);
 
-	        return window.reloadResource(name, model).then(function () {
+	        return window.reloadResource(name).then(function () {
 	            $msg.append(' OK');
 
 	            if (queue.length < 1) {
@@ -12188,6 +12192,11 @@
 	                var icon = item.icon;
 	                var $icon = void 0;
 
+	                // Implement custom routing paths
+	                if (typeof params.itemPath === 'function') {
+	                    routingPath = params.itemPath(item);
+	                }
+
 	                // Truncate long names
 	                if (name.length > 30) {
 	                    name = name.substring(0, 30) + '...';
@@ -21025,6 +21034,7 @@
 	            // Event when psating the copied Content
 	            this.onClickPasteContent = function onClickPasteContent() {
 	                var parentId = $('.context-menu-target-element').data('id');
+	                var newContentId = void 0;
 
 	                // API call to get copied Content model 
 	                apiCall('get', 'content/' + id)
@@ -21033,13 +21043,13 @@
 	                .then(function (copiedContent) {
 	                    delete copiedContent['id'];
 
-	                    copiedContent.parentId = parentId;
-
-	                    return apiCall('post', 'content/new', copiedContent);
+	                    return apiCall('post', 'content/new/' + copiedContent.schemaId + '?parent=' + parentId, copiedContent.properties);
 	                })
 
-	                // Upoen success, reload all Content models
-	                .then(function () {
+	                // Upon success, reload all Content models
+	                .then(function (newContent) {
+	                    newContentId = newContent.id;
+
 	                    return reloadResource('content');
 	                })
 
@@ -21047,6 +21057,8 @@
 	                .then(function () {
 	                    navbar.reload();
 	                    navbar.onClickPasteContent = null;
+
+	                    location.hash = '/content/' + newContentId;
 	                }).catch(UI.errorModal);
 	            };
 	        }
@@ -21434,7 +21446,11 @@
 	                        _this3.onClickCopyItemId();
 	                    };
 	                    menu['Paste'] = function () {
-	                        _this3.onClickPasteContent();
+	                        if (_this3.onClickPasteContent) {
+	                            _this3.onClickPasteContent();
+	                        } else {
+	                            UI.messageModal('Paste content', 'Nothing to paste');
+	                        }
 	                    };
 
 	                    if (!item.local && !item.remote && !item.locked) {
@@ -22748,7 +22764,61 @@
 	        /**
 	         * Event: Click add Template
 	         */
-	        value: function onClickAddTemplate() {}
+	        value: function onClickAddTemplate() {
+	            var newTemplate = new Template({ type: 'page' });
+
+	            UI.confirmModal('add', 'Add new template', [_.div({ class: 'input-group' }, _.span('Type'), _.div({ class: 'input-group-addon' }, _.select({ class: 'form-control' }, _.each(['page', 'section'], function (i, type) {
+	                return _.option({ value: type }, type);
+	            })).val(newTemplate.type).on('change', function (e) {
+	                newTemplate.type = e.target.value;
+	            }))), _.div({ class: 'input-group' }, _.span('Name'), _.div({ class: 'input-group-addon' }, _.input({ class: 'form-control', type: 'text', placeholder: 'Template name' }).on('change keyup paste propertychange', function (e) {
+	                newTemplate.name = e.target.value;
+	            })))], function () {
+	                newTemplate.updateFromName();
+
+	                // Sanity check
+	                if (!newTemplate.type || !newTemplate.name || newTemplate.name.length < 2) {
+	                    return false;
+	                }
+
+	                // Look for duplicate id
+	                var _iteratorNormalCompletion = true;
+	                var _didIteratorError = false;
+	                var _iteratorError = undefined;
+
+	                try {
+	                    for (var _iterator = resources.templates[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	                        var template = _step.value;
+
+	                        if (template.id == newTemplate.id && template.type == newTemplate.type) {
+	                            UI.errorModal(new Error('A Template of type "' + template.type + '" and id "' + template.id + '" already exists'));
+	                            return;
+	                        }
+	                    }
+	                } catch (err) {
+	                    _didIteratorError = true;
+	                    _iteratorError = err;
+	                } finally {
+	                    try {
+	                        if (!_iteratorNormalCompletion && _iterator.return) {
+	                            _iterator.return();
+	                        }
+	                    } finally {
+	                        if (_didIteratorError) {
+	                            throw _iteratorError;
+	                        }
+	                    }
+	                }
+
+	                apiCall('post', 'templates/' + newTemplate.type + '/' + newTemplate.id, newTemplate).then(function () {
+	                    return reloadResource('templates');
+	                }).then(function () {
+	                    NavbarMain.reload();
+
+	                    location.hash = '/templates/' + newTemplate.type + '/' + newTemplate.id;
+	                }).catch(UI.errorModal);
+	            });
+	        }
 
 	        /**
 	         * Event: On click remove Template
@@ -22756,61 +22826,23 @@
 
 	    }, {
 	        key: 'onClickRemoveTemplate',
-	        value: function onClickRemoveTemplate() {}
+	        value: function onClickRemoveTemplate() {
+	            var id = $('.context-menu-target-element').data('id');
+	            var type = $('.context-menu-target-element').attr('href').replace('#/templates/', '').replace('/' + id, '');
 
-	        /**
-	         * Gets the render settings
-	         *
-	         * @returns {Object} Settings
-	         */
-
-	    }, {
-	        key: 'getRenderSettings',
-	        value: function getRenderSettings() {
-	            var _this2 = this;
-
-	            var templateItems = [];
-
-	            var _iteratorNormalCompletion = true;
-	            var _didIteratorError = false;
-	            var _iteratorError = undefined;
-
-	            try {
-	                for (var _iterator = resources.templates[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-	                    var templateId = _step.value;
-
-	                    templateItems[templateItems.length] = {
-	                        id: templateId,
-	                        name: templateId
-	                    };
-	                }
-	            } catch (err) {
-	                _didIteratorError = true;
-	                _iteratorError = err;
-	            } finally {
-	                try {
-	                    if (!_iteratorNormalCompletion && _iterator.return) {
-	                        _iterator.return();
-	                    }
-	                } finally {
-	                    if (_didIteratorError) {
-	                        throw _iteratorError;
-	                    }
-	                }
-	            }
+	            var model = void 0;
 
 	            var _iteratorNormalCompletion2 = true;
 	            var _didIteratorError2 = false;
 	            var _iteratorError2 = undefined;
 
 	            try {
-	                for (var _iterator2 = resources.sectionTemplates[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-	                    var _templateId = _step2.value;
+	                for (var _iterator2 = resources.templates[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+	                    var template = _step2.value;
 
-	                    templateItems[templateItems.length] = {
-	                        id: _templateId,
-	                        name: _templateId
-	                    };
+	                    if (template.id == id && template.type == type) {
+	                        model = template;
+	                    }
 	                }
 	            } catch (err) {
 	                _didIteratorError2 = true;
@@ -22827,17 +22859,135 @@
 	                }
 	            }
 
+	            if (!model) {
+	                UI.errorModal(new Error('Template of id "' + id + '" and type "' + type + '" was not found'));
+	                return;
+	            }
+
+	            UI.confirmModal('delete', 'Delete "' + model.name + '"', 'Are you sure you want to delete this template?', function () {
+	                apiCall('delete', 'templates/' + model.type + '/' + model.id).then(function () {
+	                    return reloadResource('templates');
+	                }).then(function () {
+	                    NavbarMain.reload();
+
+	                    // Cancel the TemplateEditor view if it was displaying the deleted Template
+	                    if (location.hash == '#/templates/' + model.type + '/' + model.id) {
+	                        location.hash = '/templates/';
+	                    }
+	                }).catch(UI.errorModal);
+	            });
+	        }
+
+	        /**
+	         * Event: On click rename Template
+	         */
+
+	    }, {
+	        key: 'onClickRenameTemplate',
+	        value: function onClickRenameTemplate() {
+	            var id = $('.context-menu-target-element').data('id');
+	            var type = $('.context-menu-target-element').attr('href').replace('#/templates/', '').replace('/' + id, '');
+	            var templateEditor = ViewHelper.get('TemplateEditor');
+	            var model = void 0;
+
+	            var _iteratorNormalCompletion3 = true;
+	            var _didIteratorError3 = false;
+	            var _iteratorError3 = undefined;
+
+	            try {
+	                for (var _iterator3 = resources.templates[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+	                    var template = _step3.value;
+
+	                    if (template.id == id && template.type == type) {
+	                        model = template;
+	                    }
+	                }
+	            } catch (err) {
+	                _didIteratorError3 = true;
+	                _iteratorError3 = err;
+	            } finally {
+	                try {
+	                    if (!_iteratorNormalCompletion3 && _iterator3.return) {
+	                        _iterator3.return();
+	                    }
+	                } finally {
+	                    if (_didIteratorError3) {
+	                        throw _iteratorError3;
+	                    }
+	                }
+	            }
+
+	            if (!model) {
+	                UI.errorModal(new Error('Template of id "' + id + '" and type "' + type + '" was not found'));
+	                return;
+	            }
+
+	            UI.confirmModal('rename', 'Rename "' + model.name + '"', _.input({ class: 'form-control', type: 'text', value: model.name, placeholder: 'Enter Template name' }).on('keyup paste change propertychange', function (e) {
+	                var oldName = model.name;
+
+	                model.name = e.target.value;
+	            }), function () {
+	                apiCall('post', 'templates/' + type + '/' + id, model).then(function (newTemplate) {
+	                    return reloadResource('templates');
+	                }).then(function () {
+	                    ViewHelper.get('NavbarMain').reload();
+
+	                    // Go to new Template if TemplateEditor was showing the old one
+	                    if (templateEditor && templateEditor.model.id == model.id) {
+	                        model.updateFromName();
+
+	                        if (model.id == templateEditor.model.id) {
+	                            templateEditor.model = null;
+	                            templateEditor.fetch();
+	                        } else {
+	                            location.hash = '/templates/' + model.type + '/' + model.id;
+	                        }
+	                    }
+	                }).catch(UI.errorModal);
+	            });
+	        }
+
+	        /**
+	         * Gets the render settings
+	         *
+	         * @returns {Object} Settings
+	         */
+
+	    }, {
+	        key: 'getRenderSettings',
+	        value: function getRenderSettings() {
+	            var _this2 = this;
+
 	            return {
 	                label: 'Templates',
 	                route: '/templates/',
 	                icon: 'code',
-	                items: templateItems,
+	                items: resources.templates,
+
+	                // Item path
+	                itemPath: function itemPath(item) {
+	                    return item.type + '/' + item.id;
+	                },
+
+	                // Sorting logic
+	                sort: function sort(item, queueItem) {
+	                    queueItem.$element.attr('data-template-id', item.id);
+
+	                    if (!item.parentId) {
+	                        queueItem.createDir = true;
+	                    }
+
+	                    queueItem.parentDirAttr = { 'data-template-id': item.parentId || item.type };
+	                },
 
 	                // Item context menu
 	                itemContextMenu: {
 	                    'This template': '---',
 	                    'Copy id': function CopyId() {
 	                        _this2.onClickCopyItemId();
+	                    },
+	                    'Rename': function Rename() {
+	                        _this2.onClickRenameTemplate();
 	                    },
 	                    'Remove': function Remove() {
 	                        _this2.onClickRemoveTemplate();
@@ -22847,7 +22997,7 @@
 	                // General context menu
 	                paneContextMenu: {
 	                    'Template': '---',
-	                    'Add user': function AddUser() {
+	                    'Add template': function AddTemplate() {
 	                        _this2.onClickAddTemplate();
 	                    }
 	                }
@@ -23038,20 +23188,13 @@
 	    }, {
 	        key: 'renderLocalSwitch',
 	        value: function renderLocalSwitch() {
-	            var view = this;
+	            var _this2 = this;
 
-	            function onChange() {
-	                view.model.isLocal = this.checked;
+	            return _.div({ class: 'field-editor' }, UI.inputSwitch(this.model.isLocal == true, function (newValue) {
+	                _this2.model.isLocal = newValue;
 
-	                view.render();
-	            }
-
-	            return _.div({ class: 'field-editor' }, _.div({ class: 'switch' }, _.input({
-	                id: 'switch-is-local',
-	                class: 'form-control switch',
-	                type: 'checkbox',
-	                checked: this.model.isLocal == true
-	            }).change(onChange), _.label({ for: 'switch-is-local' })));
+	                _this2.render();
+	            }));
 	        }
 
 	        /**
@@ -25348,8 +25491,16 @@
 
 	            this.$element = _.div({ class: 'field-editor template-reference-editor' });
 
-	            var resource = window.resources[this.config.resource || 'templates'];
+	            var resource = window.resources.templates;
 	            var dropdownOptions = [];
+
+	            // Sanity check for template type
+	            this.config.type = this.config.type || 'page';
+
+	            // Backwards compatibility check for template type
+	            if (this.config.resource == 'sectionTemplates') {
+	                this.config.type = 'section';
+	            }
 
 	            // Sanity check for allowed templates
 	            if (!this.config.allowedTemplates) {
@@ -25391,16 +25542,16 @@
 	                for (var _iterator = resource[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
 	                    var template = _step.value;
 
-	                    var isAllowed = this.config.allowedTemplates.indexOf(template) > -1;
+	                    var isAllowed = this.config.type == template.type && this.config.allowedTemplates.indexOf(template.id) > -1;
 
 	                    if (!isAllowed) {
 	                        continue;
 	                    }
 
 	                    dropdownOptions[dropdownOptions.length] = {
-	                        label: template,
-	                        value: template,
-	                        selected: template == this.value
+	                        label: template.name,
+	                        value: template.id,
+	                        selected: template.id == this.value
 	                    };
 	                }
 
@@ -25750,19 +25901,11 @@
 	    }
 
 	    /**
-	     * Event: Successful API call
+	     * Event: Click basic. Returns to the regular editor
 	     */
 
 
 	    _createClass(JSONEditor, [{
-	        key: 'onSuccess',
-	        value: function onSuccess() {}
-
-	        /**
-	         * Event: Click basic. Returns to the regular editor
-	         */
-
-	    }, {
 	        key: 'onClickBasic',
 	        value: function onClickBasic() {
 	            var url = $('.navbar-main .pane-container.active .pane-item-container.active .pane-item').attr('href');
@@ -25781,10 +25924,16 @@
 	    }, {
 	        key: 'onClickSave',
 	        value: function onClickSave() {
+	            var _this2 = this;
+
 	            var view = this;
 
+	            this.$saveBtn.toggleClass('working', true);
+
 	            if (this.debug()) {
-	                apiCall('post', this.apiPath, this.model).then(this.onSuccess).catch(UI.errorModal);
+	                apiCall('post', this.apiPath, this.model).then(function () {
+	                    _this2.$saveBtn.toggleClass('working', false);
+	                }).catch(UI.errorModal);
 	            } else {
 	                UI.errorModal('Unable to save', 'Please refer to the error prompt for details');
 	            }
@@ -25809,12 +25958,14 @@
 
 	        /**
 	         * Debug the JSON string
+	         *
+	         * @param {Boolean} fromModel
 	         */
 
 	    }, {
 	        key: 'debug',
-	        value: function debug() {
-	            var _this2 = this;
+	        value: function debug(fromModel) {
+	            var _this3 = this;
 
 	            var isValid = true;
 
@@ -25888,9 +26039,9 @@
 
 	                            try {
 	                                for (var _iterator = resources.templates[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-	                                    var _id = _step.value;
+	                                    var template = _step.value;
 
-	                                    if (_id == v) {
+	                                    if (template.id == v) {
 	                                        return;
 	                                    }
 	                                }
@@ -25909,16 +26060,63 @@
 	                                }
 	                            }
 
+	                            return 'Template "' + v + '" not found';
+	                        }
+
+	                        break;
+
+	                    case 'config':
+	                        // Backward compatibility adjustment for template configs
+	                        if (v.resource) {
+	                            switch (v.resource) {
+	                                case 'sectionTemplates':
+	                                    v.type = 'section';
+	                                    delete v.resource;
+	                                    break;
+
+	                                case 'templates':
+	                                    v.type = 'page';
+	                                    delete v.resource;
+	                                    break;
+	                            }
+	                        }
+
+	                        // Allowed templates config
+	                        if (v.allowedTemplates) {
+	                            // Assume that all templates are invalid
+	                            var invalidTemplates = v.allowedTemplates.slice(0);
+
+	                            // Backwards compatibility adjustment
+	                            if (v.resource) {
+	                                if (v.resource == 'sectionTemplates') {
+	                                    v.type = 'section';
+	                                } else {
+	                                    v.type = 'page';
+	                                }
+
+	                                delete v.resource;
+	                            }
+
+	                            // Sanity check for type
+	                            if (!v.type) {
+	                                v.type = 'page';
+	                            }
+
+	                            // Loop through all available templates
 	                            var _iteratorNormalCompletion2 = true;
 	                            var _didIteratorError2 = false;
 	                            var _iteratorError2 = undefined;
 
 	                            try {
-	                                for (var _iterator2 = resources.sectionTemplates[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-	                                    var _id2 = _step2.value;
+	                                for (var _iterator2 = resources.templates[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+	                                    var existingTemplate = _step2.value;
 
-	                                    if (_id2 == v) {
-	                                        return;
+	                                    for (var a = invalidTemplates.length - 1; a >= 0; a--) {
+
+	                                        // If a template was found, and it's of the correct type, remove it from the invalid templates array
+	                                        if (existingTemplate.type == v.type && existingTemplate.id == invalidTemplates[a]) {
+	                                            invalidTemplates.splice(a, 1);
+	                                        }
 	                                    }
 	                                }
 	                            } catch (err) {
@@ -25936,29 +26134,11 @@
 	                                }
 	                            }
 
-	                            return 'Template "' + v + '" not found';
-	                        }
-
-	                        break;
-
-	                    case 'config':
-	                        if (v.allowedTemplates) {
-	                            var invalidTemplates = v.allowedTemplates.slice(0);
-	                            var resource = resources[v.resource || 'templates'];
-
-	                            for (var _r2 in resource) {
-	                                for (var a = invalidTemplates.length - 1; a >= 0; a--) {
-	                                    if (resource[_r2] == invalidTemplates[a]) {
-	                                        invalidTemplates.splice(a, 1);
-	                                    }
-	                                }
-	                            }
-
 	                            if (invalidTemplates.length > 0) {
 	                                if (invalidTemplates.length == 1) {
-	                                    return 'Template "' + invalidTemplates[0] + '" not found';
+	                                    return 'Template "' + invalidTemplates[0] + '" of type "' + v.type + '" not found';
 	                                } else {
-	                                    return 'Templates "' + invalidTemplates.join(', ') + '" not found';
+	                                    return 'Templates "' + invalidTemplates.join(', ') + '" of type "' + v.type + '" not found';
 	                                }
 	                            }
 	                        }
@@ -25978,9 +26158,9 @@
 	                        var failMessage = check(k, v);
 
 	                        if (failMessage) {
-	                            _this2.$error.children('.error-heading').html('Input error');
-	                            _this2.$error.children('.error-body').html(failMessage);
-	                            _this2.$error.show();
+	                            _this3.$error.children('.error-heading').html('Input error');
+	                            _this3.$error.children('.error-body').html(failMessage);
+	                            _this3.$error.show();
 
 	                            isValid = false;
 	                        };
@@ -25995,7 +26175,9 @@
 
 	            // Syntax check
 	            try {
-	                this.model = JSON.parse(this.value);
+	                if (!fromModel) {
+	                    this.model = JSON.parse(this.value);
+	                }
 
 	                // Sanity check
 	                recurse(this.model);
@@ -26043,42 +26225,47 @@
 	    }, {
 	        key: 'render',
 	        value: function render() {
-	            var _this3 = this;
+	            var _this4 = this;
 
+	            // Debug once before entering into the code editor
+	            // This allows for backward compatibility adjustments to happen first
+	            this.debug(true);
+
+	            // Convert the model to a string value
 	            this.value = beautify(JSON.stringify(this.model));
 
 	            _.append(this.$element.empty(), _.div({ class: 'editor-body' }, this.$textarea = _.textarea(), this.$error), _.if(!this.embedded, _.div({ class: 'editor-footer' }, _.div({ class: 'btn-group pull-left cm-theme' }, _.span('Theme'), _.select({ class: 'form-control' }, _.each(['cobalt', 'default', 'night', 'railscasts'], function (i, theme) {
 	                return _.option({ value: theme }, theme);
 	            })).change(function () {
-	                _this3.onChangeTheme();
+	                _this4.onChangeTheme();
 	            }).val(getCookie('cmtheme') || 'default')), _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-embedded' }, 'Basic').click(function () {
-	                _this3.onClickBasic();
-	            }), _.if(!this.model.locked, _.button({ class: 'btn btn-raised btn-primary' }, 'Save ').click(function () {
-	                _this3.onClickSave();
+	                _this4.onClickBasic();
+	            }), _.if(!this.model.locked, this.$saveBtn = _.button({ class: 'btn btn-raised btn-primary' }, 'Save ').click(function () {
+	                _this4.onClickSave();
 	            }))))));
 
 	            setTimeout(function () {
-	                _this3.editor = CodeMirror.fromTextArea(_this3.$textarea[0], {
+	                _this4.editor = CodeMirror.fromTextArea(_this4.$textarea[0], {
 	                    lineNumbers: true,
 	                    mode: {
 	                        name: 'javascript',
 	                        json: true
 	                    },
-	                    viewportMargin: _this3.embedded ? Infinity : 10,
+	                    viewportMargin: _this4.embedded ? Infinity : 10,
 	                    tabSize: 4,
 	                    indentUnit: 4,
 	                    indentWithTabs: true,
 	                    theme: getCookie('cmtheme') || 'default',
-	                    value: _this3.value
+	                    value: _this4.value
 	                });
 
-	                _this3.editor.getDoc().setValue(_this3.value);
+	                _this4.editor.getDoc().setValue(_this4.value);
 
-	                _this3.editor.on('change', function () {
-	                    _this3.onChangeText();
+	                _this4.editor.on('change', function () {
+	                    _this4.onChangeText();
 	                });
 
-	                _this3.onChangeText();
+	                _this4.onChangeText();
 	            }, 1);
 	        }
 	    }]);
@@ -31016,12 +31203,7 @@
 	            apiCall('post', 'connections/' + view.model.id, view.model).then(function () {
 	                view.$saveBtn.toggleClass('saving', false);
 
-	                reloadResource('connections').then(function () {
-	                    var navbar = ViewHelper.get('NavbarMain');
-
-	                    view.reload();
-	                    navbar.reload();
-	                });
+	                location.reload();
 	            }).catch(this.onError);
 	        }
 
@@ -34730,21 +34912,9 @@
 	        /**
 	         * Gets templates
 	         *
-	         * @returns {Promise(Array)} templates
+	         * @returns {Promise} Array of Templates
 	         */
 	        value: function getTemplates() {
-	            return Promise.resolve([]);
-	        }
-
-	        /**
-	         * Gets section templates
-	         *
-	         * @returns {Promise(Array)} sectionTemplates
-	         */
-
-	    }, {
-	        key: 'getSectionTemplates',
-	        value: function getSectionTemplates() {
 	            return Promise.resolve([]);
 	        }
 
@@ -35106,12 +35276,16 @@
 	        /**
 	         * Gets all Content objects
 	         *
+	         * @param {String} project
+	         * @param {String} environment
+	         *
 	         * @return {Promise} promise
 	         */
 	        value: function getAllContents() {
-	            return new Promise(function (resolve, reject) {
-	                resolve();
-	            });
+	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+
+	            return Promise.resolve();
 	        }
 
 	        /**
@@ -35131,6 +35305,8 @@
 	        /**
 	         * Gets a Content object by id
 	         *
+	         * @param {String} project
+	         * @param {String} environment
 	         * @param {Number} id
 	         *
 	         * @return {Promise} promise
@@ -35138,15 +35314,19 @@
 
 	    }, {
 	        key: 'getContentById',
-	        value: function getContentById(id) {
-	            return new Promise(function (resolve, reject) {
-	                resolve();
-	            });
+	        value: function getContentById() {
+	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+	            var id = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('id');
+
+	            return Promise.resolve();
 	        }
 
 	        /**
 	         * Sets a Content object by id
 	         *
+	         * @param {String} project
+	         * @param {String} environment
 	         * @param {Number} id
 	         * @param {Object} content
 	         *
@@ -35155,7 +35335,12 @@
 
 	    }, {
 	        key: 'setContentById',
-	        value: function setContentById(id, content) {
+	        value: function setContentById() {
+	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+	            var id = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('id');
+	            var content = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : requiredParam('content');
+
 	            return new Promise(function (resolve, reject) {
 	                resolve();
 	            });
@@ -35164,6 +35349,8 @@
 	        /**
 	         * Checks if a Schema type is allowed as a child of a Content object
 	         *
+	         * @param {String} project
+	         * @param {String} environment
 	         * @param {String} parentId
 	         * @param {String} childSchemaId
 	         *
@@ -35172,25 +35359,26 @@
 
 	    }, {
 	        key: 'isSchemaAllowedAsChild',
-	        value: function isSchemaAllowedAsChild(parentId, childSchemaId) {
-	            var _this = this;
+	        value: function isSchemaAllowedAsChild() {
+	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+	            var parentId = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('parentId');
+	            var childSchemaId = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : requiredParam('childSchemaId');
 
-	            return new Promise(function (resolve, reject) {
-	                // No parent ID means root, and all Schemas are allowed there
-	                if (!parentId) {
-	                    resolve();
-	                } else {
-	                    _this.getContentById(parentId).then(function (parentContent) {
-	                        SchemaHelper.getSchemaById(parentContent.schemaId).then(function (parentSchema) {
-	                            if (parentSchema.allowedChildSchemas.indexOf(childSchemaId) < 0) {
-	                                reject(new Error('Content with Schema "' + childSchemaId + '" is not an allowed child of Content with Schema "' + parentSchema.id + '"'));
-	                            } else {
-	                                resolve();
-	                            }
-	                        }).catch(reject);
-	                    }).catch(reject);
-	                }
-	            });
+	            // No parent ID means root, and all Schemas are allowed there
+	            if (!parentId) {
+	                return Promise.resolve();
+	            } else {
+	                return this.getContentById(project, environment, parentId).then(function (parentContent) {
+	                    return SchemaHelper.getSchemaById(project, environment, parentContent.schemaId);
+	                }).then(function (parentSchema) {
+	                    if (parentSchema.allowedChildSchemas.indexOf(childSchemaId) < 0) {
+	                        return Promise.reject(new Error('Content with Schema "' + childSchemaId + '" is not an allowed child of Content with Schema "' + parentSchema.id + '"'));
+	                    } else {
+	                        return Promise.resolve();
+	                    }
+	                });
+	            }
 	        }
 
 	        /**
@@ -35977,18 +36165,15 @@
 	});
 
 	// Edit
-	Router.route('/templates/:id', function () {
+	Router.route('/templates/:type/:id', function () {
 	    if (currentUserHasScope('templates')) {
 	        ViewHelper.get('NavbarMain').highlightItem(this.id);
 
-	        /*apiCall('get', 'templates/' + this.id)
-	        .then((template) => {
-	            let templateEditor = new TemplateEditor({
-	                model: template
-	            });
-	             populateWorkspace(templateEditor.$element);
-	        })
-	        .catch(errorModal);*/
+	        var templateEditor = new TemplateEditor({
+	            modelUrl: apiUrl('templates/' + this.type + '/' + this.id)
+	        });
+
+	        populateWorkspace(templateEditor.$element);
 	    } else {
 	        location.hash = '/';
 	    }
@@ -36065,6 +36250,199 @@
 	        location.hash = '/';
 	    }
 	});
+
+/***/ },
+/* 165 */,
+/* 166 */,
+/* 167 */,
+/* 168 */,
+/* 169 */,
+/* 170 */,
+/* 171 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	/**
+	 * A Template editor
+	 */
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var TemplateEditor = function (_View) {
+	    _inherits(TemplateEditor, _View);
+
+	    function TemplateEditor(params) {
+	        _classCallCheck(this, TemplateEditor);
+
+	        var _this = _possibleConstructorReturn(this, (TemplateEditor.__proto__ || Object.getPrototypeOf(TemplateEditor)).call(this, params));
+
+	        _this.$element = _.div({ class: 'template-editor editor flex-vertical' });
+
+	        _this.fetch();
+	        return _this;
+	    }
+
+	    /**
+	     * Event: Click save. Posts the model to the apiPath
+	     */
+
+
+	    _createClass(TemplateEditor, [{
+	        key: 'onClickSave',
+	        value: function onClickSave() {
+	            var _this2 = this;
+
+	            var view = this;
+
+	            this.$saveBtn.toggleClass('working', true);
+
+	            apiCall('post', 'templates/' + this.model.type + '/' + this.model.id, this.model).then(function () {
+	                return reloadResource('templates');
+	            }).then(function () {
+	                NavbarMain.reload();
+
+	                _this2.$saveBtn.toggleClass('working', false);
+	            }).catch(UI.errorModal);
+	        }
+
+	        /**
+	         * Event: Change text. Make sure the value is up to date
+	         */
+
+	    }, {
+	        key: 'onChangeText',
+	        value: function onChangeText() {
+	            this.model.markup = this.editor.getDoc().getValue();
+
+	            this.trigger('change', this.model);
+	        }
+
+	        /**
+	         * Event: Change theme
+	         */
+
+	    }, {
+	        key: 'onChangeTheme',
+	        value: function onChangeTheme() {
+	            var currentTheme = this.$element.find('.CodeMirror')[0].className.replace('CodeMirror cm-s-', '') || 'default';
+	            var newTheme = this.$element.find('.cm-theme select').val();
+
+	            $('.cm-s-' + currentTheme).removeClass('cm-s-' + currentTheme).addClass('cm-s-' + newTheme);
+
+	            document.cookie = 'cmtheme = ' + newTheme;
+	        }
+	    }, {
+	        key: 'render',
+	        value: function render() {
+	            var _this3 = this;
+
+	            _.append(this.$element.empty(), _.div({ class: 'editor-header' }, _.span({ class: 'fa fa-code' }), _.h4(this.model.name)), _.div({ class: 'editor-body' }, this.$textarea = _.textarea(), this.$error), _.div({ class: 'editor-footer' }, _.div({ class: 'btn-group pull-left cm-theme' }, _.span('Theme'), _.select({ class: 'form-control' }, _.each(['cobalt', 'default', 'night', 'railscasts'], function (i, theme) {
+	                return _.option({ value: theme }, theme);
+	            })).change(function () {
+	                _this3.onChangeTheme();
+	            }).val(getCookie('cmtheme') || 'default')), _.div({ class: 'btn-group' }, _.if(!this.model.locked,
+	            // Save
+	            this.$saveBtn = _.button({ class: 'btn btn-raised btn-primary' }, _.span({ class: 'text-default' }, 'Save'), _.span({ class: 'text-working' }, 'Saving')).click(function () {
+	                _this3.onClickSave();
+	            }),
+
+	            // Delete
+	            _.button({ class: 'btn btn-embedded btn-embedded-danger' }, _.span({ class: 'fa fa-trash' })).click(function () {
+	                _this3.onClickDelete(_this3.publishingSettings);
+	            })))));
+
+	            setTimeout(function () {
+	                _this3.editor = CodeMirror.fromTextArea(_this3.$textarea[0], {
+	                    lineNumbers: true,
+	                    mode: {
+	                        name: 'xml'
+	                    },
+	                    viewportMargin: _this3.embedded ? Infinity : 10,
+	                    tabSize: 4,
+	                    indentUnit: 4,
+	                    indentWithTabs: true,
+	                    theme: getCookie('cmtheme') || 'default',
+	                    value: _this3.model.markup
+	                });
+
+	                _this3.editor.getDoc().setValue(_this3.model.markup);
+
+	                _this3.editor.on('change', function () {
+	                    _this3.onChangeText();
+	                });
+
+	                _this3.onChangeText();
+	            }, 1);
+	        }
+	    }]);
+
+	    return TemplateEditor;
+	}(View);
+
+	module.exports = TemplateEditor;
+
+/***/ },
+/* 172 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var Entity = __webpack_require__(37);
+
+	/**
+	 * The Template model
+	 */
+
+	var Template = function (_Entity) {
+	    _inherits(Template, _Entity);
+
+	    function Template(params) {
+	        _classCallCheck(this, Template);
+
+	        return _possibleConstructorReturn(this, (Template.__proto__ || Object.getPrototypeOf(Template)).call(this, params));
+	    }
+
+	    _createClass(Template, [{
+	        key: 'structure',
+	        value: function structure() {
+	            this.def(String, 'id');
+	            this.def(String, 'parentId');
+	            this.def(String, 'name');
+	            this.def(String, 'type');
+	            this.def(String, 'remotePath');
+	            this.def(String, 'markup');
+	        }
+
+	        /**
+	         * Updates id and remotePath from name
+	         */
+
+	    }, {
+	        key: 'updateFromName',
+	        value: function updateFromName() {
+	            this.id = this.name.substring(0, this.name.lastIndexOf('.')) || this.name;
+	        }
+	    }]);
+
+	    return Template;
+	}(Entity);
+
+	module.exports = Template;
 
 /***/ }
 /******/ ]);

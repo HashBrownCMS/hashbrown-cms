@@ -10,6 +10,7 @@ let rimraf = require('rimraf');
 let Connection = require(appRoot + '/src/common/models/Connection');
 let Content = require(appRoot + '/src/common/models/Content');
 let Media = require(appRoot + '/src/common/models/Media');
+let Template = require(appRoot + '/src/common/models/Template');
 
 class GitHubConnection extends Connection {
     constructor(data) {
@@ -96,7 +97,7 @@ class GitHubConnection extends Connection {
                         break;
 
                     case 'file':
-                        fs.readfile(this.settings.localPath + path, (err, data) => {
+                        fs.readFile(this.settings.localPath + path, (err, data) => {
                             if(err) {
                                 reject(err);
                             
@@ -140,6 +141,8 @@ class GitHubConnection extends Connection {
                 let dirPath = path.slice(0, path.lastIndexOf('/'));
 
                 MediaHelper.mkdirRecursively(this.settings.localPath + dirPath);
+
+                debug.log('Writing file "' + this.settings.localPath + path + '"...', this);
 
                 fs.writeFile(this.settings.localPath + path, content, (err) => {
                     if(err) {
@@ -321,48 +324,201 @@ class GitHubConnection extends Connection {
         });
     }
 
+    /**
+     * Gets template by id
+     *
+     * @param {String} type
+     * @param {String} id
+     *
+     * @returns {Promise} Template
+     */
+    getTemplateById(type, id) {
+        let path = GitHubConnection.getTemplateRemotePath(type);
+
+        return this.getContents(path)
+        .then((files) => {
+            for(let i in files) {
+                let file = files[i];
+                let name = (file.path || file).replace(path + '/', '');
+                let template = new Template({ name: name, type: type, remotePath: path + '/' + name });
+
+                template.updateFromName();
+                
+                if(id == template.id) {
+                    return this.getTemplateMarkup(template);
+                }
+            }
+            
+            return Promise.reject(new Error('Template by id "' + id + '" not found'));
+        });
+    }
+   
+    /**
+     * Gets template markup
+     *
+     * @param {Template} template
+     *
+     * @returns {Promise} Promise
+     */
+    getTemplateMarkup(template) {
+        return this.getContents(template.remotePath, 'file')
+        .then((markup) => {
+            if(markup) {
+                // Stringify markup
+                if(markup.content && markup.encoding == 'base64') {
+                    template.markup = new Buffer(markup.content, 'base64').toString();
+                } else {
+                    template.markup = markup.toString();
+                }
+
+                let parentMatches = (template.markup || '').match(/layout:(.+)/);
+
+                if(parentMatches && parentMatches.length > 1) {
+                    template.parentId = parentMatches[1].replace(/ /g, '');
+                }
+            }
+
+            return Promise.resolve(template);
+        });
+    }
 
     /**
-     * Gets templates
+     * Deletes template by id
      *
-     * @returns {Promise(Array)} templates
+     * @param {String} type
+     * @param {String} id
+     *
+     * @returns {Promise} Callback
      */
-    getTemplates() {
-        return this.getContents('_layouts')
-        .then((data) => {
-            let templates = [];
-            
-            for(let i  = 0; i < data.length; i++) {
-                let file = data[i];
+    deleteTemplateById(type, id) {
+        let oldTemplate;
 
-                templates[templates.length] = (file.path || file).replace('_layouts/', '').replace('.html', '');
-            }
-               
-            return new Promise((resolve) => {
-                resolve(templates);
-            });
+        // Get original first
+        this.getTemplateById(type, id)
+        .then((template) => {
+            return this.deleteContents(template.remotePath)
         });
     }
     
     /**
-     * Gets section templates
+     * Sets template by id
      *
-     * @returns {Promise(Array)} sectionTemplates
+     * @param {String} type
+     * @param {String} id
+     * @param {Template} newTemplate
+     *
+     * @returns {Promise} Callback
      */
-    getSectionTemplates() {
-        return this.getContents('_includes/sections')
-        .then((data) => {
-            let templates = [];
+    setTemplateById(type, id, newTemplate) {
+        let oldTemplate;
 
-            for(let i in data) {
-                let file = data[i];
+        // Get original first
+        this.getTemplateById(type, id)
+        .then((template) => {
+            oldTemplate = template;
 
-                templates[templates.length] = (file.path || file).replace('_includes/sections/', '').replace('.html', '');
+            // Make sure markup is kept if it's not included in the request
+            // This would be the case when renaming Templates
+            if(!newTemplate.markup) {
+                newTemplate.markup = oldTemplate.markup;
+            }
+        })
+        // If template was not found, continue and set appropriate remote paths
+        .catch(() => {
+            newTemplate.remotePath = GitHubConnection.getTemplateRemotePath(type) + '/' + newTemplate.name;
+
+            return Promise.resolve();
+        })
+        .then(() => {
+            // Old file was not found, create new
+            if(!oldTemplate) {
+                return this.postContents(newTemplate.remotePath, newTemplate.markup);
+            }
+            
+            // Name was changed
+            if(newTemplate.name != oldTemplate.name) {
+                newTemplate.remotePath = newTemplate.remotePath.replace(oldTemplate.name, newTemplate.name);
             }
 
-            return new Promise((resolve) => {
-                resolve(templates);
-            });
+            // Path was changed
+            if(newTemplate.remotePath != oldTemplate.remotePath) {
+                // Remove old file first
+                return this.deleteContents(oldTemplate.remotePath)
+                .then(() => {
+
+                    // Post new file
+                    return this.postContents(newTemplate.remotePath, newTemplate.markup);
+                });
+        
+            // Markup was changed
+            } else if(newTemplate.markup != oldTemplate.markup) {
+                return this.postContents(newTemplate.remotePath, newTemplate.markup);
+
+            }
+
+            // Nothing was changed, resolve normally
+            return Promise.resolve(); 
+        })
+        .then(() => {
+            return this.getTemplateById(newTemplate.type, newTemplate.id);
+        });
+    }
+   
+    /**
+     * Gets appropriate Template remote path
+     *
+     * @param {String} type
+     *
+     * @returns {String} Remote path
+     */
+    static getTemplateRemotePath(type) {
+        switch(type) {
+            case 'page':
+                return '_layouts'
+            case 'section':
+                return '_includes/sections'
+        }
+
+        return '';
+    }
+
+    /**
+     * Gets templates
+     *
+     * @param {String} type
+     *
+     * @returns {Promise} Array of Templates
+     */
+    getTemplates(type) {
+        let path = GitHubConnection.getTemplateRemotePath(type);
+
+        let templates = [];
+
+        return this.getContents(path)
+        .then((files) => {
+            let getNext = () => {
+                let file = files.pop();
+
+                if(!file) { return Promise.resolve(); }
+
+                let name = (file.path || file).replace(path + '/', '');
+
+                let template = new Template({ name: name, type: type, remotePath: path + '/' + name });
+
+                template.updateFromName();
+
+                return this.getTemplateMarkup(template)
+                .then(() => {
+                    templates[templates.length] = template;
+
+                    return getNext();  
+                }); 
+            };
+
+            return getNext();
+        })
+        .then(() => {
+            return Promise.resolve(templates);
         });
     }
 

@@ -15,7 +15,6 @@ window.resources = {
     schemas: [],
     media: [],
     templates: [],
-    sectionTemplates: [],
     forms: [],
     users: []
 };
@@ -38,6 +37,7 @@ require('./views/fields');
 
 // Editor views
 window.JSONEditor = require('./views/JSONEditor');
+window.TemplateEditor = require('./views/TemplateEditor');
 window.ContentEditor = require('./views/ContentEditor');
 window.FormEditor = require('./views/FormEditor');
 window.ConnectionEditor = require('./views/ConnectionEditor');
@@ -51,6 +51,7 @@ window.MediaBrowser = require('./views/MediaBrowser');
 window.Content = require('./models/Content');
 window.Media = require('../../common/models/Media');
 window.User = require('../../common/models/User');
+window.Template = require('../../common/models/Template');
 
 // Helpers
 window.MediaHelper = require('./helpers/MediaHelper');
@@ -92,7 +93,19 @@ window.populateWorkspace = function populateWorkspace($html, classes) {
 /**
  * Reloads a resource
  */
-window.reloadResource = function reloadResource(name, model) {
+window.reloadResource = function reloadResource(name) {
+    let model = null;
+
+    switch(name) {
+        case 'templates':
+            model = Template;
+            break;
+
+        case 'users':
+            model = User;
+            break;
+    }
+
     return new Promise((resolve, reject) => {
         $.ajax({
             type: 'GET',
@@ -117,7 +130,9 @@ window.reloadResource = function reloadResource(name, model) {
                     resolve([]);
 
                 } else {
-                    reject(new Error(e.responseText));
+                    resolve([]);
+                    
+                    UI.errorModal(new Error(e.responseText));
                 
                 }
             }
@@ -137,30 +152,18 @@ window.reloadAllResources = function reloadAllResources() {
         'media',
         'connections',
         'templates',
-        'sectionTemplates',
         'forms',
-        [ 'users', User ]
+        'users'
     ];
 
     function processQueue() {
-        let entry = queue.pop();
-        let name;
-        let model;
-        
-        if(typeof entry === 'object') {
-            name = entry[0];
-            model = entry[1];
-        
-        } else {
-            name = entry;
-
-        }
+        let name = queue.pop();
 
         let $msg = _.div({'data-name': name}, 'Loading ' + name + '...');
 
         $('.loading-messages').append($msg);
 
-        return window.reloadResource(name, model)
+        return window.reloadResource(name)
         .then(() => {
             $msg.append(' OK');
             

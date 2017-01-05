@@ -75,6 +75,8 @@ class MediaHelper extends MediaHelperCommon {
         let finalPath = '/';
 
         for(let i in parents) {
+            if(!parents[i]) { continue; }
+
             finalPath += parents[i];
 
             if(!fs.existsSync(finalPath)) {

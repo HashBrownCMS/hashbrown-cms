@@ -173,23 +173,31 @@ class ContentHelper extends ContentHelperCommon {
         // Check for empty Content object
         if(!content || Object.keys(content).length < 1) {
             return Promise.reject(new Error('Posted content with id "' + id + '" is empty'));
-
-        } else if(content.parentId) {
-            return this.isSchemaAllowedAsChild(content.parentId, content.schemaId)
-            .then(updateContent);
-
-        } else {
-            return updateContent();
-
         }
+
+        // Check for self parent
+        if(content.parentId == content.id) {
+            return Promise.reject(new Error('Content "' + content.id + '" cannot be a chidl of itself'));
+        }
+
+        // Check for allowed Schemas
+        if(content.parentId) {
+            return this.isSchemaAllowedAsChild(project, environment, content.parentId, content.schemaId)
+            .then(updateContent);
+        }
+
+        return updateContent();
     }
 
     /**
      * Creates a new content object
      *
+     * @param {String} project
+     * @param {String} environment
      * @param {String} schemaId
      * @param {String} parentId
      * @param {User} user
+     * @param {Object} properties
      *
      * @return {Promise} New Content object
      */
@@ -198,14 +206,15 @@ class ContentHelper extends ContentHelperCommon {
         environment = requiredParam('environment'),
         schemaId = requiredParam('schemaId'),
         parentId = null,
-        user = requiredParam('user')
+        user = requiredParam('user'),
+        properties = null
     ) {
-        return this.isSchemaAllowedAsChild(parentId, schemaId)
+        return this.isSchemaAllowedAsChild(project, environment, parentId, schemaId)
         .then(() => {
             return SchemaHelper.getSchemaById(project, environment, schemaId);
         })
         .then((schema) => {
-            let content = Content.create(schema.id);
+            let content = Content.create(schema.id, properties);
             let collection = environment + '.content';
 
             debug.log('Creating content "' + content.id + '"...', this);

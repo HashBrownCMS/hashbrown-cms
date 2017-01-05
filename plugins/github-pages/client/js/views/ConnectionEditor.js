@@ -26,24 +26,12 @@ class ConnectionEditor extends View {
      * Render local switch
      */
     renderLocalSwitch() {
-        let view = this;
-        
-        function onChange() {
-            view.model.isLocal = this.checked;
-
-            view.render();
-        }
-
         return _.div({class: 'field-editor'},
-            _.div({class: 'switch'},
-                _.input({
-                    id: 'switch-is-local',
-                    class: 'form-control switch',
-                    type: 'checkbox',
-                    checked: this.model.isLocal == true
-                }).change(onChange),
-                _.label({for: 'switch-is-local'})
-            )
+            UI.inputSwitch(this.model.isLocal == true, (newValue) => {
+                this.model.isLocal = newValue;
+
+                this.render();
+            })
         );
     }
 

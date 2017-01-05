@@ -13,6 +13,7 @@ class ContentPane extends Pane {
         // Event when psating the copied Content
         this.onClickPasteContent = function onClickPasteContent() {
             let parentId = $('.context-menu-target-element').data('id');
+            let newContentId;
           
             // API call to get copied Content model 
             apiCall('get', 'content/' + id)
@@ -21,13 +22,13 @@ class ContentPane extends Pane {
             .then((copiedContent) => {
                 delete copiedContent['id'];
 
-                copiedContent.parentId = parentId;
-                
-                return apiCall('post', 'content/new', copiedContent);
+                return apiCall('post', 'content/new/' + copiedContent.schemaId + '?parent=' + parentId, copiedContent.properties);
             })
 
-            // Upoen success, reload all Content models
-            .then(() => {
+            // Upon success, reload all Content models
+            .then((newContent) => {
+                newContentId = newContent.id;
+
                 return reloadResource('content');
             })
 
@@ -35,6 +36,8 @@ class ContentPane extends Pane {
             .then(() => {
                 navbar.reload();
                 navbar.onClickPasteContent = null;
+
+                location.hash = '/content/' + newContentId; 
             })
             .catch(UI.errorModal);
         }
@@ -440,7 +443,7 @@ class ContentPane extends Pane {
                 menu['New child content'] = () => { this.onClickNewContent($('.context-menu-target-element').data('id')); };
                 menu['Copy'] = () => { this.onClickCopyContent(); };
                 menu['Copy id'] = () => { this.onClickCopyItemId(); };
-                menu['Paste'] = () => { this.onClickPasteContent(); };
+                menu['Paste'] = () => { if(this.onClickPasteContent) { this.onClickPasteContent(); } else { UI.messageModal('Paste content', 'Nothing to paste'); } };
 
                 if(!item.local && !item.remote && !item.locked) {
                     menu['Cut'] = () => { this.onClickCutContent(); };

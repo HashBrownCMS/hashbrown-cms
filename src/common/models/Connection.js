@@ -52,18 +52,9 @@ class Connection extends Entity {
     /**
      * Gets templates
      *
-     * @returns {Promise(Array)} templates
+     * @returns {Promise} Array of Templates
      */
     getTemplates() {
-        return Promise.resolve([]);
-    }
-
-    /**
-     * Gets section templates
-     *
-     * @returns {Promise(Array)} sectionTemplates
-     */
-    getSectionTemplates() {
         return Promise.resolve([]);
     }
 

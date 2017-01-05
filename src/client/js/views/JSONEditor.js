@@ -27,13 +27,6 @@ class JSONEditor extends View {
     }
 
     /**
-     * Event: Successful API call
-     */
-    onSuccess() {
-    
-    }
-
-    /**
      * Event: Click basic. Returns to the regular editor
      */
     onClickBasic() {
@@ -51,10 +44,14 @@ class JSONEditor extends View {
      */
     onClickSave() {
         let view = this;
+        
+        this.$saveBtn.toggleClass('working', true);
 
         if(this.debug()) {
             apiCall('post', this.apiPath, this.model)
-            .then(this.onSuccess)
+            .then(() => {
+                this.$saveBtn.toggleClass('working', false);
+            })
             .catch(UI.errorModal);
        
         } else {
@@ -81,8 +78,10 @@ class JSONEditor extends View {
 
     /**
      * Debug the JSON string
+     *
+     * @param {Boolean} fromModel
      */
-    debug() {
+    debug(fromModel) {
         let isValid = true;
         
         // Function for checking model integrity
@@ -147,31 +146,63 @@ class JSONEditor extends View {
 
                 case 'template':
                     if(typeof v === 'string') {
-                        for(let id of resources.templates) {
-                            if(id == v) {
+                        for(let template of resources.templates) {
+                            if(template.id == v) {
                                 return;
                             }
                         }   
                         
-                        for(let id of resources.sectionTemplates) {
-                            if(id == v) {
-                                return;
-                            }
-                        }   
-
                         return 'Template "' + v + '" not found';
                     }
 
                     break;
 
                 case 'config':
-                    if(v.allowedTemplates) {
-                        let invalidTemplates = v.allowedTemplates.slice(0);
-                        let resource = resources[(v.resource || 'templates')];
+                    // Backward compatibility adjustment for template configs
+                    if(v.resource) {
+                        switch(v.resource) {
+                            case 'sectionTemplates':
+                                v.type = 'section';
+                                delete v.resource;
+                                break;
+                            
+                            case 'templates':
+                                v.type = 'page';
+                                delete v.resource;
+                                break;
+                        }
+                    }
 
-                        for(let r in resource) {
+                    // Allowed templates config
+                    if(v.allowedTemplates) {
+                        // Assume that all templates are invalid
+                        let invalidTemplates = v.allowedTemplates.slice(0);
+
+                        // Backwards compatibility adjustment
+                        if(v.resource) {
+                            if(v.resource == 'sectionTemplates') {
+                                v.type = 'section';
+                            } else {
+                                v.type = 'page';
+                            }
+
+                            delete v.resource;
+                        }
+
+                        // Sanity check for type
+                        if(!v.type) {
+                            v.type = 'page';
+                        }
+
+                        // Loop through all available templates
+                        for(let existingTemplate of resources.templates) {
                             for(let a = invalidTemplates.length - 1; a >= 0; a--) {
-                                if(resource[r] == invalidTemplates[a]) {
+
+                                // If a template was found, and it's of the correct type, remove it from the invalid templates array
+                                if(
+                                    existingTemplate.type == v.type &&
+                                    existingTemplate.id == invalidTemplates[a]
+                                ) {
                                     invalidTemplates.splice(a, 1);
                                 }
                             }   
@@ -179,9 +210,9 @@ class JSONEditor extends View {
 
                         if(invalidTemplates.length > 0) {
                             if(invalidTemplates.length == 1) {
-                                return 'Template "' + invalidTemplates[0] + '" not found';
+                                return 'Template "' + invalidTemplates[0] + '" of type "' + v.type + '" not found';
                             } else {
-                                return 'Templates "' + invalidTemplates.join(', ') + '" not found';
+                                return 'Templates "' + invalidTemplates.join(', ') + '" of type "' + v.type + '" not found';
                             }
                         }
                     }
@@ -218,7 +249,9 @@ class JSONEditor extends View {
 
         // Syntax check
         try {
-            this.model = JSON.parse(this.value);
+            if(!fromModel) {
+                this.model = JSON.parse(this.value);
+            }
             
             // Sanity check
             recurse(this.model);
@@ -262,6 +295,11 @@ class JSONEditor extends View {
     }
 
     render() {
+        // Debug once before entering into the code editor
+        // This allows for backward compatibility adjustments to happen first
+        this.debug(true);
+
+        // Convert the model to a string value
         this.value = beautify(JSON.stringify(this.model));
 
         _.append(this.$element.empty(),
@@ -284,7 +322,7 @@ class JSONEditor extends View {
                             'Basic'
                         ).click(() => { this.onClickBasic(); }),
                         _.if(!this.model.locked,
-                            _.button({class: 'btn btn-raised btn-primary'},
+                            this.$saveBtn = _.button({class: 'btn btn-raised btn-primary'},
                                 'Save '
                             ).click(() => { this.onClickSave(); })
                         )

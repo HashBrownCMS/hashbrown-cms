@@ -153,6 +153,11 @@ class NavbarMain extends View {
                 let icon = item.icon;
                 let $icon;
 
+                // Implement custom routing paths
+                if(typeof params.itemPath === 'function') {
+                    routingPath = params.itemPath(item);
+                }
+
                 // Truncate long names
                 if(name.length > 30) {
                     name = name.substring(0, 30) + '...';

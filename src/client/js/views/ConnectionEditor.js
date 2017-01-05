@@ -42,14 +42,8 @@ class ConnectionEditor extends View {
         apiCall('post', 'connections/' + view.model.id, view.model)
         .then(() => {
             view.$saveBtn.toggleClass('saving', false);
-        
-            reloadResource('connections')
-            .then(function() {
-                let navbar = ViewHelper.get('NavbarMain');
-
-                view.reload();
-                navbar.reload();
-            });
+       
+            location.reload(); 
         })
         .catch(this.onError);
     }

@@ -24,8 +24,16 @@ class TemplateReferenceEditor extends View {
     render() {
         this.$element = _.div({class: 'field-editor template-reference-editor'});
 
-        let resource = window.resources[this.config.resource || 'templates'];
+        let resource = window.resources.templates;
         let dropdownOptions = [];
+
+        // Sanity check for template type
+        this.config.type = this.config.type || 'page';
+        
+        // Backwards compatibility check for template type
+        if(this.config.resource == 'sectionTemplates') {
+            this.config.type = 'section';
+        }
 
         // Sanity check for allowed templates
         if(!this.config.allowedTemplates) {
@@ -60,14 +68,16 @@ class TemplateReferenceEditor extends View {
 
         // Generate dropdown options
         for(let template of resource) {
-            let isAllowed = this.config.allowedTemplates.indexOf(template) > -1;
+            let isAllowed =
+                this.config.type == template.type &&
+                this.config.allowedTemplates.indexOf(template.id) > -1;
 
             if(!isAllowed) { continue; }
 
             dropdownOptions[dropdownOptions.length] = {
-                label: template,
-                value: template,
-                selected: template == this.value
+                label: template.name,
+                value: template.id,
+                selected: template.id == this.value
             };
         }
 

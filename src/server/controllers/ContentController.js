@@ -69,8 +69,14 @@ class ContentController extends ApiController {
     static createContent(req, res) {
         let parentId = req.query.parent;
         let schemaId = req.params.schemaId;
+        let properties = req.body;
 
-        ContentHelper.createContent(req.project, req.environment, schemaId, parentId, req.user)
+        // Sanity check for properties
+        if(properties.properties) {
+            properties = properties.properties;
+        }
+        
+        ContentHelper.createContent(req.project, req.environment, schemaId, parentId, req.user, properties)
         .then((node) => {
             res.status(200).send(node);
         })
