@@ -52,17 +52,17 @@
 	__webpack_require__(2);
 
 	// Get package file
-	window.app = __webpack_require__(154);
+	window.app = __webpack_require__(156);
 
 	// Views
-	window.ProjectEditor = __webpack_require__(165);
-	window.BackupEditor = __webpack_require__(166);
-	window.MigrationEditor = __webpack_require__(167);
-	window.InfoEditor = __webpack_require__(168);
-	window.LanguageEditor = __webpack_require__(169);
+	window.ProjectEditor = __webpack_require__(167);
+	window.BackupEditor = __webpack_require__(168);
+	window.MigrationEditor = __webpack_require__(169);
+	window.InfoEditor = __webpack_require__(170);
+	window.LanguageEditor = __webpack_require__(171);
 
 	// Models
-	window.Project = __webpack_require__(170);
+	window.Project = __webpack_require__(172);
 
 	// Get projects
 	apiCall('get', 'server/projects').then(function (projects) {
@@ -19519,7 +19519,9 @@
 /* 151 */,
 /* 152 */,
 /* 153 */,
-/* 154 */
+/* 154 */,
+/* 155 */,
+/* 156 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -19569,8 +19571,6 @@
 	};
 
 /***/ },
-/* 155 */,
-/* 156 */,
 /* 157 */,
 /* 158 */,
 /* 159 */,
@@ -19579,7 +19579,9 @@
 /* 162 */,
 /* 163 */,
 /* 164 */,
-/* 165 */
+/* 165 */,
+/* 166 */,
+/* 167 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -19822,7 +19824,7 @@
 	module.exports = ProjectEditor;
 
 /***/ },
-/* 166 */
+/* 168 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -20105,7 +20107,7 @@
 	module.exports = BackupEditor;
 
 /***/ },
-/* 167 */
+/* 169 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -20220,7 +20222,7 @@
 	module.exports = MigrationEditor;
 
 /***/ },
-/* 168 */
+/* 170 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -20342,7 +20344,7 @@
 	module.exports = InfoEditor;
 
 /***/ },
-/* 169 */
+/* 171 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -20427,7 +20429,7 @@
 	module.exports = LanguageEditor;
 
 /***/ },
-/* 170 */
+/* 172 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';

@@ -323,7 +323,8 @@ class JSONEditor extends View {
                         ).click(() => { this.onClickBasic(); }),
                         _.if(!this.model.locked,
                             this.$saveBtn = _.button({class: 'btn btn-raised btn-primary'},
-                                'Save '
+                                _.span({class: 'text-default'}, 'Save'),
+                                _.span({class: 'text-working'}, 'Saving')
                             ).click(() => { this.onClickSave(); })
                         )
                     )

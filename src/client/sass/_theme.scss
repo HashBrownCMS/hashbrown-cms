@@ -617,6 +617,7 @@ button, a {
 // Input
 .form-control {
     min-width: 110px;
+    resize: none;
 
     &.disabled {
         pointer-events: none;

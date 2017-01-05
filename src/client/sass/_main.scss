@@ -447,6 +447,19 @@ img.logo {
 
                             .text-working {
                                 display: inline;
+
+                                &:after {
+                                    content: '\f1ce';
+                                    font-family: 'FontAwesome';
+                                    margin-left: 6px;
+                                    display: inline-block;
+                                    transform-origin: 6px 5.5px;
+                                    line-height: normal;
+                                    animation-name: spinner-no-offset;
+                                    animation-duration: 1s;
+                                    animation-iteration-count: infinite;
+                                    animation-timing-function: linear;
+                                }
                             }
                         }
                     }

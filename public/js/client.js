@@ -84,27 +84,27 @@
 
 	// Editor views
 	window.JSONEditor = __webpack_require__(124);
-	window.TemplateEditor = __webpack_require__(171);
-	window.ContentEditor = __webpack_require__(129);
-	window.FormEditor = __webpack_require__(130);
-	window.ConnectionEditor = __webpack_require__(131);
-	window.SchemaEditor = __webpack_require__(132);
-	window.SyncSettings = __webpack_require__(134);
-	window.ProvidersSettings = __webpack_require__(135);
-	window.UserEditor = __webpack_require__(136);
-	window.MediaBrowser = __webpack_require__(137);
+	window.TemplateEditor = __webpack_require__(129);
+	window.ContentEditor = __webpack_require__(130);
+	window.FormEditor = __webpack_require__(131);
+	window.ConnectionEditor = __webpack_require__(132);
+	window.SchemaEditor = __webpack_require__(133);
+	window.SyncSettings = __webpack_require__(135);
+	window.ProvidersSettings = __webpack_require__(136);
+	window.UserEditor = __webpack_require__(137);
+	window.MediaBrowser = __webpack_require__(138);
 
 	// Models
-	window.Content = __webpack_require__(138);
-	window.Media = __webpack_require__(139);
-	window.User = __webpack_require__(141);
-	window.Template = __webpack_require__(172);
+	window.Content = __webpack_require__(139);
+	window.Media = __webpack_require__(140);
+	window.User = __webpack_require__(142);
+	window.Template = __webpack_require__(143);
 
 	// Helpers
-	window.MediaHelper = __webpack_require__(142);
-	window.ConnectionHelper = __webpack_require__(144);
-	window.ContentHelper = __webpack_require__(147);
-	window.SchemaHelper = __webpack_require__(149);
+	window.MediaHelper = __webpack_require__(144);
+	window.ConnectionHelper = __webpack_require__(146);
+	window.ContentHelper = __webpack_require__(149);
+	window.SchemaHelper = __webpack_require__(151);
 	window.UI = __webpack_require__(26);
 
 	// Ready callback containers
@@ -270,13 +270,13 @@
 	};
 
 	// Get package file
-	window.app = __webpack_require__(154);
+	window.app = __webpack_require__(156);
 
 	// Language
 	window.language = localStorage.getItem('language') || 'en';
 
 	// Get routes
-	__webpack_require__(155);
+	__webpack_require__(157);
 
 	// Preload resources 
 	$(document).ready(function () {
@@ -22973,11 +22973,13 @@
 	                sort: function sort(item, queueItem) {
 	                    queueItem.$element.attr('data-template-id', item.id);
 
+	                    var folderName = item.type.substring(0, 1).toUpperCase() + item.type.substring(1) + 's';
+
 	                    if (!item.parentId) {
 	                        queueItem.createDir = true;
 	                    }
 
-	                    queueItem.parentDirAttr = { 'data-template-id': item.parentId || item.type };
+	                    queueItem.parentDirAttr = { 'data-template-id': item.parentId || folderName };
 	                },
 
 	                // Item context menu
@@ -25139,9 +25141,11 @@
 	            var editor = this;
 
 	            // Main element
-	            this.$element = _.div({ class: 'field-editor string-editor' }, _.if(this.disabled, _.p(this.value || '(none)')), _.if(!this.disabled, this.$input = _.input({ class: 'form-control', value: this.value, type: this.config.type || 'text' }).on('change propertychange paste keyup', function () {
+	            this.$element = _.div({ class: 'field-editor string-editor' }, _.if(this.disabled, _.p(this.value || '(none)')), _.if(!this.disabled, _.if((!this.config.type || this.config.type == 'text') && this.config.multiline, this.$input = _.textarea({ class: 'form-control' }, this.value).on('change propertychange paste keyup', function () {
 	                editor.onChange();
-	            })));
+	            })), _.if(this.config.type && this.config.type != 'text' || !this.config.multiline, this.$input = _.input({ class: 'form-control', value: this.value, type: this.config.type || 'text' }).on('change propertychange paste keyup', function () {
+	                editor.onChange();
+	            }))));
 	        }
 	    }]);
 
@@ -26240,7 +26244,7 @@
 	                _this4.onChangeTheme();
 	            }).val(getCookie('cmtheme') || 'default')), _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-embedded' }, 'Basic').click(function () {
 	                _this4.onClickBasic();
-	            }), _.if(!this.model.locked, this.$saveBtn = _.button({ class: 'btn btn-raised btn-primary' }, 'Save ').click(function () {
+	            }), _.if(!this.model.locked, this.$saveBtn = _.button({ class: 'btn btn-raised btn-primary' }, _.span({ class: 'text-default' }, 'Save'), _.span({ class: 'text-working' }, 'Saving')).click(function () {
 	                _this4.onClickSave();
 	            }))))));
 
@@ -30196,6 +30200,137 @@
 /***/ function(module, exports) {
 
 	'use strict';
+
+	/**
+	 * A Template editor
+	 */
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var TemplateEditor = function (_View) {
+	    _inherits(TemplateEditor, _View);
+
+	    function TemplateEditor(params) {
+	        _classCallCheck(this, TemplateEditor);
+
+	        var _this = _possibleConstructorReturn(this, (TemplateEditor.__proto__ || Object.getPrototypeOf(TemplateEditor)).call(this, params));
+
+	        _this.$element = _.div({ class: 'template-editor editor flex-vertical' });
+
+	        _this.fetch();
+	        return _this;
+	    }
+
+	    /**
+	     * Event: Click save. Posts the model to the apiPath
+	     */
+
+
+	    _createClass(TemplateEditor, [{
+	        key: 'onClickSave',
+	        value: function onClickSave() {
+	            var _this2 = this;
+
+	            var view = this;
+
+	            this.$saveBtn.toggleClass('working', true);
+
+	            apiCall('post', 'templates/' + this.model.type + '/' + this.model.id, this.model).then(function () {
+	                return reloadResource('templates');
+	            }).then(function () {
+	                NavbarMain.reload();
+
+	                _this2.$saveBtn.toggleClass('working', false);
+	            }).catch(UI.errorModal);
+	        }
+
+	        /**
+	         * Event: Change text. Make sure the value is up to date
+	         */
+
+	    }, {
+	        key: 'onChangeText',
+	        value: function onChangeText() {
+	            this.model.markup = this.editor.getDoc().getValue();
+
+	            this.trigger('change', this.model);
+	        }
+
+	        /**
+	         * Event: Change theme
+	         */
+
+	    }, {
+	        key: 'onChangeTheme',
+	        value: function onChangeTheme() {
+	            var currentTheme = this.$element.find('.CodeMirror')[0].className.replace('CodeMirror cm-s-', '') || 'default';
+	            var newTheme = this.$element.find('.cm-theme select').val();
+
+	            $('.cm-s-' + currentTheme).removeClass('cm-s-' + currentTheme).addClass('cm-s-' + newTheme);
+
+	            document.cookie = 'cmtheme = ' + newTheme;
+	        }
+	    }, {
+	        key: 'render',
+	        value: function render() {
+	            var _this3 = this;
+
+	            _.append(this.$element.empty(), _.div({ class: 'editor-header' }, _.span({ class: 'fa fa-code' }), _.h4(this.model.name)), _.div({ class: 'editor-body' }, this.$textarea = _.textarea(), this.$error), _.div({ class: 'editor-footer' }, _.div({ class: 'btn-group pull-left cm-theme' }, _.span('Theme'), _.select({ class: 'form-control' }, _.each(['cobalt', 'default', 'night', 'railscasts'], function (i, theme) {
+	                return _.option({ value: theme }, theme);
+	            })).change(function () {
+	                _this3.onChangeTheme();
+	            }).val(getCookie('cmtheme') || 'default')), _.div({ class: 'btn-group' }, _.if(!this.model.locked,
+	            // Save
+	            this.$saveBtn = _.button({ class: 'btn btn-raised btn-primary' }, _.span({ class: 'text-default' }, 'Save'), _.span({ class: 'text-working' }, 'Saving')).click(function () {
+	                _this3.onClickSave();
+	            }),
+
+	            // Delete
+	            _.button({ class: 'btn btn-embedded btn-embedded-danger' }, _.span({ class: 'fa fa-trash' })).click(function () {
+	                _this3.onClickDelete(_this3.publishingSettings);
+	            })))));
+
+	            setTimeout(function () {
+	                _this3.editor = CodeMirror.fromTextArea(_this3.$textarea[0], {
+	                    lineNumbers: true,
+	                    mode: {
+	                        name: 'xml'
+	                    },
+	                    viewportMargin: _this3.embedded ? Infinity : 10,
+	                    tabSize: 4,
+	                    indentUnit: 4,
+	                    indentWithTabs: true,
+	                    theme: getCookie('cmtheme') || 'default',
+	                    value: _this3.model.markup
+	                });
+
+	                _this3.editor.getDoc().setValue(_this3.model.markup);
+
+	                _this3.editor.on('change', function () {
+	                    _this3.onChangeText();
+	                });
+
+	                _this3.onChangeText();
+	            }, 1);
+	        }
+	    }]);
+
+	    return TemplateEditor;
+	}(View);
+
+	module.exports = TemplateEditor;
+
+/***/ },
+/* 130 */
+/***/ function(module, exports) {
+
+	'use strict';
 	'strict';
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -30686,7 +30821,7 @@
 	module.exports = ContentEditor;
 
 /***/ },
-/* 130 */
+/* 131 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -31132,7 +31267,7 @@
 	module.exports = FormEditor;
 
 /***/ },
-/* 131 */
+/* 132 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -31365,7 +31500,7 @@
 	module.exports = ConnectionEditor;
 
 /***/ },
-/* 132 */
+/* 133 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -31381,7 +31516,7 @@
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 	// Icons
-	var icons = __webpack_require__(133).icons;
+	var icons = __webpack_require__(134).icons;
 
 	/**
 	 * The editor for schemas
@@ -32018,7 +32153,7 @@
 	module.exports = SchemaEditor;
 
 /***/ },
-/* 133 */
+/* 134 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -32721,7 +32856,7 @@
 	};
 
 /***/ },
-/* 134 */
+/* 135 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -33036,7 +33171,7 @@
 	module.exports = SyncSettings;
 
 /***/ },
-/* 135 */
+/* 136 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -33167,7 +33302,7 @@
 	module.exports = ProvidersSettings;
 
 /***/ },
-/* 136 */
+/* 137 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -33577,7 +33712,7 @@
 	module.exports = UserEditor;
 
 /***/ },
-/* 137 */
+/* 138 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -33858,7 +33993,7 @@
 	module.exports = MediaBrowser;
 
 /***/ },
-/* 138 */
+/* 139 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -33890,7 +34025,7 @@
 	module.exports = Content;
 
 /***/ },
-/* 139 */
+/* 140 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -33905,7 +34040,7 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var path = __webpack_require__(140);
+	var path = __webpack_require__(141);
 
 	var Entity = __webpack_require__(37);
 
@@ -34076,7 +34211,7 @@
 	module.exports = Media;
 
 /***/ },
-/* 140 */
+/* 141 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
@@ -34303,7 +34438,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(13)))
 
 /***/ },
-/* 141 */
+/* 142 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -34410,7 +34545,7 @@
 	module.exports = User;
 
 /***/ },
-/* 142 */
+/* 143 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -34423,7 +34558,63 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var MediaHelperCommon = __webpack_require__(143);
+	var Entity = __webpack_require__(37);
+
+	/**
+	 * The Template model
+	 */
+
+	var Template = function (_Entity) {
+	    _inherits(Template, _Entity);
+
+	    function Template(params) {
+	        _classCallCheck(this, Template);
+
+	        return _possibleConstructorReturn(this, (Template.__proto__ || Object.getPrototypeOf(Template)).call(this, params));
+	    }
+
+	    _createClass(Template, [{
+	        key: 'structure',
+	        value: function structure() {
+	            this.def(String, 'id');
+	            this.def(String, 'parentId');
+	            this.def(String, 'name');
+	            this.def(String, 'type');
+	            this.def(String, 'remotePath');
+	            this.def(String, 'markup');
+	        }
+
+	        /**
+	         * Updates id and remotePath from name
+	         */
+
+	    }, {
+	        key: 'updateFromName',
+	        value: function updateFromName() {
+	            this.id = this.name.substring(0, this.name.lastIndexOf('.')) || this.name;
+	        }
+	    }]);
+
+	    return Template;
+	}(Entity);
+
+	module.exports = Template;
+
+/***/ },
+/* 144 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var MediaHelperCommon = __webpack_require__(145);
 
 	var MediaHelper = function (_MediaHelperCommon) {
 	    _inherits(MediaHelper, _MediaHelperCommon);
@@ -34516,7 +34707,7 @@
 	module.exports = MediaHelper;
 
 /***/ },
-/* 143 */
+/* 145 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -34527,7 +34718,7 @@
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var Media = __webpack_require__(139);
+	var Media = __webpack_require__(140);
 
 	var MediaHelper = function () {
 	    function MediaHelper() {
@@ -34602,7 +34793,7 @@
 	module.exports = MediaHelper;
 
 /***/ },
-/* 144 */
+/* 146 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -34615,9 +34806,9 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var ConnectionHelperCommon = __webpack_require__(145);
+	var ConnectionHelperCommon = __webpack_require__(147);
 
-	var Connection = __webpack_require__(146);
+	var Connection = __webpack_require__(148);
 
 	var ConnectionHelper = function (_ConnectionHelperComm) {
 	    _inherits(ConnectionHelper, _ConnectionHelperComm);
@@ -34675,7 +34866,7 @@
 	module.exports = ConnectionHelper;
 
 /***/ },
-/* 145 */
+/* 147 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -34844,7 +35035,7 @@
 	module.exports = ConnectionHelper;
 
 /***/ },
-/* 146 */
+/* 148 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -35133,7 +35324,7 @@
 	module.exports = Connection;
 
 /***/ },
-/* 147 */
+/* 149 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -35148,9 +35339,9 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var ContentHelperCommon = __webpack_require__(148);
+	var ContentHelperCommon = __webpack_require__(150);
 
-	var Content = __webpack_require__(138);
+	var Content = __webpack_require__(139);
 
 	var ContentHelper = function (_ContentHelperCommon) {
 	    _inherits(ContentHelper, _ContentHelperCommon);
@@ -35256,7 +35447,7 @@
 	module.exports = ContentHelper;
 
 /***/ },
-/* 148 */
+/* 150 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -35418,7 +35609,7 @@
 	module.exports = ContentHelper;
 
 /***/ },
-/* 149 */
+/* 151 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -35433,10 +35624,10 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var FieldSchema = __webpack_require__(150);
+	var FieldSchema = __webpack_require__(152);
 
 	// Helpers
-	var SchemaHelperCommon = __webpack_require__(152);
+	var SchemaHelperCommon = __webpack_require__(154);
 
 	/**
 	 * Schema helper
@@ -35534,7 +35725,7 @@
 	module.exports = SchemaHelper;
 
 /***/ },
-/* 150 */
+/* 152 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -35549,7 +35740,7 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var Schema = __webpack_require__(151);
+	var Schema = __webpack_require__(153);
 
 	/**
 	 * Schema for content fields
@@ -35606,7 +35797,7 @@
 	module.exports = FieldSchema;
 
 /***/ },
-/* 151 */
+/* 153 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -35672,7 +35863,7 @@
 	module.exports = Schema;
 
 /***/ },
-/* 152 */
+/* 154 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -35683,8 +35874,8 @@
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var FieldSchema = __webpack_require__(150);
-	var ContentSchema = __webpack_require__(153);
+	var FieldSchema = __webpack_require__(152);
+	var ContentSchema = __webpack_require__(155);
 
 	/**
 	 * The common base for SchemaHelper
@@ -35738,7 +35929,7 @@
 	module.exports = SchemaHelper;
 
 /***/ },
-/* 153 */
+/* 155 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -35753,7 +35944,7 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var Schema = __webpack_require__(151);
+	var Schema = __webpack_require__(153);
 
 	/**
 	 * Schema for content nodes
@@ -35789,7 +35980,7 @@
 	module.exports = ContentSchema;
 
 /***/ },
-/* 154 */
+/* 156 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -35839,13 +36030,11 @@
 	};
 
 /***/ },
-/* 155 */
+/* 157 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	__webpack_require__(156);
-	__webpack_require__(157);
 	__webpack_require__(158);
 	__webpack_require__(159);
 	__webpack_require__(160);
@@ -35853,9 +36042,11 @@
 	__webpack_require__(162);
 	__webpack_require__(163);
 	__webpack_require__(164);
+	__webpack_require__(165);
+	__webpack_require__(166);
 
 /***/ },
-/* 156 */
+/* 158 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -35914,7 +36105,7 @@
 	});
 
 /***/ },
-/* 157 */
+/* 159 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -35978,7 +36169,7 @@
 	});
 
 /***/ },
-/* 158 */
+/* 160 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -36026,7 +36217,7 @@
 	});
 
 /***/ },
-/* 159 */
+/* 161 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -36051,7 +36242,7 @@
 	});
 
 /***/ },
-/* 160 */
+/* 162 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -36107,7 +36298,7 @@
 	});
 
 /***/ },
-/* 161 */
+/* 163 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -36147,7 +36338,7 @@
 	});
 
 /***/ },
-/* 162 */
+/* 164 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -36180,7 +36371,7 @@
 	});
 
 /***/ },
-/* 163 */
+/* 165 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -36217,7 +36408,7 @@
 	});
 
 /***/ },
-/* 164 */
+/* 166 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -36250,199 +36441,6 @@
 	        location.hash = '/';
 	    }
 	});
-
-/***/ },
-/* 165 */,
-/* 166 */,
-/* 167 */,
-/* 168 */,
-/* 169 */,
-/* 170 */,
-/* 171 */
-/***/ function(module, exports) {
-
-	'use strict';
-
-	/**
-	 * A Template editor
-	 */
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var TemplateEditor = function (_View) {
-	    _inherits(TemplateEditor, _View);
-
-	    function TemplateEditor(params) {
-	        _classCallCheck(this, TemplateEditor);
-
-	        var _this = _possibleConstructorReturn(this, (TemplateEditor.__proto__ || Object.getPrototypeOf(TemplateEditor)).call(this, params));
-
-	        _this.$element = _.div({ class: 'template-editor editor flex-vertical' });
-
-	        _this.fetch();
-	        return _this;
-	    }
-
-	    /**
-	     * Event: Click save. Posts the model to the apiPath
-	     */
-
-
-	    _createClass(TemplateEditor, [{
-	        key: 'onClickSave',
-	        value: function onClickSave() {
-	            var _this2 = this;
-
-	            var view = this;
-
-	            this.$saveBtn.toggleClass('working', true);
-
-	            apiCall('post', 'templates/' + this.model.type + '/' + this.model.id, this.model).then(function () {
-	                return reloadResource('templates');
-	            }).then(function () {
-	                NavbarMain.reload();
-
-	                _this2.$saveBtn.toggleClass('working', false);
-	            }).catch(UI.errorModal);
-	        }
-
-	        /**
-	         * Event: Change text. Make sure the value is up to date
-	         */
-
-	    }, {
-	        key: 'onChangeText',
-	        value: function onChangeText() {
-	            this.model.markup = this.editor.getDoc().getValue();
-
-	            this.trigger('change', this.model);
-	        }
-
-	        /**
-	         * Event: Change theme
-	         */
-
-	    }, {
-	        key: 'onChangeTheme',
-	        value: function onChangeTheme() {
-	            var currentTheme = this.$element.find('.CodeMirror')[0].className.replace('CodeMirror cm-s-', '') || 'default';
-	            var newTheme = this.$element.find('.cm-theme select').val();
-
-	            $('.cm-s-' + currentTheme).removeClass('cm-s-' + currentTheme).addClass('cm-s-' + newTheme);
-
-	            document.cookie = 'cmtheme = ' + newTheme;
-	        }
-	    }, {
-	        key: 'render',
-	        value: function render() {
-	            var _this3 = this;
-
-	            _.append(this.$element.empty(), _.div({ class: 'editor-header' }, _.span({ class: 'fa fa-code' }), _.h4(this.model.name)), _.div({ class: 'editor-body' }, this.$textarea = _.textarea(), this.$error), _.div({ class: 'editor-footer' }, _.div({ class: 'btn-group pull-left cm-theme' }, _.span('Theme'), _.select({ class: 'form-control' }, _.each(['cobalt', 'default', 'night', 'railscasts'], function (i, theme) {
-	                return _.option({ value: theme }, theme);
-	            })).change(function () {
-	                _this3.onChangeTheme();
-	            }).val(getCookie('cmtheme') || 'default')), _.div({ class: 'btn-group' }, _.if(!this.model.locked,
-	            // Save
-	            this.$saveBtn = _.button({ class: 'btn btn-raised btn-primary' }, _.span({ class: 'text-default' }, 'Save'), _.span({ class: 'text-working' }, 'Saving')).click(function () {
-	                _this3.onClickSave();
-	            }),
-
-	            // Delete
-	            _.button({ class: 'btn btn-embedded btn-embedded-danger' }, _.span({ class: 'fa fa-trash' })).click(function () {
-	                _this3.onClickDelete(_this3.publishingSettings);
-	            })))));
-
-	            setTimeout(function () {
-	                _this3.editor = CodeMirror.fromTextArea(_this3.$textarea[0], {
-	                    lineNumbers: true,
-	                    mode: {
-	                        name: 'xml'
-	                    },
-	                    viewportMargin: _this3.embedded ? Infinity : 10,
-	                    tabSize: 4,
-	                    indentUnit: 4,
-	                    indentWithTabs: true,
-	                    theme: getCookie('cmtheme') || 'default',
-	                    value: _this3.model.markup
-	                });
-
-	                _this3.editor.getDoc().setValue(_this3.model.markup);
-
-	                _this3.editor.on('change', function () {
-	                    _this3.onChangeText();
-	                });
-
-	                _this3.onChangeText();
-	            }, 1);
-	        }
-	    }]);
-
-	    return TemplateEditor;
-	}(View);
-
-	module.exports = TemplateEditor;
-
-/***/ },
-/* 172 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var Entity = __webpack_require__(37);
-
-	/**
-	 * The Template model
-	 */
-
-	var Template = function (_Entity) {
-	    _inherits(Template, _Entity);
-
-	    function Template(params) {
-	        _classCallCheck(this, Template);
-
-	        return _possibleConstructorReturn(this, (Template.__proto__ || Object.getPrototypeOf(Template)).call(this, params));
-	    }
-
-	    _createClass(Template, [{
-	        key: 'structure',
-	        value: function structure() {
-	            this.def(String, 'id');
-	            this.def(String, 'parentId');
-	            this.def(String, 'name');
-	            this.def(String, 'type');
-	            this.def(String, 'remotePath');
-	            this.def(String, 'markup');
-	        }
-
-	        /**
-	         * Updates id and remotePath from name
-	         */
-
-	    }, {
-	        key: 'updateFromName',
-	        value: function updateFromName() {
-	            this.id = this.name.substring(0, this.name.lastIndexOf('.')) || this.name;
-	        }
-	    }]);
-
-	    return Template;
-	}(Entity);
-
-	module.exports = Template;
 
 /***/ }
 /******/ ]);
