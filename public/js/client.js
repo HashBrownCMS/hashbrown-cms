@@ -280,7 +280,9 @@
 
 	// Preload resources 
 	$(document).ready(function () {
-	    reloadAllResources().then(function () {
+	    LanguageHelper.getSelectedLanguages(ProjectHelper.currentProject).then(function () {
+	        return reloadAllResources();
+	    }).then(function () {
 	        var _iteratorNormalCompletion2 = true;
 	        var _didIteratorError2 = false;
 	        var _iteratorError2 = undefined;
@@ -11227,6 +11229,8 @@
 
 	                settings.selected.sort();
 
+	                LanguageHelper.selectedLanguages = settings.selected;
+
 	                return Promise.resolve(settings.selected);
 	            });
 	        }
@@ -11884,17 +11888,32 @@
 
 	    /**
 	     * Event: On change language
+	     *
+	     * @param {String} newLanguage
 	     */
 
 
 	    _createClass(MainMenu, [{
 	        key: 'onChangeLanguage',
-	        value: function onChangeLanguage(e) {
-	            e.preventDefault();
+	        value: function onChangeLanguage(newLanguage) {
+	            var _this2 = this;
 
-	            localStorage.setItem('language', $(this).text());
+	            localStorage.setItem('language', newLanguage);
 
-	            location.reload();
+	            window.language = newLanguage;
+
+	            reloadResource('content').then(function () {
+	                NavbarMain.reload();
+
+	                var contentEditor = ViewHelper.get('ContentEditor');
+
+	                if (contentEditor) {
+	                    contentEditor.model = null;
+	                    contentEditor.fetch();
+	                }
+
+	                _this2.fetch();
+	            });
 	        }
 
 	        /**
@@ -11931,7 +11950,7 @@
 	                    break;
 
 	                case 'templates':
-	                    UI.messageModal('Templates', [_.p('This section containse markup rendering Templates for your authored Content.'), _.if(User.current.hasScope('settings'), _.p('Templates are served through the Connection assigned as the Template provider in the <a href="#/settings/providers/">providers settings</a>.'))]);
+	                    UI.messageModal('Templates', [_.p('This section contains rendering Templates for your authored Content.'), _.if(User.current.hasScope('settings'), _.p('Templates are served through the Connection assigned as the Template provider in the <a href="#/settings/providers/">providers settings</a>.'))]);
 	                    break;
 
 	                case 'connections':
@@ -11952,7 +11971,7 @@
 	                            UI.messageModal('Sync settings', 'Syncing lets you connect this HashBrown instance to another. When syncing is active, you can pull or push Content, Schemas, Forms and Connections between the local and the remote instance.');
 	                            break;
 	                        case 'providers':
-	                            UI.messageModal('Providers settings', [_.p('Providers are Connections set up to serve static Media and Templates.'), _.p('For example, when a Connection is assigned as the Media provider, the images and other content in the Media library are pulled from that connection.'), _.p('Similarly, if a Connection is assigned as the Template provider, the available templates in dropdown menus will be pulled from that Connection.')]);
+	                            UI.messageModal('Providers settings', [_.p('Providers are Connections set up to serve static Media and Templates.'), _.p('For example, when a Connection is assigned as the Media provider, the images and other content in the <a href="#/media/">Media gallery</a> are pulled from that connection.'), _.p('Similarly, if a Connection is assigned as the Template provider, the available <a href="#/templates/">Templates</a> will be pulled from that Connection.')]);
 	                            break;
 	                        default:
 	                            UI.messageModal('Settings', 'Here you can edit environment-specific settings');
@@ -11965,7 +11984,7 @@
 	    }, {
 	        key: 'render',
 	        value: function render() {
-	            var _this2 = this;
+	            var _this3 = this;
 
 	            // Find current user
 	            var _iteratorNormalCompletion = true;
@@ -11981,7 +12000,7 @@
 	                    }
 	                }
 
-	                // Get selected languages
+	                // Render menu
 	            } catch (err) {
 	                _didIteratorError = true;
 	                _iteratorError = err;
@@ -11997,29 +12016,28 @@
 	                }
 	            }
 
-	            LanguageHelper.getSelectedLanguages(ProjectHelper.currentProject).then(function (languages) {
-	                _this2.languages = languages;
+	            this.languages = LanguageHelper.selectedLanguages || [];
 
-	                // Render menu
-	                _.append(_this2.$element.empty(),
-	                // Language picker
-	                _.if(Array.isArray(_this2.languages) && _this2.languages.length > 1, _.div({ class: 'main-menu-item dropdown main-menu-language' }, _.button({ title: 'Language', class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, _.span({ class: 'fa fa-flag' })), _.ul({ class: 'dropdown-menu' }, _.each(_this2.languages, function (i, language) {
-	                    return _.li({ value: language, class: language == window.language ? 'active' : '' }, _.a({ href: '#' }, language).click(_this2.onChangeLanguage));
-	                })))),
+	            _.append(this.$element.empty(),
+	            // Language picker
+	            _.if(Array.isArray(this.languages) && this.languages.length > 1, _.div({ class: 'main-menu-item dropdown main-menu-language' }, _.button({ title: 'Language', class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, _.span({ class: 'fa fa-flag' })), _.ul({ class: 'dropdown-menu' }, _.each(this.languages, function (i, language) {
+	                return _.li({ value: language, class: language == window.language ? 'active' : '' }, _.button(language).click(function () {
+	                    _this3.onChangeLanguage(language);
+	                }));
+	            })))),
 
-	                // Dashboard link
-	                _.div({ class: 'main-menu-item' }, _.a({ title: 'Dashboard', href: '/', class: 'main-menu-dashboard' }, _.span({ class: 'fa fa-home' }))),
+	            // Dashboard link
+	            _.div({ class: 'main-menu-item' }, _.a({ title: 'Dashboard', href: '/', class: 'main-menu-dashboard' }, _.span({ class: 'fa fa-home' }))),
 
-	                // User dropdown
-	                _.div({ class: 'main-menu-item main-menu-user dropdown' }, _.button({ title: 'User', class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, _.span({ class: 'fa fa-user' })), _.ul({ class: 'dropdown-menu' }, _.li(_.a({ class: 'dropdown-item', href: '#/users/' + _this2.user.id }, 'User settings')), _.li(_.a({ class: 'dropdown-item', href: '#' }, 'Log out').click(function (e) {
-	                    e.preventDefault();logout();
-	                })))),
+	            // User dropdown
+	            _.div({ class: 'main-menu-item main-menu-user dropdown' }, _.button({ title: 'User', class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, _.span({ class: 'fa fa-user' })), _.ul({ class: 'dropdown-menu' }, _.li(_.a({ class: 'dropdown-item', href: '#/users/' + this.user.id }, 'User settings')), _.li(_.a({ class: 'dropdown-item', href: '#' }, 'Log out').click(function (e) {
+	                e.preventDefault();logout();
+	            })))),
 
-	                // Help
-	                _.div({ class: 'main-menu-item' }, _.button({ title: 'Help', class: 'main-menu-help' }, _.span({ class: 'fa fa-question-circle' })).click(function () {
-	                    _this2.onClickQuestion();
-	                })));
-	            });
+	            // Help
+	            _.div({ class: 'main-menu-item' }, _.button({ title: 'Help', class: 'main-menu-help' }, _.span({ class: 'fa fa-question-circle' })).click(function () {
+	                _this3.onClickQuestion();
+	            })));
 	        }
 	    }]);
 
@@ -22973,13 +22991,16 @@
 	                sort: function sort(item, queueItem) {
 	                    queueItem.$element.attr('data-template-id', item.id);
 
-	                    var folderName = item.type.substring(0, 1).toUpperCase() + item.type.substring(1) + 's';
+	                    var rootDirName = item.type.substring(0, 1).toUpperCase() + item.type.substring(1) + 's';
+	                    var parentDirName = item.parentId;
 
 	                    if (!item.parentId) {
 	                        queueItem.createDir = true;
+
+	                        parentDirName = item.folder ? rootDirName + '/' + item.folder : rootDirName;
 	                    }
 
-	                    queueItem.parentDirAttr = { 'data-template-id': item.parentId || folderName };
+	                    queueItem.parentDirAttr = { 'data-template-id': parentDirName };
 	                },
 
 	                // Item context menu
@@ -25141,9 +25162,9 @@
 	            var editor = this;
 
 	            // Main element
-	            this.$element = _.div({ class: 'field-editor string-editor' }, _.if(this.disabled, _.p(this.value || '(none)')), _.if(!this.disabled, _.if((!this.config.type || this.config.type == 'text') && this.config.multiline, this.$input = _.textarea({ class: 'form-control' }, this.value).on('change propertychange paste keyup', function () {
+	            this.$element = _.div({ class: 'field-editor string-editor' }, _.if(this.disabled, _.p(this.value || '(none)')), _.if(!this.disabled, _.if((!this.config.type || this.config.type == 'text') && this.config.multiline, this.$input = _.textarea({ class: 'form-control' }, this.value || '').on('change propertychange paste keyup', function () {
 	                editor.onChange();
-	            })), _.if(this.config.type && this.config.type != 'text' || !this.config.multiline, this.$input = _.input({ class: 'form-control', value: this.value, type: this.config.type || 'text' }).on('change propertychange paste keyup', function () {
+	            })), _.if(this.config.type && this.config.type != 'text' || !this.config.multiline, this.$input = _.input({ class: 'form-control', value: this.value || '', type: this.config.type || 'text' }).on('change propertychange paste keyup', function () {
 	                editor.onChange();
 	            }))));
 	        }
@@ -34581,6 +34602,7 @@
 	            this.def(String, 'name');
 	            this.def(String, 'type');
 	            this.def(String, 'remotePath');
+	            this.def(String, 'folder');
 	            this.def(String, 'markup');
 	        }
 
@@ -36358,7 +36380,7 @@
 	// Edit
 	Router.route('/templates/:type/:id', function () {
 	    if (currentUserHasScope('templates')) {
-	        ViewHelper.get('NavbarMain').highlightItem(this.id);
+	        ViewHelper.get('NavbarMain').highlightItem(this.type + '/' + this.id);
 
 	        var templateEditor = new TemplateEditor({
 	            modelUrl: apiUrl('templates/' + this.type + '/' + this.id)

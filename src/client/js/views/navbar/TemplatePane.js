@@ -179,13 +179,16 @@ class TemplatePane extends Pane {
             sort: function(item, queueItem) {
                 queueItem.$element.attr('data-template-id', item.id);
                
-                let folderName = item.type.substring(0, 1).toUpperCase() + item.type.substring(1) + 's';
+                let rootDirName = item.type.substring(0, 1).toUpperCase() + item.type.substring(1) + 's';
+                let parentDirName = item.parentId;
 
                 if(!item.parentId) {
                     queueItem.createDir = true;
+
+                    parentDirName = item.folder ? rootDirName + '/' + item.folder : rootDirName;
                 }
 
-                queueItem.parentDirAttr = {'data-template-id': item.parentId || folderName };
+                queueItem.parentDirAttr = {'data-template-id': parentDirName };
             },
 
             // Item context menu

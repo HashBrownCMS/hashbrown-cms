@@ -13,13 +13,27 @@ class MainMenu extends View {
     
     /**
      * Event: On change language
+     *
+     * @param {String} newLanguage
      */
-    onChangeLanguage(e) {
-        e.preventDefault();
+    onChangeLanguage(newLanguage) {
+        localStorage.setItem('language', newLanguage);
 
-        localStorage.setItem('language', $(this).text());
+        window.language = newLanguage;
 
-        location.reload();
+        reloadResource('content')
+        .then(() => {
+            NavbarMain.reload();
+
+            let contentEditor = ViewHelper.get('ContentEditor');
+
+            if(contentEditor) {
+                contentEditor.model = null;
+                contentEditor.fetch();
+            }
+
+            this.fetch();
+        });
     }
 
     /**
@@ -62,7 +76,7 @@ class MainMenu extends View {
 
             case 'templates':
                 UI.messageModal('Templates', [
-                    _.p('This section containse markup rendering Templates for your authored Content.'),
+                    _.p('This section contains rendering Templates for your authored Content.'),
                     _.if(User.current.hasScope('settings'),
                         _.p('Templates are served through the Connection assigned as the Template provider in the <a href="#/settings/providers/">providers settings</a>.')
                     )
@@ -92,8 +106,8 @@ class MainMenu extends View {
                     case 'providers':
                         UI.messageModal('Providers settings', [
                             _.p('Providers are Connections set up to serve static Media and Templates.'),
-                            _.p('For example, when a Connection is assigned as the Media provider, the images and other content in the Media library are pulled from that connection.'),
-                            _.p('Similarly, if a Connection is assigned as the Template provider, the available templates in dropdown menus will be pulled from that Connection.')
+                            _.p('For example, when a Connection is assigned as the Media provider, the images and other content in the <a href="#/media/">Media gallery</a> are pulled from that connection.'),
+                            _.p('Similarly, if a Connection is assigned as the Template provider, the available <a href="#/templates/">Templates</a> will be pulled from that Connection.')
                         ]);
                         break;
                     default:
@@ -113,63 +127,58 @@ class MainMenu extends View {
             }
         }
 
-        // Get selected languages
-        LanguageHelper.getSelectedLanguages(ProjectHelper.currentProject)
-        .then((languages) => {
-            this.languages = languages;
+        // Render menu
+        this.languages = LanguageHelper.selectedLanguages || [];
 
-            // Render menu
-            _.append(this.$element.empty(),
-                // Language picker
-                _.if(Array.isArray(this.languages) && this.languages.length > 1,
-                    _.div({class: 'main-menu-item dropdown main-menu-language'},
-                        _.button({title: 'Language', class: 'dropdown-toggle', 'data-toggle': 'dropdown'},
-                            _.span({class: 'fa fa-flag'})    
-                        ),
-                        _.ul({class: 'dropdown-menu'},
-                            _.each(this.languages, (i, language) => {
-                                return _.li({value: language, class: language == window.language ? 'active': ''},
-                                    _.a({href: '#'},
-                                        language
-                                    ).click(this.onChangeLanguage)
-                                );
-                            })
-                        )
-                    )
-                ),
-
-                // Dashboard link
-                _.div({class: 'main-menu-item'},
-                    _.a({title: 'Dashboard', href: '/', class: 'main-menu-dashboard'},
-                        _.span({class: 'fa fa-home'})
-                    )
-                ),
-
-                // User dropdown
-                _.div({class: 'main-menu-item main-menu-user dropdown'},
-                    _.button({title: 'User', class: 'dropdown-toggle', 'data-toggle': 'dropdown'},
-                        _.span({class: 'fa fa-user'})
+        _.append(this.$element.empty(),
+            // Language picker
+            _.if(Array.isArray(this.languages) && this.languages.length > 1,
+                _.div({class: 'main-menu-item dropdown main-menu-language'},
+                    _.button({title: 'Language', class: 'dropdown-toggle', 'data-toggle': 'dropdown'},
+                        _.span({class: 'fa fa-flag'})    
                     ),
                     _.ul({class: 'dropdown-menu'},
-                        _.li(
-                            _.a({class: 'dropdown-item', href: '#/users/' + this.user.id}, 'User settings')
-                        ),
-                        _.li(
-                            _.a({class: 'dropdown-item', href: '#'}, 'Log out')
-                                .click((e) => { e.preventDefault(); logout(); })
-                        )
+                        _.each(this.languages, (i, language) => {
+                            return _.li({value: language, class: language == window.language ? 'active': ''},
+                                _.button(
+                                    language
+                                ).click(() => { this.onChangeLanguage(language); })
+                            );
+                        })
                     )
-                ),
-
-                // Help
-                _.div({class: 'main-menu-item'},
-                    _.button({title: 'Help', class: 'main-menu-help'},
-                        _.span({class: 'fa fa-question-circle'})
-                    ).click(() => { this.onClickQuestion(); })
                 )
-            );
-        });
+            ),
 
+            // Dashboard link
+            _.div({class: 'main-menu-item'},
+                _.a({title: 'Dashboard', href: '/', class: 'main-menu-dashboard'},
+                    _.span({class: 'fa fa-home'})
+                )
+            ),
+
+            // User dropdown
+            _.div({class: 'main-menu-item main-menu-user dropdown'},
+                _.button({title: 'User', class: 'dropdown-toggle', 'data-toggle': 'dropdown'},
+                    _.span({class: 'fa fa-user'})
+                ),
+                _.ul({class: 'dropdown-menu'},
+                    _.li(
+                        _.a({class: 'dropdown-item', href: '#/users/' + this.user.id}, 'User settings')
+                    ),
+                    _.li(
+                        _.a({class: 'dropdown-item', href: '#'}, 'Log out')
+                            .click((e) => { e.preventDefault(); logout(); })
+                    )
+                )
+            ),
+
+            // Help
+            _.div({class: 'main-menu-item'},
+                _.button({title: 'Help', class: 'main-menu-help'},
+                    _.span({class: 'fa fa-question-circle'})
+                ).click(() => { this.onClickQuestion(); })
+            )
+        );
     }
 }
 

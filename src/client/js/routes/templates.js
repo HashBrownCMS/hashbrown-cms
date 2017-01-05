@@ -22,7 +22,7 @@ Router.route('/templates/', function() {
 // Edit
 Router.route('/templates/:type/:id', function() {
     if(currentUserHasScope('templates')) {
-        ViewHelper.get('NavbarMain').highlightItem(this.id);
+        ViewHelper.get('NavbarMain').highlightItem(this.type + '/' + this.id);
         
         let templateEditor = new TemplateEditor({
             modelUrl: apiUrl('templates/' + this.type + '/' + this.id)

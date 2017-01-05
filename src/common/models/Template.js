@@ -16,6 +16,7 @@ class Template extends Entity {
         this.def(String, 'name');
         this.def(String, 'type');
         this.def(String, 'remotePath');
+        this.def(String, 'folder');
         this.def(String, 'markup');
     }
 

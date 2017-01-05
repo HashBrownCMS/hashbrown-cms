@@ -29,11 +29,11 @@ class StringEditor extends View {
             ),
             _.if(!this.disabled,
                 _.if((!this.config.type || this.config.type == 'text') && this.config.multiline,
-                    this.$input = _.textarea({class: 'form-control'}, this.value)
+                    this.$input = _.textarea({class: 'form-control'}, this.value || '')
                         .on('change propertychange paste keyup', function() { editor.onChange(); })
                 ),
                 _.if((this.config.type && this.config.type != 'text') || !this.config.multiline,
-                    this.$input = _.input({class: 'form-control', value: this.value, type: this.config.type || 'text'})
+                    this.$input = _.input({class: 'form-control', value: this.value || '', type: this.config.type || 'text'})
                         .on('change propertychange paste keyup', function() { editor.onChange(); })
                 )
             )

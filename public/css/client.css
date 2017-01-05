@@ -165,7 +165,7 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
         font-family: 'FontAwesome';
         content: '\F00C';
         position: absolute;
-        right: 10px; }
+        right: 4px; }
     .dropdown .dropdown-menu > li > a, .dropdown .dropdown-menu > li > button, .dropdown .dropdown-menu ul > li > a, .dropdown .dropdown-menu ul > li > button {
       padding: 3px 20px;
       border: 0px;
@@ -263,6 +263,9 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
       margin-right: 0px; }
       .chip-group .chip .chip-label.dropdown.open .dropdown-toggle:before {
         content: none; }
+      .chip-group .chip .chip-label.dropdown .dropdown-menu {
+        max-height: 300px;
+        overflow-y: auto; }
       .chip-group .chip .chip-label.dropdown .dropdown-toggle {
         letter-spacing: normal;
         background: none;
@@ -430,6 +433,9 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
     border-bottom: 0px;
     cursor: pointer;
     border-radius: 2px; }
+
+textarea.form-control {
+  max-width: 400px; }
 
 select.form-control, select.form-control:active, select.form-control:focus, select.form-control[readonly] {
   border-bottom: 0px;

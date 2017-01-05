@@ -371,10 +371,15 @@ class GitHubConnection extends Connection {
                     template.markup = markup.toString();
                 }
 
-                let parentMatches = (template.markup || '').match(/layout:(.+)/);
+                let parentMatches = (template.markup || '').match(/(?:layout|parent):(.+)/);
+                let folderMatches = (template.markup || '').match(/(?:folder|directory):(.+)/);
 
                 if(parentMatches && parentMatches.length > 1) {
-                    template.parentId = parentMatches[1].replace(/ /g, '');
+                    template.parentId = parentMatches[1].replace(' ', '');
+                }
+                
+                if(folderMatches && folderMatches.length > 1) {
+                    template.folder = folderMatches[1].replace(' ', '');
                 }
             }
 

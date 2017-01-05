@@ -11069,6 +11069,8 @@
 
 	                settings.selected.sort();
 
+	                LanguageHelper.selectedLanguages = settings.selected;
+
 	                return Promise.resolve(settings.selected);
 	            });
 	        }

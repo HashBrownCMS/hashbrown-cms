@@ -228,7 +228,10 @@ require('./routes/index');
 
 // Preload resources 
 $(document).ready(() => {
-    reloadAllResources()
+    LanguageHelper.getSelectedLanguages(ProjectHelper.currentProject)
+    .then(() => {
+        return reloadAllResources();
+    })
     .then(() => {
         for(let user of resources.users) {
             if(user.isCurrent) {
