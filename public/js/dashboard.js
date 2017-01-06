@@ -11430,13 +11430,100 @@
 	         */
 	        value: function getSettings() {
 	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+
+	            var _this2 = this;
+
 	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
 	            var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('section');
 
+	            var apiCall = void 0;
+
 	            if (!environment || environment == '*') {
-	                return customApiCall('get', '/api/' + project + '/settings/' + section);
+	                apiCall = customApiCall('get', '/api/' + project + '/settings/' + section);
 	            } else {
-	                return customApiCall('get', '/api/' + project + '/' + environment + '/settings/' + section);
+	                apiCall = customApiCall('get', '/api/' + project + '/' + environment + '/settings/' + section);
+	            }
+
+	            return apiCall
+
+	            // Cache settings client-side
+	            .then(function (settings) {
+	                _this2.updateCache(project, environment, section, settings);
+
+	                return Promise.resolve(settings);
+	            });
+	        }
+
+	        /**
+	         * Cache update
+	         *
+	         * @param {String} project
+	         * @param {String} environment
+	         * @param {String} section
+	         * @param {Object} settings
+	         */
+
+	    }, {
+	        key: 'updateCache',
+	        value: function updateCache() {
+	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+	            var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('section');
+	            var settings = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : requiredParam('settings');
+
+	            // Sanity check
+	            this.cache = this.cache || {};
+	            this.cache[project] = this.cache[project] || {};
+
+	            if (environment) {
+	                this.cache[project][environment] = this.cache[project][environment] || {};
+	                this.cache[project][environment][section] = this.cache[project][environment][section] || {};
+	                this.cache[project][environment][section] = settings;
+	            } else {
+	                this.cache[project][section] = this.cache[project][section] || {};
+	                this.cache[project][section] = settings;
+	            }
+	        }
+
+	        /**
+	         * Gets cached settings
+	         *
+	         * @param {String} project
+	         * @param {String} environment
+	         * @param {String} section
+	         *
+	         * @returns {Object} Settings
+	         */
+
+	    }, {
+	        key: 'getCachedSettings',
+	        value: function getCachedSettings() {
+	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+	            var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('section');
+
+	            if (!this.cache) {
+	                return {};
+	            }
+	            if (!this.cache[project]) {
+	                return {};
+	            }
+
+	            if (environment) {
+	                if (!this.cache[project][environment]) {
+	                    return {};
+	                }
+	                if (!this.cache[project][environment][section]) {
+	                    return {};
+	                }
+
+	                return this.cache[project][environment][section];
+	            } else {
+	                if (!this.cache[project][section]) {
+	                    return {};
+	                }
+
+	                return this.cache[project][section];
 	            }
 	        }
 
@@ -11456,14 +11543,28 @@
 	        value: function setSettings() {
 	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
 	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+
+	            var _this3 = this;
+
 	            var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('section');
 	            var settings = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : requiredParam('settings');
 
+	            var apiCall = void 0;
+
 	            if (!environment || environment == '*') {
-	                return customApiCall('post', '/api/' + project + '/settings/' + section, settings);
+	                apiCall = customApiCall('post', '/api/' + project + '/settings/' + section, settings);
 	            } else {
-	                return customApiCall('post', '/api/' + project + '/' + environment + '/settings/' + section, settings);
+	                apiCall = customApiCall('post', '/api/' + project + '/' + environment + '/settings/' + section, settings);
 	            }
+
+	            return apiCall
+
+	            // Cache new settings
+	            .then(function () {
+	                _this3.updateCache(project, environment, section, settings);
+
+	                return Promise.resolve();
+	            });
 	        }
 	    }]);
 

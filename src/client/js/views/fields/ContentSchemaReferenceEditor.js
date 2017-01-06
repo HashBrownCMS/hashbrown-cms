@@ -8,40 +8,56 @@ class ContentSchemaReferenceEditor extends View {
         super(params);
        
         this.$element = _.div({class: 'field-editor content-schema-reference-editor'});
-        
+       
+        // Adopt allowed Schemas from parent if applicable
+        let parentSchema = this.getParentSchema();
+
+        if(parentSchema && this.config && this.config.allowedSchemas == 'fromParent') {
+            this.config.allowedSchemas = parentSchema.allowedChildSchemas;                            
+        }
+
+        this.init();
+    }
+
+    /**
+     * Gets the parent Schema
+     *
+     * @returns {Schema} Parentn Schema
+     */
+    getParentSchema() {
+        // Return config parent Schema if available
+        if(this.config.parentSchema) { return this.config.parentSchema; }
+
+        // Fetch current ContentEditor
+        let contentEditor = ViewHelper.get('ContentEditor');
+
+        if(!contentEditor) { return null; }
+
         // Fetch current Content model
-        let thisContent = resources.content.filter((c) => { return c.id == Router.params.id; })[0];
+        let thisContent = contentEditor.model;
 
-        if(!thisContent) {
-            UI.errorModal(new Error('Content by id "' + Router.params.id + '" not found'));
-            return;
-        }
+        if(!thisContent) { return null; }
         
-        // If no allowed Schemas are referred to by parent, proceed as normal
-        if(!thisContent.parentId || !this.config || !this.config.allowedSchemas == 'fromParent') {
-            this.init();
-            return;
-        }
-
         // Fetch parent Content
+        if(!thisContent.parentId) { return null; }
+        
         let parentContent = resources.content.filter((c) => { return c.id == thisContent.parentId; })[0];
 
         if(!parentContent) {
             UI.errorModal(new Error('Content by id "' + thisContent.parentId + '" not found'));
-            return;
+            return null;
         }
 
         // Fetch parent Schema
         let parentSchema = resources.schemas[parentContent.schemaId];
             
         if(!parentSchema) {
-            UI.errorModal(new Error('Schema by id "' + parentContent.schematId + '" not found'));
-            return;
+            UI.errorModal(new Error('Schema by id "' + parentContent.schemaId + '" not found'));
+            return null;
         }
 
-        // Adopt allowed Schemas from parent
-        this.config.allowedSchemas = parentSchema.allowedChildSchemas;                            
-        this.init();
+        // Return parent Schema
+        return parentSchema;
     }
 
     /**

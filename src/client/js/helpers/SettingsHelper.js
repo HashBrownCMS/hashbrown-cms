@@ -17,13 +17,84 @@ class SettingsHelper extends SettingsHelperCommon {
         environment = requiredParam('environment'),
         section = requiredParam('section')
     ) {
+        let apiCall;
+
         if(!environment || environment == '*') {
-            return customApiCall('get', '/api/' + project + '/settings/' + section);
+            apiCall = customApiCall('get', '/api/' + project + '/settings/' + section);
         } else {
-            return customApiCall('get', '/api/' + project + '/' + environment + '/settings/' + section);
+            apiCall = customApiCall('get', '/api/' + project + '/' + environment + '/settings/' + section);
         }
+
+        return apiCall
+
+        // Cache settings client-side
+        .then((settings) => {
+            this.updateCache(project, environment, section, settings);
+
+            return Promise.resolve(settings);
+        });
     }
     
+    /**
+     * Cache update
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} section
+     * @param {Object} settings
+     */
+    static updateCache(
+        project = requiredParam('project'),
+        environment = requiredParam('environment'),
+        section = requiredParam('section'),
+        settings = requiredParam('settings')
+    ) {
+        // Sanity check
+        this.cache = this.cache || {};
+        this.cache[project] = this.cache[project] || {};
+
+        if(environment) {
+            this.cache[project][environment] = this.cache[project][environment] || {};
+            this.cache[project][environment][section] = this.cache[project][environment][section] || {};
+            this.cache[project][environment][section] = settings;
+        
+        } else {
+            this.cache[project][section] = this.cache[project][section] || {};
+            this.cache[project][section] = settings;
+        
+        }
+    }
+
+    /**
+     * Gets cached settings
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} section
+     *
+     * @returns {Object} Settings
+     */
+    static getCachedSettings(
+        project = requiredParam('project'),
+        environment = requiredParam('environment'),
+        section = requiredParam('section')
+    ) {
+        if(!this.cache) { return {}; }
+        if(!this.cache[project]) { return {}; }
+
+        if(environment) {
+            if(!this.cache[project][environment]) { return {}; }
+            if(!this.cache[project][environment][section]) { return {}; }
+            
+            return this.cache[project][environment][section];
+        
+        } else {
+            if(!this.cache[project][section]) { return {}; }
+
+            return this.cache[project][section];
+        }
+    }
+
     /**
      * Sets all settings
      *
@@ -40,11 +111,22 @@ class SettingsHelper extends SettingsHelperCommon {
         section = requiredParam('section'),
         settings = requiredParam('settings')
     ) {
+        let apiCall;
+
         if(!environment || environment == '*') {
-            return customApiCall('post', '/api/' + project + '/settings/' + section, settings);
+            apiCall = customApiCall('post', '/api/' + project + '/settings/' + section, settings);
         } else {
-            return customApiCall('post', '/api/' + project + '/' + environment + '/settings/' + section, settings);
+            apiCall = customApiCall('post', '/api/' + project + '/' + environment + '/settings/' + section, settings);
         }
+
+        return apiCall
+
+        // Cache new settings
+        .then(() => {
+            this.updateCache(project, environment, section, settings);
+
+            return Promise.resolve();
+        })
     }
 }
 

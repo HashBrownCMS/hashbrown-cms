@@ -10,7 +10,7 @@ class ContentPane extends Pane {
         let navbar = ViewHelper.get('NavbarMain');
         let id = $('.context-menu-target-element').data('id');
 
-        // Event when psating the copied Content
+        // Event when pasting the copied Content
         this.onClickPasteContent = function onClickPasteContent() {
             let parentId = $('.context-menu-target-element').data('id');
             let newContentId;
@@ -160,7 +160,19 @@ class ContentPane extends Pane {
             
             // Some child Schemas were provided, or no restrictions were defined
             } else {
-                let $schemaReference;
+                let schemaId;
+                
+                // Instatiate a new Content Schema reference editor
+                let schemaReference = new resources.editors.contentSchemaReference({
+                    config: {
+                        allowedSchemas: allowedSchemas,
+                        parentSchema: parentSchema
+                    }
+                });
+
+                schemaReference.on('change', (newValue) => {
+                    schemaId = newValue;
+                });
 
                 // Render the confirmation modal
                 UI.confirmModal(
@@ -168,49 +180,36 @@ class ContentPane extends Pane {
                     'Create new content',
                     _.div({},
                         _.p('Please pick a schema'),
-                        
-                        // Instatiate a new Content Schema reference editor
-                        $schemaReference = new resources.editors.contentSchemaReference({
-                            config: {
-                                allowedSchemas: allowedSchemas   
-                            }
-                        }).$element
+                        schemaReference.$element
                     ),
 
                     // Event fired when clicking "OK"
                     () => {
-                        let schemaId = $schemaReference.find('select').val();
-
-                        // A Schema was picked, move on
-                        if(schemaId) {
-                            let apiUrl = 'content/new/' + schemaId;
-                            let newContent;
-
-                            if(parentId) {
-                                apiUrl += '?parent=' + parentId;
-                            }
-
-                            // API call to create new Content node
-                            apiCall('post', apiUrl)
-                            
-                            // Upon success, reload resource and UI elements    
-                            .then((result) => {
-                                newContent = result;
-
-                                return reloadResource('content');
-                            })
-                            .then(() => {
-                                navbar.reload();
-                                
-                                location.hash = '/content/' + newContent.id;
-                            })
-                            .catch(UI.errorModal);
+                        if(!schemaId) { return false; }
                        
-                        // No Schema was picked yet
-                        } else {
-                            return false;
-                    
+                        let apiUrl = 'content/new/' + schemaId;
+                        let newContent;
+
+                        // Append parent Content id to request URL
+                        if(parentId) {
+                            apiUrl += '?parent=' + parentId;
                         }
+
+                        // API call to create new Content node
+                        apiCall('post', apiUrl)
+                        
+                        // Upon success, reload resource and UI elements    
+                        .then((result) => {
+                            newContent = result;
+
+                            return reloadResource('content');
+                        })
+                        .then(() => {
+                            navbar.reload();
+                            
+                            location.hash = '/content/' + newContent.id;
+                        })
+                        .catch(UI.errorModal);
                     }
                 );
             }
@@ -438,6 +437,7 @@ class ContentPane extends Pane {
             // Item context menu
             getItemContextMenu: (item) => {
                 let menu = {};
+                let isSyncEnabled = SettingsHelper.getCachedSettings(ProjectHelper.currentProject, ProjectHelper.currentEnvironment, 'sync').enabled;
                 
                 menu['This content'] = '---';
                 menu['New child content'] = () => { this.onClickNewContent($('.context-menu-target-element').data('id')); };
@@ -455,17 +455,20 @@ class ContentPane extends Pane {
                     menu['Publishing'] = () => { this.onClickContentPublishing(); };
                 }
                 
-                if(item.local || item.remote) {
+                if(isSyncEnabled) {
                     menu['Sync'] = '---';
-                }
+                    
+                    if(!item.remote) {
+                        menu['Push to remote'] = () => { this.onClickPushContent(); };
+                    }
 
-                if(item.local) {
-                    menu['Push to remote'] = () => { this.onClickPushContent(); };
-                    menu['Remove local copy'] = () => { this.onClickRemoveContent(); };
-                }
-                
-                if(item.remote) {
-                    menu['Pull from remote'] = () => { this.onClickPullContent(); };
+                    if(item.local) {
+                        menu['Remove local copy'] = () => { this.onClickRemoveContent(); };
+                    }
+                    
+                    if(item.remote) {
+                        menu['Pull from remote'] = () => { this.onClickPullContent(); };
+                    }
                 }
 
                 return menu;

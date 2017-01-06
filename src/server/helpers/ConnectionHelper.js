@@ -59,7 +59,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
 
         debug.log('Publishing content "' + content.id + '"...', this);
         
-        return content.getSettings('publishing')
+        return content.getSettings(project, environment, 'publishing')
         .then((settings) => {
             if(settings.connections && settings.connections.length > 0) {
                 debug.log('Looping through ' + settings.connections.length + ' connections...', this);
@@ -117,7 +117,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
 
         debug.log('Unpublishing content "' + content.id + '"...', this);
         
-        return content.getSettings('publishing')
+        return content.getSettings(project, environment, 'publishing')
         .then((settings) => {
             if(settings.connections && settings.connections.length > 0) {
                 debug.log('Looping through ' + settings.connections.length + ' connections...', this);

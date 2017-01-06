@@ -228,7 +228,10 @@ require('./routes/index');
 
 // Preload resources 
 $(document).ready(() => {
-    LanguageHelper.getSelectedLanguages(ProjectHelper.currentProject)
+    SettingsHelper.getSettings(ProjectHelper.currentProject, ProjectHelper.currentEnvironment, 'sync')
+    .then(() => {
+        return LanguageHelper.getSelectedLanguages(ProjectHelper.currentProject);
+    })
     .then(() => {
         return reloadAllResources();
     })
@@ -257,7 +260,7 @@ $(document).ready(() => {
             UI.confirmModal(
                 'Discard',
                 'Discard unsaved changes?',
-                'You have made changes to "' + contentEditor.model.prop('title', window.language) + '"',
+                'You have made changes to "' + (contentEditor.model.prop('title', window.language) || contentEditor.model.id) + '"',
                 () => {
                     contentEditor.dirty = false;
                     proceed();

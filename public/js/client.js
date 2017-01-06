@@ -280,7 +280,9 @@
 
 	// Preload resources 
 	$(document).ready(function () {
-	    LanguageHelper.getSelectedLanguages(ProjectHelper.currentProject).then(function () {
+	    SettingsHelper.getSettings(ProjectHelper.currentProject, ProjectHelper.currentEnvironment, 'sync').then(function () {
+	        return LanguageHelper.getSelectedLanguages(ProjectHelper.currentProject);
+	    }).then(function () {
 	        return reloadAllResources();
 	    }).then(function () {
 	        var _iteratorNormalCompletion2 = true;
@@ -321,7 +323,7 @@
 	                return;
 	            }
 
-	            UI.confirmModal('Discard', 'Discard unsaved changes?', 'You have made changes to "' + contentEditor.model.prop('title', window.language) + '"', function () {
+	            UI.confirmModal('Discard', 'Discard unsaved changes?', 'You have made changes to "' + (contentEditor.model.prop('title', window.language) || contentEditor.model.id) + '"', function () {
 	                contentEditor.dirty = false;
 	                proceed();
 	            }, cancel);
@@ -11590,13 +11592,100 @@
 	         */
 	        value: function getSettings() {
 	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+
+	            var _this2 = this;
+
 	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
 	            var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('section');
 
+	            var apiCall = void 0;
+
 	            if (!environment || environment == '*') {
-	                return customApiCall('get', '/api/' + project + '/settings/' + section);
+	                apiCall = customApiCall('get', '/api/' + project + '/settings/' + section);
 	            } else {
-	                return customApiCall('get', '/api/' + project + '/' + environment + '/settings/' + section);
+	                apiCall = customApiCall('get', '/api/' + project + '/' + environment + '/settings/' + section);
+	            }
+
+	            return apiCall
+
+	            // Cache settings client-side
+	            .then(function (settings) {
+	                _this2.updateCache(project, environment, section, settings);
+
+	                return Promise.resolve(settings);
+	            });
+	        }
+
+	        /**
+	         * Cache update
+	         *
+	         * @param {String} project
+	         * @param {String} environment
+	         * @param {String} section
+	         * @param {Object} settings
+	         */
+
+	    }, {
+	        key: 'updateCache',
+	        value: function updateCache() {
+	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+	            var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('section');
+	            var settings = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : requiredParam('settings');
+
+	            // Sanity check
+	            this.cache = this.cache || {};
+	            this.cache[project] = this.cache[project] || {};
+
+	            if (environment) {
+	                this.cache[project][environment] = this.cache[project][environment] || {};
+	                this.cache[project][environment][section] = this.cache[project][environment][section] || {};
+	                this.cache[project][environment][section] = settings;
+	            } else {
+	                this.cache[project][section] = this.cache[project][section] || {};
+	                this.cache[project][section] = settings;
+	            }
+	        }
+
+	        /**
+	         * Gets cached settings
+	         *
+	         * @param {String} project
+	         * @param {String} environment
+	         * @param {String} section
+	         *
+	         * @returns {Object} Settings
+	         */
+
+	    }, {
+	        key: 'getCachedSettings',
+	        value: function getCachedSettings() {
+	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+	            var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('section');
+
+	            if (!this.cache) {
+	                return {};
+	            }
+	            if (!this.cache[project]) {
+	                return {};
+	            }
+
+	            if (environment) {
+	                if (!this.cache[project][environment]) {
+	                    return {};
+	                }
+	                if (!this.cache[project][environment][section]) {
+	                    return {};
+	                }
+
+	                return this.cache[project][environment][section];
+	            } else {
+	                if (!this.cache[project][section]) {
+	                    return {};
+	                }
+
+	                return this.cache[project][section];
 	            }
 	        }
 
@@ -11616,14 +11705,28 @@
 	        value: function setSettings() {
 	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
 	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+
+	            var _this3 = this;
+
 	            var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('section');
 	            var settings = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : requiredParam('settings');
 
+	            var apiCall = void 0;
+
 	            if (!environment || environment == '*') {
-	                return customApiCall('post', '/api/' + project + '/settings/' + section, settings);
+	                apiCall = customApiCall('post', '/api/' + project + '/settings/' + section, settings);
 	            } else {
-	                return customApiCall('post', '/api/' + project + '/' + environment + '/settings/' + section, settings);
+	                apiCall = customApiCall('post', '/api/' + project + '/' + environment + '/settings/' + section, settings);
 	            }
+
+	            return apiCall
+
+	            // Cache new settings
+	            .then(function () {
+	                _this3.updateCache(project, environment, section, settings);
+
+	                return Promise.resolve();
+	            });
 	        }
 	    }]);
 
@@ -12577,6 +12680,8 @@
 	    function Content(params) {
 	        _classCallCheck(this, Content);
 
+	        params = params || {};
+
 	        // Ensure correct type for dates
 	        function parseDate(input) {
 	            var result = void 0;
@@ -12661,7 +12766,32 @@
 	        }
 
 	        /**
+	         * Gets parent Content
+	         *
+	         * @param {String} project
+	         * @param {String} environment
+	         *
+	         * @returns {Promise} Parent
+	         */
+
+	    }, {
+	        key: 'getParent',
+	        value: function getParent() {
+	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+
+	            if (this.parentId) {
+	                return ContentHelper.getContentById(project, environment, this.parentId);
+	            } else {
+	                return Promise.resolve(null);
+	            }
+	        }
+
+	        /**
 	         * Gets all parents
+	         *
+	         * @param {String} project
+	         * @param {String} environment
 	         *
 	         * @returns {Promise} parents
 	         */
@@ -12669,33 +12799,31 @@
 	    }, {
 	        key: 'getParents',
 	        value: function getParents() {
-	            var _this2 = this;
+	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
 
-	            return new Promise(function (resolve, reject) {
-	                var parents = [];
+	            var parents = [];
 
-	                function iterate(content) {
-	                    if (content.parentId) {
-	                        ContentHelper.getContentById(content.parentId).then(function (parentContent) {
-	                            if (parentContent) {
-	                                parents.push(parentContent);
-	                                iterate(parentContent);
-	                            } else {
-	                                reject(new Error('Parent content with id "' + content.parentId + '" was not found'));
-	                            }
-	                        }).catch(reject);
+	            var getNextParent = function getNextParent(content) {
+	                return content.getParent(project, environment).then(function (parentContent) {
+	                    if (parentContent) {
+	                        parents.push(parentContent);
+
+	                        return getNextParent(parentContent);
 	                    } else {
-	                        resolve(parents);
+	                        return Promise.resolve(parents);
 	                    }
-	                }
+	                });
+	            };
 
-	                iterate(_this2);
-	            });
+	            return getNextParent(this);
 	        }
 
 	        /**
-	         * Gets a settings
+	         * Gets settings
 	         *
+	         * @param {String} project
+	         * @param {String} environment
 	         * @param {String} key
 	         *
 	         * @returns {Promise} settings
@@ -12703,83 +12831,68 @@
 
 	    }, {
 	        key: 'getSettings',
-	        value: function getSettings(key) {
-	            var _this3 = this;
+	        value: function getSettings() {
+	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
 
-	            var model = this;
+	            var _this2 = this;
 
-	            return new Promise(function (resolve, reject) {
-	                // Loop through all parent content to find a governing setting
-	                model.getParents().then(function (parents) {
-	                    var _iteratorNormalCompletion = true;
-	                    var _didIteratorError = false;
-	                    var _iteratorError = undefined;
+	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+	            var key = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('key');
 
+	            // Loop through all parent content to find a governing setting
+	            return this.getParents(project, environment).then(function (parents) {
+	                var _iteratorNormalCompletion = true;
+	                var _didIteratorError = false;
+	                var _iteratorError = undefined;
+
+	                try {
+	                    for (var _iterator = parents[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	                        var parentContent = _step.value;
+
+	                        if (parentContent.settings && parentContent.settings[key] && parentContent.settings[key].applyToChildren) {
+	                            var settings = parentContent.settings[key];
+
+	                            // Make clone as to avoid interference with inherent values
+	                            settings = JSON.parse(JSON.stringify(settings));
+
+	                            settings.governedBy = parentContent;
+
+	                            return Promise.resolve(settings);
+	                        }
+	                    }
+
+	                    // No parent nodes with governing settings found, return own settings
+	                } catch (err) {
+	                    _didIteratorError = true;
+	                    _iteratorError = err;
+	                } finally {
 	                    try {
-	                        for (var _iterator = parents[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-	                            var parentContent = _step.value;
-
-	                            if (parentContent.settings && parentContent.settings[key] && parentContent.settings[key].applyToChildren) {
-	                                var settings = parentContent.settings[key];
-
-	                                // Make clone as to avoid interference with inherent values
-	                                settings = JSON.parse(JSON.stringify(settings));
-
-	                                settings.governedBy = parentContent;
-
-	                                resolve(settings);
-	                                return;
-	                            }
+	                        if (!_iteratorNormalCompletion && _iterator.return) {
+	                            _iterator.return();
 	                        }
-
-	                        // No parent nodes with governing settings found, return own settings
-	                    } catch (err) {
-	                        _didIteratorError = true;
-	                        _iteratorError = err;
 	                    } finally {
-	                        try {
-	                            if (!_iteratorNormalCompletion && _iterator.return) {
-	                                _iterator.return();
-	                            }
-	                        } finally {
-	                            if (_didIteratorError) {
-	                                throw _iteratorError;
-	                            }
+	                        if (_didIteratorError) {
+	                            throw _iteratorError;
 	                        }
 	                    }
+	                }
 
-	                    if (!model.settings) {
-	                        model.settings = {};
-	                    }
+	                if (!_this2.settings) {
+	                    _this2.settings = {};
+	                }
 
-	                    if (!model.settings[key]) {
-	                        model.settings[key] = {};
-	                    }
+	                if (!_this2.settings[key]) {
+	                    _this2.settings[key] = {};
+	                }
 
-	                    // Special cases
-	                    switch (key) {
-	                        case 'publishing':
-	                            model.settings.publishing.connections = model.settings.publishing.connections || [];
-	                            break;
-	                    }
+	                // Special cases
+	                switch (key) {
+	                    case 'publishing':
+	                        _this2.settings.publishing.connections = _this2.settings.publishing.connections || [];
+	                        break;
+	                }
 
-	                    resolve(model.settings[key]);
-	                }).catch(function (e) {
-	                    // Parent id was specified, but node did not exist
-	                    // This error is not fatal, but should be reported
-	                    debug.warning(e.message, _this3);
-
-	                    // Return own settings
-	                    if (!model.settings) {
-	                        model.settings = {};
-	                    }
-
-	                    if (!model.settings[key]) {
-	                        model.settings[key] = {};
-	                    }
-
-	                    resolve(model.settings);
-	                });
+	                return Promise.resolve(_this2.settings[key]);
 	            });
 	        }
 
@@ -21049,7 +21162,7 @@
 	            var navbar = ViewHelper.get('NavbarMain');
 	            var id = $('.context-menu-target-element').data('id');
 
-	            // Event when psating the copied Content
+	            // Event when pasting the copied Content
 	            this.onClickPasteContent = function onClickPasteContent() {
 	                var parentId = $('.context-menu-target-element').data('id');
 	                var newContentId = void 0;
@@ -21207,51 +21320,50 @@
 	                    // Some child Schemas were provided, or no restrictions were defined
 	                } else {
 	                    (function () {
-	                        var $schemaReference = void 0;
-
-	                        // Render the confirmation modal
-	                        UI.confirmModal('OK', 'Create new content', _.div({}, _.p('Please pick a schema'),
+	                        var schemaId = void 0;
 
 	                        // Instatiate a new Content Schema reference editor
-	                        $schemaReference = new resources.editors.contentSchemaReference({
+	                        var schemaReference = new resources.editors.contentSchemaReference({
 	                            config: {
-	                                allowedSchemas: allowedSchemas
+	                                allowedSchemas: allowedSchemas,
+	                                parentSchema: parentSchema
 	                            }
-	                        }).$element),
+	                        });
+
+	                        schemaReference.on('change', function (newValue) {
+	                            schemaId = newValue;
+	                        });
+
+	                        // Render the confirmation modal
+	                        UI.confirmModal('OK', 'Create new content', _.div({}, _.p('Please pick a schema'), schemaReference.$element),
 
 	                        // Event fired when clicking "OK"
 	                        function () {
-	                            var schemaId = $schemaReference.find('select').val();
-
-	                            // A Schema was picked, move on
-	                            if (schemaId) {
-	                                (function () {
-	                                    var apiUrl = 'content/new/' + schemaId;
-	                                    var newContent = void 0;
-
-	                                    if (parentId) {
-	                                        apiUrl += '?parent=' + parentId;
-	                                    }
-
-	                                    // API call to create new Content node
-	                                    apiCall('post', apiUrl)
-
-	                                    // Upon success, reload resource and UI elements    
-	                                    .then(function (result) {
-	                                        newContent = result;
-
-	                                        return reloadResource('content');
-	                                    }).then(function () {
-	                                        navbar.reload();
-
-	                                        location.hash = '/content/' + newContent.id;
-	                                    }).catch(UI.errorModal);
-
-	                                    // No Schema was picked yet
-	                                })();
-	                            } else {
+	                            if (!schemaId) {
 	                                return false;
 	                            }
+
+	                            var apiUrl = 'content/new/' + schemaId;
+	                            var newContent = void 0;
+
+	                            // Append parent Content id to request URL
+	                            if (parentId) {
+	                                apiUrl += '?parent=' + parentId;
+	                            }
+
+	                            // API call to create new Content node
+	                            apiCall('post', apiUrl)
+
+	                            // Upon success, reload resource and UI elements    
+	                            .then(function (result) {
+	                                newContent = result;
+
+	                                return reloadResource('content');
+	                            }).then(function () {
+	                                navbar.reload();
+
+	                                location.hash = '/content/' + newContent.id;
+	                            }).catch(UI.errorModal);
 	                        });
 	                    })();
 	                }
@@ -21452,6 +21564,7 @@
 	                // Item context menu
 	                getItemContextMenu: function getItemContextMenu(item) {
 	                    var menu = {};
+	                    var isSyncEnabled = SettingsHelper.getCachedSettings(ProjectHelper.currentProject, ProjectHelper.currentEnvironment, 'sync').enabled;
 
 	                    menu['This content'] = '---';
 	                    menu['New child content'] = function () {
@@ -21487,23 +21600,26 @@
 	                        };
 	                    }
 
-	                    if (item.local || item.remote) {
+	                    if (isSyncEnabled) {
 	                        menu['Sync'] = '---';
-	                    }
 
-	                    if (item.local) {
-	                        menu['Push to remote'] = function () {
-	                            _this3.onClickPushContent();
-	                        };
-	                        menu['Remove local copy'] = function () {
-	                            _this3.onClickRemoveContent();
-	                        };
-	                    }
+	                        if (!item.remote) {
+	                            menu['Push to remote'] = function () {
+	                                _this3.onClickPushContent();
+	                            };
+	                        }
 
-	                    if (item.remote) {
-	                        menu['Pull from remote'] = function () {
-	                            _this3.onClickPullContent();
-	                        };
+	                        if (item.local) {
+	                            menu['Remove local copy'] = function () {
+	                                _this3.onClickRemoveContent();
+	                            };
+	                        }
+
+	                        if (item.remote) {
+	                            menu['Pull from remote'] = function () {
+	                                _this3.onClickPullContent();
+	                            };
+	                        }
 	                    }
 
 	                    return menu;
@@ -24098,54 +24214,79 @@
 
 	        _this.$element = _.div({ class: 'field-editor content-schema-reference-editor' });
 
-	        // Fetch current Content model
-	        var thisContent = resources.content.filter(function (c) {
-	            return c.id == Router.params.id;
-	        })[0];
+	        // Adopt allowed Schemas from parent if applicable
+	        var parentSchema = _this.getParentSchema();
 
-	        if (!thisContent) {
-	            UI.errorModal(new Error('Content by id "' + Router.params.id + '" not found'));
-	            return _possibleConstructorReturn(_this);
+	        if (parentSchema && _this.config && _this.config.allowedSchemas == 'fromParent') {
+	            _this.config.allowedSchemas = parentSchema.allowedChildSchemas;
 	        }
 
-	        // If no allowed Schemas are referred to by parent, proceed as normal
-	        if (!thisContent.parentId || !_this.config || !_this.config.allowedSchemas == 'fromParent') {
-	            _this.init();
-	            return _possibleConstructorReturn(_this);
-	        }
-
-	        // Fetch parent Content
-	        var parentContent = resources.content.filter(function (c) {
-	            return c.id == thisContent.parentId;
-	        })[0];
-
-	        if (!parentContent) {
-	            UI.errorModal(new Error('Content by id "' + thisContent.parentId + '" not found'));
-	            return _possibleConstructorReturn(_this);
-	        }
-
-	        // Fetch parent Schema
-	        var parentSchema = resources.schemas[parentContent.schemaId];
-
-	        if (!parentSchema) {
-	            UI.errorModal(new Error('Schema by id "' + parentContent.schematId + '" not found'));
-	            return _possibleConstructorReturn(_this);
-	        }
-
-	        // Adopt allowed Schemas from parent
-	        _this.config.allowedSchemas = parentSchema.allowedChildSchemas;
 	        _this.init();
 	        return _this;
 	    }
 
 	    /**
-	     * Event: Change input
+	     * Gets the parent Schema
 	     *
-	     * @param {String} newValue
+	     * @returns {Schema} Parentn Schema
 	     */
 
 
 	    _createClass(ContentSchemaReferenceEditor, [{
+	        key: 'getParentSchema',
+	        value: function getParentSchema() {
+	            // Return config parent Schema if available
+	            if (this.config.parentSchema) {
+	                return this.config.parentSchema;
+	            }
+
+	            // Fetch current ContentEditor
+	            var contentEditor = ViewHelper.get('ContentEditor');
+
+	            if (!contentEditor) {
+	                return null;
+	            }
+
+	            // Fetch current Content model
+	            var thisContent = contentEditor.model;
+
+	            if (!thisContent) {
+	                return null;
+	            }
+
+	            // Fetch parent Content
+	            if (!thisContent.parentId) {
+	                return null;
+	            }
+
+	            var parentContent = resources.content.filter(function (c) {
+	                return c.id == thisContent.parentId;
+	            })[0];
+
+	            if (!parentContent) {
+	                UI.errorModal(new Error('Content by id "' + thisContent.parentId + '" not found'));
+	                return null;
+	            }
+
+	            // Fetch parent Schema
+	            var parentSchema = resources.schemas[parentContent.schemaId];
+
+	            if (!parentSchema) {
+	                UI.errorModal(new Error('Schema by id "' + parentContent.schemaId + '" not found'));
+	                return null;
+	            }
+
+	            // Return parent Schema
+	            return parentSchema;
+	        }
+
+	        /**
+	         * Event: Change input
+	         *
+	         * @param {String} newValue
+	         */
+
+	    }, {
 	        key: 'onChange',
 	        value: function onChange(newValue) {
 	            this.value = newValue;
@@ -34012,6 +34153,10 @@
 
 	'use strict';
 
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -34025,15 +34170,46 @@
 	 */
 
 	var Content = function (_ContentCommon) {
-	  _inherits(Content, _ContentCommon);
+	    _inherits(Content, _ContentCommon);
 
-	  function Content() {
-	    _classCallCheck(this, Content);
+	    function Content() {
+	        _classCallCheck(this, Content);
 
-	    return _possibleConstructorReturn(this, (Content.__proto__ || Object.getPrototypeOf(Content)).apply(this, arguments));
-	  }
+	        return _possibleConstructorReturn(this, (Content.__proto__ || Object.getPrototypeOf(Content)).apply(this, arguments));
+	    }
 
-	  return Content;
+	    _createClass(Content, [{
+	        key: 'getSettings',
+
+	        /**
+	         * Gets settings
+	         *
+	         * @param {String} key
+	         *
+	         * @returns {Promise} Settings
+	         */
+	        value: function getSettings(key) {
+	            return _get(Content.prototype.__proto__ || Object.getPrototypeOf(Content.prototype), 'getSettings', this).call(this, ProjectHelper.currentProject, ProjectHelper.currentEnvironment, key);
+	        }
+
+	        /**
+	         * Gets parent Content
+	         *
+	         * @returns {Promise} Parent
+	         */
+
+	    }, {
+	        key: 'getParent',
+	        value: function getParent() {
+	            if (this.parentId) {
+	                return ContentHelper.getContentById(this.parentId);
+	            } else {
+	                return Promise.resolve(null);
+	            }
+	        }
+	    }]);
+
+	    return Content;
 	}(ContentCommon);
 
 	module.exports = Content;
@@ -35378,47 +35554,38 @@
 	         * @returns {Promise(Content)} content
 	         */
 	        value: function getContentById(id) {
-	            return new Promise(function (resolve, reject) {
-	                if (id) {
-	                    var result = void 0;
+	            if (id) {
+	                var _iteratorNormalCompletion = true;
+	                var _didIteratorError = false;
+	                var _iteratorError = undefined;
 
-	                    var _iteratorNormalCompletion = true;
-	                    var _didIteratorError = false;
-	                    var _iteratorError = undefined;
+	                try {
+	                    for (var _iterator = resources.content[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	                        var content = _step.value;
 
+	                        if (content.id == id) {
+	                            return Promise.resolve(new Content(content));
+	                        }
+	                    }
+	                } catch (err) {
+	                    _didIteratorError = true;
+	                    _iteratorError = err;
+	                } finally {
 	                    try {
-	                        for (var _iterator = resources.content[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-	                            var content = _step.value;
-
-	                            if (content.id == id) {
-	                                result = content;
-	                                break;
-	                            }
+	                        if (!_iteratorNormalCompletion && _iterator.return) {
+	                            _iterator.return();
 	                        }
-	                    } catch (err) {
-	                        _didIteratorError = true;
-	                        _iteratorError = err;
 	                    } finally {
-	                        try {
-	                            if (!_iteratorNormalCompletion && _iterator.return) {
-	                                _iterator.return();
-	                            }
-	                        } finally {
-	                            if (_didIteratorError) {
-	                                throw _iteratorError;
-	                            }
+	                        if (_didIteratorError) {
+	                            throw _iteratorError;
 	                        }
 	                    }
-
-	                    if (result) {
-	                        resolve(new Content(result));
-	                    } else {
-	                        reject(new Error('Content with id "' + id + '" doesn\'t exist'));
-	                    }
-	                } else {
-	                    reject(new Error('Content id was not provided'));
 	                }
-	            });
+
+	                return Promise.reject(new Error('Content with id "' + id + '" was not found'));
+	            } else {
+	                return Promise.reject(new Error('Content id was not provided'));
+	            }
 	        }
 
 	        /**

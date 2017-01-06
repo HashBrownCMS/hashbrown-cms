@@ -29,7 +29,7 @@ class ScheduleHelper {
      * @returns {Promise} Promise
      */
     static checkTasks() {
-        debug.log('Checking scheduled tasks...', this, 3);
+        debug.log('Checking scheduled tasks...', this, 4);
 
         return this.getTasks()
         .then((tasks) => {
@@ -45,7 +45,7 @@ class ScheduleHelper {
                         // If tasks will infinitely fail, they should be removed
                         // It will take up the entire log, if these errors occur every minute
                         if(e.message.indexOf('No connections defined') > -1) {
-                            debug.log(e.message + ', removing task...', this);
+                            debug.log(e.message + ', removing task...', this, 2);
 
                             this.removeTask(task.project, task.environment, task.type, task.content);
 
@@ -185,7 +185,7 @@ class ScheduleHelper {
             environment: environment
         };
 
-        debug.log('Updating ' + type + ' task for "' + contentId + '" to ' + date + '...', this);
+        debug.log('Updating ' + type + ' task for "' + contentId + '" to ' + date + '...', this, 2);
 
         return MongoHelper.updateOne(
             'schedule',
@@ -229,7 +229,7 @@ class ScheduleHelper {
         .then((task) => {
             if(!task) { return Promise.resolve(); }
            
-            debug.log('Removing ' + type + ' task for "' + contentId + '"...', this);
+            debug.log('Removing ' + type + ' task for "' + contentId + '"...', this, 2);
 
             return MongoHelper.remove(
                 'schedule',

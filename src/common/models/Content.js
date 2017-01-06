@@ -7,6 +7,8 @@ let Entity = require('./Entity');
  */
 class Content extends Entity {
     constructor(params) {
+        params = params || {};
+
         // Ensure correct type for dates
         function parseDate(input) {
             let result;
@@ -105,104 +107,107 @@ class Content extends Entity {
     }
 
     /**
-     * Gets all parents
+     * Gets parent Content
      *
-     * @returns {Promise} parents
+     * @param {String} project
+     * @param {String} environment
+     *
+     * @returns {Promise} Parent
      */
-    getParents() {
-        return new Promise((resolve, reject) => {
-            let parents = [];
-
-            function iterate(content) {
-                if(content.parentId) {
-                    ContentHelper.getContentById(content.parentId)
-                    .then((parentContent) => {
-                        if(parentContent) {
-                            parents.push(parentContent);
-                            iterate(parentContent);
-                        
-                        } else {
-                            reject(new Error('Parent content with id "' + content.parentId + '" was not found'));
-                        
-                        }
-                    })
-                    .catch(reject);
-
-                } else {
-                    resolve(parents);
-                }
-            }
-
-            iterate(this);
-        });
+    getParent(
+        project = requiredParam('project'),
+        environment = requiredParam('environment')
+    ) {
+        if(this.parentId) {
+            return ContentHelper.getContentById(project, environment, this.parentId)
+        } else {
+            return Promise.resolve(null);
+        }
     }
 
     /**
-     * Gets a settings
+     * Gets all parents
      *
+     * @param {String} project
+     * @param {String} environment
+     *
+     * @returns {Promise} parents
+     */
+    getParents(
+        project = requiredParam('project'),
+        environment = requiredParam('environment')
+    ) {
+        let parents = [];
+
+        let getNextParent = (content) => {
+            return content.getParent(project, environment)
+            .then((parentContent) => {
+                if(parentContent) {
+                    parents.push(parentContent);
+
+                    return getNextParent(parentContent);
+                
+                } else {
+                    return Promise.resolve(parents);
+                
+                }
+            });
+        }
+
+        return getNextParent(this);
+    }
+
+    /**
+     * Gets settings
+     *
+     * @param {String} project
+     * @param {String} environment
      * @param {String} key
      *
      * @returns {Promise} settings
      */
-    getSettings(key) {
-        let model = this;
-        
-        return new Promise((resolve, reject) => {
-            // Loop through all parent content to find a governing setting
-            model.getParents()
-            .then((parents) => {
-                for(let parentContent of parents) {
-                    if(
-                        parentContent.settings &&
-                        parentContent.settings[key] &&
-                        parentContent.settings[key].applyToChildren
-                    ) {
-                        let settings = parentContent.settings[key];
+    getSettings(
+        project = requiredParam('project'),
+        environment = requiredParam('environment'),
+        key = requiredParam('key')
+    ) {
+        // Loop through all parent content to find a governing setting
+        return this.getParents(project, environment)
+        .then((parents) => {
+            for(let parentContent of parents) {
+                if(
+                    parentContent.settings &&
+                    parentContent.settings[key] &&
+                    parentContent.settings[key].applyToChildren
+                ) {
+                    let settings = parentContent.settings[key];
 
-                        // Make clone as to avoid interference with inherent values
-                        settings = JSON.parse(JSON.stringify(settings));
+                    // Make clone as to avoid interference with inherent values
+                    settings = JSON.parse(JSON.stringify(settings));
 
-                        settings.governedBy = parentContent;
+                    settings.governedBy = parentContent;
 
-                        resolve(settings);
-                        return;
-                    }
+                    return Promise.resolve(settings);
                 }
+            }
 
-                // No parent nodes with governing settings found, return own settings
-                if(!model.settings) {
-                    model.settings = {};
-                }
+            // No parent nodes with governing settings found, return own settings
+            if(!this.settings) {
+                this.settings = {};
+            }
 
-                if(!model.settings[key]) {
-                    model.settings[key] = {};
-                }
+            if(!this.settings[key]) {
+                this.settings[key] = {};
+            }
 
-                // Special cases
-                switch(key) {
-                    case 'publishing':
-                        model.settings.publishing.connections = model.settings.publishing.connections || [];
-                        break;
-                }
+            // Special cases
+            switch(key) {
+                case 'publishing':
+                    this.settings.publishing.connections = this.settings.publishing.connections || [];
+                    break;
+            }
 
-                resolve(model.settings[key]);
-            })
-            .catch((e) => {
-                // Parent id was specified, but node did not exist
-                // This error is not fatal, but should be reported
-                debug.warning(e.message, this);
-                
-                // Return own settings
-                if(!model.settings) {
-                    model.settings = {};
-                }
-
-                if(!model.settings[key]) {
-                    model.settings[key] = {};
-                }
-
-                resolve(model.settings);
-            });
+            return Promise.resolve(this.settings[key]);
         });
     }
 
