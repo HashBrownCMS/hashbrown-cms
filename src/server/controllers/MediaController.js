@@ -16,13 +16,15 @@ class MediaController extends ApiController {
     static init(app) {
         app.get('/media/:project/:environment/:id', this.middleware({ authenticate: false }), this.serveMedia);
         
-        app.post('/api/:project/:environment/media/new', this.middleware(), MediaHelper.getUploadHandler(), this.createMedia);
         app.get('/api/:project/:environment/media/tree', this.middleware(), this.getMediaTree);
-        app.post('/api/:project/:environment/media/tree/:id', this.middleware(), this.setMediaTreeItem);
         app.get('/api/:project/:environment/media/:id', this.middleware(), this.getSingleMedia);
-        app.post('/api/:project/:environment/media/:id', this.middleware(), MediaHelper.getUploadHandler(), this.setMedia);
-        app.delete('/api/:project/:environment/media/:id', this.middleware(), this.deleteMedia);
         app.get('/api/:project/:environment/media', this.middleware(), this.getMedia);
+        
+        app.post('/api/:project/:environment/media/new', this.middleware(), MediaHelper.getUploadHandler(), this.createMedia);
+        app.post('/api/:project/:environment/media/tree/:id', this.middleware(), this.setMediaTreeItem);
+        app.post('/api/:project/:environment/media/:id', this.middleware(), MediaHelper.getUploadHandler(), this.setMedia);
+        
+        app.delete('/api/:project/:environment/media/:id', this.middleware(), this.deleteMedia);
     }
 
     /**
@@ -39,14 +41,12 @@ class MediaController extends ApiController {
             if(media) {
                 let contentType = media.getContentTypeHeader();
                 
-                if(media.isLocal) {
+                if(!media.remote) {
                     res.sendFile(media.url);
                 
-                } else 
-
                 // TODO: Replace this temporary hack with an actual file service
                 // The problem here is that SVG content is received fine through binary representation, but actual binary content isn't
-                if(contentType != 'image/svg+xml') {
+                } else if(contentType != 'image/svg+xml') {
                     res.redirect(media.url);
 
                 } else {

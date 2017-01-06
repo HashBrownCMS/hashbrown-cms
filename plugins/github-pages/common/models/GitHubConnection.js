@@ -346,7 +346,12 @@ class GitHubConnection extends Connection {
             for(let i in files) {
                 let file = files[i];
                 let name = (file.path || file).replace(path + '/', '');
-                let template = new Template({ name: name, type: type, remotePath: path + '/' + name });
+                let template = new Template({
+                    name: name,
+                    type: type,
+                    remotePath: path + '/' + name,
+                    remote: this.settings.isLocal != true
+                });
 
                 template.updateFromName();
                 
@@ -504,7 +509,12 @@ class GitHubConnection extends Connection {
             for(let file of files) {
                 let name = (file.path || file).replace(path + '/', '');
 
-                let template = new Template({ name: name, type: type, remotePath: path + '/' + name });
+                let template = new Template({
+                    name: name,
+                    type: type,
+                    remotePath: path + '/' + name,
+                    remote: this.settings.isLocal != true
+                });
 
                 template.updateFromName();
 
@@ -535,7 +545,8 @@ class GitHubConnection extends Connection {
                     media[media.length] = new Media({
                         name: path.basename(nodePath),
                         id: path.dirname(nodePath).replace('media/', '').replace(this.settings.localPath, ''),
-                        url: nodePath
+                        url: nodePath,
+                        remote: this.settings.isLocal != true
                     });
                 }
             }
@@ -564,7 +575,7 @@ class GitHubConnection extends Connection {
                         name: file.name || path.basename(file),
                         id: id,
                         url: file.download_url || this.settings.localPath + 'media/' + id + '/' + file,
-                        isLocal: this.settings.isLocal == true
+                        remote: this.settings.isLocal != true
                     });
 
                 } else {

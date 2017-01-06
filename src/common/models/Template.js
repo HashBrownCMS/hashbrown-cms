@@ -13,6 +13,8 @@ class Template extends Entity {
     structure() {
         this.def(String, 'id');
         this.def(String, 'parentId');
+        this.def(Boolean, 'remote', true);
+        this.def(String, 'icon', 'code');
         this.def(String, 'name');
         this.def(String, 'type');
         this.def(String, 'remotePath');

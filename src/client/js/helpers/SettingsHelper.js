@@ -68,17 +68,16 @@ class SettingsHelper extends SettingsHelperCommon {
     /**
      * Gets cached settings
      *
-     * @param {String} project
-     * @param {String} environment
      * @param {String} section
      *
      * @returns {Object} Settings
      */
     static getCachedSettings(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
         section = requiredParam('section')
     ) {
+        let project = ProjectHelper.currentProject;
+        let environment = ProjectHelper.currentEnvironment;
+
         if(!this.cache) { return {}; }
         if(!this.cache[project]) { return {}; }
 

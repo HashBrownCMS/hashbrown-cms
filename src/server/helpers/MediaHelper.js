@@ -164,6 +164,10 @@ class MediaHelper extends MediaHelperCommon {
     /**
      * Gets the Media tree
      *
+     * NOTE:
+     * This method, as opposed to most other resource methods, does not merge
+     * local and remote resources since it would be too complicated in the end
+     *
      * @param {String} project
      * @param {String} environment
      *
@@ -174,13 +178,14 @@ class MediaHelper extends MediaHelperCommon {
         environment = requiredParam('environment')
     ) {
         let collection = environment + '.media';
-        
-        return MongoHelper.find(
-            project,
-            collection,
-            {}
-        ).then((tree) => {
-            return SyncHelper.mergeResource(project, environment, 'media/tree', tree);
+       
+        return SyncHelper.getResource(project, environment, 'media/tree')
+        .then((tree) => {
+            if(!tree || tree.length < 1) {
+                return MongoHelper.find(project, environment + '.media', {});
+            }
+
+            return Promise.resolve(tree);   
         });
     }
     
@@ -200,34 +205,37 @@ class MediaHelper extends MediaHelperCommon {
         id = requiredParam('id'),
         item = requiredParam('item')
     ) {
-        let collection = environment + '.media';
+        return SyncHelper.setResourceItem(project, environment, 'media/tree', id, item)
+        .then((wasItemSet) => {
+            if(wasItemSet) { return Promise.resolve(); }        
 
-        // Remove the item if it's null
-        if(!item) {
-            return MongoHelper.removeOne(
-                project,
-                collection,
-                {
-                    id: id
-                }
-            );
+            // Remove the item if it's null
+            if(!item) {
+                return MongoHelper.removeOne(
+                    project,
+                    environment + '.media',
+                    {
+                        id: id
+                    }
+                );
 
-        // If it's not, update the database document
-        } else {
-            item.id = id;
+            // If it's not, update the database document
+            } else {
+                item.id = id;
 
-            return MongoHelper.updateOne(
-                project,
-                collection,
-                {
-                    id: id
-                },
-                item,
-                {
-                    upsert: true
-                }
-            );
-        }
+                return MongoHelper.updateOne(
+                    project,
+                    environment + '.media',
+                    {
+                        id: id
+                    },
+                    item,
+                    {
+                        upsert: true
+                    }
+                );
+            }
+        })
     }
     
     /**

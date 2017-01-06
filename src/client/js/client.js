@@ -104,6 +104,10 @@ window.reloadResource = function reloadResource(name) {
         case 'users':
             model = User;
             break;
+
+        case 'media':
+            model = Media;
+            break;
     }
 
     return new Promise((resolve, reject) => {

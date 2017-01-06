@@ -119,7 +119,7 @@ class SyncHelper {
      * @param {String} remoteItemName
      * @param {Object} remoteItemData
      *
-     * @returns {Promise} Promise
+     * @returns {Promise} Whether setting was successful
      */
     static setResourceItem(
         project = requiredParam('project'),
@@ -152,13 +152,13 @@ class SyncHelper {
                         } else {
                             debug.log('Remote resource item ' + remoteResourceName + '/' + remoteItemName + ' posted successfully', this, 2);
                             
-                            resolve();
+                            resolve(true);
                         
                         }
                     });
 
                 } else {
-                    reject(new Error('Sync isn\'t enabled for "' + remoteResourceName + '"'));
+                    resolve(false);
                 }
             });
         });

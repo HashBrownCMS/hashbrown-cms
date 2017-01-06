@@ -11488,8 +11488,6 @@
 	        /**
 	         * Gets cached settings
 	         *
-	         * @param {String} project
-	         * @param {String} environment
 	         * @param {String} section
 	         *
 	         * @returns {Object} Settings
@@ -11498,9 +11496,10 @@
 	    }, {
 	        key: 'getCachedSettings',
 	        value: function getCachedSettings() {
-	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
-	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
-	            var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('section');
+	            var section = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('section');
+
+	            var project = ProjectHelper.currentProject;
+	            var environment = ProjectHelper.currentEnvironment;
 
 	            if (!this.cache) {
 	                return {};
@@ -11833,7 +11832,9 @@
 
 	        for (var k in properties) {
 	            try {
-	                this[k] = properties[k] || this[k];
+	                if (typeof properties[k] !== 'undefined') {
+	                    this[k] = properties[k];
+	                }
 	            } catch (e) {
 	                debug.warning(e, this);
 	            }
@@ -11909,7 +11910,7 @@
 	                throw new TypeError('Parameter \'name\' cannot be of type \'' + (typeof name === 'undefined' ? 'undefined' : _typeof(name)) + '\'.');
 	            }
 
-	            if (!defaultValue || typeof defaultValue === 'undefined') {
+	            if (typeof defaultValue === 'undefined') {
 	                switch (type) {
 	                    case String:
 	                        defaultValue = '';
@@ -11946,7 +11947,7 @@
 	                    if (thisType == Boolean) {
 	                        if (!thatValue) {
 	                            thatValue = false;
-	                        } else if (thatValue.constructor == String) {
+	                        } else if (typeof thatValue === 'string') {
 	                            if (thatValue === 'false') {
 	                                thatValue = false;
 	                            } else if (thatValue === 'true') {
@@ -11973,7 +11974,12 @@
 	                        }
 	                    }
 
-	                    if (thatValue) {
+	                    if (typeof thatValue !== 'undefined') {
+	                        if (thatValue == null) {
+	                            thisValue = thatValue;
+	                            return;
+	                        }
+
 	                        var thatType = thatValue.constructor;
 
 	                        if (thisType !== thatType) {

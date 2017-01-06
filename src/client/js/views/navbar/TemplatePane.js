@@ -189,6 +189,7 @@ class TemplatePane extends Pane {
                 }
 
                 queueItem.parentDirAttr = {'data-template-id': parentDirName };
+                queueItem.parentDirExtraAttr = { 'data-remote': item.remote };
             },
 
             // Item context menu

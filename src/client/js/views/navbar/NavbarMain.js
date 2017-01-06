@@ -163,7 +163,7 @@ class NavbarMain extends View {
                     name = name.substring(0, 30) + '...';
                 }
 
-                // If this item has a schema id, fetch the appropriate icon
+                // If this item has a Schema id, fetch the appropriate icon
                 if(item.schemaId) {
                     let schema = resources.schemas[item.schemaId];
 
@@ -270,12 +270,21 @@ class NavbarMain extends View {
                                     class: 'pane-item'
                                 },
                                     _.span({class: 'fa fa-folder'}),
-                                    _.span(dirName)
+                                    _.span({class: 'pane-item-label'}, dirName)
                                 ),
                                 _.div({class: 'children'})
                             );
                             
                             $dir.attr(parentDirAttrKey, finalDirName);
+
+                            // Extra parent dir attributes
+                            if(queueItem.parentDirExtraAttr) {
+                                for(let k in queueItem.parentDirExtraAttr) {
+                                    let v = queueItem.parentDirExtraAttr[k];
+
+                                    $dir.attr(k, v);
+                                }
+                            }
                    
                             // Append to previous dir 
                             let $prevDir = $pane.find('[' + parentDirAttrKey + '="' + prevFinalDirName + '"]');

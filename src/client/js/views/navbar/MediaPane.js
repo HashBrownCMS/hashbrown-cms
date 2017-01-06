@@ -264,6 +264,9 @@ class MediaPane extends Pane {
      * @returns {Object} settings
      */
     static getRenderSettings() {
+        let isSyncEnabled = SettingsHelper.getCachedSettings('sync').enabled;
+        let isMediaSyncEnabled = isSyncEnabled && SettingsHelper.getCachedSettings('sync')['media/tree'];
+
         return {
             label: 'Media',
             route: '/media/',
@@ -277,7 +280,8 @@ class MediaPane extends Pane {
                
                 if(item.folder) {
                     queueItem.createDir = true;
-                    queueItem.parentDirAttr = {'data-media-folder': item.folder };
+                    queueItem.parentDirAttr = { 'data-media-folder': item.folder };
+                    queueItem.parentDirExtraAttr = { 'data-remote': isMediaSyncEnabled };
                 }
             },
             

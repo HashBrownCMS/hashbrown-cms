@@ -437,7 +437,8 @@ class ContentPane extends Pane {
             // Item context menu
             getItemContextMenu: (item) => {
                 let menu = {};
-                let isSyncEnabled = SettingsHelper.getCachedSettings(ProjectHelper.currentProject, ProjectHelper.currentEnvironment, 'sync').enabled;
+                let isSyncEnabled = SettingsHelper.getCachedSettings('sync').enabled;
+                let isContentSyncEnabled = isSyncEnabled && SettingsHelper.getCachedSettings('sync').content;
                 
                 menu['This content'] = '---';
                 menu['New child content'] = () => { this.onClickNewContent($('.context-menu-target-element').data('id')); };
@@ -455,7 +456,7 @@ class ContentPane extends Pane {
                     menu['Publishing'] = () => { this.onClickContentPublishing(); };
                 }
                 
-                if(isSyncEnabled) {
+                if(isContentSyncEnabled) {
                     menu['Sync'] = '---';
                     
                     if(!item.remote) {

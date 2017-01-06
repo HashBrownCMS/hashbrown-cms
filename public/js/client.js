@@ -151,6 +151,10 @@
 	        case 'users':
 	            model = User;
 	            break;
+
+	        case 'media':
+	            model = Media;
+	            break;
 	    }
 
 	    return new Promise(function (resolve, reject) {
@@ -11650,8 +11654,6 @@
 	        /**
 	         * Gets cached settings
 	         *
-	         * @param {String} project
-	         * @param {String} environment
 	         * @param {String} section
 	         *
 	         * @returns {Object} Settings
@@ -11660,9 +11662,10 @@
 	    }, {
 	        key: 'getCachedSettings',
 	        value: function getCachedSettings() {
-	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
-	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
-	            var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('section');
+	            var section = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('section');
+
+	            var project = ProjectHelper.currentProject;
+	            var environment = ProjectHelper.currentEnvironment;
 
 	            if (!this.cache) {
 	                return {};
@@ -12323,7 +12326,7 @@
 	                    name = name.substring(0, 30) + '...';
 	                }
 
-	                // If this item has a schema id, fetch the appropriate icon
+	                // If this item has a Schema id, fetch the appropriate icon
 	                if (item.schemaId) {
 	                    var schema = resources.schemas[item.schemaId];
 
@@ -12427,9 +12430,18 @@
 	                                if ($dir.length < 1) {
 	                                    $dir = _.div({ class: 'pane-item-container', 'data-is-directory': true }, _.a({
 	                                        class: 'pane-item'
-	                                    }, _.span({ class: 'fa fa-folder' }), _.span(dirName)), _.div({ class: 'children' }));
+	                                    }, _.span({ class: 'fa fa-folder' }), _.span({ class: 'pane-item-label' }, dirName)), _.div({ class: 'children' }));
 
 	                                    $dir.attr(parentDirAttrKey, finalDirName);
+
+	                                    // Extra parent dir attributes
+	                                    if (queueItem.parentDirExtraAttr) {
+	                                        for (var k in queueItem.parentDirExtraAttr) {
+	                                            var v = queueItem.parentDirExtraAttr[k];
+
+	                                            $dir.attr(k, v);
+	                                        }
+	                                    }
 
 	                                    // Append to previous dir 
 	                                    var $prevDir = $pane.find('[' + parentDirAttrKey + '="' + prevFinalDirName + '"]');
@@ -13097,7 +13109,9 @@
 
 	        for (var k in properties) {
 	            try {
-	                this[k] = properties[k] || this[k];
+	                if (typeof properties[k] !== 'undefined') {
+	                    this[k] = properties[k];
+	                }
 	            } catch (e) {
 	                debug.warning(e, this);
 	            }
@@ -13173,7 +13187,7 @@
 	                throw new TypeError('Parameter \'name\' cannot be of type \'' + (typeof name === 'undefined' ? 'undefined' : _typeof(name)) + '\'.');
 	            }
 
-	            if (!defaultValue || typeof defaultValue === 'undefined') {
+	            if (typeof defaultValue === 'undefined') {
 	                switch (type) {
 	                    case String:
 	                        defaultValue = '';
@@ -13210,7 +13224,7 @@
 	                    if (thisType == Boolean) {
 	                        if (!thatValue) {
 	                            thatValue = false;
-	                        } else if (thatValue.constructor == String) {
+	                        } else if (typeof thatValue === 'string') {
 	                            if (thatValue === 'false') {
 	                                thatValue = false;
 	                            } else if (thatValue === 'true') {
@@ -13237,7 +13251,12 @@
 	                        }
 	                    }
 
-	                    if (thatValue) {
+	                    if (typeof thatValue !== 'undefined') {
+	                        if (thatValue == null) {
+	                            thisValue = thatValue;
+	                            return;
+	                        }
+
 	                        var thatType = thatValue.constructor;
 
 	                        if (thisType !== thatType) {
@@ -21564,7 +21583,8 @@
 	                // Item context menu
 	                getItemContextMenu: function getItemContextMenu(item) {
 	                    var menu = {};
-	                    var isSyncEnabled = SettingsHelper.getCachedSettings(ProjectHelper.currentProject, ProjectHelper.currentEnvironment, 'sync').enabled;
+	                    var isSyncEnabled = SettingsHelper.getCachedSettings('sync').enabled;
+	                    var isContentSyncEnabled = isSyncEnabled && SettingsHelper.getCachedSettings('sync').content;
 
 	                    menu['This content'] = '---';
 	                    menu['New child content'] = function () {
@@ -21600,7 +21620,7 @@
 	                        };
 	                    }
 
-	                    if (isSyncEnabled) {
+	                    if (isContentSyncEnabled) {
 	                        menu['Sync'] = '---';
 
 	                        if (!item.remote) {
@@ -22212,6 +22232,9 @@
 	        value: function getRenderSettings() {
 	            var _this4 = this;
 
+	            var isSyncEnabled = SettingsHelper.getCachedSettings('sync').enabled;
+	            var isMediaSyncEnabled = isSyncEnabled && SettingsHelper.getCachedSettings('sync')['media/tree'];
+
 	            return {
 	                label: 'Media',
 	                route: '/media/',
@@ -22226,6 +22249,7 @@
 	                    if (item.folder) {
 	                        queueItem.createDir = true;
 	                        queueItem.parentDirAttr = { 'data-media-folder': item.folder };
+	                        queueItem.parentDirExtraAttr = { 'data-remote': isMediaSyncEnabled };
 	                    }
 	                },
 
@@ -23117,6 +23141,7 @@
 	                    }
 
 	                    queueItem.parentDirAttr = { 'data-template-id': parentDirName };
+	                    queueItem.parentDirExtraAttr = { 'data-remote': item.remote };
 	                },
 
 	                // Item context menu
@@ -34250,14 +34275,12 @@
 	    _createClass(Media, [{
 	        key: 'structure',
 	        value: function structure() {
-	            this.def(Boolean, 'locked');
-	            this.def(Boolean, 'local');
-	            this.def(Boolean, 'remote');
 	            this.def(String, 'id');
+	            this.def(Boolean, 'remote', true);
+	            this.def(String, 'icon', 'file-image-o');
 	            this.def(String, 'name');
 	            this.def(String, 'url');
 	            this.def(String, 'folder');
-	            this.def(Boolean, 'isLocal');
 	        }
 
 	        /**
@@ -34768,6 +34791,8 @@
 	        value: function structure() {
 	            this.def(String, 'id');
 	            this.def(String, 'parentId');
+	            this.def(Boolean, 'remote', true);
+	            this.def(String, 'icon', 'code');
 	            this.def(String, 'name');
 	            this.def(String, 'type');
 	            this.def(String, 'remotePath');

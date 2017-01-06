@@ -10,14 +10,12 @@ let Entity = require('./Entity');
  */
 class Media extends Entity {
     structure() {
-        this.def(Boolean, 'locked');
-        this.def(Boolean, 'local');
-        this.def(Boolean, 'remote');
         this.def(String, 'id');
+        this.def(Boolean, 'remote', true);
+        this.def(String, 'icon', 'file-image-o');
         this.def(String, 'name');
         this.def(String, 'url');
         this.def(String, 'folder');
-        this.def(Boolean, 'isLocal');
     }
 
     /**

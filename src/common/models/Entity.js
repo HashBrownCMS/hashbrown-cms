@@ -18,7 +18,9 @@ class Entity {
 
         for(let k in properties) {
             try {
-                this[k] = properties[k] || this[k];
+                if(typeof properties[k] !== 'undefined') {
+                    this[k] = properties[k]
+                }
             
             } catch(e) {
                 debug.warning(e, this);
@@ -84,7 +86,7 @@ class Entity {
             throw new TypeError('Parameter \'name\' cannot be of type \'' + (typeof name) + '\'.');
         }
 
-        if(!defaultValue || typeof defaultValue === 'undefined') {
+        if(typeof defaultValue === 'undefined') {
             switch(type) {
                 case String:
                     defaultValue = '';
@@ -122,7 +124,7 @@ class Entity {
                     if(!thatValue) {
                         thatValue = false;
 
-                    } else if(thatValue.constructor == String) {
+                    } else if(typeof thatValue === 'string') {
                         if(thatValue === 'false') {
                             thatValue = false;
                         } else if(thatValue === 'true') {
@@ -153,7 +155,12 @@ class Entity {
                     }
                 }
 
-                if(thatValue) {
+                if(typeof thatValue !== 'undefined') {
+                    if(thatValue == null) {
+                        thisValue = thatValue;
+                        return;
+                    }
+
                     let thatType = thatValue.constructor;
 
                     if(thisType !== thatType) {
