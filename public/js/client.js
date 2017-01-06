@@ -32940,18 +32940,11 @@
 	    }, {
 	        key: 'renderEnabledSwitch',
 	        value: function renderEnabledSwitch() {
-	            var view = this;
+	            var _this3 = this;
 
-	            function onChange() {
-	                view.model.enabled = this.checked;
-	            }
-
-	            return _.div({ class: 'field-editor' }, _.div({ class: 'switch' }, _.input({
-	                id: 'switch-sync-enabled',
-	                class: 'form-control switch',
-	                type: 'checkbox',
-	                checked: this.model.enabled == true
-	            }).change(onChange), _.label({ for: 'switch-sync-enabled' })));
+	            return _.div({ class: 'field-editor' }, UI.inputSwitch(this.model.enabled == true, function (newValue) {
+	                _this3.model.enabled = newValue;
+	            }));
 	        }
 
 	        /**
@@ -33084,14 +33077,14 @@
 	    }, {
 	        key: 'renderContentSwitch',
 	        value: function renderContentSwitch() {
-	            var _this3 = this;
+	            var _this4 = this;
 
 	            return _.div({ class: 'field-editor content' }, UI.inputSwitch(this.model.content == true, function (isActive) {
-	                _this3.model.content = isActive;
+	                _this4.model.content = isActive;
 
 	                if (isActive) {
-	                    _this3.model.schemas = true;
-	                    _this3.$element.find('.field-editor.schemas input')[0].checked = true;
+	                    _this4.model.schemas = true;
+	                    _this4.$element.find('.field-editor.schemas input')[0].checked = true;
 	                }
 	            }));
 	        }
@@ -33103,10 +33096,10 @@
 	    }, {
 	        key: 'renderConnectionsSwitch',
 	        value: function renderConnectionsSwitch() {
-	            var _this4 = this;
+	            var _this5 = this;
 
 	            return _.div({ class: 'field-editor connections' }, UI.inputSwitch(this.model.connections == true, function (isActive) {
-	                _this4.model.connections = isActive;
+	                _this5.model.connections = isActive;
 	            }));
 	        }
 
@@ -33117,10 +33110,10 @@
 	    }, {
 	        key: 'renderFormsSwitch',
 	        value: function renderFormsSwitch() {
-	            var _this5 = this;
+	            var _this6 = this;
 
 	            return _.div({ class: 'field-editor forms' }, UI.inputSwitch(this.model.forms == true, function (isActive) {
-	                _this5.model.forms = isActive;
+	                _this6.model.forms = isActive;
 	            }));
 	        }
 
@@ -33131,14 +33124,14 @@
 	    }, {
 	        key: 'renderSchemaSwitch',
 	        value: function renderSchemaSwitch() {
-	            var _this6 = this;
+	            var _this7 = this;
 
 	            return _.div({ class: 'field-editor schemas' }, UI.inputSwitch(this.model.schemas == true, function (isActive) {
-	                _this6.model.schemas = isActive;
+	                _this7.model.schemas = isActive;
 
 	                if (!isActive) {
-	                    _this6.model.content = false;
-	                    _this6.$element.find('.field-editor.content input')[0].checked = false;
+	                    _this7.model.content = false;
+	                    _this7.$element.find('.field-editor.content input')[0].checked = false;
 	                }
 	            }));
 	        }
@@ -33150,10 +33143,10 @@
 	    }, {
 	        key: 'renderMediaTreeSwitch',
 	        value: function renderMediaTreeSwitch() {
-	            var _this7 = this;
+	            var _this8 = this;
 
 	            return _.div({ class: 'field-editor forms' }, UI.inputSwitch(this.model['media/tree'] == true, function (isActive) {
-	                _this7.model['media/tree'] = isActive;
+	                _this8.model['media/tree'] = isActive;
 	            }));
 	        }
 
@@ -33174,13 +33167,13 @@
 	    }, {
 	        key: 'render',
 	        value: function render() {
-	            var _this8 = this;
+	            var _this9 = this;
 
 	            SettingsHelper.getSettings(ProjectHelper.currentProject, ProjectHelper.currentEnvironment, 'sync').then(function (syncSettings) {
-	                _this8.model = syncSettings || {};
+	                _this9.model = syncSettings || {};
 
-	                _.append(_this8.$element.empty(), _.div({ class: 'editor-header' }, _.span({ class: 'fa fa-refresh' }), _.h4('Sync')), _.div({ class: 'editor-body' }, _this8.renderField('Enabled', _this8.renderEnabledSwitch()), _this8.renderField('API URL', _this8.renderUrlEditor()), _this8.renderField('API Token', _this8.renderTokenEditor()), _this8.renderField('Project', _this8.renderProjectNameEditor()), _this8.renderField('Environment', _this8.renderEnvironmentNameEditor()), _this8.renderField('Content', _this8.renderContentSwitch()), _this8.renderField('Schemas', _this8.renderSchemaSwitch()), _this8.renderField('Connections', _this8.renderConnectionsSwitch()), _this8.renderField('Forms', _this8.renderFormsSwitch()), _this8.renderField('Media tree', _this8.renderMediaTreeSwitch())), _.div({ class: 'editor-footer panel panel-default panel-buttons' }, _.div({ class: 'btn-group' }, _this8.$saveBtn = _.button({ class: 'btn btn-primary btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Save '), _.span({ class: 'text-working' }, 'Saving ')).click(function () {
-	                    _this8.onClickSave();
+	                _.append(_this9.$element.empty(), _.div({ class: 'editor-header' }, _.span({ class: 'fa fa-refresh' }), _.h4('Sync')), _.div({ class: 'editor-body' }, _this9.renderField('Enabled', _this9.renderEnabledSwitch()), _this9.renderField('API URL', _this9.renderUrlEditor()), _this9.renderField('API Token', _this9.renderTokenEditor()), _this9.renderField('Project', _this9.renderProjectNameEditor()), _this9.renderField('Environment', _this9.renderEnvironmentNameEditor()), _this9.renderField('Content', _this9.renderContentSwitch()), _this9.renderField('Schemas', _this9.renderSchemaSwitch()), _this9.renderField('Connections', _this9.renderConnectionsSwitch()), _this9.renderField('Forms', _this9.renderFormsSwitch()), _this9.renderField('Media tree', _this9.renderMediaTreeSwitch())), _.div({ class: 'editor-footer panel panel-default panel-buttons' }, _.div({ class: 'btn-group' }, _this9.$saveBtn = _.button({ class: 'btn btn-primary btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Save '), _.span({ class: 'text-working' }, 'Saving ')).click(function () {
+	                    _this9.onClickSave();
 	                }))));
 	            });
 	        }

@@ -37,22 +37,10 @@ class SyncSettings extends View {
      * Render enabled switch
      */
     renderEnabledSwitch() {
-        let view = this;
-        
-        function onChange() {
-            view.model.enabled = this.checked;
-        }
-
         return _.div({class: 'field-editor'},
-            _.div({class: 'switch'},
-                _.input({
-                    id: 'switch-sync-enabled',
-                    class: 'form-control switch',
-                    type: 'checkbox',
-                    checked: this.model.enabled == true
-                }).change(onChange),
-                _.label({for: 'switch-sync-enabled'})
-            )
+            UI.inputSwitch(this.model.enabled == true, (newValue) => {
+                this.model.enabled = newValue;
+            })
         );
     }
 

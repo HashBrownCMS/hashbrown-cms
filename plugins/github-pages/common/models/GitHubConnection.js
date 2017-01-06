@@ -354,7 +354,12 @@ class GitHubConnection extends Connection {
     }
    
     /**
-     * Gets template markup
+     * Gets Template markup
+     *
+     * NOTE:
+     * Previously, Template parents were assigned using the "layout" YAML parameter, but it
+     * turned out to be too slow to fetch the entire markup for every Template when getting
+     * all of them at once.
      *
      * @param {Template} template
      *
@@ -369,17 +374,6 @@ class GitHubConnection extends Connection {
                     template.markup = new Buffer(markup.content, 'base64').toString();
                 } else {
                     template.markup = markup.toString();
-                }
-
-                let parentMatches = (template.markup || '').match(/(?:layout|parent):(.+)/);
-                let folderMatches = (template.markup || '').match(/(?:folder|directory):(.+)/);
-
-                if(parentMatches && parentMatches.length > 1) {
-                    template.parentId = parentMatches[1].replace(' ', '');
-                }
-                
-                if(folderMatches && folderMatches.length > 1) {
-                    template.folder = folderMatches[1].replace(' ', '');
                 }
             }
 
@@ -501,28 +495,16 @@ class GitHubConnection extends Connection {
 
         return this.getContents(path)
         .then((files) => {
-            let getNext = () => {
-                let file = files.pop();
-
-                if(!file) { return Promise.resolve(); }
-
+            for(let file of files) {
                 let name = (file.path || file).replace(path + '/', '');
 
                 let template = new Template({ name: name, type: type, remotePath: path + '/' + name });
 
                 template.updateFromName();
 
-                return this.getTemplateMarkup(template)
-                .then(() => {
-                    templates[templates.length] = template;
+                templates[templates.length] = template;
+            }
 
-                    return getNext();  
-                }); 
-            };
-
-            return getNext();
-        })
-        .then(() => {
             return Promise.resolve(templates);
         });
     }

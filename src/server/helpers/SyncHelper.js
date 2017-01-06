@@ -24,7 +24,7 @@ class SyncHelper {
     ) {
         return SettingsHelper.getSettings(project, environment, 'sync')
         .then((settings) => {
-            debug.log('Renewing token for sync...', this);
+            debug.log('Renewing sync token for ' + project + '/' + environment + '...', this);
 
             return new Promise((resolve, reject) => {
                 let headers = {
@@ -45,6 +45,8 @@ class SyncHelper {
                         reject(data);
                     
                     } else {
+                        debug.log('Sync token renewed successfully', this);
+                        
                         resolve(data);
                     
                     }
@@ -77,6 +79,8 @@ class SyncHelper {
                         'Accept': 'application/json'
                     };
                     
+                    debug.log('Requesting remote resource item ' + remoteResourceName + '/' + remoteItemName + ' for ' + project + '/' + environment + '...', this, 3);
+
                     restler.get(settings.url + settings.project + '/' + settings.environment + '/' + remoteResourceName + '/' + remoteItemName + '?token=' + settings.token, {
                         headers: headers
                     }).on('complete', (data, response) => {
@@ -92,6 +96,8 @@ class SyncHelper {
                                 data.remote = true;
                             }
 
+                            debug.log('Remote resource item ' + remoteResourceName + '/' + remoteItemName + ' retrieved successfully', this, 3);
+                            
                             resolve(data);
                         
                         }
@@ -126,6 +132,8 @@ class SyncHelper {
         .then((settings) => {
             return new Promise((resolve, reject) => {
                 if(settings && settings.enabled && settings[remoteResourceName]) {
+                    debug.log('Posting remote resource item ' + remoteResourceName + '/' + remoteItemName + ' for ' + project + '/' + environment + '...', this, 3);
+                   
                     let headers = {
                         'Content-Type': 'application/json'
                     };
@@ -141,6 +149,8 @@ class SyncHelper {
                             reject(new Error(data));
                         
                         } else {
+                            debug.log('Remote resource item ' + remoteResourceName + '/' + remoteItemName + ' posted successfully', this, 3);
+                            
                             resolve();
                         
                         }
@@ -173,6 +183,8 @@ class SyncHelper {
         .then((settings) => {
             return new Promise((resolve, reject) => {
                 if(settings && settings.enabled && settings[remoteResourceName]) {
+                    debug.log('Requesting remote resource ' + remoteResourceName + ' for ' + project + '/' + environment + '...', this, 3);
+                    
                     params.token = settings.token;
 
                     let headers = {
@@ -192,6 +204,8 @@ class SyncHelper {
                             reject(new Error(data));
            
                         } else {
+                            debug.log('Remote resource ' + remoteResourceName + ' retrieved successfully', this, 3);
+                            
                             resolve(data);
                         
                         }
