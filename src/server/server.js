@@ -54,7 +54,7 @@ global.AppHelper = require('./helpers/AppHelper');
 global.SyncHelper = require('./helpers/SyncHelper');
 
 global.debug = require('./helpers/DebugHelper');
-global.debug.verbosity = 3;
+global.debug.verbosity = 2;
 
 PluginHelper.init(app)
     .then(ready);
