@@ -57,14 +57,16 @@ class ContentHelper extends ContentHelperCommon {
      *
      * @param {String} project
      * @param {String} environment
-     * @param {Number} id
+     * @param {String} id
+     * @param {Boolean} localOnly
      *
      * @return {Promise} promise
      */
     static getContentById(
         project = requiredParam('project'),
         environment = requiredParam('environment'),
-        id = requiredParam('id')
+        id = requiredParam('id'),
+        localOnly = false
     ) {
         let collection = environment + '.content';
         let content;
@@ -77,6 +79,10 @@ class ContentHelper extends ContentHelperCommon {
             }
         ).then((result) => {
             if(!result) {
+                if(localOnly) {
+                    return Promise.reject(new Error('Content by id "' + id + '" was not found'));
+                }
+
                 return SyncHelper.getResourceItem(project, environment, 'content', id);
             }
             

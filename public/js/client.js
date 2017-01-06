@@ -36339,7 +36339,7 @@
 	Router.route('/content/:id/:tab', function () {
 	    var contentEditor = ViewHelper.get('ContentEditor');
 
-	    if (!contentEditor || contentEditor.model.id != this.id) {
+	    if (!contentEditor || !contentEditor.model || contentEditor.model.id != this.id) {
 	        ViewHelper.get('NavbarMain').highlightItem(this.id);
 
 	        contentEditor = new ContentEditor({

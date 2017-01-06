@@ -91,8 +91,9 @@ class ContentController extends ApiController {
     static postContent(req, res) {
         let id = req.params.id;
         let node = req.body;
+        let shouldCreate = req.query.create == 'true' || req.query.create == true;
         
-        ContentHelper.setContentById(req.project, req.environment, id, node, req.user)
+        ContentHelper.setContentById(req.project, req.environment, id, node, req.user, shouldCreate)
         .then(() => {
             res.status(200).send(node);
         })
@@ -127,12 +128,9 @@ class ContentController extends ApiController {
     static pushContent(req, res) {
         let id = req.params.id;
 
-        ContentHelper.getContentById(req.project, req.environment, id)
+        ContentHelper.getContentById(req.project, req.environment, id, true)
         .then((localContent) => {
             return SyncHelper.setResourceItem(req.project, req.environment, 'content', id, localContent);
-        })
-        .then(() => {
-            return ContentHelper.removeContentById(req.project, req.environment, id);
         })
         .then(() => {
             res.status(200).send(id);

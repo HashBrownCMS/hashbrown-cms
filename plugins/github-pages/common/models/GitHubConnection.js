@@ -220,14 +220,20 @@ class GitHubConnection extends Connection {
                     'Accept': 'application/json'
                 };
 
-                debug.log('Removing "' + path + '"...', this);
+                debug.log('Removing "' + path + '"...', this, 2);
 
                 // Fetch first to get the SHA
-                debug.log('Getting SHA...', this);
+                debug.log('Getting SHA...', this, 2);
                 
                 restler.get(getApiPath, {
                     headers: headers
                 }).on('complete', (data, response) => {
+                    // Data wasn't found, nothing needs to be deleted
+                    if(!data || !data.sha) {
+                        debug.log('No data found!', this, 2);
+                        resolve();
+                    }
+
                     let postData = {
                         sha: data.sha,
                         path: path,
@@ -236,18 +242,18 @@ class GitHubConnection extends Connection {
                     };
 
                     // Remove the file
-                    debug.log('Removing data...', this);
+                    debug.log('Removing data...', this, 2);
 
                     restler.del(delApiPath, {
                         headers: headers,
                         data: JSON.stringify(postData)
                     }).on('complete', (data, response) => {
                         if(data.message) {
-                            debug.log('Removing file failed: ' + data.message, this);
+                            debug.log('Removing file failed: ' + data.message, this, 2);
                             reject(new Error(data.message));    
 
                         } else {
-                            debug.log('Removed file successfully!', this);
+                            debug.log('Removed file successfully!', this, 2);
                             resolve();
 
                         }

@@ -50,7 +50,7 @@ Router.route('/content/:id', function() {
 Router.route('/content/:id/:tab', function() {
     let contentEditor = ViewHelper.get('ContentEditor');
   
-    if(!contentEditor || contentEditor.model.id != this.id) {
+    if(!contentEditor || !contentEditor.model || contentEditor.model.id != this.id) {
         ViewHelper.get('NavbarMain').highlightItem(this.id);
    
         contentEditor = new ContentEditor({

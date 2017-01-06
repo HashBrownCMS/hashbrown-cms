@@ -132,13 +132,14 @@ class SyncHelper {
         .then((settings) => {
             return new Promise((resolve, reject) => {
                 if(settings && settings.enabled && settings[remoteResourceName]) {
-                    debug.log('Posting remote resource item ' + remoteResourceName + '/' + remoteItemName + ' for ' + project + '/' + environment + '...', this, 3);
+                    debug.log('Posting remote resource item ' + remoteResourceName + '/' + remoteItemName + ' for ' + project + '/' + environment + '...', this, 2);
                    
                     let headers = {
                         'Content-Type': 'application/json'
                     };
-                    
-                    restler.post(settings.url + settings.project + '/' + settings.environment + '/' + remoteResourceName + '/' + remoteItemName + '?token=' + settings.token, {
+                   
+                    // Send the API request, and make sure to create/upsert any resources that do not yet exist on the remote 
+                    restler.post(settings.url + settings.project + '/' + settings.environment + '/' + remoteResourceName + '/' + remoteItemName + '?create=true&token=' + settings.token, {
                         headers: headers,
                         data: JSON.stringify(remoteItemData)
                     }).on('complete', (data, response) => {
@@ -149,7 +150,7 @@ class SyncHelper {
                             reject(new Error(data));
                         
                         } else {
-                            debug.log('Remote resource item ' + remoteResourceName + '/' + remoteItemName + ' posted successfully', this, 3);
+                            debug.log('Remote resource item ' + remoteResourceName + '/' + remoteItemName + ' posted successfully', this, 2);
                             
                             resolve();
                         
