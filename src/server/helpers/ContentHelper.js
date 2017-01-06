@@ -83,6 +83,10 @@ class ContentHelper extends ContentHelperCommon {
             return Promise.resolve(result);
 
         }).then((result) => {
+            if(!result) {
+                return Promise.reject(new Error('Content by id "' + id + '" was not found'));
+            }
+
             content = new Content(result);
 
             // Make sure runaway publish dates are not included
