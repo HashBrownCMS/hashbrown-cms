@@ -21512,7 +21512,7 @@
 	                            var contentEditor = ViewHelper.get('ContentEditor');
 
 	                            // Change the ContentEditor view if it was displaying the deleted content
-	                            if (contentEditor && contentEditor.model.id == id) {
+	                            if (contentEditor && contentEditor.model && contentEditor.model.id == id) {
 	                                // The Content was actually deleted
 	                                if (shouldUnpublish) {
 	                                    location.hash = '/content/';
