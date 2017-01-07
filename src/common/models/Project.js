@@ -18,6 +18,7 @@ class Project extends Entity {
         id = id.replace(/[^a-z_]/g, '');
         
         project.id = id;
+
         project.settings.info = {
             section: 'info',
             name: name

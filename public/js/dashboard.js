@@ -77,9 +77,7 @@
 	            if (i < projects.length - 1) {
 	                return renderNext(i + 1);
 	            } else {
-	                return new Promise(function (resolve) {
-	                    resolve();
-	                });
+	                return Promise.resolve();
 	            }
 	        }).catch(UI.errorModal);
 	    }
@@ -87,9 +85,7 @@
 	    if (projects.length > 0) {
 	        return renderNext(0);
 	    } else {
-	        return new Promise(function (resolve) {
-	            resolve();
-	        });
+	        return Promise.resolve();
 	    }
 	}).catch(UI.errorModal);
 
@@ -102,12 +98,10 @@
 	// Set create new project event
 	$('.btn-create-project').click(function () {
 	    function onClickCreate() {
-	        var project = modal.$element.find('input').val();
+	        var name = modal.$element.find('input').val();
 
-	        if (project) {
-	            apiCall('post', 'server/projects/new', {
-	                project: project
-	            }).then(function () {
+	        if (name) {
+	            apiCall('post', 'server/projects/new', { name: name }).then(function () {
 	                location.reload();
 	            }).catch(UI.errorModal);
 	        } else {
@@ -115,19 +109,10 @@
 	        }
 	    }
 
-	    function onChange() {
-	        var val = $(this).val();
-
-	        val = (val || '').toLowerCase();
-	        val = val.replace(/[^a-z_.]/g, '');
-
-	        $(this).val(val);
-	    }
-
 	    var modal = new MessageModal({
 	        model: {
 	            title: 'Create new project',
-	            body: _.div({}, _.p('Please input the new project name'), _.input({ class: 'form-control', type: 'text', placeholder: 'Project name' }).on('change propertychange keyup paste', onChange))
+	            body: [_.input({ class: 'form-control', type: 'text', placeholder: 'Project name' })]
 	        },
 	        buttons: [{
 	            label: 'Cancel',
@@ -20580,6 +20565,7 @@
 	            id = id.replace(/[^a-z_]/g, '');
 
 	            project.id = id;
+
 	            project.settings.info = {
 	                section: 'info',
 	                name: name

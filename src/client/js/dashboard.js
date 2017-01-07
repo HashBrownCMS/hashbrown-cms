@@ -34,9 +34,7 @@ apiCall('get', 'server/projects')
                 return renderNext(i + 1);
             
             } else {
-                return new Promise((resolve) => {
-                    resolve();
-                });
+                return Promise.resolve();
 
             }
         })
@@ -47,9 +45,7 @@ apiCall('get', 'server/projects')
         return renderNext(0);
     
     } else {
-        return new Promise((resolve) => {
-            resolve();
-        });
+        return Promise.resolve();
     }
 })
 .catch(UI.errorModal);
@@ -63,12 +59,10 @@ $('.navbar-main a').click(function() {
 // Set create new project event
 $('.btn-create-project').click(() => {
     function onClickCreate() {
-        let project = modal.$element.find('input').val();
+        let name = modal.$element.find('input').val();
 
-        if(project) {
-            apiCall('post', 'server/projects/new', {
-                project: project
-            })
+        if(name) {
+            apiCall('post', 'server/projects/new', { name: name })
             .then(() => {
                 location.reload();
             })
@@ -80,23 +74,12 @@ $('.btn-create-project').click(() => {
         }
     }
 
-    function onChange() {
-        let val = $(this).val();
-        
-        val = (val || '').toLowerCase();
-        val = val.replace(/[^a-z_.]/g, '');
-
-        $(this).val(val);
-    }
-
     let modal = new MessageModal({
         model: {
             title: 'Create new project',
-            body: _.div({},
-                _.p('Please input the new project name'),
+            body: [
                 _.input({class: 'form-control', type: 'text', placeholder: 'Project name'})
-                .on('change propertychange keyup paste', onChange)
-            )
+            ]
         },
         buttons: [
             {

@@ -437,13 +437,13 @@ class ServerController extends ApiController {
      * Creates a new project
      */
     static createProject(req, res) {
-        let project = req.body.project;
+        let project = req.body
         
         if(!req.user.isAdmin) {
             res.status(403).send('Only admins can create projects');  
 
         } else {
-            ProjectHelper.createProject(project, req.user.id)
+            ProjectHelper.createProject(project.name, req.user.id)
             .then((project) => {
                 res.status(200).send(project);
             })
