@@ -125,6 +125,89 @@ body >.dashboard-container {
             }
         }
 
+        .users {
+            .btn-invite-user {
+                display: block;
+                margin-left: auto;
+                margin-top: 30px;
+            }
+            
+            .user-list {
+                max-width: 600px;
+                margin: 0px auto;
+                max-height: 600px;
+                overflow-y: auto;
+
+               .user {
+                    padding: 15px 0px;
+                    border-bottom: 1px solid material-color('grey', '200');
+                    display: flex;
+
+                    &:last-child {
+                        border-bottom: 0px;
+                    }
+
+                    &.expanded {
+                        .user-editor { 
+                            display: block;
+                        }
+                    }
+
+                    .btn-remove {
+                        position: static;
+
+                        .fa {
+                            background-color: material-color('grey', '400');
+                            width: 16px;
+                            line-height: 16px;
+
+                            &:before {
+                                margin-right: -1px;
+                            }
+
+                            &:hover {
+                                background-color: material-color('red', '600');
+                            }
+                        }
+                    }
+
+                    .btn-edit {
+                        flex-grow: 1;
+                        display: flex;
+                        text-align: left;
+                        padding: 0px;
+                        margin: 0px;
+                        background-color: transparent;
+                        text-transform: none;
+                        font-weight: normal;
+                        align-items: center;
+                    }
+
+                    .user-editor {
+                        display: none;
+                    }
+
+                    .fa {
+                        width: 40px;
+                        line-height: 40px;
+                        text-align: center;
+                        border-radius: 50%;
+                        background-color: material-color('blue', '600');
+                        color: #fff;
+                        margin-right: 15px;
+                    }
+
+                    .user-info {
+                        flex-grow: 1;
+
+                        h4, p {
+                            margin: 0px;
+                        }
+                    }
+               } 
+            }
+        }
+
         .projects {
             .btn-create-project {
                 display: block;
@@ -188,13 +271,14 @@ body >.dashboard-container {
                         .environment {
                             width: 100%;
                             margin-bottom: 15px;
+                            display: flex;
 
                             &:last-of-type {
                                 margin-bottom: 0px;
                             }
 
-                            .btn {
-                                max-width: 110px;
+                            .btn-group {
+                                width: 100%;
                             }
 
                             .dropdown {
@@ -208,11 +292,16 @@ body >.dashboard-container {
                             }
 
                             .environment-title {
-                                line-height: 30px;
-                                font-weight: 700;
-                                width: 100px;
-                                flex-shrink: 0;
                                 flex-grow: 1;
+                                line-height: 30px;
+                            }
+
+                            .btn-primary {
+                                min-width: 0px;
+
+                                .fa {
+                                    line-height: 30px;
+                                }
                             }
                         }
                     } 

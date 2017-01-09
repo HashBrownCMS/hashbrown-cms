@@ -14,7 +14,6 @@ let FormsPane = require('./FormsPane');
 let MediaPane = require('./MediaPane');
 let SchemaPane = require('./SchemaPane');
 let SettingsPane = require('./SettingsPane');
-let UserPane = require('./UserPane');
 let TemplatePane = require('./TemplatePane');
 
 /**
@@ -133,15 +132,6 @@ class NavbarMain extends View {
 
                 } else if(item.name && typeof item.name === 'string') {
                     name = item.name;
-
-                } else if(item.fullName && typeof item.fullName === 'string') {
-                    name = item.fullName;
-                
-                } else if(item.username && typeof item.username === 'string') {
-                    name = item.username;
-                
-                } else if(item.email && typeof item.email === 'string') {
-                    name = item.email;
 
                 } else {
                     name = id;
@@ -451,7 +441,6 @@ class NavbarMain extends View {
         let isAdmin = User.current.isAdmin;
         let hasConnectionsScope = User.current.hasScope(ProjectHelper.currentProject, 'connections');
         let hasSchemasScope = User.current.hasScope(ProjectHelper.currentProject, 'schemas');
-        let hasUsersScope = User.current.hasScope(ProjectHelper.currentProject, 'users');
         let hasTemplatesScope = User.current.hasScope(ProjectHelper.currentProject, 'templates');
         let hasSettingsScope = User.current.hasScope(ProjectHelper.currentProject, 'settings');
         
@@ -482,11 +471,6 @@ class NavbarMain extends View {
             this.renderPane(SchemaPane.getRenderSettings());
         }
         
-        // Render the "users" pane
-        if(isAdmin || hasUsersScope) {
-            this.renderPane(UserPane.getRenderSettings());
-        }
-
         // Render the "settings" pane
         if(isAdmin || hasSettingsScope) {
             this.renderPane(SettingsPane.getRenderSettings());

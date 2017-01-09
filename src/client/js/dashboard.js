@@ -14,13 +14,24 @@ window.BackupEditor = require('./views/dashboard/BackupEditor');
 window.MigrationEditor = require('./views/dashboard/MigrationEditor');
 window.InfoEditor = require('./views/dashboard/InfoEditor');
 window.LanguageEditor = require('./views/dashboard/LanguageEditor');
+window.UserEditor = require('./views/UserEditor');
 
 // Models
 window.Project = require('../../common/models/Project');
+window.User = require('../../common/models/User');
 
-// Get projects
-apiCall('get', 'server/projects')
+// Get current user
+apiCall('get', 'user')
+.then((user) => {
+    User.current = new User(user);
+
+    return apiCall('get', 'server/projects');
+})
+
+// Get project list
 .then((projects) => {
+
+    // Get next project
     function renderNext(i) {
         return apiCall('get', 'server/projects/' + projects[i])
         .then((project) => {
@@ -30,22 +41,80 @@ apiCall('get', 'server/projects')
 
             $('.dashboard-container .workspace .projects .project-list').append(projectEditor.$element);
 
+            // If there are more projects to render, render the next one
             if(i < projects.length - 1) {
                 return renderNext(i + 1);
             
+            // If not, just resolve normally
             } else {
                 return Promise.resolve();
 
             }
-        })
-        .catch(UI.errorModal);
+        });
     }
     
+    // Get next project
     if(projects.length > 0) {
         return renderNext(0);
-    
+
+    // Resolve normally
     } else {
         return Promise.resolve();
+    }
+})
+
+// Get user list
+.then(() => {
+    if(!User.current.isAdmin) { return Promise.resolve(); }
+
+    return apiCall('get', 'users');
+})
+.then((users) => {
+    for(let user of users || []) {
+        user = new User(user);        
+
+        let $user;
+        let $projectList;
+
+        let renderUser = () => {
+            _.append($user.empty(),
+                _.button({class: 'btn btn-edit'},
+                    _.span({class: 'user-icon fa fa-' + (user.isAdmin ? 'black-tie' : 'user')}),
+                    _.div({class: 'user-info'}, 
+                        _.h4(user.fullName || user.username || user.email || user.id),
+                        _.p(user.isAdmin ? 'Admin' : 'Editor')
+                    )
+                ).on('click', () => {
+                    let userEditor = new UserEditor({ model: user }); 
+                    
+                    userEditor.on('save', () => {
+                        renderUser(); 
+                    });
+                }),
+                _.button({class: 'btn btn-remove', title: 'Remove user'},
+                    _.span({class: 'fa fa-remove'})
+                ).on('click', () => {
+                    UI.confirmModal(
+                        'remove',
+                        'Delete user "' + (user.fullName || user.username || user.id) + '"',
+                        'Are you sure you want to remove this user?',
+                        () => {
+                            apiCall('delete', 'users/' + user.id)
+                            .then(() => {
+                                $user.remove(); 
+                            })
+                            .catch(UI.errorModal);
+                        }
+                    );
+                })
+            );
+        };
+
+        $('.dashboard-container .workspace .users .user-list').append(
+            $user = _.div({class: 'user'})
+        );
+
+        renderUser();
     }
 })
 .catch(UI.errorModal);

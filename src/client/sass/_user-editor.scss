@@ -1,12 +1,35 @@
-.user-editor {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
+.modal-user-editor {
+    .modal-dialog {
+        max-width: 800px;
+    }
     
-    >.user {
-        flex-grow: 1;
-        overflow-y: auto;
-        padding: 15px;
+    .user-editor {
+        padding: 0px 34px;
+
+        .project {
+            .switch {
+                float: right;
+            }
+        }
+
+        .field-container {
+            display: flex;
+            margin-bottom: 30px;
+         
+            &:last-child {
+                margin-bottom: 0px;
+            }
+            
+            .field-key {
+                width: 200px;
+                line-height: 30px;
+                flex-shrink: 0;
+            }
+
+            .field-value {
+                flex-grow: 1;
+            }
+        }
 
         .password-editor {
             &.invalid {

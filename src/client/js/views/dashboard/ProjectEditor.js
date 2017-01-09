@@ -33,44 +33,42 @@ class ProjectEditor extends View {
      * Event: Click remove button
      */ 
     onClickRemove() {
-        let view = this;
+        if(!this.isAdmin()) { return; }
 
-        if(this.isAdmin()) {
-            let modal = new MessageModal({
-                model: {
-                    title: 'Delete project',
-                    body: _.div({},
-                        _.p('Please type in the project name to confirm'),
-                        _.input({class: 'form-control', type: 'text', placeholder: 'Project name'})
-                            .on('change propertychange input keyup paste', function() {
-                                let $btn = modal.$element.find('.btn-danger');
-                                let isMatch = $(this).val() == view.model.settings.info.name;
-                                
-                                $btn.attr('disabled', !isMatch);
-                                $btn.toggleClass('disabled', !isMatch);
-                            })
-                    )
+        let modal = new MessageModal({
+            model: {
+                title: 'Delete project',
+                body: _.div(
+                    _.p('Please type in the project name to confirm'),
+                    _.input({class: 'form-control', type: 'text', placeholder: 'Project name'})
+                        .on('change propertychange input keyup paste', function() {
+                            let $btn = modal.$element.find('.btn-danger');
+                            let isMatch = $(this).val() == this.model.settings.info.name;
+                            
+                            $btn.attr('disabled', !isMatch);
+                            $btn.toggleClass('disabled', !isMatch);
+                        })
+                )
+            },
+            buttons: [
+                {
+                    label: 'Cancel',
+                    class: 'btn-default'
                 },
-                buttons: [
-                    {
-                        label: 'Cancel',
-                        class: 'btn-default'
-                    },
-                    {
-                        label: 'Delete',
-                        class: 'btn-danger disabled',
-                        disabled: true,
-                        callback: () => {
-                            apiCall('delete', 'server/projects/' + this.model.id)
-                            .then(() => {
-                                location.reload();
-                            })
-                            .catch(UI.errorModal);
-                        }
+                {
+                    label: 'Delete',
+                    class: 'btn-danger disabled',
+                    disabled: true,
+                    callback: () => {
+                        apiCall('delete', 'server/projects/' + this.model.id)
+                        .then(() => {
+                            location.reload();
+                        })
+                        .catch(UI.errorModal);
                     }
-                ]
-            });
-        }
+                }
+            ]
+        });
     }
 
     /**
@@ -89,8 +87,7 @@ class ProjectEditor extends View {
     }
     
     /**
-     * Event: Click info button
-     */
+     * Event: Click info button */
     onClickInfo() {
         if(this.isAdmin()) {
             let infoEditor = new InfoEditor({ projectId: this.model.id });
@@ -220,7 +217,9 @@ class ProjectEditor extends View {
                         return _.div({class: 'environment'},
                             _.div({class: 'btn-group'},
                                 _.span({class: 'environment-title'}, environment),
-                                _.a({href: '/' + this.model.id + '/' + environment, class: 'btn btn-primary environment'}, 'cms'),
+                                _.a({title: 'Go to "' + environment + '" CMS', href: '/' + this.model.id + '/' + environment, class: 'btn btn-primary'}, 
+                                    _.span({class: 'fa fa-arrow-right'})
+                                ),
                                 _.if(this.isAdmin(),
                                     _.div({class: 'dropdown'},
                                         _.button({class: 'dropdown-toggle', 'data-toggle': 'dropdown'},
@@ -239,7 +238,7 @@ class ProjectEditor extends View {
                         );
                     }),
                     _.if(this.isAdmin(),
-                        _.button({class: 'btn btn-primary btn-add btn-raised btn-round'}, '+')
+                        _.button({title: 'Add environment', class: 'btn btn-primary btn-add btn-raised btn-round'}, '+')
                             .click(() => { this.onClickAddEnvironment(); })
                     )
                 )

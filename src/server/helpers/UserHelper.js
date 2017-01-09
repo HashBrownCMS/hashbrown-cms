@@ -257,6 +257,27 @@ class UserHelper {
     }
     
     /**
+     * Removes a User
+     *
+     * @param {String} id
+     *
+     * @returns {Promise} Promise
+     */
+    static removeUser(id) {
+        return MongoHelper.removeOne(
+            'users',
+            'users',
+            {
+                id: id
+            }
+        ).then(() => {
+            debug.log('Deleted user "' + id + '" successfully', this);
+           
+            return Promise.resolve();
+        });
+    }
+
+    /**
      * Removes a Project scope from a User object
      *
      * @param {String} id

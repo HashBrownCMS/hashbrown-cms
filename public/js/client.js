@@ -72,39 +72,39 @@
 	// Main views
 	window.MainMenu = __webpack_require__(34);
 	window.NavbarMain = __webpack_require__(35);
-	window.MediaViewer = __webpack_require__(104);
+	window.MediaViewer = __webpack_require__(103);
 
 	// Plugins
 	// TODO: Make these independent from the main file
+	__webpack_require__(104);
 	__webpack_require__(105);
-	__webpack_require__(106);
 
 	// Field editors
-	__webpack_require__(107);
+	__webpack_require__(106);
 
 	// Editor views
-	window.JSONEditor = __webpack_require__(124);
-	window.TemplateEditor = __webpack_require__(129);
-	window.ContentEditor = __webpack_require__(130);
-	window.FormEditor = __webpack_require__(131);
-	window.ConnectionEditor = __webpack_require__(132);
-	window.SchemaEditor = __webpack_require__(133);
-	window.SyncSettings = __webpack_require__(135);
-	window.ProvidersSettings = __webpack_require__(136);
-	window.UserEditor = __webpack_require__(137);
-	window.MediaBrowser = __webpack_require__(138);
+	window.JSONEditor = __webpack_require__(123);
+	window.TemplateEditor = __webpack_require__(128);
+	window.ContentEditor = __webpack_require__(129);
+	window.FormEditor = __webpack_require__(130);
+	window.ConnectionEditor = __webpack_require__(131);
+	window.SchemaEditor = __webpack_require__(132);
+	window.SyncSettings = __webpack_require__(134);
+	window.ProvidersSettings = __webpack_require__(135);
+	window.UserEditor = __webpack_require__(172);
+	window.MediaBrowser = __webpack_require__(136);
 
 	// Models
-	window.Content = __webpack_require__(139);
-	window.Media = __webpack_require__(140);
-	window.User = __webpack_require__(142);
-	window.Template = __webpack_require__(143);
+	window.Content = __webpack_require__(137);
+	window.Media = __webpack_require__(138);
+	window.User = __webpack_require__(140);
+	window.Template = __webpack_require__(141);
 
 	// Helpers
-	window.MediaHelper = __webpack_require__(144);
-	window.ConnectionHelper = __webpack_require__(146);
-	window.ContentHelper = __webpack_require__(149);
-	window.SchemaHelper = __webpack_require__(151);
+	window.MediaHelper = __webpack_require__(142);
+	window.ConnectionHelper = __webpack_require__(144);
+	window.ContentHelper = __webpack_require__(147);
+	window.SchemaHelper = __webpack_require__(149);
 	window.UI = __webpack_require__(26);
 
 	// Ready callback containers
@@ -274,13 +274,13 @@
 	};
 
 	// Get package file
-	window.app = __webpack_require__(156);
+	window.app = __webpack_require__(154);
 
 	// Language
 	window.language = localStorage.getItem('language') || 'en';
 
 	// Get routes
-	__webpack_require__(157);
+	__webpack_require__(155);
 
 	// Preload resources 
 	$(document).ready(function () {
@@ -1343,18 +1343,28 @@
 	function create(tag, attr, contents) {
 	    var element = document.createElement(tag.toUpperCase());
 
-	    // If the attribute parameter is a jQuery instance, just reassign the parameter values
-	    if (attr instanceof jQuery || typeof attr === 'string') {
-	        if (contents instanceof Array) {
-	            contents.unshift(attr);
-	        } else if (contents instanceof jQuery || typeof contents === 'string') {
-	            contents = [attr, contents];
-	        } else {
-	            contents = attr;
+	    var isContents = function isContents(obj) {
+	        if (!obj) {
+	            return false;
 	        }
-	    } else {
-	        for (var k in attr) {
-	            element.setAttribute(k, attr[k]);
+
+	        return obj instanceof Array || obj instanceof HTMLElement || obj instanceof jQuery || typeof obj === 'string' || typeof obj === 'number';
+	    };
+
+	    // The attribute parameter is the content
+	    if (isContents(attr)) {
+	        contents = [attr, contents];
+
+	        // The attribute parameter was defined as an object
+	    } else if (typeof attr !== 'undefined' && attr instanceof Object && attr instanceof Array == false) {
+	        try {
+	            for (var k in attr) {
+	                element.setAttribute(k, attr[k]);
+	            }
+	        } catch (e) {
+	            console.log(e);
+
+	            console.log(attr, isContents(attr));
 	        }
 	    }
 
@@ -12183,8 +12193,7 @@
 	var MediaPane = __webpack_require__(99);
 	var SchemaPane = __webpack_require__(100);
 	var SettingsPane = __webpack_require__(101);
-	var UserPane = __webpack_require__(102);
-	var TemplatePane = __webpack_require__(103);
+	var TemplatePane = __webpack_require__(102);
 
 	/**
 	 * The main navbar
@@ -12301,12 +12310,6 @@
 	                    name = item.title;
 	                } else if (item.name && typeof item.name === 'string') {
 	                    name = item.name;
-	                } else if (item.fullName && typeof item.fullName === 'string') {
-	                    name = item.fullName;
-	                } else if (item.username && typeof item.username === 'string') {
-	                    name = item.username;
-	                } else if (item.email && typeof item.email === 'string') {
-	                    name = item.email;
 	                } else {
 	                    name = id;
 	                }
@@ -12611,7 +12614,6 @@
 	            var isAdmin = User.current.isAdmin;
 	            var hasConnectionsScope = User.current.hasScope(ProjectHelper.currentProject, 'connections');
 	            var hasSchemasScope = User.current.hasScope(ProjectHelper.currentProject, 'schemas');
-	            var hasUsersScope = User.current.hasScope(ProjectHelper.currentProject, 'users');
 	            var hasTemplatesScope = User.current.hasScope(ProjectHelper.currentProject, 'templates');
 	            var hasSettingsScope = User.current.hasScope(ProjectHelper.currentProject, 'settings');
 
@@ -12640,11 +12642,6 @@
 	            // Render the "schemas" pane
 	            if (isAdmin || hasSchemasScope) {
 	                this.renderPane(SchemaPane.getRenderSettings());
-	            }
-
-	            // Render the "users" pane
-	            if (isAdmin || hasUsersScope) {
-	                this.renderPane(UserPane.getRenderSettings());
 	            }
 
 	            // Render the "settings" pane
@@ -22600,313 +22597,6 @@
 
 	var Pane = __webpack_require__(95);
 
-	var UserPane = function (_Pane) {
-	    _inherits(UserPane, _Pane);
-
-	    function UserPane() {
-	        _classCallCheck(this, UserPane);
-
-	        return _possibleConstructorReturn(this, (UserPane.__proto__ || Object.getPrototypeOf(UserPane)).apply(this, arguments));
-	    }
-
-	    _createClass(UserPane, null, [{
-	        key: 'onClickAddUser',
-
-	        /**
-	         * Event: Click add User
-	         */
-	        value: function onClickAddUser() {
-	            var navbar = ViewHelper.get('NavbarMain');
-
-	            customApiCall('get', '/api/users').then(function (users) {
-	                /**
-	                 * Generate password
-	                 */
-	                function generatePassword() {
-	                    var length = 8,
-	                        charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
-	                        retVal = "";
-	                    for (var i = 0, n = charset.length; i < length; ++i) {
-	                        retVal += charset.charAt(Math.floor(Math.random() * n));
-	                    }
-	                    return retVal;
-	                }
-
-	                /**
-	                 * Event: On submit user changes
-	                 */
-	                function onSubmit() {
-	                    var username = addUserModal.$element.find('input.username').val();
-
-	                    var emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-	                    var isEmail = emailRegex.test(username);
-
-	                    var user = users.filter(function (user) {
-	                        return user.username == username || user.email == username;
-	                    })[0];
-
-	                    // The user was found
-	                    if (user) {
-	                        if (!user.scopes) {
-	                            user.scopes = [];
-	                        }
-
-	                        // The user already has scopes in this project
-	                        if (user.scopes[ProjectHelper.currentProject]) {
-	                            UI.messageModal('Add user', 'The user  "' + username + '" is already part of this project (' + ProjectHelper.currentProject + ')');
-	                            return;
-	                        }
-
-	                        // Set empty scope array for this project
-	                        user.scopes[ProjectHelper.currentProject] = [];
-
-	                        // Post changes to user
-	                        apiCall('post', 'users/' + user.id, user).then(function () {
-	                            return reloadResource('users');
-	                        }).then(function () {
-	                            var navbar = ViewHelper.get('NavbarMain');
-
-	                            navbar.reload();
-
-	                            addUserModal.hide();
-
-	                            location.hash = '/users/' + user.id;
-	                        }).catch(errorModal);
-
-	                        // An email was provided, send invitation    
-	                    } else if (isEmail) {
-	                        (function () {
-	                            var modal = new MessageModal({
-	                                model: {
-	                                    title: 'Add user',
-	                                    body: 'Do you want to invite a new user with email "' + username + '"?'
-	                                },
-	                                buttons: [{
-	                                    label: 'Cancel',
-	                                    class: 'btn-default'
-	                                }, {
-	                                    label: 'Invite',
-	                                    class: 'btn-primary',
-	                                    callback: function callback() {
-	                                        customApiCall('post', '/api/user/invite', {
-	                                            email: username,
-	                                            project: ProjectHelper.currentProject
-	                                        }).then(function () {
-	                                            UI.messageModal('Invite user', 'Invitation was sent to ' + username);
-	                                        }).catch(errorModal);
-
-	                                        var $buttons = modal.$element.find('button').attr('disabled', true).addClass('disabled');
-
-	                                        return false;
-	                                    }
-	                                }]
-	                            });
-
-	                            // User doesn't exist, create it
-	                        })();
-	                    } else {
-	                        (function () {
-	                            var $passwd = void 0;
-
-	                            var modal = new MessageModal({
-	                                model: {
-	                                    title: 'Add user',
-	                                    body: _.div({}, _.p('Set password for new user "' + username + '"'), $passwd = _.input({ required: true, pattern: '.{6,}', class: 'form-control', type: 'text', value: generatePassword(), placeholder: 'Type new password' }))
-	                                },
-	                                buttons: [{
-	                                    label: 'Cancel',
-	                                    class: 'btn-default'
-	                                }, {
-	                                    label: 'Create',
-	                                    class: 'btn-primary',
-	                                    callback: function callback() {
-	                                        var password = $passwd.val() || '';
-	                                        var scopes = {};
-	                                        scopes[ProjectHelper.currentProject] = [];
-
-	                                        apiCall('post', 'users/new', {
-	                                            username: username,
-	                                            password: password,
-	                                            scopes: scopes
-	                                        }).then(function () {
-	                                            UI.messageModal('Create user', 'User "' + username + '" was created with password "' + password + '".', function () {
-	                                                location.reload();
-	                                            });
-	                                        }).catch(errorModal);
-
-	                                        var $buttons = modal.$element.find('button').attr('disabled', true).addClass('disabled');
-
-	                                        return false;
-	                                    }
-	                                }]
-	                            });
-	                        })();
-	                    }
-	                }
-
-	                /**
-	                 * Updates user suggestions
-	                 */
-	                function updateSuggestions() {
-	                    var _this2 = this;
-
-	                    var input = $(this).val();
-
-	                    var $dropdown = addUserModal.$element.find('.dropdown');
-	                    var $list = addUserModal.$element.find('.dropdown-menu').empty();
-
-	                    // Only consider inputs equal to or more than 2 characters
-	                    if (input.length > 1) {
-	                        // Filter search results
-	                        var results = users.filter(function (user) {
-	                            if (user.username.toLowerCase().indexOf(input) > -1) {
-	                                return true;
-	                            }
-
-	                            if ((user.fullName || '').toLowerCase().indexOf(input) > -1) {
-	                                return true;
-	                            }
-
-	                            return false;
-	                        });
-
-	                        // Only set dropdown to open if results are more than 0
-	                        $dropdown.toggleClass('open', results.length > 0);
-
-	                        // Render results
-	                        _.append($list, _.each(results, function (i, user) {
-	                            return _.li(_.a({ href: '#' }, user.username + (user.fullName ? ' (' + user.fullName + ')' : '')).click(function (e) {
-	                                e.preventDefault();
-
-	                                $(_this2).val(user.username);
-
-	                                $dropdown.toggleClass('open', false);
-	                            }));
-	                        }));
-	                    }
-	                }
-
-	                // Renders the modal
-	                var addUserModal = new MessageModal({
-	                    model: {
-	                        title: 'Add user to project',
-	                        body: _.div({ class: 'dropdown typeahead' }, _.input({ class: 'form-control username', placeholder: 'Username', type: 'text' }).on('change keyup paste propertychange input', updateSuggestions), _.ul({ class: 'dropdown-menu' }))
-	                    },
-	                    buttons: [{
-	                        label: 'Cancel',
-	                        class: 'btn-default'
-	                    }, {
-	                        label: 'OK',
-	                        class: 'btn-primary',
-	                        callback: onSubmit
-	                    }]
-	                });
-	            }).catch(errorModal);
-	        }
-
-	        /**
-	         * Event: On click remove User
-	         */
-
-	    }, {
-	        key: 'onClickRemoveUser',
-	        value: function onClickRemoveUser() {
-	            var navbar = ViewHelper.get('NavbarMain');
-	            var id = $('.context-menu-target-element').data('id');
-	            var name = $('.context-menu-target-element').data('name');
-
-	            function onSuccess() {
-	                return reloadResource('users').then(function () {
-	                    navbar.reload();
-
-	                    // Cancel the UserEditor view if it was displaying the deleted user
-	                    if (location.hash == '#/users/' + id) {
-	                        location.hash = '/users/';
-	                    }
-	                });
-	            }
-
-	            function onClickOK() {
-	                apiCall('delete', 'users/' + id).then(onSuccess).catch(navbar.onError);
-	            }
-
-	            new MessageModal({
-	                model: {
-	                    title: 'Remove user',
-	                    body: 'Are you sure you want to remove the user "' + name + '" from this project (' + ProjectHelper.currentProject + ')?'
-	                },
-	                buttons: [{
-	                    label: 'Cancel',
-	                    class: 'btn-default',
-	                    callback: function callback() {}
-	                }, {
-	                    label: 'Remove',
-	                    class: 'btn-danger',
-	                    callback: onClickOK
-	                }]
-	            });
-	        }
-
-	        /**
-	         * Gets the render settings
-	         *
-	         * @returns {Object} Settings
-	         */
-
-	    }, {
-	        key: 'getRenderSettings',
-	        value: function getRenderSettings() {
-	            var _this3 = this;
-
-	            return {
-	                label: 'Users',
-	                route: '/users/',
-	                icon: 'user',
-	                items: resources.users,
-
-	                // Item context menu
-	                itemContextMenu: {
-	                    'This user': '---',
-	                    'Copy id': function CopyId() {
-	                        _this3.onClickCopyItemId();
-	                    },
-	                    'Remove': function Remove() {
-	                        _this3.onClickRemoveUser();
-	                    }
-	                },
-
-	                // General context menu
-	                paneContextMenu: {
-	                    'User': '---',
-	                    'Add user': function AddUser() {
-	                        _this3.onClickAddUser();
-	                    }
-	                }
-	            };
-	        }
-	    }]);
-
-	    return UserPane;
-	}(Pane);
-
-	module.exports = UserPane;
-
-/***/ },
-/* 103 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var Pane = __webpack_require__(95);
-
 	var TemplatePane = function (_Pane) {
 	    _inherits(TemplatePane, _Pane);
 
@@ -23175,7 +22865,7 @@
 	module.exports = TemplatePane;
 
 /***/ },
-/* 104 */
+/* 103 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -23297,7 +22987,7 @@
 	module.exports = MediaViewer;
 
 /***/ },
-/* 105 */
+/* 104 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -23544,7 +23234,7 @@
 	resources.connectionEditors['GitHub Pages'] = ConnectionEditor;
 
 /***/ },
-/* 106 */
+/* 105 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -23623,32 +23313,32 @@
 	resources.connectionEditors['HashBrown Driver'] = ConnectionEditor;
 
 /***/ },
-/* 107 */
+/* 106 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	window.resources.editors = {
-	    array: __webpack_require__(108),
-	    boolean: __webpack_require__(109),
-	    contentReference: __webpack_require__(110),
-	    contentSchemaReference: __webpack_require__(111),
-	    date: __webpack_require__(112),
-	    dropdown: __webpack_require__(113),
-	    language: __webpack_require__(114),
-	    mediaReference: __webpack_require__(115),
-	    number: __webpack_require__(116),
-	    resourceReference: __webpack_require__(117),
-	    richText: __webpack_require__(118),
-	    string: __webpack_require__(119),
-	    struct: __webpack_require__(120),
-	    tags: __webpack_require__(121),
-	    templateReference: __webpack_require__(122),
-	    url: __webpack_require__(123)
+	    array: __webpack_require__(107),
+	    boolean: __webpack_require__(108),
+	    contentReference: __webpack_require__(109),
+	    contentSchemaReference: __webpack_require__(110),
+	    date: __webpack_require__(111),
+	    dropdown: __webpack_require__(112),
+	    language: __webpack_require__(113),
+	    mediaReference: __webpack_require__(114),
+	    number: __webpack_require__(115),
+	    resourceReference: __webpack_require__(116),
+	    richText: __webpack_require__(117),
+	    string: __webpack_require__(118),
+	    struct: __webpack_require__(119),
+	    tags: __webpack_require__(120),
+	    templateReference: __webpack_require__(121),
+	    url: __webpack_require__(122)
 	};
 
 /***/ },
-/* 108 */
+/* 107 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -24022,7 +23712,7 @@
 	module.exports = ArrayEditor;
 
 /***/ },
-/* 109 */
+/* 108 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -24096,7 +23786,7 @@
 	module.exports = BooleanEditor;
 
 /***/ },
-/* 110 */
+/* 109 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -24212,7 +23902,7 @@
 	module.exports = ContentReferenceEditor;
 
 /***/ },
-/* 111 */
+/* 110 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -24368,7 +24058,7 @@
 	module.exports = ContentSchemaReferenceEditor;
 
 /***/ },
-/* 112 */
+/* 111 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -24602,7 +24292,7 @@
 	module.exports = DateEditor;
 
 /***/ },
-/* 113 */
+/* 112 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -24679,7 +24369,7 @@
 	module.exports = DropdownEditor;
 
 /***/ },
-/* 114 */
+/* 113 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -24759,7 +24449,7 @@
 	module.exports = LanguageEditor;
 
 /***/ },
-/* 115 */
+/* 114 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -24868,7 +24558,7 @@
 	module.exports = MediaReferenceEditor;
 
 /***/ },
-/* 116 */
+/* 115 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -24927,7 +24617,7 @@
 	module.exports = NumberEditor;
 
 /***/ },
-/* 117 */
+/* 116 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -25023,7 +24713,7 @@
 	module.exports = ResourceReferenceEditor;
 
 /***/ },
-/* 118 */
+/* 117 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -25281,7 +24971,7 @@
 	module.exports = RichTextEditor;
 
 /***/ },
-/* 119 */
+/* 118 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -25342,7 +25032,7 @@
 	module.exports = StringEditor;
 
 /***/ },
-/* 120 */
+/* 119 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -25458,7 +25148,7 @@
 	module.exports = StructEditor;
 
 /***/ },
-/* 121 */
+/* 120 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -25632,7 +25322,7 @@
 	module.exports = TagsEditor;
 
 /***/ },
-/* 122 */
+/* 121 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -25774,7 +25464,7 @@
 	module.exports = TemplateReferenceEditor;
 
 /***/ },
-/* 123 */
+/* 122 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -26048,7 +25738,7 @@
 	module.exports = UrlEditor;
 
 /***/ },
-/* 124 */
+/* 123 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -26063,7 +25753,7 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var beautify = __webpack_require__(125).js_beautify;
+	var beautify = __webpack_require__(124).js_beautify;
 
 	// Views
 	var MessageModal = __webpack_require__(25);
@@ -26467,7 +26157,7 @@
 	module.exports = JSONEditor;
 
 /***/ },
-/* 125 */
+/* 124 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;"use strict";
@@ -26509,7 +26199,7 @@
 
 	if (true) {
 	    // Add support for AMD ( https://github.com/amdjs/amdjs-api/wiki/AMD#defineamd-property- )
-	    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(126), __webpack_require__(127), __webpack_require__(128)], __WEBPACK_AMD_DEFINE_RESULT__ = function (js_beautify, css_beautify, html_beautify) {
+	    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(125), __webpack_require__(126), __webpack_require__(127)], __WEBPACK_AMD_DEFINE_RESULT__ = function (js_beautify, css_beautify, html_beautify) {
 	        return get_beautify(js_beautify, css_beautify, html_beautify);
 	    }.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 	} else {
@@ -26523,7 +26213,7 @@
 	}
 
 /***/ },
-/* 126 */
+/* 125 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;"use strict";
@@ -28825,7 +28515,7 @@
 	})();
 
 /***/ },
-/* 127 */
+/* 126 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;'use strict';
@@ -29348,7 +29038,7 @@
 	})();
 
 /***/ },
-/* 128 */
+/* 127 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;'use strict';
@@ -30350,9 +30040,9 @@
 
 	    if (true) {
 	        // Add support for AMD ( https://github.com/amdjs/amdjs-api/wiki/AMD#defineamd-property- )
-	        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__, __webpack_require__(126), __webpack_require__(127)], __WEBPACK_AMD_DEFINE_RESULT__ = function (requireamd) {
-	            var js_beautify = __webpack_require__(126);
-	            var css_beautify = __webpack_require__(127);
+	        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__, __webpack_require__(125), __webpack_require__(126)], __WEBPACK_AMD_DEFINE_RESULT__ = function (requireamd) {
+	            var js_beautify = __webpack_require__(125);
+	            var css_beautify = __webpack_require__(126);
 
 	            return {
 	                html_beautify: function html_beautify(html_source, options) {
@@ -30383,7 +30073,7 @@
 	})();
 
 /***/ },
-/* 129 */
+/* 128 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -30514,7 +30204,7 @@
 	module.exports = TemplateEditor;
 
 /***/ },
-/* 130 */
+/* 129 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -31008,7 +30698,7 @@
 	module.exports = ContentEditor;
 
 /***/ },
-/* 131 */
+/* 130 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -31454,7 +31144,7 @@
 	module.exports = FormEditor;
 
 /***/ },
-/* 132 */
+/* 131 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -31687,7 +31377,7 @@
 	module.exports = ConnectionEditor;
 
 /***/ },
-/* 133 */
+/* 132 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -31703,7 +31393,7 @@
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 	// Icons
-	var icons = __webpack_require__(134).icons;
+	var icons = __webpack_require__(133).icons;
 
 	/**
 	 * The editor for schemas
@@ -32340,7 +32030,7 @@
 	module.exports = SchemaEditor;
 
 /***/ },
-/* 134 */
+/* 133 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -33043,7 +32733,7 @@
 	};
 
 /***/ },
-/* 135 */
+/* 134 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -33351,7 +33041,7 @@
 	module.exports = SyncSettings;
 
 /***/ },
-/* 136 */
+/* 135 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -33482,417 +33172,7 @@
 	module.exports = ProvidersSettings;
 
 /***/ },
-/* 137 */
-/***/ function(module, exports) {
-
-	'use strict';
-
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var UserEditor = function (_View) {
-	    _inherits(UserEditor, _View);
-
-	    function UserEditor(params) {
-	        _classCallCheck(this, UserEditor);
-
-	        var _this = _possibleConstructorReturn(this, (UserEditor.__proto__ || Object.getPrototypeOf(UserEditor)).call(this, params));
-
-	        _this.$element = _.div({ class: 'editor user-editor' });
-
-	        _this.init();
-	        return _this;
-	    }
-
-	    /**
-	     * Event: Click save.
-	     */
-
-
-	    _createClass(UserEditor, [{
-	        key: 'onClickSave',
-	        value: function onClickSave() {
-	            var _this2 = this;
-
-	            this.$saveBtn.toggleClass('working', true);
-
-	            apiCall('post', 'users/' + this.model.id, this.model).then(function () {
-	                _this2.$saveBtn.toggleClass('working', false);
-
-	                return reloadResource('users');
-	            }).then(function () {
-	                var navbar = ViewHelper.get('NavbarMain');
-
-	                navbar.reload();
-	            }).catch(errorModal);
-	        }
-
-	        /**
-	         * Event: Click remove User
-	         */
-
-	    }, {
-	        key: 'onClickRemove',
-	        value: function onClickRemove() {
-	            var id = this.model.id;
-	            var name = this.model.username;
-
-	            function onSuccess() {
-	                reloadResource('users').then(function () {
-	                    ViewHelper.get('NavbarMain').reload();
-
-	                    location.hash = '/users/';
-	                });
-	            }
-
-	            function onClickOK() {
-	                apiCall('delete', 'users/' + id).then(onSuccess).catch(errorModal);
-	            }
-
-	            new MessageModal({
-	                model: {
-	                    title: 'Delete user',
-	                    body: 'Are you sure you want to remove the user "' + name + '"?'
-	                },
-	                buttons: [{
-	                    label: 'Cancel',
-	                    class: 'btn-default',
-	                    callback: function callback() {}
-	                }, {
-	                    label: 'Remove',
-	                    class: 'btn-danger',
-	                    callback: onClickOK
-	                }]
-	            });
-	        }
-
-	        /**
-	         * Gets a list of available scopes
-	         *
-	         * @returns {Array} Array of scope strings
-	         */
-
-	    }, {
-	        key: 'getScopes',
-	        value: function getScopes() {
-	            return ['connections', 'schemas', 'settings', 'templates', 'users'];
-	        }
-
-	        /**
-	         * Gets a list of user scopes
-	         *
-	         * @returns {Array} Array of scope strings
-	         */
-
-	    }, {
-	        key: 'getUserScopes',
-	        value: function getUserScopes() {
-	            var project = ProjectHelper.currentProject;
-
-	            if (!this.model.scopes) {
-	                this.model.scopes = {};
-	            }
-
-	            if (!this.model.scopes[project]) {
-	                this.model.scopes[project] = [];
-	            }
-
-	            return this.model.scopes[project];
-	        }
-
-	        /**
-	         * Renders the username editor
-	         *
-	         * @returns {HTMLElement} Element
-	         */
-
-	    }, {
-	        key: 'renderUserNameEditor',
-	        value: function renderUserNameEditor() {
-	            var view = this;
-
-	            function onInputChange() {
-	                view.model.username = $(this).val();
-	            }
-
-	            var $element = _.div({ class: 'username-editor' }, _.input({
-	                class: 'form-control',
-	                type: 'text',
-	                value: view.model.username,
-	                placeholder: 'Input the username here'
-	            }).on('change', onInputChange));
-
-	            return $element;
-	        }
-
-	        /**
-	         * Renders the scopes editor
-	         *
-	         * @returns {HTMLElement} Element
-	         */
-
-	    }, {
-	        key: 'renderScopesEditor',
-	        value: function renderScopesEditor() {
-	            var view = this;
-
-	            function onChange() {
-	                view.getUserScopes().splice(0, view.getUserScopes().length);
-
-	                $element.find('.scopes .scope .dropdown .dropdown-toggle').each(function () {
-	                    view.getUserScopes().push($(this).attr('data-id'));
-	                });
-
-	                render();
-	            }
-
-	            function onClickAdd() {
-	                var newScope = '';
-
-	                var _iteratorNormalCompletion = true;
-	                var _didIteratorError = false;
-	                var _iteratorError = undefined;
-
-	                try {
-	                    for (var _iterator = view.getScopes()[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-	                        var scope = _step.value;
-
-	                        if (view.getUserScopes().indexOf(scope) < 0) {
-	                            newScope = scope;
-	                            break;
-	                        }
-	                    }
-	                } catch (err) {
-	                    _didIteratorError = true;
-	                    _iteratorError = err;
-	                } finally {
-	                    try {
-	                        if (!_iteratorNormalCompletion && _iterator.return) {
-	                            _iterator.return();
-	                        }
-	                    } finally {
-	                        if (_didIteratorError) {
-	                            throw _iteratorError;
-	                        }
-	                    }
-	                }
-
-	                if (newScope) {
-	                    view.getUserScopes().push(newScope);
-
-	                    render();
-	                }
-	            }
-
-	            function render() {
-	                _.append($element.empty(), _.div({ class: 'scopes chip-group' }, _.each(view.getUserScopes(), function (i, userScope) {
-	                    try {
-	                        var _ret = function () {
-	                            var $scope = _.div({ class: 'chip scope' }, _.div({ class: 'chip-label dropdown' }, _.button({ class: 'dropdown-toggle', 'data-id': userScope, 'data-toggle': 'dropdown' }, userScope), _.ul({ class: 'dropdown-menu' }, _.each(view.getScopes(), function (i, scope) {
-	                                if (scope == userScope || view.getUserScopes().indexOf(scope) < 0) {
-	                                    return _.li(_.a({ href: '#', 'data-id': scope }, scope).click(function (e) {
-	                                        e.preventDefault();
-
-	                                        var $btn = $(this).parents('.dropdown').children('.dropdown-toggle');
-
-	                                        $btn.text($(this).text());
-	                                        $btn.attr('data-id', $(this).attr('data-id'));
-
-	                                        onChange();
-	                                    }));
-	                                }
-	                            }))).change(onChange), _.button({ class: 'btn chip-remove' }, _.span({ class: 'fa fa-remove' })).click(function () {
-	                                $scope.remove();
-
-	                                onChange();
-	                            }));
-
-	                            return {
-	                                v: $scope
-	                            };
-	                        }();
-
-	                        if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
-	                    } catch (e) {
-	                        UI.errorModal(e);
-	                    }
-	                }), _.button({ class: 'btn chip-add' }, _.span({ class: 'fa fa-plus' })).click(onClickAdd)));
-	            }
-
-	            var $element = _.div({ class: 'scopes-editor' });
-
-	            render();
-
-	            return $element;
-	        }
-
-	        /**
-	         * Renders the full name editor
-	         *
-	         * @return {HTMLElement} Element
-	         */
-
-	    }, {
-	        key: 'renderFullNameEditor',
-	        value: function renderFullNameEditor() {
-	            var view = this;
-
-	            function onChange() {
-	                var fullName = $(this).val();
-
-	                view.model.fullName = fullName;
-	            }
-
-	            return _.div({ class: 'full-name-editor' }, _.input({ class: 'form-control', type: 'text', value: this.model.fullName }).change(onChange));
-	        }
-
-	        /**
-	         * Renders the email editor
-	         *
-	         * @return {HTMLElement} Element
-	         */
-
-	    }, {
-	        key: 'renderEmailEditor',
-	        value: function renderEmailEditor() {
-	            var view = this;
-
-	            function onChange() {
-	                var email = $(this).val();
-
-	                view.model.email = email;
-	            }
-
-	            return _.div({ class: 'full-name-editor' }, _.input({ class: 'form-control', type: 'email', value: this.model.email }).change(onChange));
-	        }
-
-	        /**
-	         * Renders the password
-	         *
-	         * @return {HTMLElement} Element
-	         */
-
-	    }, {
-	        key: 'renderPasswordEditor',
-	        value: function renderPasswordEditor() {
-	            var view = this;
-
-	            var password1 = void 0;
-	            var password2 = void 0;
-
-	            function onChange1() {
-	                password1 = $(this).val();
-
-	                var isValid = password1 == password2;
-
-	                $element.toggleClass('invalid', !isValid);
-
-	                if (isValid) {
-	                    view.model.password = password1;
-	                } else {
-	                    view.model.password = null;
-	                }
-	            }
-
-	            function onChange2() {
-	                password2 = $(this).val();
-
-	                var isValid = password1 == password2;
-
-	                $element.toggleClass('invalid', !isValid);
-
-	                if (isValid) {
-	                    view.model.password = password1;
-	                } else {
-	                    view.model.password = null;
-	                }
-	            }
-
-	            var $element = _.div({ class: 'password-editor' }, _.span({ class: 'invalid-message' }, 'Passwords to not match'), _.input({ class: 'form-control', type: 'password', placeholder: 'Type new password' }).on('change propertychange keyup paste input', onChange1), _.input({ class: 'form-control', type: 'password', placeholder: 'Confirm new password' }).on('change propertychange keyup paste input', onChange2));
-
-	            return $element;
-	        }
-
-	        /**
-	         * Renders the admin editor
-	         *
-	         * @return {HTMLElement} Element
-	         */
-
-	    }, {
-	        key: 'renderAdminEditor',
-	        value: function renderAdminEditor() {
-	            var _this3 = this;
-
-	            return UI.inputSwitch(this.model.isAdmin == true, function (newValue) {
-	                _this3.model.isAdmin = newValue;
-	            }).addClass('admin-editor');
-	        }
-
-	        /**
-	         * Renders a single field
-	         *
-	         * @return {HTMLElement} Element
-	         */
-
-	    }, {
-	        key: 'renderField',
-	        value: function renderField(label, $content) {
-	            return _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, label), _.div({ class: 'field-value' }, $content));
-	        }
-
-	        /**
-	         * Renders all fields
-	         *
-	         * @return {Object} element
-	         */
-
-	    }, {
-	        key: 'renderFields',
-	        value: function renderFields() {
-	            var id = parseInt(this.model.id);
-
-	            var $element = _.div({ class: 'user editor-body' });
-
-	            $element.append(this.renderField('Username', this.renderUserNameEditor()));
-	            $element.append(this.renderField('Full name', this.renderFullNameEditor()));
-	            $element.append(this.renderField('Email', this.renderEmailEditor()));
-	            $element.append(this.renderField('Password', this.renderPasswordEditor()));
-
-	            if (User.current.hasScope('users')) {
-	                $element.append(this.renderField('Is admin', this.renderAdminEditor()));
-	                $element.append(this.renderField('Scopes', this.renderScopesEditor()));
-	            }
-
-	            return $element;
-	        }
-	    }, {
-	        key: 'render',
-	        value: function render() {
-	            var _this4 = this;
-
-	            _.append(this.$element.empty(), _.div({ class: 'editor-header' }, _.span({ class: 'fa fa-user' }), _.h4(this.model.username || this.model.email)), this.renderFields(), _.div({ class: 'editor-footer' }, _.div({ class: 'btn-group' }, this.$saveBtn = _.button({ class: 'btn btn-primary btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Save '), _.span({ class: 'text-working' }, 'Saving ')).click(function () {
-	                _this4.onClickSave();
-	            }), _.if(User.current.hasScope('users'), _.button({ class: 'btn btn-embedded btn-embedded-danger' }, _.span({ class: 'fa fa-trash' })).click(function () {
-	                _this4.onClickRemove();
-	            })))));
-	        }
-	    }]);
-
-	    return UserEditor;
-	}(View);
-
-	module.exports = UserEditor;
-
-/***/ },
-/* 138 */
+/* 136 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -34173,7 +33453,7 @@
 	module.exports = MediaBrowser;
 
 /***/ },
-/* 139 */
+/* 137 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -34240,7 +33520,7 @@
 	module.exports = Content;
 
 /***/ },
-/* 140 */
+/* 138 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -34255,7 +33535,7 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var path = __webpack_require__(141);
+	var path = __webpack_require__(139);
 
 	var Entity = __webpack_require__(37);
 
@@ -34424,7 +33704,7 @@
 	module.exports = Media;
 
 /***/ },
-/* 141 */
+/* 139 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
@@ -34651,7 +33931,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(13)))
 
 /***/ },
-/* 142 */
+/* 140 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -34740,6 +34020,10 @@
 	            if (this.isAdmin) {
 	                return true;
 	            }
+
+	            if (!project) {
+	                return false;
+	            }
 	            if (!scope && !this.scopes[project]) {
 	                return false;
 	            }
@@ -34758,7 +34042,7 @@
 	module.exports = User;
 
 /***/ },
-/* 143 */
+/* 141 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -34817,7 +34101,7 @@
 	module.exports = Template;
 
 /***/ },
-/* 144 */
+/* 142 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -34830,7 +34114,7 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var MediaHelperCommon = __webpack_require__(145);
+	var MediaHelperCommon = __webpack_require__(143);
 
 	var MediaHelper = function (_MediaHelperCommon) {
 	    _inherits(MediaHelper, _MediaHelperCommon);
@@ -34923,7 +34207,7 @@
 	module.exports = MediaHelper;
 
 /***/ },
-/* 145 */
+/* 143 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -34934,7 +34218,7 @@
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var Media = __webpack_require__(140);
+	var Media = __webpack_require__(138);
 
 	var MediaHelper = function () {
 	    function MediaHelper() {
@@ -35009,7 +34293,7 @@
 	module.exports = MediaHelper;
 
 /***/ },
-/* 146 */
+/* 144 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -35022,9 +34306,9 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var ConnectionHelperCommon = __webpack_require__(147);
+	var ConnectionHelperCommon = __webpack_require__(145);
 
-	var Connection = __webpack_require__(148);
+	var Connection = __webpack_require__(146);
 
 	var ConnectionHelper = function (_ConnectionHelperComm) {
 	    _inherits(ConnectionHelper, _ConnectionHelperComm);
@@ -35082,7 +34366,7 @@
 	module.exports = ConnectionHelper;
 
 /***/ },
-/* 147 */
+/* 145 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -35251,7 +34535,7 @@
 	module.exports = ConnectionHelper;
 
 /***/ },
-/* 148 */
+/* 146 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -35540,7 +34824,7 @@
 	module.exports = Connection;
 
 /***/ },
-/* 149 */
+/* 147 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -35555,9 +34839,9 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var ContentHelperCommon = __webpack_require__(150);
+	var ContentHelperCommon = __webpack_require__(148);
 
-	var Content = __webpack_require__(139);
+	var Content = __webpack_require__(137);
 
 	var ContentHelper = function (_ContentHelperCommon) {
 	    _inherits(ContentHelper, _ContentHelperCommon);
@@ -35654,7 +34938,7 @@
 	module.exports = ContentHelper;
 
 /***/ },
-/* 150 */
+/* 148 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -35816,7 +35100,7 @@
 	module.exports = ContentHelper;
 
 /***/ },
-/* 151 */
+/* 149 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -35831,10 +35115,10 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var FieldSchema = __webpack_require__(152);
+	var FieldSchema = __webpack_require__(150);
 
 	// Helpers
-	var SchemaHelperCommon = __webpack_require__(154);
+	var SchemaHelperCommon = __webpack_require__(152);
 
 	/**
 	 * Schema helper
@@ -35932,7 +35216,7 @@
 	module.exports = SchemaHelper;
 
 /***/ },
-/* 152 */
+/* 150 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -35947,7 +35231,7 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var Schema = __webpack_require__(153);
+	var Schema = __webpack_require__(151);
 
 	/**
 	 * Schema for content fields
@@ -36004,7 +35288,7 @@
 	module.exports = FieldSchema;
 
 /***/ },
-/* 153 */
+/* 151 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -36070,7 +35354,7 @@
 	module.exports = Schema;
 
 /***/ },
-/* 154 */
+/* 152 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -36081,8 +35365,8 @@
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var FieldSchema = __webpack_require__(152);
-	var ContentSchema = __webpack_require__(155);
+	var FieldSchema = __webpack_require__(150);
+	var ContentSchema = __webpack_require__(153);
 
 	/**
 	 * The common base for SchemaHelper
@@ -36136,7 +35420,7 @@
 	module.exports = SchemaHelper;
 
 /***/ },
-/* 155 */
+/* 153 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -36151,7 +35435,7 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var Schema = __webpack_require__(153);
+	var Schema = __webpack_require__(151);
 
 	/**
 	 * Schema for content nodes
@@ -36187,7 +35471,7 @@
 	module.exports = ContentSchema;
 
 /***/ },
-/* 156 */
+/* 154 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -36237,23 +35521,23 @@
 	};
 
 /***/ },
-/* 157 */
+/* 155 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
+	__webpack_require__(156);
+	__webpack_require__(157);
 	__webpack_require__(158);
 	__webpack_require__(159);
 	__webpack_require__(160);
 	__webpack_require__(161);
 	__webpack_require__(162);
 	__webpack_require__(163);
-	__webpack_require__(164);
-	__webpack_require__(165);
-	__webpack_require__(166);
+	__webpack_require__(171);
 
 /***/ },
-/* 158 */
+/* 156 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -36312,7 +35596,7 @@
 	});
 
 /***/ },
-/* 159 */
+/* 157 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -36376,7 +35660,7 @@
 	});
 
 /***/ },
-/* 160 */
+/* 158 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -36424,7 +35708,7 @@
 	});
 
 /***/ },
-/* 161 */
+/* 159 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -36449,7 +35733,7 @@
 	});
 
 /***/ },
-/* 162 */
+/* 160 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -36505,7 +35789,7 @@
 	});
 
 /***/ },
-/* 163 */
+/* 161 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -36545,7 +35829,7 @@
 	});
 
 /***/ },
-/* 164 */
+/* 162 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -36578,7 +35862,7 @@
 	});
 
 /***/ },
-/* 165 */
+/* 163 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -36615,7 +35899,14 @@
 	});
 
 /***/ },
-/* 166 */
+/* 164 */,
+/* 165 */,
+/* 166 */,
+/* 167 */,
+/* 168 */,
+/* 169 */,
+/* 170 */,
+/* 171 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -36648,6 +35939,392 @@
 	        location.hash = '/';
 	    }
 	});
+
+/***/ },
+/* 172 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var UserEditor = function (_View) {
+	    _inherits(UserEditor, _View);
+
+	    function UserEditor(params) {
+	        _classCallCheck(this, UserEditor);
+
+	        var _this = _possibleConstructorReturn(this, (UserEditor.__proto__ || Object.getPrototypeOf(UserEditor)).call(this, params));
+
+	        _this.$element = _.div({ class: 'user-editor' });
+
+	        _this.modal = UI.confirmModal('save', 'Settings for "' + _this.getLabel() + '"', _this.$element, function () {
+	            _this.onClickSave(_this.model);
+
+	            return false;
+	        });
+
+	        _this.modal.$element.addClass('modal-user-editor');
+
+	        apiCall('get', 'server/projects').then(function (projects) {
+	            _this.projects = projects;
+	            _this.init();
+	        });
+	        return _this;
+	    }
+
+	    /**
+	     * Gets the user label
+	     *
+	     * @returns {String} Label
+	     */
+
+
+	    _createClass(UserEditor, [{
+	        key: 'getLabel',
+	        value: function getLabel() {
+	            return this.model.fullName || this.model.username || this.model.email || this.model.id;
+	        }
+
+	        /**
+	         * Event: Click save.
+	         */
+
+	    }, {
+	        key: 'onClickSave',
+	        value: function onClickSave() {
+	            var _this2 = this;
+
+	            apiCall('post', 'users/' + this.model.id, this.model).then(function () {
+	                _this2.modal.hide();
+
+	                _this2.trigger('save');
+	            }).catch(errorModal);
+	        }
+
+	        /**
+	         * Gets a list of available scopes
+	         *
+	         * @returns {Array} Array of scope strings
+	         */
+
+	    }, {
+	        key: 'getScopes',
+	        value: function getScopes() {
+	            return ['connections', 'schemas', 'settings', 'templates', 'users'];
+	        }
+
+	        /**
+	         * Gets a list of user scopes
+	         *
+	         * @param {String} project
+	         *
+	         * @returns {Array} Array of scope strings
+	         */
+
+	    }, {
+	        key: 'getUserScopes',
+	        value: function getUserScopes(project) {
+	            if (!this.model.scopes) {
+	                this.model.scopes = {};
+	            }
+
+	            if (!this.model.scopes[project]) {
+	                this.model.scopes[project] = [];
+	            }
+
+	            return this.model.scopes[project];
+	        }
+
+	        /**
+	         * Renders the username editor
+	         *
+	         * @returns {HTMLElement} Element
+	         */
+
+	    }, {
+	        key: 'renderUserNameEditor',
+	        value: function renderUserNameEditor() {
+	            var view = this;
+
+	            function onInputChange() {
+	                view.model.username = $(this).val();
+	            }
+
+	            var $element = _.div({ class: 'username-editor' }, _.input({
+	                class: 'form-control',
+	                type: 'text',
+	                value: view.model.username,
+	                placeholder: 'Input the username here'
+	            }).on('change', onInputChange));
+
+	            return $element;
+	        }
+
+	        /**
+	         * Renders the scopes editor
+	         *
+	         * @param {String} project
+	         *
+	         * @returns {HTMLElement} Element
+	         */
+
+	    }, {
+	        key: 'renderScopesEditor',
+	        value: function renderScopesEditor(project) {
+	            var view = this;
+
+	            function onChange() {
+	                view.getUserScopes(project).splice(0, view.getUserScopes(project).length);
+
+	                $element.find('.scopes .scope .dropdown .dropdown-toggle').each(function () {
+	                    view.getUserScopes(project).push($(this).attr('data-id'));
+	                });
+
+	                render();
+	            }
+
+	            function onClickAdd() {
+	                var newScope = '';
+
+	                var _iteratorNormalCompletion = true;
+	                var _didIteratorError = false;
+	                var _iteratorError = undefined;
+
+	                try {
+	                    for (var _iterator = view.getScopes()[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	                        var scope = _step.value;
+
+	                        if (view.getUserScopes(project).indexOf(scope) < 0) {
+	                            newScope = scope;
+	                            break;
+	                        }
+	                    }
+	                } catch (err) {
+	                    _didIteratorError = true;
+	                    _iteratorError = err;
+	                } finally {
+	                    try {
+	                        if (!_iteratorNormalCompletion && _iterator.return) {
+	                            _iterator.return();
+	                        }
+	                    } finally {
+	                        if (_didIteratorError) {
+	                            throw _iteratorError;
+	                        }
+	                    }
+	                }
+
+	                if (newScope) {
+	                    view.getUserScopes(project).push(newScope);
+
+	                    render();
+	                }
+	            }
+
+	            function render() {
+	                _.append($element.empty(), _.div({ class: 'scopes chip-group' }, _.each(view.getUserScopes(project), function (i, userScope) {
+	                    try {
+	                        var _ret = function () {
+	                            var $scope = _.div({ class: 'chip scope' }, _.div({ class: 'chip-label dropdown' }, _.button({ class: 'dropdown-toggle', 'data-id': userScope, 'data-toggle': 'dropdown' }, userScope), _.ul({ class: 'dropdown-menu' }, _.each(view.getScopes(), function (i, scope) {
+	                                if (scope == userScope || view.getUserScopes(project).indexOf(scope) < 0) {
+	                                    return _.li(_.a({ href: '#', 'data-id': scope }, scope).click(function (e) {
+	                                        e.preventDefault();
+
+	                                        var $btn = $(this).parents('.dropdown').children('.dropdown-toggle');
+
+	                                        $btn.text($(this).text());
+	                                        $btn.attr('data-id', $(this).attr('data-id'));
+
+	                                        onChange();
+	                                    }));
+	                                }
+	                            }))).change(onChange), _.button({ class: 'btn chip-remove' }, _.span({ class: 'fa fa-remove' })).click(function () {
+	                                $scope.remove();
+
+	                                onChange();
+	                            }));
+
+	                            return {
+	                                v: $scope
+	                            };
+	                        }();
+
+	                        if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+	                    } catch (e) {
+	                        UI.errorModal(e);
+	                    }
+	                }), _.button({ class: 'btn chip-add' }, _.span({ class: 'fa fa-plus' })).click(onClickAdd)));
+	            }
+
+	            var $element = _.div({ class: 'scopes-editor' });
+
+	            render();
+
+	            return $element;
+	        }
+
+	        /**
+	         * Renders the full name editor
+	         *
+	         * @return {HTMLElement} Element
+	         */
+
+	    }, {
+	        key: 'renderFullNameEditor',
+	        value: function renderFullNameEditor() {
+	            var view = this;
+
+	            function onChange() {
+	                var fullName = $(this).val();
+
+	                view.model.fullName = fullName;
+	            }
+
+	            return _.div({ class: 'full-name-editor' }, _.input({ class: 'form-control', type: 'text', value: this.model.fullName }).change(onChange));
+	        }
+
+	        /**
+	         * Renders the email editor
+	         *
+	         * @return {HTMLElement} Element
+	         */
+
+	    }, {
+	        key: 'renderEmailEditor',
+	        value: function renderEmailEditor() {
+	            var view = this;
+
+	            function onChange() {
+	                var email = $(this).val();
+
+	                view.model.email = email;
+	            }
+
+	            return _.div({ class: 'full-name-editor' }, _.input({ class: 'form-control', type: 'email', value: this.model.email }).change(onChange));
+	        }
+
+	        /**
+	         * Renders the password
+	         *
+	         * @return {HTMLElement} Element
+	         */
+
+	    }, {
+	        key: 'renderPasswordEditor',
+	        value: function renderPasswordEditor() {
+	            var view = this;
+
+	            var password1 = void 0;
+	            var password2 = void 0;
+
+	            function onChange1() {
+	                password1 = $(this).val();
+
+	                var isValid = password1 == password2;
+
+	                $element.toggleClass('invalid', !isValid);
+
+	                if (isValid) {
+	                    view.model.password = password1;
+	                } else {
+	                    view.model.password = null;
+	                }
+	            }
+
+	            function onChange2() {
+	                password2 = $(this).val();
+
+	                var isValid = password1 == password2;
+
+	                $element.toggleClass('invalid', !isValid);
+
+	                if (isValid) {
+	                    view.model.password = password1;
+	                } else {
+	                    view.model.password = null;
+	                }
+	            }
+
+	            var $element = _.div({ class: 'password-editor' }, _.span({ class: 'invalid-message' }, 'Passwords to not match'), _.input({ class: 'form-control', type: 'password', placeholder: 'Type new password' }).on('change propertychange keyup paste input', onChange1), _.input({ class: 'form-control', type: 'password', placeholder: 'Confirm new password' }).on('change propertychange keyup paste input', onChange2));
+
+	            return $element;
+	        }
+
+	        /**
+	         * Renders the admin editor
+	         *
+	         * @return {HTMLElement} Element
+	         */
+
+	    }, {
+	        key: 'renderAdminEditor',
+	        value: function renderAdminEditor() {
+	            var _this3 = this;
+
+	            return UI.inputSwitch(this.model.isAdmin == true, function (newValue) {
+	                _this3.model.isAdmin = newValue;
+
+	                _this3.render();
+	            }).addClass('admin-editor');
+	        }
+
+	        /**
+	         * Renders a single field
+	         *
+	         * @return {HTMLElement} Element
+	         */
+
+	    }, {
+	        key: 'renderField',
+	        value: function renderField(label, $content) {
+	            return _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, label), _.div({ class: 'field-value' }, $content));
+	        }
+
+	        /**
+	         * Renders all fields
+	         *
+	         * @return {Object} element
+	         */
+
+	    }, {
+	        key: 'renderFields',
+	        value: function renderFields() {
+	            var id = parseInt(this.model.id);
+
+	            return $element;
+	        }
+	    }, {
+	        key: 'render',
+	        value: function render() {
+	            var _this4 = this;
+
+	            _.append(this.$element.empty(), this.renderField('Username', this.renderUserNameEditor()), this.renderField('Full name', this.renderFullNameEditor()), this.renderField('Email', this.renderEmailEditor()), this.renderField('Password', this.renderPasswordEditor()), _.if(User.current.hasScope('users'), this.renderField('Is admin', this.renderAdminEditor()), _.if(!this.model.isAdmin, _.each(this.projects, function (i, project) {
+	                var hasProject = _this4.model.scopes[project] != undefined;
+
+	                return _.div({ class: 'project' }, UI.inputSwitch(hasProject, function (newValue) {
+	                    if (newValue) {
+	                        _this4.model.scopes[project] = {};
+	                    } else {
+	                        delete _this4.model.scopes[project];
+	                    }
+	                }), _.h4(project), _this4.renderScopesEditor(project));
+	            }))));
+	        }
+	    }]);
+
+	    return UserEditor;
+	}(View);
+
+	module.exports = UserEditor;
 
 /***/ }
 /******/ ]);

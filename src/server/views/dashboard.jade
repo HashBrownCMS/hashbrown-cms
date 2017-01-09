@@ -29,6 +29,12 @@ html
                             .pane-text
                                 .pane-label
                                     |  Projects
+                        a(href='#users')
+                            .pane-icon
+                                span.fa.fa-folder
+                            .pane-text
+                                .pane-label
+                                    |  Users
                         a(href='#diagnostics')
                             .pane-icon
                                 span.fa.fa-pie-chart
@@ -65,7 +71,18 @@ html
 
                         if(user.isAdmin)
                             .project-actions
-                                button.btn.btn-primary.btn-round.btn-raised.btn-create-project +
+                                button.btn.btn-primary.btn-round.btn-raised.btn-create-project(title='Create project') +
+
+                if(user.isAdmin)
+                    section
+                        h4 
+                            a#users USERS
+
+                        .users
+                            .user-list
+                                
+                            .user-actions
+                                button.btn.btn-primary.btn-round.btn-raised.btn-invite-user(title='Invite user') +
                 
                 section
                     h4 

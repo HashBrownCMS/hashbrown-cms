@@ -1121,6 +1121,57 @@ body > .dashboard-container {
         body > .dashboard-container .workspace .diagnostics tr td:first-child {
           min-width: 200px;
           font-weight: bold; }
+    body > .dashboard-container .workspace .users .btn-invite-user {
+      display: block;
+      margin-left: auto;
+      margin-top: 30px; }
+    body > .dashboard-container .workspace .users .user-list {
+      max-width: 600px;
+      margin: 0px auto;
+      max-height: 600px;
+      overflow-y: auto; }
+      body > .dashboard-container .workspace .users .user-list .user {
+        padding: 15px 0px;
+        border-bottom: 1px solid #eeeeee;
+        display: flex; }
+        body > .dashboard-container .workspace .users .user-list .user:last-child {
+          border-bottom: 0px; }
+        body > .dashboard-container .workspace .users .user-list .user.expanded .user-editor {
+          display: block; }
+        body > .dashboard-container .workspace .users .user-list .user .btn-remove {
+          position: static; }
+          body > .dashboard-container .workspace .users .user-list .user .btn-remove .fa {
+            background-color: #bdbdbd;
+            width: 16px;
+            line-height: 16px; }
+            body > .dashboard-container .workspace .users .user-list .user .btn-remove .fa:before {
+              margin-right: -1px; }
+            body > .dashboard-container .workspace .users .user-list .user .btn-remove .fa:hover {
+              background-color: #e53935; }
+        body > .dashboard-container .workspace .users .user-list .user .btn-edit {
+          flex-grow: 1;
+          display: flex;
+          text-align: left;
+          padding: 0px;
+          margin: 0px;
+          background-color: transparent;
+          text-transform: none;
+          font-weight: normal;
+          align-items: center; }
+        body > .dashboard-container .workspace .users .user-list .user .user-editor {
+          display: none; }
+        body > .dashboard-container .workspace .users .user-list .user .fa {
+          width: 40px;
+          line-height: 40px;
+          text-align: center;
+          border-radius: 50%;
+          background-color: #1e88e5;
+          color: #fff;
+          margin-right: 15px; }
+        body > .dashboard-container .workspace .users .user-list .user .user-info {
+          flex-grow: 1; }
+          body > .dashboard-container .workspace .users .user-list .user .user-info h4, body > .dashboard-container .workspace .users .user-list .user .user-info p {
+            margin: 0px; }
     body > .dashboard-container .workspace .projects .btn-create-project {
       display: block;
       margin-left: auto;
@@ -1165,11 +1216,12 @@ body > .dashboard-container {
             margin-left: auto; }
           body > .dashboard-container .workspace .projects .project-editor .body .environments .environment {
             width: 100%;
-            margin-bottom: 15px; }
+            margin-bottom: 15px;
+            display: flex; }
             body > .dashboard-container .workspace .projects .project-editor .body .environments .environment:last-of-type {
               margin-bottom: 0px; }
-            body > .dashboard-container .workspace .projects .project-editor .body .environments .environment .btn {
-              max-width: 110px; }
+            body > .dashboard-container .workspace .projects .project-editor .body .environments .environment .btn-group {
+              width: 100%; }
             body > .dashboard-container .workspace .projects .project-editor .body .environments .environment .dropdown .dropdown-toggle {
               width: 30px;
               line-height: 30px;
@@ -1177,11 +1229,12 @@ body > .dashboard-container {
               height: 30px;
               margin: 0px -5px 0px 15px; }
             body > .dashboard-container .workspace .projects .project-editor .body .environments .environment .environment-title {
-              line-height: 30px;
-              font-weight: 700;
-              width: 100px;
-              flex-shrink: 0;
-              flex-grow: 1; }
+              flex-grow: 1;
+              line-height: 30px; }
+            body > .dashboard-container .workspace .projects .project-editor .body .environments .environment .btn-primary {
+              min-width: 0px; }
+              body > .dashboard-container .workspace .projects .project-editor .body .environments .environment .btn-primary .fa {
+                line-height: 30px; }
 
 .modal.modal-icon-picker .modal-dialog {
   width: calc(100% - 30px);
@@ -1818,26 +1871,36 @@ body > .dashboard-container {
           color: #f44336;
           line-height: 34px; }
 
-.user-editor {
-  height: 100%;
-  display: flex;
-  flex-direction: column; }
-  .user-editor > .user {
-    flex-grow: 1;
-    overflow-y: auto;
-    padding: 15px; }
-    .user-editor > .user .password-editor.invalid .invalid-message {
-      display: block; }
-    .user-editor > .user .password-editor .invalid-message {
-      display: none;
-      position: absolute;
-      left: 15px;
-      margin-top: 30px;
-      padding: 5px 10px;
-      background-color: #e53935;
-      color: #fff;
-      border-radius: 2px;
-      font-weight: 700; }
+.modal-user-editor .modal-dialog {
+  max-width: 800px; }
+
+.modal-user-editor .user-editor {
+  padding: 0px 34px; }
+  .modal-user-editor .user-editor .project .switch {
+    float: right; }
+  .modal-user-editor .user-editor .field-container {
+    display: flex;
+    margin-bottom: 30px; }
+    .modal-user-editor .user-editor .field-container:last-child {
+      margin-bottom: 0px; }
+    .modal-user-editor .user-editor .field-container .field-key {
+      width: 200px;
+      line-height: 30px;
+      flex-shrink: 0; }
+    .modal-user-editor .user-editor .field-container .field-value {
+      flex-grow: 1; }
+  .modal-user-editor .user-editor .password-editor.invalid .invalid-message {
+    display: block; }
+  .modal-user-editor .user-editor .password-editor .invalid-message {
+    display: none;
+    position: absolute;
+    left: 15px;
+    margin-top: 30px;
+    padding: 5px 10px;
+    background-color: #e53935;
+    color: #fff;
+    border-radius: 2px;
+    font-weight: 700; }
 
 @media (max-width: 991px) {
   .navspace {

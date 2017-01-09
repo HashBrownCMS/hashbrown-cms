@@ -3,75 +3,50 @@
 class UserEditor extends View {
     constructor(params) {
         super(params);
-        
-        this.$element = _.div({class: 'editor user-editor'});
 
-        this.init();
+        this.$element = _.div({class: 'user-editor'});
+
+        this.modal = UI.confirmModal(
+            'save',
+            'Settings for "' + this.getLabel() + '"', this.$element,
+            () => {
+                this.onClickSave(this.model);
+
+                return false;
+            }
+        );
+
+        this.modal.$element.addClass('modal-user-editor');
+
+        apiCall('get', 'server/projects')
+        .then((projects) => {
+            this.projects = projects;
+            this.init();
+        });
     }
     
+    /**
+     * Gets the user label
+     *
+     * @returns {String} Label
+     */
+    getLabel() {
+        return this.model.fullName || this.model.username || this.model.email || this.model.id;
+    }
+
     /**
      * Event: Click save.
      */
     onClickSave() {
-        this.$saveBtn.toggleClass('working', true);
-
         apiCall('post', 'users/' + this.model.id, this.model)
         .then(() => {
-            this.$saveBtn.toggleClass('working', false);
-        
-            return reloadResource('users');
-        })
-        .then(() => {
-            let navbar = ViewHelper.get('NavbarMain');
-            
-            navbar.reload();
+            this.modal.hide();
+
+            this.trigger('save');
         })
         .catch(errorModal);
     }
     
-    /**
-     * Event: Click remove User
-     */
-    onClickRemove() {
-        let id = this.model.id;
-        let name = this.model.username;
-        
-        function onSuccess() {
-            reloadResource('users')
-            .then(function() {
-                ViewHelper.get('NavbarMain').reload();
-                
-                location.hash = '/users/';
-            });
-        }
-
-        function onClickOK() {
-            apiCall('delete', 'users/' + id)
-            .then(onSuccess)
-            .catch(errorModal);
-        }
-
-        new MessageModal({
-            model: {
-                title: 'Delete user',
-                body: 'Are you sure you want to remove the user "' + name + '"?'
-            },
-            buttons: [
-                {
-                    label: 'Cancel',
-                    class: 'btn-default',
-                    callback: function() {
-                    }
-                },
-                {
-                    label: 'Remove',
-                    class: 'btn-danger',
-                    callback: onClickOK
-                }
-            ]
-        });
-    }
-
     
     /**
      * Gets a list of available scopes
@@ -91,11 +66,11 @@ class UserEditor extends View {
     /**
      * Gets a list of user scopes
      *
+     * @param {String} project
+     *
      * @returns {Array} Array of scope strings
      */
-    getUserScopes() {
-        let project = ProjectHelper.currentProject;
-
+    getUserScopes(project) {
         if(!this.model.scopes) {
             this.model.scopes = {};
         }
@@ -134,16 +109,18 @@ class UserEditor extends View {
     /**
      * Renders the scopes editor
      *
+     * @param {String} project
+     *
      * @returns {HTMLElement} Element
      */
-    renderScopesEditor() {
+    renderScopesEditor(project) {
         let view = this;
 
         function onChange() {
-            view.getUserScopes().splice(0, view.getUserScopes().length);
+            view.getUserScopes(project).splice(0, view.getUserScopes(project).length);
             
             $element.find('.scopes .scope .dropdown .dropdown-toggle').each(function() {
-                 view.getUserScopes().push($(this).attr('data-id'));
+                 view.getUserScopes(project).push($(this).attr('data-id'));
             });
 
             render();
@@ -153,14 +130,14 @@ class UserEditor extends View {
             let newScope = '';
 
             for(let scope of view.getScopes()) {
-                if(view.getUserScopes().indexOf(scope) < 0) {
+                if(view.getUserScopes(project).indexOf(scope) < 0) {
                     newScope = scope
                     break;
                 }
             }
 
             if(newScope) {
-                view.getUserScopes().push(newScope);
+                view.getUserScopes(project).push(newScope);
 
                 render();
             }
@@ -169,7 +146,7 @@ class UserEditor extends View {
         function render() {
             _.append($element.empty(),
                 _.div({class: 'scopes chip-group'},
-                    _.each(view.getUserScopes(), (i, userScope) => {
+                    _.each(view.getUserScopes(project), (i, userScope) => {
                         try {
                             let $scope = _.div({class: 'chip scope'},
                                 _.div({class: 'chip-label dropdown'},
@@ -178,7 +155,7 @@ class UserEditor extends View {
                                     ),
                                     _.ul({class: 'dropdown-menu'},
                                         _.each(view.getScopes(), (i, scope) => {
-                                            if(scope == userScope || view.getUserScopes().indexOf(scope) < 0) {
+                                            if(scope == userScope || view.getUserScopes(project).indexOf(scope) < 0) {
                                                 return _.li(
                                                     _.a({href: '#', 'data-id': scope},
                                                         scope
@@ -328,6 +305,8 @@ class UserEditor extends View {
     renderAdminEditor() {
         return UI.inputSwitch(this.model.isAdmin == true, (newValue) => {
             this.model.isAdmin = newValue;
+
+            this.render();
         }).addClass('admin-editor');
     }
 
@@ -355,39 +334,37 @@ class UserEditor extends View {
     renderFields() {
         let id = parseInt(this.model.id);
 
-        let $element = _.div({class: 'user editor-body'});
-        
-        $element.append(this.renderField('Username', this.renderUserNameEditor()));
-        $element.append(this.renderField('Full name', this.renderFullNameEditor()));
-        $element.append(this.renderField('Email', this.renderEmailEditor()));
-        $element.append(this.renderField('Password', this.renderPasswordEditor()));
-
-        if(User.current.hasScope('users')) {
-            $element.append(this.renderField('Is admin', this.renderAdminEditor()));
-            $element.append(this.renderField('Scopes', this.renderScopesEditor()));
-        }
 
         return $element;
     }
     
     render() {
         _.append(this.$element.empty(),
-            _.div({class: 'editor-header'},
-                _.span({class: 'fa fa-user'}),
-                _.h4(this.model.username || this.model.email)
-            ),
-            this.renderFields(),
-            _.div({class: 'editor-footer'}, 
-                _.div({class: 'btn-group'},
-                    this.$saveBtn = _.button({class: 'btn btn-primary btn-raised btn-save'},
-                        _.span({class: 'text-default'}, 'Save '),
-                        _.span({class: 'text-working'}, 'Saving ')
-                    ).click(() => { this.onClickSave(); }),
-                    _.if(User.current.hasScope('users'), 
-                        _.button({class: 'btn btn-embedded btn-embedded-danger'},
-                            _.span({class: 'fa fa-trash'})
-                        ).click(() => { this.onClickRemove(); })
-                    )
+            this.renderField('Username', this.renderUserNameEditor()),
+            this.renderField('Full name', this.renderFullNameEditor()),
+            this.renderField('Email', this.renderEmailEditor()),
+            this.renderField('Password', this.renderPasswordEditor()),
+
+            _.if(User.current.hasScope('users'),
+                this.renderField('Is admin', this.renderAdminEditor()),
+
+                _.if(!this.model.isAdmin,
+                    _.each(this.projects, (i, project) => {
+                        let hasProject =
+                            this.model.scopes[project] != undefined;
+
+                        return _.div({class: 'project'},
+                            UI.inputSwitch(hasProject, (newValue) => {
+                                if(newValue) {
+                                    this.model.scopes[project] = {};
+                                } else {
+                                    delete this.model.scopes[project];
+                                }   
+                            }),
+                            _.h4(project),
+                            this.renderScopesEditor(project)
+                        );
+                    })
                 )
             )
         );

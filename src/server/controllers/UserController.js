@@ -18,8 +18,9 @@ class UserController extends ApiController {
         app.post('/api/user/login', this.login);
         app.post('/api/:project/:environment/users/new', this.middleware({scope: 'users'}), this.createUser);
         app.post('/api/:project/:environment/users/:id', this.postUser);
+        app.post('/api/users/:id', this.postUser);
         
-        app.delete('/api/:project/:environment/users/:id', this.middleware({scope: 'users'}), this.deleteUser);
+        app.delete('/api/users/:id', this.middleware({scope: 'users', setProject: false}), this.deleteUser);
     }    
     
     /**
@@ -180,9 +181,8 @@ class UserController extends ApiController {
      */
     static deleteUser(req, res) {
         let id = req.params.id;
-        let scope = req.params.project;
 
-        UserHelper.removeUserProjectScope(id, scope)
+        UserHelper.removeUser(id)
         .then((user) => {
             res.status(200).send(user);
         })
