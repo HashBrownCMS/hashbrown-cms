@@ -4,11 +4,27 @@
     }
     
     .user-editor {
-        padding: 0px 34px;
-
         .project {
-            .switch {
-                float: right;
+            padding: 15px 0px;
+            border-top: 1px solid material-color('grey', '200');
+
+            .project-header {
+                display: flex;
+
+                .project-title {
+                    flex-grow: 1;
+                    margin: 0px 0px 0px 30px;
+                    line-height: 30px;
+                }
+            }
+
+            .project-scopes {
+                margin-left: 60px;
+                display: flex;
+
+                p {
+                    margin-right: 15px;
+                }
             }
         }
 

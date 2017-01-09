@@ -157,6 +157,10 @@ body >.dashboard-container {
                         position: static;
 
                         .fa {
+                            text-align: center;
+                            border-radius: 50%;
+                            margin-right: 15px;
+                            color: #fff;
                             background-color: material-color('grey', '400');
                             width: 16px;
                             line-height: 16px;
@@ -187,7 +191,7 @@ body >.dashboard-container {
                         display: none;
                     }
 
-                    .fa {
+                    .user-icon {
                         width: 40px;
                         line-height: 40px;
                         text-align: center;
@@ -195,6 +199,7 @@ body >.dashboard-container {
                         background-color: material-color('blue', '600');
                         color: #fff;
                         margin-right: 15px;
+                        font-size: 18px;
                     }
 
                     .user-info {

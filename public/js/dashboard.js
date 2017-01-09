@@ -52,19 +52,19 @@
 	__webpack_require__(2);
 
 	// Get package file
-	window.app = __webpack_require__(154);
+	window.app = __webpack_require__(155);
 
 	// Views
-	window.ProjectEditor = __webpack_require__(164);
-	window.BackupEditor = __webpack_require__(165);
-	window.MigrationEditor = __webpack_require__(166);
-	window.InfoEditor = __webpack_require__(167);
-	window.LanguageEditor = __webpack_require__(168);
-	window.UserEditor = __webpack_require__(172);
+	window.ProjectEditor = __webpack_require__(166);
+	window.BackupEditor = __webpack_require__(167);
+	window.MigrationEditor = __webpack_require__(168);
+	window.InfoEditor = __webpack_require__(169);
+	window.LanguageEditor = __webpack_require__(170);
+	window.UserEditor = __webpack_require__(136);
 
 	// Models
-	window.Project = __webpack_require__(169);
-	window.User = __webpack_require__(140);
+	window.Project = __webpack_require__(171);
+	window.User = __webpack_require__(141);
 
 	// Get current user
 	apiCall('get', 'user').then(function (user) {
@@ -19683,11 +19683,399 @@
 /* 133 */,
 /* 134 */,
 /* 135 */,
-/* 136 */,
+/* 136 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var UserEditor = function (_View) {
+	    _inherits(UserEditor, _View);
+
+	    function UserEditor(params) {
+	        _classCallCheck(this, UserEditor);
+
+	        var _this = _possibleConstructorReturn(this, (UserEditor.__proto__ || Object.getPrototypeOf(UserEditor)).call(this, params));
+
+	        _this.$element = _.div({ class: 'user-editor' });
+
+	        _this.modal = UI.confirmModal('save', 'Settings for "' + _this.getLabel() + '"', _this.$element, function () {
+	            _this.onClickSave();
+
+	            return false;
+	        });
+
+	        _this.modal.$element.addClass('modal-user-editor');
+
+	        apiCall('get', 'server/projects').then(function (projects) {
+	            _this.projects = projects;
+	            _this.init();
+	        });
+	        return _this;
+	    }
+
+	    /**
+	     * Gets the user label
+	     *
+	     * @returns {String} Label
+	     */
+
+
+	    _createClass(UserEditor, [{
+	        key: 'getLabel',
+	        value: function getLabel() {
+	            return this.model.fullName || this.model.username || this.model.email || this.model.id;
+	        }
+
+	        /**
+	         * Event: Click save.
+	         */
+
+	    }, {
+	        key: 'onClickSave',
+	        value: function onClickSave() {
+	            var _this2 = this;
+
+	            var newUserObject = this.model.getObject();
+
+	            if (this.newPassword) {
+	                newUserObject.password = this.newPassword;
+	            }
+
+	            apiCall('post', 'users/' + this.model.id, newUserObject).then(function () {
+	                _this2.modal.hide();
+
+	                _this2.trigger('save');
+	            }).catch(errorModal);
+	        }
+
+	        /**
+	         * Gets a list of available scopes
+	         *
+	         * @returns {Array} Array of scope strings
+	         */
+
+	    }, {
+	        key: 'getScopes',
+	        value: function getScopes() {
+	            return ['connections', 'schemas', 'settings', 'templates', 'users'];
+	        }
+
+	        /**
+	         * Gets a list of user scopes
+	         *
+	         * @param {String} project
+	         *
+	         * @returns {Array} Array of scope strings
+	         */
+
+	    }, {
+	        key: 'getUserScopes',
+	        value: function getUserScopes(project) {
+	            if (!this.model.scopes) {
+	                this.model.scopes = {};
+	            }
+
+	            if (!this.model.scopes[project]) {
+	                this.model.scopes[project] = [];
+	            }
+
+	            return this.model.scopes[project];
+	        }
+
+	        /**
+	         * Renders the username editor
+	         *
+	         * @returns {HTMLElement} Element
+	         */
+
+	    }, {
+	        key: 'renderUserNameEditor',
+	        value: function renderUserNameEditor() {
+	            var view = this;
+
+	            function onInputChange() {
+	                view.model.username = $(this).val();
+	            }
+
+	            var $element = _.div({ class: 'username-editor' }, _.input({
+	                class: 'form-control',
+	                type: 'text',
+	                value: view.model.username,
+	                placeholder: 'Input the username here'
+	            }).on('change', onInputChange));
+
+	            return $element;
+	        }
+
+	        /**
+	         * Renders the scopes editor
+	         *
+	         * @param {String} project
+	         *
+	         * @returns {HTMLElement} Element
+	         */
+
+	    }, {
+	        key: 'renderScopesEditor',
+	        value: function renderScopesEditor(project) {
+	            var view = this;
+
+	            function onChange() {
+	                view.getUserScopes(project).splice(0, view.getUserScopes(project).length);
+
+	                $element.find('.scopes .scope .dropdown .dropdown-toggle').each(function () {
+	                    view.getUserScopes(project).push($(this).attr('data-id'));
+	                });
+
+	                render();
+	            }
+
+	            function onClickAdd() {
+	                var newScope = '';
+
+	                var _iteratorNormalCompletion = true;
+	                var _didIteratorError = false;
+	                var _iteratorError = undefined;
+
+	                try {
+	                    for (var _iterator = view.getScopes()[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	                        var scope = _step.value;
+
+	                        if (view.getUserScopes(project).indexOf(scope) < 0) {
+	                            newScope = scope;
+	                            break;
+	                        }
+	                    }
+	                } catch (err) {
+	                    _didIteratorError = true;
+	                    _iteratorError = err;
+	                } finally {
+	                    try {
+	                        if (!_iteratorNormalCompletion && _iterator.return) {
+	                            _iterator.return();
+	                        }
+	                    } finally {
+	                        if (_didIteratorError) {
+	                            throw _iteratorError;
+	                        }
+	                    }
+	                }
+
+	                if (newScope) {
+	                    view.getUserScopes(project).push(newScope);
+
+	                    render();
+	                }
+	            }
+
+	            function render() {
+	                _.append($element.empty(), _.div({ class: 'scopes chip-group' }, _.each(view.getUserScopes(project), function (i, userScope) {
+	                    try {
+	                        var _ret = function () {
+	                            var $scope = _.div({ class: 'chip scope' }, _.div({ class: 'chip-label dropdown' }, _.button({ class: 'dropdown-toggle', 'data-id': userScope, 'data-toggle': 'dropdown' }, userScope), _.ul({ class: 'dropdown-menu' }, _.each(view.getScopes(), function (i, scope) {
+	                                if (scope == userScope || view.getUserScopes(project).indexOf(scope) < 0) {
+	                                    return _.li(_.a({ href: '#', 'data-id': scope }, scope).click(function (e) {
+	                                        e.preventDefault();
+
+	                                        var $btn = $(this).parents('.dropdown').children('.dropdown-toggle');
+
+	                                        $btn.text($(this).text());
+	                                        $btn.attr('data-id', $(this).attr('data-id'));
+
+	                                        onChange();
+	                                    }));
+	                                }
+	                            }))).change(onChange), _.button({ class: 'btn chip-remove' }, _.span({ class: 'fa fa-remove' })).click(function () {
+	                                $scope.remove();
+
+	                                onChange();
+	                            }));
+
+	                            return {
+	                                v: $scope
+	                            };
+	                        }();
+
+	                        if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+	                    } catch (e) {
+	                        UI.errorModal(e);
+	                    }
+	                }), _.button({ class: 'btn chip-add' }, _.span({ class: 'fa fa-plus' })).click(onClickAdd)));
+	            }
+
+	            var $element = _.div({ class: 'scopes-editor' });
+
+	            render();
+
+	            return $element;
+	        }
+
+	        /**
+	         * Renders the full name editor
+	         *
+	         * @return {HTMLElement} Element
+	         */
+
+	    }, {
+	        key: 'renderFullNameEditor',
+	        value: function renderFullNameEditor() {
+	            var view = this;
+
+	            function onChange() {
+	                var fullName = $(this).val();
+
+	                view.model.fullName = fullName;
+	            }
+
+	            return _.div({ class: 'full-name-editor' }, _.input({ class: 'form-control', type: 'text', value: this.model.fullName }).change(onChange));
+	        }
+
+	        /**
+	         * Renders the email editor
+	         *
+	         * @return {HTMLElement} Element
+	         */
+
+	    }, {
+	        key: 'renderEmailEditor',
+	        value: function renderEmailEditor() {
+	            var view = this;
+
+	            function onChange() {
+	                var email = $(this).val();
+
+	                view.model.email = email;
+	            }
+
+	            return _.div({ class: 'full-name-editor' }, _.input({ class: 'form-control', type: 'email', value: this.model.email }).change(onChange));
+	        }
+
+	        /**
+	         * Renders the password
+	         *
+	         * @return {HTMLElement} Element
+	         */
+
+	    }, {
+	        key: 'renderPasswordEditor',
+	        value: function renderPasswordEditor() {
+	            var view = this;
+
+	            var password1 = void 0;
+	            var password2 = void 0;
+
+	            function onChange() {
+	                var isValid = password1 == password2 && password1 && password1.length > 4;
+
+	                $element.toggleClass('invalid', !isValid);
+
+	                view.$element.find('.model-footer .btn-primary').toggleClass('disabled', !isValid);
+
+	                if (isValid) {
+	                    view.newPassword = password1;
+	                } else {
+	                    view.newPassword = null;
+	                }
+	            }
+
+	            function onChange1() {
+	                password1 = $(this).val();
+
+	                onChange();
+	            }
+
+	            function onChange2() {
+	                password2 = $(this).val();
+	            }
+
+	            var $element = _.div({ class: 'password-editor' }, _.span({ class: 'invalid-message' }, 'Check passwords'), _.input({ class: 'form-control', type: 'password', placeholder: 'Type new password' }).on('change propertychange keyup paste input', onChange1), _.input({ class: 'form-control', type: 'password', placeholder: 'Confirm new password' }).on('change propertychange keyup paste input', onChange2));
+
+	            return $element;
+	        }
+
+	        /**
+	         * Renders the admin editor
+	         *
+	         * @return {HTMLElement} Element
+	         */
+
+	    }, {
+	        key: 'renderAdminEditor',
+	        value: function renderAdminEditor() {
+	            var _this3 = this;
+
+	            return UI.inputSwitch(this.model.isAdmin == true, function (newValue) {
+	                _this3.model.isAdmin = newValue;
+
+	                _this3.render();
+	            }).addClass('admin-editor');
+	        }
+
+	        /**
+	         * Renders a single field
+	         *
+	         * @return {HTMLElement} Element
+	         */
+
+	    }, {
+	        key: 'renderField',
+	        value: function renderField(label, $content) {
+	            return _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, label), _.div({ class: 'field-value' }, $content));
+	        }
+
+	        /**
+	         * Renders all fields
+	         *
+	         * @return {Object} element
+	         */
+
+	    }, {
+	        key: 'renderFields',
+	        value: function renderFields() {
+	            var id = parseInt(this.model.id);
+
+	            return $element;
+	        }
+	    }, {
+	        key: 'render',
+	        value: function render() {
+	            var _this4 = this;
+
+	            _.append(this.$element.empty(), this.renderField('Username', this.renderUserNameEditor()), this.renderField('Full name', this.renderFullNameEditor()), this.renderField('Email', this.renderEmailEditor()), this.renderField('Password', this.renderPasswordEditor()), _.if(User.current.isAdmin, this.renderField('Is admin', this.renderAdminEditor()), _.if(!this.model.isAdmin, _.each(this.projects, function (i, project) {
+	                var hasProject = _this4.model.scopes[project] != undefined;
+
+	                return _.div({ class: 'project' }, _.div({ class: 'project-header' }, UI.inputSwitch(hasProject, function (newValue) {
+	                    if (newValue) {
+	                        _this4.model.scopes[project] = {};
+	                    } else {
+	                        delete _this4.model.scopes[project];
+	                    }
+	                }), _.h4({ class: 'project-title' }, project)), _.div({ class: 'project-scopes' }, _.p('Scopes:'), _this4.renderScopesEditor(project)));
+	            }))));
+	        }
+	    }]);
+
+	    return UserEditor;
+	}(View);
+
+	module.exports = UserEditor;
+
+/***/ },
 /* 137 */,
 /* 138 */,
 /* 139 */,
-/* 140 */
+/* 140 */,
+/* 141 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -19798,7 +20186,6 @@
 	module.exports = User;
 
 /***/ },
-/* 141 */,
 /* 142 */,
 /* 143 */,
 /* 144 */,
@@ -19811,7 +20198,8 @@
 /* 151 */,
 /* 152 */,
 /* 153 */,
-/* 154 */
+/* 154 */,
+/* 155 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -19861,7 +20249,6 @@
 	};
 
 /***/ },
-/* 155 */,
 /* 156 */,
 /* 157 */,
 /* 158 */,
@@ -19870,7 +20257,9 @@
 /* 161 */,
 /* 162 */,
 /* 163 */,
-/* 164 */
+/* 164 */,
+/* 165 */,
+/* 166 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -20110,7 +20499,7 @@
 	module.exports = ProjectEditor;
 
 /***/ },
-/* 165 */
+/* 167 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -20393,7 +20782,7 @@
 	module.exports = BackupEditor;
 
 /***/ },
-/* 166 */
+/* 168 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -20508,7 +20897,7 @@
 	module.exports = MigrationEditor;
 
 /***/ },
-/* 167 */
+/* 169 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -20630,7 +21019,7 @@
 	module.exports = InfoEditor;
 
 /***/ },
-/* 168 */
+/* 170 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -20715,7 +21104,7 @@
 	module.exports = LanguageEditor;
 
 /***/ },
-/* 169 */
+/* 171 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -20771,394 +21160,6 @@
 	}(Entity);
 
 	module.exports = Project;
-
-/***/ },
-/* 170 */,
-/* 171 */,
-/* 172 */
-/***/ function(module, exports) {
-
-	'use strict';
-
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var UserEditor = function (_View) {
-	    _inherits(UserEditor, _View);
-
-	    function UserEditor(params) {
-	        _classCallCheck(this, UserEditor);
-
-	        var _this = _possibleConstructorReturn(this, (UserEditor.__proto__ || Object.getPrototypeOf(UserEditor)).call(this, params));
-
-	        _this.$element = _.div({ class: 'user-editor' });
-
-	        _this.modal = UI.confirmModal('save', 'Settings for "' + _this.getLabel() + '"', _this.$element, function () {
-	            _this.onClickSave(_this.model);
-
-	            return false;
-	        });
-
-	        _this.modal.$element.addClass('modal-user-editor');
-
-	        apiCall('get', 'server/projects').then(function (projects) {
-	            _this.projects = projects;
-	            _this.init();
-	        });
-	        return _this;
-	    }
-
-	    /**
-	     * Gets the user label
-	     *
-	     * @returns {String} Label
-	     */
-
-
-	    _createClass(UserEditor, [{
-	        key: 'getLabel',
-	        value: function getLabel() {
-	            return this.model.fullName || this.model.username || this.model.email || this.model.id;
-	        }
-
-	        /**
-	         * Event: Click save.
-	         */
-
-	    }, {
-	        key: 'onClickSave',
-	        value: function onClickSave() {
-	            var _this2 = this;
-
-	            apiCall('post', 'users/' + this.model.id, this.model).then(function () {
-	                _this2.modal.hide();
-
-	                _this2.trigger('save');
-	            }).catch(errorModal);
-	        }
-
-	        /**
-	         * Gets a list of available scopes
-	         *
-	         * @returns {Array} Array of scope strings
-	         */
-
-	    }, {
-	        key: 'getScopes',
-	        value: function getScopes() {
-	            return ['connections', 'schemas', 'settings', 'templates', 'users'];
-	        }
-
-	        /**
-	         * Gets a list of user scopes
-	         *
-	         * @param {String} project
-	         *
-	         * @returns {Array} Array of scope strings
-	         */
-
-	    }, {
-	        key: 'getUserScopes',
-	        value: function getUserScopes(project) {
-	            if (!this.model.scopes) {
-	                this.model.scopes = {};
-	            }
-
-	            if (!this.model.scopes[project]) {
-	                this.model.scopes[project] = [];
-	            }
-
-	            return this.model.scopes[project];
-	        }
-
-	        /**
-	         * Renders the username editor
-	         *
-	         * @returns {HTMLElement} Element
-	         */
-
-	    }, {
-	        key: 'renderUserNameEditor',
-	        value: function renderUserNameEditor() {
-	            var view = this;
-
-	            function onInputChange() {
-	                view.model.username = $(this).val();
-	            }
-
-	            var $element = _.div({ class: 'username-editor' }, _.input({
-	                class: 'form-control',
-	                type: 'text',
-	                value: view.model.username,
-	                placeholder: 'Input the username here'
-	            }).on('change', onInputChange));
-
-	            return $element;
-	        }
-
-	        /**
-	         * Renders the scopes editor
-	         *
-	         * @param {String} project
-	         *
-	         * @returns {HTMLElement} Element
-	         */
-
-	    }, {
-	        key: 'renderScopesEditor',
-	        value: function renderScopesEditor(project) {
-	            var view = this;
-
-	            function onChange() {
-	                view.getUserScopes(project).splice(0, view.getUserScopes(project).length);
-
-	                $element.find('.scopes .scope .dropdown .dropdown-toggle').each(function () {
-	                    view.getUserScopes(project).push($(this).attr('data-id'));
-	                });
-
-	                render();
-	            }
-
-	            function onClickAdd() {
-	                var newScope = '';
-
-	                var _iteratorNormalCompletion = true;
-	                var _didIteratorError = false;
-	                var _iteratorError = undefined;
-
-	                try {
-	                    for (var _iterator = view.getScopes()[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-	                        var scope = _step.value;
-
-	                        if (view.getUserScopes(project).indexOf(scope) < 0) {
-	                            newScope = scope;
-	                            break;
-	                        }
-	                    }
-	                } catch (err) {
-	                    _didIteratorError = true;
-	                    _iteratorError = err;
-	                } finally {
-	                    try {
-	                        if (!_iteratorNormalCompletion && _iterator.return) {
-	                            _iterator.return();
-	                        }
-	                    } finally {
-	                        if (_didIteratorError) {
-	                            throw _iteratorError;
-	                        }
-	                    }
-	                }
-
-	                if (newScope) {
-	                    view.getUserScopes(project).push(newScope);
-
-	                    render();
-	                }
-	            }
-
-	            function render() {
-	                _.append($element.empty(), _.div({ class: 'scopes chip-group' }, _.each(view.getUserScopes(project), function (i, userScope) {
-	                    try {
-	                        var _ret = function () {
-	                            var $scope = _.div({ class: 'chip scope' }, _.div({ class: 'chip-label dropdown' }, _.button({ class: 'dropdown-toggle', 'data-id': userScope, 'data-toggle': 'dropdown' }, userScope), _.ul({ class: 'dropdown-menu' }, _.each(view.getScopes(), function (i, scope) {
-	                                if (scope == userScope || view.getUserScopes(project).indexOf(scope) < 0) {
-	                                    return _.li(_.a({ href: '#', 'data-id': scope }, scope).click(function (e) {
-	                                        e.preventDefault();
-
-	                                        var $btn = $(this).parents('.dropdown').children('.dropdown-toggle');
-
-	                                        $btn.text($(this).text());
-	                                        $btn.attr('data-id', $(this).attr('data-id'));
-
-	                                        onChange();
-	                                    }));
-	                                }
-	                            }))).change(onChange), _.button({ class: 'btn chip-remove' }, _.span({ class: 'fa fa-remove' })).click(function () {
-	                                $scope.remove();
-
-	                                onChange();
-	                            }));
-
-	                            return {
-	                                v: $scope
-	                            };
-	                        }();
-
-	                        if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
-	                    } catch (e) {
-	                        UI.errorModal(e);
-	                    }
-	                }), _.button({ class: 'btn chip-add' }, _.span({ class: 'fa fa-plus' })).click(onClickAdd)));
-	            }
-
-	            var $element = _.div({ class: 'scopes-editor' });
-
-	            render();
-
-	            return $element;
-	        }
-
-	        /**
-	         * Renders the full name editor
-	         *
-	         * @return {HTMLElement} Element
-	         */
-
-	    }, {
-	        key: 'renderFullNameEditor',
-	        value: function renderFullNameEditor() {
-	            var view = this;
-
-	            function onChange() {
-	                var fullName = $(this).val();
-
-	                view.model.fullName = fullName;
-	            }
-
-	            return _.div({ class: 'full-name-editor' }, _.input({ class: 'form-control', type: 'text', value: this.model.fullName }).change(onChange));
-	        }
-
-	        /**
-	         * Renders the email editor
-	         *
-	         * @return {HTMLElement} Element
-	         */
-
-	    }, {
-	        key: 'renderEmailEditor',
-	        value: function renderEmailEditor() {
-	            var view = this;
-
-	            function onChange() {
-	                var email = $(this).val();
-
-	                view.model.email = email;
-	            }
-
-	            return _.div({ class: 'full-name-editor' }, _.input({ class: 'form-control', type: 'email', value: this.model.email }).change(onChange));
-	        }
-
-	        /**
-	         * Renders the password
-	         *
-	         * @return {HTMLElement} Element
-	         */
-
-	    }, {
-	        key: 'renderPasswordEditor',
-	        value: function renderPasswordEditor() {
-	            var view = this;
-
-	            var password1 = void 0;
-	            var password2 = void 0;
-
-	            function onChange1() {
-	                password1 = $(this).val();
-
-	                var isValid = password1 == password2;
-
-	                $element.toggleClass('invalid', !isValid);
-
-	                if (isValid) {
-	                    view.model.password = password1;
-	                } else {
-	                    view.model.password = null;
-	                }
-	            }
-
-	            function onChange2() {
-	                password2 = $(this).val();
-
-	                var isValid = password1 == password2;
-
-	                $element.toggleClass('invalid', !isValid);
-
-	                if (isValid) {
-	                    view.model.password = password1;
-	                } else {
-	                    view.model.password = null;
-	                }
-	            }
-
-	            var $element = _.div({ class: 'password-editor' }, _.span({ class: 'invalid-message' }, 'Passwords to not match'), _.input({ class: 'form-control', type: 'password', placeholder: 'Type new password' }).on('change propertychange keyup paste input', onChange1), _.input({ class: 'form-control', type: 'password', placeholder: 'Confirm new password' }).on('change propertychange keyup paste input', onChange2));
-
-	            return $element;
-	        }
-
-	        /**
-	         * Renders the admin editor
-	         *
-	         * @return {HTMLElement} Element
-	         */
-
-	    }, {
-	        key: 'renderAdminEditor',
-	        value: function renderAdminEditor() {
-	            var _this3 = this;
-
-	            return UI.inputSwitch(this.model.isAdmin == true, function (newValue) {
-	                _this3.model.isAdmin = newValue;
-
-	                _this3.render();
-	            }).addClass('admin-editor');
-	        }
-
-	        /**
-	         * Renders a single field
-	         *
-	         * @return {HTMLElement} Element
-	         */
-
-	    }, {
-	        key: 'renderField',
-	        value: function renderField(label, $content) {
-	            return _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, label), _.div({ class: 'field-value' }, $content));
-	        }
-
-	        /**
-	         * Renders all fields
-	         *
-	         * @return {Object} element
-	         */
-
-	    }, {
-	        key: 'renderFields',
-	        value: function renderFields() {
-	            var id = parseInt(this.model.id);
-
-	            return $element;
-	        }
-	    }, {
-	        key: 'render',
-	        value: function render() {
-	            var _this4 = this;
-
-	            _.append(this.$element.empty(), this.renderField('Username', this.renderUserNameEditor()), this.renderField('Full name', this.renderFullNameEditor()), this.renderField('Email', this.renderEmailEditor()), this.renderField('Password', this.renderPasswordEditor()), _.if(User.current.hasScope('users'), this.renderField('Is admin', this.renderAdminEditor()), _.if(!this.model.isAdmin, _.each(this.projects, function (i, project) {
-	                var hasProject = _this4.model.scopes[project] != undefined;
-
-	                return _.div({ class: 'project' }, UI.inputSwitch(hasProject, function (newValue) {
-	                    if (newValue) {
-	                        _this4.model.scopes[project] = {};
-	                    } else {
-	                        delete _this4.model.scopes[project];
-	                    }
-	                }), _.h4(project), _this4.renderScopesEditor(project));
-	            }))));
-	        }
-	    }]);
-
-	    return UserEditor;
-	}(View);
-
-	module.exports = UserEditor;
 
 /***/ }
 /******/ ]);

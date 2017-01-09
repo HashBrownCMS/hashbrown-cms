@@ -10,7 +10,7 @@ class UserEditor extends View {
             'save',
             'Settings for "' + this.getLabel() + '"', this.$element,
             () => {
-                this.onClickSave(this.model);
+                this.onClickSave();
 
                 return false;
             }
@@ -38,7 +38,13 @@ class UserEditor extends View {
      * Event: Click save.
      */
     onClickSave() {
-        apiCall('post', 'users/' + this.model.id, this.model)
+        let newUserObject = this.model.getObject();
+
+        if(this.newPassword) {
+            newUserObject.password = this.newPassword;
+        }
+
+        apiCall('post', 'users/' + this.model.id, newUserObject)
         .then(() => {
             this.modal.hide();
 
@@ -254,40 +260,34 @@ class UserEditor extends View {
         let password1;
         let password2;
 
-        function onChange1() {
-            password1 = $(this).val();
-    
-            let isValid = password1 == password2;
+        function onChange() {
+            let isValid = password1 == password2 && password1 && password1.length > 4;
 
             $element.toggleClass('invalid', !isValid);
 
+            view.$element.find('.model-footer .btn-primary').toggleClass('disabled', !isValid);
+
             if(isValid) {
-                view.model.password = password1;
+                view.newPassword = password1;
             
             } else {
-                view.model.password = null;
+                view.newPassword = null;
 
             }
+        }
+
+        function onChange1() {
+            password1 = $(this).val();
+   
+            onChange(); 
         } 
         
         function onChange2() {
             password2 = $(this).val();
-    
-            let isValid = password1 == password2;
-
-            $element.toggleClass('invalid', !isValid);
-
-            if(isValid) {
-                view.model.password = password1;
-            
-            } else {
-                view.model.password = null;
-
-            }
         } 
 
         let $element = _.div({class: 'password-editor'},
-            _.span({class: 'invalid-message'}, 'Passwords to not match'),
+            _.span({class: 'invalid-message'}, 'Check passwords'),
             _.input({class: 'form-control', type: 'password', placeholder: 'Type new password'})
                 .on('change propertychange keyup paste input', onChange1),
             _.input({class: 'form-control', type: 'password', placeholder: 'Confirm new password'})
@@ -345,24 +345,28 @@ class UserEditor extends View {
             this.renderField('Email', this.renderEmailEditor()),
             this.renderField('Password', this.renderPasswordEditor()),
 
-            _.if(User.current.hasScope('users'),
+            _.if(User.current.isAdmin,
                 this.renderField('Is admin', this.renderAdminEditor()),
 
                 _.if(!this.model.isAdmin,
                     _.each(this.projects, (i, project) => {
-                        let hasProject =
-                            this.model.scopes[project] != undefined;
+                        let hasProject = this.model.scopes[project] != undefined;
 
                         return _.div({class: 'project'},
-                            UI.inputSwitch(hasProject, (newValue) => {
-                                if(newValue) {
-                                    this.model.scopes[project] = {};
-                                } else {
-                                    delete this.model.scopes[project];
-                                }   
-                            }),
-                            _.h4(project),
-                            this.renderScopesEditor(project)
+                            _.div({class: 'project-header'},
+                                UI.inputSwitch(hasProject, (newValue) => {
+                                    if(newValue) {
+                                        this.model.scopes[project] = {};
+                                    } else {
+                                        delete this.model.scopes[project];
+                                    }   
+                                }),
+                                _.h4({class: 'project-title'}, project)
+                            ),
+                            _.div({class: 'project-scopes'},
+                                _.p('Scopes:'),
+                                this.renderScopesEditor(project)
+                            )
                         );
                     })
                 )

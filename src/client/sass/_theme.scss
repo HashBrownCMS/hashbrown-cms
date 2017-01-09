@@ -367,18 +367,19 @@ button, a {
 
 // Chips
 .chip-group {
+    &.disabled {
+        opacity: 0.5;
+        pointer-events: none;
+    }
+
     .chip {
-        margin: 0px 0px 4px 8px;
+        margin: 0px 4px 4px 0px;
         height: 32px;
         line-height: 32px;
         padding: 0px 4px;
         border-radius: 16px;
         background-color: material-color('blue', '600');
         display: inline-block;
-
-        &:first-child {
-            margin-left: 0px;
-        }
 
         input.chip-label {
             max-width: 100px;
@@ -462,7 +463,7 @@ button, a {
     }
 
     .chip-add {
-        margin: 0px 0px 4px 8px;
+        margin: 0px 0px 4px 0px;
         height: 32px;
         width: 32px;
         line-height: 32px;
@@ -471,6 +472,10 @@ button, a {
         display: inline-block;
         padding: 0px !important;
         position: relative;
+
+        &:first-child {
+            margin-left: 0px;
+        }
 
         .fa {
             color: #fff;
