@@ -55,15 +55,15 @@
 	window.app = __webpack_require__(155);
 
 	// Views
-	window.ProjectEditor = __webpack_require__(166);
-	window.BackupEditor = __webpack_require__(167);
-	window.MigrationEditor = __webpack_require__(168);
-	window.InfoEditor = __webpack_require__(169);
-	window.LanguageEditor = __webpack_require__(170);
+	window.ProjectEditor = __webpack_require__(165);
+	window.BackupEditor = __webpack_require__(166);
+	window.MigrationEditor = __webpack_require__(167);
+	window.InfoEditor = __webpack_require__(168);
+	window.LanguageEditor = __webpack_require__(169);
 	window.UserEditor = __webpack_require__(136);
 
 	// Models
-	window.Project = __webpack_require__(171);
+	window.Project = __webpack_require__(170);
 	window.User = __webpack_require__(141);
 
 	// Get current user
@@ -20282,8 +20282,7 @@
 /* 162 */,
 /* 163 */,
 /* 164 */,
-/* 165 */,
-/* 166 */
+/* 165 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -20511,7 +20510,7 @@
 	module.exports = ProjectEditor;
 
 /***/ },
-/* 167 */
+/* 166 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -20578,31 +20577,11 @@
 	    }
 
 	    /**
-	     * Checks whether the current user is admin
-	     *
-	     * @returns {Boolean} Is the current user admin
+	     * Event: Click upload button
 	     */
 
 
 	    _createClass(BackupEditor, [{
-	        key: 'isAdmin',
-	        value: function isAdmin() {
-	            for (var i in this.model.users) {
-	                var user = this.model.users[i];
-
-	                if (user.isCurrent && user.isAdmin) {
-	                    return true;
-	                }
-	            }
-
-	            return false;
-	        }
-
-	        /**
-	         * Event: Click upload button
-	         */
-
-	    }, {
 	        key: 'onClickUploadBackup',
 	        value: function onClickUploadBackup() {
 	            var view = this;
@@ -20676,23 +20655,25 @@
 	        value: function onClickCreateBackup() {
 	            var _this2 = this;
 
-	            if (this.isAdmin()) {
-	                apiCall('post', 'server/backups/' + this.model.id + '/new').then(function (data) {
-	                    new MessageModal({
-	                        model: {
-	                            title: 'Success',
-	                            body: 'Project "' + _this2.model.id + '" was backed up successfully'
-	                        },
-	                        buttons: [{
-	                            callback: function callback() {
-	                                location.reload();
-	                            },
-	                            label: 'OK',
-	                            class: 'btn-primary'
-	                        }]
-	                    });
-	                }).catch(UI.errorModal);
+	            if (!User.current.isAdmin) {
+	                return;
 	            }
+
+	            apiCall('post', 'server/backups/' + this.model.id + '/new').then(function (data) {
+	                new MessageModal({
+	                    model: {
+	                        title: 'Success',
+	                        body: 'Project "' + _this2.model.id + '" was backed up successfully'
+	                    },
+	                    buttons: [{
+	                        callback: function callback() {
+	                            location.reload();
+	                        },
+	                        label: 'OK',
+	                        class: 'btn-primary'
+	                    }]
+	                });
+	            }).catch(UI.errorModal);
 	        }
 
 	        /**
@@ -20706,47 +20687,47 @@
 	        value: function onClickRestoreBackup(timestamp) {
 	            var _this3 = this;
 
-	            if (this.isAdmin()) {
-	                (function () {
-	                    var label = '"' + timestamp + '"';
-	                    var date = new Date(parseInt(timestamp));
-
-	                    if (!isNaN(date.getTime())) {
-	                        label = date.toString();
-	                    }
-
-	                    var modal = new MessageModal({
-	                        model: {
-	                            title: 'Restore backup',
-	                            body: 'Are you sure you want to restore the backup ' + label + '? Current content will be replaced.'
-	                        },
-	                        buttons: [{
-	                            label: 'Cancel',
-	                            class: 'btn-default'
-	                        }, {
-	                            label: 'Restore',
-	                            class: 'btn-danger',
-	                            callback: function callback() {
-	                                apiCall('post', 'server/backups/' + _this3.model.id + '/' + timestamp + '/restore').then(function () {
-	                                    new MessageModal({
-	                                        model: {
-	                                            title: 'Success',
-	                                            body: 'Project "' + _this3.model.id + '" was restored successfully to ' + label
-	                                        },
-	                                        buttons: [{
-	                                            callback: function callback() {
-	                                                location.reload();
-	                                            },
-	                                            label: 'OK',
-	                                            class: 'btn-primary'
-	                                        }]
-	                                    });
-	                                }).catch(UI.errorModal);
-	                            }
-	                        }]
-	                    });
-	                })();
+	            if (!User.current.isAdmin) {
+	                return;
 	            }
+
+	            var label = '"' + timestamp + '"';
+	            var date = new Date(parseInt(timestamp));
+
+	            if (!isNaN(date.getTime())) {
+	                label = date.toString();
+	            }
+
+	            var modal = new MessageModal({
+	                model: {
+	                    title: 'Restore backup',
+	                    body: 'Are you sure you want to restore the backup ' + label + '? Current content will be replaced.'
+	                },
+	                buttons: [{
+	                    label: 'Cancel',
+	                    class: 'btn-default'
+	                }, {
+	                    label: 'Restore',
+	                    class: 'btn-danger',
+	                    callback: function callback() {
+	                        apiCall('post', 'server/backups/' + _this3.model.id + '/' + timestamp + '/restore').then(function () {
+	                            new MessageModal({
+	                                model: {
+	                                    title: 'Success',
+	                                    body: 'Project "' + _this3.model.id + '" was restored successfully to ' + label
+	                                },
+	                                buttons: [{
+	                                    callback: function callback() {
+	                                        location.reload();
+	                                    },
+	                                    label: 'OK',
+	                                    class: 'btn-primary'
+	                                }]
+	                            });
+	                        }).catch(UI.errorModal);
+	                    }
+	                }]
+	            });
 	        }
 
 	        /**
@@ -20758,33 +20739,35 @@
 	        value: function onClickDeleteBackup(timestamp) {
 	            var _this4 = this;
 
-	            if (this.isAdmin()) {
-	                var label = timestamp;
-	                var date = new Date(parseInt(timestamp));
-
-	                if (!isNaN(date.getTime())) {
-	                    label = date.toString();
-	                }
-
-	                var modal = new MessageModal({
-	                    model: {
-	                        title: 'Delete backup',
-	                        body: 'Are you sure you want to delete the backup "' + label + '"?'
-	                    },
-	                    buttons: [{
-	                        label: 'Cancel',
-	                        class: 'btn-default'
-	                    }, {
-	                        label: 'Delete',
-	                        class: 'btn-danger',
-	                        callback: function callback() {
-	                            apiCall('delete', 'server/backups/' + _this4.model.id + '/' + timestamp).then(function () {
-	                                location.reload();
-	                            }).catch(UI.errorModal);
-	                        }
-	                    }]
-	                });
+	            if (!User.current.isAdmin) {
+	                return;
 	            }
+
+	            var label = timestamp;
+	            var date = new Date(parseInt(timestamp));
+
+	            if (!isNaN(date.getTime())) {
+	                label = date.toString();
+	            }
+
+	            var modal = new MessageModal({
+	                model: {
+	                    title: 'Delete backup',
+	                    body: 'Are you sure you want to delete the backup "' + label + '"?'
+	                },
+	                buttons: [{
+	                    label: 'Cancel',
+	                    class: 'btn-default'
+	                }, {
+	                    label: 'Delete',
+	                    class: 'btn-danger',
+	                    callback: function callback() {
+	                        apiCall('delete', 'server/backups/' + _this4.model.id + '/' + timestamp).then(function () {
+	                            location.reload();
+	                        }).catch(UI.errorModal);
+	                    }
+	                }]
+	            });
 	        }
 	    }]);
 
@@ -20794,7 +20777,7 @@
 	module.exports = BackupEditor;
 
 /***/ },
-/* 168 */
+/* 167 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -20909,7 +20892,7 @@
 	module.exports = MigrationEditor;
 
 /***/ },
-/* 169 */
+/* 168 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -21031,7 +21014,7 @@
 	module.exports = InfoEditor;
 
 /***/ },
-/* 170 */
+/* 169 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -21116,7 +21099,7 @@
 	module.exports = LanguageEditor;
 
 /***/ },
-/* 171 */
+/* 170 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';

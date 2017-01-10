@@ -76,23 +76,6 @@ class BackupEditor extends View {
     }
     
     /**
-     * Checks whether the current user is admin
-     *
-     * @returns {Boolean} Is the current user admin
-     */
-    isAdmin() {
-        for(let i in this.model.users) {
-            let user = this.model.users[i];
-
-            if(user.isCurrent && user.isAdmin) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-    
-    /**
      * Event: Click upload button
      */
     onClickUploadBackup() {
@@ -168,25 +151,25 @@ class BackupEditor extends View {
      * Event: Click backup button
      */
     onClickCreateBackup() {
-        if(this.isAdmin()) {
-            apiCall('post', 'server/backups/' + this.model.id + '/new')
-            .then((data) => {
-                new MessageModal({
-                    model: {
-                        title: 'Success',
-                        body: 'Project "' + this.model.id + '" was backed up successfully'
-                    },
-                    buttons: [
-                        {
-                            callback: () => { location.reload(); },
-                            label: 'OK',
-                            class: 'btn-primary'
-                        }
-                    ]
-                });
-            })
-            .catch(UI.errorModal);
-        }
+        if(!User.current.isAdmin) { return; }
+
+        apiCall('post', 'server/backups/' + this.model.id + '/new')
+        .then((data) => {
+            new MessageModal({
+                model: {
+                    title: 'Success',
+                    body: 'Project "' + this.model.id + '" was backed up successfully'
+                },
+                buttons: [
+                    {
+                        callback: () => { location.reload(); },
+                        label: 'OK',
+                        class: 'btn-primary'
+                    }
+                ]
+            });
+        })
+        .catch(UI.errorModal);
     }
 
     /**
@@ -195,88 +178,88 @@ class BackupEditor extends View {
      * @param {String} timestamp
      */
     onClickRestoreBackup(timestamp) {
-        if(this.isAdmin()) {
-            let label = '"' + timestamp + '"';
-            let date = new Date(parseInt(timestamp));
+        if(!User.current.isAdmin) { return; }
+            
+        let label = '"' + timestamp + '"';
+        let date = new Date(parseInt(timestamp));
 
-            if(!isNaN(date.getTime())) {
-                label = date.toString();
-            }
-                                
-            let modal = new MessageModal({
-                model: {
-                    title: 'Restore backup',
-                    body: 'Are you sure you want to restore the backup ' + label + '? Current content will be replaced.'
-                },
-                buttons: [
-                    {
-                        label: 'Cancel',
-                        class: 'btn-default'
-                    },
-                    {
-                        label: 'Restore',
-                        class: 'btn-danger',
-                        callback: () => {
-                            apiCall('post', 'server/backups/' + this.model.id + '/' + timestamp + '/restore')
-                            .then(() => {
-                                new MessageModal({
-                                    model: {
-                                        title: 'Success',
-                                        body: 'Project "' + this.model.id + '" was restored successfully to ' + label
-                                    },
-                                    buttons: [
-                                        {
-                                            callback: () => { location.reload(); },
-                                            label: 'OK',
-                                            class: 'btn-primary'
-                                        }
-                                    ]
-                                });
-                            })
-                            .catch(UI.errorModal);
-                        }
-                    }
-                ]
-            });
+        if(!isNaN(date.getTime())) {
+            label = date.toString();
         }
+                            
+        let modal = new MessageModal({
+            model: {
+                title: 'Restore backup',
+                body: 'Are you sure you want to restore the backup ' + label + '? Current content will be replaced.'
+            },
+            buttons: [
+                {
+                    label: 'Cancel',
+                    class: 'btn-default'
+                },
+                {
+                    label: 'Restore',
+                    class: 'btn-danger',
+                    callback: () => {
+                        apiCall('post', 'server/backups/' + this.model.id + '/' + timestamp + '/restore')
+                        .then(() => {
+                            new MessageModal({
+                                model: {
+                                    title: 'Success',
+                                    body: 'Project "' + this.model.id + '" was restored successfully to ' + label
+                                },
+                                buttons: [
+                                    {
+                                        callback: () => { location.reload(); },
+                                        label: 'OK',
+                                        class: 'btn-primary'
+                                    }
+                                ]
+                            });
+                        })
+                        .catch(UI.errorModal);
+                    }
+                }
+            ]
+        });
     }
     
     /**
      * Event: Click delete backup button
      */ 
     onClickDeleteBackup(timestamp) {
-        if(this.isAdmin()) {
-            let label = timestamp;
-            let date = new Date(parseInt(timestamp));
+        if(!User.current.isAdmin) { return; }
+        
+        let label = timestamp;
+        let date = new Date(parseInt(timestamp));
 
-            if(!isNaN(date.getTime())) {
-                label = date.toString();
-            }
-            
-            let modal = new MessageModal({
-                model: {
-                    title: 'Delete backup',
-                    body: 'Are you sure you want to delete the backup "' + label + '"?'
-                },
-                buttons: [
-                    {
-                        label: 'Cancel',
-                        class: 'btn-default'
-                    },
-                    {
-                        label: 'Delete',
-                        class: 'btn-danger',
-                        callback: () => {
-                            apiCall('delete', 'server/backups/' + this.model.id + '/' + timestamp)
-                            .then(() => {
-                                location.reload();
-                            })
-                            .catch(UI.errorModal);
-                        }
-                    }
-                ]
-            });
+        if(!isNaN(date.getTime())) {
+            label = date.toString();
         }
+        
+        let modal = new MessageModal({
+            model: {
+                title: 'Delete backup',
+                body: 'Are you sure you want to delete the backup "' + label + '"?'
+            },
+            buttons: [
+                {
+                    label: 'Cancel',
+                    class: 'btn-default'
+                },
+                {
+                    label: 'Delete',
+                    class: 'btn-danger',
+                    callback: () => {
+                        apiCall('delete', 'server/backups/' + this.model.id + '/' + timestamp)
+                        .then(() => {
+                            location.reload();
+                        })
+                        .catch(UI.errorModal);
+                    }
+                }
+            ]
+        });
     }
 }
 
