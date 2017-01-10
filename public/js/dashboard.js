@@ -66,14 +66,18 @@
 	window.Project = __webpack_require__(170);
 	window.User = __webpack_require__(141);
 
+	// --------------------
 	// Get current user
+	// --------------------
 	apiCall('get', 'user').then(function (user) {
 	    User.current = new User(user);
 
 	    return apiCall('get', 'server/projects');
 	})
 
-	// Get project list
+	// --------------------
+	// Projects
+	// --------------------
 	.then(function (projects) {
 
 	    // Get next project
@@ -106,7 +110,9 @@
 	    }
 	})
 
-	// Get user list
+	// --------------------
+	// Users
+	// --------------------
 	.then(function () {
 	    if (!User.current.isAdmin) {
 	        return Promise.resolve();
@@ -167,13 +173,100 @@
 	    }
 	}).catch(UI.errorModal);
 
-	// Set navbar button events
+	// --------------------
+	// Navbar
+	// --------------------
 	$('.navbar-main a').click(function () {
 	    $('.navbar-main a').removeClass('active');
 	    $(this).addClass('active');
 	});
 
-	// Set create new project event
+	// --------------------
+	// Check for updates
+	// --------------------
+	$('.btn-invite-user').click(function () {
+	    customApiCall('get', '/api/users').then(function (users) {
+	        /**
+	         * Generate password
+	         */
+	        function generatePassword() {
+	            var length = 8,
+	                charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+	                retVal = "";
+	            for (var i = 0, n = charset.length; i < length; ++i) {
+	                retVal += charset.charAt(Math.floor(Math.random() * n));
+	            }
+	            return retVal;
+	        }
+
+	        /**
+	         * Event: On submit user changes
+	         */
+	        function onSubmit() {
+	            var username = addUserModal.$element.find('input.username').val();
+
+	            var emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+	            var isEmail = emailRegex.test(username);
+
+	            var user = users.filter(function (user) {
+	                return user.username == username || user.email == username;
+	            })[0];
+
+	            // The user was found
+	            if (user) {
+	                UI.errorModal(new Error('User "' + username + '" already exists'));
+
+	                // An email was provided, send invitation    
+	            } else if (isEmail) {
+	                (function () {
+	                    var modal = UI.confirmModal('invite', 'Add user', 'Do you want to invite a new user with email "' + username + '"?', function () {
+	                        customApiCall('post', '/api/user/invite', {
+	                            email: username
+	                        }).then(function () {
+	                            UI.messageModal('Invite user', 'Invitation was sent to ' + username);
+	                        }).catch(errorModal);
+
+	                        var $buttons = modal.$element.find('button').attr('disabled', true).addClass('disabled');
+
+	                        return false;
+	                    });
+
+	                    // User doesn't exist, create it
+	                })();
+	            } else {
+	                (function () {
+	                    var $passwd = void 0;
+
+	                    var modal = UI.confirmModal('create', 'Add user', [_.p('Set password for new user "' + username + '"'), $passwd = _.input({ required: true, pattern: '.{6,}', class: 'form-control', type: 'text', value: generatePassword(), placeholder: 'Type new password' })], function () {
+	                        var password = $passwd.val() || '';
+	                        var scopes = {};
+
+	                        apiCall('post', 'users/new', {
+	                            username: username,
+	                            password: password,
+	                            scopes: {}
+	                        }).then(function () {
+	                            UI.messageModal('Create user', 'User "' + username + '" was created with password "' + password + '".', function () {
+	                                location.reload();
+	                            });
+	                        }).catch(errorModal);
+
+	                        var $buttons = modal.$element.find('button').attr('disabled', true).addClass('disabled');
+
+	                        return false;
+	                    });
+	                })();
+	            }
+	        }
+
+	        // Renders the modal
+	        var addUserModal = UI.confirmModal('OK', 'Add user', _.input({ class: 'form-control username', placeholder: 'Username', type: 'text' }).on('change keyup paste propertychange input'), onSubmit);
+	    }).catch(errorModal);
+	});
+
+	// --------------------
+	// Create project
+	// --------------------
 	$('.btn-create-project').click(function () {
 	    function onClickCreate() {
 	        var name = modal.$element.find('input').val();
@@ -203,7 +296,9 @@
 	    });
 	});
 
+	// --------------------
 	// Check for updates
+	// --------------------
 	apiCall('get', 'server/update/check').then(function (update) {
 	    if (update.behind) {
 	        $('.workspace').prepend(_.section({}, _.div({ class: 'update' }, _.p('You are ' + update.amount + ' version' + (update.amount != '1' ? 's' : '') + ' behind ' + update.branch), _.button({ class: 'btn btn-primary btn-update-hashbrown' }, 'Update').click(function () {

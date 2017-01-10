@@ -370,6 +370,8 @@ class MongoHelper {
         return new Promise((resolve, reject) => {
             this.findOne(databaseName, collectionName, query)
             .then((foundDoc) => {
+                foundDoc = foundDoc || {};
+
                 for(let k in doc) {
                     foundDoc[k] = doc[k];
                 }

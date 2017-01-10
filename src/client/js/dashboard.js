@@ -20,7 +20,9 @@ window.UserEditor = require('./views/UserEditor');
 window.Project = require('../../common/models/Project');
 window.User = require('../../common/models/User');
 
+// --------------------
 // Get current user
+// --------------------
 apiCall('get', 'user')
 .then((user) => {
     User.current = new User(user);
@@ -28,7 +30,9 @@ apiCall('get', 'user')
     return apiCall('get', 'server/projects');
 })
 
-// Get project list
+// --------------------
+// Projects
+// --------------------
 .then((projects) => {
 
     // Get next project
@@ -63,7 +67,9 @@ apiCall('get', 'user')
     }
 })
 
-// Get user list
+// --------------------
+// Users
+// --------------------
 .then(() => {
     if(!User.current.isAdmin) { return Promise.resolve(); }
 
@@ -119,13 +125,119 @@ apiCall('get', 'user')
 })
 .catch(UI.errorModal);
 
-// Set navbar button events
+// --------------------
+// Navbar
+// --------------------
 $('.navbar-main a').click(function() {
     $('.navbar-main a').removeClass('active');
     $(this).addClass('active');
 });
 
-// Set create new project event
+// --------------------
+// Check for updates
+// --------------------
+$('.btn-invite-user').click(() => {
+    customApiCall('get', '/api/users')
+    .then((users) => {
+        /**
+         * Generate password
+         */
+        function generatePassword() {
+            var length = 8,
+            charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+            retVal = "";
+            for (var i = 0, n = charset.length; i < length; ++i) {
+                retVal += charset.charAt(Math.floor(Math.random() * n));
+            }
+            return retVal;
+        }
+
+        /**
+         * Event: On submit user changes
+         */
+        function onSubmit() {
+            let username = addUserModal.$element.find('input.username').val();
+
+            let emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            let isEmail = emailRegex.test(username);
+
+            let user = users.filter((user) => {
+                return user.username == username || user.email == username;
+            })[0];
+
+            // The user was found
+            if(user) {
+                UI.errorModal(new Error('User "' + username + '" already exists'));
+        
+            // An email was provided, send invitation    
+            } else if(isEmail) {
+                let modal = UI.confirmModal(
+                    'invite',
+                    'Add user',
+                    'Do you want to invite a new user with email "' + username + '"?',
+                    () => {
+                        customApiCall('post', '/api/user/invite', {
+                            email: username,
+                        })
+                        .then(() => {
+                            UI.messageModal('Invite user', 'Invitation was sent to ' + username);
+                        })
+                        .catch(errorModal);
+
+                        let $buttons = modal.$element.find('button').attr('disabled', true).addClass('disabled');
+
+                        return false;
+                    }
+                );
+           
+            // User doesn't exist, create it
+            } else {
+                let $passwd;
+
+                let modal = UI.confirmModal(
+                    'create',
+                    'Add user',
+                    [
+                        _.p('Set password for new user "' + username + '"'),
+                        $passwd = _.input({required: true, pattern: '.{6,}', class: 'form-control', type: 'text', value: generatePassword(), placeholder: 'Type new password'})
+                    ],
+                    () => {
+                        let password = $passwd.val() || '';
+                        let scopes = {};
+
+                        apiCall('post', 'users/new', {
+                            username: username,
+                            password: password,
+                            scopes: {}
+                        })
+                        .then(() => {
+                            UI.messageModal('Create user', 'User "' + username + '" was created with password "' + password + '".', () => { location.reload(); });
+                        })
+                        .catch(errorModal);
+
+                        let $buttons = modal.$element.find('button').attr('disabled', true).addClass('disabled');
+
+                        return false;
+                    }
+                );
+            }
+        }
+
+        // Renders the modal
+        let addUserModal = UI.confirmModal(
+            'OK',
+            'Add user',
+            _.input({class: 'form-control username', placeholder: 'Username', type: 'text'})
+            .on('change keyup paste propertychange input'),
+            onSubmit
+        );
+    })
+    .catch(errorModal);
+});
+
+// --------------------
+// Create project
+// --------------------
 $('.btn-create-project').click(() => {
     function onClickCreate() {
         let name = modal.$element.find('input').val();
@@ -164,7 +276,9 @@ $('.btn-create-project').click(() => {
     });
 });
 
+// --------------------
 // Check for updates
+// --------------------
 apiCall('get', 'server/update/check')
 .then((update) => {
     if(update.behind) {
