@@ -46,6 +46,8 @@
 
 	'use strict';
 
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 	window._crypto = null;
 
 	// Helper functions
@@ -141,7 +143,7 @@
 	                        renderUser();
 	                    });
 	                }), _.button({ class: 'btn btn-remove', title: 'Remove user' }, _.span({ class: 'fa fa-remove' })).on('click', function () {
-	                    UI.confirmModal('remove', 'Delete user "' + (user.fullName || user.username || user.id) + '"', 'Are you sure you want to remove this user?', function () {
+	                    UI.confirmModal('remove', 'Delete user "' + (user.fullName || user.username || user.email || user.id) + '"', 'Are you sure you want to remove this user?', function () {
 	                        apiCall('delete', 'users/' + user.id).then(function () {
 	                            $user.remove();
 	                        }).catch(UI.errorModal);
@@ -205,20 +207,24 @@
 	        function onSubmit() {
 	            var username = addUserModal.$element.find('input.username').val();
 
+	            // Check if username was email
 	            var emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 	            var isEmail = emailRegex.test(username);
 
-	            var user = users.filter(function (user) {
+	            // Check if en existing user has the same information
+	            var existingUser = users.filter(function (user) {
 	                return user.username == username || user.email == username;
 	            })[0];
 
 	            // The user was found
-	            if (user) {
+	            if (existingUser) {
 	                UI.errorModal(new Error('User "' + username + '" already exists'));
+	                return;
+	            }
 
-	                // An email was provided, send invitation    
-	            } else if (isEmail) {
-	                (function () {
+	            // An email was provided, send invitation    
+	            if (isEmail) {
+	                var _ret2 = function () {
 	                    var modal = UI.confirmModal('invite', 'Add user', 'Do you want to invite a new user with email "' + username + '"?', function () {
 	                        customApiCall('post', '/api/user/invite', {
 	                            email: username
@@ -231,36 +237,39 @@
 	                        return false;
 	                    });
 
-	                    // User doesn't exist, create it
-	                })();
-	            } else {
-	                (function () {
-	                    var $passwd = void 0;
+	                    return {
+	                        v: void 0
+	                    };
+	                }();
 
-	                    var modal = UI.confirmModal('create', 'Add user', [_.p('Set password for new user "' + username + '"'), $passwd = _.input({ required: true, pattern: '.{6,}', class: 'form-control', type: 'text', value: generatePassword(), placeholder: 'Type new password' })], function () {
-	                        var password = $passwd.val() || '';
-	                        var scopes = {};
-
-	                        apiCall('post', 'users/new', {
-	                            username: username,
-	                            password: password,
-	                            scopes: {}
-	                        }).then(function () {
-	                            UI.messageModal('Create user', 'User "' + username + '" was created with password "' + password + '".', function () {
-	                                location.reload();
-	                            });
-	                        }).catch(errorModal);
-
-	                        var $buttons = modal.$element.find('button').attr('disabled', true).addClass('disabled');
-
-	                        return false;
-	                    });
-	                })();
+	                if ((typeof _ret2 === 'undefined' ? 'undefined' : _typeof(_ret2)) === "object") return _ret2.v;
 	            }
+
+	            // User doesn't exist, create it
+	            var $passwd = void 0;
+
+	            var modal = UI.confirmModal('create', 'Add user', [_.p('Set password for new user "' + username + '"'), $passwd = _.input({ required: true, pattern: '.{6,}', class: 'form-control', type: 'text', value: generatePassword(), placeholder: 'Type new password' })], function () {
+	                var password = $passwd.val() || '';
+	                var scopes = {};
+
+	                apiCall('post', 'users/new', {
+	                    username: username,
+	                    password: password,
+	                    scopes: {}
+	                }).then(function () {
+	                    UI.messageModal('Create user', 'User "' + username + '" was created with password "' + password + '".', function () {
+	                        location.reload();
+	                    });
+	                }).catch(errorModal);
+
+	                var $buttons = modal.$element.find('button').attr('disabled', true).addClass('disabled');
+
+	                return false;
+	            });
 	        }
 
 	        // Renders the modal
-	        var addUserModal = UI.confirmModal('OK', 'Add user', _.input({ class: 'form-control username', placeholder: 'Username', type: 'text' }).on('change keyup paste propertychange input'), onSubmit);
+	        var addUserModal = UI.confirmModal('OK', 'Add user', _.input({ class: 'form-control username', placeholder: 'Username or email', type: 'text' }).on('change keyup paste propertychange input'), onSubmit);
 	    }).catch(errorModal);
 	});
 
@@ -11071,10 +11080,7 @@
 
 	            message = message || '';
 
-	            var headingBreakIndex = message.indexOf(' at ');
-	            var heading = message.substring(0, headingBreakIndex);
-
-	            var modal = messageModal('<span class="fa fa-warning"></span> Error', heading + '<br /><br />Please check the JavaScript console for details', onClickOK);
+	            var modal = messageModal('<span class="fa fa-warning"></span> Error', message + '<br /><br />Please check the JavaScript console for details', onClickOK);
 
 	            modal.$element.toggleClass('error-modal', true);
 
@@ -20261,7 +20267,7 @@
 	    }, {
 	        key: 'getScopes',
 	        value: function getScopes(project) {
-	            if (!this.scopes[project]) {
+	            if (!this.scopes[project] || !Array.isArray(this.scopes[project])) {
 	                this.scopes[project] = [];
 	            }
 
@@ -20291,7 +20297,7 @@
 	                return false;
 	            }
 
-	            if (!this.scopes[project]) {
+	            if (!Array.isArray(this.scopes[project])) {
 	                this.scopes[project] = [];
 	            }
 

@@ -63,6 +63,10 @@ $('.login').each(function() {
         var fullName = $login.find('input#full-name').val();
         var password = $login.find('input#password').val();
 
+        if(!username || !password) {
+            return;
+        }
+
         var data = {
             username: username,
             password: password,

@@ -364,10 +364,7 @@ class UIHelper {
 
         message = message || '';
 
-        let headingBreakIndex = message.indexOf(' at ');
-        let heading = message.substring(0, headingBreakIndex);
-        
-        let modal = messageModal('<span class="fa fa-warning"></span> Error', heading + '<br /><br />Please check the JavaScript console for details', onClickOK);
+        let modal = messageModal('<span class="fa fa-warning"></span> Error', message + '<br /><br />Please check the JavaScript console for details', onClickOK);
 
         modal.$element.toggleClass('error-modal', true);
 

@@ -22,7 +22,7 @@ class UserHelper {
             if(exists) {
                 fs.readFile(mailConfigPath, (err, data) => {
                     if(err) {
-                        debug.log('There was an error reading /config/mail.cfg, please check permissions', this);
+                        debug.log('There was an error reading ' + mailConfigPath + ', please check permissions', this);
 
                     } else {
                         try {
@@ -30,7 +30,7 @@ class UserHelper {
                             this.cachedAccessToken = this.mailConfig.accessToken;
 
                         } catch(e) {
-                            debug.log('There was a problem parsing /config/mail.cfg', this);
+                            debug.log('There was a problem parsing ' + mailConfigPath, this);
                             debug.log(e.message, this);
                         
                         }
@@ -38,7 +38,7 @@ class UserHelper {
                 });
         
             } else {
-                debug.log('/config/mail.cfg could not be found, email services will be unavailable', this);
+                debug.log(mailConfigPath + ' could not be found, email services will be unavailable', this);
 
             }
         });
@@ -52,40 +52,40 @@ class UserHelper {
      * @returns {Promise} Promise
      */
     static sendEmail(mailOptions) {
+        if(!this.mailConfig) {
+            return Promise.reject(new Error('Email services are not configured for this instance'));
+        }
+
         return new Promise((resolve, reject) => {
-            if(this.mailConfig) {
-                let generator = xoauth2.createXOAuth2Generator({
-                    user: this.mailConfig.user,
-                    clientId: this.mailConfig.clientId,
-                    clientSecret: this.mailConfig.clientSecret,
-                    refreshToken: this.mailConfig.refreshToken,
-                    accessToken: this.cachedAccessToken
-                });
+            let generator = xoauth2.createXOAuth2Generator({
+                user: this.mailConfig.user,
+                clientId: this.mailConfig.clientId,
+                clientSecret: this.mailConfig.clientSecret,
+                refreshToken: this.mailConfig.refreshToken,
+                accessToken: this.cachedAccessToken
+            });
+            
+            generator.on('token', (res) => {
+                this.cachedAccessToken = res.accessToken;
+            });
+
+            let mailTransport = nodemailer.createTransport({
+                service: this.mailConfig.service,
+                auth: {
+                    xoauth2: generator
+                }
+            });
+
+            mailTransport.sendMail(mailOptions, (err, info) => {
+                if(err){
+                    reject(new Error(err));
                 
-                generator.on('token', (res) => {
-                    this.cachedAccessToken = res.accessToken;
-                });
+                } else {
+                    resolve('Message sent: ' + info.response);
+                
+                }
+            });
 
-                let mailTransport = nodemailer.createTransport({
-                    service: this.mailConfig.service,
-                    auth: {
-                        xoauth2: generator
-                    }
-                });
-
-                mailTransport.sendMail(mailOptions, (err, info) => {
-                    if(err){
-                        reject(new Error(err));
-                    
-                    } else {
-                        resolve('Message sent: ' + info.response);
-                    
-                    }
-                });
-
-            } else {
-                reject(new Error('Email services are not configured for this instance'));
-            }
         });
     }
 
@@ -99,13 +99,17 @@ class UserHelper {
      * @returns {Promise} Promise
      */
     static invite(email, project) {
+        if(!this.mailConfig) {
+            return Promise.reject(new Error('Email services are not configured for this instance'));
+        }
+
         let token = crypto.randomBytes(10).toString('hex');
 
         let mailOptions = {
             from: '"' + this.mailConfig.displayName + '" <' + this.mailConfig.email + '>',
             to: email,
             subject: 'Welcome to HashBrown',
-            html: '<p>You have been kindly invited to join the HashBrown project "' + project + '".</p><p>Please go to this URL to activate your account: <br />' + this.mailConfig.host + '/login?inviteToken=' + token
+            html: '<p>You have been kindly invited to join a HashBrown instance.</p><p>Please go to this URL to activate your account: <br />' + this.mailConfig.host + '/login?inviteToken=' + token
         };
 
         let user = User.create();
@@ -114,7 +118,9 @@ class UserHelper {
         user.email = email;
         user.scopes = {};
 
-        user.scopes[project] = [];
+        if(project) {
+            user.scopes[project] = [];
+        }
         
         return this.sendEmail(mailOptions)
         .then((msg) => { 
@@ -125,9 +131,7 @@ class UserHelper {
             ).then(() => {
                 debug.log('Created new user "' + email + '" successfully', this);
                  
-                return new Promise((resolve) => {
-                    resolve(msg);
-                });
+                return Promise.resolve(msg);
             });
         });
     }
@@ -346,6 +350,16 @@ class UserHelper {
     static activateUser(username, password, fullName, inviteToken) {
         let newUser;
 
+        // Username check
+        if(!username || username.length < 4) {
+            return Promise.reject(new Error('Usernames must be at least 4 characters'));
+        }
+        
+        // Password check
+        if(!password || password.length < 4) {
+            return Promise.reject(new Error('Passwords must be at least 4 characters'));
+        }
+        
         return UserHelper.findInviteToken(inviteToken)
         .then((user) => {
             user.fullName = user.fullName || fullName;

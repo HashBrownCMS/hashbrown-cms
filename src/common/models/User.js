@@ -32,7 +32,7 @@ class User extends Entity {
      * @returns {Array} scopes
      */
     getScopes(project) {
-        if(!this.scopes[project]) {
+        if(!this.scopes[project] || !Array.isArray(this.scopes[project])) {
             this.scopes[project] = [];
         }
 
@@ -53,7 +53,7 @@ class User extends Entity {
         if(!project) { return false; }
         if(!scope && !this.scopes[project]) { return false; }
 
-        if(!this.scopes[project]) {
+        if(!Array.isArray(this.scopes[project])) {
             this.scopes[project] = [];
         }
 

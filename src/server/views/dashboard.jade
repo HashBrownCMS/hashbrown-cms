@@ -29,18 +29,20 @@ html
                             .pane-text
                                 .pane-label
                                     |  Projects
-                        a(href='#users')
-                            .pane-icon
-                                span.fa.fa-users
-                            .pane-text
-                                .pane-label
-                                    |  Users
-                        a(href='#diagnostics')
-                            .pane-icon
-                                span.fa.fa-pie-chart
-                            .pane-text
-                                .pane-label
-                                    |  Diagnostics
+                        if(user.isAdmin)
+                            a(href='#users')
+                                .pane-icon
+                                    span.fa.fa-users
+                                .pane-text
+                                    .pane-label
+                                        |  Users
+                        if(user.isAdmin)
+                            a(href='#diagnostics')
+                                .pane-icon
+                                    span.fa.fa-pie-chart
+                                .pane-text
+                                    .pane-label
+                                        |  Diagnostics
 
 
             .workspace
@@ -84,34 +86,35 @@ html
                             .user-actions
                                 button.btn.btn-primary.btn-round.btn-raised.btn-invite-user(title='Invite user') +
                 
-                section
-                    h4 
-                        a#diagnostics DIAGNOSTICS
-                    
-                    table.diagnostics
-                        tr
-                            td Software
-                            td HashBrown v#{app.version} 
-
-                        tr
-                            td Platform
-                            td #{os.type()} 
-
-                        each cpu, i in os.cpus()
+                if(user.isAdmin)
+                    section
+                        h4 
+                            a#diagnostics DIAGNOSTICS
+                        
+                        table.diagnostics
                             tr
-                                td CPU #{i + 1}
-                                td #{cpu.model}
-                        tr
-                            td Memory
-                            td #{Math.round(os.freemem() / 1000000)}mb / #{Math.round(os.totalmem() / 1000000)}mb
+                                td Software
+                                td HashBrown v#{app.version} 
 
-                        tr
-                            td Load average
-                            td #{Math.round(os.loadavg()[0] * 10000) / 10000}
+                            tr
+                                td Platform
+                                td #{os.type()} 
 
-                        tr
-                            td Uptime
-                            td #{Math.round(os.uptime() / 60)}m
+                            each cpu, i in os.cpus()
+                                tr
+                                    td CPU #{i + 1}
+                                    td #{cpu.model}
+                            tr
+                                td Memory
+                                td #{Math.round(os.freemem() / 1000000)}mb / #{Math.round(os.totalmem() / 1000000)}mb
+
+                            tr
+                                td Load average
+                                td #{Math.round(os.loadavg()[0] * 10000) / 10000}
+
+                            tr
+                                td Uptime
+                                td #{Math.round(os.uptime() / 60)}m
 
         script(src='/lib/jquery/jquery.min.js')
         script(src='/lib/bootstrap/js/bootstrap.min.js')

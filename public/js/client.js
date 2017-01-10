@@ -11079,10 +11079,7 @@
 
 	            message = message || '';
 
-	            var headingBreakIndex = message.indexOf(' at ');
-	            var heading = message.substring(0, headingBreakIndex);
-
-	            var modal = messageModal('<span class="fa fa-warning"></span> Error', heading + '<br /><br />Please check the JavaScript console for details', onClickOK);
+	            var modal = messageModal('<span class="fa fa-warning"></span> Error', message + '<br /><br />Please check the JavaScript console for details', onClickOK);
 
 	            modal.$element.toggleClass('error-modal', true);
 
@@ -34412,7 +34409,7 @@
 	    }, {
 	        key: 'getScopes',
 	        value: function getScopes(project) {
-	            if (!this.scopes[project]) {
+	            if (!this.scopes[project] || !Array.isArray(this.scopes[project])) {
 	                this.scopes[project] = [];
 	            }
 
@@ -34442,7 +34439,7 @@
 	                return false;
 	            }
 
-	            if (!this.scopes[project]) {
+	            if (!Array.isArray(this.scopes[project])) {
 	                this.scopes[project] = [];
 	            }
 

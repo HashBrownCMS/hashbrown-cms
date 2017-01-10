@@ -102,7 +102,7 @@ apiCall('get', 'user')
                 ).on('click', () => {
                     UI.confirmModal(
                         'remove',
-                        'Delete user "' + (user.fullName || user.username || user.id) + '"',
+                        'Delete user "' + (user.fullName || user.username || user.email || user.id) + '"',
                         'Are you sure you want to remove this user?',
                         () => {
                             apiCall('delete', 'users/' + user.id)
@@ -158,19 +158,23 @@ $('.btn-invite-user').click(() => {
         function onSubmit() {
             let username = addUserModal.$element.find('input.username').val();
 
+            // Check if username was email
             let emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
             let isEmail = emailRegex.test(username);
 
-            let user = users.filter((user) => {
+            // Check if en existing user has the same information
+            let existingUser = users.filter((user) => {
                 return user.username == username || user.email == username;
             })[0];
 
             // The user was found
-            if(user) {
+            if(existingUser) {
                 UI.errorModal(new Error('User "' + username + '" already exists'));
+                return;
+            }
         
             // An email was provided, send invitation    
-            } else if(isEmail) {
+            if(isEmail) {
                 let modal = UI.confirmModal(
                     'invite',
                     'Add user',
@@ -189,45 +193,46 @@ $('.btn-invite-user').click(() => {
                         return false;
                     }
                 );
+
+                return;
+            }
            
             // User doesn't exist, create it
-            } else {
-                let $passwd;
+            let $passwd;
 
-                let modal = UI.confirmModal(
-                    'create',
-                    'Add user',
-                    [
-                        _.p('Set password for new user "' + username + '"'),
-                        $passwd = _.input({required: true, pattern: '.{6,}', class: 'form-control', type: 'text', value: generatePassword(), placeholder: 'Type new password'})
-                    ],
-                    () => {
-                        let password = $passwd.val() || '';
-                        let scopes = {};
+            let modal = UI.confirmModal(
+                'create',
+                'Add user',
+                [
+                    _.p('Set password for new user "' + username + '"'),
+                    $passwd = _.input({required: true, pattern: '.{6,}', class: 'form-control', type: 'text', value: generatePassword(), placeholder: 'Type new password'})
+                ],
+                () => {
+                    let password = $passwd.val() || '';
+                    let scopes = {};
 
-                        apiCall('post', 'users/new', {
-                            username: username,
-                            password: password,
-                            scopes: {}
-                        })
-                        .then(() => {
-                            UI.messageModal('Create user', 'User "' + username + '" was created with password "' + password + '".', () => { location.reload(); });
-                        })
-                        .catch(errorModal);
+                    apiCall('post', 'users/new', {
+                        username: username,
+                        password: password,
+                        scopes: {}
+                    })
+                    .then(() => {
+                        UI.messageModal('Create user', 'User "' + username + '" was created with password "' + password + '".', () => { location.reload(); });
+                    })
+                    .catch(errorModal);
 
-                        let $buttons = modal.$element.find('button').attr('disabled', true).addClass('disabled');
+                    let $buttons = modal.$element.find('button').attr('disabled', true).addClass('disabled');
 
-                        return false;
-                    }
-                );
-            }
+                    return false;
+                }
+            );
         }
 
         // Renders the modal
         let addUserModal = UI.confirmModal(
             'OK',
             'Add user',
-            _.input({class: 'form-control username', placeholder: 'Username', type: 'text'})
+            _.input({class: 'form-control username', placeholder: 'Username or email', type: 'text'})
             .on('change keyup paste propertychange input'),
             onSubmit
         );
