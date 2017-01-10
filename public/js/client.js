@@ -11061,19 +11061,32 @@
 	    }, {
 	        key: 'errorModal',
 	        value: function errorModal(error, onClickOK) {
+	            if (!error) {
+	                return;
+	            }
+
+	            var message = '';
+
 	            if (error instanceof String) {
-	                error = new Error(error);
-	            } else if (error && error instanceof Object) {
+	                message = error;
+	            } else if (error instanceof Error) {
+	                message = error.message;
+	            } else if (error instanceof Object) {
 	                if (error.responseText) {
-	                    error = new Error(error.responseText);
+	                    message = error.responseText;
 	                }
 	            }
 
-	            var modal = messageModal('<span class="fa fa-warning"></span> Error', error.message + '<br /><br />Please check server log for details', onClickOK);
+	            message = message || '';
+
+	            var headingBreakIndex = message.indexOf(' at ');
+	            var heading = message.substring(0, headingBreakIndex);
+
+	            var modal = messageModal('<span class="fa fa-warning"></span> Error', heading + '<br /><br />Please check the JavaScript console for details', onClickOK);
 
 	            modal.$element.toggleClass('error-modal', true);
 
-	            throw error;
+	            throw new Error(message);
 	        }
 
 	        /**
@@ -12146,7 +12159,9 @@
 	            _.div({ class: 'main-menu-item' }, _.a({ title: 'Dashboard', href: '/', class: 'main-menu-dashboard' }, _.span({ class: 'fa fa-home' }))),
 
 	            // User dropdown
-	            _.div({ class: 'main-menu-item main-menu-user dropdown' }, _.button({ title: 'User', class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, _.span({ class: 'fa fa-user' })), _.ul({ class: 'dropdown-menu' }, _.li(_.a({ class: 'dropdown-item', href: '#/users/' + this.user.id }, 'User settings')), _.li(_.a({ class: 'dropdown-item', href: '#' }, 'Log out').click(function (e) {
+	            _.div({ class: 'main-menu-item main-menu-user dropdown' }, _.button({ title: 'User', class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, _.span({ class: 'fa fa-user' })), _.ul({ class: 'dropdown-menu' }, _.li(_.a({ class: 'dropdown-item', href: '#/users/' + this.user.id }, 'User settings').click(function (e) {
+	                e.preventDefault();new UserEditor({ hidePermissions: true, model: User.current });
+	            })), _.li(_.a({ class: 'dropdown-item', href: '#' }, 'Log out').click(function (e) {
 	                e.preventDefault();logout();
 	            })))),
 
@@ -33205,7 +33220,7 @@
 
 	        _this.modal.$element.addClass('modal-user-editor');
 
-	        apiCall('get', 'server/projects').then(function (projects) {
+	        customApiCall('get', '/api/server/projects').then(function (projects) {
 	            _this.projects = projects;
 	            _this.init();
 	        });
@@ -33460,11 +33475,14 @@
 	        value: function renderPasswordEditor() {
 	            var view = this;
 
+	            var $invalidMessage = void 0;
 	            var password1 = void 0;
 	            var password2 = void 0;
 
 	            function onChange() {
-	                var isValid = password1 == password2 && password1 && password1.length > 4;
+	                var isMatch = password1 == password2;
+	                var isLongEnough = password1 && password1.length > 3;
+	                var isValid = isMatch && isLongEnough;
 
 	                $element.toggleClass('invalid', !isValid);
 
@@ -33474,6 +33492,12 @@
 	                    view.newPassword = password1;
 	                } else {
 	                    view.newPassword = null;
+
+	                    if (!isMatch) {
+	                        $invalidMessage.html('Passwords do not match');
+	                    } else if (!isLongEnough) {
+	                        $invalidMessage.html('Passwords are too short');
+	                    }
 	                }
 	            }
 
@@ -33485,9 +33509,11 @@
 
 	            function onChange2() {
 	                password2 = $(this).val();
+
+	                onChange();
 	            }
 
-	            var $element = _.div({ class: 'password-editor' }, _.span({ class: 'invalid-message' }, 'Check passwords'), _.input({ class: 'form-control', type: 'password', placeholder: 'Type new password' }).on('change propertychange keyup paste input', onChange1), _.input({ class: 'form-control', type: 'password', placeholder: 'Confirm new password' }).on('change propertychange keyup paste input', onChange2));
+	            var $element = _.div({ class: 'password-editor' }, $invalidMessage = _.span({ class: 'invalid-message' }, 'Passwords do not match'), _.input({ class: 'form-control', type: 'password', placeholder: 'Type new password' }).on('change propertychange keyup paste input', onChange1), _.input({ class: 'form-control', type: 'password', placeholder: 'Confirm new password' }).on('change propertychange keyup paste input', onChange2));
 
 	            return $element;
 	        }
@@ -33540,7 +33566,7 @@
 	        value: function render() {
 	            var _this4 = this;
 
-	            _.append(this.$element.empty(), this.renderField('Username', this.renderUserNameEditor()), this.renderField('Full name', this.renderFullNameEditor()), this.renderField('Email', this.renderEmailEditor()), this.renderField('Password', this.renderPasswordEditor()), _.if(User.current.isAdmin, this.renderField('Is admin', this.renderAdminEditor()), _.if(!this.model.isAdmin, _.each(this.projects, function (i, project) {
+	            _.append(this.$element.empty(), this.renderField('Username', this.renderUserNameEditor()), this.renderField('Full name', this.renderFullNameEditor()), this.renderField('Email', this.renderEmailEditor()), this.renderField('Password', this.renderPasswordEditor()), _.if(User.current.isAdmin && !this.hidePermissions, this.renderField('Is admin', this.renderAdminEditor()), _.if(!this.model.isAdmin, _.each(this.projects, function (i, project) {
 	                var hasProject = _this4.model.scopes[project] != undefined;
 
 	                return _.div({ class: 'project' }, _.div({ class: 'project-header' }, UI.inputSwitch(hasProject, function (newValue) {
@@ -35922,7 +35948,6 @@
 	__webpack_require__(162);
 	__webpack_require__(163);
 	__webpack_require__(164);
-	__webpack_require__(165);
 
 /***/ },
 /* 157 */
@@ -36284,41 +36309,6 @@
 	    ViewHelper.get('NavbarMain').highlightItem(this.id);
 
 	    populateWorkspace(formEditor.$element);
-	});
-
-/***/ },
-/* 165 */
-/***/ function(module, exports) {
-
-	'use strict';
-
-	// Users
-
-	Router.route('/users/', function () {
-	    if (currentUserHasScope('users')) {
-	        ViewHelper.get('NavbarMain').showTab('/users/');
-
-	        populateWorkspace(_.div({ class: 'dashboard-container' }, _.h1('Users'), _.p('Please click on a user to continue')), 'presentation presentation-center');
-	    } else {
-	        location.hash = '/';
-	    }
-	});
-
-	// Edit
-	Router.route('/users/:id', function () {
-	    if (User.current.id == this.id || currentUserHasScope('users')) {
-	        ViewHelper.get('NavbarMain').highlightItem(this.id);
-
-	        apiCall('get', 'users/' + this.id).then(function (user) {
-	            var userEditor = new UserEditor({
-	                model: user
-	            });
-
-	            populateWorkspace(userEditor.$element);
-	        }).catch(errorModal);
-	    } else {
-	        location.hash = '/';
-	    }
 	});
 
 /***/ }

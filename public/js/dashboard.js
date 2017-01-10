@@ -128,7 +128,7 @@
 	            var $projectList = void 0;
 
 	            var renderUser = function renderUser() {
-	                _.append($user.empty(), _.button({ class: 'btn btn-edit' }, _.span({ class: 'user-icon fa fa-' + (user.isAdmin ? 'black-tie' : 'user') }), _.div({ class: 'user-info' }, _.h4(user.fullName || user.username || user.email || user.id), _.p(user.isAdmin ? 'Admin' : 'Editor'))).on('click', function () {
+	                _.append($user.empty(), _.button({ class: 'btn btn-edit' }, _.span({ class: 'user-icon fa fa-' + (user.isAdmin ? 'black-tie' : 'user') }), _.div({ class: 'user-info' }, _.h4((user.fullName || user.username || user.email || user.id) + (user.id == User.current.id ? ' (you)' : '')), _.p(user.isAdmin ? 'Admin' : 'Editor'))).on('click', function () {
 	                    var userEditor = new UserEditor({ model: user });
 
 	                    userEditor.on('save', function () {
@@ -10958,19 +10958,32 @@
 	    }, {
 	        key: 'errorModal',
 	        value: function errorModal(error, onClickOK) {
+	            if (!error) {
+	                return;
+	            }
+
+	            var message = '';
+
 	            if (error instanceof String) {
-	                error = new Error(error);
-	            } else if (error && error instanceof Object) {
+	                message = error;
+	            } else if (error instanceof Error) {
+	                message = error.message;
+	            } else if (error instanceof Object) {
 	                if (error.responseText) {
-	                    error = new Error(error.responseText);
+	                    message = error.responseText;
 	                }
 	            }
 
-	            var modal = messageModal('<span class="fa fa-warning"></span> Error', error.message + '<br /><br />Please check server log for details', onClickOK);
+	            message = message || '';
+
+	            var headingBreakIndex = message.indexOf(' at ');
+	            var heading = message.substring(0, headingBreakIndex);
+
+	            var modal = messageModal('<span class="fa fa-warning"></span> Error', heading + '<br /><br />Please check the JavaScript console for details', onClickOK);
 
 	            modal.$element.toggleClass('error-modal', true);
 
-	            throw error;
+	            throw new Error(message);
 	        }
 
 	        /**
@@ -19716,7 +19729,7 @@
 
 	        _this.modal.$element.addClass('modal-user-editor');
 
-	        apiCall('get', 'server/projects').then(function (projects) {
+	        customApiCall('get', '/api/server/projects').then(function (projects) {
 	            _this.projects = projects;
 	            _this.init();
 	        });
@@ -19971,11 +19984,14 @@
 	        value: function renderPasswordEditor() {
 	            var view = this;
 
+	            var $invalidMessage = void 0;
 	            var password1 = void 0;
 	            var password2 = void 0;
 
 	            function onChange() {
-	                var isValid = password1 == password2 && password1 && password1.length > 4;
+	                var isMatch = password1 == password2;
+	                var isLongEnough = password1 && password1.length > 3;
+	                var isValid = isMatch && isLongEnough;
 
 	                $element.toggleClass('invalid', !isValid);
 
@@ -19985,6 +20001,12 @@
 	                    view.newPassword = password1;
 	                } else {
 	                    view.newPassword = null;
+
+	                    if (!isMatch) {
+	                        $invalidMessage.html('Passwords do not match');
+	                    } else if (!isLongEnough) {
+	                        $invalidMessage.html('Passwords are too short');
+	                    }
 	                }
 	            }
 
@@ -19996,9 +20018,11 @@
 
 	            function onChange2() {
 	                password2 = $(this).val();
+
+	                onChange();
 	            }
 
-	            var $element = _.div({ class: 'password-editor' }, _.span({ class: 'invalid-message' }, 'Check passwords'), _.input({ class: 'form-control', type: 'password', placeholder: 'Type new password' }).on('change propertychange keyup paste input', onChange1), _.input({ class: 'form-control', type: 'password', placeholder: 'Confirm new password' }).on('change propertychange keyup paste input', onChange2));
+	            var $element = _.div({ class: 'password-editor' }, $invalidMessage = _.span({ class: 'invalid-message' }, 'Passwords do not match'), _.input({ class: 'form-control', type: 'password', placeholder: 'Type new password' }).on('change propertychange keyup paste input', onChange1), _.input({ class: 'form-control', type: 'password', placeholder: 'Confirm new password' }).on('change propertychange keyup paste input', onChange2));
 
 	            return $element;
 	        }
@@ -20051,7 +20075,7 @@
 	        value: function render() {
 	            var _this4 = this;
 
-	            _.append(this.$element.empty(), this.renderField('Username', this.renderUserNameEditor()), this.renderField('Full name', this.renderFullNameEditor()), this.renderField('Email', this.renderEmailEditor()), this.renderField('Password', this.renderPasswordEditor()), _.if(User.current.isAdmin, this.renderField('Is admin', this.renderAdminEditor()), _.if(!this.model.isAdmin, _.each(this.projects, function (i, project) {
+	            _.append(this.$element.empty(), this.renderField('Username', this.renderUserNameEditor()), this.renderField('Full name', this.renderFullNameEditor()), this.renderField('Email', this.renderEmailEditor()), this.renderField('Password', this.renderPasswordEditor()), _.if(User.current.isAdmin && !this.hidePermissions, this.renderField('Is admin', this.renderAdminEditor()), _.if(!this.model.isAdmin, _.each(this.projects, function (i, project) {
 	                var hasProject = _this4.model.scopes[project] != undefined;
 
 	                return _.div({ class: 'project' }, _.div({ class: 'project-header' }, UI.inputSwitch(hasProject, function (newValue) {
@@ -20291,36 +20315,16 @@
 	    }
 
 	    /**
-	     * Checks whether the current user is admin
-	     *
-	     * @returns {Boolean} Is the current user admin
+	     * Event: Click remove button
 	     */
 
 
 	    _createClass(ProjectEditor, [{
-	        key: 'isAdmin',
-	        value: function isAdmin() {
-	            for (var i in this.model.users) {
-	                var user = this.model.users[i];
-
-	                if (user.isCurrent && user.isAdmin) {
-	                    return true;
-	                }
-	            }
-
-	            return false;
-	        }
-
-	        /**
-	         * Event: Click remove button
-	         */
-
-	    }, {
 	        key: 'onClickRemove',
 	        value: function onClickRemove() {
 	            var _this2 = this;
 
-	            if (!this.isAdmin()) {
+	            if (!User.current.isAdmin) {
 	                return;
 	            }
 
@@ -20377,15 +20381,17 @@
 	        value: function onClickInfo() {
 	            var _this4 = this;
 
-	            if (this.isAdmin()) {
-	                var infoEditor = new InfoEditor({ projectId: this.model.id });
-
-	                infoEditor.on('change', function (newInfo) {
-	                    _this4.model.settings.info = newInfo;
-
-	                    _this4.fetch();
-	                });
+	            if (!User.current.isAdmin) {
+	                return;
 	            }
+
+	            var infoEditor = new InfoEditor({ projectId: this.model.id });
+
+	            infoEditor.on('change', function (newInfo) {
+	                _this4.model.settings.info = newInfo;
+
+	                _this4.fetch();
+	            });
 	        }
 
 	        /**
@@ -20397,15 +20403,17 @@
 	        value: function onClickLanguages() {
 	            var _this5 = this;
 
-	            if (this.isAdmin()) {
-	                var languageEditor = new LanguageEditor({ projectId: this.model.id });
-
-	                languageEditor.on('change', function (newLanguages) {
-	                    _this5.model.settings.language.selected = newLanguages;
-
-	                    _this5.fetch();
-	                });
+	            if (!User.current.isAdmin) {
+	                return;
 	            }
+
+	            var languageEditor = new LanguageEditor({ projectId: this.model.id });
+
+	            languageEditor.on('change', function (newLanguages) {
+	                _this5.model.settings.language.selected = newLanguages;
+
+	                _this5.fetch();
+	            });
 	        }
 
 	        /**
@@ -20415,9 +20423,11 @@
 	    }, {
 	        key: 'onClickBackups',
 	        value: function onClickBackups() {
-	            if (this.isAdmin()) {
-	                new BackupEditor({ model: this.model });
+	            if (!User.current.isAdmin) {
+	                return;
 	            }
+
+	            new BackupEditor({ model: this.model });
 	        }
 
 	        /**
@@ -20427,9 +20437,11 @@
 	    }, {
 	        key: 'onClickMigrate',
 	        value: function onClickMigrate() {
-	            if (this.isAdmin()) {
-	                new MigrationEditor({ model: this.model });
+	            if (!User.current.isAdmin) {
+	                return;
 	            }
+
+	            new MigrationEditor({ model: this.model });
 	        }
 
 	        /**
@@ -20473,7 +20485,7 @@
 	            var languageCount = this.model.settings.language.selected.length;
 	            var userCount = this.model.users.length;
 
-	            _.append(this.$element.empty(), _.div({ class: 'body' }, _.if(this.isAdmin(), _.div({ class: 'admin dropdown' }, _.button({ class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, _.span({ class: 'fa fa-ellipsis-v' })), _.ul({ class: 'dropdown-menu' }, _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Info').click(function (e) {
+	            _.append(this.$element.empty(), _.div({ class: 'body' }, _.if(User.current.isAdmin, _.div({ class: 'admin dropdown' }, _.button({ class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, _.span({ class: 'fa fa-ellipsis-v' })), _.ul({ class: 'dropdown-menu' }, _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Info').click(function (e) {
 	                e.preventDefault();_this7.onClickInfo();
 	            })), _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Languages').click(function (e) {
 	                e.preventDefault();_this7.onClickLanguages();
@@ -20484,10 +20496,10 @@
 	            }))), _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Delete').click(function (e) {
 	                e.preventDefault();_this7.onClickRemove();
 	            }))))), _.div({ class: 'info' }, _.h4(this.model.settings.info.name || this.model.id), _.p(userCount + ' user' + (userCount != 1 ? 's' : '')), _.p(languageCount + ' language' + (languageCount != 1 ? 's' : '') + ' (' + this.model.settings.language.selected.join(', ') + ')')), _.div({ class: 'environments' }, _.each(this.model.settings.environments.names, function (i, environment) {
-	                return _.div({ class: 'environment' }, _.div({ class: 'btn-group' }, _.span({ class: 'environment-title' }, environment), _.a({ title: 'Go to "' + environment + '" CMS', href: '/' + _this7.model.id + '/' + environment, class: 'btn btn-primary' }, _.span({ class: 'fa fa-arrow-right' })), _.if(_this7.isAdmin(), _.div({ class: 'dropdown' }, _.button({ class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, _.span({ class: 'fa fa-ellipsis-v' })), _.ul({ class: 'dropdown-menu' }, _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Delete').click(function (e) {
+	                return _.div({ class: 'environment' }, _.div({ class: 'btn-group' }, _.span({ class: 'environment-title' }, environment), _.a({ title: 'Go to "' + environment + '" CMS', href: '/' + _this7.model.id + '/' + environment, class: 'btn btn-primary' }, _.span({ class: 'fa fa-arrow-right' })), _.if(User.current.isAdmin, _.div({ class: 'dropdown' }, _.button({ class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, _.span({ class: 'fa fa-ellipsis-v' })), _.ul({ class: 'dropdown-menu' }, _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Delete').click(function (e) {
 	                    e.preventDefault();_this7.onClickRemoveEnvironment(environment);
 	                })))))));
-	            }), _.if(this.isAdmin(), _.button({ title: 'Add environment', class: 'btn btn-primary btn-add btn-raised btn-round' }, '+').click(function () {
+	            }), _.if(User.current.isAdmin, _.button({ title: 'Add environment', class: 'btn btn-primary btn-add btn-raised btn-round' }, '+').click(function () {
 	                _this7.onClickAddEnvironment();
 	            })))));
 	        }

@@ -13,18 +13,18 @@ class ServerController extends ApiController {
         app.get('/api/server/:project/environments', this.middleware({ setProject: false }), this.getAllEnvironments);
         app.get('/api/server/backups/:project/:timestamp.hba', this.middleware({ setProject: false }), this.getBackup);
         
-        app.post('/api/server/update/start', this.middleware({ setProject: false }), this.postUpdateServer);
-        app.post('/api/server/projects/new', this.middleware({ setProject: false }), this.createProject);
-        app.post('/api/server/backups/:project/new', this.middleware({ setProject: false }), this.postBackupProject);
-        app.post('/api/server/backups/:project/upload', this.middleware({ setProject: false }), BackupHelper.getUploadHandler(), this.postUploadProjectBackup);
-        app.post('/api/server/backups/:project/:timestamp/restore', this.middleware({ setProject: false }), this.postRestoreProjectBackup);
-        app.post('/api/server/settings/:project/:section', this.middleware({ setProject: false }), this.postProjectSettings);
-        app.post('/api/server/migrate/:project/', this.middleware({ setProject: false }), this.postMigrateContent);
-        app.post('/api/server/rename/:project/', this.middleware({ setProject: false }), this.postRenameProject);
+        app.post('/api/server/update/start', this.middleware({ needsAdmin: true, setProject: false }), this.postUpdateServer);
+        app.post('/api/server/projects/new', this.middleware({ needsAdmin: true, setProject: false }), this.createProject);
+        app.post('/api/server/backups/:project/new', this.middleware({ needsAdmin: true, setProject: false }), this.postBackupProject);
+        app.post('/api/server/backups/:project/upload', this.middleware({ needsAdmin: true, setProject: false }), BackupHelper.getUploadHandler(), this.postUploadProjectBackup);
+        app.post('/api/server/backups/:project/:timestamp/restore', this.middleware({ needsAdmin: true, setProject: false }), this.postRestoreProjectBackup);
+        app.post('/api/server/settings/:project/:section', this.middleware({ needsAdmin: true, setProject: false }), this.postProjectSettings);
+        app.post('/api/server/migrate/:project/', this.middleware({ needsAdmin: true, setProject: false }), this.postMigrateContent);
+        app.post('/api/server/rename/:project/', this.middleware({ needsAdmin: true, setProject: false }), this.postRenameProject);
 
-        app.delete('/api/server/backups/:project/:timestamp', this.middleware({ setProject: false }), this.deleteBackup);
-        app.delete('/api/server/projects/:project', this.middleware({ setProject: false }), this.deleteProject);
-        app.delete('/api/server/projects/:project/:environment', this.middleware({ setProject: false }), this.deleteEnvironment);
+        app.delete('/api/server/backups/:project/:timestamp', this.middleware({ needsAdmin: true, setProject: false }), this.deleteBackup);
+        app.delete('/api/server/projects/:project', this.middleware({ needsAdmin: true, setProject: false }), this.deleteProject);
+        app.delete('/api/server/projects/:project/:environment', this.middleware({ needsAdmin: true, setProject: false }), this.deleteEnvironment);
     }
     
     /**
@@ -228,20 +228,15 @@ class ServerController extends ApiController {
      * Updates the server
      */
     static postUpdateServer(req, res) {
-        if(!req.user.isAdmin) {
-            res.status(403).send('Only admins can update HashBrown');
+        UpdateHelper.update()
+        .then(() => {
+            res.status(200).send('OK');
 
-        } else {
-            UpdateHelper.update()
-            .then(() => {
-                res.status(200).send('OK');
-
-                process.exit(1);
-            })
-            .catch((e) => {
-                res.status(502).send(ServerController.printError(e));  
-            });
-        }
+            process.exit(1);
+        })
+        .catch((e) => {
+            res.status(502).send(ServerController.printError(e));  
+        });
     }
 
     /**
@@ -319,7 +314,7 @@ class ServerController extends ApiController {
             let scopedProjects = [];
 
             if(!req.user.isAdmin) {
-                for(let scope in (user.scopes || {})) {
+                for(let scope in (req.user.scopes || {})) {
                     if(projects.indexOf(scope) > -1) {
                         scopedProjects.push(scope);
                     }
@@ -397,18 +392,13 @@ class ServerController extends ApiController {
     static deleteProject(req, res) {
         let project = req.params.project;
 
-        if(!req.user.isAdmin) {
-            res.status(403).send('Only admins can delete projects');  
-
-        } else {
-            ProjectHelper.deleteProject(project)
-            .then(() => {
-                res.status(200).send('OK');
-            })
-            .catch((e) => {
-                res.status(502).send(ServerController.printError(e));
-            });
-        }
+        ProjectHelper.deleteProject(project)
+        .then(() => {
+            res.status(200).send('OK');
+        })
+        .catch((e) => {
+            res.status(502).send(ServerController.printError(e));
+        });
     }
     
     /**
@@ -418,19 +408,13 @@ class ServerController extends ApiController {
         let project = req.params.project;
         let environment = req.params.environment;
 
-        if(!req.user.isAdmin) {
-            res.status(403).send('Only admins can delete environments');  
-
-        } else {
-            ProjectHelper.deleteEnvironment(project, environment)
-            .then(() => {
-                res.status(200).send('OK');
-            })
-            .catch((e) => {
-                res.status(502).send(ServerController.printError(e));
-            });
-    
-        }
+        ProjectHelper.deleteEnvironment(project, environment)
+        .then(() => {
+            res.status(200).send('OK');
+        })
+        .catch((e) => {
+            res.status(502).send(ServerController.printError(e));
+        });
     }
 
     /**
@@ -439,19 +423,13 @@ class ServerController extends ApiController {
     static createProject(req, res) {
         let project = req.body
         
-        if(!req.user.isAdmin) {
-            res.status(403).send('Only admins can create projects');  
-
-        } else {
-            ProjectHelper.createProject(project.name, req.user.id)
-            .then((project) => {
-                res.status(200).send(project);
-            })
-            .catch((e) => {
-                res.status(502).send(ServerController.printError(e));
-            });
-    
-        }
+        ProjectHelper.createProject(project.name, req.user.id)
+        .then((project) => {
+            res.status(200).send(project);
+        })
+        .catch((e) => {
+            res.status(502).send(ServerController.printError(e));
+        });
     }
 
     /**

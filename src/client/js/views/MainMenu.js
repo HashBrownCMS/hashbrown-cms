@@ -164,6 +164,7 @@ class MainMenu extends View {
                 _.ul({class: 'dropdown-menu'},
                     _.li(
                         _.a({class: 'dropdown-item', href: '#/users/' + this.user.id}, 'User settings')
+                            .click((e) => { e.preventDefault(); new UserEditor({ hidePermissions: true, model: User.current }); })
                     ),
                     _.li(
                         _.a({class: 'dropdown-item', href: '#'}, 'Log out')

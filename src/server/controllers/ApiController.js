@@ -16,38 +16,35 @@ class ApiController extends Controller {
      * @param {String} token
      * @param {String} project
      * @param {String} scope
+     * @param {Boolean} needsAdmin
      *
      * @returns {Promise} User object
      */
-    static authenticate(token, project, scope) {
+    static authenticate(token, project, scope, needsAdmin) {
         if(!token) {
             return Promise.reject(new Error('No token was provided'));
-
-        } else {
-            return UserHelper.findToken(token)
-            .then((user) => {
-                if(user) {
-                    // If a scope is defined, and the user isn't an admin, check for it
-                    if(project && scope && !user.isAdmin) {
-                        if(user.hasScope(project, scope)) {
-                            return Promise.resolve(user);
-                
-                        } else {
-                            return Promise.reject(new Error('User "' + user.username + '" with token "' + token + '" doesn\'t have scope "' + scope + '"'));
-
-                        }
-                   
-                    // If no scope is required, return as normal 
-                    } else {
-                        return Promise.resolve(user);
-
-                    }
-
-                } else {
-                    return Promise.reject(new Error('Found no user with token "' + token + '"'));
-                }
-            });
         }
+    
+        return UserHelper.findToken(token)
+        .then((user) => {
+            // If no user was found, return error
+            if(!user) {
+                return Promise.reject(new Error('Found no user with token "' + token + '"'));
+            }
+            
+            // If admin is required, and user isn't admin, return error
+            if(needsAdmin && !user.isAdmin) {
+                return Promise.reject(new Error('User "' + user.username + '" is not an admin'))
+            }
+
+            // If a scope is defined, and the user deosn't have it, return error
+            if(project && scope && !user.hasScope(project, scope)) {
+                return Promise.reject(new Error('User "' + user.username + '" does not have scope "' + scope + '"'));
+            }
+           
+            // If all requirements have been met, resolve
+            return Promise.resolve(user);
+        });
     }
 
     /**
@@ -183,7 +180,7 @@ class ApiController extends Controller {
                     .then(() => {
                         // Using authentication
                         if(settings.authenticate != false) {
-                            return ApiController.authenticate(token, req.project, settings.scope);
+                            return ApiController.authenticate(token, req.project, settings.scope, settings.needsAdmin);
                         
                         // No authentication needed
                         } else {
@@ -193,7 +190,7 @@ class ApiController extends Controller {
                 
                 // Disregarding project parameter, but using authentication
                 } else if(settings.authenticate != false) {
-                    return ApiController.authenticate(req.cookies.token, settings.scope);
+                    return ApiController.authenticate(req.cookies.token, null, settings.scope, settings.needsAdmin);
 
                 // Neither project parameter nor authentication needed
                 } else {
@@ -234,7 +231,7 @@ class ApiController extends Controller {
             fullErrorString = shortErrorString;
            
             if(error.stack) {
-                fullErrorString += '\n\n' + error.stack;
+                fullErrorString = error.stack;
             }
 
             if(!fullErrorString) {

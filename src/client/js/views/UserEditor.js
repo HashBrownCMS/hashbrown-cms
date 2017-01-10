@@ -18,7 +18,7 @@ class UserEditor extends View {
 
         this.modal.$element.addClass('modal-user-editor');
 
-        apiCall('get', 'server/projects')
+        customApiCall('get', '/api/server/projects')
         .then((projects) => {
             this.projects = projects;
             this.init();
@@ -257,11 +257,14 @@ class UserEditor extends View {
     renderPasswordEditor() {
         let view = this;
 
+        let $invalidMessage;
         let password1;
         let password2;
 
         function onChange() {
-            let isValid = password1 == password2 && password1 && password1.length > 4;
+            let isMatch = password1 == password2;
+            let isLongEnough = password1 && password1.length > 3;
+            let isValid = isMatch && isLongEnough;
 
             $element.toggleClass('invalid', !isValid);
 
@@ -273,6 +276,11 @@ class UserEditor extends View {
             } else {
                 view.newPassword = null;
 
+                if(!isMatch) {
+                    $invalidMessage.html('Passwords do not match');
+                } else if(!isLongEnough) {
+                    $invalidMessage.html('Passwords are too short');
+                }
             }
         }
 
@@ -284,10 +292,12 @@ class UserEditor extends View {
         
         function onChange2() {
             password2 = $(this).val();
+            
+            onChange(); 
         } 
 
         let $element = _.div({class: 'password-editor'},
-            _.span({class: 'invalid-message'}, 'Check passwords'),
+            $invalidMessage = _.span({class: 'invalid-message'}, 'Passwords do not match'),
             _.input({class: 'form-control', type: 'password', placeholder: 'Type new password'})
                 .on('change propertychange keyup paste input', onChange1),
             _.input({class: 'form-control', type: 'password', placeholder: 'Confirm new password'})
@@ -345,7 +355,7 @@ class UserEditor extends View {
             this.renderField('Email', this.renderEmailEditor()),
             this.renderField('Password', this.renderPasswordEditor()),
 
-            _.if(User.current.isAdmin,
+            _.if(User.current.isAdmin && !this.hidePermissions,
                 this.renderField('Is admin', this.renderAdminEditor()),
 
                 _.if(!this.model.isAdmin,

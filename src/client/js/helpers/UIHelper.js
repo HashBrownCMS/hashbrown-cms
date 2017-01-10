@@ -346,20 +346,32 @@ class UIHelper {
      * @param {Function} onClickOK
      */
     static errorModal(error, onClickOK) {
+        if(!error) { return; }
+
+        let message = '';
+
         if(error instanceof String) {
-            error = new Error(error);
+            message = error;
         
-        } else if (error && error instanceof Object) {
+        } else if(error instanceof Error) {
+            message = error.message;
+
+        } else if(error instanceof Object) {
             if(error.responseText) {
-                error = new Error(error.responseText);
+                message = error.responseText;
             }
         }
 
-        let modal = messageModal('<span class="fa fa-warning"></span> Error', error.message + '<br /><br />Please check server log for details', onClickOK);
+        message = message || '';
+
+        let headingBreakIndex = message.indexOf(' at ');
+        let heading = message.substring(0, headingBreakIndex);
+        
+        let modal = messageModal('<span class="fa fa-warning"></span> Error', heading + '<br /><br />Please check the JavaScript console for details', onClickOK);
 
         modal.$element.toggleClass('error-modal', true);
 
-        throw error;
+        throw new Error(message);
     }
 
     /**

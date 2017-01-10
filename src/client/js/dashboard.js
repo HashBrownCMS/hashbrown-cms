@@ -81,7 +81,7 @@ apiCall('get', 'user')
                 _.button({class: 'btn btn-edit'},
                     _.span({class: 'user-icon fa fa-' + (user.isAdmin ? 'black-tie' : 'user')}),
                     _.div({class: 'user-info'}, 
-                        _.h4(user.fullName || user.username || user.email || user.id),
+                        _.h4((user.fullName || user.username || user.email || user.id) + (user.id == User.current.id ? ' (you)' : '')),
                         _.p(user.isAdmin ? 'Admin' : 'Editor')
                     )
                 ).on('click', () => {

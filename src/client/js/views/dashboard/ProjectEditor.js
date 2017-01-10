@@ -13,27 +13,10 @@ class ProjectEditor extends View {
     }
    
     /**
-     * Checks whether the current user is admin
-     *
-     * @returns {Boolean} Is the current user admin
-     */
-    isAdmin() {
-        for(let i in this.model.users) {
-            let user = this.model.users[i];
-
-            if(user.isCurrent && user.isAdmin) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
      * Event: Click remove button
      */ 
     onClickRemove() {
-        if(!this.isAdmin()) { return; }
+        if(!User.current.isAdmin) { return; }
 
         let modal = new MessageModal({
             model: {
@@ -89,48 +72,48 @@ class ProjectEditor extends View {
     /**
      * Event: Click info button */
     onClickInfo() {
-        if(this.isAdmin()) {
-            let infoEditor = new InfoEditor({ projectId: this.model.id });
+        if(!User.current.isAdmin) { return; }
+        
+        let infoEditor = new InfoEditor({ projectId: this.model.id });
 
-            infoEditor.on('change', (newInfo) => {
-                this.model.settings.info = newInfo;
+        infoEditor.on('change', (newInfo) => {
+            this.model.settings.info = newInfo;
 
-                this.fetch();
-            });
-        }
+            this.fetch();
+        });
     }
     
     /**
      * Event: Click languages button
      */
     onClickLanguages() {
-        if(this.isAdmin()) {
-            let languageEditor = new LanguageEditor({ projectId: this.model.id });
-            
-            languageEditor.on('change', (newLanguages) => {
-                this.model.settings.language.selected = newLanguages;
+        if(!User.current.isAdmin) { return; }
 
-                this.fetch();
-            });
-        }
+        let languageEditor = new LanguageEditor({ projectId: this.model.id });
+        
+        languageEditor.on('change', (newLanguages) => {
+            this.model.settings.language.selected = newLanguages;
+
+            this.fetch();
+        });
     }
 
     /**
      * Event: Click backups button
      */
     onClickBackups() {
-        if(this.isAdmin()) {
-            new BackupEditor({ model: this.model });
-        }
+        if(!User.current.isAdmin) { return; }
+        
+        new BackupEditor({ model: this.model });
     }
 
     /**
      * Event: Click migration button
      */
     onClickMigrate() {
-        if(this.isAdmin()) {
-            new MigrationEditor({ model: this.model });
-        }
+        if(!User.current.isAdmin) { return; }
+    
+        new MigrationEditor({ model: this.model });
     }
 
     /**
@@ -171,7 +154,7 @@ class ProjectEditor extends View {
 
         _.append(this.$element.empty(),
             _.div({class: 'body'},
-                _.if(this.isAdmin(),
+                _.if(User.current.isAdmin,
                     _.div({class: 'admin dropdown'}, 
                         _.button({class: 'dropdown-toggle', 'data-toggle': 'dropdown'},
                             _.span({class: 'fa fa-ellipsis-v'})
@@ -220,7 +203,7 @@ class ProjectEditor extends View {
                                 _.a({title: 'Go to "' + environment + '" CMS', href: '/' + this.model.id + '/' + environment, class: 'btn btn-primary'}, 
                                     _.span({class: 'fa fa-arrow-right'})
                                 ),
-                                _.if(this.isAdmin(),
+                                _.if(User.current.isAdmin,
                                     _.div({class: 'dropdown'},
                                         _.button({class: 'dropdown-toggle', 'data-toggle': 'dropdown'},
                                             _.span({class: 'fa fa-ellipsis-v'})
@@ -237,7 +220,7 @@ class ProjectEditor extends View {
                             )
                         );
                     }),
-                    _.if(this.isAdmin(),
+                    _.if(User.current.isAdmin,
                         _.button({title: 'Add environment', class: 'btn btn-primary btn-add btn-raised btn-round'}, '+')
                             .click(() => { this.onClickAddEnvironment(); })
                     )
