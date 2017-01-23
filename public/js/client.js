@@ -23753,24 +23753,10 @@
 	        return _this;
 	    }
 
-	    /**
-	     * Event: Change
-	     */
-
-
 	    _createClass(BooleanEditor, [{
-	        key: 'onChange',
-	        value: function onChange() {
-	            this.value = this.$input[0].checked;
-
-	            this.trigger('change', this.value);
-	        }
-	    }, {
 	        key: 'render',
 	        value: function render() {
 	            var _this2 = this;
-
-	            var switchId = 'switch-field-boolean-' + ViewHelper.getAll('BooleanEditor').length;
 
 	            // Sanity check
 	            if (typeof this.value === 'undefined') {
@@ -23781,9 +23767,11 @@
 	                this.value = false;
 	            }
 
-	            this.$element = _.div({ class: 'field-editor switch-editor' }, _.div({ class: 'switch' }, this.$input = _.input({ id: switchId, class: 'form-control switch', type: 'checkbox', checked: this.value }).change(function () {
-	                _this2.onChange();
-	            }), _.label({ for: switchId })));
+	            this.$element = _.div({ class: 'field-editor switch-editor' }, UI.inputSwitch(this.value, function (newValue) {
+	                _this2.value = newValue;
+
+	                _this2.trigger('change', _this2.value);
+	            }));
 
 	            // Just to make sure the model has the right type of value
 	            setTimeout(function () {
