@@ -199,9 +199,8 @@ class ProjectEditor extends View {
                     _.each(this.model.settings.environments.names, (i, environment) => {
                         return _.div({class: 'environment'},
                             _.div({class: 'btn-group'},
-                                _.span({class: 'environment-title'}, environment),
-                                _.a({title: 'Go to "' + environment + '" CMS', href: '/' + this.model.id + '/' + environment, class: 'btn btn-primary'}, 
-                                    _.span({class: 'fa fa-arrow-right'})
+                                _.a({title: 'Go to "' + environment + '" CMS', href: '/' + this.model.id + '/' + environment, class: 'environment-title btn btn-primary'}, 
+                                    environment
                                 ),
                                 _.if(User.current.isAdmin,
                                     _.div({class: 'dropdown'},

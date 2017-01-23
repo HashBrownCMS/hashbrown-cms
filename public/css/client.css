@@ -1236,10 +1236,9 @@ body > .dashboard-container {
               line-height: 30px;
               display: block;
               height: 30px;
-              margin: 0px -5px 0px 15px; }
+              margin: 0px -5px 0px 5px; }
             body > .dashboard-container .workspace .projects .project-editor .body .environments .environment .environment-title {
-              flex-grow: 1;
-              line-height: 30px; }
+              flex-grow: 1; }
             body > .dashboard-container .workspace .projects .project-editor .body .environments .environment .btn-primary {
               min-width: 0px; }
               body > .dashboard-container .workspace .projects .project-editor .body .environments .environment .btn-primary .fa {
