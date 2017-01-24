@@ -23379,22 +23379,50 @@
 
 	        _this.$element = _.div({ class: 'array-editor field-editor' });
 
-	        _this.$keyContent = _.button({ class: 'btn btn-primary btn-array-editor-sort-items' }, _.span({ class: 'text-default' }, 'Sort'), _.span({ class: 'text-sorting', style: 'display: none' }, 'Done')).click(function () {
+	        _this.$keyContent = _.div(_.button({ class: 'btn btn-primary btn-array-editor-sort-items' }, _.span({ class: 'text-default' }, 'Sort'), _.span({ class: 'text-sorting', style: 'display: none' }, 'Done')).click(function () {
 	            _this.onClickSort();
-	        });
+	        }), _.button({ class: 'btn btn-primary btn-array-editor-sort-items' }, 'Collapse').click(function () {
+	            _this.onClickCollapseAll();
+	        }), _.button({ class: 'btn btn-primary btn-array-editor-sort-items' }, 'Expand').click(function () {
+	            _this.onClickExpandAll();
+	        }));
 
 	        _this.fetch();
 	        return _this;
 	    }
 
 	    /**
-	     * Event: Click remove item
-	     *
-	     * @param {Number} index
+	     * Event: Click expand all items
 	     */
 
 
 	    _createClass(ArrayEditor, [{
+	        key: 'onClickExpandAll',
+	        value: function onClickExpandAll() {
+	            this.$element.find('.item').each(function (e, element) {
+	                $(element).toggleClass('collapsed', false);
+	            });
+	        }
+
+	        /**
+	         * Event: Click collapse all items
+	         */
+
+	    }, {
+	        key: 'onClickCollapseAll',
+	        value: function onClickCollapseAll() {
+	            this.$element.find('.item').each(function (e, element) {
+	                $(element).toggleClass('collapsed', true);
+	            });
+	        }
+
+	        /**
+	         * Event: Click remove item
+	         *
+	         * @param {Number} index
+	         */
+
+	    }, {
 	        key: 'onClickRemoveItem',
 	        value: function onClickRemoveItem(i) {
 	            this.value.schemaBindings.splice(i, 1);
