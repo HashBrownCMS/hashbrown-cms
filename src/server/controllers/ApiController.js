@@ -140,6 +140,8 @@ class ApiController extends Controller {
 
         return getPromise()
         .then((allowedOrigin) => {
+		console.log('AsASASAS', allowedOrigin);
+
             if(allowedOrigin) {
                 res.header('Access-Control-Allow-Origin', allowedOrigin);
                 res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');

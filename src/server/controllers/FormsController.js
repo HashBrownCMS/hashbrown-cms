@@ -41,7 +41,7 @@ class FormsController extends ApiController {
      * @returns {Promise} Result
      */
     static checkCORS(req, res) {
-        return FormHelper.getForm(req.project, req.environment, req.params.id)
+        return FormHelper.getForm(req.params.project, req.params.environment, req.params.id)
         .then((form) => {
             return Promise.resolve(form.allowedOrigin || '*');
         });
