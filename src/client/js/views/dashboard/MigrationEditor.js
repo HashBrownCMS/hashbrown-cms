@@ -36,11 +36,12 @@ class MigrationEditor extends View {
                     _.div({class: 'migration-settings'},
                         _.each({
                             replace: 'Overwrite on target',
-                            schemas: 'Migrate schemas',
-                            content: 'Migrate content',
-                            media: 'Migrate media',
-                            connections: 'Migrate connections',
-                            settings: 'Migrate settings'
+                            schemas: 'Schemas',
+                            content: 'Content',
+                            forms: 'Forms',
+                            media: 'Media',
+                            connections: 'Connections',
+                            settings: 'Settings'
                         }, (key, label) => {
                             return _.div({class: 'input-group'},      
                                 _.span(label),
