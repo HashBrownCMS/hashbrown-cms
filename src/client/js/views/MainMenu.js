@@ -35,7 +35,7 @@ class MainMenu extends View {
             this.fetch();
         });
     }
-
+    
     /**
      * Event: Click question
      */
