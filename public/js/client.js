@@ -12064,7 +12064,7 @@
 	                    break;
 
 	                case 'content':
-	                    UI.messageModal('Content', [_.p('This sections contains all of your authored work. The content is a hierarchical tree of nodes that can contain text and media, in simple or complex structures.')]);
+	                    UI.messageModal('Content', [_.p('This section contains all of your authored work. The content is a hierarchical tree of nodes that can contain text and media, in simple or complex structures.')]);
 	                    break;
 
 	                case 'media':
