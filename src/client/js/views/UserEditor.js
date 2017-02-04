@@ -48,7 +48,7 @@ class UserEditor extends View {
         .then(() => {
             this.modal.hide();
 
-            this.trigger('save');
+            this.trigger('save', this.model);
         })
         .catch(errorModal);
     }

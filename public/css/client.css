@@ -714,23 +714,17 @@ img.logo {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%); }
-    .spinner-obscure .spinner-container.inline {
-      display: flex;
-      flex-wrap: wrap;
-      width: 300px; }
-      .spinner-obscure .spinner-container.inline .spinner {
-        position: static;
-        transform: none;
-        display: block;
-        animation-name: spinner-no-offset; }
-      .spinner-obscure .spinner-container.inline .spinner-text {
-        display: block;
-        line-height: 32px;
-        font-size: 32px;
-        margin-left: 16px; }
-      .spinner-obscure .spinner-container.inline .loading-messages {
-        padding: 15px 30px;
-        width: 100%; }
+    .spinner-obscure .spinner-container.inline .spinner {
+      position: static;
+      transform: none;
+      display: block;
+      animation-name: spinner; }
+    .spinner-obscure .spinner-container.inline .loading-messages {
+      white-space: nowrap;
+      left: 30px;
+      top: 0px;
+      position: absolute;
+      transform: translateY(-50%); }
 
 .spinner-container {
   position: relative; }

@@ -142,27 +142,19 @@ img.logo {
         transform: translate(-50%, -50%);
 
         &.inline {
-            display: flex;
-            flex-wrap: wrap;
-            width: 300px;
-
             .spinner {
                 position: static;
                 transform: none;
                 display: block;
-                animation-name: spinner-no-offset;
-            }
-
-            .spinner-text {
-                display: block;
-                line-height: 32px;
-                font-size: 32px;
-                margin-left: 16px;
+                animation-name: spinner;
             }
 
             .loading-messages {
-                padding: 15px 30px;
-                width: 100%;
+                white-space: nowrap;
+                left: 30px;
+                top: 0px;
+                position: absolute;
+                transform: translateY(-50%);
             }
         }
     }

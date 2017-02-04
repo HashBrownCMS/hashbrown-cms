@@ -19961,7 +19961,7 @@
 	            apiCall('post', 'user/' + this.model.id, newUserObject).then(function () {
 	                _this2.modal.hide();
 
-	                _this2.trigger('save');
+	                _this2.trigger('save', _this2.model);
 	            }).catch(errorModal);
 	        }
 

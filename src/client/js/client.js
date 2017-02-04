@@ -160,16 +160,18 @@ window.reloadAllResources = function reloadAllResources() {
         'users'
     ];
 
-    function processQueue() {
-        let name = queue.pop();
-
-        let $msg = _.div({'data-name': name}, 'Loading ' + name + '...');
-
+    for(let item of queue) {
+        let $msg = _.div({'data-name': item}, item);
+        
         $('.loading-messages').append($msg);
+    }
+
+    function processQueue() {
+        let name = queue.shift();
 
         return window.reloadResource(name)
         .then(() => {
-            $msg.append(' OK');
+            $('.loading-messages [data-name="' + name + '"]').append(' \u2713');
             
             if(queue.length < 1) {
                 return Promise.resolve();
@@ -272,6 +274,7 @@ $(document).ready(() => {
                 cancel
             );
         };
+
 
         $('.cms-container').removeClass('faded');
 
