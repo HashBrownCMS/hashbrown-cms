@@ -105,7 +105,7 @@ apiCall('get', 'user')
                         'Delete user "' + (user.fullName || user.username || user.email || user.id) + '"',
                         'Are you sure you want to remove this user?',
                         () => {
-                            apiCall('delete', 'users/' + user.id)
+                            apiCall('delete', 'user/' + user.id)
                             .then(() => {
                                 $user.remove(); 
                             })
@@ -211,7 +211,7 @@ $('.btn-invite-user').click(() => {
                     let password = $passwd.val() || '';
                     let scopes = {};
 
-                    apiCall('post', 'users/new', {
+                    apiCall('post', 'user/new', {
                         username: username,
                         password: password,
                         scopes: {}

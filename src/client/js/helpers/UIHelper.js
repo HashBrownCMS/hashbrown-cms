@@ -41,11 +41,14 @@ class UIHelper {
      * @param {Array} items
      * @param {Array} dropdownItems
      * @param {Function} onChange
+     * @param {Boolean} isDropdownUnique
      *
      * @returns {HtmlElement} Chip group element
      */
-    static inputChipGroup(items, dropdownItems, onChange) {
+    static inputChipGroup(items, dropdownItems, onChange, isDropdownUnique) {
         let $element = _.div({class: 'chip-group'});
+
+        if(!items) { items = []; }
 
         function render() {
             _.append($element.empty(),
@@ -63,6 +66,15 @@ class UIHelper {
                                 _.if(onChange,
                                     _.ul({class: 'dropdown-menu'},
                                         _.each(dropdownItems, (dropdownItemIndex, dropdownItem) => {
+                                            // Look for unique dropdown items
+                                            if(isDropdownUnique) {
+                                                for(let item of items) {
+                                                    if(item == dropdownItem) {
+                                                        return;
+                                                    }
+                                                }
+                                            }
+
                                             return _.li(
                                                 _.a({href: '#'},
                                                     dropdownItem.label || dropdownItem.name || dropdownItem.title || dropdownItem
@@ -122,7 +134,25 @@ class UIHelper {
                         _.span({class: 'fa fa-plus'})
                     ).click(() => {
                         if(Array.isArray(dropdownItems)) {
-                            items.push(dropdownItems[0]);
+                            if(isDropdownUnique) {
+                                for(let dropdownItem of dropdownItems) {
+                                    let isSelected = false;
+
+                                    for(let item of items) {
+                                        if(item == dropdownItem) {
+                                            isSelected = true;
+                                            break;
+                                        }
+                                    }
+
+                                    if(!isSelected) {
+                                        items.push(dropdownItem);
+                                        break;
+                                    }
+                                }
+                            } else {
+                                items.push(dropdownItems[0]);
+                            }
                         
                         } else if(typeof dropdownItems === 'string') {
                             items.push(dropdownItems);

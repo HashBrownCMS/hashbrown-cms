@@ -28,11 +28,16 @@ class User extends Entity {
      * Gets all project scopes
      *
      * @param {String} project
+     * @param {Boolean} upsert
      *
      * @returns {Array} scopes
      */
-    getScopes(project) {
-        if(!this.scopes[project] || !Array.isArray(this.scopes[project])) {
+    getScopes(project, upsert) {
+        if(!this.scopes) { 
+            this.scopes = {};
+        }
+
+        if(!this.scopes[project] && upsert) {
             this.scopes[project] = [];
         }
 
@@ -57,7 +62,56 @@ class User extends Entity {
             this.scopes[project] = [];
         }
 
+        if(!scope) {
+            return true;
+        }
+
         return this.scopes[project].indexOf(scope) > -1;
+    }
+
+    /**
+     * Removes a scope
+     *
+     * @param {String} project
+     * @param {String|Boolean} scope
+     */
+    removeScope(project, scope) {
+        if(!project) { return; }
+        if(!this.scopes) { return; }
+        if(!this.scopes[project]) { return; }
+
+        if(scope) {
+            var scopeIndex = this.scopes[project].indexOf(scope);
+
+            this.scopes[project].splice(scopeIndex, 1);
+
+        } else {
+            delete this.scopes[project];
+
+        }
+    }
+
+    /**
+     * Grants a user a scope
+     *
+     * @param {String} project
+     * @param {String} scope
+     */
+    giveScope(project, scope) {
+        if(!project) { return; }
+
+        if(!this.scopes) {
+            this.scopes = {};
+        }
+
+        if(!this.scopes[project]) {
+            this.scopes[project] = [];
+        }
+
+        if(!scope) { return; }
+        if(this.scopes[project].indexOf(scope) > -1) { return; }
+
+        this.scopes[project].push(scope);
     }
 }
 

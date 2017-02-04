@@ -44,7 +44,7 @@ class UserEditor extends View {
             newUserObject.password = this.newPassword;
         }
 
-        apiCall('post', 'users/' + this.model.id, newUserObject)
+        apiCall('post', 'user/' + this.model.id, newUserObject)
         .then(() => {
             this.modal.hide();
 
@@ -67,25 +67,6 @@ class UserEditor extends View {
             'templates',
             'users'
         ];
-    }
-
-    /**
-     * Gets a list of user scopes
-     *
-     * @param {String} project
-     *
-     * @returns {Array} Array of scope strings
-     */
-    getUserScopes(project) {
-        if(!this.model.scopes) {
-            this.model.scopes = {};
-        }
-
-        if(!this.model.scopes[project]) {
-            this.model.scopes[project] = [];
-        }
-
-        return this.model.scopes[project];
     }
 
     /**
@@ -120,93 +101,13 @@ class UserEditor extends View {
      * @returns {HTMLElement} Element
      */
     renderScopesEditor(project) {
-        let view = this;
+        return _.div({class: 'scopes-editor'},
+            UI.inputChipGroup(this.model.getScopes(project), this.getScopes(), (newValue) => {
+                this.model.scopes[project] = newValue;
 
-        function onChange() {
-            view.getUserScopes(project).splice(0, view.getUserScopes(project).length);
-            
-            $element.find('.scopes .scope .dropdown .dropdown-toggle').each(function() {
-                 view.getUserScopes(project).push($(this).attr('data-id'));
-            });
-
-            render();
-        }
-
-        function onClickAdd() {
-            let newScope = '';
-
-            for(let scope of view.getScopes()) {
-                if(view.getUserScopes(project).indexOf(scope) < 0) {
-                    newScope = scope
-                    break;
-                }
-            }
-
-            if(newScope) {
-                view.getUserScopes(project).push(newScope);
-
-                render();
-            }
-        }
-
-        function render() {
-            _.append($element.empty(),
-                _.div({class: 'scopes chip-group'},
-                    _.each(view.getUserScopes(project), (i, userScope) => {
-                        try {
-                            let $scope = _.div({class: 'chip scope'},
-                                _.div({class: 'chip-label dropdown'},
-                                    _.button({class: 'dropdown-toggle', 'data-id': userScope, 'data-toggle': 'dropdown'},
-                                        userScope
-                                    ),
-                                    _.ul({class: 'dropdown-menu'},
-                                        _.each(view.getScopes(), (i, scope) => {
-                                            if(scope == userScope || view.getUserScopes(project).indexOf(scope) < 0) {
-                                                return _.li(
-                                                    _.a({href: '#', 'data-id': scope},
-                                                        scope
-                                                    ).click(function(e) {
-                                                        e.preventDefault();
-                                                            
-                                                        let $btn = $(this).parents('.dropdown').children('.dropdown-toggle');
-                                                        
-                                                        $btn.text($(this).text());
-                                                        $btn.attr('data-id', $(this).attr('data-id'));
-
-                                                        onChange();
-                                                    })
-                                                );
-                                            }
-                                        })
-                                    )
-                                ).change(onChange),
-                                _.button({class: 'btn chip-remove'},
-                                    _.span({class: 'fa fa-remove'})
-                                ).click(() => {
-                                    $scope.remove();        
-
-                                    onChange();
-                                })
-                            );
-                            
-                            return $scope;
-
-                        } catch(e) {
-                            UI.errorModal(e);
-                        }
-                    }),
-                    _.button({class: 'btn chip-add'},
-                        _.span({class: 'fa fa-plus'})
-                    ).click(onClickAdd)
-                )
-            );
-        }
-
-        let $element = _.div({class: 'scopes-editor'});
-
-        render();
-
-        return $element;
+                this.$element.find('.project[data-id="' + project + '"] .switch input')[0].checked = true;
+            }, true)
+        );
     }
 
     /**
@@ -360,15 +261,15 @@ class UserEditor extends View {
 
                 _.if(!this.model.isAdmin,
                     _.each(this.projects, (i, project) => {
-                        let hasProject = this.model.scopes[project] != undefined;
-
-                        return _.div({class: 'project'},
+                        return _.div({class: 'project', 'data-id': project},
                             _.div({class: 'project-header'},
-                                UI.inputSwitch(hasProject, (newValue) => {
+                                UI.inputSwitch(this.model.hasScope(project), (newValue) => {
                                     if(newValue) {
-                                        this.model.scopes[project] = {};
+                                        this.model.giveScope(project);
                                     } else {
-                                        delete this.model.scopes[project];
+                                        this.model.removeScope(project);
+                
+                                        this.$element.find('.project[data-id="' + project + '"] .chip-group .chip').remove();
                                     }   
                                 }),
                                 _.h4({class: 'project-title'}, project)

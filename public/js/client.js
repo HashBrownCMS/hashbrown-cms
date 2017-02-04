@@ -10798,14 +10798,19 @@
 	         * @param {Array} items
 	         * @param {Array} dropdownItems
 	         * @param {Function} onChange
+	         * @param {Boolean} isDropdownUnique
 	         *
 	         * @returns {HtmlElement} Chip group element
 	         */
 
 	    }, {
 	        key: 'inputChipGroup',
-	        value: function inputChipGroup(items, dropdownItems, onChange) {
+	        value: function inputChipGroup(items, dropdownItems, onChange, isDropdownUnique) {
 	            var $element = _.div({ class: 'chip-group' });
+
+	            if (!items) {
+	                items = [];
+	            }
 
 	            function render() {
 	                _.append($element.empty(),
@@ -10816,6 +10821,36 @@
 
 	                    // Dropdown
 	                    _.if(Array.isArray(dropdownItems), _.div({ class: 'chip-label dropdown' }, _.button({ class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, item.label || item.name || item.title || item), _.if(onChange, _.ul({ class: 'dropdown-menu' }, _.each(dropdownItems, function (dropdownItemIndex, dropdownItem) {
+	                        // Look for unique dropdown items
+	                        if (isDropdownUnique) {
+	                            var _iteratorNormalCompletion = true;
+	                            var _didIteratorError = false;
+	                            var _iteratorError = undefined;
+
+	                            try {
+	                                for (var _iterator = items[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	                                    var _item = _step.value;
+
+	                                    if (_item == dropdownItem) {
+	                                        return;
+	                                    }
+	                                }
+	                            } catch (err) {
+	                                _didIteratorError = true;
+	                                _iteratorError = err;
+	                            } finally {
+	                                try {
+	                                    if (!_iteratorNormalCompletion && _iterator.return) {
+	                                        _iterator.return();
+	                                    }
+	                                } finally {
+	                                    if (_didIteratorError) {
+	                                        throw _iteratorError;
+	                                    }
+	                                }
+	                            }
+	                        }
+
 	                        return _.li(_.a({ href: '#' }, dropdownItem.label || dropdownItem.name || dropdownItem.title || dropdownItem).click(function (e) {
 	                            e.preventDefault();
 
@@ -10851,7 +10886,67 @@
 	                // Add button
 	                _.if(onChange, _.button({ class: 'btn chip-add' }, _.span({ class: 'fa fa-plus' })).click(function () {
 	                    if (Array.isArray(dropdownItems)) {
-	                        items.push(dropdownItems[0]);
+	                        if (isDropdownUnique) {
+	                            var _iteratorNormalCompletion2 = true;
+	                            var _didIteratorError2 = false;
+	                            var _iteratorError2 = undefined;
+
+	                            try {
+	                                for (var _iterator2 = dropdownItems[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+	                                    var dropdownItem = _step2.value;
+
+	                                    var isSelected = false;
+
+	                                    var _iteratorNormalCompletion3 = true;
+	                                    var _didIteratorError3 = false;
+	                                    var _iteratorError3 = undefined;
+
+	                                    try {
+	                                        for (var _iterator3 = items[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+	                                            var item = _step3.value;
+
+	                                            if (item == dropdownItem) {
+	                                                isSelected = true;
+	                                                break;
+	                                            }
+	                                        }
+	                                    } catch (err) {
+	                                        _didIteratorError3 = true;
+	                                        _iteratorError3 = err;
+	                                    } finally {
+	                                        try {
+	                                            if (!_iteratorNormalCompletion3 && _iterator3.return) {
+	                                                _iterator3.return();
+	                                            }
+	                                        } finally {
+	                                            if (_didIteratorError3) {
+	                                                throw _iteratorError3;
+	                                            }
+	                                        }
+	                                    }
+
+	                                    if (!isSelected) {
+	                                        items.push(dropdownItem);
+	                                        break;
+	                                    }
+	                                }
+	                            } catch (err) {
+	                                _didIteratorError2 = true;
+	                                _iteratorError2 = err;
+	                            } finally {
+	                                try {
+	                                    if (!_iteratorNormalCompletion2 && _iterator2.return) {
+	                                        _iterator2.return();
+	                                    }
+	                                } finally {
+	                                    if (_didIteratorError2) {
+	                                        throw _iteratorError2;
+	                                    }
+	                                }
+	                            }
+	                        } else {
+	                            items.push(dropdownItems[0]);
+	                        }
 	                    } else if (typeof dropdownItems === 'string') {
 	                        items.push(dropdownItems);
 	                    } else {
@@ -10921,13 +11016,13 @@
 	                    return;
 	                }
 
-	                var _iteratorNormalCompletion = true;
-	                var _didIteratorError = false;
-	                var _iteratorError = undefined;
+	                var _iteratorNormalCompletion4 = true;
+	                var _didIteratorError4 = false;
+	                var _iteratorError4 = undefined;
 
 	                try {
-	                    for (var _iterator = options[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-	                        var option = _step.value;
+	                    for (var _iterator4 = options[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+	                        var option = _step4.value;
 
 	                        if (option.value == defaultValue) {
 	                            $toggle.html(option.label);
@@ -10936,16 +11031,16 @@
 	                        }
 	                    }
 	                } catch (err) {
-	                    _didIteratorError = true;
-	                    _iteratorError = err;
+	                    _didIteratorError4 = true;
+	                    _iteratorError4 = err;
 	                } finally {
 	                    try {
-	                        if (!_iteratorNormalCompletion && _iterator.return) {
-	                            _iterator.return();
+	                        if (!_iteratorNormalCompletion4 && _iterator4.return) {
+	                            _iterator4.return();
 	                        }
 	                    } finally {
-	                        if (_didIteratorError) {
-	                            throw _iteratorError;
+	                        if (_didIteratorError4) {
+	                            throw _iteratorError4;
 	                        }
 	                    }
 	                }
@@ -33205,8 +33300,6 @@
 
 	'use strict';
 
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -33268,7 +33361,7 @@
 	                newUserObject.password = this.newPassword;
 	            }
 
-	            apiCall('post', 'users/' + this.model.id, newUserObject).then(function () {
+	            apiCall('post', 'user/' + this.model.id, newUserObject).then(function () {
 	                _this2.modal.hide();
 
 	                _this2.trigger('save');
@@ -33285,28 +33378,6 @@
 	        key: 'getScopes',
 	        value: function getScopes() {
 	            return ['connections', 'schemas', 'settings', 'templates', 'users'];
-	        }
-
-	        /**
-	         * Gets a list of user scopes
-	         *
-	         * @param {String} project
-	         *
-	         * @returns {Array} Array of scope strings
-	         */
-
-	    }, {
-	        key: 'getUserScopes',
-	        value: function getUserScopes(project) {
-	            if (!this.model.scopes) {
-	                this.model.scopes = {};
-	            }
-
-	            if (!this.model.scopes[project]) {
-	                this.model.scopes[project] = [];
-	            }
-
-	            return this.model.scopes[project];
 	        }
 
 	        /**
@@ -33345,96 +33416,13 @@
 	    }, {
 	        key: 'renderScopesEditor',
 	        value: function renderScopesEditor(project) {
-	            var view = this;
+	            var _this3 = this;
 
-	            function onChange() {
-	                view.getUserScopes(project).splice(0, view.getUserScopes(project).length);
+	            return _.div({ class: 'scopes-editor' }, UI.inputChipGroup(this.model.getScopes(project), this.getScopes(), function (newValue) {
+	                _this3.model.scopes[project] = newValue;
 
-	                $element.find('.scopes .scope .dropdown .dropdown-toggle').each(function () {
-	                    view.getUserScopes(project).push($(this).attr('data-id'));
-	                });
-
-	                render();
-	            }
-
-	            function onClickAdd() {
-	                var newScope = '';
-
-	                var _iteratorNormalCompletion = true;
-	                var _didIteratorError = false;
-	                var _iteratorError = undefined;
-
-	                try {
-	                    for (var _iterator = view.getScopes()[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-	                        var scope = _step.value;
-
-	                        if (view.getUserScopes(project).indexOf(scope) < 0) {
-	                            newScope = scope;
-	                            break;
-	                        }
-	                    }
-	                } catch (err) {
-	                    _didIteratorError = true;
-	                    _iteratorError = err;
-	                } finally {
-	                    try {
-	                        if (!_iteratorNormalCompletion && _iterator.return) {
-	                            _iterator.return();
-	                        }
-	                    } finally {
-	                        if (_didIteratorError) {
-	                            throw _iteratorError;
-	                        }
-	                    }
-	                }
-
-	                if (newScope) {
-	                    view.getUserScopes(project).push(newScope);
-
-	                    render();
-	                }
-	            }
-
-	            function render() {
-	                _.append($element.empty(), _.div({ class: 'scopes chip-group' }, _.each(view.getUserScopes(project), function (i, userScope) {
-	                    try {
-	                        var _ret = function () {
-	                            var $scope = _.div({ class: 'chip scope' }, _.div({ class: 'chip-label dropdown' }, _.button({ class: 'dropdown-toggle', 'data-id': userScope, 'data-toggle': 'dropdown' }, userScope), _.ul({ class: 'dropdown-menu' }, _.each(view.getScopes(), function (i, scope) {
-	                                if (scope == userScope || view.getUserScopes(project).indexOf(scope) < 0) {
-	                                    return _.li(_.a({ href: '#', 'data-id': scope }, scope).click(function (e) {
-	                                        e.preventDefault();
-
-	                                        var $btn = $(this).parents('.dropdown').children('.dropdown-toggle');
-
-	                                        $btn.text($(this).text());
-	                                        $btn.attr('data-id', $(this).attr('data-id'));
-
-	                                        onChange();
-	                                    }));
-	                                }
-	                            }))).change(onChange), _.button({ class: 'btn chip-remove' }, _.span({ class: 'fa fa-remove' })).click(function () {
-	                                $scope.remove();
-
-	                                onChange();
-	                            }));
-
-	                            return {
-	                                v: $scope
-	                            };
-	                        }();
-
-	                        if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
-	                    } catch (e) {
-	                        UI.errorModal(e);
-	                    }
-	                }), _.button({ class: 'btn chip-add' }, _.span({ class: 'fa fa-plus' })).click(onClickAdd)));
-	            }
-
-	            var $element = _.div({ class: 'scopes-editor' });
-
-	            render();
-
-	            return $element;
+	                _this3.$element.find('.project[data-id="' + project + '"] .switch input')[0].checked = true;
+	            }, true));
 	        }
 
 	        /**
@@ -33540,12 +33528,12 @@
 	    }, {
 	        key: 'renderAdminEditor',
 	        value: function renderAdminEditor() {
-	            var _this3 = this;
+	            var _this4 = this;
 
 	            return UI.inputSwitch(this.model.isAdmin == true, function (newValue) {
-	                _this3.model.isAdmin = newValue;
+	                _this4.model.isAdmin = newValue;
 
-	                _this3.render();
+	                _this4.render();
 	            }).addClass('admin-editor');
 	        }
 
@@ -33577,18 +33565,18 @@
 	    }, {
 	        key: 'render',
 	        value: function render() {
-	            var _this4 = this;
+	            var _this5 = this;
 
 	            _.append(this.$element.empty(), this.renderField('Username', this.renderUserNameEditor()), this.renderField('Full name', this.renderFullNameEditor()), this.renderField('Email', this.renderEmailEditor()), this.renderField('Password', this.renderPasswordEditor()), _.if(User.current.isAdmin && !this.hidePermissions, this.renderField('Is admin', this.renderAdminEditor()), _.if(!this.model.isAdmin, _.each(this.projects, function (i, project) {
-	                var hasProject = _this4.model.scopes[project] != undefined;
-
-	                return _.div({ class: 'project' }, _.div({ class: 'project-header' }, UI.inputSwitch(hasProject, function (newValue) {
+	                return _.div({ class: 'project', 'data-id': project }, _.div({ class: 'project-header' }, UI.inputSwitch(_this5.model.hasScope(project), function (newValue) {
 	                    if (newValue) {
-	                        _this4.model.scopes[project] = {};
+	                        _this5.model.giveScope(project);
 	                    } else {
-	                        delete _this4.model.scopes[project];
+	                        _this5.model.removeScope(project);
+
+	                        _this5.$element.find('.project[data-id="' + project + '"] .chip-group .chip').remove();
 	                    }
-	                }), _.h4({ class: 'project-title' }, project)), _.div({ class: 'project-scopes' }, _.p('Scopes:'), _this4.renderScopesEditor(project)));
+	                }), _.h4({ class: 'project-title' }, project)), _.div({ class: 'project-scopes' }, _.p('Scopes:'), _this5.renderScopesEditor(project)));
 	            }))));
 	        }
 	    }]);
@@ -34418,14 +34406,19 @@
 	         * Gets all project scopes
 	         *
 	         * @param {String} project
+	         * @param {Boolean} upsert
 	         *
 	         * @returns {Array} scopes
 	         */
 
 	    }, {
 	        key: 'getScopes',
-	        value: function getScopes(project) {
-	            if (!this.scopes[project] || !Array.isArray(this.scopes[project])) {
+	        value: function getScopes(project, upsert) {
+	            if (!this.scopes) {
+	                this.scopes = {};
+	            }
+
+	            if (!this.scopes[project] && upsert) {
 	                this.scopes[project] = [];
 	            }
 
@@ -34459,7 +34452,72 @@
 	                this.scopes[project] = [];
 	            }
 
+	            if (!scope) {
+	                return true;
+	            }
+
 	            return this.scopes[project].indexOf(scope) > -1;
+	        }
+
+	        /**
+	         * Removes a scope
+	         *
+	         * @param {String} project
+	         * @param {String|Boolean} scope
+	         */
+
+	    }, {
+	        key: 'removeScope',
+	        value: function removeScope(project, scope) {
+	            if (!project) {
+	                return;
+	            }
+	            if (!this.scopes) {
+	                return;
+	            }
+	            if (!this.scopes[project]) {
+	                return;
+	            }
+
+	            if (scope) {
+	                var scopeIndex = this.scopes[project].indexOf(scope);
+
+	                this.scopes[project].splice(scopeIndex, 1);
+	            } else {
+	                delete this.scopes[project];
+	            }
+	        }
+
+	        /**
+	         * Grants a user a scope
+	         *
+	         * @param {String} project
+	         * @param {String} scope
+	         */
+
+	    }, {
+	        key: 'giveScope',
+	        value: function giveScope(project, scope) {
+	            if (!project) {
+	                return;
+	            }
+
+	            if (!this.scopes) {
+	                this.scopes = {};
+	            }
+
+	            if (!this.scopes[project]) {
+	                this.scopes[project] = [];
+	            }
+
+	            if (!scope) {
+	                return;
+	            }
+	            if (this.scopes[project].indexOf(scope) > -1) {
+	                return;
+	            }
+
+	            this.scopes[project].push(scope);
 	        }
 	    }]);
 

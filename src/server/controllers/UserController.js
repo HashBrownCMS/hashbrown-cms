@@ -9,18 +9,18 @@ class UserController extends ApiController {
     static init(app) {
         app.get('/api/user', this.getCurrentUser);
         app.get('/api/user/scopes', this.getScopes);
-        app.get('/api/users', this.middleware({scope: 'users', setProject: false}), this.getUsers);
+        app.get('/api/users', this.middleware({needsAdmin: true, setProject: false}), this.getUsers);
         app.get('/api/:project/:environment/users', this.middleware(), this.getUsers);
         app.get('/api/:project/:environment/users/:id', this.middleware(), this.getUser);
         
-        app.post('/api/user/invite', this.postInvite);
+        app.post('/api/user/invite', this.middleware({needsAdmin: true}), this.postInvite);
         app.post('/api/user/activate', this.postActivate);
         app.post('/api/user/login', this.login);
-        app.post('/api/:project/:environment/users/new', this.middleware({scope: 'users'}), this.createUser);
-        app.post('/api/:project/:environment/users/:id', this.postUser);
-        app.post('/api/users/:id', this.postUser);
+        app.post('/api/user/new', this.middleware({setProject: false, needsAdmin: true}), this.createUser);
+        app.post('/api/user/:id', this.middleware({setProject: false}), this.postUser);
+        app.post('/api/:project/:environment/user/:id', this.middleware(), this.postUser);
         
-        app.delete('/api/users/:id', this.middleware({scope: 'users', setProject: false}), this.deleteUser);
+        app.delete('/api/user/:id', this.middleware({setProject: false, needsAdmin: true}), this.deleteUser);
     }    
     
     /**
