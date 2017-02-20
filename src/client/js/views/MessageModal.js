@@ -29,7 +29,7 @@ class MessageModal extends View {
     }
 
     onClickOK() {
-        if(this.model.onSubmit) {
+        if(typeof this.model.onSubmit === 'function') {
             if(this.model.onSubmit() == false) {
                 return;   
             }

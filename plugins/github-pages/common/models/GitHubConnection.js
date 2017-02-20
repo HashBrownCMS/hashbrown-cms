@@ -528,7 +528,7 @@ class GitHubConnection extends Connection {
     /**
      * Gets all Media objects
      *
-     * @returns {Promise(Array)} media
+     * @returns {Promise} Array of Media objects
      */
     getAllMedia() {
         return this.getTree('media', 'file')

@@ -213,12 +213,11 @@ class ApiController extends Controller {
      * Prints a formatted error and logs it
      *
      * @param {Error} error
+     * @param {Boolean} printToLog
      *
      * @returns {String} Pretty print for the error message
      */
-     static printError(error, printToLog) {
-        printToLog = printToLog != false;
-
+     static printError(error, printToLog = true) {
         if(!error) {
             return 'Unspecified error';
         }
@@ -245,10 +244,10 @@ class ApiController extends Controller {
         }
 
         if(printToLog) {
-            debug.log(fullErrorString, this);
+            debug.log('ERROR: ' + shortErrorString, this);
         }
 
-        return fullErrorString;
+        return shortErrorString;
      }
 }
 

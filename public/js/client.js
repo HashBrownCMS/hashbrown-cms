@@ -10689,7 +10689,7 @@
 	    }, {
 	        key: 'onClickOK',
 	        value: function onClickOK() {
-	            if (this.model.onSubmit) {
+	            if (typeof this.model.onSubmit === 'function') {
 	                if (this.model.onSubmit() == false) {
 	                    return;
 	                }
