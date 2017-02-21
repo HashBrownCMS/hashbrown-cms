@@ -112,7 +112,7 @@ class ApiController extends Controller {
      *
      * @param {Object} settings
      * @param {Request} req
-     * @param {Response} req
+     * @param {Response} res
      *
      * @returns {Promise} Result
      */

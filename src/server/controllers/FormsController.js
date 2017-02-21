@@ -200,17 +200,16 @@ class FormsController extends ApiController {
             lastSubmission = Date.now();
             lastIp = req.connection.remoteAddress;
 
-            if(!req.headers.referer) {
-                res.status(400).send(FormsController.printError(new Error('Request header has no referer')));
-                return;    
-            }
-            
             FormHelper.addEntry(req.project, req.environment, req.params.id, req.body)
             .then((form) => {
                 if(form.redirect) {
                     let redirectUrl = form.redirect;
 
                     if(form.appendRedirect) {
+                        if(!req.headers.referer) {
+                            return Promise.reject(new Error('Request header has no referer'));
+                        }
+            
                         redirectUrl = req.headers.referer + redirectUrl;
                     }
                     
