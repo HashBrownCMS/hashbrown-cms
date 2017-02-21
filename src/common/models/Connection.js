@@ -61,10 +61,22 @@ class Connection extends Entity {
     /**
      * Gets the remote URL
      *
+     * @param {Boolean} withSlash
+     *
      * @returns {String} URL
      */
-    getRemoteUrl() {
-        return this.url;
+    getRemoteUrl(withSlash = false) {
+        let url = this.url;
+
+        if(!withSlash && url[url.length - 1] == '/') {
+            url = url.substring(0, url.length - 1);
+
+        } else if(withSlash && url[url.length - 1] != '/') {
+            url += '/';
+        
+        }
+
+        return url;
     }
 
     /**

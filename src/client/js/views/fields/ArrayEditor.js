@@ -211,6 +211,10 @@ class ArrayEditor extends View {
 
             let fieldEditor = resources.editors[itemSchema.editorId];
 
+            if(!fieldEditor) {
+                UI.errorModal(new Error('Field editor "' + fieldEditor + '" was not found'));
+            }
+
             // Perform sanity check and reassign the item into the array
             item = ContentHelper.fieldSanityCheck(item, itemSchema);
             this.value.items[getIndex()] = item;

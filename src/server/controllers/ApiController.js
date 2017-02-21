@@ -244,7 +244,7 @@ class ApiController extends Controller {
         }
 
         if(printToLog) {
-            debug.log('ERROR: ' + shortErrorString, this);
+            debug.log('ERROR: ' + fullErrorString, this);
         }
 
         return shortErrorString;

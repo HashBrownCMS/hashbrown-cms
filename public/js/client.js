@@ -23392,27 +23392,11 @@
 	    }
 
 	    /**
-	     * Render URL editor
+	     * Render token editor
 	     */
 
 
 	    _createClass(ConnectionEditor, [{
-	        key: 'renderURLEditor',
-	        value: function renderURLEditor() {
-	            var view = this;
-
-	            function onChange() {
-	                view.model.url = $(this).val();
-	            }
-
-	            return _.div({ class: 'field-editor' }, _.input({ class: 'form-control', type: 'text', value: this.model.url, placeholder: 'Input HashBrown Driver URL' }).change(onChange));
-	        }
-
-	        /**
-	         * Render token editor
-	         */
-
-	    }, {
 	        key: 'renderTokenEditor',
 	        value: function renderTokenEditor() {
 	            var view = this;
@@ -23429,9 +23413,6 @@
 	            this.$element.empty();
 
 	            _.append(this.$element,
-	            // URL
-	            _.div({ class: 'field-container hashbrown-url' }, _.div({ class: 'field-key' }, 'URL'), _.div({ class: 'field-value' }, this.renderURLEditor())),
-
 	            // Token
 	            _.div({ class: 'field-container hashbrown-token' }, _.div({ class: 'field-key' }, 'Token'), _.div({ class: 'field-value' }, this.renderTokenEditor())));
 	        }
@@ -23714,6 +23695,10 @@
 	                }
 
 	                var fieldEditor = resources.editors[itemSchema.editorId];
+
+	                if (!fieldEditor) {
+	                    UI.errorModal(new Error('Field editor "' + fieldEditor + '" was not found'));
+	                }
 
 	                // Perform sanity check and reassign the item into the array
 	                item = ContentHelper.fieldSanityCheck(item, itemSchema);
@@ -35120,13 +35105,25 @@
 	        /**
 	         * Gets the remote URL
 	         *
+	         * @param {Boolean} withSlash
+	         *
 	         * @returns {String} URL
 	         */
 
 	    }, {
 	        key: 'getRemoteUrl',
 	        value: function getRemoteUrl() {
-	            return this.url;
+	            var withSlash = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+
+	            var url = this.url;
+
+	            if (!withSlash && url[url.length - 1] == '/') {
+	                url = url.substring(0, url.length - 1);
+	            } else if (withSlash && url[url.length - 1] != '/') {
+	                url += '/';
+	            }
+
+	            return url;
 	        }
 
 	        /**

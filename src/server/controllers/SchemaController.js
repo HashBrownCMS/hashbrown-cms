@@ -104,7 +104,7 @@ class SchemaController extends ApiController {
             return SyncHelper.setResourceItem(req.project, req.environment, 'schemas', id, localSchema);
         })
         .then(() => {
-            return SchemaHelper.removeSchemaById(req.project, req.environment, id);
+            return SchemaHelper.removeSchema(req.project, req.environment, id);
         })
         .then(() => {
             res.status(200).send(id);

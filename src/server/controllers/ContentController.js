@@ -56,7 +56,7 @@ class ContentController extends ApiController {
             });
         
         } else {
-            res.status(402).send('Content id is undefined');
+            res.status(402).send(ContentController.printError(new Error('Content id is undefined')));
 
         }
     }

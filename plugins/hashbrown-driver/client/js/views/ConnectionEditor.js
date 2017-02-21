@@ -8,22 +8,6 @@ class ConnectionEditor extends View {
     }
     
     /**
-     * Render URL editor
-     */
-    renderURLEditor() {
-        let view = this;
-        
-        function onChange() {
-            view.model.url = $(this).val();
-        }
-
-        return _.div({class: 'field-editor'},
-            _.input({class: 'form-control', type: 'text', value: this.model.url, placeholder: 'Input HashBrown Driver URL'})
-                .change(onChange)
-        );
-    }
-
-    /**
      * Render token editor
      */
     renderTokenEditor() {
@@ -43,14 +27,6 @@ class ConnectionEditor extends View {
         this.$element.empty();
 
         _.append(this.$element,
-            // URL
-            _.div({class: 'field-container hashbrown-url'},
-                _.div({class: 'field-key'}, 'URL'),
-                _.div({class: 'field-value'},
-                    this.renderURLEditor()
-                )
-            ),
-            
             // Token
             _.div({class: 'field-container hashbrown-token'},
                 _.div({class: 'field-key'}, 'Token'),

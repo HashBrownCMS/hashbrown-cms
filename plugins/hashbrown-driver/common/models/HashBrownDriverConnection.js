@@ -17,7 +17,7 @@ class HashBrownDriverConnection extends Connection {
         this.type = 'hashbrown-driver';
         this.tree = {};
     } 
-   
+
     /**
      * Gets the entire JSON tree
      *
@@ -28,10 +28,10 @@ class HashBrownDriverConnection extends Connection {
             'Accept': 'application/json'
         };
             
-        debug.log('Getting entire tree from ' + this.settings.url + '...', this);
+        debug.log('Getting entire tree from ' + this.getRemoteUrl() + '...', this);
         
         return new Promise((resolve, reject) => {
-            let apiUrl = this.settings.url + '/hashbrown/api/content/tree?token=' + this.settings.token;
+            let apiUrl = this.getRemoteUrl() + '/hashbrown/api/content/tree?token=' + this.settings.token;
 
             restler.get(apiUrl, {
                 headers: headers
@@ -78,10 +78,10 @@ class HashBrownDriverConnection extends Connection {
             json = JSON.stringify(json);
         }
 
-        debug.log('Posting entire tree to ' + this.settings.url + '...', this);
+        debug.log('Posting entire tree to ' + this.getRemoteUrl() + '...', this);
     
         return new Promise((resolve, reject) => {
-            restler.post(this.settings.url + '/hashbrown/api/content/tree?token=' + this.settings.token, {
+            restler.post(this.getRemoteUrl() + '/hashbrown/api/content/tree?token=' + this.settings.token, {
                 headers: headers,
                 data: json
             })
@@ -103,13 +103,22 @@ class HashBrownDriverConnection extends Connection {
      * @returns {Promise} promise
      */
     deleteContentProperties(id, language) {
-        debug.log('Processing "' + id + '"...', this);
+        debug.log('Deleting Content node "' + id + '"...', this);
+        
+        let headers = {
+            'Accept': 'application/json'
+        };
 
-        return this.getTree()
-        .then((tree) => {
-            delete tree[id];
-            
-            return this.setTree(tree);
+        return new Promise((resolve, reject) => {
+            restler.del(this.getRemoteUrl() + '/hashbrown/api/content/' + id + '?token=' + this.settings.token, {
+                headers: headers
+            })
+            .on('success', (data, response) => {
+                resolve(data);
+            })
+            .on('fail', (data, response) => {
+                reject(data);
+            });
         });
     }
 
@@ -124,27 +133,28 @@ class HashBrownDriverConnection extends Connection {
      * @returns {Promise} promise
      */
     postContentProperties(properties, id, language, meta) {
-        debug.log('Processing "' + properties.title + '"...', this);
+        debug.log('Posting properties of "' + (properties.title || id) + '"...', this);
 
-        return this.getTree()
-        .then((tree) => {
-            if(!tree[id]) {
-                tree[id] = {};
-            }
+        let headers = {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json; charset=utf-8'
+        };
 
-            if(!tree[id].properties) {
-                tree[id].properties = {};
-            }
-
-            tree[id].properties[language] = properties;
-
-            if(meta) {
-                for(let k in meta) {
-                    tree[id][k] = meta[k];
-                }
-            }
-
-            return this.setTree(tree);
+        return new Promise((resolve, reject) => {
+            restler.post(this.getRemoteUrl() + '/hashbrown/api/content/' + id + '/properties?token=' + this.settings.token, {
+                headers: headers,
+                data: JSON.stringify({
+                    language: language,
+                    properties: properties,
+                    meta: meta
+                })
+            })
+            .on('success', (data, response) => {
+                resolve(data);
+            })
+            .on('fail', (data, response) => {
+                reject(data);
+            });
         });
     }
     
@@ -163,13 +173,13 @@ class HashBrownDriverConnection extends Connection {
 
         let headers = {
             'Accept': 'application/json',
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json; charset=utf-8'
         };
             
-        debug.log('Setting media object "' + id + '" at ' + this.settings.url + '...', this);
+        debug.log('Setting media object "' + id + '" at ' + this.getRemoteUrl() + '...', this);
         
         return new Promise((resolve, reject) => {
-            let apiUrl = this.settings.url + '/hashbrown/api/media/' + id + '?token=' + this.settings.token;
+            let apiUrl = this.getRemoteUrl() + '/hashbrown/api/media/' + id + '?token=' + this.settings.token;
             
             fs.readFile(tempPath, (err, fileData) => {
                 let postData = { 
@@ -202,10 +212,10 @@ class HashBrownDriverConnection extends Connection {
             'Accept': 'application/json'
         };
             
-        debug.log('Getting media objects from ' + this.settings.url + '...', this);
+        debug.log('Getting media objects from ' + this.getRemoteUrl() + '...', this);
         
         return new Promise((resolve, reject) => {
-            let apiUrl = this.settings.url + '/hashbrown/api/media?token=' + this.settings.token;
+            let apiUrl = this.getRemoteUrl() + '/hashbrown/api/media?token=' + this.settings.token;
             
             let headers = {
                 'Accept': 'application/json'
@@ -225,7 +235,7 @@ class HashBrownDriverConnection extends Connection {
                     allMedia.push(new Media({
                         name: media.name,
                         id: media.id,
-                        url: this.settings.url + '/media/' + media.id + '/' + media.name,
+                        url: this.getRemoteUrl() + '/media/' + media.id + '/' + media.name,
                         remote: true
                     }));
                 }
@@ -249,10 +259,10 @@ class HashBrownDriverConnection extends Connection {
             'Accept': 'application/json'
         };
             
-        debug.log('Getting media object "' + id + '" from ' + this.settings.url + '...', this);
+        debug.log('Getting media object "' + id + '" from ' + this.getRemoteUrl() + '...', this);
         
         return new Promise((resolve, reject) => {
-            let apiUrl = this.settings.url + '/hashbrown/api/media/' + id + '?token=' + this.settings.token;
+            let apiUrl = this.getRemoteUrl() + '/hashbrown/api/media/' + id + '?token=' + this.settings.token;
 
             restler.get(apiUrl, {
                 headers: headers
@@ -265,11 +275,43 @@ class HashBrownDriverConnection extends Connection {
                 let media = new Media({
                     name: path.basename(data),
                     id: id,
-                    url: this.settings.url + '/media/' + id + '/' + data,
+                    url: this.getRemoteUrl() + '/media/' + id + '/' + data,
                     remote: true
                 });
 
                 resolve(media);
+            });
+        });
+    }
+    
+    /**
+     * Deletes a Media object
+     *
+     * @param {String} id
+     *
+     * @returns {Promise} Response
+     */
+    removeMedia(id) {
+        if(!id || id == 'undefined' || id == 'null') { return Promise.reject(new Error('Media id was null')); }
+
+        let headers = {
+            'Accept': 'application/json'
+        };
+            
+        debug.log('Deleting media object "' + id + '" from ' + this.getRemoteUrl() + '...', this);
+        
+        return new Promise((resolve, reject) => {
+            let apiUrl = this.getRemoteUrl() + '/hashbrown/api/media/' + id + '?token=' + this.settings.token;
+
+            restler.del(apiUrl, {
+                headers: headers
+            }).on('complete', (data, response) => {
+                if(!data) {
+                    reject(new Error('Media "' + id + '" was not found'))
+                    return;
+                }
+            
+                resolve();
             });
         });
     }
