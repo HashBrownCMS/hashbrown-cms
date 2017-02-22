@@ -28,8 +28,6 @@ class HashBrownDriverConnection extends Connection {
             'Accept': 'application/json'
         };
             
-        debug.log('Getting entire tree from ' + this.getRemoteUrl() + '...', this);
-        
         return new Promise((resolve, reject) => {
             let apiUrl = this.getRemoteUrl() + '/hashbrown/api/content/tree?token=' + this.settings.token;
 
@@ -212,8 +210,6 @@ class HashBrownDriverConnection extends Connection {
             'Accept': 'application/json'
         };
             
-        debug.log('Getting media objects from ' + this.getRemoteUrl() + '...', this);
-        
         return new Promise((resolve, reject) => {
             let apiUrl = this.getRemoteUrl() + '/hashbrown/api/media?token=' + this.settings.token;
             
@@ -259,8 +255,6 @@ class HashBrownDriverConnection extends Connection {
             'Accept': 'application/json'
         };
             
-        debug.log('Getting media object "' + id + '" from ' + this.getRemoteUrl() + '...', this);
-        
         return new Promise((resolve, reject) => {
             let apiUrl = this.getRemoteUrl() + '/hashbrown/api/media/' + id + '?token=' + this.settings.token;
 
