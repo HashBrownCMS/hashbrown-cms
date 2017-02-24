@@ -19,24 +19,14 @@
         transform: translateY(-100%)
     }
 
-    .cm-theme {
-        span {
-            line-height: 30px;
-            margin-right: 2em;
-            text-transform: uppercase;
-            font-weight: 700;
-            color: material-color('grey', '400');
-        }
-    } 
-
     .error {
         position: absolute;
         right: 0px;
         bottom: 0px;
         z-index: 20;
-        color: #fff;
         pointer-events: none;
-        background-color: material-color('red', '600');
+        background-color: $warning;
+        color: $warning-text;
         padding: 15px;
         border-bottom-left-radius: 2px;
 

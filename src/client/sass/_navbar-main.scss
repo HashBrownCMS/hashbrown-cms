@@ -51,7 +51,7 @@
                 background-color: transparent;
                 width: 100%;
                 height: 60px;
-                color: $white;
+                color: $secondary-text;
                 padding: 0px;
                 margin: 0px;
                 border: none;
@@ -219,7 +219,7 @@
                             &[data-is-directory="true"] {
                                 >.pane-item {
                                     background-color: $primary;
-                                    color: #fff;
+                                    color: $primary-text;
                                 }
                             }
 
@@ -307,10 +307,6 @@
 
                             >.pane-item {
                                 font-weight: 700;
-                               
-                                .fa {
-                                    color: $primary;
-                                }
                             }
                         }
 
@@ -384,7 +380,7 @@
                         }
                         
                         .pane-item {
-                            color: $white;
+                            color: $secondary-text;
                             display: block;
                             border-radius: 0px;
                             border: none;

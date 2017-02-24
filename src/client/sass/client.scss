@@ -3,6 +3,8 @@ $md: 'max-width: 1199px';
 $sm: 'max-width: 991px';
 $xs: 'max-width: 767px';
 
+@import '_colors';
+@import '_theme';
 @import '_main';
 @import '_main-menu';
 @import '_welcome';

@@ -100,7 +100,8 @@ $('.login').each(function() {
             location = newLocation || '/';
         })
         .catch(function(e) {
-            alert(e.toString());
+            $('.login-container .message').remove();
+            $('.login-container').prepend('<div class="message raised">' + e + '</div>');
         });
     }); 
 }); 

@@ -42,20 +42,6 @@ class TemplateEditor extends View {
         this.trigger('change', this.model);
     }
 
-    /**
-     * Event: Change theme
-     */
-    onChangeTheme() {
-        let currentTheme = this.$element.find('.CodeMirror')[0].className.replace('CodeMirror cm-s-', '') || 'default';
-        let newTheme = this.$element.find('.cm-theme select').val();
-
-        $('.cm-s-' + currentTheme)
-            .removeClass('cm-s-' + currentTheme)
-            .addClass('cm-s-' + newTheme);
-
-        document.cookie = 'cmtheme = ' + newTheme;
-    }
-
     render() {
         _.append(this.$element.empty(),
             _.div({class: 'editor-header'},
@@ -67,14 +53,6 @@ class TemplateEditor extends View {
                 this.$error
             ),
             _.div({class: 'editor-footer'}, 
-                _.div({class: 'btn-group pull-left cm-theme'},
-                    _.span('Theme'),
-                    _.select({class: 'form-control'},
-                        _.each([ 'cobalt', 'default', 'night', 'railscasts' ], (i, theme) => {
-                            return _.option({value: theme}, theme);
-                        })
-                    ).change(() => { this.onChangeTheme(); }).val(getCookie('cmtheme') || 'default')
-                ),
                 _.div({class: 'btn-group'},
                     _.if(!this.model.locked,
                         // Save

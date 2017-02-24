@@ -14,11 +14,6 @@ html, body {
 .bg-primary { background-color: $primary; }
 .bg-secondary { background-color: $secondary; }
 
-// Typography
-a {
-    color: $primary;
-}
-
 // Dragdrop
 #dragdrop-placeholder, *[data-dragdrop-unsorted="true"][data-dragdrop-hovering="true"] {
     border: 2px dashed $primary;
@@ -34,10 +29,11 @@ button, a {
 /**
  * Colour a button
  */
-@mixin set-button-color($class, $color) {
+@mixin set-button-color($class, $color, $text-color) {
     &.btn-#{$class} {
         background-color: $color;
         border-color: $color;
+        color: $text-color;
     
         &:hover {
             background-color: lighten($color, 6);
@@ -768,9 +764,10 @@ a.btn {
         min-width: 0px;
     }
 
-    @include set-button-color('primary', $primary);
-    @include set-button-color('danger', material-color('red', '600'));
-    @include set-button-color('success', material-color('green', '600'));
+    @include set-button-color('primary', $primary, $primary-text);
+    @include set-button-color('danger', $warning, $warning-text);
+    @include set-button-color('success', $success, $success-text);
+    @include set-button-color('default', $secondary, $secondary-text);
 
     &:active {
         box-shadow: none;
@@ -819,7 +816,7 @@ a.btn {
         color: $primary;
 
         &.btn-embedded-danger {
-            color: material-color('red', '600');
+            color: $warning;
         }
     }
     
@@ -856,7 +853,7 @@ a.btn {
 // Tabs
 .nav-tabs {
     padding: 18px 0px 0px 15px;
-    background-color: $primary;
+    background-color: $secondary; 
     font-size: 14px;
     position: relative;
     font-weight: bold;
@@ -865,17 +862,17 @@ a.btn {
     li {
         &.active {
             a, a:hover, a:focus {
-                color: #fff;
+                color: $primary;
                 border: 0px;
                 background-color: transparent;
-                border-bottom: 5px solid $secondary-lightest;
+                border-bottom: 5px solid $primary;
             }
         }
 
         &:not(.active) {
             a {
                 &, &:hover, &:focus {
-                    color: $secondary-lightest;
+                    color: $primary-text;
                     background-color: transparent;
                     border: 0px;
                 }

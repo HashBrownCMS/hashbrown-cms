@@ -10,12 +10,31 @@ $darkest-grey: #222;
 
 $white: #ffffff;
 
+/* Standard */
+$standard-text: #cccccc;
+
+/* Primary */
 $primary: #e70d3b;
 $primary-light: lighten($primary, 20);
 
+$primary-text: #ffffff;
+
+/* Secondary */
 $secondary: #21303b; 
 $secondary-light: lighten($secondary, 4);
 $secondary-lighter: lighten($secondary, 6);
 $secondary-lightest: lighten($secondary, 12);
 $secondary-dark: darken($secondary, 10);
 $secondary-darker: darken($secondary, 20);
+
+$secondary-text: #ffffff;
+
+/* Warning */
+$warning: #FFB300;
+
+$warning-text: darken($warning, 30);
+
+/* Success */
+$success: $primary;
+
+$success-text: $primary-text;

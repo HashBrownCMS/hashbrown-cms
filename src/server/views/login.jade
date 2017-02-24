@@ -19,11 +19,11 @@ html
                     | #{message}
 
 
-            form.panel-login.login.btn-raised(data-invite-token="#{(invitedUser ? invitedUser.inviteToken : '')}")
-                .panel-heading
-                    img.lg.logo(src='/svg/logo_grey.svg')
+            form.login(data-invite-token="#{(invitedUser ? invitedUser.inviteToken : '')}")
+                .login-heading
+                    img.lg.logo(src='/svg/logo_white.svg')
                     h2 HashBrown
-                .panel-body
+                .login-body
                         if(invitedUser)
                             p
                                 | Activate the account for #{invitedUser.email}

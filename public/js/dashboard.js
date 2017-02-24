@@ -54,19 +54,19 @@
 	__webpack_require__(2);
 
 	// Get package file
-	window.app = __webpack_require__(154);
+	window.app = __webpack_require__(155);
 
 	// Views
-	window.ProjectEditor = __webpack_require__(164);
-	window.BackupEditor = __webpack_require__(165);
-	window.MigrationEditor = __webpack_require__(166);
-	window.InfoEditor = __webpack_require__(167);
-	window.LanguageEditor = __webpack_require__(168);
-	window.UserEditor = __webpack_require__(135);
+	window.ProjectEditor = __webpack_require__(165);
+	window.BackupEditor = __webpack_require__(166);
+	window.MigrationEditor = __webpack_require__(167);
+	window.InfoEditor = __webpack_require__(168);
+	window.LanguageEditor = __webpack_require__(169);
+	window.UserEditor = __webpack_require__(136);
 
 	// Models
-	window.Project = __webpack_require__(169);
-	window.User = __webpack_require__(140);
+	window.Project = __webpack_require__(170);
+	window.User = __webpack_require__(141);
 
 	// --------------------
 	// Get current user
@@ -672,17 +672,8 @@
 	            return decodeURIComponent(results[2].replace(/\+/g, " "));
 	        }
 	    }, {
-	        key: 'init',
-	        value: function init() {
-	            // Get the url
-	            var url = location.hash.slice(1) || '/';
-	            var trimmed = url.substring(0, url.indexOf('?'));
-
-	            Router.params = {};
-
-	            if (trimmed) {
-	                url = trimmed;
-	            }
+	        key: 'directToRoute',
+	        value: function directToRoute(url) {
 	            // Look for route
 	            var context = {};
 	            var route = void 0;
@@ -747,6 +738,40 @@
 
 	            Router.url = url;
 	        }
+	    }, {
+	        key: 'init',
+	        value: function init() {
+	            // Get the url
+	            var url = location.hash.slice(1) || '/';
+	            var trimmed = url.substring(0, url.indexOf('?'));
+
+	            Router.params = {};
+
+	            if (trimmed) {
+	                url = trimmed;
+	            }
+
+	            // If a check is implemented, execute it
+	            if (typeof Router.check === 'function') {
+	                Router.check(
+	                // Pass the proposed route
+	                url,
+
+	                // Cancel method
+	                function () {
+	                    location.hash = Router.url;
+	                },
+
+	                // Proceed method
+	                function () {
+	                    Router.directToRoute(url);
+	                });
+
+	                // If not, proceed as normal
+	            } else {
+	                Router.directToRoute(url);
+	            }
+	        }
 	    }]);
 
 	    return Router;
@@ -794,14 +819,16 @@
 	/**
 	 * Parse a string for the raw tokens.
 	 *
-	 * @param  {string} str
+	 * @param  {string}  str
+	 * @param  {Object=} options
 	 * @return {!Array}
 	 */
-	function parse(str) {
+	function parse(str, options) {
 	  var tokens = [];
 	  var key = 0;
 	  var index = 0;
 	  var path = '';
+	  var defaultDelimiter = options && options.delimiter || '/';
 	  var res;
 
 	  while ((res = PATH_REGEXP.exec(str)) != null) {
@@ -834,8 +861,8 @@
 	    var partial = prefix != null && next != null && next !== prefix;
 	    var repeat = modifier === '+' || modifier === '*';
 	    var optional = modifier === '?' || modifier === '*';
-	    var delimiter = res[2] || '/';
-	    var pattern = capture || group || (asterisk ? '.*' : '[^' + delimiter + ']+?');
+	    var delimiter = res[2] || defaultDelimiter;
+	    var pattern = capture || group;
 
 	    tokens.push({
 	      name: name || key++,
@@ -845,7 +872,7 @@
 	      repeat: repeat,
 	      partial: partial,
 	      asterisk: !!asterisk,
-	      pattern: escapeGroup(pattern)
+	      pattern: pattern ? escapeGroup(pattern) : asterisk ? '.*' : '[^' + escapeString(delimiter) + ']+?'
 	    });
 	  }
 
@@ -866,10 +893,11 @@
 	 * Compile a string to a template function for the path.
 	 *
 	 * @param  {string}             str
+	 * @param  {Object=}            options
 	 * @return {!function(Object=, Object=)}
 	 */
-	function compile(str) {
-	  return tokensToFunction(parse(str));
+	function compile(str, options) {
+	  return tokensToFunction(parse(str, options));
 	}
 
 	/**
@@ -1080,34 +1108,28 @@
 	 * @return {!RegExp}
 	 */
 	function stringToRegexp(path, keys, options) {
-	  var tokens = parse(path);
-	  var re = tokensToRegExp(tokens, options);
-
-	  // Attach keys back to the regexp.
-	  for (var i = 0; i < tokens.length; i++) {
-	    if (typeof tokens[i] !== 'string') {
-	      keys.push(tokens[i]);
-	    }
-	  }
-
-	  return attachKeys(re, keys);
+	  return tokensToRegExp(parse(path, options), keys, options);
 	}
 
 	/**
 	 * Expose a function for taking tokens and returning a RegExp.
 	 *
-	 * @param  {!Array}  tokens
-	 * @param  {Object=} options
+	 * @param  {!Array}          tokens
+	 * @param  {(Array|Object)=} keys
+	 * @param  {Object=}         options
 	 * @return {!RegExp}
 	 */
-	function tokensToRegExp(tokens, options) {
+	function tokensToRegExp(tokens, keys, options) {
+	  if (!isarray(keys)) {
+	    options = /** @type {!Object} */keys || options;
+	    keys = [];
+	  }
+
 	  options = options || {};
 
 	  var strict = options.strict;
 	  var end = options.end !== false;
 	  var route = '';
-	  var lastToken = tokens[tokens.length - 1];
-	  var endsWithSlash = typeof lastToken === 'string' && /\/$/.test(lastToken);
 
 	  // Iterate over the tokens and create our regexp string.
 	  for (var i = 0; i < tokens.length; i++) {
@@ -1118,6 +1140,8 @@
 	    } else {
 	      var prefix = escapeString(token.prefix);
 	      var capture = '(?:' + token.pattern + ')';
+
+	      keys.push(token);
 
 	      if (token.repeat) {
 	        capture += '(?:' + prefix + capture + ')*';
@@ -1137,12 +1161,15 @@
 	    }
 	  }
 
+	  var delimiter = escapeString(options.delimiter || '/');
+	  var endsWithDelimiter = route.slice(-delimiter.length) === delimiter;
+
 	  // In non-strict mode we allow a slash at the end of match. If the path to
 	  // match already ends with a slash, we remove it for consistency. The slash
 	  // is valid at the end of a path match, not in the middle. This is important
 	  // in non-ending mode, where "/test/" shouldn't match "/test//route".
 	  if (!strict) {
-	    route = (endsWithSlash ? route.slice(0, -2) : route) + '(?:\\/(?=$))?';
+	    route = (endsWithDelimiter ? route.slice(0, -delimiter.length) : route) + '(?:' + delimiter + '(?=$))?';
 	  }
 
 	  if (end) {
@@ -1150,10 +1177,10 @@
 	  } else {
 	    // In non-ending mode, we need the capturing groups to match as much as
 	    // possible by using a positive lookahead to the end or next path segment.
-	    route += strict && endsWithSlash ? '' : '(?=\\/|$)';
+	    route += strict && endsWithDelimiter ? '' : '(?=' + delimiter + '|$)';
 	  }
 
-	  return new RegExp('^' + route, flags(options));
+	  return attachKeys(new RegExp('^' + route, flags(options)), keys);
 	}
 
 	/**
@@ -1169,14 +1196,12 @@
 	 * @return {!RegExp}
 	 */
 	function pathToRegexp(path, keys, options) {
-	  keys = keys || [];
-
 	  if (!isarray(keys)) {
-	    options = /** @type {!Object} */keys;
+	    options = /** @type {!Object} */keys || options;
 	    keys = [];
-	  } else if (!options) {
-	    options = {};
 	  }
+
+	  options = options || {};
 
 	  if (path instanceof RegExp) {
 	    return regexpToRegexp(path, /** @type {!Array} */keys);
@@ -1220,7 +1245,11 @@
 	        }
 	    } else if (content) {
 	        // jQuery logic
-	        if (typeof jQuery !== 'undefined' && element instanceof jQuery) {
+	        if (typeof jQuery !== 'undefined') {
+	            if (element instanceof jQuery == false) {
+	                element = $(element);
+	            }
+
 	            element.append(content);
 
 	            // Native JavaScript logic
@@ -1279,7 +1308,7 @@
 	        var _loop = function _loop() {
 	            var shorthand = _step.value;
 
-	            element[shorthand] = function click(callback) {
+	            element[shorthand] = function (callback) {
 	                return element.on(shorthand, callback);
 	            };
 	        };
@@ -1315,37 +1344,44 @@
 	function create(tag, attr, contents) {
 	    var element = document.createElement(tag.toUpperCase());
 
+	    var isContents = function isContents(obj) {
+	        if (!obj) {
+	            return false;
+	        }
+
+	        return obj instanceof Array || obj instanceof HTMLElement || obj instanceof jQuery || typeof obj === 'string' || typeof obj === 'number';
+	    };
+
+	    // The attribute parameter is the content
+	    if (isContents(attr)) {
+	        contents = [attr, contents];
+
+	        // The attribute parameter was defined as an object
+	    } else if (typeof attr !== 'undefined' && attr instanceof Object && attr instanceof Array == false) {
+	        try {
+	            for (var k in attr) {
+	                element.setAttribute(k, attr[k]);
+	            }
+	        } catch (e) {
+	            console.log(e);
+
+	            console.log(attr, isContents(attr));
+	        }
+	    }
+
+	    append(element, contents);
+
 	    // jQuery logic
 	    if (typeof jQuery !== 'undefined') {
-	        element = $(element);
-
-	        // If the attribute parameter is a jQuery instance, just reassign the parameter values
-	        if (attr instanceof jQuery || typeof attr === 'string') {
-	            contents = attr;
-	        } else {
-	            for (var k in attr) {
-	                element.attr(k, attr[k]);
-	            }
-	        }
+	        return $(element);
 
 	        // Native JavaScript logic
 	    } else {
 	        // Assign custom event functions to element instead of extending the prototype
 	        assignEvents(element);
 
-	        // If the attribute parameter is a HTMLElement instance, just reassign the parameter values
-	        if (attr instanceof HTMLElement || typeof attr === 'string') {
-	            contents = attr;
-	        } else {
-	            for (var k in attr) {
-	                element.setAttribute(k, attr[k]);
-	            }
-	        }
+	        return element;
 	    }
-
-	    append(element, contents);
-
-	    return element;
 	}
 
 	/**
@@ -1408,6 +1444,28 @@
 
 	    for (var i in array) {
 	        var element = callback(i, array[i]);
+
+	        if (element) {
+	            elements.push(element);
+	        }
+	    }
+
+	    return elements;
+	};
+
+	/**
+	 * Loops a given number of times, rendering elements for each pass
+	 *
+	 * @param {Number} iterations
+	 * @param {Function} callback
+	 *
+	 * @returns {HTMLElement} elements
+	 */
+	FunctionTemplating.loop = function (iterations, callback) {
+	    var elements = [];
+
+	    for (var i = 0; i <= iterations; i++) {
+	        var element = callback(i);
 
 	        if (element) {
 	            elements.push(element);
@@ -14030,6 +14088,7 @@
 
 	'use strict';
 
+	exports.byteLength = byteLength;
 	exports.toByteArray = toByteArray;
 	exports.fromByteArray = fromByteArray;
 
@@ -14037,23 +14096,17 @@
 	var revLookup = [];
 	var Arr = typeof Uint8Array !== 'undefined' ? Uint8Array : Array;
 
-	function init() {
-	  var code = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
-	  for (var i = 0, len = code.length; i < len; ++i) {
-	    lookup[i] = code[i];
-	    revLookup[code.charCodeAt(i)] = i;
-	  }
-
-	  revLookup['-'.charCodeAt(0)] = 62;
-	  revLookup['_'.charCodeAt(0)] = 63;
+	var code = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+	for (var i = 0, len = code.length; i < len; ++i) {
+	  lookup[i] = code[i];
+	  revLookup[code.charCodeAt(i)] = i;
 	}
 
-	init();
+	revLookup['-'.charCodeAt(0)] = 62;
+	revLookup['_'.charCodeAt(0)] = 63;
 
-	function toByteArray(b64) {
-	  var i, j, l, tmp, placeHolders, arr;
+	function placeHoldersCount(b64) {
 	  var len = b64.length;
-
 	  if (len % 4 > 0) {
 	    throw new Error('Invalid string. Length must be a multiple of 4');
 	  }
@@ -14063,9 +14116,19 @@
 	  // represent one byte
 	  // if there is only one, then the three characters before it represent 2 bytes
 	  // this is just a cheap hack to not do indexOf twice
-	  placeHolders = b64[len - 2] === '=' ? 2 : b64[len - 1] === '=' ? 1 : 0;
+	  return b64[len - 2] === '=' ? 2 : b64[len - 1] === '=' ? 1 : 0;
+	}
 
+	function byteLength(b64) {
 	  // base64 is 4/3 + up to two characters of the original data
+	  return b64.length * 3 / 4 - placeHoldersCount(b64);
+	}
+
+	function toByteArray(b64) {
+	  var i, j, l, tmp, placeHolders, arr;
+	  var len = b64.length;
+	  placeHolders = placeHoldersCount(b64);
+
 	  arr = new Arr(len * 3 / 4 - placeHolders);
 
 	  // if there are placeholders, only get up to the last complete 4 chars
@@ -16034,10 +16097,10 @@
 	  var ciphers = __webpack_require__(61)(crypto);
 	  exports.createCipher = ciphers.createCipher;
 	  exports.createCipheriv = ciphers.createCipheriv;
-	  var deciphers = __webpack_require__(92)(crypto);
+	  var deciphers = __webpack_require__(93)(crypto);
 	  exports.createDecipher = deciphers.createDecipher;
 	  exports.createDecipheriv = deciphers.createDecipheriv;
-	  var modes = __webpack_require__(83);
+	  var modes = __webpack_require__(84);
 	  function listCiphers() {
 	    return Object.keys(modes);
 	  }
@@ -16052,10 +16115,10 @@
 
 	var aes = __webpack_require__(62);
 	var Transform = __webpack_require__(63);
-	var inherits = __webpack_require__(51);
-	var modes = __webpack_require__(83);
-	var ebtk = __webpack_require__(84);
-	var StreamCipher = __webpack_require__(85);
+	var inherits = __webpack_require__(66);
+	var modes = __webpack_require__(84);
+	var ebtk = __webpack_require__(85);
+	var StreamCipher = __webpack_require__(86);
 	inherits(Cipher, Transform);
 	function Cipher(mode, key, iv) {
 	  if (!(this instanceof Cipher)) {
@@ -16115,11 +16178,11 @@
 	  return out;
 	};
 	var modelist = {
-	  ECB: __webpack_require__(86),
-	  CBC: __webpack_require__(87),
-	  CFB: __webpack_require__(89),
-	  OFB: __webpack_require__(90),
-	  CTR: __webpack_require__(91)
+	  ECB: __webpack_require__(87),
+	  CBC: __webpack_require__(88),
+	  CFB: __webpack_require__(90),
+	  OFB: __webpack_require__(91),
+	  CTR: __webpack_require__(92)
 	};
 	module.exports = function (crypto) {
 	  function createCipheriv(suite, password, iv) {
@@ -16360,7 +16423,7 @@
 	/* WEBPACK VAR INJECTION */(function(Buffer) {'use strict';
 
 	var Transform = __webpack_require__(64).Transform;
-	var inherits = __webpack_require__(51);
+	var inherits = __webpack_require__(66);
 
 	module.exports = CipherBase;
 	inherits(CipherBase, Transform);
@@ -16423,14 +16486,14 @@
 	module.exports = Stream;
 
 	var EE = __webpack_require__(65).EventEmitter;
-	var inherits = __webpack_require__(51);
+	var inherits = __webpack_require__(66);
 
 	inherits(Stream, EE);
-	Stream.Readable = __webpack_require__(66);
-	Stream.Writable = __webpack_require__(79);
-	Stream.Duplex = __webpack_require__(80);
-	Stream.Transform = __webpack_require__(81);
-	Stream.PassThrough = __webpack_require__(82);
+	Stream.Readable = __webpack_require__(67);
+	Stream.Writable = __webpack_require__(80);
+	Stream.Duplex = __webpack_require__(81);
+	Stream.Transform = __webpack_require__(82);
+	Stream.PassThrough = __webpack_require__(83);
 
 	// Backwards-compat with node 0.4.x
 	Stream.Stream = Stream;
@@ -16804,6 +16867,36 @@
 
 /***/ },
 /* 66 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	if (typeof Object.create === 'function') {
+	  // implementation from standard node.js 'util' module
+	  module.exports = function inherits(ctor, superCtor) {
+	    ctor.super_ = superCtor;
+	    ctor.prototype = Object.create(superCtor.prototype, {
+	      constructor: {
+	        value: ctor,
+	        enumerable: false,
+	        writable: true,
+	        configurable: true
+	      }
+	    });
+	  };
+	} else {
+	  // old school shim for old browsers
+	  module.exports = function inherits(ctor, superCtor) {
+	    ctor.super_ = superCtor;
+	    var TempCtor = function TempCtor() {};
+	    TempCtor.prototype = superCtor.prototype;
+	    ctor.prototype = new TempCtor();
+	    ctor.prototype.constructor = ctor;
+	  };
+	}
+
+/***/ },
+/* 67 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
@@ -16813,13 +16906,13 @@
 	    return __webpack_require__(64); // hack to fix a circular dependency issue when used with browserify
 	  } catch (_) {}
 	}();
-	exports = module.exports = __webpack_require__(67);
+	exports = module.exports = __webpack_require__(68);
 	exports.Stream = Stream || exports;
 	exports.Readable = exports;
-	exports.Writable = __webpack_require__(74);
-	exports.Duplex = __webpack_require__(73);
-	exports.Transform = __webpack_require__(77);
-	exports.PassThrough = __webpack_require__(78);
+	exports.Writable = __webpack_require__(75);
+	exports.Duplex = __webpack_require__(74);
+	exports.Transform = __webpack_require__(78);
+	exports.PassThrough = __webpack_require__(79);
 
 	if (!process.browser && process.env.READABLE_STREAM === 'disable' && Stream) {
 	  module.exports = Stream;
@@ -16827,7 +16920,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(13)))
 
 /***/ },
-/* 67 */
+/* 68 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
@@ -16835,7 +16928,7 @@
 	module.exports = Readable;
 
 	/*<replacement>*/
-	var processNextTick = __webpack_require__(68);
+	var processNextTick = __webpack_require__(69);
 	/*</replacement>*/
 
 	/*<replacement>*/
@@ -16865,16 +16958,16 @@
 
 	var Buffer = __webpack_require__(39).Buffer;
 	/*<replacement>*/
-	var bufferShim = __webpack_require__(69);
+	var bufferShim = __webpack_require__(70);
 	/*</replacement>*/
 
 	/*<replacement>*/
-	var util = __webpack_require__(70);
-	util.inherits = __webpack_require__(51);
+	var util = __webpack_require__(71);
+	util.inherits = __webpack_require__(66);
 	/*</replacement>*/
 
 	/*<replacement>*/
-	var debugUtil = __webpack_require__(71);
+	var debugUtil = __webpack_require__(72);
 	var debug = void 0;
 	if (debugUtil && debugUtil.debuglog) {
 	  debug = debugUtil.debuglog('stream');
@@ -16883,7 +16976,7 @@
 	}
 	/*</replacement>*/
 
-	var BufferList = __webpack_require__(72);
+	var BufferList = __webpack_require__(73);
 	var StringDecoder;
 
 	util.inherits(Readable, Stream);
@@ -16902,7 +16995,7 @@
 
 	var Duplex;
 	function ReadableState(options, stream) {
-	  Duplex = Duplex || __webpack_require__(73);
+	  Duplex = Duplex || __webpack_require__(74);
 
 	  options = options || {};
 
@@ -16964,7 +17057,7 @@
 	  this.decoder = null;
 	  this.encoding = null;
 	  if (options.encoding) {
-	    if (!StringDecoder) StringDecoder = __webpack_require__(76).StringDecoder;
+	    if (!StringDecoder) StringDecoder = __webpack_require__(77).StringDecoder;
 	    this.decoder = new StringDecoder(options.encoding);
 	    this.encoding = options.encoding;
 	  }
@@ -16972,7 +17065,7 @@
 
 	var Duplex;
 	function Readable(options) {
-	  Duplex = Duplex || __webpack_require__(73);
+	  Duplex = Duplex || __webpack_require__(74);
 
 	  if (!(this instanceof Readable)) return new Readable(options);
 
@@ -17075,7 +17168,7 @@
 
 	// backwards compatibility.
 	Readable.prototype.setEncoding = function (enc) {
-	  if (!StringDecoder) StringDecoder = __webpack_require__(76).StringDecoder;
+	  if (!StringDecoder) StringDecoder = __webpack_require__(77).StringDecoder;
 	  this._readableState.decoder = new StringDecoder(enc);
 	  this._readableState.encoding = enc;
 	  return this;
@@ -17770,7 +17863,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(13)))
 
 /***/ },
-/* 68 */
+/* 69 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
@@ -17817,7 +17910,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(13)))
 
 /***/ },
-/* 69 */
+/* 70 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
@@ -17931,7 +18024,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 70 */
+/* 71 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(Buffer) {'use strict';
@@ -18044,20 +18137,20 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(39).Buffer))
 
 /***/ },
-/* 71 */
+/* 72 */
 /***/ function(module, exports) {
 
 	/* (ignored) */
 
 /***/ },
-/* 72 */
+/* 73 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	var Buffer = __webpack_require__(39).Buffer;
 	/*<replacement>*/
-	var bufferShim = __webpack_require__(69);
+	var bufferShim = __webpack_require__(70);
 	/*</replacement>*/
 
 	module.exports = BufferList;
@@ -18119,7 +18212,7 @@
 	};
 
 /***/ },
-/* 73 */
+/* 74 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// a duplex stream is just a stream that is both readable and writable.
@@ -18142,16 +18235,16 @@
 	module.exports = Duplex;
 
 	/*<replacement>*/
-	var processNextTick = __webpack_require__(68);
+	var processNextTick = __webpack_require__(69);
 	/*</replacement>*/
 
 	/*<replacement>*/
-	var util = __webpack_require__(70);
-	util.inherits = __webpack_require__(51);
+	var util = __webpack_require__(71);
+	util.inherits = __webpack_require__(66);
 	/*</replacement>*/
 
-	var Readable = __webpack_require__(67);
-	var Writable = __webpack_require__(74);
+	var Readable = __webpack_require__(68);
+	var Writable = __webpack_require__(75);
 
 	util.inherits(Duplex, Readable);
 
@@ -18199,7 +18292,7 @@
 	}
 
 /***/ },
-/* 74 */
+/* 75 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process, setImmediate) {// A bit simpler than readable streams.
@@ -18211,7 +18304,7 @@
 	module.exports = Writable;
 
 	/*<replacement>*/
-	var processNextTick = __webpack_require__(68);
+	var processNextTick = __webpack_require__(69);
 	/*</replacement>*/
 
 	/*<replacement>*/
@@ -18221,13 +18314,13 @@
 	Writable.WritableState = WritableState;
 
 	/*<replacement>*/
-	var util = __webpack_require__(70);
-	util.inherits = __webpack_require__(51);
+	var util = __webpack_require__(71);
+	util.inherits = __webpack_require__(66);
 	/*</replacement>*/
 
 	/*<replacement>*/
 	var internalUtil = {
-	  deprecate: __webpack_require__(75)
+	  deprecate: __webpack_require__(76)
 	};
 	/*</replacement>*/
 
@@ -18244,7 +18337,7 @@
 
 	var Buffer = __webpack_require__(39).Buffer;
 	/*<replacement>*/
-	var bufferShim = __webpack_require__(69);
+	var bufferShim = __webpack_require__(70);
 	/*</replacement>*/
 
 	util.inherits(Writable, Stream);
@@ -18260,7 +18353,7 @@
 
 	var Duplex;
 	function WritableState(options, stream) {
-	  Duplex = Duplex || __webpack_require__(73);
+	  Duplex = Duplex || __webpack_require__(74);
 
 	  options = options || {};
 
@@ -18376,7 +18469,7 @@
 
 	var Duplex;
 	function Writable(options) {
-	  Duplex = Duplex || __webpack_require__(73);
+	  Duplex = Duplex || __webpack_require__(74);
 
 	  // Writable ctor is applied to Duplexes, though they're not
 	  // instanceof Writable, they're instanceof Readable.
@@ -18731,7 +18824,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(13), __webpack_require__(14).setImmediate))
 
 /***/ },
-/* 75 */
+/* 76 */
 /***/ function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
@@ -18805,7 +18898,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 76 */
+/* 77 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -19029,7 +19122,7 @@
 	}
 
 /***/ },
-/* 77 */
+/* 78 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// a transform stream is a readable/writable stream where you do
@@ -19078,11 +19171,11 @@
 
 	module.exports = Transform;
 
-	var Duplex = __webpack_require__(73);
+	var Duplex = __webpack_require__(74);
 
 	/*<replacement>*/
-	var util = __webpack_require__(70);
-	util.inherits = __webpack_require__(51);
+	var util = __webpack_require__(71);
+	util.inherits = __webpack_require__(66);
 	/*</replacement>*/
 
 	util.inherits(Transform, Duplex);
@@ -19214,7 +19307,7 @@
 	}
 
 /***/ },
-/* 78 */
+/* 79 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// a passthrough stream.
@@ -19225,11 +19318,11 @@
 
 	module.exports = PassThrough;
 
-	var Transform = __webpack_require__(77);
+	var Transform = __webpack_require__(78);
 
 	/*<replacement>*/
-	var util = __webpack_require__(70);
-	util.inherits = __webpack_require__(51);
+	var util = __webpack_require__(71);
+	util.inherits = __webpack_require__(66);
 	/*</replacement>*/
 
 	util.inherits(PassThrough, Transform);
@@ -19245,20 +19338,12 @@
 	};
 
 /***/ },
-/* 79 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	module.exports = __webpack_require__(74);
-
-/***/ },
 /* 80 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
-	module.exports = __webpack_require__(73);
+	module.exports = __webpack_require__(75);
 
 /***/ },
 /* 81 */
@@ -19266,7 +19351,7 @@
 
 	"use strict";
 
-	module.exports = __webpack_require__(77);
+	module.exports = __webpack_require__(74);
 
 /***/ },
 /* 82 */
@@ -19278,6 +19363,14 @@
 
 /***/ },
 /* 83 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	module.exports = __webpack_require__(79);
+
+/***/ },
+/* 84 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -19392,7 +19485,7 @@
 	};
 
 /***/ },
-/* 84 */
+/* 85 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(Buffer) {'use strict';
@@ -19456,14 +19549,14 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(39).Buffer))
 
 /***/ },
-/* 85 */
+/* 86 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(Buffer) {'use strict';
 
 	var aes = __webpack_require__(62);
 	var Transform = __webpack_require__(63);
-	var inherits = __webpack_require__(51);
+	var inherits = __webpack_require__(66);
 
 	inherits(StreamCipher, Transform);
 	module.exports = StreamCipher;
@@ -19490,7 +19583,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(39).Buffer))
 
 /***/ },
-/* 86 */
+/* 87 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -19503,12 +19596,12 @@
 	};
 
 /***/ },
-/* 87 */
+/* 88 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var xor = __webpack_require__(88);
+	var xor = __webpack_require__(89);
 	exports.encrypt = function (self, block) {
 	  var data = xor(block, self._prev);
 	  self._prev = self._cipher.encryptBlock(data);
@@ -19522,7 +19615,7 @@
 	};
 
 /***/ },
-/* 88 */
+/* 89 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(Buffer) {"use strict";
@@ -19540,12 +19633,12 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(39).Buffer))
 
 /***/ },
-/* 89 */
+/* 90 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(Buffer) {'use strict';
 
-	var xor = __webpack_require__(88);
+	var xor = __webpack_require__(89);
 	exports.encrypt = function (self, data, decrypt) {
 	  var out = new Buffer('');
 	  var len;
@@ -19575,12 +19668,12 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(39).Buffer))
 
 /***/ },
-/* 90 */
+/* 91 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(Buffer) {'use strict';
 
-	var xor = __webpack_require__(88);
+	var xor = __webpack_require__(89);
 	function getBlock(self) {
 	  self._prev = self._cipher.encryptBlock(self._prev);
 	  return self._prev;
@@ -19596,12 +19689,12 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(39).Buffer))
 
 /***/ },
-/* 91 */
+/* 92 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(Buffer) {'use strict';
 
-	var xor = __webpack_require__(88);
+	var xor = __webpack_require__(89);
 	function getBlock(self) {
 	  var out = self._cipher.encryptBlock(self._prev);
 	  incr32(self._prev);
@@ -19632,17 +19725,17 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(39).Buffer))
 
 /***/ },
-/* 92 */
+/* 93 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(Buffer) {'use strict';
 
 	var aes = __webpack_require__(62);
 	var Transform = __webpack_require__(63);
-	var inherits = __webpack_require__(51);
-	var modes = __webpack_require__(83);
-	var StreamCipher = __webpack_require__(85);
-	var ebtk = __webpack_require__(84);
+	var inherits = __webpack_require__(66);
+	var modes = __webpack_require__(84);
+	var StreamCipher = __webpack_require__(86);
+	var ebtk = __webpack_require__(85);
 
 	inherits(Decipher, Transform);
 	function Decipher(mode, key, iv) {
@@ -19710,11 +19803,11 @@
 	}
 
 	var modelist = {
-	  ECB: __webpack_require__(86),
-	  CBC: __webpack_require__(87),
-	  CFB: __webpack_require__(89),
-	  OFB: __webpack_require__(90),
-	  CTR: __webpack_require__(91)
+	  ECB: __webpack_require__(87),
+	  CBC: __webpack_require__(88),
+	  CFB: __webpack_require__(90),
+	  OFB: __webpack_require__(91),
+	  CTR: __webpack_require__(92)
 	};
 
 	module.exports = function (crypto) {
@@ -19757,7 +19850,6 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(39).Buffer))
 
 /***/ },
-/* 93 */,
 /* 94 */,
 /* 95 */,
 /* 96 */,
@@ -19799,7 +19891,8 @@
 /* 132 */,
 /* 133 */,
 /* 134 */,
-/* 135 */
+/* 135 */,
+/* 136 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -20091,11 +20184,11 @@
 	module.exports = UserEditor;
 
 /***/ },
-/* 136 */,
 /* 137 */,
 /* 138 */,
 /* 139 */,
-/* 140 */
+/* 140 */,
+/* 141 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -20276,7 +20369,6 @@
 	module.exports = User;
 
 /***/ },
-/* 141 */,
 /* 142 */,
 /* 143 */,
 /* 144 */,
@@ -20289,7 +20381,8 @@
 /* 151 */,
 /* 152 */,
 /* 153 */,
-/* 154 */
+/* 154 */,
+/* 155 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -20339,7 +20432,6 @@
 	};
 
 /***/ },
-/* 155 */,
 /* 156 */,
 /* 157 */,
 /* 158 */,
@@ -20348,7 +20440,8 @@
 /* 161 */,
 /* 162 */,
 /* 163 */,
-/* 164 */
+/* 164 */,
+/* 165 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -20576,7 +20669,7 @@
 	module.exports = ProjectEditor;
 
 /***/ },
-/* 165 */
+/* 166 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -20843,7 +20936,7 @@
 	module.exports = BackupEditor;
 
 /***/ },
-/* 166 */
+/* 167 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -20959,7 +21052,7 @@
 	module.exports = MigrationEditor;
 
 /***/ },
-/* 167 */
+/* 168 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -21081,7 +21174,7 @@
 	module.exports = InfoEditor;
 
 /***/ },
-/* 168 */
+/* 169 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -21166,7 +21259,7 @@
 	module.exports = LanguageEditor;
 
 /***/ },
-/* 169 */
+/* 170 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';

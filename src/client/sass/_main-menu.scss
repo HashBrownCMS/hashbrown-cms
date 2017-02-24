@@ -15,7 +15,7 @@
             padding: 0px;
             background-color: transparent;
             text-decoration: none;
-            color: $white;
+            color: $primary-text;
             position: relative;
             display: block;
             text-align: center;
@@ -23,7 +23,7 @@
             line-height: 20px;
 
             &:hover {
-                color: $white;
+                color: $primary-text;
             }
 
             >.fa {
