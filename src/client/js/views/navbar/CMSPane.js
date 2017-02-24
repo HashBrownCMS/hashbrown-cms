@@ -12,7 +12,7 @@ class CMSPane extends Pane {
         return {
             label: 'HashBrown',
             route: '/',
-            $icon: _.img({src: '/svg/logo_grey.svg', class: 'logo'}),
+            $icon: _.img({src: '/svg/logo_white.svg', class: 'logo'}),
             items: [
                 {
                     name: 'Welcome'

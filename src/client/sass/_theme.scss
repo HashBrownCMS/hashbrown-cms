@@ -8,6 +8,22 @@ html, body {
     background-color: material-color('grey', '200');
 }
 
+// Colours
+.txt-primary { color: $primary; }
+.txt-secondary { color: $secondary; }
+.bg-primary { background-color: $primary; }
+.bg-secondary { background-color: $secondary; }
+
+// Typography
+a {
+    color: $primary;
+}
+
+// Dragdrop
+#dragdrop-placeholder, *[data-dragdrop-unsorted="true"][data-dragdrop-hovering="true"] {
+    border: 2px dashed $primary;
+}
+
 // Bootstrap fixes
 button, a {
     &, &:focus, &:hover, &:active, &:active:focus {
@@ -20,17 +36,17 @@ button, a {
  */
 @mixin set-button-color($class, $color) {
     &.btn-#{$class} {
-        background-color: material-color($color, '500');
-        border-color: material-color($color, '500');
+        background-color: $color;
+        border-color: $color;
     
         &:hover {
-            background-color: material-color($color, '400');
-            border-color: material-color($color, '400');
+            background-color: lighten($color, 6);
+            border-color: lighten($color, 6);
         }
         
         &:active {
-            background-color: material-color($color, '600');
-            border-color: material-color($color, '600');
+            background-color: darken($color, 6);
+            border-color: darken($color, 6);
         }
     }
 }
@@ -92,7 +108,7 @@ button, a {
             width: 60px;
             padding: 15px;
             text-shadow: none;
-            color: material-color('blue', '600');
+            color: $primary;
         }
     }
 }
@@ -378,7 +394,7 @@ button, a {
         line-height: 32px;
         padding: 0px 4px;
         border-radius: 16px;
-        background-color: material-color('blue', '600');
+        background-color: $primary;
         display: inline-block;
 
         input.chip-label {
@@ -452,7 +468,7 @@ button, a {
                 background-color: #fff;
 
                 .fa {
-                    color: material-color('blue', '600');
+                    color: $primary;
                 }
             }
 
@@ -468,7 +484,7 @@ button, a {
         width: 32px;
         line-height: 32px;
         border-radius: 16px;
-        background-color: material-color('blue', '600');
+        background-color: $primary;
         display: inline-block;
         padding: 0px !important;
         position: relative;
@@ -539,7 +555,7 @@ button, a {
     }
 
     &.active {
-        outline: 5px solid material-color('blue', '600') !important;
+        outline: 5px solid $primary !important;
         z-index: 2;
     }
 }
@@ -567,7 +583,7 @@ button, a {
             .fa {
                 line-height: 80px;
                 font-size: 48px;
-                color: material-color('blue', '600');
+                color: $primary;
              }
         }
     }
@@ -639,7 +655,7 @@ button, a {
         border-radius: 0px;
         box-shadow: none;
         border: 0px;
-        border-bottom: 2px solid material-color('blue', '600');
+        border-bottom: 2px solid $primary;
         padding-left: 0px;
         padding-right: 0px;
 
@@ -672,7 +688,7 @@ textarea.form-control {
 select.form-control {
     &, &:active, &:focus, &[readonly] {
         border-bottom: 0px;
-        background-color: material-color('blue', '600');
+        background-color: $primary;
         color: #fff;
         cursor: pointer;
         width: auto !important;
@@ -692,7 +708,7 @@ select.form-control {
             cursor: pointer;
 
             &:hover {
-                background-color: material-color('blue', '400');
+                background-color: $primary-light;
             }
         }
     }
@@ -752,17 +768,17 @@ a.btn {
         min-width: 0px;
     }
 
-    @include set-button-color('primary', 'blue');
-    @include set-button-color('danger', 'red');
-    @include set-button-color('success', 'green');
+    @include set-button-color('primary', $primary);
+    @include set-button-color('danger', material-color('red', '600'));
+    @include set-button-color('success', material-color('green', '600'));
 
     &:active {
         box-shadow: none;
     }
 
     &.btn-primary {
-        background-color: material-color('blue', '600');
-        border-color: material-color('blue', '600');
+        background-color: $primary;
+        border-color: $primary;
     }
 
     &.btn-right {
@@ -800,7 +816,7 @@ a.btn {
     &.btn-embedded {
         background-color: transparent;
         border: 0px;
-        color: material-color('blue', '600');
+        color: $primary;
 
         &.btn-embedded-danger {
             color: material-color('red', '600');
@@ -840,7 +856,7 @@ a.btn {
 // Tabs
 .nav-tabs {
     padding: 18px 0px 0px 15px;
-    background-color: material-color('blue', '600');
+    background-color: $primary;
     font-size: 14px;
     position: relative;
     font-weight: bold;
@@ -852,14 +868,14 @@ a.btn {
                 color: #fff;
                 border: 0px;
                 background-color: transparent;
-                border-bottom: 5px solid material-color('blue', '300');
+                border-bottom: 5px solid $secondary-lightest;
             }
         }
 
         &:not(.active) {
             a {
                 &, &:hover, &:focus {
-                    color: material-color('blue', '100');
+                    color: $secondary-lightest;
                     background-color: transparent;
                     border: 0px;
                 }
@@ -903,7 +919,7 @@ a.btn {
         &:checked {
             & + label {
                 left: 90%;
-                background-color: material-color('blue', '600');
+                background-color: $primary;
             }  
         }  
     }

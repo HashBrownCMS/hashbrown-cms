@@ -15,7 +15,7 @@
             padding: 0px;
             background-color: transparent;
             text-decoration: none;
-            color: material-color('grey', '500');
+            color: $white;
             position: relative;
             display: block;
             text-align: center;
@@ -23,7 +23,7 @@
             line-height: 20px;
 
             &:hover {
-                color: material-color('grey', '600');
+                color: $white;
             }
 
             >.fa {

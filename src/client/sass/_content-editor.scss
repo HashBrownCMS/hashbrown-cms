@@ -39,7 +39,6 @@
                     right: 10px;
                     z-index: 200;
                     text-transform: uppercase;
-                    color: material-color('blue', '100');
                     font-weight: 700;
 
                     button {
@@ -126,13 +125,13 @@
                         }
 
                         >span {
-                            background-color: material-color('blue', '700');
+                            background-color: $primary;
                             color: #fff;
                             padding-left: 10px;
                         }
 
                         .form-control {
-                            background-color: material-color('blue', '700');
+                            background-color: $primary;
                             border-top-left-radius: 0px;
                             border-bottom-left-radius: 0px;
                         }

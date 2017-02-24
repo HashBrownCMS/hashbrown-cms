@@ -25,11 +25,6 @@ body {
     overflow: hidden;
 }
 
-// Dragdrop
-#dragdrop-placeholder, *[data-dragdrop-unsorted="true"][data-dragdrop-hovering="true"] {
-    border: 2px dashed material-color('blue', '500');
-}
-
 *[data-dragdrop-enabled="true"] {
     &, * {
         cursor: -webkit-grab !important;
@@ -279,6 +274,8 @@ img.logo {
         flex-basis: 100%;
         flex-grow: 1;
         z-index: 50;
+        background-color: $primary;
+        color: $white;
 
         @extend .raised;
     }
@@ -289,8 +286,6 @@ img.logo {
 
         &.presentation {
             position: relative;
-            background-color: material-color('blue', '600');
-            color: #fff;
 
             &.presentation-center {
                 display: flex;
@@ -326,16 +321,6 @@ img.logo {
                 margin-right: auto;
             }
 
-            .btn-primary {
-                color: material-color('blue', '600');
-                background-color: #fff;
-
-                &:hover {
-                    color: material-color('blue', '600');
-                    background-color: material-color('grey', '200');
-                }
-            }
-
             a {
                 color: #fff;
                 font-weight: bold;
@@ -366,8 +351,8 @@ img.logo {
             }
 
             .editor-header {
+                background-color: $secondary;
                 padding: 20px 0px 0px 20px;
-                background-color: material-color('blue', '600');
                 color: #fff;
                 height: 61px;
                 flex-shrink: 0;
