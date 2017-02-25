@@ -59,12 +59,7 @@ class TemplateEditor extends View {
                         this.$saveBtn = _.button({class: 'btn btn-raised btn-primary'},
                             _.span({class: 'text-default'}, 'Save'),
                             _.span({class: 'text-working'}, 'Saving')
-                        ).click(() => { this.onClickSave(); }),
-
-                        // Delete
-                        _.button({class: 'btn btn-embedded btn-embedded-danger'},
-                            _.span({class: 'fa fa-trash'})
-                        ).click(() => { this.onClickDelete(this.publishingSettings); })
+                        ).click(() => { this.onClickSave(); })
                     )
                 )
             )

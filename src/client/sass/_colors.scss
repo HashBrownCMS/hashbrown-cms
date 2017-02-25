@@ -10,9 +10,6 @@ $darkest-grey: #222;
 
 $white: #ffffff;
 
-/* Standard */
-$standard-text: #cccccc;
-
 /* Primary */
 $primary: #e70d3b;
 $primary-light: lighten($primary, 20);
@@ -38,3 +35,10 @@ $warning-text: darken($warning, 30);
 $success: $primary;
 
 $success-text: $primary-text;
+
+/* Standard */
+$standard: #ffffff;
+$standard-dark: #eeeeee;
+$standard-darker: #999999;
+
+$standard-text: #333333;

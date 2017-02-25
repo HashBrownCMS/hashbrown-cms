@@ -11076,7 +11076,7 @@
 	                highlightSelectedValue();
 	            };
 
-	            var $element = _.div({ class: 'dropdown' }, $toggle = _.button({ class: 'btn btn-primary dropdown-toggle', type: 'button', 'data-toggle': 'dropdown' }, '(none)'), _.if(useClearButton, $clear = _.button({ class: 'btn btn-embedded dropdown-clear' }, _.span({ class: 'fa fa-remove' })).on('click', onClear)), _.div({ class: 'dropdown-menu' }, _.ul({ class: 'dropdown-menu-items' }, _.each(options, function (i, option) {
+	            var $element = _.div({ class: 'dropdown' }, $toggle = _.button({ class: 'btn btn-default dropdown-toggle', type: 'button', 'data-toggle': 'dropdown' }, '(none)'), _.if(useClearButton, $clear = _.button({ class: 'btn btn-embedded dropdown-clear' }, _.span({ class: 'fa fa-remove' })).on('click', onClear)), _.div({ class: 'dropdown-menu' }, _.ul({ class: 'dropdown-menu-items' }, _.each(options, function (i, option) {
 	                var optionLabel = option.label || option.id || option.name || option.toString();
 	                var isSelected = option.selected || option.value == defaultValue;
 
@@ -23027,60 +23027,13 @@
 	    }
 
 	    /**
-	     * Event: Click delete
+	     * Event: On change folder path
+	     *
+	     * @param {String} newFolder
 	     */
 
 
 	    _createClass(MediaViewer, [{
-	        key: 'onClickDelete',
-	        value: function onClickDelete() {
-	            var view = this;
-	            var id = this.model.id;
-	            var name = this.model.name;
-
-	            function onSuccess() {
-	                debug.log('Removed media with id "' + id + '"', view);
-
-	                reloadResource('media').then(function () {
-	                    ViewHelper.get('NavbarMain').reload();
-
-	                    // Cancel the MediaViever view if it was displaying the deleted object
-	                    if (location.hash == '#/media/' + id) {
-	                        location.hash = '/media/';
-	                    }
-	                });
-	            }
-
-	            new MessageModal({
-	                model: {
-	                    title: 'Delete media',
-	                    body: 'Are you sure you want to delete the media object "' + name + '"?'
-	                },
-	                buttons: [{
-	                    label: 'Cancel',
-	                    class: 'btn-default',
-	                    callback: function callback() {}
-	                }, {
-	                    label: 'Delete',
-	                    class: 'btn-danger',
-	                    callback: function callback() {
-	                        $.ajax({
-	                            url: apiUrl('media/' + id),
-	                            type: 'DELETE',
-	                            success: onSuccess
-	                        });
-	                    }
-	                }]
-	            });
-	        }
-
-	        /**
-	         * Event: On change folder path
-	         *
-	         * @param {String} newFolder
-	         */
-
-	    }, {
 	        key: 'onChangeFolder',
 	        value: function onChangeFolder(newFolder) {
 	            apiCall('post', 'media/tree/' + this.model.id, newFolder ? {
@@ -23105,9 +23058,7 @@
 	                view.$element.find('.media-data').html('(' + img.width + 'x' + img.height + ')');
 	            })), _.div({ class: 'editor-footer' }, _.input({ class: 'form-control', value: this.model.folder, placeholder: 'Type folder path here' }).change(function () {
 	                view.onChangeFolder($(this).val());
-	            }), _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-embedded btn-embedded-danger' }, _.span({ class: 'fa fa-trash' })).click(function () {
-	                view.onClickDelete();
-	            }))));
+	            })));
 	        }
 	    }]);
 
@@ -23478,11 +23429,11 @@
 
 	        _this.$element = _.div({ class: 'array-editor field-editor' });
 
-	        _this.$keyContent = _.div(_.button({ class: 'btn btn-primary btn-array-editor-sort-items' }, _.span({ class: 'text-default' }, 'Sort'), _.span({ class: 'text-sorting', style: 'display: none' }, 'Done')).click(function () {
+	        _this.$keyContent = _.div(_.button({ class: 'btn btn-default btn-array-editor-sort-items' }, _.span({ class: 'text-default' }, 'Sort'), _.span({ class: 'text-sorting', style: 'display: none' }, 'Done')).click(function () {
 	            _this.onClickSort();
-	        }), _.button({ class: 'btn btn-primary btn-array-editor-sort-items' }, 'Collapse').click(function () {
+	        }), _.button({ class: 'btn btn-default btn-array-editor-sort-items' }, 'Collapse').click(function () {
 	            _this.onClickCollapseAll();
-	        }), _.button({ class: 'btn btn-primary btn-array-editor-sort-items' }, 'Expand').click(function () {
+	        }), _.button({ class: 'btn btn-default btn-array-editor-sort-items' }, 'Expand').click(function () {
 	            _this.onClickExpandAll();
 	        }));
 
@@ -30259,11 +30210,6 @@
 	            // Save
 	            this.$saveBtn = _.button({ class: 'btn btn-raised btn-primary' }, _.span({ class: 'text-default' }, 'Save'), _.span({ class: 'text-working' }, 'Saving')).click(function () {
 	                _this3.onClickSave();
-	            }),
-
-	            // Delete
-	            _.button({ class: 'btn btn-embedded btn-embedded-danger' }, _.span({ class: 'fa fa-trash' })).click(function () {
-	                _this3.onClickDelete(_this3.publishingSettings);
 	            })))));
 
 	            setTimeout(function () {
@@ -30420,47 +30366,6 @@
 	        value: function onClickTogglePublish() {}
 
 	        /**
-	         * Event: On click remove
-	         *
-	         * @param {Object} publishing
-	         */
-
-	    }, {
-	        key: 'onClickDelete',
-	        value: function onClickDelete(publishing) {
-	            var _this3 = this;
-
-	            // Event on API success response 
-	            var onSuccess = function onSuccess() {
-	                return reloadResource('content').then(function () {
-	                    NavbarMain.reload();
-
-	                    _this3.dirty = false;
-
-	                    // Cancel the ContentEditor view
-	                    location.hash = '/content/';
-	                });
-	            };
-
-	            // Render the confirmation modal
-	            var $deleteChildrenSwitch = void 0;
-	            UI.confirmModal('Delete', 'Delete the content "' + view.model.prop('title', window.language) + '"?', _.div({ class: 'input-group' }, _.span('Remove child content too'), _.div({ class: 'input-group-addon' }, $deleteChildrenSwitch = UI.inputSwitch(true))), function () {
-	                apiCall('delete', 'content/' + _this3.model.id + '?removeChildren=' + $deleteChildrenSwitch.data('checked')).then(function () {
-	                    // Unpublish through connections if applicable
-	                    if (!_this3.model.local && publishing.connections && publishing.connections.length > 0) {
-	                        return apiCall('post', 'content/unpublish', _this3.model).then(function () {
-	                            return onSuccess();
-	                        });
-
-	                        // If not, just continue
-	                    } else {
-	                        return onSuccess();
-	                    }
-	                }).catch(UI.errorModal);
-	            });
-	        }
-
-	        /**
 	         * Reload this view
 	         */
 
@@ -30573,7 +30478,7 @@
 	    }, {
 	        key: 'renderFields',
 	        value: function renderFields(tabId, fieldDefinitions, fieldValues) {
-	            var _this4 = this;
+	            var _this3 = this;
 
 	            var view = this;
 	            var tabFieldDefinitions = {};
@@ -30603,7 +30508,7 @@
 	                var fieldSchema = resources.schemas[fieldDefinition.schemaId];
 
 	                if (!fieldSchema) {
-	                    debug.log('FieldSchema "' + fieldDefinition.schemaId + '" for key "' + key + '" not found', _this4);
+	                    debug.log('FieldSchema "' + fieldDefinition.schemaId + '" for key "' + key + '" not found', _this3);
 	                    return null;
 	                }
 
@@ -30674,7 +30579,7 @@
 	    }, {
 	        key: 'renderEditor',
 	        value: function renderEditor(content, schema) {
-	            var _this5 = this;
+	            var _this4 = this;
 
 	            var view = this;
 
@@ -30688,19 +30593,19 @@
 	            // Render editor
 	            return _.div({ class: 'object' }, _.ul({ class: 'nav editor-header nav-tabs' }, _.each(schema.tabs, function (tabId, tab) {
 	                return _.li({ class: isTabActive(tabId) ? 'active' : '' }, _.a({ 'data-toggle': 'tab', href: '#tab-' + tabId }, tab).click(function () {
-	                    _this5.onClickTab(tabId);
+	                    _this4.onClickTab(tabId);
 	                }));
 	            }), _.li({ class: isTabActive('meta') ? 'active' : '' }, _.a({ 'data-toggle': 'tab', href: '#tab-meta' }, 'meta').click(function () {
-	                _this5.onClickTab('meta');
+	                _this4.onClickTab('meta');
 	            }))), this.$body = _.div({ class: 'tab-content editor-body' },
 	            // Render content properties
 	            _.each(schema.tabs, function (tabId, tab) {
-	                return _.div({ id: 'tab-' + tabId, class: 'tab-pane' + (isTabActive(tabId) ? ' active' : '') }, _this5.renderFields(tabId, schema.fields.properties, content.properties));
+	                return _.div({ id: 'tab-' + tabId, class: 'tab-pane' + (isTabActive(tabId) ? ' active' : '') }, _this4.renderFields(tabId, schema.fields.properties, content.properties));
 	            }),
 
 	            // Render meta properties
 	            _.div({ id: 'tab-meta', class: 'tab-pane' + (isTabActive('meta') ? ' active' : '') }, this.renderFields('meta', schema.fields, content), this.renderFields('meta', schema.fields.properties, content.properties))).on('scroll', function (e) {
-	                _this5.onScroll(e);
+	                _this4.onScroll(e);
 	            }), _.div({ class: 'editor-footer' }));
 	        }
 
@@ -30711,12 +30616,12 @@
 	    }, {
 	        key: 'renderButtons',
 	        value: function renderButtons() {
-	            var _this6 = this;
+	            var _this5 = this;
 
 	            _.append($('.editor-footer').empty(), _.div({ class: 'btn-group' },
 	            // JSON editor
 	            _.button({ class: 'btn btn-embedded' }, 'Advanced').click(function () {
-	                _this6.onClickAdvanced();
+	                _this5.onClickAdvanced();
 	            }),
 
 	            // View remote
@@ -30725,7 +30630,7 @@
 	                    return connection.id == connectionId;
 	                })[0];
 
-	                var url = _this6.model.properties.url;
+	                var url = _this5.model.properties.url;
 
 	                if (url instanceof Object) {
 	                    url = url[window.language];
@@ -30737,18 +30642,13 @@
 	            })), _.if(!this.model.locked,
 	            // Save & publish
 	            _.div({ class: 'btn-group-save-publish raised' }, this.$saveBtn = _.button({ class: 'btn btn-save btn-primary' }, _.span({ class: 'text-default' }, 'Save'), _.span({ class: 'text-working' }, 'Saving')).click(function () {
-	                _this6.onClickSave(_this6.publishingSettings);
-	            }), _.if(this.publishingSettings.connections && this.publishingSettings.connections.length > 0, _.span('&'), _.select({ class: 'form-control select-publishing' }, _.option({ value: 'publish' }, 'Publish'), _.option({ value: 'unpublish' }, 'Unpublish')).val(this.model.unpublished ? 'unpublish' : 'publish'))),
-
-	            // Delete
-	            _.button({ class: 'btn btn-embedded btn-embedded-danger' }, _.span({ class: 'fa fa-trash' })).click(function () {
-	                _this6.onClickDelete(_this6.publishingSettings);
-	            }))));
+	                _this5.onClickSave(_this5.publishingSettings);
+	            }), _.if(this.publishingSettings.connections && this.publishingSettings.connections.length > 0, _.span('&'), _.select({ class: 'form-control select-publishing' }, _.option({ value: 'publish' }, 'Publish'), _.option({ value: 'unpublish' }, 'Unpublish')).val(this.model.unpublished ? 'unpublish' : 'publish'))))));
 	        }
 	    }, {
 	        key: 'render',
 	        value: function render() {
-	            var _this7 = this;
+	            var _this6 = this;
 
 	            // Make sure the model data is using the Content model
 	            if (!this.model.properties) {
@@ -30766,20 +30666,20 @@
 	            return SchemaHelper.getSchemaWithParentFields(this.model.schemaId).then(function (schema) {
 	                contentSchema = schema;
 
-	                return _this7.model.getSettings('publishing');
+	                return _this6.model.getSettings('publishing');
 	            }).then(function (settings) {
-	                _this7.publishingSettings = settings;
+	                _this6.publishingSettings = settings;
 
-	                _this7.$element.html(
+	                _this6.$element.html(
 	                // Render editor
-	                _this7.renderEditor(_this7.model, contentSchema));
+	                _this6.renderEditor(_this6.model, contentSchema));
 
-	                _this7.renderButtons();
+	                _this6.renderButtons();
 
-	                _this7.onFieldEditorsReady();
+	                _this6.onFieldEditorsReady();
 	            }).catch(function (e) {
 	                UI.errorModal(e, function () {
-	                    location.hash = '/content/json/' + _this7.model.id;
+	                    location.hash = '/content/json/' + _this6.model.id;
 	                });
 	            });
 	        }
@@ -30893,54 +30793,6 @@
 	            delete this.model.inputs[key];
 
 	            this.render();
-	        }
-
-	        /**
-	         * Event: On click remove
-	         */
-
-	    }, {
-	        key: 'onClickDelete',
-	        value: function onClickDelete() {
-	            var view = this;
-
-	            function onSuccess() {
-	                debug.log('Removed Form with id "' + view.model.id + '"', view);
-
-	                return reloadResource('forms').then(function () {
-	                    ViewHelper.get('NavbarMain').reload();
-
-	                    // Cancel the FormEditor view
-	                    location.hash = '/forms/';
-	                });
-	            }
-
-	            function onError(err) {
-	                new MessageModal({
-	                    model: {
-	                        title: 'Error',
-	                        body: err.message
-	                    }
-	                });
-	            }
-
-	            new MessageModal({
-	                model: {
-	                    title: 'Delete form',
-	                    body: 'Are you sure you want to delete the form "' + view.model.title + '"?'
-	                },
-	                buttons: [{
-	                    label: 'Cancel',
-	                    class: 'btn-default',
-	                    callback: function callback() {}
-	                }, {
-	                    label: 'Delete',
-	                    class: 'btn-danger',
-	                    callback: function callback() {
-	                        apiCall('delete', 'forms/' + view.model.id).then(onSuccess).catch(onError);
-	                    }
-	                }]
-	            });
 	        }
 
 	        /**
@@ -31225,8 +31077,6 @@
 	                _this6.onClickAdvanced();
 	            }), _.if(!this.model.locked, this.$saveBtn = _.button({ class: 'btn btn-primary btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Save '), _.span({ class: 'text-working' }, 'Saving ')).click(function () {
 	                _this6.onClickSave();
-	            }), _.button({ class: 'btn btn-embedded-danger btn-embedded' }, _.span({ class: 'fa fa-trash' })).click(function () {
-	                _this6.onClickDelete();
 	            })))));
 	        }
 	    }]);
@@ -31310,45 +31160,6 @@
 
 	                location.reload();
 	            }).catch(this.onError);
-	        }
-
-	        /**
-	         * Event: On click remove
-	         */
-
-	    }, {
-	        key: 'onClickDelete',
-	        value: function onClickDelete() {
-	            var view = this;
-
-	            function onSuccess() {
-	                debug.log('Removed connection with id "' + view.model.id + '"', this);
-
-	                reloadResource('connection').then(function () {
-	                    ViewHelper.get('NavbarMain').reload();
-
-	                    // Cancel the ConnectionEditor view
-	                    location.hash = '/connections/';
-	                });
-	            }
-
-	            new MessageModal({
-	                model: {
-	                    title: 'Delete connection',
-	                    body: 'Are you sure you want to delete the connection "' + view.model.title + '"?'
-	                },
-	                buttons: [{
-	                    label: 'Cancel',
-	                    class: 'btn-default',
-	                    callback: function callback() {}
-	                }, {
-	                    label: 'Delete',
-	                    class: 'btn-danger',
-	                    callback: function callback() {
-	                        apiCall('delete', 'connections/' + view.model.id).then(onSuccess).catch(this.onError);
-	                    }
-	                }]
-	            });
 	        }
 
 	        /**
@@ -31458,8 +31269,6 @@
 	                view.onClickAdvanced();
 	            }), _.if(!this.model.locked, view.$saveBtn = _.button({ class: 'btn btn-primary btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Save '), _.span({ class: 'text-working' }, 'Saving ')).click(function () {
 	                view.onClickSave();
-	            }), _.button({ class: 'btn btn-embedded-danger btn-embedded' }, _.span({ class: 'fa fa-trash' })).click(function () {
-	                view.onClickDelete();
 	            }))))));
 	        }
 	    }]);
@@ -31518,54 +31327,6 @@
 	        key: 'onClickAdvanced',
 	        value: function onClickAdvanced() {
 	            location.hash = location.hash.replace('/schemas/', '/schemas/json/');
-	        }
-
-	        /**
-	         * Event: On click remove
-	         */
-
-	    }, {
-	        key: 'onClickDelete',
-	        value: function onClickDelete() {
-	            var view = this;
-
-	            function onSuccess() {
-	                debug.log('Removed Schema with id "' + view.model.id + '"', view);
-
-	                return reloadResource('schemas').then(function () {
-	                    ViewHelper.get('NavbarMain').reload();
-
-	                    // Cancel the SchemaEditor view
-	                    location.hash = '/schemas/';
-	                });
-	            }
-
-	            function onError(err) {
-	                new MessageModal({
-	                    model: {
-	                        title: 'Error',
-	                        body: err.message
-	                    }
-	                });
-	            }
-
-	            new MessageModal({
-	                model: {
-	                    title: 'Delete schema',
-	                    body: 'Are you sure you want to delete the schema "' + view.model.name + '"?'
-	                },
-	                buttons: [{
-	                    label: 'Cancel',
-	                    class: 'btn-default',
-	                    callback: function callback() {}
-	                }, {
-	                    label: 'Delete',
-	                    class: 'btn-danger',
-	                    callback: function callback() {
-	                        apiCall('delete', 'schemas/' + view.model.id).then(onSuccess).catch(onError);
-	                    }
-	                }]
-	            });
 	        }
 
 	        /**
@@ -32110,8 +31871,6 @@
 	                    _this7.onClickAdvanced();
 	                }), _.if(!_this7.model.locked, _this7.$saveBtn = _.button({ class: 'btn btn-primary btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Save '), _.span({ class: 'text-working' }, 'Saving ')).click(function () {
 	                    _this7.onClickSave();
-	                }), _.button({ class: 'btn btn-embedded btn-embedded-danger' }, _.span({ class: 'fa fa-trash' })).click(function () {
-	                    _this7.onClickDelete();
 	                })))));
 	            });
 	        }

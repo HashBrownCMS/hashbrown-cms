@@ -74,58 +74,6 @@ class FormEditor extends View {
     }
     
     /**
-     * Event: On click remove
-     */
-    onClickDelete() {
-        let view = this;
-
-        function onSuccess() {
-            debug.log('Removed Form with id "' + view.model.id + '"', view); 
-        
-            return reloadResource('forms')
-            .then(function() {
-                ViewHelper.get('NavbarMain').reload();
-                
-                // Cancel the FormEditor view
-                location.hash = '/forms/';
-            });
-        }
-
-        function onError(err) {
-            new MessageModal({
-                model: {
-                    title: 'Error',
-                    body: err.message
-                }
-            });
-        }
-
-        new MessageModal({
-            model: {
-                title: 'Delete form',
-                body: 'Are you sure you want to delete the form "' + view.model.title + '"?'
-            },
-            buttons: [
-                {
-                    label: 'Cancel',
-                    class: 'btn-default',
-                    callback: () => {
-                    }
-                },
-                {
-                    label: 'Delete',
-                    class: 'btn-danger',
-                    callback: () => {
-                        apiCall('delete', 'forms/' + view.model.id)
-                        .then(onSuccess)
-                        .catch(onError);
-                    }
-                }
-            ]
-        });
-    }
-    
-    /**
      * Renders the allowed origin editor
      *
      * @return {Object} element
@@ -491,10 +439,7 @@ class FormEditor extends View {
                         this.$saveBtn = _.button({class: 'btn btn-primary btn-raised btn-save'},
                             _.span({class: 'text-default'}, 'Save '),
                             _.span({class: 'text-working'}, 'Saving ')
-                        ).click(() => { this.onClickSave(); }),
-                        _.button({class: 'btn btn-embedded-danger btn-embedded'},
-                            _.span({class: 'fa fa-trash'})
-                        ).click(() => { this.onClickDelete(); })
+                        ).click(() => { this.onClickSave(); })
                     )
                 )
             )

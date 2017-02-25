@@ -49,49 +49,6 @@ class ConnectionEditor extends View {
     }
 
     /**
-     * Event: On click remove
-     */
-    onClickDelete() {
-        let view = this;
-
-        function onSuccess() {
-            debug.log('Removed connection with id "' + view.model.id + '"', this); 
-        
-            reloadResource('connection')
-            .then(function() {
-                ViewHelper.get('NavbarMain').reload();
-                
-                // Cancel the ConnectionEditor view
-                location.hash = '/connections/';
-            });
-        }
-
-        new MessageModal({
-            model: {
-                title: 'Delete connection',
-                body: 'Are you sure you want to delete the connection "' + view.model.title + '"?'
-            },
-            buttons: [
-                {
-                    label: 'Cancel',
-                    class: 'btn-default',
-                    callback: function() {
-                    }
-                },
-                {
-                    label: 'Delete',
-                    class: 'btn-danger',
-                    callback: function() {
-                        apiCall('delete', 'connections/' + view.model.id)
-                        .then(onSuccess)
-                        .catch(this.onError);
-                    }
-                }
-            ]
-        });
-    }
-
-    /**
      * Reload this view
      */
     reload() {
@@ -234,10 +191,7 @@ class ConnectionEditor extends View {
                             view.$saveBtn = _.button({class: 'btn btn-primary btn-raised btn-save'},
                                 _.span({class: 'text-default'}, 'Save '),
                                 _.span({class: 'text-working'}, 'Saving ')
-                            ).click(function() { view.onClickSave(); }),
-                            _.button({class: 'btn btn-embedded-danger btn-embedded'},
-                                _.span({class: 'fa fa-trash'})
-                            ).click(function() { view.onClickDelete(); })
+                            ).click(function() { view.onClickSave(); })
                         )
                     )
                 )

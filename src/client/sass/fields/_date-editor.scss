@@ -3,7 +3,7 @@
         max-width: 330px;
 
         .modal-header {
-            background-color: material-color('blue', '600');
+            background-color: $secondary;
             color: #fff;
         }
 
@@ -40,7 +40,7 @@
                     display: block;
                     width: 42px;
                     text-align: center;
-                    color: material-color('grey', '400');
+                    color: $standard-text;
                     font-weight: 700;
                     line-height: 42px;
                 }
@@ -57,14 +57,14 @@
                     height: 42px;
                     
                     &:not(.current) {
-                        color: material-color('grey', '600');
+                        color: $standard-text;
                     }
 
                     &.active {
                         box-shadow: none;
-                        background-color: material-color('blue', '600');
+                        background-color: $primary;
                         border-radius: 50%;
-                        color: #fff;
+                        color: $primary-text;
                     }
                 }
             }
@@ -75,7 +75,7 @@
 
                 .date-picker-time-separator {
                     font-size: 18px;
-                    color: material-color('grey', '400');
+                    color: $standard-text;
                     font-weight: bold;
                     line-height: 40px;
                 }

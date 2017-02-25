@@ -11054,7 +11054,7 @@
 	                highlightSelectedValue();
 	            };
 
-	            var $element = _.div({ class: 'dropdown' }, $toggle = _.button({ class: 'btn btn-primary dropdown-toggle', type: 'button', 'data-toggle': 'dropdown' }, '(none)'), _.if(useClearButton, $clear = _.button({ class: 'btn btn-embedded dropdown-clear' }, _.span({ class: 'fa fa-remove' })).on('click', onClear)), _.div({ class: 'dropdown-menu' }, _.ul({ class: 'dropdown-menu-items' }, _.each(options, function (i, option) {
+	            var $element = _.div({ class: 'dropdown' }, $toggle = _.button({ class: 'btn btn-default dropdown-toggle', type: 'button', 'data-toggle': 'dropdown' }, '(none)'), _.if(useClearButton, $clear = _.button({ class: 'btn btn-embedded dropdown-clear' }, _.span({ class: 'fa fa-remove' })).on('click', onClear)), _.div({ class: 'dropdown-menu' }, _.ul({ class: 'dropdown-menu-items' }, _.each(options, function (i, option) {
 	                var optionLabel = option.label || option.id || option.name || option.toString();
 	                var isSelected = option.selected || option.value == defaultValue;
 
@@ -20654,7 +20654,7 @@
 	            }))), _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Delete').click(function (e) {
 	                e.preventDefault();_this7.onClickRemove();
 	            }))))), _.div({ class: 'info' }, _.h4(this.model.settings.info.name || this.model.id), _.p(userCount + ' user' + (userCount != 1 ? 's' : '')), _.p(languageCount + ' language' + (languageCount != 1 ? 's' : '') + ' (' + this.model.settings.language.selected.join(', ') + ')')), _.div({ class: 'environments' }, _.each(this.model.settings.environments.names, function (i, environment) {
-	                return _.div({ class: 'environment' }, _.div({ class: 'btn-group' }, _.a({ title: 'Go to "' + environment + '" CMS', href: '/' + _this7.model.id + '/' + environment, class: 'environment-title btn btn-primary' }, environment), _.if(User.current.isAdmin, _.div({ class: 'dropdown' }, _.button({ class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, _.span({ class: 'fa fa-ellipsis-v' })), _.ul({ class: 'dropdown-menu' }, _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Delete').click(function (e) {
+	                return _.div({ class: 'environment' }, _.div({ class: 'btn-group' }, _.a({ title: 'Go to "' + environment + '" CMS', href: '/' + _this7.model.id + '/' + environment, class: 'environment-title btn btn-default' }, environment), _.if(User.current.isAdmin, _.div({ class: 'dropdown' }, _.button({ class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, _.span({ class: 'fa fa-ellipsis-v' })), _.ul({ class: 'dropdown-menu' }, _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Delete').click(function (e) {
 	                    e.preventDefault();_this7.onClickRemoveEnvironment(environment);
 	                })))))));
 	            }), _.if(User.current.isAdmin, _.button({ title: 'Add environment', class: 'btn btn-primary btn-add btn-raised btn-round' }, '+').click(function () {

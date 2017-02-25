@@ -242,7 +242,7 @@ class UIHelper {
         };
 
         let $element = _.div({class: 'dropdown'},
-            $toggle = _.button({class: 'btn btn-primary dropdown-toggle', type: 'button', 'data-toggle': 'dropdown'},
+            $toggle = _.button({class: 'btn btn-default dropdown-toggle', type: 'button', 'data-toggle': 'dropdown'},
                 '(none)'
             ),
             _.if(useClearButton,

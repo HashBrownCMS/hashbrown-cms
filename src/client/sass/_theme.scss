@@ -29,20 +29,21 @@ button, a {
 /**
  * Colour a button
  */
-@mixin set-button-color($class, $color, $text-color) {
+@mixin set-button-color($class, $color, $border-color, $text-color) {
     &.btn-#{$class} {
         background-color: $color;
-        border-color: $color;
+        border-color: $border-color;
         color: $text-color;
+        border-width: 1px;
     
         &:hover {
             background-color: lighten($color, 6);
-            border-color: lighten($color, 6);
+            border-color: lighten($border-color, 6);
         }
         
         &:active {
             background-color: darken($color, 6);
-            border-color: darken($color, 6);
+            border-color: darken($border-color, 6);
         }
     }
 }
@@ -112,11 +113,11 @@ button, a {
 // Dropdown
 .dropdown {
     &.open {
-        .dropdown-toggle {
+        .dropdown-toggle:not(.btn) {
             position: relative;
 
             &, &:focus {
-                color: material-color('grey', '600');
+                color: $primary-text;
             }
 
             &:before {
@@ -129,7 +130,7 @@ button, a {
                 width: 30px;
                 height: 30px;
                 border-radius: 50%;
-                background-color: material-color('grey', '300'); 
+                background-color: $primary;
             }
 
             span {
@@ -162,10 +163,6 @@ button, a {
             padding: 0px 24px 0px 10px;
             position: relative;
 
-            &, &:hover, &:focus {
-                color: #fff;
-            }
-
             &:after {
                 font-family: 'FontAwesome';
                 content: '\f0d7';
@@ -190,7 +187,7 @@ button, a {
                 background-color: transparent;
                 opacity: 0.5;
                 position: absolute;
-                right: 0px;
+                right: 0.5rem;
                 top: 8px;
                 padding: 0px;
                 z-index: 20;
@@ -220,16 +217,19 @@ button, a {
         }
     }
 
-    .dropdown-toggle {
-        letter-spacing: normal;
-        color: material-color('grey', '400');
+    .dropdown-toggle:not(.btn) {
+        color: $standard-text;
         border: 0px;
         background-color: transparent;
         font-size: 1.5rem;
 
         &:hover {
-            color: material-color('grey', '600');
+            color: $standard-text;
         }
+    }
+    
+    .dropdown-toggle {
+        letter-spacing: normal;
     }
 
     .btn.dropdown-clear {
@@ -647,13 +647,13 @@ button, a {
     }
     
     &, &:active, &:focus, &[readonly] {
-        background-color: transparent;
+        background-color: $standard;
         border-radius: 0px;
         box-shadow: none;
-        border: 0px;
-        border-bottom: 2px solid $primary;
-        padding-left: 0px;
-        padding-right: 0px;
+        border: 1px solid $standard-darker;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+        border-radius: 2px;
 
         &[readonly] {
             border-bottom: 0px;
@@ -671,9 +671,9 @@ button, a {
     &[type="color"] {
         max-width: 110px;
         padding: 0px;
-        border-bottom: 0px;
         cursor: pointer;
-        border-radius: 2px;
+        border: 0px;
+        background-color: transparent;
     }
 }
 
@@ -764,10 +764,11 @@ a.btn {
         min-width: 0px;
     }
 
-    @include set-button-color('primary', $primary, $primary-text);
-    @include set-button-color('danger', $warning, $warning-text);
-    @include set-button-color('success', $success, $success-text);
-    @include set-button-color('default', $secondary, $secondary-text);
+    @include set-button-color('primary', $primary, $primary, $primary-text);
+    @include set-button-color('secondary', $secondary, $secondary, $secondary-text);
+    @include set-button-color('danger', $warning, $warning, $warning-text);
+    @include set-button-color('success', $success, $success, $success-text);
+    @include set-button-color('default', $standard, $standard-darker, $standard-text);
 
     &:active {
         box-shadow: none;

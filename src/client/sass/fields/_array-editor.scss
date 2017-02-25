@@ -16,7 +16,7 @@
 
     .array-editor {
         .items {
-            background-color: material-color('grey', '200');
+            background-color: $standard-dark;
             padding: 10px;
             margin-bottom: 10px;
 
@@ -52,7 +52,7 @@
         }
 
         >.items {
-            border: 2px dashed material-color('grey', '400');
+            border: 2px dashed $primary;
             padding: 30px;
 
             #dragdrop-placeholder:not(:last-child) {
@@ -60,8 +60,8 @@
             }
 
             >.item {
-                background-color: material-color('blue', '600');
-                color: #fff;
+                background-color: $primary;
+                color: $primary-text;
                 
                 .btn-remove, .btn-toggle {
                     display: none;
@@ -104,7 +104,7 @@
                 right: 0px;
 
                 .fa {
-                    color: material-color('red', '500');
+                    color: $primary;
                 }
             }
 
@@ -112,10 +112,10 @@
                 right: 34px;
 
                 .fa {
-                    color: material-color('grey', '300');
+                    color: $standard-darker;
 
                     &:hover {
-                        color: material-color('grey', '500');
+                        color: $secondary;
                     }
                 }
 

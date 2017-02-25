@@ -95,56 +95,6 @@ class ContentEditor extends View {
     }
 
     /**
-     * Event: On click remove
-     *
-     * @param {Object} publishing
-     */
-    onClickDelete(publishing) {
-        // Event on API success response 
-        let onSuccess = () => {
-            return reloadResource('content')
-            .then(() => {
-                NavbarMain.reload();
-                
-                this.dirty = false;
-                
-                // Cancel the ContentEditor view
-                location.hash = '/content/';
-            });
-        }
-
-        // Render the confirmation modal
-        let $deleteChildrenSwitch;
-        UI.confirmModal(
-            'Delete',
-            'Delete the content "' + view.model.prop('title', window.language) + '"?',
-            _.div({class: 'input-group'},      
-                _.span('Remove child content too'),
-                _.div({class: 'input-group-addon'},
-                    $deleteChildrenSwitch = UI.inputSwitch(true)
-                )
-            ),
-            () => {
-                apiCall('delete', 'content/' + this.model.id + '?removeChildren=' + $deleteChildrenSwitch.data('checked'))
-                .then(() => {
-                    // Unpublish through connections if applicable
-                    if(!this.model.local && publishing.connections && publishing.connections.length > 0) {
-                        return apiCall('post', 'content/unpublish', this.model)
-                        .then(() => {
-                            return onSuccess();
-                        });
-                        
-                    // If not, just continue
-                    } else {
-                        return onSuccess();
-                    }
-                })
-                .catch(UI.errorModal);
-            }
-        );
-    }
-
-    /**
      * Reload this view
      */
     reload() {
@@ -419,12 +369,7 @@ class ContentEditor extends View {
                                 _.option({value: 'unpublish'}, 'Unpublish')
                             ).val(this.model.unpublished ? 'unpublish' : 'publish')
                         )
-                    ),
-                    
-                    // Delete
-                    _.button({class: 'btn btn-embedded btn-embedded-danger'},
-                        _.span({class: 'fa fa-trash'})
-                    ).click(() => { this.onClickDelete(this.publishingSettings); })
+                    )
                 )
             )
         );

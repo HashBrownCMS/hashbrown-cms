@@ -10,18 +10,18 @@ class ArrayEditor extends View {
         this.$element = _.div({class: 'array-editor field-editor'});
 
         this.$keyContent = _.div(
-            _.button({class: 'btn btn-primary btn-array-editor-sort-items'},
+            _.button({class: 'btn btn-default btn-array-editor-sort-items'},
                 _.span({class: 'text-default'}, 'Sort'),
                 _.span({class: 'text-sorting', style: 'display: none'}, 'Done')
             ).click(() => {
                 this.onClickSort();
             }),
-            _.button({class: 'btn btn-primary btn-array-editor-sort-items'},
+            _.button({class: 'btn btn-default btn-array-editor-sort-items'},
                 'Collapse'
             ).click(() => {
                 this.onClickCollapseAll();
             }),
-            _.button({class: 'btn btn-primary btn-array-editor-sort-items'},
+            _.button({class: 'btn btn-default btn-array-editor-sort-items'},
                 'Expand'
             ).click(() => {
                 this.onClickExpandAll();

@@ -13,55 +13,6 @@ class MediaViewer extends View {
     }
 
     /**
-     * Event: Click delete
-     */
-    onClickDelete() {
-        let view = this;        
-        let id = this.model.id;
-        let name = this.model.name;
-        
-        function onSuccess() {
-            debug.log('Removed media with id "' + id + '"', view); 
-        
-            reloadResource('media')
-            .then(function() {
-                ViewHelper.get('NavbarMain').reload();
-                
-                // Cancel the MediaViever view if it was displaying the deleted object
-                if(location.hash == '#/media/' + id) {
-                    location.hash = '/media/';
-                }
-            });
-        }
-
-        new MessageModal({
-            model: {
-                title: 'Delete media',
-                body: 'Are you sure you want to delete the media object "' + name + '"?'
-            },
-            buttons: [
-                {
-                    label: 'Cancel',
-                    class: 'btn-default',
-                    callback: function() {
-                    }
-                },
-                {
-                    label: 'Delete',
-                    class: 'btn-danger',
-                    callback: function() {
-                        $.ajax({
-                            url: apiUrl('media/' + id),
-                            type: 'DELETE',
-                            success: onSuccess
-                        });
-                    }
-                }
-            ]
-        });
-    }
-
-    /**
      * Event: On change folder path
      *
      * @param {String} newFolder
@@ -108,12 +59,7 @@ class MediaViewer extends View {
             ),
             _.div({class: 'editor-footer'}, 
                 _.input({class: 'form-control', value: this.model.folder, placeholder: 'Type folder path here'})
-                    .change(function() { view.onChangeFolder($(this).val()); }),
-                _.div({class: 'btn-group'},
-                    _.button({class: 'btn btn-embedded btn-embedded-danger'},
-                        _.span({class: 'fa fa-trash'})
-                    ).click(function() { view.onClickDelete(); })
-                )
+                    .change(function() { view.onChangeFolder($(this).val()); })
             )
         );
     }

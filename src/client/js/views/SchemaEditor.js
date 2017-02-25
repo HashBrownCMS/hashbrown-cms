@@ -24,58 +24,6 @@ class SchemaEditor extends View {
     }
     
     /**
-     * Event: On click remove
-     */
-    onClickDelete() {
-        let view = this;
-
-        function onSuccess() {
-            debug.log('Removed Schema with id "' + view.model.id + '"', view); 
-        
-            return reloadResource('schemas')
-            .then(function() {
-                ViewHelper.get('NavbarMain').reload();
-                
-                // Cancel the SchemaEditor view
-                location.hash = '/schemas/';
-            });
-        }
-
-        function onError(err) {
-            new MessageModal({
-                model: {
-                    title: 'Error',
-                    body: err.message
-                }
-            });
-        }
-
-        new MessageModal({
-            model: {
-                title: 'Delete schema',
-                body: 'Are you sure you want to delete the schema "' + view.model.name + '"?'
-            },
-            buttons: [
-                {
-                    label: 'Cancel',
-                    class: 'btn-default',
-                    callback: () => {
-                    }
-                },
-                {
-                    label: 'Delete',
-                    class: 'btn-danger',
-                    callback: () => {
-                        apiCall('delete', 'schemas/' + view.model.id)
-                        .then(onSuccess)
-                        .catch(onError);
-                    }
-                }
-            ]
-        });
-    }
-
-    /**
      * Event: Click save. Posts the model to the modelUrl
      */
     onClickSave() {
@@ -717,10 +665,7 @@ class SchemaEditor extends View {
                             this.$saveBtn = _.button({class: 'btn btn-primary btn-raised btn-save'},
                                 _.span({class: 'text-default'}, 'Save '),
                                 _.span({class: 'text-working'}, 'Saving ')
-                            ).click(() => { this.onClickSave(); }),
-                            _.button({class: 'btn btn-embedded btn-embedded-danger'},
-                                _.span({class: 'fa fa-trash'})
-                            ).click(() => { this.onClickDelete(); })
+                            ).click(() => { this.onClickSave(); })
                         )
                     )
                 )
