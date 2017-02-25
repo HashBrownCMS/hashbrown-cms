@@ -184,6 +184,7 @@ class UIHelper {
      * @param {Array|Number} options
      * @param {Function} onChange
      * @param {Boolean} useClearButton
+     * @param {Boolean} useSearch
      *
      * @returns {HtmlElement} Dropdown element
      */
@@ -246,7 +247,7 @@ class UIHelper {
                 '(none)'
             ),
             _.if(useClearButton,
-                $clear = _.button({class: 'btn btn-embedded dropdown-clear'},
+                $clear = _.button({class: 'btn btn-default btn-small dropdown-clear'},
                     _.span({class: 'fa fa-remove'})
                 ).on('click', onClear)
             ),

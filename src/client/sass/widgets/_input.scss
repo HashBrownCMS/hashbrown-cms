@@ -1,0 +1,101 @@
+.form-control {
+    min-width: 110px;
+    resize: none;
+    line-height: 34px;
+    height: 34px;
+
+    &.disabled {
+        pointer-events: none;
+        opacity: 0.5;
+    }
+    
+    &, &:active, &:focus, &[readonly] {
+        background-color: $standard;
+        border-radius: 0px;
+        box-shadow: none;
+        border: 1px solid $standard-darker;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+        border-radius: 2px;
+    }
+
+    &[type="text"], &[type="email"], &[type="password"] {
+        max-width: 400px;
+    }
+    
+    &[type="number"] {
+        max-width: 100px;
+    }
+
+    &[type="color"] {
+        max-width: 110px;
+        padding: 0px;
+        cursor: pointer;
+        border: 0px;
+        background-color: transparent;
+    }
+
+    & + .form-control {
+        margin-top: 1rem;
+    }
+}
+
+textarea.form-control {
+    max-width: 400px;
+}
+
+select.form-control {
+    &, &:active, &:focus, &[readonly] {
+        border-bottom: 0px;
+        background-color: $primary;
+        color: #fff;
+        cursor: pointer;
+        width: auto !important;
+        padding: 0px 30px 0px 10px;
+        border-radius: 2px;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-image: url('/svg/fa/angle-down.svg');
+        background-size: auto 20px;
+        background-repeat: no-repeat;
+        background-position: top 50% right 10px;
+
+        option {
+            cursor: pointer;
+
+            &:hover {
+                background-color: $primary-light;
+            }
+        }
+    }
+}
+
+.input-group {
+    display: flex;
+
+    .input-group-addon {
+        width: auto;
+        background-color: transparent;
+        border-radius: 0px;
+        box-shadow: none;
+        border: 0px;
+    }
+    
+    .input-group-btn {
+        width: auto;
+
+        .btn {
+            line-height: 34px;
+            height: 34px;
+            border-bottom-left-radius: 0px;
+            border-top-left-radius: 0px;
+        }
+
+        &:last-child {
+            >.btn {
+                border-radius: 2px;
+            }
+        }
+    }
+}

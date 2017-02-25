@@ -101,7 +101,6 @@
             .editor-footer {
                 .btn-group {
                     .btn-group-save-publish {
-                        height: 30px;
                         padding: 0px;
                         color: #fff;
                         display: flex;
@@ -116,7 +115,6 @@
                             font-size: 12px;
                             padding-top: 0px;
                             padding-bottom: 0px;
-                            height: 30px;
                             border: 0px;
                         }
 
@@ -127,7 +125,7 @@
 
                         >span {
                             background-color: $primary;
-                            color: #fff;
+                            color: $primary-text;
                             padding-left: 10px;
                         }
 

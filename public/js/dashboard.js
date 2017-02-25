@@ -136,7 +136,7 @@
 	            var $projectList = void 0;
 
 	            var renderUser = function renderUser() {
-	                _.append($user.empty(), _.button({ class: 'btn btn-edit' }, _.span({ class: 'user-icon bg-primary fa fa-' + (user.isAdmin ? 'black-tie' : 'user') }), _.div({ class: 'user-info' }, _.h4((user.fullName || user.username || user.email || user.id) + (user.id == User.current.id ? ' (you)' : '')), _.p(user.isAdmin ? 'Admin' : 'Editor'))).on('click', function () {
+	                _.append($user.empty(), _.button({ class: 'btn btn-edit' }, _.span({ class: 'user-icon fa fa-' + (user.isAdmin ? 'black-tie' : 'user') }), _.div({ class: 'user-info' }, _.h4((user.fullName || user.username || user.email || user.id) + (user.id == User.current.id ? ' (you)' : '')), _.p(user.isAdmin ? 'Admin' : 'Editor'))).on('click', function () {
 	                    var userEditor = new UserEditor({ model: user });
 
 	                    userEditor.on('save', function () {
@@ -10974,6 +10974,7 @@
 	         * @param {Array|Number} options
 	         * @param {Function} onChange
 	         * @param {Boolean} useClearButton
+	         * @param {Boolean} useSearch
 	         *
 	         * @returns {HtmlElement} Dropdown element
 	         */
@@ -11054,7 +11055,7 @@
 	                highlightSelectedValue();
 	            };
 
-	            var $element = _.div({ class: 'dropdown' }, $toggle = _.button({ class: 'btn btn-default dropdown-toggle', type: 'button', 'data-toggle': 'dropdown' }, '(none)'), _.if(useClearButton, $clear = _.button({ class: 'btn btn-embedded dropdown-clear' }, _.span({ class: 'fa fa-remove' })).on('click', onClear)), _.div({ class: 'dropdown-menu' }, _.ul({ class: 'dropdown-menu-items' }, _.each(options, function (i, option) {
+	            var $element = _.div({ class: 'dropdown' }, $toggle = _.button({ class: 'btn btn-default dropdown-toggle', type: 'button', 'data-toggle': 'dropdown' }, '(none)'), _.if(useClearButton, $clear = _.button({ class: 'btn btn-default btn-small dropdown-clear' }, _.span({ class: 'fa fa-remove' })).on('click', onClear)), _.div({ class: 'dropdown-menu' }, _.ul({ class: 'dropdown-menu-items' }, _.each(options, function (i, option) {
 	                var optionLabel = option.label || option.id || option.name || option.toString();
 	                var isSelected = option.selected || option.value == defaultValue;
 

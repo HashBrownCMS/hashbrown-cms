@@ -3,6 +3,10 @@ $md: 'max-width: 1199px';
 $sm: 'max-width: 991px';
 $xs: 'max-width: 767px';
 
+// Helpers
+@import '_helpers';
+
+
 @import '_colors';
 @import '_theme';
 @import '_main';
@@ -20,3 +24,9 @@ $xs: 'max-width: 767px';
 @import '_navbar-main';
 @import '_media-viewer';
 @import '_settings';
+
+// Widgets
+@import 'widgets/_dropdown';
+@import 'widgets/_tabs';
+@import 'widgets/_buttons';
+@import 'widgets/_input';

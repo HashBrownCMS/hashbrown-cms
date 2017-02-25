@@ -10996,6 +10996,7 @@
 	         * @param {Array|Number} options
 	         * @param {Function} onChange
 	         * @param {Boolean} useClearButton
+	         * @param {Boolean} useSearch
 	         *
 	         * @returns {HtmlElement} Dropdown element
 	         */
@@ -11076,7 +11077,7 @@
 	                highlightSelectedValue();
 	            };
 
-	            var $element = _.div({ class: 'dropdown' }, $toggle = _.button({ class: 'btn btn-default dropdown-toggle', type: 'button', 'data-toggle': 'dropdown' }, '(none)'), _.if(useClearButton, $clear = _.button({ class: 'btn btn-embedded dropdown-clear' }, _.span({ class: 'fa fa-remove' })).on('click', onClear)), _.div({ class: 'dropdown-menu' }, _.ul({ class: 'dropdown-menu-items' }, _.each(options, function (i, option) {
+	            var $element = _.div({ class: 'dropdown' }, $toggle = _.button({ class: 'btn btn-default dropdown-toggle', type: 'button', 'data-toggle': 'dropdown' }, '(none)'), _.if(useClearButton, $clear = _.button({ class: 'btn btn-default btn-small dropdown-clear' }, _.span({ class: 'fa fa-remove' })).on('click', onClear)), _.div({ class: 'dropdown-menu' }, _.ul({ class: 'dropdown-menu-items' }, _.each(options, function (i, option) {
 	                var optionLabel = option.label || option.id || option.name || option.toString();
 	                var isSelected = option.selected || option.value == defaultValue;
 
@@ -24130,7 +24131,7 @@
 
 	            this.$element.html(UI.inputDropdownTypeAhead('(none)', this.getDropdownOptions(), function (newValue) {
 	                _this2.onChange(newValue);
-	            }, true));
+	            }, false));
 	        }
 	    }]);
 
@@ -24360,11 +24361,11 @@
 	        value: function render() {
 	            var _this3 = this;
 
-	            this.$element = _.div({ class: 'field-editor date-editor' }, _.if(this.disabled, _.p({}, this.formatDate(this.value))), _.if(!this.disabled, _.button({ class: 'form-control btn btn-edit' }, this.formatDate(this.value)).click(function () {
+	            this.$element = _.div({ class: 'field-editor date-editor input-group' }, _.if(this.disabled, _.p({}, this.formatDate(this.value))), _.if(!this.disabled, _.button({ class: 'form-control btn btn-edit' }, this.formatDate(this.value)).click(function () {
 	                _this3.onClickOpen();
-	            }), _.button({ class: 'btn btn-remove' }, _.span({ class: 'fa fa-remove' })).click(function () {
+	            }), _.div({ class: 'input-group-btn' }, _.button({ class: 'btn btn-small btn-default' }, _.span({ class: 'fa fa-remove' })).click(function () {
 	                _this3.onClickRemove();
-	            })));
+	            }))));
 	        }
 	    }]);
 
@@ -24399,6 +24400,8 @@
 
 	        var _this = _possibleConstructorReturn(this, (DropdownEditor.__proto__ || Object.getPrototypeOf(DropdownEditor)).call(this, params));
 
+	        _this.$element = _.div({ class: 'field-editor dropdown-editor' });
+
 	        _this.init();
 	        return _this;
 	    }
@@ -24410,8 +24413,8 @@
 
 	    _createClass(DropdownEditor, [{
 	        key: 'onChange',
-	        value: function onChange() {
-	            this.value = this.$select.val();
+	        value: function onChange(newValue) {
+	            this.value = newValue;
 
 	            this.trigger('change', this.value);
 	        }
@@ -24420,28 +24423,54 @@
 	        value: function render() {
 	            var _this2 = this;
 
-	            // Value sanity check, should not be null
-	            if (!this.value || typeof this.value === 'undefined') {
-	                if (this.config.options.length > 0) {
-	                    this.value = this.config.options[0].value;
+	            // Wait until next CPU cycle to trigger an eventual change if needed
+	            setTimeout(function () {
 
-	                    // Wait until next CPU cycle to trigger change
-	                    setTimeout(function () {
+	                // Value sanity check, should not be null
+	                if (!_this2.value || typeof _this2.value === 'undefined') {
+	                    if (_this2.config.options.length > 0) {
+	                        _this2.value = _this2.config.options[0].value;
+
 	                        _this2.trigger('change', _this2.value);
-	                    }, 1);
+	                    }
 	                }
-	            }
 
-	            this.$element = _.div({ class: 'field-editor dropdown-editor' }, this.$select = _.select({ class: 'form-control' }, _.each(this.config.options, function (i, option) {
-	                return _.option({
-	                    value: option.value,
-	                    selected: _this2.value == option.value
-	                }, option.label);
-	            })).change(function () {
-	                _this2.onChange();
-	            }));
+	                // Generate dropdown options
+	                var dropdownOptions = [];
 
-	            this.$select.val(this.value);
+	                var _iteratorNormalCompletion = true;
+	                var _didIteratorError = false;
+	                var _iteratorError = undefined;
+
+	                try {
+	                    for (var _iterator = (_this2.config.options || [])[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	                        var option = _step.value;
+
+	                        dropdownOptions[dropdownOptions.length] = {
+	                            label: option.label,
+	                            value: option.value,
+	                            selected: option.value == _this2.value
+	                        };
+	                    }
+	                } catch (err) {
+	                    _didIteratorError = true;
+	                    _iteratorError = err;
+	                } finally {
+	                    try {
+	                        if (!_iteratorNormalCompletion && _iterator.return) {
+	                            _iterator.return();
+	                        }
+	                    } finally {
+	                        if (_didIteratorError) {
+	                            throw _iteratorError;
+	                        }
+	                    }
+	                }
+
+	                _this2.$element.html(UI.inputDropdown('(none)', dropdownOptions, function (newValue) {
+	                    _this2.onChange(newValue);
+	                }, false, false));
+	            }, 1);
 	        }
 	    }]);
 
@@ -24946,7 +24975,7 @@
 	                return _.li({ class: activeView == alias ? 'active' : '' }, _.a({ 'data-toggle': 'tab', href: '#' + _this4.guid + '-' + alias }, label).click(function () {
 	                    _this4.onClickTab(alias);
 	                }));
-	            }), _.button({ class: 'btn btn-primary btn-insert-media' }, _.span({ class: 'fa fa-file-image-o' })).click(function () {
+	            }), _.button({ class: 'btn btn-primary btn-insert-media' }, 'Add media').click(function () {
 	                _this4.onClickInsertMedia();
 	            })), _.div({ class: 'tab-content' }, _.div({ id: this.guid + '-wysiwyg', class: 'tab-pane wysiwyg ' + (activeView == 'wysiwyg' ? 'active' : '') }, $wysiwyg = _.div({ 'contenteditable': true })), _.div({ id: this.guid + '-markdown', class: 'tab-pane markdown ' + (activeView == 'markdown' ? 'active' : '') }, $markdown = _.textarea({})), _.div({ id: this.guid + '-html', class: 'tab-pane html ' + (activeView == 'html' ? 'active' : '') }, $html = _.textarea({}))));
 
@@ -25536,7 +25565,7 @@
 
 	            _.append(this.$element, UI.inputDropdownTypeAhead('(none)', dropdownOptions, function (newValue) {
 	                _this2.onChange(newValue);
-	            }, true));
+	            }, false));
 	        }
 	    }]);
 
@@ -25763,7 +25792,7 @@
 
 	            this.$element = _.div({ class: 'field-editor url-editor input-group' }, this.$input = _.input({ class: 'form-control', type: 'text', value: this.value }).on('change', function () {
 	                _this2.onChange();
-	            }), _.div({ class: 'input-group-btn' }, _.button({ class: 'btn btn-primary btn-small' }, _.span({ class: 'fa fa-refresh' })).click(function () {
+	            }), _.div({ class: 'input-group-btn' }, _.button({ class: 'btn btn-default btn-small' }, _.span({ class: 'fa fa-refresh' })).click(function () {
 	                _this2.regenerate();
 	            })));
 
@@ -33412,7 +33441,7 @@
 
 	            _.append(this.$element.empty(), _.div({ class: 'modal-dialog' }, _.div({ class: 'modal-content' }, _.div({ class: 'modal-header' }, _.div({ class: 'input-group' }, _.input({ class: 'form-control input-search-media', placeholder: 'Search media' }).on('change keyup paste', function () {
 	                _this2.onSearchMedia();
-	            }), _.div({ class: 'input-group-btn' }, _.button({ class: 'btn btn-primary' }, 'Upload media').click(function () {
+	            }), _.div({ class: 'input-group-btn' }, _.button({ class: 'btn btn-primary' }, 'Upload file').click(function () {
 	                _this2.$element.toggleClass('disabled', true);
 
 	                MediaBrowser.uploadModal(function (id) {
@@ -35791,7 +35820,7 @@
 	        carouselItems.push([_.div(_.img({ src: '/img/welcome/intro-settings.jpg' })), _.div(_.h2('Settings'), _.p('Here you can set up synchronisation with other HashBrown instances.'))]);
 	    }
 
-	    populateWorkspace(_.div({ class: 'dashboard-container welcome' }, _.h1('Welcome to HashBrown'), _.p('If you\'re unfamiliar with HashBrown, please take a moment to look through the introduction below.'), _.p('It\'ll only take a minute.'), _.h2('Introduction'), UI.carousel(carouselItems, true, true, '400px'), _.h2('Contextual help'), _.p('You can always click the <span class="fa fa-question-circle"></span> icon in the upper right to get information about the screen you\'re currently on.'), _.h2('Guides'), _.p('If you\'d like a more in-depth walkthrough of the features, please check out the guides.'), _.a({ class: 'btn btn-primary', href: 'http://hashbrown.rocks/guides', target: '_blank' }, 'Guides')), 'presentation');
+	    populateWorkspace(_.div({ class: 'dashboard-container welcome' }, _.h1('Welcome to HashBrown'), _.p('If you\'re unfamiliar with HashBrown, please take a moment to look through the introduction below.'), _.p('It\'ll only take a minute.'), _.h2('Introduction'), UI.carousel(carouselItems, true, true, '400px'), _.h2('Contextual help'), _.p('You can always click the <span class="fa fa-question-circle"></span> icon in the upper right to get information about the screen you\'re currently on.'), _.h2('Guides'), _.p('If you\'d like a more in-depth walkthrough of the features, please check out the guides.'), _.a({ class: 'btn btn-default', href: 'http://hashbrown.rocks/guides', target: '_blank' }, 'Guides')), 'presentation');
 	});
 
 	// Readme

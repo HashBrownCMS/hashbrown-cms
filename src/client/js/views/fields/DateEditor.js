@@ -240,7 +240,7 @@ class DateEditor extends View {
     }
 
     render() {
-        this.$element = _.div({class: 'field-editor date-editor'},
+        this.$element = _.div({class: 'field-editor date-editor input-group'},
             _.if(this.disabled,
                 _.p({}, this.formatDate(this.value))
             ),
@@ -248,9 +248,11 @@ class DateEditor extends View {
                 _.button({class: 'form-control btn btn-edit'}, 
                     this.formatDate(this.value)
                 ).click(() => { this.onClickOpen(); }),
-                _.button({class: 'btn btn-remove'}, 
-                    _.span({class: 'fa fa-remove'})
-                ).click(() => { this.onClickRemove(); })
+                _.div({class: 'input-group-btn'},
+                    _.button({class: 'btn btn-small btn-default'}, 
+                        _.span({class: 'fa fa-remove'})
+                    ).click(() => { this.onClickRemove(); })
+                )
             )
         );
     }

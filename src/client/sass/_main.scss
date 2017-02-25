@@ -411,7 +411,9 @@ img.logo {
                 border-width: 0px;
                 border-top-width: 1px;
                 border-radius: 0px;
-                background-color: $secondary;
+                background-color: $standard-dark;
+                border-top: 1px solid $standard-darker;
+                color: $standard-text;
 
                 .btn-group {
                     float: right;

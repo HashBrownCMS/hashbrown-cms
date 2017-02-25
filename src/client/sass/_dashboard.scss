@@ -70,19 +70,7 @@
 }
 
 body >.dashboard-container {
-    display: flex;
-    height: 100%;
-
-    .navspace {
-        width: 160px;
-        flex-basis: 160px;
-        flex-shrink: 0;
-        height: 100%;
-    }
-
     .workspace {
-        flex-grow: 1;
-        height: 100%;
         padding: 15px 30px;
         overflow-y: auto;
         background-color: material-color('grey', '100');
@@ -195,10 +183,9 @@ body >.dashboard-container {
                         width: 40px;
                         line-height: 40px;
                         text-align: center;
-                        border-radius: 50%;
-                        color: #fff;
+                        color: $standard-text;
                         margin-right: 15px;
-                        font-size: 18px;
+                        font-size: 32px;
                     }
 
                     .user-info {

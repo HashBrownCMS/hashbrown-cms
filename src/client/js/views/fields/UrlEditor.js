@@ -172,7 +172,7 @@ class UrlEditor extends View {
             this.$input = _.input({class: 'form-control', type: 'text', value: this.value})
                 .on('change', () => { this.onChange(); }),
             _.div({class: 'input-group-btn'},
-                _.button({class: 'btn btn-primary btn-small'},
+                _.button({class: 'btn btn-default btn-small'},
                     _.span({class: 'fa fa-refresh'})
                 ).click(() => { this.regenerate(); })
             )

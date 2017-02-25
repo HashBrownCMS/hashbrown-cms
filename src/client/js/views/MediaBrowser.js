@@ -217,7 +217,7 @@ class MediaBrowser extends View {
                                 }),
                             _.div({class: 'input-group-btn'},
                                 _.button({class: 'btn btn-primary'},
-                                    'Upload media'
+                                    'Upload file'
                                 ).click(() => {
                                     this.$element.toggleClass('disabled', true);
 

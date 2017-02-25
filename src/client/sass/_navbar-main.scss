@@ -38,7 +38,7 @@
                 position: absolute;
                 width: 1px;
                 height: 100%;
-                background-color: $secondary-lighter;
+                background-color: $secondary;
                 right: 0px;
                 top: 0px;
             }
@@ -66,31 +66,8 @@
                 }
 
                 &.active {
-                    background-color: $secondary-light;
-
-                    &:before, &:after {
-                        content: '';
-                        display: block;
-                        position: absolute;
-                        width: 100%;
-                        height: 1px;
-                        background-color: $secondary-lighter;
-                        left: 0px;
-                    }
-
-                    &:before {
-                        top: 0px;
-                    }
-
-                    &:after {
-                        bottom: -1px;
-                    }
-                   
-                    &:first-child {
-                        &:before {
-                            display: none;
-                        }
-                    }
+                    background-color: $primary;
+                    color: $primary-text;
 
                     .pane-text {
                         .pane-label {
@@ -159,7 +136,7 @@
         .tab-panes {
             height: 100%;
             flex-grow: 1;
-            background-color: $secondary-light;
+            background-color: $standard-dark;
             position: relative;
             z-index: 5;
             box-shadow: 2px 0px 5px 0px rgba(0, 0, 0, 0.2);
@@ -170,7 +147,7 @@
                 position: absolute;
                 width: 1px;
                 height: 100%;
-                background-color: $secondary-light;
+                background-color: $standard-darker;
                 right: 0px;
                 top: 0px;
             }
@@ -234,7 +211,7 @@
                 }
                 
                 .pane-toolbar {
-                    border-bottom: 1px solid $secondary-light;
+                    border-bottom: 1px solid $standard-darker;
                     display: flex;
                     padding: 10px 5px;
                     height: 61px;
@@ -247,7 +224,7 @@
 
                     label {
                         text-transform: uppercase;
-                        color: $secondary-dark;
+                        color: $standard-dark;
                         font-size: 10px;
                         margin: 0px;
                         padding: 0px;
@@ -259,7 +236,6 @@
                         display: block;
                         background-color: $primary;     
                         border: 0px;
-                        padding: 5px 3px;
                         color: #fff;
                         text-transform: uppercase;
                         font-weight: 700;
@@ -269,14 +245,14 @@
                 .pane-move-buttons {
                     .btn {
                         margin: 10px;
-                        border: 2px dashed $secondary-dark;
+                        border: 2px dashed $standard-dark;
                         height: 40px;
                         padding: 0px;
                         background-color: transparent;
                         width: calc(100% - 20px);
                         text-align: center;
                         font-weight: 700;
-                        color: $secondary-dark;
+                        color: $standard-dark;
                         display: none;
 
                         &:hover {
@@ -380,7 +356,7 @@
                         }
                         
                         .pane-item {
-                            color: $secondary-text;
+                            color: $standard-text;
                             display: block;
                             border-radius: 0px;
                             border: none;

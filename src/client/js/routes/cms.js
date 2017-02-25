@@ -94,7 +94,7 @@ Router.route('/', function() {
             _.p('You can always click the <span class="fa fa-question-circle"></span> icon in the upper right to get information about the screen you\'re currently on.'),
             _.h2('Guides'),
             _.p('If you\'d like a more in-depth walkthrough of the features, please check out the guides.'),
-            _.a({class: 'btn btn-primary', href: 'http://hashbrown.rocks/guides', target: '_blank'}, 'Guides')
+            _.a({class: 'btn btn-default', href: 'http://hashbrown.rocks/guides', target: '_blank'}, 'Guides')
         ),
         'presentation'
     );

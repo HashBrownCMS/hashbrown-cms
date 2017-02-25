@@ -121,7 +121,7 @@ class RichTextEditor extends View {
                     );
                 }),
                 _.button({class: 'btn btn-primary btn-insert-media'},
-                    _.span({class: 'fa fa-file-image-o'})                                        
+                    'Add media'
                 ).click(() => { this.onClickInsertMedia(); })
             ),
             _.div({class: 'tab-content'},

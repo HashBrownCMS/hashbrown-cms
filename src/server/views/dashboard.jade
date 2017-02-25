@@ -14,37 +14,6 @@ html
         title HashBrown CMS
     body
         .dashboard-container
-            .navspace
-                .navbar-main
-                    .tab-buttons
-                        a.active(href='#welcome')
-                            .pane-icon
-                                img.logo(src='/svg/logo_white.svg')
-                            .pane-text
-                                .pane-label
-                                    |  HashBrown
-                        a(href='#projects')
-                            .pane-icon
-                                span.fa.fa-folder
-                            .pane-text
-                                .pane-label
-                                    |  Projects
-                        if(user.isAdmin)
-                            a(href='#users')
-                                .pane-icon
-                                    span.fa.fa-users
-                                .pane-text
-                                    .pane-label
-                                        |  Users
-                        if(user.isAdmin)
-                            a(href='#diagnostics')
-                                .pane-icon
-                                    span.fa.fa-pie-chart
-                                .pane-text
-                                    .pane-label
-                                        |  Diagnostics
-
-
             .workspace
                 section
                     h4 

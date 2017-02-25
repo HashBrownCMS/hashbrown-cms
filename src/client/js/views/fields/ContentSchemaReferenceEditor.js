@@ -114,7 +114,7 @@ class ContentSchemaReferenceEditor extends View {
         this.$element.html(
             UI.inputDropdownTypeAhead('(none)', this.getDropdownOptions(), (newValue) => {
                 this.onChange(newValue);
-            }, true)
+            }, false)
         );
     }
 }

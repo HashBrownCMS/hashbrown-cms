@@ -85,7 +85,7 @@ class TemplateReferenceEditor extends View {
         _.append(this.$element,
             UI.inputDropdownTypeAhead('(none)', dropdownOptions, (newValue) => {
                 this.onChange(newValue);
-            }, true)
+            }, false)
         );
     }
 }
