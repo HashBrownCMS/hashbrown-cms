@@ -806,91 +806,82 @@ img.logo {
       width: 50%;
       margin: 0px auto; }
 
-body > .dashboard-container .workspace {
-  padding: 15px 30px;
-  overflow-y: auto;
-  background-color: #f5f5f5; }
-  body > .dashboard-container .workspace section {
-    margin-bottom: 30px;
-    width: 100%;
-    max-width: 960px;
-    margin-left: auto;
-    margin-right: auto; }
-    body > .dashboard-container .workspace section > h4 a {
-      color: #424242; }
-    body > .dashboard-container .workspace section > h4 button {
+body.dashboard-container {
+  background-color: #eeeeee;
+  overflow-y: auto; }
+  body.dashboard-container .diagnostics {
+    margin: 15px; }
+    body.dashboard-container .diagnostics tr {
+      font-size: 14px; }
+      body.dashboard-container .diagnostics tr td {
+        padding-bottom: 1em; }
+        body.dashboard-container .diagnostics tr td:first-child {
+          min-width: 200px;
+          font-weight: bold; }
+  body.dashboard-container .users {
+    padding: 15px; }
+    body.dashboard-container .users .btn-invite-user {
       display: block;
-      margin-top: 15px; }
-  body > .dashboard-container .workspace .diagnostics tr {
-    font-size: 14px; }
-    body > .dashboard-container .workspace .diagnostics tr td {
-      padding-bottom: 1em; }
-      body > .dashboard-container .workspace .diagnostics tr td:first-child {
-        min-width: 200px;
-        font-weight: bold; }
-  body > .dashboard-container .workspace .users .btn-invite-user {
-    display: block;
-    margin-left: auto;
-    margin-top: 30px; }
-  body > .dashboard-container .workspace .users .user-list {
-    max-width: 600px;
-    margin: 0px auto;
-    max-height: 600px;
-    overflow-y: auto; }
-    body > .dashboard-container .workspace .users .user-list .user {
-      padding: 15px 0px;
-      border-bottom: 1px solid #eeeeee;
-      display: flex; }
-      body > .dashboard-container .workspace .users .user-list .user:last-child {
-        border-bottom: 0px; }
-      body > .dashboard-container .workspace .users .user-list .user.expanded .user-editor {
-        display: block; }
-      body > .dashboard-container .workspace .users .user-list .user .btn-remove {
-        position: static; }
-        body > .dashboard-container .workspace .users .user-list .user .btn-remove .fa {
+      margin-left: auto;
+      margin-top: 30px; }
+    body.dashboard-container .users .user-list {
+      max-width: 600px;
+      margin: 0px auto;
+      max-height: 600px;
+      overflow-y: auto; }
+      body.dashboard-container .users .user-list .user {
+        padding: 15px 0px;
+        border-bottom: 1px solid #eeeeee;
+        display: flex; }
+        body.dashboard-container .users .user-list .user:last-child {
+          border-bottom: 0px; }
+        body.dashboard-container .users .user-list .user.expanded .user-editor {
+          display: block; }
+        body.dashboard-container .users .user-list .user .btn-remove {
+          position: static; }
+          body.dashboard-container .users .user-list .user .btn-remove .fa {
+            text-align: center;
+            border-radius: 50%;
+            margin-right: 15px;
+            color: #fff;
+            background-color: #bdbdbd;
+            width: 16px;
+            line-height: 16px; }
+            body.dashboard-container .users .user-list .user .btn-remove .fa:before {
+              margin-right: -1px; }
+            body.dashboard-container .users .user-list .user .btn-remove .fa:hover {
+              background-color: #e53935; }
+        body.dashboard-container .users .user-list .user .btn-edit {
+          flex-grow: 1;
+          display: flex;
+          text-align: left;
+          padding: 0px;
+          margin: 0px;
+          background-color: transparent;
+          text-transform: none;
+          font-weight: normal;
+          align-items: center; }
+        body.dashboard-container .users .user-list .user .user-editor {
+          display: none; }
+        body.dashboard-container .users .user-list .user .user-icon {
+          width: 40px;
+          line-height: 40px;
           text-align: center;
-          border-radius: 50%;
+          color: #333333;
           margin-right: 15px;
-          color: #fff;
-          background-color: #bdbdbd;
-          width: 16px;
-          line-height: 16px; }
-          body > .dashboard-container .workspace .users .user-list .user .btn-remove .fa:before {
-            margin-right: -1px; }
-          body > .dashboard-container .workspace .users .user-list .user .btn-remove .fa:hover {
-            background-color: #e53935; }
-      body > .dashboard-container .workspace .users .user-list .user .btn-edit {
-        flex-grow: 1;
-        display: flex;
-        text-align: left;
-        padding: 0px;
-        margin: 0px;
-        background-color: transparent;
-        text-transform: none;
-        font-weight: normal;
-        align-items: center; }
-      body > .dashboard-container .workspace .users .user-list .user .user-editor {
-        display: none; }
-      body > .dashboard-container .workspace .users .user-list .user .user-icon {
-        width: 40px;
-        line-height: 40px;
-        text-align: center;
-        color: #333333;
-        margin-right: 15px;
-        font-size: 32px; }
-      body > .dashboard-container .workspace .users .user-list .user .user-info {
-        flex-grow: 1; }
-        body > .dashboard-container .workspace .users .user-list .user .user-info h4, body > .dashboard-container .workspace .users .user-list .user .user-info p {
-          margin: 0px; }
-  body > .dashboard-container .workspace .projects .btn-create-project {
+          font-size: 32px; }
+        body.dashboard-container .users .user-list .user .user-info {
+          flex-grow: 1; }
+          body.dashboard-container .users .user-list .user .user-info h4, body.dashboard-container .users .user-list .user .user-info p {
+            margin: 0px; }
+  body.dashboard-container .projects .btn-create-project {
     display: block;
     margin-left: auto;
     margin-top: 30px; }
-  body > .dashboard-container .workspace .projects .project-list {
+  body.dashboard-container .projects .project-list {
     display: flex;
-    flex-wrap: wrap;
-    margin: -15px; }
-  body > .dashboard-container .workspace .projects .project-editor {
+    flex-wrap: wrap; }
+  body.dashboard-container .projects .project-editor {
     padding: 15px;
     margin: 15px;
     position: relative;
@@ -901,50 +892,50 @@ body > .dashboard-container .workspace {
     max-width: 300px;
     color: #333333;
     background-color: #ffffff; }
-    body > .dashboard-container .workspace .projects .project-editor .btn-remove {
+    body.dashboard-container .projects .project-editor .btn-remove {
       padding: 0rem;
       position: absolute;
       right: 1rem;
       top: 1rem;
       display: block;
       color: #f44336; }
-    body > .dashboard-container .workspace .projects .project-editor .body {
+    body.dashboard-container .projects .project-editor .body {
       position: relative;
       display: flex;
       flex-direction: column; }
-      body > .dashboard-container .workspace .projects .project-editor .body .info {
+      body.dashboard-container .projects .project-editor .body .info {
         flex-grow: 1; }
-        body > .dashboard-container .workspace .projects .project-editor .body .info h4, body > .dashboard-container .workspace .projects .project-editor .body .info h2 {
+        body.dashboard-container .projects .project-editor .body .info h4, body.dashboard-container .projects .project-editor .body .info h2 {
           margin-top: 0px; }
-      body > .dashboard-container .workspace .projects .project-editor .body .admin {
+      body.dashboard-container .projects .project-editor .body .admin {
         position: absolute;
         top: 0px;
         right: 0px; }
-      body > .dashboard-container .workspace .projects .project-editor .body .environments {
+      body.dashboard-container .projects .project-editor .body .environments {
         margin: 15px -2px 0px 0px; }
-        body > .dashboard-container .workspace .projects .project-editor .body .environments .btn-add {
+        body.dashboard-container .projects .project-editor .body .environments .btn-add {
           display: block;
           margin-top: 1em;
           margin-left: auto; }
-        body > .dashboard-container .workspace .projects .project-editor .body .environments .environment {
+        body.dashboard-container .projects .project-editor .body .environments .environment {
           width: 100%;
           margin-bottom: 15px;
           display: flex; }
-          body > .dashboard-container .workspace .projects .project-editor .body .environments .environment:last-of-type {
+          body.dashboard-container .projects .project-editor .body .environments .environment:last-of-type {
             margin-bottom: 0px; }
-          body > .dashboard-container .workspace .projects .project-editor .body .environments .environment .btn-group {
+          body.dashboard-container .projects .project-editor .body .environments .environment .btn-group {
             width: 100%; }
-          body > .dashboard-container .workspace .projects .project-editor .body .environments .environment .dropdown .dropdown-toggle {
+          body.dashboard-container .projects .project-editor .body .environments .environment .dropdown .dropdown-toggle {
             width: 30px;
             line-height: 30px;
             display: block;
             height: 30px;
             margin: 0px -5px 0px 5px; }
-          body > .dashboard-container .workspace .projects .project-editor .body .environments .environment .environment-title {
+          body.dashboard-container .projects .project-editor .body .environments .environment .environment-title {
             flex-grow: 1; }
-          body > .dashboard-container .workspace .projects .project-editor .body .environments .environment .btn-primary {
+          body.dashboard-container .projects .project-editor .body .environments .environment .btn-primary {
             min-width: 0px; }
-            body > .dashboard-container .workspace .projects .project-editor .body .environments .environment .btn-primary .fa {
+            body.dashboard-container .projects .project-editor .body .environments .environment .btn-primary .fa {
               line-height: 30px; }
 
 .modal.modal-icon-picker .modal-dialog {

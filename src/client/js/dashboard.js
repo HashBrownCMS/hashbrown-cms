@@ -43,7 +43,7 @@ apiCall('get', 'user')
                 model: new Project(project)
             });
 
-            $('.dashboard-container .workspace .projects .project-list').append(projectEditor.$element);
+            $('.dashboard-container .projects .project-list').append(projectEditor.$element);
 
             // If there are more projects to render, render the next one
             if(i < projects.length - 1) {
@@ -116,7 +116,7 @@ apiCall('get', 'user')
             );
         };
 
-        $('.dashboard-container .workspace .users .user-list').append(
+        $('.dashboard-container .users .user-list').append(
             $user = _.div({class: 'user'})
         );
 
@@ -287,7 +287,7 @@ $('.btn-create-project').click(() => {
 apiCall('get', 'server/update/check')
 .then((update) => {
     if(update.behind) {
-        $('.workspace').prepend(
+        $('.dashboard-container').prepend(
             _.section({},
                 _.div({class: 'update'},
                     _.p('You are '  + update.amount + ' version' + (update.amount != '1' ? 's' : '') + ' behind ' + update.branch),

@@ -69,235 +69,216 @@
     }
 }
 
-body >.dashboard-container {
-    .workspace {
-        padding: 15px 30px;
-        overflow-y: auto;
-        background-color: material-color('grey', '100');
+body.dashboard-container {
+    background-color: $standard-dark;
+    overflow-y: auto;
 
-        section {
-            margin-bottom: 30px;
-            width: 100%;
-            max-width: 960px;
+    .diagnostics {
+        margin: 15px;
+
+        tr {
+            font-size: 14px;
+
+            td {
+                padding-bottom: 1em;
+
+                &:first-child {
+                    min-width: 200px;
+                    font-weight: bold;
+                }
+
+                &:last-child {
+
+                }
+            }
+        }
+    }
+
+    .users {
+        padding: 15px;
+
+        .btn-invite-user {
+            display: block;
             margin-left: auto;
-            margin-right: auto;
-
-            >h4 {
-                a {
-                    color: material-color('grey', '800');
-                }
-
-                button {
-                    display: block;
-                    margin-top: 15px;
-                }
-            }
+            margin-top: 30px;
         }
+        
+        .user-list {
+            max-width: 600px;
+            margin: 0px auto;
+            max-height: 600px;
+            overflow-y: auto;
 
-        .diagnostics {
-            tr {
-                font-size: 14px;
-
-                td {
-                    padding-bottom: 1em;
-
-                    &:first-child {
-                        min-width: 200px;
-                        font-weight: bold;
-                    }
-
-                    &:last-child {
-
-                    }
-                }
-            }
-        }
-
-        .users {
-            .btn-invite-user {
-                display: block;
-                margin-left: auto;
-                margin-top: 30px;
-            }
-            
-            .user-list {
-                max-width: 600px;
-                margin: 0px auto;
-                max-height: 600px;
-                overflow-y: auto;
-
-               .user {
-                    padding: 15px 0px;
-                    border-bottom: 1px solid material-color('grey', '200');
-                    display: flex;
-
-                    &:last-child {
-                        border-bottom: 0px;
-                    }
-
-                    &.expanded {
-                        .user-editor { 
-                            display: block;
-                        }
-                    }
-
-                    .btn-remove {
-                        position: static;
-
-                        .fa {
-                            text-align: center;
-                            border-radius: 50%;
-                            margin-right: 15px;
-                            color: #fff;
-                            background-color: material-color('grey', '400');
-                            width: 16px;
-                            line-height: 16px;
-
-                            &:before {
-                                margin-right: -1px;
-                            }
-
-                            &:hover {
-                                background-color: material-color('red', '600');
-                            }
-                        }
-                    }
-
-                    .btn-edit {
-                        flex-grow: 1;
-                        display: flex;
-                        text-align: left;
-                        padding: 0px;
-                        margin: 0px;
-                        background-color: transparent;
-                        text-transform: none;
-                        font-weight: normal;
-                        align-items: center;
-                    }
-
-                    .user-editor {
-                        display: none;
-                    }
-
-                    .user-icon {
-                        width: 40px;
-                        line-height: 40px;
-                        text-align: center;
-                        color: $standard-text;
-                        margin-right: 15px;
-                        font-size: 32px;
-                    }
-
-                    .user-info {
-                        flex-grow: 1;
-
-                        h4, p {
-                            margin: 0px;
-                        }
-                    }
-               } 
-            }
-        }
-
-        .projects {
-            .btn-create-project {
-                display: block;
-                margin-left: auto;
-                margin-top: 30px;
-            }
-
-            .project-list {
+           .user {
+                padding: 15px 0px;
+                border-bottom: 1px solid material-color('grey', '200');
                 display: flex;
-                flex-wrap: wrap;
-                margin: -15px;
+
+                &:last-child {
+                    border-bottom: 0px;
+                }
+
+                &.expanded {
+                    .user-editor { 
+                        display: block;
+                    }
+                }
+
+                .btn-remove {
+                    position: static;
+
+                    .fa {
+                        text-align: center;
+                        border-radius: 50%;
+                        margin-right: 15px;
+                        color: #fff;
+                        background-color: material-color('grey', '400');
+                        width: 16px;
+                        line-height: 16px;
+
+                        &:before {
+                            margin-right: -1px;
+                        }
+
+                        &:hover {
+                            background-color: material-color('red', '600');
+                        }
+                    }
+                }
+
+                .btn-edit {
+                    flex-grow: 1;
+                    display: flex;
+                    text-align: left;
+                    padding: 0px;
+                    margin: 0px;
+                    background-color: transparent;
+                    text-transform: none;
+                    font-weight: normal;
+                    align-items: center;
+                }
+
+                .user-editor {
+                    display: none;
+                }
+
+                .user-icon {
+                    width: 40px;
+                    line-height: 40px;
+                    text-align: center;
+                    color: $standard-text;
+                    margin-right: 15px;
+                    font-size: 32px;
+                }
+
+                .user-info {
+                    flex-grow: 1;
+
+                    h4, p {
+                        margin: 0px;
+                    }
+                }
+           } 
+        }
+    }
+
+    .projects {
+        .btn-create-project {
+            display: block;
+            margin-left: auto;
+            margin-top: 30px;
+        }
+
+        .project-list {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .project-editor {
+            padding: 15px;
+            margin: 15px;
+            position: relative;
+            flex-grow: 1;
+            flex-basis: 300px;
+            width: 300px;
+            min-width: 300px;
+            max-width: 300px;
+            color: $standard-text;
+            background-color: $standard;
+            
+            .btn-remove {
+                padding: 0rem;
+                position: absolute;
+                right: 1rem;
+                top: 1rem;
+                display: block;
+                color: material-color('red', '500');
             }
 
-            .project-editor {
-                padding: 15px;
-                margin: 15px;
+            .body {
                 position: relative;
-                flex-grow: 1;
-                flex-basis: 300px;
-                width: 300px;
-                min-width: 300px;
-                max-width: 300px;
-                color: $standard-text;
-                background-color: $standard;
-                
-                .btn-remove {
-                    padding: 0rem;
+                display: flex;
+                flex-direction: column;
+
+                .info {
+                    flex-grow: 1;
+
+                    h4, h2 {
+                        margin-top: 0px;
+                    }
+                }
+
+                .admin {
                     position: absolute;
-                    right: 1rem;
-                    top: 1rem;
-                    display: block;
-                    color: material-color('red', '500');
+                    top: 0px;
+                    right: 0px;
                 }
 
-                .body {
-                    position: relative;
-                    display: flex;
-                    flex-direction: column;
-
-                    .info {
-                        flex-grow: 1;
-
-                        h4, h2 {
-                            margin-top: 0px;
-                        }
+                .environments {
+                    margin: 15px -2px 0px 0px;
+               
+                    .btn-add {
+                        display: block;
+                        margin-top: 1em;
+                        margin-left: auto;
                     }
 
-                    .admin {
-                        position: absolute;
-                        top: 0px;
-                        right: 0px;
-                    }
+                    .environment {
+                        width: 100%;
+                        margin-bottom: 15px;
+                        display: flex;
 
-                    .environments {
-                        margin: 15px -2px 0px 0px;
-                   
-                        .btn-add {
-                            display: block;
-                            margin-top: 1em;
-                            margin-left: auto;
+                        &:last-of-type {
+                            margin-bottom: 0px;
                         }
 
-                        .environment {
+                        .btn-group {
                             width: 100%;
-                            margin-bottom: 15px;
-                            display: flex;
+                        }
 
-                            &:last-of-type {
-                                margin-bottom: 0px;
-                            }
-
-                            .btn-group {
-                                width: 100%;
-                            }
-
-                            .dropdown {
-                                .dropdown-toggle {
-                                    width: 30px;
-                                    line-height: 30px;
-                                    display: block;
-                                    height: 30px;
-                                    margin: 0px -5px 0px 5px;
-                                }
-                            }
-
-                            .environment-title {
-                                flex-grow: 1;
-                            }
-
-                            .btn-primary {
-                                min-width: 0px;
-
-                                .fa {
-                                    line-height: 30px;
-                                }
+                        .dropdown {
+                            .dropdown-toggle {
+                                width: 30px;
+                                line-height: 30px;
+                                display: block;
+                                height: 30px;
+                                margin: 0px -5px 0px 5px;
                             }
                         }
-                    } 
-                }
+
+                        .environment-title {
+                            flex-grow: 1;
+                        }
+
+                        .btn-primary {
+                            min-width: 0px;
+
+                            .fa {
+                                line-height: 30px;
+                            }
+                        }
+                    }
+                } 
             }
         }
     }

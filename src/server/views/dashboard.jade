@@ -12,78 +12,58 @@ html
         link(href='/css/client.css', rel='stylesheet')
 
         title HashBrown CMS
-    body
-        .dashboard-container
-            .workspace
-                section
-                    h4 
-                        a#welcome WELCOME
-                    
-                    .welcome
-                        p
-                            | Welcome to the HashBrown dashboard. <br />
-                            | Below you will find a list of active projects on this server.
+    body.dashboard-container
+        ul.nav.nav-tabs
+            li.active
+                a(data-toggle="tab", href="#projects") Projects
+            if(user.isAdmin)
+                li
+                    a(data-toggle="tab", href="#users") Users
+                li
+                    a(data-toggle="tab", href="#diagnostics") Diagnostics
+        
+        .tab-content
+            .tab-pane.active#projects
+                .projects
+                    .project-list
 
-                        p
-                            | If you're a content author, you can click the "CMS" button to get started. <br />
+                    if(user.isAdmin)
+                        .project-actions
+                            button.btn.btn-primary.btn-round.btn-raised.btn-create-project(title='Create project') +
 
-                        p
-                            | If you're an admin, you can use the various project menus ( <span class="fa fa-ellipsis-v"></span> and <span class="fa fa-plus"></span> ) to manage backups and create/delete environments and projects. 
+            if(user.isAdmin)
+                .tab-pane#users
+                    .users
+                        .user-list
+                            
+                        .user-actions
+                            button.btn.btn-primary.btn-round.btn-raised.btn-invite-user(title='Invite user') +
+            
+                .tab-pane#diagnostics
+                    table.diagnostics
+                        tr
+                            td Software
+                            td HashBrown v#{app.version} 
 
-                        p 
-                            | If you feel completely lost, check out the <a href="http://hashbrown.rocks/guides" target="_blank">guides</a>
-                
-                section
-                    h4 
-                        a#projects PROJECTS
-                    
-                    .projects
-                        .project-list
+                        tr
+                            td Platform
+                            td #{os.type()} 
 
-                        if(user.isAdmin)
-                            .project-actions
-                                button.btn.btn-primary.btn-round.btn-raised.btn-create-project(title='Create project') +
-
-                if(user.isAdmin)
-                    section
-                        h4 
-                            a#users USERS
-
-                        .users
-                            .user-list
-                                
-                            .user-actions
-                                button.btn.btn-primary.btn-round.btn-raised.btn-invite-user(title='Invite user') +
-                
-                if(user.isAdmin)
-                    section
-                        h4 
-                            a#diagnostics DIAGNOSTICS
-                        
-                        table.diagnostics
+                        each cpu, i in os.cpus()
                             tr
-                                td Software
-                                td HashBrown v#{app.version} 
+                                td CPU #{i + 1}
+                                td #{cpu.model}
+                        tr
+                            td Memory
+                            td #{Math.round(os.freemem() / 1000000)}mb / #{Math.round(os.totalmem() / 1000000)}mb
 
-                            tr
-                                td Platform
-                                td #{os.type()} 
+                        tr
+                            td Load average
+                            td #{Math.round(os.loadavg()[0] * 10000) / 10000}
 
-                            each cpu, i in os.cpus()
-                                tr
-                                    td CPU #{i + 1}
-                                    td #{cpu.model}
-                            tr
-                                td Memory
-                                td #{Math.round(os.freemem() / 1000000)}mb / #{Math.round(os.totalmem() / 1000000)}mb
-
-                            tr
-                                td Load average
-                                td #{Math.round(os.loadavg()[0] * 10000) / 10000}
-
-                            tr
-                                td Uptime
-                                td #{Math.round(os.uptime() / 60)}m
+                        tr
+                            td Uptime
+                            td #{Math.round(os.uptime() / 60)}m
 
         script(src='/lib/jquery/jquery.min.js')
         script(src='/lib/bootstrap/js/bootstrap.min.js')
