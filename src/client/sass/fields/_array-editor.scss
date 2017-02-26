@@ -1,12 +1,24 @@
-.btn-array-editor-sort-items {
-    display: block;
-    margin-top: 1em;
+.array-field-key {
+    &.sorting {
+        .widget-default {
+            display: none;
+        }
 
-    .text-default {
-        display: inline;
+        .widget-sorting {
+            display: block;
+        }
     }
 
-    .text-sorting {
+    .btn {
+        display: block;
+        margin-top: 1em;
+    }
+
+    .widget-default {
+        display: block;
+    }
+
+    .widget-sorting {
         display: none;
     }
 }

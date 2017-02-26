@@ -9,23 +9,31 @@ class ArrayEditor extends View {
 
         this.$element = _.div({class: 'array-editor field-editor'});
 
-        this.$keyContent = _.div(
-            _.button({class: 'btn btn-default btn-array-editor-sort-items'},
-                _.span({class: 'text-default'}, 'Sort'),
-                _.span({class: 'text-sorting', style: 'display: none'}, 'Done')
-            ).click(() => {
-                this.onClickSort();
-            }),
-            _.button({class: 'btn btn-default btn-array-editor-sort-items'},
-                'Collapse'
-            ).click(() => {
-                this.onClickCollapseAll();
-            }),
-            _.button({class: 'btn btn-default btn-array-editor-sort-items'},
-                'Expand'
-            ).click(() => {
-                this.onClickExpandAll();
-            })
+        this.$keyContent = _.div({class: 'array-field-key'},
+            _.div({class: 'widget-sorting'},
+                _.button({class: 'btn btn-default'},
+                    'Done'
+                ).click(() => {
+                    this.onClickSort();
+                })
+            ),
+            _.div({class: 'widget-default'},
+                _.button({class: 'btn btn-default'},
+                    'Sort',
+                ).click(() => {
+                    this.onClickSort();
+                }),
+                _.button({class: 'default btn btn-default'},
+                    'Collapse'
+                ).click(() => {
+                    this.onClickCollapseAll();
+                }),
+                _.button({class: 'btn btn-default'},
+                    'Expand'
+                ).click(() => {
+                    this.onClickExpandAll();
+                })
+            )
         );
         
         this.fetch();
@@ -107,8 +115,7 @@ class ArrayEditor extends View {
         
         let isSorting = this.$element.hasClass('sorting');
 
-        this.$keyContent.find('.text-default').toggle(!isSorting);
-        this.$keyContent.find('.text-sorting').toggle(isSorting);
+        this.$keyContent.toggleClass('sorting', isSorting);
 
         if(isSorting) {
             this.$element.children('.items').children('.item').each((oldIndex, item) => {

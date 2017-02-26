@@ -405,6 +405,9 @@ img.logo {
             }
         
             .editor-footer {
+                position: relative;
+                z-index: 10;
+                box-shadow: 0px -2px 5px 0px rgba(0, 0, 0, 0.2);
                 flex-shrink: 0;
                 padding: 15px;
                 margin: 0px;

@@ -607,6 +607,9 @@ img.logo {
         .cms-container .workspace .editor .editor-body .editor {
           height: auto; }
       .cms-container .workspace .editor .editor-footer {
+        position: relative;
+        z-index: 10;
+        box-shadow: 0px -2px 5px 0px rgba(0, 0, 0, 0.2);
         flex-shrink: 0;
         padding: 15px;
         margin: 0px;
@@ -1096,13 +1099,21 @@ body.dashboard-container {
   .date-editor .btn-edit {
     max-width: 140px; }
 
-.btn-array-editor-sort-items {
+.array-field-key.sorting .widget-default {
+  display: none; }
+
+.array-field-key.sorting .widget-sorting {
+  display: block; }
+
+.array-field-key .btn {
   display: block;
   margin-top: 1em; }
-  .btn-array-editor-sort-items .text-default {
-    display: inline; }
-  .btn-array-editor-sort-items .text-sorting {
-    display: none; }
+
+.array-field-key .widget-default {
+  display: block; }
+
+.array-field-key .widget-sorting {
+  display: none; }
 
 .array-editor {
   min-width: 100%; }
@@ -1718,16 +1729,8 @@ body.dashboard-container {
     background-color: #eeeeee;
     position: relative;
     z-index: 5;
-    box-shadow: 2px 0px 5px 0px rgba(0, 0, 0, 0.2); }
-    .navspace .navbar-main .tab-panes:after {
-      content: '';
-      display: block;
-      position: absolute;
-      width: 1px;
-      height: 100%;
-      background-color: #999999;
-      right: 0px;
-      top: 0px; }
+    box-shadow: 2px 0px 5px 0px rgba(0, 0, 0, 0.2);
+    border-right: 1px solid #999999; }
     .navspace .navbar-main .tab-panes .pane-container {
       display: none;
       height: 100%; }

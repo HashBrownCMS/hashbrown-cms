@@ -140,17 +140,7 @@
             position: relative;
             z-index: 5;
             box-shadow: 2px 0px 5px 0px rgba(0, 0, 0, 0.2);
-            
-            &:after {
-                content: '';
-                display: block;
-                position: absolute;
-                width: 1px;
-                height: 100%;
-                background-color: $standard-darker;
-                right: 0px;
-                top: 0px;
-            }
+            border-right: 1px solid $standard-darker;
 
             .pane-container {
                 display: none;

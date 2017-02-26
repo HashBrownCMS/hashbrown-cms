@@ -23380,13 +23380,15 @@
 
 	        _this.$element = _.div({ class: 'array-editor field-editor' });
 
-	        _this.$keyContent = _.div(_.button({ class: 'btn btn-default btn-array-editor-sort-items' }, _.span({ class: 'text-default' }, 'Sort'), _.span({ class: 'text-sorting', style: 'display: none' }, 'Done')).click(function () {
+	        _this.$keyContent = _.div({ class: 'array-field-key' }, _.div({ class: 'widget-sorting' }, _.button({ class: 'btn btn-default' }, 'Done').click(function () {
 	            _this.onClickSort();
-	        }), _.button({ class: 'btn btn-default btn-array-editor-sort-items' }, 'Collapse').click(function () {
+	        })), _.div({ class: 'widget-default' }, _.button({ class: 'btn btn-default' }, 'Sort').click(function () {
+	            _this.onClickSort();
+	        }), _.button({ class: 'default btn btn-default' }, 'Collapse').click(function () {
 	            _this.onClickCollapseAll();
-	        }), _.button({ class: 'btn btn-default btn-array-editor-sort-items' }, 'Expand').click(function () {
+	        }), _.button({ class: 'btn btn-default' }, 'Expand').click(function () {
 	            _this.onClickExpandAll();
-	        }));
+	        })));
 
 	        _this.fetch();
 	        return _this;
@@ -23488,8 +23490,7 @@
 
 	            var isSorting = this.$element.hasClass('sorting');
 
-	            this.$keyContent.find('.text-default').toggle(!isSorting);
-	            this.$keyContent.find('.text-sorting').toggle(isSorting);
+	            this.$keyContent.toggleClass('sorting', isSorting);
 
 	            if (isSorting) {
 	                this.$element.children('.items').children('.item').each(function (oldIndex, item) {
