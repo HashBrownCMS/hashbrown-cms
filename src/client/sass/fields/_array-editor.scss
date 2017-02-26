@@ -94,6 +94,7 @@
                 height: 34px;
                 width: 34px;
                 border-radius: 0px;
+                z-index: 50;
                 
                 .fa {
                     font-size: 12px;
@@ -104,7 +105,11 @@
                 right: 0px;
 
                 .fa {
-                    color: $primary;
+                    color: $standard-darker;
+
+                    &:hover {
+                        color: $secondary;
+                    }
                 }
             }
 

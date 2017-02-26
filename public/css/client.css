@@ -1154,13 +1154,16 @@ body.dashboard-container {
         top: 0px;
         height: 34px;
         width: 34px;
-        border-radius: 0px; }
+        border-radius: 0px;
+        z-index: 50; }
         .array-editor .items .item > .btn-toggle .fa, .array-editor .items .item > .btn-remove .fa {
           font-size: 12px; }
       .array-editor .items .item > .btn-remove {
         right: 0px; }
         .array-editor .items .item > .btn-remove .fa {
-          color: #e70d3b; }
+          color: #999999; }
+          .array-editor .items .item > .btn-remove .fa:hover {
+            color: #21303b; }
       .array-editor .items .item > .btn-toggle {
         right: 34px; }
         .array-editor .items .item > .btn-toggle .fa {

@@ -81,7 +81,13 @@ class RichTextEditor extends View {
         mediaBrowser.on('select', (id) => {
             MediaHelper.getMediaById(id)
             .then((media) => {
-                let html = '<img data-id="' + id + '" alt="' + media.name + '" src="/' + media.url + '">';
+                let html = '';
+
+                if(media.isImage()) {
+                    html = '<img data-id="' + id + '" alt="' + media.name + '" src="/' + media.url + '">';
+                } else if(media.isVideo()) {
+                    html = '<video data-id="' + id + '" alt="' + media.name + '" src="/' + media.url + '">';
+                }
 
                 let source = getCookie('rteview');
 
@@ -228,6 +234,20 @@ class RichTextEditor extends View {
                 elements: {
                     // Refactor image src url to fit MediaController
                     img: (element) => {
+                        // Fetch from data attribute
+                        if(element.attributes['data-id']) {
+                            element.attributes.src = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + element.attributes['data-id'];
+                        
+                        // Failing that, use regex
+                        } else {
+                            element.attributes.src = element.attributes.src.replace(/.+media\/([0-9a-z]{40})\/.+/g, '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/$1');
+                        
+                        }
+                        
+                    },
+                    
+                    // Refactor video src url to fit MediaController
+                    video: (element) => {
                         // Fetch from data attribute
                         if(element.attributes['data-id']) {
                             element.attributes.src = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + element.attributes['data-id'];
