@@ -24,7 +24,7 @@
 html, body {
   height: 100%;
   font-family: 'Roboto';
-  font-size: 13px;
+  font-size: 14px;
   background-color: #eeeeee; }
 
 #dragdrop-placeholder, *[data-dragdrop-unsorted="true"][data-dragdrop-hovering="true"] {
@@ -809,8 +809,26 @@ img.logo {
 body.dashboard-container {
   background-color: #eeeeee;
   overflow-y: auto; }
+  body.dashboard-container a {
+    color: #e70d3b; }
+  body.dashboard-container .dashboard-header {
+    text-align: center;
+    padding-left: 0px;
+    min-height: 64px; }
+    body.dashboard-container .dashboard-header .dashboard-logo {
+      position: absolute;
+      left: 1rem;
+      color: #ffffff;
+      line-height: 30px;
+      text-transform: none;
+      font-weight: normal;
+      top: 50%;
+      transform: translateY(-50%); }
+    body.dashboard-container .dashboard-header li {
+      float: none;
+      display: inline-block; }
   body.dashboard-container .diagnostics {
-    margin: 15px; }
+    margin: 15px auto; }
     body.dashboard-container .diagnostics tr {
       font-size: 14px; }
       body.dashboard-container .diagnostics tr td {
@@ -818,78 +836,69 @@ body.dashboard-container {
         body.dashboard-container .diagnostics tr td:first-child {
           min-width: 200px;
           font-weight: bold; }
-  body.dashboard-container .users {
-    padding: 15px; }
-    body.dashboard-container .users .btn-invite-user {
-      display: block;
-      margin-left: auto;
-      margin-top: 30px; }
-    body.dashboard-container .users .user-list {
-      max-width: 600px;
-      margin: 0px auto;
-      max-height: 600px;
-      overflow-y: auto; }
-      body.dashboard-container .users .user-list .user {
-        padding: 15px 0px;
-        border-bottom: 1px solid #eeeeee;
-        display: flex; }
-        body.dashboard-container .users .user-list .user:last-child {
-          border-bottom: 0px; }
-        body.dashboard-container .users .user-list .user.expanded .user-editor {
-          display: block; }
-        body.dashboard-container .users .user-list .user .btn-remove {
-          position: static; }
-          body.dashboard-container .users .user-list .user .btn-remove .fa {
-            text-align: center;
-            border-radius: 50%;
-            margin-right: 15px;
-            color: #fff;
-            background-color: #bdbdbd;
-            width: 16px;
-            line-height: 16px; }
-            body.dashboard-container .users .user-list .user .btn-remove .fa:before {
-              margin-right: -1px; }
-            body.dashboard-container .users .user-list .user .btn-remove .fa:hover {
-              background-color: #e53935; }
-        body.dashboard-container .users .user-list .user .btn-edit {
-          flex-grow: 1;
-          display: flex;
-          text-align: left;
-          padding: 0px;
-          margin: 0px;
-          background-color: transparent;
-          text-transform: none;
-          font-weight: normal;
-          align-items: center; }
-        body.dashboard-container .users .user-list .user .user-editor {
-          display: none; }
-        body.dashboard-container .users .user-list .user .user-icon {
-          width: 40px;
+  body.dashboard-container .users .btn-invite-user {
+    display: block;
+    margin-left: auto;
+    margin-top: 30px; }
+  body.dashboard-container .users .user-list {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0.5rem 0rem;
+    margin: 0rem -0.5rem; }
+    body.dashboard-container .users .user-list .user {
+      flex-basis: calc(33.33% - 1rem);
+      width: calc(33.33% - 1rem);
+      margin: 0.5rem;
+      padding: 1rem;
+      display: flex; }
+      body.dashboard-container .users .user-list .user:last-child {
+        border-bottom: 0px; }
+      body.dashboard-container .users .user-list .user.expanded .user-editor {
+        display: block; }
+      body.dashboard-container .users .user-list .user .btn-remove {
+        position: static; }
+        body.dashboard-container .users .user-list .user .btn-remove .fa {
+          text-align: center;
+          border-radius: 50%;
+          margin-right: 15px;
+          color: #fff;
+          background-color: #bdbdbd;
+          width: 16px;
+          line-height: 16px; }
+          body.dashboard-container .users .user-list .user .btn-remove .fa:before {
+            margin-right: -1px; }
+          body.dashboard-container .users .user-list .user .btn-remove .fa:hover {
+            background-color: #e53935; }
+      body.dashboard-container .users .user-list .user .user-actions .btn {
+        display: block; }
+        body.dashboard-container .users .user-list .user .user-actions .btn:first-child {
+          margin-bottom: 1rem; }
+      body.dashboard-container .users .user-list .user .user-info {
+        flex-grow: 1; }
+        body.dashboard-container .users .user-list .user .user-info .user-icon {
           line-height: 40px;
           text-align: center;
           color: #333333;
           margin-right: 15px;
           font-size: 32px; }
-        body.dashboard-container .users .user-list .user .user-info {
-          flex-grow: 1; }
-          body.dashboard-container .users .user-list .user .user-info h4, body.dashboard-container .users .user-list .user .user-info p {
-            margin: 0px; }
+        body.dashboard-container .users .user-list .user .user-info h4, body.dashboard-container .users .user-list .user .user-info p {
+          margin: 0px; }
   body.dashboard-container .projects .btn-create-project {
     display: block;
     margin-left: auto;
     margin-top: 30px; }
   body.dashboard-container .projects .project-list {
     display: flex;
-    flex-wrap: wrap; }
+    flex-wrap: wrap;
+    padding: 0.5rem 0rem;
+    margin: 0rem -0.5rem; }
   body.dashboard-container .projects .project-editor {
-    padding: 15px;
-    margin: 15px;
+    padding: 1rem;
+    margin: 0.5rem;
     position: relative;
-    flex-grow: 1;
-    flex-basis: 300px;
-    width: 300px;
-    min-width: 300px;
-    max-width: 300px;
+    flex-grow: 0;
+    flex-basis: calc(33.33% - 1rem);
+    width: calc(33.33% - 1rem);
     color: #333333;
     background-color: #ffffff; }
     body.dashboard-container .projects .project-editor .btn-remove {
@@ -1726,14 +1735,14 @@ body.dashboard-container {
           display: block; }
       .navspace .navbar-main .tab-panes .pane-container.select-dir .pane-move-buttons .btn {
         display: block; }
-      .navspace .navbar-main .tab-panes .pane-container.select-dir .pane .pane-item-container.moving-content > .pane-item {
+      .navspace .navbar-main .tab-panes .pane-container.select-dir .pane .pane-item-container.moving-item > .pane-item {
         font-weight: 700; }
       .navspace .navbar-main .tab-panes .pane-container.select-dir .pane .pane-item-container.active:before {
         content: none; }
-      .navspace .navbar-main .tab-panes .pane-container.select-dir .pane .pane-item-container[data-is-directory="true"] > .pane-item {
+      .navspace .navbar-main .tab-panes .pane-container.select-dir .pane .pane-item-container[data-is-directory="true"]:not(.moving-item) > .pane-item {
         background-color: #e70d3b;
         color: #ffffff; }
-      .navspace .navbar-main .tab-panes .pane-container.select-dir .pane .pane-item-container:not([data-is-directory="true"]):not(.moving-content) > .pane-item {
+      .navspace .navbar-main .tab-panes .pane-container.select-dir .pane .pane-item-container:not([data-is-directory="true"]):not(.moving-item) > .pane-item {
         pointer-events: none;
         opacity: 0.5; }
       .navspace .navbar-main .tab-panes .pane-container .pane-toolbar {
@@ -1762,14 +1771,14 @@ body.dashboard-container {
           font-weight: 700; }
       .navspace .navbar-main .tab-panes .pane-container .pane-move-buttons .btn {
         margin: 10px;
-        border: 2px dashed #eeeeee;
+        border: 2px dashed #999999;
         height: 40px;
         padding: 0px;
         background-color: transparent;
         width: calc(100% - 20px);
         text-align: center;
         font-weight: 700;
-        color: #eeeeee;
+        color: #999999;
         display: none; }
         .navspace .navbar-main .tab-panes .pane-container .pane-move-buttons .btn:hover {
           border-color: #e70d3b;
@@ -1868,7 +1877,7 @@ body.dashboard-container {
   .media-viewer .media-preview {
     flex-grow: 1;
     position: relative; }
-    .media-viewer .media-preview img {
+    .media-viewer .media-preview img, .media-viewer .media-preview video {
       position: absolute;
       top: 50%;
       left: 50%;

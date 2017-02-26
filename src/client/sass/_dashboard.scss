@@ -73,8 +73,34 @@ body.dashboard-container {
     background-color: $standard-dark;
     overflow-y: auto;
 
+    a {
+        color: $primary;
+    }
+
+    .dashboard-header {
+        text-align: center;
+        padding-left: 0px;
+        min-height: 64px;
+
+        .dashboard-logo {
+            position: absolute;
+            left: 1rem;
+            color: $secondary-text;
+            line-height: 30px;
+            text-transform: none;
+            font-weight: normal;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        li {
+            float: none;
+            display: inline-block;
+        }
+    }
+
     .diagnostics {
-        margin: 15px;
+        margin: 15px auto;
 
         tr {
             font-size: 14px;
@@ -95,8 +121,6 @@ body.dashboard-container {
     }
 
     .users {
-        padding: 15px;
-
         .btn-invite-user {
             display: block;
             margin-left: auto;
@@ -104,14 +128,16 @@ body.dashboard-container {
         }
         
         .user-list {
-            max-width: 600px;
-            margin: 0px auto;
-            max-height: 600px;
-            overflow-y: auto;
+            display: flex;
+            flex-wrap: wrap;
+            padding: 0.5rem 0rem;
+            margin: 0rem -0.5rem;
 
            .user {
-                padding: 15px 0px;
-                border-bottom: 1px solid material-color('grey', '200');
+                flex-basis: calc(33.33% - 1rem);
+                width: calc(33.33% - 1rem);
+                margin: 0.5rem;
+                padding: 1rem;
                 display: flex;
 
                 &:last-child {
@@ -146,32 +172,25 @@ body.dashboard-container {
                     }
                 }
 
-                .btn-edit {
-                    flex-grow: 1;
-                    display: flex;
-                    text-align: left;
-                    padding: 0px;
-                    margin: 0px;
-                    background-color: transparent;
-                    text-transform: none;
-                    font-weight: normal;
-                    align-items: center;
-                }
+                .user-actions {
+                    .btn {
+                        display: block;
 
-                .user-editor {
-                    display: none;
-                }
-
-                .user-icon {
-                    width: 40px;
-                    line-height: 40px;
-                    text-align: center;
-                    color: $standard-text;
-                    margin-right: 15px;
-                    font-size: 32px;
+                        &:first-child {
+                            margin-bottom: 1rem;
+                        }
+                    }
                 }
 
                 .user-info {
+                    .user-icon {
+                        line-height: 40px;
+                        text-align: center;
+                        color: $standard-text;
+                        margin-right: 15px;
+                        font-size: 32px;
+                    }
+
                     flex-grow: 1;
 
                     h4, p {
@@ -192,17 +211,17 @@ body.dashboard-container {
         .project-list {
             display: flex;
             flex-wrap: wrap;
+            padding: 0.5rem 0rem;
+            margin: 0rem -0.5rem;
         }
 
         .project-editor {
-            padding: 15px;
-            margin: 15px;
+            padding: 1rem;
+            margin: 0.5rem;
             position: relative;
-            flex-grow: 1;
-            flex-basis: 300px;
-            width: 300px;
-            min-width: 300px;
-            max-width: 300px;
+            flex-grow: 0;
+            flex-basis: calc(33.33% - 1rem);
+            width: calc(33.33% - 1rem);
             color: $standard-text;
             background-color: $standard;
             

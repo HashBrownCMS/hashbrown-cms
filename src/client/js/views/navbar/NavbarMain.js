@@ -97,12 +97,16 @@ class NavbarMain extends View {
         $pane.append(
             _.each(items, function(i, item) {
                 let id = item.id || i;
+                let isDirectory = false;
 
                 // Get item name
                 let name = '';
 
-                // This is likely a Content node
-                if(item.properties && item.properties.title) {
+                // This is a Content node
+                if(item.properties && item.createDate) {
+                    // All Content nodes are "directories" in that they can be parents of one another
+                    isDirectory = true;
+
                     // Use title directly if available
                     if(typeof item.properties.title === 'string') {
                         name = item.properties.title;
@@ -125,6 +129,11 @@ class NavbarMain extends View {
                                 }
                             }
                         }
+                    }
+
+                    // If name still wasn't found, use the id
+                    if(!name) {
+                        name = item.id;
                     }
                 
                 } else if(item.title && typeof item.title === 'string') {
@@ -194,6 +203,10 @@ class NavbarMain extends View {
                 
                 if(typeof item.local !== 'undefined') {
                     $element.attr('data-local', item.local);
+                }
+                
+                if(isDirectory) {
+                    $element.attr('data-is-directory', true);
                 }
 
                 // Attach item context menu

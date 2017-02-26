@@ -84,40 +84,43 @@ apiCall('get', 'user')
 
         let renderUser = () => {
             _.append($user.empty(),
-                _.button({class: 'btn btn-edit'},
+                _.div({class: 'user-info'}, 
                     _.span({class: 'user-icon fa fa-' + (user.isAdmin ? 'black-tie' : 'user')}),
-                    _.div({class: 'user-info'}, 
-                        _.h4((user.fullName || user.username || user.email || user.id) + (user.id == User.current.id ? ' (you)' : '')),
-                        _.p(user.isAdmin ? 'Admin' : 'Editor')
-                    )
-                ).on('click', () => {
-                    let userEditor = new UserEditor({ model: user }); 
-                    
-                    userEditor.on('save', () => {
-                        renderUser(); 
-                    });
-                }),
-                _.button({class: 'btn btn-remove', title: 'Remove user'},
-                    _.span({class: 'fa fa-remove'})
-                ).on('click', () => {
-                    UI.confirmModal(
-                        'remove',
-                        'Delete user "' + (user.fullName || user.username || user.email || user.id) + '"',
-                        'Are you sure you want to remove this user?',
-                        () => {
-                            apiCall('delete', 'user/' + user.id)
-                            .then(() => {
-                                $user.remove(); 
-                            })
-                            .catch(UI.errorModal);
-                        }
-                    );
-                })
+                    _.h4((user.fullName || user.username || user.email || user.id) + (user.id == User.current.id ? ' (you)' : '')),
+                    _.p(user.isAdmin ? 'Admin' : 'Editor')
+                ),
+                _.div({class: 'user-actions'},
+                    _.button({class: 'btn btn-primary', title: 'Edit user'},
+                        'Edit'
+                    ).on('click', () => {
+                        let userEditor = new UserEditor({ model: user }); 
+                        
+                        userEditor.on('save', () => {
+                            renderUser(); 
+                        });
+                    }),
+                    _.button({class: 'btn btn-primary', title: 'Remove user'},
+                        'Remove'
+                    ).on('click', () => {
+                        UI.confirmModal(
+                            'remove',
+                            'Delete user "' + (user.fullName || user.username || user.email || user.id) + '"',
+                            'Are you sure you want to remove this user?',
+                            () => {
+                                apiCall('delete', 'user/' + user.id)
+                                .then(() => {
+                                    $user.remove(); 
+                                })
+                                .catch(UI.errorModal);
+                            }
+                        );
+                    })
+                )
             );
         };
 
         $('.dashboard-container .users .user-list').append(
-            $user = _.div({class: 'user'})
+            $user = _.div({class: 'user raised'})
         );
 
         renderUser();

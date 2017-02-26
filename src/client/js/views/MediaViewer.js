@@ -36,30 +36,38 @@ class MediaViewer extends View {
     }
 
     render() {
-        let view = this;
-        let imgSrc = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + view.model.id;
+        this.model = new Media(this.model);        
+
+        let mediaSrc = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + this.model.id;
 
         this.$element.empty().append(
             _.div({class: 'editor-header media-heading'},
                 _.span({class: 'fa fa-file-image-o'}),
                 _.h4({class: 'media-title'},
                     this.model.name,
-                    _.span({class: 'media-data'})
+                    _.span({class: 'media-data'},
+                        this.model.getContentTypeHeader()    
+                    )
                 )
             ),
             _.div({class: 'media-preview editor-body'},
-                _.img({class: 'img-responsive', src: imgSrc}).on('load', function() {
-                    let img = new Image();
-                    img.src = imgSrc;
+                _.if(this.model.isImage(),
+                    _.img({src: mediaSrc}).on('load', () => {
+                        let img = new Image();
+                        img.src = mediaSrc;
 
-                    view.$element.find('.media-data').html(
-                        '(' + img.width + 'x' + img.height + ')'
-                    );
-                })
+                        this.$element.find('.media-data').append(
+                            ' (' + img.width + 'x' + img.height + ')'
+                        );
+                    })
+                ),
+                _.if(this.model.isVideo(),
+                    _.video({controls: true, src: mediaSrc})
+                )
             ),
             _.div({class: 'editor-footer'}, 
                 _.input({class: 'form-control', value: this.model.folder, placeholder: 'Type folder path here'})
-                    .change(function() { view.onChangeFolder($(this).val()); })
+                    .change((e) => { this.onChangeFolder($(e.target).val()); })
             )
         );
     }

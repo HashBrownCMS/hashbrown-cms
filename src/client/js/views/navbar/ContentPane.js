@@ -4,6 +4,36 @@ let Pane = require('./Pane');
 
 class ContentPane extends Pane {
     /**
+     * Event: Change parent
+     */
+    static onChangeDirectory(id, parentId) {
+        if(parentId == '/') {
+            parentId = '';
+        }
+
+        // Get the Content model
+        ContentHelper.getContentById(id)
+
+        // API call to apply changes to Content parent
+        .then((content) => {
+            content.parentId = parentId;
+         
+            return apiCall('post', 'content/' + id, content);
+        })
+
+        // Reload all Content models
+        .then(() => {
+            return reloadResource('content');
+        })
+
+        // Reload UI
+        .then(() => {
+            ViewHelper.get('NavbarMain').reload();
+        })
+        .catch(UI.errorModal);
+    }
+
+    /**
      * Event: Click copy content
      */
     static onClickCopyContent() {
@@ -91,43 +121,6 @@ class ContentPane extends Pane {
             navbar.reload();
         }) 
         .catch(UI.errorModal);
-    }
-
-    /**
-     * Event: Click cut content
-     */
-    static onClickCutContent() {
-        let navbar = ViewHelper.get('NavbarMain');
-        let cutId = $('.context-menu-target-element').data('id');
-
-        // Event when pasting the cut content
-        this.onClickPasteContent = function onClickPasteContent() {
-            let parentId = $('.context-menu-target-element').data('id');
-           
-            // Get the Content model
-            ContentHelper.getContentById(cutId)
-
-            // API call to apply changes to Content parent
-            .then((cutContent) => {
-                cutContent.parentId = parentId;
-              
-                return apiCall('post', 'content/' + cutId, cutContent);
-            })
-
-            // Reload all Content models
-            .then(() => {
-                return reloadResource('content');
-            })
-
-            // Reload UI
-            .then(() => {
-                navbar.reload();
-                navbar.onClickPasteContent = null;
-
-                location.hash = '/content/' + cutId;
-            })
-            .catch(UI.errorModal);
-        }
     }
 
     /**
@@ -446,8 +439,11 @@ class ContentPane extends Pane {
                 menu['Copy id'] = () => { this.onClickCopyItemId(); };
                 menu['Paste'] = () => { if(this.onClickPasteContent) { this.onClickPasteContent(); } else { UI.messageModal('Paste content', 'Nothing to paste'); } };
 
-                if(!item.local && !item.remote && !item.locked) {
-                    menu['Cut'] = () => { this.onClickCutContent(); };
+                if(!item.remote && !item.locked) {
+                    menu['Move'] = () => { this.onClickMoveItem(); };
+                }
+
+                if(!item.local && !item.locked) {
                     menu['Remove'] = () => { this.onClickRemoveContent(true); };
                 }
 
@@ -489,60 +485,6 @@ class ContentPane extends Pane {
 
                 // Assign the sort index to the DOM element
                 queueItem.$element.attr('data-sort', item.sort);
-            },
-
-            // End dragging logic
-            onEndDrag: function(dragdropItem, dropContainer) {
-                let thisId = dragdropItem.element.dataset.contentId;
-                
-                // Get Content node first
-                ContentHelper.getContentById(thisId)
-                .then((thisContent) => {
-                    // Then change the sorting value
-                    let thisPrevSort = thisContent.sort;
-                    let newSortBasedOn = '';
-                    let newSort;
-
-                    // Feed back a success message in the console
-                    function onSuccess() {
-                        debug.log(
-                            'Changes to Content "' + thisContent.id + '":' + 
-                            '\n- sort from ' + thisPrevSort + ' to ' + thisContent.sort + ' based on ' + newSortBasedOn + 
-                            navbar
-                        );
-                    }
-
-                    // If this element has a previous sibling, base the sorting index on that
-                    if($(dragdropItem.element).prev('.pane-item-container').length > 0) {
-                        let prevSort = parseInt(dragdropItem.element.previousSibling.dataset.sort);
-
-                        newSort = prevSort + 1;
-                        newSortBasedOn = 'previous sibling';
-            
-                    // If this element has a next sibling, base the sorting index on that
-                    } else if($(dragdropItem.element).next('.pane-item-container').length > 0) {
-                        let nextSort = parseInt(dragdropItem.element.nextSibling.dataset.sort);
-
-                        newSort = nextSort - 1;
-                        newSortBasedOn = 'next sibling';
-
-                    // If it has neither, just assign the lowest possible one
-                    } else {
-                        newSort = 10000;
-                        newSortBasedOn = 'lowest possible index';
-                    }
-
-                    if(newSort != thisContent.sort) {
-                        thisContent.sort = newSort;
-
-                        // Save model
-                        apiCall('post', 'content/' + thisContent.id, thisContent.getObject())
-                        .then(onSuccess)
-                        .catch(UI.erroroModal);
-                        
-                        dragdropItem.element.dataset.sort = thisContent.sort;
-                    }
-                });
             }
         }
     }

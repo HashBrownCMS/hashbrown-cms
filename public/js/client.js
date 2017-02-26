@@ -12409,12 +12409,16 @@
 	            // Items
 	            $pane.append(_.each(items, function (i, item) {
 	                var id = item.id || i;
+	                var isDirectory = false;
 
 	                // Get item name
 	                var name = '';
 
-	                // This is likely a Content node
-	                if (item.properties && item.properties.title) {
+	                // This is a Content node
+	                if (item.properties && item.createDate) {
+	                    // All Content nodes are "directories" in that they can be parents of one another
+	                    isDirectory = true;
+
 	                    // Use title directly if available
 	                    if (typeof item.properties.title === 'string') {
 	                        name = item.properties.title;
@@ -12436,6 +12440,11 @@
 	                                }
 	                            }
 	                        }
+	                    }
+
+	                    // If name still wasn't found, use the id
+	                    if (!name) {
+	                        name = item.id;
 	                    }
 	                } else if (item.title && typeof item.title === 'string') {
 	                    name = item.title;
@@ -12495,6 +12504,10 @@
 
 	                if (typeof item.local !== 'undefined') {
 	                    $element.attr('data-local', item.local);
+	                }
+
+	                if (isDirectory) {
+	                    $element.attr('data-is-directory', true);
 	                }
 
 	                // Attach item context menu
@@ -21054,6 +21067,112 @@
 
 	            copyToClipboard(id);
 	        }
+
+	        /**
+	         * Event: Change directory
+	         *
+	         * @param {String} id
+	         * @param {String} newParent
+	         */
+
+	    }, {
+	        key: 'onChangeDirectory',
+	        value: function onChangeDirectory(id, newParent) {}
+
+	        /**
+	         * Event: Click move item
+	         */
+
+	    }, {
+	        key: 'onClickMoveItem',
+	        value: function onClickMoveItem() {
+	            var _this = this;
+
+	            var id = $('.context-menu-target-element').data('id');
+	            var navbar = ViewHelper.get('NavbarMain');
+	            var $pane = navbar.$element.find('.pane-container.active');
+
+	            $pane.find('.pane-item-container a[data-id="' + id + '"]').parent().toggleClass('moving-item', true);
+	            $pane.toggleClass('select-dir', true);
+
+	            // Reset
+	            function reset(newPath) {
+	                var mediaViewer = ViewHelper.get('MediaViewer');
+
+	                $pane.find('.pane-item-container[data-id="' + id + '"]').toggleClass('moving-item', false);
+	                $pane.toggleClass('select-dir', false);
+	                $pane.find('.pane-move-buttons .btn').off('click');
+	                $pane.find('.pane-item-container .pane-item').off('click');
+
+	                if (!newPath) {
+	                    return;
+	                }
+
+	                if (id == Router.params.id && mediaViewer) {
+	                    mediaViewer.$element.find('.editor-footer input').val(newPath);
+	                }
+	            }
+
+	            // Cancel
+	            $(document).on('keyup', function (e) {
+	                if (e.which == 27) {
+	                    reset();
+	                }
+	            });
+
+	            // Click existing directory
+	            $pane.find('.pane-item-container[data-is-directory="true"]:not(.moving-item)').each(function (i, element) {
+	                $(element).children('.pane-item').on('click', function (e) {
+	                    e.preventDefault();
+	                    e.stopPropagation();
+
+	                    var newPath = $(element).attr('data-media-folder') || $(element).attr('data-content-id');
+
+	                    reset(newPath);
+
+	                    _this.onChangeDirectory(id, newPath);
+	                });
+	            });
+
+	            // Click "move to root" button
+	            $pane.find('.pane-move-buttons .btn-move-to-root').on('click', function (e) {
+	                var newPath = '/';
+
+	                reset(newPath);
+
+	                _this.onChangeDirectory(id, newPath);
+	            });
+
+	            $pane.find('.pane-move-buttons .btn-new-folder').toggle(this.canCreateDirectory == true);
+
+	            if (this.canCreateDirectory) {
+	                $pane.find('.pane-move-buttons .btn-new-folder').on('click', function () {
+	                    MediaHelper.getMediaById(id).then(function (item) {
+	                        var messageModal = new MessageModal({
+	                            model: {
+	                                title: 'Move item',
+	                                body: _.div({}, 'Move the media object "' + (item.name || item.title || item.id) + '"', _.input({ class: 'form-control', value: item.folder || item.parentId || '', placeholder: 'Type folder path here' }))
+	                            },
+	                            buttons: [{
+	                                label: 'Cancel',
+	                                class: 'btn-default',
+	                                callback: function callback() {}
+	                            }, {
+	                                label: 'OK',
+	                                class: 'btn-primary',
+	                                callback: function callback() {
+	                                    var newPath = messageModal.$element.find('input.form-control').val();
+
+	                                    reset(newPath);
+
+	                                    _this.onChangeDirectory(item.id, newPath);
+	                                }
+	                            }]
+	                        });
+	                    }).catch(errorModal);
+	                });
+	            }
+	        }
 	    }]);
 
 	    return Pane;
@@ -21300,11 +21419,43 @@
 	    }
 
 	    _createClass(ContentPane, null, [{
-	        key: 'onClickCopyContent',
+	        key: 'onChangeDirectory',
+
+	        /**
+	         * Event: Change parent
+	         */
+	        value: function onChangeDirectory(id, parentId) {
+	            if (parentId == '/') {
+	                parentId = '';
+	            }
+
+	            // Get the Content model
+	            ContentHelper.getContentById(id)
+
+	            // API call to apply changes to Content parent
+	            .then(function (content) {
+	                content.parentId = parentId;
+
+	                return apiCall('post', 'content/' + id, content);
+	            })
+
+	            // Reload all Content models
+	            .then(function () {
+	                return reloadResource('content');
+	            })
+
+	            // Reload UI
+	            .then(function () {
+	                ViewHelper.get('NavbarMain').reload();
+	            }).catch(UI.errorModal);
+	        }
 
 	        /**
 	         * Event: Click copy content
 	         */
+
+	    }, {
+	        key: 'onClickCopyContent',
 	        value: function onClickCopyContent() {
 	            var navbar = ViewHelper.get('NavbarMain');
 	            var id = $('.context-menu-target-element').data('id');
@@ -21393,45 +21544,6 @@
 	            .then(function () {
 	                navbar.reload();
 	            }).catch(UI.errorModal);
-	        }
-
-	        /**
-	         * Event: Click cut content
-	         */
-
-	    }, {
-	        key: 'onClickCutContent',
-	        value: function onClickCutContent() {
-	            var navbar = ViewHelper.get('NavbarMain');
-	            var cutId = $('.context-menu-target-element').data('id');
-
-	            // Event when pasting the cut content
-	            this.onClickPasteContent = function onClickPasteContent() {
-	                var parentId = $('.context-menu-target-element').data('id');
-
-	                // Get the Content model
-	                ContentHelper.getContentById(cutId)
-
-	                // API call to apply changes to Content parent
-	                .then(function (cutContent) {
-	                    cutContent.parentId = parentId;
-
-	                    return apiCall('post', 'content/' + cutId, cutContent);
-	                })
-
-	                // Reload all Content models
-	                .then(function () {
-	                    return reloadResource('content');
-	                })
-
-	                // Reload UI
-	                .then(function () {
-	                    navbar.reload();
-	                    navbar.onClickPasteContent = null;
-
-	                    location.hash = '/content/' + cutId;
-	                }).catch(UI.errorModal);
-	            };
 	        }
 
 	        /**
@@ -21732,10 +21844,13 @@
 	                        }
 	                    };
 
-	                    if (!item.local && !item.remote && !item.locked) {
-	                        menu['Cut'] = function () {
-	                            _this3.onClickCutContent();
+	                    if (!item.remote && !item.locked) {
+	                        menu['Move'] = function () {
+	                            _this3.onClickMoveItem();
 	                        };
+	                    }
+
+	                    if (!item.local && !item.locked) {
 	                        menu['Remove'] = function () {
 	                            _this3.onClickRemoveContent(true);
 	                        };
@@ -21789,53 +21904,6 @@
 
 	                    // Assign the sort index to the DOM element
 	                    queueItem.$element.attr('data-sort', item.sort);
-	                },
-
-	                // End dragging logic
-	                onEndDrag: function onEndDrag(dragdropItem, dropContainer) {
-	                    var thisId = dragdropItem.element.dataset.contentId;
-
-	                    // Get Content node first
-	                    ContentHelper.getContentById(thisId).then(function (thisContent) {
-	                        // Then change the sorting value
-	                        var thisPrevSort = thisContent.sort;
-	                        var newSortBasedOn = '';
-	                        var newSort = void 0;
-
-	                        // Feed back a success message in the console
-	                        function onSuccess() {
-	                            debug.log('Changes to Content "' + thisContent.id + '":' + '\n- sort from ' + thisPrevSort + ' to ' + thisContent.sort + ' based on ' + newSortBasedOn + navbar);
-	                        }
-
-	                        // If this element has a previous sibling, base the sorting index on that
-	                        if ($(dragdropItem.element).prev('.pane-item-container').length > 0) {
-	                            var prevSort = parseInt(dragdropItem.element.previousSibling.dataset.sort);
-
-	                            newSort = prevSort + 1;
-	                            newSortBasedOn = 'previous sibling';
-
-	                            // If this element has a next sibling, base the sorting index on that
-	                        } else if ($(dragdropItem.element).next('.pane-item-container').length > 0) {
-	                            var nextSort = parseInt(dragdropItem.element.nextSibling.dataset.sort);
-
-	                            newSort = nextSort - 1;
-	                            newSortBasedOn = 'next sibling';
-
-	                            // If it has neither, just assign the lowest possible one
-	                        } else {
-	                            newSort = 10000;
-	                            newSortBasedOn = 'lowest possible index';
-	                        }
-
-	                        if (newSort != thisContent.sort) {
-	                            thisContent.sort = newSort;
-
-	                            // Save model
-	                            apiCall('post', 'content/' + thisContent.id, thisContent.getObject()).then(onSuccess).catch(UI.erroroModal);
-
-	                            dragdropItem.element.dataset.sort = thisContent.sort;
-	                        }
-	                    });
 	                }
 	            };
 	        }
@@ -22106,14 +22174,14 @@
 	    }
 
 	    _createClass(MediaPane, null, [{
-	        key: 'onChangeFolder',
+	        key: 'onChangeDirectory',
 
 	        /**
 	         * Event: On change folder path
 	         *
 	         * @param {String} newFolder
 	         */
-	        value: function onChangeFolder(id, newFolder) {
+	        value: function onChangeDirectory(id, newFolder) {
 	            apiCall('post', 'media/tree/' + id, newFolder ? {
 	                id: id,
 	                folder: newFolder
@@ -22121,130 +22189,7 @@
 	                return reloadResource('media');
 	            }).then(function () {
 	                ViewHelper.get('NavbarMain').reload();
-
-	                var mediaViewer = ViewHelper.get('MediaViewer');
-
-	                location.hash = '/media/' + id;
 	            }).catch(errorModal);
-	        }
-
-	        /**
-	         * Event: Click move Media
-	         */
-
-	    }, {
-	        key: 'onClickMoveMedia',
-	        value: function onClickMoveMedia() {
-	            var _this2 = this;
-
-	            var id = $('.context-menu-target-element').data('id');
-	            var navbar = ViewHelper.get('NavbarMain');
-	            var $pane = navbar.$element.find('.pane-container.active');
-
-	            $pane.find('.pane-item-container[data-media-id="' + id + '"]').toggleClass('moving-content', true);
-	            $pane.toggleClass('select-dir', true);
-
-	            // TODO: Generalise this logic so it works for all panes
-
-	            // Reset
-	            function reset(newPath) {
-	                var mediaViewer = ViewHelper.get('MediaViewer');
-
-	                $pane.find('.pane-item-container[data-media-id="' + id + '"]').toggleClass('moving-content', false);
-	                $pane.toggleClass('select-dir', false);
-	                $pane.find('.pane-move-buttons .btn').off('click');
-	                $pane.find('.pane-item-container .pane-item').off('click');
-
-	                if (id == Router.params.id && mediaViewer) {
-	                    mediaViewer.$element.find('.editor-footer input').val(newPath);
-	                }
-	            }
-
-	            // Cancel
-	            $(document).on('keyup', function (e) {
-	                if (e.which == 27) {
-	                    reset();
-	                }
-	            });
-
-	            // Click existing directory
-	            $pane.find('.pane-item-container[data-is-directory="true"]').each(function (i, element) {
-	                $(element).children('.pane-item').on('click', function (e) {
-	                    e.preventDefault();
-	                    e.stopPropagation();
-
-	                    var newPath = $(element).attr('data-media-folder');
-
-	                    reset(newPath);
-
-	                    _this2.onChangeFolder(id, newPath);
-	                });
-	            });
-
-	            // Click "move to root" button
-	            $pane.find('.pane-move-buttons .btn-move-to-root').on('click', function (e) {
-	                var newPath = '/';
-
-	                reset(newPath);
-
-	                _this2.onChangeFolder(id, newPath);
-	            });
-
-	            // Click "new folder" button
-	            $pane.find('.pane-move-buttons .btn-new-folder').on('click', function () {
-	                MediaHelper.getMediaById(id).then(function (media) {
-	                    var messageModal = new MessageModal({
-	                        model: {
-	                            title: 'Move media',
-	                            body: _.div({}, 'Move the media object "' + media.name + '"', _.input({ class: 'form-control', value: media.folder, placeholder: 'Type folder path here' }))
-	                        },
-	                        buttons: [{
-	                            label: 'Cancel',
-	                            class: 'btn-default',
-	                            callback: function callback() {}
-	                        }, {
-	                            label: 'OK',
-	                            class: 'btn-danger',
-	                            callback: function callback() {
-	                                var newPath = messageModal.$element.find('input.form-control').val();
-
-	                                reset(newPath);
-
-	                                _this2.onChangeFolder(media.id, newPath);
-	                            }
-	                        }]
-	                    });
-	                }).catch(errorModal);
-	            });
-	        }
-
-	        /**
-	         * Event: Click cut Media
-	         */
-
-	    }, {
-	        key: 'onClickCutMedia',
-	        value: function onClickCutMedia() {
-	            var navbar = ViewHelper.get('NavbarMain');
-	            var cutId = $('.context-menu-target-element').data('id');
-
-	            // This function should only exist if an item has been cut
-	            this.onClickPasteMedia = function onClickPasteMedia() {
-	                var parentFolder = $('.context-menu-target-element').data('media-folder');
-
-	                apiCall('post', 'media/tree/' + cutId, parentFolder ? {
-	                    id: cutId,
-	                    folder: parentFolder
-	                } : null).then(function () {
-	                    reloadResource('media').then(function () {
-	                        navbar.reload();
-
-	                        location.hash = '/media/' + cutId;
-	                    });
-
-	                    navbar.onClickPasteMedia = null;
-	                }).catch(navbar.onError);
-	            };
 	        }
 
 	        /**
@@ -22338,12 +22283,12 @@
 	    }, {
 	        key: 'renderToolbar',
 	        value: function renderToolbar() {
-	            var _this3 = this;
+	            var _this2 = this;
 
 	            var $toolbar = _.div({ class: 'pane-toolbar' }, _.div(_.button({ class: 'btn btn-primary' }, 'Upload media').click(function () {
-	                _this3.onClickUploadMedia();
+	                _this2.onClickUploadMedia();
 	            })), _.div(_.button({ class: 'btn btn-primary' }, 'Browse').click(function () {
-	                _this3.onClickBrowseMedia();
+	                _this2.onClickBrowseMedia();
 	            })));
 
 	            return $toolbar;
@@ -22358,7 +22303,7 @@
 	    }, {
 	        key: 'getRenderSettings',
 	        value: function getRenderSettings() {
-	            var _this4 = this;
+	            var _this3 = this;
 
 	            var isSyncEnabled = SettingsHelper.getCachedSettings('sync').enabled;
 	            var isMediaSyncEnabled = isSyncEnabled && SettingsHelper.getCachedSettings('sync')['media/tree'];
@@ -22385,23 +22330,20 @@
 	                itemContextMenu: {
 	                    'This media': '---',
 	                    'Copy id': function CopyId() {
-	                        _this4.onClickCopyItemId();
-	                    },
-	                    'Cut': function Cut() {
-	                        _this4.onClickCutMedia();
+	                        _this3.onClickCopyItemId();
 	                    },
 	                    'Move': function Move() {
-	                        _this4.onClickMoveMedia();
+	                        _this3.onClickMoveItem();
 	                    },
 	                    'Remove': function Remove() {
-	                        _this4.onClickRemoveMedia();
+	                        _this3.onClickRemoveMedia();
 	                    },
 	                    'Replace': function Replace() {
-	                        _this4.onClickReplaceMedia();
+	                        _this3.onClickReplaceMedia();
 	                    },
 	                    'Directory': '---',
 	                    'Upload new media': function UploadNewMedia() {
-	                        _this4.onClickUploadMedia();
+	                        _this3.onClickUploadMedia();
 	                    }
 	                },
 
@@ -22409,16 +22351,16 @@
 	                dirContextMenu: {
 	                    'Directory': '---',
 	                    'Paste': function Paste() {
-	                        _this4.onClickPasteMedia();
+	                        _this3.onClickPasteMedia();
 	                    },
 	                    'New folder': function NewFolder() {
-	                        _this4.onClickNewMediaDirectory();
+	                        _this3.onClickNewMediaDirectory();
 	                    },
 	                    'Upload new media': function UploadNewMedia() {
-	                        _this4.onClickUploadMedia();
+	                        _this3.onClickUploadMedia();
 	                    },
 	                    'Remove': function Remove() {
-	                        _this4.onClickRemoveMediaDirectory();
+	                        _this3.onClickRemoveMediaDirectory();
 	                    }
 	                },
 
@@ -22426,13 +22368,13 @@
 	                paneContextMenu: {
 	                    'General': '---',
 	                    'Paste': function Paste() {
-	                        _this4.onClickPasteMedia();
+	                        _this3.onClickPasteMedia();
 	                    },
 	                    'New folder': function NewFolder() {
-	                        _this4.onClickNewMediaDirectory();
+	                        _this3.onClickNewMediaDirectory();
 	                    },
 	                    'Upload new media': function UploadNewMedia() {
-	                        _this4.onClickUploadMedia();
+	                        _this3.onClickUploadMedia();
 	                    }
 	                }
 	            };
@@ -22441,6 +22383,11 @@
 
 	    return MediaPane;
 	}(Pane);
+
+	// Settings
+
+
+	MediaPane.canCreateDirectory = true;
 
 	module.exports = MediaPane;
 
@@ -23049,16 +22996,19 @@
 	    }, {
 	        key: 'render',
 	        value: function render() {
-	            var view = this;
-	            var imgSrc = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + view.model.id;
+	            var _this2 = this;
 
-	            this.$element.empty().append(_.div({ class: 'editor-header media-heading' }, _.span({ class: 'fa fa-file-image-o' }), _.h4({ class: 'media-title' }, this.model.name, _.span({ class: 'media-data' }))), _.div({ class: 'media-preview editor-body' }, _.img({ class: 'img-responsive', src: imgSrc }).on('load', function () {
+	            this.model = new Media(this.model);
+
+	            var mediaSrc = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + this.model.id;
+
+	            this.$element.empty().append(_.div({ class: 'editor-header media-heading' }, _.span({ class: 'fa fa-file-image-o' }), _.h4({ class: 'media-title' }, this.model.name, _.span({ class: 'media-data' }, this.model.getContentTypeHeader()))), _.div({ class: 'media-preview editor-body' }, _.if(this.model.isImage(), _.img({ src: mediaSrc }).on('load', function () {
 	                var img = new Image();
-	                img.src = imgSrc;
+	                img.src = mediaSrc;
 
-	                view.$element.find('.media-data').html('(' + img.width + 'x' + img.height + ')');
-	            })), _.div({ class: 'editor-footer' }, _.input({ class: 'form-control', value: this.model.folder, placeholder: 'Type folder path here' }).change(function () {
-	                view.onChangeFolder($(this).val());
+	                _this2.$element.find('.media-data').append(' (' + img.width + 'x' + img.height + ')');
+	            })), _.if(this.model.isVideo(), _.video({ controls: true, src: mediaSrc }))), _.div({ class: 'editor-footer' }, _.input({ class: 'form-control', value: this.model.folder, placeholder: 'Type folder path here' }).change(function (e) {
+	                _this2.onChangeFolder($(e.target).val());
 	            })));
 	        }
 	    }]);

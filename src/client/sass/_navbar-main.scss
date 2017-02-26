@@ -181,7 +181,7 @@
 
                     .pane {
                         .pane-item-container {
-                            &.moving-content {
+                            &.moving-item {
                                 >.pane-item {
                                     font-weight: 700;
                                 }
@@ -192,15 +192,15 @@
                                     content: none;
                                 }
                             }
-
-                            &[data-is-directory="true"] {
+                                    
+                            &[data-is-directory="true"]:not(.moving-item) {
                                 >.pane-item {
                                     background-color: $primary;
                                     color: $primary-text;
                                 }
                             }
 
-                            &:not([data-is-directory="true"]):not(.moving-content) {
+                            &:not([data-is-directory="true"]):not(.moving-item) {
                                 >.pane-item {
                                     pointer-events: none;
                                     opacity: 0.5;
@@ -245,14 +245,14 @@
                 .pane-move-buttons {
                     .btn {
                         margin: 10px;
-                        border: 2px dashed $standard-dark;
+                        border: 2px dashed $standard-darker;
                         height: 40px;
                         padding: 0px;
                         background-color: transparent;
                         width: calc(100% - 20px);
                         text-align: center;
                         font-weight: 700;
-                        color: $standard-dark;
+                        color: $standard-darker;
                         display: none;
 
                         &:hover {

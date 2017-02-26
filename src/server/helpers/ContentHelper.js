@@ -187,7 +187,7 @@ class ContentHelper extends ContentHelperCommon {
 
         // Check for self parent
         if(content.parentId == content.id) {
-            return Promise.reject(new Error('Content "' + content.id + '" cannot be a chidl of itself'));
+            return Promise.reject(new Error('Content "' + content.id + '" cannot be a child of itself'));
         }
 
         // Check for allowed Schemas

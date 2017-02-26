@@ -136,22 +136,22 @@
 	            var $projectList = void 0;
 
 	            var renderUser = function renderUser() {
-	                _.append($user.empty(), _.button({ class: 'btn btn-edit' }, _.span({ class: 'user-icon fa fa-' + (user.isAdmin ? 'black-tie' : 'user') }), _.div({ class: 'user-info' }, _.h4((user.fullName || user.username || user.email || user.id) + (user.id == User.current.id ? ' (you)' : '')), _.p(user.isAdmin ? 'Admin' : 'Editor'))).on('click', function () {
+	                _.append($user.empty(), _.div({ class: 'user-info' }, _.span({ class: 'user-icon fa fa-' + (user.isAdmin ? 'black-tie' : 'user') }), _.h4((user.fullName || user.username || user.email || user.id) + (user.id == User.current.id ? ' (you)' : '')), _.p(user.isAdmin ? 'Admin' : 'Editor')), _.div({ class: 'user-actions' }, _.button({ class: 'btn btn-primary', title: 'Edit user' }, 'Edit').on('click', function () {
 	                    var userEditor = new UserEditor({ model: user });
 
 	                    userEditor.on('save', function () {
 	                        renderUser();
 	                    });
-	                }), _.button({ class: 'btn btn-remove', title: 'Remove user' }, _.span({ class: 'fa fa-remove' })).on('click', function () {
+	                }), _.button({ class: 'btn btn-primary', title: 'Remove user' }, 'Remove').on('click', function () {
 	                    UI.confirmModal('remove', 'Delete user "' + (user.fullName || user.username || user.email || user.id) + '"', 'Are you sure you want to remove this user?', function () {
 	                        apiCall('delete', 'user/' + user.id).then(function () {
 	                            $user.remove();
 	                        }).catch(UI.errorModal);
 	                    });
-	                }));
+	                })));
 	            };
 
-	            $('.dashboard-container .users .user-list').append($user = _.div({ class: 'user' }));
+	            $('.dashboard-container .users .user-list').append($user = _.div({ class: 'user raised' }));
 
 	            renderUser();
 	        };
