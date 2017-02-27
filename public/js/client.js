@@ -23652,7 +23652,58 @@
 	                })));
 
 	                // Set schema label (used when sorting items)
-	                var schemaLabel = (item ? item.name || item.title || item.description || item.type || item.id : null) || (itemSchema ? itemSchema.name : null) || 'Item #' + getIndex();
+	                var schemaLabel = 'Item #' + getIndex();
+
+	                // Add the Schema name in case we don't find the label field
+	                if (itemSchema) {
+	                    schemaLabel += ' (' + itemSchema.name + ')';
+	                }
+
+	                // Get the label from the item
+	                // TODO: Make this recursive, so we can find detailed values in structs 
+	                if (item) {
+	                    // This item is a string
+	                    if (typeof item === 'string') {
+	                        // This item is an id
+	                        if (item.length === 40) {
+	                            var content = ContentHelper.getContentByIdSync(item);
+
+	                            if (content) {
+	                                schemaLabel = content.prop('title', window.language) || content.id;
+	                            } else {
+	                                var media = MediaHelper.getMediaByIdSync(item);
+
+	                                if (media) {
+	                                    schemaLabel = media.name || media.url;
+	                                }
+	                            }
+
+	                            // This item is another type of string
+	                        } else {
+	                            schemaLabel = item;
+	                        }
+
+	                        // This item is a struct
+	                    } else if (item instanceof Object) {
+	                        // Try to get a field based on the usual suspects
+	                        schemaLabel = item.name || item.title || item.text || item.description || item.type || item.id || schemaLabel;
+
+	                        if (!schemaLabel) {
+	                            // Find the first available field
+	                            for (var configKey in itemSchema.config || {}) {
+	                                var configValue = itemSchema.config[configKey];
+
+	                                // If a label field was found, check if it has a value
+	                                if (item[configKey]) {
+	                                    schemaLabel = item[configKey];
+	                                    break;
+	                                }
+	                            }
+	                        }
+	                    }
+	                }
+
+	                // Create label element 
 	                var $schemaLabel = _.span({ class: 'schema-label' }, schemaLabel);
 
 	                // Expanding/collapsing an item
@@ -34361,6 +34412,28 @@
 	        }
 
 	        /**
+	         * Gets Media object by id synchronously
+	         *
+	         * @param {String} id
+	         *
+	         * @return {Media} Media object
+	         */
+
+	    }, {
+	        key: 'getMediaByIdSync',
+	        value: function getMediaByIdSync(id) {
+	            for (var i = 0; i < resources.media.length; i++) {
+	                var media = resources.media[i];
+
+	                if (media.id == id) {
+	                    return media;
+	                }
+	            }
+
+	            return null;
+	        }
+
+	        /**
 	         * Gets Media object by id
 	         *
 	         * @param {String} id
@@ -35077,16 +35150,16 @@
 	    }
 
 	    _createClass(ContentHelper, null, [{
-	        key: 'getContentById',
+	        key: 'getContentByIdSync',
 
 	        /**
 	         * Gets Content by id
 	         *
 	         * @param {String} id
 	         *
-	         * @returns {Promise(Content)} content
+	         * @returns {Content} Content node
 	         */
-	        value: function getContentById(id) {
+	        value: function getContentByIdSync(id) {
 	            if (id) {
 	                var _iteratorNormalCompletion = true;
 	                var _didIteratorError = false;
@@ -35097,7 +35170,7 @@
 	                        var content = _step.value;
 
 	                        if (content.id == id) {
-	                            return Promise.resolve(new Content(content));
+	                            return new Content(content);
 	                        }
 	                    }
 	                } catch (err) {
@@ -35111,6 +35184,49 @@
 	                    } finally {
 	                        if (_didIteratorError) {
 	                            throw _iteratorError;
+	                        }
+	                    }
+	                }
+	            }
+
+	            return null;
+	        }
+
+	        /**
+	         * Gets Content by id
+	         *
+	         * @param {String} id
+	         *
+	         * @returns {Promise} Content node
+	         */
+
+	    }, {
+	        key: 'getContentById',
+	        value: function getContentById(id) {
+	            if (id) {
+	                var _iteratorNormalCompletion2 = true;
+	                var _didIteratorError2 = false;
+	                var _iteratorError2 = undefined;
+
+	                try {
+	                    for (var _iterator2 = resources.content[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+	                        var content = _step2.value;
+
+	                        if (content.id == id) {
+	                            return Promise.resolve(new Content(content));
+	                        }
+	                    }
+	                } catch (err) {
+	                    _didIteratorError2 = true;
+	                    _iteratorError2 = err;
+	                } finally {
+	                    try {
+	                        if (!_iteratorNormalCompletion2 && _iterator2.return) {
+	                            _iterator2.return();
+	                        }
+	                    } finally {
+	                        if (_didIteratorError2) {
+	                            throw _iteratorError2;
 	                        }
 	                    }
 	                }

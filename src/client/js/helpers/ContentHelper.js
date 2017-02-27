@@ -10,7 +10,26 @@ class ContentHelper extends ContentHelperCommon {
      *
      * @param {String} id
      *
-     * @returns {Promise(Content)} content
+     * @returns {Content} Content node
+     */
+    static getContentByIdSync(id) {
+        if(id) {
+            for(let content of resources.content) {
+                if(content.id == id) {
+                    return new Content(content);
+                }
+            }
+        }
+
+        return null;
+    }
+    
+    /**
+     * Gets Content by id
+     *
+     * @param {String} id
+     *
+     * @returns {Promise} Content node
      */
     static getContentById(id) {
         if(id) {

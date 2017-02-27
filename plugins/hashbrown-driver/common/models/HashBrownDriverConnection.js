@@ -220,7 +220,7 @@ class HashBrownDriverConnection extends Connection {
             restler.get(apiUrl, {
                 headers: headers
             }).on('complete', (data, response) => {
-                if(!data) {
+                if(!data || !Array.isArray(data)) {
                     reject(new Error('Media was not found'))
                     return;
                 }

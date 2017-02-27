@@ -256,10 +256,60 @@ class ArrayEditor extends View {
             );
 
             // Set schema label (used when sorting items)
-            let schemaLabel =
-                (item ? (item.name || item.title || item.description || item.type || item.id) : null) ||
-                (itemSchema ? (itemSchema.name) : null) ||
-                'Item #' + getIndex();
+            let schemaLabel = 'Item #' + getIndex();
+            
+            // Add the Schema name in case we don't find the label field
+            if(itemSchema) {
+                schemaLabel += ' (' + itemSchema.name + ')';
+            }
+
+            // Get the label from the item
+            // TODO: Make this recursive, so we can find detailed values in structs 
+            if(item) {
+                // This item is a string
+                if(typeof item === 'string') {
+                    // This item is an id
+                    if(item.length === 40) {
+                        let content = ContentHelper.getContentByIdSync(item);
+
+                        if(content) {
+                            schemaLabel = content.prop('title', window.language) || content.id;
+                        
+                        } else {
+                            let media = MediaHelper.getMediaByIdSync(item);
+
+                            if(media) {
+                                schemaLabel = media.name || media.url;
+                            }
+                        }
+
+                    // This item is another type of string
+                    } else {
+                        schemaLabel = item;
+                    }
+
+                // This item is a struct
+                } else if(item instanceof Object) {
+                    // Try to get a field based on the usual suspects
+                    schemaLabel = item.name || item.title || item.text || item.description || item.type || item.id || schemaLabel;
+                  
+                    if(!schemaLabel) { 
+                        // Find the first available field
+                        for(let configKey in itemSchema.config || {}) {
+                            let configValue = itemSchema.config[configKey];
+
+                            // If a label field was found, check if it has a value
+                            if(item[configKey]) {
+                                schemaLabel = item[configKey];
+                                break;
+                            }
+                        }
+                      
+                    }
+                }
+            }
+
+            // Create label element 
             let $schemaLabel = _.span({class: 'schema-label'}, schemaLabel);
 
             // Expanding/collapsing an item
