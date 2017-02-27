@@ -137,7 +137,7 @@ $('.navbar-main a').click(function() {
 });
 
 // --------------------
-// Check for updates
+// Invite a user
 // --------------------
 $('.btn-invite-user').click(() => {
     customApiCall('get', '/api/users')

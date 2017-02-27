@@ -84,7 +84,7 @@ html
 
                         tr
                             td Uptime
-                            td #{Math.round(os.uptime() / 60)}m
+                            td #{Math.floor(os.uptime() / (60*60*24))}d #{Math.floor(os.uptime() / (60*60))}h #{Math.floor(os.uptime() % (60*60) / 60)}m
 
         script(src='/lib/jquery/jquery.min.js')
         script(src='/lib/bootstrap/js/bootstrap.min.js')
