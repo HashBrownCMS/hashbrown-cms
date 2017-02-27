@@ -291,7 +291,7 @@ class ArrayEditor extends View {
                 // This item is a struct
                 } else if(item instanceof Object) {
                     // Try to get a field based on the usual suspects
-                    schemaLabel = item.name || item.title || item.text || item.description || item.type || item.id || schemaLabel;
+                    schemaLabel = item.name || item.title || item.text || item.heading || item.header || item.description || item.type || item.body || item.id || schemaLabel;
                   
                     if(!schemaLabel) { 
                         // Find the first available field
