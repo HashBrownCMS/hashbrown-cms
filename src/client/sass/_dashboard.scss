@@ -77,6 +77,19 @@ body.dashboard-container {
         color: $primary;
     }
 
+    .update {
+        @extend .raised;
+
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        z-index: 50;
+        background-color: $secondary-dark;
+        color: $secondary-text;
+        padding: 1rem;
+        text-align: center;
+    }
+
     .dashboard-header {
         text-align: center;
         padding-left: 0px;
