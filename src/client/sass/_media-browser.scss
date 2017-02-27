@@ -64,7 +64,7 @@
             }
 
             .thumbnail {
-                width: 224px;
+                width: calc(25% - 2em);
                 flex-grow: 0;
                 margin: 1em;
                 position: relative;
