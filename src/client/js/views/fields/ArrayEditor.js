@@ -187,7 +187,7 @@ class ArrayEditor extends View {
         // Renders this item
         let rerenderItem = () => {
             // Account for large arrays
-            if(this.value.items.length >= 6) {
+            if(this.value.items.length >= 20) {
                 $element.addClass('collapsed');
             }
 

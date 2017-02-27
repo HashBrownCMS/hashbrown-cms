@@ -23574,7 +23574,7 @@
 	            // Renders this item
 	            var rerenderItem = function rerenderItem() {
 	                // Account for large arrays
-	                if (_this4.value.items.length >= 6) {
+	                if (_this4.value.items.length >= 20) {
 	                    $element.addClass('collapsed');
 	                }
 
