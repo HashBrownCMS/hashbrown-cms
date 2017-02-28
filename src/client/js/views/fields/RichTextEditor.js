@@ -27,8 +27,6 @@ class RichTextEditor extends View {
         let trimmedOldValue = this.value.trim().replace(/\n/g, '').replace(/ /g, '');
         let trimmedNewValue = value.trim().replace(/\n/g, '').replace(/ /g, '');
 
-        if(trimmedOldValue == trimmedNewValue) { return; }
-
         this.value = value;
 
         if(this.silentChange === true) {
@@ -36,6 +34,8 @@ class RichTextEditor extends View {
             return;
         }
         
+        if(trimmedOldValue == trimmedNewValue) { return; }
+
         this.trigger('change', this.value);
     }
 
@@ -45,7 +45,7 @@ class RichTextEditor extends View {
      * @param {String} source
      */
     onClickTab(source) {
-        this.silentChane = true;
+        this.silentChange = true;
 
         switch(source) {
             case 'wysiwyg':

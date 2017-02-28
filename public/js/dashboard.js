@@ -310,7 +310,7 @@
 	// --------------------
 	apiCall('get', 'server/update/check').then(function (update) {
 	    if (update.behind) {
-	        $('.dashboard-container').prepend(_.section({}, _.div({ class: 'update' }, _.p('You are ' + update.amount + ' version' + (update.amount != '1' ? 's' : '') + ' behind ' + update.branch), _.button({ class: 'btn btn-primary btn-update-hashbrown' }, 'Update').click(function () {
+	        $('.dashboard-container').prepend(_.div({ class: 'update' }, _.p('You are ' + update.amount + ' version' + (update.amount != '1' ? 's' : '') + ' behind ' + update.branch), _.p('Comment: "' + update.comment + '"'), _.button({ class: 'btn btn-primary btn-update-hashbrown' }, 'Update').click(function () {
 	            UI.messageModal('Update', 'HashBrown is updating...', false);
 
 	            apiCall('post', 'server/update/start').then(function () {
@@ -343,7 +343,7 @@
 	                    }]
 	                });
 	            }).catch(UI.errorModal);
-	        }))));
+	        })));
 	    }
 	});
 

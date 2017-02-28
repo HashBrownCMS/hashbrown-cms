@@ -24876,14 +24876,14 @@
 	            var trimmedOldValue = this.value.trim().replace(/\n/g, '').replace(/ /g, '');
 	            var trimmedNewValue = value.trim().replace(/\n/g, '').replace(/ /g, '');
 
-	            if (trimmedOldValue == trimmedNewValue) {
-	                return;
-	            }
-
 	            this.value = value;
 
 	            if (this.silentChange === true) {
 	                this.silentChange = false;
+	                return;
+	            }
+
+	            if (trimmedOldValue == trimmedNewValue) {
 	                return;
 	            }
 
@@ -24901,7 +24901,7 @@
 	        value: function onClickTab(source) {
 	            var _this2 = this;
 
-	            this.silentChane = true;
+	            this.silentChange = true;
 
 	            switch (source) {
 	                case 'wysiwyg':

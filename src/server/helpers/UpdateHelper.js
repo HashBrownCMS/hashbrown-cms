@@ -18,7 +18,8 @@ class UpdateHelper {
             let resolveObj = {
                 behind: false,
                 amount: 0,
-                branch: 'origin/stable'
+                branch: 'stable',
+                message: ''
             };
             
             debug.log('Checking for updates...', this);
@@ -26,19 +27,24 @@ class UpdateHelper {
             function checkOutput(data) {
                 let behindMatches = data.match(/Your branch is behind '(.+)' by (\d+) commit/);
                 let upToDateMatches = data.match(/Your branch is up-to-date with '(.+)'/);
+                let messageMatches = data.match(/[a-z0-9]{40} (.+)/);
 
                 if(behindMatches && behindMatches.length > 1) {
                     resolveObj.behind = true;
-                    resolveObj.branch = behindMatches[1];
+                    resolveObj.branch = behindMatches[1].replace('origin/', '');
                     resolveObj.amount = behindMatches[2];
                 }
                 
                 if(upToDateMatches && upToDateMatches.length > 1) {
-                    resolveObj.branch = upToDateMatches[1];
+                    resolveObj.branch = upToDateMatches[1].replace('origin/', '');
+                }
+
+                if(messageMatches && messageMatches.length > 1) {
+                    resolveObj.message = messageMatches[1];
                 }
             }
             
-            let git = exec('git fetch && git status', {
+            let git = exec('git fetch && git status && git log -1 --format=oneline', {
                 cwd: appRoot
             });
 
