@@ -9,7 +9,7 @@ First make sure you have these dependencies met:
 - node.js >= v6 
 - mongodb >= v3.2  
 
-Then checkout and run HashBrown:
+Then checkout and run HashBrown:  
 ```
 git clone https://github.com/Putaitu/hashbrown-cms.git -b stable --single-branch
 cd ./hashbrown-cms
