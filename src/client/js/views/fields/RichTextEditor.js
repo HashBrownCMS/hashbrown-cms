@@ -254,6 +254,7 @@ class RichTextEditor extends View {
                     footer: stripStyle,
                     ul: stripStyle,
                     li: stripStyle,
+                    blockquote: stripStyle,
 
                     // Refactor image src url to fit MediaController
                     img: (element) => {

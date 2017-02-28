@@ -25083,6 +25083,7 @@
 	                        footer: stripStyle,
 	                        ul: stripStyle,
 	                        li: stripStyle,
+	                        blockquote: stripStyle,
 
 	                        // Refactor image src url to fit MediaController
 	                        img: function img(element) {
