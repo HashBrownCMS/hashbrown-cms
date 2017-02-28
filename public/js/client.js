@@ -25058,11 +25058,36 @@
 	            });
 
 	            this.wysiwyg.on('instanceReady', function () {
+	                // Strips the style information
+	                var stripStyle = function stripStyle(element) {
+	                    delete element.attributes.style;
+	                };
+
 	                // Filtering rules
 	                _this4.wysiwyg.dataProcessor.dataFilter.addRules({
 	                    elements: {
+	                        // Strip styling from these elements
+	                        p: stripStyle,
+	                        h1: stripStyle,
+	                        h2: stripStyle,
+	                        h3: stripStyle,
+	                        h4: stripStyle,
+	                        h5: stripStyle,
+	                        h6: stripStyle,
+	                        span: stripStyle,
+	                        div: stripStyle,
+	                        section: stripStyle,
+	                        hr: stripStyle,
+	                        header: stripStyle,
+	                        aside: stripStyle,
+	                        footer: stripStyle,
+	                        ul: stripStyle,
+	                        li: stripStyle,
+
 	                        // Refactor image src url to fit MediaController
 	                        img: function img(element) {
+	                            stripStyle(element);
+
 	                            // Fetch from data attribute
 	                            if (element.attributes['data-id']) {
 	                                element.attributes.src = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + element.attributes['data-id'];
@@ -25075,6 +25100,8 @@
 
 	                        // Refactor video src url to fit MediaController
 	                        video: function video(element) {
+	                            stripStyle(element);
+
 	                            // Fetch from data attribute
 	                            if (element.attributes['data-id']) {
 	                                element.attributes.src = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + element.attributes['data-id'];

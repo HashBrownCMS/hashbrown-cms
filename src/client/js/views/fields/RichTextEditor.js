@@ -229,11 +229,36 @@ class RichTextEditor extends View {
         });
 
         this.wysiwyg.on('instanceReady', () => {
+            // Strips the style information
+            let stripStyle = (element) => {
+                delete element.attributes.style;
+            };
+
             // Filtering rules
             this.wysiwyg.dataProcessor.dataFilter.addRules({
                 elements: {
+                    // Strip styling from these elements
+                    p: stripStyle,
+                    h1: stripStyle,
+                    h2: stripStyle,
+                    h3: stripStyle,
+                    h4: stripStyle,
+                    h5: stripStyle,
+                    h6: stripStyle,
+                    span: stripStyle,
+                    div: stripStyle,
+                    section: stripStyle,
+                    hr: stripStyle,
+                    header: stripStyle,
+                    aside: stripStyle,
+                    footer: stripStyle,
+                    ul: stripStyle,
+                    li: stripStyle,
+
                     // Refactor image src url to fit MediaController
                     img: (element) => {
+                        stripStyle(element);
+
                         // Fetch from data attribute
                         if(element.attributes['data-id']) {
                             element.attributes.src = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + element.attributes['data-id'];
@@ -248,6 +273,8 @@ class RichTextEditor extends View {
                     
                     // Refactor video src url to fit MediaController
                     video: (element) => {
+                        stripStyle(element);
+
                         // Fetch from data attribute
                         if(element.attributes['data-id']) {
                             element.attributes.src = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + element.attributes['data-id'];
