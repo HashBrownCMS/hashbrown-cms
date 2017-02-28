@@ -19,7 +19,7 @@ class UpdateHelper {
                 behind: false,
                 amount: 0,
                 branch: 'stable',
-                message: ''
+                comment: ''
             };
             
             debug.log('Checking for updates...', this);
@@ -40,7 +40,7 @@ class UpdateHelper {
                 }
 
                 if(messageMatches && messageMatches.length > 1) {
-                    resolveObj.message = messageMatches[1];
+                    resolveObj.comment = messageMatches[1];
                 }
             }
             
