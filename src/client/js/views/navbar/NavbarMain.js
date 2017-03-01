@@ -189,7 +189,8 @@ class NavbarMain extends View {
                         $icon,
                         _.span({class: 'pane-item-label'}, name)
                     ),
-                    _.div({class: 'children'})
+                    _.div({class: 'children'}),
+                    _.div({class: 'pane-item-insert-below'})
                 );
 
                 // Set sync attributes

@@ -1750,13 +1750,24 @@ body.dashboard-container {
           display: block; }
       .navspace .navbar-main .tab-panes .pane-container.select-dir .pane-move-buttons .btn {
         display: block; }
-      .navspace .navbar-main .tab-panes .pane-container.select-dir .pane .pane-item-container.moving-item > .pane-item {
-        font-weight: 700; }
       .navspace .navbar-main .tab-panes .pane-container.select-dir .pane .pane-item-container.active:before {
         content: none; }
-      .navspace .navbar-main .tab-panes .pane-container.select-dir .pane .pane-item-container[data-is-directory="true"]:not(.moving-item) > .pane-item {
-        background-color: #e70d3b;
-        color: #ffffff; }
+      .navspace .navbar-main .tab-panes .pane-container.select-dir .pane .pane-item-container.active:not(:hover) > .pane-item {
+        font-weight: 400; }
+      .navspace .navbar-main .tab-panes .pane-container.select-dir .pane .pane-item-container:not(.moving-item) .pane-item-insert-below {
+        display: block; }
+      .navspace .navbar-main .tab-panes .pane-container.select-dir .pane .pane-item-container:not(.moving-item)[data-is-directory="true"]:hover {
+        background-color: #e70d3b; }
+        .navspace .navbar-main .tab-panes .pane-container.select-dir .pane .pane-item-container:not(.moving-item)[data-is-directory="true"]:hover > .pane-item {
+          color: #ffffff; }
+          .navspace .navbar-main .tab-panes .pane-container.select-dir .pane .pane-item-container:not(.moving-item)[data-is-directory="true"]:hover > .pane-item:before {
+            font-family: 'FontAwesome';
+            content: '\F060';
+            position: absolute;
+            top: 50%;
+            right: 1rem;
+            color: #ffffff;
+            transform: translateY(-50%); }
       .navspace .navbar-main .tab-panes .pane-container.select-dir .pane .pane-item-container:not([data-is-directory="true"]):not(.moving-item) > .pane-item {
         pointer-events: none;
         opacity: 0.5; }
@@ -1804,80 +1815,97 @@ body.dashboard-container {
         border: none;
         overflow-y: auto;
         transition: padding-top 0.5s ease; }
-        .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container.active:before {
-          content: '';
-          display: block;
-          height: 60px;
-          width: 5px;
-          background-color: #e70d3b;
-          position: absolute;
-          left: 0px; }
-        .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container.active > .pane-item {
-          font-weight: 700; }
-        .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container.open > .pane-item .btn-children-toggle .fa-caret-right {
-          display: none; }
-        .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container.open > .children {
-          display: block; }
-        .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container:not(.open) > .pane-item .btn-children-toggle .fa-caret-down {
-          display: none; }
-        .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container:not(.open) > .children {
-          display: none; }
-        .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container[data-remote="true"] > .pane-item .pane-item-label:after {
-          content: '\F14C';
-          font-family: 'FontAwesome';
-          opacity: 0.25;
-          margin-left: 10px; }
-        .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container[data-locked="true"] > .pane-item .pane-item-label:after {
-          content: '\F023';
-          font-family: 'FontAwesome';
-          opacity: 0.25;
-          margin-left: 10px; }
-        .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container[data-locked="true"][data-remote="true"] > .pane-item .pane-item-label:before {
-          content: '\F14C';
-          font-family: 'FontAwesome';
-          opacity: 0.25;
-          margin-left: 10px;
-          position: absolute;
-          right: -20px; }
-        .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item {
-          color: #333333;
-          display: block;
-          border-radius: 0px;
-          border: none;
-          margin: 0px;
-          height: 60px;
-          padding: 0px 15px;
-          clear: both;
-          cursor: pointer;
+        .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container {
           position: relative; }
-          .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item, .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item:focus, .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item:hover, .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item:active {
-            text-decoration: none; }
-          .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item:hover {
-            font-weight: 700; }
-          .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item .pane-item-label {
-            position: relative; }
-          .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item .btn-children-toggle {
-            position: absolute;
-            top: 0px;
-            right: 5px;
-            height: 100%;
-            width: 32px;
-            padding: 0px;
-            background-color: transparent;
-            border: none; }
-            .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item .btn-children-toggle .fa {
-              margin: 0px;
-              display: block;
-              width: 100%; }
-          .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item span {
-            height: 60px;
-            line-height: 60px;
+          .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container.active:before, .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container.moving-item:before {
+            content: '';
             display: block;
-            float: left; }
-            .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item span.fa {
-              margin-right: 15px; }
-        .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .children .pane-item-container {
-          padding-left: 15px; }
+            height: 60px;
+            width: 5px;
+            background-color: #e70d3b;
+            position: absolute;
+            left: 0px; }
+          .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container.active > .pane-item, .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container.moving-item > .pane-item {
+            font-weight: 700; }
+          .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container.open > .pane-item .btn-children-toggle .fa-caret-right {
+            display: none; }
+          .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container.open > .children {
+            display: block; }
+          .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container:not(.open) > .pane-item .btn-children-toggle .fa-caret-down {
+            display: none; }
+          .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container:not(.open) > .children {
+            display: none; }
+          .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container[data-remote="true"] > .pane-item .pane-item-label:after {
+            content: '\F14C';
+            font-family: 'FontAwesome';
+            opacity: 0.25;
+            margin-left: 10px; }
+          .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container[data-locked="true"] > .pane-item .pane-item-label:after {
+            content: '\F023';
+            font-family: 'FontAwesome';
+            opacity: 0.25;
+            margin-left: 10px; }
+          .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container[data-locked="true"][data-remote="true"] > .pane-item .pane-item-label:before {
+            content: '\F14C';
+            font-family: 'FontAwesome';
+            opacity: 0.25;
+            margin-left: 10px;
+            position: absolute;
+            right: -20px; }
+          .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item-insert-below {
+            position: absolute;
+            height: 6px;
+            width: 100%;
+            bottom: -3px;
+            z-index: 20;
+            background-color: transparent;
+            cursor: pointer; }
+            .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item-insert-below:hover:after {
+              position: absolute;
+              height: 2px;
+              width: 100%;
+              background-color: #e70d3b;
+              bottom: 4px;
+              left: 0px; }
+          .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item {
+            color: #333333;
+            display: block;
+            border-radius: 0px;
+            border: none;
+            margin: 0px;
+            height: 60px;
+            padding: 0px 15px;
+            clear: both;
+            cursor: pointer;
+            position: relative; }
+            .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item, .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item:focus, .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item:hover, .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item:active {
+              text-decoration: none; }
+            .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item:hover {
+              font-weight: 700; }
+            .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item .pane-item-label {
+              position: relative; }
+            .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item .btn-children-toggle {
+              position: absolute;
+              top: 0px;
+              right: 5px;
+              height: 100%;
+              width: 32px;
+              padding: 0px;
+              background-color: transparent;
+              border: none; }
+              .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item .btn-children-toggle .fa {
+                margin: 0px;
+                display: block;
+                width: 100%; }
+            .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item span {
+              height: 60px;
+              line-height: 60px;
+              display: block;
+              float: left; }
+              .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item span.fa {
+                margin-right: 15px; }
+          .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .children .pane-item-container {
+            padding-left: 15px; }
 
 .media-viewer {
   display: flex;

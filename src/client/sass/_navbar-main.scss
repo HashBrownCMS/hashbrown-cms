@@ -171,22 +171,39 @@
 
                     .pane {
                         .pane-item-container {
-                            &.moving-item {
-                                >.pane-item {
-                                    font-weight: 700;
-                                }
-                            }
-
                             &.active {
                                 &:before {
                                     content: none;
                                 }
+
+                                &:not(:hover)>.pane-item {
+                                    font-weight: 400;
+                                }
                             }
-                                    
-                            &[data-is-directory="true"]:not(.moving-item) {
-                                >.pane-item {
-                                    background-color: $primary;
-                                    color: $primary-text;
+
+                            &:not(.moving-item) {
+                                .pane-item-insert-below {
+                                    display: block;
+                                }
+                            
+                                &[data-is-directory="true"] {
+                                    &:hover {
+                                        background-color: $primary;
+
+                                        >.pane-item {
+                                            color: $primary-text;
+                                            
+                                            &:before {
+                                                font-family: 'FontAwesome';
+                                                content: '\f060';
+                                                position: absolute;
+                                                top: 50%;
+                                                right: 1rem;
+                                                color: $primary-text; 
+                                                transform: translateY(-50%);
+                                            }
+                                        }
+                                    }
                                 }
                             }
 
@@ -260,7 +277,9 @@
                     transition: padding-top 0.5s ease;
 
                     .pane-item-container {
-                        &.active {
+                        position: relative;
+
+                        &.active, &.moving-item {
                             &:before {
                                 content: '';
                                 display: block;
@@ -345,6 +364,25 @@
                             }
                         }
                         
+                        .pane-item-insert-below {
+                            position: absolute;
+                            height: 6px;
+                            width: 100%;
+                            bottom: -3px;
+                            z-index: 20;
+                            background-color: transparent;
+                            cursor: pointer;
+                            
+                            &:hover:after {
+                                position: absolute;
+                                height: 2px;
+                                width: 100%;
+                                background-color: $primary;
+                                bottom: 4px;
+                                left: 0px;           
+                            }                         
+                        }                         
+
                         .pane-item {
                             color: $standard-text;
                             display: block;
