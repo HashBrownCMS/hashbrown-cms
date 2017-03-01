@@ -138,8 +138,8 @@ class FormsPane extends Pane {
             icon: 'wpforms',
             items: resources.forms,
 
-            // Sorting logic
-            sort: function(item, queueItem) {
+            // Hierarchy logic
+            hierarchy: function(item, queueItem) {
                 queueItem.$element.attr('data-form-id', item.id);
                
                 if(item.folder) {

@@ -167,8 +167,8 @@ class SchemaPane extends Pane {
                 return menu;
             },
 
-            // Sorting logic
-            sort: function(item, queueItem) {
+            // Hierarchy logic
+            hierarchy: function(item, queueItem) {
                 queueItem.$element.attr('data-schema-id', item.id);
                
                 if(item.parentSchemaId) {

@@ -143,8 +143,8 @@ class MediaPane extends Pane {
             items: resources.media,
             toolbar: this.renderToolbar(),
 
-            // Sorting logic
-            sort: function(item, queueItem) {
+            // Hierarchy logic
+            hierarchy: function(item, queueItem) {
                 queueItem.$element.attr('data-media-id', item.id);
                
                 if(item.folder) {

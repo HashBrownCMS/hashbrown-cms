@@ -34,6 +34,39 @@ class ContentPane extends Pane {
     }
 
     /**
+     * Event: Change sort index
+     */
+    static onChangeSortIndex(id, newIndex, parentId) {
+        if(parentId == '/') {
+            parentId = '';
+        }
+        
+        console.log(parentId);
+
+        // Get the Content model
+        ContentHelper.getContentById(id)
+
+        // API call to apply changes to Content parent
+        .then((content) => {
+            content.sort = newIndex;
+            content.parentId = parentId;
+         
+            return apiCall('post', 'content/' + id, content);
+        })
+
+        // Reload all Content models
+        .then(() => {
+            return reloadResource('content');
+        })
+
+        // Reload UI
+        .then(() => {
+            ViewHelper.get('NavbarMain').reload();
+        })
+        .catch(UI.errorModal);
+    }
+
+    /**
      * Event: Click copy content
      */
     static onClickCopyContent() {
@@ -477,14 +510,11 @@ class ContentPane extends Pane {
                 'New content': () => { this.onClickNewContent(); }
             },
 
-            // Sorting logic
-            sort: function(item, queueItem) {
+            // Hierarchy logic
+            hierarchy: function(item, queueItem) {
                 // Set id data attributes
                 queueItem.$element.attr('data-content-id', item.id);
                 queueItem.parentDirAttr = {'data-content-id': item.parentId };
-
-                // Assign the sort index to the DOM element
-                queueItem.$element.attr('data-sort', item.sort);
             }
         }
     }

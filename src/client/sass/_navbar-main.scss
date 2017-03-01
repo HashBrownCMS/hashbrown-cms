@@ -147,19 +147,8 @@
                 height: 100%;
 
                 &.active {
-                    display: block;
-                    
-                    &[data-dragdrop-hovering="true"] {
-                        .pane {
-                            .pane-item-container:hover {
-                                >.children {
-                                    min-height: 60px;
-                                    display: block;
-                                }
-                            }
-                        }
-                    }
-
+                    display: flex;
+                    flex-direction: column;
                 }
                 
                 &.select-dir {
@@ -182,28 +171,26 @@
                             }
 
                             &:not(.moving-item) {
+                                &[data-is-directory="true"] {
+                                    >.pane-item:hover {
+                                        background-color: $primary;
+                                        color: $primary-text;
+                                    }
+                                }
+                                
                                 .pane-item-insert-below {
                                     display: block;
-                                }
                             
-                                &[data-is-directory="true"] {
-                                    &:hover {
+                                    &:hover:before {
+                                        display: block;
+                                        content: '';
+                                        position: absolute;
+                                        height: 2px;
+                                        width: 100%;
                                         background-color: $primary;
-
-                                        >.pane-item {
-                                            color: $primary-text;
-                                            
-                                            &:before {
-                                                font-family: 'FontAwesome';
-                                                content: '\f060';
-                                                position: absolute;
-                                                top: 50%;
-                                                right: 1rem;
-                                                color: $primary-text; 
-                                                transform: translateY(-50%);
-                                            }
-                                        }
-                                    }
+                                        bottom: 4px;
+                                        left: 0px;           
+                                    }                         
                                 }
                             }
 
@@ -250,6 +237,8 @@
                 }
 
                 .pane-move-buttons {
+                    flex-shrink: 0;
+
                     .btn {
                         margin: 10px;
                         border: 2px dashed $standard-darker;
@@ -274,6 +263,7 @@
                     width: 100%;
                     border: none;
                     overflow-y: auto;
+                    overflow-x: hidden;
                     transition: padding-top 0.5s ease;
 
                     .pane-item-container {
@@ -368,19 +358,11 @@
                             position: absolute;
                             height: 6px;
                             width: 100%;
-                            bottom: -3px;
+                            bottom: 0px;
                             z-index: 20;
                             background-color: transparent;
                             cursor: pointer;
-                            
-                            &:hover:after {
-                                position: absolute;
-                                height: 2px;
-                                width: 100%;
-                                background-color: $primary;
-                                bottom: 4px;
-                                left: 0px;           
-                            }                         
+                            display: none;
                         }                         
 
                         .pane-item {

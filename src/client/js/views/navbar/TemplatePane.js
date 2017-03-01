@@ -175,8 +175,8 @@ class TemplatePane extends Pane {
                 return item.type + '/' + item.id;
             },
 
-            // Sorting logic
-            sort: function(item, queueItem) {
+            // Hiearchy logic
+            hierarchy: function(item, queueItem) {
                 queueItem.$element.attr('data-template-id', item.id);
                
                 let rootDirName = item.type.substring(0, 1).toUpperCase() + item.type.substring(1) + 's';

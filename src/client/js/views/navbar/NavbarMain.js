@@ -222,9 +222,12 @@ class NavbarMain extends View {
                 // Add element to queue item
                 queueItem.$element = $element;
 
-                // Use specific sorting behaviours
-                if(params.sort) {
-                    params.sort(item, queueItem);
+                // Add sort index to element
+                queueItem.$element.attr('data-sort', item.sort || 0); 
+
+                // Use specific hierarchy behaviours
+                if(params.hierarchy) {
+                    params.hierarchy(item, queueItem);
                 }
 
                 // Add queue item to sorting queue
@@ -319,6 +322,21 @@ class NavbarMain extends View {
             }
         }
 
+        // Sort direct children
+        $pane.find('>.pane-item-container').sort((a, b) => {
+            return parseInt(a.dataset.sort) > parseInt(b.dataset.sort);
+        }).appendTo($pane);
+        
+        // Sort nested children
+        $pane.find('.pane-item-container .children').each((i, children) => {
+            let $children = $(children);
+
+            $children.find('>.pane-item-container').sort((a, b) => {
+                return parseInt(a.dataset.sort) > parseInt(b.dataset.sort);
+            }).appendTo($children);
+        });
+
+        // Render pane container
         let $paneContainer = _.div({class: 'pane-container', 'data-route': params.route},
             _.if(params.toolbar,
                 params.toolbar

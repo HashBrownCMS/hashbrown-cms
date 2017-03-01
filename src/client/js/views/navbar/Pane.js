@@ -19,6 +19,17 @@ class Pane {
     static onChangeDirectory(id, newParent) {
 
     }
+    
+    /**
+     * Event: Change sort index
+     *
+     * @param {String} id
+     * @param {Number} newIndex
+     * @param {String} newParent
+     */
+    static onChangeSortIndex(id, newIndex, newParent) {
+
+    }
 
     /**
      * Event: Click move item
@@ -39,7 +50,8 @@ class Pane {
             $pane.toggleClass('select-dir', false);
             $pane.find('.pane-move-buttons .btn').off('click');
             $pane.find('.pane-item-container .pane-item').off('click');
-
+            $pane.find('.moving-item').toggleClass('moving-item', false);
+            
             if(!newPath) { return; }
 
             if(id == Router.params.id && mediaViewer) {
@@ -67,7 +79,40 @@ class Pane {
                 this.onChangeDirectory(id, newPath);
             });
         }); 
-        
+
+        // Click below item
+        $pane.find('.pane-item-container .pane-item-insert-below').click((e) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            // Create new sort index based on the container we clicked below
+            let $container = $(e.target).parent();
+            let containerIndex = parseInt($container.data('sort') || 0)
+
+            let newIndex = containerIndex + 1000;
+
+            // If the container after the one we are trying to get below, accommodate by clamping below that neighbour's index
+            let $afterContainer = $container.next();
+           
+            if($afterContainer.length > 0) {
+                let indexAfterContainer = parseInt($afterContainer.data('sort') || 0);
+
+                if(newIndex >= indexAfterContainer) {
+                    newIndex = indexAfterContainer - 1;
+                }
+            }
+
+            // Reset the move state
+            reset();
+
+            // Fetch the parent id as well, in case that changed
+            let $parentItem = $container.parents('.pane-item-container');
+            let newPath = $parentItem.length > 0 ? ($parentItem.attr('data-media-folder') || $parentItem.attr('data-content-id')) : null;
+
+            // Trigger sort change event
+            this.onChangeSortIndex(id, newIndex, newPath);
+        });
+
         // Click "move to root" button
         $pane.find('.pane-move-buttons .btn-move-to-root').on('click', (e) => {
             let newPath = '/';

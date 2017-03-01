@@ -1744,30 +1744,28 @@ body.dashboard-container {
       display: none;
       height: 100%; }
       .navspace .navbar-main .tab-panes .pane-container.active {
-        display: block; }
-        .navspace .navbar-main .tab-panes .pane-container.active[data-dragdrop-hovering="true"] .pane .pane-item-container:hover > .children {
-          min-height: 60px;
-          display: block; }
+        display: flex;
+        flex-direction: column; }
       .navspace .navbar-main .tab-panes .pane-container.select-dir .pane-move-buttons .btn {
         display: block; }
       .navspace .navbar-main .tab-panes .pane-container.select-dir .pane .pane-item-container.active:before {
         content: none; }
       .navspace .navbar-main .tab-panes .pane-container.select-dir .pane .pane-item-container.active:not(:hover) > .pane-item {
         font-weight: 400; }
+      .navspace .navbar-main .tab-panes .pane-container.select-dir .pane .pane-item-container:not(.moving-item)[data-is-directory="true"] > .pane-item:hover {
+        background-color: #e70d3b;
+        color: #ffffff; }
       .navspace .navbar-main .tab-panes .pane-container.select-dir .pane .pane-item-container:not(.moving-item) .pane-item-insert-below {
         display: block; }
-      .navspace .navbar-main .tab-panes .pane-container.select-dir .pane .pane-item-container:not(.moving-item)[data-is-directory="true"]:hover {
-        background-color: #e70d3b; }
-        .navspace .navbar-main .tab-panes .pane-container.select-dir .pane .pane-item-container:not(.moving-item)[data-is-directory="true"]:hover > .pane-item {
-          color: #ffffff; }
-          .navspace .navbar-main .tab-panes .pane-container.select-dir .pane .pane-item-container:not(.moving-item)[data-is-directory="true"]:hover > .pane-item:before {
-            font-family: 'FontAwesome';
-            content: '\F060';
-            position: absolute;
-            top: 50%;
-            right: 1rem;
-            color: #ffffff;
-            transform: translateY(-50%); }
+        .navspace .navbar-main .tab-panes .pane-container.select-dir .pane .pane-item-container:not(.moving-item) .pane-item-insert-below:hover:before {
+          display: block;
+          content: '';
+          position: absolute;
+          height: 2px;
+          width: 100%;
+          background-color: #e70d3b;
+          bottom: 4px;
+          left: 0px; }
       .navspace .navbar-main .tab-panes .pane-container.select-dir .pane .pane-item-container:not([data-is-directory="true"]):not(.moving-item) > .pane-item {
         pointer-events: none;
         opacity: 0.5; }
@@ -1795,25 +1793,28 @@ body.dashboard-container {
           color: #fff;
           text-transform: uppercase;
           font-weight: 700; }
-      .navspace .navbar-main .tab-panes .pane-container .pane-move-buttons .btn {
-        margin: 10px;
-        border: 2px dashed #999999;
-        height: 40px;
-        padding: 0px;
-        background-color: transparent;
-        width: calc(100% - 20px);
-        text-align: center;
-        font-weight: 700;
-        color: #999999;
-        display: none; }
-        .navspace .navbar-main .tab-panes .pane-container .pane-move-buttons .btn:hover {
-          border-color: #e70d3b;
-          color: #e70d3b; }
+      .navspace .navbar-main .tab-panes .pane-container .pane-move-buttons {
+        flex-shrink: 0; }
+        .navspace .navbar-main .tab-panes .pane-container .pane-move-buttons .btn {
+          margin: 10px;
+          border: 2px dashed #999999;
+          height: 40px;
+          padding: 0px;
+          background-color: transparent;
+          width: calc(100% - 20px);
+          text-align: center;
+          font-weight: 700;
+          color: #999999;
+          display: none; }
+          .navspace .navbar-main .tab-panes .pane-container .pane-move-buttons .btn:hover {
+            border-color: #e70d3b;
+            color: #e70d3b; }
       .navspace .navbar-main .tab-panes .pane-container .pane {
         margin: 0px;
         width: 100%;
         border: none;
         overflow-y: auto;
+        overflow-x: hidden;
         transition: padding-top 0.5s ease; }
         .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container {
           position: relative; }
@@ -1856,17 +1857,11 @@ body.dashboard-container {
             position: absolute;
             height: 6px;
             width: 100%;
-            bottom: -3px;
+            bottom: 0px;
             z-index: 20;
             background-color: transparent;
-            cursor: pointer; }
-            .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item-insert-below:hover:after {
-              position: absolute;
-              height: 2px;
-              width: 100%;
-              background-color: #e70d3b;
-              bottom: 4px;
-              left: 0px; }
+            cursor: pointer;
+            display: none; }
           .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item {
             color: #333333;
             display: block;
