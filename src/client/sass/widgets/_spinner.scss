@@ -41,7 +41,7 @@
             top: 50%;
             position: absolute;
             transform: translate(0%, -50%);
-            border-left: 1px solid $standard-darker;
+            border-left: 1px solid $primary;
 
             .loading-message {
                 position: relative;
@@ -50,11 +50,12 @@
                 padding: 10px;
                 font-weight: 700;
                 text-transform: uppercase;
-                
+                color: $primary;
+
                 &:before {
                     content: '';
                     display: block;
-                    background-color: $standard-darker;
+                    background-color: $primary;
                     width: 0%;
                     height: 100%;
                     transition: width 0.25s ease;
@@ -94,6 +95,5 @@
         text-align: center;
         width: 32px;
         height: 32px;
-        opacity: 0.5;
     }
 }

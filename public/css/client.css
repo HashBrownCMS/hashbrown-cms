@@ -2219,18 +2219,19 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
       top: 50%;
       position: absolute;
       transform: translate(0%, -50%);
-      border-left: 1px solid #999999; }
+      border-left: 1px solid #e70d3b; }
       .spinner-obscure .spinner-container .loading-messages .loading-message {
         position: relative;
         width: 180px;
         transition: color 0.25s ease;
         padding: 10px;
         font-weight: 700;
-        text-transform: uppercase; }
+        text-transform: uppercase;
+        color: #e70d3b; }
         .spinner-obscure .spinner-container .loading-messages .loading-message:before {
           content: '';
           display: block;
-          background-color: #999999;
+          background-color: #e70d3b;
           width: 0%;
           height: 100%;
           transition: width 0.25s ease;
@@ -2259,5 +2260,4 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
     line-height: 32px;
     text-align: center;
     width: 32px;
-    height: 32px;
-    opacity: 0.5; }
+    height: 32px; }
