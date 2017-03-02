@@ -183,10 +183,18 @@ class MediaController extends ApiController {
      * Sets a Media object
      */
     static setMedia(req, res) {
-        let file = req.file;
+        let files = req.files;
         let id = req.params.id;
 
-        if(file) {
+        if(files.length > 0) {
+            let file = files[0];
+
+            // TODO: Fix this
+            console.log(file);
+
+            res.status(200).send(id);
+            return;
+
             ConnectionHelper.getMediaProvider(req.project, req.environment)
             .then((connection) => {
                 return connection.setMedia(id, file);
@@ -198,14 +206,14 @@ class MediaController extends ApiController {
                 }
 
                 // Return the id
-                res.send(id);
+                res.status(200).send(id);
             })            
             .catch((e) => {
                 res.status(400).send(MediaController.printError(e));
             });            
 
         } else {
-            res.status(400).send(MediaController.printError(e));
+            res.status(400).send(MediaController.printError(new Error('File was null')));
         }
     }
 
@@ -213,17 +221,34 @@ class MediaController extends ApiController {
      * Creates a Media object
      */
     static createMedia(req, res) {
-        let file = req.file;
+        let files = req.files;
 
-        if(file) {
-            let media = Media.create();
+        if(files) {
+            let ids = [];
 
-            ConnectionHelper.getMediaProvider(req.project, req.environment)
-            .then((connection) => {
-                return connection.setMedia(media.id, file);
-            })
+            let next = () => {
+                let file = files.pop();
+
+                if(!file) {
+                    return Promise.resolve();
+                }
+
+                let media = Media.create();
+
+                return ConnectionHelper.getMediaProvider(req.project, req.environment)
+                .then((connection) => {
+                    return connection.setMedia(media.id, file);
+                })
+                .then(() => {
+                    ids.push(media.id);
+
+                    return next();  
+                });
+            };
+
+            next()
             .then(() => {
-                res.status(200).send(media.id);
+                res.status(200).send(ids);
             })
             .catch((e) => {
                 res.status(400).send(MediaController.printError(e));    

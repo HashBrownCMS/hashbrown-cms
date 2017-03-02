@@ -638,16 +638,41 @@
 
 	    _createClass(Router, null, [{
 	        key: 'route',
+
+	        /**
+	         * Creates a new route
+	         *
+	         * @param {String} path
+	         * @param {Function} controller
+	         */
 	        value: function route(path, controller) {
 	            routes[path] = {
 	                controller: controller
 	            };
 	        }
+
+	        /**
+	         * Goes to the route
+	         *
+	         * @param {String} url
+	         * @param {Boolean} quiet
+	         */
+
 	    }, {
 	        key: 'go',
-	        value: function go(url) {
-	            location.hash = url;
+	        value: function go(url, quiet) {
+	            if (quiet) {
+	                window.history.pushState(url, url, '#' + url);
+	                this.directToRoute(url, true);
+	            } else {
+	                location.hash = url;
+	            }
 	        }
+
+	        /**
+	         * Goes to the base directory
+	         */
+
 	    }, {
 	        key: 'goToBaseDir',
 	        value: function goToBaseDir() {
@@ -656,6 +681,15 @@
 
 	            this.go(base);
 	        }
+
+	        /**
+	         * Gets a query string parameter
+	         *
+	         * @param {String} name
+	         *
+	         * @returns {String} Value
+	         */
+
 	    }, {
 	        key: 'query',
 	        value: function query(name) {
@@ -671,9 +705,17 @@
 
 	            return decodeURIComponent(results[2].replace(/\+/g, " "));
 	        }
+
+	        /**
+	         * Directs to the route
+	         *
+	         * @param {String} url
+	         * @param {Boolean} quiet
+	         */
+
 	    }, {
 	        key: 'directToRoute',
-	        value: function directToRoute(url) {
+	        value: function directToRoute(url, quiet) {
 	            // Look for route
 	            var context = {};
 	            var route = void 0;
@@ -732,12 +774,17 @@
 	                }
 	            }
 
-	            if (route) {
+	            if (route && !quiet) {
 	                route.controller();
 	            }
 
 	            Router.url = url;
 	        }
+
+	        /**
+	         * Initialise
+	         */
+
 	    }, {
 	        key: 'init',
 	        value: function init() {
@@ -1254,7 +1301,11 @@
 
 	            // Native JavaScript logic
 	        } else {
-	            element.appendChild(content);
+	            if (typeof content === 'number' || typeof content === 'string') {
+	                element.innerHTML += content.toString();
+	            } else {
+	                element.appendChild(content);
+	            }
 	        }
 	    }
 	}
@@ -1349,7 +1400,7 @@
 	            return false;
 	        }
 
-	        return obj instanceof Array || obj instanceof HTMLElement || obj instanceof jQuery || typeof obj === 'string' || typeof obj === 'number';
+	        return obj instanceof Array || obj instanceof HTMLElement || typeof jQuery !== 'undefined' && obj instanceof jQuery || typeof obj === 'string' || typeof obj === 'number';
 	    };
 
 	    // The attribute parameter is the content
@@ -1360,6 +1411,11 @@
 	    } else if (typeof attr !== 'undefined' && attr instanceof Object && attr instanceof Array == false) {
 	        try {
 	            for (var k in attr) {
+	                // Null, undefined or false values should not be included
+	                if (!attr[k] && attr[k] !== 0) {
+	                    continue;
+	                }
+
 	                element.setAttribute(k, attr[k]);
 	            }
 	        } catch (e) {
@@ -1485,14 +1541,16 @@
 	FunctionTemplating.find = function (query) {
 	    var element = document.querySelector(query);
 
-	    if (element) {
-	        if (typeof jQuery !== 'undefined') {
-	            return $(element);
-	        } else {
-	            assignEvents(element);
+	    if (!element) {
+	        return null;
+	    }
 
-	            return element;
-	        }
+	    if (typeof jQuery !== 'undefined') {
+	        return $(element);
+	    } else {
+	        assignEvents(element);
+
+	        return element;
 	    }
 	};
 
@@ -1506,37 +1564,21 @@
 	FunctionTemplating.findAll = function (query) {
 	    var elements = document.querySelectorAll(query);
 
-	    if (elements) {
-	        if (typeof jQuery !== 'undefined') {
-	            return $(elements);
-	        } else {
-	            var _iteratorNormalCompletion2 = true;
-	            var _didIteratorError2 = false;
-	            var _iteratorError2 = undefined;
+	    if (!elements) {
+	        return [];
+	    }
 
-	            try {
-	                for (var _iterator2 = elements[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-	                    var element = _step2.value;
+	    if (typeof jQuery !== 'undefined') {
+	        return $(elements);
+	    } else {
+	        var array = [];
 
-	                    assignEvents(element);
-	                }
-	            } catch (err) {
-	                _didIteratorError2 = true;
-	                _iteratorError2 = err;
-	            } finally {
-	                try {
-	                    if (!_iteratorNormalCompletion2 && _iterator2.return) {
-	                        _iterator2.return();
-	                    }
-	                } finally {
-	                    if (_didIteratorError2) {
-	                        throw _iteratorError2;
-	                    }
-	                }
-	            }
-
-	            return elements;
+	        for (var _i2 = 0; _i2 < elements.length; _i2++) {
+	            array[_i2] = elements[_i2];
+	            assignEvents(array[_i2]);
 	        }
+
+	        return array;
 	    }
 	};
 
@@ -2040,7 +2082,7 @@
 	                        _this2.$element.remove();
 
 	                        // Native JavaScript
-	                    } else if (_this2.element) {
+	                    } else if (_this2.element && _this2.element.parentElement) {
 	                        _this2.element.parentElement.removeChild(_this2.element);
 	                    }
 

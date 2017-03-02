@@ -100,9 +100,14 @@ class ContentHelper {
                 return SchemaHelper.getSchemaById(project, environment, parentContent.schemaId);
             })
             .then((parentSchema) => {
+                // The Schema was not an allowed child
                 if(parentSchema.allowedChildSchemas.indexOf(childSchemaId) < 0) {
-                    return Promise.reject(new Error('Content with Schema "' + childSchemaId + '" is not an allowed child of Content with Schema "' + parentSchema.id + '"'));
+                    return SchemaHelper.getSchemaById(project, environment, childSchemaId)
+                    .then((childSchema) => {
+                        return Promise.reject(new Error('Content with Schema "' + childSchema.name + '" is not an allowed child of Content with Schema "' + parentSchema.name + '"'));
+                    });
                 
+                // The Schema was an allowed child, resolve
                 } else {
                     return Promise.resolve();
 

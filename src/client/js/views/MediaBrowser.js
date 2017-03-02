@@ -49,11 +49,13 @@ class MediaBrowser extends View {
         .then(() => {
             let navbar = ViewHelper.get('NavbarMain');
 
+            // Event: Change file
             function onChangeFile() {
                 let input = $(this);
                 let numFiles = this.files ? this.files.length : 1;
-                
-                if(numFiles > 0) {
+               
+                // In the case of a single file selected 
+                if(numFiles == 1) {
                     let file = this.files[0];
 
                     let isImage =
@@ -91,20 +93,34 @@ class MediaBrowser extends View {
                     }
 
                     debug.log('Previewing data of file type ' + file.type + '...', navbar);
+                
+                // Multiple files selected
+                } else if(numFiles > 1) {
+                    uploadModal.$element.find('.media-preview').html(
+                        '(Multiple files selected)'
+                    );
+                
+                // No files selected
+                } else if(numFiles == 0) {
+                    uploadModal.$element.find('.media-preview').html(
+                        '(No files selected)'
+                    );
                 }
             }
-            
+           
+            // Event: Click upload
             function onClickUpload() {
                 uploadModal.$element.find('form').submit();
 
                 return false;
             }
 
+            // Event: Submit
             function onSubmit(e) {
                 e.preventDefault();
 
                 uploadModal.$element.find('.spinner-container').toggleClass('hidden', false);
-                
+
                 let apiPath = 'media/' + (replaceId ? replaceId : 'new');
 
                 $.ajax({
@@ -113,7 +129,7 @@ class MediaBrowser extends View {
                     data: new FormData(this),
                     processData: false,
                     contentType: false,
-                    success: (id) => {
+                    success: (ids) => {
                         reloadResource('media')
                         .then(() => {
                             uploadModal.$element.find('.spinner-container').toggleClass('hidden', true);
@@ -121,7 +137,7 @@ class MediaBrowser extends View {
                             navbar.reload();
 
                             if(onSuccess) {
-                                onSuccess(id);
+                                onSuccess(ids || []);
                             }
                             
                             uploadModal.hide();
@@ -131,6 +147,7 @@ class MediaBrowser extends View {
                 });
             }
 
+            // Render the upload modal
             let uploadModal = new MessageModal({
                 model: {
                     class: 'modal-upload-media',
@@ -141,7 +158,7 @@ class MediaBrowser extends View {
                         ),
                         _.div({class: 'media-preview'}),
                         _.form({class: 'form-control'},
-                            _.input({type: 'file', name: 'media'})
+                            _.input({type: 'file', name: 'media', multiple: replaceId ? replaceId : null})
                                 .change(onChangeFile)
                         ).submit(onSubmit)
                     ]
@@ -160,6 +177,7 @@ class MediaBrowser extends View {
                 ]
             });
 
+            // Event: Close modal
             uploadModal.on('close', () => {
                 if(onCancel) {
                     onCancel();

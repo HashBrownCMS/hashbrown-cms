@@ -85,8 +85,8 @@ class MediaPane extends Pane {
      */
     static onClickUploadMedia(replaceId) {
         MediaBrowser.uploadModal(
-            (id) => {
-                location.hash = '/media/' + id;
+            (ids) => {
+                location.hash = '/media/' + ids[0];
 
                 // Refresh on replace
                 if(replaceId) {
