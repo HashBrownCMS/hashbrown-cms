@@ -204,7 +204,7 @@
 	        for (var _iterator = queue[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
 	            var item = _step.value;
 
-	            var $msg = _.div({ 'data-name': item }, item);
+	            var $msg = _.div({ class: 'loading-message', 'data-name': item }, item);
 
 	            $('.loading-messages').append($msg);
 	        }
@@ -227,7 +227,7 @@
 	        var name = queue.shift();
 
 	        return window.reloadResource(name).then(function () {
-	            $('.loading-messages [data-name="' + name + '"]').append(' \u2713');
+	            $('.loading-messages [data-name="' + name + '"]').toggleClass('loaded', true);
 
 	            if (queue.length < 1) {
 	                return Promise.resolve();

@@ -161,7 +161,7 @@ window.reloadAllResources = function reloadAllResources() {
     ];
 
     for(let item of queue) {
-        let $msg = _.div({'data-name': item}, item);
+        let $msg = _.div({class: 'loading-message', 'data-name': item}, item);
         
         $('.loading-messages').append($msg);
     }
@@ -171,7 +171,7 @@ window.reloadAllResources = function reloadAllResources() {
 
         return window.reloadResource(name)
         .then(() => {
-            $('.loading-messages [data-name="' + name + '"]').append(' \u2713');
+            $('.loading-messages [data-name="' + name + '"]').toggleClass('loaded', true);
             
             if(queue.length < 1) {
                 return Promise.resolve();

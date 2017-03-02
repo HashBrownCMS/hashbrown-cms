@@ -409,62 +409,6 @@ img.logo {
     width: 120px;
     height: 120px; }
 
-@keyframes spinner {
-  0% {
-    transform: translate(-50%, -50%) rotate(0deg); }
-  100% {
-    transform: translate(-50%, -50%) rotate(359deg); } }
-
-@keyframes spinner-no-offset {
-  0% {
-    transform: rotate(0deg); }
-  100% {
-    transform: rotate(359deg); } }
-
-.spinner-obscure {
-  position: fixed;
-  top: 0px;
-  left: 0px;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  transition: opacity 0.5s ease;
-  pointer-events: none; }
-  .spinner-obscure .spinner-container {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%); }
-    .spinner-obscure .spinner-container.inline .spinner {
-      position: static;
-      transform: none;
-      display: block;
-      animation-name: spinner; }
-    .spinner-obscure .spinner-container.inline .loading-messages {
-      white-space: nowrap;
-      left: 30px;
-      top: 0px;
-      position: absolute;
-      transform: translateY(-50%); }
-
-.spinner-container {
-  position: relative; }
-  .spinner-container .spinner {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    animation-name: spinner;
-    animation-duration: 1s;
-    animation-iteration-count: infinite;
-    animation-timing-function: linear;
-    display: block;
-    font-size: 32px;
-    line-height: 32px;
-    text-align: center;
-    width: 32px;
-    height: 32px; }
-
 .modal .modal-dialog .modal-header {
   background-color: #21303b;
   color: #ffffff; }
@@ -2240,3 +2184,80 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
       border-top-left-radius: 0px; }
     .input-group .input-group-btn:last-child > .btn {
       border-radius: 2px; }
+
+@keyframes spinner {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg); }
+  100% {
+    transform: translate(-50%, -50%) rotate(359deg); } }
+
+.spinner-obscure {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: none; }
+  .spinner-obscure .spinner-container {
+    position: absolute;
+    top: 0%;
+    left: 0%;
+    height: 100%;
+    width: 100%; }
+    .spinner-obscure .spinner-container .spinner {
+      position: absolute;
+      display: block;
+      width: 8rem;
+      height: 8rem;
+      top: 50%;
+      left: calc(50% - 5rem);
+      transform: translate(-50%, -50%); }
+    .spinner-obscure .spinner-container .loading-messages {
+      left: 50%;
+      top: 50%;
+      position: absolute;
+      transform: translate(0%, -50%);
+      border-left: 1px solid #999999; }
+      .spinner-obscure .spinner-container .loading-messages .loading-message {
+        position: relative;
+        width: 180px;
+        transition: color 0.25s ease;
+        padding: 10px;
+        font-weight: 700;
+        text-transform: uppercase; }
+        .spinner-obscure .spinner-container .loading-messages .loading-message:before {
+          content: '';
+          display: block;
+          background-color: #999999;
+          width: 0%;
+          height: 100%;
+          transition: width 0.25s ease;
+          top: 0%;
+          left: 0%;
+          position: absolute;
+          z-index: -1; }
+        .spinner-obscure .spinner-container .loading-messages .loading-message.loaded {
+          color: #ffffff; }
+          .spinner-obscure .spinner-container .loading-messages .loading-message.loaded:before {
+            width: 100%; }
+
+.spinner-container {
+  position: relative; }
+  .spinner-container .spinner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation-name: spinner;
+    animation-duration: 2s;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+    display: block;
+    font-size: 32px;
+    line-height: 32px;
+    text-align: center;
+    width: 32px;
+    height: 32px;
+    opacity: 0.5; }
