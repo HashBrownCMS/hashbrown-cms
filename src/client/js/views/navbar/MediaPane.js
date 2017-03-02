@@ -22,6 +22,8 @@ class MediaPane extends Pane {
         })
         .then(() => {
             ViewHelper.get('NavbarMain').reload();
+
+            location.hash = '/media/' + id;
         })
         .catch(errorModal);
     }
@@ -86,7 +88,15 @@ class MediaPane extends Pane {
     static onClickUploadMedia(replaceId) {
         MediaBrowser.uploadModal(
             (ids) => {
-                location.hash = '/media/' + ids[0];
+                // We got one id back
+                if(typeof ids === 'string') {
+                    location.hash = '/media/' + ids;
+
+                // We got several ids back
+                } else {
+                    location.hash = '/media/' + ids[0];
+                
+                }
 
                 // Refresh on replace
                 if(replaceId) {

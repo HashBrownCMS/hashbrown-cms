@@ -189,12 +189,6 @@ class MediaController extends ApiController {
         if(files.length > 0) {
             let file = files[0];
 
-            // TODO: Fix this
-            console.log(file);
-
-            res.status(200).send(id);
-            return;
-
             ConnectionHelper.getMediaProvider(req.project, req.environment)
             .then((connection) => {
                 return connection.setMedia(id, file);

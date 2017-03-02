@@ -175,26 +175,30 @@ class HashBrownDriverConnection extends Connection {
         };
             
         debug.log('Setting media object "' + id + '" at ' + this.getRemoteUrl() + '...', this);
-        
-        return new Promise((resolve, reject) => {
-            let apiUrl = this.getRemoteUrl() + '/hashbrown/api/media/' + id + '?token=' + this.settings.token;
-            
-            fs.readFile(tempPath, (err, fileData) => {
-                let postData = { 
-                    filename: file.filename,
-                    content: new Buffer(fileData).toString('base64')
-                }
-              
-                restler.post(apiUrl, {
-                    headers: headers,
-                    data: JSON.stringify(postData), 
-                }).on('complete', (data, response) => {
-                    if(!data || data instanceof Error || response.statusCode != 200) {
-                        reject(new Error(data))
-                        return;
+    
+        // First remove any existing media
+        this.removeMedia(id)
+        .then(() => {
+            return new Promise((resolve, reject) => {
+                let apiUrl = this.getRemoteUrl() + '/hashbrown/api/media/' + id + '?token=' + this.settings.token;
+                
+                fs.readFile(tempPath, (err, fileData) => {
+                    let postData = { 
+                        filename: file.filename,
+                        content: new Buffer(fileData).toString('base64')
                     }
+                  
+                    restler.post(apiUrl, {
+                        headers: headers,
+                        data: JSON.stringify(postData), 
+                    }).on('complete', (data, response) => {
+                        if(!data || data instanceof Error || response.statusCode != 200) {
+                            reject(new Error(data))
+                            return;
+                        }
 
-                    resolve(data);
+                        resolve(data);
+                    });
                 });
             });
         });
@@ -300,11 +304,6 @@ class HashBrownDriverConnection extends Connection {
             restler.del(apiUrl, {
                 headers: headers
             }).on('complete', (data, response) => {
-                if(!data) {
-                    reject(new Error('Media "' + id + '" was not found'))
-                    return;
-                }
-            
                 resolve();
             });
         });

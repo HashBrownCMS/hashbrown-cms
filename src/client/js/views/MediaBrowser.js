@@ -158,7 +158,7 @@ class MediaBrowser extends View {
                         ),
                         _.div({class: 'media-preview'}),
                         _.form({class: 'form-control'},
-                            _.input({type: 'file', name: 'media', multiple: replaceId ? replaceId : null})
+                            _.input({type: 'file', name: 'media', multiple: replaceId ? false : true})
                                 .change(onChangeFile)
                         ).submit(onSubmit)
                     ]

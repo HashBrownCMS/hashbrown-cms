@@ -616,50 +616,53 @@ class GitHubConnection extends Connection {
     setMedia(id, file) {
         let path = 'media/' + id;
 
-        return new Promise((resolve, reject) => {
-            let tempPath = file.path;
-            
-            debug.log('Uploading content "' + path + '"...', this);
+        debug.log('Uploading content "' + path + '"...', this);
 
-            if(this.settings.isLocal) {
-                let newDirPath = this.settings.localPath + path; 
-                let newFilePath = newDirPath + '/' + file.filename; 
-
-                MediaHelper.mkdirRecursively(newDirPath);
-
-                fs.rename(tempPath, newFilePath, (err, fileData) => {
-                    if(err) {
-                        // We couldn't read the temp file, rejecting
-                        reject(new Error(err));
-                    
-                    } else {
-                        debug.log('Uploaded file successfully to ' + newFilePath, this);
-                        resolve();
-
-                    }
-                });
-
-            } else {
-                let apiUrl = 'https://api.github.com/repos/' + this.settings.repo + '/contents/' + path;
-                let dirApiPath = apiUrl + '?' + this.getAppendix();
-                let fileApiPath = apiUrl + '/' + file.filename + '?' + this.getAppendix();
+        // First remove existing media if it exists
+        return this.removeMedia(id)
+        .then(() => {
+            return new Promise((resolve, reject) => {
+                let tempPath = file.path;
                 
-                let headers = {
-                    'Accept': 'application/json'
-                };
+                // Local behaviour        
+                if(this.settings.isLocal) {
+                    let newDirPath = this.settings.localPath + path; 
+                    let newFilePath = newDirPath + '/' + file.filename; 
 
-                // Read the file from the temporary storage
-                fs.readFile(tempPath, (err, fileData) => {
-                    if(err) {
-                        // We couldn't read the temp file, rejecting
-                        reject(new Error(err));
-                    
-                    } else {
-                        // Remove whatever content already exists in the folder
-                        debug.log('Removing existing content if any...', this);
+                    MediaHelper.mkdirRecursively(newDirPath);
+
+                    fs.rename(tempPath, newFilePath, (err, fileData) => {
+                        if(err) {
+                            // We couldn't read the temp file, rejecting
+                            reject(new Error(err));
                         
-                        this.removeMedia(id)
-                        .then(() => {
+                        } else {
+                            debug.log('Uploaded file successfully to ' + newFilePath, this);
+                            resolve();
+
+                        }
+                    });
+
+                // Remote behaviour
+                } else {
+                    let apiUrl = 'https://api.github.com/repos/' + this.settings.repo + '/contents/' + path;
+                    let dirApiPath = apiUrl + '?' + this.getAppendix();
+                    let fileApiPath = apiUrl + '/' + file.filename + '?' + this.getAppendix();
+                    
+                    let headers = {
+                        'Accept': 'application/json'
+                    };
+
+                    // Read the file from the temporary storage
+                    fs.readFile(tempPath, (err, fileData) => {
+                        if(err) {
+                            // We couldn't read the temp file, rejecting
+                            reject(new Error(err));
+                        
+                        } else {
+                            // Remove whatever content already exists in the folder
+                            debug.log('Removing existing content if any...', this);
+                            
                             // Define the POST data
                             // SHA is not needed, since we emptied the folder first
                             let postData = {
@@ -687,10 +690,10 @@ class GitHubConnection extends Connection {
                                 
                                 }
                             });
-                        });
-                    }
-                });
-            }
+                        }
+                    });
+                }
+            });
         });
     }
     

@@ -172,8 +172,9 @@ class SyncSettings extends View {
                 _.input({class: 'form-control', type: 'text', value: view.model.token || '', placeholder: 'Input the remote API token here'})
                     .on('change', onInputChange),
                 _.div({class: 'input-group-btn'},
-                    _.button({class: 'btn btn-primary'}, 'Renew')
-                        .on('click', onClickRenew)
+                    _.button({class: 'btn btn-small btn-default'},
+                        _.span({class: 'fa fa-refresh'})
+                    ).on('click', onClickRenew)
                 )
             );
         

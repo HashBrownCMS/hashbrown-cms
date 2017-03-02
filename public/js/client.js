@@ -22328,6 +22328,8 @@
 	                return reloadResource('media');
 	            }).then(function () {
 	                ViewHelper.get('NavbarMain').reload();
+
+	                location.hash = '/media/' + id;
 	            }).catch(errorModal);
 	        }
 
@@ -22392,7 +22394,14 @@
 	        key: 'onClickUploadMedia',
 	        value: function onClickUploadMedia(replaceId) {
 	            MediaBrowser.uploadModal(function (ids) {
-	                location.hash = '/media/' + ids[0];
+	                // We got one id back
+	                if (typeof ids === 'string') {
+	                    location.hash = '/media/' + ids;
+
+	                    // We got several ids back
+	                } else {
+	                    location.hash = '/media/' + ids[0];
+	                }
 
 	                // Refresh on replace
 	                if (replaceId) {
@@ -32986,7 +32995,7 @@
 	            var $element = void 0;
 
 	            if (this.model.url) {
-	                $element = _.div({ class: 'token-editor input-group' }, _.input({ class: 'form-control', type: 'text', value: view.model.token || '', placeholder: 'Input the remote API token here' }).on('change', onInputChange), _.div({ class: 'input-group-btn' }, _.button({ class: 'btn btn-primary' }, 'Renew').on('click', onClickRenew)));
+	                $element = _.div({ class: 'token-editor input-group' }, _.input({ class: 'form-control', type: 'text', value: view.model.token || '', placeholder: 'Input the remote API token here' }).on('change', onInputChange), _.div({ class: 'input-group-btn' }, _.button({ class: 'btn btn-small btn-default' }, _.span({ class: 'fa fa-refresh' })).on('click', onClickRenew)));
 	            } else {
 	                $element = _.div('Please input the API URL and save first');
 	            }
@@ -33798,7 +33807,7 @@
 	                    model: {
 	                        class: 'modal-upload-media',
 	                        title: 'Upload a file',
-	                        body: [_.div({ class: 'spinner-container hidden' }, _.span({ class: 'spinner fa fa-refresh' })), _.div({ class: 'media-preview' }), _.form({ class: 'form-control' }, _.input({ type: 'file', name: 'media', multiple: replaceId ? replaceId : null }).change(onChangeFile)).submit(onSubmit)]
+	                        body: [_.div({ class: 'spinner-container hidden' }, _.span({ class: 'spinner fa fa-refresh' })), _.div({ class: 'media-preview' }), _.form({ class: 'form-control' }, _.input({ type: 'file', name: 'media', multiple: replaceId ? false : true }).change(onChangeFile)).submit(onSubmit)]
 	                    },
 	                    buttons: [{
 	                        label: 'Cancel',
