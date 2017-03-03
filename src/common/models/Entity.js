@@ -45,13 +45,6 @@ class Entity {
     }
 
     /**
-     * TODO: Deprecate this method
-     */
-    getFields() {
-        return this.getObject();
-    }
-
-    /**
      * Gets a copy of every field in this object as a mutable object
      *
      * @returns {Object} object

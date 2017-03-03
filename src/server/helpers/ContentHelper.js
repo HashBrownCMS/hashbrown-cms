@@ -239,7 +239,7 @@ class ContentHelper extends ContentHelperCommon {
             return MongoHelper.insertOne(
                 project,
                 collection,
-                content.getFields()
+                content.getObject()
             )
             .then(() => {
                 debug.log('Content "' + content.id + '" created and inserted into "' + project + '.' + collection + '"', this);

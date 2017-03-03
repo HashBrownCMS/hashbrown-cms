@@ -204,6 +204,26 @@ img.logo {
         flex-shrink: 0;
         height: 100%;
         transition: width 0.5s, flex-basis 0.5s;
+        
+        @media($md) {
+            width: 400px;
+            flex-basis: 400px;
+        }
+
+        @media($sm) {
+            overflow-x: hidden;
+
+            &:not(.expanded) {
+                width: 60px;
+                flex-basis: 60px;
+
+                .navbar-main {
+                    .tab-panes {
+                        display: none;
+                    }
+                }
+            }
+        }
     }
     
     .menuspace {

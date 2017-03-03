@@ -351,7 +351,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
         return MongoHelper.insertOne(
             project,
             collection,
-            connection.getFields()
+            connection.getObject()
         );
     }    
 }

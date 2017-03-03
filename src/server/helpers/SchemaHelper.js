@@ -522,7 +522,7 @@ class SchemaHelper extends SchemaHelperCommon {
         return MongoHelper.insertOne(
             project,
             collection,
-            newSchema.getFields() 
+            newSchema.getObject() 
         ).then(() => {
             return new Promise((resolve) => {
                 resolve(newSchema);

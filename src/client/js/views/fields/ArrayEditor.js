@@ -122,7 +122,7 @@ class ArrayEditor extends View {
                 $(item).exodragdrop({
                     lockX: true,
                     dropContainers: this.$element[0].querySelectorAll('.items'),
-                    scrollContainer: document.querySelector('.content-editor .nav-tabs'),
+                    scrollContainer: document.querySelector('.content-editor .tab-content'),
                     onEndDrag: (instance) => {
                         this.updateDOMIndices();
                         
@@ -264,7 +264,7 @@ class ArrayEditor extends View {
             }
 
             // Get the label from the item
-            // TODO: Make this recursive, so we can find detailed values in structs 
+            // TODO (Issue #157): Make this recursive, so we can find detailed values in structs 
             if(item) {
                 // This item is a string
                 if(typeof item === 'string') {

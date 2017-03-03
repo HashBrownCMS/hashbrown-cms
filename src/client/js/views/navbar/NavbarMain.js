@@ -68,7 +68,7 @@ class NavbarMain extends View {
             $icon = _.span({class: 'fa fa-' + params.icon});
         }
 
-        let $button = _.button({'data-route': params.route},
+        let $button = _.button({'data-route': params.route, title: params.label},
             _.div({class: 'pane-icon'},
                 $icon
             ),

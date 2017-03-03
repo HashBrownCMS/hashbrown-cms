@@ -17,14 +17,23 @@ class ContentEditor extends View {
     onScroll(e) {
         let $follow;
 
+        // Look for field labels that are close to the top of the viewport and make them follow
         this.$element.find('.field-container').each((i, field) => {
             let $field = $(field);
             $field.removeClass('following');
 
             let top = $field.position().top;
 
-            if(top < 60 && top != 0 && $field.outerHeight() > 100) {
-                $follow = $field;    
+            if(top < 60) {
+                // The closest field to the viewport top with an outer height above 100 should follow
+                if(top != 0 && $field.outerHeight() > 100) {
+                    $follow = $field;    
+
+                // If a smaller field is closer, cacnel following
+                } else {
+                    $follow = null;
+
+                }
             }
         });
 

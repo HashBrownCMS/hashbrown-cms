@@ -374,10 +374,6 @@
 	window.debug = __webpack_require__(33);
 	window.debug.verbosity = 3;
 
-	// ----------------------
-	// TODO: Move the below 3 methods into a SessionHelper
-	// ----------------------
-
 	/**
 	 * Checks if the currently logged in user is admin
 	 *
@@ -2415,67 +2411,47 @@
 	        }
 
 	        /**
-	         * Gets elements stack by position
+	         * Gets the hovered drop container
 	         *
-	         * @param {Number} x
-	         * @param {Number} y
-	         *
-	         * @returns {Array} stack
-	         */
-
-	    }, {
-	        key: 'getElementStack',
-	        value: function getElementStack(x, y) {
-	            var stack = [];
-	            var el = document.elementFromPoint(x, y);
-	            var handbrake = 0;
-
-	            while (el && el != document.body && handbrake < 20) {
-	                stack[stack.length] = el;
-	                el.style.display = 'none';
-	                handbrake++;
-
-	                el = document.elementFromPoint(x, y);
-	            }
-
-	            for (var i in stack) {
-	                stack[i].style.display = null;
-	            }
-
-	            return stack;
-	        }
-
-	        /**
-	         * Sorts an array on elements by z proximity to the cursor
-	         *
-	         * @param {Array} elements
 	         * @param {Number} x
 	         * @paraa {Number} y
 	         *
-	         * @return {Array} ranking
+	         * @return {HTMLElement} Hovered drop container
 	         */
 
 	    }, {
-	        key: 'sortByZProximity',
-	        value: function sortByZProximity(elements, x, y) {
-	            if (!elements) {
-	                throw new Error('sortByZProximity: Elements array is null');
-	            }
+	        key: 'getHoveredDropContainer',
+	        value: function getHoveredDropContainer(x, y) {
+	            var _iteratorNormalCompletion = true;
+	            var _didIteratorError = false;
+	            var _iteratorError = undefined;
 
-	            if (elements instanceof NodeList) {
-	                throw new Error('sortByZProximity: Elements array is a NodeList');
-	            }
+	            try {
+	                for (var _iterator = (DragDrop.currentDropContainers || [])[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	                    var container = _step.value;
 
-	            var result = [];
-	            var stack = DragDrop.getElementStack(x, y);
+	                    var rect = container.getBoundingClientRect();
 
-	            for (var i in stack) {
-	                if (elements.indexOf(stack[i]) > -1) {
-	                    result[result.length] = stack[i];
+	                    if (x > rect.left && x < rect.right && y > rect.top && y < rect.bottom) {
+	                        return container;
+	                    }
+	                }
+	            } catch (err) {
+	                _didIteratorError = true;
+	                _iteratorError = err;
+	            } finally {
+	                try {
+	                    if (!_iteratorNormalCompletion && _iterator.return) {
+	                        _iterator.return();
+	                    }
+	                } finally {
+	                    if (_didIteratorError) {
+	                        throw _iteratorError;
+	                    }
 	                }
 	            }
 
-	            return result;
+	            return null;
 	        }
 
 	        /**
@@ -2506,8 +2482,9 @@
 	        config = config || {};
 
 	        this.config = {
+	            scrollContainer: document.body,
 	            dragThreshold: 2,
-	            dragScrollSpeed: 5,
+	            dragScrollSpeed: 2,
 	            dropContainerSelector: '',
 	            dropContainers: [],
 	            lockY: false,
@@ -2683,6 +2660,12 @@
 	            e.preventDefault();
 	            e.stopPropagation();
 
+	            // Cache scroll container position for later restoration
+	            var lastScrollPos = {
+	                top: this.config.scrollContainer.scrollTop,
+	                left: this.config.scrollContainer.scrollLeft
+	            };
+
 	            DragDrop.current = this;
 
 	            // Prevent overlapping mouse interaction on body
@@ -2751,6 +2734,10 @@
 	            if (typeof this.config.onBeginDrag === 'function') {
 	                this.config.onBeginDrag(this);
 	            }
+
+	            // Restore last scroll container scroll position
+	            this.config.scrollContainer.scrollTop = lastScrollPos.top;
+	            this.config.scrollContainer.scrollLeft = lastScrollPos.left;
 	        }
 
 	        /**
@@ -2767,28 +2754,26 @@
 
 	            // Apply new styling to element
 	            if (!this.config.lockY) {
-	                this.element.style.top = e.pageY + this.pointerOffset.top;
+	                this.element.style.top = e.pageY + this.config.scrollContainer.scrollTop + this.pointerOffset.top;
 	            }
 
 	            if (!this.config.lockX) {
-	                this.element.style.left = e.pageX + this.pointerOffset.left;
+	                this.element.style.left = e.pageX + this.config.scrollContainer.scrollLeft + this.pointerOffset.left;
 	            }
 
-	            // Calculate viewport
-	            var viewport = {
-	                x: document.scrollLeft,
-	                y: document.scrollTop,
-	                w: window.width,
-	                h: window.height
-	            };
-
 	            // Scroll page if dragging near the top or bottom
-	            // TODO: Implement for sides too
-	            if (e.pageY > viewport.y + viewport.h - 100) {
-	                //   scroll(1 * this.dragScrollSpeed);
+	            var bounds = this.config.scrollContainer.getBoundingClientRect();
 
-	            } else if (e.pageY < viewport.y + 100) {}
-	            //  scroll(-1 * this.dragScrollSpeed);
+	            // TODO: Figure out why this keeps resetting to 0 every frame
+	            if (e.pageY > bounds.bottom - 50) {
+	                this.config.scrollContainer.scrollTop += this.config.dragScrollSpeed;
+	            } else if (e.pageY < bounds.top + 50) {
+	                this.config.scrollContainer.scrollTop -= this.config.dragScrollSpeed;
+	            } else if (e.pageX > bounds.right - 50) {
+	                this.config.scrollContainer.scrollLeft += this.config.dragScrollSpeed;
+	            } else if (e.pageX < bounds.left + 50) {
+	                this.config.scrollContainer.scrollLeft -= this.config.dragScrollSpeed;
+	            }
 
 	            // Fire drag event
 	            if (typeof this.config.onDrag === 'function') {
@@ -2802,21 +2787,18 @@
 	            elementRect.middle = elementRect.top + elementRect.height / 2;
 
 	            // Use array of drop containers sorted by their "proximity" to the pointer on the Z axis
-	            var hoveredDropContainers = DragDrop.sortByZProximity(DragDrop.currentDropContainers, elementRect.center, elementRect.middle);
-	            var foundDropContainer = void 0;
+	            var hoveredDropContainer = DragDrop.getHoveredDropContainer(e.pageX, e.pageY);
 
 	            // We only need the first index, as that is the closest to the cursor
-	            if (hoveredDropContainers.length > 0) {
-	                foundDropContainer = hoveredDropContainers[0];
-
-	                this.onHoverDropContainer(foundDropContainer);
+	            if (hoveredDropContainer) {
+	                this.onHoverDropContainer(hoveredDropContainer);
 	            }
 
 	            // Make sure to trigger the leave event on any other drop containers, if they were previously hovered
 	            for (var i = 0; i < DragDrop.currentDropContainers.length; i++) {
 	                var dropContainer = DragDrop.currentDropContainers[i];
 
-	                if (dropContainer != foundDropContainer && dropContainer.dataset.dragdropHovering) {
+	                if (dropContainer != hoveredDropContainer && dropContainer.dataset.dragdropHovering) {
 	                    this.onLeaveDropContainer(dropContainer, e);
 	                }
 	            }
@@ -12182,24 +12164,14 @@
 	         */
 
 	    }, {
-	        key: 'getFields',
+	        key: 'getObject',
 
-
-	        /**
-	         * TODO: Deprecate this method
-	         */
-	        value: function getFields() {
-	            return this.getObject();
-	        }
 
 	        /**
 	         * Gets a copy of every field in this object as a mutable object
 	         *
 	         * @returns {Object} object
 	         */
-
-	    }, {
-	        key: 'getObject',
 	        value: function getObject() {
 	            var fields = {};
 

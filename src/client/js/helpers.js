@@ -16,10 +16,6 @@ window.SettingsHelper = require('./helpers/SettingsHelper');
 window.debug = require('../../common/helpers/DebugHelper');
 window.debug.verbosity = 3;
 
-// ----------------------
-// TODO: Move the below 3 methods into a SessionHelper
-// ----------------------
-
 /**
  * Checks if the currently logged in user is admin
  *

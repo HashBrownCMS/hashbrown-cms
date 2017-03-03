@@ -436,7 +436,7 @@ class UserHelper {
                 return MongoHelper.insertOne(
                     'users',
                     'users',
-                    user.getFields()
+                    user.getObject()
                 ).then(() => {
                     debug.log('Created user "' + username + '" successfully', this);
                    

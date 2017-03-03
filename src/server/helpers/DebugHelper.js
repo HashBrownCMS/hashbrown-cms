@@ -11,7 +11,7 @@ class DebugHelper extends DebugHelperCommon {
      * @param {String} message
      */
     static onLog(senderString, dateString, message) {
-        // TODO: Write to log
+        // TODO (Issue #159): Write to log
     }
 }
 

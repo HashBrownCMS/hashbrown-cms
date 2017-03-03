@@ -1,19 +1,4 @@
 .navspace {
-    @media($sm) {
-        overflow-x: hidden;
-
-        &:not(.expanded) {
-            width: 60px;
-            flex-basis: 60px;
-
-            .navbar-main {
-                .tab-panes {
-                    display: none;
-                }
-            }
-        }
-    }
-    
     .navbar-main {
         display: flex;
         height: 100%;
@@ -43,7 +28,7 @@
                 top: 0px;
             }
 
-            @media($sm) {
+            @media($md) {
                 width: 60px;
             }
 
@@ -114,7 +99,7 @@
                     justify-content: center;
                     text-align: left;
 
-                    @media($sm) {
+                    @media($md) {
                         display: none;
                     }
 
