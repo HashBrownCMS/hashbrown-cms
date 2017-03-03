@@ -6,6 +6,7 @@ let path = require('path');
 
 let Connection = require(appRoot + '/src/common/models/Connection');
 let Media = require(appRoot + '/src/common/models/Media');
+let Template = require(appRoot + '/src/common/models/Template');
 
 /**
  * A connection for interfacing with the HashBrown driver
@@ -200,6 +201,46 @@ class HashBrownDriverConnection extends Connection {
                         resolve(data);
                     });
                 });
+            });
+        });
+    }
+    
+    /**
+     * Gets templates
+     *
+     * @param {String} type
+     *
+     * @returns {Promise} Array of Templates
+     */
+    getTemplates(type) {
+        let headers = {
+            'Accept': 'application/json'
+        };
+            
+        return new Promise((resolve, reject) => {
+            let apiUrl = this.getRemoteUrl() + '/hashbrown/api/templates/' + type + '?token=' + this.settings.token;
+            
+            let headers = {
+                'Accept': 'application/json'
+            };
+            
+            restler.get(apiUrl, {
+                headers: headers
+            }).on('complete', (data, response) => {
+                if(!data || !Array.isArray(data)) {
+                    reject(new Error('Templates were not found'))
+                    return;
+                }
+           
+                let allTemplates = [];
+
+                for(let template of data) {
+                    template.remote = true;
+
+                    allTemplates.push(new Template(template));
+                }
+                
+                resolve(allTemplates);
             });
         });
     }
