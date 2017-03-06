@@ -82,9 +82,6 @@ class ConnectionController extends ApiController {
             return SyncHelper.setResourceItem(req.project, req.environment, 'connection', id, localConnection);
         })
         .then(() => {
-            return ConnectionHelper.removeConnectionById(req.project, req.environment, id);
-        })
-        .then(() => {
             res.status(200).send(id);
         })
         .catch((e) => {

@@ -104,9 +104,6 @@ class FormsController extends ApiController {
             return SyncHelper.setResourceItem(req.project, req.environment, 'forms', id, localForm);
         })
         .then(() => {
-            return FormHelper.deleteForm(req.project, req.environment, id);
-        })
-        .then(() => {
             res.status(200).send(id);
         })
         .catch((e) => {
@@ -166,7 +163,9 @@ class FormsController extends ApiController {
      * Sets a single form by id
      */
     static postForm(req, res) {
-        FormHelper.setForm(req.project, req.environment, req.params.id, req.body)
+        let shouldCreate = req.query.create == 'true' || req.query.create == true;
+        
+        FormHelper.setForm(req.project, req.environment, req.params.id, req.body, shouldCreate)
         .then((form) => {
             res.status(200).send(form.getObject());
         })

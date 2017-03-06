@@ -142,7 +142,8 @@ class SchemaPane extends Pane {
             // Item context menu
             getItemContextMenu: (item) => {
                 let menu = {};
-                
+                let isSyncEnabled = SettingsHelper.getCachedSettings('sync').enabled == true;
+
                 menu['This schema'] = '---';
                 menu['New child schema'] = () => { this.onClickNewSchema(); };
                 menu['Copy id'] = () => { this.onClickCopyItemId(); };
@@ -151,17 +152,20 @@ class SchemaPane extends Pane {
                     menu['Remove'] = () => { this.onClickRemoveSchema(); };
                 }
                 
-                if(item.local || item.remote) {
+                if(isSyncEnabled) {
                     menu['Sync'] = '---';
-                }
+                    
+                    if(!item.remote) {
+                        menu['Push to remote'] = () => { this.onClickPushSchema(); };
+                    }
 
-                if(item.local) {
-                    menu['Push to remote'] = () => { this.onClickPushSchema(); };
-                    menu['Remove local copy'] = () => { this.onClickRemoveSchema(); };
-                }
-                
-                if(item.remote) {
-                    menu['Pull from remote'] = () => { this.onClickPullSchema(); };
+                    if(item.local) {
+                        menu['Remove local copy'] = () => { this.onClickRemoveSchema(); };
+                    }
+
+                    if(item.remote) {
+                        menu['Pull from remote'] = () => { this.onClickPullSchema(); };
+                    }
                 }
 
                 return menu;

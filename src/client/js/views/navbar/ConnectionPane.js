@@ -136,6 +136,7 @@ class ConnectionPane extends Pane {
             // Item context menu
             getItemContextMenu: (item) => {
                 let menu = {};
+                let isSyncEnabled = SettingsHelper.getCachedSettings('sync').enabled == true;
                 
                 menu['This connection'] = '---';
                 menu['Copy id'] = () => { this.onClickCopyItemId(); };
@@ -144,17 +145,20 @@ class ConnectionPane extends Pane {
                     menu['Remove'] = () => { this.onClickRemoveConnection(); };
                 }
 
-                if(item.local || item.remote) {
+                if(isSyncEnabled) {
                     menu['Sync'] = '---';
-                }
 
-                if(item.local) {
-                    menu['Push to remote'] = () => { this.onClickPushConnection(); };
-                    menu['Remove local copy'] = () => { this.onClickRemoveConnection(); };
-                }
-                
-                if(item.remote) {
-                    menu['Pull from remote'] = () => { this.onClickPullConnection(); };
+                    if(!item.remote) {
+                        menu['Push to remote'] = () => { this.onClickPushConnection(); };
+                    }
+
+                    if(item.local) {
+                        menu['Remove local copy'] = () => { this.onClickRemoveConnection(); };
+                    }
+                    
+                    if(item.remote) {
+                        menu['Pull from remote'] = () => { this.onClickPullConnection(); };
+                    }
                 }
 
                 return menu;

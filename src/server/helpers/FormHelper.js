@@ -97,6 +97,7 @@ class FormHelper {
      * @param {String} environment
      * @param {String} id
      * @param {Object} properties
+     * @param {Boolean} create
      *
      * @returns {Promise} Form
      */
@@ -104,7 +105,8 @@ class FormHelper {
         project = requiredParam('project'),
         environment = requiredParam('environment'),
         id = requiredParam('id'),
-        properties = requiredParam('properties')
+        properties = requiredParam('properties'),
+        create = true
     ) {
         let collection = environment + '.forms';
 
@@ -120,7 +122,7 @@ class FormHelper {
             },
             properties,
             {
-                upsert: true
+                upsert: create
             }
         )
         .then(() => {

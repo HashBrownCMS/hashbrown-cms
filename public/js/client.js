@@ -21422,6 +21422,7 @@
 	                // Item context menu
 	                getItemContextMenu: function getItemContextMenu(item) {
 	                    var menu = {};
+	                    var isSyncEnabled = SettingsHelper.getCachedSettings('sync').enabled == true;
 
 	                    menu['This connection'] = '---';
 	                    menu['Copy id'] = function () {
@@ -21434,23 +21435,26 @@
 	                        };
 	                    }
 
-	                    if (item.local || item.remote) {
+	                    if (isSyncEnabled) {
 	                        menu['Sync'] = '---';
-	                    }
 
-	                    if (item.local) {
-	                        menu['Push to remote'] = function () {
-	                            _this2.onClickPushConnection();
-	                        };
-	                        menu['Remove local copy'] = function () {
-	                            _this2.onClickRemoveConnection();
-	                        };
-	                    }
+	                        if (!item.remote) {
+	                            menu['Push to remote'] = function () {
+	                                _this2.onClickPushConnection();
+	                            };
+	                        }
 
-	                    if (item.remote) {
-	                        menu['Pull from remote'] = function () {
-	                            _this2.onClickPullConnection();
-	                        };
+	                        if (item.local) {
+	                            menu['Remove local copy'] = function () {
+	                                _this2.onClickRemoveConnection();
+	                            };
+	                        }
+
+	                        if (item.remote) {
+	                            menu['Pull from remote'] = function () {
+	                                _this2.onClickPullConnection();
+	                            };
+	                        }
 	                    }
 
 	                    return menu;
@@ -22203,6 +22207,7 @@
 	                // Item context menu
 	                getItemContextMenu: function getItemContextMenu(item) {
 	                    var menu = {};
+	                    var isSyncEnabled = SettingsHelper.getCachedSettings('sync').enabled == true;
 
 	                    menu['This form'] = '---';
 	                    menu['Copy'] = function () {
@@ -22218,23 +22223,26 @@
 	                        };
 	                    }
 
-	                    if (item.local || item.remote) {
+	                    if (isSyncEnabled) {
 	                        menu['Sync'] = '---';
-	                    }
 
-	                    if (item.local) {
-	                        menu['Push to remote'] = function () {
-	                            _this2.onClickPushForm();
-	                        };
-	                        menu['Remove local copy'] = function () {
-	                            _this2.onClickRemoveForm();
-	                        };
-	                    }
+	                        if (!item.remote) {
+	                            menu['Push to remote'] = function () {
+	                                _this2.onClickPushForm();
+	                            };
+	                        }
 
-	                    if (item.remote) {
-	                        menu['Pull from remote'] = function () {
-	                            _this2.onClickPullForm();
-	                        };
+	                        if (item.local) {
+	                            menu['Remove local copy'] = function () {
+	                                _this2.onClickRemoveForm();
+	                            };
+	                        }
+
+	                        if (item.remote) {
+	                            menu['Pull from remote'] = function () {
+	                                _this2.onClickPullForm();
+	                            };
+	                        }
 	                    }
 
 	                    return menu;
@@ -22673,6 +22681,7 @@
 	                // Item context menu
 	                getItemContextMenu: function getItemContextMenu(item) {
 	                    var menu = {};
+	                    var isSyncEnabled = SettingsHelper.getCachedSettings('sync').enabled == true;
 
 	                    menu['This schema'] = '---';
 	                    menu['New child schema'] = function () {
@@ -22688,23 +22697,26 @@
 	                        };
 	                    }
 
-	                    if (item.local || item.remote) {
+	                    if (isSyncEnabled) {
 	                        menu['Sync'] = '---';
-	                    }
 
-	                    if (item.local) {
-	                        menu['Push to remote'] = function () {
-	                            _this2.onClickPushSchema();
-	                        };
-	                        menu['Remove local copy'] = function () {
-	                            _this2.onClickRemoveSchema();
-	                        };
-	                    }
+	                        if (!item.remote) {
+	                            menu['Push to remote'] = function () {
+	                                _this2.onClickPushSchema();
+	                            };
+	                        }
 
-	                    if (item.remote) {
-	                        menu['Pull from remote'] = function () {
-	                            _this2.onClickPullSchema();
-	                        };
+	                        if (item.local) {
+	                            menu['Remove local copy'] = function () {
+	                                _this2.onClickRemoveSchema();
+	                            };
+	                        }
+
+	                        if (item.remote) {
+	                            menu['Pull from remote'] = function () {
+	                                _this2.onClickPullSchema();
+	                            };
+	                        }
 	                    }
 
 	                    return menu;

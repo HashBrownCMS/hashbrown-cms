@@ -63,8 +63,9 @@ class SchemaController extends ApiController {
     static setSchema(req, res) {
         let id = req.params.id;
         let schema = req.body;
+        let shouldCreate = req.query.create == 'true' || req.query.create == true;
 
-        SchemaHelper.setSchema(req.project, req.environment, id, schema)
+        SchemaHelper.setSchema(req.project, req.environment, id, schema, shouldCreate)
         .then(() => {
             res.status(200).send(schema);
         })
@@ -102,9 +103,6 @@ class SchemaController extends ApiController {
         SchemaHelper.getSchemaById(req.project, req.environment, id)
         .then((localSchema) => {
             return SyncHelper.setResourceItem(req.project, req.environment, 'schemas', id, localSchema);
-        })
-        .then(() => {
-            return SchemaHelper.removeSchema(req.project, req.environment, id);
         })
         .then(() => {
             res.status(200).send(id);

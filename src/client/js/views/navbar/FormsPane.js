@@ -151,6 +151,7 @@ class FormsPane extends Pane {
             // Item context menu
             getItemContextMenu: (item) => {
                 let menu = {};
+                let isSyncEnabled = SettingsHelper.getCachedSettings('sync').enabled == true;
                 
                 menu['This form'] = '---';
                 menu['Copy'] = () => { this.onClickCopyForm(); };
@@ -160,17 +161,20 @@ class FormsPane extends Pane {
                     menu['Remove'] = () => { this.onClickRemoveForm(); };
                 }
 
-                if(item.local || item.remote) {
+                if(isSyncEnabled) {
                     menu['Sync'] = '---';
-                }
 
-                if(item.local) {
-                    menu['Push to remote'] = () => { this.onClickPushForm(); };
-                    menu['Remove local copy'] = () => { this.onClickRemoveForm(); };
-                }
-                
-                if(item.remote) {
-                    menu['Pull from remote'] = () => { this.onClickPullForm(); };
+                    if(!item.remote) {
+                        menu['Push to remote'] = () => { this.onClickPushForm(); };
+                    }
+
+                    if(item.local) {
+                        menu['Remove local copy'] = () => { this.onClickRemoveForm(); };
+                    }
+                    
+                    if(item.remote) {
+                        menu['Pull from remote'] = () => { this.onClickPullForm(); };
+                    }
                 }
 
                 return menu;
