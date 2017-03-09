@@ -58,7 +58,6 @@ global.AppHelper = require('./helpers/AppHelper');
 global.SyncHelper = require('./helpers/SyncHelper');
 
 global.debug = require('./helpers/DebugHelper');
-global.debug.verbosity = 2;
 
 PluginHelper.init(app)
 .then(() => {
@@ -290,8 +289,6 @@ function ready() {
 
         } 
     })
-    .catch((e) => {
-        throw e;
-    });
+    .catch(debug.error);
 }
 

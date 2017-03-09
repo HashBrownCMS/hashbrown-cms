@@ -1,5 +1,7 @@
 'use strict';
 
+const VERBOSITY = 2;
+
 class DebugHelper {
     /**
      * Event: Log
@@ -98,7 +100,7 @@ class DebugHelper {
      * @param {Object} sender
      * @param {Number} verbosity
      */
-    static log(message, sender, verbosity) {
+    static log(message, sender, verbosity = 1) {
         if(verbosity == 0) {
             DebugHelper.error('Verbosity cannot be set to 0', this);
 
@@ -106,7 +108,7 @@ class DebugHelper {
             verbosity = 1;
         }
 
-        if(DebugHelper.verbosity >= verbosity) {
+        if(VERBOSITY >= verbosity) {
             let senderString = DebugHelper.parseSender(sender);
             let dateString = DebugHelper.getDateString();
             
