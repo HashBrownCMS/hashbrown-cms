@@ -48,9 +48,11 @@ class SecurityHelper {
      * @returns {Object} Let's encrypt handler
      */
     static startLetsEncrypt() {
-        if(!fs.existsSync(appRoot + '/config/ssl.cfg')) { return null; }
+        let sslConfigPath = appRoot + '/config/mail.cfg';
+        
+        if(!fs.existsSync(sslConfigPath) { return null; }
 
-        let config = require('../../../config/ssl.cfg'); 
+        let config = JSON.parse(fs.readFileSync(sslConfigPath)); 
 
         // Config sanity check
         if(!config.domain) {
