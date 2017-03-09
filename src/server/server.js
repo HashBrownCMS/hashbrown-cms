@@ -60,18 +60,6 @@ global.SyncHelper = require('./helpers/SyncHelper');
 global.debug = require('./helpers/DebugHelper');
 
 PluginHelper.init(app)
-.then(() => {
-	if(SecurityHelper.isHTTPS()) {
-		return SecurityHelper.startLetsEncrypt()
-		.then((le) => {
-			app.use('/', le.middleware());
-
-			return Promise.resolve();
-		});
-	}
-
-	return Promise.resolve();
-})
 .then(ready)
 .catch(debug.error);
 
@@ -269,26 +257,43 @@ function ready() {
     // Check for args, and close the app if any were run
     checkArgs()
     .then((result) => {
-        if(result == 'proceed') {
-            // Start server
-            let port = process.env.PORT || 80;
-            
-            global.server = http.createServer(app).listen(port);
+        if(result != 'proceed') {
+			process.exit();
+			return;
+		}
+		
+		// Start HTTP server
+		let port = process.env.PORT || 80;
+		
+		global.server = http.createServer(app).listen(port);
 
-			if(SecurityHelper.isHTTPS()) {
-	            https.createServer(SecurityHelper.getCredentials(), app).listen(443);
-			}
-            
-            debug.log('Server restarted', 'HashBrown');
-           
-            // Start schedule helper
-            ScheduleHelper.startWatching();
+		debug.log('HTTP server restarted', 'HashBrown');
+	   
+		// Start schedule helper
+		ScheduleHelper.startWatching();
         
-        } else {
-            process.exit();
-
-        } 
+		return Promise.resolve();	
     })
+
+	// Start HTTPS server
+	.then(() => {
+		if(SecurityHelper.isHTTPS()) {
+			return SecurityHelper.startLetsEncrypt()
+			.then((le) => {
+				app.use('/', le.middleware());
+
+				https.createServer(SecurityHelper.getCredentials(), app).listen(443);
+		
+				debug.log('HTTPS server restarted', 'HashBrown');
+				
+				return Promise.resolve();
+			});
+		}
+
+		return Promise.resolve();
+	})
+	
+	// Catch errors
     .catch(debug.error);
 }
 
