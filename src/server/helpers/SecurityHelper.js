@@ -3,12 +3,12 @@
 let fs = require('fs');
 
 class SecurityHelper {
-    /**
-     * Starts the letsencrypt handler
-     *
-     * @returns {Object} Let's encrypt handler
-     */
-    static startLetsEncrypt() {
+	/**
+	 * Gets the SSL config
+  	 *
+	 * @returns {Object} Config
+	 */
+	static getConfig() {
         let sslConfigPath = appRoot + '/config/ssl.cfg';
         
         if(!fs.existsSync(sslConfigPath)) { return null; }
@@ -23,7 +23,33 @@ class SecurityHelper {
         if(!config.email) {
             throw new Error('Variable "email" not set in /config/ssl.cfg');
         }
-        
+
+		return config;
+	}
+
+    /**
+     * Gets the security credentials
+     *
+     * @returns {Object} Credentials
+     */
+    static getCredentials() {
+		let config = this.getConfig();
+
+		return {
+			key: fs.readFileSync(appRoot + '/certs/live/' + config.domain + '/privkey.pem'),
+			cert: fs.readFileSync(appRoot + '/certs/live/' + config.domain + '/fullchain.pem'),
+			ca: fs.readFileSync(appRoot + '/certs/live/' + config.domain + '/chain.pem')
+		};
+    }
+
+    /**
+     * Starts the letsencrypt handler
+     *
+     * @returns {Object} Let's encrypt handler
+     */
+    static startLetsEncrypt() {
+		let config = this.getConfig();       
+ 
         // Storage backend
         let leStore = require('le-store-certbot').create({
             configDir: appRoot + '/certs',
