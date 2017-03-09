@@ -96,7 +96,7 @@ class SecurityHelper {
         });
 
         // Check in-memory cache of certificates for the named domain
-        le.check({
+        return le.check({
             domains: [config.domain]
         }).then((results) => {
             // We already  have certificates
@@ -111,15 +111,13 @@ class SecurityHelper {
             })
             .then(
                 (certs) => {
-                    console.log(certs);
+					return Promise.resolve(le);
                 },
                 (err) => {
                     throw err;
                 }
             );
         });
-
-        return le;
     }
 }
 

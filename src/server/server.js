@@ -14,11 +14,6 @@ let os = require('os');
 let cookieparser = require('cookie-parser');
 
 // ----------
-// Security helper
-// ----------
-let SecurityHelper = require('./helpers/SecurityHelper');
-
-// ----------
 // Express app
 // ----------
 let app = express();
@@ -29,10 +24,6 @@ app.set('views', appRoot + '/src/server/views');
 // ----------
 // App middlewares
 // ----------
-if(SecurityHelper.isHTTPS()) {
-	app.use('/', SecurityHelper.startLetsEncrypt().middleware());
-}
-
 app.use(cookieparser());
 app.use(bodyparser.json({limit: '50mb'}));
 app.use(express.static(appRoot + '/public'));
@@ -47,6 +38,8 @@ global.requiredParam = function(name) {
 // ----------
 // Helpers
 // ----------
+let SecurityHelper = require('./helpers/SecurityHelper');
+
 global.UserHelper = require('./helpers/UserHelper');
 global.ConnectionHelper = require('./helpers/ConnectionHelper');
 global.ContentHelper = require('./helpers/ContentHelper');
@@ -68,7 +61,19 @@ global.debug = require('./helpers/DebugHelper');
 global.debug.verbosity = 2;
 
 PluginHelper.init(app)
-    .then(ready);
+.then(() => {
+	if(SecurityHelper.isHTTPS()) {
+		return SecurityHelper.startLetsEncrypt()
+		.then((le) => {
+			app.use('/', le.middleware());
+
+			return Promise.resolve();
+		});
+	}
+
+	return Promise.resolve();
+})
+.then(ready);
 
 // ----------
 // Controllers
