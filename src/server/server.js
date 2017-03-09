@@ -14,6 +14,11 @@ let os = require('os');
 let cookieparser = require('cookie-parser');
 
 // ----------
+// Security helper
+// ----------
+let SecurityHelper = require('./helpers/SecurityHelper');
+
+// ----------
 // Express app
 // ----------
 let app = express();
@@ -24,6 +29,7 @@ app.set('views', appRoot + '/src/server/views');
 // ----------
 // App middlewares
 // ----------
+app.use('/', SecurityHelper.startLetsEncrypt().middleware());
 app.use(cookieparser());
 app.use(bodyparser.json({limit: '50mb'}));
 app.use(express.static(appRoot + '/public'));
@@ -38,8 +44,6 @@ global.requiredParam = function(name) {
 // ----------
 // Helpers
 // ----------
-let SecurityHelper = require('./helpers/SecurityHelper');
-
 global.UserHelper = require('./helpers/UserHelper');
 global.ConnectionHelper = require('./helpers/ConnectionHelper');
 global.ContentHelper = require('./helpers/ContentHelper');
@@ -262,7 +266,7 @@ function ready() {
             let port = process.env.PORT || 80;
             
             global.server = http.createServer(app).listen(port);
-            https.createServer(SecurityHelper.getCredentials(), app).listen(443);
+            //https.createServer(SecurityHelper.getCredentials(), app).listen(443);
             
             debug.log('Server restarted', 'HashBrown');
            
