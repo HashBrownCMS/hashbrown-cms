@@ -106,7 +106,7 @@ class SecurityHelper {
      */
    	static getHandler() {
 		if(!handler) {
-			handler = init();
+			handler = this.init();
 		}
 
 		return handler;
