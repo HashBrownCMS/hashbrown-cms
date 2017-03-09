@@ -73,7 +73,10 @@ class DebugHelper {
         let senderName = '';
 
         if(sender) {
-            if(typeof sender === 'function') {
+            if(typeof sender === 'string') {
+                senderName = sender;
+
+            } else if(typeof sender === 'function') {
                 senderName = sender.name;
 
             } else if(sender.constructor) {

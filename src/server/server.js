@@ -4,6 +4,8 @@
 // Libs
 // ----------
 let fs = require('fs');
+let http = require('http');
+let https = require('https');
 let markdownToHtml = require('marked');
 let express = require('express');
 let bodyparser = require('body-parser');
@@ -36,6 +38,8 @@ global.requiredParam = function(name) {
 // ----------
 // Helpers
 // ----------
+let SecurityHelper = require('./helpers/SecurityHelper');
+
 global.UserHelper = require('./helpers/UserHelper');
 global.ConnectionHelper = require('./helpers/ConnectionHelper');
 global.ContentHelper = require('./helpers/ContentHelper');
@@ -145,39 +149,11 @@ function checkArgs() {
 }
 
 // ----------
-// Ready callback
-// ----------
-function ready() {
-    // Check for args, and close the app if any were run
-    checkArgs()
-    .then((result) => {
-        if(result == 'proceed') {
-            // Start server
-            let port = process.env.PORT || 80;
-
-            global.server = app.listen(port);
-
-            console.log('RESTART');
-           
-            // Start schedule helper
-            ScheduleHelper.startWatching();
-        
-        } else {
-            process.exit();
-
-        } 
-    })
-    .catch((e) => {
-        throw e;
-    });
-}
-
-// ----------
 // Views
 // ----------
 // Catch evil-doers
 app.get([ '/wp-admin', '/wp-admin/', '/umbraco', '/umbraco/' ], (req, res) => {
-    res.status(200).send('Nice try, but wrong CMS. This incident will be reported.');
+    res.sendStatus(400);
 });
 
 // Text
@@ -273,3 +249,33 @@ app.get('/:project/:environment/', function(req, res) {
         res.status(403).redirect('/login?path=/' + req.params.project + '/' + req.params.environment);  
     });
 });
+
+// ----------
+// Ready callback
+// ----------
+function ready() {
+    // Check for args, and close the app if any were run
+    checkArgs()
+    .then((result) => {
+        if(result == 'proceed') {
+            // Start server
+            let port = process.env.PORT || 80;
+            
+            global.server = http.createServer(app).listen(port);
+            https.createServer(SecurityHelper.getCredentials(), app).listen(443);
+            
+            debug.log('Server restarted', 'HashBrown');
+           
+            // Start schedule helper
+            ScheduleHelper.startWatching();
+        
+        } else {
+            process.exit();
+
+        } 
+    })
+    .catch((e) => {
+        throw e;
+    });
+}
+
