@@ -98,26 +98,27 @@ class SecurityHelper {
         // Check in-memory cache of certificates for the named domain
         return le.check({
             domains: [config.domain]
-        }).then((results) => {
+        })
+		.then((results) => {
             // We already  have certificates
             if(results) { return; }
             
-            le.register({
+            return le.register({
                 domains: [config.domain],
                 email: config.email,
                 agreeTos: true,
                 rsaKeySize: 2048,
                 challengeType: 'http-01'
-            })
-            .then(
-                (certs) => {
-					return Promise.resolve(le);
-                },
-                (err) => {
-                    throw err;
-                }
-            );
-        });
+            });
+		})
+		.then(
+			(certs) => {
+				return Promise.resolve(le);
+			},
+			(err) => {
+				return Promise.reject(err);
+			}
+		);
     }
 }
 

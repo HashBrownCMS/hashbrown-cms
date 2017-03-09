@@ -73,7 +73,8 @@ PluginHelper.init(app)
 
 	return Promise.resolve();
 })
-.then(ready);
+.then(ready)
+.catch(debug.error);
 
 // ----------
 // Controllers
