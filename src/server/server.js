@@ -286,7 +286,7 @@ function ready() {
 	// Start HTTPS server
 	.then(() => {
 		if(SecurityHelper.isHTTPS()) {
-			return SecurityHelper.startLetsEncrypt()
+			return SecurityHelper.register()
 			.then((credentials) => {
 				https.createServer(credentials, app).listen(443);
 		
