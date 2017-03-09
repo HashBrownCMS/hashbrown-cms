@@ -48,21 +48,17 @@ class SecurityHelper {
      * @returns {Object} Let's encrypt handler
      */
     static startLetsEncrypt() {
-        if(!fs.existsSync(appRoot + '/config/ssl.json')) { return null; }
+        if(!fs.existsSync(appRoot + '/config/ssl.cfg')) { return null; }
 
-        let config = require('../../../config/ssl.json'); 
+        let config = require('../../../config/ssl.cfg'); 
 
         // Config sanity check
         if(!config.domain) {
-            throw new Error('Variable "domain" not set in /config/ssl.json');
+            throw new Error('Variable "domain" not set in /config/ssl.cfg');
         }
         
         if(!config.email) {
-            throw new Error('Variable "email" not set in /config/ssl.json');
-        }
-        
-        if(config.agreeTos != true && config.agreeTos != false) {
-            throw new Error('Variable "agreeTos" not set in /config/ssl.json');
+            throw new Error('Variable "email" not set in /config/ssl.cfg');
         }
         
         // Storage backend
@@ -103,7 +99,7 @@ class SecurityHelper {
             le.register({
                 domains: [config.domain],
                 email: config.email,
-                agreeTos: config.agreeTos,
+                agreeTos: true,
                 rsaKeySize: 2048,
                 challengeType: 'http-01'
             })
