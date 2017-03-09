@@ -70,7 +70,7 @@ class SecurityHelper {
         // Let's Encrypt instance
         let LE = require('greenlock');
         let le = LE.create({
-            server: LE.stagingServerUrl,
+            server: LE.productionServerUrl,
             store: leStore,
             challenges: { 'http-01': leChallenge },
             challengeType: 'http-01',
