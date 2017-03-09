@@ -3,6 +3,7 @@
 let fs = require('fs');
 
 let config = null;
+let handler = null;
 
 class SecurityHelper {
 	/**
@@ -59,14 +60,14 @@ class SecurityHelper {
 		return this.getConfig() != null;
 	}
 
-    /**
-     * Starts the letsencrypt handler
+	/**
+	 * Initiliases the letsencrypt instance
      *
-     * @returns {Object} Let's encrypt handler
-     */
-    static startLetsEncrypt() {
-		let config = this.getConfig();       
- 
+     * @returns {Object} Instance
+	 */
+	static init() {
+		let config = this.getConfig();
+
         // Storage backend
         let leStore = require('le-store-certbot').create({
             configDir: appRoot + '/certs',
@@ -95,6 +96,31 @@ class SecurityHelper {
             debug: false
         });
 
+		return le;
+	}
+
+	/**
+     * Gets the handler
+     *
+     * @returns {Object} handler
+     */
+   	static getHandler() {
+		if(!handler) {
+			handler = init();
+		}
+
+		return handler;
+	}
+
+    /**
+     * Registers the certs
+     *
+     * @returns {Object} Credentials
+     */
+    static register() {
+		let config = this.getConfig();
+		let le = this.getHandler();       
+
         // Check in-memory cache of certificates for the named domain
         return le.check({
             domains: [config.domain]
@@ -113,7 +139,7 @@ class SecurityHelper {
 		})
 		.then(
 			(certs) => {
-				return Promise.resolve(le);
+				return Promise.resolve(this.getCredentials());
 			},
 			(err) => {
 				return Promise.reject(err);

@@ -59,6 +59,14 @@ global.SyncHelper = require('./helpers/SyncHelper');
 
 global.debug = require('./helpers/DebugHelper');
 
+
+// ----------
+// Init
+// ----------
+if(SecurityHelper.isHTTPS()) {
+	app.use('/', SecurityHelper.getHandler().middleware());
+}
+
 PluginHelper.init(app)
 .then(ready)
 .catch(debug.error);
@@ -268,7 +276,7 @@ function ready() {
 		global.server = http.createServer(app).listen(port);
 
 		debug.log('HTTP server restarted', 'HashBrown');
-	   
+				 
 		// Start schedule helper
 		ScheduleHelper.startWatching();
         
@@ -279,10 +287,8 @@ function ready() {
 	.then(() => {
 		if(SecurityHelper.isHTTPS()) {
 			return SecurityHelper.startLetsEncrypt()
-			.then((le) => {
-				app.use('/', le.middleware());
-
-				https.createServer(SecurityHelper.getCredentials(), app).listen(443);
+			.then((credentials) => {
+				https.createServer(credentials, app).listen(443);
 		
 				debug.log('HTTPS server restarted', 'HashBrown');
 				
