@@ -13,4 +13,5 @@ config/*
 dump/*
 
 # SSL
-ssl/*
+certs/*
+
