@@ -266,7 +266,7 @@ function ready() {
             let port = process.env.PORT || 80;
             
             global.server = http.createServer(app).listen(port);
-            //https.createServer(SecurityHelper.getCredentials(), app).listen(443);
+            https.createServer(SecurityHelper.getCredentials(), app).listen(443);
             
             debug.log('Server restarted', 'HashBrown');
            
