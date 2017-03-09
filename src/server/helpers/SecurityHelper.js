@@ -48,7 +48,7 @@ class SecurityHelper {
      * @returns {Object} Let's encrypt handler
      */
     static startLetsEncrypt() {
-        let sslConfigPath = appRoot + '/config/mail.cfg';
+        let sslConfigPath = appRoot + '/config/ssl.cfg';
         
         if(!fs.existsSync(sslConfigPath)) { return null; }
 
