@@ -50,7 +50,7 @@ class SecurityHelper {
     static startLetsEncrypt() {
         let sslConfigPath = appRoot + '/config/mail.cfg';
         
-        if(!fs.existsSync(sslConfigPath) { return null; }
+        if(!fs.existsSync(sslConfigPath)) { return null; }
 
         let config = JSON.parse(fs.readFileSync(sslConfigPath)); 
 
