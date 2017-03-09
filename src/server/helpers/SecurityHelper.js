@@ -2,6 +2,8 @@
 
 let fs = require('fs');
 
+let config = null;
+
 class SecurityHelper {
 	/**
 	 * Gets the SSL config
@@ -9,18 +11,24 @@ class SecurityHelper {
 	 * @returns {Object} Config
 	 */
 	static getConfig() {
+		if(config) { return config; }
+
         let sslConfigPath = appRoot + '/config/ssl.cfg';
         
         if(!fs.existsSync(sslConfigPath)) { return null; }
 
-        let config = JSON.parse(fs.readFileSync(sslConfigPath)); 
+        config = JSON.parse(fs.readFileSync(sslConfigPath)); 
 
         // Config sanity check
         if(!config.domain) {
+			config = null;
+
             throw new Error('Variable "domain" not set in /config/ssl.cfg');
         }
         
         if(!config.email) {
+			config = null;
+
             throw new Error('Variable "email" not set in /config/ssl.cfg');
         }
 
@@ -41,6 +49,15 @@ class SecurityHelper {
 			ca: fs.readFileSync(appRoot + '/certs/live/' + config.domain + '/chain.pem')
 		};
     }
+
+	/**
+	 * Checks whether we're running HTTPS
+     *
+     * @returns {Boolean} True if config was found
+     */
+    static isHTTPS() {
+		return this.getConfig() != null;
+	}
 
     /**
      * Starts the letsencrypt handler

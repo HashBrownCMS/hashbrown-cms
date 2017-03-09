@@ -29,7 +29,10 @@ app.set('views', appRoot + '/src/server/views');
 // ----------
 // App middlewares
 // ----------
-app.use('/', SecurityHelper.startLetsEncrypt().middleware());
+if(SecurityHelper.isHTTPS()) {
+	app.use('/', SecurityHelper.startLetsEncrypt().middleware());
+}
+
 app.use(cookieparser());
 app.use(bodyparser.json({limit: '50mb'}));
 app.use(express.static(appRoot + '/public'));
@@ -266,7 +269,10 @@ function ready() {
             let port = process.env.PORT || 80;
             
             global.server = http.createServer(app).listen(port);
-            https.createServer(SecurityHelper.getCredentials(), app).listen(443);
+
+			if(SecurityHelper.isHTTPS()) {
+	            https.createServer(SecurityHelper.getCredentials(), app).listen(443);
+			}
             
             debug.log('Server restarted', 'HashBrown');
            
