@@ -11974,6 +11974,8 @@
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+	var VERBOSITY = 2;
+
 	var DebugHelper = function () {
 	    function DebugHelper() {
 	        _classCallCheck(this, DebugHelper);
@@ -12051,7 +12053,9 @@
 	            var senderName = '';
 
 	            if (sender) {
-	                if (typeof sender === 'function') {
+	                if (typeof sender === 'string') {
+	                    senderName = sender;
+	                } else if (typeof sender === 'function') {
 	                    senderName = sender.name;
 	                } else if (sender.constructor) {
 	                    senderName = sender.constructor.name;
@@ -12073,19 +12077,21 @@
 
 	    }, {
 	        key: 'log',
-	        value: function log(message, sender, verbosity) {
+	        value: function log(message, sender) {
+	            var verbosity = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
+
 	            if (verbosity == 0) {
-	                this.error('Verbosity cannot be set to 0', this);
+	                DebugHelper.error('Verbosity cannot be set to 0', this);
 	            } else if (!verbosity) {
 	                verbosity = 1;
 	            }
 
-	            if (this.verbosity >= verbosity) {
-	                var senderString = this.parseSender(sender);
-	                var dateString = this.getDateString();
+	            if (VERBOSITY >= verbosity) {
+	                var senderString = DebugHelper.parseSender(sender);
+	                var dateString = DebugHelper.getDateString();
 
 	                console.log(dateString, senderString, message);
-	                this.onLog(dateString, senderString, message);
+	                DebugHelper.onLog(dateString, senderString, message);
 	            }
 	        }
 
@@ -12103,7 +12109,7 @@
 	                message = message.message || message.trace;
 	            }
 
-	            console.log(this.getDateString(), this.parseSender(sender), message);
+	            console.log(DebugHelper.getDateString(), DebugHelper.parseSender(sender), message);
 
 	            throw new Error(message);
 	        }
@@ -12115,7 +12121,7 @@
 	    }, {
 	        key: 'warning',
 	        value: function warning(message, sender) {
-	            console.log(this.getDateString(), this.parseSender(sender), message);
+	            console.log(DebugHelper.getDateString(), DebugHelper.parseSender(sender), message);
 	            console.trace();
 	        }
 	    }]);
@@ -36019,8 +36025,13 @@
 			"exomon": "^1.1.0",
 			"express": "^4.13.3",
 			"glob": "^7.0.3",
+			"greenlock": "^2.1.12",
 			"jade": "^1.11.0",
 			"js-beautify": "^1.6.2",
+			"le-acme-core": "^2.0.9",
+			"le-challenge-fs": "^2.0.8",
+			"le-sni-auto": "^2.1.0",
+			"le-store-certbot": "^2.0.3",
 			"marked": "^0.3.5",
 			"mongodb": "^2.1.7",
 			"multer": "^1.1.0",
