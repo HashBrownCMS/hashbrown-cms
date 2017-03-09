@@ -100,18 +100,18 @@ class DebugHelper {
      */
     static log(message, sender, verbosity) {
         if(verbosity == 0) {
-            this.error('Verbosity cannot be set to 0', this);
+            DebugHelper.error('Verbosity cannot be set to 0', this);
 
         } else if(!verbosity) {
             verbosity = 1;
         }
 
-        if(this.verbosity >= verbosity) {
-            let senderString = this.parseSender(sender);
-            let dateString = this.getDateString();
+        if(DebugHelper.verbosity >= verbosity) {
+            let senderString = DebugHelper.parseSender(sender);
+            let dateString = DebugHelper.getDateString();
             
             console.log(dateString, senderString, message);
-            this.onLog(dateString, senderString, message);
+            DebugHelper.onLog(dateString, senderString, message);
         }
     }
 
@@ -126,7 +126,7 @@ class DebugHelper {
             message = message.message || message.trace;
         }
 
-        console.log(this.getDateString(), this.parseSender(sender), message);
+        console.log(DebugHelper.getDateString(), DebugHelper.parseSender(sender), message);
 
         throw new Error(message);
     }
@@ -135,7 +135,7 @@ class DebugHelper {
      * Shows a warning
      */
     static warning(message, sender) {
-        console.log(this.getDateString(), this.parseSender(sender), message);
+        console.log(DebugHelper.getDateString(), DebugHelper.parseSender(sender), message);
         console.trace();
     }
 }
