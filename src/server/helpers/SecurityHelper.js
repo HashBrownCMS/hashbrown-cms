@@ -27,13 +27,13 @@ class SecurityHelper {
         // Storage backend
         let leStore = require('le-store-certbot').create({
             configDir: appRoot + '/certs',
-            debug: false
+            debug: true
         });
 
         // ACME challenge handler
         let leChallenge = require('le-challenge-fs').create({
             webrootPath: '/',
-            debug: false
+            debug: true
         });
 
         // Agreement handler
