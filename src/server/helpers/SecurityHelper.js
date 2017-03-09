@@ -112,6 +112,21 @@ class SecurityHelper {
 		return handler;
 	}
 
+	/**
+     * Checks and redirects to HTTPS if needed
+	 *
+	 * @param {Object} req
+	 * @param {Object} res
+	 * @param {Function} next
+	 */
+	static checkHTTPS(req, res, next) {
+		if(SecurityHelper.isHTTPS() && !req.secure) {
+			return res.redirect('https://' + req.get('host') + req.url);
+		}
+
+		next();
+	}
+
     /**
      * Registers the certs
      *

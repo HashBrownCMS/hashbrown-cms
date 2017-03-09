@@ -195,7 +195,7 @@ app.get('/text/:name', function(req, res) {
 });
 
 // Login
-app.get('/login/', function(req, res) {
+app.get('/login/', SecurityHelper.checkHTTPS, function(req, res) {
     if(req.query.inviteToken) {
         UserHelper.findInviteToken(req.query.inviteToken)
         .then((user) => {
@@ -216,7 +216,7 @@ app.get('/login/', function(req, res) {
 });
 
 // Dashboard
-app.get('/', function(req, res) {
+app.get('/', SecurityHelper.checkHTTPS, function(req, res) {
     let user;
 
     ApiController.authenticate(req.cookies.token)
@@ -236,7 +236,7 @@ app.get('/', function(req, res) {
 });
 
 // Environment
-app.get('/:project/:environment/', function(req, res) {
+app.get('/:project/:environment/', SecurityHelper.checkHTTPS, function(req, res) {
     let user;
     
     ApiController.authenticate(req.cookies.token)
