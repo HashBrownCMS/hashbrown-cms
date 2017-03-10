@@ -173,6 +173,54 @@
 	            }
 	        }
 	    }
+	})
+
+	// --------------------
+	// Updates
+	// --------------------
+	.then(function () {
+	    if (!User.current.isAdmin) {
+	        return;
+	    }
+
+	    apiCall('get', 'server/update/check').then(function (update) {
+	        if (update.behind) {
+	            $('.dashboard-container').prepend(_.div({ class: 'update' }, _.p('You are ' + update.amount + ' version' + (update.amount != '1' ? 's' : '') + ' behind ' + update.branch), _.p('Comment: "' + update.comment + '"'), _.button({ class: 'btn btn-primary btn-update-hashbrown' }, 'Update').click(function () {
+	                UI.messageModal('Update', 'HashBrown is updating...', false);
+
+	                apiCall('post', 'server/update/start').then(function () {
+	                    new MessageModal({
+	                        model: {
+	                            title: 'Success',
+	                            body: 'HashBrown was updated successfully'
+	                        },
+	                        buttons: [{
+	                            label: 'Cool!',
+	                            class: 'btn-primary',
+	                            callback: function callback() {
+	                                UI.messageModal('Success', 'HashBrown is restarting...', false);
+
+	                                function poke() {
+	                                    $.ajax({
+	                                        type: 'get',
+	                                        url: '/',
+	                                        success: function success() {
+	                                            location.reload();
+	                                        },
+	                                        error: function error() {
+	                                            poke();
+	                                        }
+	                                    });
+	                                }
+
+	                                poke();
+	                            }
+	                        }]
+	                    });
+	                }).catch(UI.errorModal);
+	            })));
+	        }
+	    });
 	}).catch(UI.errorModal);
 
 	// --------------------
@@ -304,50 +352,6 @@
 	        }]
 	    });
 	});
-
-	// --------------------
-	// Check for updates
-	// --------------------
-	if (User.current.isAdmin) {
-	    apiCall('get', 'server/update/check').then(function (update) {
-	        if (update.behind) {
-	            $('.dashboard-container').prepend(_.div({ class: 'update' }, _.p('You are ' + update.amount + ' version' + (update.amount != '1' ? 's' : '') + ' behind ' + update.branch), _.p('Comment: "' + update.comment + '"'), _.button({ class: 'btn btn-primary btn-update-hashbrown' }, 'Update').click(function () {
-	                UI.messageModal('Update', 'HashBrown is updating...', false);
-
-	                apiCall('post', 'server/update/start').then(function () {
-	                    new MessageModal({
-	                        model: {
-	                            title: 'Success',
-	                            body: 'HashBrown was updated successfully'
-	                        },
-	                        buttons: [{
-	                            label: 'Cool!',
-	                            class: 'btn-primary',
-	                            callback: function callback() {
-	                                UI.messageModal('Success', 'HashBrown is restarting...', false);
-
-	                                function poke() {
-	                                    $.ajax({
-	                                        type: 'get',
-	                                        url: '/',
-	                                        success: function success() {
-	                                            location.reload();
-	                                        },
-	                                        error: function error() {
-	                                            poke();
-	                                        }
-	                                    });
-	                                }
-
-	                                poke();
-	                            }
-	                        }]
-	                    });
-	                }).catch(UI.errorModal);
-	            })));
-	        }
-	    });
-	}
 
 /***/ },
 /* 1 */,
