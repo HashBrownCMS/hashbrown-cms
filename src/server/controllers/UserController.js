@@ -13,7 +13,7 @@ class UserController extends ApiController {
         app.get('/api/:project/:environment/users', this.middleware(), this.getUsers);
         app.get('/api/:project/:environment/users/:id', this.middleware(), this.getUser);
         
-        app.post('/api/user/invite', this.middleware({needsAdmin: true}), this.postInvite);
+        app.post('/api/user/invite', this.middleware({needsAdmin: true, setProject: false}), this.postInvite);
         app.post('/api/user/activate', this.postActivate);
         app.post('/api/user/login', this.login);
         app.post('/api/user/new', this.middleware({setProject: false, needsAdmin: true}), this.createUser);
