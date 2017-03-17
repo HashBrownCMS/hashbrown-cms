@@ -3,7 +3,7 @@
 // Root
 Router.route('/', function() {
     ViewHelper.get('NavbarMain').showTab('/');
-    ViewHelper.get('NavbarMain').highlightItem('null');
+    ViewHelper.get('NavbarMain').highlightItem('/', 'null');
 
     let carouselItems = [
         [
@@ -102,7 +102,7 @@ Router.route('/', function() {
 
 // Readme
 Router.route('/readme/', function() {
-    ViewHelper.get('NavbarMain').highlightItem('readme');
+    ViewHelper.get('NavbarMain').highlightItem('/', 'readme');
 
     $.ajax({
         type: 'GET',
@@ -120,7 +120,7 @@ Router.route('/readme/', function() {
 
 // License
 Router.route('/license/', function() {
-    ViewHelper.get('NavbarMain').highlightItem('license');
+    ViewHelper.get('NavbarMain').highlightItem('/', 'license');
 
     $.ajax({
         type: 'GET',

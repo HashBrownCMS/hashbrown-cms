@@ -298,6 +298,21 @@
                             }
                         }
 
+                        // Locked icon
+                        &[data-locked="true"] {
+                            >.pane-item {
+                                .pane-item-label {
+                                    &:after {
+                                        content: '\f023';
+                                        font-family: 'FontAwesome';
+                                        opacity: 0.25;
+                                        margin-left: 10px;
+                                    }
+                                }
+                            }
+                        }
+                        
+                        // Remote icon
                         &[data-remote="true"] {
                             >.pane-item {
                                 .pane-item-label {
@@ -311,30 +326,17 @@
                             }
                         }
 
-                        &[data-locked="true"] {
+                        // Loading icon
+                        &.loading {
                             >.pane-item {
-                                .pane-item-label {
-                                    &:after {
-                                        content: '\f023';
-                                        font-family: 'FontAwesome';
-                                        opacity: 0.25;
-                                        margin-left: 10px;
-                                    }
-                                }
-                            }
-                            
-                            &[data-remote="true"] {
-                                >.pane-item {
-                                    .pane-item-label {
-                                        &:before {
-                                            content: '\f14c';
-                                            font-family: 'FontAwesome';
-                                            opacity: 0.25;
-                                            margin-left: 10px;
-                                            position: absolute;
-                                            right: -20px;
-                                        }
-                                    }
+                                &:after {
+                                    content: '\f1ce';
+                                    font-family: 'FontAwesome';
+                                    position: absolute;
+                                    right: 10px;
+                                    color: $primary;
+                                    top: 50%;
+                                    animation: spinner 1s linear infinite;
                                 }
                             }
                         }

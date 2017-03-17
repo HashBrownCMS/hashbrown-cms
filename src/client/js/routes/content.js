@@ -15,7 +15,7 @@ Router.route('/content/', function() {
 
 // Edit (JSON editor)
 Router.route('/content/json/:id', function() {
-    ViewHelper.get('NavbarMain').highlightItem(this.id);
+    ViewHelper.get('NavbarMain').highlightItem('/content/', this.id);
     
     let contentEditor = new JSONEditor({
         modelUrl: apiUrl('content/' + this.id),
@@ -51,7 +51,7 @@ Router.route('/content/:id/:tab', function() {
     let contentEditor = ViewHelper.get('ContentEditor');
   
     if(!contentEditor || !contentEditor.model || contentEditor.model.id != this.id) {
-        ViewHelper.get('NavbarMain').highlightItem(this.id);
+        ViewHelper.get('NavbarMain').highlightItem('/content/', this.id);
    
         contentEditor = new ContentEditor({
             modelUrl: apiUrl('content/' + this.id)

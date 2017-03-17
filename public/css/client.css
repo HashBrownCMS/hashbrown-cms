@@ -1168,6 +1168,8 @@ body.dashboard-container {
       .array-editor .items .item .schema-label {
         display: none; }
       .array-editor .items .item .kvp .key {
+        text-overflow: ellipsis;
+        overflow: hidden;
         padding: 0.5em 1em 0em 0em;
         line-height: 1.25em; }
       .array-editor .items .item > .item-schema-selector {
@@ -1798,23 +1800,24 @@ body.dashboard-container {
             display: none; }
           .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container:not(.open) > .children {
             display: none; }
-          .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container[data-remote="true"] > .pane-item .pane-item-label:after {
-            content: '\F14C';
-            font-family: 'FontAwesome';
-            opacity: 0.25;
-            margin-left: 10px; }
           .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container[data-locked="true"] > .pane-item .pane-item-label:after {
             content: '\F023';
             font-family: 'FontAwesome';
             opacity: 0.25;
             margin-left: 10px; }
-          .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container[data-locked="true"][data-remote="true"] > .pane-item .pane-item-label:before {
+          .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container[data-remote="true"] > .pane-item .pane-item-label:after {
             content: '\F14C';
             font-family: 'FontAwesome';
             opacity: 0.25;
-            margin-left: 10px;
+            margin-left: 10px; }
+          .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container.loading > .pane-item:after {
+            content: '\F1CE';
+            font-family: 'FontAwesome';
             position: absolute;
-            right: -20px; }
+            right: 10px;
+            color: #e70d3b;
+            top: 50%;
+            animation: spinner 1s linear infinite; }
           .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item-insert-below {
             position: absolute;
             height: 6px;

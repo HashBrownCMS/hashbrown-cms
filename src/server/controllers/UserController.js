@@ -16,6 +16,7 @@ class UserController extends ApiController {
         app.post('/api/user/invite', this.middleware({needsAdmin: true, setProject: false}), this.postInvite);
         app.post('/api/user/activate', this.postActivate);
         app.post('/api/user/login', this.login);
+        app.post('/api/user/first', this.createFirstAdmin);
         app.post('/api/user/new', this.middleware({setProject: false, needsAdmin: true}), this.createUser);
         app.post('/api/user/:id', this.middleware({setProject: false}), this.postUser);
         app.post('/api/:project/:environment/user/:id', this.middleware(), this.postUser);
@@ -188,6 +189,32 @@ class UserController extends ApiController {
         })
         .catch((e) => {
             res.status(502).send(UserController.printError(e));
+        });
+    }
+    
+    /**
+     * Creates the first admin
+     */
+    static createFirstAdmin(req, res) {
+        let username = req.body.username;
+        let password = req.body.password;
+
+        UserHelper.getAllUsers()
+        .then((users) => {
+            if(users && users.length > 0) {
+                return Promise.reject(new Error('Cannot create first admin, users already exist. If you lost your credentials, please create the new admin with the server console.'));
+            }
+
+            return UserHelper.createUser(username, password, true);
+        })
+        .then((user) => {
+            return UserHelper.loginUser(username, password);
+        })
+        .then((token) => {
+            res.status(200).cookie('token', token).send(token);
+        })
+        .catch((e) => {
+            res.status(403).send(UserController.printError(e));   
         });
     }
     

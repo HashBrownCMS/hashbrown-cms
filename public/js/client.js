@@ -12527,30 +12527,46 @@
 	    }, {
 	        key: 'renderPane',
 	        value: function renderPane(params) {
-	            var view = this;
+	            var _this2 = this;
+
+	            // Render icon
 	            var $icon = params.$icon;
 
 	            if (!$icon) {
 	                $icon = _.span({ class: 'fa fa-' + params.icon });
 	            }
 
-	            var $button = _.button({ 'data-route': params.route, title: params.label }, _.div({ class: 'pane-icon' }, $icon), _.div({ class: 'pane-text' }, _.span({ class: 'pane-label' }, params.label), params.sublabel ? _.span({ class: 'pane-sublabel' }, params.sublabel) : '')).click(function () {
-	                var $currentTab = view.$element.find('.pane-container.active');
+	            // Render button
+	            var $button = $('button[data-route="' + params.route + '"]');
 
-	                if (params.route == $currentTab.attr('data-route')) {
-	                    location.hash = params.route;
-	                } else {
-	                    view.showTab(params.route);
-	                }
-	            });
+	            // Button does not exist, create and append it
+	            if ($button.length < 1) {
+	                $button = _.button({ 'data-route': params.route, title: params.label }, _.div({ class: 'pane-icon' }, $icon), _.div({ class: 'pane-text' }, _.span({ class: 'pane-label' }, params.label), params.sublabel ? _.span({ class: 'pane-sublabel' }, params.sublabel) : '')).click(function () {
+	                    var $currentTab = _this2.$element.find('.pane-container.active');
 
-	            var $pane = _.div({ class: 'pane' });
+	                    if (params.route == $currentTab.attr('data-route')) {
+	                        location.hash = params.route;
+	                    } else {
+	                        _this2.showTab(params.route);
+	                    }
+	                });
+
+	                this.$element.find('.tab-buttons').append($button);
+	            }
+
+	            // Render pane 
+	            var $pane = $('.pane-container[data-route="' + params.route + '"] .pane');
+
+	            // Pane didn't exist, create it (it will be appended further down)
+	            if ($pane.length < 1) {
+	                $pane = _.div({ class: 'pane' });
+	            }
 
 	            var items = params.items;
 	            var sortingQueue = [];
 
-	            // Items
-	            $pane.append(_.each(items, function (i, item) {
+	            // Render items
+	            _.each(items, function (i, item) {
 	                var id = item.id || i;
 	                var isDirectory = false;
 
@@ -12599,7 +12615,7 @@
 
 	                var routingPath = item.shortPath || item.path || item.id || null;
 	                var queueItem = {};
-	                var icon = item.icon;
+	                var icon = item.icon || params.icon;
 	                var $icon = void 0;
 
 	                // Implement custom routing paths
@@ -12626,10 +12642,23 @@
 	                }
 
 	                // Item element
+	                var $existingElement = $pane.find('.pane-item-container[data-routing-path="' + routingPath + '"]');
 	                var $element = _.div({
 	                    class: 'pane-item-container',
 	                    'data-routing-path': routingPath
-	                }, _.a({
+	                });
+
+	                // Element exists already, replace
+	                if ($existingElement.length > 0) {
+	                    $existingElement.replaceWith($element);
+
+	                    // Element didn't exist already, create it and append to pane
+	                } else {
+	                    $pane.append($element);
+	                }
+
+	                // Populate element
+	                _.append($element.empty(), _.a({
 	                    'data-id': id,
 	                    'data-name': name,
 	                    href: '#' + (routingPath ? params.route + routingPath : params.route),
@@ -12673,17 +12702,7 @@
 
 	                // Add queue item to sorting queue
 	                sortingQueue.push(queueItem);
-
-	                // Add drag/drop event
-	                if (!item.locked && typeof params.onEndDrag === 'function') {
-	                    $element.exodragdrop({
-	                        lockX: true,
-	                        onEndDrag: params.onEndDrag
-	                    });
-	                }
-
-	                return $element;
-	            }));
+	            });
 
 	            // Place items into hierarchy
 	            var _iteratorNormalCompletion = true;
@@ -12794,11 +12813,20 @@
 	            });
 
 	            // Render pane container
-	            var $paneContainer = _.div({ class: 'pane-container', 'data-route': params.route }, _.if(params.toolbar, params.toolbar), _.div({ class: 'pane-move-buttons' }, _.button({ class: 'btn btn-move-to-root' }, 'Move to root'), _.button({ class: 'btn btn-new-folder' }, 'New folder')), $pane);
+	            var $paneContainer = $('.pane-container[data-route="' + params.route + '"]');
 
-	            // Attach pane context menu
-	            if (params.paneContextMenu) {
-	                $paneContainer.exocontext(params.paneContextMenu);
+	            // Pane container didn't already exist, create it
+	            if ($paneContainer.length < 1) {
+	                // Render pane container
+	                $paneContainer = _.div({ class: 'pane-container', 'data-route': params.route }, _.if(params.toolbar, params.toolbar), _.div({ class: 'pane-move-buttons' }, _.button({ class: 'btn btn-move-to-root' }, 'Move to root'), _.button({ class: 'btn btn-new-folder' }, 'New folder')), $pane);
+
+	                // Attach pane context menu
+	                if (params.paneContextMenu) {
+	                    $paneContainer.exocontext(params.paneContextMenu);
+	                }
+
+	                // Append to pane container parent
+	                this.$element.find('.tab-panes').append($paneContainer);
 	            }
 
 	            // Add expand/collapse buttons to items if needed
@@ -12831,9 +12859,6 @@
 	                $paneContainer.addClass('active');
 	                $button.addClass('active');
 	            }
-
-	            this.$element.find('.tab-panes').append($paneContainer);
-	            this.$element.find('.tab-buttons').append($button);
 	        }
 
 	        /**
@@ -12872,7 +12897,7 @@
 	                if ($currentItem.length > 0) {
 	                    var currentRoute = $currentItem.attr('data-id') || $currentItem.attr('data-routing-path');
 
-	                    this.highlightItem(currentRoute);
+	                    this.highlightItem(currentTabName, currentRoute);
 	                } else {
 	                    this.showTab(currentTabName);
 	                }
@@ -12885,11 +12910,11 @@
 	        /**
 	         * Highlights an item
 	         */
-	        value: function highlightItem(route) {
-	            var view = this;
+	        value: function highlightItem(tab, route) {
+	            this.showTab(tab);
 
-	            this.$element.find('.pane-item-container').each(function (i) {
-	                var $item = $(this);
+	            this.$element.find('.pane-container.active .pane-item-container').each(function (i, element) {
+	                var $item = $(element);
 	                var id = ($item.children('a').attr('data-id') || '').toLowerCase();
 	                var routingPath = ($item.attr('data-routing-path') || '').toLowerCase();
 
@@ -12897,10 +12922,7 @@
 
 	                if (id == route.toLowerCase() || routingPath == route.toLowerCase()) {
 	                    $item.toggleClass('active', true);
-
 	                    $item.parents('.pane-item-container').toggleClass('open', true);
-
-	                    view.showTab($item.parents('.pane-container').attr('data-route'));
 	                }
 	            });
 	        }
@@ -12913,10 +12935,6 @@
 	    }, {
 	        key: 'render',
 	        value: function render() {
-	            var view = this;
-
-	            this.clear();
-
 	            var isAdmin = User.current.isAdmin;
 	            var hasConnectionsScope = User.current.hasScope(ProjectHelper.currentProject, 'connections');
 	            var hasSchemasScope = User.current.hasScope(ProjectHelper.currentProject, 'schemas');
@@ -12958,7 +12976,7 @@
 	    }], [{
 	        key: 'reload',
 	        value: function reload() {
-	            var view = ViewHelper.get('NavbarMain').reload();
+	            ViewHelper.get('NavbarMain').reload();
 	        }
 	    }]);
 
@@ -21490,10 +21508,7 @@
 	            .then(function () {
 	                navbar.reload();
 
-	                if (connectionEditor && connectionEditor.model.id == pullId) {
-	                    connectionEditor.model = null;
-	                    connectionEditor.fetch();
-	                }
+	                location.hash = '/connections/' + pullId;
 	            }).catch(UI.errorModal);
 	        }
 
@@ -21505,7 +21520,10 @@
 	        key: 'onClickPushConnection',
 	        value: function onClickPushConnection() {
 	            var navbar = ViewHelper.get('NavbarMain');
-	            var pushId = $('.context-menu-target-element').data('id');
+	            var $element = $('.context-menu-target-element');
+	            var pushId = $element.data('id');
+
+	            $element.parent().addClass('loading');
 
 	            // API call to push the Connection by id
 	            apiCall('post', 'connections/push/' + pushId)
@@ -21752,10 +21770,7 @@
 	            .then(function () {
 	                navbar.reload();
 
-	                if (contentEditor && contentEditor.model.id == pullId) {
-	                    contentEditor.model = null;
-	                    contentEditor.fetch();
-	                }
+	                location.hash = '/content/' + pullId;
 	            }).catch(UI.errorModal);
 	        }
 
@@ -21767,7 +21782,10 @@
 	        key: 'onClickPushContent',
 	        value: function onClickPushContent() {
 	            var navbar = ViewHelper.get('NavbarMain');
-	            var pushId = $('.context-menu-target-element').data('id');
+	            var $element = $('.context-menu-target-element');
+	            var pushId = $element.data('id');
+
+	            $element.parent().addClass('loading');
 
 	            // API call to push the Content by id
 	            apiCall('post', 'content/push/' + pushId)
@@ -22249,7 +22267,6 @@
 	        key: 'onClickPullForm',
 	        value: function onClickPullForm() {
 	            var navbar = ViewHelper.get('NavbarMain');
-	            var formEditor = ViewHelper.get('FormEditor');
 	            var pullId = $('.context-menu-target-element').data('id');
 
 	            // API call to pull the Form by id
@@ -22264,10 +22281,7 @@
 	            .then(function () {
 	                navbar.reload();
 
-	                if (formEditor && formEditor.model.id == pullId) {
-	                    formEditor.model = null;
-	                    formEditor.fetch();
-	                }
+	                location.hash = '/forms/' + pullId;
 	            }).catch(UI.errorModal);
 	        }
 
@@ -22279,25 +22293,15 @@
 	        key: 'onClickPushForm',
 	        value: function onClickPushForm() {
 	            var navbar = ViewHelper.get('NavbarMain');
-	            var pushId = $('.context-menu-target-element').data('id');
-	            var formEditor = ViewHelper.get('FormEditor');
+	            var $element = $('.context-menu-target-element');
+	            var pushId = $element.data('id');
 
-	            // API call to push the Content by id
-	            apiCall('post', 'forms/push/' + pushId)
+	            $element.parent().addClass('loading');
 
-	            // Upon success, reload all Content models
-	            .then(function () {
+	            apiCall('post', 'forms/push/' + pushId).then(function () {
 	                return reloadResource('forms');
-	            })
-
-	            // Reload the UI
-	            .then(function () {
+	            }).then(function () {
 	                navbar.reload();
-
-	                if (formEditor && formEditor.model.id == pushId) {
-	                    formEditor.model = null;
-	                    formEditor.fetch();
-	                }
 	            }).catch(UI.errorModal);
 	        }
 	    }, {
@@ -22754,10 +22758,7 @@
 	            }).then(function () {
 	                navbar.reload();
 
-	                if (schemaEditor && schemaEditor.model.id == pullId) {
-	                    schemaEditor.model = null;
-	                    schemaEditor.fetch();
-	                }
+	                location.hash = '/schemas/' + pullId;
 	            }).catch(errorModal);
 	        }
 
@@ -22900,7 +22901,7 @@
 	                }, {
 	                    name: 'Providers',
 	                    path: 'providers',
-	                    icon: 'exchange'
+	                    icon: 'gift'
 	                }]
 	            };
 	        }
@@ -33567,7 +33568,7 @@
 
 	                _this3.model = providersSettings || {};
 
-	                _.append(_this3.$element.empty(), _.div({ class: 'editor-header' }, _.span({ class: 'fa fa-exchange' }), _.h4('Providers')), _.div({ class: 'editor-body' }, _this3.renderField('Media', UI.inputDropdownTypeAhead(_this3.model.media, connectionOptions, function (newValue) {
+	                _.append(_this3.$element.empty(), _.div({ class: 'editor-header' }, _.span({ class: 'fa fa-gift' }), _.h4('Providers')), _.div({ class: 'editor-body' }, _this3.renderField('Media', UI.inputDropdownTypeAhead(_this3.model.media, connectionOptions, function (newValue) {
 	                    _this3.model.media = newValue;
 	                }, true)), _this3.renderField('Templates', UI.inputDropdownTypeAhead(_this3.model.template, connectionOptions, function (newValue) {
 	                    _this3.model.template = newValue;
@@ -36418,7 +36419,7 @@
 
 	Router.route('/', function () {
 	    ViewHelper.get('NavbarMain').showTab('/');
-	    ViewHelper.get('NavbarMain').highlightItem('null');
+	    ViewHelper.get('NavbarMain').highlightItem('/', 'null');
 
 	    var carouselItems = [[_.div(_.img({ src: '/img/welcome/intro-content.jpg' })), _.div(_.h2('Content'), _.p('In the content section you will find all of your authored work. The content is a hierarchical tree of nodes that can contain text and media, in simple or complex structures.'))], [_.div(_.img({ src: '/img/welcome/intro-media.jpg' })), _.div(_.h2('Media'), _.p('An asset library for your hosted files, such as images, videos, PDFs and whatnot.'))], [_.div(_.img({ src: '/img/welcome/intro-forms.jpg' })), _.div(_.h2('Forms'), _.p('If you need an input form on your website, you can create the model for it here and see a list of the user submitted input.'))]];
 
@@ -36443,7 +36444,7 @@
 
 	// Readme
 	Router.route('/readme/', function () {
-	    ViewHelper.get('NavbarMain').highlightItem('readme');
+	    ViewHelper.get('NavbarMain').highlightItem('/', 'readme');
 
 	    $.ajax({
 	        type: 'GET',
@@ -36456,7 +36457,7 @@
 
 	// License
 	Router.route('/license/', function () {
-	    ViewHelper.get('NavbarMain').highlightItem('license');
+	    ViewHelper.get('NavbarMain').highlightItem('/', 'license');
 
 	    $.ajax({
 	        type: 'GET',
@@ -36483,7 +36484,7 @@
 
 	// Edit (JSON editor)
 	Router.route('/content/json/:id', function () {
-	    ViewHelper.get('NavbarMain').highlightItem(this.id);
+	    ViewHelper.get('NavbarMain').highlightItem('/content/', this.id);
 
 	    var contentEditor = new JSONEditor({
 	        modelUrl: apiUrl('content/' + this.id),
@@ -36521,7 +36522,7 @@
 	    var contentEditor = ViewHelper.get('ContentEditor');
 
 	    if (!contentEditor || !contentEditor.model || contentEditor.model.id != this.id) {
-	        ViewHelper.get('NavbarMain').highlightItem(this.id);
+	        ViewHelper.get('NavbarMain').highlightItem('/content/', this.id);
 
 	        contentEditor = new ContentEditor({
 	            modelUrl: apiUrl('content/' + this.id)
@@ -36556,7 +36557,7 @@
 	            modelUrl: apiUrl('connections/' + this.id)
 	        });
 
-	        ViewHelper.get('NavbarMain').highlightItem(this.id);
+	        ViewHelper.get('NavbarMain').highlightItem('/connections/', this.id);
 
 	        populateWorkspace(connectionEditor.$element);
 	    } else {
@@ -36571,7 +36572,7 @@
 	            apiPath: 'connections/' + this.id
 	        });
 
-	        ViewHelper.get('NavbarMain').highlightItem(this.id);
+	        ViewHelper.get('NavbarMain').highlightItem('/connections/', this.id);
 
 	        populateWorkspace(connectionEditor.$element);
 	    } else {
@@ -36599,7 +36600,7 @@
 	        modelUrl: apiUrl('media/' + this.id)
 	    });
 
-	    ViewHelper.get('NavbarMain').highlightItem(this.id);
+	    ViewHelper.get('NavbarMain').highlightItem('/media/', this.id);
 
 	    populateWorkspace(mediaViewer.$element);
 	});
@@ -36629,7 +36630,7 @@
 	            modelUrl: apiUrl('schemas/' + this.id)
 	        });
 
-	        ViewHelper.get('NavbarMain').highlightItem(this.id);
+	        ViewHelper.get('NavbarMain').highlightItem('/schemas/', this.id);
 
 	        populateWorkspace(schemaEditor.$element);
 	    } else {
@@ -36652,7 +36653,7 @@
 	            }
 	        });
 
-	        ViewHelper.get('NavbarMain').highlightItem(this.id);
+	        ViewHelper.get('NavbarMain').highlightItem('/schemas/', this.id);
 
 	        populateWorkspace(jsonEditor.$element);
 	    } else {
@@ -36681,7 +36682,7 @@
 	// Sync
 	Router.route('/settings/sync/', function () {
 	    if (currentUserHasScope('settings')) {
-	        ViewHelper.get('NavbarMain').highlightItem('sync');
+	        ViewHelper.get('NavbarMain').highlightItem('/settings/', 'sync');
 
 	        populateWorkspace(new SyncSettings().$element);
 	    } else {
@@ -36692,7 +36693,7 @@
 	// Providers
 	Router.route('/settings/providers/', function () {
 	    if (currentUserHasScope('settings')) {
-	        ViewHelper.get('NavbarMain').highlightItem('providers');
+	        ViewHelper.get('NavbarMain').highlightItem('/settings/', 'providers');
 
 	        populateWorkspace(new ProvidersSettings().$element);
 	    } else {
@@ -36721,7 +36722,7 @@
 	// Edit
 	Router.route('/templates/:type/:id', function () {
 	    if (currentUserHasScope('templates')) {
-	        ViewHelper.get('NavbarMain').highlightItem(this.type + '/' + this.id);
+	        ViewHelper.get('NavbarMain').highlightItem('/templates/', this.type + '/' + this.id);
 
 	        var templateEditor = new TemplateEditor({
 	            modelUrl: apiUrl('templates/' + this.type + '/' + this.id)
@@ -36749,7 +36750,7 @@
 
 	// Edit
 	Router.route('/forms/:id', function () {
-	    ViewHelper.get('NavbarMain').highlightItem(this.id);
+	    ViewHelper.get('NavbarMain').highlightItem('/forms/', this.id);
 
 	    var formEditor = new FormEditor({
 	        modelUrl: apiUrl('forms/' + this.id)
@@ -36765,7 +36766,7 @@
 	        apiPath: 'forms/' + this.id
 	    });
 
-	    ViewHelper.get('NavbarMain').highlightItem(this.id);
+	    ViewHelper.get('NavbarMain').highlightItem('/forms/', this.id);
 
 	    populateWorkspace(formEditor.$element);
 	});

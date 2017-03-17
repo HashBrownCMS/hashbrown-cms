@@ -126,10 +126,7 @@ class ContentPane extends Pane {
         .then(() => {
             navbar.reload();
 
-            if(contentEditor && contentEditor.model.id == pullId) {
-                contentEditor.model = null;
-                contentEditor.fetch();
-            }
+			location.hash = '/content/' + pullId;
         }) 
         .catch(UI.errorModal);
     }
@@ -139,7 +136,10 @@ class ContentPane extends Pane {
      */
     static onClickPushContent() {
         let navbar = ViewHelper.get('NavbarMain');
-        let pushId = $('.context-menu-target-element').data('id');
+		let $element = $('.context-menu-target-element');
+        let pushId = $element.data('id');
+
+		$element.parent().addClass('loading');
 
         // API call to push the Content by id
         apiCall('post', 'content/push/' + pushId)

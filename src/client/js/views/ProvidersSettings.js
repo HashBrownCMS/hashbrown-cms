@@ -75,7 +75,7 @@ class ProvidersSettings extends View {
 
             _.append(this.$element.empty(),
                 _.div({class: 'editor-header'},
-                    _.span({class: 'fa fa-exchange'}),
+                    _.span({class: 'fa fa-gift'}),
                     _.h4('Providers')
                 ),
                 _.div({class: 'editor-body'},

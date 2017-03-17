@@ -26,7 +26,7 @@ Router.route('/connections/:id', function() {
             modelUrl: apiUrl('connections/' + this.id)
         });
        
-        ViewHelper.get('NavbarMain').highlightItem(this.id);
+        ViewHelper.get('NavbarMain').highlightItem('/connections/', this.id);
         
         populateWorkspace(connectionEditor.$element);
     
@@ -43,7 +43,7 @@ Router.route('/connections/json/:id', function() {
             apiPath: 'connections/' + this.id
         });
          
-        ViewHelper.get('NavbarMain').highlightItem(this.id);
+        ViewHelper.get('NavbarMain').highlightItem('/connections/', this.id);
         
         populateWorkspace(connectionEditor.$element);
     

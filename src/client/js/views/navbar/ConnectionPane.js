@@ -91,10 +91,7 @@ class ConnectionPane extends Pane {
         .then(() => {
             navbar.reload();
 
-            if(connectionEditor && connectionEditor.model.id == pullId) {
-                connectionEditor.model = null;
-                connectionEditor.fetch();
-            }
+			location.hash = '/connections/' + pullId;
         }) 
         .catch(UI.errorModal);
     }
@@ -104,7 +101,10 @@ class ConnectionPane extends Pane {
      */
     static onClickPushConnection() {
         let navbar = ViewHelper.get('NavbarMain');
-        let pushId = $('.context-menu-target-element').data('id');
+		let $element = $('.context-menu-target-element');
+        let pushId = $element.data('id');
+
+		$element.parent().addClass('loading');
 
         // API call to push the Connection by id
         apiCall('post', 'connections/push/' + pushId)

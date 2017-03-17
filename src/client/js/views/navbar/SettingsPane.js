@@ -17,7 +17,7 @@ class SettingsPane extends Pane {
                 {
                     name: 'Providers',
                     path: 'providers',
-                    icon: 'exchange'
+                    icon: 'gift'
                 }
             ]
         };

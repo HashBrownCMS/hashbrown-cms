@@ -101,11 +101,8 @@ class SchemaPane extends Pane {
         })
         .then(() => {
             navbar.reload();
-            
-            if(schemaEditor && schemaEditor.model.id == pullId) {
-                schemaEditor.model = null;
-                schemaEditor.fetch();
-            }
+           
+			location.hash = '/schemas/' + pullId;
         }) 
         .catch(errorModal);
     }

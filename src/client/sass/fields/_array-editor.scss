@@ -146,6 +146,8 @@
 
             .kvp {
                 .key {
+                    text-overflow: ellipsis;
+                    overflow: hidden;
                     padding: 0.5em 1em 0em 0em;
                     line-height: 1.25em;
                 }

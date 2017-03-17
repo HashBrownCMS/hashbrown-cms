@@ -19,7 +19,7 @@ Router.route('/media/:id', function() {
         modelUrl: apiUrl('media/' + this.id)
     });
     
-    ViewHelper.get('NavbarMain').highlightItem(this.id);
+    ViewHelper.get('NavbarMain').highlightItem('/media/', this.id);
     
     populateWorkspace(mediaViewer.$element);
 });

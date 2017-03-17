@@ -61,189 +61,205 @@ class NavbarMain extends View {
      * @param {Object} params
      */
     renderPane(params) {
-        let view = this;
+        // Render icon
         let $icon = params.$icon;
        
         if(!$icon) {        
             $icon = _.span({class: 'fa fa-' + params.icon});
         }
 
-        let $button = _.button({'data-route': params.route, title: params.label},
-            _.div({class: 'pane-icon'},
-                $icon
-            ),
-            _.div({class: 'pane-text'},
-                _.span({class: 'pane-label'}, params.label),
-                params.sublabel ? _.span({class: 'pane-sublabel'}, params.sublabel) : ''
-            )
-        ).click(function() {
-            let $currentTab = view.$element.find('.pane-container.active');
-
-            if(params.route == $currentTab.attr('data-route')) {
-                location.hash = params.route;
-            
-            } else {
-                view.showTab(params.route);
-            
-            }
-        });
+        // Render button
+        let $button = $('button[data-route="' + params.route + '"]');
         
-        let $pane = _.div({class: 'pane'});
+        // Button does not exist, create and append it
+        if($button.length < 1) {
+            $button = _.button({'data-route': params.route, title: params.label},
+                _.div({class: 'pane-icon'},
+                    $icon
+                ),
+                _.div({class: 'pane-text'},
+                    _.span({class: 'pane-label'}, params.label),
+                    params.sublabel ? _.span({class: 'pane-sublabel'}, params.sublabel) : ''
+                )
+            ).click(() => {
+                let $currentTab = this.$element.find('.pane-container.active');
+
+                if(params.route == $currentTab.attr('data-route')) {
+                    location.hash = params.route;
+                
+                } else {
+                    this.showTab(params.route);
+                
+                }
+            });
+            
+            this.$element.find('.tab-buttons').append($button);
+        }
+        
+        // Render pane 
+        let $pane = $('.pane-container[data-route="' + params.route + '"] .pane');
+
+        // Pane didn't exist, create it (it will be appended further down)
+        if($pane.length < 1) {
+            $pane = _.div({class: 'pane'});
+        }
 
         let items = params.items;
         let sortingQueue = [];
 
-        // Items
-        $pane.append(
-            _.each(items, function(i, item) {
-                let id = item.id || i;
-                let isDirectory = false;
+        // Render items
+        _.each(items, (i, item) => {
+            let id = item.id || i;
+            let isDirectory = false;
 
-                // Get item name
-                let name = '';
+            // Get item name
+            let name = '';
 
-                // This is a Content node
-                if(item.properties && item.createDate) {
-                    // All Content nodes are "directories" in that they can be parents of one another
-                    isDirectory = true;
+            // This is a Content node
+            if(item.properties && item.createDate) {
+                // All Content nodes are "directories" in that they can be parents of one another
+                isDirectory = true;
 
-                    // Use title directly if available
-                    if(typeof item.properties.title === 'string') {
-                        name = item.properties.title;
+                // Use title directly if available
+                if(typeof item.properties.title === 'string') {
+                    name = item.properties.title;
 
-                    } else if(item.properties.title && typeof item.properties.title === 'object') {
-                        // Use the current language title
-                        if(item.properties.title[window.language]) {
-                            name = item.properties.title[window.language];
+                } else if(item.properties.title && typeof item.properties.title === 'object') {
+                    // Use the current language title
+                    if(item.properties.title[window.language]) {
+                        name = item.properties.title[window.language];
 
-                        // If no title was found, searh in other languages
-                        } else {
-                            name = '(Untitled)';
+                    // If no title was found, searh in other languages
+                    } else {
+                        name = '(Untitled)';
 
-                            for(let language in item.properties.title) {
-                                let languageTitle = item.properties.title[language];
+                        for(let language in item.properties.title) {
+                            let languageTitle = item.properties.title[language];
 
-                                if(languageTitle) {
-                                    name += ' - (' + language + ': ' + languageTitle + ')';
-                                    break;
-                                }
+                            if(languageTitle) {
+                                name += ' - (' + language + ': ' + languageTitle + ')';
+                                break;
                             }
                         }
                     }
-
-                    // If name still wasn't found, use the id
-                    if(!name) {
-                        name = item.id;
-                    }
-                
-                } else if(item.title && typeof item.title === 'string') {
-                    name = item.title;
-
-                } else if(item.name && typeof item.name === 'string') {
-                    name = item.name;
-
-                } else {
-                    name = id;
-
                 }
 
-                let routingPath = item.shortPath || item.path || item.id || null;
-                let queueItem = {};
-                let icon = item.icon;
-                let $icon;
-
-                // Implement custom routing paths
-                if(typeof params.itemPath === 'function') {
-                    routingPath = params.itemPath(item);
+                // If name still wasn't found, use the id
+                if(!name) {
+                    name = item.id;
                 }
+            
+            } else if(item.title && typeof item.title === 'string') {
+                name = item.title;
 
-                // Truncate long names
-                if(name.length > 30) {
-                    name = name.substring(0, 30) + '...';
+            } else if(item.name && typeof item.name === 'string') {
+                name = item.name;
+
+            } else {
+                name = id;
+
+            }
+
+            let routingPath = item.shortPath || item.path || item.id || null;
+            let queueItem = {};
+            let icon = item.icon || params.icon;
+            let $icon;
+
+            // Implement custom routing paths
+            if(typeof params.itemPath === 'function') {
+                routingPath = params.itemPath(item);
+            }
+
+            // Truncate long names
+            if(name.length > 30) {
+                name = name.substring(0, 30) + '...';
+            }
+
+            // If this item has a Schema id, fetch the appropriate icon
+            if(item.schemaId) {
+                let schema = resources.schemas[item.schemaId];
+
+                if(schema) {
+                    icon = schema.icon;
                 }
+            }
 
-                // If this item has a Schema id, fetch the appropriate icon
-                if(item.schemaId) {
-                    let schema = resources.schemas[item.schemaId];
+            if(icon) {
+                $icon = _.span({class: 'fa fa-' + icon});
+            }
 
-                    if(schema) {
-                        icon = schema.icon;
-                    }
-                }
+            // Item element
+            let $existingElement = $pane.find('.pane-item-container[data-routing-path="' + routingPath + '"]');
+            let $element =  _.div({
+                class: 'pane-item-container',
+                'data-routing-path': routingPath
+            });
+            
+            // Element exists already, replace
+            if($existingElement.length > 0) {
+                $existingElement.replaceWith($element);
+            
+            // Element didn't exist already, create it and append to pane
+            } else {
+                $pane.append($element);
 
-                if(icon) {
-                    $icon = _.span({class: 'fa fa-' + icon});
-                }
+            }
 
-                // Item element
-                let $element = _.div({
-                    class: 'pane-item-container',
-                    'data-routing-path': routingPath
+            // Populate element
+            _.append($element.empty(),
+                _.a({
+                    'data-id': id,
+                    'data-name': name,
+                    href: '#' + (routingPath ? params.route + routingPath : params.route),
+                    class: 'pane-item'
                 },
-                    _.a({
-                        'data-id': id,
-                        'data-name': name,
-                        href: '#' + (routingPath ? params.route + routingPath : params.route),
-                        class: 'pane-item'
-                    },
-                        $icon,
-                        _.span({class: 'pane-item-label'}, name)
-                    ),
-                    _.div({class: 'children'}),
-                    _.div({class: 'pane-item-insert-below'})
-                );
+                    $icon,
+                    _.span({class: 'pane-item-label'}, name)
+                ),
+                _.div({class: 'children'}),
+                _.div({class: 'pane-item-insert-below'})
+            );
 
-                // Set sync attributes
-                if(typeof item.locked !== 'undefined') {
-                    $element.attr('data-locked', item.locked);
-                }
-                
-                if(typeof item.remote !== 'undefined') {
-                    $element.attr('data-remote', item.remote);
-                }
-                
-                if(typeof item.local !== 'undefined') {
-                    $element.attr('data-local', item.local);
-                }
-                
-                if(isDirectory) {
-                    $element.attr('data-is-directory', true);
-                }
+            // Set sync attributes
+            if(typeof item.locked !== 'undefined') {
+                $element.attr('data-locked', item.locked);
+            }
+            
+            if(typeof item.remote !== 'undefined') {
+                $element.attr('data-remote', item.remote);
+            }
+            
+            if(typeof item.local !== 'undefined') {
+                $element.attr('data-local', item.local);
+            }
+            
+            if(isDirectory) {
+                $element.attr('data-is-directory', true);
+            }
 
-                // Attach item context menu
-                if(params.getItemContextMenu) {
-                    $element.find('a').exocontext(params.getItemContextMenu(item));
+            // Attach item context menu
+            if(params.getItemContextMenu) {
+                $element.find('a').exocontext(params.getItemContextMenu(item));
 
-                } else if(params.itemContextMenu) {
-                    $element.find('a').exocontext(params.itemContextMenu);
+            } else if(params.itemContextMenu) {
+                $element.find('a').exocontext(params.itemContextMenu);
 
-                }
-                
-                // Add element to queue item
-                queueItem.$element = $element;
+            }
+            
+            // Add element to queue item
+            queueItem.$element = $element;
 
-                // Add sort index to element
-                queueItem.$element.attr('data-sort', item.sort || 0); 
+            // Add sort index to element
+            queueItem.$element.attr('data-sort', item.sort || 0); 
 
-                // Use specific hierarchy behaviours
-                if(params.hierarchy) {
-                    params.hierarchy(item, queueItem);
-                }
+            // Use specific hierarchy behaviours
+            if(params.hierarchy) {
+                params.hierarchy(item, queueItem);
+            }
 
-                // Add queue item to sorting queue
-                sortingQueue.push(queueItem);
-
-                // Add drag/drop event
-                if(!item.locked && typeof params.onEndDrag === 'function') {
-                    $element.exodragdrop({
-                        lockX: true,
-                        onEndDrag: params.onEndDrag
-                    });
-                }
-
-                return $element;
-            })
-        );
+            // Add queue item to sorting queue
+            sortingQueue.push(queueItem);
+        });
 
         // Place items into hierarchy
         for(let queueItem of sortingQueue) {
@@ -337,20 +353,29 @@ class NavbarMain extends View {
         });
 
         // Render pane container
-        let $paneContainer = _.div({class: 'pane-container', 'data-route': params.route},
-            _.if(params.toolbar,
-                params.toolbar
-            ),
-            _.div({class: 'pane-move-buttons'},
-                _.button({class: 'btn btn-move-to-root'}, 'Move to root'),
-                _.button({class: 'btn btn-new-folder'}, 'New folder')
-            ),
-            $pane
-        );
+        let $paneContainer = $('.pane-container[data-route="' + params.route + '"]');
 
-        // Attach pane context menu
-        if(params.paneContextMenu) {
-            $paneContainer.exocontext(params.paneContextMenu);
+        // Pane container didn't already exist, create it
+        if($paneContainer.length < 1) {
+            // Render pane container
+            $paneContainer = _.div({class: 'pane-container', 'data-route': params.route},
+                _.if(params.toolbar,
+                    params.toolbar
+                ),
+                _.div({class: 'pane-move-buttons'},
+                    _.button({class: 'btn btn-move-to-root'}, 'Move to root'),
+                    _.button({class: 'btn btn-new-folder'}, 'New folder')
+                ),
+                $pane
+            );
+            
+            // Attach pane context menu
+            if(params.paneContextMenu) {
+                $paneContainer.exocontext(params.paneContextMenu);
+            }
+            
+            // Append to pane container parent
+            this.$element.find('.tab-panes').append($paneContainer);
         }
         
         // Add expand/collapse buttons to items if needed
@@ -386,9 +411,6 @@ class NavbarMain extends View {
             $paneContainer.addClass('active');
             $button.addClass('active');
         }
-
-        this.$element.find('.tab-panes').append($paneContainer);
-        this.$element.find('.tab-buttons').append($button);
     }
     
     /**
@@ -421,7 +443,7 @@ class NavbarMain extends View {
             if($currentItem.length > 0) {
                 let currentRoute = $currentItem.attr('data-id') || $currentItem.attr('data-routing-path');
             
-                this.highlightItem(currentRoute);
+                this.highlightItem(currentTabName, currentRoute);
             
             } else {
                 this.showTab(currentTabName);
@@ -431,17 +453,17 @@ class NavbarMain extends View {
     }
     
     static reload() {
-        let view = ViewHelper.get('NavbarMain').reload();
+        ViewHelper.get('NavbarMain').reload();
     }
 
     /**
      * Highlights an item
      */
-    highlightItem(route) {
-        let view = this;
+    highlightItem(tab, route) {
+        this.showTab(tab);
 
-        this.$element.find('.pane-item-container').each(function(i) {
-            let $item = $(this);
+        this.$element.find('.pane-container.active .pane-item-container').each((i, element) => {
+            let $item = $(element);
             let id = ($item.children('a').attr('data-id') || '').toLowerCase();
             let routingPath = ($item.attr('data-routing-path') || '').toLowerCase();
 
@@ -452,10 +474,7 @@ class NavbarMain extends View {
                 routingPath == route.toLowerCase()
             ) {
                 $item.toggleClass('active', true);
-
                 $item.parents('.pane-item-container').toggleClass('open', true);
-
-                view.showTab($item.parents('.pane-container').attr('data-route'));
             }
         });
     }
@@ -466,10 +485,6 @@ class NavbarMain extends View {
     }
 
     render() {
-        let view = this;
-
-        this.clear();
-
         let isAdmin = User.current.isAdmin;
         let hasConnectionsScope = User.current.hasScope(ProjectHelper.currentProject, 'connections');
         let hasSchemasScope = User.current.hasScope(ProjectHelper.currentProject, 'schemas');

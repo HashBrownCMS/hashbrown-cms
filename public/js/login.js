@@ -75,11 +75,16 @@ $('.login').each(function() {
 
         let apiPath = '/api/user/login?persist=true';
         let inviteToken = $login.attr('data-invite-token');
+        let firstTime = $login.attr('data-first-time');
 
         if(inviteToken) {
             apiPath = '/api/user/activate';
             
             data.inviteToken = inviteToken;
+        }
+
+        if(firstTime) {
+            apiPath = '/api/user/first';
         }
 
         apiCall('post', apiPath, data)

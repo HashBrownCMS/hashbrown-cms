@@ -80,7 +80,6 @@ class FormsPane extends Pane {
      */
     static onClickPullForm() {
         let navbar = ViewHelper.get('NavbarMain');
-        let formEditor = ViewHelper.get('FormEditor');
         let pullId = $('.context-menu-target-element').data('id');
 
         // API call to pull the Form by id
@@ -95,10 +94,7 @@ class FormsPane extends Pane {
         .then(() => {
             navbar.reload();
 
-            if(formEditor && formEditor.model.id == pullId) {
-                formEditor.model = null;
-                formEditor.fetch();
-            }
+			location.hash = '/forms/' + pullId;
         }) 
         .catch(UI.errorModal);
     }
@@ -108,25 +104,17 @@ class FormsPane extends Pane {
      */
     static onClickPushForm() {
         let navbar = ViewHelper.get('NavbarMain');
-        let pushId = $('.context-menu-target-element').data('id');
-        let formEditor = ViewHelper.get('FormEditor');
+		let $element = $('.context-menu-target-element');
+        let pushId = $element.data('id');
 
-        // API call to push the Content by id
+		$element.parent().addClass('loading');
+
         apiCall('post', 'forms/push/' + pushId)
-
-        // Upon success, reload all Content models
         .then(() => {
             return reloadResource('forms');
         })
-
-        // Reload the UI
         .then(() => {
             navbar.reload();
-
-            if(formEditor && formEditor.model.id == pushId) {
-                formEditor.model = null;
-                formEditor.fetch();
-            }
         }) 
         .catch(UI.errorModal);
     }

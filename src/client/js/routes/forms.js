@@ -15,7 +15,7 @@ Router.route('/forms/', function() {
 
 // Edit
 Router.route('/forms/:id', function() {
-    ViewHelper.get('NavbarMain').highlightItem(this.id);
+    ViewHelper.get('NavbarMain').highlightItem('/forms/', this.id);
     
     let formEditor = new FormEditor({
         modelUrl: apiUrl('forms/' + this.id)
@@ -31,7 +31,7 @@ Router.route('/forms/json/:id', function() {
         apiPath: 'forms/' + this.id
     });
      
-    ViewHelper.get('NavbarMain').highlightItem(this.id);
+    ViewHelper.get('NavbarMain').highlightItem('/forms/', this.id);
     
     populateWorkspace(formEditor.$element);
 });

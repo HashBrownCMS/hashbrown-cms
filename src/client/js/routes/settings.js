@@ -22,7 +22,7 @@ Router.route('/settings/', function() {
 // Sync
 Router.route('/settings/sync/', function() {
     if(currentUserHasScope('settings')) {
-        ViewHelper.get('NavbarMain').highlightItem('sync');
+        ViewHelper.get('NavbarMain').highlightItem('/settings/', 'sync');
         
         populateWorkspace(
             new SyncSettings().$element
@@ -37,7 +37,7 @@ Router.route('/settings/sync/', function() {
 // Providers
 Router.route('/settings/providers/', function() {
     if(currentUserHasScope('settings')) {
-        ViewHelper.get('NavbarMain').highlightItem('providers');
+        ViewHelper.get('NavbarMain').highlightItem('/settings/', 'providers');
         
         populateWorkspace(
             new ProvidersSettings().$element

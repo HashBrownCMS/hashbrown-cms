@@ -26,7 +26,7 @@ Router.route('/schemas/:id', function() {
             modelUrl: apiUrl('schemas/' + this.id)
         });
         
-        ViewHelper.get('NavbarMain').highlightItem(this.id);
+        ViewHelper.get('NavbarMain').highlightItem('/schemas/', this.id);
         
         populateWorkspace(schemaEditor.$element);
     
@@ -52,7 +52,7 @@ Router.route('/schemas/json/:id', function() {
             }
         });
 
-        ViewHelper.get('NavbarMain').highlightItem(this.id);
+        ViewHelper.get('NavbarMain').highlightItem('/schemas/', this.id);
         
         populateWorkspace(jsonEditor.$element);
     

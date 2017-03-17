@@ -210,7 +210,17 @@ app.get('/login/', SecurityHelper.checkHTTPS, function(req, res) {
         });
 
     } else {
-        res.render('login');
+        UserHelper.getAllUsers()
+        .then((users) => {
+            res.render('login', {
+                firstTime: !users || users.length < 1
+            });
+        })
+        .catch((e) => {
+            res.render('login', {
+                message: e.message   
+            });
+        });
 
     }
 });
