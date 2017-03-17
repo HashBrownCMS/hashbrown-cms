@@ -24678,12 +24678,12 @@
 	            setTimeout(function () {
 
 	                // Value sanity check, should not be null
-	                if (!_this2.value || typeof _this2.value === 'undefined') {
-	                    if (_this2.config.options.length > 0) {
-	                        _this2.value = _this2.config.options[0].value;
+	                if (!_this2.config.options || _this2.config.options.length < 1) {
+	                    _this2.config.options = [];
 
-	                        _this2.trigger('change', _this2.value);
-	                    }
+	                    console.log(_this2, _this2.config);
+
+	                    UI.errorModal(new Error('The Schema for "' + _this2.schema.label + '" has no options defined'));
 	                }
 
 	                // Generate dropdown options
@@ -24720,7 +24720,7 @@
 
 	                _this2.$element.html(UI.inputDropdown('(none)', dropdownOptions, function (newValue) {
 	                    _this2.onChange(newValue);
-	                }, false, false));
+	                }, true));
 	            }, 1);
 	        }
 	    }]);

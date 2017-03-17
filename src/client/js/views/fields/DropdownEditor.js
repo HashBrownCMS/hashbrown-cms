@@ -26,14 +26,14 @@ class DropdownEditor extends View {
         setTimeout(() => { 
         
             // Value sanity check, should not be null
-            if(!this.value || typeof this.value === 'undefined') {
-                if(this.config.options.length > 0) {
-                    this.value = this.config.options[0].value;
-                   
-                    this.trigger('change', this.value);
-                }
+            if(!this.config.options || this.config.options.length < 1) {
+                this.config.options = [];
+
+                console.log(this, this.config);
+
+                UI.errorModal(new Error('The Schema for "' + this.schema.label + '" has no options defined'));
             }
-            
+
             // Generate dropdown options
             let dropdownOptions = [];
             
@@ -48,7 +48,7 @@ class DropdownEditor extends View {
             this.$element.html(
                 UI.inputDropdown('(none)', dropdownOptions, (newValue) => {
                     this.onChange(newValue);
-                }, false, false)
+                }, true)
             );
         }, 1);
     }
