@@ -7,7 +7,7 @@ class ProjectEditor extends View {
     constructor(params) {
         super(params);
 
-        this.$element = _.div({class: 'raised project-editor'});
+        this.$element = _.div({class: 'raised project-editor in'});
 
         this.init();
     }
@@ -152,6 +152,8 @@ class ProjectEditor extends View {
         let languageCount = this.model.settings.language.selected.length;
         let userCount = this.model.users.length;
 
+		this.$element.toggleClass('in', true);
+
         _.append(this.$element.empty(),
             _.div({class: 'body'},
                 _.if(User.current.isAdmin,
@@ -226,6 +228,10 @@ class ProjectEditor extends View {
                 )
             )
         );
+
+		setTimeout(() => {
+			this.$element.toggleClass('in', false);
+		}, 50);
     }
 }
 

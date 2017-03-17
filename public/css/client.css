@@ -883,7 +883,11 @@ body.dashboard-container {
     flex-basis: calc(33.33% - 1rem);
     width: calc(33.33% - 1rem);
     color: #333333;
-    background-color: #ffffff; }
+    background-color: #ffffff;
+    transform-origin: center;
+    transition: transform 0.25s ease; }
+    body.dashboard-container .projects .project-editor.in {
+      transform: scale(0); }
     body.dashboard-container .projects .project-editor .btn-remove {
       padding: 0rem;
       position: absolute;

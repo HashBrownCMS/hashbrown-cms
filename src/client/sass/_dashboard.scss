@@ -237,7 +237,13 @@ body.dashboard-container {
             width: calc(33.33% - 1rem);
             color: $standard-text;
             background-color: $standard;
-            
+            transform-origin: center;
+            transition: transform 0.25s ease;
+
+            &.in {
+                transform: scale(0);
+            }           
+ 
             .btn-remove {
                 padding: 0rem;
                 position: absolute;

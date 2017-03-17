@@ -20603,7 +20603,7 @@
 
 	        var _this = _possibleConstructorReturn(this, (ProjectEditor.__proto__ || Object.getPrototypeOf(ProjectEditor)).call(this, params));
 
-	        _this.$element = _.div({ class: 'raised project-editor' });
+	        _this.$element = _.div({ class: 'raised project-editor in' });
 
 	        _this.init();
 	        return _this;
@@ -20780,6 +20780,8 @@
 	            var languageCount = this.model.settings.language.selected.length;
 	            var userCount = this.model.users.length;
 
+	            this.$element.toggleClass('in', true);
+
 	            _.append(this.$element.empty(), _.div({ class: 'body' }, _.if(User.current.isAdmin, _.div({ class: 'admin dropdown' }, _.button({ class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, _.span({ class: 'fa fa-ellipsis-v' })), _.ul({ class: 'dropdown-menu' }, _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Info').click(function (e) {
 	                e.preventDefault();_this7.onClickInfo();
 	            })), _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Languages').click(function (e) {
@@ -20797,6 +20799,10 @@
 	            }), _.if(User.current.isAdmin, _.button({ title: 'Add environment', class: 'btn btn-primary btn-add btn-raised btn-round' }, '+').click(function () {
 	                _this7.onClickAddEnvironment();
 	            })))));
+
+	            setTimeout(function () {
+	                _this7.$element.toggleClass('in', false);
+	            }, 50);
 	        }
 	    }]);
 
