@@ -1,4 +1,4 @@
-@import url(https://fonts.googleapis.com/css?family=Roboto);@import url(https://fonts.googleapis.com/css?family=Roboto+Mono);/**
+/**
  * Colour a button
  *
  * @param {String} class
@@ -21,9 +21,24 @@
 /* Warning */
 /* Success */
 /* Standard */
+@font-face {
+  font-family: 'Roboto';
+  font-weight: normal;
+  src: url("/fonts/Roboto/Roboto-Regular.ttf"); }
+
+@font-face {
+  font-family: 'Roboto';
+  font-weight: bold;
+  src: url("/fonts/Roboto/Roboto-Bold.ttf"); }
+
+@font-face {
+  font-family: 'RobotoMono';
+  font-weight: normal;
+  src: url("/fonts/Roboto_Mono/RobotoMono-Regular.ttf"); }
+
 html, body {
   height: 100%;
-  font-family: 'Roboto';
+  font-family: 'Roboto', sans-serif;
   font-size: 14px;
   background-color: #eeeeee; }
 
