@@ -115,7 +115,10 @@ class SchemaPane extends Pane {
      */
     static onClickPushSchema() {
         let navbar = ViewHelper.get('NavbarMain');
-        let pushId = $('.context-menu-target-element').data('id');
+		let $element = $('.context-menu-target-element');
+        let pushId = $element.data('id');
+
+		$element.parent().addClass('loading');
 
         apiCall('post', 'schemas/push/' + pushId)
         .then(() => {

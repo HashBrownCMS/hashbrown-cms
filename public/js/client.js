@@ -22769,7 +22769,10 @@
 	        key: 'onClickPushSchema',
 	        value: function onClickPushSchema() {
 	            var navbar = ViewHelper.get('NavbarMain');
-	            var pushId = $('.context-menu-target-element').data('id');
+	            var $element = $('.context-menu-target-element');
+	            var pushId = $element.data('id');
+
+	            $element.parent().addClass('loading');
 
 	            apiCall('post', 'schemas/push/' + pushId).then(function () {
 	                return reloadResource('schemas');
