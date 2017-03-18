@@ -20837,7 +20837,7 @@
 	            model: {
 	                class: 'modal-project-admin',
 	                title: _this.model.id + ' backups',
-	                body: _.div({},
+	                body: _.div(
 	                // List existing backups
 	                _.if(_this.model.backups.length > 0, _.each(_this.model.backups, function (i, backup) {
 	                    var label = backup;
@@ -20861,7 +20861,7 @@
 	                })),
 
 	                // Empty message
-	                _.if(_this.model.backups.length < 1, _.p('No backups here')),
+	                _.if(_this.model.backups.length < 1, _.h4('No backups here')),
 
 	                // Create backup
 	                _.div({ class: 'btn-round-group' }, _.button({ class: 'btn btn-round btn-raised btn-default btn-group-addon btn-upload-backup' }, _.span({ class: 'fa fa-upload' }), _.label('Upload')).click(function () {
@@ -21433,6 +21433,7 @@
 	            this.def(Array, 'users', []);
 	            this.def(Array, 'backups', []);
 	            this.def(Object, 'settings', {});
+	            this.def(Boolean, 'useAutoBackup', false);
 	        }
 	    }], [{
 	        key: 'create',

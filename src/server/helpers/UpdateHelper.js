@@ -101,7 +101,9 @@ class UpdateHelper {
                 }
             });
         })
-        .then(this.installDependencies);
+        .then(() => {
+            return this.installDependencies();
+        });
     }
 
     /**

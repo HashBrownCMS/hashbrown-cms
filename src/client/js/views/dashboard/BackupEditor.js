@@ -8,7 +8,7 @@ class BackupEditor extends View {
             model: {
                 class: 'modal-project-admin',
                 title: this.model.id + ' backups',
-                body: _.div({},
+                body: _.div(
                     // List existing backups
                     _.if(this.model.backups.length > 0,
                         _.each(this.model.backups, (i, backup) => {
@@ -51,7 +51,7 @@ class BackupEditor extends View {
 
                     // Empty message
                     _.if(this.model.backups.length < 1,
-                        _.p('No backups here')
+                        _.h4('No backups here')
                     ),
                     
                     // Create backup

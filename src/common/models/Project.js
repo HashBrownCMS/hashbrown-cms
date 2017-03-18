@@ -8,6 +8,7 @@ class Project extends Entity {
         this.def(Array, 'users', []);
         this.def(Array, 'backups', []);
         this.def(Object, 'settings', {});
+        this.def(Boolean, 'useAutoBackup', false);
     }
 
     static create(name) {
