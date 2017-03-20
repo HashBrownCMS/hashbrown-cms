@@ -102,7 +102,7 @@ class UpdateHelper {
             });
         })
         .then(() => {
-            return this.installDependencies();
+            return UpdateHelper.installDependencies();
         });
     }
 
