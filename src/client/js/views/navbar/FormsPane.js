@@ -95,6 +95,13 @@ class FormsPane extends Pane {
             navbar.reload();
 
 			location.hash = '/forms/' + pullId;
+		
+			let editor = ViewHelper.get('FormEditor');
+
+			if(editor && editor.model.id == pullId) {
+                editor.model = null;
+				editor.fetch();
+			}
         }) 
         .catch(UI.errorModal);
     }

@@ -103,6 +103,13 @@ class SchemaPane extends Pane {
             navbar.reload();
            
 			location.hash = '/schemas/' + pullId;
+		
+			let editor = ViewHelper.get('SchemaEditor');
+
+			if(editor && editor.model.id == pullId) {
+                editor.model = null;
+				editor.fetch();
+			}
         }) 
         .catch(errorModal);
     }

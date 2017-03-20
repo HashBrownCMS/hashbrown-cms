@@ -21509,6 +21509,13 @@
 	                navbar.reload();
 
 	                location.hash = '/connections/' + pullId;
+
+	                var editor = ViewHelper.get('ConnectionEditor');
+
+	                if (editor && editor.model.id == pullId) {
+	                    editor.model = null;
+	                    editor.fetch();
+	                }
 	            }).catch(UI.errorModal);
 	        }
 
@@ -21771,6 +21778,13 @@
 	                navbar.reload();
 
 	                location.hash = '/content/' + pullId;
+
+	                var editor = ViewHelper.get('ContentEditor');
+
+	                if (editor && editor.model.id == pullId) {
+	                    editor.model = null;
+	                    editor.fetch();
+	                }
 	            }).catch(UI.errorModal);
 	        }
 
@@ -22282,6 +22296,13 @@
 	                navbar.reload();
 
 	                location.hash = '/forms/' + pullId;
+
+	                var editor = ViewHelper.get('FormEditor');
+
+	                if (editor && editor.model.id == pullId) {
+	                    editor.model = null;
+	                    editor.fetch();
+	                }
 	            }).catch(UI.errorModal);
 	        }
 
@@ -22759,6 +22780,13 @@
 	                navbar.reload();
 
 	                location.hash = '/schemas/' + pullId;
+
+	                var editor = ViewHelper.get('SchemaEditor');
+
+	                if (editor && editor.model.id == pullId) {
+	                    editor.model = null;
+	                    editor.fetch();
+	                }
 	            }).catch(errorModal);
 	        }
 

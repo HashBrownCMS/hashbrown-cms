@@ -92,6 +92,13 @@ class ConnectionPane extends Pane {
             navbar.reload();
 
 			location.hash = '/connections/' + pullId;
+		
+			let editor = ViewHelper.get('ConnectionEditor');
+
+			if(editor && editor.model.id == pullId) {
+                editor.model = null;
+				editor.fetch();
+			}
         }) 
         .catch(UI.errorModal);
     }

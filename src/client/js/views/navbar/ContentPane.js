@@ -127,6 +127,13 @@ class ContentPane extends Pane {
             navbar.reload();
 
 			location.hash = '/content/' + pullId;
+		
+			let editor = ViewHelper.get('ContentEditor');
+
+			if(editor && editor.model.id == pullId) {
+                editor.model = null;
+				editor.fetch();
+			}
         }) 
         .catch(UI.errorModal);
     }
