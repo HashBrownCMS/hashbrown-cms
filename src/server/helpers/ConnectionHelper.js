@@ -86,6 +86,9 @@ class ConnectionHelper extends ConnectionHelperCommon {
                             return ContentHelper.setContentById(project, environment, content.id, content, user);
                         }
                     })
+					.catch((e) => {
+						return Promise.reject(new Error('Connection by id "' + settings.connections[i] + '" could not be found'));
+					});
                 }
 
                 return nextConnection(0);
