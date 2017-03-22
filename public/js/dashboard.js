@@ -52,19 +52,19 @@
 	__webpack_require__(2);
 
 	// Get package file
-	window.app = __webpack_require__(190);
+	window.app = __webpack_require__(188);
 
 	// Views
-	window.ProjectEditor = __webpack_require__(200);
-	window.BackupEditor = __webpack_require__(201);
-	window.MigrationEditor = __webpack_require__(202);
-	window.InfoEditor = __webpack_require__(203);
-	window.LanguageEditor = __webpack_require__(204);
-	window.UserEditor = __webpack_require__(171);
+	window.ProjectEditor = __webpack_require__(198);
+	window.BackupEditor = __webpack_require__(199);
+	window.MigrationEditor = __webpack_require__(200);
+	window.InfoEditor = __webpack_require__(201);
+	window.LanguageEditor = __webpack_require__(202);
+	window.UserEditor = __webpack_require__(169);
 
 	// Models
-	window.Project = __webpack_require__(205);
-	window.User = __webpack_require__(176);
+	window.Project = __webpack_require__(203);
+	window.User = __webpack_require__(174);
 
 	// Resources
 	window.resources = {
@@ -20027,9 +20027,7 @@
 /* 166 */,
 /* 167 */,
 /* 168 */,
-/* 169 */,
-/* 170 */,
-/* 171 */
+/* 169 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -20321,11 +20319,11 @@
 	module.exports = UserEditor;
 
 /***/ },
+/* 170 */,
+/* 171 */,
 /* 172 */,
 /* 173 */,
-/* 174 */,
-/* 175 */,
-/* 176 */
+/* 174 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -20506,6 +20504,8 @@
 	module.exports = User;
 
 /***/ },
+/* 175 */,
+/* 176 */,
 /* 177 */,
 /* 178 */,
 /* 179 */,
@@ -20517,9 +20517,7 @@
 /* 185 */,
 /* 186 */,
 /* 187 */,
-/* 188 */,
-/* 189 */,
-/* 190 */
+/* 188 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -20574,6 +20572,8 @@
 	};
 
 /***/ },
+/* 189 */,
+/* 190 */,
 /* 191 */,
 /* 192 */,
 /* 193 */,
@@ -20581,9 +20581,7 @@
 /* 195 */,
 /* 196 */,
 /* 197 */,
-/* 198 */,
-/* 199 */,
-/* 200 */
+/* 198 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -20817,7 +20815,7 @@
 	module.exports = ProjectEditor;
 
 /***/ },
-/* 201 */
+/* 199 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -21084,7 +21082,7 @@
 	module.exports = BackupEditor;
 
 /***/ },
-/* 202 */
+/* 200 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -21200,7 +21198,7 @@
 	module.exports = MigrationEditor;
 
 /***/ },
-/* 203 */
+/* 201 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -21322,7 +21320,7 @@
 	module.exports = InfoEditor;
 
 /***/ },
-/* 204 */
+/* 202 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -21407,7 +21405,7 @@
 	module.exports = LanguageEditor;
 
 /***/ },
-/* 205 */
+/* 203 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
