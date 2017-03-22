@@ -50,17 +50,17 @@ html
 
                     .project-list
 
-                        if(user.isAdmin)
-                            .project-actions
-                                button.btn.btn-primary.btn-round.btn-raised.btn-create-project(title='Create project') +
+                    if(user.isAdmin)
+                        .project-actions
+                            button.btn.btn-primary.btn-round.btn-raised.btn-create-project(title='Create project') +
 
             if(user.isAdmin)
                 .tab-pane#users
                     .users.container
                         .user-list
 
-                            .user-actions
-                                button.btn.btn-primary.btn-round.btn-raised.btn-invite-user(title='Invite user') +
+                        .user-actions
+                            button.btn.btn-primary.btn-round.btn-raised.btn-invite-user(title='Invite user') +
 
                 .tab-pane#diagnostics
                     table.diagnostics
