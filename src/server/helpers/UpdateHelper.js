@@ -101,40 +101,33 @@ class UpdateHelper {
                 }
             });
         })
+
+        // Install dependencies
         .then(() => {
-            return UpdateHelper.installDependencies();
-        });
-    }
+            return new Promise((resolve, reject) => {
+                debug.log('Installing dependencies...', this);
+                
+                let npm = exec('npm install', {
+                    cwd: appRoot
+                });
 
-    /**
-     * Install dependencies
-     *
-     * @returns {Promise} Status info
-     */
-    static installDependencies() {
-        return new Promise((resolve, reject) => {
-            debug.log('Installing dependencies...', this);
-            
-            let npm = exec('npm install', {
-                cwd: appRoot
-            });
+                npm.stdout.on('data', (data) => {
+                    debug.log(data, this, 3);
+                });
 
-            npm.stdout.on('data', (data) => {
-                debug.log(data, this, 3);
-            });
-
-            npm.stderr.on('data', (data) => {
-                debug.log(data, this, 3);
-            });
-            
-            npm.on('exit', (code) => {
-                if(code == 0 || code == '0') {
-                    debug.log('Install successful', this);
-                    resolve();
-                } else {
-                    debug.log('Update failed', this);
-                    reject(new Error('npm exited with status code ' + code));
-                }
+                npm.stderr.on('data', (data) => {
+                    debug.log(data, this, 3);
+                });
+                
+                npm.on('exit', (code) => {
+                    if(code == 0 || code == '0') {
+                        debug.log('Install successful', this);
+                        resolve();
+                    } else {
+                        debug.log('Update failed', this);
+                        reject(new Error('npm exited with status code ' + code));
+                    }
+                });
             });
         });
     }
