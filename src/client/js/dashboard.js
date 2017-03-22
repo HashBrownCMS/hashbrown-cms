@@ -39,7 +39,6 @@ apiCall('get', 'user')
 // Projects
 // --------------------
 .then((projects) => {
-
     // Get next project
     function renderNext(i) {
         return apiCall('get', 'server/projects/' + projects[i])
