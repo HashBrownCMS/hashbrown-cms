@@ -86,7 +86,13 @@ html
 
                         tr
                             td Uptime
-                            td #{Math.floor(os.uptime() / (60*60*24))}d #{Math.floor(os.uptime() / (60*60))}h #{Math.floor(os.uptime() % (60*60) / 60)}m
+
+                            - var seconds = os.uptime();
+                            - var days = Math.floor(seconds / (60*60*24));
+                            - var hours = Math.floor(seconds / (60*60)) - days * 24;
+                            - var minutes = Math.floor(seconds % (60*60) / 60);
+
+                            td #{days}d #{hours}h #{minutes}m
 
         script(src='/lib/jquery/jquery.min.js')
         script(src='/lib/bootstrap/js/bootstrap.min.js')
