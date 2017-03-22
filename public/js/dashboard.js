@@ -92,7 +92,7 @@
 	                model: new Project(project)
 	            });
 
-	            $('.dashboard-container .projects .project-list').prepend(projectEditor.$element);
+	            $('.dashboard-container .projects .project-list').append(projectEditor.$element);
 
 	            // If there are more projects to render, render the next one
 	            if (i < projects.length - 1) {
