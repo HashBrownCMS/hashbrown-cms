@@ -69,8 +69,9 @@ class TemplatePane extends Pane {
      * Event: On click remove Template
      */
     static onClickRemoveTemplate() {
-        let id = $('.context-menu-target-element').data('id');
-        let type = $('.context-menu-target-element').attr('href').replace('#/templates/', '').replace('/' + id, '');
+        let $element = $('.context-menu-target-element'); 
+        let id = $element.data('id');
+        let type = $element.attr('href').replace('#/templates/', '').replace('/' + id, '');
         
         let model;
 
@@ -88,6 +89,8 @@ class TemplatePane extends Pane {
         UI.confirmModal('delete', 'Delete "' + model.name + '"', 'Are you sure you want to delete this template?', () => {
             apiCall('delete', 'templates/' + model.type + '/' + model.id)
             .then(() => {
+                $element.parent().remove();
+
                 return reloadResource('templates');
             })
             .then(() => {

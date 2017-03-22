@@ -1,16 +1,19 @@
-class ConnectionEditor extends View {
-    constructor(params) {
-        super(params);
-
+(function() {
+    function ConnectionEditor(params) {
+        View.call(this, params);
+        
         this.$element = _.div({class: 'github-editor'});
 
         this.fetch();
     }
-
+    
+    ConnectionEditor.prototype = Object.create(View.prototype);
+    ConnectionEditor.prototype.constructor = View;
+    
     /**
      * Get organisations
      */
-    getOrgs() {
+    ConnectionEditor.prototype.getOrgs = function getOrgs() {
         return new Promise((callback) => {
             $.ajax({
                 type: 'get',
@@ -20,12 +23,12 @@ class ConnectionEditor extends View {
                 }
             });
         });
-    }
+    };
    
     /**
      * Render local switch
      */
-    renderLocalSwitch() {
+    ConnectionEditor.prototype.renderLocalSwitch = function renderLocalSwitch() {
         return _.div({class: 'field-editor'},
             UI.inputSwitch(this.model.isLocal == true, (newValue) => {
                 this.model.isLocal = newValue;
@@ -38,8 +41,8 @@ class ConnectionEditor extends View {
     /**
      * Render local path editor
      */
-    renderLocalPathEditor() {
-        let view = this;
+    ConnectionEditor.prototype.renderLocalPathEditor = function renderLocalPathEditor() {
+        var view = this;
         
         function onChange() {
             view.model.localPath = $(this).val();
@@ -56,8 +59,8 @@ class ConnectionEditor extends View {
     /**
      * Render token editor
      */
-    renderTokenEditor() {
-        let view = this;
+    ConnectionEditor.prototype.renderTokenEditor = function renderTokenEditor() {
+        var view = this;
         
         function onChange() {
             view.model.token = $(this).val();
@@ -76,17 +79,17 @@ class ConnectionEditor extends View {
     /**
      * Render organisation picker
      */
-    renderOrgPicker() {
-        let view = this;
+    ConnectionEditor.prototype.renderOrgPicker = function renderOrgPicker() {
+        var view = this;
         
-        let $editor = _.div({class: 'field-editor dropdown-editor'},
+        var $editor = _.div({class: 'field-editor dropdown-editor'},
             _.select({class: 'form-control'},
                 _.option({value: this.model.org}, this.model.org)
             ).change(onChange)
         );
         
         function onChange() {
-            let org = $(this).val();
+            var org = $(this).val();
 
             view.model.org = org;
 
@@ -121,17 +124,17 @@ class ConnectionEditor extends View {
     /**
      * Render repository picker
      */
-    renderRepoPicker() {
-        let view = this;
+    ConnectionEditor.prototype.renderRepoPicker = function renderRepoPicker() {
+        var view = this;
         
-        let $editor = _.div({class: 'field-editor dropdown-editor'},
+        var $editor = _.div({class: 'field-editor dropdown-editor'},
             _.select({class: 'form-control'},
                 _.option({value: this.model.repo}, this.model.repo)
             ).change(onChange)
         );
         
         function onChange() {
-            let repo = $(this).val();
+            var repo = $(this).val();
 
             view.model.repo = repo;
 
@@ -164,17 +167,17 @@ class ConnectionEditor extends View {
     /**
      * Render branch picker
      */
-    renderBranchPicker() {
-        let view = this;
+    ConnectionEditor.prototype.renderBranchPicker = function renderBranchPicker() {
+        var view = this;
         
-        let $editor = _.div({class: 'field-editor dropdown-editor'},
+        var $editor = _.div({class: 'field-editor dropdown-editor'},
             _.select({class: 'form-control'},
                 _.option({value: this.model.branch}, this.model.branch)
             ).change(onChange)
         );
         
         function onChange() {
-            let branch = $(this).val();
+            var branch = $(this).val();
 
             view.model.branch = branch;
 
@@ -204,7 +207,7 @@ class ConnectionEditor extends View {
         return $editor;
     }
 
-    render() {
+    ConnectionEditor.prototype.render = function render() {
         _.append(this.$element.empty(),
             // Local switch
             _.div({class: 'field-container is-local'},
@@ -257,6 +260,6 @@ class ConnectionEditor extends View {
             )
         );
     }
-}
 
-resources.connectionEditors['GitHub Pages'] = ConnectionEditor;
+    resources.connectionEditors['GitHub Pages'] = ConnectionEditor;
+})();

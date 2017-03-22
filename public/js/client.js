@@ -74,11 +74,6 @@
 	window.NavbarMain = __webpack_require__(70);
 	window.MediaViewer = __webpack_require__(138);
 
-	// Plugins
-	// TODO (Issue #146): Make these independent from the main file
-	__webpack_require__(139);
-	__webpack_require__(140);
-
 	// Field editors
 	__webpack_require__(141);
 
@@ -21450,11 +21445,14 @@
 	        key: 'onClickRemoveConnection',
 	        value: function onClickRemoveConnection() {
 	            var navbar = ViewHelper.get('NavbarMain');
-	            var id = $('.context-menu-target-element').data('id');
-	            var name = $('.context-menu-target-element').data('name');
+	            var $element = $('.context-menu-target-element');
+	            var id = $element.data('id');
+	            var name = $element.data('name');
 
 	            function onSuccess() {
 	                debug.log('Removed connection with alias "' + id + '"', navbar);
+
+	                $element.parent().remove();
 
 	                reloadResource('connections').then(function () {
 	                    navbar.reload();
@@ -21577,6 +21575,10 @@
 	                        menu['Remove'] = function () {
 	                            _this2.onClickRemoveConnection();
 	                        };
+	                    }
+
+	                    if (item.locked && !item.remote) {
+	                        isSyncEnabled = false;
 	                    }
 
 	                    if (isSyncEnabled) {
@@ -22020,8 +22022,9 @@
 	        key: 'onClickRemoveContent',
 	        value: function onClickRemoveContent(shouldUnpublish) {
 	            var navbar = ViewHelper.get('NavbarMain');
-	            var id = $('.context-menu-target-element').data('id');
-	            var name = $('.context-menu-target-element').data('name');
+	            var $element = $('.context-menu-target-element');
+	            var id = $element.data('id');
+	            var name = $element.data('name');
 
 	            ContentHelper.getContentById(id).then(function (content) {
 	                content.getSettings('publishing').then(function (publishing) {
@@ -22032,6 +22035,8 @@
 	                    }
 
 	                    function onSuccess() {
+	                        $element.parent().remove();
+
 	                        return reloadResource('content').then(function () {
 	                            navbar.reload();
 
@@ -22128,6 +22133,10 @@
 	                        menu['Publishing'] = function () {
 	                            _this3.onClickContentPublishing();
 	                        };
+	                    }
+
+	                    if (item.locked && !item.remote) {
+	                        isContentSyncEnabled = false;
 	                    }
 
 	                    if (isContentSyncEnabled) {
@@ -22229,13 +22238,16 @@
 	        key: 'onClickRemoveForm',
 	        value: function onClickRemoveForm() {
 	            var view = this;
-	            var id = $('.context-menu-target-element').data('id');
+	            var $element = $('.context-menu-target-element');
+	            var id = $element.data('id');
 	            var form = resources.forms.filter(function (form) {
 	                return form.id == id;
 	            })[0];
 
 	            function onSuccess() {
 	                debug.log('Removed Form with id "' + form.id + '"', view);
+
+	                $element.parent().remove();
 
 	                return reloadResource('forms').then(function () {
 	                    ViewHelper.get('NavbarMain').reload();
@@ -22365,6 +22377,10 @@
 	                        };
 	                    }
 
+	                    if (item.locked && !item.remote) {
+	                        isSyncEnabled = false;
+	                    }
+
 	                    if (isSyncEnabled) {
 	                        menu['Sync'] = '---';
 
@@ -22463,10 +22479,13 @@
 	        key: 'onClickRemoveMedia',
 	        value: function onClickRemoveMedia() {
 	            var navbar = ViewHelper.get('NavbarMain');
-	            var id = $('.context-menu-target-element').data('id');
-	            var name = $('.context-menu-target-element').data('name');
+	            var $element = $('.context-menu-target-element');
+	            var id = $element.data('id');
+	            var name = $element.data('name');
 
 	            function onSuccess() {
+	                $element.parent().remove();
+
 	                reloadResource('media').then(function () {
 	                    ViewHelper.get('NavbarMain').reload();
 
@@ -22535,36 +22554,6 @@
 	        }
 
 	        /**
-	         * Event: Click browse media
-	         */
-
-	    }, {
-	        key: 'onClickBrowseMedia',
-	        value: function onClickBrowseMedia() {
-	            new MediaBrowser();
-	        }
-
-	        /**
-	         * Renders the toolbar
-	         *
-	         * @returns {HTMLElement} Toolbar
-	         */
-
-	    }, {
-	        key: 'renderToolbar',
-	        value: function renderToolbar() {
-	            var _this2 = this;
-
-	            var $toolbar = _.div({ class: 'pane-toolbar' }, _.div(_.button({ class: 'btn btn-primary' }, 'Upload media').click(function () {
-	                _this2.onClickUploadMedia();
-	            })), _.div(_.button({ class: 'btn btn-primary' }, 'Browse').click(function () {
-	                _this2.onClickBrowseMedia();
-	            })));
-
-	            return $toolbar;
-	        }
-
-	        /**
 	         * Gets the render settings
 	         *
 	         * @returns {Object} settings
@@ -22573,7 +22562,7 @@
 	    }, {
 	        key: 'getRenderSettings',
 	        value: function getRenderSettings() {
-	            var _this3 = this;
+	            var _this2 = this;
 
 	            var isSyncEnabled = SettingsHelper.getCachedSettings('sync').enabled;
 	            var isMediaSyncEnabled = isSyncEnabled && SettingsHelper.getCachedSettings('sync')['media/tree'];
@@ -22583,7 +22572,6 @@
 	                route: '/media/',
 	                icon: 'file-image-o',
 	                items: resources.media,
-	                toolbar: this.renderToolbar(),
 
 	                // Hierarchy logic
 	                hierarchy: function hierarchy(item, queueItem) {
@@ -22600,51 +22588,45 @@
 	                itemContextMenu: {
 	                    'This media': '---',
 	                    'Copy id': function CopyId() {
-	                        _this3.onClickCopyItemId();
+	                        _this2.onClickCopyItemId();
 	                    },
 	                    'Move': function Move() {
-	                        _this3.onClickMoveItem();
+	                        _this2.onClickMoveItem();
 	                    },
 	                    'Remove': function Remove() {
-	                        _this3.onClickRemoveMedia();
+	                        _this2.onClickRemoveMedia();
 	                    },
 	                    'Replace': function Replace() {
-	                        _this3.onClickReplaceMedia();
+	                        _this2.onClickReplaceMedia();
 	                    },
 	                    'Directory': '---',
 	                    'Upload new media': function UploadNewMedia() {
-	                        _this3.onClickUploadMedia();
+	                        _this2.onClickUploadMedia();
 	                    }
 	                },
 
 	                // Dir context menu
 	                dirContextMenu: {
 	                    'Directory': '---',
-	                    'Paste': function Paste() {
-	                        _this3.onClickPasteMedia();
-	                    },
 	                    'New folder': function NewFolder() {
-	                        _this3.onClickNewMediaDirectory();
+	                        _this2.onClickNewMediaDirectory();
 	                    },
 	                    'Upload new media': function UploadNewMedia() {
-	                        _this3.onClickUploadMedia();
+	                        _this2.onClickUploadMedia();
 	                    },
 	                    'Remove': function Remove() {
-	                        _this3.onClickRemoveMediaDirectory();
+	                        _this2.onClickRemoveMediaDirectory();
 	                    }
 	                },
 
 	                // General context menu
 	                paneContextMenu: {
 	                    'General': '---',
-	                    'Paste': function Paste() {
-	                        _this3.onClickPasteMedia();
-	                    },
 	                    'New folder': function NewFolder() {
-	                        _this3.onClickNewMediaDirectory();
+	                        _this2.onClickNewMediaDirectory();
 	                    },
 	                    'Upload new media': function UploadNewMedia() {
-	                        _this3.onClickUploadMedia();
+	                        _this2.onClickUploadMedia();
 	                    }
 	                }
 	            };
@@ -22694,11 +22676,14 @@
 	         */
 	        value: function onClickRemoveSchema() {
 	            var navbar = ViewHelper.get('NavbarMain');
-	            var id = $('.context-menu-target-element').data('id');
+	            var $element = $('.context-menu-target-element');
+	            var id = $element.data('id');
 	            var schema = window.resources.schemas[id];
 
 	            function onSuccess() {
 	                debug.log('Removed schema with id "' + id + '"', navbar);
+
+	                $element.parent().remove();
 
 	                reloadResource('schemas').then(function () {
 	                    navbar.reload();
@@ -22844,6 +22829,10 @@
 	                        menu['Remove'] = function () {
 	                            _this2.onClickRemoveSchema();
 	                        };
+	                    }
+
+	                    if (item.locked && !item.remote) {
+	                        isSyncEnabled = false;
 	                    }
 
 	                    if (isSyncEnabled) {
@@ -23034,8 +23023,9 @@
 	    }, {
 	        key: 'onClickRemoveTemplate',
 	        value: function onClickRemoveTemplate() {
-	            var id = $('.context-menu-target-element').data('id');
-	            var type = $('.context-menu-target-element').attr('href').replace('#/templates/', '').replace('/' + id, '');
+	            var $element = $('.context-menu-target-element');
+	            var id = $element.data('id');
+	            var type = $element.attr('href').replace('#/templates/', '').replace('/' + id, '');
 
 	            var model = void 0;
 
@@ -23073,6 +23063,8 @@
 
 	            UI.confirmModal('delete', 'Delete "' + model.name + '"', 'Are you sure you want to delete this template?', function () {
 	                apiCall('delete', 'templates/' + model.type + '/' + model.id).then(function () {
+	                    $element.parent().remove();
+
 	                    return reloadResource('templates');
 	                }).then(function () {
 	                    NavbarMain.reload();
@@ -23300,313 +23292,8 @@
 	module.exports = MediaViewer;
 
 /***/ },
-/* 139 */
-/***/ function(module, exports) {
-
-	'use strict';
-
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var ConnectionEditor = function (_View) {
-	    _inherits(ConnectionEditor, _View);
-
-	    function ConnectionEditor(params) {
-	        _classCallCheck(this, ConnectionEditor);
-
-	        var _this = _possibleConstructorReturn(this, (ConnectionEditor.__proto__ || Object.getPrototypeOf(ConnectionEditor)).call(this, params));
-
-	        _this.$element = _.div({ class: 'github-editor' });
-
-	        _this.fetch();
-	        return _this;
-	    }
-
-	    /**
-	     * Get organisations
-	     */
-
-
-	    _createClass(ConnectionEditor, [{
-	        key: 'getOrgs',
-	        value: function getOrgs() {
-	            return new Promise(function (callback) {
-	                $.ajax({
-	                    type: 'get',
-	                    url: '/api/github/orgs/?connectionId=' + Router.params.id,
-	                    success: function success(orgs) {
-	                        callback(orgs);
-	                    }
-	                });
-	            });
-	        }
-
-	        /**
-	         * Render local switch
-	         */
-
-	    }, {
-	        key: 'renderLocalSwitch',
-	        value: function renderLocalSwitch() {
-	            var _this2 = this;
-
-	            return _.div({ class: 'field-editor' }, UI.inputSwitch(this.model.isLocal == true, function (newValue) {
-	                _this2.model.isLocal = newValue;
-
-	                _this2.render();
-	            }));
-	        }
-
-	        /**
-	         * Render local path editor
-	         */
-
-	    }, {
-	        key: 'renderLocalPathEditor',
-	        value: function renderLocalPathEditor() {
-	            var view = this;
-
-	            function onChange() {
-	                view.model.localPath = $(this).val();
-
-	                view.render();
-	            }
-
-	            return _.div({ class: 'field-editor' }, _.input({ class: 'form-control', type: 'text', value: this.model.localPath, placeholder: 'Input local path' }).change(onChange));
-	        }
-
-	        /**
-	         * Render token editor
-	         */
-
-	    }, {
-	        key: 'renderTokenEditor',
-	        value: function renderTokenEditor() {
-	            var view = this;
-
-	            function onChange() {
-	                view.model.token = $(this).val();
-
-	                view.render();
-	            }
-
-	            this.model.token = Router.query('token') || this.model.token;
-
-	            return _.div({ class: 'field-editor' }, _.input({ class: 'form-control', type: 'text', value: this.model.token, placeholder: 'Input GitHub API token' }).change(onChange));
-	        }
-
-	        /**
-	         * Render organisation picker
-	         */
-
-	    }, {
-	        key: 'renderOrgPicker',
-	        value: function renderOrgPicker() {
-	            var view = this;
-
-	            var $editor = _.div({ class: 'field-editor dropdown-editor' }, _.select({ class: 'form-control' }, _.option({ value: this.model.org }, this.model.org)).change(onChange));
-
-	            function onChange() {
-	                var org = $(this).val();
-
-	                view.model.org = org;
-
-	                view.render();
-	            }
-
-	            $editor.children('select').val(view.model.org);
-
-	            if (this.model.token) {
-	                $.ajax({
-	                    type: 'get',
-	                    url: '/api/github/orgs?token=' + this.model.token,
-	                    success: function success(orgs) {
-	                        _.append($editor.children('select').empty(), _.option({ value: '' }, '(none)'), _.if((typeof orgs === 'undefined' ? 'undefined' : _typeof(orgs)) === 'object', _.each(orgs, function (i, org) {
-	                            return _.option({ value: org.login }, org.login);
-	                        })));
-
-	                        $editor.children('select').val(view.model.org);
-	                    }
-	                });
-	            }
-
-	            return $editor;
-	        }
-
-	        /**
-	         * Render repository picker
-	         */
-
-	    }, {
-	        key: 'renderRepoPicker',
-	        value: function renderRepoPicker() {
-	            var view = this;
-
-	            var $editor = _.div({ class: 'field-editor dropdown-editor' }, _.select({ class: 'form-control' }, _.option({ value: this.model.repo }, this.model.repo)).change(onChange));
-
-	            function onChange() {
-	                var repo = $(this).val();
-
-	                view.model.repo = repo;
-
-	                view.render();
-	            }
-
-	            $editor.children('select').val(view.model.repo);
-
-	            if (this.model.token) {
-	                $.ajax({
-	                    type: 'get',
-	                    url: '/api/github/repos?token=' + this.model.token + '&org=' + this.model.org,
-	                    success: function success(repos) {
-	                        if ((typeof repos === 'undefined' ? 'undefined' : _typeof(repos)) === 'object') {
-	                            $editor.children('select').html(_.each(repos, function (i, repo) {
-	                                return _.option({ value: repo.full_name }, repo.full_name);
-	                            }));
-
-	                            $editor.children('select').val(view.model.repo);
-	                        }
-	                    }
-	                });
-	            }
-
-	            return $editor;
-	        }
-
-	        /**
-	         * Render branch picker
-	         */
-
-	    }, {
-	        key: 'renderBranchPicker',
-	        value: function renderBranchPicker() {
-	            var view = this;
-
-	            var $editor = _.div({ class: 'field-editor dropdown-editor' }, _.select({ class: 'form-control' }, _.option({ value: this.model.branch }, this.model.branch)).change(onChange));
-
-	            function onChange() {
-	                var branch = $(this).val();
-
-	                view.model.branch = branch;
-
-	                view.render();
-	            }
-
-	            $editor.children('select').val(view.model.branch);
-
-	            if (this.model.token && this.model.repo) {
-	                $.ajax({
-	                    type: 'get',
-	                    url: '/api/github/' + this.model.repo + '/branches?token=' + this.model.token + '&org=' + this.model.org,
-	                    success: function success(branches) {
-	                        if ((typeof branches === 'undefined' ? 'undefined' : _typeof(branches)) === 'object') {
-	                            $editor.children('select').html(_.each(branches, function (i, branch) {
-	                                return _.option({ value: branch.name }, branch.name);
-	                            }));
-
-	                            $editor.children('select').val(view.model.branch);
-	                        }
-	                    }
-	                });
-	            }
-
-	            return $editor;
-	        }
-	    }, {
-	        key: 'render',
-	        value: function render() {
-	            _.append(this.$element.empty(),
-	            // Local switch
-	            _.div({ class: 'field-container is-local' }, _.div({ class: 'field-key' }, 'Local'), _.div({ class: 'field-value' }, this.renderLocalSwitch())), _.if(this.model.isLocal,
-	            // Path
-	            _.div({ class: 'field-container local-path' }, _.div({ class: 'field-key' }, 'Local path'), _.div({ class: 'field-value' }, this.renderLocalPathEditor()))), _.if(!this.model.isLocal,
-	            // Token
-	            _.div({ class: 'field-container github-token' }, _.div({ class: 'field-key' }, 'Token'), _.div({ class: 'field-value' }, this.renderTokenEditor())),
-
-	            // Org picker
-	            _.div({ class: 'field-container github-org' }, _.div({ class: 'field-key' }, 'Organisation'), _.div({ class: 'field-value' }, this.renderOrgPicker())),
-
-	            // Repo picker
-	            _.div({ class: 'field-container github-repo' }, _.div({ class: 'field-key' }, 'Repository'), _.div({ class: 'field-value' }, this.renderRepoPicker())),
-
-	            // Branch picker
-	            _.div({ class: 'field-container github-branch' }, _.div({ class: 'field-key' }, 'Branch'), _.div({ class: 'field-value' }, this.renderBranchPicker()))));
-	        }
-	    }]);
-
-	    return ConnectionEditor;
-	}(View);
-
-	resources.connectionEditors['GitHub Pages'] = ConnectionEditor;
-
-/***/ },
-/* 140 */
-/***/ function(module, exports) {
-
-	'use strict';
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var ConnectionEditor = function (_View) {
-	    _inherits(ConnectionEditor, _View);
-
-	    function ConnectionEditor(params) {
-	        _classCallCheck(this, ConnectionEditor);
-
-	        var _this = _possibleConstructorReturn(this, (ConnectionEditor.__proto__ || Object.getPrototypeOf(ConnectionEditor)).call(this, params));
-
-	        _this.$element = _.div({ class: 'hashbrown-driver-editor' });
-
-	        _this.fetch();
-	        return _this;
-	    }
-
-	    /**
-	     * Render token editor
-	     */
-
-
-	    _createClass(ConnectionEditor, [{
-	        key: 'renderTokenEditor',
-	        value: function renderTokenEditor() {
-	            var view = this;
-
-	            function onChange() {
-	                view.model.token = $(this).val();
-	            }
-
-	            return _.div({ class: 'field-editor' }, _.input({ class: 'form-control', type: 'text', value: this.model.token, placeholder: 'Input HashBrown Driver token' }).change(onChange));
-	        }
-	    }, {
-	        key: 'render',
-	        value: function render() {
-	            this.$element.empty();
-
-	            _.append(this.$element,
-	            // Token
-	            _.div({ class: 'field-container hashbrown-token' }, _.div({ class: 'field-key' }, 'Token'), _.div({ class: 'field-value' }, this.renderTokenEditor())));
-	        }
-	    }]);
-
-	    return ConnectionEditor;
-	}(View);
-
-	resources.connectionEditors['HashBrown Driver'] = ConnectionEditor;
-
-/***/ },
+/* 139 */,
+/* 140 */,
 /* 141 */
 /***/ function(module, exports, __webpack_require__) {
 

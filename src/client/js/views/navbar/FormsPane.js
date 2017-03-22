@@ -26,11 +26,14 @@ class FormsPane extends Pane {
      */
     static onClickRemoveForm() {
         let view = this;
-        let id = $('.context-menu-target-element').data('id');
+        let $element = $('.context-menu-target-element'); 
+        let id = $element.data('id');
         let form = resources.forms.filter((form) => { return form.id == id; })[0];
 
         function onSuccess() {
             debug.log('Removed Form with id "' + form.id + '"', view); 
+            
+            $element.parent().remove();
         
             return reloadResource('forms')
             .then(function() {
@@ -155,6 +158,8 @@ class FormsPane extends Pane {
                 if(!item.local && !item.remote && !item.locked) {
                     menu['Remove'] = () => { this.onClickRemoveForm(); };
                 }
+                
+                if(item.locked && !item.remote) { isSyncEnabled = false; }
 
                 if(isSyncEnabled) {
                     menu['Sync'] = '---';

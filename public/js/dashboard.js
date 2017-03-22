@@ -66,6 +66,11 @@
 	window.Project = __webpack_require__(205);
 	window.User = __webpack_require__(176);
 
+	// Resources
+	window.resources = {
+	    connectionEditors: {}
+	};
+
 	// --------------------
 	// Get current user
 	// --------------------

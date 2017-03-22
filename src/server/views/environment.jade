@@ -10,10 +10,8 @@ html
         link(href='/lib/bootstrap/css/bootstrap.min.css', rel='stylesheet')
         link(href='/lib/font-awesome/css/font-awesome.min.css', rel='stylesheet')
         link(href='/css/client.css', rel='stylesheet')
+        link(href='/css/plugins.css', rel='stylesheet')
         link(href='/lib/codemirror/lib/codemirror.css', rel='stylesheet')
-        link(href='/lib/codemirror/theme/cobalt.css', rel='stylesheet')
-        link(href='/lib/codemirror/theme/railscasts.css', rel='stylesheet')
-        link(href='/lib/codemirror/theme/night.css', rel='stylesheet')
 
         title #{currentProject} - HashBrown
     body
@@ -35,6 +33,7 @@ html
         script(src='/lib/codemirror/mode/markdown/markdown.js')
         script(src='/lib/codemirror/mode/xml/xml.js')
         script(src='/js/client.js')
+        script(src='/js/plugins.js')
         
         script.
             ProjectHelper.currentProject = '#{currentProject}';

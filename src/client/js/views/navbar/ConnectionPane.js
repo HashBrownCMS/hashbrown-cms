@@ -29,12 +29,15 @@ class ConnectionPane extends Pane {
      */
     static onClickRemoveConnection() {
         let navbar = ViewHelper.get('NavbarMain');
-        let id = $('.context-menu-target-element').data('id');
-        let name = $('.context-menu-target-element').data('name');
+        let $element = $('.context-menu-target-element'); 
+        let id = $element.data('id');
+        let name = $element.data('name');
         
         function onSuccess() {
             debug.log('Removed connection with alias "' + id + '"', navbar); 
         
+            $element.parent().remove();
+
             reloadResource('connections')
             .then(function() {
                 navbar.reload();
@@ -151,6 +154,8 @@ class ConnectionPane extends Pane {
                 if(!item.local && !item.remote && !item.locked) {
                     menu['Remove'] = () => { this.onClickRemoveConnection(); };
                 }
+                
+                if(item.locked && !item.remote) { isSyncEnabled = false; }
 
                 if(isSyncEnabled) {
                     menu['Sync'] = '---';

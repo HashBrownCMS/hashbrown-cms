@@ -8,11 +8,14 @@ class SchemaPane extends Pane {
      */
     static onClickRemoveSchema() {
         let navbar = ViewHelper.get('NavbarMain');
-        let id = $('.context-menu-target-element').data('id');
+        let $element = $('.context-menu-target-element'); 
+        let id = $element.data('id');
         let schema = window.resources.schemas[id];
         
         function onSuccess() {
             debug.log('Removed schema with id "' + id + '"', navbar); 
+            
+            $element.parent().remove();
         
             reloadResource('schemas')
             .then(function() {
@@ -159,6 +162,8 @@ class SchemaPane extends Pane {
                     menu['Remove'] = () => { this.onClickRemoveSchema(); };
                 }
                 
+                if(item.locked && !item.remote) { isSyncEnabled = false; }
+
                 if(isSyncEnabled) {
                     menu['Sync'] = '---';
                     

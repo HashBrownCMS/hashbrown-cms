@@ -388,8 +388,9 @@ class ContentPane extends Pane {
      */
     static onClickRemoveContent(shouldUnpublish) {
         let navbar = ViewHelper.get('NavbarMain');
-        let id = $('.context-menu-target-element').data('id');
-        let name = $('.context-menu-target-element').data('name');
+        let $element = $('.context-menu-target-element'); 
+        let id = $element.data('id');
+        let name = $element.data('name');
        
         ContentHelper.getContentById(id)
         .then((content) => {
@@ -403,6 +404,8 @@ class ContentPane extends Pane {
                 }
                 
                 function onSuccess() {
+                    $element.parent().remove();
+
                     return reloadResource('content')
                     .then(() => {
                         navbar.reload();
@@ -491,6 +494,8 @@ class ContentPane extends Pane {
                     menu['Settings'] = '---';
                     menu['Publishing'] = () => { this.onClickContentPublishing(); };
                 }
+                
+                if(item.locked && !item.remote) { isContentSyncEnabled = false; }
                 
                 if(isContentSyncEnabled) {
                     menu['Sync'] = '---';

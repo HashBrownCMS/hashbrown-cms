@@ -67,6 +67,8 @@ if(SecurityHelper.isHTTPS()) {
 	app.use('/', SecurityHelper.getHandler().middleware());
 }
 
+let pluginClientFiles;
+
 PluginHelper.init(app)
 .then(ready)
 .catch(debug.error);
@@ -237,7 +239,8 @@ app.get('/', SecurityHelper.checkHTTPS, function(req, res) {
         res.render('dashboard', {
             os: os,
             user: user,
-            app: require(appRoot + '/package.json')
+            app: require(appRoot + '/package.json'),
+            pluginClientFiles: pluginClientFiles
         });
     })
     .catch((e) => {
@@ -260,7 +263,8 @@ app.get('/:project/:environment/', SecurityHelper.checkHTTPS, function(req, res)
         res.render('environment', {
             currentProject: req.params.project,
             currentEnvironment: req.params.environment,
-            user: user
+            user: user,
+            pluginClientFiles: pluginClientFiles
         });
     })
     .catch((e) => {
@@ -271,7 +275,9 @@ app.get('/:project/:environment/', SecurityHelper.checkHTTPS, function(req, res)
 // ----------
 // Ready callback
 // ----------
-function ready() {
+function ready(files) {
+    pluginClientFiles = files;
+
     // Check for args, and close the app if any were run
     checkArgs()
     .then((result) => {

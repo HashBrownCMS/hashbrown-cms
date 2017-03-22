@@ -33,10 +33,13 @@ class MediaPane extends Pane {
      */
     static onClickRemoveMedia() {
         let navbar = ViewHelper.get('NavbarMain');
-        let id = $('.context-menu-target-element').data('id');
-        let name = $('.context-menu-target-element').data('name');
+        let $element = $('.context-menu-target-element'); 
+        let id = $element.data('id');
+        let name = $element.data('name');
         
         function onSuccess() {
+            $element.parent().remove();
+
             reloadResource('media')
             .then(function() {
                 ViewHelper.get('NavbarMain').reload();
@@ -111,33 +114,6 @@ class MediaPane extends Pane {
     }
     
     /**
-     * Event: Click browse media
-     */
-    static onClickBrowseMedia() {
-        new MediaBrowser();
-    }
-
-    /**
-     * Renders the toolbar
-     *
-     * @returns {HTMLElement} Toolbar
-     */
-    static renderToolbar() {
-        let $toolbar = _.div({class: 'pane-toolbar'},
-            _.div(
-                _.button({class: 'btn btn-primary'}, 'Upload media')
-                    .click(() => { this.onClickUploadMedia(); })
-            ),
-            _.div(
-                _.button({class: 'btn btn-primary'}, 'Browse')
-                    .click(() => { this.onClickBrowseMedia(); })
-            )
-        );
-
-        return $toolbar;
-    }
-
-    /**
      * Gets the render settings
      *
      * @returns {Object} settings
@@ -151,7 +127,6 @@ class MediaPane extends Pane {
             route: '/media/',
             icon: 'file-image-o',
             items: resources.media,
-            toolbar: this.renderToolbar(),
 
             // Hierarchy logic
             hierarchy: function(item, queueItem) {
@@ -178,7 +153,6 @@ class MediaPane extends Pane {
             // Dir context menu
             dirContextMenu: {
                 'Directory': '---',
-                'Paste': () => { this.onClickPasteMedia(); },
                 'New folder': () => { this.onClickNewMediaDirectory(); },
                 'Upload new media': () => { this.onClickUploadMedia(); },
                 'Remove': () => { this.onClickRemoveMediaDirectory(); }
@@ -187,7 +161,6 @@ class MediaPane extends Pane {
             // General context menu
             paneContextMenu: {
                 'General': '---',
-                'Paste': () => { this.onClickPasteMedia(); },
                 'New folder': () => { this.onClickNewMediaDirectory(); },
                 'Upload new media': () => { this.onClickUploadMedia(); }
             }

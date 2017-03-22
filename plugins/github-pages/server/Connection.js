@@ -1,6 +1,6 @@
 'use strict';
 
-let yamljs = require('../lib/yamljs/Yaml');
+let yamljs = require('./lib/yamljs/Yaml');
 let restler = require('restler');
 let fs = require('fs');
 let path = require('path');

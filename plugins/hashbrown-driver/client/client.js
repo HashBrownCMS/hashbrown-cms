@@ -1,18 +1,21 @@
-class ConnectionEditor extends View {
-    constructor(params) {
-        super(params);
-
+(function() {
+    function ConnectionEditor(params) {
+        View.call(this, params);
+        
         this.$element = _.div({class: 'hashbrown-driver-editor'});
 
         this.fetch();
     }
-    
+
+    ConnectionEditor.prototype = Object.create(View.prototype);
+    ConnectionEditor.prototype.constructor = View;
+
     /**
      * Render token editor
      */
-    renderTokenEditor() {
-        let view = this;
-        
+    ConnectionEditor.prototype.renderTokenEditor = function renderTokenEditor() {
+        var view = this;
+
         function onChange() {
             view.model.token = $(this).val();
         }
@@ -21,9 +24,9 @@ class ConnectionEditor extends View {
             _.input({class: 'form-control', type: 'text', value: this.model.token, placeholder: 'Input HashBrown Driver token'})
                 .change(onChange)
         );
-    }
+    };
 
-    render() {
+    ConnectionEditor.prototype.render = function render() {
         this.$element.empty();
 
         _.append(this.$element,
@@ -35,7 +38,7 @@ class ConnectionEditor extends View {
                 )
             )
         );
-    }
-}
+    };
 
-resources.connectionEditors['HashBrown Driver'] = ConnectionEditor;
+    resources.connectionEditors['HashBrown Driver'] = ConnectionEditor;
+})();

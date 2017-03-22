@@ -1,6 +1,6 @@
 'use strict';
 
-let GitHubConnection = require('../common/models/GitHubConnection');
+let Connection = require('./server/Connection');
 let ConnectionHelper = require(appRoot + '/src/server/helpers/ConnectionHelper');
 
 let restler = require('restler');
@@ -10,7 +10,7 @@ let route = '';
 
 class GitHubPages {
     static init(app) {
-        ConnectionHelper.registerConnectionType('GitHub Pages', GitHubConnection);
+        ConnectionHelper.registerConnectionType('GitHub Pages', Connection);
 
         /**
          * Starts the oAuth flow

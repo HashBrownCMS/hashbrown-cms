@@ -20,6 +20,11 @@ window.UserEditor = require('./views/UserEditor');
 window.Project = require('../../common/models/Project');
 window.User = require('../../common/models/User');
 
+// Resources
+window.resources = {
+    connectionEditors: {}
+};
+
 // --------------------
 // Get current user
 // --------------------

@@ -5,10 +5,28 @@ let fs = require('fs');
 let glob = require('glob');
 let multer = require('multer');
 
+let Connection = require('../../common/models/Connection');
+
 /**
  * A helper class for managing backups
  */
 class BackupHelper {
+    /**
+     * Gets the storage provider
+     *
+     * @returns {Promise} Connection
+     */
+    static getStorageProvider(
+        project = requiredParam('project')
+    ) {
+        return SettingsHelper.getSettings(project, null, 'backup')
+        .then((result) => {
+            if(!result) { return Promise.resolve(); }
+
+            return Promise.resolve(new Connection(result));
+        });
+    }
+
     /**
      * Gets the upload handler
      *
