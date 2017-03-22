@@ -84,7 +84,6 @@
 	// Projects
 	// --------------------
 	.then(function (projects) {
-
 	    // Get next project
 	    function renderNext(i) {
 	        return apiCall('get', 'server/projects/' + projects[i]).then(function (project) {
@@ -189,7 +188,7 @@
 	    apiCall('get', 'server/update/check').then(function (update) {
 	        if (update.behind) {
 	            $('.dashboard-container').prepend(_.div({ class: 'update' }, _.p('You are ' + update.amount + ' version' + (update.amount != '1' ? 's' : '') + ' behind ' + update.branch), _.p('Comment: "' + update.comment + '"'), _.button({ class: 'btn btn-primary btn-update-hashbrown' }, 'Update').click(function () {
-	                UI.messageModal('Update', 'HashBrown is updating...', false);
+	                UI.messageModal('Update', 'HashBrown is updating (this may take a minute)...', false);
 
 	                apiCall('post', 'server/update/start').then(function () {
 	                    new MessageModal({

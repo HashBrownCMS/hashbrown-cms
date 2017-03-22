@@ -146,7 +146,7 @@ apiCall('get', 'user')
                     _.p('Comment: "'  + update.comment + '"'),
                     _.button({class: 'btn btn-primary btn-update-hashbrown'}, 'Update')
                         .click(() => {
-                            UI.messageModal('Update', 'HashBrown is updating...', false);
+                            UI.messageModal('Update', 'HashBrown is updating (this may take a minute)...', false);
 
                             apiCall('post', 'server/update/start')
                             .then(() => {
