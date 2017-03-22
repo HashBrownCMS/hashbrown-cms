@@ -111,7 +111,7 @@ class UpdateHelper {
      *
      * @returns {Promise} Status info
      */
-    installDependencies() {
+    static installDependencies() {
         return new Promise((resolve, reject) => {
             debug.log('Installing dependencies...', this);
             
