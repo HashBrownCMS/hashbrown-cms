@@ -251,8 +251,15 @@ app.get('/', SecurityHelper.checkHTTPS, function(req, res) {
 // Environment
 app.get('/:project/:environment/', SecurityHelper.checkHTTPS, function(req, res) {
     let user;
-    
-    ApiController.authenticate(req.cookies.token)
+  
+  	ProjectHelper.environmentExists(req.params.project, req.params.environment)
+	.then((exists) => {
+    	if(!exists) {
+			return Promise.reject(new Error('404: The project and environment "' + req.params.project + '/' + req.params.environment + '" could not be found'));
+		}
+		
+		return ApiController.authenticate(req.cookies.token);
+	})
     .then((authUser) => {
         user = authUser;
 
@@ -268,7 +275,11 @@ app.get('/:project/:environment/', SecurityHelper.checkHTTPS, function(req, res)
         });
     })
     .catch((e) => {
-        res.status(403).redirect('/login?path=/' + req.params.project + '/' + req.params.environment);  
+		if(e.message.indexOf('404') == 0) {
+			res.status(404).render('404', { message: e.message });
+		} else {
+			res.status(403).redirect('/login?path=/' + req.params.project + '/' + req.params.environment);  
+		}
     });
 });
 

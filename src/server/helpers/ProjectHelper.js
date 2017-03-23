@@ -113,14 +113,12 @@ class ProjectHelper {
      * @returns {Promise(Array)} environments
      */
     static getAllEnvironments(project) {
-        return new Promise((resolve, reject) => {
-            SettingsHelper.getSettings(project, null, 'environments')
-            .then((settings) => {
-                // There should always be at least one environment available
-                let environments = settings && settings.names ? settings.names : [ 'live' ];
+        return SettingsHelper.getSettings(project, null, 'environments')
+        .then((settings) => {
+            // There should always be at least one environment available
+            let environments = settings && settings.names ? settings.names : [ 'live' ];
 
-                resolve(environments);
-            });
+            return Promise.resolve(environments);
         });
     }
 
