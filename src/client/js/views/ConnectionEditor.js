@@ -113,6 +113,7 @@ class ConnectionEditor extends View {
 
         } else {
             debug.log('No connection editor found for type alias "' + this.model.type + '"', this);
+            return '';
 
         }
     }
@@ -121,27 +122,28 @@ class ConnectionEditor extends View {
      * Renders the type editor
      */
     renderTypeEditor() {
-        let view = this;
-
-        function onChange() {
-            let type = $(this).val();
+        // Generate dropdown options
+        let dropdownOptions = [];
         
-            view.model.type = type;
-
-            view.$element.find('.connection-settings .field-value').html(
-                view.renderSettingsEditor()
-            );
+        for(let label in resources.connectionEditors || []) {
+            let option = resources.connectionEditors[label];
+            
+            dropdownOptions[dropdownOptions.length] = {
+                label: label,
+                value: option.type,
+                selected: option.type == this.model.type
+            };
         }
 
         let $editor = _.div({class: 'field-editor dropdown-editor'},
-            _.select({class: 'form-control'},
-                _.each(resources.connectionEditors, function(alias, editor) {
-                    return _.option({value: alias}, alias);
-                })
-            ).change(onChange)
-        );
+            UI.inputDropdown('(none)', dropdownOptions, (newValue) => {
+                this.model.type = newValue;
 
-        $editor.children('select').val(this.model.type);
+                this.$element.find('.connection-settings .field-value').html(
+                    this.renderSettingsEditor()
+                );
+            }, true)
+        );
 
         return $editor;
     }

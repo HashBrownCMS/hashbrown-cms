@@ -1,14 +1,16 @@
 'use strict';
 
 let Entity = require('./Entity');
+let Connection = require('./Connection');
 
 class Project extends Entity {
     structure() {
         this.def(String, 'id');
         this.def(Array, 'users', []);
-        this.def(Array, 'backups', []);
         this.def(Object, 'settings', {});
-        this.def(Boolean, 'useAutoBackup', false);
+        this.def(Boolean, 'useAutoBackup');
+        this.def(Array, 'backups', []);
+        this.def(Object, 'backupStorage', 'local');
     }
 
     static create(name) {

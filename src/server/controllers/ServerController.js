@@ -12,6 +12,7 @@ class ServerController extends ApiController {
         app.get('/api/server/projects/:project', this.middleware({ setProject: false }), this.getProject);
         app.get('/api/server/:project/environments', this.middleware({ setProject: false }), this.getAllEnvironments);
         app.get('/api/server/backups/:project/:timestamp.hba', this.middleware({ setProject: false }), this.getBackup);
+        app.get('/api/server/backups/config', this.middleware({ needsAdmin: true, setProject: false }), this.getBackupConfig);
         
         app.post('/api/server/update/start', this.middleware({ needsAdmin: true, setProject: false }), this.postUpdateServer);
         app.post('/api/server/projects/new', this.middleware({ needsAdmin: true, setProject: false }), this.createProject);
@@ -238,6 +239,19 @@ class ServerController extends ApiController {
             res.status(502).send(ServerController.printError(e));  
         });
     }
+
+    /**
+     * Gets the backup config
+     */
+   static getBackupConfig(req, res) {
+       BackupHelper.getConfig()
+       .then((config) => {
+            res.status(200).send(config);
+       })
+       .catch((e) => {
+            res.status(502).send(ServerController.printError(e));
+       });
+   }
 
     /**
      * Uploads a project backup

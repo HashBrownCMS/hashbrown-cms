@@ -9,50 +9,44 @@ class BackupEditor extends View {
                 class: 'modal-project-admin',
                 title: this.model.id + ' backups',
                 body: _.div(
-                    // List existing backups
-                    _.if(this.model.backups.length > 0,
-                        _.each(this.model.backups, (i, backup) => {
-                            let label = backup;
-                            let date = new Date(parseInt(backup));
+					// List existing backups
+					_.h4('Backups'),
+					_.each(this.model.backups, (i, backup) => {
+						let label = backup;
+						let date = new Date(parseInt(backup));
 
-                            if(!isNaN(date.getTime())) {
-                                label = date.toString();
-                            }
+						if(!isNaN(date.getTime())) {
+							label = date.toString();
+						}
 
-                            return _.div({class: 'project-backup'},
-                                _.p({class: 'project-backup-name'}, label),
-                                _.div({class: 'dropdown'},
-                                    _.button({class: 'dropdown-toggle', 'data-toggle': 'dropdown'},
-                                        _.span({class: 'fa fa-ellipsis-v'})
-                                    ),
-                                    _.ul({class: 'dropdown-menu'},
-                                        _.li(
-                                            // Restore backup
-                                            _.a({href: '#', class: 'dropdown-item'}, 'Restore')
-                                                .click((e) => { e.preventDefault(); this.onClickRestoreBackup(backup); })
-                                        ),
-                                        _.li(
-                                            // Download backup
-                                            _.a({class: 'dropdown-item', href: apiUrl('server/backups/' + this.model.id + '/' + backup + '.hba')},
-                                                'Download'
-                                            )
-                                        ),
-                                        _.li(
-                                            // Delete backup
-                                            _.a({href: '#', class: 'dropdown-item'},
-                                                'Delete'
-                                            ).click((e) => { e.preventDefault(); this.onClickDeleteBackup(backup); })
-                                        )
-                                    )
-                                )
-                            );
-                        })
-                    ),
-
-                    // Empty message
-                    _.if(this.model.backups.length < 1,
-                        _.h4('No backups here')
-                    ),
+						return _.div({class: 'project-backup'},
+							_.p({class: 'project-backup-name'}, label),
+							_.div({class: 'dropdown'},
+								_.button({class: 'dropdown-toggle', 'data-toggle': 'dropdown'},
+									_.span({class: 'fa fa-ellipsis-v'})
+								),
+								_.ul({class: 'dropdown-menu'},
+									_.li(
+										// Restore backup
+										_.a({href: '#', class: 'dropdown-item'}, 'Restore')
+											.click((e) => { e.preventDefault(); this.onClickRestoreBackup(backup); })
+									),
+									_.li(
+										// Download backup
+										_.a({class: 'dropdown-item', href: apiUrl('server/backups/' + this.model.id + '/' + backup + '.hba')},
+											'Download'
+										)
+									),
+									_.li(
+										// Delete backup
+										_.a({href: '#', class: 'dropdown-item'},
+											'Delete'
+										).click((e) => { e.preventDefault(); this.onClickDeleteBackup(backup); })
+									)
+								)
+							)
+						);
+					}),
                     
                     // Create backup
                     _.div({class: 'btn-round-group'},
@@ -65,7 +59,26 @@ class BackupEditor extends View {
                             _.span({class: 'btn-icon-display fa fa-save'}),
                             _.label('Create')
                         ).click(() => { this.onClickCreateBackup(); })
-                    )
+                    ),
+                    
+					// Set up storage provider
+					_.h4('Storage'),
+					_.div({class: 'storage-provider'},
+						UI.inputDropdown('Type', [
+							{
+								label: 'Local',
+								value: 'local',
+								selected: this.model.backupStorage == 'local'
+							},
+							{
+								label: 'Amazon S3',
+								value: 's3',
+								selected: this.model.backupStorage == 's3'
+							}
+						], (newValue) => {
+							this.model.backupStorage = newValue;
+						})
+					)
                 )
             }
         });

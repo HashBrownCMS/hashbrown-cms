@@ -7,8 +7,6 @@ let Entity = require('./Entity');
  */
 class Connection extends Entity {
     constructor(params) {
-        params.provideTemplates = params.provideTemplates == 'true' || params.provideTemplates == true || false;
-
         super(params);
         
         if(!this.url) {
@@ -22,8 +20,6 @@ class Connection extends Entity {
         this.def(String, 'title');
         this.def(String, 'type');
         this.def(String, 'url');
-        this.def(Boolean, 'provideTemplates');
-        this.def(Boolean, 'provideMedia');
         
         // Sync
         this.def(Boolean, 'locked');

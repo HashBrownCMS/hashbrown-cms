@@ -31513,6 +31513,7 @@
 	                return $editor;
 	            } else {
 	                debug.log('No connection editor found for type alias "' + this.model.type + '"', this);
+	                return '';
 	            }
 	        }
 
@@ -31523,21 +31524,26 @@
 	    }, {
 	        key: 'renderTypeEditor',
 	        value: function renderTypeEditor() {
-	            var view = this;
+	            var _this2 = this;
 
-	            function onChange() {
-	                var type = $(this).val();
+	            // Generate dropdown options
+	            var dropdownOptions = [];
 
-	                view.model.type = type;
+	            for (var label in resources.connectionEditors || []) {
+	                var option = resources.connectionEditors[label];
 
-	                view.$element.find('.connection-settings .field-value').html(view.renderSettingsEditor());
+	                dropdownOptions[dropdownOptions.length] = {
+	                    label: label,
+	                    value: option.type,
+	                    selected: option.type == this.model.type
+	                };
 	            }
 
-	            var $editor = _.div({ class: 'field-editor dropdown-editor' }, _.select({ class: 'form-control' }, _.each(resources.connectionEditors, function (alias, editor) {
-	                return _.option({ value: alias }, alias);
-	            })).change(onChange));
+	            var $editor = _.div({ class: 'field-editor dropdown-editor' }, UI.inputDropdown('(none)', dropdownOptions, function (newValue) {
+	                _this2.model.type = newValue;
 
-	            $editor.children('select').val(this.model.type);
+	                _this2.$element.find('.connection-settings .field-value').html(_this2.renderSettingsEditor());
+	            }, true));
 
 	            return $editor;
 	        }
@@ -35082,8 +35088,6 @@
 	    function Connection(params) {
 	        _classCallCheck(this, Connection);
 
-	        params.provideTemplates = params.provideTemplates == 'true' || params.provideTemplates == true || false;
-
 	        var _this = _possibleConstructorReturn(this, (Connection.__proto__ || Object.getPrototypeOf(Connection)).call(this, params));
 
 	        if (!_this.url) {
@@ -35100,8 +35104,6 @@
 	            this.def(String, 'title');
 	            this.def(String, 'type');
 	            this.def(String, 'url');
-	            this.def(Boolean, 'provideTemplates');
-	            this.def(Boolean, 'provideMedia');
 
 	            // Sync
 	            this.def(Boolean, 'locked');

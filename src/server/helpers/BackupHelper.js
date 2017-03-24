@@ -12,18 +12,37 @@ let Connection = require('../../common/models/Connection');
  */
 class BackupHelper {
     /**
-     * Gets the storage provider
+     * Gets config
      *
-     * @returns {Promise} Connection
+     * @returns {Promise} Storage provider settings
      */
-    static getStorageProvider(
-        project = requiredParam('project')
-    ) {
-        return SettingsHelper.getSettings(project, null, 'backup')
-        .then((result) => {
-            if(!result) { return Promise.resolve(); }
+    static getConfig() {
+        return new Promise((resolve, reject) => {
+            let configPath = appRoot + '/config/backup.cfg';
 
-            return Promise.resolve(new Connection(result));
+            fs.exists(configPath, (exists) => {
+                if(exists) {
+                    fs.readFile(configPath, (err, data) => {
+                        if(err) {
+                            reject(new Error('There was an error reading ' + configPath + ', please check permissions'));
+
+                        } else {
+                            try {
+                                resolve(JSON.parse(data));
+
+                            } catch(e) {
+                                reject(new Error('There was a problem parsing ' + configPath));
+                            
+                            }
+                        }
+                    });
+            
+                } else {
+                    debug.log(configPath + ' could not be found, remote backup storage services will be unavailable', this);
+                    resolve();
+
+                }
+            });
         });
     }
 

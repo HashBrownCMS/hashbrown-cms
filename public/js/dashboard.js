@@ -20508,7 +20508,303 @@
 /* 177 */,
 /* 178 */,
 /* 179 */,
-/* 180 */,
+/* 180 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var Entity = __webpack_require__(72);
+
+	/**
+	 * The base class for all Connection types
+	 */
+
+	var Connection = function (_Entity) {
+	    _inherits(Connection, _Entity);
+
+	    function Connection(params) {
+	        _classCallCheck(this, Connection);
+
+	        var _this = _possibleConstructorReturn(this, (Connection.__proto__ || Object.getPrototypeOf(Connection)).call(this, params));
+
+	        if (!_this.url) {
+	            _this.url = _this.getRemoteUrl();
+	        }
+	        return _this;
+	    }
+
+	    _createClass(Connection, [{
+	        key: 'structure',
+	        value: function structure() {
+	            // Fundamental fields
+	            this.def(String, 'id');
+	            this.def(String, 'title');
+	            this.def(String, 'type');
+	            this.def(String, 'url');
+
+	            // Sync
+	            this.def(Boolean, 'locked');
+	            this.def(Boolean, 'remote');
+	            this.def(Boolean, 'local');
+
+	            // Extensible settings
+	            this.def(Object, 'settings', {});
+	        }
+
+	        /**
+	         * Creates a new Connection object
+	         *
+	         * @return {Connection} connection
+	         */
+
+	    }, {
+	        key: 'getTemplates',
+
+
+	        /**
+	         * Gets templates
+	         *
+	         * @returns {Promise} Array of Templates
+	         */
+	        value: function getTemplates() {
+	            return Promise.resolve([]);
+	        }
+
+	        /**
+	         * Gets the remote URL
+	         *
+	         * @param {Boolean} withSlash
+	         *
+	         * @returns {String} URL
+	         */
+
+	    }, {
+	        key: 'getRemoteUrl',
+	        value: function getRemoteUrl() {
+	            var withSlash = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+
+	            var url = this.url;
+
+	            if (!withSlash && url[url.length - 1] == '/') {
+	                url = url.substring(0, url.length - 1);
+	            } else if (withSlash && url[url.length - 1] != '/') {
+	                url += '/';
+	            }
+
+	            return url;
+	        }
+
+	        /**
+	         * Gets the media path
+	         *
+	         * @returns {String} path
+	         */
+
+	    }, {
+	        key: 'getMediaPath',
+	        value: function getMediaPath() {
+	            return '';
+	        }
+
+	        /**
+	         * Gets all Media objects
+	         *
+	         * @returns {Promise(Array)} media
+	         */
+
+	    }, {
+	        key: 'getAllMedia',
+	        value: function getAllMedia() {
+	            return Promise.resolve([]);
+	        }
+
+	        /**
+	         * Gets a Media object
+	         *
+	         * @param {String} id
+	         *
+	         * @returns {Promise(Media)} media
+	         */
+
+	    }, {
+	        key: 'getMedia',
+	        value: function getMedia(id) {
+	            return Promise.resolve(null);
+	        }
+
+	        /**
+	         * Sets media
+	         *
+	         * @param {String} id
+	         * @param {Object} file
+	         *
+	         * @returns {Promise(Array)} media
+	         */
+
+	    }, {
+	        key: 'setMedia',
+	        value: function setMedia(id, file) {
+	            return Promise.resolve();
+	        }
+
+	        /**
+	         * Removes media
+	         *
+	         * @param {String} id
+	         *
+	         * @returns {Promise(Array)} media
+	         */
+
+	    }, {
+	        key: 'removeMedia',
+	        value: function removeMedia(id) {
+	            return Promise.resolve();
+	        }
+
+	        /**
+	         *  Unpublishes content
+	         *
+	         * @param {String} project
+	         * @param {String} environment
+	         * @param {Content} content
+	         *
+	         * @returns {Promise} Promise
+	         */
+
+	    }, {
+	        key: 'unpublishContent',
+	        value: function unpublishContent() {
+	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+	            var content = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('content');
+
+	            var connection = this;
+
+	            debug.log('Unpublishing all localised property sets...', this);
+
+	            return LanguageHelper.getSelectedLanguages(project).then(function (languages) {
+	                function next(i) {
+	                    var language = languages[i];
+
+	                    return connection.deleteContentProperties(content.id, language).then(function () {
+	                        i++;
+
+	                        if (i < languages.length) {
+	                            return next(i);
+	                        } else {
+	                            debug.log('Unpublished all localised property sets successfully!', connection);
+
+	                            return Promise.resolve();
+	                        }
+	                    });
+	                }
+
+	                return next(0);
+	            });
+	        }
+
+	        /**
+	         * Publishes content
+	         *
+	         * @param {String} project
+	         * @param {String} environment
+	         * @param {Content} content
+	         *
+	         * @returns {Promise} Promise
+	         */
+
+	    }, {
+	        key: 'publishContent',
+	        value: function publishContent() {
+	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+	            var content = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('content');
+
+	            var connection = this;
+
+	            debug.log('Publishing all localised property sets...', this);
+
+	            return LanguageHelper.getAllLocalizedPropertySets(project, environment, content).then(function (sets) {
+	                var languages = Object.keys(sets);
+
+	                function next(i) {
+	                    var language = languages[i];
+	                    var properties = sets[language];
+
+	                    return connection.postContentProperties(properties, content.id, language, content.getMeta()).then(function () {
+	                        i++;
+
+	                        if (i < languages.length) {
+	                            return next(i);
+	                        } else {
+	                            debug.log('Published all localised property sets successfully!', connection);
+
+	                            return Promise.resolve();
+	                        }
+	                    });
+	                }
+
+	                return next(0);
+	            });
+	        }
+
+	        /**
+	         * Deletes content properties from the remote target
+	         *
+	         * @param {String} id
+	         * @param {String} language
+	         *
+	         * @returns {Promise} promise
+	         */
+
+	    }, {
+	        key: 'deleteContentProperties',
+	        value: function deleteContentProperties(id, language) {
+	            return Promise.callback();
+	        }
+
+	        /**
+	         * Posts content properties to the remote target
+	         *
+	         * @param {Object} properties
+	         * @param {String} id
+	         * @param {String} language
+	         *
+	         * @returns {Promise} promise
+	         */
+
+	    }, {
+	        key: 'postContentProperties',
+	        value: function postContentProperties(properties, id, language) {
+	            return Promise.callback();
+	        }
+	    }], [{
+	        key: 'create',
+	        value: function create() {
+	            var connection = new Connection({
+	                id: Entity.createId(),
+	                title: 'New connection',
+	                settings: {}
+	            });
+
+	            return connection;
+	        }
+	    }]);
+
+	    return Connection;
+	}(Entity);
+
+	module.exports = Connection;
+
+/***/ },
 /* 181 */,
 /* 182 */,
 /* 183 */,
@@ -20841,7 +21137,7 @@
 	                title: _this.model.id + ' backups',
 	                body: _.div(
 	                // List existing backups
-	                _.if(_this.model.backups.length > 0, _.each(_this.model.backups, function (i, backup) {
+	                _.h4('Backups'), _.each(_this.model.backups, function (i, backup) {
 	                    var label = backup;
 	                    var date = new Date(parseInt(backup));
 
@@ -20860,16 +21156,26 @@
 	                    _.a({ href: '#', class: 'dropdown-item' }, 'Delete').click(function (e) {
 	                        e.preventDefault();_this.onClickDeleteBackup(backup);
 	                    })))));
-	                })),
-
-	                // Empty message
-	                _.if(_this.model.backups.length < 1, _.h4('No backups here')),
+	                }),
 
 	                // Create backup
 	                _.div({ class: 'btn-round-group' }, _.button({ class: 'btn btn-round btn-raised btn-default btn-group-addon btn-upload-backup' }, _.span({ class: 'fa fa-upload' }), _.label('Upload')).click(function () {
 	                    _this.onClickUploadBackup();
 	                }), _.button({ class: 'btn btn-round btn-raised btn-primary btn-create-backup' }, _.span({ class: 'btn-icon-initial' }, '+'), _.span({ class: 'btn-icon-display fa fa-save' }), _.label('Create')).click(function () {
 	                    _this.onClickCreateBackup();
+	                })),
+
+	                // Set up storage provider
+	                _.h4('Storage'), _.div({ class: 'storage-provider' }, UI.inputDropdown('Type', [{
+	                    label: 'Local',
+	                    value: 'local',
+	                    selected: _this.model.backupStorage == 'local'
+	                }, {
+	                    label: 'Amazon S3',
+	                    value: 's3',
+	                    selected: _this.model.backupStorage == 's3'
+	                }], function (newValue) {
+	                    _this.model.backupStorage = newValue;
 	                })))
 	            }
 	        });
@@ -21418,6 +21724,7 @@
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 	var Entity = __webpack_require__(72);
+	var Connection = __webpack_require__(180);
 
 	var Project = function (_Entity) {
 	    _inherits(Project, _Entity);
@@ -21433,9 +21740,10 @@
 	        value: function structure() {
 	            this.def(String, 'id');
 	            this.def(Array, 'users', []);
-	            this.def(Array, 'backups', []);
 	            this.def(Object, 'settings', {});
-	            this.def(Boolean, 'useAutoBackup', false);
+	            this.def(Boolean, 'useAutoBackup');
+	            this.def(Array, 'backups', []);
+	            this.def(Object, 'backupStorage', 'local');
 	        }
 	    }], [{
 	        key: 'create',
