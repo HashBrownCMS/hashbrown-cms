@@ -1,0 +1,1 @@
+cmd_Release/obj.target/ursaNative.node := g++ -shared -pthread -rdynamic -m64  -Wl,-soname=ursaNative.node -o Release/obj.target/ursaNative.node -Wl,--start-group Release/obj.target/ursaNative/src/ursaNative.o -Wl,--end-group 

@@ -19,7 +19,7 @@ html
                     | #{message}
 
 
-            form.login(data-first-time="#{(firstTime ? 'true': '' )}", data-invite-token="#{(invitedUser ? invitedUser.inviteToken : '')}")
+            form.login(data-first-time=(firstTime ? 'true': '' ), data-invite-token=(invitedUser ? invitedUser.inviteToken : ''))
                 .login-heading
                     img.lg.logo(src='/svg/logo_white.svg')
                     h2 HashBrown

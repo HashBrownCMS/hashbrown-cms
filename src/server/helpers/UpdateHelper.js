@@ -44,7 +44,7 @@ class UpdateHelper {
                 }
             }
             
-            let git = exec('git fetch && git status && git log origin -1 --format=oneline', {
+            let git = exec('git fetch && git status && git log -- origin -1 --format=oneline', {
                 cwd: appRoot
             });
 
