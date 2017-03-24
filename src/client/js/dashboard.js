@@ -20,11 +20,6 @@ window.UserEditor = require('./views/UserEditor');
 window.Project = require('../../common/models/Project');
 window.User = require('../../common/models/User');
 
-// Resources
-window.resources = {
-    connectionEditors: {}
-};
-
 // --------------------
 // Get current user
 // --------------------
@@ -32,6 +27,15 @@ apiCall('get', 'user')
 .then((user) => {
     User.current = new User(user);
 
+    return apiCall('get', 'server/backups/config');
+})
+
+// --------------------
+// Backup config
+// --------------------
+.then((config) => {
+    window.backupConfig = config;
+    
     return apiCall('get', 'server/projects');
 })
 

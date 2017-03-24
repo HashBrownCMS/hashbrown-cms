@@ -66,16 +66,20 @@
 	window.Project = __webpack_require__(203);
 	window.User = __webpack_require__(174);
 
-	// Resources
-	window.resources = {
-	    connectionEditors: {}
-	};
-
 	// --------------------
 	// Get current user
 	// --------------------
 	apiCall('get', 'user').then(function (user) {
 	    User.current = new User(user);
+
+	    return apiCall('get', 'server/backups/config');
+	})
+
+	// --------------------
+	// Backup config
+	// --------------------
+	.then(function (config) {
+	    window.backupConfig = config;
 
 	    return apiCall('get', 'server/projects');
 	})
@@ -20834,7 +20838,6 @@
 			"express": "^4.13.3",
 			"glob": "^7.0.3",
 			"greenlock": "^2.1.12",
-			"jade": "^1.11.0",
 			"js-beautify": "^1.6.2",
 			"le-acme-core": "^2.0.9",
 			"le-challenge-fs": "^2.0.8",
@@ -20845,6 +20848,7 @@
 			"multer": "^1.1.0",
 			"nodemailer": "^2.6.1",
 			"path-to-regexp": "^1.2.1",
+			"pug": "^2.0.0-beta11",
 			"restler": "^3.4.0",
 			"rimraf": "^2.5.2",
 			"to-markdown": "^2.0.1",
@@ -21163,19 +21167,6 @@
 	                    _this.onClickUploadBackup();
 	                }), _.button({ class: 'btn btn-round btn-raised btn-primary btn-create-backup' }, _.span({ class: 'btn-icon-initial' }, '+'), _.span({ class: 'btn-icon-display fa fa-save' }), _.label('Create')).click(function () {
 	                    _this.onClickCreateBackup();
-	                })),
-
-	                // Set up storage provider
-	                _.h4('Storage'), _.div({ class: 'storage-provider' }, UI.inputDropdown('Type', [{
-	                    label: 'Local',
-	                    value: 'local',
-	                    selected: _this.model.backupStorage == 'local'
-	                }, {
-	                    label: 'Amazon S3',
-	                    value: 's3',
-	                    selected: _this.model.backupStorage == 's3'
-	                }], function (newValue) {
-	                    _this.model.backupStorage = newValue;
 	                })))
 	            }
 	        });
@@ -21743,7 +21734,7 @@
 	            this.def(Object, 'settings', {});
 	            this.def(Boolean, 'useAutoBackup');
 	            this.def(Array, 'backups', []);
-	            this.def(Object, 'backupStorage', 'local');
+	            this.def(String, 'backupStorage', 'local');
 	        }
 	    }], [{
 	        key: 'create',

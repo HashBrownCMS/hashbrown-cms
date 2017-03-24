@@ -59,26 +59,7 @@ class BackupEditor extends View {
                             _.span({class: 'btn-icon-display fa fa-save'}),
                             _.label('Create')
                         ).click(() => { this.onClickCreateBackup(); })
-                    ),
-                    
-					// Set up storage provider
-					_.h4('Storage'),
-					_.div({class: 'storage-provider'},
-						UI.inputDropdown('Type', [
-							{
-								label: 'Local',
-								value: 'local',
-								selected: this.model.backupStorage == 'local'
-							},
-							{
-								label: 'Amazon S3',
-								value: 's3',
-								selected: this.model.backupStorage == 's3'
-							}
-						], (newValue) => {
-							this.model.backupStorage = newValue;
-						})
-					)
+                    )
                 )
             }
         });

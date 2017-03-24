@@ -18,7 +18,7 @@ let cookieparser = require('cookie-parser');
 // ----------
 let app = express();
 
-app.set('view engine', 'jade');
+app.set('view engine', 'pug');
 app.set('views', appRoot + '/src/server/views');
 
 // ----------
