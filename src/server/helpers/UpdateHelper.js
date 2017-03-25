@@ -107,7 +107,7 @@ class UpdateHelper {
             return new Promise((resolve, reject) => {
                 debug.log('Installing dependencies...', this);
                 
-                let npm = exec('npm install', {
+                let npm = exec('npm install --production', {
                     cwd: appRoot
                 });
 

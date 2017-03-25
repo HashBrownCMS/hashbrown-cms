@@ -24839,17 +24839,10 @@
 	        value: function onChange(value) {
 	            value = value || '';
 
-	            var trimmedOldValue = this.value.trim().replace(/\n/g, '').replace(/ /g, '');
-	            var trimmedNewValue = value.trim().replace(/\n/g, '').replace(/ /g, '');
-
 	            this.value = value;
 
 	            if (this.silentChange === true) {
 	                this.silentChange = false;
-	                return;
-	            }
-
-	            if (trimmedOldValue == trimmedNewValue) {
 	                return;
 	            }
 

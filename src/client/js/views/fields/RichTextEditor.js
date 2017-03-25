@@ -24,9 +24,6 @@ class RichTextEditor extends View {
     onChange(value) {
         value = value || '';
 
-        let trimmedOldValue = this.value.trim().replace(/\n/g, '').replace(/ /g, '');
-        let trimmedNewValue = value.trim().replace(/\n/g, '').replace(/ /g, '');
-
         this.value = value;
 
         if(this.silentChange === true) {
@@ -34,8 +31,6 @@ class RichTextEditor extends View {
             return;
         }
         
-        if(trimmedOldValue == trimmedNewValue) { return; }
-
         this.trigger('change', this.value);
     }
 
