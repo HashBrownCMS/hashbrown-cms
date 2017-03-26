@@ -12476,17 +12476,21 @@
 
 	        var _this = _possibleConstructorReturn(this, (NavbarMain.__proto__ || Object.getPrototypeOf(NavbarMain)).call(this, params));
 
-	        _this.connectionPane = ConnectionPane;
-	        _this.contentPane = ContentPane;
-	        _this.formsPane = FormsPane;
-	        _this.mediaPane = MediaPane;
-	        _this.schemaPane = SchemaPane;
+	        _this.template = __webpack_require__(204);
+	        _this.tabPanes = [];
 
-	        _this.$element = _.nav({ class: 'navbar-main' }, _.div({ class: 'tab-buttons' }), _.div({ class: 'tab-panes' }));
+	        CMSPane.init();
+	        ContentPane.init();
+	        MediaPane.init();
+	        FormsPane.init();
+	        TemplatePane.init();
+	        ConnectionPane.init();
+	        SchemaPane.init();
+	        SettingsPane.init();
+
+	        _this.init();
 
 	        $('.navspace').html(_this.$element);
-
-	        _this.fetch();
 	        return _this;
 	    }
 
@@ -12514,346 +12518,33 @@
 	        }
 
 	        /**
-	         * Fetches pane information and renders it
-	         *
-	         * @param {Object} params
+	         * Event: Click tab
 	         */
 
 	    }, {
-	        key: 'renderPane',
-	        value: function renderPane(params) {
-	            var _this2 = this;
+	        key: 'onClickTab',
+	        value: function onClickTab(e) {
+	            var route = e.currentTarget.dataset.route;
+	            var $currentTab = this.$element.find('.pane-container.active');
 
-	            // Render icon
-	            var $icon = params.$icon;
-
-	            if (!$icon) {
-	                $icon = _.span({ class: 'fa fa-' + params.icon });
+	            if (route == $currentTab.attr('data-route')) {
+	                location.hash = route;
+	            } else {
+	                this.showTab(route);
 	            }
-
-	            // Render button
-	            var $button = $('button[data-route="' + params.route + '"]');
-
-	            // Button does not exist, create and append it
-	            if ($button.length < 1) {
-	                $button = _.button({ 'data-route': params.route, title: params.label }, _.div({ class: 'pane-icon' }, $icon), _.div({ class: 'pane-text' }, _.span({ class: 'pane-label' }, params.label), params.sublabel ? _.span({ class: 'pane-sublabel' }, params.sublabel) : '')).click(function () {
-	                    var $currentTab = _this2.$element.find('.pane-container.active');
-
-	                    if (params.route == $currentTab.attr('data-route')) {
-	                        location.hash = params.route;
-	                    } else {
-	                        _this2.showTab(params.route);
-	                    }
-	                });
-
-	                this.$element.find('.tab-buttons').append($button);
-	            }
-
-	            // Render pane 
-	            var $pane = $('.pane-container[data-route="' + params.route + '"] .pane');
-
-	            // Pane didn't exist, create it (it will be appended further down)
-	            if ($pane.length < 1) {
-	                $pane = _.div({ class: 'pane' });
-	            }
-
-	            var items = params.items;
-	            var sortingQueue = [];
-
-	            // Render items
-	            _.each(items, function (i, item) {
-	                var id = item.id || i;
-	                var isDirectory = false;
-
-	                // Get item name
-	                var name = '';
-
-	                // This is a Content node
-	                if (item.properties && item.createDate) {
-	                    // All Content nodes are "directories" in that they can be parents of one another
-	                    isDirectory = true;
-
-	                    // Use title directly if available
-	                    if (typeof item.properties.title === 'string') {
-	                        name = item.properties.title;
-	                    } else if (item.properties.title && _typeof(item.properties.title) === 'object') {
-	                        // Use the current language title
-	                        if (item.properties.title[window.language]) {
-	                            name = item.properties.title[window.language];
-
-	                            // If no title was found, searh in other languages
-	                        } else {
-	                            name = '(Untitled)';
-
-	                            for (var language in item.properties.title) {
-	                                var languageTitle = item.properties.title[language];
-
-	                                if (languageTitle) {
-	                                    name += ' - (' + language + ': ' + languageTitle + ')';
-	                                    break;
-	                                }
-	                            }
-	                        }
-	                    }
-
-	                    // If name still wasn't found, use the id
-	                    if (!name) {
-	                        name = item.id;
-	                    }
-	                } else if (item.title && typeof item.title === 'string') {
-	                    name = item.title;
-	                } else if (item.name && typeof item.name === 'string') {
-	                    name = item.name;
-	                } else {
-	                    name = id;
-	                }
-
-	                var routingPath = item.shortPath || item.path || item.id || null;
-	                var queueItem = {};
-	                var icon = item.icon || params.icon;
-	                var $icon = void 0;
-
-	                // Implement custom routing paths
-	                if (typeof params.itemPath === 'function') {
-	                    routingPath = params.itemPath(item);
-	                }
-
-	                // Truncate long names
-	                if (name.length > 30) {
-	                    name = name.substring(0, 30) + '...';
-	                }
-
-	                // If this item has a Schema id, fetch the appropriate icon
-	                if (item.schemaId) {
-	                    var schema = resources.schemas[item.schemaId];
-
-	                    if (schema) {
-	                        icon = schema.icon;
-	                    }
-	                }
-
-	                if (icon) {
-	                    $icon = _.span({ class: 'fa fa-' + icon });
-	                }
-
-	                // Item element
-	                var $existingElement = $pane.find('.pane-item-container[data-routing-path="' + routingPath + '"]');
-	                var $element = _.div({
-	                    class: 'pane-item-container',
-	                    'data-routing-path': routingPath
-	                });
-
-	                // Element exists already, replace
-	                if ($existingElement.length > 0) {
-	                    $existingElement.replaceWith($element);
-
-	                    // Element didn't exist already, create it and append to pane
-	                } else {
-	                    $pane.append($element);
-	                }
-
-	                // Populate element
-	                _.append($element.empty(), _.a({
-	                    'data-id': id,
-	                    'data-name': name,
-	                    href: '#' + (routingPath ? params.route + routingPath : params.route),
-	                    class: 'pane-item'
-	                }, $icon, _.span({ class: 'pane-item-label' }, name)), _.div({ class: 'children' }), _.div({ class: 'pane-item-insert-below' }));
-
-	                // Set sync attributes
-	                if (typeof item.locked !== 'undefined') {
-	                    $element.attr('data-locked', item.locked);
-	                }
-
-	                if (typeof item.remote !== 'undefined') {
-	                    $element.attr('data-remote', item.remote);
-	                }
-
-	                if (typeof item.local !== 'undefined') {
-	                    $element.attr('data-local', item.local);
-	                }
-
-	                if (isDirectory) {
-	                    $element.attr('data-is-directory', true);
-	                }
-
-	                // Attach item context menu
-	                if (params.getItemContextMenu) {
-	                    $element.find('a').exocontext(params.getItemContextMenu(item));
-	                } else if (params.itemContextMenu) {
-	                    $element.find('a').exocontext(params.itemContextMenu);
-	                }
-
-	                // Add element to queue item
-	                queueItem.$element = $element;
-
-	                // Add sort index to element
-	                queueItem.$element.attr('data-sort', item.sort || 0);
-
-	                // Use specific hierarchy behaviours
-	                if (params.hierarchy) {
-	                    params.hierarchy(item, queueItem);
-	                }
-
-	                // Add queue item to sorting queue
-	                sortingQueue.push(queueItem);
-	            });
-
-	            // Place items into hierarchy
-	            var _iteratorNormalCompletion = true;
-	            var _didIteratorError = false;
-	            var _iteratorError = undefined;
-
-	            try {
-	                for (var _iterator = sortingQueue[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-	                    var queueItem = _step.value;
-
-	                    if (queueItem.parentDirAttr) {
-	                        // Find parent item
-	                        var parentDirAttrKey = Object.keys(queueItem.parentDirAttr)[0];
-	                        var parentDirAttrValue = queueItem.parentDirAttr[parentDirAttrKey];
-	                        var parentDirSelector = '.pane-item-container[' + parentDirAttrKey + '="' + parentDirAttrValue + '"]';
-	                        var $parentDir = $pane.find(parentDirSelector);
-
-	                        // If parent element already exists, just append the queue item element
-	                        if ($parentDir.length > 0) {
-	                            $parentDir.children('.children').append(queueItem.$element);
-
-	                            // If not, create parent elements if specified
-	                        } else if (queueItem.createDir) {
-	                            var dirNames = parentDirAttrValue.split('/').filter(function (item) {
-	                                return item != '';
-	                            });
-	                            var finalDirName = '/';
-
-	                            for (var i in dirNames) {
-	                                var dirName = dirNames[i];
-
-	                                var prevFinalDirName = finalDirName;
-	                                finalDirName += dirName + '/';
-
-	                                var $dir = $pane.find('[' + parentDirAttrKey + '="' + finalDirName + '"]');
-
-	                                if ($dir.length < 1) {
-	                                    $dir = _.div({ class: 'pane-item-container', 'data-is-directory': true }, _.a({
-	                                        class: 'pane-item'
-	                                    }, _.span({ class: 'fa fa-folder' }), _.span({ class: 'pane-item-label' }, dirName)), _.div({ class: 'children' }));
-
-	                                    $dir.attr(parentDirAttrKey, finalDirName);
-
-	                                    // Extra parent dir attributes
-	                                    if (queueItem.parentDirExtraAttr) {
-	                                        for (var k in queueItem.parentDirExtraAttr) {
-	                                            var v = queueItem.parentDirExtraAttr[k];
-
-	                                            $dir.attr(k, v);
-	                                        }
-	                                    }
-
-	                                    // Append to previous dir 
-	                                    var $prevDir = $pane.find('[' + parentDirAttrKey + '="' + prevFinalDirName + '"]');
-
-	                                    if ($prevDir.length > 0) {
-	                                        $prevDir.children('.children').prepend($dir);
-
-	                                        // If no previous dir was found, append directly to pane
-	                                    } else {
-	                                        $pane.prepend($dir);
-	                                    }
-	                                }
-
-	                                // Attach item context menu
-	                                if (params.dirContextMenu) {
-	                                    $dir.exocontext(params.dirContextMenu);
-	                                }
-
-	                                // Only append the queue item to the final parent element
-	                                if (i >= dirNames.length - 1) {
-	                                    $parentDir = $dir;
-	                                }
-	                            }
-
-	                            $parentDir.children('.children').append(queueItem.$element);
-	                        }
-	                    }
-	                }
-
-	                // Sort direct children
-	            } catch (err) {
-	                _didIteratorError = true;
-	                _iteratorError = err;
-	            } finally {
-	                try {
-	                    if (!_iteratorNormalCompletion && _iterator.return) {
-	                        _iterator.return();
-	                    }
-	                } finally {
-	                    if (_didIteratorError) {
-	                        throw _iteratorError;
-	                    }
-	                }
-	            }
-
-	            $pane.find('>.pane-item-container').sort(function (a, b) {
-	                return parseInt(a.dataset.sort) > parseInt(b.dataset.sort);
-	            }).appendTo($pane);
-
-	            // Sort nested children
-	            $pane.find('.pane-item-container .children').each(function (i, children) {
-	                var $children = $(children);
-
-	                $children.find('>.pane-item-container').sort(function (a, b) {
-	                    return parseInt(a.dataset.sort) > parseInt(b.dataset.sort);
-	                }).appendTo($children);
-	            });
-
-	            // Render pane container
-	            var $paneContainer = $('.pane-container[data-route="' + params.route + '"]');
-
-	            // Pane container didn't already exist, create it
-	            if ($paneContainer.length < 1) {
-	                // Render pane container
-	                $paneContainer = _.div({ class: 'pane-container', 'data-route': params.route }, _.if(params.toolbar, params.toolbar), _.div({ class: 'pane-move-buttons' }, _.button({ class: 'btn btn-move-to-root' }, 'Move to root'), _.button({ class: 'btn btn-new-folder' }, 'New folder')), $pane);
-
-	                // Attach pane context menu
-	                if (params.paneContextMenu) {
-	                    $paneContainer.exocontext(params.paneContextMenu);
-	                }
-
-	                // Append to pane container parent
-	                this.$element.find('.tab-panes').append($paneContainer);
-	            }
-
-	            // Add expand/collapse buttons to items if needed
-	            $paneContainer.find('.pane-item-container').each(function (i, element) {
-	                var $paneItemContainer = $(element);
-	                var $paneItem = $paneItemContainer.children('.pane-item');;
-	                var $children = $paneItemContainer.children('.children');
-
-	                if ($children.children().length > 0) {
-	                    var onClickChildrenToggle = function onClickChildrenToggle(e) {
-	                        e.preventDefault();
-	                        e.stopPropagation();
-
-	                        $paneItemContainer.toggleClass('open');
-	                    };
-
-	                    var $childrenToggle = _.button({ class: 'btn-children-toggle' }, _.span({ class: 'fa fa-caret-down' }), _.span({ class: 'fa fa-caret-right' }));
-
-	                    $paneItem.append($childrenToggle);
-
-	                    $childrenToggle.click(onClickChildrenToggle);
-	                }
-	            });
-
-	            if (params.postSort) {
-	                params.postSort($paneContainer.find('>.pane, .pane-item-container>.children'));
-	            }
-
-	            if (this.$element.find('.tab-panes .pane-container').length < 1) {
-	                $paneContainer.addClass('active');
-	                $button.addClass('active');
-	            }
+	        }
+
+	        /**
+	         * Event: Toggle children
+	         */
+
+	    }, {
+	        key: 'onClickToggleChildren',
+	        value: function onClickToggleChildren(e) {
+	            e.preventDefault();
+	            e.stopPropagation();
+
+	            e.currentTarget.parentElement.parentElement.classList.toggle('open');
 	        }
 
 	        /**
@@ -12887,24 +12578,138 @@
 	            this.fetch();
 
 	            if ($currentTab.length > 0) {
-	                var currentTabName = $currentTab.attr('data-route');
+	                var currentTabRoute = $currentTab.attr('data-route');
 
 	                if ($currentItem.length > 0) {
-	                    var currentRoute = $currentItem.attr('data-id') || $currentItem.attr('data-routing-path');
+	                    var currentItemRoute = $currentItem.attr('data-id') || $currentItem.attr('data-routing-path');
 
-	                    this.highlightItem(currentTabName, currentRoute);
+	                    this.highlightItem(currentTabRoute, currentItemRoute);
 	                } else {
-	                    this.showTab(currentTabName);
+	                    this.showTab(currentTabRoute);
 	                }
 	            }
 	        }
 	    }, {
-	        key: 'highlightItem',
+	        key: 'getItemIcon',
 
+
+	        /**
+	         * Gets the icons of an item
+	         *
+	         * @param {Object} item
+	         * @param {Object} settings
+	         *
+	         * @returns {String} Icon name
+	         */
+	        value: function getItemIcon(item, settings) {
+	            // If this item has a Schema id, fetch the appropriate icon
+	            if (item.schemaId) {
+	                var schema = SchemaHelper.getSchemaByIdSync(item.schemaId);
+
+	                if (schema) {
+	                    return schema.icon;
+	                }
+	            }
+
+	            return item.icon || settings.icon || 'file';
+	        }
+
+	        /**
+	         * Gets whether the item is a directory
+	         *
+	         * @param {Object} item
+	         *
+	         * @return {Boolean} Is directory
+	         */
+
+	    }, {
+	        key: 'isItemDirectory',
+	        value: function isItemDirectory(item) {
+	            if (item.properties && item.createDate) {
+	                return true;
+	            }
+
+	            return false;
+	        }
+
+	        /**
+	         * Gets the routing path for an item
+	         *
+	         * @param {Object} item
+	         * @param {Object} settings
+	         *
+	         * @returns {String} Routing path
+	         */
+
+	    }, {
+	        key: 'getItemRoutingPath',
+	        value: function getItemRoutingPath(item, settings) {
+	            if (typeof settings.itemPath === 'function') {
+	                return settings.itemPath(item);
+	            }
+
+	            return item.shortPath || item.path || item.id || null;
+	        }
+
+	        /**
+	         * Gets the name of an item
+	         *
+	         * @param {Object} item
+	         *
+	         * @returns {String} Item name
+	         */
+
+	    }, {
+	        key: 'getItemName',
+	        value: function getItemName(item) {
+	            var name = '';
+
+	            // This is a Content node
+	            if (item.properties && item.createDate) {
+	                // Use title directly if available
+	                if (typeof item.properties.title === 'string') {
+	                    name = item.properties.title;
+	                } else if (item.properties.title && _typeof(item.properties.title) === 'object') {
+	                    // Use the current language title
+	                    if (item.properties.title[window.language]) {
+	                        name = item.properties.title[window.language];
+
+	                        // If no title was found, searh in other languages
+	                    } else {
+	                        name = '(Untitled)';
+
+	                        for (var language in item.properties.title) {
+	                            var languageTitle = item.properties.title[language];
+
+	                            if (languageTitle) {
+	                                name += ' - (' + language + ': ' + languageTitle + ')';
+	                                break;
+	                            }
+	                        }
+	                    }
+	                }
+
+	                // If name still wasn't found, use the id
+	                if (!name) {
+	                    name = item.id;
+	                }
+	            } else if (item.title && typeof item.title === 'string') {
+	                name = item.title;
+	            } else if (item.name && typeof item.name === 'string') {
+	                name = item.name;
+	            } else {
+	                name = item.id;
+	            }
+
+	            return name;
+	        }
 
 	        /**
 	         * Highlights an item
 	         */
+
+	    }, {
+	        key: 'highlightItem',
 	        value: function highlightItem(tab, route) {
 	            this.showTab(tab);
 
@@ -12921,57 +12726,181 @@
 	                }
 	            });
 	        }
+
+	        /**
+	         * Clears all content within the navbar
+	         */
+
 	    }, {
 	        key: 'clear',
 	        value: function clear() {
 	            this.$element.find('.tab-buttons').empty();
 	            this.$element.find('.tab-panes').empty();
 	        }
+
+	        /**
+	         * Applies item sorting
+	         *
+	         * @param {HTMLElement} $pane
+	         * @param {Object} pane
+	         */
+
 	    }, {
-	        key: 'render',
-	        value: function render() {
-	            var isAdmin = User.current.isAdmin;
-	            var hasConnectionsScope = User.current.hasScope(ProjectHelper.currentProject, 'connections');
-	            var hasSchemasScope = User.current.hasScope(ProjectHelper.currentProject, 'schemas');
-	            var hasTemplatesScope = User.current.hasScope(ProjectHelper.currentProject, 'templates');
-	            var hasSettingsScope = User.current.hasScope(ProjectHelper.currentProject, 'settings');
+	        key: 'applySorting',
+	        value: function applySorting($pane, pane) {
+	            $pane = $pane.children('.pane');
 
-	            // Render the "cms" pane
-	            this.renderPane(CMSPane.getRenderSettings());
+	            // Sort direct children
+	            $pane.find('>.pane-item-container').sort(function (a, b) {
+	                return parseInt(a.dataset.sort) > parseInt(b.dataset.sort);
+	            }).appendTo($pane);
 
-	            // Render the "content" pane
-	            this.renderPane(ContentPane.getRenderSettings());
+	            // Sort nested children
+	            $pane.find('.pane-item-container .children').each(function (i, children) {
+	                var $children = $(children);
 
-	            // Render the "media" pane
-	            this.renderPane(MediaPane.getRenderSettings());
+	                $children.find('>.pane-item-container').sort(function (a, b) {
+	                    return parseInt(a.dataset.sort) > parseInt(b.dataset.sort);
+	                }).appendTo($children);
+	            });
+	        }
 
-	            // Render the "forms" pane
-	            this.renderPane(FormsPane.getRenderSettings());
+	        /**
+	         * Applies item hierarchy
+	         *
+	         * @param {HTMLElement} $pane
+	         * @param {Object} pane
+	         * @param {Array} queue
+	         */
 
-	            // Render the "templates" pane
-	            if (isAdmin || hasTemplatesScope) {
-	                this.renderPane(TemplatePane.getRenderSettings());
-	            }
+	    }, {
+	        key: 'applyHierarchy',
+	        value: function applyHierarchy($pane, pane, queue) {
+	            var _this2 = this;
 
-	            // Render the "connections" pane
-	            if (isAdmin || hasConnectionsScope) {
-	                this.renderPane(ConnectionPane.getRenderSettings());
-	            }
+	            var _iteratorNormalCompletion = true;
+	            var _didIteratorError = false;
+	            var _iteratorError = undefined;
 
-	            // Render the "schemas" pane
-	            if (isAdmin || hasSchemasScope) {
-	                this.renderPane(SchemaPane.getRenderSettings());
-	            }
+	            try {
+	                for (var _iterator = queue[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	                    var queueItem = _step.value;
 
-	            // Render the "settings" pane
-	            if (isAdmin || hasSettingsScope) {
-	                this.renderPane(SettingsPane.getRenderSettings());
+	                    if (!queueItem.parentDirAttr) {
+	                        continue;
+	                    }
+
+	                    // Find parent item
+	                    var parentDirAttrKey = Object.keys(queueItem.parentDirAttr)[0];
+	                    var parentDirAttrValue = queueItem.parentDirAttr[parentDirAttrKey];
+	                    var parentDirSelector = '.pane-item-container[' + parentDirAttrKey + '="' + parentDirAttrValue + '"]';
+	                    var $parentDir = $pane.find(parentDirSelector);
+
+	                    // If parent element already exists, just append the queue item element
+	                    if ($parentDir.length > 0) {
+	                        $parentDir.children('.children').append(queueItem.$element);
+
+	                        // If not, create parent elements if specified
+	                    } else if (queueItem.createDir) {
+	                        var dirNames = parentDirAttrValue.split('/').filter(function (item) {
+	                            return item != '';
+	                        });
+	                        var finalDirName = '/';
+
+	                        for (var i in dirNames) {
+	                            var dirName = dirNames[i];
+
+	                            var prevFinalDirName = finalDirName;
+	                            finalDirName += dirName + '/';
+
+	                            var $dir = $pane.find('[' + parentDirAttrKey + '="' + finalDirName + '"]');
+
+	                            if ($dir.length < 1) {
+	                                $dir = _.div({ class: 'pane-item-container', 'data-is-directory': true }, _.a({
+	                                    class: 'pane-item'
+	                                }, _.span({ class: 'fa fa-folder' }), _.span({ class: 'pane-item-label' }, dirName)), _.div({ class: 'children' }));
+
+	                                $dir.attr(parentDirAttrKey, finalDirName);
+
+	                                // Extra parent dir attributes
+	                                if (queueItem.parentDirExtraAttr) {
+	                                    for (var k in queueItem.parentDirExtraAttr) {
+	                                        var v = queueItem.parentDirExtraAttr[k];
+
+	                                        $dir.attr(k, v);
+	                                    }
+	                                }
+
+	                                // Append to previous dir 
+	                                var $prevDir = $pane.find('[' + parentDirAttrKey + '="' + prevFinalDirName + '"]');
+
+	                                if ($prevDir.length > 0) {
+	                                    $prevDir.children('.children').prepend($dir);
+
+	                                    // If no previous dir was found, append directly to pane
+	                                } else {
+	                                    $pane.children('.pane').prepend($dir);
+	                                }
+	                            }
+
+	                            // Attach item context menu
+	                            if (pane.settings.dirContextMenu) {
+	                                $dir.exocontext(pane.settings.dirContextMenu);
+	                            }
+
+	                            // Only append the queue item to the final parent element
+	                            if (i >= dirNames.length - 1) {
+	                                $parentDir = $dir;
+	                            }
+	                        }
+
+	                        $parentDir.children('.children').append(queueItem.$element);
+	                    }
+
+	                    // Add expand/collapse buttons
+	                    if ($parentDir.children('.pane-item').children('.btn-children-toggle').length < 1) {
+	                        $parentDir.children('.pane-item').append(_.button({ class: 'btn-children-toggle' }, _.span({ class: 'fa fa-caret-down' }), _.span({ class: 'fa fa-caret-right' })).click(function (e) {
+	                            _this2.onClickToggleChildren(e);
+	                        }));
+	                    }
+	                }
+	            } catch (err) {
+	                _didIteratorError = true;
+	                _iteratorError = err;
+	            } finally {
+	                try {
+	                    if (!_iteratorNormalCompletion && _iterator.return) {
+	                        _iterator.return();
+	                    }
+	                } finally {
+	                    if (_didIteratorError) {
+	                        throw _iteratorError;
+	                    }
+	                }
 	            }
 	        }
 	    }], [{
 	        key: 'reload',
 	        value: function reload() {
 	            ViewHelper.get('NavbarMain').reload();
+	        }
+
+	        /**
+	         * Adds a tab pane
+	         *
+	         * @param {String} route
+	         * @param {Object} settings
+	         */
+
+	    }, {
+	        key: 'addTabPane',
+	        value: function addTabPane(route, label, icon, settings) {
+	            ViewHelper.get('NavbarMain').tabPanes.push({
+	                label: label,
+	                route: route,
+	                icon: icon,
+	                settings: settings
+	            });
 	        }
 	    }]);
 
@@ -21176,18 +21105,13 @@
 	    }
 
 	    _createClass(CMSPane, null, [{
-	        key: 'getRenderSettings',
+	        key: 'init',
 
 	        /**
-	         * Gets the render settings
-	         *
-	         * @returns {Object} Settings
+	         * Init
 	         */
-	        value: function getRenderSettings() {
-	            return {
-	                label: 'HashBrown',
-	                route: '/',
-	                $icon: _.img({ src: '/svg/logo_white.svg', class: 'logo' }),
+	        value: function init() {
+	            NavbarMain.addTabPane('/', 'HashBrown', _.img({ src: '/svg/logo_white.svg', class: 'logo' }), {
 	                items: [{
 	                    name: 'Welcome'
 	                }, {
@@ -21197,7 +21121,7 @@
 	                    name: 'License',
 	                    path: 'license'
 	                }]
-	            };
+	            });
 	        }
 	    }]);
 
@@ -21222,11 +21146,21 @@
 	    }
 
 	    _createClass(Pane, null, [{
-	        key: 'onClickCopyItemId',
+	        key: 'init',
+
+	        /**
+	         * Init
+	         */
+	        value: function init() {
+	            NavbarMain.addTabButton('My pane', '/my-route', 'question');
+	        }
 
 	        /**
 	         * Event: Click copy item id
 	         */
+
+	    }, {
+	        key: 'onClickCopyItemId',
 	        value: function onClickCopyItemId() {
 	            var id = $('.context-menu-target-element').data('id');
 
@@ -21452,8 +21386,6 @@
 	            function onSuccess() {
 	                debug.log('Removed connection with alias "' + id + '"', navbar);
 
-	                $element.parent().remove();
-
 	                reloadResource('connections').then(function () {
 	                    navbar.reload();
 
@@ -21545,21 +21477,18 @@
 	        }
 
 	        /**
-	         * Gets render settings
-	         *
-	         * @returns {Object} settings
+	         * Init
 	         */
 
 	    }, {
-	        key: 'getRenderSettings',
-	        value: function getRenderSettings() {
+	        key: 'init',
+	        value: function init() {
 	            var _this2 = this;
 
-	            return {
-	                label: 'Connections',
-	                route: '/connections/',
-	                icon: 'exchange',
-	                items: resources.connections,
+	            NavbarMain.addTabPane('/connections/', 'Connections', 'exchange', {
+	                getItems: function getItems() {
+	                    return resources.connections;
+	                },
 
 	                // Item context menu
 	                getItemContextMenu: function getItemContextMenu(item) {
@@ -21613,7 +21542,7 @@
 	                        _this2.onClickNewConnection();
 	                    }
 	                }
-	            };
+	            });
 	        }
 	    }]);
 
@@ -22035,8 +21964,6 @@
 	                    }
 
 	                    function onSuccess() {
-	                        $element.parent().remove();
-
 	                        return reloadResource('content').then(function () {
 	                            navbar.reload();
 
@@ -22074,23 +22001,18 @@
 	        }
 
 	        /**
-	         * Gets render settings
-	         *
-	         * @returns {Object} settings
+	         * Init
 	         */
 
 	    }, {
-	        key: 'getRenderSettings',
-	        value: function getRenderSettings() {
+	        key: 'init',
+	        value: function init() {
 	            var _this3 = this;
 
-	            var navbar = ViewHelper.get('NavbarMain');
-
-	            return {
-	                label: 'Content',
-	                route: '/content/',
-	                icon: 'file',
-	                items: resources.content,
+	            NavbarMain.addTabPane('/content/', 'Content', 'file', {
+	                getItems: function getItems() {
+	                    return resources.content;
+	                },
 
 	                // Item context menu
 	                getItemContextMenu: function getItemContextMenu(item) {
@@ -22178,7 +22100,7 @@
 	                    queueItem.$element.attr('data-content-id', item.id);
 	                    queueItem.parentDirAttr = { 'data-content-id': item.parentId };
 	                }
-	            };
+	            });
 	        }
 	    }]);
 
@@ -22246,8 +22168,6 @@
 
 	            function onSuccess() {
 	                debug.log('Removed Form with id "' + form.id + '"', view);
-
-	                $element.parent().remove();
 
 	                return reloadResource('forms').then(function () {
 	                    ViewHelper.get('NavbarMain').reload();
@@ -22337,16 +22257,20 @@
 	                navbar.reload();
 	            }).catch(UI.errorModal);
 	        }
+
+	        /**
+	         * Init
+	         */
+
 	    }, {
-	        key: 'getRenderSettings',
-	        value: function getRenderSettings() {
+	        key: 'init',
+	        value: function init() {
 	            var _this2 = this;
 
-	            return {
-	                label: 'Forms',
-	                route: '/forms/',
-	                icon: 'wpforms',
-	                items: resources.forms,
+	            NavbarMain.addTabPane('/forms/', 'Forms', 'wpforms', {
+	                getItems: function getItems() {
+	                    return resources.forms;
+	                },
 
 	                // Hierarchy logic
 	                hierarchy: function hierarchy(item, queueItem) {
@@ -22416,7 +22340,7 @@
 	                        _this2.onClickPasteForm();
 	                    }
 	                }
-	            };
+	            });
 	        }
 	    }]);
 
@@ -22484,8 +22408,6 @@
 	            var name = $element.data('name');
 
 	            function onSuccess() {
-	                $element.parent().remove();
-
 	                reloadResource('media').then(function () {
 	                    ViewHelper.get('NavbarMain').reload();
 
@@ -22554,27 +22476,24 @@
 	        }
 
 	        /**
-	         * Gets the render settings
-	         *
-	         * @returns {Object} settings
+	         * Init
 	         */
 
 	    }, {
-	        key: 'getRenderSettings',
-	        value: function getRenderSettings() {
+	        key: 'init',
+	        value: function init() {
 	            var _this2 = this;
 
-	            var isSyncEnabled = SettingsHelper.getCachedSettings('sync').enabled;
-	            var isMediaSyncEnabled = isSyncEnabled && SettingsHelper.getCachedSettings('sync')['media/tree'];
-
-	            return {
-	                label: 'Media',
-	                route: '/media/',
-	                icon: 'file-image-o',
-	                items: resources.media,
+	            NavbarMain.addTabPane('/media/', 'Media', 'file-image-o', {
+	                getItems: function getItems() {
+	                    return resources.media;
+	                },
 
 	                // Hierarchy logic
 	                hierarchy: function hierarchy(item, queueItem) {
+	                    var isSyncEnabled = SettingsHelper.getCachedSettings('sync').enabled;
+	                    var isMediaSyncEnabled = isSyncEnabled && SettingsHelper.getCachedSettings('sync')['media/tree'];
+
 	                    queueItem.$element.attr('data-media-id', item.id);
 
 	                    if (item.folder) {
@@ -22629,7 +22548,7 @@
 	                        _this2.onClickUploadMedia();
 	                    }
 	                }
-	            };
+	            });
 	        }
 	    }]);
 
@@ -22682,8 +22601,6 @@
 
 	            function onSuccess() {
 	                debug.log('Removed schema with id "' + id + '"', navbar);
-
-	                $element.parent().remove();
 
 	                reloadResource('schemas').then(function () {
 	                    navbar.reload();
@@ -22796,21 +22713,18 @@
 	        }
 
 	        /**
-	         * Gets the render settings
-	         *
-	         * @returns {Object} settings
+	         * Init
 	         */
 
 	    }, {
-	        key: 'getRenderSettings',
-	        value: function getRenderSettings() {
+	        key: 'init',
+	        value: function init() {
 	            var _this2 = this;
 
-	            return {
-	                label: 'Schemas',
-	                route: '/schemas/',
-	                icon: 'gears',
-	                items: resources.schemas,
+	            NavbarMain.addTabPane('/schemas/', 'Schemas', 'gears', {
+	                getItems: function getItems() {
+	                    return resources.schemas;
+	                },
 
 	                // Item context menu
 	                getItemContextMenu: function getItemContextMenu(item) {
@@ -22870,7 +22784,7 @@
 	                        queueItem.parentDirAttr = { 'data-schema-type': item.type };
 	                    }
 	                }
-	            };
+	            });
 	        }
 	    }]);
 
@@ -22905,12 +22819,13 @@
 	    }
 
 	    _createClass(SettingsPane, null, [{
-	        key: 'getRenderSettings',
-	        value: function getRenderSettings() {
-	            return {
-	                label: 'Settings',
-	                route: '/settings/',
-	                icon: 'wrench',
+	        key: 'init',
+
+	        /**
+	         * Init
+	         */
+	        value: function init() {
+	            NavbarMain.addTabPane('/settings/', 'Settings', 'wrench', {
 	                items: [{
 	                    name: 'Sync',
 	                    path: 'sync',
@@ -22920,7 +22835,7 @@
 	                    path: 'providers',
 	                    icon: 'gift'
 	                }]
-	            };
+	            });
 	        }
 	    }]);
 
@@ -23147,28 +23062,25 @@
 	        }
 
 	        /**
-	         * Gets the render settings
-	         *
-	         * @returns {Object} Settings
+	         * Init
 	         */
 
 	    }, {
-	        key: 'getRenderSettings',
-	        value: function getRenderSettings() {
+	        key: 'init',
+	        value: function init() {
 	            var _this2 = this;
 
-	            return {
-	                label: 'Templates',
-	                route: '/templates/',
-	                icon: 'code',
-	                items: resources.templates,
+	            NavbarMain.addTabPane('/templates/', 'Templates', 'code', {
+	                getItems: function getItems() {
+	                    return resources.templates;
+	                },
 
 	                // Item path
 	                itemPath: function itemPath(item) {
 	                    return item.type + '/' + item.id;
 	                },
 
-	                // Hiearchy logic
+	                // Hierarchy logic
 	                hierarchy: function hierarchy(item, queueItem) {
 	                    queueItem.$element.attr('data-template-id', item.id);
 
@@ -23206,7 +23118,7 @@
 	                        _this2.onClickAddTemplate();
 	                    }
 	                }
-	            };
+	            });
 	        }
 	    }]);
 
@@ -35792,6 +35704,28 @@
 	                reject(new Error('No Schema by id "' + id + '" was found'));
 	            });
 	        }
+
+	        /**
+	         * Gets a Schema by id (sync)
+	         *
+	         * @param {String} id
+	         *
+	         * @return {Promise} Promise
+	         */
+
+	    }, {
+	        key: 'getSchemaByIdSync',
+	        value: function getSchemaByIdSync(id) {
+	            for (var i in resources.schemas) {
+	                var schema = resources.schemas[i];
+
+	                if (schema.id == id) {
+	                    return schema;
+	                }
+	            }
+
+	            UI.errorModal(new Error('No Schema by id "' + id + '" was found'));
+	        }
 	    }]);
 
 	    return SchemaHelper;
@@ -36485,6 +36419,413 @@
 
 	    populateWorkspace(formEditor.$element);
 	});
+
+/***/ },
+/* 198 */,
+/* 199 */,
+/* 200 */,
+/* 201 */,
+/* 202 */,
+/* 203 */,
+/* 204 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+	module.exports = function () {
+	    var _this = this;
+
+	    var isAdmin = User.current.isAdmin;
+	    var hasConnectionsScope = User.current.hasScope(ProjectHelper.currentProject, 'connections');
+	    var hasSchemasScope = User.current.hasScope(ProjectHelper.currentProject, 'schemas');
+	    var hasTemplatesScope = User.current.hasScope(ProjectHelper.currentProject, 'templates');
+	    var hasSettingsScope = User.current.hasScope(ProjectHelper.currentProject, 'settings');
+
+	    /**
+	     * Fetches pane information and renders it
+	     *
+	     * @param {Object} params
+	     */
+	    var renderPane = function renderPane(params) {
+	        // Render pane 
+	        var $pane = $('.pane-container[data-route="' + params.route + '"] .pane');
+
+	        // Pane didn't exist, create it (it will be appended further down)
+	        if ($pane.length < 1) {
+	            $pane = _.div({ class: 'pane' });
+	        }
+
+	        var items = params.items;
+	        var sortingQueue = [];
+
+	        // Render items
+	        _.each(items, function (i, item) {
+	            var id = item.id || i;
+	            var isDirectory = false;
+
+	            // Get item name
+	            var name = '';
+
+	            // This is a Content node
+	            if (item.properties && item.createDate) {
+	                // All Content nodes are "directories" in that they can be parents of one another
+	                isDirectory = true;
+
+	                // Use title directly if available
+	                if (typeof item.properties.title === 'string') {
+	                    name = item.properties.title;
+	                } else if (item.properties.title && _typeof(item.properties.title) === 'object') {
+	                    // Use the current language title
+	                    if (item.properties.title[window.language]) {
+	                        name = item.properties.title[window.language];
+
+	                        // If no title was found, searh in other languages
+	                    } else {
+	                        name = '(Untitled)';
+
+	                        for (var language in item.properties.title) {
+	                            var languageTitle = item.properties.title[language];
+
+	                            if (languageTitle) {
+	                                name += ' - (' + language + ': ' + languageTitle + ')';
+	                                break;
+	                            }
+	                        }
+	                    }
+	                }
+
+	                // If name still wasn't found, use the id
+	                if (!name) {
+	                    name = item.id;
+	                }
+	            } else if (item.title && typeof item.title === 'string') {
+	                name = item.title;
+	            } else if (item.name && typeof item.name === 'string') {
+	                name = item.name;
+	            } else {
+	                name = id;
+	            }
+
+	            var routingPath = item.shortPath || item.path || item.id || null;
+	            var queueItem = {};
+	            var icon = item.icon || params.icon;
+	            var $icon = void 0;
+
+	            // Implement custom routing paths
+	            if (typeof params.itemPath === 'function') {
+	                routingPath = params.itemPath(item);
+	            }
+
+	            // Truncate long names
+	            if (name.length > 30) {
+	                name = name.substring(0, 30) + '...';
+	            }
+
+	            // If this item has a Schema id, fetch the appropriate icon
+	            if (item.schemaId) {
+	                var schema = resources.schemas[item.schemaId];
+
+	                if (schema) {
+	                    icon = schema.icon;
+	                }
+	            }
+
+	            if (icon) {
+	                $icon = _.span({ class: 'fa fa-' + icon });
+	            }
+
+	            // Item element
+	            var $existingElement = $pane.find('.pane-item-container[data-routing-path="' + routingPath + '"]');
+	            var $element = _.div({
+	                class: 'pane-item-container',
+	                'data-routing-path': routingPath
+	            });
+
+	            // Element exists already, replace
+	            if ($existingElement.length > 0) {
+	                $existingElement.replaceWith($element);
+
+	                // Element didn't exist already, create it and append to pane
+	            } else {
+	                $pane.append($element);
+	            }
+
+	            // Populate element
+	            _.append($element.empty(), _.a({
+	                'data-id': id,
+	                'data-name': name,
+	                href: '#' + (routingPath ? params.route + routingPath : params.route),
+	                class: 'pane-item'
+	            }, $icon, _.span({ class: 'pane-item-label' }, name)), _.div({ class: 'children' }), _.div({ class: 'pane-item-insert-below' }));
+
+	            // Set sync attributes
+	            if (typeof item.locked !== 'undefined') {
+	                $element.attr('data-locked', item.locked);
+	            }
+
+	            if (typeof item.remote !== 'undefined') {
+	                $element.attr('data-remote', item.remote);
+	            }
+
+	            if (typeof item.local !== 'undefined') {
+	                $element.attr('data-local', item.local);
+	            }
+
+	            if (isDirectory) {
+	                $element.attr('data-is-directory', true);
+	            }
+
+	            // Attach item context menu
+	            if (params.getItemContextMenu) {
+	                $element.find('a').exocontext(params.getItemContextMenu(item));
+	            } else if (params.itemContextMenu) {
+	                $element.find('a').exocontext(params.itemContextMenu);
+	            }
+
+	            // Add element to queue item
+	            queueItem.$element = $element;
+
+	            // Add sort index to element
+	            queueItem.$element.attr('data-sort', item.sort || 0);
+
+	            // Use specific hierarchy behaviours
+	            if (params.hierarchy) {
+	                params.hierarchy(item, queueItem);
+	            }
+
+	            // Add queue item to sorting queue
+	            sortingQueue.push(queueItem);
+	        });
+
+	        // Place items into hierarchy
+	        var _iteratorNormalCompletion = true;
+	        var _didIteratorError = false;
+	        var _iteratorError = undefined;
+
+	        try {
+	            for (var _iterator = sortingQueue[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	                var queueItem = _step.value;
+
+	                if (queueItem.parentDirAttr) {
+	                    // Find parent item
+	                    var parentDirAttrKey = Object.keys(queueItem.parentDirAttr)[0];
+	                    var parentDirAttrValue = queueItem.parentDirAttr[parentDirAttrKey];
+	                    var parentDirSelector = '.pane-item-container[' + parentDirAttrKey + '="' + parentDirAttrValue + '"]';
+	                    var $parentDir = $pane.find(parentDirSelector);
+
+	                    // If parent element already exists, just append the queue item element
+	                    if ($parentDir.length > 0) {
+	                        $parentDir.children('.children').append(queueItem.$element);
+
+	                        // If not, create parent elements if specified
+	                    } else if (queueItem.createDir) {
+	                        var dirNames = parentDirAttrValue.split('/').filter(function (item) {
+	                            return item != '';
+	                        });
+	                        var finalDirName = '/';
+
+	                        for (var i in dirNames) {
+	                            var dirName = dirNames[i];
+
+	                            var prevFinalDirName = finalDirName;
+	                            finalDirName += dirName + '/';
+
+	                            var $dir = $pane.find('[' + parentDirAttrKey + '="' + finalDirName + '"]');
+
+	                            if ($dir.length < 1) {
+	                                $dir = _.div({ class: 'pane-item-container', 'data-is-directory': true }, _.a({
+	                                    class: 'pane-item'
+	                                }, _.span({ class: 'fa fa-folder' }), _.span({ class: 'pane-item-label' }, dirName)), _.div({ class: 'children' }));
+
+	                                $dir.attr(parentDirAttrKey, finalDirName);
+
+	                                // Extra parent dir attributes
+	                                if (queueItem.parentDirExtraAttr) {
+	                                    for (var k in queueItem.parentDirExtraAttr) {
+	                                        var v = queueItem.parentDirExtraAttr[k];
+
+	                                        $dir.attr(k, v);
+	                                    }
+	                                }
+
+	                                // Append to previous dir 
+	                                var $prevDir = $pane.find('[' + parentDirAttrKey + '="' + prevFinalDirName + '"]');
+
+	                                if ($prevDir.length > 0) {
+	                                    $prevDir.children('.children').prepend($dir);
+
+	                                    // If no previous dir was found, append directly to pane
+	                                } else {
+	                                    $pane.prepend($dir);
+	                                }
+	                            }
+
+	                            // Attach item context menu
+	                            if (params.dirContextMenu) {
+	                                $dir.exocontext(params.dirContextMenu);
+	                            }
+
+	                            // Only append the queue item to the final parent element
+	                            if (i >= dirNames.length - 1) {
+	                                $parentDir = $dir;
+	                            }
+	                        }
+
+	                        $parentDir.children('.children').append(queueItem.$element);
+	                    }
+	                }
+	            }
+
+	            // Sort direct children
+	        } catch (err) {
+	            _didIteratorError = true;
+	            _iteratorError = err;
+	        } finally {
+	            try {
+	                if (!_iteratorNormalCompletion && _iterator.return) {
+	                    _iterator.return();
+	                }
+	            } finally {
+	                if (_didIteratorError) {
+	                    throw _iteratorError;
+	                }
+	            }
+	        }
+
+	        $pane.find('>.pane-item-container').sort(function (a, b) {
+	            return parseInt(a.dataset.sort) > parseInt(b.dataset.sort);
+	        }).appendTo($pane);
+
+	        // Sort nested children
+	        $pane.find('.pane-item-container .children').each(function (i, children) {
+	            var $children = $(children);
+
+	            $children.find('>.pane-item-container').sort(function (a, b) {
+	                return parseInt(a.dataset.sort) > parseInt(b.dataset.sort);
+	            }).appendTo($children);
+	        });
+
+	        // Render pane container
+	        var $paneContainer = $('.pane-container[data-route="' + params.route + '"]');
+
+	        // Pane container didn't already exist, create it
+	        if ($paneContainer.length < 1) {
+	            // Render pane container
+	            $paneContainer = _.div({ class: 'pane-container', 'data-route': params.route }, _.if(params.toolbar, params.toolbar), _.div({ class: 'pane-move-buttons' }, _.button({ class: 'btn btn-move-to-root' }, 'Move to root'), _.button({ class: 'btn btn-new-folder' }, 'New folder')), $pane);
+
+	            // Attach pane context menu
+	            if (params.paneContextMenu) {
+	                $paneContainer.exocontext(params.paneContextMenu);
+	            }
+	        }
+
+	        // Add expand/collapse buttons to items if needed
+	        $paneContainer.find('.pane-item-container').each(function (i, element) {
+	            var $paneItemContainer = $(element);
+	            var $paneItem = $paneItemContainer.children('.pane-item');;
+	            var $children = $paneItemContainer.children('.children');
+
+	            if ($children.children().length > 0) {
+	                var $childrenToggle = _.button({ class: 'btn-children-toggle' }, _.span({ class: 'fa fa-caret-down' }), _.span({ class: 'fa fa-caret-right' }));
+
+	                $paneItem.append($childrenToggle);
+
+	                $childrenToggle.click(function (e) {
+	                    _this.onClickToggleChildren(e);
+	                });
+	            }
+	        });
+
+	        if (params.postSort) {
+	            params.postSort($paneContainer.find('>.pane, .pane-item-container>.children'));
+	        }
+	        /*
+	                if(this.$element.find('.tab-panes .pane-container').length < 1) {
+	                    $paneContainer.addClass('active');
+	                    $button.addClass('active');
+	                }
+	        */
+	        return $paneContainer;
+	    };
+
+	    return _.nav({ class: 'navbar-main' },
+	    // Buttons
+	    _.div({ class: 'tab-buttons' }, _.each(this.tabPanes, function (i, pane) {
+	        var $icon = pane.icon;
+
+	        if (typeof pane.icon === 'string') {
+	            $icon = _.span({ class: 'fa fa-' + pane.icon });
+	        }
+
+	        return _.button({ 'data-route': pane.route, title: pane.label }, _.div({ class: 'pane-icon' }, $icon), _.div({ class: 'pane-text' }, _.span({ class: 'pane-label' }, pane.label))).click(function (e) {
+	            _this.onClickTab(e);
+	        });
+	    })),
+
+	    // Panes
+	    _.div({ class: 'tab-panes' }, _.each(this.tabPanes, function (i, pane) {
+	        var queue = [];
+
+	        var $pane = _.div({ class: 'pane-container', 'data-route': pane.route },
+	        // Toolbar
+	        _.if(pane.settings.toolbar, pane.settings.toolbar),
+
+	        // Move buttons
+	        _.div({ class: 'pane-move-buttons' }, _.button({ class: 'btn btn-move-to-root' }, 'Move to root'), _.button({ class: 'btn btn-new-folder' }, 'New folder')),
+
+	        // Items
+	        _.div({ class: 'pane' }, _.each(pane.settings.items || pane.settings.getItems(), function (i, item) {
+	            var id = item.id || i;
+	            var name = _this.getItemName(item);
+	            var icon = _this.getItemIcon(item, pane.settings);
+	            var routingPath = _this.getItemRoutingPath(item, pane.settings);
+	            var isDirectory = _this.isItemDirectory(item);
+	            var queueItem = {};
+
+	            var $item = _.div({
+	                class: 'pane-item-container',
+	                'data-routing-path': routingPath,
+	                'data-locked': item.locked,
+	                'data-remote': item.remote,
+	                'data-local': item.local,
+	                'data-is-directory': isDirectory,
+	                'data-sort': item.sort || 0
+	            }, _.a({
+	                'data-id': id,
+	                'data-name': name,
+	                href: '#' + (routingPath ? pane.route + routingPath : pane.route),
+	                class: 'pane-item'
+	            }, _.span({ class: 'fa fa-' + icon }), _.span({ class: 'pane-item-label' }, name)), _.div({ class: 'children' }), _.div({ class: 'pane-item-insert-below' }));
+
+	            // Attach item context menu
+	            if (pane.settings.getItemContextMenu) {
+	                $item.find('a').exocontext(pane.settings.getItemContextMenu(item));
+	            } else if (pane.settings.itemContextMenu) {
+	                $item.find('a').exocontext(pane.settings.itemContextMenu);
+	            }
+
+	            // Add element to queue item
+	            queueItem.$element = $item;
+
+	            // Use specific hierarchy behaviours
+	            if (pane.settings.hierarchy) {
+	                pane.settings.hierarchy(item, queueItem);
+	            }
+
+	            // Add queue item to sorting queue
+	            queue.push(queueItem);
+
+	            return $item;
+	        })));
+
+	        _this.applyHierarchy($pane, pane, queue);
+	        _this.applySorting($pane, pane);
+
+	        return $pane;
+	    })));
+	};
 
 /***/ }
 /******/ ]);

@@ -38,8 +38,6 @@ class MediaPane extends Pane {
         let name = $element.data('name');
         
         function onSuccess() {
-            $element.parent().remove();
-
             reloadResource('media')
             .then(function() {
                 ViewHelper.get('NavbarMain').reload();
@@ -114,22 +112,17 @@ class MediaPane extends Pane {
     }
     
     /**
-     * Gets the render settings
-     *
-     * @returns {Object} settings
+     * Init
      */
-    static getRenderSettings() {
-        let isSyncEnabled = SettingsHelper.getCachedSettings('sync').enabled;
-        let isMediaSyncEnabled = isSyncEnabled && SettingsHelper.getCachedSettings('sync')['media/tree'];
-
-        return {
-            label: 'Media',
-            route: '/media/',
-            icon: 'file-image-o',
-            items: resources.media,
+    static init() {
+        NavbarMain.addTabPane('/media/', 'Media', 'file-image-o', {
+            getItems: () => { return resources.media; },
 
             // Hierarchy logic
-            hierarchy: function(item, queueItem) {
+            hierarchy: (item, queueItem) => {
+                let isSyncEnabled = SettingsHelper.getCachedSettings('sync').enabled;
+                let isMediaSyncEnabled = isSyncEnabled && SettingsHelper.getCachedSettings('sync')['media/tree'];
+
                 queueItem.$element.attr('data-media-id', item.id);
                
                 if(item.folder) {
@@ -164,7 +157,7 @@ class MediaPane extends Pane {
                 'New folder': () => { this.onClickNewMediaDirectory(); },
                 'Upload new media': () => { this.onClickUploadMedia(); }
             }
-        };
+        });
     }
 }
 

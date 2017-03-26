@@ -78,6 +78,25 @@ class SchemaHelper extends SchemaHelperCommon {
             reject(new Error('No Schema by id "' + id + '" was found'));
         });
     }
+    
+    /**
+     * Gets a Schema by id (sync)
+     *
+     * @param {String} id
+     *
+     * @return {Promise} Promise
+     */
+    static getSchemaByIdSync(id) {
+        for(let i in resources.schemas) {
+            let schema = resources.schemas[i];
+
+            if(schema.id == id) {
+                return schema;
+            }
+        }
+
+        UI.errorModal(new Error('No Schema by id "' + id + '" was found'));
+    }
 }
 
 module.exports = SchemaHelper;

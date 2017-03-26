@@ -4,15 +4,10 @@ let Pane = require('./Pane');
 
 class CMSPane extends Pane {
     /**
-     * Gets the render settings
-     *
-     * @returns {Object} Settings
+     * Init
      */
-    static getRenderSettings() {
-        return {
-            label: 'HashBrown',
-            route: '/',
-            $icon: _.img({src: '/svg/logo_white.svg', class: 'logo'}),
+    static init() {
+        NavbarMain.addTabPane('/', 'HashBrown', _.img({src: '/svg/logo_white.svg', class: 'logo'}), {
             items: [
                 {
                     name: 'Welcome'
@@ -26,7 +21,7 @@ class CMSPane extends Pane {
                     path: 'license'
                 }
             ]
-        };
+        });
     }
 }
 

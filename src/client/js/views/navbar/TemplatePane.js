@@ -162,23 +162,18 @@ class TemplatePane extends Pane {
     }
 
     /**
-     * Gets the render settings
-     *
-     * @returns {Object} Settings
+     * Init
      */
-    static getRenderSettings() {
-        return {
-            label: 'Templates',
-            route: '/templates/',
-            icon: 'code',
-            items: resources.templates,
+    static init() {
+        NavbarMain.addTabPane('/templates/', 'Templates', 'code', {
+            getItems: () => { return resources.templates; },
 
             // Item path
             itemPath: function(item) {
                 return item.type + '/' + item.id;
             },
 
-            // Hiearchy logic
+            // Hierarchy logic
             hierarchy: function(item, queueItem) {
                 queueItem.$element.attr('data-template-id', item.id);
                
@@ -208,7 +203,7 @@ class TemplatePane extends Pane {
                 'Template': '---',
                 'Add template': () => { this.onClickAddTemplate(); }
             }
-        };
+        });
     }
 }
 

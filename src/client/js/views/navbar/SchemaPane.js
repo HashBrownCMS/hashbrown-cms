@@ -15,8 +15,6 @@ class SchemaPane extends Pane {
         function onSuccess() {
             debug.log('Removed schema with id "' + id + '"', navbar); 
             
-            $element.parent().remove();
-        
             reloadResource('schemas')
             .then(function() {
                 navbar.reload();
@@ -138,16 +136,11 @@ class SchemaPane extends Pane {
     }
 
     /**
-     * Gets the render settings
-     *
-     * @returns {Object} settings
+     * Init
      */
-    static getRenderSettings() {
-        return {
-            label: 'Schemas',
-            route: '/schemas/',
-            icon: 'gears',
-            items: resources.schemas,
+    static init() {
+        NavbarMain.addTabPane('/schemas/', 'Schemas', 'gears', {
+            getItems: () => { return resources.schemas; },
 
             // Item context menu
             getItemContextMenu: (item) => {
@@ -194,7 +187,7 @@ class SchemaPane extends Pane {
                     queueItem.parentDirAttr = {'data-schema-type': item.type};
                 }
             }
-        };
+        });
     }
 }
 

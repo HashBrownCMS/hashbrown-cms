@@ -2,6 +2,13 @@
 
 class Pane {
     /**
+     * Init
+     */
+    static init() {
+        NavbarMain.addTabButton('My pane', '/my-route', 'question');
+    }
+
+    /**
      * Event: Click copy item id
      */
     static onClickCopyItemId() {

@@ -36,8 +36,6 @@ class ConnectionPane extends Pane {
         function onSuccess() {
             debug.log('Removed connection with alias "' + id + '"', navbar); 
         
-            $element.parent().remove();
-
             reloadResource('connections')
             .then(function() {
                 navbar.reload();
@@ -132,16 +130,11 @@ class ConnectionPane extends Pane {
     }
 
     /**
-     * Gets render settings
-     *
-     * @returns {Object} settings
+     * Init
      */
-    static getRenderSettings() {
-        return {
-            label: 'Connections',
-            route: '/connections/',
-            icon: 'exchange',
-            items: resources.connections,
+    static init() {
+        NavbarMain.addTabPane('/connections/', 'Connections', 'exchange', {
+            getItems: () => { return resources.connections; },
 
             // Item context menu
             getItemContextMenu: (item) => {
@@ -181,7 +174,7 @@ class ConnectionPane extends Pane {
                 'General': '---',
                 'New connection': () => { this.onClickNewConnection(); }
             }
-        };
+        });
     }
 }
 

@@ -404,8 +404,6 @@ class ContentPane extends Pane {
                 }
                 
                 function onSuccess() {
-                    $element.parent().remove();
-
                     return reloadResource('content')
                     .then(() => {
                         navbar.reload();
@@ -457,18 +455,11 @@ class ContentPane extends Pane {
     }
 
     /**
-     * Gets render settings
-     *
-     * @returns {Object} settings
+     * Init
      */
-    static getRenderSettings() {
-        let navbar = ViewHelper.get('NavbarMain');
-        
-        return {
-            label: 'Content',
-            route: '/content/',
-            icon: 'file',
-            items: resources.content,
+    static init() {
+        NavbarMain.addTabPane('/content/', 'Content', 'file', {
+            getItems: () => { return resources.content; },
 
             // Item context menu
             getItemContextMenu: (item) => {
@@ -528,7 +519,7 @@ class ContentPane extends Pane {
                 queueItem.$element.attr('data-content-id', item.id);
                 queueItem.parentDirAttr = {'data-content-id': item.parentId };
             }
-        }
+        });
     }
 }
 

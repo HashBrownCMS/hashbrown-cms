@@ -1624,6 +1624,7 @@ body.dashboard-container {
     overflow-x: hidden; }
   .navspace .navbar-main .tab-buttons {
     width: 160px;
+    flex-shrink: 0;
     height: 100%;
     position: relative;
     z-index: 10;
@@ -1800,23 +1801,13 @@ body.dashboard-container {
             display: none; }
           .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container:not(.open) > .children {
             display: none; }
-          .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container[data-locked="true"] > .pane-item .pane-item-label:after {
-            content: '\F023';
-            font-family: 'FontAwesome';
-            opacity: 0.25;
-            margin-left: 10px; }
-          .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container[data-remote="true"] > .pane-item .pane-item-label:after {
-            content: '\F14C';
-            font-family: 'FontAwesome';
-            opacity: 0.25;
-            margin-left: 10px; }
+          .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container[data-locked="true"] > .pane-item:after {
+            content: '\F023'; }
+          .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container[data-remote="true"] > .pane-item:after {
+            content: '\F14C'; }
           .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container.loading > .pane-item:after {
             content: '\F1CE';
-            font-family: 'FontAwesome';
-            position: absolute;
-            right: 10px;
             color: #e70d3b;
-            top: 50%;
             animation: spinner 1s linear infinite; }
           .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item-insert-below {
             position: absolute;
@@ -1829,7 +1820,7 @@ body.dashboard-container {
             display: none; }
           .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item {
             color: #333333;
-            display: block;
+            display: flex;
             border-radius: 0px;
             border: none;
             margin: 0px;
@@ -1840,14 +1831,20 @@ body.dashboard-container {
             position: relative; }
             .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item, .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item:focus, .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item:hover, .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item:active {
               text-decoration: none; }
-            .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item:hover {
+            .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item:hover .pane-item-label {
               font-weight: 700; }
+            .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item:after {
+              font-family: 'FontAwesome';
+              opacity: 0.25;
+              margin-left: 10px;
+              line-height: 60px; }
             .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item .pane-item-label {
-              position: relative; }
+              position: relative;
+              white-space: nowrap;
+              overflow-x: hidden;
+              text-overflow: ellipsis;
+              flex-grow: 1; }
             .navspace .navbar-main .tab-panes .pane-container .pane .pane-item-container .pane-item .btn-children-toggle {
-              position: absolute;
-              top: 0px;
-              right: 5px;
               height: 100%;
               width: 32px;
               padding: 0px;

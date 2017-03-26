@@ -12,6 +12,7 @@
         
         .tab-buttons {
             width: 160px;
+            flex-shrink: 0;
             height: 100%;
             position: relative;
             z-index: 10;
@@ -301,13 +302,8 @@
                         // Locked icon
                         &[data-locked="true"] {
                             >.pane-item {
-                                .pane-item-label {
-                                    &:after {
-                                        content: '\f023';
-                                        font-family: 'FontAwesome';
-                                        opacity: 0.25;
-                                        margin-left: 10px;
-                                    }
+                                &:after {
+                                    content: '\f023';
                                 }
                             }
                         }
@@ -315,13 +311,8 @@
                         // Remote icon
                         &[data-remote="true"] {
                             >.pane-item {
-                                .pane-item-label {
-                                    &:after {
-                                        content: '\f14c';
-                                        font-family: 'FontAwesome';
-                                        opacity: 0.25;
-                                        margin-left: 10px;
-                                    }
+                                &:after {
+                                    content: '\f14c';
                                 }
                             }
                         }
@@ -331,11 +322,7 @@
                             >.pane-item {
                                 &:after {
                                     content: '\f1ce';
-                                    font-family: 'FontAwesome';
-                                    position: absolute;
-                                    right: 10px;
                                     color: $primary;
-                                    top: 50%;
                                     animation: spinner 1s linear infinite;
                                 }
                             }
@@ -354,7 +341,7 @@
 
                         .pane-item {
                             color: $standard-text;
-                            display: block;
+                            display: flex;
                             border-radius: 0px;
                             border: none;
                             margin: 0px;
@@ -369,17 +356,27 @@
                             }
 
                             &:hover {
-                                font-weight: 700;
+                                .pane-item-label {
+                                    font-weight: 700;
+                                }
+                            }
+
+                            &:after {
+                                font-family: 'FontAwesome';
+                                opacity: 0.25;
+                                margin-left: 10px;
+                                line-height: 60px;
                             }
 
                             .pane-item-label {
                                 position: relative;
+                                white-space: nowrap;
+                                overflow-x: hidden;
+                                text-overflow: ellipsis;
+                                flex-grow: 1;
                             }
 
                             .btn-children-toggle {
-                                position: absolute;
-                                top: 0px;
-                                right: 5px;
                                 height: 100%;
                                 width: 32px;
                                 padding: 0px;

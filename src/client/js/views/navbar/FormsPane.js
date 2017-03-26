@@ -33,8 +33,6 @@ class FormsPane extends Pane {
         function onSuccess() {
             debug.log('Removed Form with id "' + form.id + '"', view); 
             
-            $element.parent().remove();
-        
             return reloadResource('forms')
             .then(function() {
                 ViewHelper.get('NavbarMain').reload();
@@ -129,12 +127,12 @@ class FormsPane extends Pane {
         .catch(UI.errorModal);
     }
 
-    static getRenderSettings() {
-        return {
-            label: 'Forms',
-            route: '/forms/',
-            icon: 'wpforms',
-            items: resources.forms,
+    /**
+     * Init
+     */
+    static init() {
+        NavbarMain.addTabPane('/forms/', 'Forms', 'wpforms', {
+            getItems: () => { return resources.forms; },
 
             // Hierarchy logic
             hierarchy: function(item, queueItem) {
@@ -186,7 +184,7 @@ class FormsPane extends Pane {
                 'New form': () => { this.onClickNewForm(); },
                 'Paste': () => { this.onClickPasteForm(); }
             }
-        };
+        });
     }
 }
 

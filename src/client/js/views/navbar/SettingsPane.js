@@ -3,11 +3,11 @@
 let Pane = require('./Pane');
 
 class SettingsPane extends Pane {
-    static getRenderSettings() {
-        return {
-            label: 'Settings',
-            route: '/settings/',
-            icon: 'wrench',
+    /**
+     * Init
+     */
+    static init() {
+        NavbarMain.addTabPane('/settings/', 'Settings', 'wrench', {
             items: [
                 {
                     name: 'Sync',
@@ -20,7 +20,7 @@ class SettingsPane extends Pane {
                     icon: 'gift'
                 }
             ]
-        };
+        });
     }
 }
 
