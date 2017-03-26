@@ -72,34 +72,34 @@
 	// Main views
 	window.MainMenu = __webpack_require__(69);
 	window.NavbarMain = __webpack_require__(70);
-	window.MediaViewer = __webpack_require__(138);
+	window.MediaViewer = __webpack_require__(139);
 
 	// Field editors
-	__webpack_require__(139);
+	__webpack_require__(140);
 
 	// Editor views
-	window.JSONEditor = __webpack_require__(156);
-	window.TemplateEditor = __webpack_require__(161);
-	window.ContentEditor = __webpack_require__(162);
-	window.FormEditor = __webpack_require__(163);
-	window.ConnectionEditor = __webpack_require__(164);
-	window.SchemaEditor = __webpack_require__(165);
-	window.SyncSettings = __webpack_require__(167);
-	window.ProvidersSettings = __webpack_require__(168);
-	window.UserEditor = __webpack_require__(169);
-	window.MediaBrowser = __webpack_require__(170);
+	window.JSONEditor = __webpack_require__(157);
+	window.TemplateEditor = __webpack_require__(162);
+	window.ContentEditor = __webpack_require__(163);
+	window.FormEditor = __webpack_require__(164);
+	window.ConnectionEditor = __webpack_require__(165);
+	window.SchemaEditor = __webpack_require__(166);
+	window.SyncSettings = __webpack_require__(168);
+	window.ProvidersSettings = __webpack_require__(169);
+	window.UserEditor = __webpack_require__(170);
+	window.MediaBrowser = __webpack_require__(171);
 
 	// Models
-	window.Content = __webpack_require__(171);
-	window.Media = __webpack_require__(172);
-	window.User = __webpack_require__(174);
-	window.Template = __webpack_require__(175);
+	window.Content = __webpack_require__(172);
+	window.Media = __webpack_require__(173);
+	window.User = __webpack_require__(175);
+	window.Template = __webpack_require__(176);
 
 	// Helpers
-	window.MediaHelper = __webpack_require__(176);
-	window.ConnectionHelper = __webpack_require__(178);
-	window.ContentHelper = __webpack_require__(181);
-	window.SchemaHelper = __webpack_require__(183);
+	window.MediaHelper = __webpack_require__(177);
+	window.ConnectionHelper = __webpack_require__(179);
+	window.ContentHelper = __webpack_require__(182);
+	window.SchemaHelper = __webpack_require__(184);
 	window.UI = __webpack_require__(61);
 
 	// Ready callback containers
@@ -292,13 +292,13 @@
 	};
 
 	// Get package file
-	window.app = __webpack_require__(188);
+	window.app = __webpack_require__(189);
 
 	// Language
 	window.language = localStorage.getItem('language') || 'en';
 
 	// Get routes
-	__webpack_require__(189);
+	__webpack_require__(190);
 
 	// Preload resources 
 	$(document).ready(function () {
@@ -12476,7 +12476,7 @@
 
 	        var _this = _possibleConstructorReturn(this, (NavbarMain.__proto__ || Object.getPrototypeOf(NavbarMain)).call(this, params));
 
-	        _this.template = __webpack_require__(204);
+	        _this.template = __webpack_require__(138);
 	        _this.tabPanes = [];
 
 	        CMSPane.init();
@@ -23129,6 +23129,407 @@
 
 /***/ },
 /* 138 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+	module.exports = function () {
+	    var _this = this;
+
+	    var isAdmin = User.current.isAdmin;
+	    var hasConnectionsScope = User.current.hasScope(ProjectHelper.currentProject, 'connections');
+	    var hasSchemasScope = User.current.hasScope(ProjectHelper.currentProject, 'schemas');
+	    var hasTemplatesScope = User.current.hasScope(ProjectHelper.currentProject, 'templates');
+	    var hasSettingsScope = User.current.hasScope(ProjectHelper.currentProject, 'settings');
+
+	    /**
+	     * Fetches pane information and renders it
+	     *
+	     * @param {Object} params
+	     */
+	    var renderPane = function renderPane(params) {
+	        // Render pane 
+	        var $pane = $('.pane-container[data-route="' + params.route + '"] .pane');
+
+	        // Pane didn't exist, create it (it will be appended further down)
+	        if ($pane.length < 1) {
+	            $pane = _.div({ class: 'pane' });
+	        }
+
+	        var items = params.items;
+	        var sortingQueue = [];
+
+	        // Render items
+	        _.each(items, function (i, item) {
+	            var id = item.id || i;
+	            var isDirectory = false;
+
+	            // Get item name
+	            var name = '';
+
+	            // This is a Content node
+	            if (item.properties && item.createDate) {
+	                // All Content nodes are "directories" in that they can be parents of one another
+	                isDirectory = true;
+
+	                // Use title directly if available
+	                if (typeof item.properties.title === 'string') {
+	                    name = item.properties.title;
+	                } else if (item.properties.title && _typeof(item.properties.title) === 'object') {
+	                    // Use the current language title
+	                    if (item.properties.title[window.language]) {
+	                        name = item.properties.title[window.language];
+
+	                        // If no title was found, searh in other languages
+	                    } else {
+	                        name = '(Untitled)';
+
+	                        for (var language in item.properties.title) {
+	                            var languageTitle = item.properties.title[language];
+
+	                            if (languageTitle) {
+	                                name += ' - (' + language + ': ' + languageTitle + ')';
+	                                break;
+	                            }
+	                        }
+	                    }
+	                }
+
+	                // If name still wasn't found, use the id
+	                if (!name) {
+	                    name = item.id;
+	                }
+	            } else if (item.title && typeof item.title === 'string') {
+	                name = item.title;
+	            } else if (item.name && typeof item.name === 'string') {
+	                name = item.name;
+	            } else {
+	                name = id;
+	            }
+
+	            var routingPath = item.shortPath || item.path || item.id || null;
+	            var queueItem = {};
+	            var icon = item.icon || params.icon;
+	            var $icon = void 0;
+
+	            // Implement custom routing paths
+	            if (typeof params.itemPath === 'function') {
+	                routingPath = params.itemPath(item);
+	            }
+
+	            // Truncate long names
+	            if (name.length > 30) {
+	                name = name.substring(0, 30) + '...';
+	            }
+
+	            // If this item has a Schema id, fetch the appropriate icon
+	            if (item.schemaId) {
+	                var schema = resources.schemas[item.schemaId];
+
+	                if (schema) {
+	                    icon = schema.icon;
+	                }
+	            }
+
+	            if (icon) {
+	                $icon = _.span({ class: 'fa fa-' + icon });
+	            }
+
+	            // Item element
+	            var $existingElement = $pane.find('.pane-item-container[data-routing-path="' + routingPath + '"]');
+	            var $element = _.div({
+	                class: 'pane-item-container',
+	                'data-routing-path': routingPath
+	            });
+
+	            // Element exists already, replace
+	            if ($existingElement.length > 0) {
+	                $existingElement.replaceWith($element);
+
+	                // Element didn't exist already, create it and append to pane
+	            } else {
+	                $pane.append($element);
+	            }
+
+	            // Populate element
+	            _.append($element.empty(), _.a({
+	                'data-id': id,
+	                'data-name': name,
+	                href: '#' + (routingPath ? params.route + routingPath : params.route),
+	                class: 'pane-item'
+	            }, $icon, _.span({ class: 'pane-item-label' }, name)), _.div({ class: 'children' }), _.div({ class: 'pane-item-insert-below' }));
+
+	            // Set sync attributes
+	            if (typeof item.locked !== 'undefined') {
+	                $element.attr('data-locked', item.locked);
+	            }
+
+	            if (typeof item.remote !== 'undefined') {
+	                $element.attr('data-remote', item.remote);
+	            }
+
+	            if (typeof item.local !== 'undefined') {
+	                $element.attr('data-local', item.local);
+	            }
+
+	            if (isDirectory) {
+	                $element.attr('data-is-directory', true);
+	            }
+
+	            // Attach item context menu
+	            if (params.getItemContextMenu) {
+	                $element.find('a').exocontext(params.getItemContextMenu(item));
+	            } else if (params.itemContextMenu) {
+	                $element.find('a').exocontext(params.itemContextMenu);
+	            }
+
+	            // Add element to queue item
+	            queueItem.$element = $element;
+
+	            // Add sort index to element
+	            queueItem.$element.attr('data-sort', item.sort || 0);
+
+	            // Use specific hierarchy behaviours
+	            if (params.hierarchy) {
+	                params.hierarchy(item, queueItem);
+	            }
+
+	            // Add queue item to sorting queue
+	            sortingQueue.push(queueItem);
+	        });
+
+	        // Place items into hierarchy
+	        var _iteratorNormalCompletion = true;
+	        var _didIteratorError = false;
+	        var _iteratorError = undefined;
+
+	        try {
+	            for (var _iterator = sortingQueue[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	                var queueItem = _step.value;
+
+	                if (queueItem.parentDirAttr) {
+	                    // Find parent item
+	                    var parentDirAttrKey = Object.keys(queueItem.parentDirAttr)[0];
+	                    var parentDirAttrValue = queueItem.parentDirAttr[parentDirAttrKey];
+	                    var parentDirSelector = '.pane-item-container[' + parentDirAttrKey + '="' + parentDirAttrValue + '"]';
+	                    var $parentDir = $pane.find(parentDirSelector);
+
+	                    // If parent element already exists, just append the queue item element
+	                    if ($parentDir.length > 0) {
+	                        $parentDir.children('.children').append(queueItem.$element);
+
+	                        // If not, create parent elements if specified
+	                    } else if (queueItem.createDir) {
+	                        var dirNames = parentDirAttrValue.split('/').filter(function (item) {
+	                            return item != '';
+	                        });
+	                        var finalDirName = '/';
+
+	                        for (var i in dirNames) {
+	                            var dirName = dirNames[i];
+
+	                            var prevFinalDirName = finalDirName;
+	                            finalDirName += dirName + '/';
+
+	                            var $dir = $pane.find('[' + parentDirAttrKey + '="' + finalDirName + '"]');
+
+	                            if ($dir.length < 1) {
+	                                $dir = _.div({ class: 'pane-item-container', 'data-is-directory': true }, _.a({
+	                                    class: 'pane-item'
+	                                }, _.span({ class: 'fa fa-folder' }), _.span({ class: 'pane-item-label' }, dirName)), _.div({ class: 'children' }));
+
+	                                $dir.attr(parentDirAttrKey, finalDirName);
+
+	                                // Extra parent dir attributes
+	                                if (queueItem.parentDirExtraAttr) {
+	                                    for (var k in queueItem.parentDirExtraAttr) {
+	                                        var v = queueItem.parentDirExtraAttr[k];
+
+	                                        $dir.attr(k, v);
+	                                    }
+	                                }
+
+	                                // Append to previous dir 
+	                                var $prevDir = $pane.find('[' + parentDirAttrKey + '="' + prevFinalDirName + '"]');
+
+	                                if ($prevDir.length > 0) {
+	                                    $prevDir.children('.children').prepend($dir);
+
+	                                    // If no previous dir was found, append directly to pane
+	                                } else {
+	                                    $pane.prepend($dir);
+	                                }
+	                            }
+
+	                            // Attach item context menu
+	                            if (params.dirContextMenu) {
+	                                $dir.exocontext(params.dirContextMenu);
+	                            }
+
+	                            // Only append the queue item to the final parent element
+	                            if (i >= dirNames.length - 1) {
+	                                $parentDir = $dir;
+	                            }
+	                        }
+
+	                        $parentDir.children('.children').append(queueItem.$element);
+	                    }
+	                }
+	            }
+
+	            // Sort direct children
+	        } catch (err) {
+	            _didIteratorError = true;
+	            _iteratorError = err;
+	        } finally {
+	            try {
+	                if (!_iteratorNormalCompletion && _iterator.return) {
+	                    _iterator.return();
+	                }
+	            } finally {
+	                if (_didIteratorError) {
+	                    throw _iteratorError;
+	                }
+	            }
+	        }
+
+	        $pane.find('>.pane-item-container').sort(function (a, b) {
+	            return parseInt(a.dataset.sort) > parseInt(b.dataset.sort);
+	        }).appendTo($pane);
+
+	        // Sort nested children
+	        $pane.find('.pane-item-container .children').each(function (i, children) {
+	            var $children = $(children);
+
+	            $children.find('>.pane-item-container').sort(function (a, b) {
+	                return parseInt(a.dataset.sort) > parseInt(b.dataset.sort);
+	            }).appendTo($children);
+	        });
+
+	        // Render pane container
+	        var $paneContainer = $('.pane-container[data-route="' + params.route + '"]');
+
+	        // Pane container didn't already exist, create it
+	        if ($paneContainer.length < 1) {
+	            // Render pane container
+	            $paneContainer = _.div({ class: 'pane-container', 'data-route': params.route }, _.if(params.toolbar, params.toolbar), _.div({ class: 'pane-move-buttons' }, _.button({ class: 'btn btn-move-to-root' }, 'Move to root'), _.button({ class: 'btn btn-new-folder' }, 'New folder')), $pane);
+
+	            // Attach pane context menu
+	            if (params.paneContextMenu) {
+	                $paneContainer.exocontext(params.paneContextMenu);
+	            }
+	        }
+
+	        // Add expand/collapse buttons to items if needed
+	        $paneContainer.find('.pane-item-container').each(function (i, element) {
+	            var $paneItemContainer = $(element);
+	            var $paneItem = $paneItemContainer.children('.pane-item');;
+	            var $children = $paneItemContainer.children('.children');
+
+	            if ($children.children().length > 0) {
+	                var $childrenToggle = _.button({ class: 'btn-children-toggle' }, _.span({ class: 'fa fa-caret-down' }), _.span({ class: 'fa fa-caret-right' }));
+
+	                $paneItem.append($childrenToggle);
+
+	                $childrenToggle.click(function (e) {
+	                    _this.onClickToggleChildren(e);
+	                });
+	            }
+	        });
+
+	        if (params.postSort) {
+	            params.postSort($paneContainer.find('>.pane, .pane-item-container>.children'));
+	        }
+	        /*
+	                if(this.$element.find('.tab-panes .pane-container').length < 1) {
+	                    $paneContainer.addClass('active');
+	                    $button.addClass('active');
+	                }
+	        */
+	        return $paneContainer;
+	    };
+
+	    return _.nav({ class: 'navbar-main' },
+	    // Buttons
+	    _.div({ class: 'tab-buttons' }, _.each(this.tabPanes, function (i, pane) {
+	        var $icon = pane.icon;
+
+	        if (typeof pane.icon === 'string') {
+	            $icon = _.span({ class: 'fa fa-' + pane.icon });
+	        }
+
+	        return _.button({ 'data-route': pane.route, title: pane.label }, _.div({ class: 'pane-icon' }, $icon), _.div({ class: 'pane-text' }, _.span({ class: 'pane-label' }, pane.label))).click(function (e) {
+	            _this.onClickTab(e);
+	        });
+	    })),
+
+	    // Panes
+	    _.div({ class: 'tab-panes' }, _.each(this.tabPanes, function (i, pane) {
+	        var queue = [];
+
+	        var $pane = _.div({ class: 'pane-container', 'data-route': pane.route },
+	        // Toolbar
+	        _.if(pane.settings.toolbar, pane.settings.toolbar),
+
+	        // Move buttons
+	        _.div({ class: 'pane-move-buttons' }, _.button({ class: 'btn btn-move-to-root' }, 'Move to root'), _.button({ class: 'btn btn-new-folder' }, 'New folder')),
+
+	        // Items
+	        _.div({ class: 'pane' }, _.each(pane.settings.items || pane.settings.getItems(), function (i, item) {
+	            var id = item.id || i;
+	            var name = _this.getItemName(item);
+	            var icon = _this.getItemIcon(item, pane.settings);
+	            var routingPath = _this.getItemRoutingPath(item, pane.settings);
+	            var isDirectory = _this.isItemDirectory(item);
+	            var queueItem = {};
+
+	            var $item = _.div({
+	                class: 'pane-item-container',
+	                'data-routing-path': routingPath,
+	                'data-locked': item.locked,
+	                'data-remote': item.remote,
+	                'data-local': item.local,
+	                'data-is-directory': isDirectory,
+	                'data-sort': item.sort || 0
+	            }, _.a({
+	                'data-id': id,
+	                'data-name': name,
+	                href: '#' + (routingPath ? pane.route + routingPath : pane.route),
+	                class: 'pane-item'
+	            }, _.span({ class: 'fa fa-' + icon }), _.span({ class: 'pane-item-label' }, name)), _.div({ class: 'children' }), _.div({ class: 'pane-item-insert-below' }));
+
+	            // Attach item context menu
+	            if (pane.settings.getItemContextMenu) {
+	                $item.find('a').exocontext(pane.settings.getItemContextMenu(item));
+	            } else if (pane.settings.itemContextMenu) {
+	                $item.find('a').exocontext(pane.settings.itemContextMenu);
+	            }
+
+	            // Add element to queue item
+	            queueItem.$element = $item;
+
+	            // Use specific hierarchy behaviours
+	            if (pane.settings.hierarchy) {
+	                pane.settings.hierarchy(item, queueItem);
+	            }
+
+	            // Add queue item to sorting queue
+	            queue.push(queueItem);
+
+	            return $item;
+	        })));
+
+	        _this.applyHierarchy($pane, pane, queue);
+	        _this.applySorting($pane, pane);
+
+	        return $pane;
+	    })));
+	};
+
+/***/ },
+/* 139 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -23204,32 +23605,32 @@
 	module.exports = MediaViewer;
 
 /***/ },
-/* 139 */
+/* 140 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	window.resources.editors = {
-	    array: __webpack_require__(140),
-	    boolean: __webpack_require__(141),
-	    contentReference: __webpack_require__(142),
-	    contentSchemaReference: __webpack_require__(143),
-	    date: __webpack_require__(144),
-	    dropdown: __webpack_require__(145),
-	    language: __webpack_require__(146),
-	    mediaReference: __webpack_require__(147),
-	    number: __webpack_require__(148),
-	    resourceReference: __webpack_require__(149),
-	    richText: __webpack_require__(150),
-	    string: __webpack_require__(151),
-	    struct: __webpack_require__(152),
-	    tags: __webpack_require__(153),
-	    templateReference: __webpack_require__(154),
-	    url: __webpack_require__(155)
+	    array: __webpack_require__(141),
+	    boolean: __webpack_require__(142),
+	    contentReference: __webpack_require__(143),
+	    contentSchemaReference: __webpack_require__(144),
+	    date: __webpack_require__(145),
+	    dropdown: __webpack_require__(146),
+	    language: __webpack_require__(147),
+	    mediaReference: __webpack_require__(148),
+	    number: __webpack_require__(149),
+	    resourceReference: __webpack_require__(150),
+	    richText: __webpack_require__(151),
+	    string: __webpack_require__(152),
+	    struct: __webpack_require__(153),
+	    tags: __webpack_require__(154),
+	    templateReference: __webpack_require__(155),
+	    url: __webpack_require__(156)
 	};
 
 /***/ },
-/* 140 */
+/* 141 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -23687,7 +24088,7 @@
 	module.exports = ArrayEditor;
 
 /***/ },
-/* 141 */
+/* 142 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -23749,7 +24150,7 @@
 	module.exports = BooleanEditor;
 
 /***/ },
-/* 142 */
+/* 143 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -23865,7 +24266,7 @@
 	module.exports = ContentReferenceEditor;
 
 /***/ },
-/* 143 */
+/* 144 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -24021,7 +24422,7 @@
 	module.exports = ContentSchemaReferenceEditor;
 
 /***/ },
-/* 144 */
+/* 145 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -24255,7 +24656,7 @@
 	module.exports = DateEditor;
 
 /***/ },
-/* 145 */
+/* 146 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -24360,7 +24761,7 @@
 	module.exports = DropdownEditor;
 
 /***/ },
-/* 146 */
+/* 147 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -24440,7 +24841,7 @@
 	module.exports = LanguageEditor;
 
 /***/ },
-/* 147 */
+/* 148 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -24549,7 +24950,7 @@
 	module.exports = MediaReferenceEditor;
 
 /***/ },
-/* 148 */
+/* 149 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -24608,7 +25009,7 @@
 	module.exports = NumberEditor;
 
 /***/ },
-/* 149 */
+/* 150 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -24704,7 +25105,7 @@
 	module.exports = ResourceReferenceEditor;
 
 /***/ },
-/* 150 */
+/* 151 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -24751,17 +25152,10 @@
 	        value: function onChange(value) {
 	            value = value || '';
 
-	            var trimmedOldValue = this.value.trim().replace(/\n/g, '').replace(/ /g, '');
-	            var trimmedNewValue = value.trim().replace(/\n/g, '').replace(/ /g, '');
-
 	            this.value = value;
 
 	            if (this.silentChange === true) {
 	                this.silentChange = false;
-	                return;
-	            }
-
-	            if (trimmedOldValue == trimmedNewValue) {
 	                return;
 	            }
 
@@ -25008,7 +25402,7 @@
 	module.exports = RichTextEditor;
 
 /***/ },
-/* 151 */
+/* 152 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -25069,7 +25463,7 @@
 	module.exports = StringEditor;
 
 /***/ },
-/* 152 */
+/* 153 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -25185,7 +25579,7 @@
 	module.exports = StructEditor;
 
 /***/ },
-/* 153 */
+/* 154 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -25351,7 +25745,7 @@
 	module.exports = TagsEditor;
 
 /***/ },
-/* 154 */
+/* 155 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -25493,7 +25887,7 @@
 	module.exports = TemplateReferenceEditor;
 
 /***/ },
-/* 155 */
+/* 156 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -25767,7 +26161,7 @@
 	module.exports = UrlEditor;
 
 /***/ },
-/* 156 */
+/* 157 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -25782,7 +26176,7 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var beautify = __webpack_require__(157).js_beautify;
+	var beautify = __webpack_require__(158).js_beautify;
 
 	// Views
 	var MessageModal = __webpack_require__(60);
@@ -26167,7 +26561,7 @@
 	module.exports = JSONEditor;
 
 /***/ },
-/* 157 */
+/* 158 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;"use strict";
@@ -26236,7 +26630,7 @@
 
 	if (true) {
 	    // Add support for AMD ( https://github.com/amdjs/amdjs-api/wiki/AMD#defineamd-property- )
-	    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(158), __webpack_require__(159), __webpack_require__(160)], __WEBPACK_AMD_DEFINE_RESULT__ = function (js_beautify, css_beautify, html_beautify) {
+	    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(159), __webpack_require__(160), __webpack_require__(161)], __WEBPACK_AMD_DEFINE_RESULT__ = function (js_beautify, css_beautify, html_beautify) {
 	        return get_beautify(js_beautify, css_beautify, html_beautify);
 	    }.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 	} else {
@@ -26250,7 +26644,7 @@
 	}
 
 /***/ },
-/* 158 */
+/* 159 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;"use strict";
@@ -28637,7 +29031,7 @@
 	})();
 
 /***/ },
-/* 159 */
+/* 160 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;'use strict';
@@ -29193,7 +29587,7 @@
 	})();
 
 /***/ },
-/* 160 */
+/* 161 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;'use strict';
@@ -30289,9 +30683,9 @@
 
 	    if (true) {
 	        // Add support for AMD ( https://github.com/amdjs/amdjs-api/wiki/AMD#defineamd-property- )
-	        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__, __webpack_require__(158), __webpack_require__(159)], __WEBPACK_AMD_DEFINE_RESULT__ = function (requireamd) {
-	            var js_beautify = __webpack_require__(158);
-	            var css_beautify = __webpack_require__(159);
+	        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__, __webpack_require__(159), __webpack_require__(160)], __WEBPACK_AMD_DEFINE_RESULT__ = function (requireamd) {
+	            var js_beautify = __webpack_require__(159);
+	            var css_beautify = __webpack_require__(160);
 
 	            return {
 	                html_beautify: function html_beautify(html_source, options) {
@@ -30322,7 +30716,7 @@
 	})();
 
 /***/ },
-/* 161 */
+/* 162 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -30429,7 +30823,7 @@
 	module.exports = TemplateEditor;
 
 /***/ },
-/* 162 */
+/* 163 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -30885,7 +31279,7 @@
 	module.exports = ContentEditor;
 
 /***/ },
-/* 163 */
+/* 164 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -31281,7 +31675,7 @@
 	module.exports = FormEditor;
 
 /***/ },
-/* 164 */
+/* 165 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -31479,7 +31873,7 @@
 	module.exports = ConnectionEditor;
 
 /***/ },
-/* 165 */
+/* 166 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -31493,7 +31887,7 @@
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 	// Icons
-	var icons = __webpack_require__(166).icons;
+	var icons = __webpack_require__(167).icons;
 
 	/**
 	 * The editor for schemas
@@ -32074,7 +32468,7 @@
 	module.exports = SchemaEditor;
 
 /***/ },
-/* 166 */
+/* 167 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -32777,7 +33171,7 @@
 	};
 
 /***/ },
-/* 167 */
+/* 168 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -33085,7 +33479,7 @@
 	module.exports = SyncSettings;
 
 /***/ },
-/* 168 */
+/* 169 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -33216,7 +33610,7 @@
 	module.exports = ProvidersSettings;
 
 /***/ },
-/* 169 */
+/* 170 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -33508,7 +33902,7 @@
 	module.exports = UserEditor;
 
 /***/ },
-/* 170 */
+/* 171 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -33801,7 +34195,7 @@
 	module.exports = MediaBrowser;
 
 /***/ },
-/* 171 */
+/* 172 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -33868,7 +34262,7 @@
 	module.exports = Content;
 
 /***/ },
-/* 172 */
+/* 173 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -33883,7 +34277,7 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var path = __webpack_require__(173);
+	var path = __webpack_require__(174);
 
 	var Entity = __webpack_require__(72);
 
@@ -34052,7 +34446,7 @@
 	module.exports = Media;
 
 /***/ },
-/* 173 */
+/* 174 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
@@ -34279,7 +34673,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(14)))
 
 /***/ },
-/* 174 */
+/* 175 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -34460,7 +34854,7 @@
 	module.exports = User;
 
 /***/ },
-/* 175 */
+/* 176 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -34519,7 +34913,7 @@
 	module.exports = Template;
 
 /***/ },
-/* 176 */
+/* 177 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -34532,7 +34926,7 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var MediaHelperCommon = __webpack_require__(177);
+	var MediaHelperCommon = __webpack_require__(178);
 
 	var MediaHelper = function (_MediaHelperCommon) {
 	    _inherits(MediaHelper, _MediaHelperCommon);
@@ -34647,7 +35041,7 @@
 	module.exports = MediaHelper;
 
 /***/ },
-/* 177 */
+/* 178 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -34658,7 +35052,7 @@
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var Media = __webpack_require__(172);
+	var Media = __webpack_require__(173);
 
 	var MediaHelper = function () {
 	    function MediaHelper() {
@@ -34733,7 +35127,7 @@
 	module.exports = MediaHelper;
 
 /***/ },
-/* 178 */
+/* 179 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -34746,9 +35140,9 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var ConnectionHelperCommon = __webpack_require__(179);
+	var ConnectionHelperCommon = __webpack_require__(180);
 
-	var Connection = __webpack_require__(180);
+	var Connection = __webpack_require__(181);
 
 	var ConnectionHelper = function (_ConnectionHelperComm) {
 	    _inherits(ConnectionHelper, _ConnectionHelperComm);
@@ -34806,7 +35200,7 @@
 	module.exports = ConnectionHelper;
 
 /***/ },
-/* 179 */
+/* 180 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -34975,7 +35369,7 @@
 	module.exports = ConnectionHelper;
 
 /***/ },
-/* 180 */
+/* 181 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -35272,7 +35666,7 @@
 	module.exports = Connection;
 
 /***/ },
-/* 181 */
+/* 182 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -35287,9 +35681,9 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var ContentHelperCommon = __webpack_require__(182);
+	var ContentHelperCommon = __webpack_require__(183);
 
-	var Content = __webpack_require__(171);
+	var Content = __webpack_require__(172);
 
 	var ContentHelper = function (_ContentHelperCommon) {
 	    _inherits(ContentHelper, _ContentHelperCommon);
@@ -35429,7 +35823,7 @@
 	module.exports = ContentHelper;
 
 /***/ },
-/* 182 */
+/* 183 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -35596,7 +35990,7 @@
 	module.exports = ContentHelper;
 
 /***/ },
-/* 183 */
+/* 184 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -35611,10 +36005,10 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var FieldSchema = __webpack_require__(184);
+	var FieldSchema = __webpack_require__(185);
 
 	// Helpers
-	var SchemaHelperCommon = __webpack_require__(186);
+	var SchemaHelperCommon = __webpack_require__(187);
 
 	/**
 	 * Schema helper
@@ -35734,7 +36128,7 @@
 	module.exports = SchemaHelper;
 
 /***/ },
-/* 184 */
+/* 185 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -35749,7 +36143,7 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var Schema = __webpack_require__(185);
+	var Schema = __webpack_require__(186);
 
 	/**
 	 * Schema for content fields
@@ -35806,7 +36200,7 @@
 	module.exports = FieldSchema;
 
 /***/ },
-/* 185 */
+/* 186 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -35872,7 +36266,7 @@
 	module.exports = Schema;
 
 /***/ },
-/* 186 */
+/* 187 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -35883,8 +36277,8 @@
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var FieldSchema = __webpack_require__(184);
-	var ContentSchema = __webpack_require__(187);
+	var FieldSchema = __webpack_require__(185);
+	var ContentSchema = __webpack_require__(188);
 
 	/**
 	 * The common base for SchemaHelper
@@ -35938,7 +36332,7 @@
 	module.exports = SchemaHelper;
 
 /***/ },
-/* 187 */
+/* 188 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -35953,7 +36347,7 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var Schema = __webpack_require__(185);
+	var Schema = __webpack_require__(186);
 
 	/**
 	 * Schema for content nodes
@@ -35989,7 +36383,7 @@
 	module.exports = ContentSchema;
 
 /***/ },
-/* 188 */
+/* 189 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -36044,12 +36438,11 @@
 	};
 
 /***/ },
-/* 189 */
+/* 190 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	__webpack_require__(190);
 	__webpack_require__(191);
 	__webpack_require__(192);
 	__webpack_require__(193);
@@ -36057,9 +36450,10 @@
 	__webpack_require__(195);
 	__webpack_require__(196);
 	__webpack_require__(197);
+	__webpack_require__(198);
 
 /***/ },
-/* 190 */
+/* 191 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -36118,7 +36512,7 @@
 	});
 
 /***/ },
-/* 191 */
+/* 192 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -36182,7 +36576,7 @@
 	});
 
 /***/ },
-/* 192 */
+/* 193 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -36230,7 +36624,7 @@
 	});
 
 /***/ },
-/* 193 */
+/* 194 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -36255,7 +36649,7 @@
 	});
 
 /***/ },
-/* 194 */
+/* 195 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -36311,7 +36705,7 @@
 	});
 
 /***/ },
-/* 195 */
+/* 196 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -36351,7 +36745,7 @@
 	});
 
 /***/ },
-/* 196 */
+/* 197 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -36384,7 +36778,7 @@
 	});
 
 /***/ },
-/* 197 */
+/* 198 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -36419,413 +36813,6 @@
 
 	    populateWorkspace(formEditor.$element);
 	});
-
-/***/ },
-/* 198 */,
-/* 199 */,
-/* 200 */,
-/* 201 */,
-/* 202 */,
-/* 203 */,
-/* 204 */
-/***/ function(module, exports) {
-
-	'use strict';
-
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-	module.exports = function () {
-	    var _this = this;
-
-	    var isAdmin = User.current.isAdmin;
-	    var hasConnectionsScope = User.current.hasScope(ProjectHelper.currentProject, 'connections');
-	    var hasSchemasScope = User.current.hasScope(ProjectHelper.currentProject, 'schemas');
-	    var hasTemplatesScope = User.current.hasScope(ProjectHelper.currentProject, 'templates');
-	    var hasSettingsScope = User.current.hasScope(ProjectHelper.currentProject, 'settings');
-
-	    /**
-	     * Fetches pane information and renders it
-	     *
-	     * @param {Object} params
-	     */
-	    var renderPane = function renderPane(params) {
-	        // Render pane 
-	        var $pane = $('.pane-container[data-route="' + params.route + '"] .pane');
-
-	        // Pane didn't exist, create it (it will be appended further down)
-	        if ($pane.length < 1) {
-	            $pane = _.div({ class: 'pane' });
-	        }
-
-	        var items = params.items;
-	        var sortingQueue = [];
-
-	        // Render items
-	        _.each(items, function (i, item) {
-	            var id = item.id || i;
-	            var isDirectory = false;
-
-	            // Get item name
-	            var name = '';
-
-	            // This is a Content node
-	            if (item.properties && item.createDate) {
-	                // All Content nodes are "directories" in that they can be parents of one another
-	                isDirectory = true;
-
-	                // Use title directly if available
-	                if (typeof item.properties.title === 'string') {
-	                    name = item.properties.title;
-	                } else if (item.properties.title && _typeof(item.properties.title) === 'object') {
-	                    // Use the current language title
-	                    if (item.properties.title[window.language]) {
-	                        name = item.properties.title[window.language];
-
-	                        // If no title was found, searh in other languages
-	                    } else {
-	                        name = '(Untitled)';
-
-	                        for (var language in item.properties.title) {
-	                            var languageTitle = item.properties.title[language];
-
-	                            if (languageTitle) {
-	                                name += ' - (' + language + ': ' + languageTitle + ')';
-	                                break;
-	                            }
-	                        }
-	                    }
-	                }
-
-	                // If name still wasn't found, use the id
-	                if (!name) {
-	                    name = item.id;
-	                }
-	            } else if (item.title && typeof item.title === 'string') {
-	                name = item.title;
-	            } else if (item.name && typeof item.name === 'string') {
-	                name = item.name;
-	            } else {
-	                name = id;
-	            }
-
-	            var routingPath = item.shortPath || item.path || item.id || null;
-	            var queueItem = {};
-	            var icon = item.icon || params.icon;
-	            var $icon = void 0;
-
-	            // Implement custom routing paths
-	            if (typeof params.itemPath === 'function') {
-	                routingPath = params.itemPath(item);
-	            }
-
-	            // Truncate long names
-	            if (name.length > 30) {
-	                name = name.substring(0, 30) + '...';
-	            }
-
-	            // If this item has a Schema id, fetch the appropriate icon
-	            if (item.schemaId) {
-	                var schema = resources.schemas[item.schemaId];
-
-	                if (schema) {
-	                    icon = schema.icon;
-	                }
-	            }
-
-	            if (icon) {
-	                $icon = _.span({ class: 'fa fa-' + icon });
-	            }
-
-	            // Item element
-	            var $existingElement = $pane.find('.pane-item-container[data-routing-path="' + routingPath + '"]');
-	            var $element = _.div({
-	                class: 'pane-item-container',
-	                'data-routing-path': routingPath
-	            });
-
-	            // Element exists already, replace
-	            if ($existingElement.length > 0) {
-	                $existingElement.replaceWith($element);
-
-	                // Element didn't exist already, create it and append to pane
-	            } else {
-	                $pane.append($element);
-	            }
-
-	            // Populate element
-	            _.append($element.empty(), _.a({
-	                'data-id': id,
-	                'data-name': name,
-	                href: '#' + (routingPath ? params.route + routingPath : params.route),
-	                class: 'pane-item'
-	            }, $icon, _.span({ class: 'pane-item-label' }, name)), _.div({ class: 'children' }), _.div({ class: 'pane-item-insert-below' }));
-
-	            // Set sync attributes
-	            if (typeof item.locked !== 'undefined') {
-	                $element.attr('data-locked', item.locked);
-	            }
-
-	            if (typeof item.remote !== 'undefined') {
-	                $element.attr('data-remote', item.remote);
-	            }
-
-	            if (typeof item.local !== 'undefined') {
-	                $element.attr('data-local', item.local);
-	            }
-
-	            if (isDirectory) {
-	                $element.attr('data-is-directory', true);
-	            }
-
-	            // Attach item context menu
-	            if (params.getItemContextMenu) {
-	                $element.find('a').exocontext(params.getItemContextMenu(item));
-	            } else if (params.itemContextMenu) {
-	                $element.find('a').exocontext(params.itemContextMenu);
-	            }
-
-	            // Add element to queue item
-	            queueItem.$element = $element;
-
-	            // Add sort index to element
-	            queueItem.$element.attr('data-sort', item.sort || 0);
-
-	            // Use specific hierarchy behaviours
-	            if (params.hierarchy) {
-	                params.hierarchy(item, queueItem);
-	            }
-
-	            // Add queue item to sorting queue
-	            sortingQueue.push(queueItem);
-	        });
-
-	        // Place items into hierarchy
-	        var _iteratorNormalCompletion = true;
-	        var _didIteratorError = false;
-	        var _iteratorError = undefined;
-
-	        try {
-	            for (var _iterator = sortingQueue[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-	                var queueItem = _step.value;
-
-	                if (queueItem.parentDirAttr) {
-	                    // Find parent item
-	                    var parentDirAttrKey = Object.keys(queueItem.parentDirAttr)[0];
-	                    var parentDirAttrValue = queueItem.parentDirAttr[parentDirAttrKey];
-	                    var parentDirSelector = '.pane-item-container[' + parentDirAttrKey + '="' + parentDirAttrValue + '"]';
-	                    var $parentDir = $pane.find(parentDirSelector);
-
-	                    // If parent element already exists, just append the queue item element
-	                    if ($parentDir.length > 0) {
-	                        $parentDir.children('.children').append(queueItem.$element);
-
-	                        // If not, create parent elements if specified
-	                    } else if (queueItem.createDir) {
-	                        var dirNames = parentDirAttrValue.split('/').filter(function (item) {
-	                            return item != '';
-	                        });
-	                        var finalDirName = '/';
-
-	                        for (var i in dirNames) {
-	                            var dirName = dirNames[i];
-
-	                            var prevFinalDirName = finalDirName;
-	                            finalDirName += dirName + '/';
-
-	                            var $dir = $pane.find('[' + parentDirAttrKey + '="' + finalDirName + '"]');
-
-	                            if ($dir.length < 1) {
-	                                $dir = _.div({ class: 'pane-item-container', 'data-is-directory': true }, _.a({
-	                                    class: 'pane-item'
-	                                }, _.span({ class: 'fa fa-folder' }), _.span({ class: 'pane-item-label' }, dirName)), _.div({ class: 'children' }));
-
-	                                $dir.attr(parentDirAttrKey, finalDirName);
-
-	                                // Extra parent dir attributes
-	                                if (queueItem.parentDirExtraAttr) {
-	                                    for (var k in queueItem.parentDirExtraAttr) {
-	                                        var v = queueItem.parentDirExtraAttr[k];
-
-	                                        $dir.attr(k, v);
-	                                    }
-	                                }
-
-	                                // Append to previous dir 
-	                                var $prevDir = $pane.find('[' + parentDirAttrKey + '="' + prevFinalDirName + '"]');
-
-	                                if ($prevDir.length > 0) {
-	                                    $prevDir.children('.children').prepend($dir);
-
-	                                    // If no previous dir was found, append directly to pane
-	                                } else {
-	                                    $pane.prepend($dir);
-	                                }
-	                            }
-
-	                            // Attach item context menu
-	                            if (params.dirContextMenu) {
-	                                $dir.exocontext(params.dirContextMenu);
-	                            }
-
-	                            // Only append the queue item to the final parent element
-	                            if (i >= dirNames.length - 1) {
-	                                $parentDir = $dir;
-	                            }
-	                        }
-
-	                        $parentDir.children('.children').append(queueItem.$element);
-	                    }
-	                }
-	            }
-
-	            // Sort direct children
-	        } catch (err) {
-	            _didIteratorError = true;
-	            _iteratorError = err;
-	        } finally {
-	            try {
-	                if (!_iteratorNormalCompletion && _iterator.return) {
-	                    _iterator.return();
-	                }
-	            } finally {
-	                if (_didIteratorError) {
-	                    throw _iteratorError;
-	                }
-	            }
-	        }
-
-	        $pane.find('>.pane-item-container').sort(function (a, b) {
-	            return parseInt(a.dataset.sort) > parseInt(b.dataset.sort);
-	        }).appendTo($pane);
-
-	        // Sort nested children
-	        $pane.find('.pane-item-container .children').each(function (i, children) {
-	            var $children = $(children);
-
-	            $children.find('>.pane-item-container').sort(function (a, b) {
-	                return parseInt(a.dataset.sort) > parseInt(b.dataset.sort);
-	            }).appendTo($children);
-	        });
-
-	        // Render pane container
-	        var $paneContainer = $('.pane-container[data-route="' + params.route + '"]');
-
-	        // Pane container didn't already exist, create it
-	        if ($paneContainer.length < 1) {
-	            // Render pane container
-	            $paneContainer = _.div({ class: 'pane-container', 'data-route': params.route }, _.if(params.toolbar, params.toolbar), _.div({ class: 'pane-move-buttons' }, _.button({ class: 'btn btn-move-to-root' }, 'Move to root'), _.button({ class: 'btn btn-new-folder' }, 'New folder')), $pane);
-
-	            // Attach pane context menu
-	            if (params.paneContextMenu) {
-	                $paneContainer.exocontext(params.paneContextMenu);
-	            }
-	        }
-
-	        // Add expand/collapse buttons to items if needed
-	        $paneContainer.find('.pane-item-container').each(function (i, element) {
-	            var $paneItemContainer = $(element);
-	            var $paneItem = $paneItemContainer.children('.pane-item');;
-	            var $children = $paneItemContainer.children('.children');
-
-	            if ($children.children().length > 0) {
-	                var $childrenToggle = _.button({ class: 'btn-children-toggle' }, _.span({ class: 'fa fa-caret-down' }), _.span({ class: 'fa fa-caret-right' }));
-
-	                $paneItem.append($childrenToggle);
-
-	                $childrenToggle.click(function (e) {
-	                    _this.onClickToggleChildren(e);
-	                });
-	            }
-	        });
-
-	        if (params.postSort) {
-	            params.postSort($paneContainer.find('>.pane, .pane-item-container>.children'));
-	        }
-	        /*
-	                if(this.$element.find('.tab-panes .pane-container').length < 1) {
-	                    $paneContainer.addClass('active');
-	                    $button.addClass('active');
-	                }
-	        */
-	        return $paneContainer;
-	    };
-
-	    return _.nav({ class: 'navbar-main' },
-	    // Buttons
-	    _.div({ class: 'tab-buttons' }, _.each(this.tabPanes, function (i, pane) {
-	        var $icon = pane.icon;
-
-	        if (typeof pane.icon === 'string') {
-	            $icon = _.span({ class: 'fa fa-' + pane.icon });
-	        }
-
-	        return _.button({ 'data-route': pane.route, title: pane.label }, _.div({ class: 'pane-icon' }, $icon), _.div({ class: 'pane-text' }, _.span({ class: 'pane-label' }, pane.label))).click(function (e) {
-	            _this.onClickTab(e);
-	        });
-	    })),
-
-	    // Panes
-	    _.div({ class: 'tab-panes' }, _.each(this.tabPanes, function (i, pane) {
-	        var queue = [];
-
-	        var $pane = _.div({ class: 'pane-container', 'data-route': pane.route },
-	        // Toolbar
-	        _.if(pane.settings.toolbar, pane.settings.toolbar),
-
-	        // Move buttons
-	        _.div({ class: 'pane-move-buttons' }, _.button({ class: 'btn btn-move-to-root' }, 'Move to root'), _.button({ class: 'btn btn-new-folder' }, 'New folder')),
-
-	        // Items
-	        _.div({ class: 'pane' }, _.each(pane.settings.items || pane.settings.getItems(), function (i, item) {
-	            var id = item.id || i;
-	            var name = _this.getItemName(item);
-	            var icon = _this.getItemIcon(item, pane.settings);
-	            var routingPath = _this.getItemRoutingPath(item, pane.settings);
-	            var isDirectory = _this.isItemDirectory(item);
-	            var queueItem = {};
-
-	            var $item = _.div({
-	                class: 'pane-item-container',
-	                'data-routing-path': routingPath,
-	                'data-locked': item.locked,
-	                'data-remote': item.remote,
-	                'data-local': item.local,
-	                'data-is-directory': isDirectory,
-	                'data-sort': item.sort || 0
-	            }, _.a({
-	                'data-id': id,
-	                'data-name': name,
-	                href: '#' + (routingPath ? pane.route + routingPath : pane.route),
-	                class: 'pane-item'
-	            }, _.span({ class: 'fa fa-' + icon }), _.span({ class: 'pane-item-label' }, name)), _.div({ class: 'children' }), _.div({ class: 'pane-item-insert-below' }));
-
-	            // Attach item context menu
-	            if (pane.settings.getItemContextMenu) {
-	                $item.find('a').exocontext(pane.settings.getItemContextMenu(item));
-	            } else if (pane.settings.itemContextMenu) {
-	                $item.find('a').exocontext(pane.settings.itemContextMenu);
-	            }
-
-	            // Add element to queue item
-	            queueItem.$element = $item;
-
-	            // Use specific hierarchy behaviours
-	            if (pane.settings.hierarchy) {
-	                pane.settings.hierarchy(item, queueItem);
-	            }
-
-	            // Add queue item to sorting queue
-	            queue.push(queueItem);
-
-	            return $item;
-	        })));
-
-	        _this.applyHierarchy($pane, pane, queue);
-	        _this.applySorting($pane, pane);
-
-	        return $pane;
-	    })));
-	};
 
 /***/ }
 /******/ ]);

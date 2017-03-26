@@ -233,6 +233,7 @@ class ServerController extends ApiController {
         .then(() => {
             res.status(200).send('OK');
 
+            // Shut down HashBrown, let serverside task manager handle restart
             process.exit(1);
         })
         .catch((e) => {

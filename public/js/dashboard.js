@@ -52,19 +52,19 @@
 	__webpack_require__(2);
 
 	// Get package file
-	window.app = __webpack_require__(188);
+	window.app = __webpack_require__(189);
 
 	// Views
-	window.ProjectEditor = __webpack_require__(198);
-	window.BackupEditor = __webpack_require__(199);
-	window.MigrationEditor = __webpack_require__(200);
-	window.InfoEditor = __webpack_require__(201);
-	window.LanguageEditor = __webpack_require__(202);
-	window.UserEditor = __webpack_require__(169);
+	window.ProjectEditor = __webpack_require__(199);
+	window.BackupEditor = __webpack_require__(200);
+	window.MigrationEditor = __webpack_require__(201);
+	window.InfoEditor = __webpack_require__(202);
+	window.LanguageEditor = __webpack_require__(203);
+	window.UserEditor = __webpack_require__(170);
 
 	// Models
-	window.Project = __webpack_require__(203);
-	window.User = __webpack_require__(174);
+	window.Project = __webpack_require__(204);
+	window.User = __webpack_require__(175);
 
 	// --------------------
 	// Get current user
@@ -20030,7 +20030,8 @@
 /* 166 */,
 /* 167 */,
 /* 168 */,
-/* 169 */
+/* 169 */,
+/* 170 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -20322,11 +20323,11 @@
 	module.exports = UserEditor;
 
 /***/ },
-/* 170 */,
 /* 171 */,
 /* 172 */,
 /* 173 */,
-/* 174 */
+/* 174 */,
+/* 175 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -20507,12 +20508,12 @@
 	module.exports = User;
 
 /***/ },
-/* 175 */,
 /* 176 */,
 /* 177 */,
 /* 178 */,
 /* 179 */,
-/* 180 */
+/* 180 */,
+/* 181 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -20809,14 +20810,14 @@
 	module.exports = Connection;
 
 /***/ },
-/* 181 */,
 /* 182 */,
 /* 183 */,
 /* 184 */,
 /* 185 */,
 /* 186 */,
 /* 187 */,
-/* 188 */
+/* 188 */,
+/* 189 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -20871,7 +20872,6 @@
 	};
 
 /***/ },
-/* 189 */,
 /* 190 */,
 /* 191 */,
 /* 192 */,
@@ -20880,7 +20880,8 @@
 /* 195 */,
 /* 196 */,
 /* 197 */,
-/* 198 */
+/* 198 */,
+/* 199 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -21114,7 +21115,7 @@
 	module.exports = ProjectEditor;
 
 /***/ },
-/* 199 */
+/* 200 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -21378,7 +21379,7 @@
 	module.exports = BackupEditor;
 
 /***/ },
-/* 200 */
+/* 201 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -21494,7 +21495,7 @@
 	module.exports = MigrationEditor;
 
 /***/ },
-/* 201 */
+/* 202 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -21616,7 +21617,7 @@
 	module.exports = InfoEditor;
 
 /***/ },
-/* 202 */
+/* 203 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -21701,7 +21702,7 @@
 	module.exports = LanguageEditor;
 
 /***/ },
-/* 203 */
+/* 204 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -21715,7 +21716,7 @@
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 	var Entity = __webpack_require__(72);
-	var Connection = __webpack_require__(180);
+	var Connection = __webpack_require__(181);
 
 	var Project = function (_Entity) {
 	    _inherits(Project, _Entity);
