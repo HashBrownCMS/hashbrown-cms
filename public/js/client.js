@@ -12751,9 +12751,9 @@
 	                    if (item.properties.title[window.language]) {
 	                        name = item.properties.title[window.language];
 
-	                        // If no title was found, searh in other languages
+	                        // If no title was found, search in other languages
 	                    } else {
-	                        name = '(Untitled)';
+	                        name = 'Untitled';
 
 	                        for (var language in item.properties.title) {
 	                            var languageTitle = item.properties.title[language];
@@ -12766,9 +12766,8 @@
 	                    }
 	                }
 
-	                // If name still wasn't found, use the id
-	                if (!name) {
-	                    name = item.id;
+	                if (!name || name === 'Untitled') {
+	                    name = 'Untitled (id: ' + item.id.substring(0, 6) + '...)';
 	                }
 	            } else if (item.title && typeof item.title === 'string') {
 	                name = item.title;

@@ -268,9 +268,9 @@ class NavbarMain extends View {
                 if(item.properties.title[window.language]) {
                     name = item.properties.title[window.language];
 
-                // If no title was found, searh in other languages
+                // If no title was found, search in other languages
                 } else {
-                    name = '(Untitled)';
+                    name = 'Untitled';
 
                     for(let language in item.properties.title) {
                         let languageTitle = item.properties.title[language];
@@ -283,9 +283,8 @@ class NavbarMain extends View {
                 }
             }
 
-            // If name still wasn't found, use the id
-            if(!name) {
-                name = item.id;
+            if(!name || name === 'Untitled') {
+                name = 'Untitled (id: ' + item.id.substring(0, 6) + '...)';
             }
         
         } else if(item.title && typeof item.title === 'string') {
