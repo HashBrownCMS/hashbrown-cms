@@ -33,7 +33,7 @@ class BooleanEditor extends View {
 
         // Just to make sure the model has the right type of value
         setTimeout(() => {
-            this.trigger('change', this.value);
+            this.trigger('silentchange', this.value);
         }, 20);
     }
 }

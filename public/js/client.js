@@ -23744,8 +23744,8 @@
 	         */
 
 	    }, {
-	        key: 'onChange',
-	        value: function onChange(newValue, i, itemSchema) {
+	        key: 'onChangeValue',
+	        value: function onChangeValue(newValue, i, itemSchema) {
 	            if (itemSchema.multilingual) {
 	                // Sanity check to make sure multilingual fields are accomodated for
 	                if (!this.value.items[i] || _typeof(this.value.items[i]) !== 'object') {
@@ -23757,8 +23757,30 @@
 	            } else {
 	                this.value.items[i] = newValue;
 	            }
+	        }
+
+	        /**
+	         * Event: Change
+	         */
+
+	    }, {
+	        key: 'onChange',
+	        value: function onChange(newValue, i, itemSchema) {
+	            this.onChangeValue(newValue, i, itemSchema);
 
 	            this.trigger('change', this.value);
+	        }
+
+	        /**
+	         * Event: Silent change
+	         */
+
+	    }, {
+	        key: 'onSilentChange',
+	        value: function onSilentChange(newValue, i, itemSchema) {
+	            this.onChangeValue(newValue, i, itemSchema);
+
+	            this.trigger('silentchange', this.value);
 	        }
 
 	        /**
@@ -23794,6 +23816,8 @@
 
 	                            // Rebuild Schema bindings array
 	                            _this2.rebuildSchemaBindings();
+
+	                            _this2.trigger('change', _this2.value);
 	                        }
 	                    });
 	                });
@@ -24003,9 +24027,13 @@
 	                    schema: itemSchema
 	                });
 
-	                // Hook up the change event
+	                // Hook up the change events
 	                fieldEditorInstance.on('change', function (newValue) {
 	                    _this4.onChange(newValue, getIndex(), itemSchema);
+	                });
+
+	                fieldEditorInstance.on('silentchange', function (newValue) {
+	                    _this4.onSilentChange(newValue, getIndex(), itemSchema);
 	                });
 
 	                // Render the DOM element
@@ -24144,7 +24172,7 @@
 
 	            // Just to make sure the model has the right type of value
 	            setTimeout(function () {
-	                _this2.trigger('change', _this2.value);
+	                _this2.trigger('silentchange', _this2.value);
 	            }, 20);
 	        }
 	    }]);
@@ -25161,10 +25189,11 @@
 
 	            if (this.silentChange === true) {
 	                this.silentChange = false;
-	                return;
-	            }
 
-	            this.trigger('change', this.value);
+	                this.trigger('silentchange', this.value);
+	            } else {
+	                this.trigger('change', this.value);
+	            }
 	        }
 
 	        /**
@@ -26062,7 +26091,7 @@
 
 	            this.$input.val(newUrl);
 
-	            this.trigger('change', this.$input.val());
+	            this.trigger('silentchange', this.$input.val());
 	        }
 	    }, {
 	        key: 'fetchFromTitle',
@@ -31029,6 +31058,8 @@
 	    }, {
 	        key: 'renderField',
 	        value: function renderField(fieldValue, fieldDefinition, onChange, config, $keyContent) {
+	            var _this3 = this;
+
 	            var compiledSchema = SchemaHelper.getFieldSchemaWithParentConfigs(fieldDefinition.schemaId);
 
 	            if (compiledSchema) {
@@ -31043,7 +31074,17 @@
 	                        multilingual: fieldDefinition.multilingual
 	                    });
 
-	                    fieldEditorInstance.on('change', onChange);
+	                    fieldEditorInstance.on('change', function (newValue) {
+	                        if (!_this3.model.locked) {
+	                            _this3.dirty = true;
+	                        }
+
+	                        onChange(newValue);
+	                    });
+
+	                    fieldEditorInstance.on('silentchange', function (newValue) {
+	                        onChange(newValue);
+	                    });
 
 	                    if (fieldEditorInstance.$keyContent) {
 	                        $keyContent.append(fieldEditorInstance.$keyContent);
@@ -31071,7 +31112,7 @@
 	    }, {
 	        key: 'renderFields',
 	        value: function renderFields(tabId, fieldDefinitions, fieldValues) {
-	            var _this3 = this;
+	            var _this4 = this;
 
 	            var view = this;
 	            var tabFieldDefinitions = {};
@@ -31101,7 +31142,7 @@
 	                var fieldSchema = resources.schemas[fieldDefinition.schemaId];
 
 	                if (!fieldSchema) {
-	                    debug.log('FieldSchema "' + fieldDefinition.schemaId + '" for key "' + key + '" not found', _this3);
+	                    debug.log('FieldSchema "' + fieldDefinition.schemaId + '" for key "' + key + '" not found', _this4);
 	                    return null;
 	                }
 
@@ -31125,10 +31166,6 @@
 
 	                // On change function
 	                function (newValue) {
-	                    if (!view.model.locked) {
-	                        view.dirty = true;
-	                    }
-
 	                    // If field definition is set to multilingual, assign flag and value onto object...
 	                    if (fieldDefinition.multilingual) {
 	                        fieldValues[key]._multilingual = true;
@@ -31172,7 +31209,7 @@
 	    }, {
 	        key: 'renderEditor',
 	        value: function renderEditor(content, schema) {
-	            var _this4 = this;
+	            var _this5 = this;
 
 	            var view = this;
 
@@ -31186,19 +31223,19 @@
 	            // Render editor
 	            return _.div({ class: 'object' }, _.ul({ class: 'nav editor-header nav-tabs' }, _.each(schema.tabs, function (tabId, tab) {
 	                return _.li({ class: isTabActive(tabId) ? 'active' : '' }, _.a({ 'data-toggle': 'tab', href: '#tab-' + tabId }, tab).click(function () {
-	                    _this4.onClickTab(tabId);
+	                    _this5.onClickTab(tabId);
 	                }));
 	            }), _.li({ class: isTabActive('meta') ? 'active' : '' }, _.a({ 'data-toggle': 'tab', href: '#tab-meta' }, 'meta').click(function () {
-	                _this4.onClickTab('meta');
+	                _this5.onClickTab('meta');
 	            }))), this.$body = _.div({ class: 'tab-content editor-body' },
 	            // Render content properties
 	            _.each(schema.tabs, function (tabId, tab) {
-	                return _.div({ id: 'tab-' + tabId, class: 'tab-pane' + (isTabActive(tabId) ? ' active' : '') }, _this4.renderFields(tabId, schema.fields.properties, content.properties));
+	                return _.div({ id: 'tab-' + tabId, class: 'tab-pane' + (isTabActive(tabId) ? ' active' : '') }, _this5.renderFields(tabId, schema.fields.properties, content.properties));
 	            }),
 
 	            // Render meta properties
 	            _.div({ id: 'tab-meta', class: 'tab-pane' + (isTabActive('meta') ? ' active' : '') }, this.renderFields('meta', schema.fields, content), this.renderFields('meta', schema.fields.properties, content.properties))).on('scroll', function (e) {
-	                _this4.onScroll(e);
+	                _this5.onScroll(e);
 	            }), _.div({ class: 'editor-footer' }));
 	        }
 
@@ -31209,12 +31246,12 @@
 	    }, {
 	        key: 'renderButtons',
 	        value: function renderButtons() {
-	            var _this5 = this;
+	            var _this6 = this;
 
 	            _.append($('.editor-footer').empty(), _.div({ class: 'btn-group' },
 	            // JSON editor
 	            _.button({ class: 'btn btn-embedded' }, 'Advanced').click(function () {
-	                _this5.onClickAdvanced();
+	                _this6.onClickAdvanced();
 	            }),
 
 	            // View remote
@@ -31223,7 +31260,7 @@
 	                    return connection.id == connectionId;
 	                })[0];
 
-	                var url = _this5.model.properties.url;
+	                var url = _this6.model.properties.url;
 
 	                if (url instanceof Object) {
 	                    url = url[window.language];
@@ -31235,13 +31272,13 @@
 	            })), _.if(!this.model.locked,
 	            // Save & publish
 	            _.div({ class: 'btn-group-save-publish raised' }, this.$saveBtn = _.button({ class: 'btn btn-save btn-primary' }, _.span({ class: 'text-default' }, 'Save'), _.span({ class: 'text-working' }, 'Saving')).click(function () {
-	                _this5.onClickSave(_this5.publishingSettings);
+	                _this6.onClickSave(_this6.publishingSettings);
 	            }), _.if(this.publishingSettings.connections && this.publishingSettings.connections.length > 0, _.span('&'), _.select({ class: 'form-control select-publishing' }, _.option({ value: 'publish' }, 'Publish'), _.option({ value: 'unpublish' }, 'Unpublish')).val(this.model.unpublished ? 'unpublish' : 'publish'))))));
 	        }
 	    }, {
 	        key: 'render',
 	        value: function render() {
-	            var _this6 = this;
+	            var _this7 = this;
 
 	            // Make sure the model data is using the Content model
 	            if (!this.model.properties) {
@@ -31259,20 +31296,20 @@
 	            return SchemaHelper.getSchemaWithParentFields(this.model.schemaId).then(function (schema) {
 	                contentSchema = schema;
 
-	                return _this6.model.getSettings('publishing');
+	                return _this7.model.getSettings('publishing');
 	            }).then(function (settings) {
-	                _this6.publishingSettings = settings;
+	                _this7.publishingSettings = settings;
 
-	                _this6.$element.html(
+	                _this7.$element.html(
 	                // Render editor
-	                _this6.renderEditor(_this6.model, contentSchema));
+	                _this7.renderEditor(_this7.model, contentSchema));
 
-	                _this6.renderButtons();
+	                _this7.renderButtons();
 
-	                _this6.onFieldEditorsReady();
+	                _this7.onFieldEditorsReady();
 	            }).catch(function (e) {
 	                UI.errorModal(e, function () {
-	                    location.hash = '/content/json/' + _this6.model.id;
+	                    location.hash = '/content/json/' + _this7.model.id;
 	                });
 	            });
 	        }

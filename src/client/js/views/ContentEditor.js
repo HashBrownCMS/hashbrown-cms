@@ -159,7 +159,17 @@ class ContentEditor extends View {
                     multilingual: fieldDefinition.multilingual
                 });
 
-                fieldEditorInstance.on('change', onChange);
+                fieldEditorInstance.on('change', (newValue) => {
+                    if(!this.model.locked) {
+                        this.dirty = true;
+                    }
+
+                    onChange(newValue);
+                });
+
+                fieldEditorInstance.on('silentchange', (newValue) => {
+                    onChange(newValue);
+                });
 
                 if(fieldEditorInstance.$keyContent) {
                     $keyContent.append(fieldEditorInstance.$keyContent);
@@ -246,10 +256,6 @@ class ContentEditor extends View {
 
                         // On change function
                         function(newValue) {
-                            if(!view.model.locked) {
-                                view.dirty = true;
-                            }
-
                             // If field definition is set to multilingual, assign flag and value onto object...
                             if(fieldDefinition.multilingual) {
                                 fieldValues[key]._multilingual = true;

@@ -90,7 +90,7 @@ class ArrayEditor extends View {
      * @param {Number} index
      * @param {Schema} itemSchema
      */
-    onChange(newValue, i, itemSchema) {
+    onChangeValue(newValue, i, itemSchema) {
         if(itemSchema.multilingual) {
             // Sanity check to make sure multilingual fields are accomodated for
             if(!this.value.items[i] || typeof this.value.items[i] !== 'object') {
@@ -103,8 +103,24 @@ class ArrayEditor extends View {
         } else {
             this.value.items[i] = newValue;
         }
+    }
+
+    /**
+     * Event: Change
+     */
+    onChange(newValue, i, itemSchema) {
+        this.onChangeValue(newValue, i, itemSchema);
 
         this.trigger('change', this.value);
+    }
+    
+    /**
+     * Event: Silent change
+     */
+    onSilentChange(newValue, i, itemSchema) {
+        this.onChangeValue(newValue, i, itemSchema);
+
+        this.trigger('silentchange', this.value);
     }
 
     /**
@@ -135,6 +151,8 @@ class ArrayEditor extends View {
                         
                         // Rebuild Schema bindings array
                         this.rebuildSchemaBindings();
+
+                        this.trigger('change', this.value);
                     }
                 });
             });
@@ -328,9 +346,13 @@ class ArrayEditor extends View {
                 schema: itemSchema
             });
 
-            // Hook up the change event
+            // Hook up the change events
             fieldEditorInstance.on('change', (newValue) => {
                 this.onChange(newValue, getIndex(), itemSchema);
+            });
+            
+            fieldEditorInstance.on('silentchange', (newValue) => {
+                this.onSilentChange(newValue, getIndex(), itemSchema);
             });
 
             // Render the DOM element

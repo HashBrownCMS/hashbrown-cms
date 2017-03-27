@@ -132,7 +132,7 @@ class UrlEditor extends View {
 
         this.$input.val(newUrl);
 
-        this.trigger('change', this.$input.val());
+        this.trigger('silentchange', this.$input.val());
     };
 
     /**

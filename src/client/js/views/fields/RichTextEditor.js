@@ -28,10 +28,13 @@ class RichTextEditor extends View {
 
         if(this.silentChange === true) {
             this.silentChange = false;
-            return;
-        }
+
+            this.trigger('silentchange', this.value);
         
-        this.trigger('change', this.value);
+        } else {
+            this.trigger('change', this.value);
+
+        }
     }
 
     /**
