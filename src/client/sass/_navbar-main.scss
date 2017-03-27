@@ -323,7 +323,8 @@
                                 &:after {
                                     content: '\f1ce';
                                     color: $primary;
-                                    animation: spinner 1s linear infinite;
+                                    animation: spinner-no-offset 1s linear infinite;
+                                    opacity: 1;
                                 }
                             }
                         }

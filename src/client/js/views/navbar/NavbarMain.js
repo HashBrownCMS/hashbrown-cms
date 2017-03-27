@@ -104,7 +104,8 @@ class NavbarMain extends View {
 		this.state = {
 			buttons: {},
 			panes: {},
-			items: {}
+			items: {},
+            scroll: $('.pane-container.active .pane').scrollTop() || 0
 		};
 		
 		this.$element.find('.tab-buttons button').each((i, element) => {
@@ -125,7 +126,7 @@ class NavbarMain extends View {
 			let $item = $(element);
 			let key = $item.data('routing-path');
 
-			this.state.items[key] = $item[0].className;
+			this.state.items[key] = $item[0].className.replace('loading', '');
 		});
 	}
 
@@ -161,6 +162,8 @@ class NavbarMain extends View {
 				$item[0].className = this.state.items[key];
 			}
 		});
+
+        $('.pane-container.active .pane').scrollTop(this.state.scroll || 0);
 
 		this.state = null;
 	}

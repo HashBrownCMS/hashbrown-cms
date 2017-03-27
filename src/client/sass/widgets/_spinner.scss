@@ -9,6 +9,16 @@
     }
 }
 
+@keyframes spinner-no-offset {
+    0% {
+        transform: rotate(0deg);
+    }
+    
+    100% {
+        transform: rotate(359deg);
+    }
+}
+
 .spinner-obscure {
     position: fixed;
     top: 0px;

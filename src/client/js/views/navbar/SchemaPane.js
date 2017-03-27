@@ -112,14 +112,13 @@ class SchemaPane extends Pane {
 				editor.fetch();
 			}
         }) 
-        .catch(errorModal);
+        .catch(UI.errorModal);
     }
     
     /**
      * Event: Click push Schema
      */
     static onClickPushSchema() {
-        let navbar = ViewHelper.get('NavbarMain');
 		let $element = $('.context-menu-target-element');
         let pushId = $element.data('id');
 
@@ -130,9 +129,9 @@ class SchemaPane extends Pane {
             return reloadResource('schemas');
         })
         .then(() => {
-            navbar.reload();
+            NavbarMain.reload();
         }) 
-        .catch(errorModal);
+        .catch(UI.errorModal);
     }
 
     /**

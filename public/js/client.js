@@ -12585,7 +12585,8 @@
 	            this.state = {
 	                buttons: {},
 	                panes: {},
-	                items: {}
+	                items: {},
+	                scroll: $('.pane-container.active .pane').scrollTop() || 0
 	            };
 
 	            this.$element.find('.tab-buttons button').each(function (i, element) {
@@ -12606,7 +12607,7 @@
 	                var $item = $(element);
 	                var key = $item.data('routing-path');
 
-	                _this2.state.items[key] = $item[0].className;
+	                _this2.state.items[key] = $item[0].className.replace('loading', '');
 	            });
 	        }
 
@@ -12649,6 +12650,8 @@
 	                    $item[0].className = _this3.state.items[key];
 	                }
 	            });
+
+	            $('.pane-container.active .pane').scrollTop(this.state.scroll || 0);
 
 	            this.state = null;
 	        }
@@ -22774,7 +22777,7 @@
 	                    editor.model = null;
 	                    editor.fetch();
 	                }
-	            }).catch(errorModal);
+	            }).catch(UI.errorModal);
 	        }
 
 	        /**
@@ -22784,7 +22787,6 @@
 	    }, {
 	        key: 'onClickPushSchema',
 	        value: function onClickPushSchema() {
-	            var navbar = ViewHelper.get('NavbarMain');
 	            var $element = $('.context-menu-target-element');
 	            var pushId = $element.data('id');
 
@@ -22793,8 +22795,8 @@
 	            apiCall('post', 'schemas/push/' + pushId).then(function () {
 	                return reloadResource('schemas');
 	            }).then(function () {
-	                navbar.reload();
-	            }).catch(errorModal);
+	                NavbarMain.reload();
+	            }).catch(UI.errorModal);
 	        }
 
 	        /**
