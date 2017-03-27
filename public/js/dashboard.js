@@ -72,15 +72,6 @@
 	apiCall('get', 'user').then(function (user) {
 	    User.current = new User(user);
 
-	    return apiCall('get', 'server/backups/config');
-	})
-
-	// --------------------
-	// Backup config
-	// --------------------
-	.then(function (config) {
-	    window.backupConfig = config;
-
 	    return apiCall('get', 'server/projects');
 	})
 
