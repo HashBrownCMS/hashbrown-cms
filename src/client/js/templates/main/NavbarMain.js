@@ -417,6 +417,11 @@ module.exports = function() {
                 this.applyHierarchy($pane, pane, queue);
                 this.applySorting($pane, pane);
 
+                // Attach pane context menu
+                if(pane.settings.paneContextMenu) {
+                    $pane.exocontext(pane.settings.paneContextMenu);
+                }
+                
                 return $pane;
             })
         )

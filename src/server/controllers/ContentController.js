@@ -68,6 +68,7 @@ class ContentController extends ApiController {
      */
     static createContent(req, res) {
         let parentId = req.query.parent;
+        let sortIndex = req.query.sort;
         let schemaId = req.params.schemaId;
         let properties = req.body;
 
@@ -76,7 +77,7 @@ class ContentController extends ApiController {
             properties = properties.properties;
         }
         
-        ContentHelper.createContent(req.project, req.environment, schemaId, parentId, req.user, properties)
+        ContentHelper.createContent(req.project, req.environment, schemaId, parentId, req.user, properties, sortIndex)
         .then((node) => {
             res.status(200).send(node);
         })

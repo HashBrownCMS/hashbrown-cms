@@ -79,6 +79,38 @@ class ContentHelper extends ContentHelperCommon {
 
         return value;
     }
+
+    /**
+     * Get new sort index
+     *
+     * @param {String} parentId
+     */
+    static getNewSortIndex(parentId, aboveId, belowId) {
+        if(aboveId) {
+            return this.getContentByIdSync(aboveId).sort + 1;
+        }
+
+        if(belowId) {
+            return this.getContentByIdSync(belowId).sort - 1;
+        }
+
+        // Filter out content that doesn't have the same parent
+        let nodes = resouces.content.filter((x) => { x.parentId == parentId });
+
+        // Find new index
+        // NOTE: The index should be the highest sort number + 10000 to give a bit of leg room for sorting later
+        let newIndex = 0;
+
+        for(let content of nodes) {
+            if(content.parentId == parentId) {
+                if(newIndex - 10000 <= content.sort) {
+                    newIndex = content.sort + 10000;
+                }
+            }
+        }
+
+        return newIndex;
+    }
 }
 
 module.exports = ContentHelper;

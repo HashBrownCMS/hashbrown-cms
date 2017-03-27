@@ -41,8 +41,6 @@ class ContentPane extends Pane {
             parentId = '';
         }
         
-        console.log(parentId);
-
         // Get the Content model
         ContentHelper.getContentById(id)
 
@@ -225,7 +223,7 @@ class ContentPane extends Pane {
 
                         // Append parent Content id to request URL
                         if(parentId) {
-                            apiUrl += '?parent=' + parentId;
+                            apiUrl += '?parent=' + parentId + '&sort=' + sortIndex;
                         }
 
                         // API call to create new Content node

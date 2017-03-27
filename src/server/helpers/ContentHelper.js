@@ -217,7 +217,8 @@ class ContentHelper extends ContentHelperCommon {
         schemaId = requiredParam('schemaId'),
         parentId = null,
         user = requiredParam('user'),
-        properties = null
+        properties = null,
+        sortIndex = 1000
     ) {
         return this.isSchemaAllowedAsChild(project, environment, parentId, schemaId)
         .then(() => {
@@ -235,6 +236,8 @@ class ContentHelper extends ContentHelperCommon {
             if(parentId) {
                 content.parentId = parentId;
             }
+
+            content.sort = sortIndex;
 
             return MongoHelper.insertOne(
                 project,

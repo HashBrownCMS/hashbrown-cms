@@ -21619,8 +21619,6 @@
 	                parentId = '';
 	            }
 
-	            console.log(parentId);
-
 	            // Get the Content model
 	            ContentHelper.getContentById(id)
 
@@ -21806,7 +21804,7 @@
 
 	                        // Append parent Content id to request URL
 	                        if (parentId) {
-	                            apiUrl += '?parent=' + parentId;
+	                            apiUrl += '?parent=' + parentId + '&sort=' + sortIndex;
 	                        }
 
 	                        // API call to create new Content node
@@ -23523,6 +23521,11 @@
 
 	        _this.applyHierarchy($pane, pane, queue);
 	        _this.applySorting($pane, pane);
+
+	        // Attach pane context menu
+	        if (pane.settings.paneContextMenu) {
+	            $pane.exocontext(pane.settings.paneContextMenu);
+	        }
 
 	        return $pane;
 	    })));
@@ -35814,6 +35817,64 @@
 	            }
 
 	            return value;
+	        }
+
+	        /**
+	         * Get new sort index
+	         *
+	         * @param {String} parentId
+	         */
+
+	    }, {
+	        key: 'getNewSortIndex',
+	        value: function getNewSortIndex(parentId, aboveId, belowId) {
+	            if (aboveId) {
+	                return this.getContentByIdSync(aboveId).sort + 1;
+	            }
+
+	            if (belowId) {
+	                return this.getContentByIdSync(belowId).sort - 1;
+	            }
+
+	            // Filter out content that doesn't have the same parent
+	            var nodes = resouces.content.filter(function (x) {
+	                x.parentId == parentId;
+	            });
+
+	            // Find new index
+	            // NOTE: The index should be the highest sort number + 10000 to give a bit of leg room for sorting later
+	            var newIndex = 0;
+
+	            var _iteratorNormalCompletion3 = true;
+	            var _didIteratorError3 = false;
+	            var _iteratorError3 = undefined;
+
+	            try {
+	                for (var _iterator3 = nodes[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+	                    var content = _step3.value;
+
+	                    if (content.parentId == parentId) {
+	                        if (newIndex - 10000 <= content.sort) {
+	                            newIndex = content.sort + 10000;
+	                        }
+	                    }
+	                }
+	            } catch (err) {
+	                _didIteratorError3 = true;
+	                _iteratorError3 = err;
+	            } finally {
+	                try {
+	                    if (!_iteratorNormalCompletion3 && _iterator3.return) {
+	                        _iterator3.return();
+	                    }
+	                } finally {
+	                    if (_didIteratorError3) {
+	                        throw _iteratorError3;
+	                    }
+	                }
+	            }
+
+	            return newIndex;
 	        }
 	    }]);
 
