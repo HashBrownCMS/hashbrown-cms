@@ -96,7 +96,7 @@ class Pane {
             let $container = $(e.target).parent();
             let containerIndex = parseInt($container.data('sort') || 0)
 
-            let newIndex = containerIndex + 1000;
+            let newIndex = containerIndex + 1;
 
             // If the container after the one we are trying to get below, accommodate by clamping below that neighbour's index
             let $afterContainer = $container.next();

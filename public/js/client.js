@@ -21255,7 +21255,7 @@
 	                var $container = $(e.target).parent();
 	                var containerIndex = parseInt($container.data('sort') || 0);
 
-	                var newIndex = containerIndex + 1000;
+	                var newIndex = containerIndex + 1;
 
 	                // If the container after the one we are trying to get below, accommodate by clamping below that neighbour's index
 	                var $afterContainer = $container.next();
@@ -21777,6 +21777,7 @@
 	                    // Some child Schemas were provided, or no restrictions were defined
 	                } else {
 	                    var schemaId = void 0;
+	                    var sortIndex = ContentHelper.getNewSortIndex(parentId);
 
 	                    // Instatiate a new Content Schema reference editor
 	                    var schemaReference = new resources.editors.contentSchemaReference({
@@ -21799,12 +21800,13 @@
 	                            return false;
 	                        }
 
-	                        var apiUrl = 'content/new/' + schemaId;
+	                        var apiUrl = 'content/new/' + schemaId + '?sort=' + sortIndex;
+
 	                        var newContent = void 0;
 
 	                        // Append parent Content id to request URL
 	                        if (parentId) {
-	                            apiUrl += '?parent=' + parentId + '&sort=' + sortIndex;
+	                            apiUrl += '&parent=' + parentId;
 	                        }
 
 	                        // API call to create new Content node
@@ -35823,6 +35825,8 @@
 	         * Get new sort index
 	         *
 	         * @param {String} parentId
+	         * @param {String} aboveId
+	         * @param {String} belowId
 	         */
 
 	    }, {
@@ -35837,13 +35841,13 @@
 	            }
 
 	            // Filter out content that doesn't have the same parent
-	            var nodes = resouces.content.filter(function (x) {
-	                x.parentId == parentId;
+	            var nodes = resources.content.filter(function (x) {
+	                return x.parentId == parentId || !x.parentId && !parentId;
 	            });
 
 	            // Find new index
 	            // NOTE: The index should be the highest sort number + 10000 to give a bit of leg room for sorting later
-	            var newIndex = 0;
+	            var newIndex = 10000;
 
 	            var _iteratorNormalCompletion3 = true;
 	            var _didIteratorError3 = false;
@@ -35853,10 +35857,8 @@
 	                for (var _iterator3 = nodes[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
 	                    var content = _step3.value;
 
-	                    if (content.parentId == parentId) {
-	                        if (newIndex - 10000 <= content.sort) {
-	                            newIndex = content.sort + 10000;
-	                        }
+	                    if (newIndex - 10000 <= content.sort) {
+	                        newIndex = content.sort + 10000;
 	                    }
 	                }
 	            } catch (err) {

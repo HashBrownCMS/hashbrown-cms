@@ -218,7 +218,7 @@ class ContentHelper extends ContentHelperCommon {
         parentId = null,
         user = requiredParam('user'),
         properties = null,
-        sortIndex = 1000
+        sortIndex = 10000
     ) {
         return this.isSchemaAllowedAsChild(project, environment, parentId, schemaId)
         .then(() => {

@@ -84,6 +84,8 @@ class ContentHelper extends ContentHelperCommon {
      * Get new sort index
      *
      * @param {String} parentId
+     * @param {String} aboveId
+     * @param {String} belowId
      */
     static getNewSortIndex(parentId, aboveId, belowId) {
         if(aboveId) {
@@ -95,17 +97,17 @@ class ContentHelper extends ContentHelperCommon {
         }
 
         // Filter out content that doesn't have the same parent
-        let nodes = resouces.content.filter((x) => { x.parentId == parentId });
+        let nodes = resources.content.filter((x) => {
+            return x.parentId == parentId || (!x.parentId && !parentId);
+        });
 
         // Find new index
         // NOTE: The index should be the highest sort number + 10000 to give a bit of leg room for sorting later
-        let newIndex = 0;
+        let newIndex = 10000;
 
         for(let content of nodes) {
-            if(content.parentId == parentId) {
-                if(newIndex - 10000 <= content.sort) {
-                    newIndex = content.sort + 10000;
-                }
+            if(newIndex - 10000 <= content.sort) {
+                newIndex = content.sort + 10000;
             }
         }
 

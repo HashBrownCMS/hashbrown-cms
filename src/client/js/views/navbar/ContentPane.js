@@ -192,7 +192,8 @@ class ContentPane extends Pane {
             // Some child Schemas were provided, or no restrictions were defined
             } else {
                 let schemaId;
-                
+                let sortIndex = ContentHelper.getNewSortIndex(parentId);
+              
                 // Instatiate a new Content Schema reference editor
                 let schemaReference = new resources.editors.contentSchemaReference({
                     config: {
@@ -218,12 +219,13 @@ class ContentPane extends Pane {
                     () => {
                         if(!schemaId) { return false; }
                        
-                        let apiUrl = 'content/new/' + schemaId;
+                        let apiUrl = 'content/new/' + schemaId + '?sort=' + sortIndex;
+
                         let newContent;
 
                         // Append parent Content id to request URL
                         if(parentId) {
-                            apiUrl += '?parent=' + parentId + '&sort=' + sortIndex;
+                            apiUrl += '&parent=' + parentId;
                         }
 
                         // API call to create new Content node
