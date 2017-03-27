@@ -44,7 +44,7 @@ class UpdateHelper {
                 }
             }
             
-            let git = exec('git fetch && git status && git log -- origin -1 --format=oneline', {
+            let git = exec('git fetch && git status && git log origin -1 --format=oneline', {
                 cwd: appRoot
             });
 
@@ -63,8 +63,14 @@ class UpdateHelper {
                     debug.log('Done checking for updates', this);
                     resolve(resolveObj);
                 } else {
-                    debug.log('Checking for updates failed', this);
-                    reject(new Error('git exited with status code ' + code));
+                    if(resolveObj.behind && resolveObj.amount > 0) {
+                        debug.log('Done checking for updates, but couldn\'t get last commit message', this);
+                        resolve(resolveObj);
+                    
+                    } else {
+                        debug.log('Checking for updates failed', this);
+                        reject(new Error('Checking for updates failed. Please run "git fetch && git status && git log origin -1 --format=oneline" on the server to check if it runs correctly.'));
+                    }
                 }
             });
         });
