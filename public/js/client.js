@@ -12828,7 +12828,7 @@
 
 	            // Sort direct children
 	            $pane.find('>.pane-item-container').sort(function (a, b) {
-	                return parseInt(a.dataset.sort) > parseInt(b.dataset.sort);
+	                return parseInt(a.dataset.sort) > parseInt(b.dataset.sort) ? 1 : -1;
 	            }).appendTo($pane);
 
 	            // Sort nested children
@@ -12836,7 +12836,7 @@
 	                var $children = $(children);
 
 	                $children.find('>.pane-item-container').sort(function (a, b) {
-	                    return parseInt(a.dataset.sort) > parseInt(b.dataset.sort);
+	                    return parseInt(a.dataset.sort) > parseInt(b.dataset.sort) ? 1 : -1;
 	                }).appendTo($children);
 	            });
 	        }

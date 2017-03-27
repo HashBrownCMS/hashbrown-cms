@@ -343,7 +343,7 @@ class NavbarMain extends View {
 
         // Sort direct children
         $pane.find('>.pane-item-container').sort((a, b) => {
-            return parseInt(a.dataset.sort) > parseInt(b.dataset.sort);
+            return parseInt(a.dataset.sort) > parseInt(b.dataset.sort) ? 1 : -1;
         }).appendTo($pane);
         
         // Sort nested children
@@ -351,7 +351,7 @@ class NavbarMain extends View {
             let $children = $(children);
 
             $children.find('>.pane-item-container').sort((a, b) => {
-                return parseInt(a.dataset.sort) > parseInt(b.dataset.sort);
+                return parseInt(a.dataset.sort) > parseInt(b.dataset.sort) ? 1 : -1;
             }).appendTo($children);
         });
     }
