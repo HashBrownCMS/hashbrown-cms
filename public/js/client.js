@@ -2282,9 +2282,9 @@
 	    _createClass(ContextMenu, [{
 	        key: 'render',
 	        value: function render() {
-	            var view = this;
+	            var _this2 = this;
 
-	            view.$element.html(_.each(view.model, function (label, func) {
+	            this.$element.html(_.each(this.model, function (label, func) {
 	                if (func == '---') {
 	                    return _.li({ class: 'dropdown-header' }, label);
 	                } else {
@@ -2295,13 +2295,21 @@
 	                        if (func) {
 	                            func(e);
 
-	                            view.remove();
+	                            _this2.remove();
 	                        }
 	                    }));
 	                }
 	            }));
 
-	            $('body').append(view.$element);
+	            $('body').append(this.$element);
+
+	            var rect = this.$element[0].getBoundingClientRect();
+
+	            if (rect.left + rect.width > window.innerWidth) {
+	                this.$element.css('left', rect.left - rect.width + 'px');
+	            } else if (rect.bottom > window.innerHeight) {
+	                this.$element.css('top', rect.top - rect.height + 'px');
+	            }
 	        }
 	    }]);
 
@@ -12566,28 +12574,97 @@
 	        }
 
 	        /**
+	         * Saves the navbar state
+	         */
+
+	    }, {
+	        key: 'save',
+	        value: function save() {
+	            var _this2 = this;
+
+	            this.state = {
+	                buttons: {},
+	                panes: {},
+	                items: {}
+	            };
+
+	            this.$element.find('.tab-buttons button').each(function (i, element) {
+	                var $button = $(element);
+	                var key = $button.data('route');
+
+	                _this2.state.buttons[key] = $button[0].className;
+	            });
+
+	            this.$element.find('.pane-container').each(function (i, element) {
+	                var $pane = $(element);
+	                var key = $pane.data('route');
+
+	                _this2.state.panes[key] = $pane[0].className;
+	            });
+
+	            this.$element.find('.pane-item-container').each(function (i, element) {
+	                var $item = $(element);
+	                var key = $item.data('routing-path');
+
+	                _this2.state.items[key] = $item[0].className;
+	            });
+	        }
+
+	        /**
+	         * Restores the navbar state
+	         */
+
+	    }, {
+	        key: 'restore',
+	        value: function restore() {
+	            var _this3 = this;
+
+	            if (!this.state) {
+	                return;
+	            }
+
+	            this.$element.find('.tab-buttons button').each(function (i, element) {
+	                var $button = $(element);
+	                var key = $button.data('route');
+
+	                if (_this3.state.buttons[key]) {
+	                    $button[0].className = _this3.state.buttons[key];
+	                }
+	            });
+
+	            this.$element.find('.pane-container').each(function (i, element) {
+	                var $pane = $(element);
+	                var key = $pane.data('route');
+
+	                if (_this3.state.panes[key]) {
+	                    $pane[0].className = _this3.state.panes[key];
+	                }
+	            });
+
+	            this.$element.find('.pane-item-container').each(function (i, element) {
+	                var $item = $(element);
+	                var key = $item.data('routing-path');
+
+	                if (_this3.state.items[key]) {
+	                    $item[0].className = _this3.state.items[key];
+	                }
+	            });
+
+	            this.state = null;
+	        }
+
+	        /**
 	         * Reloads this view
 	         */
 
 	    }, {
 	        key: 'reload',
 	        value: function reload() {
-	            var $currentTab = this.$element.find('.pane-container.active');
-	            var $currentItem = this.$element.find('.pane-container.active .pane-item-container.active');
+	            this.save();
 
 	            this.fetch();
 
-	            if ($currentTab.length > 0) {
-	                var currentTabRoute = $currentTab.attr('data-route');
-
-	                if ($currentItem.length > 0) {
-	                    var currentItemRoute = $currentItem.attr('data-id') || $currentItem.attr('data-routing-path');
-
-	                    this.highlightItem(currentTabRoute, currentItemRoute);
-	                } else {
-	                    this.showTab(currentTabRoute);
-	                }
-	            }
+	            this.restore();
 	        }
 	    }, {
 	        key: 'getItemIcon',
@@ -12776,7 +12853,7 @@
 	    }, {
 	        key: 'applyHierarchy',
 	        value: function applyHierarchy($pane, pane, queue) {
-	            var _this2 = this;
+	            var _this4 = this;
 
 	            var _iteratorNormalCompletion = true;
 	            var _didIteratorError = false;
@@ -12860,7 +12937,7 @@
 	                    // Add expand/collapse buttons
 	                    if ($parentDir.children('.pane-item').children('.btn-children-toggle').length < 1) {
 	                        $parentDir.children('.pane-item').append(_.button({ class: 'btn-children-toggle' }, _.span({ class: 'fa fa-caret-down' }), _.span({ class: 'fa fa-caret-right' })).click(function (e) {
-	                            _this2.onClickToggleChildren(e);
+	                            _this4.onClickToggleChildren(e);
 	                        }));
 	                    }
 	                }
@@ -21752,7 +21829,7 @@
 
 	    }, {
 	        key: 'onClickNewContent',
-	        value: function onClickNewContent(parentId) {
+	        value: function onClickNewContent(parentId, asSibling) {
 	            var navbar = ViewHelper.get('NavbarMain');
 
 	            // Try to get a parent Schema if it exists
@@ -22021,9 +22098,18 @@
 	                    var isContentSyncEnabled = isSyncEnabled && SettingsHelper.getCachedSettings('sync').content;
 
 	                    menu['This content'] = '---';
+
+	                    menu['New content'] = function () {
+	                        var targetId = $('.context-menu-target-element').data('id');
+	                        var parentId = ContentHelper.getContentByIdSync(targetId).parentId;
+
+	                        _this3.onClickNewContent(parentId);
+	                    };
+
 	                    menu['New child content'] = function () {
 	                        _this3.onClickNewContent($('.context-menu-target-element').data('id'));
 	                    };
+
 	                    menu['Copy'] = function () {
 	                        _this3.onClickCopyContent();
 	                    };

@@ -97,28 +97,83 @@ class NavbarMain extends View {
         });
     }
 
+	/**
+	 * Saves the navbar state
+	 */
+	save() {
+		this.state = {
+			buttons: {},
+			panes: {},
+			items: {}
+		};
+		
+		this.$element.find('.tab-buttons button').each((i, element) => {
+			let $button = $(element);
+			let key = $button.data('route');
+
+			this.state.buttons[key] = $button[0].className;
+		});
+		
+		this.$element.find('.pane-container').each((i, element) => {
+			let $pane = $(element);
+			let key = $pane.data('route');
+
+			this.state.panes[key] = $pane[0].className;
+		});
+
+		this.$element.find('.pane-item-container').each((i, element) => {
+			let $item = $(element);
+			let key = $item.data('routing-path');
+
+			this.state.items[key] = $item[0].className;
+		});
+	}
+
+	/**
+	 * Restores the navbar state
+	 */
+	restore() {
+		if(!this.state) { return; }
+
+		this.$element.find('.tab-buttons button').each((i, element) => {
+			let $button = $(element);
+			let key = $button.data('route');
+
+			if(this.state.buttons[key]) {
+				$button[0].className = this.state.buttons[key];
+			}
+		});
+		
+		this.$element.find('.pane-container').each((i, element) => {
+			let $pane = $(element);
+			let key = $pane.data('route');
+
+			if(this.state.panes[key]) {
+				$pane[0].className = this.state.panes[key];
+			}
+		});
+
+		this.$element.find('.pane-item-container').each((i, element) => {
+			let $item = $(element);
+			let key = $item.data('routing-path');
+
+			if(this.state.items[key]) {
+				$item[0].className = this.state.items[key];
+			}
+		});
+
+		this.state = null;
+	}
+
     /**
      * Reloads this view
      */
     reload() {
-        let $currentTab = this.$element.find('.pane-container.active');
-        let $currentItem = this.$element.find('.pane-container.active .pane-item-container.active');
+		this.save();
+        
+		this.fetch();
 
-        this.fetch();
-
-        if($currentTab.length > 0) {
-            let currentTabRoute = $currentTab.attr('data-route');
-
-            if($currentItem.length > 0) {
-                let currentItemRoute = $currentItem.attr('data-id') || $currentItem.attr('data-routing-path');
-            
-                this.highlightItem(currentTabRoute, currentItemRoute);
-            
-            } else {
-                this.showTab(currentTabRoute);
-
-            }
-        }
+		this.restore();
     }
     
     static reload() {

@@ -166,7 +166,7 @@ class ContentPane extends Pane {
      *
      * @param {String} parentId
      */
-    static onClickNewContent(parentId) {
+    static onClickNewContent(parentId, asSibling) {
         let navbar = ViewHelper.get('NavbarMain');
 
         // Try to get a parent Schema if it exists
@@ -468,7 +468,18 @@ class ContentPane extends Pane {
                 let isContentSyncEnabled = isSyncEnabled && SettingsHelper.getCachedSettings('sync').content;
                 
                 menu['This content'] = '---';
-                menu['New child content'] = () => { this.onClickNewContent($('.context-menu-target-element').data('id')); };
+                
+                menu['New content'] = () => {
+                    let targetId = $('.context-menu-target-element').data('id');
+                    let parentId = ContentHelper.getContentByIdSync(targetId).parentId;
+                    
+                    this.onClickNewContent(parentId);
+                };
+                
+                menu['New child content'] = () => {
+                    this.onClickNewContent($('.context-menu-target-element').data('id'));
+                };
+                                
                 menu['Copy'] = () => { this.onClickCopyContent(); };
                 menu['Copy id'] = () => { this.onClickCopyItemId(); };
                 menu['Paste'] = () => { if(this.onClickPasteContent) { this.onClickPasteContent(); } else { UI.messageModal('Paste content', 'Nothing to paste'); } };
