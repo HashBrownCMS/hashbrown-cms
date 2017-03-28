@@ -1,8 +1,6 @@
 'use strict';
 
-let Pane = require('./Pane');
-
-class CMSPane extends Pane {
+class CMSPane extends NavbarPane {
     /**
      * Init
      */

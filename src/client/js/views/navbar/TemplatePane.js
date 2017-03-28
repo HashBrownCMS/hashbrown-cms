@@ -1,8 +1,6 @@
 'use strict';
 
-let Pane = require('./Pane');
-
-class TemplatePane extends Pane {
+class TemplatePane extends NavbarPane {
     /**
      * Event: Click add Template
      */

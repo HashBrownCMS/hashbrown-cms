@@ -1,8 +1,6 @@
 'use strict';
 
-let Pane = require('./Pane');
-
-class SettingsPane extends Pane {
+class SettingsPane extends NavbarPane {
     /**
      * Init
      */

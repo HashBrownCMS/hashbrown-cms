@@ -24,8 +24,10 @@ require('./helpers');
 
 // Main views
 window.MainMenu = require('./views/MainMenu');
+window.NavbarPane = require('./views/navbar/Pane');
 window.NavbarMain = require('./views/navbar/NavbarMain');
 window.MediaViewer = require('./views/MediaViewer');
+window.MediaBrowser = require('./views/MediaBrowser');
 
 // Field editors
 require('./views/fields');
@@ -40,10 +42,10 @@ window.SchemaEditor = require('./views/SchemaEditor');
 window.SyncSettings = require('./views/SyncSettings');
 window.ProvidersSettings = require('./views/ProvidersSettings');
 window.UserEditor = require('./views/UserEditor');
-window.MediaBrowser = require('./views/MediaBrowser');
 
 // Models
 window.Content = require('./models/Content');
+window.Schema = require('../../common/models/Schema');
 window.Media = require('../../common/models/Media');
 window.User = require('../../common/models/User');
 window.Template = require('../../common/models/Template');

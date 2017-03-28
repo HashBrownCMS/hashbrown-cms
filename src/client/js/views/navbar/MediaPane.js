@@ -1,8 +1,6 @@
 'use strict';
 
-let Pane = require('./Pane');
-
-class MediaPane extends Pane {
+class MediaPane extends NavbarPane {
     /**
      * Event: On change folder path
      *

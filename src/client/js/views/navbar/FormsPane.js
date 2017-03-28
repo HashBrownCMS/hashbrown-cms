@@ -1,8 +1,6 @@
 'use strict';
 
-let Pane = require('./Pane');
-
-class FormsPane extends Pane {
+class FormsPane extends NavbarPane {
     /**
      * Event: Click create new form
      */

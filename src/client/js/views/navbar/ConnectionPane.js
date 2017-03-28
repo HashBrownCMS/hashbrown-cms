@@ -1,8 +1,6 @@
 'use strict';
 
-let Pane = require('./Pane');
-
-class ConnectionPane extends Pane {
+class ConnectionPane extends NavbarPane {
     /**
      * Event: Click new connection
      */

@@ -1,11 +1,5 @@
 'use strict';
 
-// Views
-let MessageModal = require('../MessageModal');
-
-// Models
-let Content = require('../../../../common/models/Content');
-
 // Panes
 let CMSPane = require('./CMSPane');
 let ConnectionPane = require('./ConnectionPane');

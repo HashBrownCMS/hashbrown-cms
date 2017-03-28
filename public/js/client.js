@@ -71,8 +71,10 @@
 
 	// Main views
 	window.MainMenu = __webpack_require__(69);
+	window.NavbarPane = __webpack_require__(130);
 	window.NavbarMain = __webpack_require__(70);
 	window.MediaViewer = __webpack_require__(139);
+	window.MediaBrowser = __webpack_require__(171);
 
 	// Field editors
 	__webpack_require__(140);
@@ -87,10 +89,10 @@
 	window.SyncSettings = __webpack_require__(168);
 	window.ProvidersSettings = __webpack_require__(169);
 	window.UserEditor = __webpack_require__(170);
-	window.MediaBrowser = __webpack_require__(171);
 
 	// Models
 	window.Content = __webpack_require__(172);
+	window.Schema = __webpack_require__(186);
 	window.Media = __webpack_require__(173);
 	window.User = __webpack_require__(175);
 	window.Template = __webpack_require__(176);
@@ -12445,7 +12447,7 @@
 
 	'use strict';
 
-	// Views
+	// Panes
 
 	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
@@ -12457,12 +12459,6 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var MessageModal = __webpack_require__(60);
-
-	// Models
-	var Content = __webpack_require__(71);
-
-	// Panes
 	var CMSPane = __webpack_require__(129);
 	var ConnectionPane = __webpack_require__(131);
 	var ContentPane = __webpack_require__(132);
@@ -21160,7 +21156,7 @@
 
 /***/ },
 /* 129 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	'use strict';
 
@@ -21172,10 +21168,8 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var Pane = __webpack_require__(130);
-
-	var CMSPane = function (_Pane) {
-	    _inherits(CMSPane, _Pane);
+	var CMSPane = function (_NavbarPane) {
+	    _inherits(CMSPane, _NavbarPane);
 
 	    function CMSPane() {
 	        _classCallCheck(this, CMSPane);
@@ -21205,7 +21199,7 @@
 	    }]);
 
 	    return CMSPane;
-	}(Pane);
+	}(NavbarPane);
 
 	module.exports = CMSPane;
 
@@ -21336,17 +21330,6 @@
 
 	                var newIndex = containerIndex + 1;
 
-	                // If the container after the one we are trying to get below, accommodate by clamping below that neighbour's index
-	                var $afterContainer = $container.next();
-
-	                if ($afterContainer.length > 0) {
-	                    var indexAfterContainer = parseInt($afterContainer.data('sort') || 0);
-
-	                    if (newIndex >= indexAfterContainer) {
-	                        newIndex = indexAfterContainer - 1;
-	                    }
-	                }
-
 	                // Reset the move state
 	                reset();
 
@@ -21406,7 +21389,7 @@
 
 /***/ },
 /* 131 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	'use strict';
 
@@ -21418,10 +21401,8 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var Pane = __webpack_require__(130);
-
-	var ConnectionPane = function (_Pane) {
-	    _inherits(ConnectionPane, _Pane);
+	var ConnectionPane = function (_NavbarPane) {
+	    _inherits(ConnectionPane, _NavbarPane);
 
 	    function ConnectionPane() {
 	        _classCallCheck(this, ConnectionPane);
@@ -21626,13 +21607,13 @@
 	    }]);
 
 	    return ConnectionPane;
-	}(Pane);
+	}(NavbarPane);
 
 	module.exports = ConnectionPane;
 
 /***/ },
 /* 132 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	'use strict';
 
@@ -21644,10 +21625,8 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var Pane = __webpack_require__(130);
-
-	var ContentPane = function (_Pane) {
-	    _inherits(ContentPane, _Pane);
+	var ContentPane = function (_NavbarPane) {
+	    _inherits(ContentPane, _NavbarPane);
 
 	    function ContentPane() {
 	        _classCallCheck(this, ContentPane);
@@ -22143,13 +22122,13 @@
 	    }]);
 
 	    return ContentPane;
-	}(Pane);
+	}(NavbarPane);
 
 	module.exports = ContentPane;
 
 /***/ },
 /* 133 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	'use strict';
 
@@ -22161,10 +22140,8 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var Pane = __webpack_require__(130);
-
-	var FormsPane = function (_Pane) {
-	    _inherits(FormsPane, _Pane);
+	var FormsPane = function (_NavbarPane) {
+	    _inherits(FormsPane, _NavbarPane);
 
 	    function FormsPane() {
 	        _classCallCheck(this, FormsPane);
@@ -22377,13 +22354,13 @@
 	    }]);
 
 	    return FormsPane;
-	}(Pane);
+	}(NavbarPane);
 
 	module.exports = FormsPane;
 
 /***/ },
 /* 134 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	'use strict';
 
@@ -22395,10 +22372,8 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var Pane = __webpack_require__(130);
-
-	var MediaPane = function (_Pane) {
-	    _inherits(MediaPane, _Pane);
+	var MediaPane = function (_NavbarPane) {
+	    _inherits(MediaPane, _NavbarPane);
 
 	    function MediaPane() {
 	        _classCallCheck(this, MediaPane);
@@ -22585,7 +22560,7 @@
 	    }]);
 
 	    return MediaPane;
-	}(Pane);
+	}(NavbarPane);
 
 	// Settings
 
@@ -22596,7 +22571,7 @@
 
 /***/ },
 /* 135 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	'use strict';
 
@@ -22608,10 +22583,8 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var Pane = __webpack_require__(130);
-
-	var SchemaPane = function (_Pane) {
-	    _inherits(SchemaPane, _Pane);
+	var SchemaPane = function (_NavbarPane) {
+	    _inherits(SchemaPane, _NavbarPane);
 
 	    function SchemaPane() {
 	        _classCallCheck(this, SchemaPane);
@@ -22820,13 +22793,13 @@
 	    }]);
 
 	    return SchemaPane;
-	}(Pane);
+	}(NavbarPane);
 
 	module.exports = SchemaPane;
 
 /***/ },
 /* 136 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	'use strict';
 
@@ -22838,10 +22811,8 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var Pane = __webpack_require__(130);
-
-	var SettingsPane = function (_Pane) {
-	    _inherits(SettingsPane, _Pane);
+	var SettingsPane = function (_NavbarPane) {
+	    _inherits(SettingsPane, _NavbarPane);
 
 	    function SettingsPane() {
 	        _classCallCheck(this, SettingsPane);
@@ -22871,13 +22842,13 @@
 	    }]);
 
 	    return SettingsPane;
-	}(Pane);
+	}(NavbarPane);
 
 	module.exports = SettingsPane;
 
 /***/ },
 /* 137 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	'use strict';
 
@@ -22889,10 +22860,8 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var Pane = __webpack_require__(130);
-
-	var TemplatePane = function (_Pane) {
-	    _inherits(TemplatePane, _Pane);
+	var TemplatePane = function (_NavbarPane) {
+	    _inherits(TemplatePane, _NavbarPane);
 
 	    function TemplatePane() {
 	        _classCallCheck(this, TemplatePane);
@@ -23154,7 +23123,7 @@
 	    }]);
 
 	    return TemplatePane;
-	}(Pane);
+	}(NavbarPane);
 
 	module.exports = TemplatePane;
 

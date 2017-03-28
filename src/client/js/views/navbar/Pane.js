@@ -98,17 +98,6 @@ class Pane {
 
             let newIndex = containerIndex + 1;
 
-            // If the container after the one we are trying to get below, accommodate by clamping below that neighbour's index
-            let $afterContainer = $container.next();
-           
-            if($afterContainer.length > 0) {
-                let indexAfterContainer = parseInt($afterContainer.data('sort') || 0);
-
-                if(newIndex >= indexAfterContainer) {
-                    newIndex = indexAfterContainer - 1;
-                }
-            }
-
             // Reset the move state
             reset();
 

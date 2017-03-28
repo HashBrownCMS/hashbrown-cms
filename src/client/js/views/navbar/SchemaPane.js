@@ -1,8 +1,6 @@
 'use strict';
 
-let Pane = require('./Pane');
-
-class SchemaPane extends Pane {
+class SchemaPane extends NavbarPane {
     /**
      * Event: Click remove schema
      */

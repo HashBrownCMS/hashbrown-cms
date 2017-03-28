@@ -1,8 +1,6 @@
 'use strict';
 
-let Pane = require('./Pane');
-
-class ContentPane extends Pane {
+class ContentPane extends NavbarPane {
     /**
      * Event: Change parent
      */
