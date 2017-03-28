@@ -105,9 +105,9 @@ class MainMenu extends View {
                         break;
                     case 'providers':
                         UI.messageModal('Providers settings', [
-                            _.p('Providers are Connections set up to serve static Media and Templates.'),
-                            _.p('For example, when a Connection is assigned as the Media provider, the images and other content in the <a href="#/media/">Media gallery</a> are pulled from that connection.'),
-                            _.p('Similarly, if a Connection is assigned as the Template provider, the available <a href="#/templates/">Templates</a> will be pulled from that Connection.')
+                            _.p('Providers are <a href="#/connections/">Connections</a> set up to serve static <a href="#/media/">Media</a> and <a href="#/template/">Templates</a>.'),
+                            _.p('For example, when a <a href="#/connections/">Connection</a> is assigned as the <a href="#/media/">Media</a> provider, the images and other content in the <a href="#/media/">Media gallery</a> are pulled from that connection.'),
+                            _.p('Similarly, if a <a href="#/connections/">Connection</a> is assigned as the <a href="#/templates/">Template</a> provider, the available <a href="#/templates/">Templates</a> will be pulled from that <a href="#/connections/">Connection</a>.')
                         ]);
                         break;
                     default:

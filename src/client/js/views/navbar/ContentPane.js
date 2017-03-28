@@ -65,46 +65,6 @@ class ContentPane extends Pane {
     }
 
     /**
-     * Event: Click copy content
-     */
-    static onClickCopyContent() {
-        let navbar = ViewHelper.get('NavbarMain');
-        let id = $('.context-menu-target-element').data('id');
-
-        // Event when pasting the copied Content
-        this.onClickPasteContent = function onClickPasteContent() {
-            let parentId = $('.context-menu-target-element').data('id');
-            let newContentId;
-          
-            // API call to get copied Content model 
-            apiCall('get', 'content/' + id)
-
-            // Remove the id and call the API to create a new Content node
-            .then((copiedContent) => {
-                delete copiedContent['id'];
-
-                return apiCall('post', 'content/new/' + copiedContent.schemaId + '?parent=' + parentId, copiedContent.properties);
-            })
-
-            // Upon success, reload all Content models
-            .then((newContent) => {
-                newContentId = newContent.id;
-
-                return reloadResource('content');
-            })
-
-            // Reload the UI
-            .then(() => {
-                navbar.reload();
-                navbar.onClickPasteContent = null;
-
-                location.hash = '/content/' + newContentId; 
-            })
-            .catch(UI.errorModal);
-        }
-    }
-    
-    /**
      * Event: Click pull content
      */
     static onClickPullContent() {
@@ -469,20 +429,11 @@ class ContentPane extends Pane {
                 
                 menu['This content'] = '---';
                 
-                menu['New content'] = () => {
-                    let targetId = $('.context-menu-target-element').data('id');
-                    let parentId = ContentHelper.getContentByIdSync(targetId).parentId;
-                    
-                    this.onClickNewContent(parentId);
-                };
-                
                 menu['New child content'] = () => {
                     this.onClickNewContent($('.context-menu-target-element').data('id'));
                 };
                                 
-                menu['Copy'] = () => { this.onClickCopyContent(); };
                 menu['Copy id'] = () => { this.onClickCopyItemId(); };
-                menu['Paste'] = () => { if(this.onClickPasteContent) { this.onClickPasteContent(); } else { UI.messageModal('Paste content', 'Nothing to paste'); } };
 
                 if(!item.remote && !item.locked) {
                     menu['Move'] = () => { this.onClickMoveItem(); };
@@ -491,6 +442,15 @@ class ContentPane extends Pane {
                 if(!item.local && !item.locked) {
                     menu['Remove'] = () => { this.onClickRemoveContent(true); };
                 }
+                
+                menu['Folder'] = '---';
+
+                menu['New content'] = () => {
+                    let targetId = $('.context-menu-target-element').data('id');
+                    let parentId = ContentHelper.getContentByIdSync(targetId).parentId;
+                    
+                    this.onClickNewContent(parentId);
+                };
 
                 if(!item.remote && !item.locked) {
                     menu['Settings'] = '---';
@@ -498,7 +458,7 @@ class ContentPane extends Pane {
                 }
                 
                 if(item.locked && !item.remote) { isContentSyncEnabled = false; }
-                
+               
                 if(isContentSyncEnabled) {
                     menu['Sync'] = '---';
                     

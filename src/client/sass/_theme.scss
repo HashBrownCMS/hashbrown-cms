@@ -1,28 +1,3 @@
-@font-face {
-    font-family: 'Roboto';
-    font-weight: normal;
-    src: url('/fonts/Roboto/Roboto-Regular.ttf');
-}
-
-@font-face {
-    font-family: 'Roboto';
-    font-weight: bold;
-    src: url('/fonts/Roboto/Roboto-Bold.ttf');
-}
-
-@font-face {
-    font-family: 'RobotoMono';
-    font-weight: normal;
-    src: url('/fonts/Roboto_Mono/RobotoMono-Regular.ttf');
-}
-
-html, body {
-    height: 100%;
-    font-family: 'Roboto', sans-serif;
-    font-size: 14px;
-    background-color: material-color('grey', '200');
-}
-
 // Dragdrop
 #dragdrop-placeholder, *[data-dragdrop-unsorted="true"][data-dragdrop-hovering="true"] {
     border: 2px dashed $primary;
@@ -32,68 +7,6 @@ html, body {
 button, a {
     &, &:focus, &:hover, &:active, &:active:focus {
         outline: none !important;
-    }
-}
-
-// Carousel
-.carousel {
-    .carousel-indicators {
-        bottom: 20px;
-        opacity: 0.75;
-
-        li {
-            border: 0px;
-            background-color: material-color('grey', '200');
-            margin: 5px;
-            transition: background-color 0.25s ease;
-            width: 14px;
-            height: 14px;
-            
-            &.active {
-                background-color: material-color('grey', '600');
-                margin: 5px;
-                width: 14px;
-                height: 14px;
-            }
-        }
-    }
-
-    .carousel-control {
-        background: none;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-direction: column;
-        opacity: 0; 
-
-        &:hover {
-            opacity: 1;
-        }
-       
-        &.left {
-            align-items: flex-start;
-
-            .fa {
-                border-top-right-radius: 2px;
-                border-bottom-right-radius: 2px;
-            }
-        }
-        
-        &.right {
-            align-items: flex-end;
-
-            .fa {
-                border-top-left-radius: 2px;
-                border-bottom-left-radius: 2px;
-            }
-        }
-
-        .fa {
-            width: 60px;
-            padding: 15px;
-            text-shadow: none;
-            color: $primary;
-        }
     }
 }
 

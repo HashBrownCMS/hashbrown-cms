@@ -157,6 +157,19 @@
                             }
 
                             &:not(.moving-item) {
+                                &[data-is-directory="true"] >.pane-item:hover,
+                                .pane-item-insert-below:hover {
+                                    &:after {
+                                        font-family: inherit;
+                                        opacity: 1;
+                                        font-weight: bold;
+                                        color: $primary-text;
+                                        content: "MOVE HERE";
+                                        display: block;
+                                        white-space: nowrap;
+                                    }
+                                }
+
                                 &[data-is-directory="true"] {
                                     >.pane-item:hover {
                                         background-color: $primary;
@@ -167,16 +180,13 @@
                                 .pane-item-insert-below {
                                     display: block;
                             
-                                    &:hover:before {
-                                        display: block;
-                                        content: '';
-                                        position: absolute;
-                                        height: 2px;
-                                        width: 100%;
+                                    &:hover {
                                         background-color: $primary;
-                                        bottom: 4px;
-                                        left: 0px;           
-                                    }                         
+                                        height: 30px;
+                                        line-height: 30px;
+                                        text-align: right;
+                                        padding-right: 15px;
+                                    }
                                 }
                             }
 
@@ -338,6 +348,7 @@
                             background-color: transparent;
                             cursor: pointer;
                             display: none;
+                            transform: translateY(50%);
                         }                         
 
                         .pane-item {

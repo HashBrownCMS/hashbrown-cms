@@ -129,7 +129,7 @@ class Pane {
             this.onChangeDirectory(id, newPath);
         });
         
-        $pane.find('.pane-move-buttons .btn-new-folder').toggle(this.canCreateDirectory == true);
+        $pane.find('.pane-move-buttons').toggle(this.canCreateDirectory == true);
 
         if(this.canCreateDirectory) {
             $pane.find('.pane-move-buttons .btn-new-folder').on('click', () => {

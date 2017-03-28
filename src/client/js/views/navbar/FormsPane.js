@@ -150,7 +150,6 @@ class FormsPane extends Pane {
                 let isSyncEnabled = SettingsHelper.getCachedSettings('sync').enabled == true;
                 
                 menu['This form'] = '---';
-                menu['Copy'] = () => { this.onClickCopyForm(); };
                 menu['Copy id'] = () => { this.onClickCopyItemId(); };
 
                 if(!item.local && !item.remote && !item.locked) {
@@ -181,8 +180,7 @@ class FormsPane extends Pane {
             // General context menu
             paneContextMenu: {
                 'Forms': '---',
-                'New form': () => { this.onClickNewForm(); },
-                'Paste': () => { this.onClickPasteForm(); }
+                'New form': () => { this.onClickNewForm(); }
             }
         });
     }

@@ -12362,7 +12362,7 @@
 	                            UI.messageModal('Sync settings', 'Syncing lets you connect this HashBrown instance to another. When syncing is active, you can pull or push Content, Schemas, Forms and Connections between the local and the remote instance.');
 	                            break;
 	                        case 'providers':
-	                            UI.messageModal('Providers settings', [_.p('Providers are Connections set up to serve static Media and Templates.'), _.p('For example, when a Connection is assigned as the Media provider, the images and other content in the <a href="#/media/">Media gallery</a> are pulled from that connection.'), _.p('Similarly, if a Connection is assigned as the Template provider, the available <a href="#/templates/">Templates</a> will be pulled from that Connection.')]);
+	                            UI.messageModal('Providers settings', [_.p('Providers are <a href="#/connections/">Connections</a> set up to serve static <a href="#/media/">Media</a> and <a href="#/template/">Templates</a>.'), _.p('For example, when a <a href="#/connections/">Connection</a> is assigned as the <a href="#/media/">Media</a> provider, the images and other content in the <a href="#/media/">Media gallery</a> are pulled from that connection.'), _.p('Similarly, if a <a href="#/connections/">Connection</a> is assigned as the <a href="#/templates/">Template</a> provider, the available <a href="#/templates/">Templates</a> will be pulled from that <a href="#/connections/">Connection</a>.')]);
 	                            break;
 	                        default:
 	                            UI.messageModal('Settings', 'Here you can edit environment-specific settings');
@@ -21367,7 +21367,7 @@
 	                _this.onChangeDirectory(id, newPath);
 	            });
 
-	            $pane.find('.pane-move-buttons .btn-new-folder').toggle(this.canCreateDirectory == true);
+	            $pane.find('.pane-move-buttons').toggle(this.canCreateDirectory == true);
 
 	            if (this.canCreateDirectory) {
 	                $pane.find('.pane-move-buttons .btn-new-folder').on('click', function () {
@@ -21721,48 +21721,6 @@
 	        }
 
 	        /**
-	         * Event: Click copy content
-	         */
-
-	    }, {
-	        key: 'onClickCopyContent',
-	        value: function onClickCopyContent() {
-	            var navbar = ViewHelper.get('NavbarMain');
-	            var id = $('.context-menu-target-element').data('id');
-
-	            // Event when pasting the copied Content
-	            this.onClickPasteContent = function onClickPasteContent() {
-	                var parentId = $('.context-menu-target-element').data('id');
-	                var newContentId = void 0;
-
-	                // API call to get copied Content model 
-	                apiCall('get', 'content/' + id)
-
-	                // Remove the id and call the API to create a new Content node
-	                .then(function (copiedContent) {
-	                    delete copiedContent['id'];
-
-	                    return apiCall('post', 'content/new/' + copiedContent.schemaId + '?parent=' + parentId, copiedContent.properties);
-	                })
-
-	                // Upon success, reload all Content models
-	                .then(function (newContent) {
-	                    newContentId = newContent.id;
-
-	                    return reloadResource('content');
-	                })
-
-	                // Reload the UI
-	                .then(function () {
-	                    navbar.reload();
-	                    navbar.onClickPasteContent = null;
-
-	                    location.hash = '/content/' + newContentId;
-	                }).catch(UI.errorModal);
-	            };
-	        }
-
-	        /**
 	         * Event: Click pull content
 	         */
 
@@ -22101,29 +22059,12 @@
 
 	                    menu['This content'] = '---';
 
-	                    menu['New content'] = function () {
-	                        var targetId = $('.context-menu-target-element').data('id');
-	                        var parentId = ContentHelper.getContentByIdSync(targetId).parentId;
-
-	                        _this3.onClickNewContent(parentId);
-	                    };
-
 	                    menu['New child content'] = function () {
 	                        _this3.onClickNewContent($('.context-menu-target-element').data('id'));
 	                    };
 
-	                    menu['Copy'] = function () {
-	                        _this3.onClickCopyContent();
-	                    };
 	                    menu['Copy id'] = function () {
 	                        _this3.onClickCopyItemId();
-	                    };
-	                    menu['Paste'] = function () {
-	                        if (_this3.onClickPasteContent) {
-	                            _this3.onClickPasteContent();
-	                        } else {
-	                            UI.messageModal('Paste content', 'Nothing to paste');
-	                        }
 	                    };
 
 	                    if (!item.remote && !item.locked) {
@@ -22137,6 +22078,15 @@
 	                            _this3.onClickRemoveContent(true);
 	                        };
 	                    }
+
+	                    menu['Folder'] = '---';
+
+	                    menu['New content'] = function () {
+	                        var targetId = $('.context-menu-target-element').data('id');
+	                        var parentId = ContentHelper.getContentByIdSync(targetId).parentId;
+
+	                        _this3.onClickNewContent(parentId);
+	                    };
 
 	                    if (!item.remote && !item.locked) {
 	                        menu['Settings'] = '---';
@@ -22376,9 +22326,6 @@
 	                    var isSyncEnabled = SettingsHelper.getCachedSettings('sync').enabled == true;
 
 	                    menu['This form'] = '---';
-	                    menu['Copy'] = function () {
-	                        _this2.onClickCopyForm();
-	                    };
 	                    menu['Copy id'] = function () {
 	                        _this2.onClickCopyItemId();
 	                    };
@@ -22423,9 +22370,6 @@
 	                    'Forms': '---',
 	                    'New form': function NewForm() {
 	                        _this2.onClickNewForm();
-	                    },
-	                    'Paste': function Paste() {
-	                        _this2.onClickPasteForm();
 	                    }
 	                }
 	            });
@@ -22606,7 +22550,7 @@
 	                    'Replace': function Replace() {
 	                        _this2.onClickReplaceMedia();
 	                    },
-	                    'Directory': '---',
+	                    'Folder': '---',
 	                    'Upload new media': function UploadNewMedia() {
 	                        _this2.onClickUploadMedia();
 	                    }

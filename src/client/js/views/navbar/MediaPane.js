@@ -139,7 +139,7 @@ class MediaPane extends Pane {
                 'Move': () => { this.onClickMoveItem(); },
                 'Remove': () => { this.onClickRemoveMedia(); },
                 'Replace': () => { this.onClickReplaceMedia(); },
-                'Directory': '---',
+                'Folder': '---',
                 'Upload new media': () => { this.onClickUploadMedia(); }
             },
 
