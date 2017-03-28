@@ -94,6 +94,7 @@ class SyncHelper {
                             if(data instanceof Object) {
                                 data.locked = true;
                                 data.remote = true;
+                                data.local = false;
                             }
 
                             debug.log('Remote resource item ' + remoteResourceName + '/' + remoteItemName + ' retrieved successfully', this, 3);
@@ -132,7 +133,7 @@ class SyncHelper {
         .then((settings) => {
             return new Promise((resolve, reject) => {
                 if(settings && settings.enabled && settings[remoteResourceName]) {
-                    debug.log('Posting remote resource item ' + remoteResourceName + '/' + remoteItemName + ' for ' + project + '/' + environment + '...', this, 2);
+                    debug.log('Posting remote resource item ' + remoteResourceName + '/' + remoteItemName + ' for ' + project + '/' + environment + '...', this, 3);
                    
                     let headers = {
                         'Content-Type': 'application/json'
@@ -150,10 +151,9 @@ class SyncHelper {
                             reject(new Error(data));
                         
                         } else {
-                            debug.log('Remote resource item ' + remoteResourceName + '/' + remoteItemName + ' posted successfully', this, 2);
+                            debug.log('Remote resource item ' + remoteResourceName + '/' + remoteItemName + ' posted successfully', this, 3);
                             
                             resolve(true);
-                        
                         }
                     });
 
@@ -258,6 +258,7 @@ class SyncHelper {
                     } else {
                         remoteItem.locked = true;
                         remoteItem.remote = true;
+                        remoteItem.local = false;
 
                         remoteIds[remoteItem.id] = true;
 
@@ -269,7 +270,10 @@ class SyncHelper {
                     let localItem = localResource[l];
 
                     if(remoteIds[localItem.id] == true) {
+                        localItem.remote = false;
+                        localItem.locked = false;
                         localItem.local = true;
+
                         duplicateIds[localItem.id] = true;
                     }
                 }

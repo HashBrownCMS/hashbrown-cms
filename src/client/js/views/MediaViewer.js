@@ -52,14 +52,7 @@ class MediaViewer extends View {
             ),
             _.div({class: 'media-preview editor-body'},
                 _.if(this.model.isImage(),
-                    _.img({src: mediaSrc}).on('load', () => {
-                        let img = new Image();
-                        img.src = mediaSrc;
-
-                        this.$element.find('.media-data').append(
-                            ' (' + img.width + 'x' + img.height + ')'
-                        );
-                    })
+                    _.img({src: mediaSrc})
                 ),
                 _.if(this.model.isVideo(),
                     _.video({controls: true, src: mediaSrc})

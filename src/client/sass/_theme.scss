@@ -241,21 +241,20 @@ button, a {
     background-color: material-color('grey', '300');
     position: relative;
 
-    &:not([style]), &[style=""] {
-        &:before {
-            content: '\f1c5';
-            transform: translate(-50%, -50%);
-            display: block;
-            position: absolute;
-            left: 50%;
-            top: 50%;
-            font-family: 'FontAwesome';
-            font-size: 60px;
-            color: material-color('grey', '500');
-        }
+    &:before {
+        content: '\f1c5';
+        transform: translate(-50%, -50%);
+        display: block;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        font-family: 'FontAwesome';
+        font-size: 60px;
+        color: material-color('grey', '500');
     }
 
     label {
+        opacity: 0.75;
         min-height: 41.5px;
         pointer-events: none;
         position: absolute;

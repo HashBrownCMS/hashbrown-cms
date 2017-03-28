@@ -178,12 +178,16 @@ class HashBrownDriverConnection extends Connection {
         debug.log('Setting media object "' + id + '" at ' + this.getRemoteUrl() + '...', this);
     
         // First remove any existing media
-        this.removeMedia(id)
+        return this.removeMedia(id)
         .then(() => {
             return new Promise((resolve, reject) => {
                 let apiUrl = this.getRemoteUrl() + '/hashbrown/api/media/' + id + '?token=' + this.settings.token;
-                
+              
                 fs.readFile(tempPath, (err, fileData) => {
+					if(!fileData) {
+						return reject(new Error('Could not read temporary file at "' + tempPath + '"'));
+					}
+
                     let postData = { 
                         filename: file.filename,
                         content: new Buffer(fileData).toString('base64')

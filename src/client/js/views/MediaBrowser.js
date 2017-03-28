@@ -121,7 +121,7 @@ class MediaBrowser extends View {
 
                 uploadModal.$element.find('.spinner-container').toggleClass('hidden', false);
 
-                let apiPath = 'media/' + (replaceId ? replaceId : 'new');
+                let apiPath = 'media/' + (replaceId ? 'replace/' + replaceId : 'new');
 
                 $.ajax({
                     url: apiUrl(apiPath),

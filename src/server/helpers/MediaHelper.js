@@ -16,9 +16,11 @@ class MediaHelper extends MediaHelperCommon {
     /**
      * Gets the upload handler
      *
+     * @param {Boolean} isSingleFile
+     *
      * @return {Function} handler
      */
-    static getUploadHandler() {
+    static getUploadHandler(isSingleFile) {
         let handler = multer({
             storage: multer.diskStorage({
                 destination: (req, file, resolve) => {
@@ -51,10 +53,12 @@ class MediaHelper extends MediaHelperCommon {
                 }
             })
         })
-        
-        //return handler.single('media'); <- Used for single Media files
-        
-        return handler.array('media', 100);
+       
+        if(isSingleFile) {
+            return handler.single('media');
+        } else {
+            return handler.array('media', 100);
+        }
     }
 
     /**

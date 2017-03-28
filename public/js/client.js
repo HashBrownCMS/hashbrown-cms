@@ -23624,12 +23624,7 @@
 
 	            var mediaSrc = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + this.model.id;
 
-	            this.$element.empty().append(_.div({ class: 'editor-header media-heading' }, _.span({ class: 'fa fa-file-image-o' }), _.h4({ class: 'media-title' }, this.model.name, _.span({ class: 'media-data' }, this.model.getContentTypeHeader()))), _.div({ class: 'media-preview editor-body' }, _.if(this.model.isImage(), _.img({ src: mediaSrc }).on('load', function () {
-	                var img = new Image();
-	                img.src = mediaSrc;
-
-	                _this2.$element.find('.media-data').append(' (' + img.width + 'x' + img.height + ')');
-	            })), _.if(this.model.isVideo(), _.video({ controls: true, src: mediaSrc }))), _.div({ class: 'editor-footer' }, _.input({ class: 'form-control', value: this.model.folder, placeholder: 'Type folder path here' }).change(function (e) {
+	            this.$element.empty().append(_.div({ class: 'editor-header media-heading' }, _.span({ class: 'fa fa-file-image-o' }), _.h4({ class: 'media-title' }, this.model.name, _.span({ class: 'media-data' }, this.model.getContentTypeHeader()))), _.div({ class: 'media-preview editor-body' }, _.if(this.model.isImage(), _.img({ src: mediaSrc })), _.if(this.model.isVideo(), _.video({ controls: true, src: mediaSrc }))), _.div({ class: 'editor-footer' }, _.input({ class: 'form-control', value: this.model.folder, placeholder: 'Type folder path here' }).change(function (e) {
 	                _this2.onChangeFolder($(e.target).val());
 	            })));
 	        }
@@ -34209,7 +34204,7 @@
 
 	                    uploadModal.$element.find('.spinner-container').toggleClass('hidden', false);
 
-	                    var apiPath = 'media/' + (replaceId ? replaceId : 'new');
+	                    var apiPath = 'media/' + (replaceId ? 'replace/' + replaceId : 'new');
 
 	                    $.ajax({
 	                        url: apiUrl(apiPath),

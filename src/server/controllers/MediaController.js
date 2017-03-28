@@ -23,6 +23,7 @@ class MediaController extends ApiController {
         app.post('/api/:project/:environment/media/new', this.middleware(), MediaHelper.getUploadHandler(), this.createMedia);
         app.post('/api/:project/:environment/media/tree/:id', this.middleware(), this.setMediaTreeItem);
         app.post('/api/:project/:environment/media/:id', this.middleware(), MediaHelper.getUploadHandler(), this.setMedia);
+        app.post('/api/:project/:environment/media/replace/:id', this.middleware(), MediaHelper.getUploadHandler(true), this.setMedia);
         
         app.delete('/api/:project/:environment/media/:id', this.middleware(), this.deleteMedia);
     }
@@ -183,11 +184,15 @@ class MediaController extends ApiController {
      * Sets a Media object
      */
     static setMedia(req, res) {
+        let file = req.file;
         let files = req.files;
         let id = req.params.id;
 
-        if(files.length > 0) {
-            let file = files[0];
+        if(!file && files && files.length > 0) {
+            file = files[0];
+        }
+
+        if(file) {
 
             ConnectionHelper.getMediaProvider(req.project, req.environment)
             .then((connection) => {
