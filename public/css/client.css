@@ -320,7 +320,7 @@ html, body {
   height: 100%;
   font-family: 'Roboto', sans-serif;
   font-size: 14px;
-  background-color: #ffffff;
+  background-color: #eeeeee;
   overflow: hidden; }
 
 *[data-dragdrop-enabled="true"], *[data-dragdrop-enabled="true"] * {
