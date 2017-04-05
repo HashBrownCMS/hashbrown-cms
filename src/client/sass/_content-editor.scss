@@ -1,0 +1,142 @@
+@import './fields/_struct-editor';
+@import './fields/_string-editor';
+@import './fields/_date-editor';
+@import './fields/_array-editor';
+@import './fields/_media-reference-editor';
+@import './fields/_rich-text-editor';
+@import './fields/_tags-editor';
+@import './fields/_content-reference-editor';
+
+.cms-container {
+    .workspace {
+        .content-editor {
+            height: 100%;
+
+            // First level
+            >.object {
+                display: flex;
+                flex-direction: column;
+                height: 100%;
+
+                >.nav-tabs {
+                    padding-top: 15px !important;
+                    padding-left: 15px !important;
+                }
+
+                >.tab-content {
+                    flex-grow: 1;
+                    overflow-y: auto;
+
+                    >.tab-pane {
+                        max-width: 1200px;
+                    }
+                }
+
+                // Language picker
+                .language-picker {
+                    position: absolute;
+                    top: 10px;
+                    right: 10px;
+                    z-index: 200;
+                    text-transform: uppercase;
+                    font-weight: 700;
+
+                    button {
+                        text-transform: uppercase;
+                    }
+
+                    span {
+                        margin-right: 1em;
+                    }
+
+                    .dropdown-toggle {
+                        background-color: transparent;
+                        border: 0px;
+                        color: #fff;
+
+                        .fa {
+                            margin-left: 0.5em;
+                            margin-right: 0px;
+                        }
+                    }
+
+                    .dropdown-menu {
+                        width: 100%;
+                        min-width: 0px;
+                        margin-top: -1px;
+                        border-radius: 0px;
+                        padding: 0px;
+                        border: 0px;
+                        background-color: material-color('grey', '200');
+
+                        @extend .raised;
+
+                        li {
+                            a {
+                                text-transform: uppercase;
+                                font-weight: bold;
+                                text-align: center;
+                                font-size: 12px;
+                                padding: 5px 0px;
+                                display: block;
+
+                                &:hover {
+                                    background-color: material-color('grey', '300');
+                                }
+                            }
+                        }
+                    }
+                }
+
+            }
+
+            // Every subsequent level
+            .object {
+                .tab-content {
+                    padding: 15px;
+                }
+            }
+
+            // Buttons
+            .editor-footer {
+                .btn-group {
+                    .btn-group-save-publish {
+                        padding: 0px;
+                        color: #fff;
+                        display: flex;
+                        background-color: transparent;
+
+                        >span, .form-control, .btn {
+                            margin: 0px;
+                            display: block;
+                            font-weight: 700;
+                            text-transform: uppercase;
+                            line-height: 34px;
+                            font-size: 12px;
+                            padding-top: 0px;
+                            padding-bottom: 0px;
+                            border: 0px;
+                        }
+
+                        .btn {
+                            border-top-right-radius: 0px;
+                            border-bottom-right-radius: 0px;
+                        }
+
+                        >span {
+                            background-color: $primary;
+                            color: $primary-text;
+                            padding-left: 10px;
+                        }
+
+                        .form-control {
+                            background-color: $primary;
+                            border-top-left-radius: 0px;
+                            border-bottom-left-radius: 0px;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

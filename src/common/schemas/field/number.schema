@@ -1,0 +1,6 @@
+{
+    "parentSchemaId": "fieldBase",
+    "editorId": "number",
+    "icon": "sort-numeric-asc",
+    "name": "Number"
+}

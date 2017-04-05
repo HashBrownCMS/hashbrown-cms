@@ -1,0 +1,40 @@
+.dashboard-container.welcome {
+    .carousel {
+        @extend .raised;
+        padding: 0px;
+        margin: 30px auto;
+
+        .item {
+            &.active, &.next, &.prev {
+                display: flex;
+            }
+
+            >div {
+                width: 50%;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                position: relative;
+                overflow: hidden;
+                height: 100%;
+                background-color: $secondary;
+                color: $secondary-text;
+
+                img {
+                    position: absolute;
+                    height: 100%;
+                    top: 0px;
+                    left: 0px;
+                }
+
+                p, h2 {
+                    position: relative;
+                    z-index: 20;
+                    width: calc(100% - 100px);
+                    text-align: justify;
+                }
+            }
+        } 
+    }
+}

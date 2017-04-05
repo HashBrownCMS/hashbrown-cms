@@ -1,0 +1,6 @@
+{
+    "parentSchemaId": "fieldBase",
+    "editorId": "dropdown",
+    "icon": "list-alt",
+    "name": "Dropdown"
+}

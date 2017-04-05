@@ -1,0 +1,56 @@
+{
+    "defaultTabId": "meta",
+    "icon": "cogs",
+    "name": "Content Base",
+    "fields": {
+        "createDate": {
+            "disabled": "true",
+            "label": "Created at",
+            "schemaId": "date"
+        },
+        "updateDate": {
+            "disabled": "true",
+            "label": "Updated at",
+            "schemaId": "date"
+        },
+        "createdBy": {
+            "disabled": "true",
+            "label": "Created by",
+            "schemaId": "resourceReference",
+            "config": {
+                "resource": "users",
+                "resourceKeys": ["fullName", "username"]
+            }
+        },
+        "updatedBy": {
+            "disabled": "true",
+            "label": "Updated by",
+            "schemaId": "resourceReference",
+            "config": {
+                "resource": "users",
+                "resourceKeys": ["fullName", "username"]
+            }
+        },
+        "publishOn": {
+            "label": "Publish on",
+            "schemaId": "date"
+        },
+        "unpublishOn": {
+            "label": "Unpublish on",
+            "schemaId": "date"
+        },
+        "schemaId": {
+            "label": "Schema",
+            "schemaId": "contentSchemaReference",
+            "config": {
+                "allowedSchemas": "fromParent"
+            }
+        },
+        "properties": {
+            "title": {
+                "label": "Title",
+                "schemaId": "string"
+            }
+        }
+    }
+}

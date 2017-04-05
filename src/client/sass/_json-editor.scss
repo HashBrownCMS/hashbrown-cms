@@ -1,0 +1,38 @@
+.template-editor, .json-editor {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    
+    .CodeMirror {
+        height: 100%;
+        display: block;
+        width: 100%;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+    }
+
+    .btn-prettify {
+        position: absolute;
+        top: calc(100% - 1em);
+        right: 1em;
+        transform: translateY(-100%)
+    }
+
+    .error {
+        position: absolute;
+        right: 0px;
+        bottom: 0px;
+        z-index: 20;
+        pointer-events: none;
+        background-color: $warning;
+        color: $warning-text;
+        padding: 15px;
+        border-bottom-left-radius: 2px;
+
+        .error-heading {
+            font-weight: 700;
+            padding: 0px 0px 5px 0px;
+        }
+    }
+}

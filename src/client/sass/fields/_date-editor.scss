@@ -1,0 +1,132 @@
+.modal.date-picker {
+    .modal-dialog {
+        max-width: 330px;
+
+        .modal-header {
+            background-color: $secondary;
+            color: #fff;
+        }
+
+        .modal-body {
+            .date-picker-top-nav {
+                display: flex;
+
+                span {
+                    flex-grow: 1;
+                    text-align: center;
+                    line-height: 24px;
+                    font-size: 14px;
+                    font-weight: 700;
+                }
+
+                .btn {
+                    flex-shrink: 0;
+                    flex-grow: 0;
+                    padding: 0px 12px;
+                    font-size: 24px;
+                    width: 42px;
+
+                    .fa {
+                        position: relative;
+                        top: -2px;
+                    }
+                }
+            }
+
+            .date-picker-weekdays {
+                display: flex;
+
+                span {
+                    display: block;
+                    width: 42px;
+                    text-align: center;
+                    color: $standard-text;
+                    font-weight: 700;
+                    line-height: 42px;
+                }
+            }
+
+            .date-picker-days {
+                display: flex;
+                flex-wrap: wrap;
+
+                .btn {
+                    position: relative;
+                    display: block;
+                    width: 42px;
+                    height: 42px;
+                    
+                    &:not(.current) {
+                        color: $standard-text;
+                    }
+
+                    &.active {
+                        box-shadow: none;
+                        background-color: $primary;
+                        border-radius: 50%;
+                        color: $primary-text;
+                    }
+                }
+            }
+
+            .date-picker-time {
+                padding: 15px 0px;
+                display: flex;
+
+                .date-picker-time-separator {
+                    font-size: 18px;
+                    color: $standard-text;
+                    font-weight: bold;
+                    line-height: 40px;
+                }
+
+                .dropdown {
+                    display: block;
+                    flex-grow: 1;
+                    width: 50%;
+                    flex-basis: 50%;
+
+                    &.open {
+                        .dropdown-toggle {
+                            &:before {
+                                display: none;
+                            }
+                        }
+                    }
+
+                    button {
+                        .fa, .caret {
+                            display: none;
+                        }
+                    }
+                            
+                    button, li {
+                        line-height: 40px;
+                        height: 40px;
+                        width: 100%;
+                        background-color: #fff;
+                    }
+
+                    ul {
+                        max-height: 100px;
+                        overflow-y: auto;
+                    }
+                }
+            }
+        }
+    }
+}
+
+.date-editor {
+    min-width: 130px;
+    position: relative;
+    max-width: 200px;
+
+    .btn-remove {
+        top: 5px;
+    }
+
+    .btn-edit {
+        max-width: 140px;
+    }
+}

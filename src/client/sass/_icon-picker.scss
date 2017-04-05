@@ -1,0 +1,37 @@
+.modal.modal-icon-picker {
+    .modal-dialog {
+        width: calc(100% - 30px);
+        max-width: 900px;
+    }
+
+
+    .modal-body {
+        display: flex;
+        flex-wrap: wrap;
+
+        .icon-search {
+            margin-bottom: 15px;
+            width: 100%;
+            flex-basis: 100%;
+        }
+
+        .btn-icon {
+            text-align: center;
+            background-color: transparent;
+            width: 10%;
+
+            .fa {
+                font-size: 20px;
+            }
+
+            .icon-name {
+                width: 100%;
+                display: block;
+                font-size: 10px;
+                color: material-color('grey', '600');
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+        }
+    }
+}

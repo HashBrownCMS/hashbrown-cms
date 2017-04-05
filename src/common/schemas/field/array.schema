@@ -1,0 +1,6 @@
+{
+    "parentSchemaId": "fieldBase",
+    "editorId": "array",
+    "icon": "list-ol",
+    "name": "Array"
+}

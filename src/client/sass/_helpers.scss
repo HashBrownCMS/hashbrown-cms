@@ -1,0 +1,27 @@
+/**
+ * Colour a button
+ *
+ * @param {String} class
+ * @param {Color} color
+ * @param {Color} border-color
+ * @param {Color} text-color
+ */
+@mixin set-button-color($class, $color, $border-color, $text-color) {
+    &.btn-#{$class} {
+        background-color: $color;
+        border-color: $border-color;
+        color: $text-color;
+        border-width: 1px;
+    
+        &:hover {
+            background-color: lighten($color, 6);
+            border-color: lighten($border-color, 6);
+        }
+        
+        &:active {
+            background-color: darken($color, 6);
+            border-color: darken($border-color, 6);
+        }
+    }
+}
+

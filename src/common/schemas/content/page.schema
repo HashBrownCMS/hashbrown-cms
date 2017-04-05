@@ -1,0 +1,36 @@
+{
+    "icon": "file",
+    "name": "Page",
+    "parentSchemaId": "contentBase",
+    "tabs": {
+        "content": "Content"
+    },
+    "defaultTabId": "content",
+    "fields": {
+        "properties": {
+            "title": {
+                "label": "Title",
+                "schemaId": "string",
+                "tabId": "content"
+            },
+            "description": {
+                "label": "Description",
+                "schemaId": "string",
+                "tabId": "content"
+            },
+            "template": {
+                "label": "Template",
+                "schemaId": "templateReference",
+                "tabId": "content",
+                "config": {
+                    "allowedTemplates": []
+                }
+            },
+            "url": {
+                "label": "URL",
+                "schemaId": "url",
+                "tabId": "content"
+            }
+        }
+    }
+}

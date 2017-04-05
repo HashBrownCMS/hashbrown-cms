@@ -1,0 +1,220 @@
+.rich-text-editor {
+    margin: 0px;
+    min-width: 100%;
+    max-width: 100px; // A hack to prevent CodeMirror from exceeding boundaries
+
+    .nav-tabs {
+        padding: 5px 0px 0px 0px;
+        position: relative;
+
+        .btn {
+            position: absolute;
+            right: 8px;
+            top: 8px;
+            min-width: 30px;
+            padding: 0px 12px;
+        }
+    }
+
+    .tab-content {
+        padding: 0px !important;
+    }   
+
+    .CodeMirror {
+        p, pre, span, .cke_editable {
+            font-size: 14px;
+        }
+    }
+
+    .cke {
+        padding: 0px;
+        background: none;
+        border: 0px;
+        border-radius: 0px;
+        box-shadow: none;
+        
+        .cke_inner {
+            border-radius: 0px;
+
+            .cke_top, .cke_contents, .cke_bottom {
+                background-image: none;
+                border: 0px;
+                box-shadow: none;
+            }
+
+            .cke_top {
+                background-image: linear-gradient(top, #f5f5f5, #eee);
+                background-image: -webkit-linear-gradient(top, #f5f5f5, #eee);
+                background-image: -moz-linear-gradient(top, #f5f5f5, #eee);
+                background-color: #f5f5f5;
+                border-bottom: 1px solid #d9d9d9;
+                padding: 0px;
+
+                .cke_toolgroup {
+                    border: 0px;
+                    box-shadow: none;
+                    background-image: none;
+                    background-color: transparent;
+                    border-radius: 0px;
+                    margin: 0px;
+
+                    .cke_toolbar_separator {
+                        display: none;
+                    }
+                }
+
+                .cke_toolbar {
+                    border-right: 1px solid #ccc;
+                    padding: 0px 5px;
+                }
+
+                .cke_combo {
+                    margin: 5px 0px;
+                    
+                    .cke_combo_button {
+                        margin: 0px;
+                        border: 1px solid transparent;
+                        background-image: none;
+                        background-color: transparent;
+                        box-shadow: none;
+                        
+                        &:hover {
+                            border: 1px solid #ccc;
+                            border-radius: 2px;
+                        }
+
+                        .cke_combo_arrow {
+                            margin-top: 9px;
+                        }
+
+                        .cke_combo_text {
+                            line-height: 23px;
+                            font-weight: 700;
+                        }
+                    }
+                }
+
+                .cke_button {
+                    margin: 5px 0px;
+                    background-image: none;
+                    border: 0px;
+                    box-shadow: none;
+                    padding: 0px;
+                    height: 23px;
+                    width: 23px;
+                    position: relative;
+                    border: 1px solid transparent;
+
+                    &:hover {
+                        background-color: transparent;
+                        border: 1px solid #ccc;
+                        border-radius: 2px;
+                    }
+
+                    .cke_button_label {
+                        display: none;
+                    }
+
+                    .cke_button_icon {
+                        display: block;
+                        font-family: 'FontAwesome';
+                        position: absolute;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        margin: 0px;
+
+                        &:not(.cke_button__markdown_icon) {
+                            background-image: none !important;
+                            margin-top: 2px;
+                        }
+
+                        &.cke_button__bold_icon:after {
+                            content: '\f032';
+                        }
+                        
+                        &.cke_button__italic_icon:after {
+                            content: '\f033';
+                        }
+                        
+                        &.cke_button__strike_icon:after {
+                            content: '\f0cc';
+                        }
+                        
+                        &.cke_button__removeformat_icon:after {
+                            content: '\f00d';
+                        }
+
+                        &.cke_button__numberedlist_icon:after {
+                            content: '\f0cb';
+                        }
+                        
+                        &.cke_button__bulletedlist_icon:after {
+                            content: '\f0ca';
+                        }
+                        
+                        &.cke_button__outdent_icon:after {
+                            content: '\f03b';
+                        }
+                        
+                        &.cke_button__indent_icon:after {
+                            content: '\f03c';
+                        }
+                        
+                        &.cke_button__blockquote_icon:after {
+                            content: '\f10e';
+                        }
+                        
+                        &.cke_button__link_icon:after {
+                            content: '\f0c1';
+                        }
+                        
+                        &.cke_button__unlink_icon:after {
+                            content: '\f127';
+                        }
+                        
+                        &.cke_button__image_icon:after {
+                            content: '\f1c5';
+                        }
+                        
+                        &.cke_button__justifyleft_icon:after {
+                            content: '\f036';
+                        }
+                        
+                        &.cke_button__justifycenter_icon:after {
+                            content: '\f037';
+                        }
+                        
+                        &.cke_button__justifyright_icon:after {
+                            content: '\f038';
+                        }
+                        
+                        &.cke_button__justifyblock_icon:after {
+                            content: '\f039';
+                        }
+                    }
+                }
+            }
+
+            .cke_contents {
+            }
+
+            .cke_bottom {
+                background-color: material-color('grey', '800');
+
+                .cke_path {
+                    a {
+                        color: material-color('grey', '300');
+                        text-shadow: none;
+                        cursor: pointer;
+
+                        &:hover {
+                            background: none;
+                            box-shadow: none;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

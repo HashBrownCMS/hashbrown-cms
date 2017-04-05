@@ -1,0 +1,36 @@
+.schema-editor {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+
+    .locked-message {
+        margin: 30px auto 15px auto;
+    }
+
+    >.schema {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding: 15px;
+  
+        .json-editor {
+            min-height: 400px;
+        }
+
+        .field-value {
+            .read-only {
+                line-height: 30px;
+                margin: 0px;
+            }
+
+            .allowed-child-schemas-editor {
+                line-height: 30px;
+            }
+        }
+
+        .icon-editor {
+            >.fa {
+                line-height: 30px;
+            }
+        }
+    }
+}

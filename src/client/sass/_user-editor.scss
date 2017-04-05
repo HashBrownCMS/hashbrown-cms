@@ -1,0 +1,70 @@
+.modal-user-editor {
+    .modal-dialog {
+        max-width: 800px;
+    }
+    
+    .user-editor {
+        .project {
+            padding: 15px 0px;
+            border-top: 1px solid material-color('grey', '200');
+
+            .project-header {
+                display: flex;
+
+                .project-title {
+                    flex-grow: 1;
+                    margin: 0px 0px 0px 30px;
+                    line-height: 30px;
+                }
+            }
+
+            .project-scopes {
+                margin-left: 60px;
+                display: flex;
+
+                p {
+                    margin-right: 15px;
+                }
+            }
+        }
+
+        .field-container {
+            display: flex;
+            margin-bottom: 30px;
+         
+            &:last-child {
+                margin-bottom: 0px;
+            }
+            
+            .field-key {
+                width: 200px;
+                line-height: 30px;
+                flex-shrink: 0;
+            }
+
+            .field-value {
+                flex-grow: 1;
+            }
+        }
+
+        .password-editor {
+            &.invalid {
+                .invalid-message {
+                    display: block;
+                }
+            }
+
+            .invalid-message {
+                display: none;
+                position: absolute;
+                left: 15px;
+                margin-top: 30px;
+                padding: 5px 10px;
+                background-color: material-color('red', '600');
+                color: #fff;
+                border-radius: 2px;
+                font-weight: 700;
+            }
+        }
+    }
+}

@@ -1,0 +1,38 @@
+.media-viewer {
+    display: flex;
+    flex-direction: column;
+    margin: 0px;
+    height: 100%;
+
+    .media-heading {
+        .media-title {
+            display: inline;
+
+            .media-data {
+                margin-left: 10px;
+                opacity: 0.5;
+            }
+        }
+    }
+
+    .media-preview {
+        flex-grow: 1;
+        position: relative;
+    
+        img, video {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            max-width: 90%;
+            max-height: 90%;
+        }
+    }
+
+    .editor-footer {
+        input.form-control {
+            float: left;
+            width: 50%;
+        }
+    }
+}

@@ -1,0 +1,97 @@
+.form-entries-list-modal {
+    .modal-body {
+        overflow-y: scroll;
+        max-height: 300px;
+
+        table {
+            width: 100%;
+
+            tbody {
+                border-bottom: 1px solid material-color('grey', '500');
+
+                tr {
+                    line-height: 30px;
+
+                    .key {
+                        color: material-color('grey', '500');
+                        padding-right: 15px;
+                    }
+                }
+            }
+        }
+    }
+}
+
+.form-editor {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+
+    >.form {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding: 15px;
+        
+        >.field-container {
+            max-width: 800px;
+        }
+
+        .btn-add-input {
+            display: block;
+            margin-left: auto;
+        }
+
+        form.preview {
+            display: block;
+            padding: 15px;
+            max-width: 500px;
+
+            input:not(.btn), select, textarea {
+                display: block;
+                margin-bottom: 15px;
+                width: 100%;
+
+                &:last-child {
+                    margin-bottom: 0px;
+                }
+            }
+
+            .btn {
+                margin-left: auto;
+                display: block;
+                width: 80px;
+            }
+
+            textarea {
+                height: 160px;
+                resize: none;
+            }
+        }
+
+        .inputs-editor {
+            .input {
+                margin-bottom: 30px;
+                position: relative;
+                padding: 15px 30px;
+               
+                .switch {
+                    margin-top: 10px;
+                }
+
+                >.btn-remove {
+                    position: absolute;
+                    right: 0px;
+                    top: 0px;
+                    height: 34px;
+                    width: 34px;
+                    padding: 0px !important;
+
+                    .fa {
+                        color: material-color('red', '500');
+                        line-height: 34px;
+                    }
+                }
+            }
+        }   
+    }
+}

@@ -1,0 +1,63 @@
+// Carousel
+.carousel {
+    .carousel-indicators {
+        bottom: 20px;
+        opacity: 1;
+
+        li {
+            background-color: $primary-text;
+            border: 2px solid $primary;
+            margin: 5px;
+            transition: background-color 0.25s ease, border-color 0.25s ease;
+            width: 14px;
+            height: 14px;
+            
+            &.active {
+                border-color: $primary-text;
+                background-color: $primary;
+                margin: 5px;
+                width: 14px;
+                height: 14px;
+            }
+        }
+    }
+
+    .carousel-control {
+        background: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        opacity: 0; 
+
+        &:hover {
+            opacity: 1;
+        }
+       
+        &.left {
+            align-items: flex-start;
+
+            .fa {
+                border-top-right-radius: 2px;
+                border-bottom-right-radius: 2px;
+            }
+        }
+        
+        &.right {
+            align-items: flex-end;
+
+            .fa {
+                border-top-left-radius: 2px;
+                border-bottom-left-radius: 2px;
+            }
+        }
+
+        .fa {
+            width: 60px;
+            padding: 15px;
+            text-shadow: none;
+            color: $primary;
+        }
+    }
+}
+

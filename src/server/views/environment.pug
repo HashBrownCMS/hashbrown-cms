@@ -1,0 +1,41 @@
+html
+    head
+        meta(charset='utf-8')
+        meta(http-equiv='X-UA-Compatible', content='IE=edge')
+        meta(name='viewport', content='width=device-width initial-scale=1')
+        meta(name='description', content="The pluggable CMS")
+        meta(name='robots', content='noindex, nofollow, noarchive, nosnippet')
+        
+        link(href='/favicon.png?v=2', rel='icon', type='image/png')
+        link(href='/lib/bootstrap/css/bootstrap.min.css', rel='stylesheet')
+        link(href='/lib/font-awesome/css/font-awesome.min.css', rel='stylesheet')
+        link(href='/css/client.css', rel='stylesheet')
+        link(href='/css/plugins.css', rel='stylesheet')
+        link(href='/lib/codemirror/lib/codemirror.css', rel='stylesheet')
+
+        title #{currentProject} - HashBrown
+    body
+        .cms-container.faded
+            .menuspace
+            .navspace
+            .workspace
+        
+        .spinner-obscure
+            .spinner-container.inline
+                img.spinner(src='/svg/logo_pink.svg')
+                .loading-messages
+
+        script(src='/lib/jquery/jquery.min.js')
+        script(src='/lib/bootstrap/js/bootstrap.min.js')
+        script(src='/lib/ckeditor/ckeditor.js')
+        script(src='/lib/codemirror/lib/codemirror.js')
+        script(src='/lib/codemirror/mode/javascript/javascript.js')
+        script(src='/lib/codemirror/mode/markdown/markdown.js')
+        script(src='/lib/codemirror/mode/xml/xml.js')
+        script(src='/js/client.js')
+        script(src='/js/plugins.js')
+        
+        script.
+            ProjectHelper.currentProject = '#{currentProject}';
+            ProjectHelper.currentEnvironment = '#{currentEnvironment}';
+        
