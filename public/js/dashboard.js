@@ -20919,9 +20919,9 @@
 	            var modal = new MessageModal({
 	                model: {
 	                    title: 'Delete project',
-	                    body: _.div(_.p('Please type in the project name to confirm'), _.input({ class: 'form-control', type: 'text', placeholder: 'Project name' }).on('change propertychange input keyup paste', function () {
+	                    body: _.div(_.p('Please type in the project name to confirm'), _.input({ class: 'form-control', type: 'text', placeholder: 'Project name' }).on('change propertychange input keyup paste', function (e) {
 	                        var $btn = modal.$element.find('.btn-danger');
-	                        var isMatch = $(this).val() == this.model.settings.info.name;
+	                        var isMatch = $(e.target).val() == _this2.model.settings.info.name;
 
 	                        $btn.attr('disabled', !isMatch);
 	                        $btn.toggleClass('disabled', !isMatch);

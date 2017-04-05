@@ -24,9 +24,9 @@ class ProjectEditor extends View {
                 body: _.div(
                     _.p('Please type in the project name to confirm'),
                     _.input({class: 'form-control', type: 'text', placeholder: 'Project name'})
-                        .on('change propertychange input keyup paste', function() {
+                        .on('change propertychange input keyup paste', (e) => {
                             let $btn = modal.$element.find('.btn-danger');
-                            let isMatch = $(this).val() == this.model.settings.info.name;
+                            let isMatch = $(e.target).val() == this.model.settings.info.name;
                             
                             $btn.attr('disabled', !isMatch);
                             $btn.toggleClass('disabled', !isMatch);

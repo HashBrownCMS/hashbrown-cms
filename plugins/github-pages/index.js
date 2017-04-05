@@ -10,46 +10,53 @@ let route = '';
 
 class GitHubPages {
     static init(app) {
+        let config = ConfigHelper.getSync('plugins/github');
+
         ConnectionHelper.registerConnectionType('GitHub Pages', Connection);
 
         /**
          * Starts the oAuth flow
          */
-       // app.get('/api/github/oauth/start', (req, res) => {
-       //     route = req.query.route;
+        app.get('/plugins/github/oauth/start', (req, res) => {
+            if(!config || !config.clientId || !config.clientSecret) {
+                res.status(502).send('Malformed or non-existent GitHub config file (/config/plugins/github.cfg)');
+            }
 
-       //     res.redirect('https://github.com/login/oauth/authorize?client_id=' + config.client.id + '&scope=repo read:org');
-       // });
+            route = req.query.route;
 
-       // /**
-       //  * The callback for the oAuth flow
-       //  */
-       // app.get('/api/github/oauth/callback', (req, res) => {
-       //     let code = req.query.code;
-       //     let data = {
-       //         code: code,
-       //         client_id: config.client.id,
-       //         client_secret: config.client.secret
-       //     };
-       //     let headers = {
-       //         'Accept': 'application/json'
-       //     };
+            res.redirect('https://github.com/login/oauth/authorize?client_id=' + config.clientId + '&scope=repo read:org');
+        });
 
-       //     restler.post('https://github.com/login/oauth/access_token', {
-       //         data: data,
-       //         headers: headers    
-       //     })
-       //     .on('complete', (data, response) => {
-       //         let token = data.access_token;
+        /**
+         * Ends the oAuth flow
+         */
+        app.get('/plugins/github/oauth/end', (req, res) => {
+            let code = req.query.code;
+            let data = {
+                code: code,
+                client_id: config.clientId,
+                client_secret: config.clientSecret
+            };
 
-       //         res.redirect('/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/#' + route + '?token=' + token);
-       //     });
-       // });
+            let headers = {
+                'Accept': 'application/json'
+            };
+
+            restler.post('https://github.com/login/oauth/access_token', {
+                data: data,
+                headers: headers    
+            })
+            .on('complete', (data, response) => {
+                let token = data.access_token;
+                
+                res.send(token);
+            });
+        });
 
         /**
          * Lists all user orgs
          */
-        app.get('/api/github/orgs', (req, res) => {
+        app.get('/plugins/github/orgs', (req, res) => {
             let headers = {
                 'Accept': 'application/json'
             };
@@ -64,7 +71,7 @@ class GitHubPages {
         /**
          * Lists all user repos
          */
-        app.get('/api/github/repos', (req, res) => {
+        app.get('/plugins/github/repos', (req, res) => {
             let headers = {
                 'Accept': 'application/json'
             };
@@ -87,7 +94,7 @@ class GitHubPages {
         /**
          * Lists all branches
          */
-        app.get('/api/github/:owner/:repo/branches', (req, res) => {
+        app.get('/plugins/github/:owner/:repo/branches', (req, res) => {
             let headers = {
                 'Accept': 'application/json'
             };
@@ -102,7 +109,7 @@ class GitHubPages {
         /**
          * Lists all root directories
          */
-        app.get('/api/github/:owner/:repo/dirs', (req, res) => {
+        app.get('/plugins/github/:owner/:repo/dirs', (req, res) => {
             let headers = {
                 'Accept': 'application/json'
             };

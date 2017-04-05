@@ -17,7 +17,7 @@
         return new Promise((callback) => {
             $.ajax({
                 type: 'get',
-                url: '/api/github/orgs/?connectionId=' + Router.params.id,
+                url: '/plugins/github/orgs/?connectionId=' + Router.params.id,
                 success: (orgs) => {
                     callback(orgs);
                 }
@@ -68,11 +68,28 @@
             view.render();
         }
 
+        function onRefresh() {
+            var w = window.open('/plugins/github/oauth/start');
+
+            w.addEventListener('load', function() {
+                view.model.token = w.document.body.innerHTML;
+
+                view.render();
+
+                w.close();
+            });
+        }
+
         this.model.token = Router.query('token') || this.model.token; 
 
-        return _.div({class: 'field-editor'},
+        return _.div({class: 'field-editor input-group'},
             _.input({class: 'form-control', type: 'text', value: this.model.token, placeholder: 'Input GitHub API token'})
-                .change(onChange)
+                .change(onChange),
+            _.div({class: 'input-group-btn'},
+                _.button({class: 'btn btn-default btn-small'},
+                    _.span({class: 'fa fa-refresh'})
+                ).on('click', onRefresh)
+            )
         );
     }
     
@@ -101,7 +118,7 @@
         if(this.model.token) {
             $.ajax({
                 type: 'get',
-                url: '/api/github/orgs?token=' + this.model.token,
+                url: '/plugins/github/orgs?token=' + this.model.token,
                 success: (orgs) => {
                     _.append($editor.children('select').empty(),
                         _.option({value: ''}, '(none)'),
@@ -146,7 +163,7 @@
         if(this.model.token) {
             $.ajax({
                 type: 'get',
-                url: '/api/github/repos?token=' + this.model.token + '&org=' + this.model.org,
+                url: '/plugins/github/repos?token=' + this.model.token + '&org=' + this.model.org,
                 success: (repos) => {
                     if(typeof repos === 'object') {
                         $editor.children('select').html(
@@ -189,7 +206,7 @@
         if(this.model.token && this.model.repo) {
             $.ajax({
                 type: 'get',
-                url: '/api/github/' + this.model.repo + '/branches?token=' + this.model.token + '&org=' + this.model.org,
+                url: '/plugins/github/' + this.model.repo + '/branches?token=' + this.model.token + '&org=' + this.model.org,
                 success: (branches) => {
                     if(typeof branches === 'object') {
                         $editor.children('select').html(
