@@ -60,12 +60,16 @@ class ArrayEditor extends View {
     /**
      * Event: Click remove item
      *
-     * @param {Number} index
+     * @param {HTMLElement} element
      */
-    onClickRemoveItem(i) {
+    onClickRemoveItem($element) {
+        let i = $element.attr('data-index');
+
         this.value.schemaBindings.splice(i,1);
         this.value.items.splice(i,1);
-       
+
+        $element.remove();
+
         this.updateDOMIndices();
     }
 
@@ -361,8 +365,7 @@ class ArrayEditor extends View {
                 _.button({class: 'btn btn-embedded btn-remove'},
                     _.span({class: 'fa fa-remove'})
                 ).click(() => {
-                    this.onClickRemoveItem(getIndex());
-                    $element.remove();
+                    this.onClickRemoveItem($element);
                 }),
                 $schemaLabel,
                 this.config.allowedSchemas.length > 1 ? $schemaSelector : null,

@@ -15813,14 +15813,18 @@
 	        /**
 	         * Event: Click remove item
 	         *
-	         * @param {Number} index
+	         * @param {HTMLElement} element
 	         */
 
 	    }, {
 	        key: 'onClickRemoveItem',
-	        value: function onClickRemoveItem(i) {
+	        value: function onClickRemoveItem($element) {
+	            var i = $element.attr('data-index');
+
 	            this.value.schemaBindings.splice(i, 1);
 	            this.value.items.splice(i, 1);
+
+	            $element.remove();
 
 	            this.updateDOMIndices();
 	        }
@@ -16145,8 +16149,7 @@
 
 	                // Render the DOM element
 	                _.append($element.empty(), $btnToggle, _.button({ class: 'btn btn-embedded btn-remove' }, _.span({ class: 'fa fa-remove' })).click(function () {
-	                    _this4.onClickRemoveItem(getIndex());
-	                    $element.remove();
+	                    _this4.onClickRemoveItem($element);
 	                }), $schemaLabel, _this4.config.allowedSchemas.length > 1 ? $schemaSelector : null, fieldEditorInstance.$element);
 	            };
 
