@@ -5,6 +5,8 @@ let ContentHelperCommon = require('../../common/helpers/ContentHelper');
 
 // Models
 let Content = require('../../common/models/Content');
+let ContentSchema = require('../../common/models/ContentSchema');
+let FieldSchema = require('../../common/models/FieldSchema');
 let User = require('../models/User');
 
 class ContentHelper extends ContentHelperCommon {
@@ -312,6 +314,153 @@ class ContentHelper extends ContentHelperCommon {
             })
             .catch(reject);
         });
+    }
+    
+    /**
+     * Creates example content
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {User} user
+     *
+     * @returns {Promise} Result
+     */
+    static createExampleContent(
+        project = requiredParam('project'),
+        environment = requiredParam('environment'),
+        user = requieredParam('user')
+    ) {
+        // Rich Text Page
+        let richTextPageSchema = new ContentSchema({
+            id: ContentSchema.createId(),
+            icon: 'file',
+            type: 'content',
+            defaultTabId: 'content',
+            name: 'Rich Text Page',
+            parentSchemaId: 'page',
+            fields: {
+                properties: {
+                    text: {
+                        label: 'Text',
+                        tabId: 'content',
+                        schemaId: 'richText'
+                    }
+                }
+            }
+        });
+
+        let richTextPageContent = new Content({
+            id: Content.createId(),
+            createDate: Date.now(),
+            updateDate: Date.now(),
+            schemaId: richTextPageSchema.id,
+            sort: 10000,
+            properties: {
+                url: '/my-rich-text-page/',
+                title: 'My Rich Text Page',
+                text: '<h2>This is a rich text page</h2><p>A simple page for inserting formatted text and media</p>'
+            }
+        });
+
+        // Section page
+        let sectionSchema = new FieldSchema({
+            id: FieldSchema.createId(),
+            name: 'Section',
+            icon: 'arrows-h',
+            type: 'field',
+            editorId: 'struct',
+            parentSchemaId: 'struct',
+            config: {
+                struct: {
+                    heading: {
+                        label: 'Heading text',
+                        schemaId: 'string'
+                    },
+                    body: {
+                        label: 'Body text',
+                        schemaId: 'richText'
+                    }
+                }
+            }
+        });
+
+        let sectionPageSchema = new ContentSchema({
+            id: ContentSchema.createId(),
+            icon: 'file',
+            type: 'content',
+            defaultTabId: 'content',
+            name: 'Section Page',
+            parentSchemaId: 'page',
+            fields: {
+                properties: {
+                    sections: {
+                        label: 'Sections',
+                        tabId: 'content',
+                        schemaId: 'array',
+                        config: {
+                            allowedSchemas: [ sectionSchema.id ]
+                        }
+                    }
+                }
+            }
+        });
+
+        let sectionPageContent = new Content({
+            id: Content.createId(),
+            createDate: Date.now(),
+            updateDate: Date.now(),
+            schemaId: sectionPageSchema.id,
+            sort: 10000,
+            properties: {
+                url: '/my-section-page/',
+                title: 'My Section Page',
+                sections: {
+                    items: [ { heading: 'This is a section', body: '<p>With a heading and some body text</p>' } ],
+                    schemaBindings: [ sectionSchema.id ]
+                }
+            }
+        });
+
+        // Create rich text page
+        return SchemaHelper.setSchema(
+            project,
+            environment,
+            richTextPageSchema.id,
+            richTextPageSchema,
+            true
+        )
+        .then(ContentHelper.setContentById(
+            project,
+            environment,
+            richTextPageContent.id,
+            richTextPageContent,
+            user,
+            true
+        ))
+        
+        // Create section page
+        .then(SchemaHelper.setSchema(
+            project,
+            environment,
+            sectionSchema.id,
+            sectionSchema, 
+            true
+        ))
+        .then(SchemaHelper.setSchema(
+            project,
+            environment,
+            sectionPageSchema.id,
+            sectionPageSchema, 
+            true
+        ))
+        .then(ContentHelper.setContentById(
+            project,
+            environment,
+            sectionPageContent.id,
+            sectionPageContent,
+            user,
+            true
+        ));
     }
 }
 

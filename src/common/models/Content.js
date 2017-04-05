@@ -120,6 +120,12 @@ class Content extends Entity {
     ) {
         if(this.parentId) {
             return ContentHelper.getContentById(project, environment, this.parentId)
+            .then((parentContent) => {
+                return Promise.resolve(parentContent);
+            })
+            .catch((e) => {
+                return Promise.resolve(null);
+            });
         } else {
             return Promise.resolve(null);
         }

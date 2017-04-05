@@ -15,6 +15,7 @@ class ServerController extends ApiController {
         app.get('/api/server/backups/config', this.middleware({ needsAdmin: true, setProject: false }), this.getBackupConfig);
         
         app.post('/api/server/update/start', this.middleware({ needsAdmin: true, setProject: false }), this.postUpdateServer);
+        app.post('/api/server/restart', this.middleware({ needsAdmin: true, setProject: false }), this.postRestartServer);
         app.post('/api/server/projects/new', this.middleware({ needsAdmin: true, setProject: false }), this.createProject);
         app.post('/api/server/backups/:project/new', this.middleware({ needsAdmin: true, setProject: false }), this.postBackupProject);
         app.post('/api/server/backups/:project/upload', this.middleware({ needsAdmin: true, setProject: false }), BackupHelper.getUploadHandler(), this.postUploadProjectBackup);
@@ -223,6 +224,16 @@ class ServerController extends ApiController {
         .catch((e) => {
             res.status(502).send(ServerController.printError(e));
         });
+    }
+    
+    /**
+     * Restarts the server
+     */
+    static postRestartServer(req, res) {
+        res.status(200).send('OK');
+
+        // Shut down HashBrown, let serverside task manager handle restart
+        process.exit(1);
     }
 
     /**

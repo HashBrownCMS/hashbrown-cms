@@ -127,6 +127,20 @@ apiCall('get', 'user')
 })
 
 // --------------------
+// Restart button
+// --------------------
+.then(() => {
+    if(!User.current.isAdmin) { return Promise.resolve(); }
+
+    $('.btn-restart').click(() => {
+        apiCall('post', 'server/restart')
+        .then(() => {
+            listenForRestart();
+        });
+    });
+})
+
+// --------------------
 // Updates
 // --------------------
 .then(() => {
@@ -155,22 +169,7 @@ apiCall('get', 'user')
                                             label: 'Cool!',
                                             class: 'btn-primary',
                                             callback: () => {
-                                                UI.messageModal('Success', 'HashBrown is restarting...', false);
-
-                                                function poke() {
-                                                    $.ajax({
-                                                        type: 'get',
-                                                        url: '/',
-                                                        success: () => {
-                                                            location.reload();
-                                                        },
-                                                        error: () => {
-                                                            poke();
-                                                        }
-                                                    });
-                                                }
-
-                                                poke();
+                                                listenForRestart();
                                             }
                                         }
                                     ]

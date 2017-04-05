@@ -86,8 +86,16 @@ Router.route('/', function() {
     populateWorkspace(
         _.div({class: 'dashboard-container welcome'},
             _.h1('Welcome to HashBrown'),
-            _.p('If you\'re unfamiliar with HashBrown, please take a moment to look through the introduction below.'),
-            _.p('It\'ll only take a minute.'),
+            _.h2('Example content'),
+            _.p('Press the button below to get some example content to work with.'),
+            _.button({class: 'btn btn-default'}, 'example')
+                .click(() => {
+                    apiCall('post', 'content/example')
+                    .then(() => {
+                        location.reload();
+                    })
+                    .catch(UI.errorModal);
+                }),
             _.h2('Introduction'), 
             UI.carousel(carouselItems, true, true, '400px'),
             _.h2('Contextual help'),

@@ -173,6 +173,21 @@
 	})
 
 	// --------------------
+	// Restart button
+	// --------------------
+	.then(function () {
+	    if (!User.current.isAdmin) {
+	        return Promise.resolve();
+	    }
+
+	    $('.btn-restart').click(function () {
+	        apiCall('post', 'server/restart').then(function () {
+	            listenForRestart();
+	        });
+	    });
+	})
+
+	// --------------------
 	// Updates
 	// --------------------
 	.then(function () {
@@ -195,22 +210,7 @@
 	                            label: 'Cool!',
 	                            class: 'btn-primary',
 	                            callback: function callback() {
-	                                UI.messageModal('Success', 'HashBrown is restarting...', false);
-
-	                                function poke() {
-	                                    $.ajax({
-	                                        type: 'get',
-	                                        url: '/',
-	                                        success: function success() {
-	                                            location.reload();
-	                                        },
-	                                        error: function error() {
-	                                            poke();
-	                                        }
-	                                    });
-	                                }
-
-	                                poke();
+	                                listenForRestart();
 	                            }
 	                        }]
 	                    });
@@ -586,6 +586,28 @@
 	            }
 	        };
 	    });
+	};
+
+	/**
+	 * Listens for server restart
+	 */
+	window.listenForRestart = function listenForRestart() {
+	    UI.messageModal('Restart', 'HashBrown is restarting...', false);
+
+	    function poke() {
+	        $.ajax({
+	            type: 'get',
+	            url: '/',
+	            success: function success() {
+	                location.reload();
+	            },
+	            error: function error() {
+	                poke();
+	            }
+	        });
+	    }
+
+	    poke();
 	};
 
 /***/ },
@@ -20813,7 +20835,7 @@
 	module.exports = {
 		"name": "hashbrown-cms",
 		"repository": "https://github.com/Putaitu/hashbrown-cms.git",
-		"version": "0.7.1",
+		"version": "0.7.2",
 		"description": "The pluggable CMS",
 		"main": "hashbrown.js",
 		"scripts": {

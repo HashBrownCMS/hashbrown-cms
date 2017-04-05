@@ -20,11 +20,25 @@ class ContentController extends ApiController {
         app.post('/api/:project/:environment/content/push/:id', this.middleware(), this.pushContent);
         app.post('/api/:project/:environment/content/publish', this.middleware(), this.publishContent);
         app.post('/api/:project/:environment/content/unpublish', this.middleware(), this.unpublishContent);
+        app.post('/api/:project/:environment/content/example', this.middleware(), this.createExampleContent);
         app.post('/api/:project/:environment/content/:id', this.middleware(), this.postContent);
 
         app.delete('/api/:project/:environment/content/:id', this.middleware(), this.deleteContent);
     }
-    
+   
+    /**
+     * Creates the example content
+     */
+    static createExampleContent(req, res) {
+        ContentHelper.createExampleContent(req.project, req.environment, req.user)
+        .then(() => {
+            res.status(200).send('OK');
+        })
+        .catch((e) => {
+            res.status(502).send(ContentController.printError(e));
+        });
+    }
+
     /**
      * Gets a list of all Content objects
      */

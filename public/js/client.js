@@ -610,6 +610,28 @@
 	    });
 	};
 
+	/**
+	 * Listens for server restart
+	 */
+	window.listenForRestart = function listenForRestart() {
+	    UI.messageModal('Restart', 'HashBrown is restarting...', false);
+
+	    function poke() {
+	        $.ajax({
+	            type: 'get',
+	            url: '/',
+	            success: function success() {
+	                location.reload();
+	            },
+	            error: function error() {
+	                poke();
+	            }
+	        });
+	    }
+
+	    poke();
+	};
+
 /***/ },
 /* 3 */
 /***/ function(module, exports, __webpack_require__) {
@@ -26108,7 +26130,11 @@
 	        key: 'getParent',
 	        value: function getParent() {
 	            if (this.parentId) {
-	                return ContentHelper.getContentById(this.parentId);
+	                return ContentHelper.getContentById(this.parentId).then(function (parentContent) {
+	                    return Promise.resolve(parentContent);
+	                }).catch(function (e) {
+	                    return Promise.resolve(null);
+	                });
 	            } else {
 	                return Promise.resolve(null);
 	            }
@@ -26249,7 +26275,11 @@
 	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
 
 	            if (this.parentId) {
-	                return ContentHelper.getContentById(project, environment, this.parentId);
+	                return ContentHelper.getContentById(project, environment, this.parentId).then(function (parentContent) {
+	                    return Promise.resolve(parentContent);
+	                }).catch(function (e) {
+	                    return Promise.resolve(null);
+	                });
 	            } else {
 	                return Promise.resolve(null);
 	            }
@@ -36270,8 +36300,6 @@
 	                    return schema;
 	                }
 	            }
-
-	            UI.errorModal(new Error('No Schema by id "' + id + '" was found'));
 	        }
 	    }]);
 
@@ -36476,7 +36504,7 @@
 	module.exports = {
 		"name": "hashbrown-cms",
 		"repository": "https://github.com/Putaitu/hashbrown-cms.git",
-		"version": "0.7.1",
+		"version": "0.7.2",
 		"description": "The pluggable CMS",
 		"main": "hashbrown.js",
 		"scripts": {
@@ -36569,7 +36597,11 @@
 	        carouselItems.push([_.div(_.img({ src: '/img/welcome/intro-settings.jpg' })), _.div(_.h2('Settings'), _.p('Here you can set up synchronisation with other HashBrown instances.'))]);
 	    }
 
-	    populateWorkspace(_.div({ class: 'dashboard-container welcome' }, _.h1('Welcome to HashBrown'), _.p('If you\'re unfamiliar with HashBrown, please take a moment to look through the introduction below.'), _.p('It\'ll only take a minute.'), _.h2('Introduction'), UI.carousel(carouselItems, true, true, '400px'), _.h2('Contextual help'), _.p('You can always click the <span class="fa fa-question-circle"></span> icon in the upper right to get information about the screen you\'re currently on.'), _.h2('Guides'), _.p('If you\'d like a more in-depth walkthrough of the features, please check out the guides.'), _.a({ class: 'btn btn-default', href: 'http://hashbrown.rocks/guides', target: '_blank' }, 'Guides')), 'presentation');
+	    populateWorkspace(_.div({ class: 'dashboard-container welcome' }, _.h1('Welcome to HashBrown'), _.h2('Example content'), _.p('Press the button below to get some example content to work with.'), _.button({ class: 'btn btn-default' }, 'example').click(function () {
+	        apiCall('post', 'content/example').then(function () {
+	            location.reload();
+	        }).catch(UI.errorModal);
+	    }), _.h2('Introduction'), UI.carousel(carouselItems, true, true, '400px'), _.h2('Contextual help'), _.p('You can always click the <span class="fa fa-question-circle"></span> icon in the upper right to get information about the screen you\'re currently on.'), _.h2('Guides'), _.p('If you\'d like a more in-depth walkthrough of the features, please check out the guides.'), _.a({ class: 'btn btn-default', href: 'http://hashbrown.rocks/guides', target: '_blank' }, 'Guides')), 'presentation');
 	});
 
 	// Readme

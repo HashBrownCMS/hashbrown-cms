@@ -196,3 +196,25 @@ window.customApiCall = function customApiCall(method, url, data) {
         }
     });
 };
+
+/**
+ * Listens for server restart
+ */
+window.listenForRestart = function listenForRestart() {
+    UI.messageModal('Restart', 'HashBrown is restarting...', false);
+
+    function poke() {
+        $.ajax({
+            type: 'get',
+            url: '/',
+            success: () => {
+                location.reload();
+            },
+            error: () => {
+                poke();
+            }
+        });
+    }
+
+    poke();
+};

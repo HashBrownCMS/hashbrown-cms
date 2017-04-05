@@ -43,25 +43,12 @@ class MediaController extends ApiController {
                 if(!media.remote) {
                     res.sendFile(media.url);
                 
-                // TODO (Issue #158): Replace this temporary hack with an actual file service
-                // The problem here is that SVG content is received fine through binary representation, but actual binary content isn't
-                } else if(contentType != 'image/svg+xml') {
-                    res.redirect(media.url);
-
                 } else {
-                    RequestHelper.get(media.url, {
-                        headers: {
-                            'Accept': contentType 
-                        }
-                    })
-                    .on('success', (data, response) => {
-                        res.header('Content-Type', contentType);
-
-                        res.status(200).end(data, 'binary');
-                    })
-                    .on('fail', (data, response) => {
-                        res.status(404).send(response);   
+                    res.writeHead(200, {
+                        'Content-Type': contentType
                     });
+
+                    RequestHelper.pipe(media.url, res);
                 }
             } else {
                 res.status(404).send('Not found');

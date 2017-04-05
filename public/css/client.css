@@ -776,13 +776,13 @@ body.dashboard-container {
       top: 1rem;
       right: 1rem;
       margin: 0px; }
-  body.dashboard-container .diagnostics {
+  body.dashboard-container .server {
     margin: 15px auto; }
-    body.dashboard-container .diagnostics tr {
+    body.dashboard-container .server tr {
       font-size: 14px; }
-      body.dashboard-container .diagnostics tr td {
+      body.dashboard-container .server tr td {
         padding-bottom: 1em; }
-        body.dashboard-container .diagnostics tr td:first-child {
+        body.dashboard-container .server tr td:first-child {
           min-width: 200px;
           font-weight: bold; }
   body.dashboard-container .users .btn-invite-user {

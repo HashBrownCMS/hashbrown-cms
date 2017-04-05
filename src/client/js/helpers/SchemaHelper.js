@@ -94,8 +94,6 @@ class SchemaHelper extends SchemaHelperCommon {
                 return schema;
             }
         }
-
-        UI.errorModal(new Error('No Schema by id "' + id + '" was found'));
     }
 }
 

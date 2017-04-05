@@ -25,6 +25,12 @@ class Content extends ContentCommon {
     getParent() {
         if(this.parentId) {
             return ContentHelper.getContentById(this.parentId)
+            .then((parentContent) => {
+                return Promise.resolve(parentContent);
+            })
+            .catch((e) => {
+                return Promise.resolve(null);
+            });
         } else {
             return Promise.resolve(null);
         }

@@ -25,7 +25,7 @@ html
                 li
                     a(data-toggle="tab", href="#users") Users
                 li
-                    a(data-toggle="tab", href="#diagnostics") Diagnostics
+                    a(data-toggle="tab", href="#server") Server
 
             form(action='/api/user/logout', method='POST')
                 input(type='submit', class='btn btn-primary', value='Log out')
@@ -64,8 +64,8 @@ html
                         .user-actions
                             button.btn.btn-primary.btn-round.btn-raised.btn-invite-user(title='Invite user') +
 
-                .tab-pane#diagnostics
-                    table.diagnostics
+                .tab-pane#server
+                    table.server
                         tr
                             td Software
                             td HashBrown v#{app.version} 
@@ -95,6 +95,10 @@ html
                             - var minutes = Math.floor(seconds % (60*60) / 60);
 
                             td #{days}d #{hours}h #{minutes}m
+
+                        tr
+                            td
+                                button.btn.btn-primary.btn-restart Restart
 
         script(src='/lib/jquery/jquery.min.js')
         script(src='/lib/bootstrap/js/bootstrap.min.js')
