@@ -16,31 +16,13 @@ class UserHelper {
      * Initialises this helper
      */
     static init() {
-        let mailConfigPath = appRoot + '/config/mail.cfg';
-
-        fs.exists(mailConfigPath, (exists) => {
-            if(exists) {
-                fs.readFile(mailConfigPath, (err, data) => {
-                    if(err) {
-                        debug.log('There was an error reading ' + mailConfigPath + ', please check permissions', this);
-
-                    } else {
-                        try {
-                            this.mailConfig = JSON.parse(data);
-                            this.cachedAccessToken = this.mailConfig.accessToken;
-
-                        } catch(e) {
-                            debug.log('There was a problem parsing ' + mailConfigPath, this);
-                            debug.log(e.message, this);
-                        
-                        }
-                    }
-                });
-        
-            } else {
-                debug.log(mailConfigPath + ' could not be found, email services will be unavailable', this);
-
-            }
+        ConfigHelper.get('mail')
+        .then((cfg) => {
+            this.mailConfig = cfg;
+            this.cachedAccessToken = this.mailConfig.accessToken;
+        })
+        .catch((e) => {
+            debug.log('There was an error reading mail config: ' + e.message, this);
         });
     }
 
@@ -182,7 +164,7 @@ class UserHelper {
      * @param {String} password
      * @param {Boolean} persist
      *
-     * @returns {Promise(String)} token
+     * @returns {Promise} Token
      */
     static loginUser(username, password, persist) {
         debug.log('Attempting login for user "' + username + '"...', this);
@@ -202,6 +184,29 @@ class UserHelper {
             } else {
                 return Promise.reject(new Error('Invalid password'));
             }
+        });
+    }
+    
+    /**
+     * Logs out a User
+     *
+     * @param {String} token
+     *
+     * @returns {Promise} Result
+     */
+    static logoutUser(token) {
+        debug.log('Logging out user with "' + token + '"...', this);
+
+        return this.findToken(token)
+        .then((user) => {
+            user.removeToken(token);
+
+            return this.updateUser(user.username, user.getObject())
+            .then(() => {
+                debug.log('User "' + user.username + '" logged out', this);
+
+                return Promise.resolve();
+            });
         });
     }
 

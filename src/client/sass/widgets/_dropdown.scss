@@ -133,7 +133,20 @@
                     }
                 }
 
-                >a, >button {
+                form {
+                    margin: 0px;
+                    
+                    input[type="submit"] {
+                        padding: 0px;
+                        border: none;
+                        background: transparent;
+                        display: block;
+                        text-align: left;
+                        width: 100%; 
+                    }
+                }
+
+                >a, >button, >form {
                     padding: 3px 12px;
                     border: 0px;
                     color: $standard-text;
@@ -141,6 +154,7 @@
                     width: 100%;
                     text-align: left;
                     background-color: $standard;
+                    cursor: pointer;
 
                     &:hover {
                         background-color: $primary;

@@ -18,7 +18,7 @@ class SecurityHelper {
         
         if(!fs.existsSync(sslConfigPath)) { return null; }
 
-        config = JSON.parse(fs.readFileSync(sslConfigPath)); 
+        config = ConfigHelper.getSync('ssl') || {};
 
         // Config sanity check
         if(!config.domain) {

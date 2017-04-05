@@ -167,8 +167,9 @@ class MainMenu extends View {
                             .click((e) => { e.preventDefault(); new UserEditor({ hidePermissions: true, model: User.current }); })
                     ),
                     _.li(
-                        _.a({class: 'dropdown-item', href: '#'}, 'Log out')
-                            .click((e) => { e.preventDefault(); logout(); })
+                        _.form({class: 'dropdown-item', action: '/api/user/logout', method: 'POST'},
+                            _.input({type: 'submit', value: 'Log out'})
+                        )
                     )
                 )
             ),

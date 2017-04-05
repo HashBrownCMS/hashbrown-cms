@@ -130,8 +130,8 @@ class ConnectionEditor extends View {
             
             dropdownOptions[dropdownOptions.length] = {
                 label: label,
-                value: option.type,
-                selected: option.type == this.model.type
+                value: label,
+                selected: label == this.model.type
             };
         }
 

@@ -91,6 +91,7 @@ body.dashboard-container {
         text-align: center;
         padding-left: 0px;
         min-height: 64px;
+        justify-content: center;
 
         .dashboard-logo {
             position: absolute;
@@ -101,11 +102,23 @@ body.dashboard-container {
             font-weight: normal;
             top: 50%;
             transform: translateY(-50%);
+            text-decoration: none;
+
+            span {
+                margin-left: 0.5rem;
+            }
         }
 
         li {
             float: none;
             display: inline-block;
+        }
+
+        form {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            margin: 0px;
         }
     }
 

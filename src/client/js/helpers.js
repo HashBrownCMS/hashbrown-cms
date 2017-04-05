@@ -49,15 +49,6 @@ window.currentUserHasScope = function currentUserHasScope(scope) {
 }
 
 /**
- * Logs out the current user
- */
-window.logout = function logout() {
-    document.cookie = 'token=; Path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-    
-    location.reload();
-}
-
-/**
  * Handles a required parameter
  */
 window.requiredParam = function requiredParam(name) {

@@ -32,7 +32,21 @@ class User extends UserCommon {
         this.def(Array, 'tokens', []);
         this.def(String, 'inviteToken');
     }
-    
+
+    /**
+     * Removes a token
+     *
+     * @param {String} token
+     */
+    removeToken(token) {
+        for(let i in this.tokens) {
+            if(this.tokens[i].key === token) {
+                this.tokens.splice(i, 1);
+                break;
+            }
+        }
+    }
+
     /**
      * Clears all sensitive data
      */

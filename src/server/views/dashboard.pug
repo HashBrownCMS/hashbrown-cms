@@ -15,8 +15,8 @@ html
 
     body.dashboard-container
         ul.nav.nav-tabs.dashboard-header
-            .dashboard-logo
-                img.logo(src="/svg/logo_white.svg")
+            a.dashboard-logo(target='_blank', href='http://hashbrown.rocks')
+                img.logo(src="/svg/logo_pink.svg")
                 span HashBrown
 
             if(user.isAdmin)
@@ -26,6 +26,9 @@ html
                     a(data-toggle="tab", href="#users") Users
                 li
                     a(data-toggle="tab", href="#diagnostics") Diagnostics
+
+            form(action='/api/user/logout', method='POST')
+                input(type='submit', class='btn btn-primary', value='Log out')
 
         .tab-content
             .tab-pane.active#projects

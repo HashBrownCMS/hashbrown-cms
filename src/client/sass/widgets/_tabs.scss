@@ -1,12 +1,16 @@
 .nav-tabs {
-    padding: 18px 0px 0px 15px;
+    padding: 1rem 0px 0px 1rem;
     background-color: $secondary; 
     font-size: 14px;
     position: relative;
     font-weight: bold;
     text-transform: uppercase;
+    display: flex;
+    align-items: flex-end;
 
-    li {
+    >li {
+        margin: 0px;
+
         &.active {
             a, a:hover, a:focus {
                 color: $primary;
@@ -22,13 +26,14 @@
                     color: $primary-text;
                     background-color: transparent;
                     border: 0px;
+                    border-bottom: 5px solid transparent;
                 }
             }
         }
 
         a {
             border-radius: 0px;
-            margin-bottom: 1px;
+            margin: 0px;
         }
     }
 }

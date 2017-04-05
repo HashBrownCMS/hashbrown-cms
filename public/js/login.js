@@ -47,6 +47,20 @@ function apiCall(method, url, data) {
     });
 };
 
+function getParam(name) {
+    var url = window.location.href;
+
+    name = name.replace(/[\[\]]/g, "\\$&");
+
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+
+    if (!results) return '';
+    if (!results[2]) return '';
+
+    return decodeURIComponent(results[2].replace(/\+/g, " ")) || '';
+}
+
 $('.login').each(function() {
     var $login = $(this);
     
@@ -89,17 +103,18 @@ $('.login').each(function() {
 
         apiCall('post', apiPath, data)
         .then(function() {
-            let newLocation = location.href.replace(location.protocol + '//' + location.hostname + location.pathname, '');
-            newLocation = newLocation.replace('?path=', '') || '';
-            
-            // Check for initial hash
-            if(newLocation[0] == '#') {
-                newLocation = newLocation.slice(1);
-            }
+            let newLocation = getParam('path');
+           
+            if(newLocation) { 
+                // Check for initial hash
+                if(newLocation[0] == '#') {
+                    newLocation = newLocation.slice(1);
+                }
 
-            // Check for initial slash
-            if(newLocation[0] != '/') {
-                newLocation = '/' + newLocation;
+                // Check for initial slash
+                if(newLocation[0] != '/') {
+                    newLocation = '/' + newLocation;
+                }
             }
 
             location = newLocation || '/';

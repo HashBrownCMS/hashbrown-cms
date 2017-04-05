@@ -40,6 +40,7 @@ global.requiredParam = function(name) {
 // ----------
 let SecurityHelper = require('./helpers/SecurityHelper');
 
+global.ConfigHelper = require('./helpers/ConfigHelper');
 global.UserHelper = require('./helpers/UserHelper');
 global.ConnectionHelper = require('./helpers/ConnectionHelper');
 global.ContentHelper = require('./helpers/ContentHelper');
@@ -298,11 +299,11 @@ function ready(files) {
 		}
 		
 		// Start HTTP server
-		let port = process.env.PORT || 80;
+		let port = ConfigHelper.getSync('server').port || process.env.PORT || 80;
 		
 		global.server = http.createServer(app).listen(port);
 
-		debug.log('HTTP server restarted', 'HashBrown');
+		debug.log('HTTP server restarted on port ' + port, 'HashBrown');
 				 
 		// Start schedule helper
 		ScheduleHelper.startWatching();

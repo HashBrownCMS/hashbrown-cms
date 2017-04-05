@@ -662,6 +662,9 @@ img.logo {
         height: 20px;
         display: block;
         font-size: 20px; }
+    .main-menu .main-menu-item .dropdown-menu {
+      left: auto;
+      right: 0px; }
 
 .dashboard-container.welcome .carousel {
   padding: 0px;
@@ -751,7 +754,8 @@ body.dashboard-container {
   body.dashboard-container .dashboard-header {
     text-align: center;
     padding-left: 0px;
-    min-height: 64px; }
+    min-height: 64px;
+    justify-content: center; }
     body.dashboard-container .dashboard-header .dashboard-logo {
       position: absolute;
       left: 1rem;
@@ -760,10 +764,18 @@ body.dashboard-container {
       text-transform: none;
       font-weight: normal;
       top: 50%;
-      transform: translateY(-50%); }
+      transform: translateY(-50%);
+      text-decoration: none; }
+      body.dashboard-container .dashboard-header .dashboard-logo span {
+        margin-left: 0.5rem; }
     body.dashboard-container .dashboard-header li {
       float: none;
       display: inline-block; }
+    body.dashboard-container .dashboard-header form {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      margin: 0px; }
   body.dashboard-container .diagnostics {
     margin: 15px auto; }
     body.dashboard-container .diagnostics tr {
@@ -1937,15 +1949,25 @@ body.dashboard-container {
         position: relative; }
         .dropdown .dropdown-menu > li.active > a:hover, .dropdown .dropdown-menu > li.active > button:hover, .dropdown .dropdown-menu ul > li.active > a:hover, .dropdown .dropdown-menu ul > li.active > button:hover {
           background-color: #e70d3b; }
-      .dropdown .dropdown-menu > li > a, .dropdown .dropdown-menu > li > button, .dropdown .dropdown-menu ul > li > a, .dropdown .dropdown-menu ul > li > button {
+      .dropdown .dropdown-menu > li form, .dropdown .dropdown-menu ul > li form {
+        margin: 0px; }
+        .dropdown .dropdown-menu > li form input[type="submit"], .dropdown .dropdown-menu ul > li form input[type="submit"] {
+          padding: 0px;
+          border: none;
+          background: transparent;
+          display: block;
+          text-align: left;
+          width: 100%; }
+      .dropdown .dropdown-menu > li > a, .dropdown .dropdown-menu > li > button, .dropdown .dropdown-menu > li > form, .dropdown .dropdown-menu ul > li > a, .dropdown .dropdown-menu ul > li > button, .dropdown .dropdown-menu ul > li > form {
         padding: 3px 12px;
         border: 0px;
         color: #333333;
         display: block;
         width: 100%;
         text-align: left;
-        background-color: #ffffff; }
-        .dropdown .dropdown-menu > li > a:hover, .dropdown .dropdown-menu > li > button:hover, .dropdown .dropdown-menu ul > li > a:hover, .dropdown .dropdown-menu ul > li > button:hover {
+        background-color: #ffffff;
+        cursor: pointer; }
+        .dropdown .dropdown-menu > li > a:hover, .dropdown .dropdown-menu > li > button:hover, .dropdown .dropdown-menu > li > form:hover, .dropdown .dropdown-menu ul > li > a:hover, .dropdown .dropdown-menu ul > li > button:hover, .dropdown .dropdown-menu ul > li > form:hover {
           background-color: #e70d3b;
           color: #ffffff; }
     .dropdown .dropdown-menu ul {
@@ -1953,24 +1975,29 @@ body.dashboard-container {
       margin: 0px; }
 
 .nav-tabs {
-  padding: 18px 0px 0px 15px;
+  padding: 1rem 0px 0px 1rem;
   background-color: #21303b;
   font-size: 14px;
   position: relative;
   font-weight: bold;
-  text-transform: uppercase; }
-  .nav-tabs li.active a, .nav-tabs li.active a:hover, .nav-tabs li.active a:focus {
-    color: #e70d3b;
-    border: 0px;
-    background-color: transparent;
-    border-bottom: 5px solid #e70d3b; }
-  .nav-tabs li:not(.active) a, .nav-tabs li:not(.active) a:hover, .nav-tabs li:not(.active) a:focus {
-    color: #ffffff;
-    background-color: transparent;
-    border: 0px; }
-  .nav-tabs li a {
-    border-radius: 0px;
-    margin-bottom: 1px; }
+  text-transform: uppercase;
+  display: flex;
+  align-items: flex-end; }
+  .nav-tabs > li {
+    margin: 0px; }
+    .nav-tabs > li.active a, .nav-tabs > li.active a:hover, .nav-tabs > li.active a:focus {
+      color: #e70d3b;
+      border: 0px;
+      background-color: transparent;
+      border-bottom: 5px solid #e70d3b; }
+    .nav-tabs > li:not(.active) a, .nav-tabs > li:not(.active) a:hover, .nav-tabs > li:not(.active) a:focus {
+      color: #ffffff;
+      background-color: transparent;
+      border: 0px;
+      border-bottom: 5px solid transparent; }
+    .nav-tabs > li a {
+      border-radius: 0px;
+      margin: 0px; }
 
 .btn {
   border-radius: 2px;

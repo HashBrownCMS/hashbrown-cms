@@ -16,6 +16,7 @@ class UserController extends ApiController {
         app.post('/api/user/invite', this.middleware({needsAdmin: true, setProject: false}), this.postInvite);
         app.post('/api/user/activate', this.postActivate);
         app.post('/api/user/login', this.login);
+        app.post('/api/user/logout', this.logout);
         app.post('/api/user/first', this.createFirstAdmin);
         app.post('/api/user/new', this.middleware({setProject: false, needsAdmin: true}), this.createUser);
         app.post('/api/user/:id', this.middleware({setProject: false}), this.postUser);
@@ -66,6 +67,19 @@ class UserController extends ApiController {
         UserHelper.loginUser(username, password, persist)
         .then((token) => {
             res.status(200).cookie('token', token).send(token);
+        })
+        .catch((e) => {
+            res.status(403).send(UserController.printError(e));   
+        });
+    }
+    
+    /** 
+     * Logs out a user
+     */
+    static logout(req, res) {
+        UserHelper.logoutUser(req.cookies.token)
+        .then(() => {
+            res.status(200).cookie('token', '').redirect('/');
         })
         .catch((e) => {
             res.status(403).send(UserController.printError(e));   
