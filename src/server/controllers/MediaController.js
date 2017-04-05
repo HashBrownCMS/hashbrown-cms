@@ -3,8 +3,6 @@
 // Libraries
 let fs = require('fs');
 
-let restler = require('restler');
-
 // Classes
 let ApiController = require('./ApiController');
 let Media = require('../models/Media');
@@ -51,7 +49,7 @@ class MediaController extends ApiController {
                     res.redirect(media.url);
 
                 } else {
-                    restler.get(media.url, {
+                    RequestHelper.get(media.url, {
                         headers: {
                             'Accept': contentType 
                         }

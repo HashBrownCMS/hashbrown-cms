@@ -3,7 +3,6 @@
 let Connection = require('./server/Connection');
 let ConnectionHelper = require(appRoot + '/src/server/helpers/ConnectionHelper');
 
-let restler = require('restler');
 let fs = require('fs');
 
 let route = '';
@@ -42,7 +41,7 @@ class GitHubPages {
                 'Accept': 'application/json'
             };
 
-            restler.post('https://github.com/login/oauth/access_token', {
+            RequestHelper.post('https://github.com/login/oauth/access_token', {
                 data: data,
                 headers: headers    
             })
@@ -61,7 +60,7 @@ class GitHubPages {
                 'Accept': 'application/json'
             };
            
-            restler.get('https://api.github.com/user/orgs?access_token=' + req.query.token, {
+            RequestHelper.get('https://api.github.com/user/orgs?access_token=' + req.query.token, {
                 headers: headers
             }).on('complete', (data, response) => {
                 res.send(data);
@@ -84,7 +83,7 @@ class GitHubPages {
                 apiUrl = 'https://api.github.com/user/repos';
             }
             
-            restler.get(apiUrl + '?access_token=' + req.query.token, {
+            RequestHelper.get(apiUrl + '?access_token=' + req.query.token, {
                 headers: headers
             }).on('complete', (data, response) => {
                 res.send(data);
@@ -99,7 +98,7 @@ class GitHubPages {
                 'Accept': 'application/json'
             };
             
-            restler.get('https://api.github.com/repos/' + req.params.owner + '/' + req.params.repo + '/branches?access_token=' + req.query.token, {
+            RequestHelper.get('https://api.github.com/repos/' + req.params.owner + '/' + req.params.repo + '/branches?access_token=' + req.query.token, {
                 headers: headers
             }).on('complete', (data, response) => {
                 res.send(data);
@@ -114,7 +113,7 @@ class GitHubPages {
                 'Accept': 'application/json'
             };
             
-            restler.get('https://api.github.com/repos/' + req.params.owner + '/' + req.params.repo + '/contents?access_token=' + req.query.token, {
+            RequestHelper.get('https://api.github.com/repos/' + req.params.owner + '/' + req.params.repo + '/contents?access_token=' + req.query.token, {
                 headers: headers
             }).on('complete', (data, response) => {
                 let dirs = [];

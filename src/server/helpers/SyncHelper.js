@@ -1,7 +1,5 @@
 'use strict';
 
-let restler = require('restler');
-
 /**
  * The helper class for all synchronisation services
  */
@@ -37,7 +35,7 @@ class SyncHelper {
                     password: password
                 };
                     
-                restler.post(settings.url + 'user/login?persist=true', {
+                RequestHelper.post(settings.url + 'user/login?persist=true', {
                     headers: headers,
                     data: JSON.stringify(postData)
                 }).on('complete', (data, response) => {
@@ -81,7 +79,7 @@ class SyncHelper {
                     
                     debug.log('Requesting remote resource item ' + remoteResourceName + '/' + remoteItemName + ' for ' + project + '/' + environment + '...', this, 3);
 
-                    restler.get(settings.url + settings.project + '/' + settings.environment + '/' + remoteResourceName + '/' + remoteItemName + '?token=' + settings.token, {
+                    RequestHelper.get(settings.url + settings.project + '/' + settings.environment + '/' + remoteResourceName + '/' + remoteItemName + '?token=' + settings.token, {
                         headers: headers
                     }).on('complete', (data, response) => {
                         if(data instanceof Error) {
@@ -140,7 +138,7 @@ class SyncHelper {
                     };
                    
                     // Send the API request, and make sure to create/upsert any resources that do not yet exist on the remote 
-                    restler.post(settings.url + settings.project + '/' + settings.environment + '/' + remoteResourceName + '/' + remoteItemName + '?create=true&token=' + settings.token, {
+                    RequestHelper.post(settings.url + settings.project + '/' + settings.environment + '/' + remoteResourceName + '/' + remoteItemName + '?create=true&token=' + settings.token, {
                         headers: headers,
                         data: JSON.stringify(remoteItemData)
                     }).on('complete', (data, response) => {
@@ -194,7 +192,7 @@ class SyncHelper {
                   
                     let now = Date.now();
 
-                    restler.get(settings.url + settings.project + '/' + settings.environment + '/' + remoteResourceName, {
+                    RequestHelper.get(settings.url + settings.project + '/' + settings.environment + '/' + remoteResourceName, {
                         headers: headers,
                         query: params
                     }).on('complete', (data, response) => {

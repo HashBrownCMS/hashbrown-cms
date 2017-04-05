@@ -1,7 +1,6 @@
 'use strict';
 
 let fs = require('fs');
-let restler = require('restler');
 let path = require('path');
 
 let Connection = require(appRoot + '/src/common/models/Connection');
@@ -32,7 +31,7 @@ class HashBrownDriverConnection extends Connection {
         return new Promise((resolve, reject) => {
             let apiUrl = this.getRemoteUrl() + '/hashbrown/api/content/tree?token=' + this.settings.token;
 
-            restler.get(apiUrl, {
+            RequestHelper.get(apiUrl, {
                 headers: headers
             }).on('complete', (data, response) => {
                 if(data) {
@@ -80,7 +79,7 @@ class HashBrownDriverConnection extends Connection {
         debug.log('Posting entire tree to ' + this.getRemoteUrl() + '...', this);
     
         return new Promise((resolve, reject) => {
-            restler.post(this.getRemoteUrl() + '/hashbrown/api/content/tree?token=' + this.settings.token, {
+            RequestHelper.post(this.getRemoteUrl() + '/hashbrown/api/content/tree?token=' + this.settings.token, {
                 headers: headers,
                 data: json
             })
@@ -109,7 +108,7 @@ class HashBrownDriverConnection extends Connection {
         };
 
         return new Promise((resolve, reject) => {
-            restler.del(this.getRemoteUrl() + '/hashbrown/api/content/' + id + '?token=' + this.settings.token, {
+            RequestHelper.del(this.getRemoteUrl() + '/hashbrown/api/content/' + id + '?token=' + this.settings.token, {
                 headers: headers
             })
             .on('success', (data, response) => {
@@ -140,7 +139,7 @@ class HashBrownDriverConnection extends Connection {
         };
 
         return new Promise((resolve, reject) => {
-            restler.post(this.getRemoteUrl() + '/hashbrown/api/content/' + id + '/properties?token=' + this.settings.token, {
+            RequestHelper.post(this.getRemoteUrl() + '/hashbrown/api/content/' + id + '/properties?token=' + this.settings.token, {
                 headers: headers,
                 data: JSON.stringify({
                     language: language,
@@ -193,7 +192,7 @@ class HashBrownDriverConnection extends Connection {
                         content: new Buffer(fileData).toString('base64')
                     }
                   
-                    restler.post(apiUrl, {
+                    RequestHelper.post(apiUrl, {
                         headers: headers,
                         data: JSON.stringify(postData), 
                     }).on('complete', (data, response) => {
@@ -228,7 +227,7 @@ class HashBrownDriverConnection extends Connection {
                 'Accept': 'application/json'
             };
             
-            restler.get(apiUrl, {
+            RequestHelper.get(apiUrl, {
                 headers: headers
             }).on('complete', (data, response) => {
                 if(!data || !Array.isArray(data)) {
@@ -266,7 +265,7 @@ class HashBrownDriverConnection extends Connection {
                 'Accept': 'application/json'
             };
             
-            restler.get(apiUrl, {
+            RequestHelper.get(apiUrl, {
                 headers: headers
             }).on('complete', (data, response) => {
                 if(!data || !Array.isArray(data)) {
@@ -307,7 +306,7 @@ class HashBrownDriverConnection extends Connection {
         return new Promise((resolve, reject) => {
             let apiUrl = this.getRemoteUrl() + '/hashbrown/api/media/' + id + '?token=' + this.settings.token;
 
-            restler.get(apiUrl, {
+            RequestHelper.get(apiUrl, {
                 headers: headers
             }).on('complete', (data, response) => {
                 if(!data) {
@@ -346,7 +345,7 @@ class HashBrownDriverConnection extends Connection {
         return new Promise((resolve, reject) => {
             let apiUrl = this.getRemoteUrl() + '/hashbrown/api/media/' + id + '?token=' + this.settings.token;
 
-            restler.del(apiUrl, {
+            RequestHelper.del(apiUrl, {
                 headers: headers
             }).on('complete', (data, response) => {
                 resolve();

@@ -42,6 +42,7 @@ let SecurityHelper = require('./helpers/SecurityHelper');
 
 global.ConfigHelper = require('./helpers/ConfigHelper');
 global.UserHelper = require('./helpers/UserHelper');
+global.RequestHelper = require('./helpers/RequestHelper');
 global.ConnectionHelper = require('./helpers/ConnectionHelper');
 global.ContentHelper = require('./helpers/ContentHelper');
 global.LanguageHelper = require('./helpers/LanguageHelper');

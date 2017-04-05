@@ -1,7 +1,6 @@
 'use strict';
 
 let yamljs = require('./lib/yamljs/Yaml');
-let restler = require('restler');
 let fs = require('fs');
 let path = require('path');
 let glob = require('glob');
@@ -111,7 +110,7 @@ class GitHubConnection extends Connection {
 
             // If not, proceed with REST call
             } else {
-                restler.get('https://api.github.com/repos/' + this.settings.repo + '/contents/' + path + '?' + this.getAppendix(), {
+                RequestHelper.get('https://api.github.com/repos/' + this.settings.repo + '/contents/' + path + '?' + this.getAppendix(), {
                     headers: headers
                 }).on('complete', (data, response) => {
                     if(data) {
@@ -162,7 +161,7 @@ class GitHubConnection extends Connection {
                 // Fetch first to get the SHA
                 debug.log('Getting SHA...', this);
                 
-                restler.get(apiPath, {
+                RequestHelper.get(apiPath, {
                     headers: headers
                 }).on('complete', (data, response) => {
                     let postData = {
@@ -176,7 +175,7 @@ class GitHubConnection extends Connection {
                     // Commit the file
                     debug.log('Committing data...', this);
 
-                    restler.put(apiPath, {
+                    RequestHelper.put(apiPath, {
                         headers: headers,
                         data: JSON.stringify(postData)
                     }).on('complete', (data, response) => {
@@ -225,7 +224,7 @@ class GitHubConnection extends Connection {
                 // Fetch first to get the SHA
                 debug.log('Getting SHA...', this, 2);
                 
-                restler.get(getApiPath, {
+                RequestHelper.get(getApiPath, {
                     headers: headers
                 }).on('complete', (data, response) => {
                     // Data wasn't found, nothing needs to be deleted
@@ -244,7 +243,7 @@ class GitHubConnection extends Connection {
                     // Remove the file
                     debug.log('Removing data...', this, 2);
 
-                    restler.del(delApiPath, {
+                    RequestHelper.del(delApiPath, {
                         headers: headers,
                         data: JSON.stringify(postData)
                     }).on('complete', (data, response) => {
@@ -310,7 +309,7 @@ class GitHubConnection extends Connection {
                
                 let getApiUrl = 'https://api.github.com/repos/' + this.settings.repo + '/git/trees/' + (this.settings.branch || 'gh-pages') + '?recursive=1&access_token=' + this.settings.token;
 
-                restler.get(getApiUrl, {
+                RequestHelper.get(getApiUrl, {
                     headers: headers
                 }).on('complete', (data, response) => {
                     if(data) {
@@ -676,7 +675,7 @@ class GitHubConnection extends Connection {
                             debug.log('Committing media data to ' + postData.path + '...', this);
 
                             // PUT the content
-                            restler.put(fileApiPath, {
+                            RequestHelper.put(fileApiPath, {
                                 headers: headers,
                                 data: JSON.stringify(postData)
                             }).on('complete', (data, response) => {
@@ -727,7 +726,7 @@ class GitHubConnection extends Connection {
                 // Fetch first to get the SHA
                 debug.log('Getting existing files...', this);
                 
-                restler.get(dirApiPath, {
+                RequestHelper.get(dirApiPath, {
                     headers: headers
                 }).on('complete', (data, response) => {
                     let removeNext = (i) => {
@@ -745,7 +744,7 @@ class GitHubConnection extends Connection {
                             // Remove the file
                             debug.log('Removing data...', this);
 
-                            restler.del(fileApiPath, {
+                            RequestHelper.del(fileApiPath, {
                                 headers: headers,
                                 data: JSON.stringify(postData)
                             }).on('complete', (data, response) => {
