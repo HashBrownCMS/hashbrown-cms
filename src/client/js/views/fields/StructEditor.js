@@ -12,6 +12,46 @@ class StructEditor extends View {
         this.fetch();
     }
 
+    /**
+     * Renders a field preview template
+     *
+     * @returns {HTMLElement} Element
+     */
+    renderPreview() {
+        if(!this.schema.previewTemplate) { return null; }
+
+        let $element = _.div({class: 'field-preview'});
+        let template = this.schema.previewTemplate;
+        let regex = /\${([\s\S]+?)}/g;
+        let field = this.value;
+
+        let html = template.replace(regex, (key) => {
+            // Remove braces first
+            key = key.replace('${ ', '').replace('${', '');
+            key = key.replace(' }', '').replace('}', '');
+
+            // Find result
+            let result = '';
+
+            try {
+                result = eval("'use strict'; " + key);
+            } catch(e) {
+                // Ignore failed eval, the values are just not set yet
+                result = e.message;
+            }
+
+            if(result && result._multilingual) {
+                result = result[window.language];
+            }
+
+            return result || '';
+        });
+
+        $element.html(html);
+
+        return $element;
+    }
+
 
     /**
      * Event: Change value
@@ -45,6 +85,9 @@ class StructEditor extends View {
     
         // Render editor
         _.append(this.$element.empty(),
+            // Render preview
+            this.renderPreview(),
+
             // Loop through each key in the struct
             _.each(this.config.struct, (k, keySchema) => {
                 let value = this.value[k];

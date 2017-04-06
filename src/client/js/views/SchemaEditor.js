@@ -581,6 +581,35 @@ class SchemaEditor extends View {
         return $element;
     }
 
+	/**
+	 * Render template editor
+	 *
+	 * @returns {HTMLElement} Element
+	 */
+	renderTemplateEditor() {
+        let $element = _.div({class: 'field-properties-editor'});
+
+		setTimeout(() => {
+			this.templateEditor = CodeMirror($element[0], {
+				value: this.model.previewTemplate || '',
+                mode: {
+                    name: 'xml'
+                },
+                lineWrapping: true,
+                lineNumbers: true,
+                tabSize: 4,
+                indentUnit: 4,
+                indentWithTabs: true
+			});
+
+			this.templateEditor.on('change', () => {
+				this.model.previewTemplate = this.templateEditor.getDoc().getValue();
+			});
+		}, 1);
+
+		return $element;
+	}
+
     /**
      * Renders a single field
      *
@@ -634,8 +663,9 @@ class SchemaEditor extends View {
                 
                 if(!this.model.locked) {
                     $element.append(this.renderField('Config', this.renderFieldPropertiesEditor(), true));
+                    $element.append(this.renderField('Preview template', this.renderTemplateEditor(), true));
                 }
-                    
+       
                 break;
         }
 

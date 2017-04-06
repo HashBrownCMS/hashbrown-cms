@@ -12615,7 +12615,7 @@
 	                    this[k] = properties[k];
 	                }
 	            } catch (e) {
-	                debug.warning(e, this);
+	                debug.log(e, this);
 	            }
 	        }
 	    }

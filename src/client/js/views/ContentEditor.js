@@ -137,7 +137,7 @@ class ContentEditor extends View {
      * Renders a field view
      *
      * @param {Object} fieldValue The field value to inject into the field editor
-     * @param {Object} fieldDefinition The field definition
+     * @param {FieldSchema} fieldDefinition The field definition
      * @param {Function} onChange The change event
      * @param {Object} config The field config
      * @param {HTMLElement} keyContent The key content container

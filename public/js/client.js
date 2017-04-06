@@ -17663,15 +17663,60 @@
 	    }
 
 	    /**
-	     * Event: Change value
+	     * Renders a field preview template
 	     *
-	     * @param {Object} newValue
-	     * @param {String} key
-	     * @param {Object} keySchema
+	     * @returns {HTMLElement} Element
 	     */
 
 
 	    _createClass(StructEditor, [{
+	        key: 'renderPreview',
+	        value: function renderPreview() {
+	            if (!this.schema.previewTemplate) {
+	                return null;
+	            }
+
+	            var $element = _.div({ class: 'field-preview' });
+	            var template = this.schema.previewTemplate;
+	            var regex = /\${([\s\S]+?)}/g;
+	            var field = this.value;
+
+	            var html = template.replace(regex, function (key) {
+	                // Remove braces first
+	                key = key.replace('${ ', '').replace('${', '');
+	                key = key.replace(' }', '').replace('}', '');
+
+	                // Find result
+	                var result = '';
+
+	                try {
+	                    result = eval("'use strict'; " + key);
+	                } catch (e) {
+	                    // Ignore failed eval, the values are just not set yet
+	                    result = e.message;
+	                }
+
+	                if (result && result._multilingual) {
+	                    result = result[window.language];
+	                }
+
+	                return result || '';
+	            });
+
+	            $element.html(html);
+
+	            return $element;
+	        }
+
+	        /**
+	         * Event: Change value
+	         *
+	         * @param {Object} newValue
+	         * @param {String} key
+	         * @param {Object} keySchema
+	         */
+
+	    }, {
 	        key: 'onChange',
 	        value: function onChange(newValue, key, keySchema) {
 	            if (keySchema.multilingual) {
@@ -17700,6 +17745,9 @@
 
 	            // Render editor
 	            _.append(this.$element.empty(),
+	            // Render preview
+	            this.renderPreview(),
+
 	            // Loop through each key in the struct
 	            _.each(this.config.struct, function (k, keySchema) {
 	                var value = _this2.value[k];
@@ -23179,7 +23227,7 @@
 	         * Renders a field view
 	         *
 	         * @param {Object} fieldValue The field value to inject into the field editor
-	         * @param {Object} fieldDefinition The field definition
+	         * @param {FieldSchema} fieldDefinition The field definition
 	         * @param {Function} onChange The change event
 	         * @param {Object} config The field config
 	         * @param {HTMLElement} keyContent The key content container
@@ -24559,6 +24607,40 @@
 	        }
 
 	        /**
+	         * Render template editor
+	         *
+	         * @returns {HTMLElement} Element
+	         */
+
+	    }, {
+	        key: 'renderTemplateEditor',
+	        value: function renderTemplateEditor() {
+	            var _this7 = this;
+
+	            var $element = _.div({ class: 'field-properties-editor' });
+
+	            setTimeout(function () {
+	                _this7.templateEditor = CodeMirror($element[0], {
+	                    value: _this7.model.previewTemplate || '',
+	                    mode: {
+	                        name: 'xml'
+	                    },
+	                    lineWrapping: true,
+	                    lineNumbers: true,
+	                    tabSize: 4,
+	                    indentUnit: 4,
+	                    indentWithTabs: true
+	                });
+
+	                _this7.templateEditor.on('change', function () {
+	                    _this7.model.previewTemplate = _this7.templateEditor.getDoc().getValue();
+	                });
+	            }, 1);
+
+	            return $element;
+	        }
+
+	        /**
 	         * Renders a single field
 	         *
 	         * @param {String} label
@@ -24610,6 +24692,7 @@
 
 	                    if (!this.model.locked) {
 	                        $element.append(this.renderField('Config', this.renderFieldPropertiesEditor(), true));
+	                        $element.append(this.renderField('Preview template', this.renderTemplateEditor(), true));
 	                    }
 
 	                    break;
@@ -24620,17 +24703,17 @@
 	    }, {
 	        key: 'render',
 	        value: function render() {
-	            var _this7 = this;
+	            var _this8 = this;
 
 	            this.$element.toggleClass('locked', this.model.locked);
 
 	            SchemaHelper.getSchemaWithParentFields(this.model.id).then(function (compiledSchema) {
-	                _this7.compiledSchema = compiledSchema;
+	                _this8.compiledSchema = compiledSchema;
 
-	                _.append(_this7.$element.empty(), _.div({ class: 'editor-header' }, _.span({ class: 'fa fa-' + _this7.compiledSchema.icon }), _.h4(_this7.model.name)), _this7.renderFields(), _.div({ class: 'editor-footer panel panel-default panel-buttons' }, _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-embedded' }, 'Advanced').click(function () {
-	                    _this7.onClickAdvanced();
-	                }), _.if(!_this7.model.locked, _this7.$saveBtn = _.button({ class: 'btn btn-primary btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Save '), _.span({ class: 'text-working' }, 'Saving ')).click(function () {
-	                    _this7.onClickSave();
+	                _.append(_this8.$element.empty(), _.div({ class: 'editor-header' }, _.span({ class: 'fa fa-' + _this8.compiledSchema.icon }), _.h4(_this8.model.name)), _this8.renderFields(), _.div({ class: 'editor-footer panel panel-default panel-buttons' }, _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-embedded' }, 'Advanced').click(function () {
+	                    _this8.onClickAdvanced();
+	                }), _.if(!_this8.model.locked, _this8.$saveBtn = _.button({ class: 'btn btn-primary btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Save '), _.span({ class: 'text-working' }, 'Saving ')).click(function () {
+	                    _this8.onClickSave();
 	                })))));
 	            });
 	        }
@@ -26599,7 +26682,7 @@
 	                    this[k] = properties[k];
 	                }
 	            } catch (e) {
-	                debug.warning(e, this);
+	                debug.log(e, this);
 	            }
 	        }
 	    }
@@ -35108,6 +35191,16 @@
 	        }
 
 	        /**
+	         * Gets the Media Url
+	         */
+
+	    }, {
+	        key: 'getMediaUrl',
+	        value: function getMediaUrl(id) {
+	            return '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + id;
+	        }
+
+	        /**
 	         * Gets Media object by id
 	         *
 	         * @param {String} id
@@ -36345,6 +36438,7 @@
 	            _get(FieldSchema.prototype.__proto__ || Object.getPrototypeOf(FieldSchema.prototype), 'structure', this).call(this);
 
 	            this.def(String, 'editorId');
+	            this.def(String, 'previewTemplate', '');
 	            this.def(Object, 'config', {});
 
 	            this.name = 'New field schema';

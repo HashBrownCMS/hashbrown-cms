@@ -616,11 +616,19 @@ img.logo {
             content: '\F071';
             margin-right: 5px; }
         .cms-container .workspace .editor .field-container .field-value {
-          flex-grow: 1; }
+          flex-grow: 1;
+          position: relative; }
           .cms-container .workspace .editor .field-container .field-value input, .cms-container .workspace .editor .field-container .field-value select, .cms-container .workspace .editor .field-container .field-value option, .cms-container .workspace .editor .field-container .field-value textarea, .cms-container .workspace .editor .field-container .field-value p {
             font-size: 14px; }
           .cms-container .workspace .editor .field-container .field-value select option {
             padding: 5px; }
+          .cms-container .workspace .editor .field-container .field-value .field-preview {
+            position: absolute;
+            z-index: 50;
+            top: 0px;
+            left: 0px;
+            right: 0px;
+            bottom: 0px; }
           .cms-container .workspace .editor .field-container .field-value .date-editor {
             height: 30px; }
             .cms-container .workspace .editor .field-container .field-value .date-editor p {
