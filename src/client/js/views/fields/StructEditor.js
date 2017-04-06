@@ -47,7 +47,12 @@ class StructEditor extends View {
             return result || '';
         });
 
-        $element.html(html);
+        $element.append(
+			_.div({class: 'field-preview-toolbar'},
+				_.button({class: 'btn btn-default'}, 'Edit')
+			),
+			html
+		);
 
         return $element;
     }

@@ -629,6 +629,11 @@ img.logo {
             left: 0px;
             right: 0px;
             bottom: 0px; }
+            .cms-container .workspace .editor .field-container .field-value .field-preview .field-preview-toolbar {
+              position: absolute;
+              top: 0px;
+              right: 0px;
+              background-color: rgba(255, 255, 255, 0.5); }
           .cms-container .workspace .editor .field-container .field-value .date-editor {
             height: 30px; }
             .cms-container .workspace .editor .field-container .field-value .date-editor p {

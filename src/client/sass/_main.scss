@@ -524,6 +524,13 @@ img.logo {
                         left: 0px;
                         right: 0px;
                         bottom: 0px;
+                    
+                        .field-preview-toolbar {
+                            position: absolute;
+                            top: 0px;
+                            right: 0px;
+                            background-color: rgba(255, 255, 255, 0.5);
+                        }
                     }
 
                     .date-editor {

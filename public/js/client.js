@@ -2297,9 +2297,9 @@
 	    _createClass(ContextMenu, [{
 	        key: 'render',
 	        value: function render() {
-	            var _this2 = this;
+	            var view = this;
 
-	            this.$element.html(_.each(this.model, function (label, func) {
+	            view.$element.html(_.each(view.model, function (label, func) {
 	                if (func == '---') {
 	                    return _.li({ class: 'dropdown-header' }, label);
 	                } else {
@@ -2310,21 +2310,13 @@
 	                        if (func) {
 	                            func(e);
 
-	                            _this2.remove();
+	                            view.remove();
 	                        }
 	                    }));
 	                }
 	            }));
 
-	            $('body').append(this.$element);
-
-	            var rect = this.$element[0].getBoundingClientRect();
-
-	            if (rect.right > window.innerWidth) {
-	                this.$element.css('left', rect.left - rect.width + 'px');
-	            } else if (rect.bottom > window.innerHeight) {
-	                this.$element.css('top', rect.top - rect.height + 'px');
-	            }
+	            $('body').append(view.$element);
 	        }
 	    }]);
 
@@ -17703,7 +17695,7 @@
 	                return result || '';
 	            });
 
-	            $element.html(html);
+	            $element.append(_.div({ class: 'field-preview-toolbar' }, _.button({ class: 'btn btn-default' }, 'Edit')), html);
 
 	            return $element;
 	        }
@@ -18752,6 +18744,7 @@
 	                    },
 	                    viewportMargin: _this4.embedded ? Infinity : 10,
 	                    tabSize: 4,
+	                    lineWrapping: _this4.embedded,
 	                    indentUnit: 4,
 	                    indentWithTabs: true,
 	                    theme: getCookie('cmtheme') || 'default',
