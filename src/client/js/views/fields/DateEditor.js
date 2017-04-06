@@ -1,9 +1,11 @@
 'use strict';
 
+const FieldEditor = require('./FieldEditor');
+
 /**
  * An editor for date values
  */
-class DateEditor extends View {
+class DateEditor extends FieldEditor {
     constructor(params) {
         super(params);
 
@@ -241,6 +243,9 @@ class DateEditor extends View {
 
     render() {
         this.$element = _.div({class: 'field-editor date-editor input-group'},
+            // Render preview
+            this.renderPreview(),
+
             _.if(this.disabled,
                 _.p({}, this.formatDate(this.value))
             ),

@@ -1,9 +1,11 @@
 'use strict';
 
+const FieldEditor = require('./FieldEditor');
+
 /**
  * A CSV string editor
  */
-class TagsEditor extends View {
+class TagsEditor extends FieldEditor {
     constructor(params) {
         super(params);
 
@@ -119,6 +121,9 @@ class TagsEditor extends View {
 
         // Main element
         this.$element = _.div({class: 'field-editor tags-editor'},
+            // Render preview
+            this.renderPreview(),
+
             _.if(this.disabled,
                 _.p(this.value || '(none)')
             ),

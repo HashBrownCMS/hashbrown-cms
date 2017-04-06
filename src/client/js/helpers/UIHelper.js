@@ -379,27 +379,24 @@ class UIHelper {
     static errorModal(error, onClickOK) {
         if(!error) { return; }
 
-        let message = '';
-
         if(error instanceof String) {
-            message = error;
+            error = new Error(error);
         
-        } else if(error instanceof Error) {
-            message = error.message;
-
         } else if(error instanceof Object) {
             if(error.responseText) {
-                message = error.responseText;
+                error = new Error(error.responseText);
             }
+        
+        } else if(error instanceof Error == false) {
+            error = new Error(error.toString());
+
         }
 
-        message = message || '';
-
-        let modal = messageModal('<span class="fa fa-warning"></span> Error', message + '<br /><br />Please check the JavaScript console for details', onClickOK);
+        let modal = messageModal('<span class="fa fa-warning"></span> Error', error.message + '<br /><br />Please check the JavaScript console for details', onClickOK);
 
         modal.$element.toggleClass('error-modal', true);
 
-        throw new Error(message);
+        throw error;
     }
 
     /**

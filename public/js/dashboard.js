@@ -2275,9 +2275,9 @@
 	    _createClass(ContextMenu, [{
 	        key: 'render',
 	        value: function render() {
-	            var view = this;
+	            var _this2 = this;
 
-	            view.$element.html(_.each(view.model, function (label, func) {
+	            this.$element.html(_.each(this.model, function (label, func) {
 	                if (func == '---') {
 	                    return _.li({ class: 'dropdown-header' }, label);
 	                } else {
@@ -2288,13 +2288,21 @@
 	                        if (func) {
 	                            func(e);
 
-	                            view.remove();
+	                            _this2.remove();
 	                        }
 	                    }));
 	                }
 	            }));
 
-	            $('body').append(view.$element);
+	            $('body').append(this.$element);
+
+	            var rect = this.$element[0].getBoundingClientRect();
+
+	            if (rect.right > window.innerWidth) {
+	                this.$element.css('left', rect.left - rect.width + 'px');
+	            } else if (rect.bottom > window.innerHeight) {
+	                this.$element.css('top', rect.top - rect.height + 'px');
+	            }
 	        }
 	    }]);
 
@@ -11309,25 +11317,21 @@
 	                return;
 	            }
 
-	            var message = '';
-
 	            if (error instanceof String) {
-	                message = error;
-	            } else if (error instanceof Error) {
-	                message = error.message;
+	                error = new Error(error);
 	            } else if (error instanceof Object) {
 	                if (error.responseText) {
-	                    message = error.responseText;
+	                    error = new Error(error.responseText);
 	                }
+	            } else if (error instanceof Error == false) {
+	                error = new Error(error.toString());
 	            }
 
-	            message = message || '';
-
-	            var modal = messageModal('<span class="fa fa-warning"></span> Error', message + '<br /><br />Please check the JavaScript console for details', onClickOK);
+	            var modal = messageModal('<span class="fa fa-warning"></span> Error', error.message + '<br /><br />Please check the JavaScript console for details', onClickOK);
 
 	            modal.$element.toggleClass('error-modal', true);
 
-	            throw new Error(message);
+	            throw error;
 	        }
 
 	        /**
@@ -21103,7 +21107,7 @@
 	                return _.div({ class: 'environment' }, _.div({ class: 'btn-group' }, _.a({ title: 'Go to "' + environment + '" CMS', href: '/' + _this7.model.id + '/' + environment, class: 'environment-title btn btn-default' }, environment), _.if(User.current.isAdmin, _.div({ class: 'dropdown' }, _.button({ class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, _.span({ class: 'fa fa-ellipsis-v' })), _.ul({ class: 'dropdown-menu' }, _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Delete').click(function (e) {
 	                    e.preventDefault();_this7.onClickRemoveEnvironment(environment);
 	                })))))));
-	            }), _.if(User.current.isAdmin, _.button({ title: 'Add environment', class: 'btn btn-primary btn-add btn-raised btn-round' }, '+').click(function () {
+	            }), _.if(User.current.isAdmin, _.button({ title: 'Add environment', class: 'btn btn-primary btn-add btn-raised btn-round' }, _.span({ class: 'fa fa-plus' })).click(function () {
 	                _this7.onClickAddEnvironment();
 	            })))));
 
@@ -21170,7 +21174,7 @@
 	                // Create backup
 	                _.div({ class: 'btn-round-group' }, _.button({ class: 'btn btn-round btn-raised btn-default btn-group-addon btn-upload-backup' }, _.span({ class: 'fa fa-upload' }), _.label('Upload')).click(function () {
 	                    _this.onClickUploadBackup();
-	                }), _.button({ class: 'btn btn-round btn-raised btn-primary btn-create-backup' }, _.span({ class: 'btn-icon-initial' }, '+'), _.span({ class: 'btn-icon-display fa fa-save' }), _.label('Create')).click(function () {
+	                }), _.button({ class: 'btn btn-round btn-raised btn-primary btn-create-backup' }, _.span({ class: 'btn-icon-initial' }, _.span({ class: 'fa fa-plus' })), _.span({ class: 'btn-icon-display fa fa-save' }), _.label('Create')).click(function () {
 	                    _this.onClickCreateBackup();
 	                })))
 	            }

@@ -1,9 +1,11 @@
 'use strict';
 
+const FieldEditor = require('./FieldEditor');
+
 /**
  * An editor for referring to other Content
  */
-class ContentReferenceEditor extends View {
+class ContentReferenceEditor extends FieldEditor {
     constructor(params) {
         super(params);
 
@@ -50,6 +52,8 @@ class ContentReferenceEditor extends View {
     render() {
         // Render main element
         this.$element = _.div({class: 'field-editor content-reference-editor'}, [
+            // Render preview
+            this.renderPreview(),
 
             // Render picker
             this.$dropdown = UI.inputDropdownTypeAhead('(none)', this.getDropdownOptions(), (newValue) => {

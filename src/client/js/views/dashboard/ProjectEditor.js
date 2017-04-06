@@ -222,7 +222,7 @@ class ProjectEditor extends View {
                         );
                     }),
                     _.if(User.current.isAdmin,
-                        _.button({title: 'Add environment', class: 'btn btn-primary btn-add btn-raised btn-round'}, '+')
+                        _.button({title: 'Add environment', class: 'btn btn-primary btn-add btn-raised btn-round'}, _.span({class: 'fa fa-plus'}))
                             .click(() => { this.onClickAddEnvironment(); })
                     )
                 )

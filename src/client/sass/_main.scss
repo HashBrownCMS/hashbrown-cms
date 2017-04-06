@@ -524,12 +524,24 @@ img.logo {
                         left: 0px;
                         right: 0px;
                         bottom: 0px;
+                        transition: opacity 0.5s ease;
+                        background-color: $standard;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: center;
                     
+                        &.editing {
+                            pointer-events: none;
+                            opacity: 0;
+                        }
+
                         .field-preview-toolbar {
                             position: absolute;
-                            top: 0px;
-                            right: 0px;
-                            background-color: rgba(255, 255, 255, 0.5);
+                            top: 0rem;
+                            right: 0rem;
+                            left: 0rem;
+                            padding: 1rem;
+                            text-align: right;
                         }
                     }
 

@@ -26,8 +26,9 @@ class Schema extends Entity {
     static create(parentSchema) {
         return SchemaHelper.getModel({
             id: Entity.createId(),
-            icon: 'file',
+            icon: parentSchema.icon || 'file',
             type: parentSchema.type,
+            editorId: parentSchema.editorId,
             parentSchemaId: parentSchema.id
         });
     }

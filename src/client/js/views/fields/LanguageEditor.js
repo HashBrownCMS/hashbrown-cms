@@ -1,9 +1,11 @@
 'use strict';
 
+const FieldEditor = require('./FieldEditor');
+
 /**
  * A field editor for specifying one of the selected languages
  */
-class LanguageEditor extends View {
+class LanguageEditor extends FieldEditor {
     constructor(params) {
         super(params);
 
@@ -21,6 +23,9 @@ class LanguageEditor extends View {
     
     render() {
         this.$element = _.div({class: 'field-editor dropdown-editor'},
+            // Render preview
+            this.renderPreview(),
+
             this.$select = _.select({class: 'form-control'}).change(() => { this.onChange(); })
         );
 

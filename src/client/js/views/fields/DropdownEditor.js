@@ -1,9 +1,11 @@
 'use strict';
 
+const FieldEditor = require('./FieldEditor');
+
 /**
  * A simple list picker
  */
-class DropdownEditor extends View {
+class DropdownEditor extends FieldEditor {
     constructor(params) {
         super(params);
 
@@ -23,15 +25,10 @@ class DropdownEditor extends View {
 
     render() {
         // Wait until next CPU cycle to trigger an eventual change if needed
-        setTimeout(() => { 
-        
+        setTimeout(() => {         
             // Value sanity check, should not be null
-            if(!this.config.options || this.config.options.length < 1) {
+            if(!this.config.options) {
                 this.config.options = [];
-
-                console.log(this, this.config);
-
-                UI.errorModal(new Error('The Schema for "' + this.schema.label + '" has no options defined'));
             }
 
             // Generate dropdown options
@@ -45,10 +42,19 @@ class DropdownEditor extends View {
                 };
             }
         
-            this.$element.html(
-                UI.inputDropdown('(none)', dropdownOptions, (newValue) => {
-                    this.onChange(newValue);
-                }, true)
+            _.append(this.$element.empty(),
+                // Render preview
+                this.renderPreview(),
+
+                _.if(this.config.options.length > 0,
+                    UI.inputDropdown('(none)', dropdownOptions, (newValue) => {
+                        this.onChange(newValue);
+                    }, true)
+                ),
+                _.if(this.config.options.length < 1,
+                    _.span({class: 'field-warning'}, 'No options configured')
+                )
+
             );
         }, 1);
     }

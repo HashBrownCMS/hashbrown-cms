@@ -2297,9 +2297,9 @@
 	    _createClass(ContextMenu, [{
 	        key: 'render',
 	        value: function render() {
-	            var view = this;
+	            var _this2 = this;
 
-	            view.$element.html(_.each(view.model, function (label, func) {
+	            this.$element.html(_.each(this.model, function (label, func) {
 	                if (func == '---') {
 	                    return _.li({ class: 'dropdown-header' }, label);
 	                } else {
@@ -2310,13 +2310,21 @@
 	                        if (func) {
 	                            func(e);
 
-	                            view.remove();
+	                            _this2.remove();
 	                        }
 	                    }));
 	                }
 	            }));
 
-	            $('body').append(view.$element);
+	            $('body').append(this.$element);
+
+	            var rect = this.$element[0].getBoundingClientRect();
+
+	            if (rect.right > window.innerWidth) {
+	                this.$element.css('left', rect.left - rect.width + 'px');
+	            } else if (rect.bottom > window.innerHeight) {
+	                this.$element.css('top', rect.top - rect.height + 'px');
+	            }
 	        }
 	    }]);
 
@@ -11331,25 +11339,21 @@
 	                return;
 	            }
 
-	            var message = '';
-
 	            if (error instanceof String) {
-	                message = error;
-	            } else if (error instanceof Error) {
-	                message = error.message;
+	                error = new Error(error);
 	            } else if (error instanceof Object) {
 	                if (error.responseText) {
-	                    message = error.responseText;
+	                    error = new Error(error.responseText);
 	                }
+	            } else if (error instanceof Error == false) {
+	                error = new Error(error.toString());
 	            }
 
-	            message = message || '';
-
-	            var modal = messageModal('<span class="fa fa-warning"></span> Error', message + '<br /><br />Please check the JavaScript console for details', onClickOK);
+	            var modal = messageModal('<span class="fa fa-warning"></span> Error', error.message + '<br /><br />Please check the JavaScript console for details', onClickOK);
 
 	            modal.$element.toggleClass('error-modal', true);
 
-	            throw new Error(message);
+	            throw error;
 	        }
 
 	        /**
@@ -15757,13 +15761,9 @@
 
 /***/ },
 /* 84 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-
-	/**
-	 * An array editor for editing a list of other field values
-	 */
 
 	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
@@ -15775,8 +15775,14 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var ArrayEditor = function (_View) {
-	    _inherits(ArrayEditor, _View);
+	var FieldEditor = __webpack_require__(205);
+
+	/**
+	 * An array editor for editing a list of other field values
+	 */
+
+	var ArrayEditor = function (_FieldEditor) {
+	    _inherits(ArrayEditor, _FieldEditor);
 
 	    function ArrayEditor(params) {
 	        _classCallCheck(this, ArrayEditor);
@@ -15851,6 +15857,11 @@
 	        key: 'onClickAddItem',
 	        value: function onClickAddItem() {
 	            var index = this.value.items.length;
+
+	            if (this.config.maxItems && index >= this.config.maxItems) {
+	                UI.messageModal('Item maximum reached', 'You  can maximum add ' + this.config.maxItems + ' items here');
+	                return;
+	            }
 
 	            this.value.items[index] = null;
 	            this.value.schemaBindings[index] = null;
@@ -16001,7 +16012,7 @@
 
 	            // Returns the correct index, even if it's updated
 	            var getIndex = function getIndex() {
-	                return $element.attr('data-index');
+	                return parseInt($element.attr('data-index'));
 	            };
 
 	            // Renders this item
@@ -16085,12 +16096,7 @@
 	                })));
 
 	                // Set schema label (used when sorting items)
-	                var schemaLabel = 'Item #' + getIndex();
-
-	                // Add the Schema name in case we don't find the label field
-	                if (itemSchema) {
-	                    schemaLabel += ' (' + itemSchema.name + ')';
-	                }
+	                var schemaLabel = '';
 
 	                // Get the label from the item
 	                // TODO (Issue #157): Make this recursive, so we can find detailed values in structs 
@@ -16102,24 +16108,24 @@
 	                            var content = ContentHelper.getContentByIdSync(item);
 
 	                            if (content) {
-	                                schemaLabel = content.prop('title', window.language) || content.id;
+	                                schemaLabel = content.prop('title', window.language) || content.id || schemaLabel;
 	                            } else {
 	                                var media = MediaHelper.getMediaByIdSync(item);
 
 	                                if (media) {
-	                                    schemaLabel = media.name || media.url;
+	                                    schemaLabel = media.name || media.url || schemaLabel;
 	                                }
 	                            }
 
 	                            // This item is another type of string
 	                        } else {
-	                            schemaLabel = item;
+	                            schemaLabel = item || schemaLabel;
 	                        }
 
 	                        // This item is a struct
 	                    } else if (item instanceof Object) {
 	                        // Try to get a field based on the usual suspects
-	                        schemaLabel = item.name || item.title || item.text || item.heading || item.header || item.description || item.type || item.body || item.id || schemaLabel;
+	                        schemaLabel = item.name || item.title || item.text || item.heading || item.header || item.body || item.description || item.type || item.body || item.id || schemaLabel;
 
 	                        if (!schemaLabel) {
 	                            // Find the first available field
@@ -16128,7 +16134,8 @@
 
 	                                // If a label field was found, check if it has a value
 	                                if (item[configKey]) {
-	                                    schemaLabel = item[configKey];
+	                                    schemaLabel = item[configKey] || schemaLabel;
+	                                    console.log('s2', schemaLabel);
 	                                    break;
 	                                }
 	                            }
@@ -16136,11 +16143,26 @@
 	                    }
 	                }
 
+	                // If the schema label is multilingual, pick the appropriate string
+	                if (schemaLabel && schemaLabel._multilingual) {
+	                    schemaLabel = schemaLabel[window.language];
+	                }
+
+	                // If no schema label was found, or it's not a string, resort to generic naming
+	                if (!schemaLabel || typeof schemaLabel !== 'string') {
+	                    schemaLabel = 'Item #' + (getIndex() + 1);
+
+	                    // Add the Schema name in case we don't find the label field
+	                    if (itemSchema) {
+	                        schemaLabel += ' (' + itemSchema.name + ')';
+	                    }
+	                }
+
 	                // Create label element 
 	                var $schemaLabel = _.span({ class: 'schema-label' }, schemaLabel);
 
 	                // Expanding/collapsing an item
-	                var $btnToggle = _.button({ class: 'btn btn-embedded btn-toggle' }, _.span({ class: 'fa fa-window-maximize' }), _.span({ class: 'fa fa-window-minimize' })).on('click', function () {
+	                var $btnToggle = _.button({ title: 'Collapse/expand item', class: 'btn btn-embedded btn-toggle' }, _.span({ class: 'fa fa-window-maximize' }), _.span({ class: 'fa fa-window-minimize' })).on('click', function () {
 	                    $element.toggleClass('collapsed');
 	                });
 
@@ -16162,7 +16184,7 @@
 	                });
 
 	                // Render the DOM element
-	                _.append($element.empty(), $btnToggle, _.button({ class: 'btn btn-embedded btn-remove' }, _.span({ class: 'fa fa-remove' })).click(function () {
+	                _.append($element.empty(), $btnToggle, _.button({ title: 'Remove item', class: 'btn btn-embedded btn-remove' }, _.span({ class: 'fa fa-remove' })).click(function () {
 	                    _this4.onClickRemoveItem($element);
 	                }), $schemaLabel, _this4.config.allowedSchemas.length > 1 ? $schemaSelector : null, fieldEditorInstance.$element);
 	            };
@@ -16184,10 +16206,10 @@
 	                };
 	            }
 
-	            // NOTE: The reason for having a separate array with schema ids is that there is no way
-	            // to associate a value with a schema id if it's not an Object type, like a String
+	            // NOTE: The reason for having a separate array with Schema ids is that there is no other way
+	            // to associate a value with a Schema id if it's not an Object type, like a String or a Number
 
-	            // A sanity check to make sure we're working with an object
+	            // A sanity check to make sure we're working with an object value
 	            if (!this.value || !(this.value instanceof Object)) {
 	                this.value = {
 	                    items: [],
@@ -16214,7 +16236,7 @@
 	            _.append(this.$element.empty(), _.div({ class: 'items' }),
 
 	            // Render the add item button
-	            _.button({ class: 'btn btn-primary btn-raised btn-add-item btn-round' }, '+').click(function () {
+	            _.button({ title: 'Add item', class: 'btn btn-primary btn-raised btn-add-item btn-round' }, _.span({ class: 'fa fa-plus' })).click(function () {
 	                _this5.onClickAddItem();
 	            }));
 
@@ -16240,19 +16262,15 @@
 	    }]);
 
 	    return ArrayEditor;
-	}(View);
+	}(FieldEditor);
 
 	module.exports = ArrayEditor;
 
 /***/ },
 /* 85 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-
-	/**
-	 * A simple boolean editor
-	 */
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -16262,8 +16280,14 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var BooleanEditor = function (_View) {
-	    _inherits(BooleanEditor, _View);
+	var FieldEditor = __webpack_require__(205);
+
+	/**
+	 * A simple boolean editor
+	 */
+
+	var BooleanEditor = function (_FieldEditor) {
+	    _inherits(BooleanEditor, _FieldEditor);
 
 	    function BooleanEditor(params) {
 	        _classCallCheck(this, BooleanEditor);
@@ -16288,7 +16312,9 @@
 	                this.value = false;
 	            }
 
-	            this.$element = _.div({ class: 'field-editor switch-editor' }, UI.inputSwitch(this.value, function (newValue) {
+	            this.$element = _.div({ class: 'field-editor switch-editor' },
+	            // Render preview
+	            this.renderPreview(), UI.inputSwitch(this.value, function (newValue) {
 	                _this2.value = newValue;
 
 	                _this2.trigger('change', _this2.value);
@@ -16302,19 +16328,15 @@
 	    }]);
 
 	    return BooleanEditor;
-	}(View);
+	}(FieldEditor);
 
 	module.exports = BooleanEditor;
 
 /***/ },
 /* 86 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-
-	/**
-	 * An editor for referring to other Content
-	 */
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -16324,8 +16346,14 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var ContentReferenceEditor = function (_View) {
-	    _inherits(ContentReferenceEditor, _View);
+	var FieldEditor = __webpack_require__(205);
+
+	/**
+	 * An editor for referring to other Content
+	 */
+
+	var ContentReferenceEditor = function (_FieldEditor) {
+	    _inherits(ContentReferenceEditor, _FieldEditor);
 
 	    function ContentReferenceEditor(params) {
 	        _classCallCheck(this, ContentReferenceEditor);
@@ -16409,6 +16437,8 @@
 
 	            // Render main element
 	            this.$element = _.div({ class: 'field-editor content-reference-editor' }, [
+	            // Render preview
+	            this.renderPreview(),
 
 	            // Render picker
 	            this.$dropdown = UI.inputDropdownTypeAhead('(none)', this.getDropdownOptions(), function (newValue) {
@@ -16418,19 +16448,15 @@
 	    }]);
 
 	    return ContentReferenceEditor;
-	}(View);
+	}(FieldEditor);
 
 	module.exports = ContentReferenceEditor;
 
 /***/ },
 /* 87 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-
-	/**
-	 * An editor for referencing content schemas
-	 */
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -16440,8 +16466,14 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var ContentSchemaReferenceEditor = function (_View) {
-	    _inherits(ContentSchemaReferenceEditor, _View);
+	var FieldEditor = __webpack_require__(205);
+
+	/**
+	 * An editor for referencing content schemas
+	 */
+
+	var ContentSchemaReferenceEditor = function (_FieldEditor) {
+	    _inherits(ContentSchemaReferenceEditor, _FieldEditor);
 
 	    function ContentSchemaReferenceEditor(params) {
 	        _classCallCheck(this, ContentSchemaReferenceEditor);
@@ -16567,26 +16599,24 @@
 	        value: function render() {
 	            var _this2 = this;
 
-	            this.$element.html(UI.inputDropdownTypeAhead('(none)', this.getDropdownOptions(), function (newValue) {
+	            _.append(this.$element.empty(),
+	            // Render preview
+	            this.renderPreview(), UI.inputDropdownTypeAhead('(none)', this.getDropdownOptions(), function (newValue) {
 	                _this2.onChange(newValue);
 	            }, false));
 	        }
 	    }]);
 
 	    return ContentSchemaReferenceEditor;
-	}(View);
+	}(FieldEditor);
 
 	module.exports = ContentSchemaReferenceEditor;
 
 /***/ },
 /* 88 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-
-	/**
-	 * An editor for date values
-	 */
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -16596,8 +16626,14 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var DateEditor = function (_View) {
-	    _inherits(DateEditor, _View);
+	var FieldEditor = __webpack_require__(205);
+
+	/**
+	 * An editor for date values
+	 */
+
+	var DateEditor = function (_FieldEditor) {
+	    _inherits(DateEditor, _FieldEditor);
 
 	    function DateEditor(params) {
 	        _classCallCheck(this, DateEditor);
@@ -16799,7 +16835,9 @@
 	        value: function render() {
 	            var _this3 = this;
 
-	            this.$element = _.div({ class: 'field-editor date-editor input-group' }, _.if(this.disabled, _.p({}, this.formatDate(this.value))), _.if(!this.disabled, _.button({ class: 'form-control btn btn-edit' }, this.formatDate(this.value)).click(function () {
+	            this.$element = _.div({ class: 'field-editor date-editor input-group' },
+	            // Render preview
+	            this.renderPreview(), _.if(this.disabled, _.p({}, this.formatDate(this.value))), _.if(!this.disabled, _.button({ class: 'form-control btn btn-edit' }, this.formatDate(this.value)).click(function () {
 	                _this3.onClickOpen();
 	            }), _.div({ class: 'input-group-btn' }, _.button({ class: 'btn btn-small btn-default' }, _.span({ class: 'fa fa-remove' })).click(function () {
 	                _this3.onClickRemove();
@@ -16808,19 +16846,15 @@
 	    }]);
 
 	    return DateEditor;
-	}(View);
+	}(FieldEditor);
 
 	module.exports = DateEditor;
 
 /***/ },
 /* 89 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-
-	/**
-	 * A simple list picker
-	 */
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -16830,8 +16864,14 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var DropdownEditor = function (_View) {
-	    _inherits(DropdownEditor, _View);
+	var FieldEditor = __webpack_require__(205);
+
+	/**
+	 * A simple list picker
+	 */
+
+	var DropdownEditor = function (_FieldEditor) {
+	    _inherits(DropdownEditor, _FieldEditor);
 
 	    function DropdownEditor(params) {
 	        _classCallCheck(this, DropdownEditor);
@@ -16863,14 +16903,9 @@
 
 	            // Wait until next CPU cycle to trigger an eventual change if needed
 	            setTimeout(function () {
-
 	                // Value sanity check, should not be null
-	                if (!_this2.config.options || _this2.config.options.length < 1) {
+	                if (!_this2.config.options) {
 	                    _this2.config.options = [];
-
-	                    console.log(_this2, _this2.config);
-
-	                    UI.errorModal(new Error('The Schema for "' + _this2.schema.label + '" has no options defined'));
 	                }
 
 	                // Generate dropdown options
@@ -16905,27 +16940,25 @@
 	                    }
 	                }
 
-	                _this2.$element.html(UI.inputDropdown('(none)', dropdownOptions, function (newValue) {
+	                _.append(_this2.$element.empty(),
+	                // Render preview
+	                _this2.renderPreview(), _.if(_this2.config.options.length > 0, UI.inputDropdown('(none)', dropdownOptions, function (newValue) {
 	                    _this2.onChange(newValue);
-	                }, true));
+	                }, true)), _.if(_this2.config.options.length < 1, _.span({ class: 'field-warning' }, 'No options configured')));
 	            }, 1);
 	        }
 	    }]);
 
 	    return DropdownEditor;
-	}(View);
+	}(FieldEditor);
 
 	module.exports = DropdownEditor;
 
 /***/ },
 /* 90 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-
-	/**
-	 * A field editor for specifying one of the selected languages
-	 */
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -16935,8 +16968,14 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var LanguageEditor = function (_View) {
-	    _inherits(LanguageEditor, _View);
+	var FieldEditor = __webpack_require__(205);
+
+	/**
+	 * A field editor for specifying one of the selected languages
+	 */
+
+	var LanguageEditor = function (_FieldEditor) {
+	    _inherits(LanguageEditor, _FieldEditor);
 
 	    function LanguageEditor(params) {
 	        _classCallCheck(this, LanguageEditor);
@@ -16964,7 +17003,9 @@
 	        value: function render() {
 	            var _this2 = this;
 
-	            this.$element = _.div({ class: 'field-editor dropdown-editor' }, this.$select = _.select({ class: 'form-control' }).change(function () {
+	            this.$element = _.div({ class: 'field-editor dropdown-editor' },
+	            // Render preview
+	            this.renderPreview(), this.$select = _.select({ class: 'form-control' }).change(function () {
 	                _this2.onChange();
 	            }));
 
@@ -16993,19 +17034,15 @@
 	    }]);
 
 	    return LanguageEditor;
-	}(View);
+	}(FieldEditor);
 
 	module.exports = LanguageEditor;
 
 /***/ },
 /* 91 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-
-	/**
-	 * A picker for referencing Media 
-	 */
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -17015,15 +17052,23 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var MediaReferenceEditor = function (_View) {
-	    _inherits(MediaReferenceEditor, _View);
+	var FieldEditor = __webpack_require__(205);
+
+	/**
+	 * A picker for referencing Media 
+	 */
+
+	var MediaReferenceEditor = function (_FieldEditor) {
+	    _inherits(MediaReferenceEditor, _FieldEditor);
 
 	    function MediaReferenceEditor(params) {
 	        _classCallCheck(this, MediaReferenceEditor);
 
 	        var _this = _possibleConstructorReturn(this, (MediaReferenceEditor.__proto__ || Object.getPrototypeOf(MediaReferenceEditor)).call(this, params));
 
-	        _this.$element = _.div({ class: 'field-editor media-reference-editor' }, _this.$body = _.button({ class: 'thumbnail raised' }).click(function () {
+	        _this.$element = _.div({ class: 'field-editor media-reference-editor' },
+	        // Render preview
+	        _this.renderPreview(), _this.$body = _.button({ class: 'thumbnail raised' }).click(function () {
 	            _this.onClickBrowse();
 	        }), _.button({ class: 'btn btn-remove' }, _.span({ class: 'fa fa-remove' })).click(function (e) {
 	            e.stopPropagation();e.preventDefault();_this.onClickRemove();
@@ -17102,19 +17147,15 @@
 	    }]);
 
 	    return MediaReferenceEditor;
-	}(View);
+	}(FieldEditor);
 
 	module.exports = MediaReferenceEditor;
 
 /***/ },
 /* 92 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-
-	/**
-	 * A simple number editor
-	 */
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -17124,8 +17165,14 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var NumberEditor = function (_View) {
-	    _inherits(NumberEditor, _View);
+	var FieldEditor = __webpack_require__(205);
+
+	/**
+	 * A simple number editor
+	 */
+
+	var NumberEditor = function (_FieldEditor) {
+	    _inherits(NumberEditor, _FieldEditor);
 
 	    function NumberEditor(params) {
 	        _classCallCheck(this, NumberEditor);
@@ -17154,26 +17201,24 @@
 	            var editor = this;
 
 	            // Main element
-	            this.$element = _.div({ class: 'field-editor string-editor' }, _.if(this.disabled, _.p(this.value || '(none)')), _.if(!this.disabled, this.$input = _.input({ class: 'form-control', value: this.value, type: 'number', step: this.config.step || 'any' }).on('change propertychange paste keyup', function () {
+	            this.$element = _.div({ class: 'field-editor string-editor' },
+	            // Render preview
+	            this.renderPreview(), _.if(this.disabled, _.p(this.value || '(none)')), _.if(!this.disabled, this.$input = _.input({ class: 'form-control', value: this.value, type: 'number', step: this.config.step || 'any' }).on('change propertychange paste keyup', function () {
 	                editor.onChange();
 	            })));
 	        }
 	    }]);
 
 	    return NumberEditor;
-	}(View);
+	}(FieldEditor);
 
 	module.exports = NumberEditor;
 
 /***/ },
 /* 93 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-
-	/**
-	 * A simple string editor
-	 */
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -17183,8 +17228,14 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var ResourceReferenceEditor = function (_View) {
-	    _inherits(ResourceReferenceEditor, _View);
+	var FieldEditor = __webpack_require__(205);
+
+	/**
+	 * A simple string editor
+	 */
+
+	var ResourceReferenceEditor = function (_FieldEditor) {
+	    _inherits(ResourceReferenceEditor, _FieldEditor);
 
 	    function ResourceReferenceEditor(params) {
 	        _classCallCheck(this, ResourceReferenceEditor);
@@ -17257,19 +17308,15 @@
 	    }]);
 
 	    return ResourceReferenceEditor;
-	}(View);
+	}(FieldEditor);
 
 	module.exports = ResourceReferenceEditor;
 
 /***/ },
 /* 94 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-
-	/**
-	 * A rich text editor
-	 */
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -17279,8 +17326,14 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var RichTextEditor = function (_View) {
-	    _inherits(RichTextEditor, _View);
+	var FieldEditor = __webpack_require__(205);
+
+	/**
+	 * A rich text editor
+	 */
+
+	var RichTextEditor = function (_FieldEditor) {
+	    _inherits(RichTextEditor, _FieldEditor);
 
 	    function RichTextEditor(params) {
 	        _classCallCheck(this, RichTextEditor);
@@ -17555,19 +17608,15 @@
 	    }]);
 
 	    return RichTextEditor;
-	}(View);
+	}(FieldEditor);
 
 	module.exports = RichTextEditor;
 
 /***/ },
 /* 95 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-
-	/**
-	 * A simple string editor
-	 */
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -17577,8 +17626,14 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var StringEditor = function (_View) {
-	    _inherits(StringEditor, _View);
+	var FieldEditor = __webpack_require__(205);
+
+	/**
+	 * A simple string editor
+	 */
+
+	var StringEditor = function (_FieldEditor) {
+	    _inherits(StringEditor, _FieldEditor);
 
 	    function StringEditor(params) {
 	        _classCallCheck(this, StringEditor);
@@ -17616,19 +17671,15 @@
 	    }]);
 
 	    return StringEditor;
-	}(View);
+	}(FieldEditor);
 
 	module.exports = StringEditor;
 
 /***/ },
 /* 96 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-
-	/**
-	 * A struct editor for editing any arbitrary object value
-	 */
 
 	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
@@ -17640,8 +17691,14 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var StructEditor = function (_View) {
-	    _inherits(StructEditor, _View);
+	var FieldEditor = __webpack_require__(205);
+
+	/**
+	 * A struct editor for editing any arbitrary object value
+	 */
+
+	var StructEditor = function (_FieldEditor) {
+	    _inherits(StructEditor, _FieldEditor);
 
 	    function StructEditor(params) {
 	        _classCallCheck(this, StructEditor);
@@ -17655,60 +17712,15 @@
 	    }
 
 	    /**
-	     * Renders a field preview template
+	     * Event: Change value
 	     *
-	     * @returns {HTMLElement} Element
+	     * @param {Object} newValue
+	     * @param {String} key
+	     * @param {Object} keySchema
 	     */
 
 
 	    _createClass(StructEditor, [{
-	        key: 'renderPreview',
-	        value: function renderPreview() {
-	            if (!this.schema.previewTemplate) {
-	                return null;
-	            }
-
-	            var $element = _.div({ class: 'field-preview' });
-	            var template = this.schema.previewTemplate;
-	            var regex = /\${([\s\S]+?)}/g;
-	            var field = this.value;
-
-	            var html = template.replace(regex, function (key) {
-	                // Remove braces first
-	                key = key.replace('${ ', '').replace('${', '');
-	                key = key.replace(' }', '').replace('}', '');
-
-	                // Find result
-	                var result = '';
-
-	                try {
-	                    result = eval("'use strict'; " + key);
-	                } catch (e) {
-	                    // Ignore failed eval, the values are just not set yet
-	                    result = e.message;
-	                }
-
-	                if (result && result._multilingual) {
-	                    result = result[window.language];
-	                }
-
-	                return result || '';
-	            });
-
-	            $element.append(_.div({ class: 'field-preview-toolbar' }, _.button({ class: 'btn btn-default' }, 'Edit')), html);
-
-	            return $element;
-	        }
-
-	        /**
-	         * Event: Change value
-	         *
-	         * @param {Object} newValue
-	         * @param {String} key
-	         * @param {Object} keySchema
-	         */
-
-	    }, {
 	        key: 'onChange',
 	        value: function onChange(newValue, key, keySchema) {
 	            if (keySchema.multilingual) {
@@ -17780,19 +17792,15 @@
 	    }]);
 
 	    return StructEditor;
-	}(View);
+	}(FieldEditor);
 
 	module.exports = StructEditor;
 
 /***/ },
 /* 97 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-
-	/**
-	 * A CSV string editor
-	 */
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -17802,8 +17810,14 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var TagsEditor = function (_View) {
-	    _inherits(TagsEditor, _View);
+	var FieldEditor = __webpack_require__(205);
+
+	/**
+	 * A CSV string editor
+	 */
+
+	var TagsEditor = function (_FieldEditor) {
+	    _inherits(TagsEditor, _FieldEditor);
 
 	    function TagsEditor(params) {
 	        _classCallCheck(this, TagsEditor);
@@ -17939,26 +17953,24 @@
 	            var editor = this;
 
 	            // Main element
-	            this.$element = _.div({ class: 'field-editor tags-editor' }, _.if(this.disabled, _.p(this.value || '(none)')), _.if(!this.disabled, this.$tags = _.div({ class: 'tags chip-group' })));
+	            this.$element = _.div({ class: 'field-editor tags-editor' },
+	            // Render preview
+	            this.renderPreview(), _.if(this.disabled, _.p(this.value || '(none)')), _.if(!this.disabled, this.$tags = _.div({ class: 'tags chip-group' })));
 
 	            this.renderTags();
 	        }
 	    }]);
 
 	    return TagsEditor;
-	}(View);
+	}(FieldEditor);
 
 	module.exports = TagsEditor;
 
 /***/ },
 /* 98 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-
-	/**
-	 * An editor for referencing templates
-	 */
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -17968,8 +17980,14 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var TemplateReferenceEditor = function (_View) {
-	    _inherits(TemplateReferenceEditor, _View);
+	var FieldEditor = __webpack_require__(205);
+
+	/**
+	 * An editor for referencing templates
+	 */
+
+	var TemplateReferenceEditor = function (_FieldEditor) {
+	    _inherits(TemplateReferenceEditor, _FieldEditor);
 
 	    function TemplateReferenceEditor(params) {
 	        _classCallCheck(this, TemplateReferenceEditor);
@@ -18081,26 +18099,24 @@
 	                }
 	            }
 
-	            _.append(this.$element, UI.inputDropdownTypeAhead('(none)', dropdownOptions, function (newValue) {
+	            _.append(this.$element,
+	            // Render preview
+	            this.renderPreview(), UI.inputDropdownTypeAhead('(none)', dropdownOptions, function (newValue) {
 	                _this2.onChange(newValue);
 	            }, false));
 	        }
 	    }]);
 
 	    return TemplateReferenceEditor;
-	}(View);
+	}(FieldEditor);
 
 	module.exports = TemplateReferenceEditor;
 
 /***/ },
 /* 99 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-
-	/**
-	 * An editor for content URLs
-	 */
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -18110,8 +18126,14 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var UrlEditor = function (_View) {
-	    _inherits(UrlEditor, _View);
+	var FieldEditor = __webpack_require__(205);
+
+	/**
+	 * An editor for content URLs
+	 */
+
+	var UrlEditor = function (_FieldEditor) {
+	    _inherits(UrlEditor, _FieldEditor);
 
 	    function UrlEditor(params) {
 	        _classCallCheck(this, UrlEditor);
@@ -18308,7 +18330,9 @@
 	        value: function render() {
 	            var _this2 = this;
 
-	            this.$element = _.div({ class: 'field-editor url-editor input-group' }, this.$input = _.input({ class: 'form-control', type: 'text', value: this.value }).on('change', function () {
+	            this.$element = _.div({ class: 'field-editor url-editor input-group' },
+	            // Render preview
+	            this.renderPreview(), this.$input = _.input({ class: 'form-control', type: 'text', value: this.value }).on('change', function () {
 	                _this2.onChange();
 	            }), _.div({ class: 'input-group-btn' }, _.button({ class: 'btn btn-default btn-small' }, _.span({ class: 'fa fa-refresh' })).click(function () {
 	                _this2.regenerate();
@@ -18362,7 +18386,7 @@
 	    }]);
 
 	    return UrlEditor;
-	}(View);
+	}(FieldEditor);
 
 	module.exports = UrlEditor;
 
@@ -34450,8 +34474,9 @@
 	        value: function create(parentSchema) {
 	            return SchemaHelper.getModel({
 	                id: Entity.createId(),
-	                icon: 'file',
+	                icon: parentSchema.icon || 'file',
 	                type: parentSchema.type,
+	                editorId: parentSchema.editorId,
 	                parentSchemaId: parentSchema.id
 	            });
 	        }
@@ -37019,6 +37044,88 @@
 
 	    populateWorkspace(formEditor.$element);
 	});
+
+/***/ },
+/* 199 */,
+/* 200 */,
+/* 201 */,
+/* 202 */,
+/* 203 */,
+/* 204 */,
+/* 205 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var FieldEditor = function (_View) {
+	    _inherits(FieldEditor, _View);
+
+	    function FieldEditor() {
+	        _classCallCheck(this, FieldEditor);
+
+	        return _possibleConstructorReturn(this, (FieldEditor.__proto__ || Object.getPrototypeOf(FieldEditor)).apply(this, arguments));
+	    }
+
+	    _createClass(FieldEditor, [{
+	        key: 'renderPreview',
+
+	        /**
+	         * Renders a field preview template
+	         *
+	         * @returns {HTMLElement} Element
+	         */
+	        value: function renderPreview() {
+	            if (!this.schema || !this.schema.previewTemplate) {
+	                return null;
+	            }
+
+	            var $element = _.div({ class: 'field-preview' });
+	            var template = this.schema.previewTemplate;
+	            var regex = /\${([\s\S]+?)}/g;
+	            var field = this.value;
+
+	            var html = template.replace(regex, function (key) {
+	                // Remove braces first
+	                key = key.replace('${ ', '').replace('${', '');
+	                key = key.replace(' }', '').replace('}', '');
+
+	                // Find result
+	                var result = '';
+
+	                try {
+	                    result = eval("'use strict'; " + key);
+	                } catch (e) {
+	                    // Ignore failed eval, the values are just not set yet
+	                    result = e.message;
+	                }
+
+	                if (result && result._multilingual) {
+	                    result = result[window.language];
+	                }
+
+	                return result || '';
+	            });
+
+	            $element.append(_.div({ class: 'field-preview-toolbar' }, _.button({ class: 'btn raised btn-primary' }, 'Edit').click(function () {
+	                $element.toggleClass('editing');
+	            })), html);
+
+	            return $element;
+	        }
+	    }]);
+
+	    return FieldEditor;
+	}(View);
+
+	module.exports = FieldEditor;
 
 /***/ }
 /******/ ]);

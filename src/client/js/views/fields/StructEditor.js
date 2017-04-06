@@ -1,9 +1,11 @@
 'use strict';
 
+const FieldEditor = require('./FieldEditor');
+
 /**
  * A struct editor for editing any arbitrary object value
  */
-class StructEditor extends View {
+class StructEditor extends FieldEditor {
     constructor(params) {
         super(params);
 
@@ -11,52 +13,6 @@ class StructEditor extends View {
 
         this.fetch();
     }
-
-    /**
-     * Renders a field preview template
-     *
-     * @returns {HTMLElement} Element
-     */
-    renderPreview() {
-        if(!this.schema.previewTemplate) { return null; }
-
-        let $element = _.div({class: 'field-preview'});
-        let template = this.schema.previewTemplate;
-        let regex = /\${([\s\S]+?)}/g;
-        let field = this.value;
-
-        let html = template.replace(regex, (key) => {
-            // Remove braces first
-            key = key.replace('${ ', '').replace('${', '');
-            key = key.replace(' }', '').replace('}', '');
-
-            // Find result
-            let result = '';
-
-            try {
-                result = eval("'use strict'; " + key);
-            } catch(e) {
-                // Ignore failed eval, the values are just not set yet
-                result = e.message;
-            }
-
-            if(result && result._multilingual) {
-                result = result[window.language];
-            }
-
-            return result || '';
-        });
-
-        $element.append(
-			_.div({class: 'field-preview-toolbar'},
-				_.button({class: 'btn btn-default'}, 'Edit')
-			),
-			html
-		);
-
-        return $element;
-    }
-
 
     /**
      * Event: Change value

@@ -55,7 +55,7 @@ class BackupEditor extends View {
                             _.label('Upload')
                         ).click(() => { this.onClickUploadBackup(); }),
                         _.button({class: 'btn btn-round btn-raised btn-primary btn-create-backup'},
-                            _.span({class: 'btn-icon-initial'}, '+'),
+                            _.span({class: 'btn-icon-initial'}, _.span({class: 'fa fa-plus'})),
                             _.span({class: 'btn-icon-display fa fa-save'}),
                             _.label('Create')
                         ).click(() => { this.onClickCreateBackup(); })

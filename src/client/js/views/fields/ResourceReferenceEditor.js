@@ -1,9 +1,11 @@
 'use strict';
 
+const FieldEditor = require('./FieldEditor');
+
 /**
  * A simple string editor
  */
-class ResourceReferenceEditor extends View {
+class ResourceReferenceEditor extends FieldEditor {
     constructor(params) {
         super(params);
 

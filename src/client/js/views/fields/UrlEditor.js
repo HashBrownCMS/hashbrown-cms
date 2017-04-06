@@ -1,9 +1,11 @@
 'use strict';
 
+const FieldEditor = require('./FieldEditor');
+
 /**
  * An editor for content URLs
  */
-class UrlEditor extends View {
+class UrlEditor extends FieldEditor {
     constructor(params) {
         super(params);
 
@@ -169,6 +171,9 @@ class UrlEditor extends View {
 
     render() {
         this.$element = _.div({class: 'field-editor url-editor input-group'},
+            // Render preview
+            this.renderPreview(),
+
             this.$input = _.input({class: 'form-control', type: 'text', value: this.value})
                 .on('change', () => { this.onChange(); }),
             _.div({class: 'input-group-btn'},

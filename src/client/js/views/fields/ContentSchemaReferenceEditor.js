@@ -1,9 +1,11 @@
 'use strict';
 
+const FieldEditor = require('./FieldEditor');
+
 /**
  * An editor for referencing content schemas
  */
-class ContentSchemaReferenceEditor extends View {
+class ContentSchemaReferenceEditor extends FieldEditor {
     constructor(params) {
         super(params);
        
@@ -111,7 +113,10 @@ class ContentSchemaReferenceEditor extends View {
     }
 
     render() {
-        this.$element.html(
+        _.append(this.$element.empty(),
+            // Render preview
+            this.renderPreview(),
+
             UI.inputDropdownTypeAhead('(none)', this.getDropdownOptions(), (newValue) => {
                 this.onChange(newValue);
             }, false)

@@ -1,9 +1,11 @@
 'use strict';
 
+const FieldEditor = require('./FieldEditor');
+
 /**
  * An array editor for editing a list of other field values
  */
-class ArrayEditor extends View {
+class ArrayEditor extends FieldEditor {
     constructor(params) {
         super(params);
 
@@ -78,6 +80,11 @@ class ArrayEditor extends View {
      */
     onClickAddItem() {
         let index = this.value.items.length;
+
+        if(this.config.maxItems && index >= this.config.maxItems) {
+            UI.messageModal('Item maximum reached', 'You  can maximum add ' + this.config.maxItems + ' items here');
+            return;
+        }
 
         this.value.items[index] = null;
         this.value.schemaBindings[index] = null;
@@ -203,7 +210,7 @@ class ArrayEditor extends View {
             
         // Returns the correct index, even if it's updated
         let getIndex = () => {
-            return $element.attr('data-index');
+            return parseInt($element.attr('data-index'));
         };
 
         // Renders this item
@@ -278,12 +285,7 @@ class ArrayEditor extends View {
             );
 
             // Set schema label (used when sorting items)
-            let schemaLabel = 'Item #' + getIndex();
-            
-            // Add the Schema name in case we don't find the label field
-            if(itemSchema) {
-                schemaLabel += ' (' + itemSchema.name + ')';
-            }
+            let schemaLabel = '';
 
             // Get the label from the item
             // TODO (Issue #157): Make this recursive, so we can find detailed values in structs 
@@ -295,25 +297,25 @@ class ArrayEditor extends View {
                         let content = ContentHelper.getContentByIdSync(item);
 
                         if(content) {
-                            schemaLabel = content.prop('title', window.language) || content.id;
+                            schemaLabel = content.prop('title', window.language) || content.id || schemaLabel;
                         
                         } else {
                             let media = MediaHelper.getMediaByIdSync(item);
 
                             if(media) {
-                                schemaLabel = media.name || media.url;
+                                schemaLabel = media.name || media.url || schemaLabel;
                             }
                         }
 
                     // This item is another type of string
                     } else {
-                        schemaLabel = item;
+                        schemaLabel = item || schemaLabel;
                     }
 
                 // This item is a struct
                 } else if(item instanceof Object) {
                     // Try to get a field based on the usual suspects
-                    schemaLabel = item.name || item.title || item.text || item.heading || item.header || item.description || item.type || item.body || item.id || schemaLabel;
+                    schemaLabel = item.name || item.title || item.text || item.heading || item.header || item.body || item.description || item.type || item.body || item.id || schemaLabel;
                   
                     if(!schemaLabel) { 
                         // Find the first available field
@@ -322,7 +324,8 @@ class ArrayEditor extends View {
 
                             // If a label field was found, check if it has a value
                             if(item[configKey]) {
-                                schemaLabel = item[configKey];
+                                schemaLabel = item[configKey] || schemaLabel;
+                                console.log('s2', schemaLabel);
                                 break;
                             }
                         }
@@ -331,11 +334,26 @@ class ArrayEditor extends View {
                 }
             }
 
+            // If the schema label is multilingual, pick the appropriate string
+            if(schemaLabel && schemaLabel._multilingual) {
+                schemaLabel = schemaLabel[window.language];
+            }
+
+            // If no schema label was found, or it's not a string, resort to generic naming
+            if(!schemaLabel || typeof schemaLabel !== 'string') {
+                schemaLabel = 'Item #' + (getIndex() + 1);
+                
+                // Add the Schema name in case we don't find the label field
+                if(itemSchema) {
+                    schemaLabel += ' (' + itemSchema.name + ')';
+                }
+            }
+
             // Create label element 
             let $schemaLabel = _.span({class: 'schema-label'}, schemaLabel);
 
             // Expanding/collapsing an item
-            let $btnToggle = _.button({class: 'btn btn-embedded btn-toggle'},
+            let $btnToggle = _.button({title: 'Collapse/expand item', class: 'btn btn-embedded btn-toggle'},
                 _.span({class: 'fa fa-window-maximize'}),
                 _.span({class: 'fa fa-window-minimize'})
             ).on('click', () => {
@@ -362,7 +380,7 @@ class ArrayEditor extends View {
             // Render the DOM element
             _.append($element.empty(),
                 $btnToggle,
-                _.button({class: 'btn btn-embedded btn-remove'},
+                _.button({title: 'Remove item', class: 'btn btn-embedded btn-remove'},
                     _.span({class: 'fa fa-remove'})
                 ).click(() => {
                     this.onClickRemoveItem($element);
@@ -387,10 +405,10 @@ class ArrayEditor extends View {
             };
         }
         
-        // NOTE: The reason for having a separate array with schema ids is that there is no way
-        // to associate a value with a schema id if it's not an Object type, like a String
+        // NOTE: The reason for having a separate array with Schema ids is that there is no other way
+        // to associate a value with a Schema id if it's not an Object type, like a String or a Number
 
-        // A sanity check to make sure we're working with an object
+        // A sanity check to make sure we're working with an object value
         if(
             !this.value ||
             !(this.value instanceof Object)
@@ -422,8 +440,8 @@ class ArrayEditor extends View {
             _.div({class: 'items'}),
 
             // Render the add item button
-            _.button({class: 'btn btn-primary btn-raised btn-add-item btn-round'},
-                '+'
+            _.button({title: 'Add item', class: 'btn btn-primary btn-raised btn-add-item btn-round'},
+                _.span({class: 'fa fa-plus'})
             ).click(() => { this.onClickAddItem(); })
         );
 

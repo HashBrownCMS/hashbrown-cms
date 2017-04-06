@@ -1,9 +1,11 @@
 'use strict';
 
+const FieldEditor = require('./FieldEditor');
+
 /**
  * A simple boolean editor
  */
-class BooleanEditor extends View {
+class BooleanEditor extends FieldEditor {
     constructor(params) {
         super(params);
 
@@ -24,6 +26,9 @@ class BooleanEditor extends View {
         }
 
         this.$element = _.div({class: 'field-editor switch-editor'},
+            // Render preview
+            this.renderPreview(),
+
             UI.inputSwitch(this.value, (newValue) => {
                 this.value = newValue;        
                 

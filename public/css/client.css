@@ -628,12 +628,22 @@ img.logo {
             top: 0px;
             left: 0px;
             right: 0px;
-            bottom: 0px; }
+            bottom: 0px;
+            transition: opacity 0.5s ease;
+            background-color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center; }
+            .cms-container .workspace .editor .field-container .field-value .field-preview.editing {
+              pointer-events: none;
+              opacity: 0; }
             .cms-container .workspace .editor .field-container .field-value .field-preview .field-preview-toolbar {
               position: absolute;
-              top: 0px;
-              right: 0px;
-              background-color: rgba(255, 255, 255, 0.5); }
+              top: 0rem;
+              right: 0rem;
+              left: 0rem;
+              padding: 1rem;
+              text-align: right; }
           .cms-container .workspace .editor .field-container .field-value .date-editor {
             height: 30px; }
             .cms-container .workspace .editor .field-container .field-value .date-editor p {
@@ -2104,6 +2114,8 @@ body.dashboard-container {
     border-radius: 50%;
     font-size: 20px;
     font-weight: 100; }
+    .btn.btn-round .fa-plus {
+      font-size: 14px; }
   .btn.btn-raised {
     box-shadow: 0px 2px 3px 1px rgba(0, 0, 0, 0.2);
     position: relative; }

@@ -1,9 +1,11 @@
 'use strict';
 
+const FieldEditor = require('./FieldEditor');
+
 /**
  * An editor for referencing templates
  */
-class TemplateReferenceEditor extends View {
+class TemplateReferenceEditor extends FieldEditor {
     constructor(params) {
         super(params);
 
@@ -83,6 +85,9 @@ class TemplateReferenceEditor extends View {
 
         // Render picker
         _.append(this.$element,
+            // Render preview
+            this.renderPreview(),
+
             UI.inputDropdownTypeAhead('(none)', dropdownOptions, (newValue) => {
                 this.onChange(newValue);
             }, false)
