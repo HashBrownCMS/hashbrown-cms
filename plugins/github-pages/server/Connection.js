@@ -1,15 +1,15 @@
 'use strict';
 
-let yamljs = require('./lib/yamljs/Yaml');
-let fs = require('fs');
-let path = require('path');
-let glob = require('glob');
-let rimraf = require('rimraf');
+const yamljs = require('./lib/yamljs/Yaml');
+const fs = require('fs');
+const path = require('path');
+const glob = require('glob');
+const rimraf = require('rimraf');
 
-let Connection = require(appRoot + '/src/common/models/Connection');
-let Content = require(appRoot + '/src/common/models/Content');
-let Media = require(appRoot + '/src/common/models/Media');
-let Template = require(appRoot + '/src/common/models/Template');
+const Connection = require(appRoot + '/src/common/models/Connection');
+const Content = require(appRoot + '/src/common/models/Content');
+const Media = require(appRoot + '/src/common/models/Media');
+const Template = require(appRoot + '/src/common/models/Template');
 
 class GitHubConnection extends Connection {
     constructor(data) {
@@ -485,7 +485,8 @@ class GitHubConnection extends Connection {
             case 'page':
                 return '_layouts'
             case 'section':
-                return '_includes/sections'
+            case 'partial':
+                return '_includes/partials'
         }
 
         return '';

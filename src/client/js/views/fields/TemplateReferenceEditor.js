@@ -33,8 +33,8 @@ class TemplateReferenceEditor extends FieldEditor {
         this.config.type = this.config.type || 'page';
         
         // Backwards compatibility check for template type
-        if(this.config.resource == 'sectionTemplates') {
-            this.config.type = 'section';
+        if(this.config.resource == 'partialTemplates' || this.config.resource == 'sectionTemplates') {
+            this.config.type = 'partial';
         }
 
         // Sanity check for allowed templates

@@ -92,13 +92,26 @@ class TemplateController extends ApiController {
 
             return connection.getTemplates('page')
             .then((pageTemplates) => {
-                allTemplates = allTemplates.concat(pageTemplates);
+                if(Array.isArray(pageTemplates)) {
+                    allTemplates = allTemplates.concat(pageTemplates);
+                }
 
-                return connection.getTemplates('section');
+                return connection.getTemplates('partial');
             })
-            .then((sectionTemplates) => {
-                allTemplates = allTemplates.concat(sectionTemplates);
+            .catch((e) => {
+                debug.log(e.message, TemplateController);
+            })
+            .then((partialTemplates) => {
+                if(Array.isArray(partialTemplates)) {
+                    allTemplates = allTemplates.concat(partialTemplates);
+                }
 
+                return Promise.resolve();
+            })
+            .catch((e) => {
+                debug.log(e.message, TemplateController);
+            })
+            .then(() => {
                 return Promise.resolve(allTemplates);
             });
         })

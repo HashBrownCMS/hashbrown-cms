@@ -1,11 +1,11 @@
 'use strict';
 
-let fs = require('fs');
-let path = require('path');
+const fs = require('fs');
+const path = require('path');
 
-let Connection = require(appRoot + '/src/common/models/Connection');
-let Media = require(appRoot + '/src/common/models/Media');
-let Template = require(appRoot + '/src/common/models/Template');
+const Connection = require(appRoot + '/src/common/models/Connection');
+const Media = require(appRoot + '/src/common/models/Media');
+const Template = require(appRoot + '/src/common/models/Template');
 
 /**
  * A connection for interfacing with the HashBrown driver
@@ -207,7 +207,37 @@ class HashBrownDriverConnection extends Connection {
             });
         });
     }
-    
+   
+    /**
+     * Gets template by id
+     *
+     * @param {String} type
+     * @param {String} id
+     *
+     * @returns {Promise} Template
+     */
+    getTemplateById(type, id) {
+        return new Promise((resolve, reject) => {
+            let apiUrl = this.getRemoteUrl() + '/hashbrown/api/templates/' + type + '/' + id + '?token=' + this.settings.token;
+            
+            let headers = {
+                'Accept': 'application/json'
+            };
+            
+            RequestHelper.get(apiUrl, {
+                headers: headers
+            }).on('complete', (template, response) => {
+                if(!template) {
+                    return reject(new Error('Template "' + id + '" was not found'));
+                }
+           
+                template.remote = true;
+
+                resolve(new Template(template));
+            });
+        });
+    }
+
     /**
      * Gets templates
      *
@@ -216,10 +246,6 @@ class HashBrownDriverConnection extends Connection {
      * @returns {Promise} Array of Templates
      */
     getTemplates(type) {
-        let headers = {
-            'Accept': 'application/json'
-        };
-            
         return new Promise((resolve, reject) => {
             let apiUrl = this.getRemoteUrl() + '/hashbrown/api/templates/' + type + '?token=' + this.settings.token;
             
@@ -231,8 +257,7 @@ class HashBrownDriverConnection extends Connection {
                 headers: headers
             }).on('complete', (data, response) => {
                 if(!data || !Array.isArray(data)) {
-                    reject(new Error('Templates were not found'))
-                    return;
+                    return reject(new Error('Templates were not found. Response from remote was: ' + data));
                 }
            
                 let allTemplates = [];

@@ -161,8 +161,9 @@ class JSONEditor extends View {
                     // Backward compatibility adjustment for template configs
                     if(v.resource) {
                         switch(v.resource) {
+                            case 'partialTemplates':
                             case 'sectionTemplates':
-                                v.type = 'section';
+                                v.type = 'partial';
                                 delete v.resource;
                                 break;
                             
@@ -180,8 +181,8 @@ class JSONEditor extends View {
 
                         // Backwards compatibility adjustment
                         if(v.resource) {
-                            if(v.resource == 'sectionTemplates') {
-                                v.type = 'section';
+                            if(v.resource == 'partialTemplates' || v.resource == 'sectionTemplates') {
+                                v.type = 'partial';
                             } else {
                                 v.type = 'page';
                             }

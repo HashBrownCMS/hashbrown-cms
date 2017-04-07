@@ -42,6 +42,25 @@ class TemplateEditor extends View {
         this.trigger('change', this.model);
     }
 
+    /**
+     * Gets the current highlight mode
+     *
+     * @returns {String} Mode
+     */
+    getMode() {
+        if(this.model.name.indexOf('html') > -1) {
+            return 'xml';
+        }
+
+        if(this.model.name.indexOf('.js') > -1) {
+            return 'javascript';
+        }
+        
+        if(this.model.name.indexOf('.pug') > -1 || this.model.name.indexOf('.jade') > -1) {
+            return 'pug';
+        }
+    }
+
     render() {
         _.append(this.$element.empty(),
             _.div({class: 'editor-header'},
@@ -69,7 +88,7 @@ class TemplateEditor extends View {
             this.editor = CodeMirror.fromTextArea(this.$textarea[0], {
                 lineNumbers: true,
                 mode: {
-                    name: 'xml',
+                    name: this.getMode(),
                 },
                 viewportMargin: this.embedded ? Infinity : 10,
                 tabSize: 4,

@@ -15,7 +15,7 @@ class TemplatePane extends NavbarPane {
                     _.span('Type'),
                     _.div({class: 'input-group-addon'}, 
                         _.select({class: 'form-control'},
-                            _.each(['page', 'section'], (i, type) => {
+                            _.each(['page', 'partial'], (i, type) => {
                                 return _.option({value: type}, type);
                             })
                         )
