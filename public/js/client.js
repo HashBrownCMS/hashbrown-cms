@@ -23116,7 +23116,7 @@
 	        value: function render() {
 	            var _this3 = this;
 
-	            _.append(this.$element.empty(), _.div({ class: 'editor-header' }, _.span({ class: 'fa fa-code' }), _.h4(this.model.name)), _.div({ class: 'editor-body' }, this.$textarea = _.textarea(), this.$error), _.div({ class: 'editor-footer' }, _.div({ class: 'btn-group' }, _.if(!this.model.locked,
+	            _.append(this.$element.empty(), _.div({ class: 'editor-header' }, _.span({ class: 'fa fa-code' }), _.h4(this.model.name)), _.div({ class: 'editor-body' }, this.$textarea = _.textarea(), this.$error), _.if(!this.model.locked, _.div({ class: 'editor-footer' }, _.div({ class: 'btn-group' },
 	            // Save
 	            this.$saveBtn = _.button({ class: 'btn btn-raised btn-primary' }, _.span({ class: 'text-default' }, 'Save'), _.span({ class: 'text-working' }, 'Saving')).click(function () {
 	                _this3.onClickSave();
