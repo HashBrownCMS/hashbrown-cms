@@ -18,6 +18,8 @@
             z-index: 10;
             background-color: $secondary;
 
+            @include background('secondary');
+
             &:after {
                 content: '';
                 display: block;

@@ -93,6 +93,8 @@ body.dashboard-container {
         min-height: 64px;
         justify-content: center;
 
+        @include background('secondary');
+
         .dashboard-logo {
             position: absolute;
             left: 1rem;

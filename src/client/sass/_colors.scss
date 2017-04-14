@@ -42,3 +42,10 @@ $standard-dark: #eeeeee;
 $standard-darker: #999999;
 
 $standard-text: #333333;
+
+/* Fancy backgrounds */
+@mixin background($variant, $top: 0px) {
+    background-image: url('/img/bg-#{$variant}.jpg');
+    background-attachment: fixed;
+    background-position: 0px $top;
+}
