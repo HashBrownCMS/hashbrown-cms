@@ -2275,9 +2275,9 @@
 	    _createClass(ContextMenu, [{
 	        key: 'render',
 	        value: function render() {
-	            var _this2 = this;
+	            var view = this;
 
-	            this.$element.html(_.each(this.model, function (label, func) {
+	            view.$element.html(_.each(view.model, function (label, func) {
 	                if (func == '---') {
 	                    return _.li({ class: 'dropdown-header' }, label);
 	                } else {
@@ -2288,21 +2288,13 @@
 	                        if (func) {
 	                            func(e);
 
-	                            _this2.remove();
+	                            view.remove();
 	                        }
 	                    }));
 	                }
 	            }));
 
-	            $('body').append(this.$element);
-
-	            var rect = this.$element[0].getBoundingClientRect();
-
-	            if (rect.right > window.innerWidth) {
-	                this.$element.css('left', rect.left - rect.width + 'px');
-	            } else if (rect.bottom > window.innerHeight) {
-	                this.$element.css('top', rect.top - rect.height + 'px');
-	            }
+	            $('body').append(view.$element);
 	        }
 	    }]);
 
@@ -12612,7 +12604,7 @@
 	                    this[k] = properties[k];
 	                }
 	            } catch (e) {
-	                debug.log(e, this);
+	                debug.log(e.message, this);
 	            }
 	        }
 	    }
@@ -20724,6 +20716,52 @@
 
 	                return next(0);
 	            });
+	        }
+
+	        /**
+	         * Removes a Content preview
+	         *
+	         * @params {Content} content
+	         *
+	         * @param {String} project
+	         * @param {String} environment
+	         * @param {Content} content
+	         *
+	         * @returns {Promise} Preview URL
+	         */
+
+	    }, {
+	        key: 'removePreview',
+	        value: function removePreview() {
+	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+	            var content = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('content');
+
+	            return Promise.resolve();
+	        }
+
+	        /**
+	         * Generates a Content preview
+	         *
+	         * @params {Content} content
+	         *
+	         * @param {String} project
+	         * @param {String} environment
+	         * @param {Content} content
+	         * @param {String} language
+	         *
+	         * @returns {Promise} Preview URL
+	         */
+
+	    }, {
+	        key: 'generatePreview',
+	        value: function generatePreview() {
+	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+	            var content = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('content');
+	            var language = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : requiredParam('language');
+
+	            return Promise.resolve();
 	        }
 
 	        /**

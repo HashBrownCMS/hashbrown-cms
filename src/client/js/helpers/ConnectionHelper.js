@@ -15,6 +15,25 @@ class ConnectionHelper extends ConnectionHelperCommon {
     }
     
     /**
+     * Gets a Connection by id (sync)
+     *
+     * @param {string} id
+     *
+     * @return {Promise} Connection
+     */
+    static getConnectionByIdSync(
+        id = requiredParam('id')
+    ) {
+        for(let i in resources.connections) {
+            let connection = resources.connections[i];
+
+            if(connection.id == id) {
+                return connection;
+            }
+        }
+    }
+    
+    /**
      * Gets a Connection by id
      *
      * @param {String} project

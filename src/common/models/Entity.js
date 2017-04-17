@@ -23,7 +23,7 @@ class Entity {
                 }
             
             } catch(e) {
-                debug.log(e, this);
+                debug.log(e.message, this);
             }
         }
     }

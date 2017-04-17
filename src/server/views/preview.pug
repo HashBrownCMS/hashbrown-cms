@@ -1,0 +1,20 @@
+html
+    head
+        meta(charset='utf-8')
+        meta(http-equiv='X-UA-Compatible', content='IE=edge')
+        meta(name='viewport', content='width=device-width initial-scale=1')
+        meta(name='description', content="The pluggable CMS")
+        meta(name='robots', content='noindex, nofollow, noarchive, nosnippet')
+
+        link(href='/favicon.png?v=2', rel='icon', type='image/png')
+
+        link(href='/css/client.css', rel='stylesheet')
+        link(href='/css/preview.css', rel='stylesheet')
+
+        title HashBrown CMS
+
+    body
+        .preview-banner
+            | Preview
+
+        iframe(src=previewUrl)

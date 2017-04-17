@@ -80,8 +80,8 @@ class ConnectionHelper extends ConnectionHelperCommon {
                         } else {
                             debug.log('Published content "' + content.id + '" successfully!', helper);
 
-                            // Update unpublished flag
-                            content.unpublished = false;
+                            // Update published flag
+                            content.isPublished = true;
 
                             return ContentHelper.setContentById(project, environment, content.id, content, user);
                         }
@@ -114,7 +114,8 @@ class ConnectionHelper extends ConnectionHelperCommon {
         project = requiredParam('project'),
         environment = requiredParam('environment'),
         content = requiredParam('content'),
-        user = requiredParam('user')
+        user = requiredParam('user'),
+        unpublishFirst = true
     ) {
         let helper = this;
 
@@ -128,6 +129,8 @@ class ConnectionHelper extends ConnectionHelperCommon {
                 function nextConnection(i) {
                     return ConnectionHelper.getConnectionById(project, environment, settings.connections[i])
                     .then((connection) => {
+                        if(!unpublishFirst) { return Promise.resolve(); }
+                        
                         debug.log('Unpublishing through connection "' + settings.connections[i] + '" of type "' + connection.type + '"...', helper);
 
                         return connection.unpublishContent(project, environment, content);
@@ -141,8 +144,8 @@ class ConnectionHelper extends ConnectionHelperCommon {
                         } else {
                             debug.log('Unpublished content "' + content.id + '" successfully!', helper);
 
-                            // Update unpublished flag
-                            content.unpublished = true;
+                            // Update published flag
+                            content.isPublished = false;
 
                             return ContentHelper.setContentById(project, environment, content.id, content, user);
                         }

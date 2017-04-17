@@ -2297,9 +2297,9 @@
 	    _createClass(ContextMenu, [{
 	        key: 'render',
 	        value: function render() {
-	            var _this2 = this;
+	            var view = this;
 
-	            this.$element.html(_.each(this.model, function (label, func) {
+	            view.$element.html(_.each(view.model, function (label, func) {
 	                if (func == '---') {
 	                    return _.li({ class: 'dropdown-header' }, label);
 	                } else {
@@ -2310,21 +2310,13 @@
 	                        if (func) {
 	                            func(e);
 
-	                            _this2.remove();
+	                            view.remove();
 	                        }
 	                    }));
 	                }
 	            }));
 
-	            $('body').append(this.$element);
-
-	            var rect = this.$element[0].getBoundingClientRect();
-
-	            if (rect.right > window.innerWidth) {
-	                this.$element.css('left', rect.left - rect.width + 'px');
-	            } else if (rect.bottom > window.innerHeight) {
-	                this.$element.css('top', rect.top - rect.height + 'px');
-	            }
+	            $('body').append(view.$element);
 	        }
 	    }]);
 
@@ -23240,7 +23232,7 @@
 
 	            var shouldUnpublish = this.$element.find('.editor-footer .select-publishing').val() == 'unpublish';
 
-	            this.model.unpublished = shouldUnpublish;
+	            this.model.isPublished = !shouldUnpublish;
 
 	            var setContent = function setContent() {
 	                // Use publishing API
@@ -23544,6 +23536,12 @@
 	        value: function renderButtons() {
 	            var _this6 = this;
 
+	            var url = this.model.properties.url;
+
+	            if (url instanceof Object) {
+	                url = url[window.language];
+	            }
+
 	            _.append($('.editor-footer').empty(), _.div({ class: 'btn-group' },
 	            // JSON editor
 	            _.button({ class: 'btn btn-embedded' }, 'Advanced').click(function () {
@@ -23551,25 +23549,27 @@
 	            }),
 
 	            // View remote
-	            _.if(this.model.properties && this.model.properties.url && !this.model.unpublished, _.each(this.publishingSettings.connections, function (i, connectionId) {
-	                var connection = resources.connections.filter(function (connection) {
-	                    return connection.id == connectionId;
-	                })[0];
+	            _.if(this.model.properties && this.model.properties.url && this.publishingSettings.connections[0], _.if(!this.model.hasPreview, _.button({ class: 'btn btn-primary' }, _.span({ class: 'text-default' }, 'Preview'), _.span({ class: 'text-working' }, 'Generating')).click(function (e) {
+	                window.open('/api/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/content/preview/' + _this6.model.id);
 
-	                var url = _this6.model.properties.url;
+	                $(e.currentTarget).toggleClass('working', true);
 
-	                if (url instanceof Object) {
-	                    url = url[window.language];
-	                }
+	                apiCall('post', 'content/preview/' + _this6.model.id + '/?language=' + window.language).then(function () {
+	                    _this6.model = null;
+	                    _this6.fetch();
+	                }).catch(UI.errorModal);
+	            })), _.if(this.model.hasPreview, _.button({ class: 'btn btn-primary' }, _.span({ class: 'text-default' }, 'Remove preview'), _.span({ class: 'text-working' }, 'Removing')).click(function (e) {
+	                $(e.currentTarget).toggleClass('working', true);
 
-	                if (connection) {
-	                    return _.a({ target: '_blank', href: connection.url + url, class: 'btn btn-primary' }, 'View page');
-	                }
-	            })), _.if(!this.model.locked,
+	                apiCall('delete', 'content/preview/' + _this6.model.id).then(function () {
+	                    _this6.model = null;
+	                    _this6.fetch();
+	                }).catch(UI.errorModal);
+	            })), _.if(this.model.isPublished, _.a({ target: '_blank', href: ConnectionHelper.getConnectionByIdSync(this.publishingSettings.connections[0]).url + url, class: 'btn btn-primary' }, 'View'))), _.if(!this.model.locked,
 	            // Save & publish
 	            _.div({ class: 'btn-group-save-publish raised' }, this.$saveBtn = _.button({ class: 'btn btn-save btn-primary' }, _.span({ class: 'text-default' }, 'Save'), _.span({ class: 'text-working' }, 'Saving')).click(function () {
 	                _this6.onClickSave(_this6.publishingSettings);
-	            }), _.if(this.publishingSettings.connections && this.publishingSettings.connections.length > 0, _.span('&'), _.select({ class: 'form-control select-publishing' }, _.option({ value: 'publish' }, 'Publish'), _.option({ value: 'unpublish' }, 'Unpublish')).val(this.model.unpublished ? 'unpublish' : 'publish'))))));
+	            }), _.if(this.publishingSettings.connections && this.publishingSettings.connections.length > 0, _.span('&'), _.select({ class: 'form-control select-publishing' }, _.option({ value: 'publish' }, 'Publish'), _.option({ value: 'unpublish' }, 'Unpublish')).val('publish'))))));
 	        }
 	    }, {
 	        key: 'render',
@@ -26410,7 +26410,8 @@
 	            this.def(Date, 'publishOn');
 	            this.def(Date, 'unpublishOn');
 	            this.def(String, 'schemaId');
-	            this.def(Boolean, 'unpublished');
+	            this.def(Boolean, 'isPublished');
+	            this.def(Boolean, 'hasPreview');
 	            this.def(Number, 'sort', -1);
 
 	            // Extensible properties
@@ -26798,7 +26799,7 @@
 	                    this[k] = properties[k];
 	                }
 	            } catch (e) {
-	                debug.log(e, this);
+	                debug.log(e.message, this);
 	            }
 	        }
 	    }
@@ -35501,6 +35502,28 @@
 	        }
 
 	        /**
+	         * Gets a Connection by id (sync)
+	         *
+	         * @param {string} id
+	         *
+	         * @return {Promise} Connection
+	         */
+
+	    }, {
+	        key: 'getConnectionByIdSync',
+	        value: function getConnectionByIdSync() {
+	            var id = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('id');
+
+	            for (var i in resources.connections) {
+	                var connection = resources.connections[i];
+
+	                if (connection.id == id) {
+	                    return connection;
+	                }
+	            }
+	        }
+
+	        /**
 	         * Gets a Connection by id
 	         *
 	         * @param {String} project
@@ -35905,6 +35928,52 @@
 
 	                return next(0);
 	            });
+	        }
+
+	        /**
+	         * Removes a Content preview
+	         *
+	         * @params {Content} content
+	         *
+	         * @param {String} project
+	         * @param {String} environment
+	         * @param {Content} content
+	         *
+	         * @returns {Promise} Preview URL
+	         */
+
+	    }, {
+	        key: 'removePreview',
+	        value: function removePreview() {
+	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+	            var content = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('content');
+
+	            return Promise.resolve();
+	        }
+
+	        /**
+	         * Generates a Content preview
+	         *
+	         * @params {Content} content
+	         *
+	         * @param {String} project
+	         * @param {String} environment
+	         * @param {Content} content
+	         * @param {String} language
+	         *
+	         * @returns {Promise} Preview URL
+	         */
+
+	    }, {
+	        key: 'generatePreview',
+	        value: function generatePreview() {
+	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+	            var content = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('content');
+	            var language = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : requiredParam('language');
+
+	            return Promise.resolve();
 	        }
 
 	        /**

@@ -184,7 +184,7 @@ class GitHubConnection extends Connection {
                             reject(newError(data.message));
                         
                         } else {
-                            debug.log('Committed file successfully to' + path, this);
+                            debug.log('Committed file successfully to ' + path, this);
                             resolve();
 
                         }
@@ -814,13 +814,18 @@ class GitHubConnection extends Connection {
      * @param {String} id
      * @param {String} language
      * @param {Object} meta
+     * @param {Boolean} usePreviewPath
      *
      * @returns {Promise} promise
      */
-    postContentProperties(properties, id, language, meta) {
+    postContentProperties(properties, id, language, meta, usePreviewPath) {
         let path = 'content/' + language + '/' + id + '.md';
         let createdBy;
         let updatedBy;
+
+        if(usePreviewPath) {
+            path = 'preview/' + id + '.md';
+        }
 
         // Get created by user
         return UserHelper.getUserById(meta.createdBy)
@@ -883,6 +888,55 @@ class GitHubConnection extends Connection {
             debug.log('Uploading "' + path + '"...', this);
 
             return this.postContents(path, fileContent);
+        });
+    }
+
+    /**
+     * Removes a preview
+     * @param {String} project
+     * @param {String} environment
+     * @param {Content} content
+     *
+     * @returns {Promise}
+     */
+    removePreview(
+        project = requiredParam('project'),
+        environment = requiredParam('environment'),
+        content = requiredParam('content')
+    ) {
+        let path = 'preview/' + content.id + '.md';
+        
+        return this.deleteContents(path);
+    }
+
+    /**
+     * Generates a Content preview
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {Content} content
+     * @param {String} language
+     *
+     * @returns {Promise} Preview URL
+     */
+    generatePreview(
+        project = requiredParam('project'),
+        environment = requiredParam('environment'),
+        content = requiredParam('content'),
+        language = requiredParam('language')
+    ) {
+        return LanguageHelper.getAllLocalizedPropertySets(project, environment, content)
+        .then((sets) => {
+            let properties = sets[language];
+
+            let url = '/preview/' + content.id;
+            
+            properties.url = url;
+
+            return this.postContentProperties(properties, content.id, language, content.getMeta(), true)
+            .then(() => {
+                return Promise.resolve(this.url + url);
+            });
         });
     }
 }

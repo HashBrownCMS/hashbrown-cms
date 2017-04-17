@@ -159,7 +159,7 @@ class Connection extends Entity {
                     
                     } else {
                         debug.log('Unpublished all localised property sets successfully!', connection);
-                            
+                           
                         return Promise.resolve();
                     
                     }
@@ -168,6 +168,46 @@ class Connection extends Entity {
 
             return next(0);
         });
+    }
+    
+    /**
+     * Removes a Content preview
+     *
+     * @params {Content} content
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {Content} content
+     *
+     * @returns {Promise} Preview URL
+     */
+    removePreview(
+        project = requiredParam('project'),
+        environment = requiredParam('environment'),
+        content = requiredParam('content')
+    ) {
+        return Promise.resolve();
+    }
+
+    /**
+     * Generates a Content preview
+     *
+     * @params {Content} content
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {Content} content
+     * @param {String} language
+     *
+     * @returns {Promise} Preview URL
+     */
+    generatePreview(
+        project = requiredParam('project'),
+        environment = requiredParam('environment'),
+        content = requiredParam('content'),
+        language = requiredParam('language')
+    ) {
+        return Promise.resolve();
     }
 
     /**

@@ -57,7 +57,7 @@ class ContentEditor extends View {
     onClickSave(publishing) {
         let shouldUnpublish = this.$element.find('.editor-footer .select-publishing').val() == 'unpublish';
 
-        this.model.unpublished = shouldUnpublish;
+        this.model.isPublished = !shouldUnpublish;
 
         let setContent = () => {
             // Use publishing API
@@ -345,6 +345,12 @@ class ContentEditor extends View {
      * Renders the action buttons
      */
     renderButtons() {
+        let url = this.model.properties.url;
+
+        if(url instanceof Object) {
+            url = url[window.language];
+        }
+
         _.append($('.editor-footer').empty(), 
             _.div({class: 'btn-group'},
                 // JSON editor
@@ -353,22 +359,42 @@ class ContentEditor extends View {
                 ).click(() => { this.onClickAdvanced(); }),
 
                 // View remote
-                _.if(this.model.properties && this.model.properties.url && !this.model.unpublished,
-                    _.each(this.publishingSettings.connections, (i, connectionId) => {
-                        let connection = resources.connections.filter((connection) => {
-                            return connection.id == connectionId;
-                        })[0];
-
-                        let url = this.model.properties.url;
-
-                        if(url instanceof Object) {
-                            url = url[window.language];
-                        }
-
-                        if(connection) {
-                            return _.a({target: '_blank', href: connection.url + url, class: 'btn btn-primary'}, 'View page')
-                        }
-                    })
+                _.if(this.model.properties && this.model.properties.url && this.publishingSettings.connections[0],
+                    _.if(!this.model.hasPreview,                       
+                        _.button({class: 'btn btn-primary'},
+                            _.span({class: 'text-default'}, 'Preview'),
+                            _.span({class: 'text-working'}, 'Generating')
+                        ).click((e) => {
+                            window.open('/api/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/content/preview/' + this.model.id);
+                                
+                            $(e.currentTarget).toggleClass('working', true);
+                            
+                            apiCall('post', 'content/preview/' + this.model.id + '/?language=' + window.language)
+                            .then(() => {
+                                this.model = null;
+                                this.fetch();
+                            })
+                            .catch((UI.errorModal));
+                        })
+                    ),
+                    _.if(this.model.hasPreview,
+                        _.button({class: 'btn btn-primary'},
+                            _.span({class: 'text-default'}, 'Remove preview'),
+                            _.span({class: 'text-working'}, 'Removing')
+                        ).click((e) => {
+                            $(e.currentTarget).toggleClass('working', true);
+                            
+                            apiCall('delete', 'content/preview/' + this.model.id)
+                            .then(() => {
+                                this.model = null;
+                                this.fetch();
+                            })
+                            .catch((UI.errorModal));
+                        })
+                    ),
+                    _.if(this.model.isPublished,
+                        _.a({target: '_blank', href: ConnectionHelper.getConnectionByIdSync(this.publishingSettings.connections[0]).url + url, class: 'btn btn-primary'}, 'View')
+                    )
                 ),
                 _.if(!this.model.locked, 
                     // Save & publish
@@ -382,7 +408,7 @@ class ContentEditor extends View {
                             _.select({class: 'form-control select-publishing'},
                                 _.option({value: 'publish'}, 'Publish'),
                                 _.option({value: 'unpublish'}, 'Unpublish')
-                            ).val(this.model.unpublished ? 'unpublish' : 'publish')
+                            ).val('publish')
                         )
                     )
                 )
