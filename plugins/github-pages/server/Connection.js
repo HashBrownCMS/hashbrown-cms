@@ -925,6 +925,8 @@ class GitHubConnection extends Connection {
         content = requiredParam('content'),
         language = requiredParam('language')
     ) {
+        if(!content.hasPreview) { return Promise.resolve(); }
+
         return LanguageHelper.getAllLocalizedPropertySets(project, environment, content)
         .then((sets) => {
             let properties = sets[language];

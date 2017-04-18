@@ -65,13 +65,13 @@ class ConnectionHelper extends ConnectionHelperCommon {
 
             return ConnectionHelper.getConnectionById(project, environment, settings.connections[0]);
         })
+        .then((connection) => {
+            return connection.generatePreview(project, environment, content, language);
+        })
         .then(() => {
             content.hasPreview = true;
 
             return ContentHelper.setContentById(project, environment, content.id, content, user);
-        })
-        .then((connection) => {
-            return connection.generatePreview(project, environment, content, language);
         });
     }
 

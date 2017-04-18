@@ -416,6 +416,20 @@ class UIHelper {
     }
 
     /**
+     * Brings up an iframe modal
+     *
+     * @param {String} title
+     * @param {String} url
+     */
+    static iframeModal(title, url) {
+        let modal = this.messageModal(title, _.iframe({src: url}));
+    
+        modal.$element.toggleClass('iframe-modal', true);
+
+        return modal;
+    }
+
+    /**
      * Brings up a confirm modal
      *
      * @param {String} type

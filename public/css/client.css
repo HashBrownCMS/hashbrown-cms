@@ -400,6 +400,23 @@ img.logo {
     .settings-modal .modal-dialog .input-group .input-group-addon, .confirm-modal .modal-dialog .input-group .input-group-addon {
       padding: 0px; }
 
+.iframe-modal .modal-dialog {
+  max-width: 80%;
+  width: 80%;
+  height: 80%; }
+  .iframe-modal .modal-dialog .modal-content {
+    height: 100%; }
+    .iframe-modal .modal-dialog .modal-content .modal-body {
+      padding: 0px;
+      position: relative; }
+      .iframe-modal .modal-dialog .modal-content .modal-body iframe {
+        top: 0px;
+        left: 0px;
+        width: 100%;
+        height: 100%;
+        border: 0px;
+        position: absolute; }
+
 .error-modal .modal-dialog .fa-warning {
   margin-right: 10px; }
 

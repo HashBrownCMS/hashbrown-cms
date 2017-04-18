@@ -1284,7 +1284,6 @@
 	'use strict';
 
 	var FunctionTemplating = {};
-	var lastCondition = void 0;
 
 	/**
 	 * Appends content to an element
@@ -1482,35 +1481,12 @@
 	 * @param {Boolean} condition
 	 * @param {HTMLElement} contents
 	 *
-	 * @returns {HTMLElement} Contents
+	 * @returns {HTMLElement} contents
 	 */
 	FunctionTemplating.if = function (condition) {
-	    lastCondition = condition || false;
-
-	    if (lastCondition) {
+	    if (condition != false && condition != null && condition != undefined) {
 	        for (var _len3 = arguments.length, contents = Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
 	            contents[_key3 - 1] = arguments[_key3];
-	        }
-
-	        return contents;
-	    }
-	};
-
-	/**
-	 * Uses the last provided condition to simulate an "else" statement
-	 *
-	 * @param {HTMLElement} contents
-	 *
-	 * @returns {HTMLElement} Contents
-	 */
-	FunctionTemplating.else = function () {
-	    if (typeof lastCondition === 'undefined') {
-	        throw new Error('No "if" statement was provided before this "else" statement');
-	    }
-
-	    if (!lastCondition) {
-	        for (var _len4 = arguments.length, contents = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
-	            contents[_key4] = arguments[_key4];
 	        }
 
 	        return contents;
@@ -1996,15 +1972,7 @@
 	            this.render();
 	            this.postrender();
 
-	            var element = this.element;
-
-	            if (!element && this.$element && this.$element.length > 0) {
-	                element = this.$element[0];
-	            }
-
-	            if (!element) {
-	                return;
-	            }
+	            var element = this.element || this.$element[0];
 
 	            element.addEventListener('DOMNodeRemovedFromDocument', function () {
 	                // Wait a few cycles before removing, as the element might just have been relocated
@@ -2307,7 +2275,9 @@
 	    _createClass(ContextMenu, [{
 	        key: 'render',
 	        value: function render() {
-	            this.$element.html(_.each(this.model, function (label, func) {
+	            var view = this;
+
+	            view.$element.html(_.each(view.model, function (label, func) {
 	                if (func == '---') {
 	                    return _.li({ class: 'dropdown-header' }, label);
 	                } else {
@@ -2318,21 +2288,13 @@
 	                        if (func) {
 	                            func(e);
 
-	                            this.remove();
+	                            view.remove();
 	                        }
 	                    }));
 	                }
 	            }));
 
-	            $('body').append(this.$element);
-
-	            var rect = this.$element[0].getBoundingClientRect();
-
-	            if (rect.left + rect.width > window.innerWidth) {
-	                this.$element.css('left', rect.left - rect.width + 'px');
-	            } else if (rect.bottom > window.innerHeight) {
-	                this.$element.css('top', rect.top - rect.height + 'px');
-	            }
+	            $('body').append(view.$element);
 	        }
 	    }]);
 
@@ -11381,6 +11343,23 @@
 	                    onSubmit: onSubmit
 	                }
 	            });
+	        }
+
+	        /**
+	         * Brings up an iframe modal
+	         *
+	         * @param {String} title
+	         * @param {String} url
+	         */
+
+	    }, {
+	        key: 'iframeModal',
+	        value: function iframeModal(title, url) {
+	            var modal = this.messageModal(title, _.iframe({ src: url }));
+
+	            modal.$element.toggleClass('iframe-modal', true);
+
+	            return modal;
 	        }
 
 	        /**

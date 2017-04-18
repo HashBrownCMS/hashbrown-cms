@@ -1306,7 +1306,6 @@
 	'use strict';
 
 	var FunctionTemplating = {};
-	var lastCondition = void 0;
 
 	/**
 	 * Appends content to an element
@@ -1504,35 +1503,12 @@
 	 * @param {Boolean} condition
 	 * @param {HTMLElement} contents
 	 *
-	 * @returns {HTMLElement} Contents
+	 * @returns {HTMLElement} contents
 	 */
 	FunctionTemplating.if = function (condition) {
-	    lastCondition = condition || false;
-
-	    if (lastCondition) {
+	    if (condition != false && condition != null && condition != undefined) {
 	        for (var _len3 = arguments.length, contents = Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
 	            contents[_key3 - 1] = arguments[_key3];
-	        }
-
-	        return contents;
-	    }
-	};
-
-	/**
-	 * Uses the last provided condition to simulate an "else" statement
-	 *
-	 * @param {HTMLElement} contents
-	 *
-	 * @returns {HTMLElement} Contents
-	 */
-	FunctionTemplating.else = function () {
-	    if (typeof lastCondition === 'undefined') {
-	        throw new Error('No "if" statement was provided before this "else" statement');
-	    }
-
-	    if (!lastCondition) {
-	        for (var _len4 = arguments.length, contents = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
-	            contents[_key4] = arguments[_key4];
 	        }
 
 	        return contents;
@@ -2018,15 +1994,7 @@
 	            this.render();
 	            this.postrender();
 
-	            var element = this.element;
-
-	            if (!element && this.$element && this.$element.length > 0) {
-	                element = this.$element[0];
-	            }
-
-	            if (!element) {
-	                return;
-	            }
+	            var element = this.element || this.$element[0];
 
 	            element.addEventListener('DOMNodeRemovedFromDocument', function () {
 	                // Wait a few cycles before removing, as the element might just have been relocated
@@ -2329,7 +2297,9 @@
 	    _createClass(ContextMenu, [{
 	        key: 'render',
 	        value: function render() {
-	            this.$element.html(_.each(this.model, function (label, func) {
+	            var view = this;
+
+	            view.$element.html(_.each(view.model, function (label, func) {
 	                if (func == '---') {
 	                    return _.li({ class: 'dropdown-header' }, label);
 	                } else {
@@ -2340,21 +2310,13 @@
 	                        if (func) {
 	                            func(e);
 
-	                            this.remove();
+	                            view.remove();
 	                        }
 	                    }));
 	                }
 	            }));
 
-	            $('body').append(this.$element);
-
-	            var rect = this.$element[0].getBoundingClientRect();
-
-	            if (rect.left + rect.width > window.innerWidth) {
-	                this.$element.css('left', rect.left - rect.width + 'px');
-	            } else if (rect.bottom > window.innerHeight) {
-	                this.$element.css('top', rect.top - rect.height + 'px');
-	            }
+	            $('body').append(view.$element);
 	        }
 	    }]);
 
@@ -11403,6 +11365,23 @@
 	                    onSubmit: onSubmit
 	                }
 	            });
+	        }
+
+	        /**
+	         * Brings up an iframe modal
+	         *
+	         * @param {String} title
+	         * @param {String} url
+	         */
+
+	    }, {
+	        key: 'iframeModal',
+	        value: function iframeModal(title, url) {
+	            var modal = this.messageModal(title, _.iframe({ src: url }));
+
+	            modal.$element.toggleClass('iframe-modal', true);
+
+	            return modal;
 	        }
 
 	        /**
@@ -23304,6 +23283,10 @@
 	                ViewHelper.get('NavbarMain').reload();
 
 	                _this2.dirty = false;
+
+	                if (saveAction === 'preview') {
+	                    UI.iframeModal('Preview', '/api/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/content/preview/' + _this2.model.id);
+	                }
 	            }).catch(errorModal);
 	        }
 
@@ -23589,23 +23572,7 @@
 	            }),
 
 	            // View remote
-	            _.if(this.model.properties && this.model.properties.url && this.publishingSettings.connections[0], _.if(!this.model.hasPreview, _.button({ class: 'btn btn-primary' }, _.span({ class: 'text-default' }, 'Preview'), _.span({ class: 'text-working' }, 'Generating')).click(function (e) {
-	                window.open('/api/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/content/preview/' + _this6.model.id);
-
-	                $(e.currentTarget).toggleClass('working', true);
-
-	                apiCall('post', 'content/preview/' + _this6.model.id + '/?language=' + window.language).then(function () {
-	                    _this6.model = null;
-	                    _this6.fetch();
-	                }).catch(UI.errorModal);
-	            })), _.if(this.model.hasPreview, _.button({ class: 'btn btn-primary' }, _.span({ class: 'text-default' }, 'Remove preview'), _.span({ class: 'text-working' }, 'Removing')).click(function (e) {
-	                $(e.currentTarget).toggleClass('working', true);
-
-	                apiCall('delete', 'content/preview/' + _this6.model.id).then(function () {
-	                    _this6.model = null;
-	                    _this6.fetch();
-	                }).catch(UI.errorModal);
-	            })), _.if(this.model.isPublished, _.a({ target: '_blank', href: ConnectionHelper.getConnectionByIdSync(this.publishingSettings.connections[0]).url + url, class: 'btn btn-primary' }, 'View'))), _.if(!this.model.locked,
+	            _.if(this.model.properties && this.model.properties.url && this.publishingSettings.connections[0], _.if(this.model.isPublished, _.a({ target: '_blank', href: ConnectionHelper.getConnectionByIdSync(this.publishingSettings.connections[0]).url + url, class: 'btn btn-primary' }, 'View'))), _.if(!this.model.locked,
 	            // Save & publish
 	            _.div({ class: 'btn-group-save-publish raised' }, this.$saveBtn = _.button({ class: 'btn btn-save btn-primary' }, _.span({ class: 'text-default' }, 'Save'), _.span({ class: 'text-working' }, 'Saving')).click(function () {
 	                _this6.onClickSave(_this6.publishingSettings);
