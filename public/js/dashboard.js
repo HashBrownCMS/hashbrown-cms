@@ -11400,7 +11400,7 @@
 	            return new MessageModal({
 	                model: {
 	                    title: title,
-	                    body: $iframe,
+	                    body: [_.span({ class: 'iframe-modal-error' }, 'If the preview didn\'t show up, please try the "reload" or "open" buttons'), $iframe],
 	                    class: 'iframe-modal'
 	                },
 	                buttons: [{
@@ -11408,6 +11408,14 @@
 	                    class: 'btn-primary',
 	                    callback: function callback() {
 	                        $iframe[0].src += '';
+
+	                        return false;
+	                    }
+	                }, {
+	                    label: 'Open',
+	                    class: 'btn-primary',
+	                    callback: function callback() {
+	                        window.open($iframe[0].src);
 
 	                        return false;
 	                    }

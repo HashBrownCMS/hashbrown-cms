@@ -409,6 +409,13 @@ img.logo {
     .iframe-modal .modal-dialog .modal-content .modal-body {
       padding: 0px;
       position: relative; }
+      .iframe-modal .modal-dialog .modal-content .modal-body .iframe-modal-error {
+        background-color: #FFB300;
+        color: #664800;
+        padding: 10px 15px;
+        position: absolute;
+        bottom: 0px;
+        right: 0px; }
       .iframe-modal .modal-dialog .modal-content .modal-body iframe {
         top: 0px;
         left: 0px;
