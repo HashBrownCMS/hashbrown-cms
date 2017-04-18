@@ -109,7 +109,25 @@ class ContentHelper extends ContentHelperCommon {
             return Promise.resolve(content);
         });
     }
-    
+   
+    /**
+     * Updates a Content object (quick, no checks)
+     *
+     * @param {Content} content
+     */
+    static updateContent(
+        project = requiredParam('project'),
+        environment = requiredParam('environment'),
+        content = requiredParam('content')
+    ) {
+        return MongoHelper.updateOne(
+            project,
+            environment + '.content',
+            { id: content.id },
+            content.getObject()
+        );
+    }
+
     /**
      * Sets a Content object by id
      *

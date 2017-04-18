@@ -420,11 +420,16 @@ class UIHelper {
      *
      * @param {String} title
      * @param {String} url
+     * @param {Function} onload
      */
-    static iframeModal(title, url) {
+    static iframeModal(title, url, onload) {
         let modal = this.messageModal(title, _.iframe({src: url}));
     
         modal.$element.toggleClass('iframe-modal', true);
+        
+        if(typeof onload === 'function') {
+            modal.$element.find('iframe')[0].onload = onload;
+        }
 
         return modal;
     }

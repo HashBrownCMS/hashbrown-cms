@@ -94,29 +94,29 @@ class ContentEditor extends View {
             this.$saveBtn.toggleClass('saving', false);
             
             this.reload();
-            ViewHelper.get('NavbarMain').reload();
+            
+            NavbarMain.reload();
 
             this.dirty = false;
 
             if(saveAction === 'preview') {
-                UI.iframeModal('Preview', postSaveUrl);
+                UI.iframeModal('Preview', postSaveUrl, (e) => {
+                
+                });
             }
         })
         .catch(errorModal);
     }
 
     /**
-     * Event: Click toggle publish
-     */
-    onClickTogglePublish() {
-
-    }
-
-    /**
      * Reload this view
      */
     reload() {
-        this.renderButtons();
+        this.lastScrollPos = this.$element.find('.editor-body')[0].scrollTop; 
+
+        this.model = null;
+
+        this.fetch();
     }
 
     /**
@@ -139,6 +139,25 @@ class ContentEditor extends View {
             }
 
             this.fieldEditorReadyCallbacks = [];
+        }
+
+        this.restoreScrollPos();
+    }
+
+    /**
+     * Restores the scroll position
+     */
+    restoreScrollPos() {
+        if(this.lastScrollPos) {
+            this.$element.find('.editor-body')[0].scrollTop = this.lastScrollPos;
+        }
+    }
+
+    static restoreScrollPos() {
+        let editor = ViewHelper.get('ContentEditor');
+
+        if(editor) {
+            editor.restoreScrollPos();
         }
     }
 

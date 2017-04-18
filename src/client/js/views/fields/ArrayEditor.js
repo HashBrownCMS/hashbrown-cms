@@ -450,6 +450,9 @@ class ArrayEditor extends FieldEditor {
             // Update DOM indices after all items have been rendered
             if(i >= this.value.items.length) {
                 this.updateDOMIndices();
+                
+                ContentEditor.restoreScrollPos();
+                
                 return;
             }
 

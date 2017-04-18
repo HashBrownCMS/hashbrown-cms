@@ -11372,14 +11372,19 @@
 	         *
 	         * @param {String} title
 	         * @param {String} url
+	         * @param {Function} onload
 	         */
 
 	    }, {
 	        key: 'iframeModal',
-	        value: function iframeModal(title, url) {
+	        value: function iframeModal(title, url, onload) {
 	            var modal = this.messageModal(title, _.iframe({ src: url }));
 
 	            modal.$element.toggleClass('iframe-modal', true);
+
+	            if (typeof onload === 'function') {
+	                modal.$element.find('iframe')[0].onload = onload;
+	            }
 
 	            return modal;
 	        }
@@ -16254,6 +16259,9 @@
 	                // Update DOM indices after all items have been rendered
 	                if (i >= _this5.value.items.length) {
 	                    _this5.updateDOMIndices();
+
+	                    ContentEditor.restoreScrollPos();
+
 	                    return;
 	                }
 
@@ -23283,23 +23291,16 @@
 	                _this2.$saveBtn.toggleClass('saving', false);
 
 	                _this2.reload();
-	                ViewHelper.get('NavbarMain').reload();
+
+	                NavbarMain.reload();
 
 	                _this2.dirty = false;
 
 	                if (saveAction === 'preview') {
-	                    UI.iframeModal('Preview', postSaveUrl);
+	                    UI.iframeModal('Preview', postSaveUrl, function (e) {});
 	                }
 	            }).catch(errorModal);
 	        }
-
-	        /**
-	         * Event: Click toggle publish
-	         */
-
-	    }, {
-	        key: 'onClickTogglePublish',
-	        value: function onClickTogglePublish() {}
 
 	        /**
 	         * Reload this view
@@ -23308,7 +23309,11 @@
 	    }, {
 	        key: 'reload',
 	        value: function reload() {
-	            this.renderButtons();
+	            this.lastScrollPos = this.$element.find('.editor-body')[0].scrollTop;
+
+	            this.model = null;
+
+	            this.fetch();
 	        }
 
 	        /**
@@ -23355,7 +23360,24 @@
 
 	                this.fieldEditorReadyCallbacks = [];
 	            }
+
+	            this.restoreScrollPos();
 	        }
+
+	        /**
+	         * Restores the scroll position
+	         */
+
+	    }, {
+	        key: 'restoreScrollPos',
+	        value: function restoreScrollPos() {
+	            if (this.lastScrollPos) {
+	                this.$element.find('.editor-body')[0].scrollTop = this.lastScrollPos;
+	            }
+	        }
+	    }, {
+	        key: 'renderField',
+
 
 	        /**
 	         * Renders a field view
@@ -23368,9 +23390,6 @@
 	         *
 	         * @return {Object} element
 	         */
-
-	    }, {
-	        key: 'renderField',
 	        value: function renderField(fieldValue, fieldDefinition, onChange, config, $keyContent) {
 	            var _this3 = this;
 
@@ -23618,6 +23637,15 @@
 	                    location.hash = '/content/json/' + _this7.model.id;
 	                });
 	            });
+	        }
+	    }], [{
+	        key: 'restoreScrollPos',
+	        value: function restoreScrollPos() {
+	            var editor = ViewHelper.get('ContentEditor');
+
+	            if (editor) {
+	                editor.restoreScrollPos();
+	            }
 	        }
 	    }]);
 
@@ -35972,10 +36000,8 @@
 
 	            content.hasPreview = false;
 
-	            return MongoHelper.updateOne(project, environment + '.content', { id: content.id }, content.getObject()).then(function () {
-	                content.id += '_preview';
-
-	                return _this2.deleteContentProperties(content.id, language);
+	            return ContentHelper.updateContent(project, environment, content).then(function () {
+	                return _this2.deleteContentProperties(content.id + '_preview', language);
 	            }).then(function () {
 	                return Promise.resolve();
 	            });
@@ -35983,8 +36009,6 @@
 
 	        /**
 	         * Generates a Content preview
-	         *
-	         * @params {Content} content
 	         *
 	         * @param {String} project
 	         * @param {String} environment
@@ -36007,7 +36031,7 @@
 
 	            content.hasPreview = true;
 
-	            return MongoHelper.updateOne(project, environment + '.content', { id: content.id }, content.getObject()).then(function () {
+	            return ContentHelper.updateContent(project, environment, content).then(function () {
 	                return LanguageHelper.getAllLocalizedPropertySets(project, environment, content);
 	            }).then(function (sets) {
 	                var properties = sets[language];
@@ -36015,9 +36039,8 @@
 	                var url = '/preview/' + content.id;
 
 	                properties.url = url;
-	                content.id += '_preview';
 
-	                return _this3.postContentProperties(properties, content.id, language, content.getMeta()).then(function () {
+	                return _this3.postContentProperties(properties, content.id + '_preview', language, content.getMeta()).then(function () {
 	                    return Promise.resolve(_this3.url + url);
 	                });
 	            });

@@ -11350,14 +11350,19 @@
 	         *
 	         * @param {String} title
 	         * @param {String} url
+	         * @param {Function} onload
 	         */
 
 	    }, {
 	        key: 'iframeModal',
-	        value: function iframeModal(title, url) {
+	        value: function iframeModal(title, url, onload) {
 	            var modal = this.messageModal(title, _.iframe({ src: url }));
 
 	            modal.$element.toggleClass('iframe-modal', true);
+
+	            if (typeof onload === 'function') {
+	                modal.$element.find('iframe')[0].onload = onload;
+	            }
 
 	            return modal;
 	        }
@@ -20767,10 +20772,8 @@
 
 	            content.hasPreview = false;
 
-	            return MongoHelper.updateOne(project, environment + '.content', { id: content.id }, content.getObject()).then(function () {
-	                content.id += '_preview';
-
-	                return _this2.deleteContentProperties(content.id, language);
+	            return ContentHelper.updateContent(project, environment, content).then(function () {
+	                return _this2.deleteContentProperties(content.id + '_preview', language);
 	            }).then(function () {
 	                return Promise.resolve();
 	            });
@@ -20778,8 +20781,6 @@
 
 	        /**
 	         * Generates a Content preview
-	         *
-	         * @params {Content} content
 	         *
 	         * @param {String} project
 	         * @param {String} environment
@@ -20802,7 +20803,7 @@
 
 	            content.hasPreview = true;
 
-	            return MongoHelper.updateOne(project, environment + '.content', { id: content.id }, content.getObject()).then(function () {
+	            return ContentHelper.updateContent(project, environment, content).then(function () {
 	                return LanguageHelper.getAllLocalizedPropertySets(project, environment, content);
 	            }).then(function (sets) {
 	                var properties = sets[language];
@@ -20810,9 +20811,8 @@
 	                var url = '/preview/' + content.id;
 
 	                properties.url = url;
-	                content.id += '_preview';
 
-	                return _this3.postContentProperties(properties, content.id, language, content.getMeta()).then(function () {
+	                return _this3.postContentProperties(properties, content.id + '_preview', language, content.getMeta()).then(function () {
 	                    return Promise.resolve(_this3.url + url);
 	                });
 	            });
