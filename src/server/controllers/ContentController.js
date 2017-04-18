@@ -14,7 +14,6 @@ class ContentController extends ApiController {
     static init(app) {
         app.get('/api/:project/:environment/content', this.middleware(), this.getAllContents);
         app.get('/api/:project/:environment/content/:id', this.middleware(), this.getContent);
-        app.get('/api/:project/:environment/content/preview/:id', this.middleware(), this.getContentPreview);
 
         app.post('/api/:project/:environment/content/new/:schemaId', this.middleware(), this.createContent);
         app.post('/api/:project/:environment/content/pull/:id', this.middleware(), this.pullContent);
@@ -84,92 +83,12 @@ class ContentController extends ApiController {
         let content = new Content(req.body);
 
         ConnectionHelper.previewContent(req.project, req.environment, content, req.user, req.query.language || 'en')
-        .then(() => {
-            res.status(200).send(req.body);
+        .then((previewUrl) => {
+            res.status(200).send(previewUrl);
         })
         .catch((e) => {
             res.status(502).send(ContentController.printError(e));   
         });
-    }
-   
-    /**
-     * Renders a Content preview by id
-     */
-    static getContentPreview(req, res) {
-        let id = req.params.id;
-   
-        if(id && id != 'undefined') {
-            let content;
-            let url;
-
-            ContentHelper.getContentById(req.project, req.environment, id)
-            .then((node) => {
-                content = node;
-                
-                return content.getSettings(req.project, req.environment, 'publishing');
-            })
-            .then((settings) => {
-                if(settings.connections.length < 1) {
-                    return res.status(502).send(ContentController.printError(new Error('No Connections configured for publishing for Content by id "' + id + '"')));
-                }
-
-                return ConnectionHelper.getConnectionById(req.project, req.environment, settings.connections[0]);
-            })
-            .then((connection) => {
-                res.status(200).render('preview', { previewUrl: connection.url + '/preview/' + content.id });
-            })
-            .catch((e) => {
-                res.status(502).send(ContentController.printError(e));
-            });
-        
-        } else {
-            res.status(400).send(ContentController.printError(new Error('Content id is undefined')));
-
-        }
-    }
-    
-    /**
-     * Deletes a Content preview by id
-     */
-    static deleteContentPreview(req, res) {
-        let id = req.params.id;
-   
-        if(id && id != 'undefined') {
-            let content;
-            let url;
-
-            ContentHelper.getContentById(req.project, req.environment, id)
-            .then((node) => {
-                content = node;
-                
-                return content.getSettings(req.project, req.environment, 'publishing');
-            })
-            .then((settings) => {
-                if(settings.connections.length < 1) {
-                    return res.status(502).send(ContentController.printError(new Error('No Connections configured for publishing for Content by id "' + id + '"')));
-                }
-
-                return ConnectionHelper.getConnectionById(req.project, req.environment, settings.connections[0]);
-            })
-            .then((connection) => {
-                return connection.removePreview(req.project, req.environment, content);
-            })
-            .then(() => {
-                content.hasPreview = false;
-
-                return ContentHelper.setContentById(req.project, req.environment, content.id, content, req.user);
-            })
-            .then(() => {
-                res.status(200).send('OK');
-            })
-            .catch((e) => {
-                res.status(502).send(ContentController.printError(e));
-            });
-        
-        } else {
-            res.status(400).send(ContentController.printError(new Error('Content id is undefined')));
-
-        }
     }
 
     /**

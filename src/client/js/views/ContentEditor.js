@@ -56,6 +56,7 @@ class ContentEditor extends View {
      */
     onClickSave(publishing) {
         let saveAction = this.$element.find('.editor-footer .select-publishing').val();
+        let postSaveUrl;
 
         let setContent = () => {
             // Use publishing API
@@ -84,7 +85,9 @@ class ContentEditor extends View {
 
         // Save content to database
         setContent()
-        .then(() => {
+        .then((url) => {
+            postSaveUrl = url;
+            
             return reloadResource('content');
         })
         .then(() => {
@@ -96,7 +99,7 @@ class ContentEditor extends View {
             this.dirty = false;
 
             if(saveAction === 'preview') {
-                UI.iframeModal('Preview', '/api/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/content/preview/' + this.model.id);
+                UI.iframeModal('Preview', postSaveUrl);
             }
         })
         .catch(errorModal);

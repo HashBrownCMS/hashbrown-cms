@@ -145,15 +145,15 @@ class Connection extends Entity {
 
         debug.log('Unpublishing all localised property sets...', this);
         
-        return this.removePreview(project, environment, content)
-        .then(() => {
-            return LanguageHelper.getSelectedLanguages(project);
-        })
+        return LanguageHelper.getSelectedLanguages(project)
         .then((languages) => {
             function next(i) {
                 let language = languages[i];
 
-                return connection.deleteContentProperties(content.id, language)
+                return connection.removePreview(project, environment, content, language)
+                .then(() => {
+                    return connection.deleteContentProperties(content.id, language);
+                })
                 .then(() => {
                     i++;
 
@@ -181,15 +181,34 @@ class Connection extends Entity {
      * @param {String} project
      * @param {String} environment
      * @param {Content} content
+     * @param {String} language
      *
      * @returns {Promise} Preview URL
      */
     removePreview(
         project = requiredParam('project'),
         environment = requiredParam('environment'),
-        content = requiredParam('content')
+        content = requiredParam('content'),
+        language = requiredParam('language')
     ) {
-        return Promise.resolve();
+        if(!content.hasPreview) { return Promise.resolve(); }
+
+        content.hasPreview = false;
+
+        return MongoHelper.updateOne(
+            project,
+            environment + '.content',
+            { id: content.id },
+            content.getObject()
+        )
+        .then(() => {
+            content.id += '_preview';
+            
+            return this.deleteContentProperties(content.id, language)
+        })
+        .then(() => {
+            return Promise.resolve();
+        });
     }
 
     /**
@@ -210,7 +229,30 @@ class Connection extends Entity {
         content = requiredParam('content'),
         language = requiredParam('language')
     ) {
-        return Promise.resolve();
+        content.hasPreview = true;
+        
+        return MongoHelper.updateOne(
+            project,
+            environment + '.content',
+            { id: content.id },
+            content.getObject()
+        )
+        .then(() => {
+            return LanguageHelper.getAllLocalizedPropertySets(project, environment, content);
+        })
+        .then((sets) => {
+            let properties = sets[language];
+
+            let url = '/preview/' + content.id;
+            
+            properties.url = url;
+            content.id += '_preview';
+
+            return this.postContentProperties(properties, content.id, language, content.getMeta())
+            .then(() => {
+                return Promise.resolve(this.url + url);
+            });
+        });
     }
 
     /**
@@ -231,10 +273,7 @@ class Connection extends Entity {
 
         debug.log('Publishing all localised property sets...', this);
 
-        return this.removePreview(project, environment, content)
-        .then(() => {
-            return LanguageHelper.getAllLocalizedPropertySets(project, environment, content);
-        })
+        return LanguageHelper.getAllLocalizedPropertySets(project, environment, content)
         .then((sets) => {
             let languages = Object.keys(sets);
             
@@ -242,7 +281,10 @@ class Connection extends Entity {
                 let language = languages[i];
                 let properties = sets[language];
 
-                return connection.postContentProperties(properties, content.id, language, content.getMeta())
+                return connection.removePreview(project, environment, content, language)
+                .then(() => {
+                    return connection.postContentProperties(properties, content.id, language, content.getMeta())
+                })
                 .then(() => {
                     i++;
 

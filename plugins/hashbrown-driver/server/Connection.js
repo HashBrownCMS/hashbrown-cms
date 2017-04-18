@@ -119,7 +119,7 @@ class HashBrownDriverConnection extends Connection {
             });
         });
     }
-
+    
     /**
      * Posts content properties to JSON tree
      *

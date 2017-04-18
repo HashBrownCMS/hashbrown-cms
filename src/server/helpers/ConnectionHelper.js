@@ -68,10 +68,8 @@ class ConnectionHelper extends ConnectionHelperCommon {
         .then((connection) => {
             return connection.generatePreview(project, environment, content, language);
         })
-        .then(() => {
-            content.hasPreview = true;
-
-            return ContentHelper.setContentById(project, environment, content.id, content, user);
+        .then((previewUrl) => {
+            return Promise.resolve(previewUrl);  
         });
     }
 
@@ -123,7 +121,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
                         }
                     })
 					.catch((e) => {
-						return Promise.reject(new Error('Connection by id "' + settings.connections[i] + '" could not be found'));
+						return Promise.reject(e);
 					});
                 }
 
