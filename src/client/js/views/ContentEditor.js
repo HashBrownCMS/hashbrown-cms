@@ -55,21 +55,23 @@ class ContentEditor extends View {
      * @param {Object} publishing
      */
     onClickSave(publishing) {
-        let shouldUnpublish = this.$element.find('.editor-footer .select-publishing').val() == 'unpublish';
-
-        this.model.isPublished = !shouldUnpublish;
+        let saveAction = this.$element.find('.editor-footer .select-publishing').val();
 
         let setContent = () => {
             // Use publishing API
             if(publishing.connections && publishing.connections.length > 0) {
                 // Unpublish
-                if(shouldUnpublish) {
+                if(saveAction === 'unpublish') {
                     return apiCall('post', 'content/unpublish', this.model);
 
                 // Publish
-                } else {
+                } else if(saveAction === 'publish') {
                     return apiCall('post', 'content/publish', this.model);
                 
+                // Preview
+                } else if(saveAction === 'preview') {
+                    return apiCall('post', 'content/preview', this.model);
+
                 }
 
             // Just save normally
@@ -396,7 +398,7 @@ class ContentEditor extends View {
                         _.a({target: '_blank', href: ConnectionHelper.getConnectionByIdSync(this.publishingSettings.connections[0]).url + url, class: 'btn btn-primary'}, 'View')
                     )
                 ),
-                _.if(!this.model.locked, 
+                _.if(!this.model.locked,
                     // Save & publish
                     _.div({class: 'btn-group-save-publish raised'},
                         this.$saveBtn = _.button({class: 'btn btn-save btn-primary'},
@@ -407,6 +409,7 @@ class ContentEditor extends View {
                             _.span('&'),
                             _.select({class: 'form-control select-publishing'},
                                 _.option({value: 'publish'}, 'Publish'),
+                                _.option({value: 'preview'}, 'Preview'),
                                 _.option({value: 'unpublish'}, 'Unpublish')
                             ).val('publish')
                         )

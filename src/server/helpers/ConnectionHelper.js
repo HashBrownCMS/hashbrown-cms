@@ -40,6 +40,42 @@ class ConnectionHelper extends ConnectionHelperCommon {
     }
 
     /**
+     * Previews content
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {Content} content
+     * @param {User} user
+     * @param {String} language
+     *
+     * @returns {Promise} Promise
+     */
+    static previewContent(
+        project = requiredParam('project'),
+        environment = requiredParam('environment'),
+        content = requiredParam('content'),
+        user = requiredParam('user'),
+        language = requiredParam('language')
+    ) {
+        return content.getSettings(project, environment, 'publishing')
+        .then((settings) => {
+            if(!settings.connections || settings.connections.length < 1) {
+                return Promise.reject(new Error('Content by id "' + content.id + '" has no connections configured'));
+            }
+
+            return ConnectionHelper.getConnectionById(project, environment, settings.connections[0]);
+        })
+        .then(() => {
+            content.hasPreview = true;
+
+            return ContentHelper.setContentById(project, environment, content.id, content, user);
+        })
+        .then((connection) => {
+            return connection.generatePreview(project, environment, content, language);
+        });
+    }
+
+    /**
      * Publishes content
      *
      * @param {String} project

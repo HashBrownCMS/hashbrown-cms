@@ -144,8 +144,11 @@ class Connection extends Entity {
         let connection = this;
 
         debug.log('Unpublishing all localised property sets...', this);
-
-        return LanguageHelper.getSelectedLanguages(project)
+        
+        return this.removePreview(project, environment, content)
+        .then(() => {
+            return LanguageHelper.getSelectedLanguages(project);
+        })
         .then((languages) => {
             function next(i) {
                 let language = languages[i];
@@ -228,7 +231,10 @@ class Connection extends Entity {
 
         debug.log('Publishing all localised property sets...', this);
 
-        return LanguageHelper.getAllLocalizedPropertySets(project, environment, content)
+        return this.removePreview(project, environment, content)
+        .then(() => {
+            return LanguageHelper.getAllLocalizedPropertySets(project, environment, content);
+        })
         .then((sets) => {
             let languages = Object.keys(sets);
             
