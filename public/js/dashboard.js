@@ -1284,6 +1284,7 @@
 	'use strict';
 
 	var FunctionTemplating = {};
+	var lastCondition = void 0;
 
 	/**
 	 * Appends content to an element
@@ -1481,12 +1482,35 @@
 	 * @param {Boolean} condition
 	 * @param {HTMLElement} contents
 	 *
-	 * @returns {HTMLElement} contents
+	 * @returns {HTMLElement} Contents
 	 */
 	FunctionTemplating.if = function (condition) {
-	    if (condition != false && condition != null && condition != undefined) {
+	    lastCondition = condition || false;
+
+	    if (lastCondition) {
 	        for (var _len3 = arguments.length, contents = Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
 	            contents[_key3 - 1] = arguments[_key3];
+	        }
+
+	        return contents;
+	    }
+	};
+
+	/**
+	 * Uses the last provided condition to simulate an "else" statement
+	 *
+	 * @param {HTMLElement} contents
+	 *
+	 * @returns {HTMLElement} Contents
+	 */
+	FunctionTemplating.else = function () {
+	    if (typeof lastCondition === 'undefined') {
+	        throw new Error('No "if" statement was provided before this "else" statement');
+	    }
+
+	    if (!lastCondition) {
+	        for (var _len4 = arguments.length, contents = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+	            contents[_key4] = arguments[_key4];
 	        }
 
 	        return contents;
@@ -1972,7 +1996,15 @@
 	            this.render();
 	            this.postrender();
 
-	            var element = this.element || this.$element[0];
+	            var element = this.element;
+
+	            if (!element && this.$element && this.$element.length > 0) {
+	                element = this.$element[0];
+	            }
+
+	            if (!element) {
+	                return;
+	            }
 
 	            element.addEventListener('DOMNodeRemovedFromDocument', function () {
 	                // Wait a few cycles before removing, as the element might just have been relocated
@@ -2275,9 +2307,7 @@
 	    _createClass(ContextMenu, [{
 	        key: 'render',
 	        value: function render() {
-	            var view = this;
-
-	            view.$element.html(_.each(view.model, function (label, func) {
+	            this.$element.html(_.each(this.model, function (label, func) {
 	                if (func == '---') {
 	                    return _.li({ class: 'dropdown-header' }, label);
 	                } else {
@@ -2288,13 +2318,21 @@
 	                        if (func) {
 	                            func(e);
 
-	                            view.remove();
+	                            this.remove();
 	                        }
 	                    }));
 	                }
 	            }));
 
-	            $('body').append(view.$element);
+	            $('body').append(this.$element);
+
+	            var rect = this.$element[0].getBoundingClientRect();
+
+	            if (rect.left + rect.width > window.innerWidth) {
+	                this.$element.css('left', rect.left - rect.width + 'px');
+	            } else if (rect.bottom > window.innerHeight) {
+	                this.$element.css('top', rect.top - rect.height + 'px');
+	            }
 	        }
 	    }]);
 
@@ -11351,20 +11389,33 @@
 	         * @param {String} title
 	         * @param {String} url
 	         * @param {Function} onload
+	         * @param {Function} onerror
 	         */
 
 	    }, {
 	        key: 'iframeModal',
-	        value: function iframeModal(title, url, onload) {
-	            var modal = this.messageModal(title, _.iframe({ src: url }));
+	        value: function iframeModal(title, url, onload, onerror) {
+	            var $iframe = _.iframe({ src: url });
 
-	            modal.$element.toggleClass('iframe-modal', true);
+	            return new MessageModal({
+	                model: {
+	                    title: title,
+	                    body: $iframe,
+	                    class: 'iframe-modal'
+	                },
+	                buttons: [{
+	                    label: 'Reload',
+	                    class: 'btn-primary',
+	                    callback: function callback() {
+	                        $iframe[0].src += '';
 
-	            if (typeof onload === 'function') {
-	                modal.$element.find('iframe')[0].onload = onload;
-	            }
-
-	            return modal;
+	                        return false;
+	                    }
+	                }, {
+	                    label: 'OK',
+	                    class: 'btn-default'
+	                }]
+	            });
 	        }
 
 	        /**
@@ -20719,13 +20770,13 @@
 
 	            debug.log('Unpublishing all localised property sets...', this);
 
-	            return LanguageHelper.getSelectedLanguages(project).then(function (languages) {
+	            return connection.removePreview(project, environment, content).then(function () {
+	                return LanguageHelper.getSelectedLanguages(project);
+	            }).then(function (languages) {
 	                function next(i) {
 	                    var language = languages[i];
 
-	                    return connection.removePreview(project, environment, content, language).then(function () {
-	                        return connection.deleteContentProperties(content.id, language);
-	                    }).then(function () {
+	                    return connection.deleteContentProperties(content.id, language).then(function () {
 	                        i++;
 
 	                        if (i < languages.length) {
@@ -20750,7 +20801,6 @@
 	         * @param {String} project
 	         * @param {String} environment
 	         * @param {Content} content
-	         * @param {String} language
 	         *
 	         * @returns {Promise} Preview URL
 	         */
@@ -20759,12 +20809,11 @@
 	        key: 'removePreview',
 	        value: function removePreview() {
 	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
-	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
 
 	            var _this2 = this;
 
+	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
 	            var content = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('content');
-	            var language = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : requiredParam('language');
 
 	            if (!content.hasPreview) {
 	                return Promise.resolve();
@@ -20773,9 +20822,21 @@
 	            content.hasPreview = false;
 
 	            return ContentHelper.updateContent(project, environment, content).then(function () {
-	                return _this2.deleteContentProperties(content.id + '_preview', language);
-	            }).then(function () {
-	                return Promise.resolve();
+	                return LanguageHelper.getSelectedLanguages(project);
+	            }).then(function (languages) {
+	                var next = function next() {
+	                    var language = languages.pop();
+
+	                    if (!language) {
+	                        return Promise.resolve();
+	                    }
+
+	                    return _this2.deleteContentProperties(content.id + '_preview', language).then(function () {
+	                        return next();
+	                    });
+	                };
+
+	                return next();
 	            });
 	        }
 
@@ -20839,16 +20900,16 @@
 
 	            debug.log('Publishing all localised property sets...', this);
 
-	            return LanguageHelper.getAllLocalizedPropertySets(project, environment, content).then(function (sets) {
+	            return connection.removePreview(project, environment, content).then(function () {
+	                return LanguageHelper.getAllLocalizedPropertySets(project, environment, content);
+	            }).then(function (sets) {
 	                var languages = Object.keys(sets);
 
 	                function next(i) {
 	                    var language = languages[i];
 	                    var properties = sets[language];
 
-	                    return connection.removePreview(project, environment, content, language).then(function () {
-	                        return connection.postContentProperties(properties, content.id, language, content.getMeta());
-	                    }).then(function () {
+	                    return connection.postContentProperties(properties, content.id, language, content.getMeta()).then(function () {
 	                        i++;
 
 	                        if (i < languages.length) {

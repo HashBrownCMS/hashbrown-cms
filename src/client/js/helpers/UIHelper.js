@@ -421,17 +421,33 @@ class UIHelper {
      * @param {String} title
      * @param {String} url
      * @param {Function} onload
+     * @param {Function} onerror
      */
-    static iframeModal(title, url, onload) {
-        let modal = this.messageModal(title, _.iframe({src: url}));
-    
-        modal.$element.toggleClass('iframe-modal', true);
-        
-        if(typeof onload === 'function') {
-            modal.$element.find('iframe')[0].onload = onload;
-        }
+    static iframeModal(title, url, onload, onerror) {
+        let $iframe = _.iframe({src: url});
 
-        return modal;
+        return new MessageModal({
+            model: {
+                title: title,
+                body: $iframe,
+                class: 'iframe-modal'
+            },
+            buttons: [
+                {
+                    label: 'Reload',
+                    class: 'btn-primary',
+                    callback: () => {
+                        $iframe[0].src += '';
+
+                        return false;
+                    }
+                },
+                {
+                    label: 'OK',
+                    class: 'btn-default'
+                }
+            ]
+        });
     }
 
     /**

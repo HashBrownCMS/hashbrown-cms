@@ -100,9 +100,10 @@ class ContentEditor extends View {
             this.dirty = false;
 
             if(saveAction === 'preview') {
-                UI.iframeModal('Preview', postSaveUrl, (e) => {
-                
-                });
+                UI.iframeModal(
+                    'Preview',
+                    postSaveUrl
+                );
             }
         })
         .catch(errorModal);
