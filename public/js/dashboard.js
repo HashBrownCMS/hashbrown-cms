@@ -2009,7 +2009,11 @@
 	            element.addEventListener('DOMNodeRemovedFromDocument', function () {
 	                // Wait a few cycles before removing, as the element might just have been relocated
 	                setTimeout(function () {
-	                    var element = _this.element || _this.$element[0];
+	                    var element = _this.element;
+
+	                    if (!element && _this.$element) {
+	                        element = _this.$element[0];
+	                    }
 
 	                    if (!element || !element.parentNode) {
 	                        _this.remove();
@@ -2283,22 +2287,32 @@
 	    function ContextMenu(params) {
 	        _classCallCheck(this, ContextMenu);
 
-	        // Recycle other context menus
 	        var _this = _possibleConstructorReturn(this, (ContextMenu.__proto__ || Object.getPrototypeOf(ContextMenu)).call(this, params));
 
-	        if ($('.context-menu').length > 0) {
-	            _this.$element = $('.context-menu');
+	        _this.element = _.ul({ class: 'context-menu dropdown-menu', role: 'menu' });
+
+	        var existingMenu = _.find('.context-menu');
+
+	        if (typeof jQuery !== 'undefined') {
+	            if (existingMenu && existingMenu.length > 0) {
+	                _this.element = existingMenu;
+	            }
 	        } else {
-	            _this.$element = _.ul({ class: 'context-menu dropdown-menu', role: 'menu' });
+	            if (existingMenu) {
+	                _this.element = existingMenu;
+	            }
 	        }
 
-	        _this.$element.css({
-	            position: 'absolute',
-	            'z-index': 1200,
-	            top: _this.pos.y,
-	            left: _this.pos.x,
-	            display: 'block'
-	        });
+	        if (typeof jQuery !== 'undefined') {
+	            _this.$element = _this.element;
+	            _this.element = _this.$element[0];
+	        }
+
+	        _this.element.style.position = 'absolute';
+	        _this.element.style.zIndex = 1200;
+	        _this.element.style.top = _this.pos.y;
+	        _this.element.style.left = _this.pos.x;
+	        _this.element.style.display = 'block';
 
 	        _this.fetch();
 	        return _this;
@@ -2307,7 +2321,9 @@
 	    _createClass(ContextMenu, [{
 	        key: 'render',
 	        value: function render() {
-	            this.$element.html(_.each(this.model, function (label, func) {
+	            var _this2 = this;
+
+	            _.append(this.element, _.each(this.model, function (label, func) {
 	                if (func == '---') {
 	                    return _.li({ class: 'dropdown-header' }, label);
 	                } else {
@@ -2318,20 +2334,20 @@
 	                        if (func) {
 	                            func(e);
 
-	                            this.remove();
+	                            _this2.remove();
 	                        }
 	                    }));
 	                }
 	            }));
 
-	            $('body').append(this.$element);
+	            _.append(_.find('body'), this.element);
 
-	            var rect = this.$element[0].getBoundingClientRect();
+	            var rect = this.element.getBoundingClientRect();
 
 	            if (rect.left + rect.width > window.innerWidth) {
-	                this.$element.css('left', rect.left - rect.width + 'px');
+	                this.element.style.left = rect.left - rect.width + 'px';
 	            } else if (rect.bottom > window.innerHeight) {
-	                this.$element.css('top', rect.top - rect.height + 'px');
+	                this.element.style.top = rect.top - rect.height + 'px';
 	            }
 	        }
 	    }]);
