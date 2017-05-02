@@ -6,6 +6,10 @@ let Entity = require('./Entity');
  * The base class for all Schema types
  */
 class Schema extends Entity {
+    constructor(properties) {
+        super(properties);
+    }
+    
     structure() {
         this.def(Boolean, 'locked');
         this.def(Boolean, 'local');
@@ -14,6 +18,18 @@ class Schema extends Entity {
         this.def(String, 'name');
         this.def(String, 'icon');
         this.def(String, 'parentSchemaId');
+        this.def(Array, 'hiddenProperties', []);
+    }
+
+    /**
+     * Checks whether a property is hidden
+     *
+     * @param {String} name
+     *
+     * @returns {Boolean} Is hidden
+     */
+    isPropertyHidden(name) {
+        return this.hiddenProperties.indexOf(name) > -1;
     }
 
     /**

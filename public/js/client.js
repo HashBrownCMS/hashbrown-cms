@@ -24334,6 +24334,10 @@
 	        value: function renderEditorPicker() {
 	            var _this3 = this;
 
+	            if (this.model.isPropertyHidden('editorId')) {
+	                return;
+	            }
+
 	            var editorOptions = [];
 
 	            for (var editorId in resources.editors) {
@@ -24365,6 +24369,10 @@
 	    }, {
 	        key: 'renderNameEditor',
 	        value: function renderNameEditor() {
+	            if (this.model.isPropertyHidden('name')) {
+	                return;
+	            }
+
 	            var view = this;
 
 	            function onInputChange() {
@@ -24385,6 +24393,10 @@
 	    }, {
 	        key: 'renderTabsEditor',
 	        value: function renderTabsEditor() {
+	            if (this.model.isPropertyHidden('tabs')) {
+	                return;
+	            }
+
 	            var view = this;
 
 	            function onInputChange($input) {
@@ -24507,6 +24519,10 @@
 	    }, {
 	        key: 'renderIconEditor',
 	        value: function renderIconEditor() {
+	            if (this.model.isPropertyHidden('icon')) {
+	                return;
+	            }
+
 	            var view = this;
 
 	            function onClickBrowse() {
@@ -24559,6 +24575,10 @@
 	        key: 'renderParentEditor',
 	        value: function renderParentEditor() {
 	            var _this4 = this;
+
+	            if (this.model.isPropertyHidden('parentSchemaId')) {
+	                return;
+	            }
 
 	            var schemaOptions = [];
 
@@ -24620,6 +24640,10 @@
 	        value: function renderDefaultTabEditor() {
 	            var _this5 = this;
 
+	            if (this.model.isPropertyHidden('defaultTabId')) {
+	                return;
+	            }
+
 	            var tabOptions = [{ value: 'meta', label: 'Meta' }];
 
 	            // Sanity check
@@ -24645,6 +24669,10 @@
 	    }, {
 	        key: 'renderAllowedChildSchemasEditor',
 	        value: function renderAllowedChildSchemasEditor() {
+	            if (this.model.isPropertyHidden('allowedChildSchemas')) {
+	                return;
+	            }
+
 	            var view = this;
 
 	            function onChange() {
@@ -24807,6 +24835,10 @@
 	    }, {
 	        key: 'renderField',
 	        value: function renderField(label, $content, isVertical) {
+	            if (!$content) {
+	                return;
+	            }
+
 	            return _.div({ class: 'field-container ' + (isVertical ? 'vertical' : '') }, _.div({ class: 'field-key' }, label), _.div({ class: 'field-value' }, $content));
 	        }
 
@@ -24858,6 +24890,10 @@
 	        key: 'render',
 	        value: function render() {
 	            var _this8 = this;
+
+	            if (this.model instanceof Schema === false) {
+	                this.model = SchemaHelper.getModel(this.model);
+	            }
 
 	            this.$element.toggleClass('locked', this.model.locked);
 
@@ -34581,10 +34617,10 @@
 	var Schema = function (_Entity) {
 	    _inherits(Schema, _Entity);
 
-	    function Schema() {
+	    function Schema(properties) {
 	        _classCallCheck(this, Schema);
 
-	        return _possibleConstructorReturn(this, (Schema.__proto__ || Object.getPrototypeOf(Schema)).apply(this, arguments));
+	        return _possibleConstructorReturn(this, (Schema.__proto__ || Object.getPrototypeOf(Schema)).call(this, properties));
 	    }
 
 	    _createClass(Schema, [{
@@ -34597,6 +34633,21 @@
 	            this.def(String, 'name');
 	            this.def(String, 'icon');
 	            this.def(String, 'parentSchemaId');
+	            this.def(Array, 'hiddenProperties', []);
+	        }
+
+	        /**
+	         * Checks whether a property is hidden
+	         *
+	         * @param {String} name
+	         *
+	         * @returns {Boolean} Is hidden
+	         */
+
+	    }, {
+	        key: 'isPropertyHidden',
+	        value: function isPropertyHidden(name) {
+	            return this.hiddenProperties.indexOf(name) > -1;
 	        }
 
 	        /**
@@ -35947,13 +35998,13 @@
 
 	            debug.log('Unpublishing all localised property sets...', this);
 
-	            return LanguageHelper.getSelectedLanguages(project).then(function (languages) {
+	            return connection.removePreview(project, environment, content).then(function () {
+	                return LanguageHelper.getSelectedLanguages(project);
+	            }).then(function (languages) {
 	                function next(i) {
 	                    var language = languages[i];
 
-	                    return connection.removePreview(project, environment, content, language).then(function () {
-	                        return connection.deleteContentProperties(content.id, language);
-	                    }).then(function () {
+	                    return connection.deleteContentProperties(content.id, language).then(function () {
 	                        i++;
 
 	                        if (i < languages.length) {
@@ -35978,7 +36029,6 @@
 	         * @param {String} project
 	         * @param {String} environment
 	         * @param {Content} content
-	         * @param {String} language
 	         *
 	         * @returns {Promise} Preview URL
 	         */
@@ -35987,12 +36037,11 @@
 	        key: 'removePreview',
 	        value: function removePreview() {
 	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
-	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
 
 	            var _this2 = this;
 
+	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
 	            var content = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('content');
-	            var language = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : requiredParam('language');
 
 	            if (!content.hasPreview) {
 	                return Promise.resolve();
@@ -36001,9 +36050,21 @@
 	            content.hasPreview = false;
 
 	            return ContentHelper.updateContent(project, environment, content).then(function () {
-	                return _this2.deleteContentProperties(content.id + '_preview', language);
-	            }).then(function () {
-	                return Promise.resolve();
+	                return LanguageHelper.getSelectedLanguages(project);
+	            }).then(function (languages) {
+	                var next = function next() {
+	                    var language = languages.pop();
+
+	                    if (!language) {
+	                        return Promise.resolve();
+	                    }
+
+	                    return _this2.deleteContentProperties(content.id + '_preview', language).then(function () {
+	                        return next();
+	                    });
+	                };
+
+	                return next();
 	            });
 	        }
 
@@ -36067,16 +36128,16 @@
 
 	            debug.log('Publishing all localised property sets...', this);
 
-	            return LanguageHelper.getAllLocalizedPropertySets(project, environment, content).then(function (sets) {
+	            return connection.removePreview(project, environment, content).then(function () {
+	                return LanguageHelper.getAllLocalizedPropertySets(project, environment, content);
+	            }).then(function (sets) {
 	                var languages = Object.keys(sets);
 
 	                function next(i) {
 	                    var language = languages[i];
 	                    var properties = sets[language];
 
-	                    return connection.removePreview(project, environment, content, language).then(function () {
-	                        return connection.postContentProperties(properties, content.id, language, content.getMeta());
-	                    }).then(function () {
+	                    return connection.postContentProperties(properties, content.id, language, content.getMeta()).then(function () {
 	                        i++;
 
 	                        if (i < languages.length) {
@@ -36773,6 +36834,32 @@
 	        }
 
 	        /**
+	         * Sanity check for site settings Schema
+	         *
+	         * @param {Object} schema
+	         *
+	         * @returns {Object} Checked Schema
+	         */
+
+	    }, {
+	        key: 'checkSiteSettings',
+	        value: function checkSiteSettings(schema) {
+	            schema = schema || {};
+
+	            schema.icon = 'wrench';
+	            schema.id = 'siteSettings';
+	            schema.name = 'Site settings';
+	            schema.parentSchemaId = 'contentBase';
+	            schema.hiddenProperties = ['allowedChildSchemas', 'parentSchemaId', 'name', 'icon'];
+
+	            if (schema instanceof ContentSchema === false) {
+	                schema = new ContentSchema(schema);
+	            }
+
+	            return schema;
+	        }
+
+	        /**
 	         * Gets the appropriate model
 	         *
 	         * @param {Object} properties
@@ -36823,10 +36910,10 @@
 	var ContentSchema = function (_Schema) {
 	    _inherits(ContentSchema, _Schema);
 
-	    function ContentSchema() {
+	    function ContentSchema(properties) {
 	        _classCallCheck(this, ContentSchema);
 
-	        return _possibleConstructorReturn(this, (ContentSchema.__proto__ || Object.getPrototypeOf(ContentSchema)).apply(this, arguments));
+	        return _possibleConstructorReturn(this, (ContentSchema.__proto__ || Object.getPrototypeOf(ContentSchema)).call(this, properties));
 	    }
 
 	    _createClass(ContentSchema, [{

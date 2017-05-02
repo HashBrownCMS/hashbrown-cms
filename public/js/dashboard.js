@@ -20719,13 +20719,13 @@
 
 	            debug.log('Unpublishing all localised property sets...', this);
 
-	            return LanguageHelper.getSelectedLanguages(project).then(function (languages) {
+	            return connection.removePreview(project, environment, content).then(function () {
+	                return LanguageHelper.getSelectedLanguages(project);
+	            }).then(function (languages) {
 	                function next(i) {
 	                    var language = languages[i];
 
-	                    return connection.removePreview(project, environment, content, language).then(function () {
-	                        return connection.deleteContentProperties(content.id, language);
-	                    }).then(function () {
+	                    return connection.deleteContentProperties(content.id, language).then(function () {
 	                        i++;
 
 	                        if (i < languages.length) {
@@ -20750,7 +20750,6 @@
 	         * @param {String} project
 	         * @param {String} environment
 	         * @param {Content} content
-	         * @param {String} language
 	         *
 	         * @returns {Promise} Preview URL
 	         */
@@ -20759,12 +20758,11 @@
 	        key: 'removePreview',
 	        value: function removePreview() {
 	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
-	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
 
 	            var _this2 = this;
 
+	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
 	            var content = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('content');
-	            var language = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : requiredParam('language');
 
 	            if (!content.hasPreview) {
 	                return Promise.resolve();
@@ -20773,9 +20771,21 @@
 	            content.hasPreview = false;
 
 	            return ContentHelper.updateContent(project, environment, content).then(function () {
-	                return _this2.deleteContentProperties(content.id + '_preview', language);
-	            }).then(function () {
-	                return Promise.resolve();
+	                return LanguageHelper.getSelectedLanguages(project);
+	            }).then(function (languages) {
+	                var next = function next() {
+	                    var language = languages.pop();
+
+	                    if (!language) {
+	                        return Promise.resolve();
+	                    }
+
+	                    return _this2.deleteContentProperties(content.id + '_preview', language).then(function () {
+	                        return next();
+	                    });
+	                };
+
+	                return next();
 	            });
 	        }
 
@@ -20839,16 +20849,16 @@
 
 	            debug.log('Publishing all localised property sets...', this);
 
-	            return LanguageHelper.getAllLocalizedPropertySets(project, environment, content).then(function (sets) {
+	            return connection.removePreview(project, environment, content).then(function () {
+	                return LanguageHelper.getAllLocalizedPropertySets(project, environment, content);
+	            }).then(function (sets) {
 	                var languages = Object.keys(sets);
 
 	                function next(i) {
 	                    var language = languages[i];
 	                    var properties = sets[language];
 
-	                    return connection.removePreview(project, environment, content, language).then(function () {
-	                        return connection.postContentProperties(properties, content.id, language, content.getMeta());
-	                    }).then(function () {
+	                    return connection.postContentProperties(properties, content.id, language, content.getMeta()).then(function () {
 	                        i++;
 
 	                        if (i < languages.length) {

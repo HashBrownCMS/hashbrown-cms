@@ -53,6 +53,8 @@ class SchemaEditor extends View {
      * @return {Object} element
      */
     renderEditorPicker() {
+        if(this.model.isPropertyHidden('editorId')) { return; }  
+        
         let editorOptions = [];
 
         for(let editorId in resources.editors) {
@@ -90,6 +92,8 @@ class SchemaEditor extends View {
      * @return {Object} element
      */
     renderNameEditor() {
+        if(this.model.isPropertyHidden('name')) { return; }  
+        
         let view = this;
 
         function onInputChange() {
@@ -117,6 +121,8 @@ class SchemaEditor extends View {
      * @return {Object} element
      */
     renderTabsEditor() {
+        if(this.model.isPropertyHidden('tabs')) { return; }  
+        
         let view = this;
         
         function onInputChange($input) {
@@ -262,6 +268,8 @@ class SchemaEditor extends View {
      * @return {Object} element
      */
     renderIconEditor() {
+        if(this.model.isPropertyHidden('icon')) { return; }  
+        
         let view = this;
 
         function onClickBrowse() {
@@ -328,6 +336,8 @@ class SchemaEditor extends View {
      * @return {Object} element
      */
     renderParentEditor() {
+        if(this.model.isPropertyHidden('parentSchemaId')) { return; }  
+        
         let schemaOptions = [];
 
         // Filter out irrelevant schemas, self and children of self
@@ -395,6 +405,8 @@ class SchemaEditor extends View {
      * @return {Object} element
      */
     renderDefaultTabEditor() {
+        if(this.model.isPropertyHidden('defaultTabId')) { return; }  
+        
         let tabOptions = [
             { value: 'meta', label: 'Meta' }
         ];
@@ -428,6 +440,8 @@ class SchemaEditor extends View {
      * @return {HTMLElement} Element
      */
     renderAllowedChildSchemasEditor() {
+        if(this.model.isPropertyHidden('allowedChildSchemas')) { return; }  
+       
         let view = this;
 
         function onChange() {
@@ -620,6 +634,8 @@ class SchemaEditor extends View {
      * @return {HTMLElement} Editor element
      */
     renderField(label, $content, isVertical) {
+        if(!$content) { return; }
+
         return _.div({class: 'field-container ' + (isVertical ? 'vertical' : '')},
             _.div({class: 'field-key'},
                 label
@@ -674,6 +690,10 @@ class SchemaEditor extends View {
     }
 
     render() {
+        if(this.model instanceof Schema === false) {
+            this.model = SchemaHelper.getModel(this.model);
+        }
+
         this.$element.toggleClass('locked', this.model.locked);
 
         SchemaHelper.getSchemaWithParentFields(this.model.id)

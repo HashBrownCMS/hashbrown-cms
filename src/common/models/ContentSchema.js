@@ -6,6 +6,10 @@ let Schema = require('./Schema');
  * Schema for content nodes
  */
 class ContentSchema extends Schema {
+    constructor(properties) {
+        super(properties);
+    }
+    
     structure() {
         super.structure();
 
