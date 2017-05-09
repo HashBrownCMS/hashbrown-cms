@@ -55,7 +55,7 @@ class ProjectHelper {
 
         return SettingsHelper.getSettings(id)
         .then((foundSettings) => {
-            settings = foundSettings;
+            settings = foundSettings || {};
 
             return UserHelper.getAllUsers(id);
         })
@@ -72,7 +72,9 @@ class ProjectHelper {
             project.id = id;
             project.backups = backups;
 
-            for(let section of (settings || [])) {
+            for(let i in settings) {
+                let section = settings[i];
+                
                 project.settings[section.section] = section;
             }
 
