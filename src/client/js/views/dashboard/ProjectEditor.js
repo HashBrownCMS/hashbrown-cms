@@ -78,6 +78,26 @@ class ProjectEditor extends View {
 
         infoEditor.on('change', (newInfo) => {
             this.model.settings.info = newInfo;
+   
+            this.fetch();
+        });
+    }
+    
+    /**
+     * Event: Click sync button
+     */
+    onClickSync() {
+        if(!User.current.isAdmin) { return; }
+
+        let syncEditor = new SyncEditor({ projectId: this.model.id });
+        
+        syncEditor.on('change', (syncSettings) => {
+            this.model.settings.sync = {
+                section: 'sync',
+                enabled: syncSettings.enabled,
+                url: syncSettings.url,
+                token: syncSettings.token
+            };
 
             this.fetch();
         });
@@ -183,6 +203,11 @@ class ProjectEditor extends View {
                                         'Migrate'
                                     ).click((e) => { e.preventDefault(); this.onClickMigrate(); })
                                 )
+                            ),
+                            _.li(
+                                _.a({href: '#', class: 'dropdown-item'}, 
+                                    'Sync'
+                                ).click((e) => { e.preventDefault(); this.onClickSync(); })
                             ),
                             _.li(
                                 _.a({href: '#', class: 'dropdown-item'},

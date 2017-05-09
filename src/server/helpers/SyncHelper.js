@@ -8,7 +8,6 @@ class SyncHelper {
      * Gets a new token
      *
      * @param {String} project
-     * @param {String} environment
      * @param {String} username
      * @param {String} password
      *
@@ -16,13 +15,12 @@ class SyncHelper {
      */
     static renewToken(
         project = requiredParam('project'),
-        environment = requiredParam('environment'),
         username = requiredParam('username'),
         password = requiredParam('password')
     ) {
-        return SettingsHelper.getSettings(project, environment, 'sync')
+        return SettingsHelper.getSettings(project, '', 'sync')
         .then((settings) => {
-            debug.log('Renewing sync token for ' + project + '/' + environment + '...', this);
+            debug.log('Renewing sync token for ' + project + '...', this);
 
             return new Promise((resolve, reject) => {
                 let headers = {
@@ -69,17 +67,17 @@ class SyncHelper {
         remoteResourceName = requiredParam('remoteResourceName'),
         remoteItemName = requiredParam('remoteItemName')
     ) {
-        return SettingsHelper.getSettings(project, environment, 'sync')
+        return SettingsHelper.getSettings(project, '', 'sync')
         .then((settings) => {
             return new Promise((resolve, reject) => {
-                if(settings && settings.enabled && settings[remoteResourceName]) {
+                if(settings && settings.enabled) {
                     let headers = {
                         'Accept': 'application/json'
                     };
                     
                     debug.log('Requesting remote resource item ' + remoteResourceName + '/' + remoteItemName + ' for ' + project + '/' + environment + '...', this, 3);
 
-                    RequestHelper.get(settings.url + settings.project + '/' + settings.environment + '/' + remoteResourceName + '/' + remoteItemName + '?token=' + settings.token, {
+                    RequestHelper.get(settings.url + settings.project + '/' + environment + '/' + remoteResourceName + '/' + remoteItemName + '?token=' + settings.token, {
                         headers: headers
                     }).on('complete', (data, response) => {
                         if(data instanceof Error) {
@@ -98,7 +96,6 @@ class SyncHelper {
                             debug.log('Remote resource item ' + remoteResourceName + '/' + remoteItemName + ' retrieved successfully', this, 3);
                             
                             resolve(data);
-                        
                         }
                     });
 
@@ -127,10 +124,10 @@ class SyncHelper {
         remoteItemName = requiredParam('remoteItemName'),
         remoteItemData = requiredParam('remoteItemData')
     ) {
-        return SettingsHelper.getSettings(project, environment, 'sync')
+        return SettingsHelper.getSettings(project, '', 'sync')
         .then((settings) => {
             return new Promise((resolve, reject) => {
-                if(settings && settings.enabled && settings[remoteResourceName]) {
+                if(settings && settings.enabled) {
                     debug.log('Posting remote resource item ' + remoteResourceName + '/' + remoteItemName + ' for ' + project + '/' + environment + '...', this, 3);
                    
                     let headers = {
@@ -138,7 +135,7 @@ class SyncHelper {
                     };
                    
                     // Send the API request, and make sure to create/upsert any resources that do not yet exist on the remote 
-                    RequestHelper.post(settings.url + settings.project + '/' + settings.environment + '/' + remoteResourceName + '/' + remoteItemName + '?create=true&token=' + settings.token, {
+                    RequestHelper.post(settings.url + settings.project + '/' + environment + '/' + remoteResourceName + '/' + remoteItemName + '?create=true&token=' + settings.token, {
                         headers: headers,
                         data: JSON.stringify(remoteItemData)
                     }).on('complete', (data, response) => {
@@ -178,10 +175,10 @@ class SyncHelper {
         remoteResourceName = requiredParam('remoteResourceName'),
         params = {}
     ) {
-        return SettingsHelper.getSettings(project, environment, 'sync')
+        return SettingsHelper.getSettings(project, '', 'sync')
         .then((settings) => {
             return new Promise((resolve, reject) => {
-                if(settings && settings.enabled && settings[remoteResourceName]) {
+                if(settings && settings.enabled) {
                     debug.log('Requesting remote resource ' + remoteResourceName + ' for ' + project + '/' + environment + '...', this, 3);
                     
                     params.token = settings.token;
@@ -192,7 +189,7 @@ class SyncHelper {
                   
                     let now = Date.now();
 
-                    RequestHelper.get(settings.url + settings.project + '/' + settings.environment + '/' + remoteResourceName, {
+                    RequestHelper.get(settings.url + settings.project + '/' + environment + '/' + remoteResourceName, {
                         headers: headers,
                         query: params
                     }).on('complete', (data, response) => {

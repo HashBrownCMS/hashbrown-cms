@@ -15,6 +15,7 @@ window.MigrationEditor = require('./views/dashboard/MigrationEditor');
 window.InfoEditor = require('./views/dashboard/InfoEditor');
 window.LanguageEditor = require('./views/dashboard/LanguageEditor');
 window.UserEditor = require('./views/UserEditor');
+window.SyncEditor = require('./views/dashboard/SyncEditor');
 
 // Models
 window.Project = require('../../common/models/Project');

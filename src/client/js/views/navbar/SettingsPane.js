@@ -8,11 +8,6 @@ class SettingsPane extends NavbarPane {
         NavbarMain.addTabPane('/settings/', 'Settings', 'wrench', {
             items: [
                 {
-                    name: 'Sync',
-                    path: 'sync',
-                    icon: 'refresh'
-                },
-                {
                     name: 'Providers',
                     path: 'providers',
                     icon: 'gift'

@@ -61,6 +61,7 @@
 	window.InfoEditor = __webpack_require__(203);
 	window.LanguageEditor = __webpack_require__(204);
 	window.UserEditor = __webpack_require__(114);
+	window.SyncEditor = __webpack_require__(206);
 
 	// Models
 	window.Project = __webpack_require__(205);
@@ -1284,7 +1285,6 @@
 	'use strict';
 
 	var FunctionTemplating = {};
-	var lastCondition = void 0;
 
 	/**
 	 * Appends content to an element
@@ -1482,35 +1482,12 @@
 	 * @param {Boolean} condition
 	 * @param {HTMLElement} contents
 	 *
-	 * @returns {HTMLElement} Contents
+	 * @returns {HTMLElement} contents
 	 */
 	FunctionTemplating.if = function (condition) {
-	    lastCondition = condition || false;
-
-	    if (lastCondition) {
+	    if (condition != false && condition != null && condition != undefined) {
 	        for (var _len3 = arguments.length, contents = Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
 	            contents[_key3 - 1] = arguments[_key3];
-	        }
-
-	        return contents;
-	    }
-	};
-
-	/**
-	 * Uses the last provided condition to simulate an "else" statement
-	 *
-	 * @param {HTMLElement} contents
-	 *
-	 * @returns {HTMLElement} Contents
-	 */
-	FunctionTemplating.else = function () {
-	    if (typeof lastCondition === 'undefined') {
-	        throw new Error('No "if" statement was provided before this "else" statement');
-	    }
-
-	    if (!lastCondition) {
-	        for (var _len4 = arguments.length, contents = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
-	            contents[_key4] = arguments[_key4];
 	        }
 
 	        return contents;
@@ -1996,24 +1973,12 @@
 	            this.render();
 	            this.postrender();
 
-	            var element = this.element;
-
-	            if (!element && this.$element && this.$element.length > 0) {
-	                element = this.$element[0];
-	            }
-
-	            if (!element) {
-	                return;
-	            }
+	            var element = this.element || this.$element[0];
 
 	            element.addEventListener('DOMNodeRemovedFromDocument', function () {
 	                // Wait a few cycles before removing, as the element might just have been relocated
 	                setTimeout(function () {
-	                    var element = _this.element;
-
-	                    if (!element && _this.$element) {
-	                        element = _this.$element[0];
-	                    }
+	                    var element = _this.element || _this.$element[0];
 
 	                    if (!element || !element.parentNode) {
 	                        _this.remove();
@@ -2287,32 +2252,22 @@
 	    function ContextMenu(params) {
 	        _classCallCheck(this, ContextMenu);
 
+	        // Recycle other context menus
 	        var _this = _possibleConstructorReturn(this, (ContextMenu.__proto__ || Object.getPrototypeOf(ContextMenu)).call(this, params));
 
-	        _this.element = _.ul({ class: 'context-menu dropdown-menu', role: 'menu' });
-
-	        var existingMenu = _.find('.context-menu');
-
-	        if (typeof jQuery !== 'undefined') {
-	            if (existingMenu && existingMenu.length > 0) {
-	                _this.element = existingMenu;
-	            }
+	        if ($('.context-menu').length > 0) {
+	            _this.$element = $('.context-menu');
 	        } else {
-	            if (existingMenu) {
-	                _this.element = existingMenu;
-	            }
+	            _this.$element = _.ul({ class: 'context-menu dropdown-menu', role: 'menu' });
 	        }
 
-	        if (typeof jQuery !== 'undefined') {
-	            _this.$element = _this.element;
-	            _this.element = _this.$element[0];
-	        }
-
-	        _this.element.style.position = 'absolute';
-	        _this.element.style.zIndex = 1200;
-	        _this.element.style.top = _this.pos.y;
-	        _this.element.style.left = _this.pos.x;
-	        _this.element.style.display = 'block';
+	        _this.$element.css({
+	            position: 'absolute',
+	            'z-index': 1200,
+	            top: _this.pos.y,
+	            left: _this.pos.x,
+	            display: 'block'
+	        });
 
 	        _this.fetch();
 	        return _this;
@@ -2321,9 +2276,9 @@
 	    _createClass(ContextMenu, [{
 	        key: 'render',
 	        value: function render() {
-	            var _this2 = this;
+	            var view = this;
 
-	            _.append(this.element, _.each(this.model, function (label, func) {
+	            view.$element.html(_.each(view.model, function (label, func) {
 	                if (func == '---') {
 	                    return _.li({ class: 'dropdown-header' }, label);
 	                } else {
@@ -2334,21 +2289,13 @@
 	                        if (func) {
 	                            func(e);
 
-	                            _this2.remove();
+	                            view.remove();
 	                        }
 	                    }));
 	                }
 	            }));
 
-	            _.append(_.find('body'), this.element);
-
-	            var rect = this.element.getBoundingClientRect();
-
-	            if (rect.left + rect.width > window.innerWidth) {
-	                this.element.style.left = rect.left - rect.width + 'px';
-	            } else if (rect.bottom > window.innerHeight) {
-	                this.element.style.top = rect.top - rect.height + 'px';
-	            }
+	            $('body').append(view.$element);
 	        }
 	    }]);
 
@@ -21181,13 +21128,40 @@
 	        }
 
 	        /**
+	         * Event: Click sync button
+	         */
+
+	    }, {
+	        key: 'onClickSync',
+	        value: function onClickSync() {
+	            var _this5 = this;
+
+	            if (!User.current.isAdmin) {
+	                return;
+	            }
+
+	            var syncEditor = new SyncEditor({ projectId: this.model.id });
+
+	            syncEditor.on('change', function (syncSettings) {
+	                _this5.model.settings.sync = {
+	                    section: 'sync',
+	                    enabled: syncSettings.enabled,
+	                    url: syncSettings.url,
+	                    token: syncSettings.token
+	                };
+
+	                _this5.fetch();
+	            });
+	        }
+
+	        /**
 	         * Event: Click languages button
 	         */
 
 	    }, {
 	        key: 'onClickLanguages',
 	        value: function onClickLanguages() {
-	            var _this5 = this;
+	            var _this6 = this;
 
 	            if (!User.current.isAdmin) {
 	                return;
@@ -21196,9 +21170,9 @@
 	            var languageEditor = new LanguageEditor({ projectId: this.model.id });
 
 	            languageEditor.on('change', function (newLanguages) {
-	                _this5.model.settings.language.selected = newLanguages;
+	                _this6.model.settings.language.selected = newLanguages;
 
-	                _this5.fetch();
+	                _this6.fetch();
 	            });
 	        }
 
@@ -21237,7 +21211,7 @@
 	    }, {
 	        key: 'onClickAddEnvironment',
 	        value: function onClickAddEnvironment() {
-	            var _this6 = this;
+	            var _this7 = this;
 
 	            var modal = new MessageModal({
 	                model: {
@@ -21250,9 +21224,9 @@
 	                    callback: function callback() {
 	                        var newName = modal.$element.find('input').val();
 
-	                        _this6.model.settings.environments.names.push(newName);
+	                        _this7.model.settings.environments.names.push(newName);
 
-	                        apiCall('post', 'server/settings/' + _this6.model.id + '/environments', _this6.model.settings.environments).then(function () {
+	                        apiCall('post', 'server/settings/' + _this7.model.id + '/environments', _this7.model.settings.environments).then(function () {
 	                            UI.messageModal('Succes', 'The new environment "' + newName + '" was created successfully', function () {
 	                                location.reload();
 	                            });
@@ -21266,7 +21240,7 @@
 	    }, {
 	        key: 'render',
 	        value: function render() {
-	            var _this7 = this;
+	            var _this8 = this;
 
 	            var languageCount = this.model.settings.language.selected.length;
 	            var userCount = this.model.users.length;
@@ -21274,25 +21248,27 @@
 	            this.$element.toggleClass('in', true);
 
 	            _.append(this.$element.empty(), _.div({ class: 'body' }, _.if(User.current.isAdmin, _.div({ class: 'admin dropdown' }, _.button({ class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, _.span({ class: 'fa fa-ellipsis-v' })), _.ul({ class: 'dropdown-menu' }, _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Info').click(function (e) {
-	                e.preventDefault();_this7.onClickInfo();
+	                e.preventDefault();_this8.onClickInfo();
 	            })), _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Languages').click(function (e) {
-	                e.preventDefault();_this7.onClickLanguages();
+	                e.preventDefault();_this8.onClickLanguages();
 	            })), _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Backups').click(function (e) {
-	                e.preventDefault();_this7.onClickBackups();
+	                e.preventDefault();_this8.onClickBackups();
 	            })), _.if(this.model.settings.environments.names.length > 1, _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Migrate').click(function (e) {
-	                e.preventDefault();_this7.onClickMigrate();
-	            }))), _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Delete').click(function (e) {
-	                e.preventDefault();_this7.onClickRemove();
+	                e.preventDefault();_this8.onClickMigrate();
+	            }))), _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Sync').click(function (e) {
+	                e.preventDefault();_this8.onClickSync();
+	            })), _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Delete').click(function (e) {
+	                e.preventDefault();_this8.onClickRemove();
 	            }))))), _.div({ class: 'info' }, _.h4(this.model.settings.info.name || this.model.id), _.p(userCount + ' user' + (userCount != 1 ? 's' : '')), _.p(languageCount + ' language' + (languageCount != 1 ? 's' : '') + ' (' + this.model.settings.language.selected.join(', ') + ')')), _.div({ class: 'environments' }, _.each(this.model.settings.environments.names, function (i, environment) {
-	                return _.div({ class: 'environment' }, _.div({ class: 'btn-group' }, _.a({ title: 'Go to "' + environment + '" CMS', href: '/' + _this7.model.id + '/' + environment, class: 'environment-title btn btn-default' }, environment), _.if(User.current.isAdmin, _.div({ class: 'dropdown' }, _.button({ class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, _.span({ class: 'fa fa-ellipsis-v' })), _.ul({ class: 'dropdown-menu' }, _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Delete').click(function (e) {
-	                    e.preventDefault();_this7.onClickRemoveEnvironment(environment);
+	                return _.div({ class: 'environment' }, _.div({ class: 'btn-group' }, _.a({ title: 'Go to "' + environment + '" CMS', href: '/' + _this8.model.id + '/' + environment, class: 'environment-title btn btn-default' }, environment), _.if(User.current.isAdmin, _.div({ class: 'dropdown' }, _.button({ class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, _.span({ class: 'fa fa-ellipsis-v' })), _.ul({ class: 'dropdown-menu' }, _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Delete').click(function (e) {
+	                    e.preventDefault();_this8.onClickRemoveEnvironment(environment);
 	                })))))));
 	            }), _.if(User.current.isAdmin, _.button({ title: 'Add environment', class: 'btn btn-primary btn-add btn-raised btn-round' }, _.span({ class: 'fa fa-plus' })).click(function () {
-	                _this7.onClickAddEnvironment();
+	                _this8.onClickAddEnvironment();
 	            })))));
 
 	            setTimeout(function () {
-	                _this7.$element.toggleClass('in', false);
+	                _this8.$element.toggleClass('in', false);
 	            }, 50);
 	        }
 	    }]);
@@ -21949,6 +21925,196 @@
 	}(Entity);
 
 	module.exports = Project;
+
+/***/ },
+/* 206 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	/**
+	 * The sync settings editor
+	 *
+	 * @class View SyncEditor
+	 */
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var SyncEditor = function (_View) {
+	    _inherits(SyncEditor, _View);
+
+	    function SyncEditor(params) {
+	        _classCallCheck(this, SyncEditor);
+
+	        var _this = _possibleConstructorReturn(this, (SyncEditor.__proto__ || Object.getPrototypeOf(SyncEditor)).call(this, params));
+
+	        _this.modal = new MessageModal({
+	            model: {
+	                class: 'modal-sync-settings settings-modal',
+	                title: 'Sync'
+	            },
+	            buttons: [{
+	                label: 'Cancel',
+	                class: 'btn-default'
+	            }, {
+	                label: 'Save',
+	                class: 'btn-primary',
+	                callback: function callback() {
+	                    _this.onClickSave();
+
+	                    return false;
+	                }
+	            }]
+	        });
+
+	        _this.$element = _this.modal.$element;
+
+	        SettingsHelper.getSettings(_this.projectId, '', 'sync').then(function (syncSettings) {
+	            _this.model = syncSettings || {};
+
+	            _this.fetch();
+	        });
+	        return _this;
+	    }
+
+	    /**
+	     * Event: Click save. Posts the model to the modelUrl
+	     */
+
+
+	    _createClass(SyncEditor, [{
+	        key: 'onClickSave',
+	        value: function onClickSave() {
+	            var _this2 = this;
+
+	            SettingsHelper.setSettings(this.projectId, '', 'sync', this.model).then(function () {
+	                _this2.modal.hide();
+
+	                _this2.trigger('change', _this2.model);
+	            }).catch(UI.errorModal);
+	        }
+
+	        /**
+	         * Render enabled switch
+	         */
+
+	    }, {
+	        key: 'renderEnabledSwitch',
+	        value: function renderEnabledSwitch() {
+	            var _this3 = this;
+
+	            return _.div({ class: 'field-editor' }, UI.inputSwitch(this.model.enabled == true, function (newValue) {
+	                _this3.model.enabled = newValue;
+	            }));
+	        }
+
+	        /**
+	         * Renders the URL editor
+	         *
+	         * @returns {HTMLElement} Element
+	         */
+
+	    }, {
+	        key: 'renderUrlEditor',
+	        value: function renderUrlEditor() {
+	            var _this4 = this;
+
+	            return _.div({ class: 'url-editor' }, _.input({ class: 'form-control', type: 'text', value: this.model.url || '', placeholder: 'e.g. "https://myserver.com/api/"' }).on('change', function (e) {
+	                _this4.model.url = $(e.target).val();
+	            }));
+	        }
+
+	        /**
+	         * Renders the project name editor
+	         *
+	         * @returns {HTMLElement} Element
+	         */
+
+	    }, {
+	        key: 'renderProjectNameEditor',
+	        value: function renderProjectNameEditor() {
+	            var _this5 = this;
+
+	            if (!this.model.project) {
+	                this.model.project = this.projectId;
+	            }
+
+	            return _.div({ class: 'project-name-editor' }, _.input({ class: 'form-control', type: 'text', value: this.model.project || '', placeholder: 'e.g. "' + ProjectHelper.currentProject + '"' }).on('change', function (e) {
+	                _this5.model.project = $(e.target).val();
+	            }));
+	        }
+
+	        /**
+	         * Renders the token editor
+	         *
+	         * @returns {HTMLElement} Element
+	         */
+
+	    }, {
+	        key: 'renderTokenEditor',
+	        value: function renderTokenEditor() {
+	            var view = this;
+
+	            function onInputChange() {
+	                view.model.token = $(this).val();
+	            }
+
+	            function onClickRenew() {
+	                if (!view.model.url) {
+	                    UI.messageModal('URL missing', 'You need to specify a URL. Please do so and save the settings first.');
+	                    return;
+	                }
+
+	                var username = prompt('Remote instance username');
+	                var password = prompt('Remote instance password');
+
+	                apiCall('post', view.projectId + '/sync/login', {
+	                    username: username,
+	                    password: password
+	                }).then(function (token) {
+	                    view.model.token = token;
+	                    $element.children('input').val(token);
+	                }).catch(errorModal);
+	            }
+
+	            var $element = void 0;
+
+	            $element = _.div({ class: 'token-editor input-group' }, _.input({ class: 'form-control', type: 'text', value: view.model.token || '', placeholder: 'Input the remote API token here' }).on('change', onInputChange), _.div({ class: 'input-group-btn' }, _.button({ class: 'btn btn-small btn-default' }, _.span({ class: 'fa fa-refresh' })).on('click', onClickRenew)));
+
+	            return $element;
+	        }
+
+	        /**
+	         * Renders a single field
+	         *
+	         * @param {String} label
+	         * @param {HTMLElement} content
+	         *
+	         * @return {HTMLElement} Editor element
+	         */
+
+	    }, {
+	        key: 'renderField',
+	        value: function renderField(label, $content) {
+	            return _.div({ class: 'field' }, _.div({ class: 'field-key' }, label), _.div({ class: 'field-value' }, $content));
+	        }
+	    }, {
+	        key: 'render',
+	        value: function render() {
+	            _.append(this.$element.find('.modal-body').empty(), this.renderField('Enabled', this.renderEnabledSwitch()), this.renderField('API URL', this.renderUrlEditor()), this.renderField('API Token', this.renderTokenEditor()), this.renderField('Project', this.renderProjectNameEditor()));
+	        }
+	    }]);
+
+	    return SyncEditor;
+	}(View);
+
+	module.exports = SyncEditor;
 
 /***/ }
 /******/ ]);

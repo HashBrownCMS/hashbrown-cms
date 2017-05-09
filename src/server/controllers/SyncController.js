@@ -8,14 +8,14 @@ class SyncController extends ApiController {
      * Initialises this controller
      */
     static init(app) {
-        app.post('/api/:project/:environment/sync/login', this.middleware({scope: 'settings'}), this.postLogin);
+        app.post('/api/:project/sync/login', this.middleware({setProject: false, needsAdmin: true}), this.postLogin);
     }
 
     /**
      * Logs in a user remotely
      */
     static postLogin(req, res) {
-        SyncHelper.renewToken(req.project, req.environment, req.body.username, req.body.password)
+        SyncHelper.renewToken(req.params.project, req.body.username, req.body.password)
         .then((token) => {
             res.status(200).send(token);
         })

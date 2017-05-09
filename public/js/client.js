@@ -86,7 +86,6 @@
 	window.FormEditor = __webpack_require__(108);
 	window.ConnectionEditor = __webpack_require__(109);
 	window.SchemaEditor = __webpack_require__(110);
-	window.SyncSettings = __webpack_require__(112);
 	window.ProvidersSettings = __webpack_require__(113);
 	window.UserEditor = __webpack_require__(114);
 
@@ -1306,7 +1305,6 @@
 	'use strict';
 
 	var FunctionTemplating = {};
-	var lastCondition = void 0;
 
 	/**
 	 * Appends content to an element
@@ -1504,35 +1502,12 @@
 	 * @param {Boolean} condition
 	 * @param {HTMLElement} contents
 	 *
-	 * @returns {HTMLElement} Contents
+	 * @returns {HTMLElement} contents
 	 */
 	FunctionTemplating.if = function (condition) {
-	    lastCondition = condition || false;
-
-	    if (lastCondition) {
+	    if (condition != false && condition != null && condition != undefined) {
 	        for (var _len3 = arguments.length, contents = Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
 	            contents[_key3 - 1] = arguments[_key3];
-	        }
-
-	        return contents;
-	    }
-	};
-
-	/**
-	 * Uses the last provided condition to simulate an "else" statement
-	 *
-	 * @param {HTMLElement} contents
-	 *
-	 * @returns {HTMLElement} Contents
-	 */
-	FunctionTemplating.else = function () {
-	    if (typeof lastCondition === 'undefined') {
-	        throw new Error('No "if" statement was provided before this "else" statement');
-	    }
-
-	    if (!lastCondition) {
-	        for (var _len4 = arguments.length, contents = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
-	            contents[_key4] = arguments[_key4];
 	        }
 
 	        return contents;
@@ -2018,24 +1993,12 @@
 	            this.render();
 	            this.postrender();
 
-	            var element = this.element;
-
-	            if (!element && this.$element && this.$element.length > 0) {
-	                element = this.$element[0];
-	            }
-
-	            if (!element) {
-	                return;
-	            }
+	            var element = this.element || this.$element[0];
 
 	            element.addEventListener('DOMNodeRemovedFromDocument', function () {
 	                // Wait a few cycles before removing, as the element might just have been relocated
 	                setTimeout(function () {
-	                    var element = _this.element;
-
-	                    if (!element && _this.$element) {
-	                        element = _this.$element[0];
-	                    }
+	                    var element = _this.element || _this.$element[0];
 
 	                    if (!element || !element.parentNode) {
 	                        _this.remove();
@@ -2309,32 +2272,22 @@
 	    function ContextMenu(params) {
 	        _classCallCheck(this, ContextMenu);
 
+	        // Recycle other context menus
 	        var _this = _possibleConstructorReturn(this, (ContextMenu.__proto__ || Object.getPrototypeOf(ContextMenu)).call(this, params));
 
-	        _this.element = _.ul({ class: 'context-menu dropdown-menu', role: 'menu' });
-
-	        var existingMenu = _.find('.context-menu');
-
-	        if (typeof jQuery !== 'undefined') {
-	            if (existingMenu && existingMenu.length > 0) {
-	                _this.element = existingMenu;
-	            }
+	        if ($('.context-menu').length > 0) {
+	            _this.$element = $('.context-menu');
 	        } else {
-	            if (existingMenu) {
-	                _this.element = existingMenu;
-	            }
+	            _this.$element = _.ul({ class: 'context-menu dropdown-menu', role: 'menu' });
 	        }
 
-	        if (typeof jQuery !== 'undefined') {
-	            _this.$element = _this.element;
-	            _this.element = _this.$element[0];
-	        }
-
-	        _this.element.style.position = 'absolute';
-	        _this.element.style.zIndex = 1200;
-	        _this.element.style.top = _this.pos.y;
-	        _this.element.style.left = _this.pos.x;
-	        _this.element.style.display = 'block';
+	        _this.$element.css({
+	            position: 'absolute',
+	            'z-index': 1200,
+	            top: _this.pos.y,
+	            left: _this.pos.x,
+	            display: 'block'
+	        });
 
 	        _this.fetch();
 	        return _this;
@@ -2343,9 +2296,9 @@
 	    _createClass(ContextMenu, [{
 	        key: 'render',
 	        value: function render() {
-	            var _this2 = this;
+	            var view = this;
 
-	            _.append(this.element, _.each(this.model, function (label, func) {
+	            view.$element.html(_.each(view.model, function (label, func) {
 	                if (func == '---') {
 	                    return _.li({ class: 'dropdown-header' }, label);
 	                } else {
@@ -2356,21 +2309,13 @@
 	                        if (func) {
 	                            func(e);
 
-	                            _this2.remove();
+	                            view.remove();
 	                        }
 	                    }));
 	                }
 	            }));
 
-	            _.append(_.find('body'), this.element);
-
-	            var rect = this.element.getBoundingClientRect();
-
-	            if (rect.left + rect.width > window.innerWidth) {
-	                this.element.style.left = rect.left - rect.width + 'px';
-	            } else if (rect.bottom > window.innerHeight) {
-	                this.element.style.top = rect.top - rect.height + 'px';
-	            }
+	            $('body').append(view.$element);
 	        }
 	    }]);
 
@@ -14755,10 +14700,6 @@
 	        value: function init() {
 	            NavbarMain.addTabPane('/settings/', 'Settings', 'wrench', {
 	                items: [{
-	                    name: 'Sync',
-	                    path: 'sync',
-	                    icon: 'refresh'
-	                }, {
 	                    name: 'Providers',
 	                    path: 'providers',
 	                    icon: 'gift'
@@ -25693,314 +25634,7 @@
 	};
 
 /***/ },
-/* 112 */
-/***/ function(module, exports) {
-
-	'use strict';
-
-	/**
-	 * The sync settings editor
-	 *
-	 * @class View SyncSettings
-	 */
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var SyncSettings = function (_View) {
-	    _inherits(SyncSettings, _View);
-
-	    function SyncSettings(params) {
-	        _classCallCheck(this, SyncSettings);
-
-	        var _this = _possibleConstructorReturn(this, (SyncSettings.__proto__ || Object.getPrototypeOf(SyncSettings)).call(this, params));
-
-	        _this.$element = _.div({ class: 'editor sync-settings' });
-
-	        _this.fetch();
-	        return _this;
-	    }
-
-	    /**
-	     * Event: Click save. Posts the model to the modelUrl
-	     */
-
-
-	    _createClass(SyncSettings, [{
-	        key: 'onClickSave',
-	        value: function onClickSave() {
-	            var _this2 = this;
-
-	            if (this.jsonEditor && this.jsonEditor.isValid == false) {
-	                return;
-	            }
-
-	            this.$saveBtn.toggleClass('working', true);
-
-	            SettingsHelper.setSettings(ProjectHelper.currentProject, ProjectHelper.currentEnvironment, 'sync', this.model).then(function () {
-	                _this2.$saveBtn.toggleClass('working', false);
-
-	                location.reload();
-	            }).catch(errorModal);
-	        }
-
-	        /**
-	         * Render enabled switch
-	         */
-
-	    }, {
-	        key: 'renderEnabledSwitch',
-	        value: function renderEnabledSwitch() {
-	            var _this3 = this;
-
-	            return _.div({ class: 'field-editor' }, UI.inputSwitch(this.model.enabled == true, function (newValue) {
-	                _this3.model.enabled = newValue;
-	            }));
-	        }
-
-	        /**
-	         * Renders the URL editor
-	         *
-	         * @returns {HTMLElement} Element
-	         */
-
-	    }, {
-	        key: 'renderUrlEditor',
-	        value: function renderUrlEditor() {
-	            var view = this;
-
-	            function onInputChange() {
-	                view.model.url = $(this).val();
-	            }
-
-	            var $element = _.div({ class: 'url-editor' }, _.input({ class: 'form-control', type: 'text', value: view.model.url || '', placeholder: 'Input the remote API URL here, e.g. "https://myserver.com/api/"' }).on('change', onInputChange));
-
-	            return $element;
-	        }
-
-	        /**
-	         * Renders the project name editor
-	         *
-	         * @returns {HTMLElement} Element
-	         */
-
-	    }, {
-	        key: 'renderProjectNameEditor',
-	        value: function renderProjectNameEditor() {
-	            var view = this;
-
-	            if (!view.model.project) {
-	                view.model.project = ProjectHelper.currentProject;
-	            }
-
-	            function onInputChange() {
-	                view.model.project = $(this).val();
-	            }
-
-	            var $element = _.div({ class: 'project-name-editor' }, _.input({ class: 'form-control', type: 'text', value: view.model.project || '', placeholder: 'Input the remote project name here, e.g. "' + ProjectHelper.currentProject + '"' }).on('change', onInputChange));
-
-	            return $element;
-	        }
-
-	        /**
-	         * Renders the environment name editor
-	         *
-	         * @returns {HTMLElement} Element
-	         */
-
-	    }, {
-	        key: 'renderEnvironmentNameEditor',
-	        value: function renderEnvironmentNameEditor() {
-	            var view = this;
-
-	            if (!view.model.environment) {
-	                view.model.environment = ProjectHelper.currentEnvironment;
-	            }
-
-	            function onInputChange() {
-	                view.model.environment = $(this).val();
-	            }
-
-	            var $element = _.div({ class: 'project-name-editor' }, _.input({ class: 'form-control', type: 'text', value: view.model.environment || '', placeholder: 'Input the remote environment name here, e.g. "' + ProjectHelper.currentEnvironment + '"' }).on('change', onInputChange));
-
-	            return $element;
-	        }
-
-	        /**
-	         * Renders the token editor
-	         *
-	         * @returns {HTMLElement} Element
-	         */
-
-	    }, {
-	        key: 'renderTokenEditor',
-	        value: function renderTokenEditor() {
-	            var view = this;
-
-	            function onInputChange() {
-	                view.model.token = $(this).val();
-	            }
-
-	            function onClickRenew() {
-	                var modal = new MessageModal({
-	                    model: {
-	                        title: 'Renew token',
-	                        body: _.div({}, _.input({ class: 'form-control', type: 'text', placeholder: 'Username' }), _.input({ class: 'form-control', type: 'password', placeholder: 'Password' }))
-	                    },
-	                    buttons: [{
-	                        label: 'Cancel',
-	                        class: 'btn-default'
-	                    }, {
-	                        label: 'Renew',
-	                        class: 'btn-primary',
-	                        callback: function callback() {
-	                            apiCall('post', 'sync/login', {
-	                                username: modal.$element.find('input[type="text"]').val(),
-	                                password: modal.$element.find('input[type="password"]').val()
-	                            }).then(function (token) {
-	                                view.model.token = token;
-	                                $element.children('input').val(token);
-
-	                                modal.hide();
-	                            }).catch(errorModal);
-
-	                            return false;
-	                        }
-	                    }]
-	                });
-	            }
-
-	            var $element = void 0;
-
-	            if (this.model.url) {
-	                $element = _.div({ class: 'token-editor input-group' }, _.input({ class: 'form-control', type: 'text', value: view.model.token || '', placeholder: 'Input the remote API token here' }).on('change', onInputChange), _.div({ class: 'input-group-btn' }, _.button({ class: 'btn btn-small btn-default' }, _.span({ class: 'fa fa-refresh' })).on('click', onClickRenew)));
-	            } else {
-	                $element = _.div('Please input the API URL and save first');
-	            }
-
-	            return $element;
-	        }
-
-	        /**
-	         * Render Content switch
-	         */
-
-	    }, {
-	        key: 'renderContentSwitch',
-	        value: function renderContentSwitch() {
-	            var _this4 = this;
-
-	            return _.div({ class: 'field-editor content' }, UI.inputSwitch(this.model.content == true, function (isActive) {
-	                _this4.model.content = isActive;
-
-	                if (isActive) {
-	                    _this4.model.schemas = true;
-	                    _this4.$element.find('.field-editor.schemas input')[0].checked = true;
-	                }
-	            }));
-	        }
-
-	        /**
-	         * Render Connections switch
-	         */
-
-	    }, {
-	        key: 'renderConnectionsSwitch',
-	        value: function renderConnectionsSwitch() {
-	            var _this5 = this;
-
-	            return _.div({ class: 'field-editor connections' }, UI.inputSwitch(this.model.connections == true, function (isActive) {
-	                _this5.model.connections = isActive;
-	            }));
-	        }
-
-	        /**
-	         * Render Forms switch
-	         */
-
-	    }, {
-	        key: 'renderFormsSwitch',
-	        value: function renderFormsSwitch() {
-	            var _this6 = this;
-
-	            return _.div({ class: 'field-editor forms' }, UI.inputSwitch(this.model.forms == true, function (isActive) {
-	                _this6.model.forms = isActive;
-	            }));
-	        }
-
-	        /**
-	         * Render Schema switch
-	         */
-
-	    }, {
-	        key: 'renderSchemaSwitch',
-	        value: function renderSchemaSwitch() {
-	            var _this7 = this;
-
-	            return _.div({ class: 'field-editor schemas' }, UI.inputSwitch(this.model.schemas == true, function (isActive) {
-	                _this7.model.schemas = isActive;
-
-	                if (!isActive) {
-	                    _this7.model.content = false;
-	                    _this7.$element.find('.field-editor.content input')[0].checked = false;
-	                }
-	            }));
-	        }
-
-	        /**
-	         * Render Media tree switch
-	         */
-
-	    }, {
-	        key: 'renderMediaTreeSwitch',
-	        value: function renderMediaTreeSwitch() {
-	            var _this8 = this;
-
-	            return _.div({ class: 'field-editor forms' }, UI.inputSwitch(this.model['media/tree'] == true, function (isActive) {
-	                _this8.model['media/tree'] = isActive;
-	            }));
-	        }
-
-	        /**
-	         * Renders a single field
-	         *
-	         * @param {String} label
-	         * @param {HTMLElement} content
-	         *
-	         * @return {HTMLElement} Editor element
-	         */
-
-	    }, {
-	        key: 'renderField',
-	        value: function renderField(label, $content) {
-	            return _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, label), _.div({ class: 'field-value' }, $content));
-	        }
-	    }, {
-	        key: 'render',
-	        value: function render() {
-	            var _this9 = this;
-
-	            SettingsHelper.getSettings(ProjectHelper.currentProject, ProjectHelper.currentEnvironment, 'sync').then(function (syncSettings) {
-	                _this9.model = syncSettings || {};
-
-	                _.append(_this9.$element.empty(), _.div({ class: 'editor-header' }, _.span({ class: 'fa fa-refresh' }), _.h4('Sync')), _.div({ class: 'editor-body' }, _this9.renderField('Enabled', _this9.renderEnabledSwitch()), _this9.renderField('API URL', _this9.renderUrlEditor()), _this9.renderField('API Token', _this9.renderTokenEditor()), _this9.renderField('Project', _this9.renderProjectNameEditor()), _this9.renderField('Environment', _this9.renderEnvironmentNameEditor()), _this9.renderField('Content', _this9.renderContentSwitch()), _this9.renderField('Schemas', _this9.renderSchemaSwitch()), _this9.renderField('Connections', _this9.renderConnectionsSwitch()), _this9.renderField('Forms', _this9.renderFormsSwitch()), _this9.renderField('Media tree', _this9.renderMediaTreeSwitch())), _.div({ class: 'editor-footer panel panel-default panel-buttons' }, _.div({ class: 'btn-group' }, _this9.$saveBtn = _.button({ class: 'btn btn-primary btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Save '), _.span({ class: 'text-working' }, 'Saving ')).click(function () {
-	                    _this9.onClickSave();
-	                }))));
-	            });
-	        }
-	    }]);
-
-	    return SyncSettings;
-	}(View);
-
-	module.exports = SyncSettings;
-
-/***/ },
+/* 112 */,
 /* 113 */
 /***/ function(module, exports) {
 
@@ -37350,17 +36984,6 @@
 	        ViewHelper.get('NavbarMain').showTab('/settings/');
 
 	        populateWorkspace(_.div({ class: 'dashboard-container' }, _.h1('Settings'), _.p('Please click on a section to proceed')), 'presentation presentation-center');
-	    } else {
-	        location.hash = '/';
-	    }
-	});
-
-	// Sync
-	Router.route('/settings/sync/', function () {
-	    if (currentUserHasScope('settings')) {
-	        ViewHelper.get('NavbarMain').highlightItem('/settings/', 'sync');
-
-	        populateWorkspace(new SyncSettings().$element);
 	    } else {
 	        location.hash = '/';
 	    }

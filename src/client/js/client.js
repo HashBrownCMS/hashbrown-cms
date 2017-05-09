@@ -39,7 +39,6 @@ window.ContentEditor = require('./views/ContentEditor');
 window.FormEditor = require('./views/FormEditor');
 window.ConnectionEditor = require('./views/ConnectionEditor');
 window.SchemaEditor = require('./views/SchemaEditor');
-window.SyncSettings = require('./views/SyncSettings');
 window.ProvidersSettings = require('./views/ProvidersSettings');
 window.UserEditor = require('./views/UserEditor');
 

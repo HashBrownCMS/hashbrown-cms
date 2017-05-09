@@ -392,6 +392,15 @@ img.logo {
 
 .settings-modal .modal-dialog, .confirm-modal .modal-dialog {
   max-width: 400px; }
+  .settings-modal .modal-dialog .field, .confirm-modal .modal-dialog .field {
+    display: flex;
+    margin-bottom: 1rem; }
+    .settings-modal .modal-dialog .field .field-key, .confirm-modal .modal-dialog .field .field-key {
+      flex-basis: 30%;
+      display: flex;
+      align-items: center; }
+    .settings-modal .modal-dialog .field .field-value, .confirm-modal .modal-dialog .field .field-value {
+      flex-basis: 70%; }
   .settings-modal .modal-dialog .input-group, .confirm-modal .modal-dialog .input-group {
     display: flex; }
     .settings-modal .modal-dialog .input-group span, .confirm-modal .modal-dialog .input-group span {
