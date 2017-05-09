@@ -53,7 +53,7 @@ class ProjectHelper {
         let users;
         let backups;
 
-        return MongoHelper.find(id, 'settings', {})
+        return SettingsHelper.getSettings(id)
         .then((foundSettings) => {
             settings = foundSettings;
 
