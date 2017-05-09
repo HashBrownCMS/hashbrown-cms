@@ -190,7 +190,7 @@ class ApiController extends Controller {
                 
                 // Disregarding project parameter, but using authentication
                 } else if(settings.authenticate != false) {
-                    return ApiController.authenticate(req.cookies.token, null, settings.scope, settings.needsAdmin);
+                    return ApiController.authenticate(token, null, settings.scope, settings.needsAdmin);
 
                 // Neither project parameter nor authentication needed
                 } else {
