@@ -34,7 +34,7 @@ class SettingsController extends ApiController {
     static setSettings(req, res) {
         let settings = req.body;
 
-        SettingsHelper.setSettings(req.project, req.environment, req.params.section, settings)
+        SettingsHelper.setSettings(req.params.project, req.params.environment, req.params.section, settings)
         .then(() => {
             res.status(200).send(settings);
         })

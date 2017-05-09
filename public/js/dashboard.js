@@ -1285,6 +1285,7 @@
 	'use strict';
 
 	var FunctionTemplating = {};
+	var lastCondition = void 0;
 
 	/**
 	 * Appends content to an element
@@ -1482,12 +1483,35 @@
 	 * @param {Boolean} condition
 	 * @param {HTMLElement} contents
 	 *
-	 * @returns {HTMLElement} contents
+	 * @returns {HTMLElement} Contents
 	 */
 	FunctionTemplating.if = function (condition) {
-	    if (condition != false && condition != null && condition != undefined) {
+	    lastCondition = condition || false;
+
+	    if (lastCondition) {
 	        for (var _len3 = arguments.length, contents = Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
 	            contents[_key3 - 1] = arguments[_key3];
+	        }
+
+	        return contents;
+	    }
+	};
+
+	/**
+	 * Uses the last provided condition to simulate an "else" statement
+	 *
+	 * @param {HTMLElement} contents
+	 *
+	 * @returns {HTMLElement} Contents
+	 */
+	FunctionTemplating.else = function () {
+	    if (typeof lastCondition === 'undefined') {
+	        throw new Error('No "if" statement was provided before this "else" statement');
+	    }
+
+	    if (!lastCondition) {
+	        for (var _len4 = arguments.length, contents = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+	            contents[_key4] = arguments[_key4];
 	        }
 
 	        return contents;
@@ -1973,12 +1997,24 @@
 	            this.render();
 	            this.postrender();
 
-	            var element = this.element || this.$element[0];
+	            var element = this.element;
+
+	            if (!element && this.$element && this.$element.length > 0) {
+	                element = this.$element[0];
+	            }
+
+	            if (!element) {
+	                return;
+	            }
 
 	            element.addEventListener('DOMNodeRemovedFromDocument', function () {
 	                // Wait a few cycles before removing, as the element might just have been relocated
 	                setTimeout(function () {
-	                    var element = _this.element || _this.$element[0];
+	                    var element = _this.element;
+
+	                    if (!element && _this.$element) {
+	                        element = _this.$element[0];
+	                    }
 
 	                    if (!element || !element.parentNode) {
 	                        _this.remove();
@@ -2252,22 +2288,32 @@
 	    function ContextMenu(params) {
 	        _classCallCheck(this, ContextMenu);
 
-	        // Recycle other context menus
 	        var _this = _possibleConstructorReturn(this, (ContextMenu.__proto__ || Object.getPrototypeOf(ContextMenu)).call(this, params));
 
-	        if ($('.context-menu').length > 0) {
-	            _this.$element = $('.context-menu');
+	        _this.element = _.ul({ class: 'context-menu dropdown-menu', role: 'menu' });
+
+	        var existingMenu = _.find('.context-menu');
+
+	        if (typeof jQuery !== 'undefined') {
+	            if (existingMenu && existingMenu.length > 0) {
+	                _this.element = existingMenu;
+	            }
 	        } else {
-	            _this.$element = _.ul({ class: 'context-menu dropdown-menu', role: 'menu' });
+	            if (existingMenu) {
+	                _this.element = existingMenu;
+	            }
 	        }
 
-	        _this.$element.css({
-	            position: 'absolute',
-	            'z-index': 1200,
-	            top: _this.pos.y,
-	            left: _this.pos.x,
-	            display: 'block'
-	        });
+	        if (typeof jQuery !== 'undefined') {
+	            _this.$element = _this.element;
+	            _this.element = _this.$element[0];
+	        }
+
+	        _this.element.style.position = 'absolute';
+	        _this.element.style.zIndex = 1200;
+	        _this.element.style.top = _this.pos.y;
+	        _this.element.style.left = _this.pos.x;
+	        _this.element.style.display = 'block';
 
 	        _this.fetch();
 	        return _this;
@@ -2276,9 +2322,9 @@
 	    _createClass(ContextMenu, [{
 	        key: 'render',
 	        value: function render() {
-	            var view = this;
+	            var _this2 = this;
 
-	            view.$element.html(_.each(view.model, function (label, func) {
+	            _.append(this.element, _.each(this.model, function (label, func) {
 	                if (func == '---') {
 	                    return _.li({ class: 'dropdown-header' }, label);
 	                } else {
@@ -2289,13 +2335,21 @@
 	                        if (func) {
 	                            func(e);
 
-	                            view.remove();
+	                            _this2.remove();
 	                        }
 	                    }));
 	                }
 	            }));
 
-	            $('body').append(view.$element);
+	            _.append(_.find('body'), this.element);
+
+	            var rect = this.element.getBoundingClientRect();
+
+	            if (rect.left + rect.width > window.innerWidth) {
+	                this.element.style.left = rect.left - rect.width + 'px';
+	            } else if (rect.bottom > window.innerHeight) {
+	                this.element.style.top = rect.top - rect.height + 'px';
+	            }
 	        }
 	    }]);
 
@@ -12115,7 +12169,7 @@
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var VERBOSITY = 2;
+	var VERBOSITY = 3;
 
 	var DebugHelper = function () {
 	    function DebugHelper() {

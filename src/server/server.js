@@ -61,7 +61,6 @@ global.SyncHelper = require('./helpers/SyncHelper');
 
 global.debug = require('./helpers/DebugHelper');
 
-
 // ----------
 // Init
 // ----------

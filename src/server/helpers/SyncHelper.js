@@ -67,6 +67,10 @@ class SyncHelper {
         remoteResourceName = requiredParam('remoteResourceName'),
         remoteItemName = requiredParam('remoteItemName')
     ) {
+        if(!remoteItemName) {
+            return SyncHelper.getResource(project, environment, remoteResourceName);
+        }
+
         return SettingsHelper.getSettings(project, '', 'sync')
         .then((settings) => {
             return new Promise((resolve, reject) => {
@@ -76,17 +80,16 @@ class SyncHelper {
                     };
                     
                     let path = settings.project;
-                    let resource = remoteResourceName;
                     
                     if(environment) {
                         path += '/' + environment;
                     }
 
-                    if(remoteItemName) {
-                        resource += '/' + remoteItemName;
-                    }
+                    let resource = remoteResourceName + '/' + remoteItemName;
 
                     debug.log('Requesting remote resource item ' + resource + ' for ' + path + '...', this, 3);
+
+                    console.log(settings.url + path + '/' + resource + '?token=' + settings.token);
 
                     RequestHelper.get(settings.url + path + '/' + resource + '?token=' + settings.token, {
                         headers: headers
@@ -104,7 +107,7 @@ class SyncHelper {
                                 data.local = false;
                             }
 
-                            debug.log('Remote resource item ' + remoteResourceName + '/' + remoteItemName + ' retrieved successfully', this, 3);
+                            debug.log('Remote resource item ' + resource + ' retrieved successfully', this, 3);
                             
                             resolve(data);
                         }
@@ -145,14 +148,20 @@ class SyncHelper {
                         path += '/' + environment;
                     }
                     
-                    debug.log('Posting remote resource item ' + remoteResourceName + '/' + remoteItemName + ' for ' + path + '...', this, 3);
+                    let resource = remoteResourceName;
+                    
+                    if(remoteItemName) {
+                        resource += '/' + remoteItemName;
+                    }
+                    
+                    debug.log('Posting remote resource item ' + resource + ' for ' + path + '...', this, 3);
                    
                     let headers = {
                         'Content-Type': 'application/json'
                     };
                    
                     // Send the API request, and make sure to create/upsert any resources that do not yet exist on the remote 
-                    RequestHelper.post(settings.url + path + '/' + remoteResourceName + '/' + remoteItemName + '?create=true&token=' + settings.token, {
+                    RequestHelper.post(settings.url + path + '/' + resource + '?create=true&token=' + settings.token, {
                         headers: headers,
                         data: JSON.stringify(remoteItemData)
                     }).on('complete', (data, response) => {
@@ -163,7 +172,7 @@ class SyncHelper {
                             reject(new Error(data));
                         
                         } else {
-                            debug.log('Remote resource item ' + remoteResourceName + '/' + remoteItemName + ' posted successfully', this, 3);
+                            debug.log('Remote resource item ' + resource + ' posted successfully', this, 3);
                             
                             resolve(true);
                         }
