@@ -1285,7 +1285,6 @@
 	'use strict';
 
 	var FunctionTemplating = {};
-	var lastCondition = void 0;
 
 	/**
 	 * Appends content to an element
@@ -1483,35 +1482,12 @@
 	 * @param {Boolean} condition
 	 * @param {HTMLElement} contents
 	 *
-	 * @returns {HTMLElement} Contents
+	 * @returns {HTMLElement} contents
 	 */
 	FunctionTemplating.if = function (condition) {
-	    lastCondition = condition || false;
-
-	    if (lastCondition) {
+	    if (condition != false && condition != null && condition != undefined) {
 	        for (var _len3 = arguments.length, contents = Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
 	            contents[_key3 - 1] = arguments[_key3];
-	        }
-
-	        return contents;
-	    }
-	};
-
-	/**
-	 * Uses the last provided condition to simulate an "else" statement
-	 *
-	 * @param {HTMLElement} contents
-	 *
-	 * @returns {HTMLElement} Contents
-	 */
-	FunctionTemplating.else = function () {
-	    if (typeof lastCondition === 'undefined') {
-	        throw new Error('No "if" statement was provided before this "else" statement');
-	    }
-
-	    if (!lastCondition) {
-	        for (var _len4 = arguments.length, contents = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
-	            contents[_key4] = arguments[_key4];
 	        }
 
 	        return contents;
@@ -1997,24 +1973,12 @@
 	            this.render();
 	            this.postrender();
 
-	            var element = this.element;
-
-	            if (!element && this.$element && this.$element.length > 0) {
-	                element = this.$element[0];
-	            }
-
-	            if (!element) {
-	                return;
-	            }
+	            var element = this.element || this.$element[0];
 
 	            element.addEventListener('DOMNodeRemovedFromDocument', function () {
 	                // Wait a few cycles before removing, as the element might just have been relocated
 	                setTimeout(function () {
-	                    var element = _this.element;
-
-	                    if (!element && _this.$element) {
-	                        element = _this.$element[0];
-	                    }
+	                    var element = _this.element || _this.$element[0];
 
 	                    if (!element || !element.parentNode) {
 	                        _this.remove();
@@ -2288,32 +2252,22 @@
 	    function ContextMenu(params) {
 	        _classCallCheck(this, ContextMenu);
 
+	        // Recycle other context menus
 	        var _this = _possibleConstructorReturn(this, (ContextMenu.__proto__ || Object.getPrototypeOf(ContextMenu)).call(this, params));
 
-	        _this.element = _.ul({ class: 'context-menu dropdown-menu', role: 'menu' });
-
-	        var existingMenu = _.find('.context-menu');
-
-	        if (typeof jQuery !== 'undefined') {
-	            if (existingMenu && existingMenu.length > 0) {
-	                _this.element = existingMenu;
-	            }
+	        if ($('.context-menu').length > 0) {
+	            _this.$element = $('.context-menu');
 	        } else {
-	            if (existingMenu) {
-	                _this.element = existingMenu;
-	            }
+	            _this.$element = _.ul({ class: 'context-menu dropdown-menu', role: 'menu' });
 	        }
 
-	        if (typeof jQuery !== 'undefined') {
-	            _this.$element = _this.element;
-	            _this.element = _this.$element[0];
-	        }
-
-	        _this.element.style.position = 'absolute';
-	        _this.element.style.zIndex = 1200;
-	        _this.element.style.top = _this.pos.y;
-	        _this.element.style.left = _this.pos.x;
-	        _this.element.style.display = 'block';
+	        _this.$element.css({
+	            position: 'absolute',
+	            'z-index': 1200,
+	            top: _this.pos.y,
+	            left: _this.pos.x,
+	            display: 'block'
+	        });
 
 	        _this.fetch();
 	        return _this;
@@ -2322,9 +2276,9 @@
 	    _createClass(ContextMenu, [{
 	        key: 'render',
 	        value: function render() {
-	            var _this2 = this;
+	            var view = this;
 
-	            _.append(this.element, _.each(this.model, function (label, func) {
+	            view.$element.html(_.each(view.model, function (label, func) {
 	                if (func == '---') {
 	                    return _.li({ class: 'dropdown-header' }, label);
 	                } else {
@@ -2335,21 +2289,13 @@
 	                        if (func) {
 	                            func(e);
 
-	                            _this2.remove();
+	                            view.remove();
 	                        }
 	                    }));
 	                }
 	            }));
 
-	            _.append(_.find('body'), this.element);
-
-	            var rect = this.element.getBoundingClientRect();
-
-	            if (rect.left + rect.width > window.innerWidth) {
-	                this.element.style.left = rect.left - rect.width + 'px';
-	            } else if (rect.bottom > window.innerHeight) {
-	                this.element.style.top = rect.top - rect.height + 'px';
-	            }
+	            $('body').append(view.$element);
 	        }
 	    }]);
 
@@ -11957,24 +11903,28 @@
 
 	            var _this2 = this;
 
-	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
-	            var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('section');
+	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+	            var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
 
-	            var apiCall = void 0;
+	            var apiUrl = '/api/' + project + '/';
 
-	            if (!environment || environment == '*') {
-	                apiCall = customApiCall('get', '/api/' + project + '/settings/' + section);
-	            } else {
-	                apiCall = customApiCall('get', '/api/' + project + '/' + environment + '/settings/' + section);
+	            if (environment && environment !== '*') {
+	                apiUrl += environment + '/';
 	            }
 
-	            return apiCall
+	            apiUrl += 'settings';
+
+	            if (section) {
+	                apiUrl += '/' + section;
+	            }
+
+	            return customApiCall('get', apiUrl)
 
 	            // Cache settings client-side
 	            .then(function (settings) {
 	                _this2.updateCache(project, environment, section, settings);
 
-	                return Promise.resolve(settings);
+	                return Promise.resolve(settings || {});
 	            });
 	        }
 
@@ -12003,9 +11953,11 @@
 	                this.cache[project][environment] = this.cache[project][environment] || {};
 	                this.cache[project][environment][section] = this.cache[project][environment][section] || {};
 	                this.cache[project][environment][section] = settings;
-	            } else {
+	            } else if (section) {
 	                this.cache[project][section] = this.cache[project][section] || {};
 	                this.cache[project][section] = settings;
+	            } else {
+	                this.cache[project] = settings;
 	            }
 	        }
 
@@ -12020,10 +11972,13 @@
 	    }, {
 	        key: 'getCachedSettings',
 	        value: function getCachedSettings() {
-	            var section = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('section');
+	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+	            var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
 
-	            var project = ProjectHelper.currentProject;
-	            var environment = ProjectHelper.currentEnvironment;
+	            if (!environment) {
+	                environment = '*';
+	            }
 
 	            if (!this.cache) {
 	                return {};
@@ -12031,23 +11986,14 @@
 	            if (!this.cache[project]) {
 	                return {};
 	            }
-
-	            if (environment) {
-	                if (!this.cache[project][environment]) {
-	                    return {};
-	                }
-	                if (!this.cache[project][environment][section]) {
-	                    return {};
-	                }
-
-	                return this.cache[project][environment][section];
-	            } else {
-	                if (!this.cache[project][section]) {
-	                    return {};
-	                }
-
-	                return this.cache[project][section];
+	            if (!this.cache[project][environment]) {
+	                return {};
 	            }
+	            if (!this.cache[project][environment][section]) {
+	                return {};
+	            }
+
+	            return this.cache[project][environment][section];
 	        }
 
 	        /**

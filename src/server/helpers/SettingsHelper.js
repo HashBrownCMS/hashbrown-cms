@@ -17,6 +17,11 @@ class SettingsHelper extends SettingsHelperCommon {
         environment = null,
         section = null
     ) {
+        if(environment === '*') {
+            environment = null;
+        }
+
+        // First find the remote resource
         return function() {
             // If the requested section is "sync" itself, don't look for remote resource
             if(section === 'sync') {
@@ -25,21 +30,25 @@ class SettingsHelper extends SettingsHelperCommon {
 
             return SyncHelper.getResourceItem(project, environment, 'settings', section)
             .catch((e) => {
-                debug.log(e.message, SettingsHelper);
+                if(e.message) {
+                    debug.log(e.message, SettingsHelper);
+                }
 
                 return Promise.resolve(null);  
             });
         }()
-        .then((settings) => {
+
+        // Then perform resolving logic
+        .then((remoteSettings) => {
             // If the remote section was found, return it
-            if(settings) {
-                return Promise.resolve(settings);
+            if(remoteSettings) {
+                return Promise.resolve(remoteSettings);
             }
 
             // If not, get the local section instead
             let collection = 'settings';
 
-            if(environment && environment != '*') {
+            if(environment) {
                 collection = environment + '.' + collection;
             }
 
@@ -55,6 +64,17 @@ class SettingsHelper extends SettingsHelperCommon {
                 collection,
                 query
             );
+        })
+        .then((result) => {
+            // If result was found, return it
+            if(result) {
+                return Promise.resolve(result);
+            }
+
+            // Fallbacks
+            if(!environment && section === 'environments') {
+                return Promise.resolve({section: 'environments', names: [ 'live' ]});
+            }
         });
     }
     

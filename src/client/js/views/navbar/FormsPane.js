@@ -145,7 +145,7 @@ class FormsPane extends NavbarPane {
             // Item context menu
             getItemContextMenu: (item) => {
                 let menu = {};
-                let isSyncEnabled = SettingsHelper.getCachedSettings('sync').enabled == true;
+                let isSyncEnabled = SettingsHelper.getCachedSettings(ProjectHelper.currentProject, null, 'sync').enabled == true;
                 
                 menu['This form'] = '---';
                 menu['Copy id'] = () => { this.onClickCopyItemId(); };

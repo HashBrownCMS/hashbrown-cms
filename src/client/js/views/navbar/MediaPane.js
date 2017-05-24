@@ -118,8 +118,8 @@ class MediaPane extends NavbarPane {
 
             // Hierarchy logic
             hierarchy: (item, queueItem) => {
-                let isSyncEnabled = SettingsHelper.getCachedSettings('sync').enabled;
-                let isMediaSyncEnabled = isSyncEnabled && SettingsHelper.getCachedSettings('sync')['media/tree'];
+                let isSyncEnabled = SettingsHelper.getCachedSettings(ProjectHelper.currentProject, null, 'sync').enabled;
+                let isMediaSyncEnabled = isSyncEnabled && SettingsHelper.getCachedSettings(ProjectHelper.currentProject, null, 'sync')['media/tree'];
 
                 queueItem.$element.attr('data-media-id', item.id);
                

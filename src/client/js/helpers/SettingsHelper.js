@@ -14,24 +14,28 @@ class SettingsHelper extends SettingsHelperCommon {
      */
     static getSettings(
         project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        section = requiredParam('section')
+        environment = null,
+        section = null
     ) {
-        let apiCall;
+        let apiUrl = '/api/' + project + '/';
 
-        if(!environment || environment == '*') {
-            apiCall = customApiCall('get', '/api/' + project + '/settings/' + section);
-        } else {
-            apiCall = customApiCall('get', '/api/' + project + '/' + environment + '/settings/' + section);
+        if(environment && environment !== '*') {
+            apiUrl += environment + '/'; 
+        }
+       
+        apiUrl += 'settings';
+
+        if(section) {
+            apiUrl += '/' + section;
         }
 
-        return apiCall
+        return customApiCall('get', apiUrl)
 
         // Cache settings client-side
         .then((settings) => {
             this.updateCache(project, environment, section, settings);
 
-            return Promise.resolve(settings);
+            return Promise.resolve(settings || {});
         });
     }
     
@@ -58,10 +62,13 @@ class SettingsHelper extends SettingsHelperCommon {
             this.cache[project][environment][section] = this.cache[project][environment][section] || {};
             this.cache[project][environment][section] = settings;
         
-        } else {
+        } else if(section) {
             this.cache[project][section] = this.cache[project][section] || {};
             this.cache[project][section] = settings;
         
+        } else {
+            this.cache[project] = settings;
+
         }
     }
 
@@ -73,25 +80,20 @@ class SettingsHelper extends SettingsHelperCommon {
      * @returns {Object} Settings
      */
     static getCachedSettings(
-        section = requiredParam('section')
+        project = requiredParam('project'),
+        environment = null,
+        section = null,
     ) {
-        let project = ProjectHelper.currentProject;
-        let environment = ProjectHelper.currentEnvironment;
+        if(!environment) {
+            environment = '*';
+        }
 
         if(!this.cache) { return {}; }
         if(!this.cache[project]) { return {}; }
-
-        if(environment) {
-            if(!this.cache[project][environment]) { return {}; }
-            if(!this.cache[project][environment][section]) { return {}; }
-            
-            return this.cache[project][environment][section];
+        if(!this.cache[project][environment]) { return {}; }
+        if(!this.cache[project][environment][section]) { return {}; }
         
-        } else {
-            if(!this.cache[project][section]) { return {}; }
-
-            return this.cache[project][section];
-        }
+        return this.cache[project][environment][section];
     }
 
     /**

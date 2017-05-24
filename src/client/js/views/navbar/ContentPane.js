@@ -422,8 +422,8 @@ class ContentPane extends NavbarPane {
             // Item context menu
             getItemContextMenu: (item) => {
                 let menu = {};
-                let isSyncEnabled = SettingsHelper.getCachedSettings('sync').enabled;
-                let isContentSyncEnabled = isSyncEnabled && SettingsHelper.getCachedSettings('sync').content;
+                let isSyncEnabled = SettingsHelper.getCachedSettings(ProjectHelper.currentProject, null, 'sync').enabled;
+                let isContentSyncEnabled = isSyncEnabled && SettingsHelper.getCachedSettings(ProjectHelper.currentProject, null, 'sync').content;
                 
                 menu['This content'] = '---';
                 

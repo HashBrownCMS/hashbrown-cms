@@ -89,8 +89,6 @@ class SyncHelper {
 
                     debug.log('Requesting remote resource item ' + resource + ' for ' + path + '...', this, 3);
 
-                    console.log(settings.url + path + '/' + resource + '?token=' + settings.token);
-
                     RequestHelper.get(settings.url + path + '/' + resource + '?token=' + settings.token, {
                         headers: headers
                     }).on('complete', (data, response) => {
