@@ -22,34 +22,6 @@ class SchemaHelper {
     }
 
     /**
-     * Sanity check for site settings Schema
-     *
-     * @param {Object} schema
-     *
-     * @returns {Object} Checked Schema
-     */
-    static checkSiteSettings(schema) {
-        schema = schema || {};
-
-        schema.icon = 'wrench';
-        schema.id = 'siteSettings'
-        schema.name = 'Site settings';
-        schema.parentSchemaId = 'contentBase';
-        schema.hiddenProperties = [
-            'allowedChildSchemas',
-            'parentSchemaId',
-            'name',
-            'icon'
-        ];
-
-        if(schema instanceof ContentSchema === false) {
-            schema = new ContentSchema(schema);
-        }
-
-        return schema;
-    }
-
-    /**
      * Gets the appropriate model
      *
      * @param {Object} properties

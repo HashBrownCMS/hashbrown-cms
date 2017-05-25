@@ -132,12 +132,6 @@ class SchemaHelper extends SchemaHelperCommon {
             }
 
             return SyncHelper.mergeResource(project, environment, 'schemas', schemas, { customOnly: true });
-        })
-        .then((schemas) => {
-            // Last sanity check for site settings
-            schemas.siteSettings = SchemaHelper.checkSiteSettings(schemas.siteSettings || {});
-
-            return Promise.resolve(schemas);
         });
     }
 
@@ -245,45 +239,6 @@ class SchemaHelper extends SchemaHelperCommon {
     }
 
     /**
-     * Gets the site settings Schema
-     *
-     * @param {String} project
-     * @param {String} environment
-     *
-     * @return {Promise} ContentSchema
-     */
-    static getSiteSettingsSchema(
-        project = requiredParam('project'),
-        environment = requiredParam('environment')
-    ) {
-        let collection = environment + '.schemas';
-
-        // First attempt to find site settings in the database
-        return MongoHelper.findOne(
-            project,
-            collection,
-            {
-                id: 'siteSettings'
-            }
-        ).then((schemaData) => {
-            // If that fails, try to find it using the synced remote
-            if(!schemaData || Object.keys(schemaData).length < 1) {
-                return SyncHelper.getResourceItem(project, environment, 'schemas', 'siteSettings');
-            }
-
-            // If successful, resolve with Schema data
-            return Promise.resolve(schemaData);
-        })
-        .catch(() => {
-            // If site settings were not found on synced instance, never mind
-            return Promise.resolve();
-        })
-        .then((schemaData) => {
-            return Promise.resolve(SchemaHelper.checkSiteSettings(schemaData));
-        });
-    }
-
-    /**
      * Gets a Schema by id
      *
      * @param {String} project
@@ -297,11 +252,6 @@ class SchemaHelper extends SchemaHelperCommon {
         environment = requiredParam('environment'),
         id = requiredParam('id')
     ) {
-        // Special case for the "siteSettings" id
-        if(id === 'siteSettings') {
-            return SchemaHelper.getSiteSettingsSchema(project, environment);
-        }
-        
         let collection = environment + '.schemas';
 
         if(id) {
@@ -534,12 +484,6 @@ class SchemaHelper extends SchemaHelperCommon {
         let collection = environment + '.schemas';
        
         schema = schema || {};
-
-        // Special case for site settings schema
-        if(id === 'siteSettings') {
-            schema = SchemaHelper.checkSiteSettings(schema).getObject();
-            create = true;
-        }
 
         // Unset automatic flags
         schema.locked = false;
