@@ -58,16 +58,16 @@ class SettingsHelper extends SettingsHelperCommon {
         this.cache = this.cache || {};
         this.cache[project] = this.cache[project] || {};
 
-        if(environment && !section) {
+        if(environment) {
             this.cache[project][environment] = this.cache[project][environment] || {};
-        }
 
-        if(!environment && section) {
+            if(section) {
+                this.cache[project][environment][section] = this.cache[project][environment][section] || {};
+            }
+     
+        } else if(section) {
             this.cache[project][section] = this.cache[project][section] || {};
-        }
-
-        if(environment && section) {
-            this.cache[project][environment][section] = this.cache[project][environment][section] || {};
+        
         }
     }
 
