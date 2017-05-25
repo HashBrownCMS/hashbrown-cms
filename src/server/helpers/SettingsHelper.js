@@ -309,8 +309,8 @@ class SettingsHelper extends SettingsHelperCommon {
      */
     static setSettings(
         project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        section = requiredParam('section'),
+        environment = null,
+        section = null,
         settings = requiredParam('settings')
     ) {
         debug.log('Setting "' + section + '" to ' + JSON.stringify(settings), this, 3);
