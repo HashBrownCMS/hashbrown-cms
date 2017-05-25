@@ -103,21 +103,31 @@ class ProjectHelper {
      * @returns {Promise(Array)} environments
      */
     static getAllEnvironments(project) {
-        return MongoHelper.find(project, 'settings', {})
-        .then((allSettings) => {
-            let names = [];
-
-            for(let setting of allSettings) {
-                if(setting.usedBy === 'project') { continue; }
-
-                names.push(setting.usedBy);
+        // First attempt to get remote environments
+        return SyncHelper.getResource(project, null, 'environments')
+        .then((environments) => {
+            // If remote environments were found, resolve immediately
+            if(environments && Array.isArray(environments)) {
+                return Promise.resolve(environments);
             }
 
-            if(names.length < 1) {
-                names.push('live');
-            }
+            // If remote environments were not found, return local ones
+            return MongoHelper.find(project, 'settings', {})
+            .then((allSettings) => {
+                let names = [];
 
-            return Promise.resolve(names);
+                for(let setting of allSettings) {
+                    if(setting.usedBy === 'project') { continue; }
+
+                    names.push(setting.usedBy);
+                }
+
+                if(names.length < 1) {
+                    names.push('live');
+                }
+
+                return Promise.resolve(names);
+            });
         });
     }
 
@@ -134,6 +144,29 @@ class ProjectHelper {
         .then(() => {
             return MongoHelper.dropDatabase(name);
         });
+    }
+
+    /**
+     * Adds an environment
+     *
+     * @param {String} project
+     * @param {String} environment
+     *
+     * @returns {Promise} Promise
+     */
+    static addEnvironment(
+        project = requiredParam('project'),
+        environment = requiredParam('environment')
+    ) {
+        debug.log('Adding environment "' + environment + '" to project "' + project + '"...', this);
+       
+        return MongoHelper.updateOne(
+            project,
+            'settings',
+            { usedBy: environment },
+            { usedBy: environment },
+            { upsert: true }
+        );
     }
 
     /**

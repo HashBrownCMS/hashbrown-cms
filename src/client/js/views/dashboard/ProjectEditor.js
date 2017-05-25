@@ -149,13 +149,13 @@ class ProjectEditor extends View {
                     label: 'Create',
                     class: 'btn-primary',
                     callback: () => {
-                        let newName = modal.$element.find('input').val();
+                        let environmentName = modal.$element.find('input').val();
 
-                        this.model.environments.push(newName);
+                        this.model.environments.push(environmentName);
 
-                        SettingsHelper.setSettings(this.model.id, newName, {})
+                        apiCall('put', 'server/projects/' + this.model.id + '/' + environmentName)
                         .then(() => {
-                            UI.messageModal('Succes', 'The new environment "' + newName + '" was created successfully', () => { location.reload(); });
+                            UI.messageModal('Success', 'The new environment "' + environmentName + '" was created successfully', () => { location.reload(); });
                         })
                         .catch(UI.errorModal);
 

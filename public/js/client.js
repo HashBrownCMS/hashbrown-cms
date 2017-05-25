@@ -303,7 +303,7 @@
 
 	// Preload resources 
 	$(document).ready(function () {
-	    SettingsHelper.getSettings(ProjectHelper.currentProject, ProjectHelper.currentEnvironment, 'sync').then(function () {
+	    SettingsHelper.getSettings(ProjectHelper.currentProject, null, 'sync').then(function () {
 	        return LanguageHelper.getSelectedLanguages(ProjectHelper.currentProject);
 	    }).then(function () {
 	        return reloadAllResources();
@@ -11954,9 +11954,13 @@
 	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
 	            var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
 
+	            if (environment === '*') {
+	                environment = null;
+	            }
+
 	            var apiUrl = '/api/' + project + '/';
 
-	            if (environment && environment !== '*') {
+	            if (environment) {
 	                apiUrl += environment + '/';
 	            }
 
@@ -11982,6 +11986,41 @@
 	         * @param {String} project
 	         * @param {String} environment
 	         * @param {String} section
+	         */
+
+	    }, {
+	        key: 'cacheSanityCheck',
+	        value: function cacheSanityCheck() {
+	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+	            var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+
+	            if (environment === '*') {
+	                environment = null;
+	            }
+
+	            this.cache = this.cache || {};
+	            this.cache[project] = this.cache[project] || {};
+
+	            if (environment && !section) {
+	                this.cache[project][environment] = this.cache[project][environment] || {};
+	            }
+
+	            if (!environment && section) {
+	                this.cache[project][section] = this.cache[project][section] || {};
+	            }
+
+	            if (environment && section) {
+	                this.cache[project][environment][section] = this.cache[project][environment][section] || {};
+	            }
+	        }
+
+	        /**
+	         * Cache update
+	         *
+	         * @param {String} project
+	         * @param {String} environment
+	         * @param {String} section
 	         * @param {Object} settings
 	         */
 
@@ -11989,24 +12028,29 @@
 	        key: 'updateCache',
 	        value: function updateCache() {
 	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
-	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
-	            var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('section');
+	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+	            var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
 	            var settings = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : requiredParam('settings');
 
-	            // Sanity check
-	            this.cache = this.cache || {};
-	            this.cache[project] = this.cache[project] || {};
-
-	            if (environment) {
-	                this.cache[project][environment] = this.cache[project][environment] || {};
-	                this.cache[project][environment][section] = this.cache[project][environment][section] || {};
-	                this.cache[project][environment][section] = settings;
-	            } else if (section) {
-	                this.cache[project][section] = this.cache[project][section] || {};
-	                this.cache[project][section] = settings;
-	            } else {
-	                this.cache[project] = settings;
+	            if (environment === '*') {
+	                environment = null;
 	            }
+
+	            this.cacheSanityCheck(project, environment, section);
+
+	            if (environment && !section) {
+	                return this.cache[project][environment] = settings;
+	            }
+
+	            if (!environment && section) {
+	                return this.cache[project][section] = settings;
+	            }
+
+	            if (environment && section) {
+	                return this.cache[project][environment][section] = settings;
+	            }
+
+	            return this.cache[project] = settings;
 	        }
 
 	        /**
@@ -12024,24 +12068,25 @@
 	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
 	            var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
 
-	            if (!environment) {
-	                environment = '*';
+	            if (environment === '*') {
+	                environment = null;
 	            }
 
-	            if (!this.cache) {
-	                return {};
-	            }
-	            if (!this.cache[project]) {
-	                return {};
-	            }
-	            if (!this.cache[project][environment]) {
-	                return {};
-	            }
-	            if (!this.cache[project][environment][section]) {
-	                return {};
+	            this.cacheSanityCheck(project, environment, section);
+
+	            if (environment) {
+	                if (section) {
+	                    return this.cache[project][environment][section];
+	                }
+
+	                return this.cache[project][environment];
 	            }
 
-	            return this.cache[project][environment][section];
+	            if (section) {
+	                return this.cache[project][section];
+	            }
+
+	            return this.cache[project];
 	        }
 
 	        /**
@@ -12059,22 +12104,34 @@
 	        key: 'setSettings',
 	        value: function setSettings() {
 	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
-	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
 
 	            var _this3 = this;
 
-	            var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('section');
+	            var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
 	            var settings = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : requiredParam('settings');
 
-	            var apiCall = void 0;
-
-	            if (!environment || environment == '*') {
-	                apiCall = customApiCall('post', '/api/' + project + '/settings/' + section, settings);
-	            } else {
-	                apiCall = customApiCall('post', '/api/' + project + '/' + environment + '/settings/' + section, settings);
+	            if (environment === '*') {
+	                environment = null;
 	            }
 
-	            return apiCall
+	            var apiUrl = '/api/' + project + '/';
+
+	            settings.usedBy = 'project';
+
+	            if (environment) {
+	                apiUrl += environment + '/';
+
+	                settings.usedBy = environment;
+	            }
+
+	            apiUrl += 'settings';
+
+	            if (section) {
+	                apiUrl += '/' + section;
+	            }
+
+	            return customApiCall('post', apiUrl, settings)
 
 	            // Cache new settings
 	            .then(function () {
@@ -13403,7 +13460,7 @@
 	                // Item context menu
 	                getItemContextMenu: function getItemContextMenu(item) {
 	                    var menu = {};
-	                    var isSyncEnabled = SettingsHelper.getCachedSettings(ProjectHelper.currentProject, null, 'sync').enabled == true;
+	                    var isSyncEnabled = SettingsHelper.getCachedSettings(ProjectHelper.currentProject, null, 'sync').enabled;
 
 	                    menu['This connection'] = '---';
 	                    menu['Copy id'] = function () {
@@ -13884,7 +13941,6 @@
 	                getItemContextMenu: function getItemContextMenu(item) {
 	                    var menu = {};
 	                    var isSyncEnabled = SettingsHelper.getCachedSettings(ProjectHelper.currentProject, null, 'sync').enabled;
-	                    var isContentSyncEnabled = isSyncEnabled && SettingsHelper.getCachedSettings(ProjectHelper.currentProject, null, 'sync').content;
 
 	                    menu['This content'] = '---';
 
@@ -13925,10 +13981,10 @@
 	                    }
 
 	                    if (item.locked && !item.remote) {
-	                        isContentSyncEnabled = false;
+	                        isSyncEnabled = false;
 	                    }
 
-	                    if (isContentSyncEnabled) {
+	                    if (isSyncEnabled) {
 	                        menu['Sync'] = '---';
 
 	                        if (!item.remote) {
@@ -14150,7 +14206,7 @@
 	                // Item context menu
 	                getItemContextMenu: function getItemContextMenu(item) {
 	                    var menu = {};
-	                    var isSyncEnabled = SettingsHelper.getCachedSettings(ProjectHelper.currentProject, null, 'sync').enabled == true;
+	                    var isSyncEnabled = SettingsHelper.getCachedSettings(ProjectHelper.currentProject, null, 'sync').enabled;
 
 	                    menu['This form'] = '---';
 	                    menu['Copy id'] = function () {
@@ -14349,14 +14405,13 @@
 	                // Hierarchy logic
 	                hierarchy: function hierarchy(item, queueItem) {
 	                    var isSyncEnabled = SettingsHelper.getCachedSettings(ProjectHelper.currentProject, null, 'sync').enabled;
-	                    var isMediaSyncEnabled = isSyncEnabled && SettingsHelper.getCachedSettings(ProjectHelper.currentProject, null, 'sync')['media/tree'];
 
 	                    queueItem.$element.attr('data-media-id', item.id);
 
 	                    if (item.folder) {
 	                        queueItem.createDir = true;
 	                        queueItem.parentDirAttr = { 'data-media-folder': item.folder };
-	                        queueItem.parentDirExtraAttr = { 'data-remote': isMediaSyncEnabled };
+	                        queueItem.parentDirExtraAttr = { 'data-remote': isSyncEnabled };
 	                    }
 	                },
 
@@ -14583,7 +14638,7 @@
 	                // Item context menu
 	                getItemContextMenu: function getItemContextMenu(item) {
 	                    var menu = {};
-	                    var isSyncEnabled = SettingsHelper.getCachedSettings(ProjectHelper.currentProject, null, 'sync').enabled == true;
+	                    var isSyncEnabled = SettingsHelper.getCachedSettings(ProjectHelper.currentProject, null, 'sync').enabled;
 
 	                    menu['This schema'] = '---';
 	                    menu['New child schema'] = function () {

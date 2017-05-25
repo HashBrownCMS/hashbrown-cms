@@ -7,6 +7,8 @@ class SettingsController extends ApiController {
      * Initialises this controller
      */
     static init(app) {
+        app.get('/api/:project/environments', this.middleware({setProject: false}), this.getEnvironments);
+
         app.get('/api/:project/settings', this.middleware({setProject: false}), this.getSettings);
         app.get('/api/:project/settings/:section', this.middleware(), this.getSettings);
         app.get('/api/:project/:environment/settings', this.middleware(), this.getSettings);
@@ -18,6 +20,19 @@ class SettingsController extends ApiController {
         app.post('/api/:project/:environment/settings/:section', this.middleware({scope: 'settings'}), this.setSettings);
     }
     
+    /**
+     * Get environments
+     */
+    static getEnvironments(req, res) {
+        ProjectHelper.getAllEnvironments(req.params.project)
+        .then((environments) => {
+            res.status(200).send(environments);
+        })
+        .catch((e) => {
+            res.status(502).send(SettingsController.printError(e));
+        });
+    }
+
     /**
      * Get settings object
      */

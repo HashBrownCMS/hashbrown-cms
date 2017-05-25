@@ -17,9 +17,11 @@ class SettingsHelper extends SettingsHelperCommon {
         environment = null,
         section = null
     ) {
+        if(environment === '*') { environment = null; }
+
         let apiUrl = '/api/' + project + '/';
 
-        if(environment && environment !== '*') {
+        if(environment) {
             apiUrl += environment + '/'; 
         }
        
@@ -38,7 +40,37 @@ class SettingsHelper extends SettingsHelperCommon {
             return Promise.resolve(settings || {});
         });
     }
-    
+   
+    /**
+     * Cache update
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} section
+     */
+    static cacheSanityCheck(
+        project = requiredParam('project'),
+        environment = null,
+        section = null
+    ) {
+        if(environment === '*') { environment = null; }
+
+        this.cache = this.cache || {};
+        this.cache[project] = this.cache[project] || {};
+
+        if(environment && !section) {
+            this.cache[project][environment] = this.cache[project][environment] || {};
+        }
+
+        if(!environment && section) {
+            this.cache[project][section] = this.cache[project][section] || {};
+        }
+
+        if(environment && section) {
+            this.cache[project][environment][section] = this.cache[project][environment][section] || {};
+        }
+    }
+
     /**
      * Cache update
      *
@@ -49,27 +81,27 @@ class SettingsHelper extends SettingsHelperCommon {
      */
     static updateCache(
         project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        section = requiredParam('section'),
+        environment = null,
+        section = null,
         settings = requiredParam('settings')
     ) {
-        // Sanity check
-        this.cache = this.cache || {};
-        this.cache[project] = this.cache[project] || {};
+        if(environment === '*') { environment = null; }
 
-        if(environment) {
-            this.cache[project][environment] = this.cache[project][environment] || {};
-            this.cache[project][environment][section] = this.cache[project][environment][section] || {};
-            this.cache[project][environment][section] = settings;
-        
-        } else if(section) {
-            this.cache[project][section] = this.cache[project][section] || {};
-            this.cache[project][section] = settings;
-        
-        } else {
-            this.cache[project] = settings;
+        this.cacheSanityCheck(project, environment, section);
 
+        if(environment && !section) {
+            return this.cache[project][environment] = settings;
         }
+
+        if(!environment && section) {
+            return this.cache[project][section] = settings;
+        }
+        
+        if(environment && section) {
+            return this.cache[project][environment][section] = settings;
+        } 
+        
+        return this.cache[project] = settings;
     }
 
     /**
@@ -84,16 +116,23 @@ class SettingsHelper extends SettingsHelperCommon {
         environment = null,
         section = null,
     ) {
-        if(!environment) {
-            environment = '*';
+        if(environment === '*') { environment = null; }
+
+        this.cacheSanityCheck(project, environment, section);
+
+        if(environment) {
+            if(section) {
+                return this.cache[project][environment][section];
+            }
+                
+            return this.cache[project][environment];
+        }
+        
+        if(section) {
+            return this.cache[project][section];
         }
 
-        if(!this.cache) { return {}; }
-        if(!this.cache[project]) { return {}; }
-        if(!this.cache[project][environment]) { return {}; }
-        if(!this.cache[project][environment][section]) { return {}; }
-        
-        return this.cache[project][environment][section];
+        return this.cache[project];
     }
 
     /**
@@ -108,19 +147,29 @@ class SettingsHelper extends SettingsHelperCommon {
      */
     static setSettings(
         project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        section = requiredParam('section'),
+        environment = null,
+        section = null,
         settings = requiredParam('settings')
     ) {
-        let apiCall;
+        if(environment === '*') { environment = null; }
 
-        if(!environment || environment == '*') {
-            apiCall = customApiCall('post', '/api/' + project + '/settings/' + section, settings);
-        } else {
-            apiCall = customApiCall('post', '/api/' + project + '/' + environment + '/settings/' + section, settings);
+        let apiUrl = '/api/' + project + '/';
+
+        settings.usedBy = 'project';
+
+        if(environment) {
+            apiUrl += environment + '/'; 
+
+            settings.usedBy = environment;
+        }
+       
+        apiUrl += 'settings';
+
+        if(section) {
+            apiUrl += '/' + section;
         }
 
-        return apiCall
+        return customApiCall('post', apiUrl, settings)
 
         // Cache new settings
         .then(() => {
