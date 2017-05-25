@@ -11605,20 +11605,16 @@
 	        value: function getSelectedLanguages() {
 	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
 
-	            return SettingsHelper.getSettings(project, null, 'language').then(function (settings) {
-	                if (!settings) {
-	                    settings = {};
+	            return SettingsHelper.getSettings(project, null, 'language').then(function (selected) {
+	                if (!selected) {
+	                    selected = ['en'];
 	                }
 
-	                if (!settings.selected || settings.selected.length < 1) {
-	                    settings.selected = ['en'];
-	                }
+	                selected.sort();
 
-	                settings.selected.sort();
+	                LanguageHelper.selectedLanguages = selected;
 
-	                LanguageHelper.selectedLanguages = settings.selected;
-
-	                return Promise.resolve(settings.selected);
+	                return Promise.resolve(selected);
 	            });
 	        }
 
@@ -11637,56 +11633,11 @@
 	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
 	            var languages = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('languages');
 
-	            return SettingsHelper.getSettings(project, null, 'language').then(function (settings) {
-	                if (!(settings instanceof Object)) {
-	                    settings = {};
-	                }
+	            if (!Array.isArray(languages)) {
+	                return Promise.reject(new Error('Language array cannot be of type "' + (typeof languages === 'undefined' ? 'undefined' : _typeof(languages)) + '"'));
+	            }
 
-	                if (!Array.isArray(languages)) {
-	                    return Promise.reject(new Error('Language array cannot be of type "' + (typeof languages === 'undefined' ? 'undefined' : _typeof(languages)) + '"'));
-	                }
-
-	                settings.selected = languages;
-
-	                return SettingsHelper.setSettings(project, null, 'language', settings);
-	            });
-	        }
-
-	        /**
-	         * Toggle a language
-	         *
-	         * @param {String} project
-	         * @param {String} language
-	         * @param {Boolean} state
-	         *
-	         * @returns {Promise} promise
-	         */
-
-	    }, {
-	        key: 'toggleLanguage',
-	        value: function toggleLanguage() {
-	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
-	            var language = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('language');
-	            var state = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('state');
-
-	            return SettingsHelper.getSettings(project, 'language').then(function (settings) {
-	                if (!(settings instanceof Object)) {
-	                    settings = {};
-	                }
-
-	                if (!settings.selected || settings.selected.length < 1) {
-	                    settings.selected = ['en'];
-	                }
-
-	                if (!state && settings.selected.indexOf(language) > -1) {
-	                    settings.selected.splice(settings.selected.indexOf(language), 1);
-	                } else if (state && settings.selected.indexOf(language) < 0) {
-	                    settings.selected.push(language);
-	                    settings.selected.sort();
-	                }
-
-	                return SettingsHelper.setSettings(project, null, 'language', settings);
-	            });
+	            return SettingsHelper.setSettings(project, null, 'languages', languages);
 	        }
 
 	        /**
