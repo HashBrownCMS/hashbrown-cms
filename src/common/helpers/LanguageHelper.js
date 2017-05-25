@@ -20,9 +20,9 @@ class LanguageHelper {
     static getSelectedLanguages(
         project = requiredParam('project')
     ) {
-        return SettingsHelper.getSettings(project, null, 'language')
+        return SettingsHelper.getSettings(project, null, 'languages')
         .then((selected) => {
-            if(!selected) {
+            if(!selected || !Array.isArray(selected)) {
                 selected = ['en'];
             }
 

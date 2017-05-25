@@ -11605,8 +11605,8 @@
 	        value: function getSelectedLanguages() {
 	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
 
-	            return SettingsHelper.getSettings(project, null, 'language').then(function (selected) {
-	                if (!selected) {
+	            return SettingsHelper.getSettings(project, null, 'languages').then(function (selected) {
+	                if (!selected || !Array.isArray(selected)) {
 	                    selected = ['en'];
 	                }
 
