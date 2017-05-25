@@ -143,9 +143,6 @@ class ServerController extends ApiController {
         .then(() => {
             return getResource('from', 'schemas');
         })
-        .then(() => {
-            return getResource('from', 'settings');
-        })
 
         // To
         .then(() => {
@@ -163,9 +160,6 @@ class ServerController extends ApiController {
         .then(() => {
             return getResource('to', 'schemas');
         })
-        .then(() => {
-            return getResource('to', 'settings');
-        })
 
         // Merge "from" and "to"
         .then(() => {
@@ -182,9 +176,6 @@ class ServerController extends ApiController {
         })
         .then(() => {
             return mergeResource('schemas');
-        })
-        .then(() => {
-            return mergeResource('settings');
         })
 
         // Success

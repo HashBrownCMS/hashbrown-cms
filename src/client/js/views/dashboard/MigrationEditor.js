@@ -40,8 +40,7 @@ class MigrationEditor extends View {
                             content: 'Content',
                             forms: 'Forms',
                             media: 'Media',
-                            connections: 'Connections',
-                            settings: 'Settings'
+                            connections: 'Connections'
                         }, (key, label) => {
                             return _.div({class: 'input-group'},      
                                 _.span(label),

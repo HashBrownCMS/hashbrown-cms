@@ -21619,8 +21619,7 @@
 	                    content: 'Content',
 	                    forms: 'Forms',
 	                    media: 'Media',
-	                    connections: 'Connections',
-	                    settings: 'Settings'
+	                    connections: 'Connections'
 	                }, function (key, label) {
 	                    return _.div({ class: 'input-group' }, _.span(label), _.div({ class: 'input-group-addon' }, UI.inputSwitch(_this.data.settings[key], function (newValue) {
 	                        _this.data.settings[key] = newValue;
