@@ -23,7 +23,6 @@ class Project extends Entity {
         project.id = id;
 
         project.settings.info = {
-            section: 'info',
             name: name
         };
 

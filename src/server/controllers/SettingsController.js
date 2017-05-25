@@ -9,9 +9,12 @@ class SettingsController extends ApiController {
     static init(app) {
         app.get('/api/:project/settings', this.middleware({setProject: false}), this.getSettings);
         app.get('/api/:project/settings/:section', this.middleware(), this.getSettings);
+        app.get('/api/:project/:environment/settings', this.middleware(), this.getSettings);
         app.get('/api/:project/:environment/settings/:section', this.middleware(), this.getSettings);
         
-        app.post('/api/:project/settings/:section', this.middleware({scope: 'settings'}), this.setSettings);
+        app.post('/api/:project/settings', this.middleware({needsAdmin: true}), this.setSettings);
+        app.post('/api/:project/settings/:section', this.middleware({needsAdmin: true}), this.setSettings);
+        app.post('/api/:project/:environment/settings', this.middleware({scope: 'settings'}), this.setSettings);
         app.post('/api/:project/:environment/settings/:section', this.middleware({scope: 'settings'}), this.setSettings);
     }
     

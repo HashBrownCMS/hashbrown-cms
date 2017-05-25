@@ -72,33 +72,21 @@ class ProjectHelper {
             project.id = id;
             project.backups = backups;
 
-            for(let i in settings) {
-                let section = settings[i];
-                
-                project.settings[section.section] = section;
-            }
+            project.settings = settings;
 
             // Sanity check
             if(!project.settings.language) {
                 project.settings.language = {
-                    section: 'language',
                     selected: [ 'en' ]
                 };
             }
             
-            if(!project.settings.environments) {
-                project.settings.environments = {
-                    section: 'environments',
-                    names: [ 'live' ]
-                };
-            }
-        
             if(!project.settings.info) {
                 project.settings.info = {
-                    section: 'info',
                     name: id
                 };
             }
+
             project.users = users;
 
             return new Promise((resolve) => {

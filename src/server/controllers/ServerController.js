@@ -74,7 +74,7 @@ class ServerController extends ApiController {
                 
                 // Overwrite
                 if(data.settings.replace) {
-                    debug.log('Updating "' + (item.id || item.section || item) + '" into ' + resource + '...', ServerController);
+                    debug.log('Updating "' + (item.id || item) + '" into ' + resource + '...', ServerController);
                 
                     mongoPromise = MongoHelper.updateOne(
                         project,
