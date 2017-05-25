@@ -1484,6 +1484,18 @@
 	}
 
 	/**
+	 * Defines a new component
+	 *
+	 * @param {String} tag
+	 * @param {Function} template
+	 */
+	FunctionTemplating.component = function (tag, template) {
+	    FunctionTemplating[tag] = function (model) {
+	        return create('div', { 'data-component': tag }, template(model));
+	    };
+	};
+
+	/**
 	 * Appends content using the function templating rules
 	 *
 	 * @params {HTMLElement} parentElement
@@ -1495,6 +1507,17 @@
 	    }
 
 	    append(parentElement, contents);
+	};
+
+	/**
+	 * Encapsulates logic and renders the result
+	 *
+	 * @param {Function} func
+	 *
+	 * @param {HTMLElement} Contents
+	 */
+	FunctionTemplating.do = function (func) {
+	    return func();
 	};
 
 	/**
@@ -23615,7 +23638,11 @@
 	            }),
 
 	            // View remote
-	            _.if(this.model.properties && this.model.properties.url && this.publishingSettings.connections[0], _.if(this.model.isPublished, _.a({ target: '_blank', href: ConnectionHelper.getConnectionByIdSync(this.publishingSettings.connections[0]).url + url, class: 'btn btn-primary' }, 'View'))), _.if(!this.model.locked,
+	            _.do(function () {
+	                if (_this6.model.properties && _this6.model.properties.url && _this6.publishingSettings.connections.length > 0 && _this6.model.isPublished) {
+	                    return _.a({ target: '_blank', href: ConnectionHelper.getConnectionByIdSync(_this6.publishingSettings.connections[0]).url + url, class: 'btn btn-primary' }, 'View');
+	                }
+	            }), _.if(!this.model.locked,
 	            // Save & publish
 	            _.div({ class: 'btn-group-save-publish raised' }, this.$saveBtn = _.button({ class: 'btn btn-save btn-primary' }, _.span({ class: 'text-default' }, 'Save'), _.span({ class: 'text-working' }, 'Saving')).click(function () {
 	                _this6.onClickSave(_this6.publishingSettings);

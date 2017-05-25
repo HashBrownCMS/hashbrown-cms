@@ -24,7 +24,7 @@ class MigrationEditor extends View {
                     ),
                     _.div({class: 'migration-operation'},
                         _.select({class: 'form-control environment-from'},
-                            _.each(this.model.settings.environments.names, (i, environment) => {
+                            _.each(this.model.environments, (i, environment) => {
                                 return _.option({value: environment}, environment);  
                             })
                         ).change(() => {
@@ -84,7 +84,7 @@ class MigrationEditor extends View {
      */
     updateOptions() {
         _.append(this.modal.$element.find('.environment-to').empty(),
-            _.each(this.model.settings.environments.names, (i, environment) => {
+            _.each(this.model.environments, (i, environment) => {
                 // Filter out "from" environment
                 if(environment != this.modal.$element.find('.environment-from').val()) {
                     return _.option({value: environment}, environment);  

@@ -238,7 +238,7 @@ class SyncHelper {
                     });
 
                 } else {
-                    resolve([]);
+                    resolve(null);
                 }
             });
         });

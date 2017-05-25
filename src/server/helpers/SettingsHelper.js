@@ -268,7 +268,7 @@ class SettingsHelper extends SettingsHelperCommon {
         // Process local settings, if applicable
         .then((remoteSettings) => {
             // If the remote settings were found, return it
-            if(remoteSettings) {
+            if(remoteSettings && !Array.isArray(remoteSettings)) {
                 return Promise.resolve(remoteSettings);
             }
 
@@ -318,6 +318,10 @@ class SettingsHelper extends SettingsHelperCommon {
         // First get the existing settings object
         return this.getSettings(project, environment)
         .then((oldSettings) => {
+            if(!oldSettings) {
+                oldSettings = {};
+            }
+
             // If the section is "sync", always set the local setting
             if(section === 'sync') {
                 oldSettings.sync = settings;
@@ -326,7 +330,7 @@ class SettingsHelper extends SettingsHelperCommon {
             }
 
             // Set the remote setting, if applicable
-            return SyncHelper.setResourceItem(project, environment, section, settings)
+            return SyncHelper.setResourceItem(project, environment, 'settings', section, settings)
             .then((isSyncEnabled) => {
                 // If the setting was synced, resolve immediately
                 if(isSyncEnabled) {
@@ -335,9 +339,11 @@ class SettingsHelper extends SettingsHelperCommon {
 
                 // If sync was not enabled, set the local setting instead
                 let query = { usedBy: 'project' };
+                oldSettings.usedBy = 'project';
 
                 if(environment) {
                     query.usedBy = environment;
+                    oldSettings.usedBy = environment;
                 }
                 
                 // If a section was provided, only set that setting
@@ -349,7 +355,7 @@ class SettingsHelper extends SettingsHelperCommon {
                     oldSettings = settings;
                 }
 
-                return MongoHelper(project, 'settings', query, oldSettings, { upsert: true });
+                return MongoHelper.updateOne(project, 'settings', query, oldSettings, { upsert: true });
             });
         });
     }

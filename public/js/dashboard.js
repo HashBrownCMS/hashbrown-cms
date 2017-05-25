@@ -1464,6 +1464,18 @@
 	}
 
 	/**
+	 * Defines a new component
+	 *
+	 * @param {String} tag
+	 * @param {Function} template
+	 */
+	FunctionTemplating.component = function (tag, template) {
+	    FunctionTemplating[tag] = function (model) {
+	        return create('div', { 'data-component': tag }, template(model));
+	    };
+	};
+
+	/**
 	 * Appends content using the function templating rules
 	 *
 	 * @params {HTMLElement} parentElement
@@ -1475,6 +1487,17 @@
 	    }
 
 	    append(parentElement, contents);
+	};
+
+	/**
+	 * Encapsulates logic and renders the result
+	 *
+	 * @param {Function} func
+	 *
+	 * @param {HTMLElement} Contents
+	 */
+	FunctionTemplating.do = function (func) {
+	    return func();
 	};
 
 	/**
@@ -21148,7 +21171,6 @@
 
 	            syncEditor.on('change', function (syncSettings) {
 	                _this5.model.settings.sync = {
-	                    section: 'sync',
 	                    enabled: syncSettings.enabled,
 	                    url: syncSettings.url,
 	                    token: syncSettings.token
@@ -21174,7 +21196,7 @@
 	            var languageEditor = new LanguageEditor({ projectId: this.model.id });
 
 	            languageEditor.on('change', function (newLanguages) {
-	                _this6.model.settings.language.selected = newLanguages;
+	                _this6.model.settings.languages = newLanguages;
 
 	                _this6.fetch();
 	            });
@@ -21228,9 +21250,9 @@
 	                    callback: function callback() {
 	                        var newName = modal.$element.find('input').val();
 
-	                        _this7.model.settings.environments.names.push(newName);
+	                        _this7.model.environments.push(newName);
 
-	                        apiCall('post', 'server/settings/' + _this7.model.id + '/environments', _this7.model.settings.environments).then(function () {
+	                        SettingsHelper.setSettings(_this7.model.id, newName, {}).then(function () {
 	                            UI.messageModal('Succes', 'The new environment "' + newName + '" was created successfully', function () {
 	                                location.reload();
 	                            });
@@ -21246,7 +21268,7 @@
 	        value: function render() {
 	            var _this8 = this;
 
-	            var languageCount = this.model.settings.language.selected.length;
+	            var languageCount = this.model.settings.languages.length;
 	            var userCount = this.model.users.length;
 
 	            this.$element.toggleClass('in', true);
@@ -21257,13 +21279,13 @@
 	                e.preventDefault();_this8.onClickLanguages();
 	            })), _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Backups').click(function (e) {
 	                e.preventDefault();_this8.onClickBackups();
-	            })), _.if(this.model.settings.environments.names.length > 1, _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Migrate').click(function (e) {
+	            })), _.if(this.model.environments.length > 1, _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Migrate').click(function (e) {
 	                e.preventDefault();_this8.onClickMigrate();
 	            }))), _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Sync').click(function (e) {
 	                e.preventDefault();_this8.onClickSync();
 	            })), _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Delete').click(function (e) {
 	                e.preventDefault();_this8.onClickRemove();
-	            }))))), _.div({ class: 'info' }, _.h4(this.model.settings.info.name || this.model.id), _.p(userCount + ' user' + (userCount != 1 ? 's' : '')), _.p(languageCount + ' language' + (languageCount != 1 ? 's' : '') + ' (' + this.model.settings.language.selected.join(', ') + ')')), _.div({ class: 'environments' }, _.each(this.model.settings.environments.names, function (i, environment) {
+	            }))))), _.div({ class: 'info' }, _.h4(this.model.settings.info.name || this.model.id), _.p(userCount + ' user' + (userCount != 1 ? 's' : '')), _.p(languageCount + ' language' + (languageCount != 1 ? 's' : '') + ' (' + this.model.settings.languages.join(', ') + ')')), _.div({ class: 'environments' }, _.each(this.model.environments, function (i, environment) {
 	                return _.div({ class: 'environment' }, _.div({ class: 'btn-group' }, _.a({ title: 'Go to "' + environment + '" CMS', href: '/' + _this8.model.id + '/' + environment, class: 'environment-title btn btn-default' }, environment), _.if(User.current.isAdmin, _.div({ class: 'dropdown' }, _.button({ class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, _.span({ class: 'fa fa-ellipsis-v' })), _.ul({ class: 'dropdown-menu' }, _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Delete').click(function (e) {
 	                    e.preventDefault();_this8.onClickRemoveEnvironment(environment);
 	                })))))));
@@ -21581,7 +21603,7 @@
 	            model: {
 	                class: 'modal-migrate-content settings-modal',
 	                title: 'Migrate content',
-	                body: [_.div({ class: 'migration-message' }, _.span({ class: 'fa fa-warning' }), _.span('It might be a good idea to make a project backup before you proceed')), _.div({ class: 'migration-operation' }, _.select({ class: 'form-control environment-from' }, _.each(_this.model.settings.environments.names, function (i, environment) {
+	                body: [_.div({ class: 'migration-message' }, _.span({ class: 'fa fa-warning' }), _.span('It might be a good idea to make a project backup before you proceed')), _.div({ class: 'migration-operation' }, _.select({ class: 'form-control environment-from' }, _.each(_this.model.environments, function (i, environment) {
 	                    return _.option({ value: environment }, environment);
 	                })).change(function () {
 	                    _this.updateOptions();
@@ -21631,7 +21653,7 @@
 	        value: function updateOptions() {
 	            var _this2 = this;
 
-	            _.append(this.modal.$element.find('.environment-to').empty(), _.each(this.model.settings.environments.names, function (i, environment) {
+	            _.append(this.modal.$element.find('.environment-to').empty(), _.each(this.model.environments, function (i, environment) {
 	                // Filter out "from" environment
 	                if (environment != _this2.modal.$element.find('.environment-from').val()) {
 	                    return _.option({ value: environment }, environment);
@@ -22091,6 +22113,7 @@
 	            this.def(String, 'id');
 	            this.def(Array, 'users', []);
 	            this.def(Object, 'settings', {});
+	            this.def(Array, 'environments', ['live']);
 	            this.def(Boolean, 'useAutoBackup');
 	            this.def(Array, 'backups', []);
 	            this.def(String, 'backupStorage', 'local');

@@ -388,11 +388,17 @@ class ContentEditor extends View {
                 ).click(() => { this.onClickAdvanced(); }),
 
                 // View remote
-                _.if(this.model.properties && this.model.properties.url && this.publishingSettings.connections[0],
-                    _.if(this.model.isPublished,
-                        _.a({target: '_blank', href: ConnectionHelper.getConnectionByIdSync(this.publishingSettings.connections[0]).url + url, class: 'btn btn-primary'}, 'View')
-                    )
-                ),
+                _.do(() => {
+                    if(
+                        this.model.properties &&
+                        this.model.properties.url &&
+                        this.publishingSettings.connections.length > 0 &&
+                        this.model.isPublished
+                    ) {
+                        return _.a({target: '_blank', href: ConnectionHelper.getConnectionByIdSync(this.publishingSettings.connections[0]).url + url, class: 'btn btn-primary'}, 'View');
+                    }
+                }),
+
                 _.if(!this.model.locked,
                     // Save & publish
                     _.div({class: 'btn-group-save-publish raised'},
