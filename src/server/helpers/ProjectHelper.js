@@ -117,7 +117,7 @@ class ProjectHelper {
                 let names = [];
 
                 for(let setting of allSettings) {
-                    if(setting.usedBy === 'project') { continue; }
+                    if(!setting.usedBy || setting.usedBy === 'project') { continue; }
 
                     names.push(setting.usedBy);
                 }
@@ -163,7 +163,6 @@ class ProjectHelper {
         return MongoHelper.updateOne(
             project,
             'settings',
-            { usedBy: environment },
             { usedBy: environment },
             { upsert: true }
         );
@@ -233,7 +232,7 @@ class ProjectHelper {
             if(name && userId) {
                 let project = Project.create(name);
 
-                MongoHelper.insertOne(project.id, 'settings', project.settings.info)
+                MongoHelper.insertOne(project.id, 'settings', project.settings)
                 .then(() => {
                     // The user that creates a project gets all scopes
                     return UserHelper.addUserProjectScope(userId, project.id, [ 'users', 'settings', 'connections', 'schemas' ]);

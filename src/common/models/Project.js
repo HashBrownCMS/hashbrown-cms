@@ -23,6 +23,7 @@ class Project extends Entity {
         
         project.id = id;
 
+        project.settings.usedBy = 'project';
         project.settings.info = {
             name: name
         };

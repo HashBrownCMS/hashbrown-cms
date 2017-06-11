@@ -2332,6 +2332,8 @@
 	            _this.element = _this.$element[0];
 	        }
 
+	        _this.element.innerHTML = '';
+
 	        _this.element.style.position = 'absolute';
 	        _this.element.style.zIndex = 1200;
 	        _this.element.style.top = _this.pos.y;
@@ -22134,6 +22136,7 @@
 
 	            project.id = id;
 
+	            project.settings.usedBy = 'project';
 	            project.settings.info = {
 	                name: name
 	            };
