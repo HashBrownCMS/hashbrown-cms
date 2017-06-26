@@ -1285,7 +1285,6 @@
 	'use strict';
 
 	var FunctionTemplating = {};
-	var lastCondition = void 0;
 
 	/**
 	 * Appends content to an element
@@ -1464,18 +1463,6 @@
 	}
 
 	/**
-	 * Defines a new component
-	 *
-	 * @param {String} tag
-	 * @param {Function} template
-	 */
-	FunctionTemplating.component = function (tag, template) {
-	    FunctionTemplating[tag] = function (model) {
-	        return create('div', { 'data-component': tag }, template(model));
-	    };
-	};
-
-	/**
 	 * Appends content using the function templating rules
 	 *
 	 * @params {HTMLElement} parentElement
@@ -1490,51 +1477,17 @@
 	};
 
 	/**
-	 * Encapsulates logic and renders the result
-	 *
-	 * @param {Function} func
-	 *
-	 * @param {HTMLElement} Contents
-	 */
-	FunctionTemplating.do = function (func) {
-	    return func();
-	};
-
-	/**
 	 * Renders content based on a condition
 	 * 
 	 * @param {Boolean} condition
 	 * @param {HTMLElement} contents
 	 *
-	 * @returns {HTMLElement} Contents
+	 * @returns {HTMLElement} contents
 	 */
 	FunctionTemplating.if = function (condition) {
-	    lastCondition = condition || false;
-
-	    if (lastCondition) {
+	    if (condition != false && condition != null && condition != undefined) {
 	        for (var _len3 = arguments.length, contents = Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
 	            contents[_key3 - 1] = arguments[_key3];
-	        }
-
-	        return contents;
-	    }
-	};
-
-	/**
-	 * Uses the last provided condition to simulate an "else" statement
-	 *
-	 * @param {HTMLElement} contents
-	 *
-	 * @returns {HTMLElement} Contents
-	 */
-	FunctionTemplating.else = function () {
-	    if (typeof lastCondition === 'undefined') {
-	        throw new Error('No "if" statement was provided before this "else" statement');
-	    }
-
-	    if (!lastCondition) {
-	        for (var _len4 = arguments.length, contents = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
-	            contents[_key4] = arguments[_key4];
 	        }
 
 	        return contents;
@@ -2020,24 +1973,12 @@
 	            this.render();
 	            this.postrender();
 
-	            var element = this.element;
-
-	            if (!element && this.$element && this.$element.length > 0) {
-	                element = this.$element[0];
-	            }
-
-	            if (!element) {
-	                return;
-	            }
+	            var element = this.element || this.$element[0];
 
 	            element.addEventListener('DOMNodeRemovedFromDocument', function () {
 	                // Wait a few cycles before removing, as the element might just have been relocated
 	                setTimeout(function () {
-	                    var element = _this.element;
-
-	                    if (!element && _this.$element) {
-	                        element = _this.$element[0];
-	                    }
+	                    var element = _this.element || _this.$element[0];
 
 	                    if (!element || !element.parentNode) {
 	                        _this.remove();
@@ -2311,34 +2252,22 @@
 	    function ContextMenu(params) {
 	        _classCallCheck(this, ContextMenu);
 
+	        // Recycle other context menus
 	        var _this = _possibleConstructorReturn(this, (ContextMenu.__proto__ || Object.getPrototypeOf(ContextMenu)).call(this, params));
 
-	        _this.element = _.ul({ class: 'context-menu dropdown-menu', role: 'menu' });
-
-	        var existingMenu = _.find('.context-menu');
-
-	        if (typeof jQuery !== 'undefined') {
-	            if (existingMenu && existingMenu.length > 0) {
-	                _this.element = existingMenu;
-	            }
+	        if ($('.context-menu').length > 0) {
+	            _this.$element = $('.context-menu');
 	        } else {
-	            if (existingMenu) {
-	                _this.element = existingMenu;
-	            }
+	            _this.$element = _.ul({ class: 'context-menu dropdown-menu', role: 'menu' });
 	        }
 
-	        if (typeof jQuery !== 'undefined') {
-	            _this.$element = _this.element;
-	            _this.element = _this.$element[0];
-	        }
-
-	        _this.element.innerHTML = '';
-
-	        _this.element.style.position = 'absolute';
-	        _this.element.style.zIndex = 1200;
-	        _this.element.style.top = _this.pos.y;
-	        _this.element.style.left = _this.pos.x;
-	        _this.element.style.display = 'block';
+	        _this.$element.css({
+	            position: 'absolute',
+	            'z-index': 1200,
+	            top: _this.pos.y,
+	            left: _this.pos.x,
+	            display: 'block'
+	        });
 
 	        _this.fetch();
 	        return _this;
@@ -2347,9 +2276,9 @@
 	    _createClass(ContextMenu, [{
 	        key: 'render',
 	        value: function render() {
-	            var _this2 = this;
+	            var view = this;
 
-	            _.append(this.element, _.each(this.model, function (label, func) {
+	            view.$element.html(_.each(view.model, function (label, func) {
 	                if (func == '---') {
 	                    return _.li({ class: 'dropdown-header' }, label);
 	                } else {
@@ -2360,21 +2289,13 @@
 	                        if (func) {
 	                            func(e);
 
-	                            _this2.remove();
+	                            view.remove();
 	                        }
 	                    }));
 	                }
 	            }));
 
-	            _.append(_.find('body'), this.element);
-
-	            var rect = this.element.getBoundingClientRect();
-
-	            if (rect.left + rect.width > window.innerWidth) {
-	                this.element.style.left = rect.left - rect.width + 'px';
-	            } else if (rect.bottom > window.innerHeight) {
-	                this.element.style.top = rect.top - rect.height + 'px';
-	            }
+	            $('body').append(view.$element);
 	        }
 	    }]);
 
@@ -20993,7 +20914,7 @@
 	module.exports = {
 		"name": "hashbrown-cms",
 		"repository": "https://github.com/Putaitu/hashbrown-cms.git",
-		"version": "0.8.0",
+		"version": "0.8.1",
 		"description": "The pluggable CMS",
 		"main": "hashbrown.js",
 		"scripts": {
@@ -22113,16 +22034,38 @@
 
 	        var _this = _possibleConstructorReturn(this, (Project.__proto__ || Object.getPrototypeOf(Project)).call(this, params));
 
-	        if (!_this.settings) {
-	            _this.settings = {};
-	        }
-	        if (!_this.settings.languages) {
-	            _this.settings.languages = ['en'];
-	        }
+	        _this.sanityCheck();
 	        return _this;
 	    }
 
 	    _createClass(Project, [{
+	        key: 'sanityCheck',
+	        value: function sanityCheck() {
+	            if (!this.settings) {
+	                this.settings = {};
+	            }
+	            if (!this.settings.info) {
+	                this.settings.info = {};
+	            }
+	            if (!this.settings.languages) {
+	                this.settings.languages = ['en'];
+	            }
+
+	            if (!Array.isArray(this.settings.languages)) {
+	                var languages = [];
+
+	                for (var key in this.settings.languages) {
+	                    if (key === 'section') {
+	                        continue;
+	                    }
+
+	                    languages.push(this.settings.languages[key]);
+	                }
+
+	                this.settings.languages = languages;
+	            }
+	        }
+	    }, {
 	        key: 'structure',
 	        value: function structure() {
 	            this.def(String, 'id');

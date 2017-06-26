@@ -7,8 +7,25 @@ class Project extends Entity {
     constructor(params) {
         super(params);
 
+        this.sanityCheck();
+    }
+
+    sanityCheck() {
         if(!this.settings) { this.settings = {}; }
+        if(!this.settings.info) { this.settings.info = {}; }
         if(!this.settings.languages) { this.settings.languages = [ 'en' ]; }
+    
+        if(!Array.isArray(this.settings.languages)) {
+            let languages = [];
+            
+            for(let key in this.settings.languages) {
+                if(key === 'section') { continue; }
+
+                languages.push(this.settings.languages[key]);
+            }
+
+            this.settings.languages = languages;
+        }
     }
 
     structure() {
