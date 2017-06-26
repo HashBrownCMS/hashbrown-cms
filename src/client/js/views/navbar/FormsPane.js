@@ -24,7 +24,7 @@ class FormsPane extends NavbarPane {
      */
     static onClickRemoveForm() {
         let view = this;
-        let $element = $('.context-menu-target-element'); 
+        let $element = $('.cr-context-menu__target-element'); 
         let id = $element.data('id');
         let form = resources.forms.filter((form) => { return form.id == id; })[0];
 
@@ -79,7 +79,7 @@ class FormsPane extends NavbarPane {
      */
     static onClickPullForm() {
         let navbar = ViewHelper.get('NavbarMain');
-        let pullId = $('.context-menu-target-element').data('id');
+        let pullId = $('.cr-context-menu__target-element').data('id');
 
         // API call to pull the Form by id
         apiCall('post', 'forms/pull/' + pullId, {})
@@ -110,7 +110,7 @@ class FormsPane extends NavbarPane {
      */
     static onClickPushForm() {
         let navbar = ViewHelper.get('NavbarMain');
-		let $element = $('.context-menu-target-element');
+		let $element = $('.cr-context-menu__target-element');
         let pushId = $element.data('id');
 
 		$element.parent().addClass('loading');

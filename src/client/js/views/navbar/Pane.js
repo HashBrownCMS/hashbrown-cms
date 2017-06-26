@@ -12,7 +12,7 @@ class Pane {
      * Event: Click copy item id
      */
     static onClickCopyItemId() {
-        let id = $('.context-menu-target-element').data('id');
+        let id = $('.cr-context-menu__target-element').data('id');
 
         copyToClipboard(id);
     }
@@ -42,7 +42,7 @@ class Pane {
      * Event: Click move item
      */
     static onClickMoveItem() {
-        let id = $('.context-menu-target-element').data('id');
+        let id = $('.cr-context-menu__target-element').data('id');
         let navbar = ViewHelper.get('NavbarMain');
         let $pane = navbar.$element.find('.pane-container.active');
 

@@ -261,9 +261,26 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
     .modal .modal-dialog .modal-content .modal-footer {
       border-top: 0px; }
 
-.context-menu {
+.cr-context-menu {
   border-radius: 0px;
-  box-shadow: 0px 2px 3px 1px rgba(0, 0, 0, 0.2); }
+  box-shadow: 0px 2px 3px 1px rgba(0, 0, 0, 0.2);
+  padding: 1rem 2rem 1rem 1rem;
+  list-style: none;
+  background-color: #21303b; }
+  .cr-context-menu__header {
+    color: #ffffff;
+    opacity: 0.8; }
+    .cr-context-menu__header:not(:first-of-type) {
+      margin-top: 1rem; }
+  .cr-context-menu li {
+    line-height: 2; }
+  .cr-context-menu a {
+    margin-left: 0.5rem;
+    color: #ffffff; }
+    .cr-context-menu a:hover {
+      color: #e70d3b; }
+    .cr-context-menu a:hover, .cr-context-menu a:focus {
+      text-decoration: none; }
 
 .switch {
   width: 30px;

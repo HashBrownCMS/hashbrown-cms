@@ -68,7 +68,7 @@ class ContentPane extends NavbarPane {
     static onClickPullContent() {
         let navbar = ViewHelper.get('NavbarMain');
         let contentEditor = ViewHelper.get('ContentEditor');
-        let pullId = $('.context-menu-target-element').data('id');
+        let pullId = $('.cr-context-menu__target-element').data('id');
 
         // API call to pull the Content by id
         apiCall('post', 'content/pull/' + pullId, {})
@@ -99,7 +99,7 @@ class ContentPane extends NavbarPane {
      */
     static onClickPushContent() {
         let navbar = ViewHelper.get('NavbarMain');
-		let $element = $('.context-menu-target-element');
+		let $element = $('.cr-context-menu__target-element');
         let pushId = $element.data('id');
 
 		$element.parent().addClass('loading');
@@ -312,7 +312,7 @@ class ContentPane extends NavbarPane {
      * Event: Click Content settings
      */
     static onClickContentPublishing() {
-        let id = $('.context-menu-target-element').data('id');
+        let id = $('.cr-context-menu__target-element').data('id');
         let navbar = ViewHelper.get('NavbarMain');
         let content;
 
@@ -346,7 +346,7 @@ class ContentPane extends NavbarPane {
      */
     static onClickRemoveContent(shouldUnpublish) {
         let navbar = ViewHelper.get('NavbarMain');
-        let $element = $('.context-menu-target-element'); 
+        let $element = $('.cr-context-menu__target-element'); 
         let id = $element.data('id');
         let name = $element.data('name');
        
@@ -427,7 +427,7 @@ class ContentPane extends NavbarPane {
                 menu['This content'] = '---';
                 
                 menu['New child content'] = () => {
-                    this.onClickNewContent($('.context-menu-target-element').data('id'));
+                    this.onClickNewContent($('.cr-context-menu__target-element').data('id'));
                 };
                                 
                 menu['Copy id'] = () => { this.onClickCopyItemId(); };
@@ -443,7 +443,7 @@ class ContentPane extends NavbarPane {
                 menu['Folder'] = '---';
 
                 menu['New content'] = () => {
-                    let targetId = $('.context-menu-target-element').data('id');
+                    let targetId = $('.cr-context-menu__target-element').data('id');
                     let parentId = ContentHelper.getContentByIdSync(targetId).parentId;
                     
                     this.onClickNewContent(parentId);

@@ -146,7 +146,7 @@ class ArrayEditor extends FieldEditor {
 
         if(isSorting) {
             this.$element.children('.items').children('.item').each((oldIndex, item) => {
-                $(item).exodragdrop({
+                $(item).crdragdrop({
                     lockX: true,
                     dropContainers: this.$element[0].querySelectorAll('.items'),
                     scrollContainer: document.querySelector('.content-editor .tab-content'),
@@ -172,7 +172,7 @@ class ArrayEditor extends FieldEditor {
             this.updateDOMIndices();
             
             this.$element.children('.items').children('.item').each(function() {
-                $(this).exodragdrop('destroy');
+                $(this).crdragdrop('destroy');
             });
         }
     }

@@ -1,5 +1,5 @@
 // Libraries
-require('exomon');
+require('crisp-ui');
 window.Promise = require('bluebird');
 window.marked = require('marked');
 window.toMarkdown = require('to-markdown');

@@ -67,7 +67,7 @@ class TemplatePane extends NavbarPane {
      * Event: On click remove Template
      */
     static onClickRemoveTemplate() {
-        let $element = $('.context-menu-target-element'); 
+        let $element = $('.cr-context-menu__target-element'); 
         let id = $element.data('id');
         let type = $element.attr('href').replace('#/templates/', '').replace('/' + id, '');
         
@@ -107,8 +107,8 @@ class TemplatePane extends NavbarPane {
      * Event: On click rename Template
      */
     static onClickRenameTemplate() {
-        let id = $('.context-menu-target-element').data('id');
-        let type = $('.context-menu-target-element').attr('href').replace('#/templates/', '').replace('/' + id, '');
+        let id = $('.cr-context-menu__target-element').data('id');
+        let type = $('.cr-context-menu__target-element').attr('href').replace('#/templates/', '').replace('/' + id, '');
         let templateEditor = ViewHelper.get('TemplateEditor');
         let model;
 

@@ -154,10 +154,10 @@ module.exports = function() {
 
             // Attach item context menu
             if(params.getItemContextMenu) {
-                $element.find('a').exocontext(params.getItemContextMenu(item));
+                $element.find('a').crcontext(params.getItemContextMenu(item));
 
             } else if(params.itemContextMenu) {
-                $element.find('a').exocontext(params.itemContextMenu);
+                $element.find('a').crcontext(params.itemContextMenu);
 
             }
             
@@ -238,7 +238,7 @@ module.exports = function() {
                        
                         // Attach item context menu
                         if(params.dirContextMenu) {
-                            $dir.exocontext(params.dirContextMenu);
+                            $dir.crcontext(params.dirContextMenu);
                         }
                         
                         // Only append the queue item to the final parent element
@@ -286,7 +286,7 @@ module.exports = function() {
             
             // Attach pane context menu
             if(params.paneContextMenu) {
-                $paneContainer.exocontext(params.paneContextMenu);
+                $paneContainer.crcontext(params.paneContextMenu);
             }
         }
         
@@ -391,10 +391,10 @@ module.exports = function() {
 
                             // Attach item context menu
                             if(pane.settings.getItemContextMenu) {
-                                $item.find('a').exocontext(pane.settings.getItemContextMenu(item));
+                                $item.find('a').crcontext(pane.settings.getItemContextMenu(item));
 
                             } else if(pane.settings.itemContextMenu) {
-                                $item.find('a').exocontext(pane.settings.itemContextMenu);
+                                $item.find('a').crcontext(pane.settings.itemContextMenu);
 
                             }
                             
@@ -419,7 +419,7 @@ module.exports = function() {
 
                 // Attach pane context menu
                 if(pane.settings.paneContextMenu) {
-                    $pane.exocontext(pane.settings.paneContextMenu);
+                    $pane.crcontext(pane.settings.paneContextMenu);
                 }
                 
                 return $pane;

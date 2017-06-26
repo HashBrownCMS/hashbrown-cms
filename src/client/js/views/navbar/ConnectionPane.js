@@ -27,7 +27,7 @@ class ConnectionPane extends NavbarPane {
      */
     static onClickRemoveConnection() {
         let navbar = ViewHelper.get('NavbarMain');
-        let $element = $('.context-menu-target-element'); 
+        let $element = $('.cr-context-menu__target-element'); 
         let id = $element.data('id');
         let name = $element.data('name');
         
@@ -76,7 +76,7 @@ class ConnectionPane extends NavbarPane {
     static onClickPullConnection() {
         let navbar = ViewHelper.get('NavbarMain');
         let connectionEditor = ViewHelper.get('ConnectionEditor');
-        let pullId = $('.context-menu-target-element').data('id');
+        let pullId = $('.cr-context-menu__target-element').data('id');
 
         // API call to pull the Connection by id
         apiCall('post', 'connections/pull/' + pullId, {})
@@ -107,7 +107,7 @@ class ConnectionPane extends NavbarPane {
      */
     static onClickPushConnection() {
         let navbar = ViewHelper.get('NavbarMain');
-		let $element = $('.context-menu-target-element');
+		let $element = $('.cr-context-menu__target-element');
         let pushId = $element.data('id');
 
 		$element.parent().addClass('loading');

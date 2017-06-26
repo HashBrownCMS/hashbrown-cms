@@ -31,7 +31,7 @@ class MediaPane extends NavbarPane {
      */
     static onClickRemoveMedia() {
         let navbar = ViewHelper.get('NavbarMain');
-        let $element = $('.context-menu-target-element'); 
+        let $element = $('.cr-context-menu__target-element'); 
         let id = $element.data('id');
         let name = $element.data('name');
         
@@ -76,7 +76,7 @@ class MediaPane extends NavbarPane {
      * Event: Click replace media
      */
     static onClickReplaceMedia() {
-        let id = $('.context-menu-target-element').data('id');
+        let id = $('.cr-context-menu__target-element').data('id');
 
         this.onClickUploadMedia(id);
     }

@@ -45,7 +45,7 @@ class NavbarMain extends View {
      * Event: Click copy item id
      */
     onClickCopyItemId() {
-        let id = $('.context-menu-target-element').data('id');
+        let id = $('.cr-context-menu__target-element').data('id');
 
         copyToClipboard(id);
     }
@@ -423,7 +423,7 @@ class NavbarMain extends View {
                    
                     // Attach item context menu
                     if(pane.settings.dirContextMenu) {
-                        $dir.exocontext(pane.settings.dirContextMenu);
+                        $dir.crcontext(pane.settings.dirContextMenu);
                     }
                     
                     // Only append the queue item to the final parent element

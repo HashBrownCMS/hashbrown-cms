@@ -6,7 +6,7 @@ class SchemaPane extends NavbarPane {
      */
     static onClickRemoveSchema() {
         let navbar = ViewHelper.get('NavbarMain');
-        let $element = $('.context-menu-target-element'); 
+        let $element = $('.cr-context-menu__target-element'); 
         let id = $element.data('id');
         let schema = window.resources.schemas[id];
         
@@ -71,7 +71,7 @@ class SchemaPane extends NavbarPane {
      */
     static onClickNewSchema() {
         let navbar = ViewHelper.get('NavbarMain');
-        let parentId = $('.context-menu-target-element').data('id');
+        let parentId = $('.cr-context-menu__target-element').data('id');
         let parentSchema = window.resources.schemas[parentId];
 
         apiCall('post', 'schemas/new', parentSchema)
@@ -92,7 +92,7 @@ class SchemaPane extends NavbarPane {
     static onClickPullSchema() {
         let navbar = ViewHelper.get('NavbarMain');
         let schemaEditor = ViewHelper.get('SchemaEditor');
-        let pullId = $('.context-menu-target-element').data('id');
+        let pullId = $('.cr-context-menu__target-element').data('id');
 
         apiCall('post', 'schemas/pull/' + pullId, {})
         .then(() => {
@@ -117,7 +117,7 @@ class SchemaPane extends NavbarPane {
      * Event: Click push Schema
      */
     static onClickPushSchema() {
-		let $element = $('.context-menu-target-element');
+		let $element = $('.cr-context-menu__target-element');
         let pushId = $element.data('id');
 
 		$element.parent().addClass('loading');
