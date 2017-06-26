@@ -113,7 +113,7 @@ function checkArgs() {
     for(let k in process.argv) {
         let v = process.argv[k];
 
-        let matches = v.match(/(\w+)=(\w+)/);
+        let matches = v.match(/(\w+)=(.+)/);
 
         if(matches) {
             args[matches[1]] = matches[2];
@@ -152,10 +152,17 @@ function checkArgs() {
                 return UserHelper.updateUser(args.u, user.getObject());
             });
 
+        case 'eval':
+            let val = eval(args.cmd);
+
+            if(val && typeof val.then === 'function') {
+                return val;
+            }
+
+            return Promise.resolve();
+
         default:
-            return new Promise((resolve) => {
-                resolve('proceed');  
-            });
+            return Promise.resolve('proceed');  
     }
 }
 
@@ -164,7 +171,7 @@ function checkArgs() {
 // ----------
 // Catch evil-doers
 app.get([ '/wp-admin', '/wp-admin/', '/umbraco', '/umbraco/' ], (req, res) => {
-    res.sendStatus(400);
+    res.sendStatus(404);
 });
 
 // Text
@@ -297,7 +304,11 @@ function ready(files) {
 			process.exit();
 			return;
 		}
-		
+	
+        // Check if any migrations are needed
+        return SettingsHelper.migrationCheck();
+    })
+    .then(() => {
 		// Start HTTP server
 		let port = ConfigHelper.getSync('server').port || process.env.PORT || 80;
 		

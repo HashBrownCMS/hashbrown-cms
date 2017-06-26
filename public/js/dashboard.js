@@ -1285,6 +1285,7 @@
 	'use strict';
 
 	var FunctionTemplating = {};
+	var lastCondition = void 0;
 
 	/**
 	 * Appends content to an element
@@ -1463,6 +1464,18 @@
 	}
 
 	/**
+	 * Defines a new component
+	 *
+	 * @param {String} tag
+	 * @param {Function} template
+	 */
+	FunctionTemplating.component = function (tag, template) {
+	    FunctionTemplating[tag] = function (model) {
+	        return create('div', { 'data-component': tag }, template(model));
+	    };
+	};
+
+	/**
 	 * Appends content using the function templating rules
 	 *
 	 * @params {HTMLElement} parentElement
@@ -1477,17 +1490,51 @@
 	};
 
 	/**
+	 * Encapsulates logic and renders the result
+	 *
+	 * @param {Function} func
+	 *
+	 * @param {HTMLElement} Contents
+	 */
+	FunctionTemplating.do = function (func) {
+	    return func();
+	};
+
+	/**
 	 * Renders content based on a condition
 	 * 
 	 * @param {Boolean} condition
 	 * @param {HTMLElement} contents
 	 *
-	 * @returns {HTMLElement} contents
+	 * @returns {HTMLElement} Contents
 	 */
 	FunctionTemplating.if = function (condition) {
-	    if (condition != false && condition != null && condition != undefined) {
+	    lastCondition = condition || false;
+
+	    if (lastCondition) {
 	        for (var _len3 = arguments.length, contents = Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
 	            contents[_key3 - 1] = arguments[_key3];
+	        }
+
+	        return contents;
+	    }
+	};
+
+	/**
+	 * Uses the last provided condition to simulate an "else" statement
+	 *
+	 * @param {HTMLElement} contents
+	 *
+	 * @returns {HTMLElement} Contents
+	 */
+	FunctionTemplating.else = function () {
+	    if (typeof lastCondition === 'undefined') {
+	        throw new Error('No "if" statement was provided before this "else" statement');
+	    }
+
+	    if (!lastCondition) {
+	        for (var _len4 = arguments.length, contents = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+	            contents[_key4] = arguments[_key4];
 	        }
 
 	        return contents;
@@ -1973,12 +2020,24 @@
 	            this.render();
 	            this.postrender();
 
-	            var element = this.element || this.$element[0];
+	            var element = this.element;
+
+	            if (!element && this.$element && this.$element.length > 0) {
+	                element = this.$element[0];
+	            }
+
+	            if (!element) {
+	                return;
+	            }
 
 	            element.addEventListener('DOMNodeRemovedFromDocument', function () {
 	                // Wait a few cycles before removing, as the element might just have been relocated
 	                setTimeout(function () {
-	                    var element = _this.element || _this.$element[0];
+	                    var element = _this.element;
+
+	                    if (!element && _this.$element) {
+	                        element = _this.$element[0];
+	                    }
 
 	                    if (!element || !element.parentNode) {
 	                        _this.remove();
@@ -2252,22 +2311,34 @@
 	    function ContextMenu(params) {
 	        _classCallCheck(this, ContextMenu);
 
-	        // Recycle other context menus
 	        var _this = _possibleConstructorReturn(this, (ContextMenu.__proto__ || Object.getPrototypeOf(ContextMenu)).call(this, params));
 
-	        if ($('.context-menu').length > 0) {
-	            _this.$element = $('.context-menu');
+	        _this.element = _.ul({ class: 'context-menu dropdown-menu', role: 'menu' });
+
+	        var existingMenu = _.find('.context-menu');
+
+	        if (typeof jQuery !== 'undefined') {
+	            if (existingMenu && existingMenu.length > 0) {
+	                _this.element = existingMenu;
+	            }
 	        } else {
-	            _this.$element = _.ul({ class: 'context-menu dropdown-menu', role: 'menu' });
+	            if (existingMenu) {
+	                _this.element = existingMenu;
+	            }
 	        }
 
-	        _this.$element.css({
-	            position: 'absolute',
-	            'z-index': 1200,
-	            top: _this.pos.y,
-	            left: _this.pos.x,
-	            display: 'block'
-	        });
+	        if (typeof jQuery !== 'undefined') {
+	            _this.$element = _this.element;
+	            _this.element = _this.$element[0];
+	        }
+
+	        _this.element.innerHTML = '';
+
+	        _this.element.style.position = 'absolute';
+	        _this.element.style.zIndex = 1200;
+	        _this.element.style.top = _this.pos.y;
+	        _this.element.style.left = _this.pos.x;
+	        _this.element.style.display = 'block';
 
 	        _this.fetch();
 	        return _this;
@@ -2276,9 +2347,9 @@
 	    _createClass(ContextMenu, [{
 	        key: 'render',
 	        value: function render() {
-	            var view = this;
+	            var _this2 = this;
 
-	            view.$element.html(_.each(view.model, function (label, func) {
+	            _.append(this.element, _.each(this.model, function (label, func) {
 	                if (func == '---') {
 	                    return _.li({ class: 'dropdown-header' }, label);
 	                } else {
@@ -2289,13 +2360,21 @@
 	                        if (func) {
 	                            func(e);
 
-	                            view.remove();
+	                            _this2.remove();
 	                        }
 	                    }));
 	                }
 	            }));
 
-	            $('body').append(view.$element);
+	            _.append(_.find('body'), this.element);
+
+	            var rect = this.element.getBoundingClientRect();
+
+	            if (rect.left + rect.width > window.innerWidth) {
+	                this.element.style.left = rect.left - rect.width + 'px';
+	            } else if (rect.bottom > window.innerHeight) {
+	                this.element.style.top = rect.top - rect.height + 'px';
+	            }
 	        }
 	    }]);
 
@@ -11528,20 +11607,16 @@
 	        value: function getSelectedLanguages() {
 	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
 
-	            return SettingsHelper.getSettings(project, null, 'language').then(function (settings) {
-	                if (!settings) {
-	                    settings = {};
+	            return SettingsHelper.getSettings(project, null, 'languages').then(function (selected) {
+	                if (!selected || !Array.isArray(selected)) {
+	                    selected = ['en'];
 	                }
 
-	                if (!settings.selected || settings.selected.length < 1) {
-	                    settings.selected = ['en'];
-	                }
+	                selected.sort();
 
-	                settings.selected.sort();
+	                LanguageHelper.selectedLanguages = selected;
 
-	                LanguageHelper.selectedLanguages = settings.selected;
-
-	                return Promise.resolve(settings.selected);
+	                return Promise.resolve(selected);
 	            });
 	        }
 
@@ -11560,56 +11635,11 @@
 	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
 	            var languages = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('languages');
 
-	            return SettingsHelper.getSettings(project, null, 'language').then(function (settings) {
-	                if (!(settings instanceof Object)) {
-	                    settings = {};
-	                }
+	            if (!Array.isArray(languages)) {
+	                return Promise.reject(new Error('Language array cannot be of type "' + (typeof languages === 'undefined' ? 'undefined' : _typeof(languages)) + '"'));
+	            }
 
-	                if (!Array.isArray(languages)) {
-	                    return Promise.reject(new Error('Language array cannot be of type "' + (typeof languages === 'undefined' ? 'undefined' : _typeof(languages)) + '"'));
-	                }
-
-	                settings.selected = languages;
-
-	                return SettingsHelper.setSettings(project, null, 'language', settings);
-	            });
-	        }
-
-	        /**
-	         * Toggle a language
-	         *
-	         * @param {String} project
-	         * @param {String} language
-	         * @param {Boolean} state
-	         *
-	         * @returns {Promise} promise
-	         */
-
-	    }, {
-	        key: 'toggleLanguage',
-	        value: function toggleLanguage() {
-	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
-	            var language = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('language');
-	            var state = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('state');
-
-	            return SettingsHelper.getSettings(project, 'language').then(function (settings) {
-	                if (!(settings instanceof Object)) {
-	                    settings = {};
-	                }
-
-	                if (!settings.selected || settings.selected.length < 1) {
-	                    settings.selected = ['en'];
-	                }
-
-	                if (!state && settings.selected.indexOf(language) > -1) {
-	                    settings.selected.splice(settings.selected.indexOf(language), 1);
-	                } else if (state && settings.selected.indexOf(language) < 0) {
-	                    settings.selected.push(language);
-	                    settings.selected.sort();
-	                }
-
-	                return SettingsHelper.setSettings(project, null, 'language', settings);
-	            });
+	            return SettingsHelper.setSettings(project, null, 'languages', languages);
 	        }
 
 	        /**
@@ -11906,9 +11936,13 @@
 	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
 	            var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
 
+	            if (environment === '*') {
+	                environment = null;
+	            }
+
 	            var apiUrl = '/api/' + project + '/';
 
-	            if (environment && environment !== '*') {
+	            if (environment) {
 	                apiUrl += environment + '/';
 	            }
 
@@ -11934,6 +11968,39 @@
 	         * @param {String} project
 	         * @param {String} environment
 	         * @param {String} section
+	         */
+
+	    }, {
+	        key: 'cacheSanityCheck',
+	        value: function cacheSanityCheck() {
+	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+	            var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+
+	            if (environment === '*') {
+	                environment = null;
+	            }
+
+	            this.cache = this.cache || {};
+	            this.cache[project] = this.cache[project] || {};
+
+	            if (environment) {
+	                this.cache[project][environment] = this.cache[project][environment] || {};
+
+	                if (section) {
+	                    this.cache[project][environment][section] = this.cache[project][environment][section] || {};
+	                }
+	            } else if (section) {
+	                this.cache[project][section] = this.cache[project][section] || {};
+	            }
+	        }
+
+	        /**
+	         * Cache update
+	         *
+	         * @param {String} project
+	         * @param {String} environment
+	         * @param {String} section
 	         * @param {Object} settings
 	         */
 
@@ -11941,24 +12008,29 @@
 	        key: 'updateCache',
 	        value: function updateCache() {
 	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
-	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
-	            var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('section');
+	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+	            var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
 	            var settings = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : requiredParam('settings');
 
-	            // Sanity check
-	            this.cache = this.cache || {};
-	            this.cache[project] = this.cache[project] || {};
-
-	            if (environment) {
-	                this.cache[project][environment] = this.cache[project][environment] || {};
-	                this.cache[project][environment][section] = this.cache[project][environment][section] || {};
-	                this.cache[project][environment][section] = settings;
-	            } else if (section) {
-	                this.cache[project][section] = this.cache[project][section] || {};
-	                this.cache[project][section] = settings;
-	            } else {
-	                this.cache[project] = settings;
+	            if (environment === '*') {
+	                environment = null;
 	            }
+
+	            this.cacheSanityCheck(project, environment, section);
+
+	            if (environment && !section) {
+	                return this.cache[project][environment] = settings;
+	            }
+
+	            if (!environment && section) {
+	                return this.cache[project][section] = settings;
+	            }
+
+	            if (environment && section) {
+	                return this.cache[project][environment][section] = settings;
+	            }
+
+	            return this.cache[project] = settings;
 	        }
 
 	        /**
@@ -11976,24 +12048,25 @@
 	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
 	            var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
 
-	            if (!environment) {
-	                environment = '*';
+	            if (environment === '*') {
+	                environment = null;
 	            }
 
-	            if (!this.cache) {
-	                return {};
-	            }
-	            if (!this.cache[project]) {
-	                return {};
-	            }
-	            if (!this.cache[project][environment]) {
-	                return {};
-	            }
-	            if (!this.cache[project][environment][section]) {
-	                return {};
+	            this.cacheSanityCheck(project, environment, section);
+
+	            if (environment) {
+	                if (section) {
+	                    return this.cache[project][environment][section];
+	                }
+
+	                return this.cache[project][environment];
 	            }
 
-	            return this.cache[project][environment][section];
+	            if (section) {
+	                return this.cache[project][section];
+	            }
+
+	            return this.cache[project];
 	        }
 
 	        /**
@@ -12011,22 +12084,34 @@
 	        key: 'setSettings',
 	        value: function setSettings() {
 	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
-	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
 
 	            var _this3 = this;
 
-	            var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('section');
+	            var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
 	            var settings = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : requiredParam('settings');
 
-	            var apiCall = void 0;
-
-	            if (!environment || environment == '*') {
-	                apiCall = customApiCall('post', '/api/' + project + '/settings/' + section, settings);
-	            } else {
-	                apiCall = customApiCall('post', '/api/' + project + '/' + environment + '/settings/' + section, settings);
+	            if (environment === '*') {
+	                environment = null;
 	            }
 
-	            return apiCall
+	            var apiUrl = '/api/' + project + '/';
+
+	            settings.usedBy = 'project';
+
+	            if (environment) {
+	                apiUrl += environment + '/';
+
+	                settings.usedBy = environment;
+	            }
+
+	            apiUrl += 'settings';
+
+	            if (section) {
+	                apiUrl += '/' + section;
+	            }
+
+	            return customApiCall('post', apiUrl, settings)
 
 	            // Cache new settings
 	            .then(function () {
@@ -12048,60 +12133,11 @@
 
 	'use strict';
 
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var SettingsHelper = function () {
-	    function SettingsHelper() {
-	        _classCallCheck(this, SettingsHelper);
-	    }
-
-	    _createClass(SettingsHelper, null, [{
-	        key: 'getSettings',
-
-	        /**
-	         * Gets all settings
-	         *
-	         * @param {String} project
-	         * @param {String} environment
-	         * @param {String} section
-	         *
-	         * @return {Promise(Object)}  settings
-	         */
-	        value: function getSettings() {
-	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
-	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
-	            var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('section');
-
-	            return Promise.resolve({});
-	        }
-
-	        /**
-	         * Sets all settings
-	         *
-	         * @param {String} project
-	         * @param {String} environment
-	         * @param {String} section
-	         * @param {Object} settings
-	         *
-	         * @return {Promise} promise
-	         */
-
-	    }, {
-	        key: 'setSettings',
-	        value: function setSettings() {
-	            var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
-	            var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
-	            var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('section');
-	            var settings = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : requiredParam('settings');
-
-	            return Promise.resolve();
-	        }
-	    }]);
-
-	    return SettingsHelper;
-	}();
+	var SettingsHelper = function SettingsHelper() {
+	  _classCallCheck(this, SettingsHelper);
+	};
 
 	module.exports = SettingsHelper;
 
@@ -12115,7 +12151,7 @@
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var VERBOSITY = 3;
+	var VERBOSITY = 2;
 
 	var DebugHelper = function () {
 	    function DebugHelper() {
@@ -20957,7 +20993,7 @@
 	module.exports = {
 		"name": "hashbrown-cms",
 		"repository": "https://github.com/Putaitu/hashbrown-cms.git",
-		"version": "0.7.2",
+		"version": "0.8.0",
 		"description": "The pluggable CMS",
 		"main": "hashbrown.js",
 		"scripts": {
@@ -21143,7 +21179,6 @@
 
 	            syncEditor.on('change', function (syncSettings) {
 	                _this5.model.settings.sync = {
-	                    section: 'sync',
 	                    enabled: syncSettings.enabled,
 	                    url: syncSettings.url,
 	                    token: syncSettings.token
@@ -21169,7 +21204,7 @@
 	            var languageEditor = new LanguageEditor({ projectId: this.model.id });
 
 	            languageEditor.on('change', function (newLanguages) {
-	                _this6.model.settings.language.selected = newLanguages;
+	                _this6.model.settings.languages = newLanguages;
 
 	                _this6.fetch();
 	            });
@@ -21221,12 +21256,12 @@
 	                    label: 'Create',
 	                    class: 'btn-primary',
 	                    callback: function callback() {
-	                        var newName = modal.$element.find('input').val();
+	                        var environmentName = modal.$element.find('input').val();
 
-	                        _this7.model.settings.environments.names.push(newName);
+	                        _this7.model.environments.push(environmentName);
 
-	                        apiCall('post', 'server/settings/' + _this7.model.id + '/environments', _this7.model.settings.environments).then(function () {
-	                            UI.messageModal('Succes', 'The new environment "' + newName + '" was created successfully', function () {
+	                        apiCall('put', 'server/projects/' + _this7.model.id + '/' + environmentName).then(function () {
+	                            UI.messageModal('Success', 'The new environment "' + environmentName + '" was created successfully', function () {
 	                                location.reload();
 	                            });
 	                        }).catch(UI.errorModal);
@@ -21241,7 +21276,7 @@
 	        value: function render() {
 	            var _this8 = this;
 
-	            var languageCount = this.model.settings.language.selected.length;
+	            var languageCount = this.model.settings.languages.length;
 	            var userCount = this.model.users.length;
 
 	            this.$element.toggleClass('in', true);
@@ -21252,13 +21287,13 @@
 	                e.preventDefault();_this8.onClickLanguages();
 	            })), _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Backups').click(function (e) {
 	                e.preventDefault();_this8.onClickBackups();
-	            })), _.if(this.model.settings.environments.names.length > 1, _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Migrate').click(function (e) {
+	            })), _.if(this.model.environments.length > 1, _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Migrate').click(function (e) {
 	                e.preventDefault();_this8.onClickMigrate();
 	            }))), _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Sync').click(function (e) {
 	                e.preventDefault();_this8.onClickSync();
 	            })), _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Delete').click(function (e) {
 	                e.preventDefault();_this8.onClickRemove();
-	            }))))), _.div({ class: 'info' }, _.h4(this.model.settings.info.name || this.model.id), _.p(userCount + ' user' + (userCount != 1 ? 's' : '')), _.p(languageCount + ' language' + (languageCount != 1 ? 's' : '') + ' (' + this.model.settings.language.selected.join(', ') + ')')), _.div({ class: 'environments' }, _.each(this.model.settings.environments.names, function (i, environment) {
+	            }))))), _.div({ class: 'info' }, _.h4(this.model.settings.info.name || this.model.id), _.p(userCount + ' user' + (userCount != 1 ? 's' : '')), _.p(languageCount + ' language' + (languageCount != 1 ? 's' : '') + ' (' + this.model.settings.languages.join(', ') + ')')), _.div({ class: 'environments' }, _.each(this.model.environments, function (i, environment) {
 	                return _.div({ class: 'environment' }, _.div({ class: 'btn-group' }, _.a({ title: 'Go to "' + environment + '" CMS', href: '/' + _this8.model.id + '/' + environment, class: 'environment-title btn btn-default' }, environment), _.if(User.current.isAdmin, _.div({ class: 'dropdown' }, _.button({ class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, _.span({ class: 'fa fa-ellipsis-v' })), _.ul({ class: 'dropdown-menu' }, _.li(_.a({ href: '#', class: 'dropdown-item' }, 'Delete').click(function (e) {
 	                    e.preventDefault();_this8.onClickRemoveEnvironment(environment);
 	                })))))));
@@ -21576,7 +21611,7 @@
 	            model: {
 	                class: 'modal-migrate-content settings-modal',
 	                title: 'Migrate content',
-	                body: [_.div({ class: 'migration-message' }, _.span({ class: 'fa fa-warning' }), _.span('It might be a good idea to make a project backup before you proceed')), _.div({ class: 'migration-operation' }, _.select({ class: 'form-control environment-from' }, _.each(_this.model.settings.environments.names, function (i, environment) {
+	                body: [_.div({ class: 'migration-message' }, _.span({ class: 'fa fa-warning' }), _.span('It might be a good idea to make a project backup before you proceed')), _.div({ class: 'migration-operation' }, _.select({ class: 'form-control environment-from' }, _.each(_this.model.environments, function (i, environment) {
 	                    return _.option({ value: environment }, environment);
 	                })).change(function () {
 	                    _this.updateOptions();
@@ -21586,8 +21621,7 @@
 	                    content: 'Content',
 	                    forms: 'Forms',
 	                    media: 'Media',
-	                    connections: 'Connections',
-	                    settings: 'Settings'
+	                    connections: 'Connections'
 	                }, function (key, label) {
 	                    return _.div({ class: 'input-group' }, _.span(label), _.div({ class: 'input-group-addon' }, UI.inputSwitch(_this.data.settings[key], function (newValue) {
 	                        _this.data.settings[key] = newValue;
@@ -21626,7 +21660,7 @@
 	        value: function updateOptions() {
 	            var _this2 = this;
 
-	            _.append(this.modal.$element.find('.environment-to').empty(), _.each(this.model.settings.environments.names, function (i, environment) {
+	            _.append(this.modal.$element.find('.environment-to').empty(), _.each(this.model.environments, function (i, environment) {
 	                // Filter out "from" environment
 	                if (environment != _this2.modal.$element.find('.environment-from').val()) {
 	                    return _.option({ value: environment }, environment);
@@ -22094,6 +22128,7 @@
 	            this.def(String, 'id');
 	            this.def(Array, 'users', []);
 	            this.def(Object, 'settings', {});
+	            this.def(Array, 'environments', ['live']);
 	            this.def(Boolean, 'useAutoBackup');
 	            this.def(Array, 'backups', []);
 	            this.def(String, 'backupStorage', 'local');
@@ -22109,8 +22144,8 @@
 
 	            project.id = id;
 
+	            project.settings.usedBy = 'project';
 	            project.settings.info = {
-	                section: 'info',
 	                name: name
 	            };
 

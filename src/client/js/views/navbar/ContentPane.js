@@ -423,7 +423,6 @@ class ContentPane extends NavbarPane {
             getItemContextMenu: (item) => {
                 let menu = {};
                 let isSyncEnabled = SettingsHelper.getCachedSettings(ProjectHelper.currentProject, null, 'sync').enabled;
-                let isContentSyncEnabled = isSyncEnabled && SettingsHelper.getCachedSettings(ProjectHelper.currentProject, null, 'sync').content;
                 
                 menu['This content'] = '---';
                 
@@ -455,9 +454,9 @@ class ContentPane extends NavbarPane {
                     menu['Publishing'] = () => { this.onClickContentPublishing(); };
                 }
                 
-                if(item.locked && !item.remote) { isContentSyncEnabled = false; }
+                if(item.locked && !item.remote) { isSyncEnabled = false; }
                
-                if(isContentSyncEnabled) {
+                if(isSyncEnabled) {
                     menu['Sync'] = '---';
                     
                     if(!item.remote) {

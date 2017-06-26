@@ -15,6 +15,7 @@ class Project extends Entity {
         this.def(String, 'id');
         this.def(Array, 'users', []);
         this.def(Object, 'settings', {});
+        this.def(Array, 'environments', [ 'live'  ]);
         this.def(Boolean, 'useAutoBackup');
         this.def(Array, 'backups', []);
         this.def(String, 'backupStorage', 'local');
@@ -29,8 +30,8 @@ class Project extends Entity {
         
         project.id = id;
 
+        project.settings.usedBy = 'project';
         project.settings.info = {
-            section: 'info',
             name: name
         };
 

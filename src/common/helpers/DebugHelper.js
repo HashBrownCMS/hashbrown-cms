@@ -1,6 +1,6 @@
 'use strict';
 
-const VERBOSITY = 3;
+const VERBOSITY = 2;
 
 class DebugHelper {
     /**

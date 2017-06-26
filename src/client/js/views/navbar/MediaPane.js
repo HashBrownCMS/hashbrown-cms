@@ -119,14 +119,13 @@ class MediaPane extends NavbarPane {
             // Hierarchy logic
             hierarchy: (item, queueItem) => {
                 let isSyncEnabled = SettingsHelper.getCachedSettings(ProjectHelper.currentProject, null, 'sync').enabled;
-                let isMediaSyncEnabled = isSyncEnabled && SettingsHelper.getCachedSettings(ProjectHelper.currentProject, null, 'sync')['media/tree'];
 
                 queueItem.$element.attr('data-media-id', item.id);
                
                 if(item.folder) {
                     queueItem.createDir = true;
                     queueItem.parentDirAttr = { 'data-media-folder': item.folder };
-                    queueItem.parentDirExtraAttr = { 'data-remote': isMediaSyncEnabled };
+                    queueItem.parentDirExtraAttr = { 'data-remote': isSyncEnabled };
                 }
             },
             

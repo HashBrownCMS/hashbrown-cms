@@ -67,43 +67,31 @@ class ProjectHelper {
         .then((foundBackups) => {
             backups = foundBackups;
 
+            return this.getAllEnvironments(id);
+        })
+        .then((foundEnvironments) => {
             let project = new Project();
 
             project.id = id;
             project.backups = backups;
 
-            for(let i in settings) {
-                let section = settings[i];
-                
-                project.settings[section.section] = section;
-            }
+            project.settings = settings;
+            project.environments = foundEnvironments;
 
             // Sanity check
-            if(!project.settings.language) {
-                project.settings.language = {
-                    section: 'language',
-                    selected: [ 'en' ]
-                };
+            if(!project.settings.languages) {
+                project.settings.languages = [ 'en' ];
             }
             
-            if(!project.settings.environments) {
-                project.settings.environments = {
-                    section: 'environments',
-                    names: [ 'live' ]
-                };
-            }
-        
             if(!project.settings.info) {
                 project.settings.info = {
-                    section: 'info',
                     name: id
                 };
             }
-            project.users = users;
 
-            return new Promise((resolve) => {
-                resolve(project.getObject());
-            });
+            project.users = users;
+            
+            return Promise.resolve(project.getObject());
         });
     }
 
@@ -115,12 +103,31 @@ class ProjectHelper {
      * @returns {Promise(Array)} environments
      */
     static getAllEnvironments(project) {
-        return SettingsHelper.getSettings(project, null, 'environments')
-        .then((settings) => {
-            // There should always be at least one environment available
-            let environments = settings && settings.names ? settings.names : [ 'live' ];
+        // First attempt to get remote environments
+        return SyncHelper.getResource(project, null, 'environments')
+        .then((environments) => {
+            // If remote environments were found, resolve immediately
+            if(environments && Array.isArray(environments)) {
+                return Promise.resolve(environments);
+            }
 
-            return Promise.resolve(environments);
+            // If remote environments were not found, return local ones
+            return MongoHelper.find(project, 'settings', {})
+            .then((allSettings) => {
+                let names = [];
+
+                for(let setting of allSettings) {
+                    if(!setting.usedBy || setting.usedBy === 'project') { continue; }
+
+                    names.push(setting.usedBy);
+                }
+
+                if(names.length < 1) {
+                    names.push('live');
+                }
+
+                return Promise.resolve(names);
+            });
         });
     }
 
@@ -137,6 +144,28 @@ class ProjectHelper {
         .then(() => {
             return MongoHelper.dropDatabase(name);
         });
+    }
+
+    /**
+     * Adds an environment
+     *
+     * @param {String} project
+     * @param {String} environment
+     *
+     * @returns {Promise} Promise
+     */
+    static addEnvironment(
+        project = requiredParam('project'),
+        environment = requiredParam('environment')
+    ) {
+        debug.log('Adding environment "' + environment + '" to project "' + project + '"...', this);
+       
+        return MongoHelper.updateOne(
+            project,
+            'settings',
+            { usedBy: environment },
+            { upsert: true }
+        );
     }
 
     /**
@@ -184,16 +213,9 @@ class ProjectHelper {
             return next();
         })
         
-        // Remove listing from settings
+        // Remove environment settings settings
         .then(() => {
-            return SettingsHelper.getSettings(project, null, 'environments');
-        })
-        .then((environments) => {
-            let index = environments.names.indexOf(environment);
-
-            environments.names.splice(index, 1);
-
-            return SettingsHelper.setSettings(project, null, 'environments', environments);
+            return MongoHelper.remove(project, 'settings', { usedBy: environment });
         });
     }
     
@@ -210,7 +232,7 @@ class ProjectHelper {
             if(name && userId) {
                 let project = Project.create(name);
 
-                MongoHelper.insertOne(project.id, 'settings', project.settings.info)
+                MongoHelper.insertOne(project.id, 'settings', project.settings)
                 .then(() => {
                     // The user that creates a project gets all scopes
                     return UserHelper.addUserProjectScope(userId, project.id, [ 'users', 'settings', 'connections', 'schemas' ]);

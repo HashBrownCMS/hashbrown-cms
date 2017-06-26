@@ -93,7 +93,6 @@ class ProjectEditor extends View {
         
         syncEditor.on('change', (syncSettings) => {
             this.model.settings.sync = {
-                section: 'sync',
                 enabled: syncSettings.enabled,
                 url: syncSettings.url,
                 token: syncSettings.token
@@ -112,7 +111,7 @@ class ProjectEditor extends View {
         let languageEditor = new LanguageEditor({ projectId: this.model.id });
         
         languageEditor.on('change', (newLanguages) => {
-            this.model.settings.language.selected = newLanguages;
+            this.model.settings.languages = newLanguages;
 
             this.fetch();
         });
@@ -150,13 +149,13 @@ class ProjectEditor extends View {
                     label: 'Create',
                     class: 'btn-primary',
                     callback: () => {
-                        let newName = modal.$element.find('input').val();
+                        let environmentName = modal.$element.find('input').val();
 
-                        this.model.settings.environments.names.push(newName);
+                        this.model.environments.push(environmentName);
 
-                        apiCall('post', 'server/settings/' + this.model.id + '/environments', this.model.settings.environments)
+                        apiCall('put', 'server/projects/' + this.model.id + '/' + environmentName)
                         .then(() => {
-                            UI.messageModal('Succes', 'The new environment "' + newName + '" was created successfully', () => { location.reload(); });
+                            UI.messageModal('Success', 'The new environment "' + environmentName + '" was created successfully', () => { location.reload(); });
                         })
                         .catch(UI.errorModal);
 
@@ -169,7 +168,7 @@ class ProjectEditor extends View {
 
 
     render() {
-        let languageCount = this.model.settings.language.selected.length;
+        let languageCount = this.model.settings.languages.length;
         let userCount = this.model.users.length;
 
 		this.$element.toggleClass('in', true);
@@ -197,7 +196,7 @@ class ProjectEditor extends View {
                                     'Backups'
                                 ).click((e) => { e.preventDefault(); this.onClickBackups(); })
                             ),
-                            _.if(this.model.settings.environments.names.length > 1,
+                            _.if(this.model.environments.length > 1,
                                 _.li(
                                     _.a({href: '#', class: 'dropdown-item'}, 
                                         'Migrate'
@@ -220,10 +219,10 @@ class ProjectEditor extends View {
                 _.div({class: 'info'},
                     _.h4(this.model.settings.info.name || this.model.id),
                     _.p(userCount + ' user' + (userCount != 1 ? 's' : '')),
-                    _.p(languageCount + ' language' + (languageCount != 1 ? 's' : '') + ' (' + this.model.settings.language.selected.join(', ') + ')')
+                    _.p(languageCount + ' language' + (languageCount != 1 ? 's' : '') + ' (' + this.model.settings.languages.join(', ') + ')')
                 ),
                 _.div({class: 'environments'},
-                    _.each(this.model.settings.environments.names, (i, environment) => {
+                    _.each(this.model.environments, (i, environment) => {
                         return _.div({class: 'environment'},
                             _.div({class: 'btn-group'},
                                 _.a({title: 'Go to "' + environment + '" CMS', href: '/' + this.model.id + '/' + environment, class: 'environment-title btn btn-default'}, 

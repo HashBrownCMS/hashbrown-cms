@@ -230,7 +230,7 @@ require('./routes/index');
 
 // Preload resources 
 $(document).ready(() => {
-    SettingsHelper.getSettings(ProjectHelper.currentProject, ProjectHelper.currentEnvironment, 'sync')
+    SettingsHelper.getSettings(ProjectHelper.currentProject, null, 'sync')
     .then(() => {
         return LanguageHelper.getSelectedLanguages(ProjectHelper.currentProject);
     })

@@ -24,6 +24,8 @@ class ServerController extends ApiController {
         app.post('/api/server/migrate/:project/', this.middleware({ needsAdmin: true, setProject: false }), this.postMigrateContent);
         app.post('/api/server/rename/:project/', this.middleware({ needsAdmin: true, setProject: false }), this.postRenameProject);
 
+        app.put('/api/server/projects/:project/:environment', this.middleware({ needsAdmin: true, setProject: false }), this.putEnvironment);
+
         app.delete('/api/server/backups/:project/:timestamp', this.middleware({ needsAdmin: true, setProject: false }), this.deleteBackup);
         app.delete('/api/server/projects/:project', this.middleware({ needsAdmin: true, setProject: false }), this.deleteProject);
         app.delete('/api/server/projects/:project/:environment', this.middleware({ needsAdmin: true, setProject: false }), this.deleteEnvironment);
@@ -74,7 +76,7 @@ class ServerController extends ApiController {
                 
                 // Overwrite
                 if(data.settings.replace) {
-                    debug.log('Updating "' + (item.id || item.section || item) + '" into ' + resource + '...', ServerController);
+                    debug.log('Updating "' + (item.id || item) + '" into ' + resource + '...', ServerController);
                 
                     mongoPromise = MongoHelper.updateOne(
                         project,
@@ -141,9 +143,6 @@ class ServerController extends ApiController {
         .then(() => {
             return getResource('from', 'schemas');
         })
-        .then(() => {
-            return getResource('from', 'settings');
-        })
 
         // To
         .then(() => {
@@ -161,9 +160,6 @@ class ServerController extends ApiController {
         .then(() => {
             return getResource('to', 'schemas');
         })
-        .then(() => {
-            return getResource('to', 'settings');
-        })
 
         // Merge "from" and "to"
         .then(() => {
@@ -180,9 +176,6 @@ class ServerController extends ApiController {
         })
         .then(() => {
             return mergeResource('schemas');
-        })
-        .then(() => {
-            return mergeResource('settings');
         })
 
         // Success
@@ -419,6 +412,22 @@ class ServerController extends ApiController {
         let project = req.params.project;
 
         ProjectHelper.deleteProject(project)
+        .then(() => {
+            res.status(200).send('OK');
+        })
+        .catch((e) => {
+            res.status(502).send(ServerController.printError(e));
+        });
+    }
+    
+    /**
+     * Adds an environment
+     */
+    static putEnvironment(req, res) {
+        let project = req.params.project;
+        let environment = req.params.environment;
+
+        ProjectHelper.addEnvironment(project, environment)
         .then(() => {
             res.status(200).send('OK');
         })
