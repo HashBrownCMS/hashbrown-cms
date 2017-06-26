@@ -22074,10 +22074,18 @@
 	var Project = function (_Entity) {
 	    _inherits(Project, _Entity);
 
-	    function Project() {
+	    function Project(params) {
 	        _classCallCheck(this, Project);
 
-	        return _possibleConstructorReturn(this, (Project.__proto__ || Object.getPrototypeOf(Project)).apply(this, arguments));
+	        var _this = _possibleConstructorReturn(this, (Project.__proto__ || Object.getPrototypeOf(Project)).call(this, params));
+
+	        if (!_this.settings) {
+	            _this.settings = {};
+	        }
+	        if (!_this.settings.languages) {
+	            _this.settings.languages = ['en'];
+	        }
+	        return _this;
 	    }
 
 	    _createClass(Project, [{

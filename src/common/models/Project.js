@@ -4,6 +4,13 @@ let Entity = require('./Entity');
 let Connection = require('./Connection');
 
 class Project extends Entity {
+    constructor(params) {
+        super(params);
+
+        if(!this.settings) { this.settings = {}; }
+        if(!this.settings.languages) { this.settings.languages = [ 'en' ]; }
+    }
+
     structure() {
         this.def(String, 'id');
         this.def(Array, 'users', []);
