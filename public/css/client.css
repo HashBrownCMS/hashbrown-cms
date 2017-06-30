@@ -1508,17 +1508,20 @@ body.dashboard-container {
       flex-grow: 1;
       flex-basis: 100%;
       margin-top: 30px; }
-      .media-browser .modal-dialog .thumbnail-container .folder .folder-heading h4 {
+      .media-browser .modal-dialog .thumbnail-container .folder.expanded .folder-items {
+        display: flex; }
+      .media-browser .modal-dialog .thumbnail-container .folder .folder-heading button {
         background-color: #eeeeee;
         margin: 0px;
         padding: 10px 15px;
+        border: 0;
         border-top-left-radius: 2px;
         border-top-right-radius: 2px;
         display: inline-block; }
-        .media-browser .modal-dialog .thumbnail-container .folder .folder-heading h4 .fa {
+        .media-browser .modal-dialog .thumbnail-container .folder .folder-heading button .fa {
           margin-right: 10px; }
       .media-browser .modal-dialog .thumbnail-container .folder .folder-items {
-        display: flex;
+        display: none;
         flex-wrap: wrap;
         background-color: #eeeeee;
         border-top-right-radius: 2px;

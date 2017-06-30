@@ -12956,18 +12956,26 @@
 	                        });
 	                        var finalDirName = '/';
 
+	                        // Create a folder for each directory name in the path
 	                        for (var i in dirNames) {
 	                            var dirName = dirNames[i];
 
 	                            var prevFinalDirName = finalDirName;
 	                            finalDirName += dirName + '/';
 
+	                            // Look for an existing directory element
 	                            var $dir = $pane.find('[' + parentDirAttrKey + '="' + finalDirName + '"]');
 
+	                            // Create it if not found
 	                            if ($dir.length < 1) {
 	                                $dir = _.div({ class: 'pane-item-container', 'data-is-directory': true }, _.a({
 	                                    class: 'pane-item'
-	                                }, _.span({ class: 'fa fa-folder' }), _.span({ class: 'pane-item-label' }, dirName)), _.div({ class: 'children' }));
+	                                }, _.span({ class: 'fa fa-folder' }), _.span({ class: 'pane-item-label' }, dirName),
+
+	                                // Toggle button
+	                                _.button({ class: 'btn-children-toggle' }, _.span({ class: 'fa fa-caret-down' }), _.span({ class: 'fa fa-caret-right' })).click(function (e) {
+	                                    _this4.onClickToggleChildren(e);
+	                                })), _.div({ class: 'children' }));
 
 	                                $dir.attr(parentDirAttrKey, finalDirName);
 
@@ -12990,11 +12998,11 @@
 	                                } else {
 	                                    $pane.children('.pane').prepend($dir);
 	                                }
-	                            }
 
-	                            // Attach item context menu
-	                            if (pane.settings.dirContextMenu) {
-	                                $dir.crcontext(pane.settings.dirContextMenu);
+	                                // Attach item context menu
+	                                if (pane.settings.dirContextMenu) {
+	                                    $dir.crcontext(pane.settings.dirContextMenu);
+	                                }
 	                            }
 
 	                            // Only append the queue item to the final parent element
@@ -14252,9 +14260,6 @@
 	                // Dir context menu
 	                dirContextMenu: {
 	                    'Directory': '---',
-	                    'New folder': function NewFolder() {
-	                        _this2.onClickNewMediaDirectory();
-	                    },
 	                    'Upload new media': function UploadNewMedia() {
 	                        _this2.onClickUploadMedia();
 	                    },
@@ -14266,9 +14271,6 @@
 	                // General context menu
 	                paneContextMenu: {
 	                    'General': '---',
-	                    'New folder': function NewFolder() {
-	                        _this2.onClickNewMediaDirectory();
-	                    },
 	                    'Upload new media': function UploadNewMedia() {
 	                        _this2.onClickUploadMedia();
 	                    }
@@ -15445,9 +15447,25 @@
 	                    var $folder = $folders[media.folder];
 
 	                    if (!$folder) {
-	                        $folder = _.div({ class: 'folder', 'data-path': media.folder }, _.div({ class: 'folder-heading' }, _.h4({}, _.span({ class: 'fa fa-folder' }), media.folder)), _.div({ class: 'folder-items' }));
+	                        $folder = _.div({ class: 'folder', 'data-path': media.folder }, _.div({ class: 'folder-heading' }, _.button(_.span({ class: 'fa fa-folder' }), media.folder).click(function () {
+	                            $folder.toggleClass('expanded');
+
+	                            if ($folder.hasClass('expanded')) {
+	                                $folder.find('img, video').each(function (i, mediaSource) {
+	                                    $(mediaSource).attr('src', $(mediaSource).data('src'));
+	                                });
+	                            }
+	                        })), _.div({ class: 'folder-items' }));
 
 	                        $folders[media.folder] = $folder;
+	                    }
+
+	                    // Prevent the media from loading
+	                    if (media.isImage() || media.isVideo()) {
+	                        var $mediaSource = $media.find('img, video');
+
+	                        $mediaSource.data('src', $mediaSource.attr('src'));
+	                        $mediaSource.attr('src', '#');
 	                    }
 
 	                    // Wait 1 CPU cycle before appending to folders

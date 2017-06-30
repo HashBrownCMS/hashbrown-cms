@@ -379,21 +379,30 @@ class NavbarMain extends View {
                 let dirNames = parentDirAttrValue.split('/').filter((item) => { return item != ''; });
                 let finalDirName = '/';
 
+                // Create a folder for each directory name in the path
                 for(let i in dirNames) {
                     let dirName = dirNames[i];
 
                     let prevFinalDirName = finalDirName;
                     finalDirName += dirName + '/';
 
+                    // Look for an existing directory element
                     let $dir = $pane.find('[' + parentDirAttrKey + '="' + finalDirName + '"]');
 
+                    // Create it if not found
                     if($dir.length < 1) {
                         $dir = _.div({class: 'pane-item-container', 'data-is-directory': true},
                             _.a({
                                 class: 'pane-item'
                             },
                                 _.span({class: 'fa fa-folder'}),
-                                _.span({class: 'pane-item-label'}, dirName)
+                                _.span({class: 'pane-item-label'}, dirName),
+                                
+                                // Toggle button
+                                _.button({class: 'btn-children-toggle'},
+                                    _.span({class:'fa fa-caret-down'}),
+                                    _.span({class:'fa fa-caret-right'})
+                                ).click((e) => { this.onClickToggleChildren(e); })
                             ),
                             _.div({class: 'children'})
                         );
@@ -419,13 +428,13 @@ class NavbarMain extends View {
                         } else {
                             $pane.children('.pane').prepend($dir); 
                         }
+                        
+                        // Attach item context menu
+                        if(pane.settings.dirContextMenu) {
+                            $dir.crcontext(pane.settings.dirContextMenu);
+                        }
                     }
                    
-                    // Attach item context menu
-                    if(pane.settings.dirContextMenu) {
-                        $dir.crcontext(pane.settings.dirContextMenu);
-                    }
-                    
                     // Only append the queue item to the final parent element
                     if(i >= dirNames.length - 1) {
                         $parentDir = $dir;

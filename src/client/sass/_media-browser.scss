@@ -38,11 +38,18 @@
                 flex-basis: 100%;
                 margin-top: 30px;
 
+                &.expanded {
+                    .folder-items {
+                        display: flex;
+                    }
+                }
+
                 .folder-heading {
-                    h4 {
+                    button {
                         background-color: material-color('grey', '200');
                         margin: 0px;
                         padding: 10px 15px;
+                        border: 0;
                         border-top-left-radius: 2px;
                         border-top-right-radius: 2px;
                         display: inline-block;
@@ -54,7 +61,7 @@
                 }
 
                 .folder-items {
-                    display: flex;
+                    display: none;
                     flex-wrap: wrap;
                     background-color: material-color('grey', '200');
                     border-top-right-radius: 2px;

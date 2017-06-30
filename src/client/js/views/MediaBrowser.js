@@ -285,15 +285,31 @@ class MediaBrowser extends View {
                                     if(!$folder) {
                                         $folder = _.div({class: 'folder', 'data-path': media.folder},
                                             _.div({class: 'folder-heading'},
-                                                _.h4({},
+                                                _.button(
                                                     _.span({class: 'fa fa-folder'}),
                                                     media.folder
-                                                )
+                                                ).click(() => {
+                                                    $folder.toggleClass('expanded');
+
+                                                    if($folder.hasClass('expanded')) {
+                                                        $folder.find('img, video').each((i, mediaSource) => {
+                                                            $(mediaSource).attr('src', $(mediaSource).data('src'));
+                                                        });
+                                                    }
+                                                })
                                             ),
                                             _.div({class: 'folder-items'})
                                         );
 
                                         $folders[media.folder] = $folder;
+                                    }
+
+                                    // Prevent the media from loading
+                                    if(media.isImage() || media.isVideo()) {
+                                        let $mediaSource = $media.find('img, video');
+
+                                        $mediaSource.data('src', $mediaSource.attr('src'));
+                                        $mediaSource.attr('src', '#');
                                     }
 
                                     // Wait 1 CPU cycle before appending to folders

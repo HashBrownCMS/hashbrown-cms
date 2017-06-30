@@ -143,7 +143,6 @@ class MediaPane extends NavbarPane {
             // Dir context menu
             dirContextMenu: {
                 'Directory': '---',
-                'New folder': () => { this.onClickNewMediaDirectory(); },
                 'Upload new media': () => { this.onClickUploadMedia(); },
                 'Remove': () => { this.onClickRemoveMediaDirectory(); }
             },
@@ -151,7 +150,6 @@ class MediaPane extends NavbarPane {
             // General context menu
             paneContextMenu: {
                 'General': '---',
-                'New folder': () => { this.onClickNewMediaDirectory(); },
                 'Upload new media': () => { this.onClickUploadMedia(); }
             }
         });
