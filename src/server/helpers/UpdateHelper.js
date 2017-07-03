@@ -42,6 +42,8 @@ class UpdateHelper {
                 if(messageMatches && messageMatches.length > 1) {
                     resolveObj.comment = messageMatches[1];
                 }
+
+                console.log(data);
             }
             
             let git = exec('git fetch && git status && git log origin -1 --format=oneline', {

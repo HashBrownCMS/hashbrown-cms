@@ -407,6 +407,26 @@ img.logo {
   background-color: #21303b;
   color: #ffffff; }
 
+.btn .text-working {
+  display: none; }
+
+.btn.working .text-default {
+  display: none; }
+
+.btn.working .text-working {
+  display: inline; }
+  .btn.working .text-working:after {
+    content: '\F1CE';
+    font-family: 'FontAwesome';
+    margin-left: 6px;
+    display: inline-block;
+    transform-origin: 6px 5.5px;
+    line-height: normal;
+    animation-name: spinner-no-offset;
+    animation-duration: 1s;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear; }
+
 .settings-modal .modal-dialog, .confirm-modal .modal-dialog {
   max-width: 400px; }
   .settings-modal .modal-dialog .field, .confirm-modal .modal-dialog .field {
@@ -616,21 +636,6 @@ img.logo {
                 font-size: 18px; }
             .cms-container .workspace .editor .editor-footer .btn-group .btn .text-working {
               display: none; }
-            .cms-container .workspace .editor .editor-footer .btn-group .btn.working .text-default {
-              display: none; }
-            .cms-container .workspace .editor .editor-footer .btn-group .btn.working .text-working {
-              display: inline; }
-              .cms-container .workspace .editor .editor-footer .btn-group .btn.working .text-working:after {
-                content: '\F1CE';
-                font-family: 'FontAwesome';
-                margin-left: 6px;
-                display: inline-block;
-                transform-origin: 6px 5.5px;
-                line-height: normal;
-                animation-name: spinner-no-offset;
-                animation-duration: 1s;
-                animation-iteration-count: infinite;
-                animation-timing-function: linear; }
       .cms-container .workspace .editor > .field-container .field-editor {
         display: inline-block;
         position: relative; }
@@ -854,11 +859,15 @@ body.dashboard-container {
     body.dashboard-container .dashboard-header li {
       float: none;
       display: inline-block; }
-    body.dashboard-container .dashboard-header form {
+    body.dashboard-container .dashboard-header aside {
       position: absolute;
       top: 1rem;
       right: 1rem;
-      margin: 0px; }
+      display: flex; }
+      body.dashboard-container .dashboard-header aside button {
+        margin-right: 1rem; }
+      body.dashboard-container .dashboard-header aside form {
+        margin: 0; }
   body.dashboard-container .server {
     margin: 15px auto; }
     body.dashboard-container .server tr {

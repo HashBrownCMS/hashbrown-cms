@@ -116,11 +116,19 @@ body.dashboard-container {
             display: inline-block;
         }
 
-        form {
+        aside {
             position: absolute;
             top: 1rem;
             right: 1rem;
-            margin: 0px;
+            display: flex;
+            
+            button {
+                margin-right: 1rem;
+            }
+
+            form {
+                margin: 0;
+            }
         }
     }
 

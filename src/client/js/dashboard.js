@@ -147,39 +147,43 @@ apiCall('get', 'user')
 .then(() => {
     if(!User.current.isAdmin) { return; }
 
-    apiCall('get', 'server/update/check')
-    .then((update) => {
-        if(update.behind) {
-            $('.dashboard-container').prepend(
-                _.div({class: 'update'},
-                    _.p('You are '  + update.amount + ' version' + (update.amount != '1' ? 's' : '') + ' behind ' + update.branch),
-                    _.p('Comment: "'  + update.comment + '"'),
-                    _.button({class: 'btn btn-primary btn-update-hashbrown'}, 'Update')
-                        .click(() => {
-                            UI.messageModal('Update', 'HashBrown is updating (this may take a minute)...', false);
+    let $btnUpdate = _.find('.btn-update');
 
-                            apiCall('post', 'server/update/start')
-                            .then(() => {
-                                new MessageModal({
-                                    model: {
-                                        title: 'Success',
-                                        body: 'HashBrown was updated successfully'
-                                    },
-                                    buttons: [
-                                        {
-                                            label: 'Cool!',
-                                            class: 'btn-primary',
-                                            callback: () => {
-                                                listenForRestart();
-                                            }
-                                        }
-                                    ]
-                                });
-                            })
-                            .catch(UI.errorModal);
-                        })
-                )
-            );
+    return apiCall('get', 'server/update/check')
+    .then((update) => {
+        $btnUpdate.removeClass('working');
+
+        if(update.behind) {
+            $btnUpdate.attr('title', 'Update is available');
+           
+            $btnUpdate.click(() => {
+                UI.messageModal('Update', 'HashBrown is updating (this may take a minute)...', false);
+
+                apiCall('post', 'server/update/start')
+                .then(() => {
+                    new MessageModal({
+                        model: {
+                            title: 'Success',
+                            body: 'HashBrown was updated successfully'
+                        },
+                        buttons: [
+                            {
+                                label: 'Cool!',
+                                class: 'btn-primary',
+                                callback: () => {
+                                    listenForRestart();
+                                }
+                            }
+                        ]
+                    });
+                })
+                .catch(UI.errorModal);
+            })
+
+        } else {
+            $btnUpdate.attr('disabled', true);
+            $btnUpdate.addClass('disabled');
+            $btnUpdate.attr('title', 'HashBrown is up to date');
         }
     });
 })
