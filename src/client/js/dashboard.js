@@ -153,11 +153,11 @@ apiCall('get', 'user')
     .then((update) => {
         $btnUpdate.removeClass('working');
 
-        if(update.behind) {
-            $btnUpdate.attr('title', 'Update is available');
+        if(update.isBehind) {
+            $btnUpdate.attr('title', 'Update is available (' + update.remoteVersion + ')');
            
             $btnUpdate.click(() => {
-                UI.messageModal('Update', 'HashBrown is updating (this may take a minute)...', false);
+                UI.messageModal('Update', 'HashBrown is upgrading from ' + update.localVersion + ' to ' + update.remoteVersion + ' (this may take a minute)...', false);
 
                 apiCall('post', 'server/update/start')
                 .then(() => {

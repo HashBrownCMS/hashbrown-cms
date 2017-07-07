@@ -1,8 +1,10 @@
 'use strict';
 
 // Libs
-let spawn = require('child_process').spawn;
-let exec = require('child_process').exec;
+const spawn = require('child_process').spawn;
+const exec = require('child_process').exec;
+const zlib = require('zlib');
+const path = require('path');
 
 /**
  * The helper class for system updates
@@ -14,99 +16,88 @@ class UpdateHelper {
      * @returns {Promise} Status info
      */
     static check() {
-        return new Promise((resolve, reject) => {
-            let resolveObj = {
-                behind: false,
-                amount: 0,
-                branch: 'stable',
-                comment: ''
-            };
-            
-            debug.log('Checking for updates...', this);
-
-            function checkOutput(data) {
-                let behindMatches = data.match(/Your branch is behind '(.+)' by (\d+) commit/);
-                let upToDateMatches = data.match(/Your branch is up-to-date with '(.+)'/);
-                let messageMatches = data.match(/[a-z0-9]{40} (.+)/);
-
-                if(behindMatches && behindMatches.length > 1) {
-                    resolveObj.behind = true;
-                    resolveObj.branch = behindMatches[1].replace('origin/', '');
-                    resolveObj.amount = behindMatches[2];
-                }
-                
-                if(upToDateMatches && upToDateMatches.length > 1) {
-                    resolveObj.branch = upToDateMatches[1].replace('origin/', '');
-                }
-
-                if(messageMatches && messageMatches.length > 1) {
-                    resolveObj.comment = messageMatches[1];
-                }
-
-                console.log(data);
+        return RequestHelper.request('get', 'https://api.github.com/repos/Putaitu/hashbrown-cms/releases/latest')
+        .then((res) => {
+            if(!res || !res.tag_name) {
+                return Promise.reject(new Error('Couldn\'t fetch update information'));
             }
-            
-            let git = exec('git fetch && git status && git log origin -1 --format=oneline', {
-                cwd: appRoot
-            });
 
-            git.stdout.on('data', (data) => {
-                checkOutput(data);
-                debug.log(data, this, 3);
-            });
+            // Compare local and remote version numbers
+            let remoteVersion = res.tag_name;
+            let localVersion = require(appRoot + '/package.json').version;
 
-            git.stderr.on('data', (data) => {
-                checkOutput(data);
-                debug.log(data, this, 3);
-            });
-            
-            git.on('exit', (code) => {
-                if(code == 0 || code == '0') {
-                    debug.log('Done checking for updates', this);
-                    resolve(resolveObj);
-                } else {
-                    if(resolveObj.behind && resolveObj.amount > 0) {
-                        debug.log('Done checking for updates, but couldn\'t get last commit message', this);
-                        resolve(resolveObj);
-                    
-                    } else {
-                        debug.log('Checking for updates failed', this);
-                        reject(new Error('Checking for updates failed. Please run "git fetch && git status && git log origin -1 --format=oneline" on the server to check if it runs correctly.'));
-                    }
-                }
+
+            return Promise.resolve({
+                isBehind: this.isVersionBehind(remoteVersion, localVersion),
+                remoteVersion: remoteVersion,
+                localVersion: localVersion,
+                comment: res.body
             });
         });
     }
-    
+   
+    /**
+     * Checks if version a is behind version b
+     *
+     * @param {String} a
+     * @param {String} b
+     *
+     * @returns {Boolean} Whether version a is behind version b
+     */
+    static isVersionBehind(a, b) {
+        a = a.replace('v', '');
+        b = b.replace('v', '');
+
+        let aNums = a.split('.');
+        let bNums = b.split('.');
+
+        if(aNums.length !== 3 || bNums.length !== 3) {
+            throw new Error('Couldn\'t compare version numbers');
+        }
+
+        return aNums[0] > bNums[0] || aNums[1] > bNums[1] || aNums[2] > bNums[2];
+    }
+
     /**
      * Perform update
      *
      * @returns {Promise} Status info
      */
     static update() {
-        return new Promise((resolve, reject) => {
-            debug.log('Updating HashBrown...', this);
+        debug.log('Updating HashBrown...', this);
+        
+        // Get latest release info
+        return RequestHelper.request('get', 'https://apt.github.com/repos/Putaitu/hashbrown-cms/releases/latest')
+        
+        // Download zip
+        .then((response) => {
+            debug.log('Downloading update...', this);
             
-            let git = exec('git pull', {
-                cwd: appRoot
-            });
+            return RequestHelper.download(response.zipball_url, appRoot + '/storage/update.zip');
+        })
 
-            git.stdout.on('data', (data) => {
-                debug.log(data, this, 3);
-            });
+        // Unpack zip
+        .then(() => {
+            debug.log('Unpacking update...', this);
 
-            git.stderr.on('data', (data) => {
-                debug.log(data, this, 3);
-            });
-            
-            git.on('exit', (code) => {
-                if(code == 0 || code == '0') {
-                    debug.log('Update successful', this);
-                    resolve();
-                } else {
-                    debug.log('Update failed', this);
-                    reject(new Error('git exited with status code ' + code));
-                }
+            return new Promise((resolve, reject) => {
+                let stream = fs.createReadStream(appRoot + '/storage/update.zip');
+
+                stream.pipe(zlib.unzip());
+
+                stream.on('error', (e) => {
+                    reject(e);
+                });
+
+                stream.on('entry', (entry) => {
+                    let dirPath = appRoot + '/storage/update';
+                    let fullPath = path.join(dirPath, entry.path);
+
+                    // Create the unpacking directory
+                    fs.mkDirSync(dirPath);
+
+                    entry.pipe(fs.createWriteStream(fullPath));
+                });
             });
         })
 
@@ -132,7 +123,7 @@ class UpdateHelper {
                         debug.log('Install successful', this);
                         resolve();
                     } else {
-                        debug.log('Update failed', this);
+                        debug.log('Install failed', this);
                         reject(new Error('npm exited with status code ' + code));
                     }
                 });
