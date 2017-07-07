@@ -4,10 +4,10 @@ const Restler = require('restler');
 const HTTP = require('http');
 const HTTPS = require('https');
 const QueryString = require('querystring');
-const FS = require('fs');
+const FileSystem = require('fs');
 const URL = require('url');
 
-const MAX_REDIRECTS = 5;
+const MAX_REDIRECTS = 10;
 
 /**
  * A helper class for making HTTP requests
@@ -57,21 +57,30 @@ class RequestHelper {
         url = requiredParam('url'),
         destination = requiredParam('destination')
     ) {
-        return new Promise((resolve, reject) => {
-            let file = FS.createWriteStream(destination);   
-            let request = HTTP.get(url, (response) => {
-                response.pipe(file);
+        return this.request('get', url)
+        .then((data) => {
+            let stream = FileSystem.createWriteStream(destination);
 
-                file.on('finish', () => {
-                    file.close(resolve);
-                });
-            });
+            stream.write(data);
 
-            request.on('error', (e) => {
-                FS.unlink(destination);
-
+            stream.on('error', (e) => {
                 reject(e);
             });
+
+            stream.on('finish', () => {
+                stream.close();
+            });
+
+            stream.on('close', () => {
+                resolve();
+            });
+        })
+        .catch((e) => {
+            if(FileSystem.existsSync(destination)) {
+                FileSystem.unlinkSync(destination);
+            }
+
+            return Promise.reject(e);
         });
     }
 
@@ -137,7 +146,7 @@ class RequestHelper {
 
                         let newUrl = URL.parse(res.headers.location);
 
-                        // Host name found
+                        // Host name not found, prepend old one
                         if(!newUrl.hostname) {
                             newUrl.hostname = url.hostname;
                         }
@@ -147,8 +156,14 @@ class RequestHelper {
                         redirects++;
 
                         makeRequest();
+                    
+                    // Error happened
+                    } else if(res.statusCode >= 400 && res.statusCode < 600) {
+                        console.log(res);
 
-                    // No redirect, re reached out destination
+                        reject(new Error(res.statusMessage + ' (' + url.href + ')'));
+
+                    // No redirect, we reached out destination
                     } else {
                         let str = '';
                  
@@ -176,6 +191,11 @@ class RequestHelper {
                     }
                 });
                
+                // Handle errors
+                req.on('error', (e) => {
+                    reject(e);
+                });
+
                 if(data && method !== 'GET') {
                     req.write(data);
                 }

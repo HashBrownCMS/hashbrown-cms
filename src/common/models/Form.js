@@ -55,6 +55,8 @@ class Form extends Entity {
      * @param {Object} entry
      */
     addEntry(entry) {
+        if(!entry) { return; }
+
         let filteredEntry = {};
         let duplicateChecks = {};
 
@@ -84,6 +86,9 @@ class Form extends Entity {
 
         // Copy to new entries array to avoid changing original before duplicate check
         let newEntries = [...(this.entries || [])];
+
+        // Add timestamp
+        filteredEntry.time = new Date().toISOString();
 
         newEntries.push(filteredEntry);
 

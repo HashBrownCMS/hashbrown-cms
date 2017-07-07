@@ -136,8 +136,8 @@ class FormsController extends ApiController {
                 csv += '"' + inputKey + '",';
             }
 
-            // Remove last comma
-            csv = csv.slice(0, -1);
+            csv += '"time"';
+            
             csv += '\r\n';
 
             for(let entry of form.entries) {
@@ -145,12 +145,12 @@ class FormsController extends ApiController {
                     csv += '"' + (entry[inputKey] || ' ') + '",';
                 }
                 
-                // Remove last comma
-                csv = csv.slice(0, -1);
+                csv += entry.time || 'n/a';
+                
                 csv += '\r\n';
             }
 
-            res.attachment('entries-' + form.id + '.csv');
+            res.attachment(form.title.toLowerCase().replace(/ /g, '-') + '_' + new Date().toISOString() + '.csv');
 
             res.status(200).send(csv);
         })

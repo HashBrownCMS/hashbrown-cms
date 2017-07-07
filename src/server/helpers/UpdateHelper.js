@@ -1,10 +1,10 @@
 'use strict';
 
 // Libs
-const spawn = require('child_process').spawn;
-const exec = require('child_process').exec;
-const zlib = require('zlib');
-const path = require('path');
+const ChildProcess = require('child_process');
+const ZLib = require('zlib');
+const Path = require('path');
+const FileSystem = require('fs');
 
 /**
  * The helper class for system updates
@@ -26,7 +26,6 @@ class UpdateHelper {
             let remoteVersion = res.tag_name;
             let localVersion = require(appRoot + '/package.json').version;
 
-
             return Promise.resolve({
                 isBehind: this.isVersionBehind(remoteVersion, localVersion),
                 remoteVersion: remoteVersion,
@@ -37,12 +36,12 @@ class UpdateHelper {
     }
    
     /**
-     * Checks if version a is behind version b
+     * Checks if version b is behind version a
      *
      * @param {String} a
      * @param {String} b
      *
-     * @returns {Boolean} Whether version a is behind version b
+     * @returns {Boolean} Whether version b is behind version a
      */
     static isVersionBehind(a, b) {
         a = a.replace('v', '');
@@ -67,13 +66,22 @@ class UpdateHelper {
         debug.log('Updating HashBrown...', this);
         
         // Get latest release info
-        return RequestHelper.request('get', 'https://apt.github.com/repos/Putaitu/hashbrown-cms/releases/latest')
+        return RequestHelper.request('get', 'https://api.github.com/repos/Putaitu/hashbrown-cms/releases/latest')
         
         // Download zip
-        .then((response) => {
-            debug.log('Downloading update...', this);
+        .then((res) => {
+            let remoteVersion = res.tag_name;
+            let localVersion = require(appRoot + '/package.json').version;
+
+            if(!this.isVersionBehind(remoteVersion, localVersion)) {
+                return Promise.reject(new Error('Can\'t update, local version is not behind remote version'));
+            }
+
+            let url = 'https://github.com/Putaitu/hashbrown-cms/archive/' + remoteVersion + '.zip';
+
+            debug.log('Downloading update from ' + url + '...', this);
             
-            return RequestHelper.download(response.zipball_url, appRoot + '/storage/update.zip');
+            return RequestHelper.download(url, appRoot + '/storage/update.zip');
         })
 
         // Unpack zip
@@ -81,9 +89,9 @@ class UpdateHelper {
             debug.log('Unpacking update...', this);
 
             return new Promise((resolve, reject) => {
-                let stream = fs.createReadStream(appRoot + '/storage/update.zip');
+                let stream = FileSystem.createReadStream(appRoot + '/storage/update.zip');
 
-                stream.pipe(zlib.unzip());
+                stream.pipe(ZLib.unzip());
 
                 stream.on('error', (e) => {
                     reject(e);
@@ -91,12 +99,12 @@ class UpdateHelper {
 
                 stream.on('entry', (entry) => {
                     let dirPath = appRoot + '/storage/update';
-                    let fullPath = path.join(dirPath, entry.path);
+                    let fullPath = Path.join(dirPath, entry.path);
 
                     // Create the unpacking directory
-                    fs.mkDirSync(dirPath);
+                    FileSystem.mkDirSync(dirPath);
 
-                    entry.pipe(fs.createWriteStream(fullPath));
+                    entry.pipe(FileSystem.createWriteStream(fullPath));
                 });
             });
         })
@@ -106,7 +114,7 @@ class UpdateHelper {
             return new Promise((resolve, reject) => {
                 debug.log('Installing dependencies...', this);
                 
-                let npm = exec('npm install --production', {
+                let npm = ChildProcess.exec('npm install --production', {
                     cwd: appRoot
                 });
 
@@ -119,7 +127,9 @@ class UpdateHelper {
                 });
                 
                 npm.on('exit', (code) => {
-                    if(code == 0 || code == '0') {
+                    code = parseInt(code);
+
+                    if(code === 0) {
                         debug.log('Install successful', this);
                         resolve();
                     } else {
