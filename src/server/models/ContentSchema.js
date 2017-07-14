@@ -1,6 +1,6 @@
 'use strict';
 
-let ContentSchemaCommon = require('../../common/models/ContentSchema');
+let ContentSchemaCommon = require('../../common/Models/ContentSchema');
 
 /**
  * Schema for content nodes

@@ -1,6 +1,6 @@
 'use strict';
 
-let FieldSchemaCommon = require('../../common/models/FieldSchema');
+let FieldSchemaCommon = require('../../common/Models/FieldSchema');
 
 /**
  * Schema for content fields

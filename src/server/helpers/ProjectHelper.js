@@ -1,6 +1,6 @@
 'use strict';
 
-let Project = require('../../common/models/Project');
+let Project = require('../../common/Models/Project');
 
 /**
  * A helper class for managing projects

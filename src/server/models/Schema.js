@@ -1,6 +1,6 @@
 'use strict';
 
-let SchemaCommon = require('../../common/models/Schema');
+let SchemaCommon = require('../../common/Models/Schema');
 
 class Schema extends SchemaCommon {
     constructor(properties) {

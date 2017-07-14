@@ -1,9 +1,9 @@
 'use strict';
 
-let crypto = require('crypto');
+const crypto = require('crypto');
 
-let Entity = require('../../common/models/Entity');
-let UserCommon = require('../../common/models/User');
+const Entity = require('../../common/Models/Entity');
+const UserCommon = require('../../common/Models/User');
 
 class Password extends Entity {
     structure() {

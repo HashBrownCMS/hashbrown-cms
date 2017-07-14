@@ -1,6 +1,6 @@
 'use strict';
 
-let ContentCommon = require('../../common/models/Content');
+let ContentCommon = require('../../common/Models/Content');
 
 /**
  * The server-side content model

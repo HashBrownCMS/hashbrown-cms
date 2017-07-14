@@ -1,54 +1,65 @@
 'use strict';
 
 // Libs
+const path = require('path');
+const webpack = require('webpack');
+
 let ExtractText = require('extract-text-webpack-plugin');
 
 // Define settings
 module.exports = {
-    // The main .js file path
+    // Input .js
     entry: {
-        'client': './src/client/js/client.js',
-        'dashboard': './src/client/js/dashboard.js'
+        client: './src/client/js/client.js',
+        dashboard: './src/client/js/dashboard.js'
     },
+    
+    // Output .js
+    output: {
+        filename: './public/js/[name].js'
+    },
+
 
     // Define loaders
     module: {
-        loaders: [
+        rules: [
             // Babel.js
             {
                 test: /\.js$/,
-                loader: 'babel',
-                query: {
-                    presets: ['es2015']
+                use: {
+                    loader: 'babel-loader',
+                    options: {
+                        presets: [
+                            ['es2015', { loose: true, modules: false }]
+                        ]
+                    }
                 }
             },
 
             // JSON
             {
                 test: /\.json$/,
-                loader: 'json'
+                use: 'json-loader'
             },
 
             // Sass
             {
                 test: /\.scss$/,
-                loader: ExtractText.extract('style', 'css-loader?sourceMap!sass-loader?sourceMap')
+                loader: ExtractText.extract(['css-loader', 'sass-loader'])
             }
         ]
     },
 
     // Automatically accept these extensions
     resolve: {
-        extensions: ['', '.js', '.json', '.scss']
+        extensions: ['.js', '.json', '.scss']
     },
     
-    // Output .js file
-    output: {
-        filename: './public/js/[name].js'
-    },
-
     // Output .css file
     plugins: [
-        new ExtractText('./public/css/client.css', { allChunks: true })
+        new ExtractText({
+            filename: './public/css/client.css',
+            allChunks: true
+        })
     ]
 };

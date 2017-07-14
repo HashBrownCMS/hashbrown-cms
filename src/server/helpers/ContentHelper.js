@@ -1,12 +1,12 @@
 'use strict';
 
 // Helpers
-let ContentHelperCommon = require('../../common/helpers/ContentHelper');
+let ContentHelperCommon = require('../../common/Helpers/ContentHelper');
 
 // Models
-let Content = require('../../common/models/Content');
-let ContentSchema = require('../../common/models/ContentSchema');
-let FieldSchema = require('../../common/models/FieldSchema');
+let Content = require('../../common/Models/Content');
+let ContentSchema = require('../../common/Models/ContentSchema');
+let FieldSchema = require('../../common/Models/FieldSchema');
 let User = require('../models/User');
 
 class ContentHelper extends ContentHelperCommon {

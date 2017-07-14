@@ -1,8 +1,8 @@
 'use strict';
 
-let ConnectionHelperCommon = require(appRoot + '/src/common/helpers/ConnectionHelper');
+let ConnectionHelperCommon = require(appRoot + '/src/common/Helpers/ConnectionHelper');
 
-let Connection = require(appRoot + '/src/common/models/Connection');
+let Connection = require(appRoot + '/src/common/Models/Connection');
 
 class ConnectionHelper extends ConnectionHelperCommon {
     /**

@@ -10,7 +10,7 @@ let multer = require('multer');
 // Models
 let Media = require('../models/Media');
 
-let MediaHelperCommon = require('../../common/helpers/MediaHelper');
+let MediaHelperCommon = require('../../common/Helpers/MediaHelper');
 
 class MediaHelper extends MediaHelperCommon {
     /**

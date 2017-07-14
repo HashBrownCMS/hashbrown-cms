@@ -1,20 +1,6 @@
-// Libraries
-require('crisp-ui');
 window.Promise = require('bluebird');
 window.marked = require('marked');
 window.toMarkdown = require('to-markdown');
-
-// Common views
-window.MessageModal = require('./views/MessageModal');
-
-// Common helpers
-window.UI = require('./helpers/UIHelper');
-window.ProjectHelper = require('./helpers/ProjectHelper');
-window.LanguageHelper = require('./helpers/LanguageHelper');
-window.SettingsHelper = require('./helpers/SettingsHelper');
-
-window.debug = require('../../common/helpers/DebugHelper');
-window.debug.verbosity = 3;
 
 /**
  * Checks if the currently logged in user is admin
@@ -22,13 +8,7 @@ window.debug.verbosity = 3;
  * @resurns {Boolean} Is admin
  */
 window.isCurrentUserAdmin = function isCurrentUserAdmin() {
-    for(let user of resources.users) {
-        if(user.isCurrent) {
-            return user.isAdmin;
-        }
-    }
-
-    return false;
+    return HashBrown.Models.User.current.isAdmin;
 }
 
 /**
@@ -108,12 +88,12 @@ window.copyToClipboard = function copyToClipboard(string) {
 window.apiUrl = function apiUrl(url) {
     let newUrl = '/api/';
 
-    if(ProjectHelper.currentProject) {
-        newUrl += ProjectHelper.currentProject + '/';
+    if(HashBrown.Helpers.ProjectHelper.currentProject) {
+        newUrl += HashBrown.Helpers.ProjectHelper.currentProject + '/';
     }
         
-    if(ProjectHelper.currentEnvironment) {
-        newUrl += ProjectHelper.currentEnvironment + '/';
+    if(HashBrown.Helpers.ProjectHelper.currentEnvironment) {
+        newUrl += HashBrown.Helpers.ProjectHelper.currentEnvironment + '/';
     }
 
     newUrl += url;
@@ -218,3 +198,169 @@ window.listenForRestart = function listenForRestart() {
 
     poke();
 };
+
+/**
+ * Clears the workspace
+ */
+window.clearWorkspace = function clearWorkspace() {
+    $('.workspace').empty();
+};
+
+/**
+ * Sets workspace content
+ */
+window.populateWorkspace = function populateWorkspace($html, classes) {
+    let $workspace = $('.workspace');
+
+    $workspace.empty();
+    $workspace.attr('class', 'workspace');
+    
+    _.append($workspace, $html);
+
+    if(classes) {
+        $workspace.addClass(classes);
+    }
+};
+
+/**
+ * Reloads a resource
+ */
+window.reloadResource = function reloadResource(name) {
+    let model = null;
+
+    switch(name) {
+        case 'templates':
+            model = Template;
+            break;
+
+        case 'users':
+            model = User;
+            break;
+
+        case 'media':
+            model = Media;
+            break;
+    }
+
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            type: 'GET',
+            url: apiUrl(name),
+            success: function(result) {
+                window.resources[name] = result;
+
+                // If a model is specified, use it to initialise every resource
+                if(model) {
+                    for(let i in window.resources[name]) {
+                        window.resources[name][i] = new model(window.resources[name][i]);
+                    }
+                }
+
+                resolve(result);
+            },
+            error: function(e) {
+                if(e.status == 403) {
+                    location = '/login/?path=' + location.pathname + location.hash;
+                
+                } else if(e.status == 404) {
+                    resolve([]);
+
+                } else {
+                    resolve([]);
+                    
+                    UI.errorModal(new Error(e.responseText));
+                
+                }
+            }
+        });
+    });
+};
+
+/**
+ * Reloads all resources
+ */
+window.reloadAllResources = function reloadAllResources() {
+    $('.loading-messages').empty();
+    
+    let queue = [
+        'content',
+        'schemas',
+        'media',
+        'connections',
+        'templates',
+        'forms',
+        'users'
+    ];
+
+    for(let item of queue) {
+        let $msg = _.div({class: 'loading-message', 'data-name': item}, item);
+        
+        $('.loading-messages').append($msg);
+    }
+
+    function processQueue() {
+        let name = queue.shift();
+
+        return window.reloadResource(name)
+        .then(() => {
+            $('.loading-messages [data-name="' + name + '"]').toggleClass('loaded', true);
+            
+            if(queue.length < 1) {
+                return Promise.resolve();
+
+            } else {
+                return processQueue();
+
+            }
+        });
+    }
+
+    return processQueue();
+};
+
+/**
+ * Adds a ready callback to the queue or executes it if given key is already triggered
+ */
+let onReadyCallbacks = {};
+let isReady = {};
+
+window.onReady = function onReady(name, callback) {
+    if(isReady[name]) {
+        callback();
+    
+    } else {
+        if(!onReadyCallbacks[name]) {
+            onReadyCallbacks[name] = [];
+        }
+
+        onReadyCallbacks[name].push(callback);
+    
+    }
+}
+
+/**
+ * Resets a key
+ */
+window.resetReady = function resetReady(name) {
+    delete isReady[name];
+}
+
+/**
+ * Triggers a key
+ */
+window.triggerReady = function triggerReady(name) {
+    isReady[name] = true;
+
+    if(onReadyCallbacks[name]) {
+        for(let callback of onReadyCallbacks[name]) {
+            callback();
+        }
+    }
+}
+
+// Get package file
+window.app = require('../../../package.json');
+
+// Language
+window.language = localStorage.getItem('language') || 'en';
+

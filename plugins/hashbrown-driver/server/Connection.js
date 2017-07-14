@@ -3,9 +3,9 @@
 const fs = require('fs');
 const path = require('path');
 
-const Connection = require(appRoot + '/src/common/models/Connection');
-const Media = require(appRoot + '/src/common/models/Media');
-const Template = require(appRoot + '/src/common/models/Template');
+const Connection = require(appRoot + '/src/common/Models/Connection');
+const Media = require(appRoot + '/src/common/Models/Media');
+const Template = require(appRoot + '/src/common/Models/Template');
 
 /**
  * A connection for interfacing with the HashBrown driver

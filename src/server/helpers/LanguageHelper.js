@@ -1,6 +1,6 @@
 'use strict';
 
-let LanguageHelperCommon = require('../../common/helpers/LanguageHelper');
+let LanguageHelperCommon = require('../../common/Helpers/LanguageHelper');
 
 class LanguageHelper extends LanguageHelperCommon {
     /**

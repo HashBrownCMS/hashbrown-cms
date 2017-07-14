@@ -6,7 +6,7 @@ let FieldSchema = require('../models/FieldSchema');
 let ContentSchema = require('../models/ContentSchema');
 
 // Helpers
-let SchemaHelperCommon = require('../../common/helpers/SchemaHelper');
+let SchemaHelperCommon = require('../../common/Helpers/SchemaHelper');
 
 // Libs
 let fs = require('fs');

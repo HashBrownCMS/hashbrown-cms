@@ -10,7 +10,7 @@ let mongoClient = mongodb.MongoClient;
 
 // Models
 let Content = require('../models/Content');
-let Connection = require('../../common/models/Connection');
+let Connection = require('../../common/Models/Connection');
 let User = require('../models/User');
 
 /**

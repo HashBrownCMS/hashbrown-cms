@@ -1,6 +1,6 @@
 'use strict';
 
-let Entity = require('../../common/models/Entity');
+let Entity = require('../../common/Models/Entity');
 
 /**
  * The base class for all tasks

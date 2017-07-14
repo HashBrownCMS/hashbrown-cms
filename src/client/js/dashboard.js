@@ -1,32 +1,45 @@
 'use strict';
 
-window._crypto = null;
-
 // Helper functions
 require('./helpers');
 
 // Get package file
 window.app = require('../../../package.json');
 
-// Views
-window.ProjectEditor = require('./views/dashboard/ProjectEditor');
-window.BackupEditor = require('./views/dashboard/BackupEditor');
-window.MigrationEditor = require('./views/dashboard/MigrationEditor');
-window.InfoEditor = require('./views/dashboard/InfoEditor');
-window.LanguageEditor = require('./views/dashboard/LanguageEditor');
-window.UserEditor = require('./views/UserEditor');
-window.SyncEditor = require('./views/dashboard/SyncEditor');
+// --------------------
+// Namespaces
+// --------------------
+// Libraries
+require('crisp-ui');
 
-// Models
-window.Project = require('../../common/models/Project');
-window.User = require('../../common/models/User');
+// HashBrown
+window.HashBrown = {
+    Views: {
+        Dashboard: require('./Views/Dashboard'),
+        Modals: {
+            MessageModal: require('./Views/Modals/MessageModal')
+        },
+        Editors: {
+            UserEditor: require('./Views/Editors/UserEditor')
+        }
+    },
+    Models: {
+        Project: require('../../common/Models/Project'),
+        User: require('../../common/Models/User')
+    },
+    Helpers: require('./Helpers')
+};
+
+// Helper shortcuts
+window.debug = HashBrown.Helpers.DebugHelper;
+window.UI = HashBrown.Helpers.UIHelper;
 
 // --------------------
 // Get current user
 // --------------------
 apiCall('get', 'user')
 .then((user) => {
-    User.current = new User(user);
+    HashBrown.Models.User.current = new HashBrown.Models.User(user);
 
     return apiCall('get', 'server/projects');
 })
@@ -39,8 +52,8 @@ apiCall('get', 'user')
     function renderNext(i) {
         return apiCall('get', 'server/projects/' + projects[i])
         .then((project) => {
-            let projectEditor = new ProjectEditor({
-                model: new Project(project)
+            let projectEditor = new HashBrown.Views.Dashboard.ProjectEditor({
+                model: new HashBrown.Models.Project(project)
             });
 
             $('.dashboard-container .projects .project-list').append(projectEditor.$element);
@@ -71,13 +84,13 @@ apiCall('get', 'user')
 // Users
 // --------------------
 .then(() => {
-    if(!User.current.isAdmin) { return Promise.resolve(); }
+    if(!HashBrown.Models.User.current.isAdmin) { return Promise.resolve(); }
 
     return apiCall('get', 'users');
 })
 .then((users) => {
     for(let user of users || []) {
-        user = new User(user);        
+        user = new HashBrown.Models.User(user);        
 
         let $user;
         let $projectList;
@@ -86,14 +99,14 @@ apiCall('get', 'user')
             _.append($user.empty(),
                 _.div({class: 'user-info'}, 
                     _.span({class: 'user-icon fa fa-' + (user.isAdmin ? 'black-tie' : 'user')}),
-                    _.h4((user.fullName || user.username || user.email || user.id) + (user.id == User.current.id ? ' (you)' : '')),
+                    _.h4((user.fullName || user.username || user.email || user.id) + (user.id == HashBrown.Models.User.current.id ? ' (you)' : '')),
                     _.p(user.isAdmin ? 'Admin' : 'Editor')
                 ),
                 _.div({class: 'user-actions'},
                     _.button({class: 'btn btn-primary', title: 'Edit user'},
                         'Edit'
                     ).on('click', () => {
-                        let userEditor = new UserEditor({ model: user }); 
+                        let userEditor = new HashBrown.Views.Editors.UserEditor({ model: user }); 
                         
                         userEditor.on('save', () => {
                             renderUser(); 
@@ -131,7 +144,7 @@ apiCall('get', 'user')
 // Restart button
 // --------------------
 .then(() => {
-    if(!User.current.isAdmin) { return Promise.resolve(); }
+    if(!HashBrown.Models.User.current.isAdmin) { return Promise.resolve(); }
 
     $('.btn-restart').click(() => {
         apiCall('post', 'server/restart')
@@ -145,7 +158,7 @@ apiCall('get', 'user')
 // Updates
 // --------------------
 .then(() => {
-    if(!User.current.isAdmin) { return; }
+    if(!HashBrown.Models.User.current.isAdmin) { return; }
 
     let $btnUpdate = _.find('.btn-update');
 
@@ -250,7 +263,7 @@ $('.btn-invite-user').click(() => {
                         .then(() => {
                             UI.messageModal('Invite user', 'Invitation was sent to ' + username);
                         })
-                        .catch(errorModal);
+                        .catch(UI.errorModal);
 
                         let $buttons = modal.$element.find('button').attr('disabled', true).addClass('disabled');
 
@@ -283,7 +296,7 @@ $('.btn-invite-user').click(() => {
                     .then(() => {
                         UI.messageModal('Create user', 'User "' + username + '" was created with password "' + password + '".', () => { location.reload(); });
                     })
-                    .catch(errorModal);
+                    .catch(UI.errorModal);
 
                     let $buttons = modal.$element.find('button').attr('disabled', true).addClass('disabled');
 
@@ -301,7 +314,7 @@ $('.btn-invite-user').click(() => {
             onSubmit
         );
     })
-    .catch(errorModal);
+    .catch(UI.errorModal);
 });
 
 // --------------------

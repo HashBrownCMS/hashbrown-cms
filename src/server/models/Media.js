@@ -1,6 +1,6 @@
 'use strict';
 
-let MediaCommon = require('../../common/models/Media');
+let MediaCommon = require('../../common/Models/Media');
 
 class Media extends MediaCommon {
     

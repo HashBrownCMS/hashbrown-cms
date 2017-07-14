@@ -1,6 +1,6 @@
 'use strict';
 
-let Form = require(appRoot + '/src/common/models/Form');
+let Form = require(appRoot + '/src/common/Models/Form');
 
 /**
  * The helper class for Forms

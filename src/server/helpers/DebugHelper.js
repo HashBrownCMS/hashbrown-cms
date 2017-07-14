@@ -1,6 +1,6 @@
 'use strict';
 
-let DebugHelperCommon = require(appRoot + '/src/common/helpers/DebugHelper');
+let DebugHelperCommon = require(appRoot + '/src/common/Helpers/DebugHelper');
 
 class DebugHelper extends DebugHelperCommon {
     /**

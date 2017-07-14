@@ -5,7 +5,7 @@ let fs = require('fs');
 let glob = require('glob');
 let multer = require('multer');
 
-let Connection = require('../../common/models/Connection');
+let Connection = require('../../common/Models/Connection');
 
 /**
  * A helper class for managing backups

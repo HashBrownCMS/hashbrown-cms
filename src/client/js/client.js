@@ -6,9 +6,36 @@ window._crypto = null;
 // Style
 require('../sass/client');
 
+// ------------------
+// Namespaces
+// ------------------
+window.HashBrown = {};
+
+// Views
+HashBrown.Views = {};
+
+import * as Navigation from './Views/Navigation';
+HashBrown.Views.Navigation = Navigation;
+
+import * as Modals from './Views/Modals';
+HashBrown.Views.Modals = Modals;
+
+import * as Editors from './Views/Editors';
+HashBrown.Views.Editors = Editors;
+
+import * as FieldEditors from './Views/Editors/FieldEditors';
+HashBrown.Views.Editors.FieldEditors = FieldEditors;
+
+// Helpers
+import * as Helpers from './Helpers';
+HashBrown.Helpers = Helpers;
+
+// Models
+import * as Models from './Models';
+HashBrown.Models = Models;
+
 // Resource cache
 window.resources = {
-    editors: {},
     connections: {},
     connectionEditors: {},
     content: [],
@@ -22,211 +49,8 @@ window.resources = {
 // Helper functions
 require('./helpers');
 
-// Main views
-window.MainMenu = require('./views/MainMenu');
-window.NavbarPane = require('./views/navbar/Pane');
-window.NavbarMain = require('./views/navbar/NavbarMain');
-window.MediaViewer = require('./views/MediaViewer');
-window.MediaBrowser = require('./views/MediaBrowser');
-
-// Field editors
-require('./views/fields');
-
-// Editor views
-window.JSONEditor = require('./views/JSONEditor');
-window.TemplateEditor = require('./views/TemplateEditor');
-window.ContentEditor = require('./views/ContentEditor');
-window.FormEditor = require('./views/FormEditor');
-window.ConnectionEditor = require('./views/ConnectionEditor');
-window.SchemaEditor = require('./views/SchemaEditor');
-window.ProvidersSettings = require('./views/ProvidersSettings');
-window.UserEditor = require('./views/UserEditor');
-
-// Models
-window.Content = require('./models/Content');
-window.Schema = require('../../common/models/Schema');
-window.Media = require('../../common/models/Media');
-window.User = require('../../common/models/User');
-window.Template = require('../../common/models/Template');
-
-// Helpers
-window.MediaHelper = require('./helpers/MediaHelper');
-window.ConnectionHelper = require('./helpers/ConnectionHelper');
-window.ContentHelper = require('./helpers/ContentHelper');
-window.SchemaHelper = require('./helpers/SchemaHelper');
-window.UI = require('./helpers/UIHelper');
-
-// Ready callback containers
-let onReadyCallbacks = {};
-let isReady = {};
-
-// ----------
-// Global methods
-// ----------
-/**
- * Clears the workspace
- */
-window.clearWorkspace = function clearWorkspace() {
-    $('.workspace').empty();
-};
-
-/**
- * Sets workspace content
- */
-window.populateWorkspace = function populateWorkspace($html, classes) {
-    let $workspace = $('.workspace');
-
-    $workspace.empty();
-    $workspace.attr('class', 'workspace');
-    
-    _.append($workspace, $html);
-
-    if(classes) {
-        $workspace.addClass(classes);
-    }
-};
-
-/**
- * Reloads a resource
- */
-window.reloadResource = function reloadResource(name) {
-    let model = null;
-
-    switch(name) {
-        case 'templates':
-            model = Template;
-            break;
-
-        case 'users':
-            model = User;
-            break;
-
-        case 'media':
-            model = Media;
-            break;
-    }
-
-    return new Promise((resolve, reject) => {
-        $.ajax({
-            type: 'GET',
-            url: apiUrl(name),
-            success: function(result) {
-                window.resources[name] = result;
-
-                // If a model is specified, use it to initialise every resource
-                if(model) {
-                    for(let i in window.resources[name]) {
-                        window.resources[name][i] = new model(window.resources[name][i]);
-                    }
-                }
-
-                resolve(result);
-            },
-            error: function(e) {
-                if(e.status == 403) {
-                    location = '/login/?path=' + location.pathname + location.hash;
-                
-                } else if(e.status == 404) {
-                    resolve([]);
-
-                } else {
-                    resolve([]);
-                    
-                    UI.errorModal(new Error(e.responseText));
-                
-                }
-            }
-        });
-    });
-};
-
-/**
- * Reloads all resources
- */
-window.reloadAllResources = function reloadAllResources() {
-    $('.loading-messages').empty();
-    
-    let queue = [
-        'content',
-        'schemas',
-        'media',
-        'connections',
-        'templates',
-        'forms',
-        'users'
-    ];
-
-    for(let item of queue) {
-        let $msg = _.div({class: 'loading-message', 'data-name': item}, item);
-        
-        $('.loading-messages').append($msg);
-    }
-
-    function processQueue() {
-        let name = queue.shift();
-
-        return window.reloadResource(name)
-        .then(() => {
-            $('.loading-messages [data-name="' + name + '"]').toggleClass('loaded', true);
-            
-            if(queue.length < 1) {
-                return Promise.resolve();
-
-            } else {
-                return processQueue();
-
-            }
-        });
-    }
-
-    return processQueue();
-};
-
-/**
- * Adds a ready callback to the queue or executes it if given key is already triggered
- */
-window.onReady = function onReady(name, callback) {
-    if(isReady[name]) {
-        callback();
-    
-    } else {
-        if(!onReadyCallbacks[name]) {
-            onReadyCallbacks[name] = [];
-        }
-
-        onReadyCallbacks[name].push(callback);
-    
-    }
-}
-
-/**
- * Resets a key
- */
-window.resetReady = function resetReady(name) {
-    delete isReady[name];
-}
-
-/**
- * Triggers a key
- */
-window.triggerReady = function triggerReady(name) {
-    isReady[name] = true;
-
-    if(onReadyCallbacks[name]) {
-        for(let callback of onReadyCallbacks[name]) {
-            callback();
-        }
-    }
-}
-
-// Get package file
-window.app = require('../../../package.json');
-
-// Language
-window.language = localStorage.getItem('language') || 'en';
-
 // Get routes
-require('./routes/index');
+require('./Routes');
 
 // Preload resources 
 $(document).ready(() => {
