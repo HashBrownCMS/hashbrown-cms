@@ -1,12 +1,21 @@
 'use strict';
 
-let path = require('path');
+const AppModulePath = require('app-module-path'); 
+const Path = require('path');
 
-global.appRoot = path.resolve(__dirname);
+// Set app root
+global.appRoot = Path.resolve(__dirname);
+
+// Make sure we can require our source files conveniently
+AppModulePath.addPath(__dirname);
+AppModulePath.addPath(Path.resolve(__dirname, './src'));
+
+// Use bluebird promise
 global.Promise = require('bluebird');
 
 Promise.onPossiblyUnhandledRejection((error, promise) => {
     throw error;
 });
 
-require(appRoot + '/src/server/server.js');
+// Include main server module
+require(appRoot + '/src/Server/server.js');

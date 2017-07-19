@@ -1,7 +1,7 @@
 'use strict';
 
 let Connection = require('./server/Connection');
-let ConnectionHelper = require(appRoot + '/src/server/helpers/ConnectionHelper');
+let ConnectionHelper = require('Server/Helpers/ConnectionHelper');
 
 class HashBrownDriver {
     static init(app) {

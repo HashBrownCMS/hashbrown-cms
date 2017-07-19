@@ -6,10 +6,10 @@ const path = require('path');
 const glob = require('glob');
 const rimraf = require('rimraf');
 
-const Connection = require(appRoot + '/src/common/Models/Connection');
-const Content = require(appRoot + '/src/common/Models/Content');
-const Media = require(appRoot + '/src/common/Models/Media');
-const Template = require(appRoot + '/src/common/Models/Template');
+const Connection = require('Common/Models/Connection');
+const Content = require('Common/Models/Content');
+const Media = require('Common/Models/Media');
+const Template = require('Common/Models/Template');
 
 class GitHubConnection extends Connection {
     constructor(data) {

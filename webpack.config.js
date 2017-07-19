@@ -10,8 +10,8 @@ let ExtractText = require('extract-text-webpack-plugin');
 module.exports = {
     // Input .js
     entry: {
-        client: './src/client/js/client.js',
-        dashboard: './src/client/js/dashboard.js'
+        client: './src/Client/client.js',
+        dashboard: './src/Client/dashboard.js'
     },
     
     // Output .js
@@ -52,6 +52,7 @@ module.exports = {
 
     // Automatically accept these extensions
     resolve: {
+        modules: [path.resolve(__dirname), path.resolve(__dirname, 'src'), 'node_modules'],
         extensions: ['.js', '.json', '.scss']
     },
     
