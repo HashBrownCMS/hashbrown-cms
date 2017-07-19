@@ -1,5 +1,8 @@
 'use strict';
 
+const NavbarMain = require('./NavbarMain');
+const NavbarPane = require('./NavbarPane');
+
 class CMSPane extends NavbarPane {
     /**
      * Init

@@ -1,5 +1,8 @@
 'use strict';
 
+const NavbarPane = require('./NavbarPane');
+const NavbarMain = require('./NavbarMain');
+
 class SettingsPane extends NavbarPane {
     /**
      * Init

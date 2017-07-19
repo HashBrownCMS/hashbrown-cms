@@ -1,43 +1,20 @@
 'use strict';
 
-// NOTE: a temporary fix for webpack
-window._crypto = null;
-
 // Style
 require('Style/client');
 
-// ------------------
-// Namespaces
-// ------------------
-window.HashBrown = {};
+// Helper functions
+require('Client/helpers');
 
-// Views
-HashBrown.Views = {};
+// Libraries
+require('crisp-ui');
 
-import * as Navigation from './Views/Navigation';
-HashBrown.Views.Navigation = Navigation;
-
-import * as Modals from './Views/Modals';
-HashBrown.Views.Modals = Modals;
-
-import * as Editors from './Views/Editors';
-HashBrown.Views.Editors = Editors;
-
-import * as FieldEditors from './Views/Editors/FieldEditors';
-HashBrown.Views.Editors.FieldEditors = FieldEditors;
-
-// Helpers
-import * as Helpers from './Helpers';
-HashBrown.Helpers = Helpers;
-
-// Models
-import * as Models from './Models';
-HashBrown.Models = Models;
+// Get routes
+require('Client/Routes');
 
 // Resource cache
 window.resources = {
     connections: {},
-    connectionEditors: {},
     content: [],
     schemas: [],
     media: [],
@@ -46,14 +23,32 @@ window.resources = {
     users: []
 };
 
-// Helper functions
-require('./helpers');
+// Namespaces
+window.HashBrown = {};
 
-// Get routes
-require('./Routes');
+HashBrown.Client = {};
+HashBrown.Client.Models = require('Common/Models');
+HashBrown.Client.Views = {};
+HashBrown.Client.Views.Modals = require('Client/Views/Modals');
+HashBrown.Client.Views.Navigation = require('Client/Views/Navigation');
+HashBrown.Client.Views.Editors = require('Client/Views/Editors');
+HashBrown.Client.Views.Editors.ConnectionEditors = {};
+HashBrown.Client.Views.Editors.FieldEditors = require('Client/Views/Editors/FieldEditors');
+HashBrown.Client.Helpers = require('Client/Helpers');
+
+HashBrown.Common = {};
+HashBrown.Common.Models = require('Common/Models');
+
+// Helper shortcuts
+window.debug = require('Common/Helpers/DebugHelper');
+window.UI = require('Client/Helpers/UIHelper');
 
 // Preload resources 
 $(document).ready(() => {
+    const SettingsHelper = HashBrown.Client.Helpers.SettingsHelper;
+    const LanguageHelper = HashBrown.Client.Helpers.LanguageHelper;
+    const ProjectHelper = HashBrown.Client.Helpers.ProjectHelper;
+
     SettingsHelper.getSettings(ProjectHelper.currentProject, null, 'sync')
     .then(() => {
         return LanguageHelper.getSelectedLanguages(ProjectHelper.currentProject);
@@ -64,12 +59,12 @@ $(document).ready(() => {
     .then(() => {
         for(let user of resources.users) {
             if(user.isCurrent) {
-                User.current = user;
+                HashBrown.Common.Models.User.current = user;
             }
         }
-        
-        new NavbarMain();
-        new MainMenu();
+       
+        new HashBrown.Client.Views.Navigation.NavbarMain();
+        new HashBrown.Client.Views.Navigation.MainMenu();
 
         Router.check = (newRoute, cancel, proceed) => {
             let contentEditor = ViewHelper.get('ContentEditor');

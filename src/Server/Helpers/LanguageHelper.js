@@ -1,5 +1,6 @@
 'use strict';
 
+const SettingsHelper = require('Server/Helpers/SettingsHelper');
 const LanguageHelperCommon = require('Common/Helpers/LanguageHelper');
 
 class LanguageHelper extends LanguageHelperCommon {
@@ -8,27 +9,44 @@ class LanguageHelper extends LanguageHelperCommon {
      *
      * @param {String} project
      *
-     * @returns {Array} Array of language names
+     * @returns {Array} List of language names
      */
     static getSelectedLanguages(
         project = requiredParam('project')
     ) {
-        return SettingsHelper.getSettings(project, null, 'language')
-        .then((settings) => {
-            if(!settings) {
-                settings = {};
+        return SettingsHelper.getSettings(project, null, 'languages')
+        .then((selected) => {
+            if(!selected || !Array.isArray(selected)) {
+                selected = ['en'];
             }
-            
-            if(!settings.selected || settings.selected.length < 1) {
-                settings.selected = ['en'];
-            }
-      
-            settings.selected.sort();
 
-            return Promise.resolve(settings.selected);
-        });  
+            selected.sort();
+
+            this.selectedLanguages = selected;
+
+            return Promise.resolve(selected);
+        });
     }
+    
+    /**
+     * Sets all languages
+     *
+     * @param {String} project
+     * @param {Array} languages
+     *
+     * @returns {Promise} promise
+     */
+    static setLanguages(
+        project = requiredParam('project'),
+        languages = requiredParam('languages')
+    ) {
+        if(!Array.isArray(languages)) {
+            return Promise.reject(new Error('Language array cannot be of type "' + typeof languages + '"'));
+        }
 
+        return setSettings(project, null, 'languages', languages);
+    }
+    
     /**
      * Toggle a language
      *

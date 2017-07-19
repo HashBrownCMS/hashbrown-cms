@@ -1,5 +1,8 @@
 'use strict';
 
+const NavbarPane = require('./NavbarPane');
+const NavbarMain = require('./NavbarMain');
+
 class ContentPane extends NavbarPane {
     /**
      * Event: Change parent
@@ -26,7 +29,7 @@ class ContentPane extends NavbarPane {
 
         // Reload UI
         .then(() => {
-            ViewHelper.get('NavbarMain').reload();
+            NavbarMain.reload();
         })
         .catch(UI.errorModal);
     }
@@ -57,7 +60,7 @@ class ContentPane extends NavbarPane {
 
         // Reload UI
         .then(() => {
-            ViewHelper.get('NavbarMain').reload();
+            NavbarMain.reload();
         })
         .catch(UI.errorModal);
     }
@@ -66,7 +69,6 @@ class ContentPane extends NavbarPane {
      * Event: Click pull content
      */
     static onClickPullContent() {
-        let navbar = ViewHelper.get('NavbarMain');
         let contentEditor = ViewHelper.get('ContentEditor');
         let pullId = $('.cr-context-menu__target-element').data('id');
 
@@ -80,7 +82,7 @@ class ContentPane extends NavbarPane {
 
         // Reload the UI
         .then(() => {
-            navbar.reload();
+            NavbarMain.reload();
 
 			location.hash = '/content/' + pullId;
 		
@@ -98,7 +100,6 @@ class ContentPane extends NavbarPane {
      * Event: Click push content
      */
     static onClickPushContent() {
-        let navbar = ViewHelper.get('NavbarMain');
 		let $element = $('.cr-context-menu__target-element');
         let pushId = $element.data('id');
 
@@ -114,7 +115,7 @@ class ContentPane extends NavbarPane {
 
         // Reload the UI
         .then(() => {
-            navbar.reload();
+            NavbarMain.reload();
         }) 
         .catch(UI.errorModal);
     }
@@ -125,7 +126,6 @@ class ContentPane extends NavbarPane {
      * @param {String} parentId
      */
     static onClickNewContent(parentId, asSibling) {
-        let navbar = ViewHelper.get('NavbarMain');
 
         // Try to get a parent Schema if it exists
         return function getParentSchema() {
@@ -196,7 +196,7 @@ class ContentPane extends NavbarPane {
                             return reloadResource('content');
                         })
                         .then(() => {
-                            navbar.reload();
+                            NavbarMain.reload();
                             
                             location.hash = '/content/' + newContent.id;
                         })
@@ -313,7 +313,6 @@ class ContentPane extends NavbarPane {
      */
     static onClickContentPublishing() {
         let id = $('.cr-context-menu__target-element').data('id');
-        let navbar = ViewHelper.get('NavbarMain');
         let content;
 
         // Get Content model
@@ -345,7 +344,6 @@ class ContentPane extends NavbarPane {
      * @param {Boolean} shouldUnpublish
      */
     static onClickRemoveContent(shouldUnpublish) {
-        let navbar = ViewHelper.get('NavbarMain');
         let $element = $('.cr-context-menu__target-element'); 
         let id = $element.data('id');
         let name = $element.data('name');
@@ -364,7 +362,7 @@ class ContentPane extends NavbarPane {
                 function onSuccess() {
                     return reloadResource('content')
                     .then(() => {
-                        navbar.reload();
+                        NavbarMain.reload();
                                 
                         let contentEditor = ViewHelper.get('ContentEditor');
                        

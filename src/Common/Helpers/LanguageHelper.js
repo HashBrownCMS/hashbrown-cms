@@ -1,5 +1,6 @@
 'use strict';
 
+
 module.exports = class LanguageHelper {
     /**
      * Gets all languages
@@ -20,18 +21,7 @@ module.exports = class LanguageHelper {
     static getSelectedLanguages(
         project = requiredParam('project')
     ) {
-        return HashBrown.Helpers.SettingsHelper.getSettings(project, null, 'languages')
-        .then((selected) => {
-            if(!selected || !Array.isArray(selected)) {
-                selected = ['en'];
-            }
-
-            selected.sort();
-
-            LanguageHelper.selectedLanguages = selected;
-
-            return Promise.resolve(selected);
-        });
+        return Promise.resolve([]);
     }
     
     /**
@@ -40,17 +30,13 @@ module.exports = class LanguageHelper {
      * @param {String} project
      * @param {Array} languages
      *
-     * @returns {Promise} promise
+     * @returns {Promise} Promise
      */
     static setLanguages(
         project = requiredParam('project'),
         languages = requiredParam('languages')
     ) {
-        if(!Array.isArray(languages)) {
-            return Promise.reject(new Error('Language array cannot be of type "' + typeof languages + '"'));
-        }
-
-        return HashBrown.Helpers.SettingsHelper.setSettings(project, null, 'languages', languages);
+        return Promise.resolve();
     }
 
     /**
@@ -67,7 +53,7 @@ module.exports = class LanguageHelper {
         environment = requiredParam('environment'),
         content = requiredParam('content')
     ) {
-        return LanguageHelper.getSelectedLanguages(project)
+        return this.getSelectedLanguages(project)
         .then((languages) => {
             let sets = {};
 

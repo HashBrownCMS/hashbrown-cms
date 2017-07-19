@@ -233,15 +233,15 @@ window.reloadResource = function reloadResource(name) {
 
     switch(name) {
         case 'templates':
-            model = Template;
+            model = HashBrown.Common.Models.Template;
             break;
 
         case 'users':
-            model = User;
+            model = HashBrown.Common.Models.User;
             break;
 
         case 'media':
-            model = Media;
+            model = HashBrown.Common.Models.Media;
             break;
     }
 

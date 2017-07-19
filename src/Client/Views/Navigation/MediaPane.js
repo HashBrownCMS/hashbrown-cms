@@ -1,5 +1,8 @@
 'use strict';
 
+const NavbarPane = require('./NavbarPane');
+const NavbarMain = require('./NavbarMain');
+
 class MediaPane extends NavbarPane {
     /**
      * Event: On change folder path
@@ -19,7 +22,7 @@ class MediaPane extends NavbarPane {
             return reloadResource('media');
         })
         .then(() => {
-            ViewHelper.get('NavbarMain').reload();
+            NavbarMain.reload();
 
             location.hash = '/media/' + id;
         })
@@ -30,7 +33,6 @@ class MediaPane extends NavbarPane {
      * Event: Click remove media
      */
     static onClickRemoveMedia() {
-        let navbar = ViewHelper.get('NavbarMain');
         let $element = $('.cr-context-menu__target-element'); 
         let id = $element.data('id');
         let name = $element.data('name');
@@ -38,7 +40,7 @@ class MediaPane extends NavbarPane {
         function onSuccess() {
             reloadResource('media')
             .then(function() {
-                ViewHelper.get('NavbarMain').reload();
+                NavbarMain.reload();
                 
                 // Cancel the MediaViever view if it was displaying the deleted object
                 if(location.hash == '#/media/' + id) {
@@ -65,7 +67,7 @@ class MediaPane extends NavbarPane {
                     callback: function() {
                         apiCall('delete', 'media/' + id)
                         .then(onSuccess)
-                        .catch(navbar.onError);
+                        .catch(UI.errorModal);
                     }
                 }
             ]

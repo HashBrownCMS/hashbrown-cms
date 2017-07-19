@@ -1,11 +1,13 @@
 'use strict';
 
+const NavbarPane = require('./NavbarPane');
+const NavbarMain = require('./NavbarMain');
+
 class ConnectionPane extends NavbarPane {
     /**
      * Event: Click new connection
      */
     static onClickNewConnection() {
-        let navbar = ViewHelper.get('NavbarMain');
         let newConnection;
 
         apiCall('post', 'connections/new')
@@ -15,28 +17,27 @@ class ConnectionPane extends NavbarPane {
             return reloadResource('connections');
         })
         .then(() => {
-            navbar.reload();
+            NavbarMain.reload();
 
             location.hash = '/connections/' + newConnection.id;
         })
-        .catch(navbar.onError);
+        .catch(UI.errorModal);
     }
 
     /**
      * Event: On click remove connection
      */
     static onClickRemoveConnection() {
-        let navbar = ViewHelper.get('NavbarMain');
         let $element = $('.cr-context-menu__target-element'); 
         let id = $element.data('id');
         let name = $element.data('name');
         
         function onSuccess() {
-            debug.log('Removed connection with alias "' + id + '"', navbar); 
+            debug.log('Removed connection with alias "' + id + '"', this); 
         
             reloadResource('connections')
             .then(function() {
-                navbar.reload();
+                NavbarMain.reload();
                 
                 // Cancel the ConnectionEditor view if it was displaying the deleted connection
                 if(location.hash == '#/connections/' + id) {
@@ -74,7 +75,6 @@ class ConnectionPane extends NavbarPane {
      * Event: Click pull connection
      */
     static onClickPullConnection() {
-        let navbar = ViewHelper.get('NavbarMain');
         let connectionEditor = ViewHelper.get('ConnectionEditor');
         let pullId = $('.cr-context-menu__target-element').data('id');
 
@@ -88,7 +88,7 @@ class ConnectionPane extends NavbarPane {
 
         // Reload the UI
         .then(() => {
-            navbar.reload();
+            NavbarMain.reload();
 
 			location.hash = '/connections/' + pullId;
 		
@@ -106,7 +106,6 @@ class ConnectionPane extends NavbarPane {
      * Event: Click push connection
      */
     static onClickPushConnection() {
-        let navbar = ViewHelper.get('NavbarMain');
 		let $element = $('.cr-context-menu__target-element');
         let pushId = $element.data('id');
 
@@ -122,7 +121,7 @@ class ConnectionPane extends NavbarPane {
 
         // Reload the UI
         .then(() => {
-            navbar.reload();
+            NavbarMain.reload();
         }) 
         .catch(UI.errorModal);
     }

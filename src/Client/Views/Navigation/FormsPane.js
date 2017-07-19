@@ -1,22 +1,23 @@
 'use strict';
 
+const NavbarPane = require('./NavbarPane');
+const NavbarMain = require('./NavbarMain');
+
 class FormsPane extends NavbarPane {
     /**
      * Event: Click create new form
      */
     static onClickNewForm() {
-        let navbar = ViewHelper.get('NavbarMain');
-
         apiCall('post', 'forms/new')
         .then((newFormId) => {
             reloadResource('forms')
             .then(() => {
-                navbar.reload();
+                NavbarMain.reload();
                 
                 location.hash = '/forms/' + newFormId;
             });
         })
-        .catch(navbar.onError);
+        .catch(UI.errorModal);
     }
     
     /**
@@ -33,7 +34,7 @@ class FormsPane extends NavbarPane {
             
             return reloadResource('forms')
             .then(function() {
-                ViewHelper.get('NavbarMain').reload();
+                NavbarMain.reload();
                 
                 // Cancel the FormEditor view
                 location.hash = '/forms/';
@@ -78,7 +79,6 @@ class FormsPane extends NavbarPane {
      * Event: Click pull Form
      */
     static onClickPullForm() {
-        let navbar = ViewHelper.get('NavbarMain');
         let pullId = $('.cr-context-menu__target-element').data('id');
 
         // API call to pull the Form by id
@@ -91,7 +91,7 @@ class FormsPane extends NavbarPane {
 
         // Reload the UI
         .then(() => {
-            navbar.reload();
+            NavbarMain.reload();
 
 			location.hash = '/forms/' + pullId;
 		
@@ -109,7 +109,6 @@ class FormsPane extends NavbarPane {
      * Event: Click push Form
      */
     static onClickPushForm() {
-        let navbar = ViewHelper.get('NavbarMain');
 		let $element = $('.cr-context-menu__target-element');
         let pushId = $element.data('id');
 
@@ -120,7 +119,7 @@ class FormsPane extends NavbarPane {
             return reloadResource('forms');
         })
         .then(() => {
-            navbar.reload();
+            NavbarMain.reload();
         }) 
         .catch(UI.errorModal);
     }

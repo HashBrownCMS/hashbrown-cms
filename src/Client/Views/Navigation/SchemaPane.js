@@ -1,21 +1,23 @@
 'use strict';
 
+const NavbarPane = require('./NavbarPane');
+const NavbarMain = require('./NavbarMain');
+
 class SchemaPane extends NavbarPane {
     /**
      * Event: Click remove schema
      */
     static onClickRemoveSchema() {
-        let navbar = ViewHelper.get('NavbarMain');
         let $element = $('.cr-context-menu__target-element'); 
         let id = $element.data('id');
         let schema = window.resources.schemas[id];
         
         function onSuccess() {
-            debug.log('Removed schema with id "' + id + '"', navbar); 
+            debug.log('Removed schema with id "' + id + '"', this); 
             
             reloadResource('schemas')
             .then(function() {
-                navbar.reload();
+                NavbarMain.reload();
                 
                 // Cancel the SchemaEditor view if it was displaying the deleted content
                 if(location.hash == '#/schemas/' + id) {
@@ -43,7 +45,7 @@ class SchemaPane extends NavbarPane {
                         callback: function() {
                             apiCall('delete', 'schemas/' + id)
                             .then(onSuccess)
-                            .catch(navbar.onError);
+                            .catch(UI.errorModal);
                         }
                     }
                 ]
@@ -70,7 +72,6 @@ class SchemaPane extends NavbarPane {
      * Event: Click new schema
      */
     static onClickNewSchema() {
-        let navbar = ViewHelper.get('NavbarMain');
         let parentId = $('.cr-context-menu__target-element').data('id');
         let parentSchema = window.resources.schemas[parentId];
 
@@ -78,19 +79,18 @@ class SchemaPane extends NavbarPane {
         .then((newSchema) => {
             reloadResource('schemas')
             .then(() => {
-                navbar.reload();
+                NavbarMain.reload();
 
                 location.hash = '/schemas/' + newSchema.id;
             });
         })
-        .catch(navbar.onError);
+        .catch(UI.errorModal);
     }
     
     /**
      * Event: Click pull Schema
      */
     static onClickPullSchema() {
-        let navbar = ViewHelper.get('NavbarMain');
         let schemaEditor = ViewHelper.get('SchemaEditor');
         let pullId = $('.cr-context-menu__target-element').data('id');
 
@@ -99,7 +99,7 @@ class SchemaPane extends NavbarPane {
             return reloadResource('schemas');
         })
         .then(() => {
-            navbar.reload();
+            NavbarMain.reload();
            
 			location.hash = '/schemas/' + pullId;
 		

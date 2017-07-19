@@ -1,5 +1,8 @@
 'use strict';
 
+const NavbarPane = require('./NavbarPane');
+const NavbarMain = require('./NavbarMain');
+
 class TemplatePane extends NavbarPane {
     /**
      * Event: Click add Template
@@ -138,7 +141,7 @@ class TemplatePane extends NavbarPane {
                     return reloadResource('templates');
                 })
                 .then(() => {
-                    ViewHelper.get('NavbarMain').reload();
+                    NavbarMain.reload();
 
                     // Go to new Template if TemplateEditor was showing the old one
                     if(templateEditor && templateEditor.model.id == model.id) {

@@ -40,5 +40,5 @@
         );
     };
 
-    resources.connectionEditors['HashBrown Driver'] = ConnectionEditor;
+    HashBrown.Client.Views.Editors.ConnectionEditors['HashBrown Driver'] = ConnectionEditor;
 })();

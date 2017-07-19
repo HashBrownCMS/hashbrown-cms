@@ -8,7 +8,7 @@ module.exports = {
     MainMenu: require('./MainMenu'),
     MediaPane: require('./MediaPane'),
     NavbarMain: require('./NavbarMain'),
-    Pane: require('./Pane'),
+    NavbarPane: require('./NavbarPane'),
     SchemaPane: require('./SchemaPane'),
     SettingsPane: require('./SettingsPane'),
     TemplatePane: require('./TemplatePane')
