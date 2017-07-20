@@ -1,6 +1,6 @@
 {
     "parentSchemaId": "fieldBase",
-    "editorId": "url",
+    "editorId": "UrlEditor",
     "icon": "link",
     "name": "Url"
 }

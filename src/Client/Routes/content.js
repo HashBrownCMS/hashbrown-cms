@@ -17,7 +17,7 @@ Router.route('/content/', function() {
 Router.route('/content/json/:id', function() {
     ViewHelper.get('NavbarMain').highlightItem('/content/', this.id);
     
-    let contentEditor = new JSONEditor({
+    let contentEditor = new HashBrown.Client.Views.Editors.JSONEditor({
         modelUrl: apiUrl('content/' + this.id),
         apiPath: 'content/' + this.id
     });
@@ -53,7 +53,7 @@ Router.route('/content/:id/:tab', function() {
     if(!contentEditor || !contentEditor.model || contentEditor.model.id != this.id) {
         ViewHelper.get('NavbarMain').highlightItem('/content/', this.id);
    
-        contentEditor = new ContentEditor({
+        contentEditor = new HashBrown.Client.Views.Editors.ContentEditor({
             modelUrl: apiUrl('content/' + this.id)
         });
         

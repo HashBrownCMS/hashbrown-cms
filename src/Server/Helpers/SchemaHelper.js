@@ -5,6 +5,7 @@ const FieldSchema = require('Server/Models/FieldSchema');
 const ContentSchema = require('Server/Models/ContentSchema');
 
 const SchemaHelperCommon = require('Common/Helpers/SchemaHelper');
+const MongoHelper = require('Server/Helpers/MongoHelper');
 
 const FileSystem = require('fs');
 const Path = require('path');
@@ -17,29 +18,29 @@ class SchemaHelper extends SchemaHelperCommon {
      * @returns {Promise} Array of Schemas
      */
     static getNativeSchemas() {
-        return new Promise(function(resolve, reject) {
-            if(!SchemaHelper.nativeSchemas) {
-                Glob(appRoot + '/src/common/schemas/*/*.schema', function(err, paths) {
+        return new Promise((resolve, reject) => {
+            if(!this.nativeSchemas) {
+                Glob(appRoot + '/src/Common/Schemas/*/*.schema', function(err, paths) {
                     if(err) {
                         reject(new Error(err));
                     
                     } else {
                         let queue = paths || [];
 
-                        // Cache native schemas
-                        SchemaHelper.nativeSchemas = {};
+                        // Native Schemas output
+                        let nativeSchemas = {};
 
                         if(queue.length > 0) {
-                            function readNextSchema() {
+                            let readNextSchema = () => {
                                 let schemaPath = queue[0];
 
-                                FileSystem.readFile(schemaPath, function(err, data) {
+                                FileSystem.readFile(schemaPath, (err, data) => {
                                     if(err) {
                                         throw err;
                                     }
 
                                     let properties = JSON.parse(data);
-                                    let parentDirName = Path.dirname(schemaPath).replace(appRoot + '/src/common/schemas/', '');
+                                    let parentDirName = Path.dirname(schemaPath).split('/').pop();
                                     let id = Path.basename(schemaPath, '.schema');
 
                                     // Generated values, will be overwritten every time
@@ -60,7 +61,7 @@ class SchemaHelper extends SchemaHelperCommon {
                                     schema.locked = true;
 
                                     // Add the loaded schema to the output array
-                                    SchemaHelper.nativeSchemas[schema.id] = schema;
+                                    nativeSchemas[schema.id] = schema;
 
                                     // Shift the queue (removes the first element of the array)
                                     queue.shift();
@@ -71,7 +72,7 @@ class SchemaHelper extends SchemaHelperCommon {
 
                                     // ...if not, we'll return all the loaded schemas
                                     } else {
-                                        resolve(SchemaHelper.nativeSchemas);
+                                        resolve(nativeSchemas);
                                     
                                     }
                                 });
@@ -86,7 +87,7 @@ class SchemaHelper extends SchemaHelperCommon {
                     }
                 }); 
             } else {
-                resolve(SchemaHelper.nativeSchemas);
+                resolve(this.nativeSchemas);
 
             }
         });
@@ -116,7 +117,7 @@ class SchemaHelper extends SchemaHelperCommon {
             let schemas = {};
 
             for(let i in result) {
-                let schema = SchemaHelper.getModel(result[i]);
+                let schema = this.getModel(result[i]);
 
                 if(schema) {
                     schemas[schema.id] = schema;
@@ -147,11 +148,11 @@ class SchemaHelper extends SchemaHelperCommon {
         let nativeSchemas;
         let customSchemas;
 
-        return SchemaHelper.getNativeSchemas()
+        return this.getNativeSchemas()
         .then((result) => {
             nativeSchemas = result;
 
-            return SchemaHelper.getCustomSchemas(project, environment);
+            return this.getCustomSchemas(project, environment);
         })
         .then((result) => {
             customSchemas = result;
@@ -206,7 +207,7 @@ class SchemaHelper extends SchemaHelperCommon {
      */
     static getNativeSchema(id) {
         return new Promise((resolve, reject) => {
-            Glob(appRoot + '/src/common/schemas/*/' + id + '.schema', function(err, paths) {
+            Glob(appRoot + '/src/Common/Schemas/*/' + id + '.schema', function(err, paths) {
                 if(err) {
                     reject(new Error(err));
                 
@@ -252,8 +253,8 @@ class SchemaHelper extends SchemaHelperCommon {
         let collection = environment + '.schemas';
 
         if(id) {
-            let promise = SchemaHelper.isNativeSchema(id) ?
-                SchemaHelper.getNativeSchema(id) :
+            let promise = this.isNativeSchema(id) ?
+                this.getNativeSchema(id) :
                 MongoHelper.findOne(
                     project,
                     collection,
@@ -266,7 +267,7 @@ class SchemaHelper extends SchemaHelperCommon {
             .then((schemaData) => {
                 if(schemaData && Object.keys(schemaData).length > 0) {
                     return new Promise((resolve, reject) => {
-                        let schema = SchemaHelper.getModel(schemaData);
+                        let schema = this.getModel(schemaData);
                         resolve(schema);
                     });
                 
@@ -365,14 +366,14 @@ class SchemaHelper extends SchemaHelperCommon {
         id = requiredParam('id')
     ) {
         return new Promise((resolve, reject) => {
-            SchemaHelper.getSchemaById(project, environment, id)
+            this.getSchemaById(project, environment, id)
             .then((schema) => {
                 // If this Schema has a parent, merge fields with it
                 if(schema.parentSchemaId) {
-                    SchemaHelper.getSchemaWithParentFields(project, environment, schema.parentSchemaId)
+                    this.getSchemaWithParentFields(project, environment, schema.parentSchemaId)
                     .then((parentSchema) => {
-                        let mergedSchema = SchemaHelper.mergeSchemas(schema, parentSchema);
-                        let model = SchemaHelper.getModel(mergedSchema);
+                        let mergedSchema = this.mergeSchemas(schema, parentSchema);
+                        let model = this.getModel(mergedSchema);
 
                         resolve(model);
                     })
@@ -380,7 +381,7 @@ class SchemaHelper extends SchemaHelperCommon {
 
                 // If this Schema doesn't have a parent, return this Schema
                 } else {
-                    let model = SchemaHelper.getModel(schema);
+                    let model = this.getModel(schema);
 
                     resolve(model);
 

@@ -1,6 +1,6 @@
 {
     "parentSchemaId": "fieldBase",
-    "editorId": "mediaReference",
+    "editorId": "MediaReferenceEditor",
     "icon": "file-image-o",
     "name": "Media Reference"
 }

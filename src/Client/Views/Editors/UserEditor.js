@@ -256,7 +256,7 @@ class UserEditor extends View {
             this.renderField('Email', this.renderEmailEditor()),
             this.renderField('Password', this.renderPasswordEditor()),
 
-            _.if(isCurrentUserAdmin() && !this.hidePermissions,
+            _.if(currentUserIsAdmin() && !this.hidePermissions,
                 this.renderField('Is admin', this.renderAdminEditor()),
 
                 _.if(!this.model.isAdmin,

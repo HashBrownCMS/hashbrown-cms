@@ -1,6 +1,9 @@
 'use strict';
 
 const FieldEditor = require('./FieldEditor');
+const SchemaHelper = require('Client/Helpers/SchemaHelper');
+const ContentHelper = require('Client/Helpers/ContentHelper');
+const ContentEditor = require('Client/Views/Editors/ContentEditor');
 
 /**
  * A struct editor for editing any arbitrary object value
@@ -63,7 +66,7 @@ module.exports = class StructEditor extends FieldEditor {
                     UI.errorModal(new Error('Field schema "' + keySchema.schemaId + '" could not be found for key " + k + "'));
                 }
 
-                let fieldEditor = resources.editors[fieldSchema.editorId];
+                let fieldEditor = ContentEditor.getFieldEditor(fieldSchema.editorId);
 
                 // Sanity check
                 value = ContentHelper.fieldSanityCheck(value, keySchema);

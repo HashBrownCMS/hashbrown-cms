@@ -1,7 +1,8 @@
 'use strict';
 
-// Classes
-let ApiController = require('./ApiController');
+const ApiController = require('Server/Controllers/ApiController');
+const SchemaHelper = require('Server/Helpers/SchemaHelper');
+const SyncHelper = require('Server/Helpers/SyncHelper');
 
 /**
  * The Controller for Schemas
@@ -26,11 +27,15 @@ class SchemaController extends ApiController {
      * Get a list of all Schemas
      */
     static getSchemas(req, res) {
-        let getter = req.query.customOnly ? 
-            SchemaHelper.getCustomSchemas :
-            SchemaHelper.getAllSchemas;
+        let getter = function() {
+            if(req.query.customOnly) {
+                return SchemaHelper.getCustomSchemas(req.project, req.environment);
+            } else {
+                return SchemaHelper.getAllSchemas(req.project, req.environment);
+            }
+        };
 
-        getter(req.project, req.environment)
+        getter()
         .then((schemas) => {
             res.status(200).send(schemas);
         })
@@ -43,12 +48,15 @@ class SchemaController extends ApiController {
      * Get a Schema by id
      */
     static getSchema(req, res) {
-        let id = req.params.id;
-        let getter = req.query.withParentFields ? 
-            SchemaHelper.getSchemaWithParentFields :
-            SchemaHelper.getSchemaById;
+        let getter = () => {
+            if(req.query.withParentFields) {
+                return SchemaHelper.getSchemaWithParentFields(req.project, req.environment, req.params.id);
+            } else {
+                return SchemaHelper.getSchemaById(req.project, req.environment, req.params.id);
+            }
+        }
 
-        getter(req.project, req.environment, id)    
+        getter()
         .then((schema) => {
             res.status(200).send(schema);
         })

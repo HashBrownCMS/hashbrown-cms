@@ -1,6 +1,9 @@
 'use strict';
 
 const FieldEditor = require('./FieldEditor');
+const SchemaHelper = require('Client/Helpers/SchemaHelper');
+const ContentHelper = require('Client/Helpers/ContentHelper');
+const ContentEditor = require('Client/Views/Editors/ContentEditor');
 
 /**
  * An array editor for editing a list of other field values
@@ -247,7 +250,7 @@ module.exports = class ArrayEditor extends FieldEditor {
                 return;
             }
 
-            let fieldEditor = resources.editors[itemSchema.editorId];
+            let fieldEditor = ContentEditor.getFieldEditor(itemSchema.editorId);
 
             if(!fieldEditor) {
                 UI.errorModal(new Error('Field editor "' + fieldEditor + '" was not found'));

@@ -1,6 +1,6 @@
 {
     "parentSchemaId": "fieldBase",
-    "editorId": "date",
+    "editorId": "DateEditor",
     "icon": "calendar",
     "name": "Date"
 }

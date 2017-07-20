@@ -1,5 +1,15 @@
-'strict';
+'use strict';
 
+const Content = require('Client/Models/Content');
+const SchemaHelper = require('Client/Helpers/SchemaHelper');
+const ContentHelper = require('Client/Helpers/ContentHelper');
+const ConnectionHelper = require('Client/Helpers/ConnectionHelper');
+
+/**
+ * The editor view for Content objects
+ *
+ * @memberof HashBrown.Client.Views.Editors
+ */
 class ContentEditor extends View {
     constructor(params) {
         super(params);
@@ -163,6 +173,26 @@ class ContentEditor extends View {
     }
 
     /**
+     * Gets a field editor for a Schema
+     *
+     * @param {string} editorId
+     *
+     * @returns {View} Field editor
+     */
+    static getFieldEditor(editorId) {
+        if(!editorId) { return; }
+
+        // Backwards compatible check
+        editorId = editorId.charAt(0).toUpperCase() + editorId.slice(1);
+        
+        if(editorId.indexOf('Editor') < 0) {
+            editorId += 'Editor';
+        }
+
+        return HashBrown.Client.Views.Editors.FieldEditors[editorId];
+    }
+
+    /**
      * Renders a field view
      *
      * @param {Object} fieldValue The field value to inject into the field editor
@@ -177,7 +207,7 @@ class ContentEditor extends View {
         let compiledSchema = SchemaHelper.getFieldSchemaWithParentConfigs(fieldDefinition.schemaId);
 
         if(compiledSchema) {
-            let fieldEditor = resources.editors[compiledSchema.editorId];
+            let fieldEditor = ContentEditor.getFieldEditor(compiledSchema.editorId);
             
             if(fieldEditor) {
                 let fieldEditorInstance = new fieldEditor({
@@ -426,7 +456,9 @@ class ContentEditor extends View {
             this.model.properties = {};
         }
 
-        this.model = new Content(this.model);
+        if(this.model instanceof Content === false) {
+            this.model = new Content(this.model);
+        }
         
         this.$element.toggleClass('locked', this.model.locked);
 

@@ -1,9 +1,9 @@
 module.exports = function() {
-    let isAdmin = User.current.isAdmin;
-    let hasConnectionsScope = User.current.hasScope(ProjectHelper.currentProject, 'connections');
-    let hasSchemasScope = User.current.hasScope(ProjectHelper.currentProject, 'schemas');
-    let hasTemplatesScope = User.current.hasScope(ProjectHelper.currentProject, 'templates');
-    let hasSettingsScope = User.current.hasScope(ProjectHelper.currentProject, 'settings');
+    let currentUser = HashBrown.Common.Models.User.current;
+    let hasConnectionsScope = currentUser.hasScope(ProjectHelper.currentProject, 'connections');
+    let hasSchemasScope = currentUser.hasScope(ProjectHelper.currentProject, 'schemas');
+    let hasTemplatesScope = currentUser.hasScope(ProjectHelper.currentProject, 'templates');
+    let hasSettingsScope = currentUser.hasScope(ProjectHelper.currentProject, 'settings');
      
     /**
      * Fetches pane information and renders it

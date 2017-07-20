@@ -1,5 +1,8 @@
 'use strict';
 
+const User = require('Common/Models/User');
+const UserEditor = require('Client/Views/Editors/UserEditor');
+
 class MainMenu extends View {
     constructor(params) {
         super(params);
@@ -23,7 +26,7 @@ class MainMenu extends View {
 
         reloadResource('content')
         .then(() => {
-            NavbarMain.reload();
+            HashBrown.Client.Views.Navigation.NavbarMain.reload();
 
             let contentEditor = ViewHelper.get('ContentEditor');
 
@@ -120,15 +123,8 @@ class MainMenu extends View {
     }
 
     render() {
-        // Find current user
-        for(let user of resources.users) {
-            if(user.isCurrent) {
-                this.user = user;
-            }
-        }
-
         // Render menu
-        this.languages = LanguageHelper.selectedLanguages || [];
+        this.languages = HashBrown.Client.Helpers.LanguageHelper.selectedLanguages || [];
 
         _.append(this.$element.empty(),
             // Language picker
@@ -163,7 +159,7 @@ class MainMenu extends View {
                 ),
                 _.ul({class: 'dropdown-menu'},
                     _.li(
-                        _.a({class: 'dropdown-item', href: '#/users/' + this.user.id}, 'User settings')
+                        _.a({class: 'dropdown-item', href: '#/users/' + User.current.id}, 'User settings')
                             .click((e) => { e.preventDefault(); new UserEditor({ hidePermissions: true, model: User.current }); })
                     ),
                     _.li(

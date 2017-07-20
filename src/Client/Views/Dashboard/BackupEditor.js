@@ -152,7 +152,7 @@ class BackupEditor extends View {
      * Event: Click backup button
      */
     onClickCreateBackup() {
-        if(!isCurrentUserAdmin()) { return; }
+        if(!currentUserIsAdmin()) { return; }
 
         apiCall('post', 'server/backups/' + this.model.id + '/new')
         .then((data) => {
@@ -179,7 +179,7 @@ class BackupEditor extends View {
      * @param {String} timestamp
      */
     onClickRestoreBackup(timestamp) {
-        if(!isCurrentUserAdmin()) { return; }
+        if(!currentUserIsAdmin()) { return; }
             
         let label = '"' + timestamp + '"';
         let date = new Date(parseInt(timestamp));
@@ -229,7 +229,7 @@ class BackupEditor extends View {
      * Event: Click delete backup button
      */ 
     onClickDeleteBackup(timestamp) {
-        if(!isCurrentUserAdmin()) { return; }
+        if(!currentUserIsAdmin()) { return; }
         
         let label = timestamp;
         let date = new Date(parseInt(timestamp));

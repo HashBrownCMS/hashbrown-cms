@@ -1,15 +1,5 @@
 'use strict';
 
-// Panes
-const CMSPane = require('./CMSPane');
-const ConnectionPane = require('./ConnectionPane');
-const ContentPane = require('./ContentPane');
-const FormsPane = require('./FormsPane');
-const MediaPane = require('./MediaPane');
-const SchemaPane = require('./SchemaPane');
-const SettingsPane = require('./SettingsPane');
-const TemplatePane = require('./TemplatePane');
-
 /**
  * The main navbar
  */
@@ -20,14 +10,14 @@ class NavbarMain extends View {
         this.template = require('Client/Templates/Navigation/NavbarMain');
         this.tabPanes = [];
 
-        CMSPane.init();
-        ContentPane.init();
-        MediaPane.init();
-        FormsPane.init();
-        TemplatePane.init();
-        ConnectionPane.init();
-        SchemaPane.init();
-        SettingsPane.init();
+        HashBrown.Client.Views.Navigation.CMSPane.init();
+        HashBrown.Client.Views.Navigation.ContentPane.init();
+        HashBrown.Client.Views.Navigation.MediaPane.init();
+        HashBrown.Client.Views.Navigation.FormsPane.init();
+        HashBrown.Client.Views.Navigation.TemplatePane.init();
+        HashBrown.Client.Views.Navigation.ConnectionPane.init();
+        HashBrown.Client.Views.Navigation.SchemaPane.init();
+        HashBrown.Client.Views.Navigation.SettingsPane.init();
 
         this.init();
         
@@ -203,7 +193,7 @@ class NavbarMain extends View {
     getItemIcon(item, settings) {
         // If this item has a Schema id, fetch the appropriate icon
         if(item.schemaId) {
-            let schema = SchemaHelper.getSchemaByIdSync(item.schemaId);
+            let schema = HashBrown.Client.Helpers.SchemaHelper.getSchemaByIdSync(item.schemaId);
 
             if(schema) {
                 return schema.icon;

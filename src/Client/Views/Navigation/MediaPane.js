@@ -120,7 +120,7 @@ class MediaPane extends NavbarPane {
 
             // Hierarchy logic
             hierarchy: (item, queueItem) => {
-                let isSyncEnabled = SettingsHelper.getCachedSettings(ProjectHelper.currentProject, null, 'sync').enabled;
+                let isSyncEnabled = HashBrown.Client.Helpers.SettingsHelper.getCachedSettings(ProjectHelper.currentProject, null, 'sync').enabled;
 
                 queueItem.$element.attr('data-media-id', item.id);
                

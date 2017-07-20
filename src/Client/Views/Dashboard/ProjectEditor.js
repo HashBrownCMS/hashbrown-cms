@@ -25,7 +25,7 @@ class ProjectEditor extends View {
      * Event: Click remove button
      */ 
     onClickRemove() {
-        if(!isCurrentUserAdmin()) { return; }
+        if(!currentUserIsAdmin()) { return; }
 
         let modal = new MessageModal({
             model: {
@@ -81,7 +81,7 @@ class ProjectEditor extends View {
     /**
      * Event: Click info button */
     onClickInfo() {
-        if(!isCurrentUserAdmin()) { return; }
+        if(!currentUserIsAdmin()) { return; }
         
         let infoEditor = new InfoEditor({ projectId: this.model.id });
 
@@ -96,7 +96,7 @@ class ProjectEditor extends View {
      * Event: Click sync button
      */
     onClickSync() {
-        if(!isCurrentUserAdmin()) { return; }
+        if(!currentUserIsAdmin()) { return; }
 
         let syncEditor = new SyncEditor({ projectId: this.model.id });
         
@@ -115,7 +115,7 @@ class ProjectEditor extends View {
      * Event: Click languages button
      */
     onClickLanguages() {
-        if(!isCurrentUserAdmin()) { return; }
+        if(!currentUserIsAdmin()) { return; }
         
         let languageEditor = new LanguageEditor({ projectId: this.model.id });
         
@@ -130,7 +130,7 @@ class ProjectEditor extends View {
      * Event: Click backups button
      */
     onClickBackups() {
-        if(!isCurrentUserAdmin()) { return; }
+        if(!currentUserIsAdmin()) { return; }
         
         new BackupEditor({ model: this.model });
     }
@@ -139,7 +139,7 @@ class ProjectEditor extends View {
      * Event: Click migration button
      */
     onClickMigrate() {
-        if(!isCurrentUserAdmin()) { return; }
+        if(!currentUserIsAdmin()) { return; }
     
         new MigrationEditor({ model: this.model });
     }
@@ -184,7 +184,7 @@ class ProjectEditor extends View {
 
         _.append(this.$element.empty(),
             _.div({class: 'body'},
-                _.if(isCurrentUserAdmin(),
+                _.if(currentUserIsAdmin(),
                     _.div({class: 'admin dropdown'}, 
                         _.button({class: 'dropdown-toggle', 'data-toggle': 'dropdown'},
                             _.span({class: 'fa fa-ellipsis-v'})
@@ -237,7 +237,7 @@ class ProjectEditor extends View {
                                 _.a({title: 'Go to "' + environment + '" CMS', href: '/' + this.model.id + '/' + environment, class: 'environment-title btn btn-default'}, 
                                     environment
                                 ),
-                                _.if(isCurrentUserAdmin(),
+                                _.if(currentUserIsAdmin(),
                                     _.div({class: 'dropdown'},
                                         _.button({class: 'dropdown-toggle', 'data-toggle': 'dropdown'},
                                             _.span({class: 'fa fa-ellipsis-v'})
@@ -254,7 +254,7 @@ class ProjectEditor extends View {
                             )
                         );
                     }),
-                    _.if(isCurrentUserAdmin(),
+                    _.if(currentUserIsAdmin(),
                         _.button({title: 'Add environment', class: 'btn btn-primary btn-add btn-raised btn-round'}, _.span({class: 'fa fa-plus'}))
                             .click(() => { this.onClickAddEnvironment(); })
                     )

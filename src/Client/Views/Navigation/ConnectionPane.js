@@ -136,7 +136,7 @@ class ConnectionPane extends NavbarPane {
             // Item context menu
             getItemContextMenu: (item) => {
                 let menu = {};
-                let isSyncEnabled = SettingsHelper.getCachedSettings(ProjectHelper.currentProject, null, 'sync').enabled;
+                let isSyncEnabled = HashBrown.Client.Helpers.SettingsHelper.getCachedSettings(ProjectHelper.currentProject, null, 'sync').enabled;
                 
                 menu['This connection'] = '---';
                 menu['Copy id'] = () => { this.onClickCopyItemId(); };

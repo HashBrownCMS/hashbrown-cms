@@ -8,27 +8,21 @@ const User = require('Common/Models/User');
 /**
  * Checks if the currently logged in user is admin
  *
- * @resurns {Boolean} Is admin
+ * @returns {Boolean} Is admin
  */
-window.isCurrentUserAdmin = function isCurrentUserAdmin() {
+window.currentUserIsAdmin = function isCurrentUserAdmin() {
     return User.current.isAdmin;
 }
 
 /**
- * Checks if the currently logged in user has a particular scope
+ * Checks if the currently logged in user has a certain scope
  *
  * @param {String} scope
  *
- * @resurns {Boolean} Has scope
+ * @returns {Boolean} Has scope
  */
-window.currentUserHasScope = function currentUserHasScope(scope) {
-    for(let user of resources.users) {
-        if(user.isCurrent) {
-            return user.hasScope(scope);
-        }
-    }
-
-    return false;
+window.currentUserHasScope = function currentUsr(scope) {
+    return User.current.hasScope(ProjectHelper.currentProject, scope);
 }
 
 /**

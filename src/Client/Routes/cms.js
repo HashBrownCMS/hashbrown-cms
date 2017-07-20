@@ -35,7 +35,7 @@ Router.route('/', function() {
         ]
     ];
 
-    if(User.current.hasScope(ProjectHelper.currentProject, 'connections')) {
+    if(currentUserHasScope('connections')) {
         carouselItems.push([
             _.div(
                 _.img({src: '/img/welcome/intro-connections.jpg'})
@@ -47,7 +47,7 @@ Router.route('/', function() {
         ]);
     }
     
-    if(User.current.hasScope(ProjectHelper.currentProject, 'schemas')) {
+    if(currentUserHasScope('schemas')) {
         carouselItems.push([
             _.div(
                 _.img({src: '/img/welcome/intro-schemas.jpg'})
@@ -59,7 +59,7 @@ Router.route('/', function() {
         ]);
     }
 
-    if(User.current.hasScope(ProjectHelper.currentProject, 'users')) {
+    if(currentUserHasScope('users')) {
         carouselItems.push([
             _.div(
                 _.img({src: '/img/welcome/intro-users.jpg'})
@@ -71,7 +71,7 @@ Router.route('/', function() {
         ]);
     }
     
-    if(User.current.hasScope(ProjectHelper.currentProject, 'settings')) {
+    if(currentUserHasScope('settings')) {
         carouselItems.push([
             _.div(
                 _.img({src: '/img/welcome/intro-settings.jpg'})

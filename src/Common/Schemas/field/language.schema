@@ -1,6 +1,6 @@
 {
     "parentSchemaId": "fieldBase",
-    "editorId": "language",
+    "editorId": "LanguageEditor",
     "icon": "globe",
     "name": "Language"
 }
