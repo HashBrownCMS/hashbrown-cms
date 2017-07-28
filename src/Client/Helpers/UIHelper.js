@@ -1,5 +1,7 @@
 'use strict';
 
+const MessageModal = require('Client/Views/Modals/MessageModal');
+
 /**
  * A UI helper for creating and handling common interface behaviours
  *
@@ -194,9 +196,6 @@ module.exports = class UIHelper {
      * @returns {HtmlElement} Dropdown element
      */
     static inputDropdown(defaultValue, options, onChange, useClearButton) {
-        let $toggle;
-        let $clear;
-
         // If "options" parameter is a number, convert to array
         if(typeof options === 'number') {
             let amount = options;
@@ -247,34 +246,63 @@ module.exports = class UIHelper {
             highlightSelectedValue();
         };
 
-        let $element = _.div({class: 'dropdown'},
-            $toggle = _.button({class: 'btn btn-default dropdown-toggle', type: 'button', 'data-toggle': 'dropdown'},
-                '(none)'
-            ),
+        // Base elements
+        let $element = _.div({class: 'dropdown'});
+        let $toggle = _.button({class: 'btn btn-default dropdown-toggle', type: 'button', 'data-toggle': 'dropdown'}, '(none)');
+        let $clear = _.button({class: 'btn btn-default btn-small dropdown-clear'}, _.span({class: 'fa fa-remove'})).on('click', onClear);
+        let $list = _.ul({class: 'dropdown-menu-items'});
+
+        // Add an option
+        $element.on('addOption', (e, option) => {
+            let optionLabel = option.label || option.id || option.name || option.toString();
+            let isSelected = option.selected || option.value == defaultValue;
+
+            if(isSelected) {
+                $toggle.html(optionLabel);
+            }
+
+            let $li = _.li({'data-value': option.value || optionLabel, class: isSelected ? 'active' : ''},
+                _.button(optionLabel).on('click', onClick)
+            );
+
+            $list.append($li);
+        });
+
+        // Remove an option
+        $element.on('removeOption', (e, optionValue) => {
+            $list.children('[data-value="' + optionValue + '"]').remove();
+        });
+        
+        // Change an option
+        $element.on('changeOption', (e, oldOptionValue, newOption) => {
+            $element.trigger('removeOption', oldOptionValue);
+            $element.trigger('addOption', newOption);
+        });
+
+        // Set current option
+        $element.on('setValue', (e, newValue) => {
+            let $option = $list.children('[data-value="' + newValue + '"]');
+            
+            if($option.length > 0) {
+                $toggle.html($option.children('button').html());   
+            }
+        });
+
+        // Render
+        _.append($element,
+            $toggle,
             _.if(useClearButton,
-                $clear = _.button({class: 'btn btn-default btn-small dropdown-clear'},
-                    _.span({class: 'fa fa-remove'})
-                ).on('click', onClear)
+                $clear
             ),
             _.div({class: 'dropdown-menu'}, 
-                _.ul({class: 'dropdown-menu-items'},
-                    _.each(options, (i, option) => {
-                        let optionLabel = option.label || option.id || option.name || option.toString();
-                        let isSelected = option.selected || option.value == defaultValue;
-
-                        if(isSelected) {
-                            $toggle.html(optionLabel);
-                        }
-
-                        let $li = _.li({'data-value': option.value || optionLabel, class: isSelected ? 'active' : ''},
-                            _.button(optionLabel).on('click', onClick)
-                        );
-
-                        return $li;
-                    })
-                )
+                $list
             )
         );
+
+        // Render all options
+        for(let i in options || []) {
+            $element.trigger('addOption', options[i]);
+        }
 
         return $element;
     }
@@ -397,7 +425,7 @@ module.exports = class UIHelper {
 
         }
 
-        new HashBrown.Client.Views.Modals.MessageModal({
+        new MessageModal({
             model: {
                 title: '<span class="fa fa-warning"></span> Error',
                 body: error.message + '<br /><br />Please check the JavaScript console for details',
@@ -416,7 +444,7 @@ module.exports = class UIHelper {
      * @param {String} body
      */
     static messageModal(title, body, onSubmit) {
-        return new HashBrown.Client.Views.Modals.MessageModal({
+        return new MessageModal({
             model: {
                 title: title,
                 body: body,
@@ -436,7 +464,7 @@ module.exports = class UIHelper {
     static iframeModal(title, url, onload, onerror) {
         let $iframe = _.iframe({src: url});
 
-        return new HashBrown.Client.Views.Modals.MessageModal({
+        return new MessageModal({
             model: {
                 title: title,
                 body: [
@@ -491,7 +519,7 @@ module.exports = class UIHelper {
                 break;
         }
 
-        return new HashBrown.Views.Modals.MessageModal({
+        return new MessageModal({
             model: {
                 title: title,
                 body: body,

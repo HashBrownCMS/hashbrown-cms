@@ -1,5 +1,7 @@
 'use strict';
 
+const Content = require('Client/Models/Content');
+
 const FieldEditor = require('./FieldEditor');
 
 /**

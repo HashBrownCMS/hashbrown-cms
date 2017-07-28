@@ -22,7 +22,7 @@ Router.route('/connections/', function() {
 // Edit
 Router.route('/connections/:id', function() {
     if(currentUserHasScope('connections')) {
-        let connectionEditor = new ConnectionEditor({
+        let connectionEditor = new HashBrown.Client.Views.Editors.ConnectionEditor({
             modelUrl: apiUrl('connections/' + this.id)
         });
        
@@ -39,7 +39,7 @@ Router.route('/connections/:id', function() {
 // Edit (JSON editor)
 Router.route('/connections/json/:id', function() {
     if(currentUserHasScope('connections')) {
-        let connectionEditor = new JSONEditor({
+        let connectionEditor = new HashBrown.Client.Views.Editors.JSONEditor({
             apiPath: 'connections/' + this.id
         });
          

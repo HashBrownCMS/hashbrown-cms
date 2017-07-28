@@ -49,10 +49,10 @@ class SchemaHelper extends SchemaHelperCommon {
                                     let schema;
                                     
                                     switch(parentDirName) {
-                                        case 'content':
+                                        case 'Content':
                                             schema = new ContentSchema(properties);
                                             break;
-                                        case 'field':
+                                        case 'Field':
                                             schema = new FieldSchema(properties);
                                             break;
                                     }
@@ -179,8 +179,8 @@ class SchemaHelper extends SchemaHelperCommon {
      * @returns {Boolean} isNative
      */
     static isNativeSchema(id) {
-        let fieldPath = appRoot + '/src/common/schemas/field/' + id + '.schema';
-        let contentPath = appRoot + '/src/common/schemas/content/' + id + '.schema';
+        let fieldPath = appRoot + '/src/Common/Schemas/Field/' + id + '.schema';
+        let contentPath = appRoot + '/src/Common/Schemas/Content/' + id + '.schema';
     
         try {
             FileSystem.statSync(fieldPath);
@@ -214,18 +214,18 @@ class SchemaHelper extends SchemaHelperCommon {
                 } else {
                     let schemaPath = paths[0];
 
-                    FileSystem.readFile(schemaPath, function(err, data) {
+                    FileSystem.readFile(schemaPath, (err, data) => {
                         if(err) {
                             reject(new Error(err));
                         
                         } else {
                             let properties = JSON.parse(data);
-                            let parentDirName = Path.dirname(schemaPath).replace(appRoot + '/src/common/schemas/', '');
+                            let parentDirName = Path.dirname(schemaPath).split('/').pop();
                             let id = Path.basename(schemaPath, '.schema');
 
                             // Generated values, will be overwritten every time
                             properties.id = id;
-                            properties.type = parentDirName;
+                            properties.type = parentDirName.toLowerCase();
                             properties.locked = true;
 
                             resolve(properties);
@@ -252,37 +252,31 @@ class SchemaHelper extends SchemaHelperCommon {
     ) {
         let collection = environment + '.schemas';
 
-        if(id) {
-            let promise = this.isNativeSchema(id) ?
-                this.getNativeSchema(id) :
-                MongoHelper.findOne(
-                    project,
-                    collection,
-                    {
-                        id: id
-                    }
-                );
-            
-            return promise
-            .then((schemaData) => {
-                if(schemaData && Object.keys(schemaData).length > 0) {
-                    return new Promise((resolve, reject) => {
-                        let schema = this.getModel(schemaData);
-                        resolve(schema);
-                    });
-                
-                } else {
-                    return SyncHelper.getResourceItem(project, environment, 'schemas', id);
-
-                }
-            });
-
-        } else {
-            return new Promise((resolve, reject) => {
-                reject(new Error('Schema id is null'));
-            });
-
+        if(!id) {
+            return Promise.reject(new Error('Schema id is null'));
         }
+
+        let promise = this.isNativeSchema(id) ?
+            this.getNativeSchema(id) :
+            MongoHelper.findOne(
+                project,
+                collection
+                ,
+                {
+                    id: id
+                }
+            );
+        
+        return promise
+        .then((schemaData) => {
+            if(schemaData && Object.keys(schemaData).length > 0) {
+                return Promise.resolve(this.getModel(schemaData));
+            
+            } else {
+                return SyncHelper.getResourceItem(project, environment, 'schemas', id);
+
+            }
+        });
     }
    
     /**
@@ -332,18 +326,11 @@ class SchemaHelper extends SchemaHelperCommon {
                 if(!childSchema.tabs) {
                     childSchema.tabs = {};
                 }
-                
+               
                 // Merge tabs
-                for(let k in mergedSchema.tabs) {
-                   mergedTabs[k] = mergedSchema.tabs[k];
-                }
+                merge(mergedSchema.tabs, childSchema.tabs);
 
-                for(let k in childSchema.tabs) {
-                   mergedTabs[k] = childSchema.tabs[k];
-                }
-
-                mergedSchema.tabs = mergedTabs;
-
+                // Set default tab id
                 mergedSchema.defaultTabId = childSchema.defaultTabId || mergedSchema.defaultTabId;
                 break;
         }
@@ -365,29 +352,29 @@ class SchemaHelper extends SchemaHelperCommon {
         environment = requiredParam('environment'),
         id = requiredParam('id')
     ) {
-        return new Promise((resolve, reject) => {
-            this.getSchemaById(project, environment, id)
-            .then((schema) => {
-                // If this Schema has a parent, merge fields with it
-                if(schema.parentSchemaId) {
-                    this.getSchemaWithParentFields(project, environment, schema.parentSchemaId)
-                    .then((parentSchema) => {
-                        let mergedSchema = this.mergeSchemas(schema, parentSchema);
-                        let model = this.getModel(mergedSchema);
+        // Get the Schema by id
+        return this.getSchemaById(project, environment, id)
 
-                        resolve(model);
-                    })
-                    .catch(reject);
+        // Return object along with any parent objects
+        .then((schema) => {
+            if(!schema) {
+                return Promise.reject(new Error('Schema by id "' + id + '" could not be found'));
+            }
 
-                // If this Schema doesn't have a parent, return this Schema
-                } else {
-                    let model = this.getModel(schema);
+            // If this Schema has a parent, merge fields with it
+            if(schema.parentSchemaId) {
+                return this.getSchemaWithParentFields(project, environment, schema.parentSchemaId)
+                .then((parentSchema) => {
+                    let mergedSchema = this.mergeSchemas(schema, parentSchema);
 
-                    resolve(model);
+                    return Promise.resolve(mergedSchema);
+                });
+            }
 
-                }
-            })
-            .catch(reject);
+            // If this Schema doesn't have a parent, return this Schema
+            let model = this.getModel(schema);
+            
+            return Promise.resolve(model);
         });
     }
 

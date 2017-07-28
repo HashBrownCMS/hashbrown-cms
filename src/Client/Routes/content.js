@@ -27,10 +27,10 @@ Router.route('/content/json/:id', function() {
 
 // Edit (redirect to default tab)
 Router.route('/content/:id', function() {
-    let content = resources.content.filter((c) => { return c.id == this.id; })[0];
+    let content = HashBrown.Client.Helpers.ContentHelper.getContentByIdSync(this.id);
 
     if(content) {
-        let contentSchema = resources.schemas[content.schemaId];
+        let contentSchema = HashBrown.Client.Helpers.SchemaHelper.getSchemaByIdSync(content.schemaId);
 
         if(contentSchema) {
             location.hash = '/content/' + this.id + '/' + (contentSchema.defaultTabId || 'meta');

@@ -1,5 +1,8 @@
 'use strict';
 
+const ProjectHelper = require('Client/Helpers/ProjectHelper');
+const SettingsHelper = require('Client/Helpers/SettingsHelper');
+
 /**
  * A browser modal for Media objects
  *
@@ -244,7 +247,7 @@ module.exports = class MediaBrowser extends View {
                                 ).click(() => {
                                     this.$element.toggleClass('disabled', true);
 
-                                    MediaBrowser.uploadModal(
+                                    this.uploadModal(
                                         (id) => {
                                             this.$element.toggleClass('disabled', false);
 

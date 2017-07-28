@@ -29,7 +29,7 @@ module.exports = class SchemaHelper {
      * @return {Schema} schema
      */
     static getModel(properties) {
-        switch(properties.type) {
+        switch(properties.type.toLowerCase()) {
             case 'content': default:
                 return new ContentSchema(properties);
         

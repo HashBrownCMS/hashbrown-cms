@@ -65,7 +65,7 @@ apiCall('get', 'user')
 // Users
 // --------------------
 .then(() => {
-    if(!isCurrentUserAdmin()) { return Promise.resolve(); }
+    if(!currentUserIsAdmin()) { return Promise.resolve(); }
 
     return apiCall('get', 'users');
 })
@@ -128,7 +128,7 @@ apiCall('get', 'user')
 // Restart button
 // --------------------
 .then(() => {
-    if(!isCurrentUserAdmin()) { return Promise.resolve(); }
+    if(!currentUserIsAdmin()) { return Promise.resolve(); }
 
     $('.btn-restart').click(() => {
         apiCall('post', 'server/restart')
@@ -142,7 +142,7 @@ apiCall('get', 'user')
 // Updates
 // --------------------
 .then(() => {
-    if(!isCurrentUserAdmin()) { return; }
+    if(!currentUserIsAdmin()) { return; }
 
     let $btnUpdate = _.find('.btn-update');
 

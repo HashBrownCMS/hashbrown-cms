@@ -76,7 +76,7 @@ module.exports = class RichTextEditor extends FieldEditor {
      * Event: Click insert media
      */
     onClickInsertMedia() {
-        let mediaBrowser = new MediaBrowser();
+        let mediaBrowser = new HashBrown.Client.Views.Modals.MediaBrowser();
 
         mediaBrowser.on('select', (id) => {
             MediaHelper.getMediaById(id)

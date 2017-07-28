@@ -42,7 +42,7 @@ module.exports = class ArrayEditor extends FieldEditor {
                 })
             )
         );
-        
+
         this.fetch();
     }
     
@@ -330,7 +330,6 @@ module.exports = class ArrayEditor extends FieldEditor {
                             // If a label field was found, check if it has a value
                             if(item[configKey]) {
                                 schemaLabel = item[configKey] || schemaLabel;
-                                console.log('s2', schemaLabel);
                                 break;
                             }
                         }

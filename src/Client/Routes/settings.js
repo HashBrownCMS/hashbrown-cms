@@ -25,7 +25,7 @@ Router.route('/settings/providers/', function() {
         ViewHelper.get('NavbarMain').highlightItem('/settings/', 'providers');
         
         populateWorkspace(
-            new ProvidersSettings().$element
+            new HashBrown.Client.Views.Editors.ProvidersSettings().$element
         );
     
     } else {

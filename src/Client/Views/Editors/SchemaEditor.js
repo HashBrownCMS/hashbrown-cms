@@ -1,6 +1,11 @@
 // Icons
 let icons = require('../../icons.json').icons;
 
+const Schema = require('Common/Models/Schema');
+const SchemaHelper = require('Client/Helpers/SchemaHelper');
+const ContentHelper = require('Client/Helpers/ContentHelper');
+const JSONEditor = require('Client/Views/Editors/JSONEditor');
+
 /**
  * The editor for schemas
  *
@@ -37,14 +42,12 @@ class SchemaEditor extends View {
         .then(() => {
             this.$saveBtn.toggleClass('working', false);
         
-            reloadResource('schemas')
-            .then(() => {
-                let navbar = ViewHelper.get('NavbarMain');
-                
-                navbar.reload();
-            });
+            return reloadResource('schemas');
         })
-        .catch(errorModal);
+        .then(() => {
+            ViewHelper.get('NavbarMain').reload();
+        })
+        .catch(UI.errorModal);
     }
 
     /**
@@ -57,22 +60,28 @@ class SchemaEditor extends View {
         
         let editorOptions = [];
 
-        for(let editorId in resources.editors) {
+        for(let i in HashBrown.Client.Views.Editors.FieldEditors) {
+            let editor = HashBrown.Client.Views.Editors.FieldEditors[i];
+
             editorOptions[editorOptions.length] = {
-                value: editorId,
-                label: resources.editors[editorId].name
+                value: editor.id,
+                label: editor.name
             };
         }
 
         let editorName = '(none)';
+        let editorId = this.model.editorId;
         
-        if(resources.editors[this.model.editorId]) {
-            editorName = resources.editors[this.model.editorId].name;
+        // Backwards compatible check
+        editorId = editorId.charAt(0).toUpperCase() + editorId.slice(1);
+        
+        if(HashBrown.Client.Views.Editors.FieldEditors[editorId]) {
+            editorName = HashBrown.Client.Views.Editors.FieldEditors[editorId].name;
         }
 
         let $element = _.div({class: 'editor-picker'},
             _.if(!this.model.locked,
-                UI.inputDropdownTypeAhead(this.model.editorId, editorOptions, (newValue) => {
+                UI.inputDropdownTypeAhead(editorId, editorOptions, (newValue) => {
                     this.model.editorId = newValue;
                 })
             ),
@@ -130,7 +139,7 @@ class SchemaEditor extends View {
             let oldId = $chip.attr('data-id');
             let newLabel = $input.val();
             let newId = ContentHelper.getSlug(newLabel);
-            let $defaultTabSelect = view.$element.find('.default-tab-editor select');
+            let $defaultTab = view.$element.find('.default-tab-editor .dropdown');
 
             // Assign new id to data attribute
             $chip.attr('data-id', newId);
@@ -142,29 +151,20 @@ class SchemaEditor extends View {
             view.model.tabs[newId] = newLabel;
 
             // Remove old tab from select element
-            $defaultTabSelect.children().each((i, option) => {
-                if($(option).attr('value') == oldId) {
-                    $(option).remove();
-                }
-            });
-
-            // Append the new tab to the select element
-            $defaultTabSelect.append(
-                _.option({value: newId}, newLabel)
-            );
+            $defaultTab.trigger('changeOption', [ oldId, { id: newId, label: newLabel } ]);
 
             // If the default tab id was the old id, update the select element
             if(view.model.defaultTabId == oldId) {
                 view.model.defaultTabId = newId;
 
-                $defaultTabSelect.val(newId);
+                $defaultTab.trigger('setValue', newId);
             }
         }
 
         function onClickRemove($btn) {
             let $chip = $btn.parents('.chip');
             let id = $chip.attr('data-id');
-            let $defaultTabSelect = view.$element.find('.default-tab-editor select');
+            let $defaultTab = view.$element.find('.default-tab-editor .dropdown');
 
             // Remove the id from the tabs list
             delete view.model.tabs[id];
@@ -173,24 +173,20 @@ class SchemaEditor extends View {
             $chip.remove();
             
             // Remove the tab from select element
-            $defaultTabSelect.children().each((i, option) => {
-                if($(option).attr('value') == id) {
-                    $(option).remove();
-                }
-            });
+            $defaultTab.trigger('removeOption', id);
             
             // If default tab id was this tab, revert to 'meta'
             if(view.model.defaultTabId == id) {
                 view.model.defaultTabId = 'meta';
 
-                $defaultTabSelect.val('meta');
+                $defaultTab.trigger('setValue', 'meta');
             }
         }
         
         function onClickAdd() {
             let name = 'New tab';
             let id = 'new-tab';
-            let $defaultTabSelect = view.$element.find('.default-tab-editor select');
+            let $defaultTab = view.$element.find('.default-tab-editor .dropdown');
 
             // Add new tab to model
             view.model.tabs[id] = name;
@@ -199,9 +195,7 @@ class SchemaEditor extends View {
             render();
 
             // Add new tab to default tab select element
-            $defaultTabSelect.append(
-                _.option({value: id}, name)
-            );
+            $defaultTab.trigger('addOption', { value: id, label: name});
         }
 
         function render() {
@@ -221,7 +215,7 @@ class SchemaEditor extends View {
                         })
                     );
                 })
-                .catch(errorModal);
+                .catch(UI.errorModal);
             }
 
             let $tabs = _.div({class: 'chip-group'});
@@ -410,17 +404,17 @@ class SchemaEditor extends View {
         let tabOptions = [
             { value: 'meta', label: 'Meta' }
         ];
-        
-        // Sanity check
-        this.model.defaultTabId = this.model.defaultTabId || 'meta';
 
-        for(let k in this.compiledSchema.tabs) {
-            tabOptions[tabOptions.length] = { value: k, label: this.compiledSchema.tabs[k] };
+        // Sanity check
+        this.model.defaultTabId = this.model.defaultTabId || this.compiledSchema.defaultTabId || 'meta';
+
+        for(let value in this.compiledSchema.tabs) {
+            tabOptions[tabOptions.length] = { value: value, label: this.compiledSchema.tabs[value] };
         }
 
         let $element = _.div({class: 'default-tab-editor'},
             _.if(!this.model.locked,
-                UI.inputDropdownTypeAhead(this.model.defaultTabId, tabOptions, (newValue) => {
+                UI.inputDropdown(this.model.defaultTabId, tabOptions, (newValue) => {
                     this.model.defaultTabId = newValue;
                 })
             ),

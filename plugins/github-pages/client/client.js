@@ -2,8 +2,6 @@
     function ConnectionEditor(params) {
         View.call(this, params);
         
-        this.$element = _.div({class: 'github-editor'});
-
         this.fetch();
     }
     
@@ -33,7 +31,7 @@
             UI.inputSwitch(this.model.isLocal == true, (newValue) => {
                 this.model.isLocal = newValue;
 
-                this.render();
+                this.fetch();
             })
         );
     }
@@ -224,8 +222,8 @@
         return $editor;
     }
 
-    ConnectionEditor.prototype.render = function render() {
-        _.append(this.$element.empty(),
+    ConnectionEditor.prototype.template = function template() {
+        return _.div({class: 'github-editor'},
             // Local switch
             _.div({class: 'field-container is-local'},
                 _.div({class: 'field-key'}, 'Local'),

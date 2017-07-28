@@ -1,5 +1,8 @@
 'use strict';
 
+const SettingsHelper = require('Client/Helpers/SettingsHelper');
+const ProjectHelper = require('Client/Helpers/ProjectHelper');
+
 /**
  * The providers settings editor
  *

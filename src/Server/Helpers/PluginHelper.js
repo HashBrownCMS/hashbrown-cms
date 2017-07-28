@@ -1,14 +1,8 @@
 'use strict';
 
 // Libs
-let glob = require('glob');
-let fs = require('fs');
-
-// Cache
-let cache = {
-    js: '',
-    css: ''
-}
+const Glob = require('glob');
+const FileSystem = require('fs');
 
 class PluginHelper {
     /**
@@ -23,7 +17,7 @@ class PluginHelper {
         app.get('/css/plugins.cs', PluginHelper.serveCssFiles);
 
         return new Promise((resolve, reject) => {
-            glob(appRoot + '/plugins/*', (err, paths) => {
+            Glob(appRoot + '/plugins/*', (err, paths) => {
                 for(let path of paths) {
                     let plugin = require(path + '/index.js');
                     
@@ -39,36 +33,30 @@ class PluginHelper {
      * Serves JS files
      */
     static serveJsFiles(req, res) {
-        if(cache.js) {
-            res.send(cache.js);
-        
-        } else {
-            glob(appRoot + '/plugins/*/client/client.js', (err, paths) => {
-                for(let path of paths) {
-                    cache.js += fs.readFileSync(path, 'utf8');
-                }
+        Glob(appRoot + '/plugins/**/client.js', (err, paths) => {
+            let compiledJs = '';
 
-                res.send(cache.js);
-            });
-        }
+            for(let path of paths) {
+                compiledJs += FileSystem.readFileSync(path, 'utf8');
+            }
+
+            res.send(compiledJs);
+        });
     }
     
     /**
      * Serves CSS files
      */
     static serveCssFiles(req, res) {
-        if(cache.css) {
-            res.send(cache.css);
-        
-        } else {
-            glob(appRoot + '/plugins/*/client/client.css', (err, paths) => {
-                for(let path of paths) {
-                    cache.css += fs.readFileSync(path, 'utf8');
-                }
+        Glob(appRoot + '/plugins/**/client.css', (err, paths) => {
+            let compiledCss = '';
 
-                res.send(cache.css);
-            });
-        }
+            for(let path of paths) {
+                compiledCss += FileSystem.readFileSync(path, 'utf8');
+            }
+
+            res.send(compiledCss);
+        });
     }
 }
 

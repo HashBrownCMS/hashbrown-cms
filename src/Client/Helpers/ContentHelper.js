@@ -17,15 +17,13 @@ module.exports = class ContentHelper extends ContentHelperCommon {
      * @returns {Content} Content node
      */
     static getContentByIdSync(id) {
-        if(id) {
-            for(let content of resources.content) {
-                if(content.id == id) {
-                    return new Content(content);
-                }
+        if(!id) { return null; }
+
+        for(let content of resources.content) {
+            if(content.id === id) {
+                return new Content(content);
             }
         }
-
-        return null;
     }
     
     /**

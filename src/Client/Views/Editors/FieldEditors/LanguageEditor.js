@@ -1,5 +1,7 @@
 'use strict';
 
+const LanguageHelper = require('Client/Helpers/LanguageHelper');
+
 const FieldEditor = require('./FieldEditor');
 
 /**

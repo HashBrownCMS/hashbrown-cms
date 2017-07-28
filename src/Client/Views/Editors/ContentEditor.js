@@ -242,7 +242,7 @@ class ContentEditor extends View {
             }
         
         } else {
-            debug.log('No field schema found for schema id "' + fieldDefinition.schemaId + '"', this);
+            debug.log('No FieldSchema found for Schema id "' + fieldDefinition.schemaId + '"', this);
 
         }
     }
@@ -266,11 +266,11 @@ class ContentEditor extends View {
             let fieldDefinition = fieldDefinitions[key];
 
             let noTabAssigned = !fieldDefinition.tabId;
-            let isMetaTab = tabId == 'meta';
+            let isMetaTab = tabId === 'meta';
             let thisTabAssigned = fieldDefinition.tabId == tabId;
 
             // Don't include "properties" field, if this is the meta tab
-            if(isMetaTab && key == 'properties') {
+            if(isMetaTab && key === 'properties') {
                 continue;
             }
 
@@ -282,7 +282,7 @@ class ContentEditor extends View {
         // Render all fields
         return _.each(tabFieldDefinitions, (key, fieldDefinition) => {
             // Fetch field schema
-            let fieldSchema = resources.schemas[fieldDefinition.schemaId];
+            let fieldSchema = SchemaHelper.getSchemaByIdSync(fieldDefinition.schemaId);
 
             if(!fieldSchema) {
                 debug.log('FieldSchema "' + fieldDefinition.schemaId + '" for key "' + key + '" not found', this);
