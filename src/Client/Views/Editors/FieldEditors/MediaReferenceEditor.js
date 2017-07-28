@@ -1,5 +1,9 @@
 'use strict';
 
+const Media = require('Common/Models/Media');
+const MediaHelper = require('Client/Helpers/MediaHelper');
+const MediaBrowser = require('Client/Views/Modals/MediaBrowser');
+
 const FieldEditor = require('./FieldEditor');
 
 /**
@@ -61,16 +65,11 @@ module.exports = class MediaReferenceEditor extends FieldEditor {
             return;
         }
 
-        let media = (resources.media || []).filter((m) => {
-            return m.id == this.value;
-        })[0];
+        let media = MediaHelper.getMediaByIdSync(this.value);
         
         if(!media) {
-            this.$body.empty();
-            return;
+            return this.$body.empty();
         }
-
-        media = new Media(media);
 
         _.append(this.$body.empty(),
             _.if(media.isVideo(),

@@ -32860,6 +32860,8 @@ apiCall('get', 'user').then(function (user) {
                 UI.messageModal('Update', 'HashBrown is upgrading from ' + update.localVersion + ' to ' + update.remoteVersion + ' (this may take a minute)...', false);
 
                 apiCall('post', 'server/update/start').then(function () {
+                    var MessageModal = __webpack_require__(30);
+
                     new MessageModal({
                         model: {
                             title: 'Success',
@@ -32990,6 +32992,8 @@ $('.btn-create-project').click(function () {
             return false;
         }
     }
+
+    var MessageModal = __webpack_require__(30);
 
     var modal = new MessageModal({
         model: {
@@ -33391,17 +33395,21 @@ module.exports = InfoEditor;
 "use strict";
 
 
-/**
- * The sync settings editor
- *
- * @memberof HashBrown.Client.Views.Dashboard
- */
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var MessageModal = __webpack_require__(30);
+var SettingsHelper = __webpack_require__(46);
+var ProjectHelper = __webpack_require__(33);
+
+/**
+ * The sync settings editor
+ *
+ * @memberof HashBrown.Client.Views.Dashboard
+ */
 
 var SyncEditor = function (_View) {
     _inherits(SyncEditor, _View);
@@ -33411,7 +33419,7 @@ var SyncEditor = function (_View) {
 
         var _this = _possibleConstructorReturn(this, _View.call(this, params));
 
-        _this.modal = new HashBrown.Views.Modals.MessageModal({
+        _this.modal = new MessageModal({
             model: {
                 class: 'modal-sync-settings settings-modal',
                 title: 'Sync'
@@ -33432,7 +33440,7 @@ var SyncEditor = function (_View) {
 
         _this.$element = _this.modal.$element;
 
-        HashBrown.Helpers.SettingsHelper.getSettings(_this.projectId, '', 'sync').then(function (syncSettings) {
+        SettingsHelper.getSettings(_this.projectId, '', 'sync').then(function (syncSettings) {
             _this.model = syncSettings || {};
 
             _this.fetch();
@@ -33448,7 +33456,7 @@ var SyncEditor = function (_View) {
     SyncEditor.prototype.onClickSave = function onClickSave() {
         var _this2 = this;
 
-        HashBrown.Helpers.SettingsHelper.setSettings(this.projectId, '', 'sync', this.model).then(function () {
+        SettingsHelper.setSettings(this.projectId, '', 'sync', this.model).then(function () {
             _this2.modal.hide();
 
             _this2.trigger('change', _this2.model);
@@ -33497,7 +33505,7 @@ var SyncEditor = function (_View) {
             this.model.project = this.projectId;
         }
 
-        return _.div({ class: 'project-name-editor' }, _.input({ class: 'form-control', type: 'text', value: this.model.project || '', placeholder: 'e.g. "' + HashBrown.Helpers.ProjectHelper.currentProject + '"' }).on('change', function (e) {
+        return _.div({ class: 'project-name-editor' }, _.input({ class: 'form-control', type: 'text', value: this.model.project || '', placeholder: 'e.g. "' + ProjectHelper.currentProject + '"' }).on('change', function (e) {
             _this5.model.project = $(e.target).val();
         }));
     };

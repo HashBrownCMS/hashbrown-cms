@@ -10477,7 +10477,6 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var ContentHelperCommon = __webpack_require__(232);
-var Content = __webpack_require__(194);
 
 /**
  * The client side content helper
@@ -10504,6 +10503,8 @@ module.exports = function (_ContentHelperCommon) {
         if (!id) {
             return null;
         }
+
+        var Content = __webpack_require__(194);
 
         for (var _iterator = resources.content, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
             var _ref;
@@ -10536,6 +10537,8 @@ module.exports = function (_ContentHelperCommon) {
 
     ContentHelper.getContentById = function getContentById(id) {
         if (id) {
+            var Content = __webpack_require__(194);
+
             for (var _iterator2 = resources.content, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
                 var _ref2;
 
@@ -33713,14 +33716,14 @@ var ContentEditor = function (_View) {
 
             _this2.reload();
 
-            NavbarMain.reload();
+            HashBrown.Client.Views.Navigation.NavbarMain.reload();
 
             _this2.dirty = false;
 
             if (saveAction === 'preview') {
                 UI.iframeModal('Preview', postSaveUrl);
             }
-        }).catch(errorModal);
+        }).catch(UI.errorModal);
     };
 
     /**
@@ -39230,6 +39233,8 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+var Media = __webpack_require__(201);
+
 var ProjectHelper = __webpack_require__(33);
 var SettingsHelper = __webpack_require__(46);
 
@@ -39462,8 +39467,6 @@ module.exports = function (_View) {
         })))), _.div({ class: 'modal-body' }, _.div({ class: 'thumbnail-container' },
         // Append all files
         _.each(resources.media, function (i, media) {
-            media = new Media(media);
-
             var $media = _.button({
                 class: 'thumbnail raised',
                 'data-id': media.id,
@@ -40213,6 +40216,8 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+var ContentHelper = __webpack_require__(47);
+
 var NavbarPane = __webpack_require__(32);
 var NavbarMain = __webpack_require__(31);
 
@@ -40586,7 +40591,7 @@ var ContentPane = function (_NavbarPane) {
                         } else {
                             return onSuccess();
                         }
-                    }).catch(errorModal);
+                    }).catch(UI.errorModal);
                 });
             });
         });
@@ -46837,6 +46842,10 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+var Media = __webpack_require__(201);
+var MediaHelper = __webpack_require__(261);
+var MediaBrowser = __webpack_require__(218);
+
 var FieldEditor = __webpack_require__(9);
 
 /**
@@ -46903,23 +46912,16 @@ module.exports = function (_FieldEditor) {
     };
 
     MediaReferenceEditor.prototype.render = function render() {
-        var _this3 = this;
-
         if (!this.value) {
             this.$body.empty();
             return;
         }
 
-        var media = (resources.media || []).filter(function (m) {
-            return m.id == _this3.value;
-        })[0];
+        var media = MediaHelper.getMediaByIdSync(this.value);
 
         if (!media) {
-            this.$body.empty();
-            return;
+            return this.$body.empty();
         }
-
-        media = new Media(media);
 
         _.append(this.$body.empty(), _.if(media.isVideo(), _.video({ src: '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + media.id })), _.if(media.isImage(), _.img({ src: '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + media.id })), _.label(media.name));
     };

@@ -105,7 +105,7 @@ class ContentEditor extends View {
             
             this.reload();
             
-            NavbarMain.reload();
+            HashBrown.Client.Views.Navigation.NavbarMain.reload();
 
             this.dirty = false;
 
@@ -116,7 +116,7 @@ class ContentEditor extends View {
                 );
             }
         })
-        .catch(errorModal);
+        .catch(UI.errorModal);
     }
 
     /**

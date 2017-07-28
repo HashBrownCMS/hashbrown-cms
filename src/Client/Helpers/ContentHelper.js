@@ -1,7 +1,6 @@
 'use strict';
 
 const ContentHelperCommon = require('Common/Helpers/ContentHelper');
-const Content = require('Client/Models/Content');
 
 /**
  * The client side content helper
@@ -19,6 +18,8 @@ module.exports = class ContentHelper extends ContentHelperCommon {
     static getContentByIdSync(id) {
         if(!id) { return null; }
 
+        const Content = require('Client/Models/Content');
+        
         for(let content of resources.content) {
             if(content.id === id) {
                 return new Content(content);
@@ -35,6 +36,8 @@ module.exports = class ContentHelper extends ContentHelperCommon {
      */
     static getContentById(id) {
         if(id) {
+            const Content = require('Client/Models/Content');
+            
             for(let content of resources.content) {
                 if(content.id == id) {
                     return Promise.resolve(new Content(content));

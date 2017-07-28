@@ -1,5 +1,7 @@
 'use strict';
 
+const Media = require('Common/Models/Media');
+
 const ProjectHelper = require('Client/Helpers/ProjectHelper');
 const SettingsHelper = require('Client/Helpers/SettingsHelper');
 
@@ -267,8 +269,6 @@ module.exports = class MediaBrowser extends View {
                         _.div({class: 'thumbnail-container'},
                             // Append all files
                             _.each(resources.media, (i, media) => {
-                                media = new Media(media);
-
                                 let $media = _.button(
                                     {
                                         class: 'thumbnail raised',

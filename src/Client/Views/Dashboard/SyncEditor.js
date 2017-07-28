@@ -1,5 +1,9 @@
 'use strict';
 
+const MessageModal = require('Client/Views/Modals/MessageModal');
+const SettingsHelper = require('Client/Helpers/SettingsHelper');
+const ProjectHelper = require('Client/Helpers/ProjectHelper');
+
 /**
  * The sync settings editor
  *
@@ -9,7 +13,7 @@ class SyncEditor extends View {
     constructor(params) {
         super(params);
 
-        this.modal = new HashBrown.Views.Modals.MessageModal({
+        this.modal = new MessageModal({
             model: {
                 class: 'modal-sync-settings settings-modal',
                 title: 'Sync'
@@ -33,7 +37,7 @@ class SyncEditor extends View {
         
         this.$element = this.modal.$element;
 
-        HashBrown.Helpers.SettingsHelper.getSettings(this.projectId, '', 'sync')
+        SettingsHelper.getSettings(this.projectId, '', 'sync')
         .then((syncSettings) => {
             this.model = syncSettings || {};
 
@@ -45,7 +49,7 @@ class SyncEditor extends View {
      * Event: Click save. Posts the model to the modelUrl
      */
     onClickSave() {
-        HashBrown.Helpers.SettingsHelper.setSettings(this.projectId, '', 'sync', this.model)
+        SettingsHelper.setSettings(this.projectId, '', 'sync', this.model)
         .then(() => {
             this.modal.hide();
 
@@ -90,7 +94,7 @@ class SyncEditor extends View {
         }
 
         return _.div({class: 'project-name-editor'},
-            _.input({class: 'form-control', type: 'text', value: this.model.project || '', placeholder: 'e.g. "' + HashBrown.Helpers.ProjectHelper.currentProject + '"'})
+            _.input({class: 'form-control', type: 'text', value: this.model.project || '', placeholder: 'e.g. "' + ProjectHelper.currentProject + '"'})
                 .on('change', (e) => {
                     this.model.project = $(e.target).val();
                 })

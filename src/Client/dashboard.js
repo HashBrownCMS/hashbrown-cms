@@ -158,6 +158,8 @@ apiCall('get', 'user')
 
                 apiCall('post', 'server/update/start')
                 .then(() => {
+                    const MessageModal = require('Client/Views/Modals/MessageModal');
+
                     new MessageModal({
                         model: {
                             title: 'Success',
@@ -320,6 +322,8 @@ $('.btn-create-project').click(() => {
 
         }
     }
+                    
+    const MessageModal = require('Client/Views/Modals/MessageModal');
 
     let modal = new MessageModal({
         model: {

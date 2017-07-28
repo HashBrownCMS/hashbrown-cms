@@ -1,5 +1,7 @@
 'use strict';
 
+const ContentHelper = require('Client/Helpers/ContentHelper');
+
 const NavbarPane = require('./NavbarPane');
 const NavbarMain = require('./NavbarMain');
 
@@ -403,7 +405,7 @@ class ContentPane extends NavbarPane {
                                 return onSuccess();
                             }
                         })
-                        .catch(errorModal);
+                        .catch(UI.errorModal);
                     }
                 );
             });
