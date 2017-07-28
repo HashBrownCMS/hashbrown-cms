@@ -68,7 +68,7 @@ class UpdateHelper {
         // Get latest release info
         return RequestHelper.request('get', 'https://api.github.com/repos/Putaitu/hashbrown-cms/releases/latest')
         
-        // Download zip
+        // Check versions
         .then((res) => {
             let remoteVersion = res.tag_name;
             let localVersion = require(appRoot + '/package.json').version;
@@ -77,43 +77,73 @@ class UpdateHelper {
                 return Promise.reject(new Error('Can\'t update, local version is not behind remote version'));
             }
 
-            let url = 'https://github.com/Putaitu/hashbrown-cms/archive/' + remoteVersion + '.zip';
-
-            debug.log('Downloading update from ' + url + '...', this);
-            
-            return RequestHelper.download(url, appRoot + '/storage/update.zip');
+            return Promise.resolve();
         })
-
-        // Unpack zip
+        
+        // Git checkout stable
+        // NOTE: When the user is upgrading through the UI, they should be on stable
         .then(() => {
-            debug.log('Unpacking update...', this);
+            debug.log('Checking out stable branch...', this);
 
             return new Promise((resolve, reject) => {
-                let stream = FileSystem.createReadStream(appRoot + '/storage/update.zip');
-
-                stream.pipe(ZLib.unzip());
-
-                stream.on('error', (e) => {
-                    reject(e);
+                let git = exec('git checkout stable', {
+                    cwd: appRoot
                 });
 
-                stream.on('entry', (entry) => {
-                    let dirPath = appRoot + '/storage/update';
-                    let fullPath = Path.join(dirPath, entry.path);
-
-                    // Create the unpacking directory
-                    FileSystem.mkDirSync(dirPath);
-
-                    entry.pipe(FileSystem.createWriteStream(fullPath));
+                git.stdout.on('data', (data) => {
+                    debug.log(data, this, 3);
                 });
-            });
+
+                git.stderr.on('data', (data) => {
+                    debug.log(data, this, 3);
+                });
+
+                git.on('exit', (code) => {
+                    if(code == 0 || code == '0') {
+                        debug.log('Check done', this);
+                        resolve();
+                    } else {
+                        debug.log('Check failed', this);
+                        reject(new Error('git exited with status code ' + code));
+                    }
+                });
+            })
+        })
+
+        // Git pull
+        .then((res) => {
+            debug.log('Pulling update from GitHub...', this);
+            
+            return new Promise((resolve, reject) => {
+                let git = exec('git pull origin stable', {
+                    cwd: appRoot
+                });
+
+                git.stdout.on('data', (data) => {
+                    debug.log(data, this, 3);
+                });
+
+                git.stderr.on('data', (data) => {
+                    debug.log(data, this, 3);
+                });
+
+                git.on('exit', (code) => {
+                    if(code == 0 || code == '0') {
+                        debug.log('Update successful', this);
+                        resolve();
+                    } else {
+                        debug.log('Update failed', this);
+                        reject(new Error('git exited with status code ' + code));
+                    }
+                });
+            })
         })
 
         // Install dependencies
         .then(() => {
+            debug.log('Installing dependencies...', this);
+            
             return new Promise((resolve, reject) => {
-                debug.log('Installing dependencies...', this);
-                
                 let npm = ChildProcess.exec('npm install --production', {
                     cwd: appRoot
                 });

@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 208);
+/******/ 	return __webpack_require__(__webpack_require__.s = 204);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -78,8 +78,8 @@
 
 
 
-var base64 = __webpack_require__(98);
-var ieee754 = __webpack_require__(99);
+var base64 = __webpack_require__(101);
+var ieee754 = __webpack_require__(102);
 var isArray = __webpack_require__(47);
 
 exports.Buffer = Buffer;
@@ -5201,7 +5201,7 @@ if (typeof Object.create === 'function') {
     return res._forceRed(this);
   };
 })(typeof module === 'undefined' || module, this);
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(129)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(132)(module)))
 
 /***/ }),
 /* 3 */
@@ -5212,15 +5212,15 @@ if (typeof Object.create === 'function') {
 
 var elliptic = exports;
 
-elliptic.version = __webpack_require__(135).version;
-elliptic.utils = __webpack_require__(136);
+elliptic.version = __webpack_require__(138).version;
+elliptic.utils = __webpack_require__(139);
 elliptic.rand = __webpack_require__(68);
 elliptic.curve = __webpack_require__(28);
-elliptic.curves = __webpack_require__(141);
+elliptic.curves = __webpack_require__(144);
 
 // Protocols
-elliptic.ec = __webpack_require__(149);
-elliptic.eddsa = __webpack_require__(153);
+elliptic.ec = __webpack_require__(152);
+elliptic.eddsa = __webpack_require__(156);
 
 /***/ }),
 /* 4 */
@@ -5689,7 +5689,7 @@ module.exports = g;
 
 var Buffer = __webpack_require__(17).Buffer;
 var Transform = __webpack_require__(11).Transform;
-var StringDecoder = __webpack_require__(36).StringDecoder;
+var StringDecoder = __webpack_require__(37).StringDecoder;
 var inherits = __webpack_require__(1);
 
 function CipherBase(hashMode) {
@@ -5885,7 +5885,7 @@ var objectKeys = Object.keys || function (obj) {
 module.exports = Duplex;
 
 /*<replacement>*/
-var processNextTick = __webpack_require__(33);
+var processNextTick = __webpack_require__(34);
 /*</replacement>*/
 
 /*<replacement>*/
@@ -5894,7 +5894,7 @@ util.inherits = __webpack_require__(1);
 /*</replacement>*/
 
 var Readable = __webpack_require__(48);
-var Writable = __webpack_require__(35);
+var Writable = __webpack_require__(36);
 
 util.inherits(Duplex, Readable);
 
@@ -5972,11 +5972,11 @@ var EE = __webpack_require__(23).EventEmitter;
 var inherits = __webpack_require__(1);
 
 inherits(Stream, EE);
-Stream.Readable = __webpack_require__(102);
-Stream.Writable = __webpack_require__(106);
-Stream.Duplex = __webpack_require__(107);
-Stream.Transform = __webpack_require__(108);
-Stream.PassThrough = __webpack_require__(109);
+Stream.Readable = __webpack_require__(105);
+Stream.Writable = __webpack_require__(109);
+Stream.Duplex = __webpack_require__(110);
+Stream.Transform = __webpack_require__(111);
+Stream.PassThrough = __webpack_require__(112);
 
 // Backwards-compat with node 0.4.x
 Stream.Stream = Stream;
@@ -6156,7 +6156,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var crypto = __webpack_require__(96);
+var crypto = __webpack_require__(99);
 
 /**
  * The base class for everything
@@ -6345,7 +6345,7 @@ function oldBrowser() {
   throw new Error('secure random number generation not supported by this browser\nuse chrome, FireFox or Internet Explorer 11');
 }
 
-var Buffer = __webpack_require__(97).Buffer;
+var Buffer = __webpack_require__(100).Buffer;
 var crypto = global.crypto || global.msCrypto;
 
 if (crypto && crypto.getRandomValues) {
@@ -6389,8 +6389,8 @@ function randomBytes(size, cb) {
 
 var inherits = __webpack_require__(1);
 var md5 = __webpack_require__(22);
-var RIPEMD160 = __webpack_require__(32);
-var sha = __webpack_require__(38);
+var RIPEMD160 = __webpack_require__(33);
+var sha = __webpack_require__(39);
 
 var Base = __webpack_require__(8);
 
@@ -6675,11 +6675,11 @@ var asn1 = exports;
 
 asn1.bignum = __webpack_require__(2);
 
-asn1.define = __webpack_require__(157).define;
+asn1.define = __webpack_require__(160).define;
 asn1.base = __webpack_require__(21);
 asn1.constants = __webpack_require__(74);
-asn1.decoders = __webpack_require__(163);
-asn1.encoders = __webpack_require__(165);
+asn1.decoders = __webpack_require__(166);
+asn1.encoders = __webpack_require__(168);
 
 /***/ }),
 /* 21 */
@@ -6687,10 +6687,10 @@ asn1.encoders = __webpack_require__(165);
 
 var base = exports;
 
-base.Reporter = __webpack_require__(160).Reporter;
+base.Reporter = __webpack_require__(163).Reporter;
 base.DecoderBuffer = __webpack_require__(73).DecoderBuffer;
 base.EncoderBuffer = __webpack_require__(73).EncoderBuffer;
-base.Node = __webpack_require__(161);
+base.Node = __webpack_require__(164);
 
 /***/ }),
 /* 22 */
@@ -6707,7 +6707,7 @@ base.Node = __webpack_require__(161);
  * See http://pajhome.org.uk/crypt/md5 for more info.
  */
 
-var makeHash = __webpack_require__(100);
+var makeHash = __webpack_require__(103);
 
 /*
  * Calculate the MD5 of an array of little-endian words, and a bit length
@@ -7599,10 +7599,10 @@ exports.encrypt = function (self, chunk) {
 
 var curve = exports;
 
-curve.base = __webpack_require__(137);
-curve.short = __webpack_require__(138);
-curve.mont = __webpack_require__(139);
-curve.edwards = __webpack_require__(140);
+curve.base = __webpack_require__(140);
+curve.short = __webpack_require__(141);
+curve.mont = __webpack_require__(142);
+curve.edwards = __webpack_require__(143);
 
 /***/ }),
 /* 29 */
@@ -7610,10 +7610,10 @@ curve.edwards = __webpack_require__(140);
 
 /* WEBPACK VAR INJECTION */(function(Buffer) {var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-var asn1 = __webpack_require__(156);
-var aesid = __webpack_require__(168);
-var fixProc = __webpack_require__(169);
-var ciphers = __webpack_require__(39);
+var asn1 = __webpack_require__(159);
+var aesid = __webpack_require__(171);
+var fixProc = __webpack_require__(172);
+var ciphers = __webpack_require__(40);
 var compat = __webpack_require__(54);
 module.exports = parseKeys;
 
@@ -7748,7 +7748,7 @@ var NavbarMain = function (_View) {
 
         var _this = _possibleConstructorReturn(this, _View.call(this, params));
 
-        _this.template = __webpack_require__(224);
+        _this.template = __webpack_require__(221);
         _this.tabPanes = [];
 
         HashBrown.Client.Views.Navigation.CMSPane.init();
@@ -8412,10 +8412,180 @@ module.exports = Pane;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Entity = __webpack_require__(13);
+
+var Password = function (_Entity) {
+    _inherits(Password, _Entity);
+
+    function Password() {
+        _classCallCheck(this, Password);
+
+        return _possibleConstructorReturn(this, _Entity.apply(this, arguments));
+    }
+
+    Password.prototype.structure = function structure() {
+        this.def(String, 'hash');
+        this.def(String, 'salt');
+    };
+
+    return Password;
+}(Entity);
+
+var User = function (_Entity2) {
+    _inherits(User, _Entity2);
+
+    function User(params) {
+        _classCallCheck(this, User);
+
+        return _possibleConstructorReturn(this, _Entity2.call(this, params));
+    }
+
+    User.prototype.structure = function structure() {
+        this.def(String, 'id');
+        this.def(Boolean, 'isAdmin', false);
+        this.def(Boolean, 'isCurrent', false);
+        this.def(String, 'username');
+        this.def(String, 'fullName');
+        this.def(String, 'email');
+        this.def(Object, 'scopes', {});
+    };
+
+    /**
+     * Gets all project scopes
+     *
+     * @param {String} project
+     * @param {Boolean} upsert
+     *
+     * @returns {Array} scopes
+     */
+
+
+    User.prototype.getScopes = function getScopes(project, upsert) {
+        if (!this.scopes) {
+            this.scopes = {};
+        }
+
+        if (!this.scopes[project] && upsert) {
+            this.scopes[project] = [];
+        }
+
+        return this.scopes[project];
+    };
+
+    /**
+     * Checks if a user has a project scope
+     *
+     * @param {String} project
+     * @param {String} scope
+     *
+     * @returns {Boolean} hasScope
+     */
+
+
+    User.prototype.hasScope = function hasScope(project, scope) {
+        if (this.isAdmin) {
+            return true;
+        }
+
+        if (!project) {
+            return false;
+        }
+        if (!scope && !this.scopes[project]) {
+            return false;
+        }
+
+        if (!Array.isArray(this.scopes[project])) {
+            this.scopes[project] = [];
+        }
+
+        if (!scope) {
+            return true;
+        }
+
+        return this.scopes[project].indexOf(scope) > -1;
+    };
+
+    /**
+     * Removes a scope
+     *
+     * @param {String} project
+     * @param {String|Boolean} scope
+     */
+
+
+    User.prototype.removeScope = function removeScope(project, scope) {
+        if (!project) {
+            return;
+        }
+        if (!this.scopes) {
+            return;
+        }
+        if (!this.scopes[project]) {
+            return;
+        }
+
+        if (scope) {
+            var scopeIndex = this.scopes[project].indexOf(scope);
+
+            this.scopes[project].splice(scopeIndex, 1);
+        } else {
+            delete this.scopes[project];
+        }
+    };
+
+    /**
+     * Grants a user a scope
+     *
+     * @param {String} project
+     * @param {String} scope
+     */
+
+
+    User.prototype.giveScope = function giveScope(project, scope) {
+        if (!project) {
+            return;
+        }
+
+        if (!this.scopes) {
+            this.scopes = {};
+        }
+
+        if (!this.scopes[project]) {
+            this.scopes[project] = [];
+        }
+
+        if (!scope) {
+            return;
+        }
+        if (this.scopes[project].indexOf(scope) > -1) {
+            return;
+        }
+
+        this.scopes[project].push(scope);
+    };
+
+    return User;
+}(Entity);
+
+module.exports = User;
+
+/***/ }),
+/* 33 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
 /* WEBPACK VAR INJECTION */(function(Buffer) {
 
 var inherits = __webpack_require__(1);
-var HashBase = __webpack_require__(101);
+var HashBase = __webpack_require__(104);
 
 function RIPEMD160() {
   HashBase.call(this, 64);
@@ -8707,7 +8877,7 @@ module.exports = RIPEMD160;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8755,7 +8925,7 @@ function nextTick(fn, arg1, arg2, arg3) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6)))
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8870,7 +9040,7 @@ exports.allocUnsafeSlow = function allocUnsafeSlow(size) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7)))
 
 /***/ }),
-/* 35 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8883,7 +9053,7 @@ exports.allocUnsafeSlow = function allocUnsafeSlow(size) {
 module.exports = Writable;
 
 /*<replacement>*/
-var processNextTick = __webpack_require__(33);
+var processNextTick = __webpack_require__(34);
 /*</replacement>*/
 
 /*<replacement>*/
@@ -8899,7 +9069,7 @@ util.inherits = __webpack_require__(1);
 
 /*<replacement>*/
 var internalUtil = {
-  deprecate: __webpack_require__(105)
+  deprecate: __webpack_require__(108)
 };
 /*</replacement>*/
 
@@ -8916,7 +9086,7 @@ var Stream;
 
 var Buffer = __webpack_require__(0).Buffer;
 /*<replacement>*/
-var bufferShim = __webpack_require__(34);
+var bufferShim = __webpack_require__(35);
 /*</replacement>*/
 
 util.inherits(Writable, Stream);
@@ -9403,7 +9573,7 @@ function CorkedRequest(state) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6), __webpack_require__(45).setImmediate))
 
 /***/ }),
-/* 36 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // Copyright Joyent, Inc. and other Node contributors.
@@ -9625,7 +9795,7 @@ function base64DetectIncompleteChar(buffer) {
 }
 
 /***/ }),
-/* 37 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9811,7 +9981,7 @@ function done(stream, er) {
 }
 
 /***/ }),
-/* 38 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var exports = module.exports = function SHA(algorithm) {
@@ -9823,21 +9993,21 @@ var exports = module.exports = function SHA(algorithm) {
   return new Algorithm();
 };
 
-exports.sha = __webpack_require__(110);
-exports.sha1 = __webpack_require__(111);
-exports.sha224 = __webpack_require__(112);
+exports.sha = __webpack_require__(113);
+exports.sha1 = __webpack_require__(114);
+exports.sha224 = __webpack_require__(115);
 exports.sha256 = __webpack_require__(50);
-exports.sha384 = __webpack_require__(113);
+exports.sha384 = __webpack_require__(116);
 exports.sha512 = __webpack_require__(51);
 
 /***/ }),
-/* 39 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var ciphers = __webpack_require__(118);
+var ciphers = __webpack_require__(121);
 exports.createCipher = exports.Cipher = ciphers.createCipher;
 exports.createCipheriv = exports.Cipheriv = ciphers.createCipheriv;
-var deciphers = __webpack_require__(120);
+var deciphers = __webpack_require__(123);
 exports.createDecipher = exports.Decipher = deciphers.createDecipher;
 exports.createDecipheriv = exports.Decipheriv = deciphers.createDecipheriv;
 var modes = __webpack_require__(26);
@@ -9847,20 +10017,20 @@ function getCiphers() {
 exports.listCiphers = exports.getCiphers = getCiphers;
 
 /***/ }),
-/* 40 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-exports.utils = __webpack_require__(122);
-exports.Cipher = __webpack_require__(123);
-exports.DES = __webpack_require__(124);
-exports.CBC = __webpack_require__(125);
-exports.EDE = __webpack_require__(126);
+exports.utils = __webpack_require__(125);
+exports.Cipher = __webpack_require__(126);
+exports.DES = __webpack_require__(127);
+exports.CBC = __webpack_require__(128);
+exports.EDE = __webpack_require__(129);
 
 /***/ }),
-/* 41 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(Buffer) {var bn = __webpack_require__(2);
@@ -9905,16 +10075,16 @@ function getr(priv) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
 
 /***/ }),
-/* 42 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var hash = exports;
 
 hash.utils = __webpack_require__(5);
 hash.common = __webpack_require__(19);
-hash.sha = __webpack_require__(142);
-hash.ripemd = __webpack_require__(146);
-hash.hmac = __webpack_require__(147);
+hash.sha = __webpack_require__(145);
+hash.ripemd = __webpack_require__(149);
+hash.hmac = __webpack_require__(150);
 
 // Proxy hash functions to the main object
 hash.sha1 = hash.sha.sha1;
@@ -9925,7 +10095,7 @@ hash.sha512 = hash.sha.sha512;
 hash.ripemd160 = hash.ripemd.ripemd160;
 
 /***/ }),
-/* 43 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10043,176 +10213,6 @@ module.exports = function (_View) {
 }(View);
 
 /***/ }),
-/* 44 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var Entity = __webpack_require__(13);
-
-var Password = function (_Entity) {
-    _inherits(Password, _Entity);
-
-    function Password() {
-        _classCallCheck(this, Password);
-
-        return _possibleConstructorReturn(this, _Entity.apply(this, arguments));
-    }
-
-    Password.prototype.structure = function structure() {
-        this.def(String, 'hash');
-        this.def(String, 'salt');
-    };
-
-    return Password;
-}(Entity);
-
-var User = function (_Entity2) {
-    _inherits(User, _Entity2);
-
-    function User(params) {
-        _classCallCheck(this, User);
-
-        return _possibleConstructorReturn(this, _Entity2.call(this, params));
-    }
-
-    User.prototype.structure = function structure() {
-        this.def(String, 'id');
-        this.def(Boolean, 'isAdmin', false);
-        this.def(Boolean, 'isCurrent', false);
-        this.def(String, 'username');
-        this.def(String, 'fullName');
-        this.def(String, 'email');
-        this.def(Object, 'scopes', {});
-    };
-
-    /**
-     * Gets all project scopes
-     *
-     * @param {String} project
-     * @param {Boolean} upsert
-     *
-     * @returns {Array} scopes
-     */
-
-
-    User.prototype.getScopes = function getScopes(project, upsert) {
-        if (!this.scopes) {
-            this.scopes = {};
-        }
-
-        if (!this.scopes[project] && upsert) {
-            this.scopes[project] = [];
-        }
-
-        return this.scopes[project];
-    };
-
-    /**
-     * Checks if a user has a project scope
-     *
-     * @param {String} project
-     * @param {String} scope
-     *
-     * @returns {Boolean} hasScope
-     */
-
-
-    User.prototype.hasScope = function hasScope(project, scope) {
-        if (this.isAdmin) {
-            return true;
-        }
-
-        if (!project) {
-            return false;
-        }
-        if (!scope && !this.scopes[project]) {
-            return false;
-        }
-
-        if (!Array.isArray(this.scopes[project])) {
-            this.scopes[project] = [];
-        }
-
-        if (!scope) {
-            return true;
-        }
-
-        return this.scopes[project].indexOf(scope) > -1;
-    };
-
-    /**
-     * Removes a scope
-     *
-     * @param {String} project
-     * @param {String|Boolean} scope
-     */
-
-
-    User.prototype.removeScope = function removeScope(project, scope) {
-        if (!project) {
-            return;
-        }
-        if (!this.scopes) {
-            return;
-        }
-        if (!this.scopes[project]) {
-            return;
-        }
-
-        if (scope) {
-            var scopeIndex = this.scopes[project].indexOf(scope);
-
-            this.scopes[project].splice(scopeIndex, 1);
-        } else {
-            delete this.scopes[project];
-        }
-    };
-
-    /**
-     * Grants a user a scope
-     *
-     * @param {String} project
-     * @param {String} scope
-     */
-
-
-    User.prototype.giveScope = function giveScope(project, scope) {
-        if (!project) {
-            return;
-        }
-
-        if (!this.scopes) {
-            this.scopes = {};
-        }
-
-        if (!this.scopes[project]) {
-            this.scopes[project] = [];
-        }
-
-        if (!scope) {
-            return;
-        }
-        if (this.scopes[project].indexOf(scope) > -1) {
-            return;
-        }
-
-        this.scopes[project].push(scope);
-    };
-
-    return User;
-}(Entity);
-
-module.exports = User;
-
-/***/ }),
 /* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -10264,7 +10264,7 @@ exports._unrefActive = exports.active = function (item) {
 };
 
 // setimmediate attaches itself to the global object
-__webpack_require__(86);
+__webpack_require__(89);
 exports.setImmediate = setImmediate;
 exports.clearImmediate = clearImmediate;
 
@@ -10307,7 +10307,7 @@ module.exports = Array.isArray || function (arr) {
 module.exports = Readable;
 
 /*<replacement>*/
-var processNextTick = __webpack_require__(33);
+var processNextTick = __webpack_require__(34);
 /*</replacement>*/
 
 /*<replacement>*/
@@ -10337,7 +10337,7 @@ var Stream;
 
 var Buffer = __webpack_require__(0).Buffer;
 /*<replacement>*/
-var bufferShim = __webpack_require__(34);
+var bufferShim = __webpack_require__(35);
 /*</replacement>*/
 
 /*<replacement>*/
@@ -10346,7 +10346,7 @@ util.inherits = __webpack_require__(1);
 /*</replacement>*/
 
 /*<replacement>*/
-var debugUtil = __webpack_require__(103);
+var debugUtil = __webpack_require__(106);
 var debug = void 0;
 if (debugUtil && debugUtil.debuglog) {
   debug = debugUtil.debuglog('stream');
@@ -10355,7 +10355,7 @@ if (debugUtil && debugUtil.debuglog) {
 }
 /*</replacement>*/
 
-var BufferList = __webpack_require__(104);
+var BufferList = __webpack_require__(107);
 var StringDecoder;
 
 util.inherits(Readable, Stream);
@@ -10436,7 +10436,7 @@ function ReadableState(options, stream) {
   this.decoder = null;
   this.encoding = null;
   if (options.encoding) {
-    if (!StringDecoder) StringDecoder = __webpack_require__(36).StringDecoder;
+    if (!StringDecoder) StringDecoder = __webpack_require__(37).StringDecoder;
     this.decoder = new StringDecoder(options.encoding);
     this.encoding = options.encoding;
   }
@@ -10547,7 +10547,7 @@ function needMoreData(state) {
 
 // backwards compatibility.
 Readable.prototype.setEncoding = function (enc) {
-  if (!StringDecoder) StringDecoder = __webpack_require__(36).StringDecoder;
+  if (!StringDecoder) StringDecoder = __webpack_require__(37).StringDecoder;
   this._readableState.decoder = new StringDecoder(enc);
   this._readableState.encoding = enc;
   return this;
@@ -11254,7 +11254,7 @@ function indexOf(xs, x) {
 
 module.exports = PassThrough;
 
-var Transform = __webpack_require__(37);
+var Transform = __webpack_require__(38);
 
 /*<replacement>*/
 var util = __webpack_require__(16);
@@ -11629,13 +11629,13 @@ module.exports = Sha512;
 
 
 var inherits = __webpack_require__(1);
-var Legacy = __webpack_require__(114);
+var Legacy = __webpack_require__(117);
 var Base = __webpack_require__(8);
 var Buffer = __webpack_require__(17).Buffer;
 var md5 = __webpack_require__(22);
-var RIPEMD160 = __webpack_require__(32);
+var RIPEMD160 = __webpack_require__(33);
 
-var sha = __webpack_require__(38);
+var sha = __webpack_require__(39);
 
 var ZEROS = Buffer.alloc(128);
 
@@ -11852,7 +11852,7 @@ module.exports = {
 /***/ (function(module, exports, __webpack_require__) {
 
 
-exports.pbkdf2 = __webpack_require__(116);
+exports.pbkdf2 = __webpack_require__(119);
 
 exports.pbkdf2Sync = __webpack_require__(57);
 
@@ -11901,8 +11901,8 @@ module.exports = defaultEncoding;
 /***/ (function(module, exports, __webpack_require__) {
 
 var md5 = __webpack_require__(22);
-var rmd160 = __webpack_require__(32);
-var sha = __webpack_require__(38);
+var rmd160 = __webpack_require__(33);
+var sha = __webpack_require__(39);
 
 var checkParameters = __webpack_require__(55);
 var defaultEncoding = __webpack_require__(56);
@@ -12043,7 +12043,7 @@ StreamCipher.prototype._final = function () {
 /* WEBPACK VAR INJECTION */(function(Buffer) {var aes = __webpack_require__(25);
 var Transform = __webpack_require__(8);
 var inherits = __webpack_require__(1);
-var GHASH = __webpack_require__(119);
+var GHASH = __webpack_require__(122);
 var xor = __webpack_require__(18);
 inherits(StreamCipher, Transform);
 module.exports = StreamCipher;
@@ -12559,7 +12559,7 @@ if ((typeof self === 'undefined' ? 'undefined' : _typeof(self)) === 'object') {
 } else {
   // Node.js or Web worker with no crypto support
   try {
-    var crypto = __webpack_require__(130);
+    var crypto = __webpack_require__(133);
     if (typeof crypto.randomBytes !== 'function') throw new Error('Not supported');
 
     Rand.prototype._rand = function _rand(n) {
@@ -13142,7 +13142,7 @@ constants._reverse = function reverse(map) {
   return res;
 };
 
-constants.der = __webpack_require__(162);
+constants.der = __webpack_require__(165);
 
 /***/ }),
 /* 75 */
@@ -14106,13 +14106,198 @@ module.exports = Connection;
 "use strict";
 
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var SettingsHelperCommon = __webpack_require__(192);
+var ContentHelperCommon = __webpack_require__(232);
+var Content = __webpack_require__(202);
+
+/**
+ * The client side content helper
+ *
+ * @memberof HashBrown.Client.Helpers
+ */
+module.exports = function (_ContentHelperCommon) {
+    _inherits(ContentHelper, _ContentHelperCommon);
+
+    function ContentHelper() {
+        _classCallCheck(this, ContentHelper);
+
+        return _possibleConstructorReturn(this, _ContentHelperCommon.apply(this, arguments));
+    }
+
+    /**
+     * Gets Content by id
+     *
+     * @param {String} id
+     *
+     * @returns {Content} Content node
+     */
+    ContentHelper.getContentByIdSync = function getContentByIdSync(id) {
+        if (id) {
+            for (var _iterator = resources.content, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+                var _ref;
+
+                if (_isArray) {
+                    if (_i >= _iterator.length) break;
+                    _ref = _iterator[_i++];
+                } else {
+                    _i = _iterator.next();
+                    if (_i.done) break;
+                    _ref = _i.value;
+                }
+
+                var content = _ref;
+
+                if (content.id == id) {
+                    return new Content(content);
+                }
+            }
+        }
+
+        return null;
+    };
+
+    /**
+     * Gets Content by id
+     *
+     * @param {String} id
+     *
+     * @returns {Promise} Content node
+     */
+
+
+    ContentHelper.getContentById = function getContentById(id) {
+        if (id) {
+            for (var _iterator2 = resources.content, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
+                var _ref2;
+
+                if (_isArray2) {
+                    if (_i2 >= _iterator2.length) break;
+                    _ref2 = _iterator2[_i2++];
+                } else {
+                    _i2 = _iterator2.next();
+                    if (_i2.done) break;
+                    _ref2 = _i2.value;
+                }
+
+                var content = _ref2;
+
+                if (content.id == id) {
+                    return Promise.resolve(new Content(content));
+                }
+            }
+
+            return Promise.reject(new Error('Content with id "' + id + '" was not found'));
+        } else {
+            return Promise.reject(new Error('Content id was not provided'));
+        }
+    };
+
+    /**
+     * A sanity check for fields
+     *
+     * @param {Object} value
+     * @param {Schema} schema
+     */
+
+
+    ContentHelper.fieldSanityCheck = function fieldSanityCheck(value, schema) {
+        // If the schema value is set to multilingual, but the value isn't an object, convert it
+        if (schema.multilingual && (!value || (typeof value === 'undefined' ? 'undefined' : _typeof(value)) !== 'object')) {
+            var oldValue = value;
+
+            value = {};
+            value[window.language] = oldValue;
+        }
+
+        // If the schema value is not set to multilingual, but the value is an object
+        // containing the _multilingual flag, convert it
+        if (!schema.multilingual && value && (typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object' && value._multilingual) {
+            value = value[window.language];
+        }
+
+        // Update the _multilingual flag
+        if (schema.multilingual && value && !value._multilingual) {
+            value._multilingual = true;
+        } else if (!schema.multilingual && value && value._multilingual) {
+            delete value._multilingual;
+        }
+
+        return value;
+    };
+
+    /**
+     * Get new sort index
+     *
+     * @param {String} parentId
+     * @param {String} aboveId
+     * @param {String} belowId
+     */
+
+
+    ContentHelper.getNewSortIndex = function getNewSortIndex(parentId, aboveId, belowId) {
+        if (aboveId) {
+            return this.getContentByIdSync(aboveId).sort + 1;
+        }
+
+        if (belowId) {
+            return this.getContentByIdSync(belowId).sort - 1;
+        }
+
+        // Filter out content that doesn't have the same parent
+        var nodes = resources.content.filter(function (x) {
+            return x.parentId == parentId || !x.parentId && !parentId;
+        });
+
+        // Find new index
+        // NOTE: The index should be the highest sort number + 10000 to give a bit of leg room for sorting later
+        var newIndex = 10000;
+
+        for (var _iterator3 = nodes, _isArray3 = Array.isArray(_iterator3), _i3 = 0, _iterator3 = _isArray3 ? _iterator3 : _iterator3[Symbol.iterator]();;) {
+            var _ref3;
+
+            if (_isArray3) {
+                if (_i3 >= _iterator3.length) break;
+                _ref3 = _iterator3[_i3++];
+            } else {
+                _i3 = _iterator3.next();
+                if (_i3.done) break;
+                _ref3 = _i3.value;
+            }
+
+            var content = _ref3;
+
+            if (newIndex - 10000 <= content.sort) {
+                newIndex = content.sort + 10000;
+            }
+        }
+
+        return newIndex;
+    };
+
+    return ContentHelper;
+}(ContentHelperCommon);
+
+/***/ }),
+/* 83 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var SettingsHelperCommon = __webpack_require__(195);
 
 /**
  * The client side settings helper
@@ -14330,7 +14515,407 @@ module.exports = function (_SettingsHelperCommon) {
 }(SettingsHelperCommon);
 
 /***/ }),
-/* 83 */
+/* 84 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var UserEditor = function (_View) {
+    _inherits(UserEditor, _View);
+
+    function UserEditor(params) {
+        _classCallCheck(this, UserEditor);
+
+        var _this = _possibleConstructorReturn(this, _View.call(this, params));
+
+        _this.$element = _.div({ class: 'user-editor' });
+
+        _this.modal = UI.confirmModal('save', 'Settings for "' + _this.getLabel() + '"', _this.$element, function () {
+            _this.onClickSave();
+
+            return false;
+        });
+
+        _this.modal.$element.addClass('modal-user-editor');
+
+        customApiCall('get', '/api/server/projects').then(function (projects) {
+            _this.projects = projects;
+            _this.init();
+        });
+        return _this;
+    }
+
+    /**
+     * Gets the user label
+     *
+     * @returns {String} Label
+     */
+
+
+    UserEditor.prototype.getLabel = function getLabel() {
+        return this.model.fullName || this.model.username || this.model.email || this.model.id;
+    };
+
+    /**
+     * Event: Click save.
+     */
+
+
+    UserEditor.prototype.onClickSave = function onClickSave() {
+        var _this2 = this;
+
+        var newUserObject = this.model.getObject();
+
+        if (this.newPassword) {
+            newUserObject.password = this.newPassword;
+        }
+
+        apiCall('post', 'user/' + this.model.id, newUserObject).then(function () {
+            _this2.modal.hide();
+
+            _this2.trigger('save', _this2.model);
+        }).catch(UI.errorModal);
+    };
+
+    /**
+     * Gets a list of available scopes
+     *
+     * @returns {Array} Array of scope strings
+     */
+
+
+    UserEditor.prototype.getScopes = function getScopes() {
+        return ['connections', 'schemas', 'settings', 'templates', 'users'];
+    };
+
+    /**
+     * Renders the username editor
+     *
+     * @returns {HTMLElement} Element
+     */
+
+
+    UserEditor.prototype.renderUserNameEditor = function renderUserNameEditor() {
+        var view = this;
+
+        function onInputChange() {
+            view.model.username = $(this).val();
+        }
+
+        var $element = _.div({ class: 'username-editor' }, _.input({
+            class: 'form-control',
+            type: 'text',
+            value: view.model.username,
+            placeholder: 'Input the username here'
+        }).on('change', onInputChange));
+
+        return $element;
+    };
+
+    /**
+     * Renders the scopes editor
+     *
+     * @param {String} project
+     *
+     * @returns {HTMLElement} Element
+     */
+
+
+    UserEditor.prototype.renderScopesEditor = function renderScopesEditor(project) {
+        var _this3 = this;
+
+        return _.div({ class: 'scopes-editor' }, UI.inputChipGroup(this.model.getScopes(project), this.getScopes(), function (newValue) {
+            _this3.model.scopes[project] = newValue;
+
+            _this3.$element.find('.project[data-id="' + project + '"] .switch input')[0].checked = true;
+        }, true));
+    };
+
+    /**
+     * Renders the full name editor
+     *
+     * @return {HTMLElement} Element
+     */
+
+
+    UserEditor.prototype.renderFullNameEditor = function renderFullNameEditor() {
+        var view = this;
+
+        function onChange() {
+            var fullName = $(this).val();
+
+            view.model.fullName = fullName;
+        }
+
+        return _.div({ class: 'full-name-editor' }, _.input({ class: 'form-control', type: 'text', value: this.model.fullName }).change(onChange));
+    };
+
+    /**
+     * Renders the email editor
+     *
+     * @return {HTMLElement} Element
+     */
+
+
+    UserEditor.prototype.renderEmailEditor = function renderEmailEditor() {
+        var view = this;
+
+        function onChange() {
+            var email = $(this).val();
+
+            view.model.email = email;
+        }
+
+        return _.div({ class: 'full-name-editor' }, _.input({ class: 'form-control', type: 'email', value: this.model.email }).change(onChange));
+    };
+
+    /**
+     * Renders the password
+     *
+     * @return {HTMLElement} Element
+     */
+
+
+    UserEditor.prototype.renderPasswordEditor = function renderPasswordEditor() {
+        var view = this;
+
+        var $invalidMessage = void 0;
+        var password1 = void 0;
+        var password2 = void 0;
+
+        function onChange() {
+            var isMatch = password1 == password2;
+            var isLongEnough = password1 && password1.length > 3;
+            var isValid = isMatch && isLongEnough;
+
+            $element.toggleClass('invalid', !isValid);
+
+            view.$element.find('.model-footer .btn-primary').toggleClass('disabled', !isValid);
+
+            if (isValid) {
+                view.newPassword = password1;
+            } else {
+                view.newPassword = null;
+
+                if (!isMatch) {
+                    $invalidMessage.html('Passwords do not match');
+                } else if (!isLongEnough) {
+                    $invalidMessage.html('Passwords are too short');
+                }
+            }
+        }
+
+        function onChange1() {
+            password1 = $(this).val();
+
+            onChange();
+        }
+
+        function onChange2() {
+            password2 = $(this).val();
+
+            onChange();
+        }
+
+        var $element = _.div({ class: 'password-editor' }, $invalidMessage = _.span({ class: 'invalid-message' }, 'Passwords do not match'), _.input({ class: 'form-control', type: 'password', placeholder: 'Type new password' }).on('change propertychange keyup paste input', onChange1), _.input({ class: 'form-control', type: 'password', placeholder: 'Confirm new password' }).on('change propertychange keyup paste input', onChange2));
+
+        return $element;
+    };
+
+    /**
+     * Renders the admin editor
+     *
+     * @return {HTMLElement} Element
+     */
+
+
+    UserEditor.prototype.renderAdminEditor = function renderAdminEditor() {
+        var _this4 = this;
+
+        return UI.inputSwitch(this.model.isAdmin == true, function (newValue) {
+            _this4.model.isAdmin = newValue;
+
+            _this4.render();
+        }).addClass('admin-editor');
+    };
+
+    /**
+     * Renders a single field
+     *
+     * @return {HTMLElement} Element
+     */
+
+
+    UserEditor.prototype.renderField = function renderField(label, $content) {
+        return _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, label), _.div({ class: 'field-value' }, $content));
+    };
+
+    /**
+     * Renders all fields
+     *
+     * @return {Object} element
+     */
+
+
+    UserEditor.prototype.renderFields = function renderFields() {
+        var id = parseInt(this.model.id);
+
+        return $element;
+    };
+
+    UserEditor.prototype.render = function render() {
+        var _this5 = this;
+
+        _.append(this.$element.empty(), this.renderField('Username', this.renderUserNameEditor()), this.renderField('Full name', this.renderFullNameEditor()), this.renderField('Email', this.renderEmailEditor()), this.renderField('Password', this.renderPasswordEditor()), _.if(currentUserIsAdmin() && !this.hidePermissions, this.renderField('Is admin', this.renderAdminEditor()), _.if(!this.model.isAdmin, _.each(this.projects, function (i, project) {
+            return _.div({ class: 'project', 'data-id': project }, _.div({ class: 'project-header' }, UI.inputSwitch(_this5.model.hasScope(project), function (newValue) {
+                if (newValue) {
+                    _this5.model.giveScope(project);
+                } else {
+                    _this5.model.removeScope(project);
+
+                    _this5.$element.find('.project[data-id="' + project + '"] .chip-group .chip').remove();
+                }
+            }), _.h4({ class: 'project-title' }, project)), _.div({ class: 'project-scopes' }, _.p('Scopes:'), _this5.renderScopesEditor(project)));
+        }))));
+    };
+
+    return UserEditor;
+}(View);
+
+module.exports = UserEditor;
+
+/***/ }),
+/* 85 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var FieldSchema = __webpack_require__(189);
+var SchemaHelperCommon = __webpack_require__(233);
+
+/**
+ * The client side Schema helper
+ *
+ * @memberof HashBrown.Client.Helpers
+ */
+module.exports = function (_SchemaHelperCommon) {
+    _inherits(SchemaHelper, _SchemaHelperCommon);
+
+    function SchemaHelper() {
+        _classCallCheck(this, SchemaHelper);
+
+        return _possibleConstructorReturn(this, _SchemaHelperCommon.apply(this, arguments));
+    }
+
+    /**
+     * Gets a Schema with all parent fields
+     *
+     * @param {String} id
+     *
+     * @returns {Promise} Schema with parent fields
+     */
+    SchemaHelper.getSchemaWithParentFields = function getSchemaWithParentFields(id) {
+        if (id) {
+            return apiCall('get', 'schemas/' + id + '/?withParentFields=true').then(function (schema) {
+                return new Promise(function (resolve) {
+                    resolve(SchemaHelper.getModel(schema));
+                });
+            });
+        } else {
+            return new Promise(function (resolve) {
+                resolve(null);
+            });
+        }
+    };
+
+    /**
+     * Gets a FieldSchema with all parent configs
+     *
+     * @param {String} id
+     *
+     * @returns {FieldSchema} Compiled FieldSchema
+     */
+
+
+    SchemaHelper.getFieldSchemaWithParentConfigs = function getFieldSchemaWithParentConfigs(id) {
+        var fieldSchema = resources.schemas[id];
+
+        if (fieldSchema) {
+            var nextSchema = resources.schemas[fieldSchema.parentSchemaId];
+            var compiledSchema = new FieldSchema(fieldSchema);
+
+            while (nextSchema) {
+                compiledSchema.appendConfig(nextSchema.config);
+
+                nextSchema = resources.schemas[nextSchema.parentSchemaId];
+            }
+
+            return compiledSchema;
+        }
+    };
+
+    /**
+     * Gets a Schema by id
+     *
+     * @param {String} id
+     *
+     * @return {Promise} Promise
+     */
+
+
+    SchemaHelper.getSchemaById = function getSchemaById(id) {
+        return new Promise(function (resolve, reject) {
+            for (var i in resources.schemas) {
+                var schema = resources.schemas[i];
+
+                if (schema.id == id) {
+                    resolve(schema);
+                    return;
+                }
+            }
+
+            reject(new Error('No Schema by id "' + id + '" was found'));
+        });
+    };
+
+    /**
+     * Gets a Schema by id (sync)
+     *
+     * @param {String} id
+     *
+     * @return {Promise} Promise
+     */
+
+
+    SchemaHelper.getSchemaByIdSync = function getSchemaByIdSync(id) {
+        for (var i in resources.schemas) {
+            var schema = resources.schemas[i];
+
+            if (schema.id == id) {
+                return schema;
+            }
+        }
+    };
+
+    return SchemaHelper;
+}(SchemaHelperCommon);
+
+/***/ }),
+/* 86 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14838,17 +15423,17 @@ module.exports = function () {
 }();
 
 /***/ }),
-/* 84 */
+/* 87 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-window.Promise = __webpack_require__(85);
-window.marked = __webpack_require__(87);
-window.toMarkdown = __webpack_require__(88);
+window.Promise = __webpack_require__(88);
+window.marked = __webpack_require__(90);
+window.toMarkdown = __webpack_require__(91);
 
 var ProjectHelper = __webpack_require__(46);
-var User = __webpack_require__(44);
+var User = __webpack_require__(32);
 
 /**
  * Checks if the currently logged in user is admin
@@ -15205,13 +15790,13 @@ window.triggerReady = function triggerReady(name) {
 };
 
 // Get package file
-window.app = __webpack_require__(175);
+window.app = __webpack_require__(178);
 
 // Language
 window.language = localStorage.getItem('language') || 'en';
 
 /***/ }),
-/* 85 */
+/* 88 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process, global, setImmediate) {var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -20542,7 +21127,7 @@ window.language = localStorage.getItem('language') || 'en';
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6), __webpack_require__(7), __webpack_require__(45).setImmediate))
 
 /***/ }),
-/* 86 */
+/* 89 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, process) {(function (global, undefined) {
@@ -20730,7 +21315,7 @@ window.language = localStorage.getItem('language') || 'en';
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7), __webpack_require__(6)))
 
 /***/ }),
-/* 87 */
+/* 90 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {var __WEBPACK_AMD_DEFINE_RESULT__;var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -21919,7 +22504,7 @@ window.language = localStorage.getItem('language') || 'en';
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7)))
 
 /***/ }),
-/* 88 */
+/* 91 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -21935,10 +22520,10 @@ window.language = localStorage.getItem('language') || 'en';
 
 var toMarkdown;
 var converters;
-var mdConverters = __webpack_require__(89);
-var gfmConverters = __webpack_require__(90);
-var HtmlParser = __webpack_require__(91);
-var collapse = __webpack_require__(93);
+var mdConverters = __webpack_require__(92);
+var gfmConverters = __webpack_require__(93);
+var HtmlParser = __webpack_require__(94);
+var collapse = __webpack_require__(96);
 
 /*
  * Utilities
@@ -22146,7 +22731,7 @@ toMarkdown.outer = outer;
 module.exports = toMarkdown;
 
 /***/ }),
-/* 89 */
+/* 92 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -22279,7 +22864,7 @@ module.exports = [{
 }];
 
 /***/ }),
-/* 90 */
+/* 93 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -22379,7 +22964,7 @@ module.exports = [{
 }];
 
 /***/ }),
-/* 91 */
+/* 94 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -22413,7 +22998,7 @@ function createHtmlParser() {
 
   // For Node.js environments
   if (typeof document === 'undefined') {
-    var jsdom = __webpack_require__(92);
+    var jsdom = __webpack_require__(95);
     Parser.prototype.parseFromString = function (string) {
       return jsdom.jsdom(string, {
         features: {
@@ -22460,25 +23045,25 @@ function shouldUseActiveX() {
 module.exports = canParseHtmlNatively() ? _window.DOMParser : createHtmlParser();
 
 /***/ }),
-/* 92 */
+/* 95 */
 /***/ (function(module, exports) {
 
 /* (ignored) */
 
 /***/ }),
-/* 93 */
+/* 96 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var voidElements = __webpack_require__(94);
+var voidElements = __webpack_require__(97);
 Object.keys(voidElements).forEach(function (name) {
   voidElements[name.toUpperCase()] = 1;
 });
 
 var blockElements = {};
-__webpack_require__(95).forEach(function (name) {
+__webpack_require__(98).forEach(function (name) {
   blockElements[name.toUpperCase()] = 1;
 });
 
@@ -22608,7 +23193,7 @@ function next(prev, current) {
 module.exports = collapseWhitespace;
 
 /***/ }),
-/* 94 */
+/* 97 */
 /***/ (function(module, exports) {
 
 /**
@@ -22636,7 +23221,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 95 */
+/* 98 */
 /***/ (function(module, exports) {
 
 /**
@@ -22644,10 +23229,10 @@ module.exports = {
  * Do not manually edit.
  */
 
-module.exports = ["address", "article", "aside", "audio", "blockquote", "canvas", "dd", "div", "dl", "fieldset", "figcaption", "figure", "footer", "form", "h1", "h2", "h3", "h4", "h5", "h6", "header", "hgroup", "hr", "main", "nav", "noscript", "ol", "output", "p", "pre", "section", "table", "tfoot", "ul", "video"];
+module.exports = ["address", "article", "aside", "blockquote", "canvas", "dd", "div", "dl", "dt", "fieldset", "figcaption", "figure", "footer", "form", "h1", "h2", "h3", "h4", "h5", "h6", "header", "hgroup", "hr", "li", "main", "nav", "noscript", "ol", "output", "p", "pre", "section", "table", "tfoot", "ul", "video"];
 
 /***/ }),
-/* 96 */
+/* 99 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -22657,7 +23242,7 @@ exports.randomBytes = exports.rng = exports.pseudoRandomBytes = exports.prng = _
 exports.createHash = exports.Hash = __webpack_require__(15);
 exports.createHmac = exports.Hmac = __webpack_require__(52);
 
-var algos = __webpack_require__(115);
+var algos = __webpack_require__(118);
 var algoKeys = Object.keys(algos);
 var hashes = ['sha1', 'sha224', 'sha256', 'sha384', 'sha512', 'md5', 'rmd160'].concat(algoKeys);
 exports.getHashes = function () {
@@ -22668,7 +23253,7 @@ var p = __webpack_require__(54);
 exports.pbkdf2 = p.pbkdf2;
 exports.pbkdf2Sync = p.pbkdf2Sync;
 
-var aes = __webpack_require__(117);
+var aes = __webpack_require__(120);
 
 exports.Cipher = aes.Cipher;
 exports.createCipher = aes.createCipher;
@@ -22681,7 +23266,7 @@ exports.createDecipheriv = aes.createDecipheriv;
 exports.getCiphers = aes.getCiphers;
 exports.listCiphers = aes.listCiphers;
 
-var dh = __webpack_require__(128);
+var dh = __webpack_require__(131);
 
 exports.DiffieHellmanGroup = dh.DiffieHellmanGroup;
 exports.createDiffieHellmanGroup = dh.createDiffieHellmanGroup;
@@ -22689,16 +23274,16 @@ exports.getDiffieHellman = dh.getDiffieHellman;
 exports.createDiffieHellman = dh.createDiffieHellman;
 exports.DiffieHellman = dh.DiffieHellman;
 
-var sign = __webpack_require__(133);
+var sign = __webpack_require__(136);
 
 exports.createSign = sign.createSign;
 exports.Sign = sign.Sign;
 exports.createVerify = sign.createVerify;
 exports.Verify = sign.Verify;
 
-exports.createECDH = __webpack_require__(171);
+exports.createECDH = __webpack_require__(174);
 
-var publicEncrypt = __webpack_require__(172);
+var publicEncrypt = __webpack_require__(175);
 
 exports.publicEncrypt = publicEncrypt.publicEncrypt;
 exports.privateEncrypt = publicEncrypt.privateEncrypt;
@@ -22741,7 +23326,7 @@ exports.constants = {
 };
 
 /***/ }),
-/* 97 */
+/* 100 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* eslint-disable node/no-deprecated-api */
@@ -22808,7 +23393,7 @@ SafeBuffer.allocUnsafeSlow = function (size) {
 };
 
 /***/ }),
-/* 98 */
+/* 101 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -22928,7 +23513,7 @@ function fromByteArray(uint8) {
 }
 
 /***/ }),
-/* 99 */
+/* 102 */
 /***/ (function(module, exports) {
 
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
@@ -23017,7 +23602,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 };
 
 /***/ }),
-/* 100 */
+/* 103 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -23055,7 +23640,7 @@ module.exports = function hash(buf, fn) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
 
 /***/ }),
-/* 101 */
+/* 104 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -23147,7 +23732,7 @@ module.exports = HashBase;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
 
 /***/ }),
-/* 102 */
+/* 105 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process) {var Stream = function () {
@@ -23158,9 +23743,9 @@ module.exports = HashBase;
 exports = module.exports = __webpack_require__(48);
 exports.Stream = Stream || exports;
 exports.Readable = exports;
-exports.Writable = __webpack_require__(35);
+exports.Writable = __webpack_require__(36);
 exports.Duplex = __webpack_require__(10);
-exports.Transform = __webpack_require__(37);
+exports.Transform = __webpack_require__(38);
 exports.PassThrough = __webpack_require__(49);
 
 if (!process.browser && process.env.READABLE_STREAM === 'disable' && Stream) {
@@ -23169,13 +23754,13 @@ if (!process.browser && process.env.READABLE_STREAM === 'disable' && Stream) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6)))
 
 /***/ }),
-/* 103 */
+/* 106 */
 /***/ (function(module, exports) {
 
 /* (ignored) */
 
 /***/ }),
-/* 104 */
+/* 107 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -23183,7 +23768,7 @@ if (!process.browser && process.env.READABLE_STREAM === 'disable' && Stream) {
 
 var Buffer = __webpack_require__(0).Buffer;
 /*<replacement>*/
-var bufferShim = __webpack_require__(34);
+var bufferShim = __webpack_require__(35);
 /*</replacement>*/
 
 module.exports = BufferList;
@@ -23245,7 +23830,7 @@ BufferList.prototype.concat = function (n) {
 };
 
 /***/ }),
-/* 105 */
+/* 108 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {
@@ -23318,31 +23903,31 @@ function config(name) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7)))
 
 /***/ }),
-/* 106 */
+/* 109 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(35);
+module.exports = __webpack_require__(36);
 
 /***/ }),
-/* 107 */
+/* 110 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__(10);
 
 /***/ }),
-/* 108 */
+/* 111 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(37);
+module.exports = __webpack_require__(38);
 
 /***/ }),
-/* 109 */
+/* 112 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__(49);
 
 /***/ }),
-/* 110 */
+/* 113 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(Buffer) {/*
@@ -23440,7 +24025,7 @@ module.exports = Sha;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
 
 /***/ }),
-/* 111 */
+/* 114 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(Buffer) {/*
@@ -23543,7 +24128,7 @@ module.exports = Sha1;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
 
 /***/ }),
-/* 112 */
+/* 115 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(Buffer) {/**
@@ -23601,7 +24186,7 @@ module.exports = Sha224;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
 
 /***/ }),
-/* 113 */
+/* 116 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(Buffer) {var inherits = __webpack_require__(1);
@@ -23663,7 +24248,7 @@ module.exports = Sha384;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
 
 /***/ }),
-/* 114 */
+/* 117 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -23716,13 +24301,13 @@ Hmac.prototype._final = function () {
 module.exports = Hmac;
 
 /***/ }),
-/* 115 */
+/* 118 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__(53);
 
 /***/ }),
-/* 116 */
+/* 119 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, process) {var checkParameters = __webpack_require__(55);
@@ -23823,13 +24408,13 @@ module.exports = function (password, salt, iterations, keylen, digest, callback)
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7), __webpack_require__(6)))
 
 /***/ }),
-/* 117 */
+/* 120 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var ebtk = __webpack_require__(24);
-var aes = __webpack_require__(39);
-var DES = __webpack_require__(121);
-var desModes = __webpack_require__(127);
+var aes = __webpack_require__(40);
+var DES = __webpack_require__(124);
+var desModes = __webpack_require__(130);
 var aesModes = __webpack_require__(26);
 function createCipher(suite, password) {
   var keyLen, ivLen;
@@ -23901,7 +24486,7 @@ function getCiphers() {
 exports.listCiphers = exports.getCiphers = getCiphers;
 
 /***/ }),
-/* 118 */
+/* 121 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(Buffer) {var aes = __webpack_require__(25);
@@ -24029,7 +24614,7 @@ exports.createCipher = createCipher;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
 
 /***/ }),
-/* 119 */
+/* 122 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(Buffer) {var zeros = new Buffer(16);
@@ -24120,7 +24705,7 @@ function xor(a, b) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
 
 /***/ }),
-/* 120 */
+/* 123 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(Buffer) {var aes = __webpack_require__(25);
@@ -24263,11 +24848,11 @@ exports.createDecipheriv = createDecipheriv;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
 
 /***/ }),
-/* 121 */
+/* 124 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(Buffer) {var CipherBase = __webpack_require__(8);
-var des = __webpack_require__(40);
+var des = __webpack_require__(41);
 var inherits = __webpack_require__(1);
 
 var modes = {
@@ -24312,7 +24897,7 @@ DES.prototype._final = function () {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
 
 /***/ }),
-/* 122 */
+/* 125 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -24522,7 +25107,7 @@ exports.padSplit = function padSplit(num, size, group) {
 };
 
 /***/ }),
-/* 123 */
+/* 126 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -24653,7 +25238,7 @@ Cipher.prototype._finalDecrypt = function _finalDecrypt() {
 };
 
 /***/ }),
-/* 124 */
+/* 127 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -24662,7 +25247,7 @@ Cipher.prototype._finalDecrypt = function _finalDecrypt() {
 var assert = __webpack_require__(4);
 var inherits = __webpack_require__(1);
 
-var des = __webpack_require__(40);
+var des = __webpack_require__(41);
 var utils = des.utils;
 var Cipher = des.Cipher;
 
@@ -24794,7 +25379,7 @@ DES.prototype._decrypt = function _decrypt(state, lStart, rStart, out, off) {
 };
 
 /***/ }),
-/* 125 */
+/* 128 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -24866,7 +25451,7 @@ proto._update = function _update(inp, inOff, out, outOff) {
 };
 
 /***/ }),
-/* 126 */
+/* 129 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -24875,7 +25460,7 @@ proto._update = function _update(inp, inOff, out, outOff) {
 var assert = __webpack_require__(4);
 var inherits = __webpack_require__(1);
 
-var des = __webpack_require__(40);
+var des = __webpack_require__(41);
 var Cipher = des.Cipher;
 var DES = des.DES;
 
@@ -24919,7 +25504,7 @@ EDE.prototype._pad = DES.prototype._pad;
 EDE.prototype._unpad = DES.prototype._unpad;
 
 /***/ }),
-/* 127 */
+/* 130 */
 /***/ (function(module, exports) {
 
 exports['des-ecb'] = {
@@ -24948,13 +25533,13 @@ exports['des-ede'] = {
 };
 
 /***/ }),
-/* 128 */
+/* 131 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(Buffer) {var generatePrime = __webpack_require__(66);
-var primes = __webpack_require__(131);
+var primes = __webpack_require__(134);
 
-var DH = __webpack_require__(132);
+var DH = __webpack_require__(135);
 
 function getDiffieHellman(mod) {
   var prime = new Buffer(primes[mod].prime, 'hex');
@@ -24996,7 +25581,7 @@ exports.createDiffieHellman = exports.DiffieHellman = createDiffieHellman;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
 
 /***/ }),
-/* 129 */
+/* 132 */
 /***/ (function(module, exports) {
 
 module.exports = function (module) {
@@ -25023,13 +25608,13 @@ module.exports = function (module) {
 };
 
 /***/ }),
-/* 130 */
+/* 133 */
 /***/ (function(module, exports) {
 
 /* (ignored) */
 
 /***/ }),
-/* 131 */
+/* 134 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -25068,7 +25653,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 132 */
+/* 135 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(Buffer) {var BN = __webpack_require__(2);
@@ -25235,14 +25820,14 @@ function formatReturnValue(bn, enc) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
 
 /***/ }),
-/* 133 */
+/* 136 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(Buffer) {var createHash = __webpack_require__(15);
 var stream = __webpack_require__(11);
 var inherits = __webpack_require__(1);
-var sign = __webpack_require__(134);
-var verify = __webpack_require__(170);
+var sign = __webpack_require__(137);
+var verify = __webpack_require__(173);
 
 var algorithms = __webpack_require__(53);
 Object.keys(algorithms).forEach(function (key) {
@@ -25332,12 +25917,12 @@ module.exports = {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
 
 /***/ }),
-/* 134 */
+/* 137 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(Buffer) {// much of this based on https://github.com/indutny/self-signed/blob/gh-pages/lib/rsa.js
 var createHmac = __webpack_require__(52);
-var crt = __webpack_require__(41);
+var crt = __webpack_require__(42);
 var EC = __webpack_require__(3).ec;
 var BN = __webpack_require__(2);
 var parseKeys = __webpack_require__(29);
@@ -25484,57 +26069,40 @@ module.exports.makeKey = makeKey;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
 
 /***/ }),
-/* 135 */
+/* 138 */
 /***/ (function(module, exports) {
 
 module.exports = {
 	"_args": [
 		[
-			{
-				"raw": "elliptic@^6.0.0",
-				"scope": null,
-				"escapedName": "elliptic",
-				"name": "elliptic",
-				"rawSpec": "^6.0.0",
-				"spec": ">=6.0.0 <7.0.0",
-				"type": "range"
-			},
-			"/home/mrzapp/Development/Web/hashbrown-cms/node_modules/browserify-sign"
+			"elliptic@6.4.0",
+			"/home/mrzapp/Development/Web/hashbrown-cms"
 		]
 	],
-	"_from": "elliptic@>=6.0.0 <7.0.0",
+	"_development": true,
+	"_from": "elliptic@6.4.0",
 	"_id": "elliptic@6.4.0",
-	"_inCache": true,
+	"_inBundle": false,
+	"_integrity": "sha1-ysmvh2LIWDYYcAPI3+GT5eLq5d8=",
 	"_location": "/elliptic",
-	"_nodeVersion": "7.0.0",
-	"_npmOperationalInternal": {
-		"host": "packages-18-east.internal.npmjs.com",
-		"tmp": "tmp/elliptic-6.4.0.tgz_1487798866428_0.30510620190761983"
-	},
-	"_npmUser": {
-		"name": "indutny",
-		"email": "fedor@indutny.com"
-	},
-	"_npmVersion": "3.10.8",
 	"_phantomChildren": {},
 	"_requested": {
-		"raw": "elliptic@^6.0.0",
-		"scope": null,
-		"escapedName": "elliptic",
+		"type": "version",
+		"registry": true,
+		"raw": "elliptic@6.4.0",
 		"name": "elliptic",
-		"rawSpec": "^6.0.0",
-		"spec": ">=6.0.0 <7.0.0",
-		"type": "range"
+		"escapedName": "elliptic",
+		"rawSpec": "6.4.0",
+		"saveSpec": null,
+		"fetchSpec": "6.4.0"
 	},
 	"_requiredBy": [
 		"/browserify-sign",
 		"/create-ecdh"
 	],
 	"_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-6.4.0.tgz",
-	"_shasum": "cac9af8762c85836187003c8dfe193e5e2eae5df",
-	"_shrinkwrap": null,
-	"_spec": "elliptic@^6.0.0",
-	"_where": "/home/mrzapp/Development/Web/hashbrown-cms/node_modules/browserify-sign",
+	"_spec": "6.4.0",
+	"_where": "/home/mrzapp/Development/Web/hashbrown-cms",
 	"author": {
 		"name": "Fedor Indutny",
 		"email": "fedor@indutny.com"
@@ -25568,15 +26136,9 @@ module.exports = {
 		"jshint": "^2.6.0",
 		"mocha": "^2.1.0"
 	},
-	"directories": {},
-	"dist": {
-		"shasum": "cac9af8762c85836187003c8dfe193e5e2eae5df",
-		"tarball": "https://registry.npmjs.org/elliptic/-/elliptic-6.4.0.tgz"
-	},
 	"files": [
 		"lib"
 	],
-	"gitHead": "6b0d2b76caae91471649c8e21f0b1d3ba0f96090",
 	"homepage": "https://github.com/indutny/elliptic",
 	"keywords": [
 		"EC",
@@ -25586,16 +26148,7 @@ module.exports = {
 	],
 	"license": "MIT",
 	"main": "lib/elliptic.js",
-	"maintainers": [
-		{
-			"name": "indutny",
-			"email": "fedor@indutny.com"
-		}
-	],
 	"name": "elliptic",
-	"optionalDependencies": {},
-	"readme": "# Elliptic [![Build Status](https://secure.travis-ci.org/indutny/elliptic.png)](http://travis-ci.org/indutny/elliptic) [![Coverage Status](https://coveralls.io/repos/indutny/elliptic/badge.svg?branch=master&service=github)](https://coveralls.io/github/indutny/elliptic?branch=master) [![Code Climate](https://codeclimate.com/github/indutny/elliptic/badges/gpa.svg)](https://codeclimate.com/github/indutny/elliptic)\n\n[![Saucelabs Test Status](https://saucelabs.com/browser-matrix/gh-indutny-elliptic.svg)](https://saucelabs.com/u/gh-indutny-elliptic)\n\nFast elliptic-curve cryptography in a plain javascript implementation.\n\nNOTE: Please take a look at http://safecurves.cr.yp.to/ before choosing a curve\nfor your cryptography operations.\n\n## Incentive\n\nECC is much slower than regular RSA cryptography, the JS implementations are\neven more slower.\n\n## Benchmarks\n\n```bash\n$ node benchmarks/index.js\nBenchmarking: sign\nelliptic#sign x 262 ops/sec ±0.51% (177 runs sampled)\neccjs#sign x 55.91 ops/sec ±0.90% (144 runs sampled)\n------------------------\nFastest is elliptic#sign\n========================\nBenchmarking: verify\nelliptic#verify x 113 ops/sec ±0.50% (166 runs sampled)\neccjs#verify x 48.56 ops/sec ±0.36% (125 runs sampled)\n------------------------\nFastest is elliptic#verify\n========================\nBenchmarking: gen\nelliptic#gen x 294 ops/sec ±0.43% (176 runs sampled)\neccjs#gen x 62.25 ops/sec ±0.63% (129 runs sampled)\n------------------------\nFastest is elliptic#gen\n========================\nBenchmarking: ecdh\nelliptic#ecdh x 136 ops/sec ±0.85% (156 runs sampled)\n------------------------\nFastest is elliptic#ecdh\n========================\n```\n\n## API\n\n### ECDSA\n\n```javascript\nvar EC = require('elliptic').ec;\n\n// Create and initialize EC context\n// (better do it once and reuse it)\nvar ec = new EC('secp256k1');\n\n// Generate keys\nvar key = ec.genKeyPair();\n\n// Sign message (must be an array, or it'll be treated as a hex sequence)\nvar msg = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ];\nvar signature = key.sign(msg);\n\n// Export DER encoded signature in Array\nvar derSign = signature.toDER();\n\n// Verify signature\nconsole.log(key.verify(msg, derSign));\n\n// CHECK WITH NO PRIVATE KEY\n\n// Public key as '04 + x + y'\nvar pub = '04bb1fa3...';\n\n// Signature MUST be either:\n// 1) hex-string of DER-encoded signature; or\n// 2) DER-encoded signature as buffer; or\n// 3) object with two hex-string properties (r and s)\n\nvar signature = 'b102ac...'; // case 1\nvar signature = new Buffer('...'); // case 2\nvar signature = { r: 'b1fc...', s: '9c42...' }; // case 3\n\n// Import public key\nvar key = ec.keyFromPublic(pub, 'hex');\n\n// Verify signature\nconsole.log(key.verify(msg, signature));\n```\n\n### EdDSA\n\n```javascript\nvar EdDSA = require('elliptic').eddsa;\n\n// Create and initialize EdDSA context\n// (better do it once and reuse it)\nvar ec = new EdDSA('ed25519');\n\n// Create key pair from secret\nvar key = ec.keyFromSecret('693e3c...'); // hex string, array or Buffer\n\n// Sign message (must be an array, or it'll be treated as a hex sequence)\nvar msg = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ];\nvar signature = key.sign(msg).toHex();\n\n// Verify signature\nconsole.log(key.verify(msg, signature));\n\n// CHECK WITH NO PRIVATE KEY\n\n// Import public key\nvar pub = '0a1af638...';\nvar key = ec.keyFromPublic(pub, 'hex');\n\n// Verify signature\nvar signature = '70bed1...';\nconsole.log(key.verify(msg, signature));\n```\n\n### ECDH\n\n```javascript\nvar EC = require('elliptic').ec;\nvar ec = new EC('curve25519');\n\n// Generate keys\nvar key1 = ec.genKeyPair();\nvar key2 = ec.genKeyPair();\n\nvar shared1 = key1.derive(key2.getPublic());\nvar shared2 = key2.derive(key1.getPublic());\n\nconsole.log('Both shared secrets are BN instances');\nconsole.log(shared1.toString(16));\nconsole.log(shared2.toString(16));\n```\n\nthree and more members:\n```javascript\nvar EC = require('elliptic').ec;\nvar ec = new EC('curve25519');\n\nvar A = ec.genKeyPair();\nvar B = ec.genKeyPair();\nvar C = ec.genKeyPair();\n\nvar AB = A.getPublic().mul(B.getPrivate())\nvar BC = B.getPublic().mul(C.getPrivate())\nvar CA = C.getPublic().mul(A.getPrivate())\n\nvar ABC = AB.mul(C.getPrivate())\nvar BCA = BC.mul(A.getPrivate())\nvar CAB = CA.mul(B.getPrivate())\n\nconsole.log(ABC.getX().toString(16))\nconsole.log(BCA.getX().toString(16))\nconsole.log(CAB.getX().toString(16))\n```\n\nNOTE: `.derive()` returns a [BN][1] instance.\n\n## Supported curves\n\nElliptic.js support following curve types:\n\n* Short Weierstrass\n* Montgomery\n* Edwards\n* Twisted Edwards\n\nFollowing curve 'presets' are embedded into the library:\n\n* `secp256k1`\n* `p192`\n* `p224`\n* `p256`\n* `p384`\n* `p521`\n* `curve25519`\n* `ed25519`\n\nNOTE: That `curve25519` could not be used for ECDSA, use `ed25519` instead.\n\n### Implementation details\n\nECDSA is using deterministic `k` value generation as per [RFC6979][0]. Most of\nthe curve operations are performed on non-affine coordinates (either projective\nor extended), various windowing techniques are used for different cases.\n\nAll operations are performed in reduction context using [bn.js][1], hashing is\nprovided by [hash.js][2]\n\n### Related projects\n\n* [eccrypto][3]: isomorphic implementation of ECDSA, ECDH and ECIES for both\n  browserify and node (uses `elliptic` for browser and [secp256k1-node][4] for\n  node)\n\n#### LICENSE\n\nThis software is licensed under the MIT License.\n\nCopyright Fedor Indutny, 2014.\n\nPermission is hereby granted, free of charge, to any person obtaining a\ncopy of this software and associated documentation files (the\n\"Software\"), to deal in the Software without restriction, including\nwithout limitation the rights to use, copy, modify, merge, publish,\ndistribute, sublicense, and/or sell copies of the Software, and to permit\npersons to whom the Software is furnished to do so, subject to the\nfollowing conditions:\n\nThe above copyright notice and this permission notice shall be included\nin all copies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS\nOR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF\nMERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN\nNO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,\nDAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR\nOTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE\nUSE OR OTHER DEALINGS IN THE SOFTWARE.\n\n[0]: http://tools.ietf.org/html/rfc6979\n[1]: https://github.com/indutny/bn.js\n[2]: https://github.com/indutny/hash.js\n[3]: https://github.com/bitchan/eccrypto\n[4]: https://github.com/wanderer/secp256k1-node\n",
-	"readmeFilename": "README.md",
 	"repository": {
 		"type": "git",
 		"url": "git+ssh://git@github.com/indutny/elliptic.git"
@@ -25612,7 +26165,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 136 */
+/* 139 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -25719,7 +26272,7 @@ function intFromLE(bytes) {
 utils.intFromLE = intFromLE;
 
 /***/ }),
-/* 137 */
+/* 140 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -26055,7 +26608,7 @@ BasePoint.prototype.dblp = function dblp(k) {
 };
 
 /***/ }),
-/* 138 */
+/* 141 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -26924,7 +27477,7 @@ JPoint.prototype.isInfinity = function isInfinity() {
 };
 
 /***/ }),
-/* 139 */
+/* 142 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -27105,7 +27658,7 @@ Point.prototype.getX = function getX() {
 };
 
 /***/ }),
-/* 140 */
+/* 143 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -27497,7 +28050,7 @@ Point.prototype.toP = Point.prototype.normalize;
 Point.prototype.mixedAdd = Point.prototype.add;
 
 /***/ }),
-/* 141 */
+/* 144 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -27505,7 +28058,7 @@ Point.prototype.mixedAdd = Point.prototype.add;
 
 var curves = exports;
 
-var hash = __webpack_require__(42);
+var hash = __webpack_require__(43);
 var elliptic = __webpack_require__(3);
 
 var assert = elliptic.utils.assert;
@@ -27628,7 +28181,7 @@ defineCurve('ed25519', {
 
 var pre;
 try {
-  pre = __webpack_require__(148);
+  pre = __webpack_require__(151);
 } catch (e) {
   pre = undefined;
 }
@@ -27659,20 +28212,20 @@ defineCurve('secp256k1', {
 });
 
 /***/ }),
-/* 142 */
+/* 145 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-exports.sha1 = __webpack_require__(143);
-exports.sha224 = __webpack_require__(144);
+exports.sha1 = __webpack_require__(146);
+exports.sha224 = __webpack_require__(147);
 exports.sha256 = __webpack_require__(71);
-exports.sha384 = __webpack_require__(145);
+exports.sha384 = __webpack_require__(148);
 exports.sha512 = __webpack_require__(72);
 
 /***/ }),
-/* 143 */
+/* 146 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -27741,7 +28294,7 @@ SHA1.prototype._digest = function digest(enc) {
 };
 
 /***/ }),
-/* 144 */
+/* 147 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -27770,7 +28323,7 @@ SHA224.prototype._digest = function digest(enc) {
 };
 
 /***/ }),
-/* 145 */
+/* 148 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -27799,7 +28352,7 @@ SHA384.prototype._digest = function digest(enc) {
 };
 
 /***/ }),
-/* 146 */
+/* 149 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -27888,7 +28441,7 @@ var s = [11, 14, 15, 12, 5, 8, 7, 9, 11, 13, 14, 15, 6, 7, 9, 8, 7, 6, 8, 13, 11
 var sh = [8, 9, 9, 11, 13, 15, 15, 5, 7, 7, 8, 11, 14, 14, 12, 6, 9, 13, 15, 7, 12, 8, 9, 11, 7, 7, 12, 7, 6, 15, 13, 11, 9, 7, 15, 11, 8, 6, 6, 14, 12, 13, 5, 14, 13, 13, 7, 5, 15, 5, 8, 11, 14, 14, 6, 14, 6, 9, 12, 9, 12, 5, 15, 8, 8, 5, 12, 9, 12, 5, 14, 6, 8, 13, 6, 5, 15, 13, 11, 11];
 
 /***/ }),
-/* 147 */
+/* 150 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -27938,7 +28491,7 @@ Hmac.prototype.digest = function digest(enc) {
 };
 
 /***/ }),
-/* 148 */
+/* 151 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -27953,7 +28506,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 149 */
+/* 152 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -27962,13 +28515,13 @@ module.exports = {
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var BN = __webpack_require__(2);
-var HmacDRBG = __webpack_require__(150);
+var HmacDRBG = __webpack_require__(153);
 var elliptic = __webpack_require__(3);
 var utils = elliptic.utils;
 var assert = utils.assert;
 
-var KeyPair = __webpack_require__(151);
-var Signature = __webpack_require__(152);
+var KeyPair = __webpack_require__(154);
+var Signature = __webpack_require__(155);
 
 function EC(options) {
   if (!(this instanceof EC)) return new EC(options);
@@ -28175,13 +28728,13 @@ EC.prototype.getKeyRecoveryParam = function (e, signature, Q, enc) {
 };
 
 /***/ }),
-/* 150 */
+/* 153 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var hash = __webpack_require__(42);
+var hash = __webpack_require__(43);
 var utils = __webpack_require__(69);
 var assert = __webpack_require__(4);
 
@@ -28282,7 +28835,7 @@ HmacDRBG.prototype.generate = function generate(len, enc, add, addEnc) {
 };
 
 /***/ }),
-/* 151 */
+/* 154 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -28393,7 +28946,7 @@ KeyPair.prototype.inspect = function inspect() {
 };
 
 /***/ }),
-/* 152 */
+/* 155 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -28527,19 +29080,19 @@ Signature.prototype.toDER = function toDER(enc) {
 };
 
 /***/ }),
-/* 153 */
+/* 156 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var hash = __webpack_require__(42);
+var hash = __webpack_require__(43);
 var elliptic = __webpack_require__(3);
 var utils = elliptic.utils;
 var assert = utils.assert;
 var parseBytes = utils.parseBytes;
-var KeyPair = __webpack_require__(154);
-var Signature = __webpack_require__(155);
+var KeyPair = __webpack_require__(157);
+var Signature = __webpack_require__(158);
 
 function EDDSA(curve) {
   assert(curve === 'ed25519', 'only tested with ed25519 so far');
@@ -28648,7 +29201,7 @@ EDDSA.prototype.isPoint = function isPoint(val) {
 };
 
 /***/ }),
-/* 154 */
+/* 157 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -28744,7 +29297,7 @@ KeyPair.prototype.getPublic = function getPublic(enc) {
 module.exports = KeyPair;
 
 /***/ }),
-/* 155 */
+/* 158 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -28815,7 +29368,7 @@ Signature.prototype.toHex = function toHex() {
 module.exports = Signature;
 
 /***/ }),
-/* 156 */
+/* 159 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -28825,7 +29378,7 @@ module.exports = Signature;
 
 var asn1 = __webpack_require__(20);
 
-exports.certificate = __webpack_require__(167);
+exports.certificate = __webpack_require__(170);
 
 var RSAPrivateKey = asn1.define('RSAPrivateKey', function () {
   this.seq().obj(this.key('version').int(), this.key('modulus').int(), this.key('publicExponent').int(), this.key('privateExponent').int(), this.key('prime1').int(), this.key('prime2').int(), this.key('exponent1').int(), this.key('exponent2').int(), this.key('coefficient').int());
@@ -28881,7 +29434,7 @@ exports.signature = asn1.define('signature', function () {
 });
 
 /***/ }),
-/* 157 */
+/* 160 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var asn1 = __webpack_require__(20);
@@ -28904,7 +29457,7 @@ function Entity(name, body) {
 Entity.prototype._createNamed = function createNamed(base) {
   var named;
   try {
-    named = __webpack_require__(158).runInThisContext('(function ' + this.name + '(entity) {\n' + '  this._initNamed(entity);\n' + '})');
+    named = __webpack_require__(161).runInThisContext('(function ' + this.name + '(entity) {\n' + '  this._initNamed(entity);\n' + '})');
   } catch (e) {
     named = function named(entity) {
       this._initNamed(entity);
@@ -28941,12 +29494,12 @@ Entity.prototype.encode = function encode(data, enc, /* internal */reporter) {
 };
 
 /***/ }),
-/* 158 */
+/* 161 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-var indexOf = __webpack_require__(159);
+var indexOf = __webpack_require__(162);
 
 var Object_keys = function Object_keys(obj) {
     if (Object.keys) return Object.keys(obj);else {
@@ -29082,7 +29635,7 @@ exports.createContext = Script.createContext = function (context) {
 };
 
 /***/ }),
-/* 159 */
+/* 162 */
 /***/ (function(module, exports) {
 
 
@@ -29097,7 +29650,7 @@ module.exports = function (arr, obj) {
 };
 
 /***/ }),
-/* 160 */
+/* 163 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var inherits = __webpack_require__(1);
@@ -29218,7 +29771,7 @@ ReporterError.prototype.rethrow = function rethrow(msg) {
 };
 
 /***/ }),
-/* 161 */
+/* 164 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -29748,7 +30301,7 @@ Node.prototype._isPrintstr = function isPrintstr(str) {
 };
 
 /***/ }),
-/* 162 */
+/* 165 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var constants = __webpack_require__(74);
@@ -29795,16 +30348,16 @@ exports.tag = {
 exports.tagByName = constants._reverse(exports.tag);
 
 /***/ }),
-/* 163 */
+/* 166 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var decoders = exports;
 
 decoders.der = __webpack_require__(75);
-decoders.pem = __webpack_require__(164);
+decoders.pem = __webpack_require__(167);
 
 /***/ }),
-/* 164 */
+/* 167 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var inherits = __webpack_require__(1);
@@ -29853,16 +30406,16 @@ PEMDecoder.prototype.decode = function decode(data, options) {
 };
 
 /***/ }),
-/* 165 */
+/* 168 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var encoders = exports;
 
 encoders.der = __webpack_require__(76);
-encoders.pem = __webpack_require__(166);
+encoders.pem = __webpack_require__(169);
 
 /***/ }),
-/* 166 */
+/* 169 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var inherits = __webpack_require__(1);
@@ -29888,7 +30441,7 @@ PEMEncoder.prototype.encode = function encode(data, options) {
 };
 
 /***/ }),
-/* 167 */
+/* 170 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -29951,7 +30504,7 @@ var X509Certificate = asn.define('X509Certificate', function () {
 module.exports = X509Certificate;
 
 /***/ }),
-/* 168 */
+/* 171 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -29970,7 +30523,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 169 */
+/* 172 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(Buffer) {// adapted from https://github.com/apatil/pemstrip
@@ -29978,7 +30531,7 @@ var findProc = /Proc-Type: 4,ENCRYPTED\n\r?DEK-Info: AES-((?:128)|(?:192)|(?:256
 var startRegex = /^-----BEGIN ((?:.* KEY)|CERTIFICATE)-----\n/m;
 var fullRegex = /^-----BEGIN ((?:.* KEY)|CERTIFICATE)-----\n\r?([0-9A-z\n\r\+\/\=]+)\n\r?-----END \1-----$/m;
 var evp = __webpack_require__(24);
-var ciphers = __webpack_require__(39);
+var ciphers = __webpack_require__(40);
 module.exports = function (okey, password) {
   var key = okey.toString();
   var match = key.match(findProc);
@@ -30006,7 +30559,7 @@ module.exports = function (okey, password) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
 
 /***/ }),
-/* 170 */
+/* 173 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(Buffer) {// much of this based on https://github.com/indutny/self-signed/blob/gh-pages/lib/rsa.js
@@ -30091,7 +30644,7 @@ module.exports = verify;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
 
 /***/ }),
-/* 171 */
+/* 174 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(Buffer) {var elliptic = __webpack_require__(3);
@@ -30219,11 +30772,11 @@ function formatReturnValue(bn, enc, len) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
 
 /***/ }),
-/* 172 */
+/* 175 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports.publicEncrypt = __webpack_require__(173);
-exports.privateDecrypt = __webpack_require__(174);
+exports.publicEncrypt = __webpack_require__(176);
+exports.privateDecrypt = __webpack_require__(177);
 
 exports.privateEncrypt = function privateEncrypt(key, buf) {
   return exports.publicEncrypt(key, buf, true);
@@ -30234,7 +30787,7 @@ exports.publicDecrypt = function publicDecrypt(key, buf) {
 };
 
 /***/ }),
-/* 173 */
+/* 176 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(Buffer) {var parseKeys = __webpack_require__(29);
@@ -30244,7 +30797,7 @@ var mgf = __webpack_require__(78);
 var xor = __webpack_require__(79);
 var bn = __webpack_require__(2);
 var withPublic = __webpack_require__(80);
-var crt = __webpack_require__(41);
+var crt = __webpack_require__(42);
 
 var constants = {
   RSA_PKCS1_OAEP_PADDING: 4,
@@ -30335,14 +30888,14 @@ function nonZero(len, crypto) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
 
 /***/ }),
-/* 174 */
+/* 177 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(Buffer) {var parseKeys = __webpack_require__(29);
 var mgf = __webpack_require__(78);
 var xor = __webpack_require__(79);
 var bn = __webpack_require__(2);
-var crt = __webpack_require__(41);
+var crt = __webpack_require__(42);
 var createHash = __webpack_require__(15);
 var withPublic = __webpack_require__(80);
 module.exports = function privateDecrypt(private_key, enc, reverse) {
@@ -30449,7 +31002,7 @@ function compare(a, b) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
 
 /***/ }),
-/* 175 */
+/* 178 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -30506,19 +31059,19 @@ module.exports = {
 };
 
 /***/ }),
-/* 176 */
+/* 179 */
 /***/ (function(module, exports, __webpack_require__) {
 
 window.Crisp = {};
 
-__webpack_require__(177);
 __webpack_require__(180);
-__webpack_require__(181);
-__webpack_require__(182);
 __webpack_require__(183);
+__webpack_require__(184);
+__webpack_require__(185);
+__webpack_require__(186);
 
 /***/ }),
-/* 177 */
+/* 180 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -30526,7 +31079,7 @@ __webpack_require__(183);
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var pathToRegexp = __webpack_require__(178);
+var pathToRegexp = __webpack_require__(181);
 
 var routes = [];
 
@@ -30724,12 +31277,12 @@ window.addEventListener('hashchange', Router.init);
 window.Router = Router;
 
 /***/ }),
-/* 178 */
+/* 181 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-var isarray = __webpack_require__(179);
+var isarray = __webpack_require__(182);
 
 /**
  * Expose `pathToRegexp`.
@@ -31156,7 +31709,7 @@ function pathToRegexp(path, keys, options) {
 }
 
 /***/ }),
-/* 179 */
+/* 182 */
 /***/ (function(module, exports) {
 
 module.exports = Array.isArray || function (arr) {
@@ -31164,7 +31717,7 @@ module.exports = Array.isArray || function (arr) {
 };
 
 /***/ }),
-/* 180 */
+/* 183 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -31528,7 +32081,7 @@ for (var i in elementTypes) {
 window._ = Crisp.Elements;
 
 /***/ }),
-/* 181 */
+/* 184 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -31939,7 +32492,7 @@ var View = function () {
 window.View = View;
 
 /***/ }),
-/* 182 */
+/* 185 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -32064,7 +32617,7 @@ if (typeof jQuery !== 'undefined') {
 }
 
 /***/ }),
-/* 183 */
+/* 186 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -32670,7 +33223,7 @@ if (typeof jQuery !== 'undefined') {
 }
 
 /***/ }),
-/* 184 */
+/* 187 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -32678,20 +33231,20 @@ if (typeof jQuery !== 'undefined') {
 
 module.exports = {
     Connection: __webpack_require__(81),
-    Content: __webpack_require__(196),
-    ContentSchema: __webpack_require__(197),
+    Content: __webpack_require__(199),
+    ContentSchema: __webpack_require__(200),
     Entity: __webpack_require__(13),
-    FieldSchema: __webpack_require__(186),
-    index: __webpack_require__(184),
-    Media: __webpack_require__(198),
-    Project: __webpack_require__(187),
-    Schema: __webpack_require__(185),
-    Template: __webpack_require__(220),
-    User: __webpack_require__(44)
+    FieldSchema: __webpack_require__(189),
+    index: __webpack_require__(187),
+    Media: __webpack_require__(201),
+    Project: __webpack_require__(190),
+    Schema: __webpack_require__(188),
+    Template: __webpack_require__(216),
+    User: __webpack_require__(32)
 };
 
 /***/ }),
-/* 185 */
+/* 188 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -32767,7 +33320,7 @@ var Schema = function (_Entity) {
 module.exports = Schema;
 
 /***/ }),
-/* 186 */
+/* 189 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -32779,7 +33332,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Schema = __webpack_require__(185);
+var Schema = __webpack_require__(188);
 
 /**
  * Schema for content fields
@@ -32833,7 +33386,7 @@ var FieldSchema = function (_Schema) {
 module.exports = FieldSchema;
 
 /***/ }),
-/* 187 */
+/* 190 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -32919,7 +33472,508 @@ var Project = function (_Entity) {
 module.exports = Project;
 
 /***/ }),
-/* 188 */
+/* 191 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Content = __webpack_require__(202);
+var SchemaHelper = __webpack_require__(85);
+var ContentHelper = __webpack_require__(82);
+var ConnectionHelper = __webpack_require__(203);
+
+/**
+ * The editor view for Content objects
+ *
+ * @memberof HashBrown.Client.Views.Editors
+ */
+
+var ContentEditor = function (_View) {
+    _inherits(ContentEditor, _View);
+
+    function ContentEditor(params) {
+        _classCallCheck(this, ContentEditor);
+
+        var _this = _possibleConstructorReturn(this, _View.call(this, params));
+
+        _this.dirty = false;
+
+        _this.$element = _.div({ class: 'editor content-editor' });
+
+        _this.fetch();
+        return _this;
+    }
+
+    /**
+     * Event: Scroll
+     */
+
+
+    ContentEditor.prototype.onScroll = function onScroll(e) {
+        var $follow = void 0;
+
+        // Look for field labels that are close to the top of the viewport and make them follow
+        this.$element.find('.field-container').each(function (i, field) {
+            var $field = $(field);
+            $field.removeClass('following');
+
+            var top = $field.position().top;
+
+            if (top < 60) {
+                // The closest field to the viewport top with an outer height above 100 should follow
+                if (top != 0 && $field.outerHeight() > 100) {
+                    $follow = $field;
+
+                    // If a smaller field is closer, cacnel following
+                } else {
+                    $follow = null;
+                }
+            }
+        });
+
+        if ($follow) {
+            $follow.addClass('following');
+        }
+    };
+
+    /**
+     * Event: Click advanced. Routes to the JSON editor
+     */
+
+
+    ContentEditor.prototype.onClickAdvanced = function onClickAdvanced() {
+        location.hash = '/content/json/' + this.model.id;
+    };
+
+    /**
+     * Event: Click save. Posts the model to the modelUrl
+     *
+     * @param {Object} publishing
+     */
+
+
+    ContentEditor.prototype.onClickSave = function onClickSave(publishing) {
+        var _this2 = this;
+
+        var saveAction = this.$element.find('.editor-footer .select-publishing').val();
+        var postSaveUrl = void 0;
+
+        var setContent = function setContent() {
+            // Use publishing API
+            if (publishing.connections && publishing.connections.length > 0) {
+                // Unpublish
+                if (saveAction === 'unpublish') {
+                    return apiCall('post', 'content/unpublish', _this2.model);
+
+                    // Publish
+                } else if (saveAction === 'publish') {
+                    return apiCall('post', 'content/publish', _this2.model);
+
+                    // Preview
+                } else if (saveAction === 'preview') {
+                    return apiCall('post', 'content/preview', _this2.model);
+                }
+
+                // Just save normally
+            } else {
+                return apiCall('post', 'content/' + _this2.model.id, _this2.model);
+            }
+        };
+
+        this.$saveBtn.toggleClass('working', true);
+
+        // Save content to database
+        setContent().then(function (url) {
+            postSaveUrl = url;
+
+            return reloadResource('content');
+        }).then(function () {
+            _this2.$saveBtn.toggleClass('saving', false);
+
+            _this2.reload();
+
+            NavbarMain.reload();
+
+            _this2.dirty = false;
+
+            if (saveAction === 'preview') {
+                UI.iframeModal('Preview', postSaveUrl);
+            }
+        }).catch(errorModal);
+    };
+
+    /**
+     * Reload this view
+     */
+
+
+    ContentEditor.prototype.reload = function reload() {
+        this.lastScrollPos = this.$element.find('.editor-body')[0].scrollTop;
+
+        this.model = null;
+
+        this.fetch();
+    };
+
+    /**
+     * Binds event to fire when field editors are ready
+     * Or fires them if no callback was passed
+     *
+     * @param {Function} callback
+     */
+
+
+    ContentEditor.prototype.onFieldEditorsReady = function onFieldEditorsReady(callback) {
+        if (!this.fieldEditorReadyCallbacks) {
+            this.fieldEditorReadyCallbacks = [];
+        }
+
+        if (callback) {
+            this.fieldEditorReadyCallbacks.push(callback);
+        } else {
+            for (var _iterator = this.fieldEditorReadyCallbacks, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+                var _ref;
+
+                if (_isArray) {
+                    if (_i >= _iterator.length) break;
+                    _ref = _iterator[_i++];
+                } else {
+                    _i = _iterator.next();
+                    if (_i.done) break;
+                    _ref = _i.value;
+                }
+
+                var registeredCallback = _ref;
+
+                registeredCallback();
+            }
+
+            this.fieldEditorReadyCallbacks = [];
+        }
+
+        this.restoreScrollPos();
+    };
+
+    /**
+     * Restores the scroll position
+     */
+
+
+    ContentEditor.prototype.restoreScrollPos = function restoreScrollPos() {
+        if (this.lastScrollPos) {
+            this.$element.find('.editor-body')[0].scrollTop = this.lastScrollPos;
+        }
+    };
+
+    ContentEditor.restoreScrollPos = function restoreScrollPos() {
+        var editor = ViewHelper.get('ContentEditor');
+
+        if (editor) {
+            editor.restoreScrollPos();
+        }
+    };
+
+    /**
+     * Gets a field editor for a Schema
+     *
+     * @param {string} editorId
+     *
+     * @returns {View} Field editor
+     */
+
+
+    ContentEditor.getFieldEditor = function getFieldEditor(editorId) {
+        if (!editorId) {
+            return;
+        }
+
+        // Backwards compatible check
+        editorId = editorId.charAt(0).toUpperCase() + editorId.slice(1);
+
+        if (editorId.indexOf('Editor') < 0) {
+            editorId += 'Editor';
+        }
+
+        return HashBrown.Client.Views.Editors.FieldEditors[editorId];
+    };
+
+    /**
+     * Renders a field view
+     *
+     * @param {Object} fieldValue The field value to inject into the field editor
+     * @param {FieldSchema} fieldDefinition The field definition
+     * @param {Function} onChange The change event
+     * @param {Object} config The field config
+     * @param {HTMLElement} keyContent The key content container
+     *
+     * @return {Object} element
+     */
+
+
+    ContentEditor.prototype.renderField = function renderField(fieldValue, fieldDefinition, onChange, config, $keyContent) {
+        var _this3 = this;
+
+        var compiledSchema = SchemaHelper.getFieldSchemaWithParentConfigs(fieldDefinition.schemaId);
+
+        if (compiledSchema) {
+            var fieldEditor = ContentEditor.getFieldEditor(compiledSchema.editorId);
+
+            if (fieldEditor) {
+                var fieldEditorInstance = new fieldEditor({
+                    value: fieldValue,
+                    disabled: fieldDefinition.disabled || false,
+                    config: config || {},
+                    schema: compiledSchema.getObject(),
+                    multilingual: fieldDefinition.multilingual
+                });
+
+                fieldEditorInstance.on('change', function (newValue) {
+                    if (!_this3.model.locked) {
+                        _this3.dirty = true;
+                    }
+
+                    onChange(newValue);
+                });
+
+                fieldEditorInstance.on('silentchange', function (newValue) {
+                    onChange(newValue);
+                });
+
+                if (fieldEditorInstance.$keyContent) {
+                    $keyContent.append(fieldEditorInstance.$keyContent);
+                }
+
+                return fieldEditorInstance.$element;
+            } else {
+                debug.log('No editor by id "' + fieldSchema.editorId + '" found', this);
+            }
+        } else {
+            debug.log('No field schema found for schema id "' + fieldDefinition.schemaId + '"', this);
+        }
+    };
+
+    /**
+     * Renders fields
+     *
+     * @param {String} tabId The tab for which to render the fields
+     * @param {Object} fieldDefinitions The set of field definitions to render
+     * @param {Object} fieldValues The set of field values to inject into the field editor
+     *
+     * @returns {Array} A list of HTMLElements to render
+     */
+
+
+    ContentEditor.prototype.renderFields = function renderFields(tabId, fieldDefinitions, fieldValues) {
+        var _this4 = this;
+
+        var view = this;
+        var tabFieldDefinitions = {};
+
+        // Map out field definitions to render
+        // This is necessary because we're only rendering the fields for the specified tab
+        for (var key in fieldDefinitions) {
+            var fieldDefinition = fieldDefinitions[key];
+
+            var noTabAssigned = !fieldDefinition.tabId;
+            var isMetaTab = tabId == 'meta';
+            var thisTabAssigned = fieldDefinition.tabId == tabId;
+
+            // Don't include "properties" field, if this is the meta tab
+            if (isMetaTab && key == 'properties') {
+                continue;
+            }
+
+            if (noTabAssigned && isMetaTab || thisTabAssigned) {
+                tabFieldDefinitions[key] = fieldDefinition;
+            }
+        }
+
+        // Render all fields
+        return _.each(tabFieldDefinitions, function (key, fieldDefinition) {
+            // Fetch field schema
+            var fieldSchema = resources.schemas[fieldDefinition.schemaId];
+
+            if (!fieldSchema) {
+                debug.log('FieldSchema "' + fieldDefinition.schemaId + '" for key "' + key + '" not found', _this4);
+                return null;
+            }
+
+            // Field value sanity check
+            fieldValues[key] = ContentHelper.fieldSanityCheck(fieldValues[key], fieldDefinition);
+
+            // Render the field container
+            var $keyContent = void 0;
+
+            return _.div({ class: 'field-container', 'data-key': key },
+            // Render the label and icon
+            _.div({ class: 'field-key' }, $keyContent = _.div({ class: 'field-key-content' }, _.span({ class: 'field-key-icon fa fa-' + fieldSchema.icon }), _.span({ class: 'field-key-label' }, fieldDefinition.label || key))),
+
+            // Render the field editor
+            _.div({ class: 'field-value' }, view.renderField(
+            // If the field definition is set to multilingual, pass value from object
+            fieldDefinition.multilingual ? fieldValues[key][window.language] : fieldValues[key],
+
+            // Pass the field definition
+            fieldDefinition,
+
+            // On change function
+            function (newValue) {
+                // If field definition is set to multilingual, assign flag and value onto object...
+                if (fieldDefinition.multilingual) {
+                    fieldValues[key]._multilingual = true;
+                    fieldValues[key][window.language] = newValue;
+
+                    // ...if not, assign the value directly
+                } else {
+                    fieldValues[key] = newValue;
+                }
+            },
+
+            // Pass the field definition config, and use the field's schema config as fallback
+            fieldDefinition.config || fieldSchema.config,
+
+            // Pass the key content container, so the field editor can populate it
+            $keyContent)));
+        });
+    };
+
+    /**
+     * Event: Click tab
+     *
+     * @param {String} tab
+     */
+
+
+    ContentEditor.prototype.onClickTab = function onClickTab(tab) {
+        location.hash = '/content/' + Router.params.id + '/' + tab;
+    };
+
+    /**
+     * Renders the editor
+     *
+     * @param {Content} content
+     * @param {Object} schema
+     *
+     * @return {Object} element
+     */
+
+
+    ContentEditor.prototype.renderEditor = function renderEditor(content, schema) {
+        var _this5 = this;
+
+        var view = this;
+
+        // Check for active tab
+        function isTabActive(tabId) {
+            var targetTab = Router.params.tab || schema.defaultTabId || 'meta';
+
+            return tabId == targetTab;
+        }
+
+        // Render editor
+        return _.div({ class: 'object' }, _.ul({ class: 'nav editor-header nav-tabs' }, _.each(schema.tabs, function (tabId, tab) {
+            return _.li({ class: isTabActive(tabId) ? 'active' : '' }, _.a({ 'data-toggle': 'tab', href: '#tab-' + tabId }, tab).click(function () {
+                _this5.onClickTab(tabId);
+            }));
+        }), _.li({ class: isTabActive('meta') ? 'active' : '' }, _.a({ 'data-toggle': 'tab', href: '#tab-meta' }, 'meta').click(function () {
+            _this5.onClickTab('meta');
+        }))), this.$body = _.div({ class: 'tab-content editor-body' },
+        // Render content properties
+        _.each(schema.tabs, function (tabId, tab) {
+            return _.div({ id: 'tab-' + tabId, class: 'tab-pane' + (isTabActive(tabId) ? ' active' : '') }, _this5.renderFields(tabId, schema.fields.properties, content.properties));
+        }),
+
+        // Render meta properties
+        _.div({ id: 'tab-meta', class: 'tab-pane' + (isTabActive('meta') ? ' active' : '') }, this.renderFields('meta', schema.fields, content), this.renderFields('meta', schema.fields.properties, content.properties))).on('scroll', function (e) {
+            _this5.onScroll(e);
+        }), _.div({ class: 'editor-footer' }));
+    };
+
+    /**
+     * Renders the action buttons
+     */
+
+
+    ContentEditor.prototype.renderButtons = function renderButtons() {
+        var _this6 = this;
+
+        var url = this.model.properties.url;
+
+        if (url instanceof Object) {
+            url = url[window.language];
+        }
+
+        _.append($('.editor-footer').empty(), _.div({ class: 'btn-group' },
+        // JSON editor
+        _.button({ class: 'btn btn-embedded' }, 'Advanced').click(function () {
+            _this6.onClickAdvanced();
+        }),
+
+        // View remote
+        _.do(function () {
+            if (_this6.model.properties && _this6.model.properties.url && _this6.publishingSettings.connections.length > 0 && _this6.model.isPublished) {
+                return _.a({ target: '_blank', href: ConnectionHelper.getConnectionByIdSync(_this6.publishingSettings.connections[0]).url + url, class: 'btn btn-primary' }, 'View');
+            }
+        }), _.if(!this.model.locked,
+        // Save & publish
+        _.div({ class: 'btn-group-save-publish raised' }, this.$saveBtn = _.button({ class: 'btn btn-save btn-primary' }, _.span({ class: 'text-default' }, 'Save'), _.span({ class: 'text-working' }, 'Saving')).click(function () {
+            _this6.onClickSave(_this6.publishingSettings);
+        }), _.if(this.publishingSettings.connections && this.publishingSettings.connections.length > 0, _.span('&'), _.select({ class: 'form-control select-publishing' }, _.option({ value: 'publish' }, 'Publish'), _.option({ value: 'preview' }, 'Preview'), _.option({ value: 'unpublish' }, 'Unpublish')).val('publish'))))));
+    };
+
+    ContentEditor.prototype.render = function render() {
+        var _this7 = this;
+
+        // Make sure the model data is using the Content model
+        if (!this.model.properties) {
+            this.model.properties = {};
+        }
+
+        if (this.model instanceof Content === false) {
+            this.model = new Content(this.model);
+        }
+
+        this.$element.toggleClass('locked', this.model.locked);
+
+        // Fetch information
+        var contentSchema = void 0;
+        var publishingSettings = void 0;
+
+        return SchemaHelper.getSchemaWithParentFields(this.model.schemaId).then(function (schema) {
+            contentSchema = schema;
+
+            return _this7.model.getSettings('publishing');
+        }).then(function (settings) {
+            _this7.publishingSettings = settings;
+
+            _this7.$element.html(
+            // Render editor
+            _this7.renderEditor(_this7.model, contentSchema));
+
+            _this7.renderButtons();
+
+            _this7.onFieldEditorsReady();
+        }).catch(function (e) {
+            UI.errorModal(e, function () {
+                location.hash = '/content/json/' + _this7.model.id;
+            });
+        });
+    };
+
+    return ContentEditor;
+}(View);
+
+module.exports = ContentEditor;
+
+/***/ }),
+/* 192 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*jshint curly:true, eqeqeq:true, laxbreak:true, noempty:false */
@@ -35305,7 +36359,7 @@ if (!Object.values) {
 })();
 
 /***/ }),
-/* 189 */
+/* 193 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*jshint curly:true, eqeqeq:true, laxbreak:true, noempty:false */
@@ -35351,6 +36405,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*jshint curly:t
     The options are (default in brackets):
         indent_size (4)                         — indentation size,
         indent_char (space)                     — character to indent with,
+        preserve_newlines (default false)       - whether existing line breaks should be preserved,
         selector_separator_newline (true)       - separate selectors with newline or
                                                   not (e.g. "a,\nbr" or "a, br")
         end_with_newline (false)                - end with a newline
@@ -35405,8 +36460,10 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*jshint curly:t
 
         source_text = source_text || '';
 
+        var newlinesFromLastWSEat = 0;
         var indentSize = options.indent_size ? parseInt(options.indent_size, 10) : 4;
         var indentCharacter = options.indent_char || ' ';
+        var preserve_newlines = options.preserve_newlines === undefined ? false : options.preserve_newlines;
         var selectorSeparatorNewline = options.selector_separator_newline === undefined ? true : options.selector_separator_newline;
         var end_with_newline = options.end_with_newline === undefined ? false : options.end_with_newline;
         var newline_between_rules = options.newline_between_rules === undefined ? true : options.newline_between_rules;
@@ -35477,12 +36534,16 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*jshint curly:t
             return str;
         }
 
-        function eatWhitespace() {
-            var result = '';
+        function eatWhitespace(preserve_newlines_local) {
+            var result = 0;
             while (whiteRe.test(peek())) {
                 next();
-                result += ch;
+                if (ch === '\n' && preserve_newlines_local && preserve_newlines) {
+                    print.newLine(true);
+                    result++;
+                }
             }
+            newlinesFromLastWSEat = result;
             return result;
         }
 
@@ -35561,12 +36622,18 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*jshint curly:t
         print["{"] = function (ch) {
             print.singleSpace();
             output.push(ch);
-            print.newLine();
+            if (!eatWhitespace(true)) {
+                print.newLine();
+            }
         };
-        print["}"] = function (ch) {
-            print.newLine();
-            output.push(ch);
-            print.newLine();
+        print["}"] = function (newline) {
+            if (newline) {
+                print.newLine();
+            }
+            output.push('}');
+            if (!eatWhitespace(true)) {
+                print.newLine();
+            }
         };
 
         print._lastCharWhitespace = function () {
@@ -35577,8 +36644,9 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*jshint curly:t
             if (output.length) {
                 if (!keepWhitespace && output[output.length - 1] !== '\n') {
                     print.trim();
+                } else if (output[output.length - 1] === basebaseIndentString) {
+                    output.pop();
                 }
-
                 output.push('\n');
 
                 if (basebaseIndentString) {
@@ -35681,9 +36749,9 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*jshint curly:t
                     eatWhitespace();
                     next();
                     print.singleSpace();
-                    output.push("{}");
-                    print.newLine();
-                    if (newline_between_rules && indentLevel === 0) {
+                    output.push("{");
+                    print['}'](false);
+                    if (newlinesFromLastWSEat < 2 && newline_between_rules && indentLevel === 0) {
                         print.newLine(true);
                     }
                 } else {
@@ -35700,13 +36768,13 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*jshint curly:t
                 }
             } else if (ch === '}') {
                 outdent();
-                print["}"](ch);
+                print["}"](true);
                 insideRule = false;
                 insidePropertyValue = false;
                 if (nestedLevel) {
                     nestedLevel--;
                 }
-                if (newline_between_rules && indentLevel === 0) {
+                if (newlinesFromLastWSEat < 2 && newline_between_rules && indentLevel === 0) {
                     print.newLine(true);
                 }
             } else if (ch === ":") {
@@ -35742,7 +36810,9 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*jshint curly:t
             } else if (ch === ';') {
                 insidePropertyValue = false;
                 output.push(ch);
-                print.newLine();
+                if (!eatWhitespace(true)) {
+                    print.newLine();
+                }
             } else if (ch === '(') {
                 // may be a url
                 if (lookBack("url")) {
@@ -35766,8 +36836,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*jshint curly:t
                 parenLevel--;
             } else if (ch === ',') {
                 output.push(ch);
-                eatWhitespace();
-                if (selectorSeparatorNewline && !insidePropertyValue && parenLevel < 1) {
+                if (!eatWhitespace(true) && selectorSeparatorNewline && !insidePropertyValue && parenLevel < 1) {
                     print.newLine();
                 } else {
                     print.singleSpace();
@@ -35794,8 +36863,10 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*jshint curly:t
             } else if (ch === '=') {
                 // no whitespace before or after
                 eatWhitespace();
-                ch = '=';
-                output.push(ch);
+                output.push('=');
+                if (whiteRe.test(ch)) {
+                    ch = '';
+                }
             } else {
                 print.preserveSingleSpace();
                 output.push(ch);
@@ -35860,284 +36931,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*jshint curly:t
 })();
 
 /***/ }),
-/* 190 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var UserEditor = function (_View) {
-    _inherits(UserEditor, _View);
-
-    function UserEditor(params) {
-        _classCallCheck(this, UserEditor);
-
-        var _this = _possibleConstructorReturn(this, _View.call(this, params));
-
-        _this.$element = _.div({ class: 'user-editor' });
-
-        _this.modal = UI.confirmModal('save', 'Settings for "' + _this.getLabel() + '"', _this.$element, function () {
-            _this.onClickSave();
-
-            return false;
-        });
-
-        _this.modal.$element.addClass('modal-user-editor');
-
-        customApiCall('get', '/api/server/projects').then(function (projects) {
-            _this.projects = projects;
-            _this.init();
-        });
-        return _this;
-    }
-
-    /**
-     * Gets the user label
-     *
-     * @returns {String} Label
-     */
-
-
-    UserEditor.prototype.getLabel = function getLabel() {
-        return this.model.fullName || this.model.username || this.model.email || this.model.id;
-    };
-
-    /**
-     * Event: Click save.
-     */
-
-
-    UserEditor.prototype.onClickSave = function onClickSave() {
-        var _this2 = this;
-
-        var newUserObject = this.model.getObject();
-
-        if (this.newPassword) {
-            newUserObject.password = this.newPassword;
-        }
-
-        apiCall('post', 'user/' + this.model.id, newUserObject).then(function () {
-            _this2.modal.hide();
-
-            _this2.trigger('save', _this2.model);
-        }).catch(UI.errorModal);
-    };
-
-    /**
-     * Gets a list of available scopes
-     *
-     * @returns {Array} Array of scope strings
-     */
-
-
-    UserEditor.prototype.getScopes = function getScopes() {
-        return ['connections', 'schemas', 'settings', 'templates', 'users'];
-    };
-
-    /**
-     * Renders the username editor
-     *
-     * @returns {HTMLElement} Element
-     */
-
-
-    UserEditor.prototype.renderUserNameEditor = function renderUserNameEditor() {
-        var view = this;
-
-        function onInputChange() {
-            view.model.username = $(this).val();
-        }
-
-        var $element = _.div({ class: 'username-editor' }, _.input({
-            class: 'form-control',
-            type: 'text',
-            value: view.model.username,
-            placeholder: 'Input the username here'
-        }).on('change', onInputChange));
-
-        return $element;
-    };
-
-    /**
-     * Renders the scopes editor
-     *
-     * @param {String} project
-     *
-     * @returns {HTMLElement} Element
-     */
-
-
-    UserEditor.prototype.renderScopesEditor = function renderScopesEditor(project) {
-        var _this3 = this;
-
-        return _.div({ class: 'scopes-editor' }, UI.inputChipGroup(this.model.getScopes(project), this.getScopes(), function (newValue) {
-            _this3.model.scopes[project] = newValue;
-
-            _this3.$element.find('.project[data-id="' + project + '"] .switch input')[0].checked = true;
-        }, true));
-    };
-
-    /**
-     * Renders the full name editor
-     *
-     * @return {HTMLElement} Element
-     */
-
-
-    UserEditor.prototype.renderFullNameEditor = function renderFullNameEditor() {
-        var view = this;
-
-        function onChange() {
-            var fullName = $(this).val();
-
-            view.model.fullName = fullName;
-        }
-
-        return _.div({ class: 'full-name-editor' }, _.input({ class: 'form-control', type: 'text', value: this.model.fullName }).change(onChange));
-    };
-
-    /**
-     * Renders the email editor
-     *
-     * @return {HTMLElement} Element
-     */
-
-
-    UserEditor.prototype.renderEmailEditor = function renderEmailEditor() {
-        var view = this;
-
-        function onChange() {
-            var email = $(this).val();
-
-            view.model.email = email;
-        }
-
-        return _.div({ class: 'full-name-editor' }, _.input({ class: 'form-control', type: 'email', value: this.model.email }).change(onChange));
-    };
-
-    /**
-     * Renders the password
-     *
-     * @return {HTMLElement} Element
-     */
-
-
-    UserEditor.prototype.renderPasswordEditor = function renderPasswordEditor() {
-        var view = this;
-
-        var $invalidMessage = void 0;
-        var password1 = void 0;
-        var password2 = void 0;
-
-        function onChange() {
-            var isMatch = password1 == password2;
-            var isLongEnough = password1 && password1.length > 3;
-            var isValid = isMatch && isLongEnough;
-
-            $element.toggleClass('invalid', !isValid);
-
-            view.$element.find('.model-footer .btn-primary').toggleClass('disabled', !isValid);
-
-            if (isValid) {
-                view.newPassword = password1;
-            } else {
-                view.newPassword = null;
-
-                if (!isMatch) {
-                    $invalidMessage.html('Passwords do not match');
-                } else if (!isLongEnough) {
-                    $invalidMessage.html('Passwords are too short');
-                }
-            }
-        }
-
-        function onChange1() {
-            password1 = $(this).val();
-
-            onChange();
-        }
-
-        function onChange2() {
-            password2 = $(this).val();
-
-            onChange();
-        }
-
-        var $element = _.div({ class: 'password-editor' }, $invalidMessage = _.span({ class: 'invalid-message' }, 'Passwords do not match'), _.input({ class: 'form-control', type: 'password', placeholder: 'Type new password' }).on('change propertychange keyup paste input', onChange1), _.input({ class: 'form-control', type: 'password', placeholder: 'Confirm new password' }).on('change propertychange keyup paste input', onChange2));
-
-        return $element;
-    };
-
-    /**
-     * Renders the admin editor
-     *
-     * @return {HTMLElement} Element
-     */
-
-
-    UserEditor.prototype.renderAdminEditor = function renderAdminEditor() {
-        var _this4 = this;
-
-        return UI.inputSwitch(this.model.isAdmin == true, function (newValue) {
-            _this4.model.isAdmin = newValue;
-
-            _this4.render();
-        }).addClass('admin-editor');
-    };
-
-    /**
-     * Renders a single field
-     *
-     * @return {HTMLElement} Element
-     */
-
-
-    UserEditor.prototype.renderField = function renderField(label, $content) {
-        return _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, label), _.div({ class: 'field-value' }, $content));
-    };
-
-    /**
-     * Renders all fields
-     *
-     * @return {Object} element
-     */
-
-
-    UserEditor.prototype.renderFields = function renderFields() {
-        var id = parseInt(this.model.id);
-
-        return $element;
-    };
-
-    UserEditor.prototype.render = function render() {
-        var _this5 = this;
-
-        _.append(this.$element.empty(), this.renderField('Username', this.renderUserNameEditor()), this.renderField('Full name', this.renderFullNameEditor()), this.renderField('Email', this.renderEmailEditor()), this.renderField('Password', this.renderPasswordEditor()), _.if(currentUserIsAdmin() && !this.hidePermissions, this.renderField('Is admin', this.renderAdminEditor()), _.if(!this.model.isAdmin, _.each(this.projects, function (i, project) {
-            return _.div({ class: 'project', 'data-id': project }, _.div({ class: 'project-header' }, UI.inputSwitch(_this5.model.hasScope(project), function (newValue) {
-                if (newValue) {
-                    _this5.model.giveScope(project);
-                } else {
-                    _this5.model.removeScope(project);
-
-                    _this5.$element.find('.project[data-id="' + project + '"] .chip-group .chip').remove();
-                }
-            }), _.h4({ class: 'project-title' }, project)), _.div({ class: 'project-scopes' }, _.p('Scopes:'), _this5.renderScopesEditor(project)));
-        }))));
-    };
-
-    return UserEditor;
-}(View);
-
-module.exports = UserEditor;
-
-/***/ }),
-/* 191 */
+/* 194 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36151,8 +36945,8 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var SettingsHelper = __webpack_require__(82);
-var LanguageHelperCommon = __webpack_require__(193);
+var SettingsHelper = __webpack_require__(83);
+var LanguageHelperCommon = __webpack_require__(196);
 
 /**
  * The client side language helper
@@ -36218,7 +37012,7 @@ module.exports = function (_LanguageHelperCommon) {
 }(LanguageHelperCommon);
 
 /***/ }),
-/* 192 */
+/* 195 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36231,7 +37025,7 @@ module.exports = function SettingsHelper() {
 };
 
 /***/ }),
-/* 193 */
+/* 196 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36250,7 +37044,7 @@ module.exports = function () {
      * @returns {Array} List of language names
      */
     LanguageHelper.getLanguages = function getLanguages() {
-        return __webpack_require__(194);
+        return __webpack_require__(197);
     };
 
     /**
@@ -36331,7 +37125,7 @@ module.exports = function () {
 }();
 
 /***/ }),
-/* 194 */
+/* 197 */
 /***/ (function(module, exports) {
 
 module.exports = [
@@ -36523,7 +37317,7 @@ module.exports = [
 ];
 
 /***/ }),
-/* 195 */
+/* 198 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36678,7 +37472,7 @@ module.exports = function () {
 }();
 
 /***/ }),
-/* 196 */
+/* 199 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37071,7 +37865,7 @@ var Content = function (_Entity) {
 module.exports = Content;
 
 /***/ }),
-/* 197 */
+/* 200 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37083,7 +37877,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Schema = __webpack_require__(185);
+var Schema = __webpack_require__(188);
 
 /**
  * Schema for content nodes
@@ -37116,7 +37910,7 @@ var ContentSchema = function (_Schema) {
 module.exports = ContentSchema;
 
 /***/ }),
-/* 198 */
+/* 201 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37130,7 +37924,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var path = __webpack_require__(219);
+var path = __webpack_require__(215);
 
 var Entity = __webpack_require__(13);
 
@@ -37290,7 +38084,1266 @@ var Media = function (_Entity) {
 module.exports = Media;
 
 /***/ }),
-/* 199 */
+/* 202 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var ContentCommon = __webpack_require__(199);
+var ContentHelper = __webpack_require__(82);
+var ProjectHelper = __webpack_require__(46);
+
+/**
+ * The client-side content model
+ */
+module.exports = function (_ContentCommon) {
+    _inherits(Content, _ContentCommon);
+
+    function Content() {
+        _classCallCheck(this, Content);
+
+        return _possibleConstructorReturn(this, _ContentCommon.apply(this, arguments));
+    }
+
+    /**
+     * Gets settings
+     *
+     * @param {String} key
+     *
+     * @returns {Promise} Settings
+     */
+    Content.prototype.getSettings = function getSettings(key) {
+        return _ContentCommon.prototype.getSettings.call(this, ProjectHelper.currentProject, ProjectHelper.currentEnvironment, key);
+    };
+
+    /**
+     * Gets parent Content
+     *
+     * @returns {Promise} Parent
+     */
+
+
+    Content.prototype.getParent = function getParent() {
+        if (this.parentId) {
+            return ContentHelper.getContentById(this.parentId).then(function (parentContent) {
+                return Promise.resolve(parentContent);
+            }).catch(function (e) {
+                return Promise.resolve(null);
+            });
+        } else {
+            return Promise.resolve(null);
+        }
+    };
+
+    return Content;
+}(ContentCommon);
+
+/***/ }),
+/* 203 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var ConnectionHelperCommon = __webpack_require__(234);
+var Connection = __webpack_require__(81);
+
+/**
+ * The client side connection helper
+ *
+ * @memberof HashBrown.Client.Helpers
+ */
+module.exports = function (_ConnectionHelperComm) {
+    _inherits(ConnectionHelper, _ConnectionHelperComm);
+
+    function ConnectionHelper() {
+        _classCallCheck(this, ConnectionHelper);
+
+        return _possibleConstructorReturn(this, _ConnectionHelperComm.apply(this, arguments));
+    }
+
+    /**
+     * Gets all connections
+     *
+     * @return {Promise(Connection[])} promise
+     */
+    ConnectionHelper.getAllConnections = function getAllConnections() {
+        return Promise.resolve(resources.connections);
+    };
+
+    /**
+     * Gets a Connection by id (sync)
+     *
+     * @param {string} id
+     *
+     * @return {Promise} Connection
+     */
+
+
+    ConnectionHelper.getConnectionByIdSync = function getConnectionByIdSync() {
+        var id = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('id');
+
+        for (var i in resources.connections) {
+            var connection = resources.connections[i];
+
+            if (connection.id == id) {
+                return connection;
+            }
+        }
+    };
+
+    /**
+     * Gets a Connection by id
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {string} id
+     *
+     * @return {Promise(Connection)} promise
+     */
+
+
+    ConnectionHelper.getConnectionById = function getConnectionById() {
+        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+        var id = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('id');
+
+        for (var i in resources.connections) {
+            var connection = resources.connections[i];
+
+            if (connection.id == id) {
+                return Promise.resolve(connection);
+            }
+        }
+
+        return Promise.reject(new Error('No Connection by id "' + id + '" was found'));
+    };
+
+    return ConnectionHelper;
+}(ConnectionHelperCommon);
+
+/***/ }),
+/* 204 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+// Style
+
+__webpack_require__(205);
+
+// Helper functions
+__webpack_require__(87);
+
+// Libraries
+__webpack_require__(179);
+
+// Get routes
+__webpack_require__(206);
+
+// Resource cache
+window.resources = {
+    connections: {},
+    content: [],
+    schemas: [],
+    media: [],
+    templates: [],
+    forms: [],
+    users: []
+};
+
+// Namespaces
+window.HashBrown = {};
+
+HashBrown.Client = {};
+HashBrown.Client.Models = __webpack_require__(187);
+HashBrown.Client.Views = {};
+HashBrown.Client.Views.Modals = __webpack_require__(217);
+HashBrown.Client.Views.Navigation = __webpack_require__(219);
+HashBrown.Client.Views.Editors = __webpack_require__(230);
+HashBrown.Client.Views.Editors.ConnectionEditors = {};
+HashBrown.Client.Views.Editors.FieldEditors = __webpack_require__(244);
+HashBrown.Client.Helpers = __webpack_require__(261);
+
+HashBrown.Common = {};
+HashBrown.Common.Models = __webpack_require__(187);
+
+// Helper shortcuts
+window.debug = __webpack_require__(198);
+window.UI = __webpack_require__(86);
+
+// Preload resources 
+$(document).ready(function () {
+    var SettingsHelper = HashBrown.Client.Helpers.SettingsHelper;
+    var LanguageHelper = HashBrown.Client.Helpers.LanguageHelper;
+    var ProjectHelper = HashBrown.Client.Helpers.ProjectHelper;
+
+    SettingsHelper.getSettings(ProjectHelper.currentProject, null, 'sync').then(function () {
+        return LanguageHelper.getSelectedLanguages(ProjectHelper.currentProject);
+    }).then(function () {
+        return reloadAllResources();
+    }).then(function () {
+        for (var _iterator = resources.users, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+            var _ref;
+
+            if (_isArray) {
+                if (_i >= _iterator.length) break;
+                _ref = _iterator[_i++];
+            } else {
+                _i = _iterator.next();
+                if (_i.done) break;
+                _ref = _i.value;
+            }
+
+            var user = _ref;
+
+            if (user.isCurrent) {
+                HashBrown.Common.Models.User.current = user;
+            }
+        }
+
+        new HashBrown.Client.Views.Navigation.NavbarMain();
+        new HashBrown.Client.Views.Navigation.MainMenu();
+
+        Router.check = function (newRoute, cancel, proceed) {
+            var contentEditor = ViewHelper.get('ContentEditor');
+
+            if (!contentEditor || !contentEditor.model || newRoute.indexOf(contentEditor.model.id) > -1 || !contentEditor.dirty) {
+                proceed();
+                return;
+            }
+
+            UI.confirmModal('Discard', 'Discard unsaved changes?', 'You have made changes to "' + (contentEditor.model.prop('title', window.language) || contentEditor.model.id) + '"', function () {
+                contentEditor.dirty = false;
+                proceed();
+            }, cancel);
+        };
+
+        $('.cms-container').removeClass('faded');
+
+        Router.init();
+    }).catch(function (e) {
+        UI.errorModal(e);
+    });
+});
+
+/***/ }),
+/* 205 */
+/***/ (function(module, exports) {
+
+// removed by extract-text-webpack-plugin
+
+/***/ }),
+/* 206 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+__webpack_require__(207);
+__webpack_require__(208);
+__webpack_require__(209);
+__webpack_require__(210);
+__webpack_require__(211);
+__webpack_require__(212);
+__webpack_require__(213);
+__webpack_require__(214);
+
+/***/ }),
+/* 207 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+// Root
+
+Router.route('/', function () {
+    ViewHelper.get('NavbarMain').showTab('/');
+    ViewHelper.get('NavbarMain').highlightItem('/', 'null');
+
+    var carouselItems = [[_.div(_.img({ src: '/img/welcome/intro-content.jpg' })), _.div(_.h2('Content'), _.p('In the content section you will find all of your authored work. The content is a hierarchical tree of nodes that can contain text and media, in simple or complex structures.'))], [_.div(_.img({ src: '/img/welcome/intro-media.jpg' })), _.div(_.h2('Media'), _.p('An asset library for your hosted files, such as images, videos, PDFs and whatnot.'))], [_.div(_.img({ src: '/img/welcome/intro-forms.jpg' })), _.div(_.h2('Forms'), _.p('If you need an input form on your website, you can create the model for it here and see a list of the user submitted input.'))]];
+
+    if (currentUserHasScope('connections')) {
+        carouselItems.push([_.div(_.img({ src: '/img/welcome/intro-connections.jpg' })), _.div(_.h2('Connections'), _.p('A list of endpoints and resources for your content. Connections can be set up to publish your content to remote servers, provide statically hosted media and serve rendering templates.'))]);
+    }
+
+    if (currentUserHasScope('schemas')) {
+        carouselItems.push([_.div(_.img({ src: '/img/welcome/intro-schemas.jpg' })), _.div(_.h2('Schemas'), _.p('A library of content structures. Here you define how your editable content looks and behaves. You can define schemas for both content nodes and property fields.'))]);
+    }
+
+    if (currentUserHasScope('users')) {
+        carouselItems.push([_.div(_.img({ src: '/img/welcome/intro-users.jpg' })), _.div(_.h2('Users'), _.p('All of the users connected to this project. Here you can edit permissions and personal information and remove/add new users.'))]);
+    }
+
+    if (currentUserHasScope('settings')) {
+        carouselItems.push([_.div(_.img({ src: '/img/welcome/intro-settings.jpg' })), _.div(_.h2('Settings'), _.p('Here you can set up synchronisation with other HashBrown instances.'))]);
+    }
+
+    populateWorkspace(_.div({ class: 'dashboard-container welcome' }, _.h1('Welcome to HashBrown'), _.h2('Example content'), _.p('Press the button below to get some example content to work with.'), _.button({ class: 'btn btn-default' }, 'example').click(function () {
+        apiCall('post', 'content/example').then(function () {
+            location.reload();
+        }).catch(UI.errorModal);
+    }), _.h2('Introduction'), UI.carousel(carouselItems, true, true, '400px'), _.h2('Contextual help'), _.p('You can always click the <span class="fa fa-question-circle"></span> icon in the upper right to get information about the screen you\'re currently on.'), _.h2('Guides'), _.p('If you\'d like a more in-depth walkthrough of the features, please check out the guides.'), _.a({ class: 'btn btn-default', href: 'http://hashbrown.rocks/guides', target: '_blank' }, 'Guides')), 'presentation');
+});
+
+// Readme
+Router.route('/readme/', function () {
+    ViewHelper.get('NavbarMain').highlightItem('/', 'readme');
+
+    $.ajax({
+        type: 'GET',
+        url: '/text/readme',
+        success: function success(html) {
+            populateWorkspace(_.div({ class: 'dashboard-container readme' }, html), 'presentation');
+        }
+    });
+});
+
+// License
+Router.route('/license/', function () {
+    ViewHelper.get('NavbarMain').highlightItem('/', 'license');
+
+    $.ajax({
+        type: 'GET',
+        url: '/text/license',
+        success: function success(html) {
+            populateWorkspace(_.div({ class: 'dashboard-container license' }, html), 'presentation presentation-center');
+        }
+    });
+});
+
+/***/ }),
+/* 208 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+// Dashboard
+
+Router.route('/content/', function () {
+    ViewHelper.get('NavbarMain').showTab('/content/');
+
+    populateWorkspace(_.div({ class: 'dashboard-container' }, _.h1('Content'), _.p('Please click on a content node to proceed')), 'presentation presentation-center');
+});
+
+// Edit (JSON editor)
+Router.route('/content/json/:id', function () {
+    ViewHelper.get('NavbarMain').highlightItem('/content/', this.id);
+
+    var contentEditor = new HashBrown.Client.Views.Editors.JSONEditor({
+        modelUrl: apiUrl('content/' + this.id),
+        apiPath: 'content/' + this.id
+    });
+
+    populateWorkspace(contentEditor.$element);
+});
+
+// Edit (redirect to default tab)
+Router.route('/content/:id', function () {
+    var _this = this;
+
+    var content = resources.content.filter(function (c) {
+        return c.id == _this.id;
+    })[0];
+
+    if (content) {
+        var contentSchema = resources.schemas[content.schemaId];
+
+        if (contentSchema) {
+            location.hash = '/content/' + this.id + '/' + (contentSchema.defaultTabId || 'meta');
+        } else {
+            UI.errorModal(new Error('Schema by id "' + content.schemaId + '" not found'), function () {
+                location.hash = '/content/json/' + _this.id;
+            });
+        }
+    } else {
+        UI.errorModal(new Error('Content by id "' + this.id + '" not found'));
+    }
+});
+
+// Edit (with tab specified)
+Router.route('/content/:id/:tab', function () {
+    var contentEditor = ViewHelper.get('ContentEditor');
+
+    if (!contentEditor || !contentEditor.model || contentEditor.model.id != this.id) {
+        ViewHelper.get('NavbarMain').highlightItem('/content/', this.id);
+
+        contentEditor = new HashBrown.Client.Views.Editors.ContentEditor({
+            modelUrl: apiUrl('content/' + this.id)
+        });
+
+        populateWorkspace(contentEditor.$element);
+    }
+});
+
+/***/ }),
+/* 209 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+// Dashboard
+
+Router.route('/connections/', function () {
+    if (currentUserHasScope('connections')) {
+        ViewHelper.get('NavbarMain').showTab('/connections/');
+
+        populateWorkspace(_.div({ class: 'dashboard-container' }, _.h1('Connections'), _.p('Please click on a connection to proceed')), 'presentation presentation-center');
+    } else {
+        location.hash = '/';
+    }
+});
+
+// Edit
+Router.route('/connections/:id', function () {
+    if (currentUserHasScope('connections')) {
+        var connectionEditor = new ConnectionEditor({
+            modelUrl: apiUrl('connections/' + this.id)
+        });
+
+        ViewHelper.get('NavbarMain').highlightItem('/connections/', this.id);
+
+        populateWorkspace(connectionEditor.$element);
+    } else {
+        location.hash = '/';
+    }
+});
+
+// Edit (JSON editor)
+Router.route('/connections/json/:id', function () {
+    if (currentUserHasScope('connections')) {
+        var connectionEditor = new JSONEditor({
+            apiPath: 'connections/' + this.id
+        });
+
+        ViewHelper.get('NavbarMain').highlightItem('/connections/', this.id);
+
+        populateWorkspace(connectionEditor.$element);
+    } else {
+        location.hash = '/';
+    }
+});
+
+/***/ }),
+/* 210 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+// Dashboard
+
+Router.route('/media/', function () {
+    ViewHelper.get('NavbarMain').showTab('/media/');
+
+    populateWorkspace(_.div({ class: 'dashboard-container' }, _.h1('Media'), _.p('Please click on a media object to proceed')), 'presentation presentation-center');
+});
+
+// Preview
+Router.route('/media/:id', function () {
+    var mediaViewer = new MediaViewer({
+        modelUrl: apiUrl('media/' + this.id)
+    });
+
+    ViewHelper.get('NavbarMain').highlightItem('/media/', this.id);
+
+    populateWorkspace(mediaViewer.$element);
+});
+
+/***/ }),
+/* 211 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+// Dashboard
+
+Router.route('/schemas/', function () {
+    if (currentUserHasScope('schemas')) {
+        ViewHelper.get('NavbarMain').showTab('/schemas/');
+
+        populateWorkspace(_.div({ class: 'dashboard-container' }, _.h1('Schemas'), _.p('Please click on a schema to proceed')), 'presentation presentation-center');
+    } else {
+        location.hash = '/';
+    }
+});
+
+// Edit
+Router.route('/schemas/:id', function () {
+    if (currentUserHasScope('schemas')) {
+        var schemaEditor = new SchemaEditor({
+            modelUrl: apiUrl('schemas/' + this.id)
+        });
+
+        ViewHelper.get('NavbarMain').highlightItem('/schemas/', this.id);
+
+        populateWorkspace(schemaEditor.$element);
+    } else {
+        location.hash = '/';
+    }
+});
+
+// Edit (JSON editor)
+Router.route('/schemas/json/:id', function () {
+    if (currentUserHasScope('schemas')) {
+        var jsonEditor = new JSONEditor({
+            model: resources.schemas[this.id],
+            apiPath: 'schemas/' + this.id,
+            onSuccess: function onSuccess() {
+                return reloadResource('schemas').then(function () {
+                    var navbar = ViewHelper.get('NavbarMain');
+
+                    navbar.reload();
+                });
+            }
+        });
+
+        ViewHelper.get('NavbarMain').highlightItem('/schemas/', this.id);
+
+        populateWorkspace(jsonEditor.$element);
+    } else {
+        location.hash = '/';
+    }
+});
+
+/***/ }),
+/* 212 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+// Dashboard
+
+Router.route('/settings/', function () {
+    if (currentUserHasScope('settings')) {
+        ViewHelper.get('NavbarMain').showTab('/settings/');
+
+        populateWorkspace(_.div({ class: 'dashboard-container' }, _.h1('Settings'), _.p('Please click on a section to proceed')), 'presentation presentation-center');
+    } else {
+        location.hash = '/';
+    }
+});
+
+// Providers
+Router.route('/settings/providers/', function () {
+    if (currentUserHasScope('settings')) {
+        ViewHelper.get('NavbarMain').highlightItem('/settings/', 'providers');
+
+        populateWorkspace(new ProvidersSettings().$element);
+    } else {
+        location.hash = '/';
+    }
+});
+
+/***/ }),
+/* 213 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+// Templates
+
+Router.route('/templates/', function () {
+    if (currentUserHasScope('templates')) {
+        ViewHelper.get('NavbarMain').showTab('/templates/');
+
+        populateWorkspace(_.div({ class: 'dashboard-container' }, _.h1('Templates'), _.p('Please click on a template to continue')), 'presentation presentation-center');
+    } else {
+        location.hash = '/';
+    }
+});
+
+// Edit
+Router.route('/templates/:type/:id', function () {
+    if (currentUserHasScope('templates')) {
+        ViewHelper.get('NavbarMain').highlightItem('/templates/', this.type + '/' + this.id);
+
+        var templateEditor = new TemplateEditor({
+            modelUrl: apiUrl('templates/' + this.type + '/' + this.id)
+        });
+
+        populateWorkspace(templateEditor.$element);
+    } else {
+        location.hash = '/';
+    }
+});
+
+/***/ }),
+/* 214 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+// Dashboard
+
+Router.route('/forms/', function () {
+    ViewHelper.get('NavbarMain').showTab('/forms/');
+
+    populateWorkspace(_.div({ class: 'dashboard-container' }, _.h1('Forms'), _.p('Please click on a form to proceed')), 'presentation presentation-center');
+});
+
+// Edit
+Router.route('/forms/:id', function () {
+    ViewHelper.get('NavbarMain').highlightItem('/forms/', this.id);
+
+    var formEditor = new FormEditor({
+        modelUrl: apiUrl('forms/' + this.id)
+    });
+
+    populateWorkspace(formEditor.$element);
+});
+
+// Edit (JSON editor)
+Router.route('/forms/json/:id', function () {
+    var formEditor = new JSONEditor({
+        modelUrl: apiUrl('forms/' + this.id),
+        apiPath: 'forms/' + this.id
+    });
+
+    ViewHelper.get('NavbarMain').highlightItem('/forms/', this.id);
+
+    populateWorkspace(formEditor.$element);
+});
+
+/***/ }),
+/* 215 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(process) {// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+// resolves . and .. elements in a path array with directory names there
+// must be no slashes, empty elements, or device names (c:\) in the array
+// (so also no leading and trailing slashes - it does not distinguish
+// relative and absolute paths)
+function normalizeArray(parts, allowAboveRoot) {
+  // if the path tries to go above the root, `up` ends up > 0
+  var up = 0;
+  for (var i = parts.length - 1; i >= 0; i--) {
+    var last = parts[i];
+    if (last === '.') {
+      parts.splice(i, 1);
+    } else if (last === '..') {
+      parts.splice(i, 1);
+      up++;
+    } else if (up) {
+      parts.splice(i, 1);
+      up--;
+    }
+  }
+
+  // if the path is allowed to go above the root, restore leading ..s
+  if (allowAboveRoot) {
+    for (; up--; up) {
+      parts.unshift('..');
+    }
+  }
+
+  return parts;
+}
+
+// Split a filename into [root, dir, basename, ext], unix version
+// 'root' is just a slash, or nothing.
+var splitPathRe = /^(\/?|)([\s\S]*?)((?:\.{1,2}|[^\/]+?|)(\.[^.\/]*|))(?:[\/]*)$/;
+var splitPath = function splitPath(filename) {
+  return splitPathRe.exec(filename).slice(1);
+};
+
+// path.resolve([from ...], to)
+// posix version
+exports.resolve = function () {
+  var resolvedPath = '',
+      resolvedAbsolute = false;
+
+  for (var i = arguments.length - 1; i >= -1 && !resolvedAbsolute; i--) {
+    var path = i >= 0 ? arguments[i] : process.cwd();
+
+    // Skip empty and invalid entries
+    if (typeof path !== 'string') {
+      throw new TypeError('Arguments to path.resolve must be strings');
+    } else if (!path) {
+      continue;
+    }
+
+    resolvedPath = path + '/' + resolvedPath;
+    resolvedAbsolute = path.charAt(0) === '/';
+  }
+
+  // At this point the path should be resolved to a full absolute path, but
+  // handle relative paths to be safe (might happen when process.cwd() fails)
+
+  // Normalize the path
+  resolvedPath = normalizeArray(filter(resolvedPath.split('/'), function (p) {
+    return !!p;
+  }), !resolvedAbsolute).join('/');
+
+  return (resolvedAbsolute ? '/' : '') + resolvedPath || '.';
+};
+
+// path.normalize(path)
+// posix version
+exports.normalize = function (path) {
+  var isAbsolute = exports.isAbsolute(path),
+      trailingSlash = substr(path, -1) === '/';
+
+  // Normalize the path
+  path = normalizeArray(filter(path.split('/'), function (p) {
+    return !!p;
+  }), !isAbsolute).join('/');
+
+  if (!path && !isAbsolute) {
+    path = '.';
+  }
+  if (path && trailingSlash) {
+    path += '/';
+  }
+
+  return (isAbsolute ? '/' : '') + path;
+};
+
+// posix version
+exports.isAbsolute = function (path) {
+  return path.charAt(0) === '/';
+};
+
+// posix version
+exports.join = function () {
+  var paths = Array.prototype.slice.call(arguments, 0);
+  return exports.normalize(filter(paths, function (p, index) {
+    if (typeof p !== 'string') {
+      throw new TypeError('Arguments to path.join must be strings');
+    }
+    return p;
+  }).join('/'));
+};
+
+// path.relative(from, to)
+// posix version
+exports.relative = function (from, to) {
+  from = exports.resolve(from).substr(1);
+  to = exports.resolve(to).substr(1);
+
+  function trim(arr) {
+    var start = 0;
+    for (; start < arr.length; start++) {
+      if (arr[start] !== '') break;
+    }
+
+    var end = arr.length - 1;
+    for (; end >= 0; end--) {
+      if (arr[end] !== '') break;
+    }
+
+    if (start > end) return [];
+    return arr.slice(start, end - start + 1);
+  }
+
+  var fromParts = trim(from.split('/'));
+  var toParts = trim(to.split('/'));
+
+  var length = Math.min(fromParts.length, toParts.length);
+  var samePartsLength = length;
+  for (var i = 0; i < length; i++) {
+    if (fromParts[i] !== toParts[i]) {
+      samePartsLength = i;
+      break;
+    }
+  }
+
+  var outputParts = [];
+  for (var i = samePartsLength; i < fromParts.length; i++) {
+    outputParts.push('..');
+  }
+
+  outputParts = outputParts.concat(toParts.slice(samePartsLength));
+
+  return outputParts.join('/');
+};
+
+exports.sep = '/';
+exports.delimiter = ':';
+
+exports.dirname = function (path) {
+  var result = splitPath(path),
+      root = result[0],
+      dir = result[1];
+
+  if (!root && !dir) {
+    // No dirname whatsoever
+    return '.';
+  }
+
+  if (dir) {
+    // It has a dirname, strip trailing slash
+    dir = dir.substr(0, dir.length - 1);
+  }
+
+  return root + dir;
+};
+
+exports.basename = function (path, ext) {
+  var f = splitPath(path)[2];
+  // TODO: make this comparison case-insensitive on windows?
+  if (ext && f.substr(-1 * ext.length) === ext) {
+    f = f.substr(0, f.length - ext.length);
+  }
+  return f;
+};
+
+exports.extname = function (path) {
+  return splitPath(path)[3];
+};
+
+function filter(xs, f) {
+  if (xs.filter) return xs.filter(f);
+  var res = [];
+  for (var i = 0; i < xs.length; i++) {
+    if (f(xs[i], i, xs)) res.push(xs[i]);
+  }
+  return res;
+}
+
+// String.prototype.substr - negative index don't work in IE8
+var substr = 'ab'.substr(-1) === 'b' ? function (str, start, len) {
+  return str.substr(start, len);
+} : function (str, start, len) {
+  if (start < 0) start = str.length + start;
+  return str.substr(start, len);
+};
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6)))
+
+/***/ }),
+/* 216 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Entity = __webpack_require__(13);
+
+/**
+ * The Template model
+ */
+
+var Template = function (_Entity) {
+    _inherits(Template, _Entity);
+
+    function Template(params) {
+        _classCallCheck(this, Template);
+
+        return _possibleConstructorReturn(this, _Entity.call(this, params));
+    }
+
+    Template.prototype.structure = function structure() {
+        this.def(String, 'id');
+        this.def(String, 'parentId');
+        this.def(Boolean, 'remote', true);
+        this.def(String, 'icon', 'code');
+        this.def(String, 'name');
+        this.def(String, 'type');
+        this.def(String, 'remotePath');
+        this.def(String, 'folder');
+        this.def(String, 'markup');
+    };
+
+    /**
+     * Updates id and remotePath from name
+     */
+
+
+    Template.prototype.updateFromName = function updateFromName() {
+        this.id = this.name.substring(0, this.name.lastIndexOf('.')) || this.name;
+    };
+
+    return Template;
+}(Entity);
+
+module.exports = Template;
+
+/***/ }),
+/* 217 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+module.exports = {
+    MediaBrowser: __webpack_require__(218),
+    MessageModal: __webpack_require__(44)
+};
+
+/***/ }),
+/* 218 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/**
+ * A browser modal for Media objects
+ *
+ * @memberof HashBrown.Client.Views.Modals
+ */
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+module.exports = function (_View) {
+    _inherits(MediaBrowser, _View);
+
+    function MediaBrowser(params) {
+        _classCallCheck(this, MediaBrowser);
+
+        var _this = _possibleConstructorReturn(this, _View.call(this, params));
+
+        _this.$element = _.div({ class: 'modal fade media-browser' });
+
+        MediaBrowser.checkMediaProvider().then(function () {
+            _this.init();
+
+            // Make sure the modal is removed when it's cancelled
+            _this.$element.on('hidden.bs.modal', function () {
+                _this.$element.remove();
+            });
+
+            // Show the modal
+            _this.$element.modal('show');
+        }).catch(UI.errorModal);
+        return _this;
+    }
+
+    /**
+     * Gets whether the media provider exists
+     *
+     * @returns {Promise} Promise
+     */
+
+
+    MediaBrowser.checkMediaProvider = function checkMediaProvider() {
+        return SettingsHelper.getSettings(ProjectHelper.currentProject, ProjectHelper.currentEnvironment, 'providers').then(function (result) {
+            if (!result || !result.media) {
+                return Promise.reject(new Error('No Media provider has been set for this project. Please check providers settings.'));
+            }
+
+            return Promise.resolve();
+        });
+    };
+
+    /**
+     * Open the upload modal
+     *
+     * @param {Function} onSuccess
+     * @param {Function} onCancel
+     * @param {String} replaceId
+     */
+
+
+    MediaBrowser.uploadModal = function uploadModal(onSuccess, onCancel, replaceId) {
+        MediaBrowser.checkMediaProvider().then(function () {
+            var navbar = ViewHelper.get('NavbarMain');
+
+            // Event: Change file
+            function onChangeFile() {
+                var input = $(this);
+                var numFiles = this.files ? this.files.length : 1;
+
+                // In the case of a single file selected 
+                if (numFiles == 1) {
+                    var file = this.files[0];
+
+                    var isImage = file.type == 'image/png' || file.type == 'image/jpeg' || file.type == 'image/gif';
+
+                    var isVideo = file.type == 'video/mpeg' || file.type == 'video/mp4' || file.type == 'video/quicktime' || file.type == 'video/x-matroska';
+
+                    if (isImage) {
+                        var reader = new FileReader();
+
+                        uploadModal.$element.find('.spinner-container').toggleClass('hidden', false);
+
+                        reader.onload = function (e) {
+                            uploadModal.$element.find('.media-preview').html(_.img({ src: e.target.result }));
+
+                            uploadModal.$element.find('.spinner-container').toggleClass('hidden', true);
+                        };
+
+                        reader.readAsDataURL(file);
+                    }
+
+                    if (isVideo) {
+                        uploadModal.$element.find('.media-preview').html(_.video({ src: window.URL.createObjectURL(file), controls: 'controls' }));
+                    }
+
+                    debug.log('Previewing data of file type ' + file.type + '...', navbar);
+
+                    // Multiple files selected
+                } else if (numFiles > 1) {
+                    uploadModal.$element.find('.media-preview').html('(Multiple files selected)');
+
+                    // No files selected
+                } else if (numFiles == 0) {
+                    uploadModal.$element.find('.media-preview').html('(No files selected)');
+                }
+            }
+
+            // Event: Click upload
+            function onClickUpload() {
+                uploadModal.$element.find('form').submit();
+
+                return false;
+            }
+
+            // Event: Submit
+            function onSubmit(e) {
+                e.preventDefault();
+
+                uploadModal.$element.find('.spinner-container').toggleClass('hidden', false);
+
+                var apiPath = 'media/' + (replaceId ? 'replace/' + replaceId : 'new');
+
+                $.ajax({
+                    url: apiUrl(apiPath),
+                    type: 'POST',
+                    data: new FormData(this),
+                    processData: false,
+                    contentType: false,
+                    success: function success(ids) {
+                        reloadResource('media').then(function () {
+                            uploadModal.$element.find('.spinner-container').toggleClass('hidden', true);
+
+                            navbar.reload();
+
+                            if (onSuccess) {
+                                onSuccess(ids || []);
+                            }
+
+                            uploadModal.hide();
+                        });
+                    },
+                    error: errorModal
+                });
+            }
+
+            // Render the upload modal
+            var uploadModal = new HashBrown.Views.Modals.MessageModal({
+                model: {
+                    class: 'modal-upload-media',
+                    title: 'Upload a file',
+                    body: [_.div({ class: 'spinner-container hidden' }, _.span({ class: 'spinner fa fa-refresh' })), _.div({ class: 'media-preview' }), _.form({ class: 'form-control' }, _.input({ type: 'file', name: 'media', multiple: replaceId ? false : true }).change(onChangeFile)).submit(onSubmit)]
+                },
+                buttons: [{
+                    label: 'Cancel',
+                    class: 'btn-default',
+                    callback: onCancel
+                }, {
+                    label: 'Upload',
+                    class: 'btn-primary',
+                    callback: onClickUpload
+                }]
+            });
+
+            // Event: Close modal
+            uploadModal.on('close', function () {
+                if (onCancel) {
+                    onCancel();
+                }
+            });
+        }).catch(UI.errorModal);
+    };
+
+    /**
+     * Event: Search media
+     */
+
+
+    MediaBrowser.prototype.onSearchMedia = function onSearchMedia() {
+        var query = (this.$element.find('.input-search-media').val() || '').toLowerCase();
+
+        this.$element.find('.thumbnail').each(function (i) {
+            var isMatch = !query || ($(this).attr('data-name') || '').toLowerCase().indexOf(query) > -1;
+
+            $(this).toggleClass('hidden', !isMatch);
+        });
+    };
+
+    /** 
+     * Event: Click OK
+     */
+
+
+    MediaBrowser.prototype.onClickOK = function onClickOK() {
+        this.value = this.$element.find('.thumbnail.active').attr('data-id');
+
+        if (this.value) {
+            this.trigger('select', this.value);
+        }
+
+        this.$element.modal('hide');
+    };
+
+    /** 
+     * Event: Click cancel
+     */
+
+
+    MediaBrowser.prototype.onClickCancel = function onClickCancel() {
+        this.$element.modal('hide');
+    };
+
+    MediaBrowser.prototype.render = function render() {
+        var _this2 = this;
+
+        // Render the modal
+        var $folders = [];
+
+        _.append(this.$element.empty(), _.div({ class: 'modal-dialog' }, _.div({ class: 'modal-content' }, _.div({ class: 'modal-header' }, _.div({ class: 'input-group' }, _.input({ class: 'form-control input-search-media', placeholder: 'Search media' }).on('change keyup paste', function () {
+            _this2.onSearchMedia();
+        }), _.div({ class: 'input-group-btn' }, _.button({ class: 'btn btn-primary' }, 'Upload file').click(function () {
+            _this2.$element.toggleClass('disabled', true);
+
+            MediaBrowser.uploadModal(function (id) {
+                _this2.$element.toggleClass('disabled', false);
+
+                _this2.value = id;
+
+                _this2.render();
+            }, function () {
+                _this2.$element.toggleClass('disabled', false);
+            });
+        })))), _.div({ class: 'modal-body' }, _.div({ class: 'thumbnail-container' },
+        // Append all files
+        _.each(resources.media, function (i, media) {
+            media = new Media(media);
+
+            var $media = _.button({
+                class: 'thumbnail raised',
+                'data-id': media.id,
+                'data-name': media.name
+            }, _.if(media.isVideo(), _.video({ src: '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + media.id })), _.if(media.isImage(), _.img({ src: '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + media.id })), _.label(media.name)).click(function () {
+                _this2.$element.find('.thumbnail').toggleClass('active', false);
+                $media.toggleClass('active', true);
+            });
+
+            if (media.folder && media.folder != '/') {
+                var $folder = $folders[media.folder];
+
+                if (!$folder) {
+                    $folder = _.div({ class: 'folder', 'data-path': media.folder }, _.div({ class: 'folder-heading' }, _.button(_.span({ class: 'fa fa-folder' }), media.folder).click(function () {
+                        $folder.toggleClass('expanded');
+
+                        if ($folder.hasClass('expanded')) {
+                            $folder.find('img, video').each(function (i, mediaSource) {
+                                $(mediaSource).attr('src', $(mediaSource).data('src'));
+                            });
+                        }
+                    })), _.div({ class: 'folder-items' }));
+
+                    $folders[media.folder] = $folder;
+                }
+
+                // Prevent the media from loading
+                if (media.isImage() || media.isVideo()) {
+                    var $mediaSource = $media.find('img, video');
+
+                    $mediaSource.data('src', $mediaSource.attr('src'));
+                    $mediaSource.attr('src', '#');
+                }
+
+                // Wait 1 CPU cycle before appending to folders
+                setTimeout(function () {
+                    $folder.find('.folder-items').append($media);
+                }, 1);
+            }
+
+            return $media;
+        }),
+
+        // Append all folders
+        _.each(Object.keys($folders).sort(), function (i, path) {
+            return $folders[path];
+        }))), _.div({ class: 'modal-footer' }, _.button({ class: 'btn btn-default' }, 'Cancel').click(function () {
+            _this2.onClickCancel();
+        }), _.button({ class: 'btn btn-primary' }, 'OK').click(function () {
+            _this2.onClickOK();
+        })))));
+
+        // Mark the selected media as active
+        this.$element.find('.thumbnail[data-id="' + this.value + '"]').toggleClass('active', true);
+    };
+
+    return MediaBrowser;
+}(View);
+
+/***/ }),
+/* 219 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+module.exports = {
+    CMSPane: __webpack_require__(220),
+    ConnectionPane: __webpack_require__(222),
+    ContentPane: __webpack_require__(223),
+    FormsPane: __webpack_require__(224),
+    MainMenu: __webpack_require__(225),
+    MediaPane: __webpack_require__(226),
+    NavbarMain: __webpack_require__(30),
+    NavbarPane: __webpack_require__(31),
+    SchemaPane: __webpack_require__(227),
+    SettingsPane: __webpack_require__(228),
+    TemplatePane: __webpack_require__(229)
+};
+
+/***/ }),
+/* 220 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37337,7 +39390,402 @@ var CMSPane = function (_NavbarPane) {
 module.exports = CMSPane;
 
 /***/ }),
-/* 200 */
+/* 221 */
+/***/ (function(module, exports) {
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+module.exports = function () {
+    var _this = this;
+
+    var currentUser = HashBrown.Common.Models.User.current;
+    var hasConnectionsScope = currentUser.hasScope(ProjectHelper.currentProject, 'connections');
+    var hasSchemasScope = currentUser.hasScope(ProjectHelper.currentProject, 'schemas');
+    var hasTemplatesScope = currentUser.hasScope(ProjectHelper.currentProject, 'templates');
+    var hasSettingsScope = currentUser.hasScope(ProjectHelper.currentProject, 'settings');
+
+    /**
+     * Fetches pane information and renders it
+     *
+     * @param {Object} params
+     */
+    var renderPane = function renderPane(params) {
+        // Render pane 
+        var $pane = $('.pane-container[data-route="' + params.route + '"] .pane');
+
+        // Pane didn't exist, create it (it will be appended further down)
+        if ($pane.length < 1) {
+            $pane = _.div({ class: 'pane' });
+        }
+
+        var items = params.items;
+        var sortingQueue = [];
+
+        // Render items
+        _.each(items, function (i, item) {
+            var id = item.id || i;
+            var isDirectory = false;
+
+            // Get item name
+            var name = '';
+
+            // This is a Content node
+            if (item.properties && item.createDate) {
+                // All Content nodes are "directories" in that they can be parents of one another
+                isDirectory = true;
+
+                // Use title directly if available
+                if (typeof item.properties.title === 'string') {
+                    name = item.properties.title;
+                } else if (item.properties.title && _typeof(item.properties.title) === 'object') {
+                    // Use the current language title
+                    if (item.properties.title[window.language]) {
+                        name = item.properties.title[window.language];
+
+                        // If no title was found, searh in other languages
+                    } else {
+                        name = '(Untitled)';
+
+                        for (var language in item.properties.title) {
+                            var languageTitle = item.properties.title[language];
+
+                            if (languageTitle) {
+                                name += ' - (' + language + ': ' + languageTitle + ')';
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                // If name still wasn't found, use the id
+                if (!name) {
+                    name = item.id;
+                }
+            } else if (item.title && typeof item.title === 'string') {
+                name = item.title;
+            } else if (item.name && typeof item.name === 'string') {
+                name = item.name;
+            } else {
+                name = id;
+            }
+
+            var routingPath = item.shortPath || item.path || item.id || null;
+            var queueItem = {};
+            var icon = item.icon || params.icon;
+            var $icon = void 0;
+
+            // Implement custom routing paths
+            if (typeof params.itemPath === 'function') {
+                routingPath = params.itemPath(item);
+            }
+
+            // Truncate long names
+            if (name.length > 30) {
+                name = name.substring(0, 30) + '...';
+            }
+
+            // If this item has a Schema id, fetch the appropriate icon
+            if (item.schemaId) {
+                var schema = resources.schemas[item.schemaId];
+
+                if (schema) {
+                    icon = schema.icon;
+                }
+            }
+
+            if (icon) {
+                $icon = _.span({ class: 'fa fa-' + icon });
+            }
+
+            // Item element
+            var $existingElement = $pane.find('.pane-item-container[data-routing-path="' + routingPath + '"]');
+            var $element = _.div({
+                class: 'pane-item-container',
+                'data-routing-path': routingPath
+            });
+
+            // Element exists already, replace
+            if ($existingElement.length > 0) {
+                $existingElement.replaceWith($element);
+
+                // Element didn't exist already, create it and append to pane
+            } else {
+                $pane.append($element);
+            }
+
+            // Populate element
+            _.append($element.empty(), _.a({
+                'data-id': id,
+                'data-name': name,
+                href: '#' + (routingPath ? params.route + routingPath : params.route),
+                class: 'pane-item'
+            }, $icon, _.span({ class: 'pane-item-label' }, name)), _.div({ class: 'children' }), _.div({ class: 'pane-item-insert-below' }));
+
+            // Set sync attributes
+            if (typeof item.locked !== 'undefined') {
+                $element.attr('data-locked', item.locked);
+            }
+
+            if (typeof item.remote !== 'undefined') {
+                $element.attr('data-remote', item.remote);
+            }
+
+            if (typeof item.local !== 'undefined') {
+                $element.attr('data-local', item.local);
+            }
+
+            if (isDirectory) {
+                $element.attr('data-is-directory', true);
+            }
+
+            // Attach item context menu
+            if (params.getItemContextMenu) {
+                $element.find('a').crcontext(params.getItemContextMenu(item));
+            } else if (params.itemContextMenu) {
+                $element.find('a').crcontext(params.itemContextMenu);
+            }
+
+            // Add element to queue item
+            queueItem.$element = $element;
+
+            // Add sort index to element
+            queueItem.$element.attr('data-sort', item.sort || 0);
+
+            // Use specific hierarchy behaviours
+            if (params.hierarchy) {
+                params.hierarchy(item, queueItem);
+            }
+
+            // Add queue item to sorting queue
+            sortingQueue.push(queueItem);
+        });
+
+        // Place items into hierarchy
+        for (var _iterator = sortingQueue, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+            var _ref;
+
+            if (_isArray) {
+                if (_i >= _iterator.length) break;
+                _ref = _iterator[_i++];
+            } else {
+                _i = _iterator.next();
+                if (_i.done) break;
+                _ref = _i.value;
+            }
+
+            var queueItem = _ref;
+
+            if (queueItem.parentDirAttr) {
+                // Find parent item
+                var parentDirAttrKey = Object.keys(queueItem.parentDirAttr)[0];
+                var parentDirAttrValue = queueItem.parentDirAttr[parentDirAttrKey];
+                var parentDirSelector = '.pane-item-container[' + parentDirAttrKey + '="' + parentDirAttrValue + '"]';
+                var $parentDir = $pane.find(parentDirSelector);
+
+                // If parent element already exists, just append the queue item element
+                if ($parentDir.length > 0) {
+                    $parentDir.children('.children').append(queueItem.$element);
+
+                    // If not, create parent elements if specified
+                } else if (queueItem.createDir) {
+                    var dirNames = parentDirAttrValue.split('/').filter(function (item) {
+                        return item != '';
+                    });
+                    var finalDirName = '/';
+
+                    for (var i in dirNames) {
+                        var dirName = dirNames[i];
+
+                        var prevFinalDirName = finalDirName;
+                        finalDirName += dirName + '/';
+
+                        var $dir = $pane.find('[' + parentDirAttrKey + '="' + finalDirName + '"]');
+
+                        if ($dir.length < 1) {
+                            $dir = _.div({ class: 'pane-item-container', 'data-is-directory': true }, _.a({
+                                class: 'pane-item'
+                            }, _.span({ class: 'fa fa-folder' }), _.span({ class: 'pane-item-label' }, dirName)), _.div({ class: 'children' }));
+
+                            $dir.attr(parentDirAttrKey, finalDirName);
+
+                            // Extra parent dir attributes
+                            if (queueItem.parentDirExtraAttr) {
+                                for (var k in queueItem.parentDirExtraAttr) {
+                                    var v = queueItem.parentDirExtraAttr[k];
+
+                                    $dir.attr(k, v);
+                                }
+                            }
+
+                            // Append to previous dir 
+                            var $prevDir = $pane.find('[' + parentDirAttrKey + '="' + prevFinalDirName + '"]');
+
+                            if ($prevDir.length > 0) {
+                                $prevDir.children('.children').prepend($dir);
+
+                                // If no previous dir was found, append directly to pane
+                            } else {
+                                $pane.prepend($dir);
+                            }
+                        }
+
+                        // Attach item context menu
+                        if (params.dirContextMenu) {
+                            $dir.crcontext(params.dirContextMenu);
+                        }
+
+                        // Only append the queue item to the final parent element
+                        if (i >= dirNames.length - 1) {
+                            $parentDir = $dir;
+                        }
+                    }
+
+                    $parentDir.children('.children').append(queueItem.$element);
+                }
+            }
+        }
+
+        // Sort direct children
+        $pane.find('>.pane-item-container').sort(function (a, b) {
+            return parseInt(a.dataset.sort) > parseInt(b.dataset.sort);
+        }).appendTo($pane);
+
+        // Sort nested children
+        $pane.find('.pane-item-container .children').each(function (i, children) {
+            var $children = $(children);
+
+            $children.find('>.pane-item-container').sort(function (a, b) {
+                return parseInt(a.dataset.sort) > parseInt(b.dataset.sort);
+            }).appendTo($children);
+        });
+
+        // Render pane container
+        var $paneContainer = $('.pane-container[data-route="' + params.route + '"]');
+
+        // Pane container didn't already exist, create it
+        if ($paneContainer.length < 1) {
+            // Render pane container
+            $paneContainer = _.div({ class: 'pane-container', 'data-route': params.route }, _.if(params.toolbar, params.toolbar), _.div({ class: 'pane-move-buttons' }, _.button({ class: 'btn btn-move-to-root' }, 'Move to root'), _.button({ class: 'btn btn-new-folder' }, 'New folder')), $pane);
+
+            // Attach pane context menu
+            if (params.paneContextMenu) {
+                $paneContainer.crcontext(params.paneContextMenu);
+            }
+        }
+
+        // Add expand/collapse buttons to items if needed
+        $paneContainer.find('.pane-item-container').each(function (i, element) {
+            var $paneItemContainer = $(element);
+            var $paneItem = $paneItemContainer.children('.pane-item');;
+            var $children = $paneItemContainer.children('.children');
+
+            if ($children.children().length > 0) {
+                var $childrenToggle = _.button({ class: 'btn-children-toggle' }, _.span({ class: 'fa fa-caret-down' }), _.span({ class: 'fa fa-caret-right' }));
+
+                $paneItem.append($childrenToggle);
+
+                $childrenToggle.click(function (e) {
+                    _this.onClickToggleChildren(e);
+                });
+            }
+        });
+
+        if (params.postSort) {
+            params.postSort($paneContainer.find('>.pane, .pane-item-container>.children'));
+        }
+        /*
+                if(this.$element.find('.tab-panes .pane-container').length < 1) {
+                    $paneContainer.addClass('active');
+                    $button.addClass('active');
+                }
+        */
+        return $paneContainer;
+    };
+
+    return _.nav({ class: 'navbar-main' },
+    // Buttons
+    _.div({ class: 'tab-buttons' }, _.each(this.tabPanes, function (i, pane) {
+        var $icon = pane.icon;
+
+        if (typeof pane.icon === 'string') {
+            $icon = _.span({ class: 'fa fa-' + pane.icon });
+        }
+
+        return _.button({ 'data-route': pane.route, title: pane.label }, _.div({ class: 'pane-icon' }, $icon), _.div({ class: 'pane-text' }, _.span({ class: 'pane-label' }, pane.label))).click(function (e) {
+            _this.onClickTab(e);
+        });
+    })),
+
+    // Panes
+    _.div({ class: 'tab-panes' }, _.each(this.tabPanes, function (i, pane) {
+        var queue = [];
+
+        var $pane = _.div({ class: 'pane-container', 'data-route': pane.route },
+        // Toolbar
+        _.if(pane.settings.toolbar, pane.settings.toolbar),
+
+        // Move buttons
+        _.div({ class: 'pane-move-buttons' }, _.button({ class: 'btn btn-move-to-root' }, 'Move to root'), _.button({ class: 'btn btn-new-folder' }, 'New folder')),
+
+        // Items
+        _.div({ class: 'pane' }, _.each(pane.settings.items || pane.settings.getItems(), function (i, item) {
+            var id = item.id || i;
+            var name = _this.getItemName(item);
+            var icon = _this.getItemIcon(item, pane.settings);
+            var routingPath = _this.getItemRoutingPath(item, pane.settings);
+            var isDirectory = _this.isItemDirectory(item);
+            var queueItem = {};
+
+            var $item = _.div({
+                class: 'pane-item-container',
+                'data-routing-path': routingPath,
+                'data-locked': item.locked,
+                'data-remote': item.remote,
+                'data-local': item.local,
+                'data-is-directory': isDirectory,
+                'data-sort': item.sort || 0
+            }, _.a({
+                'data-id': id,
+                'data-name': name,
+                href: '#' + (routingPath ? pane.route + routingPath : pane.route),
+                class: 'pane-item'
+            }, _.span({ class: 'fa fa-' + icon }), _.span({ class: 'pane-item-label' }, name)), _.div({ class: 'children' }), _.div({ class: 'pane-item-insert-below' }));
+
+            // Attach item context menu
+            if (pane.settings.getItemContextMenu) {
+                $item.find('a').crcontext(pane.settings.getItemContextMenu(item));
+            } else if (pane.settings.itemContextMenu) {
+                $item.find('a').crcontext(pane.settings.itemContextMenu);
+            }
+
+            // Add element to queue item
+            queueItem.$element = $item;
+
+            // Use specific hierarchy behaviours
+            if (pane.settings.hierarchy) {
+                pane.settings.hierarchy(item, queueItem);
+            }
+
+            // Add queue item to sorting queue
+            queue.push(queueItem);
+
+            return $item;
+        })));
+
+        _this.applyHierarchy($pane, pane, queue);
+        _this.applySorting($pane, pane);
+
+        // Attach pane context menu
+        if (pane.settings.paneContextMenu) {
+            $pane.crcontext(pane.settings.paneContextMenu);
+        }
+
+        return $pane;
+    })));
+};
+
+/***/ }),
+/* 222 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37551,7 +39999,7 @@ var ConnectionPane = function (_NavbarPane) {
 module.exports = ConnectionPane;
 
 /***/ }),
-/* 201 */
+/* 223 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38050,7 +40498,7 @@ var ContentPane = function (_NavbarPane) {
 module.exports = ContentPane;
 
 /***/ }),
-/* 202 */
+/* 224 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38272,7 +40720,165 @@ var FormsPane = function (_NavbarPane) {
 module.exports = FormsPane;
 
 /***/ }),
-/* 203 */
+/* 225 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var User = __webpack_require__(32);
+var UserEditor = __webpack_require__(84);
+
+var MainMenu = function (_View) {
+    _inherits(MainMenu, _View);
+
+    function MainMenu(params) {
+        _classCallCheck(this, MainMenu);
+
+        var _this = _possibleConstructorReturn(this, _View.call(this, params));
+
+        _this.$element = _.div({ class: 'main-menu' });
+
+        $('.menuspace').html(_this.$element);
+
+        _this.fetch();
+        return _this;
+    }
+
+    /**
+     * Event: On change language
+     *
+     * @param {String} newLanguage
+     */
+
+
+    MainMenu.prototype.onChangeLanguage = function onChangeLanguage(newLanguage) {
+        var _this2 = this;
+
+        localStorage.setItem('language', newLanguage);
+
+        window.language = newLanguage;
+
+        reloadResource('content').then(function () {
+            HashBrown.Client.Views.Navigation.NavbarMain.reload();
+
+            var contentEditor = ViewHelper.get('ContentEditor');
+
+            if (contentEditor) {
+                contentEditor.model = null;
+                contentEditor.fetch();
+            }
+
+            _this2.fetch();
+        });
+    };
+
+    /**
+     * Event: Click question
+     */
+
+
+    MainMenu.prototype.onClickQuestion = function onClickQuestion() {
+        var path = location.hash.replace('#', '').split('/');
+
+        if (!path || path.length < 1) {
+            return;
+        }
+
+        var level1 = path[1];
+        var level2 = path[2];
+
+        switch (level1) {
+            default:
+                UI.messageModal('The help modal', [_.p('To get help for any particular screen, click the <span class="fa fa-question-circle"></span> button to bring up this modal.'), _.p('There\'s nothing worth explaining on this screen, though.')]);
+                break;
+
+            case 'content':
+                UI.messageModal('Content', [_.p('This section contains all of your authored work. The content is a hierarchical tree of nodes that can contain text and media, in simple or complex structures.')]);
+                break;
+
+            case 'media':
+                UI.messageModal('Media', [_.p('This is a gallery of your statically hosted files, such as images, videos and PDFs.'), _.if(User.current.hasScope('settings'), _.p('The contents of this gallery depends on which Connection has been set up as the Media provider in the <a href="#/settings/providers/">providers settings</a>'))]);
+                break;
+
+            case 'forms':
+                UI.messageModal('Forms', 'If you need an input form on your website, you can create the model for it here and see a list of the user submitted input.');
+                break;
+
+            case 'templates':
+                UI.messageModal('Templates', [_.p('This section contains rendering Templates for your authored Content.'), _.if(User.current.hasScope('settings'), _.p('Templates are served through the Connection assigned as the Template provider in the <a href="#/settings/providers/">providers settings</a>.'))]);
+                break;
+
+            case 'connections':
+                UI.messageModal('Connections', [_.p('Connections are endpoints and resources for your content. Connections can be set up to publish your Content and Media to remote servers.'), _.p('Through the <a href="#/settings/providers/">providers settings</a>, they can also be set up to provide statically hosted media and serve rendering templates.')]);
+                break;
+
+            case 'schemas':
+                UI.messageModal('Schemas', 'This is a library of content structures. Here you define how your editable content looks and behaves. You can define schemas for both content nodes and property fields.');
+                break;
+
+            case 'users':
+                UI.messageModal('Users', 'Here you can add and remove users, edit personal information and scopes and change passwords');
+                break;
+
+            case 'settings':
+                switch (level2) {
+                    case 'sync':
+                        UI.messageModal('Sync settings', 'Syncing lets you connect this HashBrown instance to another. When syncing is active, you can pull or push Content, Schemas, Forms and Connections between the local and the remote instance.');
+                        break;
+                    case 'providers':
+                        UI.messageModal('Providers settings', [_.p('Providers are <a href="#/connections/">Connections</a> set up to serve static <a href="#/media/">Media</a> and <a href="#/template/">Templates</a>.'), _.p('For example, when a <a href="#/connections/">Connection</a> is assigned as the <a href="#/media/">Media</a> provider, the images and other content in the <a href="#/media/">Media gallery</a> are pulled from that connection.'), _.p('Similarly, if a <a href="#/connections/">Connection</a> is assigned as the <a href="#/templates/">Template</a> provider, the available <a href="#/templates/">Templates</a> will be pulled from that <a href="#/connections/">Connection</a>.')]);
+                        break;
+                    default:
+                        UI.messageModal('Settings', 'Here you can edit environment-specific settings');
+                        break;
+                }
+
+                break;
+        }
+    };
+
+    MainMenu.prototype.render = function render() {
+        var _this3 = this;
+
+        // Render menu
+        this.languages = HashBrown.Client.Helpers.LanguageHelper.selectedLanguages || [];
+
+        _.append(this.$element.empty(),
+        // Language picker
+        _.if(Array.isArray(this.languages) && this.languages.length > 1, _.div({ class: 'main-menu-item dropdown main-menu-language' }, _.button({ title: 'Language', class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, _.span({ class: 'fa fa-flag' })), _.ul({ class: 'dropdown-menu' }, _.each(this.languages, function (i, language) {
+            return _.li({ value: language, class: language == window.language ? 'active' : '' }, _.button(language).click(function () {
+                _this3.onChangeLanguage(language);
+            }));
+        })))),
+
+        // Dashboard link
+        _.div({ class: 'main-menu-item' }, _.a({ title: 'Dashboard', href: '/', class: 'main-menu-dashboard' }, _.span({ class: 'fa fa-home' }))),
+
+        // User dropdown
+        _.div({ class: 'main-menu-item main-menu-user dropdown' }, _.button({ title: 'User', class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, _.span({ class: 'fa fa-user' })), _.ul({ class: 'dropdown-menu' }, _.li(_.a({ class: 'dropdown-item', href: '#/users/' + User.current.id }, 'User settings').click(function (e) {
+            e.preventDefault();new UserEditor({ hidePermissions: true, model: User.current });
+        })), _.li(_.form({ class: 'dropdown-item', action: '/api/user/logout', method: 'POST' }, _.input({ type: 'submit', value: 'Log out' }))))),
+
+        // Help
+        _.div({ class: 'main-menu-item' }, _.button({ title: 'Help', class: 'main-menu-help' }, _.span({ class: 'fa fa-question-circle' })).click(function () {
+            _this3.onClickQuestion();
+        })));
+    };
+
+    return MainMenu;
+}(View);
+
+module.exports = MainMenu;
+
+/***/ }),
+/* 226 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38469,7 +41075,7 @@ MediaPane.canCreateDirectory = true;
 module.exports = MediaPane;
 
 /***/ }),
-/* 204 */
+/* 227 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38688,7 +41294,7 @@ var SchemaPane = function (_NavbarPane) {
 module.exports = SchemaPane;
 
 /***/ }),
-/* 205 */
+/* 228 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38731,7 +41337,7 @@ var SettingsPane = function (_NavbarPane) {
 module.exports = SettingsPane;
 
 /***/ }),
-/* 206 */
+/* 229 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38983,1871 +41589,26 @@ var TemplatePane = function (_NavbarPane) {
 module.exports = TemplatePane;
 
 /***/ }),
-/* 207 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var ContentHelperCommon = __webpack_require__(258);
-var Content = __webpack_require__(259);
-
-/**
- * The client side content helper
- *
- * @memberof HashBrown.Client.Helpers
- */
-module.exports = function (_ContentHelperCommon) {
-    _inherits(ContentHelper, _ContentHelperCommon);
-
-    function ContentHelper() {
-        _classCallCheck(this, ContentHelper);
-
-        return _possibleConstructorReturn(this, _ContentHelperCommon.apply(this, arguments));
-    }
-
-    /**
-     * Gets Content by id
-     *
-     * @param {String} id
-     *
-     * @returns {Content} Content node
-     */
-    ContentHelper.getContentByIdSync = function getContentByIdSync(id) {
-        if (id) {
-            for (var _iterator = resources.content, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-                var _ref;
-
-                if (_isArray) {
-                    if (_i >= _iterator.length) break;
-                    _ref = _iterator[_i++];
-                } else {
-                    _i = _iterator.next();
-                    if (_i.done) break;
-                    _ref = _i.value;
-                }
-
-                var content = _ref;
-
-                if (content.id == id) {
-                    return new Content(content);
-                }
-            }
-        }
-
-        return null;
-    };
-
-    /**
-     * Gets Content by id
-     *
-     * @param {String} id
-     *
-     * @returns {Promise} Content node
-     */
-
-
-    ContentHelper.getContentById = function getContentById(id) {
-        if (id) {
-            for (var _iterator2 = resources.content, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
-                var _ref2;
-
-                if (_isArray2) {
-                    if (_i2 >= _iterator2.length) break;
-                    _ref2 = _iterator2[_i2++];
-                } else {
-                    _i2 = _iterator2.next();
-                    if (_i2.done) break;
-                    _ref2 = _i2.value;
-                }
-
-                var content = _ref2;
-
-                if (content.id == id) {
-                    return Promise.resolve(new Content(content));
-                }
-            }
-
-            return Promise.reject(new Error('Content with id "' + id + '" was not found'));
-        } else {
-            return Promise.reject(new Error('Content id was not provided'));
-        }
-    };
-
-    /**
-     * A sanity check for fields
-     *
-     * @param {Object} value
-     * @param {Schema} schema
-     */
-
-
-    ContentHelper.fieldSanityCheck = function fieldSanityCheck(value, schema) {
-        // If the schema value is set to multilingual, but the value isn't an object, convert it
-        if (schema.multilingual && (!value || (typeof value === 'undefined' ? 'undefined' : _typeof(value)) !== 'object')) {
-            var oldValue = value;
-
-            value = {};
-            value[window.language] = oldValue;
-        }
-
-        // If the schema value is not set to multilingual, but the value is an object
-        // containing the _multilingual flag, convert it
-        if (!schema.multilingual && value && (typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object' && value._multilingual) {
-            value = value[window.language];
-        }
-
-        // Update the _multilingual flag
-        if (schema.multilingual && value && !value._multilingual) {
-            value._multilingual = true;
-        } else if (!schema.multilingual && value && value._multilingual) {
-            delete value._multilingual;
-        }
-
-        return value;
-    };
-
-    /**
-     * Get new sort index
-     *
-     * @param {String} parentId
-     * @param {String} aboveId
-     * @param {String} belowId
-     */
-
-
-    ContentHelper.getNewSortIndex = function getNewSortIndex(parentId, aboveId, belowId) {
-        if (aboveId) {
-            return this.getContentByIdSync(aboveId).sort + 1;
-        }
-
-        if (belowId) {
-            return this.getContentByIdSync(belowId).sort - 1;
-        }
-
-        // Filter out content that doesn't have the same parent
-        var nodes = resources.content.filter(function (x) {
-            return x.parentId == parentId || !x.parentId && !parentId;
-        });
-
-        // Find new index
-        // NOTE: The index should be the highest sort number + 10000 to give a bit of leg room for sorting later
-        var newIndex = 10000;
-
-        for (var _iterator3 = nodes, _isArray3 = Array.isArray(_iterator3), _i3 = 0, _iterator3 = _isArray3 ? _iterator3 : _iterator3[Symbol.iterator]();;) {
-            var _ref3;
-
-            if (_isArray3) {
-                if (_i3 >= _iterator3.length) break;
-                _ref3 = _iterator3[_i3++];
-            } else {
-                _i3 = _iterator3.next();
-                if (_i3.done) break;
-                _ref3 = _i3.value;
-            }
-
-            var content = _ref3;
-
-            if (newIndex - 10000 <= content.sort) {
-                newIndex = content.sort + 10000;
-            }
-        }
-
-        return newIndex;
-    };
-
-    return ContentHelper;
-}(ContentHelperCommon);
-
-/***/ }),
-/* 208 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-// Style
-
-__webpack_require__(209);
-
-// Helper functions
-__webpack_require__(84);
-
-// Libraries
-__webpack_require__(176);
-
-// Get routes
-__webpack_require__(210);
-
-// Resource cache
-window.resources = {
-    connections: {},
-    content: [],
-    schemas: [],
-    media: [],
-    templates: [],
-    forms: [],
-    users: []
-};
-
-// Namespaces
-window.HashBrown = {};
-
-HashBrown.Client = {};
-HashBrown.Client.Models = __webpack_require__(184);
-HashBrown.Client.Views = {};
-HashBrown.Client.Views.Modals = __webpack_require__(221);
-HashBrown.Client.Views.Navigation = __webpack_require__(223);
-HashBrown.Client.Views.Editors = __webpack_require__(226);
-HashBrown.Client.Views.Editors.ConnectionEditors = {};
-HashBrown.Client.Views.Editors.FieldEditors = __webpack_require__(238);
-HashBrown.Client.Helpers = __webpack_require__(255);
-
-HashBrown.Common = {};
-HashBrown.Common.Models = __webpack_require__(184);
-
-// Helper shortcuts
-window.debug = __webpack_require__(195);
-window.UI = __webpack_require__(83);
-
-// Preload resources 
-$(document).ready(function () {
-    var SettingsHelper = HashBrown.Client.Helpers.SettingsHelper;
-    var LanguageHelper = HashBrown.Client.Helpers.LanguageHelper;
-    var ProjectHelper = HashBrown.Client.Helpers.ProjectHelper;
-
-    SettingsHelper.getSettings(ProjectHelper.currentProject, null, 'sync').then(function () {
-        return LanguageHelper.getSelectedLanguages(ProjectHelper.currentProject);
-    }).then(function () {
-        return reloadAllResources();
-    }).then(function () {
-        for (var _iterator = resources.users, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-            var _ref;
-
-            if (_isArray) {
-                if (_i >= _iterator.length) break;
-                _ref = _iterator[_i++];
-            } else {
-                _i = _iterator.next();
-                if (_i.done) break;
-                _ref = _i.value;
-            }
-
-            var user = _ref;
-
-            if (user.isCurrent) {
-                HashBrown.Common.Models.User.current = user;
-            }
-        }
-
-        new HashBrown.Client.Views.Navigation.NavbarMain();
-        new HashBrown.Client.Views.Navigation.MainMenu();
-
-        Router.check = function (newRoute, cancel, proceed) {
-            var contentEditor = ViewHelper.get('ContentEditor');
-
-            if (!contentEditor || !contentEditor.model || newRoute.indexOf(contentEditor.model.id) > -1 || !contentEditor.dirty) {
-                proceed();
-                return;
-            }
-
-            UI.confirmModal('Discard', 'Discard unsaved changes?', 'You have made changes to "' + (contentEditor.model.prop('title', window.language) || contentEditor.model.id) + '"', function () {
-                contentEditor.dirty = false;
-                proceed();
-            }, cancel);
-        };
-
-        $('.cms-container').removeClass('faded');
-
-        Router.init();
-    }).catch(function (e) {
-        UI.errorModal(e);
-    });
-});
-
-/***/ }),
-/* 209 */
-/***/ (function(module, exports) {
-
-// removed by extract-text-webpack-plugin
-
-/***/ }),
-/* 210 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-__webpack_require__(211);
-__webpack_require__(212);
-__webpack_require__(213);
-__webpack_require__(214);
-__webpack_require__(215);
-__webpack_require__(216);
-__webpack_require__(217);
-__webpack_require__(218);
-
-/***/ }),
-/* 211 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-// Root
-
-Router.route('/', function () {
-    ViewHelper.get('NavbarMain').showTab('/');
-    ViewHelper.get('NavbarMain').highlightItem('/', 'null');
-
-    var carouselItems = [[_.div(_.img({ src: '/img/welcome/intro-content.jpg' })), _.div(_.h2('Content'), _.p('In the content section you will find all of your authored work. The content is a hierarchical tree of nodes that can contain text and media, in simple or complex structures.'))], [_.div(_.img({ src: '/img/welcome/intro-media.jpg' })), _.div(_.h2('Media'), _.p('An asset library for your hosted files, such as images, videos, PDFs and whatnot.'))], [_.div(_.img({ src: '/img/welcome/intro-forms.jpg' })), _.div(_.h2('Forms'), _.p('If you need an input form on your website, you can create the model for it here and see a list of the user submitted input.'))]];
-
-    if (currentUserHasScope('connections')) {
-        carouselItems.push([_.div(_.img({ src: '/img/welcome/intro-connections.jpg' })), _.div(_.h2('Connections'), _.p('A list of endpoints and resources for your content. Connections can be set up to publish your content to remote servers, provide statically hosted media and serve rendering templates.'))]);
-    }
-
-    if (currentUserHasScope('schemas')) {
-        carouselItems.push([_.div(_.img({ src: '/img/welcome/intro-schemas.jpg' })), _.div(_.h2('Schemas'), _.p('A library of content structures. Here you define how your editable content looks and behaves. You can define schemas for both content nodes and property fields.'))]);
-    }
-
-    if (currentUserHasScope('users')) {
-        carouselItems.push([_.div(_.img({ src: '/img/welcome/intro-users.jpg' })), _.div(_.h2('Users'), _.p('All of the users connected to this project. Here you can edit permissions and personal information and remove/add new users.'))]);
-    }
-
-    if (currentUserHasScope('settings')) {
-        carouselItems.push([_.div(_.img({ src: '/img/welcome/intro-settings.jpg' })), _.div(_.h2('Settings'), _.p('Here you can set up synchronisation with other HashBrown instances.'))]);
-    }
-
-    populateWorkspace(_.div({ class: 'dashboard-container welcome' }, _.h1('Welcome to HashBrown'), _.h2('Example content'), _.p('Press the button below to get some example content to work with.'), _.button({ class: 'btn btn-default' }, 'example').click(function () {
-        apiCall('post', 'content/example').then(function () {
-            location.reload();
-        }).catch(UI.errorModal);
-    }), _.h2('Introduction'), UI.carousel(carouselItems, true, true, '400px'), _.h2('Contextual help'), _.p('You can always click the <span class="fa fa-question-circle"></span> icon in the upper right to get information about the screen you\'re currently on.'), _.h2('Guides'), _.p('If you\'d like a more in-depth walkthrough of the features, please check out the guides.'), _.a({ class: 'btn btn-default', href: 'http://hashbrown.rocks/guides', target: '_blank' }, 'Guides')), 'presentation');
-});
-
-// Readme
-Router.route('/readme/', function () {
-    ViewHelper.get('NavbarMain').highlightItem('/', 'readme');
-
-    $.ajax({
-        type: 'GET',
-        url: '/text/readme',
-        success: function success(html) {
-            populateWorkspace(_.div({ class: 'dashboard-container readme' }, html), 'presentation');
-        }
-    });
-});
-
-// License
-Router.route('/license/', function () {
-    ViewHelper.get('NavbarMain').highlightItem('/', 'license');
-
-    $.ajax({
-        type: 'GET',
-        url: '/text/license',
-        success: function success(html) {
-            populateWorkspace(_.div({ class: 'dashboard-container license' }, html), 'presentation presentation-center');
-        }
-    });
-});
-
-/***/ }),
-/* 212 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-// Dashboard
-
-Router.route('/content/', function () {
-    ViewHelper.get('NavbarMain').showTab('/content/');
-
-    populateWorkspace(_.div({ class: 'dashboard-container' }, _.h1('Content'), _.p('Please click on a content node to proceed')), 'presentation presentation-center');
-});
-
-// Edit (JSON editor)
-Router.route('/content/json/:id', function () {
-    ViewHelper.get('NavbarMain').highlightItem('/content/', this.id);
-
-    var contentEditor = new HashBrown.Client.Views.Editors.JSONEditor({
-        modelUrl: apiUrl('content/' + this.id),
-        apiPath: 'content/' + this.id
-    });
-
-    populateWorkspace(contentEditor.$element);
-});
-
-// Edit (redirect to default tab)
-Router.route('/content/:id', function () {
-    var _this = this;
-
-    var content = resources.content.filter(function (c) {
-        return c.id == _this.id;
-    })[0];
-
-    if (content) {
-        var contentSchema = resources.schemas[content.schemaId];
-
-        if (contentSchema) {
-            location.hash = '/content/' + this.id + '/' + (contentSchema.defaultTabId || 'meta');
-        } else {
-            UI.errorModal(new Error('Schema by id "' + content.schemaId + '" not found'), function () {
-                location.hash = '/content/json/' + _this.id;
-            });
-        }
-    } else {
-        UI.errorModal(new Error('Content by id "' + this.id + '" not found'));
-    }
-});
-
-// Edit (with tab specified)
-Router.route('/content/:id/:tab', function () {
-    var contentEditor = ViewHelper.get('ContentEditor');
-
-    if (!contentEditor || !contentEditor.model || contentEditor.model.id != this.id) {
-        ViewHelper.get('NavbarMain').highlightItem('/content/', this.id);
-
-        contentEditor = new HashBrown.Client.Views.Editors.ContentEditor({
-            modelUrl: apiUrl('content/' + this.id)
-        });
-
-        populateWorkspace(contentEditor.$element);
-    }
-});
-
-/***/ }),
-/* 213 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-// Dashboard
-
-Router.route('/connections/', function () {
-    if (currentUserHasScope('connections')) {
-        ViewHelper.get('NavbarMain').showTab('/connections/');
-
-        populateWorkspace(_.div({ class: 'dashboard-container' }, _.h1('Connections'), _.p('Please click on a connection to proceed')), 'presentation presentation-center');
-    } else {
-        location.hash = '/';
-    }
-});
-
-// Edit
-Router.route('/connections/:id', function () {
-    if (currentUserHasScope('connections')) {
-        var connectionEditor = new ConnectionEditor({
-            modelUrl: apiUrl('connections/' + this.id)
-        });
-
-        ViewHelper.get('NavbarMain').highlightItem('/connections/', this.id);
-
-        populateWorkspace(connectionEditor.$element);
-    } else {
-        location.hash = '/';
-    }
-});
-
-// Edit (JSON editor)
-Router.route('/connections/json/:id', function () {
-    if (currentUserHasScope('connections')) {
-        var connectionEditor = new JSONEditor({
-            apiPath: 'connections/' + this.id
-        });
-
-        ViewHelper.get('NavbarMain').highlightItem('/connections/', this.id);
-
-        populateWorkspace(connectionEditor.$element);
-    } else {
-        location.hash = '/';
-    }
-});
-
-/***/ }),
-/* 214 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-// Dashboard
-
-Router.route('/media/', function () {
-    ViewHelper.get('NavbarMain').showTab('/media/');
-
-    populateWorkspace(_.div({ class: 'dashboard-container' }, _.h1('Media'), _.p('Please click on a media object to proceed')), 'presentation presentation-center');
-});
-
-// Preview
-Router.route('/media/:id', function () {
-    var mediaViewer = new MediaViewer({
-        modelUrl: apiUrl('media/' + this.id)
-    });
-
-    ViewHelper.get('NavbarMain').highlightItem('/media/', this.id);
-
-    populateWorkspace(mediaViewer.$element);
-});
-
-/***/ }),
-/* 215 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-// Dashboard
-
-Router.route('/schemas/', function () {
-    if (currentUserHasScope('schemas')) {
-        ViewHelper.get('NavbarMain').showTab('/schemas/');
-
-        populateWorkspace(_.div({ class: 'dashboard-container' }, _.h1('Schemas'), _.p('Please click on a schema to proceed')), 'presentation presentation-center');
-    } else {
-        location.hash = '/';
-    }
-});
-
-// Edit
-Router.route('/schemas/:id', function () {
-    if (currentUserHasScope('schemas')) {
-        var schemaEditor = new SchemaEditor({
-            modelUrl: apiUrl('schemas/' + this.id)
-        });
-
-        ViewHelper.get('NavbarMain').highlightItem('/schemas/', this.id);
-
-        populateWorkspace(schemaEditor.$element);
-    } else {
-        location.hash = '/';
-    }
-});
-
-// Edit (JSON editor)
-Router.route('/schemas/json/:id', function () {
-    if (currentUserHasScope('schemas')) {
-        var jsonEditor = new JSONEditor({
-            model: resources.schemas[this.id],
-            apiPath: 'schemas/' + this.id,
-            onSuccess: function onSuccess() {
-                return reloadResource('schemas').then(function () {
-                    var navbar = ViewHelper.get('NavbarMain');
-
-                    navbar.reload();
-                });
-            }
-        });
-
-        ViewHelper.get('NavbarMain').highlightItem('/schemas/', this.id);
-
-        populateWorkspace(jsonEditor.$element);
-    } else {
-        location.hash = '/';
-    }
-});
-
-/***/ }),
-/* 216 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-// Dashboard
-
-Router.route('/settings/', function () {
-    if (currentUserHasScope('settings')) {
-        ViewHelper.get('NavbarMain').showTab('/settings/');
-
-        populateWorkspace(_.div({ class: 'dashboard-container' }, _.h1('Settings'), _.p('Please click on a section to proceed')), 'presentation presentation-center');
-    } else {
-        location.hash = '/';
-    }
-});
-
-// Providers
-Router.route('/settings/providers/', function () {
-    if (currentUserHasScope('settings')) {
-        ViewHelper.get('NavbarMain').highlightItem('/settings/', 'providers');
-
-        populateWorkspace(new ProvidersSettings().$element);
-    } else {
-        location.hash = '/';
-    }
-});
-
-/***/ }),
-/* 217 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-// Templates
-
-Router.route('/templates/', function () {
-    if (currentUserHasScope('templates')) {
-        ViewHelper.get('NavbarMain').showTab('/templates/');
-
-        populateWorkspace(_.div({ class: 'dashboard-container' }, _.h1('Templates'), _.p('Please click on a template to continue')), 'presentation presentation-center');
-    } else {
-        location.hash = '/';
-    }
-});
-
-// Edit
-Router.route('/templates/:type/:id', function () {
-    if (currentUserHasScope('templates')) {
-        ViewHelper.get('NavbarMain').highlightItem('/templates/', this.type + '/' + this.id);
-
-        var templateEditor = new TemplateEditor({
-            modelUrl: apiUrl('templates/' + this.type + '/' + this.id)
-        });
-
-        populateWorkspace(templateEditor.$element);
-    } else {
-        location.hash = '/';
-    }
-});
-
-/***/ }),
-/* 218 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-// Dashboard
-
-Router.route('/forms/', function () {
-    ViewHelper.get('NavbarMain').showTab('/forms/');
-
-    populateWorkspace(_.div({ class: 'dashboard-container' }, _.h1('Forms'), _.p('Please click on a form to proceed')), 'presentation presentation-center');
-});
-
-// Edit
-Router.route('/forms/:id', function () {
-    ViewHelper.get('NavbarMain').highlightItem('/forms/', this.id);
-
-    var formEditor = new FormEditor({
-        modelUrl: apiUrl('forms/' + this.id)
-    });
-
-    populateWorkspace(formEditor.$element);
-});
-
-// Edit (JSON editor)
-Router.route('/forms/json/:id', function () {
-    var formEditor = new JSONEditor({
-        modelUrl: apiUrl('forms/' + this.id),
-        apiPath: 'forms/' + this.id
-    });
-
-    ViewHelper.get('NavbarMain').highlightItem('/forms/', this.id);
-
-    populateWorkspace(formEditor.$element);
-});
-
-/***/ }),
-/* 219 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(process) {// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-// resolves . and .. elements in a path array with directory names there
-// must be no slashes, empty elements, or device names (c:\) in the array
-// (so also no leading and trailing slashes - it does not distinguish
-// relative and absolute paths)
-function normalizeArray(parts, allowAboveRoot) {
-  // if the path tries to go above the root, `up` ends up > 0
-  var up = 0;
-  for (var i = parts.length - 1; i >= 0; i--) {
-    var last = parts[i];
-    if (last === '.') {
-      parts.splice(i, 1);
-    } else if (last === '..') {
-      parts.splice(i, 1);
-      up++;
-    } else if (up) {
-      parts.splice(i, 1);
-      up--;
-    }
-  }
-
-  // if the path is allowed to go above the root, restore leading ..s
-  if (allowAboveRoot) {
-    for (; up--; up) {
-      parts.unshift('..');
-    }
-  }
-
-  return parts;
-}
-
-// Split a filename into [root, dir, basename, ext], unix version
-// 'root' is just a slash, or nothing.
-var splitPathRe = /^(\/?|)([\s\S]*?)((?:\.{1,2}|[^\/]+?|)(\.[^.\/]*|))(?:[\/]*)$/;
-var splitPath = function splitPath(filename) {
-  return splitPathRe.exec(filename).slice(1);
-};
-
-// path.resolve([from ...], to)
-// posix version
-exports.resolve = function () {
-  var resolvedPath = '',
-      resolvedAbsolute = false;
-
-  for (var i = arguments.length - 1; i >= -1 && !resolvedAbsolute; i--) {
-    var path = i >= 0 ? arguments[i] : process.cwd();
-
-    // Skip empty and invalid entries
-    if (typeof path !== 'string') {
-      throw new TypeError('Arguments to path.resolve must be strings');
-    } else if (!path) {
-      continue;
-    }
-
-    resolvedPath = path + '/' + resolvedPath;
-    resolvedAbsolute = path.charAt(0) === '/';
-  }
-
-  // At this point the path should be resolved to a full absolute path, but
-  // handle relative paths to be safe (might happen when process.cwd() fails)
-
-  // Normalize the path
-  resolvedPath = normalizeArray(filter(resolvedPath.split('/'), function (p) {
-    return !!p;
-  }), !resolvedAbsolute).join('/');
-
-  return (resolvedAbsolute ? '/' : '') + resolvedPath || '.';
-};
-
-// path.normalize(path)
-// posix version
-exports.normalize = function (path) {
-  var isAbsolute = exports.isAbsolute(path),
-      trailingSlash = substr(path, -1) === '/';
-
-  // Normalize the path
-  path = normalizeArray(filter(path.split('/'), function (p) {
-    return !!p;
-  }), !isAbsolute).join('/');
-
-  if (!path && !isAbsolute) {
-    path = '.';
-  }
-  if (path && trailingSlash) {
-    path += '/';
-  }
-
-  return (isAbsolute ? '/' : '') + path;
-};
-
-// posix version
-exports.isAbsolute = function (path) {
-  return path.charAt(0) === '/';
-};
-
-// posix version
-exports.join = function () {
-  var paths = Array.prototype.slice.call(arguments, 0);
-  return exports.normalize(filter(paths, function (p, index) {
-    if (typeof p !== 'string') {
-      throw new TypeError('Arguments to path.join must be strings');
-    }
-    return p;
-  }).join('/'));
-};
-
-// path.relative(from, to)
-// posix version
-exports.relative = function (from, to) {
-  from = exports.resolve(from).substr(1);
-  to = exports.resolve(to).substr(1);
-
-  function trim(arr) {
-    var start = 0;
-    for (; start < arr.length; start++) {
-      if (arr[start] !== '') break;
-    }
-
-    var end = arr.length - 1;
-    for (; end >= 0; end--) {
-      if (arr[end] !== '') break;
-    }
-
-    if (start > end) return [];
-    return arr.slice(start, end - start + 1);
-  }
-
-  var fromParts = trim(from.split('/'));
-  var toParts = trim(to.split('/'));
-
-  var length = Math.min(fromParts.length, toParts.length);
-  var samePartsLength = length;
-  for (var i = 0; i < length; i++) {
-    if (fromParts[i] !== toParts[i]) {
-      samePartsLength = i;
-      break;
-    }
-  }
-
-  var outputParts = [];
-  for (var i = samePartsLength; i < fromParts.length; i++) {
-    outputParts.push('..');
-  }
-
-  outputParts = outputParts.concat(toParts.slice(samePartsLength));
-
-  return outputParts.join('/');
-};
-
-exports.sep = '/';
-exports.delimiter = ':';
-
-exports.dirname = function (path) {
-  var result = splitPath(path),
-      root = result[0],
-      dir = result[1];
-
-  if (!root && !dir) {
-    // No dirname whatsoever
-    return '.';
-  }
-
-  if (dir) {
-    // It has a dirname, strip trailing slash
-    dir = dir.substr(0, dir.length - 1);
-  }
-
-  return root + dir;
-};
-
-exports.basename = function (path, ext) {
-  var f = splitPath(path)[2];
-  // TODO: make this comparison case-insensitive on windows?
-  if (ext && f.substr(-1 * ext.length) === ext) {
-    f = f.substr(0, f.length - ext.length);
-  }
-  return f;
-};
-
-exports.extname = function (path) {
-  return splitPath(path)[3];
-};
-
-function filter(xs, f) {
-  if (xs.filter) return xs.filter(f);
-  var res = [];
-  for (var i = 0; i < xs.length; i++) {
-    if (f(xs[i], i, xs)) res.push(xs[i]);
-  }
-  return res;
-}
-
-// String.prototype.substr - negative index don't work in IE8
-var substr = 'ab'.substr(-1) === 'b' ? function (str, start, len) {
-  return str.substr(start, len);
-} : function (str, start, len) {
-  if (start < 0) start = str.length + start;
-  return str.substr(start, len);
-};
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6)))
-
-/***/ }),
-/* 220 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var Entity = __webpack_require__(13);
-
-/**
- * The Template model
- */
-
-var Template = function (_Entity) {
-    _inherits(Template, _Entity);
-
-    function Template(params) {
-        _classCallCheck(this, Template);
-
-        return _possibleConstructorReturn(this, _Entity.call(this, params));
-    }
-
-    Template.prototype.structure = function structure() {
-        this.def(String, 'id');
-        this.def(String, 'parentId');
-        this.def(Boolean, 'remote', true);
-        this.def(String, 'icon', 'code');
-        this.def(String, 'name');
-        this.def(String, 'type');
-        this.def(String, 'remotePath');
-        this.def(String, 'folder');
-        this.def(String, 'markup');
-    };
-
-    /**
-     * Updates id and remotePath from name
-     */
-
-
-    Template.prototype.updateFromName = function updateFromName() {
-        this.id = this.name.substring(0, this.name.lastIndexOf('.')) || this.name;
-    };
-
-    return Template;
-}(Entity);
-
-module.exports = Template;
-
-/***/ }),
-/* 221 */
+/* 230 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 module.exports = {
-    MediaBrowser: __webpack_require__(222),
-    MessageModal: __webpack_require__(43)
+    ConnectionEditor: __webpack_require__(231),
+    ContentEditor: __webpack_require__(191),
+    FormEditor: __webpack_require__(235),
+    JSONEditor: __webpack_require__(236),
+    MediaViewer: __webpack_require__(239),
+    ProvidersSettings: __webpack_require__(240),
+    SchemaEditor: __webpack_require__(241),
+    TemplateEditor: __webpack_require__(243),
+    UserEditor: __webpack_require__(84)
 };
 
 /***/ }),
-/* 222 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-/**
- * A browser modal for Media objects
- *
- * @memberof HashBrown.Client.Views.Modals
- */
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-module.exports = function (_View) {
-    _inherits(MediaBrowser, _View);
-
-    function MediaBrowser(params) {
-        _classCallCheck(this, MediaBrowser);
-
-        var _this = _possibleConstructorReturn(this, _View.call(this, params));
-
-        _this.$element = _.div({ class: 'modal fade media-browser' });
-
-        MediaBrowser.checkMediaProvider().then(function () {
-            _this.init();
-
-            // Make sure the modal is removed when it's cancelled
-            _this.$element.on('hidden.bs.modal', function () {
-                _this.$element.remove();
-            });
-
-            // Show the modal
-            _this.$element.modal('show');
-        }).catch(UI.errorModal);
-        return _this;
-    }
-
-    /**
-     * Gets whether the media provider exists
-     *
-     * @returns {Promise} Promise
-     */
-
-
-    MediaBrowser.checkMediaProvider = function checkMediaProvider() {
-        return SettingsHelper.getSettings(ProjectHelper.currentProject, ProjectHelper.currentEnvironment, 'providers').then(function (result) {
-            if (!result || !result.media) {
-                return Promise.reject(new Error('No Media provider has been set for this project. Please check providers settings.'));
-            }
-
-            return Promise.resolve();
-        });
-    };
-
-    /**
-     * Open the upload modal
-     *
-     * @param {Function} onSuccess
-     * @param {Function} onCancel
-     * @param {String} replaceId
-     */
-
-
-    MediaBrowser.uploadModal = function uploadModal(onSuccess, onCancel, replaceId) {
-        MediaBrowser.checkMediaProvider().then(function () {
-            var navbar = ViewHelper.get('NavbarMain');
-
-            // Event: Change file
-            function onChangeFile() {
-                var input = $(this);
-                var numFiles = this.files ? this.files.length : 1;
-
-                // In the case of a single file selected 
-                if (numFiles == 1) {
-                    var file = this.files[0];
-
-                    var isImage = file.type == 'image/png' || file.type == 'image/jpeg' || file.type == 'image/gif';
-
-                    var isVideo = file.type == 'video/mpeg' || file.type == 'video/mp4' || file.type == 'video/quicktime' || file.type == 'video/x-matroska';
-
-                    if (isImage) {
-                        var reader = new FileReader();
-
-                        uploadModal.$element.find('.spinner-container').toggleClass('hidden', false);
-
-                        reader.onload = function (e) {
-                            uploadModal.$element.find('.media-preview').html(_.img({ src: e.target.result }));
-
-                            uploadModal.$element.find('.spinner-container').toggleClass('hidden', true);
-                        };
-
-                        reader.readAsDataURL(file);
-                    }
-
-                    if (isVideo) {
-                        uploadModal.$element.find('.media-preview').html(_.video({ src: window.URL.createObjectURL(file), controls: 'controls' }));
-                    }
-
-                    debug.log('Previewing data of file type ' + file.type + '...', navbar);
-
-                    // Multiple files selected
-                } else if (numFiles > 1) {
-                    uploadModal.$element.find('.media-preview').html('(Multiple files selected)');
-
-                    // No files selected
-                } else if (numFiles == 0) {
-                    uploadModal.$element.find('.media-preview').html('(No files selected)');
-                }
-            }
-
-            // Event: Click upload
-            function onClickUpload() {
-                uploadModal.$element.find('form').submit();
-
-                return false;
-            }
-
-            // Event: Submit
-            function onSubmit(e) {
-                e.preventDefault();
-
-                uploadModal.$element.find('.spinner-container').toggleClass('hidden', false);
-
-                var apiPath = 'media/' + (replaceId ? 'replace/' + replaceId : 'new');
-
-                $.ajax({
-                    url: apiUrl(apiPath),
-                    type: 'POST',
-                    data: new FormData(this),
-                    processData: false,
-                    contentType: false,
-                    success: function success(ids) {
-                        reloadResource('media').then(function () {
-                            uploadModal.$element.find('.spinner-container').toggleClass('hidden', true);
-
-                            navbar.reload();
-
-                            if (onSuccess) {
-                                onSuccess(ids || []);
-                            }
-
-                            uploadModal.hide();
-                        });
-                    },
-                    error: errorModal
-                });
-            }
-
-            // Render the upload modal
-            var uploadModal = new HashBrown.Views.Modals.MessageModal({
-                model: {
-                    class: 'modal-upload-media',
-                    title: 'Upload a file',
-                    body: [_.div({ class: 'spinner-container hidden' }, _.span({ class: 'spinner fa fa-refresh' })), _.div({ class: 'media-preview' }), _.form({ class: 'form-control' }, _.input({ type: 'file', name: 'media', multiple: replaceId ? false : true }).change(onChangeFile)).submit(onSubmit)]
-                },
-                buttons: [{
-                    label: 'Cancel',
-                    class: 'btn-default',
-                    callback: onCancel
-                }, {
-                    label: 'Upload',
-                    class: 'btn-primary',
-                    callback: onClickUpload
-                }]
-            });
-
-            // Event: Close modal
-            uploadModal.on('close', function () {
-                if (onCancel) {
-                    onCancel();
-                }
-            });
-        }).catch(UI.errorModal);
-    };
-
-    /**
-     * Event: Search media
-     */
-
-
-    MediaBrowser.prototype.onSearchMedia = function onSearchMedia() {
-        var query = (this.$element.find('.input-search-media').val() || '').toLowerCase();
-
-        this.$element.find('.thumbnail').each(function (i) {
-            var isMatch = !query || ($(this).attr('data-name') || '').toLowerCase().indexOf(query) > -1;
-
-            $(this).toggleClass('hidden', !isMatch);
-        });
-    };
-
-    /** 
-     * Event: Click OK
-     */
-
-
-    MediaBrowser.prototype.onClickOK = function onClickOK() {
-        this.value = this.$element.find('.thumbnail.active').attr('data-id');
-
-        if (this.value) {
-            this.trigger('select', this.value);
-        }
-
-        this.$element.modal('hide');
-    };
-
-    /** 
-     * Event: Click cancel
-     */
-
-
-    MediaBrowser.prototype.onClickCancel = function onClickCancel() {
-        this.$element.modal('hide');
-    };
-
-    MediaBrowser.prototype.render = function render() {
-        var _this2 = this;
-
-        // Render the modal
-        var $folders = [];
-
-        _.append(this.$element.empty(), _.div({ class: 'modal-dialog' }, _.div({ class: 'modal-content' }, _.div({ class: 'modal-header' }, _.div({ class: 'input-group' }, _.input({ class: 'form-control input-search-media', placeholder: 'Search media' }).on('change keyup paste', function () {
-            _this2.onSearchMedia();
-        }), _.div({ class: 'input-group-btn' }, _.button({ class: 'btn btn-primary' }, 'Upload file').click(function () {
-            _this2.$element.toggleClass('disabled', true);
-
-            MediaBrowser.uploadModal(function (id) {
-                _this2.$element.toggleClass('disabled', false);
-
-                _this2.value = id;
-
-                _this2.render();
-            }, function () {
-                _this2.$element.toggleClass('disabled', false);
-            });
-        })))), _.div({ class: 'modal-body' }, _.div({ class: 'thumbnail-container' },
-        // Append all files
-        _.each(resources.media, function (i, media) {
-            media = new Media(media);
-
-            var $media = _.button({
-                class: 'thumbnail raised',
-                'data-id': media.id,
-                'data-name': media.name
-            }, _.if(media.isVideo(), _.video({ src: '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + media.id })), _.if(media.isImage(), _.img({ src: '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + media.id })), _.label(media.name)).click(function () {
-                _this2.$element.find('.thumbnail').toggleClass('active', false);
-                $media.toggleClass('active', true);
-            });
-
-            if (media.folder && media.folder != '/') {
-                var $folder = $folders[media.folder];
-
-                if (!$folder) {
-                    $folder = _.div({ class: 'folder', 'data-path': media.folder }, _.div({ class: 'folder-heading' }, _.button(_.span({ class: 'fa fa-folder' }), media.folder).click(function () {
-                        $folder.toggleClass('expanded');
-
-                        if ($folder.hasClass('expanded')) {
-                            $folder.find('img, video').each(function (i, mediaSource) {
-                                $(mediaSource).attr('src', $(mediaSource).data('src'));
-                            });
-                        }
-                    })), _.div({ class: 'folder-items' }));
-
-                    $folders[media.folder] = $folder;
-                }
-
-                // Prevent the media from loading
-                if (media.isImage() || media.isVideo()) {
-                    var $mediaSource = $media.find('img, video');
-
-                    $mediaSource.data('src', $mediaSource.attr('src'));
-                    $mediaSource.attr('src', '#');
-                }
-
-                // Wait 1 CPU cycle before appending to folders
-                setTimeout(function () {
-                    $folder.find('.folder-items').append($media);
-                }, 1);
-            }
-
-            return $media;
-        }),
-
-        // Append all folders
-        _.each(Object.keys($folders).sort(), function (i, path) {
-            return $folders[path];
-        }))), _.div({ class: 'modal-footer' }, _.button({ class: 'btn btn-default' }, 'Cancel').click(function () {
-            _this2.onClickCancel();
-        }), _.button({ class: 'btn btn-primary' }, 'OK').click(function () {
-            _this2.onClickOK();
-        })))));
-
-        // Mark the selected media as active
-        this.$element.find('.thumbnail[data-id="' + this.value + '"]').toggleClass('active', true);
-    };
-
-    return MediaBrowser;
-}(View);
-
-/***/ }),
-/* 223 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-module.exports = {
-    CMSPane: __webpack_require__(199),
-    ConnectionPane: __webpack_require__(200),
-    ContentPane: __webpack_require__(201),
-    FormsPane: __webpack_require__(202),
-    MainMenu: __webpack_require__(225),
-    MediaPane: __webpack_require__(203),
-    NavbarMain: __webpack_require__(30),
-    NavbarPane: __webpack_require__(31),
-    SchemaPane: __webpack_require__(204),
-    SettingsPane: __webpack_require__(205),
-    TemplatePane: __webpack_require__(206)
-};
-
-/***/ }),
-/* 224 */
-/***/ (function(module, exports) {
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-module.exports = function () {
-    var _this = this;
-
-    var currentUser = HashBrown.Common.Models.User.current;
-    var hasConnectionsScope = currentUser.hasScope(ProjectHelper.currentProject, 'connections');
-    var hasSchemasScope = currentUser.hasScope(ProjectHelper.currentProject, 'schemas');
-    var hasTemplatesScope = currentUser.hasScope(ProjectHelper.currentProject, 'templates');
-    var hasSettingsScope = currentUser.hasScope(ProjectHelper.currentProject, 'settings');
-
-    /**
-     * Fetches pane information and renders it
-     *
-     * @param {Object} params
-     */
-    var renderPane = function renderPane(params) {
-        // Render pane 
-        var $pane = $('.pane-container[data-route="' + params.route + '"] .pane');
-
-        // Pane didn't exist, create it (it will be appended further down)
-        if ($pane.length < 1) {
-            $pane = _.div({ class: 'pane' });
-        }
-
-        var items = params.items;
-        var sortingQueue = [];
-
-        // Render items
-        _.each(items, function (i, item) {
-            var id = item.id || i;
-            var isDirectory = false;
-
-            // Get item name
-            var name = '';
-
-            // This is a Content node
-            if (item.properties && item.createDate) {
-                // All Content nodes are "directories" in that they can be parents of one another
-                isDirectory = true;
-
-                // Use title directly if available
-                if (typeof item.properties.title === 'string') {
-                    name = item.properties.title;
-                } else if (item.properties.title && _typeof(item.properties.title) === 'object') {
-                    // Use the current language title
-                    if (item.properties.title[window.language]) {
-                        name = item.properties.title[window.language];
-
-                        // If no title was found, searh in other languages
-                    } else {
-                        name = '(Untitled)';
-
-                        for (var language in item.properties.title) {
-                            var languageTitle = item.properties.title[language];
-
-                            if (languageTitle) {
-                                name += ' - (' + language + ': ' + languageTitle + ')';
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                // If name still wasn't found, use the id
-                if (!name) {
-                    name = item.id;
-                }
-            } else if (item.title && typeof item.title === 'string') {
-                name = item.title;
-            } else if (item.name && typeof item.name === 'string') {
-                name = item.name;
-            } else {
-                name = id;
-            }
-
-            var routingPath = item.shortPath || item.path || item.id || null;
-            var queueItem = {};
-            var icon = item.icon || params.icon;
-            var $icon = void 0;
-
-            // Implement custom routing paths
-            if (typeof params.itemPath === 'function') {
-                routingPath = params.itemPath(item);
-            }
-
-            // Truncate long names
-            if (name.length > 30) {
-                name = name.substring(0, 30) + '...';
-            }
-
-            // If this item has a Schema id, fetch the appropriate icon
-            if (item.schemaId) {
-                var schema = resources.schemas[item.schemaId];
-
-                if (schema) {
-                    icon = schema.icon;
-                }
-            }
-
-            if (icon) {
-                $icon = _.span({ class: 'fa fa-' + icon });
-            }
-
-            // Item element
-            var $existingElement = $pane.find('.pane-item-container[data-routing-path="' + routingPath + '"]');
-            var $element = _.div({
-                class: 'pane-item-container',
-                'data-routing-path': routingPath
-            });
-
-            // Element exists already, replace
-            if ($existingElement.length > 0) {
-                $existingElement.replaceWith($element);
-
-                // Element didn't exist already, create it and append to pane
-            } else {
-                $pane.append($element);
-            }
-
-            // Populate element
-            _.append($element.empty(), _.a({
-                'data-id': id,
-                'data-name': name,
-                href: '#' + (routingPath ? params.route + routingPath : params.route),
-                class: 'pane-item'
-            }, $icon, _.span({ class: 'pane-item-label' }, name)), _.div({ class: 'children' }), _.div({ class: 'pane-item-insert-below' }));
-
-            // Set sync attributes
-            if (typeof item.locked !== 'undefined') {
-                $element.attr('data-locked', item.locked);
-            }
-
-            if (typeof item.remote !== 'undefined') {
-                $element.attr('data-remote', item.remote);
-            }
-
-            if (typeof item.local !== 'undefined') {
-                $element.attr('data-local', item.local);
-            }
-
-            if (isDirectory) {
-                $element.attr('data-is-directory', true);
-            }
-
-            // Attach item context menu
-            if (params.getItemContextMenu) {
-                $element.find('a').crcontext(params.getItemContextMenu(item));
-            } else if (params.itemContextMenu) {
-                $element.find('a').crcontext(params.itemContextMenu);
-            }
-
-            // Add element to queue item
-            queueItem.$element = $element;
-
-            // Add sort index to element
-            queueItem.$element.attr('data-sort', item.sort || 0);
-
-            // Use specific hierarchy behaviours
-            if (params.hierarchy) {
-                params.hierarchy(item, queueItem);
-            }
-
-            // Add queue item to sorting queue
-            sortingQueue.push(queueItem);
-        });
-
-        // Place items into hierarchy
-        for (var _iterator = sortingQueue, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-            var _ref;
-
-            if (_isArray) {
-                if (_i >= _iterator.length) break;
-                _ref = _iterator[_i++];
-            } else {
-                _i = _iterator.next();
-                if (_i.done) break;
-                _ref = _i.value;
-            }
-
-            var queueItem = _ref;
-
-            if (queueItem.parentDirAttr) {
-                // Find parent item
-                var parentDirAttrKey = Object.keys(queueItem.parentDirAttr)[0];
-                var parentDirAttrValue = queueItem.parentDirAttr[parentDirAttrKey];
-                var parentDirSelector = '.pane-item-container[' + parentDirAttrKey + '="' + parentDirAttrValue + '"]';
-                var $parentDir = $pane.find(parentDirSelector);
-
-                // If parent element already exists, just append the queue item element
-                if ($parentDir.length > 0) {
-                    $parentDir.children('.children').append(queueItem.$element);
-
-                    // If not, create parent elements if specified
-                } else if (queueItem.createDir) {
-                    var dirNames = parentDirAttrValue.split('/').filter(function (item) {
-                        return item != '';
-                    });
-                    var finalDirName = '/';
-
-                    for (var i in dirNames) {
-                        var dirName = dirNames[i];
-
-                        var prevFinalDirName = finalDirName;
-                        finalDirName += dirName + '/';
-
-                        var $dir = $pane.find('[' + parentDirAttrKey + '="' + finalDirName + '"]');
-
-                        if ($dir.length < 1) {
-                            $dir = _.div({ class: 'pane-item-container', 'data-is-directory': true }, _.a({
-                                class: 'pane-item'
-                            }, _.span({ class: 'fa fa-folder' }), _.span({ class: 'pane-item-label' }, dirName)), _.div({ class: 'children' }));
-
-                            $dir.attr(parentDirAttrKey, finalDirName);
-
-                            // Extra parent dir attributes
-                            if (queueItem.parentDirExtraAttr) {
-                                for (var k in queueItem.parentDirExtraAttr) {
-                                    var v = queueItem.parentDirExtraAttr[k];
-
-                                    $dir.attr(k, v);
-                                }
-                            }
-
-                            // Append to previous dir 
-                            var $prevDir = $pane.find('[' + parentDirAttrKey + '="' + prevFinalDirName + '"]');
-
-                            if ($prevDir.length > 0) {
-                                $prevDir.children('.children').prepend($dir);
-
-                                // If no previous dir was found, append directly to pane
-                            } else {
-                                $pane.prepend($dir);
-                            }
-                        }
-
-                        // Attach item context menu
-                        if (params.dirContextMenu) {
-                            $dir.crcontext(params.dirContextMenu);
-                        }
-
-                        // Only append the queue item to the final parent element
-                        if (i >= dirNames.length - 1) {
-                            $parentDir = $dir;
-                        }
-                    }
-
-                    $parentDir.children('.children').append(queueItem.$element);
-                }
-            }
-        }
-
-        // Sort direct children
-        $pane.find('>.pane-item-container').sort(function (a, b) {
-            return parseInt(a.dataset.sort) > parseInt(b.dataset.sort);
-        }).appendTo($pane);
-
-        // Sort nested children
-        $pane.find('.pane-item-container .children').each(function (i, children) {
-            var $children = $(children);
-
-            $children.find('>.pane-item-container').sort(function (a, b) {
-                return parseInt(a.dataset.sort) > parseInt(b.dataset.sort);
-            }).appendTo($children);
-        });
-
-        // Render pane container
-        var $paneContainer = $('.pane-container[data-route="' + params.route + '"]');
-
-        // Pane container didn't already exist, create it
-        if ($paneContainer.length < 1) {
-            // Render pane container
-            $paneContainer = _.div({ class: 'pane-container', 'data-route': params.route }, _.if(params.toolbar, params.toolbar), _.div({ class: 'pane-move-buttons' }, _.button({ class: 'btn btn-move-to-root' }, 'Move to root'), _.button({ class: 'btn btn-new-folder' }, 'New folder')), $pane);
-
-            // Attach pane context menu
-            if (params.paneContextMenu) {
-                $paneContainer.crcontext(params.paneContextMenu);
-            }
-        }
-
-        // Add expand/collapse buttons to items if needed
-        $paneContainer.find('.pane-item-container').each(function (i, element) {
-            var $paneItemContainer = $(element);
-            var $paneItem = $paneItemContainer.children('.pane-item');;
-            var $children = $paneItemContainer.children('.children');
-
-            if ($children.children().length > 0) {
-                var $childrenToggle = _.button({ class: 'btn-children-toggle' }, _.span({ class: 'fa fa-caret-down' }), _.span({ class: 'fa fa-caret-right' }));
-
-                $paneItem.append($childrenToggle);
-
-                $childrenToggle.click(function (e) {
-                    _this.onClickToggleChildren(e);
-                });
-            }
-        });
-
-        if (params.postSort) {
-            params.postSort($paneContainer.find('>.pane, .pane-item-container>.children'));
-        }
-        /*
-                if(this.$element.find('.tab-panes .pane-container').length < 1) {
-                    $paneContainer.addClass('active');
-                    $button.addClass('active');
-                }
-        */
-        return $paneContainer;
-    };
-
-    return _.nav({ class: 'navbar-main' },
-    // Buttons
-    _.div({ class: 'tab-buttons' }, _.each(this.tabPanes, function (i, pane) {
-        var $icon = pane.icon;
-
-        if (typeof pane.icon === 'string') {
-            $icon = _.span({ class: 'fa fa-' + pane.icon });
-        }
-
-        return _.button({ 'data-route': pane.route, title: pane.label }, _.div({ class: 'pane-icon' }, $icon), _.div({ class: 'pane-text' }, _.span({ class: 'pane-label' }, pane.label))).click(function (e) {
-            _this.onClickTab(e);
-        });
-    })),
-
-    // Panes
-    _.div({ class: 'tab-panes' }, _.each(this.tabPanes, function (i, pane) {
-        var queue = [];
-
-        var $pane = _.div({ class: 'pane-container', 'data-route': pane.route },
-        // Toolbar
-        _.if(pane.settings.toolbar, pane.settings.toolbar),
-
-        // Move buttons
-        _.div({ class: 'pane-move-buttons' }, _.button({ class: 'btn btn-move-to-root' }, 'Move to root'), _.button({ class: 'btn btn-new-folder' }, 'New folder')),
-
-        // Items
-        _.div({ class: 'pane' }, _.each(pane.settings.items || pane.settings.getItems(), function (i, item) {
-            var id = item.id || i;
-            var name = _this.getItemName(item);
-            var icon = _this.getItemIcon(item, pane.settings);
-            var routingPath = _this.getItemRoutingPath(item, pane.settings);
-            var isDirectory = _this.isItemDirectory(item);
-            var queueItem = {};
-
-            var $item = _.div({
-                class: 'pane-item-container',
-                'data-routing-path': routingPath,
-                'data-locked': item.locked,
-                'data-remote': item.remote,
-                'data-local': item.local,
-                'data-is-directory': isDirectory,
-                'data-sort': item.sort || 0
-            }, _.a({
-                'data-id': id,
-                'data-name': name,
-                href: '#' + (routingPath ? pane.route + routingPath : pane.route),
-                class: 'pane-item'
-            }, _.span({ class: 'fa fa-' + icon }), _.span({ class: 'pane-item-label' }, name)), _.div({ class: 'children' }), _.div({ class: 'pane-item-insert-below' }));
-
-            // Attach item context menu
-            if (pane.settings.getItemContextMenu) {
-                $item.find('a').crcontext(pane.settings.getItemContextMenu(item));
-            } else if (pane.settings.itemContextMenu) {
-                $item.find('a').crcontext(pane.settings.itemContextMenu);
-            }
-
-            // Add element to queue item
-            queueItem.$element = $item;
-
-            // Use specific hierarchy behaviours
-            if (pane.settings.hierarchy) {
-                pane.settings.hierarchy(item, queueItem);
-            }
-
-            // Add queue item to sorting queue
-            queue.push(queueItem);
-
-            return $item;
-        })));
-
-        _this.applyHierarchy($pane, pane, queue);
-        _this.applySorting($pane, pane);
-
-        // Attach pane context menu
-        if (pane.settings.paneContextMenu) {
-            $pane.crcontext(pane.settings.paneContextMenu);
-        }
-
-        return $pane;
-    })));
-};
-
-/***/ }),
-/* 225 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var User = __webpack_require__(44);
-var UserEditor = __webpack_require__(190);
-
-var MainMenu = function (_View) {
-    _inherits(MainMenu, _View);
-
-    function MainMenu(params) {
-        _classCallCheck(this, MainMenu);
-
-        var _this = _possibleConstructorReturn(this, _View.call(this, params));
-
-        _this.$element = _.div({ class: 'main-menu' });
-
-        $('.menuspace').html(_this.$element);
-
-        _this.fetch();
-        return _this;
-    }
-
-    /**
-     * Event: On change language
-     *
-     * @param {String} newLanguage
-     */
-
-
-    MainMenu.prototype.onChangeLanguage = function onChangeLanguage(newLanguage) {
-        var _this2 = this;
-
-        localStorage.setItem('language', newLanguage);
-
-        window.language = newLanguage;
-
-        reloadResource('content').then(function () {
-            HashBrown.Client.Views.Navigation.NavbarMain.reload();
-
-            var contentEditor = ViewHelper.get('ContentEditor');
-
-            if (contentEditor) {
-                contentEditor.model = null;
-                contentEditor.fetch();
-            }
-
-            _this2.fetch();
-        });
-    };
-
-    /**
-     * Event: Click question
-     */
-
-
-    MainMenu.prototype.onClickQuestion = function onClickQuestion() {
-        var path = location.hash.replace('#', '').split('/');
-
-        if (!path || path.length < 1) {
-            return;
-        }
-
-        var level1 = path[1];
-        var level2 = path[2];
-
-        switch (level1) {
-            default:
-                UI.messageModal('The help modal', [_.p('To get help for any particular screen, click the <span class="fa fa-question-circle"></span> button to bring up this modal.'), _.p('There\'s nothing worth explaining on this screen, though.')]);
-                break;
-
-            case 'content':
-                UI.messageModal('Content', [_.p('This section contains all of your authored work. The content is a hierarchical tree of nodes that can contain text and media, in simple or complex structures.')]);
-                break;
-
-            case 'media':
-                UI.messageModal('Media', [_.p('This is a gallery of your statically hosted files, such as images, videos and PDFs.'), _.if(User.current.hasScope('settings'), _.p('The contents of this gallery depends on which Connection has been set up as the Media provider in the <a href="#/settings/providers/">providers settings</a>'))]);
-                break;
-
-            case 'forms':
-                UI.messageModal('Forms', 'If you need an input form on your website, you can create the model for it here and see a list of the user submitted input.');
-                break;
-
-            case 'templates':
-                UI.messageModal('Templates', [_.p('This section contains rendering Templates for your authored Content.'), _.if(User.current.hasScope('settings'), _.p('Templates are served through the Connection assigned as the Template provider in the <a href="#/settings/providers/">providers settings</a>.'))]);
-                break;
-
-            case 'connections':
-                UI.messageModal('Connections', [_.p('Connections are endpoints and resources for your content. Connections can be set up to publish your Content and Media to remote servers.'), _.p('Through the <a href="#/settings/providers/">providers settings</a>, they can also be set up to provide statically hosted media and serve rendering templates.')]);
-                break;
-
-            case 'schemas':
-                UI.messageModal('Schemas', 'This is a library of content structures. Here you define how your editable content looks and behaves. You can define schemas for both content nodes and property fields.');
-                break;
-
-            case 'users':
-                UI.messageModal('Users', 'Here you can add and remove users, edit personal information and scopes and change passwords');
-                break;
-
-            case 'settings':
-                switch (level2) {
-                    case 'sync':
-                        UI.messageModal('Sync settings', 'Syncing lets you connect this HashBrown instance to another. When syncing is active, you can pull or push Content, Schemas, Forms and Connections between the local and the remote instance.');
-                        break;
-                    case 'providers':
-                        UI.messageModal('Providers settings', [_.p('Providers are <a href="#/connections/">Connections</a> set up to serve static <a href="#/media/">Media</a> and <a href="#/template/">Templates</a>.'), _.p('For example, when a <a href="#/connections/">Connection</a> is assigned as the <a href="#/media/">Media</a> provider, the images and other content in the <a href="#/media/">Media gallery</a> are pulled from that connection.'), _.p('Similarly, if a <a href="#/connections/">Connection</a> is assigned as the <a href="#/templates/">Template</a> provider, the available <a href="#/templates/">Templates</a> will be pulled from that <a href="#/connections/">Connection</a>.')]);
-                        break;
-                    default:
-                        UI.messageModal('Settings', 'Here you can edit environment-specific settings');
-                        break;
-                }
-
-                break;
-        }
-    };
-
-    MainMenu.prototype.render = function render() {
-        var _this3 = this;
-
-        // Render menu
-        this.languages = HashBrown.Client.Helpers.LanguageHelper.selectedLanguages || [];
-
-        _.append(this.$element.empty(),
-        // Language picker
-        _.if(Array.isArray(this.languages) && this.languages.length > 1, _.div({ class: 'main-menu-item dropdown main-menu-language' }, _.button({ title: 'Language', class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, _.span({ class: 'fa fa-flag' })), _.ul({ class: 'dropdown-menu' }, _.each(this.languages, function (i, language) {
-            return _.li({ value: language, class: language == window.language ? 'active' : '' }, _.button(language).click(function () {
-                _this3.onChangeLanguage(language);
-            }));
-        })))),
-
-        // Dashboard link
-        _.div({ class: 'main-menu-item' }, _.a({ title: 'Dashboard', href: '/', class: 'main-menu-dashboard' }, _.span({ class: 'fa fa-home' }))),
-
-        // User dropdown
-        _.div({ class: 'main-menu-item main-menu-user dropdown' }, _.button({ title: 'User', class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, _.span({ class: 'fa fa-user' })), _.ul({ class: 'dropdown-menu' }, _.li(_.a({ class: 'dropdown-item', href: '#/users/' + User.current.id }, 'User settings').click(function (e) {
-            e.preventDefault();new UserEditor({ hidePermissions: true, model: User.current });
-        })), _.li(_.form({ class: 'dropdown-item', action: '/api/user/logout', method: 'POST' }, _.input({ type: 'submit', value: 'Log out' }))))),
-
-        // Help
-        _.div({ class: 'main-menu-item' }, _.button({ title: 'Help', class: 'main-menu-help' }, _.span({ class: 'fa fa-question-circle' })).click(function () {
-            _this3.onClickQuestion();
-        })));
-    };
-
-    return MainMenu;
-}(View);
-
-module.exports = MainMenu;
-
-/***/ }),
-/* 226 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-module.exports = {
-    ConnectionEditor: __webpack_require__(227),
-    ContentEditor: __webpack_require__(228),
-    FormEditor: __webpack_require__(229),
-    JSONEditor: __webpack_require__(230),
-    MediaViewer: __webpack_require__(233),
-    ProvidersSettings: __webpack_require__(234),
-    SchemaEditor: __webpack_require__(235),
-    TemplateEditor: __webpack_require__(237),
-    UserEditor: __webpack_require__(190)
-};
-
-/***/ }),
-/* 227 */
+/* 231 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41033,7 +41794,7 @@ var ConnectionEditor = function (_View) {
 module.exports = ConnectionEditor;
 
 /***/ }),
-/* 228 */
+/* 232 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41041,500 +41802,368 @@ module.exports = ConnectionEditor;
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var Content = __webpack_require__(259);
-var SchemaHelper = __webpack_require__(262);
-var ContentHelper = __webpack_require__(207);
-var ConnectionHelper = __webpack_require__(256);
-
-/**
- * The editor view for Content objects
- *
- * @memberof HashBrown.Client.Views.Editors
- */
-
-var ContentEditor = function (_View) {
-    _inherits(ContentEditor, _View);
-
-    function ContentEditor(params) {
-        _classCallCheck(this, ContentEditor);
-
-        var _this = _possibleConstructorReturn(this, _View.call(this, params));
-
-        _this.dirty = false;
-
-        _this.$element = _.div({ class: 'editor content-editor' });
-
-        _this.fetch();
-        return _this;
+module.exports = function () {
+    function ContentHelper() {
+        _classCallCheck(this, ContentHelper);
     }
 
     /**
-     * Event: Scroll
+     * Gets all Content objects
+     *
+     * @param {String} project
+     * @param {String} environment
+     *
+     * @return {Promise} promise
      */
+    ContentHelper.getAllContents = function getAllContents() {
+        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
 
-
-    ContentEditor.prototype.onScroll = function onScroll(e) {
-        var $follow = void 0;
-
-        // Look for field labels that are close to the top of the viewport and make them follow
-        this.$element.find('.field-container').each(function (i, field) {
-            var $field = $(field);
-            $field.removeClass('following');
-
-            var top = $field.position().top;
-
-            if (top < 60) {
-                // The closest field to the viewport top with an outer height above 100 should follow
-                if (top != 0 && $field.outerHeight() > 100) {
-                    $follow = $field;
-
-                    // If a smaller field is closer, cacnel following
-                } else {
-                    $follow = null;
-                }
-            }
-        });
-
-        if ($follow) {
-            $follow.addClass('following');
-        }
+        return Promise.resolve();
     };
 
     /**
-     * Event: Click advanced. Routes to the JSON editor
+     * Gets a URL-friendly version of a string
+     *
+     * @param {String} string
+     *
+     * @param {String} slug
      */
 
 
-    ContentEditor.prototype.onClickAdvanced = function onClickAdvanced() {
-        location.hash = '/content/json/' + this.model.id;
+    ContentHelper.getSlug = function getSlug(string) {
+        return (string || '').toLowerCase().replace(/[æ|ä]/g, 'ae').replace(/[ø|ö]/g, 'oe').replace(/å/g, 'aa').replace(/ü/g, 'ue').replace(/ß/g, 'ss').replace(/[^\w ]+/g, '').replace(/ +/g, '-');
     };
 
     /**
-     * Event: Click save. Posts the model to the modelUrl
+     * Gets a Content object by id
      *
-     * @param {Object} publishing
+     * @param {String} project
+     * @param {String} environment
+     * @param {Number} id
+     *
+     * @return {Promise} promise
      */
 
 
-    ContentEditor.prototype.onClickSave = function onClickSave(publishing) {
-        var _this2 = this;
+    ContentHelper.getContentById = function getContentById() {
+        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+        var id = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('id');
 
-        var saveAction = this.$element.find('.editor-footer .select-publishing').val();
-        var postSaveUrl = void 0;
-
-        var setContent = function setContent() {
-            // Use publishing API
-            if (publishing.connections && publishing.connections.length > 0) {
-                // Unpublish
-                if (saveAction === 'unpublish') {
-                    return apiCall('post', 'content/unpublish', _this2.model);
-
-                    // Publish
-                } else if (saveAction === 'publish') {
-                    return apiCall('post', 'content/publish', _this2.model);
-
-                    // Preview
-                } else if (saveAction === 'preview') {
-                    return apiCall('post', 'content/preview', _this2.model);
-                }
-
-                // Just save normally
-            } else {
-                return apiCall('post', 'content/' + _this2.model.id, _this2.model);
-            }
-        };
-
-        this.$saveBtn.toggleClass('working', true);
-
-        // Save content to database
-        setContent().then(function (url) {
-            postSaveUrl = url;
-
-            return reloadResource('content');
-        }).then(function () {
-            _this2.$saveBtn.toggleClass('saving', false);
-
-            _this2.reload();
-
-            NavbarMain.reload();
-
-            _this2.dirty = false;
-
-            if (saveAction === 'preview') {
-                UI.iframeModal('Preview', postSaveUrl);
-            }
-        }).catch(errorModal);
+        return Promise.resolve();
     };
 
     /**
-     * Reload this view
+     * Sets a Content object by id
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {Number} id
+     * @param {Object} content
+     *
+     * @return {Promise} promise
      */
 
 
-    ContentEditor.prototype.reload = function reload() {
-        this.lastScrollPos = this.$element.find('.editor-body')[0].scrollTop;
+    ContentHelper.setContentById = function setContentById() {
+        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+        var id = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('id');
+        var content = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : requiredParam('content');
 
-        this.model = null;
-
-        this.fetch();
-    };
-
-    /**
-     * Binds event to fire when field editors are ready
-     * Or fires them if no callback was passed
-     *
-     * @param {Function} callback
-     */
-
-
-    ContentEditor.prototype.onFieldEditorsReady = function onFieldEditorsReady(callback) {
-        if (!this.fieldEditorReadyCallbacks) {
-            this.fieldEditorReadyCallbacks = [];
-        }
-
-        if (callback) {
-            this.fieldEditorReadyCallbacks.push(callback);
-        } else {
-            for (var _iterator = this.fieldEditorReadyCallbacks, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-                var _ref;
-
-                if (_isArray) {
-                    if (_i >= _iterator.length) break;
-                    _ref = _iterator[_i++];
-                } else {
-                    _i = _iterator.next();
-                    if (_i.done) break;
-                    _ref = _i.value;
-                }
-
-                var registeredCallback = _ref;
-
-                registeredCallback();
-            }
-
-            this.fieldEditorReadyCallbacks = [];
-        }
-
-        this.restoreScrollPos();
-    };
-
-    /**
-     * Restores the scroll position
-     */
-
-
-    ContentEditor.prototype.restoreScrollPos = function restoreScrollPos() {
-        if (this.lastScrollPos) {
-            this.$element.find('.editor-body')[0].scrollTop = this.lastScrollPos;
-        }
-    };
-
-    ContentEditor.restoreScrollPos = function restoreScrollPos() {
-        var editor = ViewHelper.get('ContentEditor');
-
-        if (editor) {
-            editor.restoreScrollPos();
-        }
-    };
-
-    /**
-     * Gets a field editor for a Schema
-     *
-     * @param {string} editorId
-     *
-     * @returns {View} Field editor
-     */
-
-
-    ContentEditor.getFieldEditor = function getFieldEditor(editorId) {
-        if (!editorId) {
-            return;
-        }
-
-        // Backwards compatible check
-        editorId = editorId.charAt(0).toUpperCase() + editorId.slice(1);
-
-        if (editorId.indexOf('Editor') < 0) {
-            editorId += 'Editor';
-        }
-
-        return HashBrown.Client.Views.Editors.FieldEditors[editorId];
-    };
-
-    /**
-     * Renders a field view
-     *
-     * @param {Object} fieldValue The field value to inject into the field editor
-     * @param {FieldSchema} fieldDefinition The field definition
-     * @param {Function} onChange The change event
-     * @param {Object} config The field config
-     * @param {HTMLElement} keyContent The key content container
-     *
-     * @return {Object} element
-     */
-
-
-    ContentEditor.prototype.renderField = function renderField(fieldValue, fieldDefinition, onChange, config, $keyContent) {
-        var _this3 = this;
-
-        var compiledSchema = SchemaHelper.getFieldSchemaWithParentConfigs(fieldDefinition.schemaId);
-
-        if (compiledSchema) {
-            var fieldEditor = ContentEditor.getFieldEditor(compiledSchema.editorId);
-
-            if (fieldEditor) {
-                var fieldEditorInstance = new fieldEditor({
-                    value: fieldValue,
-                    disabled: fieldDefinition.disabled || false,
-                    config: config || {},
-                    schema: compiledSchema.getObject(),
-                    multilingual: fieldDefinition.multilingual
-                });
-
-                fieldEditorInstance.on('change', function (newValue) {
-                    if (!_this3.model.locked) {
-                        _this3.dirty = true;
-                    }
-
-                    onChange(newValue);
-                });
-
-                fieldEditorInstance.on('silentchange', function (newValue) {
-                    onChange(newValue);
-                });
-
-                if (fieldEditorInstance.$keyContent) {
-                    $keyContent.append(fieldEditorInstance.$keyContent);
-                }
-
-                return fieldEditorInstance.$element;
-            } else {
-                debug.log('No editor by id "' + fieldSchema.editorId + '" found', this);
-            }
-        } else {
-            debug.log('No field schema found for schema id "' + fieldDefinition.schemaId + '"', this);
-        }
-    };
-
-    /**
-     * Renders fields
-     *
-     * @param {String} tabId The tab for which to render the fields
-     * @param {Object} fieldDefinitions The set of field definitions to render
-     * @param {Object} fieldValues The set of field values to inject into the field editor
-     *
-     * @returns {Array} A list of HTMLElements to render
-     */
-
-
-    ContentEditor.prototype.renderFields = function renderFields(tabId, fieldDefinitions, fieldValues) {
-        var _this4 = this;
-
-        var view = this;
-        var tabFieldDefinitions = {};
-
-        // Map out field definitions to render
-        // This is necessary because we're only rendering the fields for the specified tab
-        for (var key in fieldDefinitions) {
-            var fieldDefinition = fieldDefinitions[key];
-
-            var noTabAssigned = !fieldDefinition.tabId;
-            var isMetaTab = tabId == 'meta';
-            var thisTabAssigned = fieldDefinition.tabId == tabId;
-
-            // Don't include "properties" field, if this is the meta tab
-            if (isMetaTab && key == 'properties') {
-                continue;
-            }
-
-            if (noTabAssigned && isMetaTab || thisTabAssigned) {
-                tabFieldDefinitions[key] = fieldDefinition;
-            }
-        }
-
-        // Render all fields
-        return _.each(tabFieldDefinitions, function (key, fieldDefinition) {
-            // Fetch field schema
-            var fieldSchema = resources.schemas[fieldDefinition.schemaId];
-
-            if (!fieldSchema) {
-                debug.log('FieldSchema "' + fieldDefinition.schemaId + '" for key "' + key + '" not found', _this4);
-                return null;
-            }
-
-            // Field value sanity check
-            fieldValues[key] = ContentHelper.fieldSanityCheck(fieldValues[key], fieldDefinition);
-
-            // Render the field container
-            var $keyContent = void 0;
-
-            return _.div({ class: 'field-container', 'data-key': key },
-            // Render the label and icon
-            _.div({ class: 'field-key' }, $keyContent = _.div({ class: 'field-key-content' }, _.span({ class: 'field-key-icon fa fa-' + fieldSchema.icon }), _.span({ class: 'field-key-label' }, fieldDefinition.label || key))),
-
-            // Render the field editor
-            _.div({ class: 'field-value' }, view.renderField(
-            // If the field definition is set to multilingual, pass value from object
-            fieldDefinition.multilingual ? fieldValues[key][window.language] : fieldValues[key],
-
-            // Pass the field definition
-            fieldDefinition,
-
-            // On change function
-            function (newValue) {
-                // If field definition is set to multilingual, assign flag and value onto object...
-                if (fieldDefinition.multilingual) {
-                    fieldValues[key]._multilingual = true;
-                    fieldValues[key][window.language] = newValue;
-
-                    // ...if not, assign the value directly
-                } else {
-                    fieldValues[key] = newValue;
-                }
-            },
-
-            // Pass the field definition config, and use the field's schema config as fallback
-            fieldDefinition.config || fieldSchema.config,
-
-            // Pass the key content container, so the field editor can populate it
-            $keyContent)));
+        return new Promise(function (resolve, reject) {
+            resolve();
         });
     };
 
     /**
-     * Event: Click tab
+     * Checks if a Schema type is allowed as a child of a Content object
      *
-     * @param {String} tab
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} parentId
+     * @param {String} childSchemaId
+     *
+     * @returns {Promise} Is the Content node allowed as a child
      */
 
 
-    ContentEditor.prototype.onClickTab = function onClickTab(tab) {
-        location.hash = '/content/' + Router.params.id + '/' + tab;
-    };
+    ContentHelper.isSchemaAllowedAsChild = function isSchemaAllowedAsChild() {
+        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+        var parentId = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('parentId');
+        var childSchemaId = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : requiredParam('childSchemaId');
 
-    /**
-     * Renders the editor
-     *
-     * @param {Content} content
-     * @param {Object} schema
-     *
-     * @return {Object} element
-     */
+        // No parent ID means root, and all Schemas are allowed there
+        if (!parentId) {
+            return Promise.resolve();
+        } else {
+            return this.getContentById(project, environment, parentId).then(function (parentContent) {
+                return SchemaHelper.getSchemaById(project, environment, parentContent.schemaId);
+            }).then(function (parentSchema) {
+                // The Schema was not an allowed child
+                if (parentSchema.allowedChildSchemas.indexOf(childSchemaId) < 0) {
+                    return SchemaHelper.getSchemaById(project, environment, childSchemaId).then(function (childSchema) {
+                        return Promise.reject(new Error('Content with Schema "' + childSchema.name + '" is not an allowed child of Content with Schema "' + parentSchema.name + '"'));
+                    });
 
-
-    ContentEditor.prototype.renderEditor = function renderEditor(content, schema) {
-        var _this5 = this;
-
-        var view = this;
-
-        // Check for active tab
-        function isTabActive(tabId) {
-            var targetTab = Router.params.tab || schema.defaultTabId || 'meta';
-
-            return tabId == targetTab;
-        }
-
-        // Render editor
-        return _.div({ class: 'object' }, _.ul({ class: 'nav editor-header nav-tabs' }, _.each(schema.tabs, function (tabId, tab) {
-            return _.li({ class: isTabActive(tabId) ? 'active' : '' }, _.a({ 'data-toggle': 'tab', href: '#tab-' + tabId }, tab).click(function () {
-                _this5.onClickTab(tabId);
-            }));
-        }), _.li({ class: isTabActive('meta') ? 'active' : '' }, _.a({ 'data-toggle': 'tab', href: '#tab-meta' }, 'meta').click(function () {
-            _this5.onClickTab('meta');
-        }))), this.$body = _.div({ class: 'tab-content editor-body' },
-        // Render content properties
-        _.each(schema.tabs, function (tabId, tab) {
-            return _.div({ id: 'tab-' + tabId, class: 'tab-pane' + (isTabActive(tabId) ? ' active' : '') }, _this5.renderFields(tabId, schema.fields.properties, content.properties));
-        }),
-
-        // Render meta properties
-        _.div({ id: 'tab-meta', class: 'tab-pane' + (isTabActive('meta') ? ' active' : '') }, this.renderFields('meta', schema.fields, content), this.renderFields('meta', schema.fields.properties, content.properties))).on('scroll', function (e) {
-            _this5.onScroll(e);
-        }), _.div({ class: 'editor-footer' }));
-    };
-
-    /**
-     * Renders the action buttons
-     */
-
-
-    ContentEditor.prototype.renderButtons = function renderButtons() {
-        var _this6 = this;
-
-        var url = this.model.properties.url;
-
-        if (url instanceof Object) {
-            url = url[window.language];
-        }
-
-        _.append($('.editor-footer').empty(), _.div({ class: 'btn-group' },
-        // JSON editor
-        _.button({ class: 'btn btn-embedded' }, 'Advanced').click(function () {
-            _this6.onClickAdvanced();
-        }),
-
-        // View remote
-        _.do(function () {
-            if (_this6.model.properties && _this6.model.properties.url && _this6.publishingSettings.connections.length > 0 && _this6.model.isPublished) {
-                return _.a({ target: '_blank', href: ConnectionHelper.getConnectionByIdSync(_this6.publishingSettings.connections[0]).url + url, class: 'btn btn-primary' }, 'View');
-            }
-        }), _.if(!this.model.locked,
-        // Save & publish
-        _.div({ class: 'btn-group-save-publish raised' }, this.$saveBtn = _.button({ class: 'btn btn-save btn-primary' }, _.span({ class: 'text-default' }, 'Save'), _.span({ class: 'text-working' }, 'Saving')).click(function () {
-            _this6.onClickSave(_this6.publishingSettings);
-        }), _.if(this.publishingSettings.connections && this.publishingSettings.connections.length > 0, _.span('&'), _.select({ class: 'form-control select-publishing' }, _.option({ value: 'publish' }, 'Publish'), _.option({ value: 'preview' }, 'Preview'), _.option({ value: 'unpublish' }, 'Unpublish')).val('publish'))))));
-    };
-
-    ContentEditor.prototype.render = function render() {
-        var _this7 = this;
-
-        // Make sure the model data is using the Content model
-        if (!this.model.properties) {
-            this.model.properties = {};
-        }
-
-        if (this.model instanceof Content === false) {
-            this.model = new Content(this.model);
-        }
-
-        this.$element.toggleClass('locked', this.model.locked);
-
-        // Fetch information
-        var contentSchema = void 0;
-        var publishingSettings = void 0;
-
-        return SchemaHelper.getSchemaWithParentFields(this.model.schemaId).then(function (schema) {
-            contentSchema = schema;
-
-            return _this7.model.getSettings('publishing');
-        }).then(function (settings) {
-            _this7.publishingSettings = settings;
-
-            _this7.$element.html(
-            // Render editor
-            _this7.renderEditor(_this7.model, contentSchema));
-
-            _this7.renderButtons();
-
-            _this7.onFieldEditorsReady();
-        }).catch(function (e) {
-            UI.errorModal(e, function () {
-                location.hash = '/content/json/' + _this7.model.id;
+                    // The Schema was an allowed child, resolve
+                } else {
+                    return Promise.resolve();
+                }
             });
+        }
+    };
+
+    /**
+     * Creates a new content object
+     *
+     * @return {Promise} promise
+     */
+
+
+    ContentHelper.createContent = function createContent() {
+        return new Promise(function (resolve, reject) {
+            resolve();
         });
     };
 
-    return ContentEditor;
-}(View);
+    /**
+     * Removes a content object
+     *
+     * @param {Number} id
+     *
+     * @return {Promise} promise
+     */
 
-module.exports = ContentEditor;
+
+    ContentHelper.removeContentById = function removeContentById(id) {
+        return new Promise(function (resolve, reject) {
+            resolve();
+        });
+    };
+
+    return ContentHelper;
+}();
 
 /***/ }),
-/* 229 */
+/* 233 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+// Models
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var FieldSchema = __webpack_require__(189);
+var ContentSchema = __webpack_require__(200);
+
+/**
+ * The common base for SchemaHelper
+ */
+module.exports = function () {
+    function SchemaHelper() {
+        _classCallCheck(this, SchemaHelper);
+    }
+
+    /**
+     * Gets all parent fields
+     *
+     * @param {String} id
+     *
+     * @returns {Promise(Schema)} schema
+     */
+    SchemaHelper.getSchemaWithParentFields = function getSchemaWithParentFields(id) {
+        return new Promise(function (callback) {
+            callback();
+        });
+    };
+
+    /**
+     * Gets the appropriate model
+     *
+     * @param {Object} properties
+     *
+     * @return {Schema} schema
+     */
+
+
+    SchemaHelper.getModel = function getModel(properties) {
+        switch (properties.type) {
+            case 'content':default:
+                return new ContentSchema(properties);
+
+            case 'field':
+                return new FieldSchema(properties);
+        }
+    };
+
+    return SchemaHelper;
+}();
+
+/***/ }),
+/* 234 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+module.exports = function () {
+    function ConnectionHelper() {
+        _classCallCheck(this, ConnectionHelper);
+    }
+
+    /**
+     * Gets all connections
+     *
+     * @param {String} project
+     * @param {String} environment
+     *
+     * @returns {Promise(Array)} connections
+     */
+    ConnectionHelper.getAllConnections = function getAllConnections() {
+        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+
+        return Promise.resolve();
+    };
+
+    /**
+     * Sets the Template provider
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} id
+     *
+     * @return {Promise} Promise
+     */
+
+
+    ConnectionHelper.setTemplateProvider = function setTemplateProvider() {
+        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+        var id = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('id');
+
+        return SettingsHelper.getSettings(project, environment, 'providers').then(function (providers) {
+            providers = providers || {};
+            providers.template = id;
+
+            SettingsHelper.setSettings(project, environment, 'providers', providers);
+        });
+    };
+
+    /**
+     * Gets the Template provider
+     *
+     * @param {String} project
+     * @param {String} environment
+     *
+     * @return {Promise} Connection object
+     */
+
+
+    ConnectionHelper.getTemplateProvider = function getTemplateProvider() {
+        var _this = this;
+
+        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+
+        return SettingsHelper.getSettings(project, environment, 'providers')
+
+        // Previously, providers were set project-wide, so retrieve automatically if needed
+        .then(function (providers) {
+            if (!providers) {
+                return SettingsHelper.getSettings(project, null, 'providers');
+            } else {
+                return Promise.resolve(providers);
+            }
+        })
+
+        // Return requested provider
+        .then(function (providers) {
+            providers = providers || {};
+
+            if (providers.template) {
+                return _this.getConnectionById(project, environment, providers.template);
+            } else {
+                return Promise.reject(new Error('Template provider is not defined'));
+            }
+        });
+    };
+
+    /**
+     * Sets the Media provider
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} id
+     *
+     * @return {Promise} Promise
+     */
+
+
+    ConnectionHelper.setMediaProvider = function setMediaProvider() {
+        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+        var id = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('id');
+
+        return SettingsHelper.getSettings(project, environment, 'providers').then(function (providers) {
+            providers = providers || {};
+            providers.media = id;
+
+            SettingsHelper.setSettings(project, environment, 'providers', providers);
+        });
+    };
+
+    /**
+     * Gets the Media provider
+     *
+     * @param {String} project
+     * @param {String} environment
+     *
+     * @return {Promise} Connection object
+     */
+
+
+    ConnectionHelper.getMediaProvider = function getMediaProvider() {
+        var _this2 = this;
+
+        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+
+        return SettingsHelper.getSettings(project, environment, 'providers')
+
+        // Previously, providers were set project-wide, so retrieve automatically if needed
+        .then(function (providers) {
+            if (!providers) {
+                return SettingsHelper.getSettings(project, null, 'providers');
+            } else {
+                return Promise.resolve(providers);
+            }
+        })
+
+        // Return requested provider
+        .then(function (providers) {
+            providers = providers || {};
+
+            if (providers.media) {
+                return _this2.getConnectionById(project, environment, providers.media);
+            } else {
+                return Promise.reject(new Error('Media provider is not defined'));
+            }
+        });
+    };
+
+    return ConnectionHelper;
+}();
+
+/***/ }),
+/* 235 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41913,7 +42542,7 @@ var FormEditor = function (_View) {
 module.exports = FormEditor;
 
 /***/ }),
-/* 230 */
+/* 236 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41927,7 +42556,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var beautify = __webpack_require__(231).js_beautify;
+var beautify = __webpack_require__(237).js_beautify;
 
 /**
  * A basic JSON editor for any object
@@ -42287,7 +42916,7 @@ var JSONEditor = function (_View) {
 module.exports = JSONEditor;
 
 /***/ }),
-/* 231 */
+/* 237 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*
@@ -42354,7 +42983,7 @@ function get_beautify(js_beautify, css_beautify, html_beautify) {
 
 if (true) {
     // Add support for AMD ( https://github.com/amdjs/amdjs-api/wiki/AMD#defineamd-property- )
-    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(188), __webpack_require__(189), __webpack_require__(232)], __WEBPACK_AMD_DEFINE_RESULT__ = function (js_beautify, css_beautify, html_beautify) {
+    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(192), __webpack_require__(193), __webpack_require__(238)], __WEBPACK_AMD_DEFINE_RESULT__ = function (js_beautify, css_beautify, html_beautify) {
         return get_beautify(js_beautify, css_beautify, html_beautify);
     }.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
@@ -42369,7 +42998,7 @@ if (true) {
 }
 
 /***/ }),
-/* 232 */
+/* 238 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -42561,7 +43190,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var _typeof = ty
             this.Utils = { //Uilities made available to the various functions
                 whitespace: "\n\r\t ".split(''),
 
-                single_token: [
+                single_token: options.void_elements || [
                 // HTLM void elements - aka self-closing tags - aka singletons
                 // https://www.w3.org/html/wg/drafts/html/master/syntax.html#void-elements
                 'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'keygen', 'link', 'menuitem', 'meta', 'param', 'source', 'track', 'wbr',
@@ -43205,7 +43834,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var _typeof = ty
                 // if next_tag comes back but is not an isolated tag, then
                 // let's treat the 'a' tag as having content
                 // and respect the unformatted option
-                if (!tag || this.Utils.in_array(tag, unformatted)) {
+                if (!tag || this.Utils.in_array(tag[1], unformatted)) {
                     return true;
                 } else {
                     return false;
@@ -43463,9 +44092,9 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var _typeof = ty
 
     if (true) {
         // Add support for AMD ( https://github.com/amdjs/amdjs-api/wiki/AMD#defineamd-property- )
-        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__, __webpack_require__(188), __webpack_require__(189)], __WEBPACK_AMD_DEFINE_RESULT__ = function (requireamd) {
-            var js_beautify = __webpack_require__(188);
-            var css_beautify = __webpack_require__(189);
+        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__, __webpack_require__(192), __webpack_require__(193)], __WEBPACK_AMD_DEFINE_RESULT__ = function (requireamd) {
+            var js_beautify = __webpack_require__(192);
+            var css_beautify = __webpack_require__(193);
 
             return {
                 html_beautify: function html_beautify(html_source, options) {
@@ -43497,7 +44126,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var _typeof = ty
 })();
 
 /***/ }),
-/* 233 */
+/* 239 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43559,7 +44188,7 @@ var MediaViewer = function (_View) {
 module.exports = MediaViewer;
 
 /***/ }),
-/* 234 */
+/* 240 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43676,7 +44305,7 @@ var ProvidersSettings = function (_View) {
 module.exports = ProvidersSettings;
 
 /***/ }),
-/* 235 */
+/* 241 */
 /***/ (function(module, exports, __webpack_require__) {
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -43686,7 +44315,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 // Icons
-var icons = __webpack_require__(236).icons;
+var icons = __webpack_require__(242).icons;
 
 /**
  * The editor for schemas
@@ -44322,7 +44951,7 @@ var SchemaEditor = function (_View) {
 module.exports = SchemaEditor;
 
 /***/ }),
-/* 236 */
+/* 242 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -45025,7 +45654,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 237 */
+/* 243 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45147,34 +45776,34 @@ var TemplateEditor = function (_View) {
 module.exports = TemplateEditor;
 
 /***/ }),
-/* 238 */
+/* 244 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 module.exports = {
-    ArrayEditor: __webpack_require__(239),
-    BooleanEditor: __webpack_require__(240),
-    ContentReferenceEditor: __webpack_require__(241),
-    ContentSchemaReferenceEditor: __webpack_require__(242),
-    DateEditor: __webpack_require__(243),
-    DropdownEditor: __webpack_require__(244),
+    ArrayEditor: __webpack_require__(245),
+    BooleanEditor: __webpack_require__(246),
+    ContentReferenceEditor: __webpack_require__(247),
+    ContentSchemaReferenceEditor: __webpack_require__(248),
+    DateEditor: __webpack_require__(249),
+    DropdownEditor: __webpack_require__(250),
     FieldEditor: __webpack_require__(9),
-    LanguageEditor: __webpack_require__(245),
-    MediaReferenceEditor: __webpack_require__(246),
-    NumberEditor: __webpack_require__(247),
-    ResourceReferenceEditor: __webpack_require__(248),
-    RichTextEditor: __webpack_require__(249),
-    StringEditor: __webpack_require__(250),
-    StructEditor: __webpack_require__(251),
-    TagsEditor: __webpack_require__(252),
-    TemplateReferenceEditor: __webpack_require__(253),
-    UrlEditor: __webpack_require__(254)
+    LanguageEditor: __webpack_require__(251),
+    MediaReferenceEditor: __webpack_require__(252),
+    NumberEditor: __webpack_require__(253),
+    ResourceReferenceEditor: __webpack_require__(254),
+    RichTextEditor: __webpack_require__(255),
+    StringEditor: __webpack_require__(256),
+    StructEditor: __webpack_require__(257),
+    TagsEditor: __webpack_require__(258),
+    TemplateReferenceEditor: __webpack_require__(259),
+    UrlEditor: __webpack_require__(260)
 };
 
 /***/ }),
-/* 239 */
+/* 245 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45189,9 +45818,9 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var FieldEditor = __webpack_require__(9);
-var SchemaHelper = __webpack_require__(262);
-var ContentHelper = __webpack_require__(207);
-var ContentEditor = __webpack_require__(228);
+var SchemaHelper = __webpack_require__(85);
+var ContentHelper = __webpack_require__(82);
+var ContentEditor = __webpack_require__(191);
 
 /**
  * An array editor for editing a list of other field values
@@ -45662,7 +46291,7 @@ module.exports = function (_FieldEditor) {
 }(FieldEditor);
 
 /***/ }),
-/* 240 */
+/* 246 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45721,7 +46350,7 @@ module.exports = function (_FieldEditor) {
 }(FieldEditor);
 
 /***/ }),
-/* 241 */
+/* 247 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45824,7 +46453,7 @@ module.exports = function (_FieldEditor) {
 }(FieldEditor);
 
 /***/ }),
-/* 242 */
+/* 248 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45974,7 +46603,7 @@ module.exports = function (_FieldEditor) {
 }(FieldEditor);
 
 /***/ }),
-/* 243 */
+/* 249 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46200,7 +46829,7 @@ module.exports = function (_FieldEditor) {
 }(FieldEditor);
 
 /***/ }),
-/* 244 */
+/* 250 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46288,7 +46917,7 @@ module.exports = function (_FieldEditor) {
 }(FieldEditor);
 
 /***/ }),
-/* 245 */
+/* 251 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46364,7 +46993,7 @@ module.exports = function (_FieldEditor) {
 }(FieldEditor);
 
 /***/ }),
-/* 246 */
+/* 252 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46467,7 +47096,7 @@ module.exports = function (_FieldEditor) {
 }(FieldEditor);
 
 /***/ }),
-/* 247 */
+/* 253 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46522,7 +47151,7 @@ module.exports = function (_FieldEditor) {
 }(FieldEditor);
 
 /***/ }),
-/* 248 */
+/* 254 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46605,7 +47234,7 @@ module.exports = function (_FieldEditor) {
 }(FieldEditor);
 
 /***/ }),
-/* 249 */
+/* 255 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46895,7 +47524,7 @@ module.exports = function (_FieldEditor) {
 }(FieldEditor);
 
 /***/ }),
-/* 250 */
+/* 256 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46950,7 +47579,7 @@ module.exports = function (_FieldEditor) {
 }(FieldEditor);
 
 /***/ }),
-/* 251 */
+/* 257 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46965,9 +47594,9 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var FieldEditor = __webpack_require__(9);
-var SchemaHelper = __webpack_require__(262);
-var ContentHelper = __webpack_require__(207);
-var ContentEditor = __webpack_require__(228);
+var SchemaHelper = __webpack_require__(85);
+var ContentHelper = __webpack_require__(82);
+var ContentEditor = __webpack_require__(191);
 
 /**
  * A struct editor for editing any arbitrary object value
@@ -47066,7 +47695,7 @@ module.exports = function (_FieldEditor) {
 }(FieldEditor);
 
 /***/ }),
-/* 252 */
+/* 258 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47223,7 +47852,7 @@ module.exports = function (_FieldEditor) {
 }(FieldEditor);
 
 /***/ }),
-/* 253 */
+/* 259 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47352,7 +47981,7 @@ module.exports = function (_FieldEditor) {
 }(FieldEditor);
 
 /***/ }),
-/* 254 */
+/* 260 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47600,25 +48229,25 @@ module.exports = function (_FieldEditor) {
 }(FieldEditor);
 
 /***/ }),
-/* 255 */
+/* 261 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 module.exports = {
-    ConnectionHelper: __webpack_require__(256),
-    ContentHelper: __webpack_require__(207),
-    LanguageHelper: __webpack_require__(191),
-    MediaHelper: __webpack_require__(260),
+    ConnectionHelper: __webpack_require__(203),
+    ContentHelper: __webpack_require__(82),
+    LanguageHelper: __webpack_require__(194),
+    MediaHelper: __webpack_require__(262),
     ProjectHelper: __webpack_require__(46),
-    SchemaHelper: __webpack_require__(262),
-    SettingsHelper: __webpack_require__(82),
-    UIHelper: __webpack_require__(83)
+    SchemaHelper: __webpack_require__(85),
+    SettingsHelper: __webpack_require__(83),
+    UIHelper: __webpack_require__(86)
 };
 
 /***/ }),
-/* 256 */
+/* 262 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47630,471 +48259,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var ConnectionHelperCommon = __webpack_require__(257);
-var Connection = __webpack_require__(81);
-
-/**
- * The client side connection helper
- *
- * @memberof HashBrown.Client.Helpers
- */
-module.exports = function (_ConnectionHelperComm) {
-    _inherits(ConnectionHelper, _ConnectionHelperComm);
-
-    function ConnectionHelper() {
-        _classCallCheck(this, ConnectionHelper);
-
-        return _possibleConstructorReturn(this, _ConnectionHelperComm.apply(this, arguments));
-    }
-
-    /**
-     * Gets all connections
-     *
-     * @return {Promise(Connection[])} promise
-     */
-    ConnectionHelper.getAllConnections = function getAllConnections() {
-        return Promise.resolve(resources.connections);
-    };
-
-    /**
-     * Gets a Connection by id (sync)
-     *
-     * @param {string} id
-     *
-     * @return {Promise} Connection
-     */
-
-
-    ConnectionHelper.getConnectionByIdSync = function getConnectionByIdSync() {
-        var id = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('id');
-
-        for (var i in resources.connections) {
-            var connection = resources.connections[i];
-
-            if (connection.id == id) {
-                return connection;
-            }
-        }
-    };
-
-    /**
-     * Gets a Connection by id
-     *
-     * @param {String} project
-     * @param {String} environment
-     * @param {string} id
-     *
-     * @return {Promise(Connection)} promise
-     */
-
-
-    ConnectionHelper.getConnectionById = function getConnectionById() {
-        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
-        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
-        var id = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('id');
-
-        for (var i in resources.connections) {
-            var connection = resources.connections[i];
-
-            if (connection.id == id) {
-                return Promise.resolve(connection);
-            }
-        }
-
-        return Promise.reject(new Error('No Connection by id "' + id + '" was found'));
-    };
-
-    return ConnectionHelper;
-}(ConnectionHelperCommon);
-
-/***/ }),
-/* 257 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-module.exports = function () {
-    function ConnectionHelper() {
-        _classCallCheck(this, ConnectionHelper);
-    }
-
-    /**
-     * Gets all connections
-     *
-     * @param {String} project
-     * @param {String} environment
-     *
-     * @returns {Promise(Array)} connections
-     */
-    ConnectionHelper.getAllConnections = function getAllConnections() {
-        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
-        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
-
-        return Promise.resolve();
-    };
-
-    /**
-     * Sets the Template provider
-     *
-     * @param {String} project
-     * @param {String} environment
-     * @param {String} id
-     *
-     * @return {Promise} Promise
-     */
-
-
-    ConnectionHelper.setTemplateProvider = function setTemplateProvider() {
-        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
-        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
-        var id = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('id');
-
-        return SettingsHelper.getSettings(project, environment, 'providers').then(function (providers) {
-            providers = providers || {};
-            providers.template = id;
-
-            SettingsHelper.setSettings(project, environment, 'providers', providers);
-        });
-    };
-
-    /**
-     * Gets the Template provider
-     *
-     * @param {String} project
-     * @param {String} environment
-     *
-     * @return {Promise} Connection object
-     */
-
-
-    ConnectionHelper.getTemplateProvider = function getTemplateProvider() {
-        var _this = this;
-
-        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
-        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
-
-        return SettingsHelper.getSettings(project, environment, 'providers')
-
-        // Previously, providers were set project-wide, so retrieve automatically if needed
-        .then(function (providers) {
-            if (!providers) {
-                return SettingsHelper.getSettings(project, null, 'providers');
-            } else {
-                return Promise.resolve(providers);
-            }
-        })
-
-        // Return requested provider
-        .then(function (providers) {
-            providers = providers || {};
-
-            if (providers.template) {
-                return _this.getConnectionById(project, environment, providers.template);
-            } else {
-                return Promise.reject(new Error('Template provider is not defined'));
-            }
-        });
-    };
-
-    /**
-     * Sets the Media provider
-     *
-     * @param {String} project
-     * @param {String} environment
-     * @param {String} id
-     *
-     * @return {Promise} Promise
-     */
-
-
-    ConnectionHelper.setMediaProvider = function setMediaProvider() {
-        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
-        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
-        var id = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('id');
-
-        return SettingsHelper.getSettings(project, environment, 'providers').then(function (providers) {
-            providers = providers || {};
-            providers.media = id;
-
-            SettingsHelper.setSettings(project, environment, 'providers', providers);
-        });
-    };
-
-    /**
-     * Gets the Media provider
-     *
-     * @param {String} project
-     * @param {String} environment
-     *
-     * @return {Promise} Connection object
-     */
-
-
-    ConnectionHelper.getMediaProvider = function getMediaProvider() {
-        var _this2 = this;
-
-        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
-        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
-
-        return SettingsHelper.getSettings(project, environment, 'providers')
-
-        // Previously, providers were set project-wide, so retrieve automatically if needed
-        .then(function (providers) {
-            if (!providers) {
-                return SettingsHelper.getSettings(project, null, 'providers');
-            } else {
-                return Promise.resolve(providers);
-            }
-        })
-
-        // Return requested provider
-        .then(function (providers) {
-            providers = providers || {};
-
-            if (providers.media) {
-                return _this2.getConnectionById(project, environment, providers.media);
-            } else {
-                return Promise.reject(new Error('Media provider is not defined'));
-            }
-        });
-    };
-
-    return ConnectionHelper;
-}();
-
-/***/ }),
-/* 258 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-module.exports = function () {
-    function ContentHelper() {
-        _classCallCheck(this, ContentHelper);
-    }
-
-    /**
-     * Gets all Content objects
-     *
-     * @param {String} project
-     * @param {String} environment
-     *
-     * @return {Promise} promise
-     */
-    ContentHelper.getAllContents = function getAllContents() {
-        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
-        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
-
-        return Promise.resolve();
-    };
-
-    /**
-     * Gets a URL-friendly version of a string
-     *
-     * @param {String} string
-     *
-     * @param {String} slug
-     */
-
-
-    ContentHelper.getSlug = function getSlug(string) {
-        return (string || '').toLowerCase().replace(/[æ|ä]/g, 'ae').replace(/[ø|ö]/g, 'oe').replace(/å/g, 'aa').replace(/ü/g, 'ue').replace(/ß/g, 'ss').replace(/[^\w ]+/g, '').replace(/ +/g, '-');
-    };
-
-    /**
-     * Gets a Content object by id
-     *
-     * @param {String} project
-     * @param {String} environment
-     * @param {Number} id
-     *
-     * @return {Promise} promise
-     */
-
-
-    ContentHelper.getContentById = function getContentById() {
-        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
-        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
-        var id = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('id');
-
-        return Promise.resolve();
-    };
-
-    /**
-     * Sets a Content object by id
-     *
-     * @param {String} project
-     * @param {String} environment
-     * @param {Number} id
-     * @param {Object} content
-     *
-     * @return {Promise} promise
-     */
-
-
-    ContentHelper.setContentById = function setContentById() {
-        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
-        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
-        var id = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('id');
-        var content = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : requiredParam('content');
-
-        return new Promise(function (resolve, reject) {
-            resolve();
-        });
-    };
-
-    /**
-     * Checks if a Schema type is allowed as a child of a Content object
-     *
-     * @param {String} project
-     * @param {String} environment
-     * @param {String} parentId
-     * @param {String} childSchemaId
-     *
-     * @returns {Promise} Is the Content node allowed as a child
-     */
-
-
-    ContentHelper.isSchemaAllowedAsChild = function isSchemaAllowedAsChild() {
-        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
-        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
-        var parentId = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('parentId');
-        var childSchemaId = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : requiredParam('childSchemaId');
-
-        // No parent ID means root, and all Schemas are allowed there
-        if (!parentId) {
-            return Promise.resolve();
-        } else {
-            return this.getContentById(project, environment, parentId).then(function (parentContent) {
-                return SchemaHelper.getSchemaById(project, environment, parentContent.schemaId);
-            }).then(function (parentSchema) {
-                // The Schema was not an allowed child
-                if (parentSchema.allowedChildSchemas.indexOf(childSchemaId) < 0) {
-                    return SchemaHelper.getSchemaById(project, environment, childSchemaId).then(function (childSchema) {
-                        return Promise.reject(new Error('Content with Schema "' + childSchema.name + '" is not an allowed child of Content with Schema "' + parentSchema.name + '"'));
-                    });
-
-                    // The Schema was an allowed child, resolve
-                } else {
-                    return Promise.resolve();
-                }
-            });
-        }
-    };
-
-    /**
-     * Creates a new content object
-     *
-     * @return {Promise} promise
-     */
-
-
-    ContentHelper.createContent = function createContent() {
-        return new Promise(function (resolve, reject) {
-            resolve();
-        });
-    };
-
-    /**
-     * Removes a content object
-     *
-     * @param {Number} id
-     *
-     * @return {Promise} promise
-     */
-
-
-    ContentHelper.removeContentById = function removeContentById(id) {
-        return new Promise(function (resolve, reject) {
-            resolve();
-        });
-    };
-
-    return ContentHelper;
-}();
-
-/***/ }),
-/* 259 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var ContentCommon = __webpack_require__(196);
-var ContentHelper = __webpack_require__(207);
-var ProjectHelper = __webpack_require__(46);
-
-/**
- * The client-side content model
- */
-module.exports = function (_ContentCommon) {
-    _inherits(Content, _ContentCommon);
-
-    function Content() {
-        _classCallCheck(this, Content);
-
-        return _possibleConstructorReturn(this, _ContentCommon.apply(this, arguments));
-    }
-
-    /**
-     * Gets settings
-     *
-     * @param {String} key
-     *
-     * @returns {Promise} Settings
-     */
-    Content.prototype.getSettings = function getSettings(key) {
-        return _ContentCommon.prototype.getSettings.call(this, ProjectHelper.currentProject, ProjectHelper.currentEnvironment, key);
-    };
-
-    /**
-     * Gets parent Content
-     *
-     * @returns {Promise} Parent
-     */
-
-
-    Content.prototype.getParent = function getParent() {
-        if (this.parentId) {
-            return ContentHelper.getContentById(this.parentId).then(function (parentContent) {
-                return Promise.resolve(parentContent);
-            }).catch(function (e) {
-                return Promise.resolve(null);
-            });
-        } else {
-            return Promise.resolve(null);
-        }
-    };
-
-    return Content;
-}(ContentCommon);
-
-/***/ }),
-/* 260 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var MediaHelperCommon = __webpack_require__(261);
+var MediaHelperCommon = __webpack_require__(263);
 
 /**
  * The client side media helper
@@ -48217,7 +48382,7 @@ var MediaHelper = function (_MediaHelperCommon) {
 module.exports = MediaHelper;
 
 /***/ }),
-/* 261 */
+/* 263 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -48227,7 +48392,7 @@ module.exports = MediaHelper;
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var Media = __webpack_require__(198);
+var Media = __webpack_require__(201);
 
 module.exports = function () {
     function MediaHelper() {
@@ -48290,186 +48455,6 @@ module.exports = function () {
     };
 
     return MediaHelper;
-}();
-
-/***/ }),
-/* 262 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var FieldSchema = __webpack_require__(186);
-var SchemaHelperCommon = __webpack_require__(263);
-
-/**
- * The client side Schema helper
- *
- * @memberof HashBrown.Client.Helpers
- */
-module.exports = function (_SchemaHelperCommon) {
-    _inherits(SchemaHelper, _SchemaHelperCommon);
-
-    function SchemaHelper() {
-        _classCallCheck(this, SchemaHelper);
-
-        return _possibleConstructorReturn(this, _SchemaHelperCommon.apply(this, arguments));
-    }
-
-    /**
-     * Gets a Schema with all parent fields
-     *
-     * @param {String} id
-     *
-     * @returns {Promise} Schema with parent fields
-     */
-    SchemaHelper.getSchemaWithParentFields = function getSchemaWithParentFields(id) {
-        if (id) {
-            return apiCall('get', 'schemas/' + id + '/?withParentFields=true').then(function (schema) {
-                return new Promise(function (resolve) {
-                    resolve(SchemaHelper.getModel(schema));
-                });
-            });
-        } else {
-            return new Promise(function (resolve) {
-                resolve(null);
-            });
-        }
-    };
-
-    /**
-     * Gets a FieldSchema with all parent configs
-     *
-     * @param {String} id
-     *
-     * @returns {FieldSchema} Compiled FieldSchema
-     */
-
-
-    SchemaHelper.getFieldSchemaWithParentConfigs = function getFieldSchemaWithParentConfigs(id) {
-        var fieldSchema = resources.schemas[id];
-
-        if (fieldSchema) {
-            var nextSchema = resources.schemas[fieldSchema.parentSchemaId];
-            var compiledSchema = new FieldSchema(fieldSchema);
-
-            while (nextSchema) {
-                compiledSchema.appendConfig(nextSchema.config);
-
-                nextSchema = resources.schemas[nextSchema.parentSchemaId];
-            }
-
-            return compiledSchema;
-        }
-    };
-
-    /**
-     * Gets a Schema by id
-     *
-     * @param {String} id
-     *
-     * @return {Promise} Promise
-     */
-
-
-    SchemaHelper.getSchemaById = function getSchemaById(id) {
-        return new Promise(function (resolve, reject) {
-            for (var i in resources.schemas) {
-                var schema = resources.schemas[i];
-
-                if (schema.id == id) {
-                    resolve(schema);
-                    return;
-                }
-            }
-
-            reject(new Error('No Schema by id "' + id + '" was found'));
-        });
-    };
-
-    /**
-     * Gets a Schema by id (sync)
-     *
-     * @param {String} id
-     *
-     * @return {Promise} Promise
-     */
-
-
-    SchemaHelper.getSchemaByIdSync = function getSchemaByIdSync(id) {
-        for (var i in resources.schemas) {
-            var schema = resources.schemas[i];
-
-            if (schema.id == id) {
-                return schema;
-            }
-        }
-    };
-
-    return SchemaHelper;
-}(SchemaHelperCommon);
-
-/***/ }),
-/* 263 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-// Models
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var FieldSchema = __webpack_require__(186);
-var ContentSchema = __webpack_require__(197);
-
-/**
- * The common base for SchemaHelper
- */
-module.exports = function () {
-    function SchemaHelper() {
-        _classCallCheck(this, SchemaHelper);
-    }
-
-    /**
-     * Gets all parent fields
-     *
-     * @param {String} id
-     *
-     * @returns {Promise(Schema)} schema
-     */
-    SchemaHelper.getSchemaWithParentFields = function getSchemaWithParentFields(id) {
-        return new Promise(function (callback) {
-            callback();
-        });
-    };
-
-    /**
-     * Gets the appropriate model
-     *
-     * @param {Object} properties
-     *
-     * @return {Schema} schema
-     */
-
-
-    SchemaHelper.getModel = function getModel(properties) {
-        switch (properties.type) {
-            case 'content':default:
-                return new ContentSchema(properties);
-
-            case 'field':
-                return new FieldSchema(properties);
-        }
-    };
-
-    return SchemaHelper;
 }();
 
 /***/ })
