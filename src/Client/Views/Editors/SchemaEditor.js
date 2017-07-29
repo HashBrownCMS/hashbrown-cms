@@ -280,7 +280,7 @@ class SchemaEditor extends View {
                 }
             }
 
-            let modal = new HashBrown.Views.Modals.MessageModal({
+            let modal = new HashBrown.Client.Views.Modals.MessageModal({
                 model: {
                     class: 'modal-icon-picker',
                     title: 'Pick an icon',

@@ -13,18 +13,6 @@ class ConnectionEditor extends View {
     }
 
     /**
-     * Event: Failed API call
-     */
-    onError(err) {
-        new HashBrown.Views.Modals.MessageModal({
-            model: {
-                title: 'Error',
-                body: err
-            }
-        });
-    }
-
-    /**
      * Event: Click advanced. Routes to the JSON editor
      */
     onClickAdvanced() {
@@ -45,7 +33,7 @@ class ConnectionEditor extends View {
        
             location.reload(); 
         })
-        .catch(this.onError);
+        .catch(UI.errorModal);
     }
 
     /**

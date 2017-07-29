@@ -158,7 +158,7 @@ module.exports = class MediaBrowser extends View {
             }
 
             // Render the upload modal
-            let uploadModal = new HashBrown.Views.Modals.MessageModal({
+            let uploadModal = new HashBrown.Client.Views.Modals.MessageModal({
                 model: {
                     class: 'modal-upload-media',
                     title: 'Upload a file',

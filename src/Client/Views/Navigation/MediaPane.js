@@ -49,7 +49,7 @@ class MediaPane extends NavbarPane {
             });
         }
 
-        new HashBrown.Views.Modals.MessageModal({
+        new HashBrown.Client.Views.Modals.MessageModal({
             model: {
                 title: 'Delete media',
                 body: 'Are you sure you want to delete the media object "' + name + '"?'

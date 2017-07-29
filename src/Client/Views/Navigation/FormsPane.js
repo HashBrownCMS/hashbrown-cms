@@ -42,7 +42,7 @@ class FormsPane extends NavbarPane {
         }
 
         function onError(err) {
-            new HashBrown.Views.Modals.MessageModal({
+            new HashBrown.Client.Views.Modals.MessageModal({
                 model: {
                     title: 'Error',
                     body: err.message
@@ -50,7 +50,7 @@ class FormsPane extends NavbarPane {
             });
         }
 
-        new HashBrown.Views.Modals.MessageModal({
+        new HashBrown.Client.Views.Modals.MessageModal({
             model: {
                 title: 'Delete form',
                 body: 'Are you sure you want to delete the form "' + form.title + '"?'

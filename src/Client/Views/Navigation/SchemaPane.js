@@ -27,7 +27,7 @@ class SchemaPane extends NavbarPane {
         }
 
         if(!schema.locked) {
-            new HashBrown.Views.Modals.MessageModal({
+            new HashBrown.Client.Views.Modals.MessageModal({
                 model: {
                     title: 'Delete schema',
                     body: 'Are you sure you want to delete the schema "' + schema.name + '"?'
@@ -51,7 +51,7 @@ class SchemaPane extends NavbarPane {
                 ]
             });
         } else {
-            new HashBrown.Views.Modals.MessageModal({
+            new HashBrown.Client.Views.Modals.MessageModal({
                 model: {
                     title: 'Delete schema',
                     body: 'The schema "' + schema.name + '" is locked and cannot be removed'

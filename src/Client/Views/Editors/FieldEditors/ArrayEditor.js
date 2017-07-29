@@ -2,6 +2,7 @@
 
 const FieldEditor = require('./FieldEditor');
 const SchemaHelper = require('Client/Helpers/SchemaHelper');
+const MediaHelper = require('Client/Helpers/MediaHelper');
 const ContentHelper = require('Client/Helpers/ContentHelper');
 const ContentEditor = require('Client/Views/Editors/ContentEditor');
 
@@ -72,8 +73,7 @@ module.exports = class ArrayEditor extends FieldEditor {
     onClickRemoveItem($element) {
         let i = $element.attr('data-index');
 
-        this.value.schemaBindings.splice(i,1);
-        this.value.items.splice(i,1);
+        this.value.splice(i,1);
 
         $element.remove();
 
@@ -84,17 +84,16 @@ module.exports = class ArrayEditor extends FieldEditor {
      * Event: Click add item
      */
     onClickAddItem() {
-        let index = this.value.items.length;
+        let index = this.value.length;
 
         if(this.config.maxItems && index >= this.config.maxItems) {
             UI.messageModal('Item maximum reached', 'You  can maximum add ' + this.config.maxItems + ' items here');
             return;
         }
 
-        this.value.items[index] = null;
-        this.value.schemaBindings[index] = null;
+        this.value[index] = { value: null, schemaId: null };
 
-        this.$element.children('.items').append(this.renderItem(index, null));
+        this.$element.children('.items').append(this.renderItem(index));
         
         this.updateDOMIndices();
     }
@@ -109,15 +108,15 @@ module.exports = class ArrayEditor extends FieldEditor {
     onChangeValue(newValue, i, itemSchema) {
         if(itemSchema.multilingual) {
             // Sanity check to make sure multilingual fields are accomodated for
-            if(!this.value.items[i] || typeof this.value.items[i] !== 'object') {
-                this.value.items[i] = {};
+            if(!this.value[i] || typeof this.value[i] !== 'object') {
+                this.value[i] = { value: null, schemaId: null };
             }
             
-            this.value.items[i]._multilingual = true;
-            this.value.items[i][window.language] = newValue;
+            this.value[i].value._multilingual = true;
+            this.value[i].value[window.language] = newValue;
 
         } else {
-            this.value.items[i] = newValue;
+            this.value[i].value = newValue;
         }
     }
 
@@ -161,13 +160,10 @@ module.exports = class ArrayEditor extends FieldEditor {
                         let newIndex = parseInt(instance.element.dataset.index);
 
                         // Change the index in the items array
-                        let item = this.value.items[oldIndex];
-                        this.value.items.splice(oldIndex, 1);
-                        this.value.items.splice(newIndex, 0, item)
+                        let item = this.value[oldIndex];
+                        this.value.splice(oldIndex, 1);
+                        this.value.splice(newIndex, 0, item)
                         
-                        // Rebuild Schema bindings array
-                        this.rebuildSchemaBindings();
-
                         this.trigger('change', this.value);
                     }
                 });
@@ -183,17 +179,6 @@ module.exports = class ArrayEditor extends FieldEditor {
     }
 
     /**
-     * Rebuild Schema bindings
-     */
-    rebuildSchemaBindings() {
-        this.value.schemaBindings = [];
-
-        this.$element.find('.item').each((i, element) => {
-            this.value.schemaBindings[element.dataset.index] = element.dataset.schema;
-        });
-    }
-
-    /**
      * Updates DOM indices
      */
     updateDOMIndices() {
@@ -206,11 +191,10 @@ module.exports = class ArrayEditor extends FieldEditor {
      * Renders an item
      *
      * @param {Number} index
-     * @param {Object} item
      *
      * @returns {HTMLElement} Item
      */
-    renderItem(index, item) {
+    renderItem(index) {
         let $element = _.div({class: 'item raised', 'data-index': index});
             
         // Returns the correct index, even if it's updated
@@ -220,23 +204,24 @@ module.exports = class ArrayEditor extends FieldEditor {
 
         // Renders this item
         let rerenderItem = () => {
+            // Check if item exists
+            let item = this.value[getIndex()];
+            
+            if(!item) {
+                return UI.errorModal(new Error('Index "' + getIndex() + '" is out of bounds'));
+            }
+
             // Account for large arrays
-            if(this.value.items.length >= 20) {
+            if(this.value.length >= 20) {
                 $element.addClass('collapsed');
             }
 
-            let itemSchemaId = this.value.schemaBindings[getIndex()];
+            let itemSchemaId = this.value[getIndex()].schemaId;
 
-            // Schema could not be found, assign first allowed schema
-            if(
-                this.config.allowedSchemas.length > 0 &&
-                (
-                    !itemSchemaId ||
-                    this.config.allowedSchemas.indexOf(itemSchemaId) < 0
-                )
-            ) {
-                itemSchemaId = this.config.allowedSchemas[0];                    
-                this.value.schemaBindings[getIndex()] = itemSchemaId;
+            // Schema could not be found, assign first allowed Schema
+            if(!itemSchemaId || this.config.allowedSchemas.indexOf(itemSchemaId) < 0) {
+                itemSchemaId = this.config.allowedSchemas[0];
+                this.value[getIndex()].schemaId = itemSchemaId;
             }
 
             // Assign the Schema id as a DOM attribute
@@ -246,19 +231,17 @@ module.exports = class ArrayEditor extends FieldEditor {
             let itemSchema = SchemaHelper.getFieldSchemaWithParentConfigs(itemSchemaId);
 
             if(!itemSchema) {
-                UI.errorModal(new Error('Schema by id "' + itemSchemaId + '" not found'));
-                return;
+                return UI.errorModal(new Error('Schema by id "' + itemSchemaId + '" not found'));
             }
 
             let fieldEditor = ContentEditor.getFieldEditor(itemSchema.editorId);
 
             if(!fieldEditor) {
-                UI.errorModal(new Error('Field editor "' + fieldEditor + '" was not found'));
+                return UI.errorModal(new Error('Field editor "' + fieldEditor + '" was not found'));
             }
 
-            // Perform sanity check and reassign the item into the array
-            item = ContentHelper.fieldSanityCheck(item, itemSchema);
-            this.value.items[getIndex()] = item;
+            // Perform sanity check on item value
+            item.value = ContentHelper.fieldSanityCheck(item.value, itemSchema);
 
             // Create dropdown array for Schema selector
             let dropdownOptions = [];
@@ -281,7 +264,7 @@ module.exports = class ArrayEditor extends FieldEditor {
                 _.div({class: 'value'},
                     UI.inputDropdownTypeAhead('(none)', dropdownOptions, (newValue) => {
                         // Set new value in Schema bindings
-                        this.value.schemaBindings[getIndex()] = newValue;
+                        item.schemaId = newValue;
                    
                         // Re-render this item
                         rerenderItem();
@@ -294,18 +277,18 @@ module.exports = class ArrayEditor extends FieldEditor {
 
             // Get the label from the item
             // TODO (Issue #157): Make this recursive, so we can find detailed values in structs 
-            if(item) {
+            if(item.value) {
                 // This item is a string
-                if(typeof item === 'string') {
+                if(typeof item.value === 'string') {
                     // This item is an id
-                    if(item.length === 40) {
-                        let content = ContentHelper.getContentByIdSync(item);
+                    if(item.value.length === 40) {
+                        let content = ContentHelper.getContentByIdSync(item.value);
 
                         if(content) {
                             schemaLabel = content.prop('title', window.language) || content.id || schemaLabel;
                         
                         } else {
-                            let media = MediaHelper.getMediaByIdSync(item);
+                            let media = MediaHelper.getMediaByIdSync(item.value);
 
                             if(media) {
                                 schemaLabel = media.name || media.url || schemaLabel;
@@ -314,13 +297,13 @@ module.exports = class ArrayEditor extends FieldEditor {
 
                     // This item is another type of string
                     } else {
-                        schemaLabel = item || schemaLabel;
+                        schemaLabel = item.value || schemaLabel;
                     }
 
                 // This item is a struct
                 } else if(item instanceof Object) {
                     // Try to get a field based on the usual suspects
-                    schemaLabel = item.name || item.title || item.text || item.heading || item.header || item.body || item.description || item.type || item.body || item.id || schemaLabel;
+                    schemaLabel = item.value.name || item.value.title || item.value.text || item.value.heading || item.value.header || item.value.body || item.value.description || item.value.type || item.value.body || item.value.id || schemaLabel;
                   
                     if(!schemaLabel) { 
                         // Find the first available field
@@ -328,12 +311,11 @@ module.exports = class ArrayEditor extends FieldEditor {
                             let configValue = itemSchema.config[configKey];
 
                             // If a label field was found, check if it has a value
-                            if(item[configKey]) {
-                                schemaLabel = item[configKey] || schemaLabel;
+                            if(item.value[configKey]) {
+                                schemaLabel = item.value[configKey] || schemaLabel;
                                 break;
                             }
                         }
-                      
                     }
                 }
             }
@@ -366,7 +348,7 @@ module.exports = class ArrayEditor extends FieldEditor {
 
             // Init the field editor
             let fieldEditorInstance = new fieldEditor({
-                value: itemSchema.multilingual ? item[window.language] : item,
+                value: itemSchema.multilingual ? item.value[window.language] : item.value,
                 disabled: itemSchema.disabled || false,
                 config: itemSchema.config || {},
                 schema: itemSchema
@@ -400,44 +382,58 @@ module.exports = class ArrayEditor extends FieldEditor {
         return $element;
     }
 
-    render() {
-        // Recover flat arrays
-        if(Array.isArray(this.value)) {
-            this.value = {
-                items: this.value,
-                schemaBindings: []
-            };
-        }
-        
-        // NOTE: The reason for having a separate array with Schema ids is that there is no other way
-        // to associate a value with a Schema id if it's not an Object type, like a String or a Number
+    /**
+     * Sanity check
+     */
+    sanityCheck() {
+        // The value was null
+        if(!this.value) { this.value = []; }
 
-        // A sanity check to make sure we're working with an object value
-        if(
-            !this.value ||
-            !(this.value instanceof Object)
-        ) {
-            this.value = {
-                items: [],
-                schemaBindings: []
-            };
-        
-        }
+        // Config
+        this.config = this.config || {};
 
-        // Sanity check for items array
-        if(!this.value.items) {
-            this.value.items = [];
-        }
-
-        // Sanity check for Schema bindings array
-        if(!this.value.schemaBindings) {
-            this.value.schemaBindings = [];
-        }
-        
         // Sanity check for allowed Schemas array
-        if(!this.config.allowedSchemas) {
-            this.config.allowedSchemas = []
+        this.config.allowedSchemas = this.config.allowedSchemas || [];
+        
+        // The value was not an array, recover the items
+        if(!Array.isArray(this.value)) {
+            debug.log('Restructuring array from old format...', this);
+
+            // If this value isn't using the old system, we can't recover it
+            if(!Array.isArray(this.value.items) || !Array.isArray(this.value.schemaBindings)) {
+                return UI.errorModal(new Error('The type "' + typeof this.value + '" of the value is incorrect or corrupted'));
+            }
+
+            let newItems = [];
+
+            // Restructure "items" array into objects
+            for(let i in this.value.items) {
+                newItems[i] = {
+                    value: this.value.items[i]
+                };
+            
+                // Try to get the Schema id
+                if(this.value.schemaBindings[i]) {
+                    newItems[i].schemaId = this.value.schemaBindings[i];
+
+                // If we couldn't find it, just use the first allowed Schema
+                } else {
+                    newItems[i].schemaId = this.config.allowedSchemas[0];
+
+                }
+            }
+
+            this.value = newItems;
+    
+            setTimeout(() => {
+                this.trigger('change', this.value);
+            }, 500);
         }
+    }
+
+    render() {
+        // Perform sanity check
+        this.sanityCheck();
 
         // Render editor
         _.append(this.$element.empty(),
@@ -452,17 +448,16 @@ module.exports = class ArrayEditor extends FieldEditor {
         // Render items asynchronously to accommodate for large arrays
         let renderNextItem = (i) => {
             // Update DOM indices after all items have been rendered
-            if(i >= this.value.items.length) {
+            if(i >= this.value.length) {
                 this.updateDOMIndices();
                 
                 ContentEditor.restoreScrollPos();
-                
                 return;
             }
 
             // Append the item to the DOM
             this.$element.children('.items').append(
-                this.renderItem(i, this.value.items[i])
+                this.renderItem(i)
             );
 
             // Render next item in the next CPU cycle

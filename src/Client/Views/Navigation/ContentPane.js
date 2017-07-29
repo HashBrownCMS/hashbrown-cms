@@ -260,7 +260,7 @@ class ContentPane extends NavbarPane {
 
         }
         
-        let modal = new HashBrown.Views.Modals.MessageModal({
+        let modal = new HashBrown.Client.Views.Modals.MessageModal({
             model: {
                 title: 'Publishing settings for "' + content.prop('title', window.language) + '"'
             },

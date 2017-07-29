@@ -611,7 +611,7 @@ class GitHubConnection extends Connection {
      * @param {String} id
      * @param {Object} file
      *
-     * @returns {Promise(Array)} media
+     * @returns {Promise} Promise
      */
     setMedia(id, file) {
         let path = 'media/' + id;
@@ -702,7 +702,7 @@ class GitHubConnection extends Connection {
      *
      * @param {String} id
      *
-     * @returns {Promise(Array)} media
+     * @returns {Promise} Promise
      */
     removeMedia(id) {
         let path = 'media/' + id;

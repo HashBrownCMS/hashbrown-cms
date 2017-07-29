@@ -42,7 +42,7 @@ class FormEditor extends View {
             });
         })
         .catch((err) => {
-            new HashBrown.Views.Modals.MessageModal({
+            new HashBrown.Client.Views.Modals.MessageModal({
                 model: {
                     title: 'Error',
                     body: err
@@ -312,7 +312,7 @@ class FormEditor extends View {
      */
     renderEntries() {
         return _.button({class: 'btn btn-primary'}, 'View entries').click(() => {
-            let modal = new HashBrown.Views.Modals.MessageModal({
+            let modal = new HashBrown.Client.Views.Modals.MessageModal({
                 model: {
                     title: 'Entries',
                     body: _.table({},

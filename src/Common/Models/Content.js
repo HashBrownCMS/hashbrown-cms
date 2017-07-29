@@ -275,8 +275,12 @@ class Content extends Entity {
      * @returns {Object} properties
      */
     getLocalizedProperties(language) {
-        let properties = {};
+        // Create references
+        // NOTE: We're cloning the "properties" value to avoid destroying the structure
+        let localizedProperties = {};
+        let allProperties = JSON.parse(JSON.stringify(this.properties));
 
+        // Flatten properties recursively
         function flattenRecursively(source, target) {
             // Loop through all keys
             for(let key in source) {
@@ -294,14 +298,14 @@ class Content extends Entity {
 
                     // If not, recurse into the object
                     } else {
-                        // If this value was created with the ArrayEditor, filter out schema
-                        // bindings by assigning the "items" value to the value variable
-                        if(
-                            value instanceof Object &&
-                            value.items && Array.isArray(value.items) &&
-                            value.schemaBindings && Array.isArray(value.schemaBindings)
-                        ) {
-                            value = value.items;
+                        // If this value was created with the ArrayEditor, filter out Schema ids
+                        // by assigning the "value" of each item directly to the array
+                        if(Array.isArray(value)) {
+                            for(let i in value) {
+                                if(!value[i].value) { continue; }
+
+                                value[i] = value[i].value;
+                            }
                         }
 
                         // Prepare target data type for either Object or Array
@@ -323,9 +327,9 @@ class Content extends Entity {
             }
         }
 
-        flattenRecursively(this.properties, properties);
+        flattenRecursively(allProperties, localizedProperties);
 
-        return properties;
+        return localizedProperties;
     }
 
     /**
