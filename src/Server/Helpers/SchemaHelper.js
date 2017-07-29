@@ -11,6 +11,11 @@ const FileSystem = require('fs');
 const Path = require('path');
 const Glob = require('glob');
 
+/**
+ * The helpers class for Schemas
+ *
+ * @memberof HashBrown.Server.Helpers
+ */
 class SchemaHelper extends SchemaHelperCommon {
     /**
      * Gets a list of native schema objects

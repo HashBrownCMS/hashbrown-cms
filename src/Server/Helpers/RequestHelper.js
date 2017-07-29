@@ -11,6 +11,8 @@ const MAX_REDIRECTS = 10;
 
 /**
  * A helper class for making HTTP requests
+ *
+ * @memberof HashBrown.Server.Helpers
  */
 class RequestHelper {
     /**

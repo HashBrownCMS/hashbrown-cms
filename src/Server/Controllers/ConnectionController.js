@@ -5,6 +5,8 @@ let ApiController = require('./ApiController');
 
 /**
  * The Controller for Connections
+ *
+ * @memberof HashBrown.Server.Controllers
  */
 class ConnectionController extends ApiController {
     /**

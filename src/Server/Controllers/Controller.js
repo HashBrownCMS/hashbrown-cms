@@ -2,6 +2,8 @@
 
 /**
  * The base class for all controllers
+ *
+ * @memberof HashBrown.Server.Controllers
  */
 class Controller {
     /**

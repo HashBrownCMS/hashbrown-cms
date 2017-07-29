@@ -7,6 +7,11 @@ const ContentSchema = require('Common/Models/ContentSchema');
 const FieldSchema = require('Common/Models/FieldSchema');
 const User = require('Server/Models/User');
 
+/**
+ * The helper class for Content
+ *
+ * @memberof HashBrown.Server.Helpers
+ */
 class ContentHelper extends ContentHelperCommon {
     /**
      * Gets all Content objects

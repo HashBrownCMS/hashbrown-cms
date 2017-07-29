@@ -4,6 +4,8 @@ const Entity = require('Common/Models/Entity');
 
 /**
  * The base class for all tasks
+ *
+ * @memberof HashBrown.Server.Models
  */
 class Task extends Entity {
     structure() {

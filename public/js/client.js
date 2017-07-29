@@ -48100,6 +48100,12 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var SettingsHelperCommon = __webpack_require__(194);
 
+/**
+ * The helper class for settings
+ *
+ * @memberof HashBrown.Server.Helpers
+ */
+
 var SettingsHelper = function (_SettingsHelperCommon) {
     _inherits(SettingsHelper, _SettingsHelperCommon);
 

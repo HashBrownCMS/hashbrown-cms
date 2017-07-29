@@ -5,6 +5,11 @@ let fs = require('fs');
 let config = null;
 let handler = null;
 
+/**
+ * The helper class for security
+ *
+ * @memberof HashBrown.Server.Helpers
+ */
 class SecurityHelper {
 	/**
 	 * Gets the SSL config

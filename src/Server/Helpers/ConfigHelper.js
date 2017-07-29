@@ -2,6 +2,11 @@
 
 let fs = require('fs');
 
+/**
+ * A helper class for reading and writing config files
+ *
+ * @memberof HashBrown.Server.Helpers
+ */
 class ConfigHelper {
     /**
      * Gets a particular config section

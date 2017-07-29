@@ -6,6 +6,8 @@ const SyncHelper = require('Server/Helpers/SyncHelper');
 
 /**
  * The Controller for Schemas
+ *
+ * @memberof HashBrown.Server.Controllers
  */
 class SchemaController extends ApiController {
     /**

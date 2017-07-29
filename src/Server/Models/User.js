@@ -5,6 +5,11 @@ const Crypto = require('crypto');
 const Entity = require('Common/Models/Entity');
 const UserCommon = require('Common/Models/User');
 
+/**
+ * A stored password
+ *
+ * @memberof HashBrown.Server.Models
+ */
 class Password extends Entity {
     structure() {
         this.def(String, 'hash');
@@ -12,6 +17,11 @@ class Password extends Entity {
     }
 }
 
+/**
+ * A model for Users
+ *
+ * @memberof HashBrown.Server.Models
+ */
 class User extends UserCommon {
     constructor(params) {
         if(params && params.password) {

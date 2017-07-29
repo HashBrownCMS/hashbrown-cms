@@ -4,6 +4,8 @@ const Form = require('Common/Models/Form');
 
 /**
  * The helper class for Forms
+ *
+ * @memberof HashBrown.Server.Helpers
  */
 class FormHelper {
     /**

@@ -8,6 +8,8 @@ const Connection = require('Common/Models/Connection');
 
 /**
  * A helper class for managing backups
+ *
+ * @memberof HashBrown.Server.Helpers
  */
 class BackupHelper {
     /**

@@ -5,6 +5,8 @@ let ApiController = require('./ApiController');
 
 /**
  * The Controller for scheduled Tasks
+ *
+ * @memberof HashBrown.Server.Controllers
  */
 class ScheduleController extends ApiController {
     /**

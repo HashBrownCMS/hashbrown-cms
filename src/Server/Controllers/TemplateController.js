@@ -2,6 +2,11 @@
 
 let ApiController = require('./ApiController');
 
+/**
+ * The controller fro templates
+ *
+ * @memberof HashBrown.Server.Controllers
+ */
 class TemplateController extends ApiController {
     /**
      * Initialises this controller

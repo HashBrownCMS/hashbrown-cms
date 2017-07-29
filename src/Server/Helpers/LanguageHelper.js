@@ -3,6 +3,11 @@
 const SettingsHelper = require('Server/Helpers/SettingsHelper');
 const LanguageHelperCommon = require('Common/Helpers/LanguageHelper');
 
+/**
+ * The helper class for languages
+ *
+ * @memberof HashBrown.Server.Helpers
+ */
 class LanguageHelper extends LanguageHelperCommon {
     /**
      * Gets all selected languages

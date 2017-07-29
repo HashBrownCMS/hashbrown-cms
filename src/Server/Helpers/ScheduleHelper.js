@@ -8,6 +8,8 @@ const WATCH_INTERVAL = 1000 * 60; // One minute
 
 /**
  * A helper class for scheduling tasks
+ *
+ * @memberof HashBrown.Server.Helpers
  */
 class ScheduleHelper {
     /**

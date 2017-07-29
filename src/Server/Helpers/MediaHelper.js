@@ -8,6 +8,11 @@ const Multer = require('multer');
 const Media = require('Server/Models/Media');
 const MediaHelperCommon = require('Common/Helpers/MediaHelper');
 
+/**
+ * The helper class for Media
+ *
+ * @memberof HashBrown.Server.Helpers
+ */
 class MediaHelper extends MediaHelperCommon {
     /**
      * Gets the upload handler

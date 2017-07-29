@@ -8,6 +8,8 @@ const FileSystem = require('fs');
 
 /**
  * The helper class for system updates
+ *
+ * @memberof HashBrown.Server.Helpers
  */
 class UpdateHelper {
     /**

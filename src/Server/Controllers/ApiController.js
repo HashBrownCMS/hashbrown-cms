@@ -8,6 +8,8 @@ let Controller = require('./Controller');
 
 /**
  * The main API controller
+ *
+ * @memberof HashBrown.Server.Controllers
  */
 class ApiController extends Controller {
     /**

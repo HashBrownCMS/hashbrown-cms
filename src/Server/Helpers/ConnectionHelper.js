@@ -3,6 +3,11 @@
 const ConnectionHelperCommon = require('Common/Helpers/ConnectionHelper');
 const Connection = require('Common/Models/Connection');
 
+/**
+ * The helper class for Connections
+ *
+ * @memberof HashBrown.Server.Helpers
+ */
 class ConnectionHelper extends ConnectionHelperCommon {
     /**
      * Registers a connection type

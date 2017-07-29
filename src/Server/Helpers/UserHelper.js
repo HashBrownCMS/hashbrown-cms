@@ -8,6 +8,8 @@ const User = require('Server/Models/User');
 
 /**
  * A helper class for managing and getting information about CMS users
+ *
+ * @memberof HashBrown.Server.Helpers
  */
 class UserHelper {
     /**

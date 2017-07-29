@@ -2,6 +2,11 @@
 
 let DebugHelperCommon = require('Common/Helpers/DebugHelper');
 
+/**
+ * The helper class for debugging
+ *
+ * @memberof HashBrown.Server.Helpers
+ */
 class DebugHelper extends DebugHelperCommon {
     /**
      * Event: Log

@@ -2,6 +2,8 @@
 
 /**
  * The helper class for all synchronisation services
+ *
+ * @memberof HashBrown.Server.Helper
  */
 class SyncHelper {
     /**

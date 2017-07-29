@@ -2,6 +2,11 @@
 
 let ApiController = require('./ApiController');
 
+/**
+ * The controller for settings
+ *
+ * @memberof HashBrown.Server.Controllers
+ */
 class SettingsController extends ApiController {
     /**
      * Initialises this controller

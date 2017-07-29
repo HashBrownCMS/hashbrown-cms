@@ -4,6 +4,8 @@ const Project = require('Common/Models/Project');
 
 /**
  * A helper class for managing projects
+ *
+ * @memberof HashBrown.Server.Helpers
  */
 class ProjectHelper {
     /**

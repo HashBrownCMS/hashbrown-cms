@@ -13,6 +13,11 @@ const SUBMISSION_TIMEOUT_MS = 1000;
 let lastSubmission = Date.now();
 let lastIp = '';
 
+/**
+ * The controller for Forms
+ *
+ * @memberof HashBrown.Server.Controllers
+ */
 class FormsController extends ApiController {
     /**
      * Initialises this controller

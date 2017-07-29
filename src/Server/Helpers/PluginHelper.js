@@ -4,6 +4,11 @@
 const Glob = require('glob');
 const FileSystem = require('fs');
 
+/**
+ * The helper class for plugins
+ *
+ * @memberof HashBrown.Server.Helpers
+ */
 class PluginHelper {
     /**
      * Initialises all plugins located at /plugins/:name/server/index.js

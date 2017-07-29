@@ -2,6 +2,11 @@
 
 const SettingsHelperCommon = require('Common/Helpers/SettingsHelper');
 
+/**
+ * The helper class for settings
+ *
+ * @memberof HashBrown.Server.Helpers
+ */
 class SettingsHelper extends SettingsHelperCommon {
     /**
      * Migrates old settings format
