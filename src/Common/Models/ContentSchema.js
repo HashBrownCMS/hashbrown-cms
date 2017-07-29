@@ -4,6 +4,8 @@ let Schema = require('./Schema');
 
 /**
  * Schema for content nodes
+ *
+ * @memberof HashBrown.Common.Models
  */
 class ContentSchema extends Schema {
     constructor(properties) {

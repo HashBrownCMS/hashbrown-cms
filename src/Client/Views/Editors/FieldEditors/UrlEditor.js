@@ -4,8 +4,10 @@ const FieldEditor = require('./FieldEditor');
 
 /**
  * An editor for content URLs
+ *
+ * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
-module.exports = class UrlEditor extends FieldEditor {
+class UrlEditor extends FieldEditor {
     constructor(params) {
         super(params);
 
@@ -199,3 +201,5 @@ module.exports = class UrlEditor extends FieldEditor {
         }, 2);
     }
 }
+
+module.exports = UrlEditor;

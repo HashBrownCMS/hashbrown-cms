@@ -1,5 +1,8 @@
 'use strict';
 
+/**
+ * @namespace HashBrown.Common.Helpers
+ */
 module.exports = {
     ConnectionHelper: require('./ConnectionHelper'),
     ContentHelper: require('./ContentHelper'),

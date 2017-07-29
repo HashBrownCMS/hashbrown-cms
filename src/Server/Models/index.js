@@ -1,18 +1,14 @@
 'use strict';
 
 /**
- * @namespace HashBrown.Common.Models
+ * @namespace HashBrown.Server.Models
  */
 module.exports = {
-    Connection: require('./Connection'),
     Content: require('./Content'),
     ContentSchema: require('./ContentSchema'),
-    Entity: require('./Entity'),
     FieldSchema: require('./FieldSchema'),
-    index: require('./index'),
     Media: require('./Media'),
-    Project: require('./Project'),
     Schema: require('./Schema'),
-    Template: require('./Template'),
+    Task: require('./Task'),
     User: require('./User')
 };

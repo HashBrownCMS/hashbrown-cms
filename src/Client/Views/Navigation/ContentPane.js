@@ -5,6 +5,11 @@ const ContentHelper = require('Client/Helpers/ContentHelper');
 const NavbarPane = require('./NavbarPane');
 const NavbarMain = require('./NavbarMain');
 
+/**
+ * The Content navbar pane
+ * 
+ * @memberof HashBrown.Client.Views.Navigation
+ */
 class ContentPane extends NavbarPane {
     /**
      * Event: Change parent

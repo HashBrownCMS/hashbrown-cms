@@ -317,49 +317,8 @@ window.reloadAllResources = function reloadAllResources() {
     return processQueue();
 };
 
-/**
- * Adds a ready callback to the queue or executes it if given key is already triggered
- */
-let onReadyCallbacks = {};
-let isReady = {};
-
-window.onReady = function onReady(name, callback) {
-    if(isReady[name]) {
-        callback();
-    
-    } else {
-        if(!onReadyCallbacks[name]) {
-            onReadyCallbacks[name] = [];
-        }
-
-        onReadyCallbacks[name].push(callback);
-    
-    }
-}
-
-/**
- * Resets a key
- */
-window.resetReady = function resetReady(name) {
-    delete isReady[name];
-}
-
-/**
- * Triggers a key
- */
-window.triggerReady = function triggerReady(name) {
-    isReady[name] = true;
-
-    if(onReadyCallbacks[name]) {
-        for(let callback of onReadyCallbacks[name]) {
-            callback();
-        }
-    }
-}
-
 // Get package file
 window.app = require('package.json');
 
 // Language
 window.language = localStorage.getItem('language') || 'en';
-

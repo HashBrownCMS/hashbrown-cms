@@ -4,8 +4,10 @@ const FieldEditor = require('./FieldEditor');
 
 /**
  * A simple number editor
+ *
+ * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
-module.exports = class NumberEditor extends FieldEditor {
+class NumberEditor extends FieldEditor {
     constructor(params) {
         super(params);
 
@@ -39,3 +41,5 @@ module.exports = class NumberEditor extends FieldEditor {
         );
     }
 }
+
+module.exports = NumberEditor;

@@ -3,7 +3,7 @@
 /**
  * The helper class for all synchronisation services
  *
- * @memberof HashBrown.Server.Helper
+ * @memberof HashBrown.Server.Helpers
  */
 class SyncHelper {
     /**

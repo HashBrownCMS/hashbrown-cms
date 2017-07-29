@@ -1,6 +1,11 @@
 'use strict';
 
-module.exports = class LanguageHelper {
+/**
+ * A helper for language
+ *
+ * @memberof HashBrown.Common.Helpers
+ */
+class LanguageHelper {
     /**
      * Gets all selected languages
      *
@@ -252,3 +257,5 @@ module.exports = class LanguageHelper {
         ];
     }
 }
+
+module.exports = LanguageHelper;

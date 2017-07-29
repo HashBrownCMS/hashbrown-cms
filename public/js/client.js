@@ -5796,6 +5796,8 @@ module.exports = CipherBase;
 
 /**
  * The base for all field editors
+ *
+ * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -5804,7 +5806,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-module.exports = function (_View) {
+var FieldEditor = function (_View) {
     _inherits(FieldEditor, _View);
 
     function FieldEditor() {
@@ -5859,6 +5861,8 @@ module.exports = function (_View) {
 
     return FieldEditor;
 }(View);
+
+module.exports = FieldEditor;
 
 /***/ }),
 /* 10 */
@@ -6160,6 +6164,8 @@ var crypto = __webpack_require__(103);
 
 /**
  * The base class for everything
+ *
+ * @memberof HashBrown.Common.Models
  */
 
 var Entity = function () {
@@ -6343,6 +6349,8 @@ module.exports = Entity;
 
 /**
  * A basic modal for displaying messages to the user
+ *
+ * @memberof HashBrown.Client.Views.Modals
  */
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -6351,7 +6359,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-module.exports = function (_View) {
+var MessageModal = function (_View) {
     _inherits(MessageModal, _View);
 
     function MessageModal(params) {
@@ -6451,6 +6459,8 @@ module.exports = function (_View) {
 
     return MessageModal;
 }(View);
+
+module.exports = MessageModal;
 
 /***/ }),
 /* 15 */
@@ -7848,6 +7858,8 @@ function decrypt(data, password) {
 
 /**
  * The main navbar
+ * 
+ * @memberof HashBrown.Client.Views.Navigation
  */
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -8360,6 +8372,12 @@ module.exports = NavbarMain;
 "use strict";
 
 
+/**
+ * A navbar pane
+ * 
+ * @memberof HashBrown.Client.Views.Navigation
+ */
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Pane = function () {
@@ -8543,9 +8561,11 @@ module.exports = Pane;
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-module.exports = function ProjectHelper() {
+var ProjectHelper = function ProjectHelper() {
   _classCallCheck(this, ProjectHelper);
 };
+
+module.exports = ProjectHelper;
 
 /***/ }),
 /* 34 */
@@ -8567,7 +8587,8 @@ var SettingsHelperCommon = __webpack_require__(194);
  *
  * @memberof HashBrown.Client.Helpers
  */
-module.exports = function (_SettingsHelperCommon) {
+
+var SettingsHelper = function (_SettingsHelperCommon) {
     _inherits(SettingsHelper, _SettingsHelperCommon);
 
     function SettingsHelper() {
@@ -8777,6 +8798,8 @@ module.exports = function (_SettingsHelperCommon) {
     return SettingsHelper;
 }(SettingsHelperCommon);
 
+module.exports = SettingsHelper;
+
 /***/ }),
 /* 35 */
 /***/ (function(module, exports, __webpack_require__) {
@@ -8792,30 +8815,19 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var Entity = __webpack_require__(13);
 
-var Password = function (_Entity) {
-    _inherits(Password, _Entity);
+/**
+ * A model for Users
+ *
+ * @memberof HashBrown.Common.Models
+ */
 
-    function Password() {
-        _classCallCheck(this, Password);
-
-        return _possibleConstructorReturn(this, _Entity.apply(this, arguments));
-    }
-
-    Password.prototype.structure = function structure() {
-        this.def(String, 'hash');
-        this.def(String, 'salt');
-    };
-
-    return Password;
-}(Entity);
-
-var User = function (_Entity2) {
-    _inherits(User, _Entity2);
+var User = function (_Entity) {
+    _inherits(User, _Entity);
 
     function User(params) {
         _classCallCheck(this, User);
 
-        return _possibleConstructorReturn(this, _Entity2.call(this, params));
+        return _possibleConstructorReturn(this, _Entity.call(this, params));
     }
 
     User.prototype.structure = function structure() {
@@ -10486,7 +10498,8 @@ var ContentHelperCommon = __webpack_require__(225);
  *
  * @memberof HashBrown.Client.Helpers
  */
-module.exports = function (_ContentHelperCommon) {
+
+var ContentHelper = function (_ContentHelperCommon) {
     _inherits(ContentHelper, _ContentHelperCommon);
 
     function ContentHelper() {
@@ -10651,6 +10664,8 @@ module.exports = function (_ContentHelperCommon) {
 
     return ContentHelper;
 }(ContentHelperCommon);
+
+module.exports = ContentHelper;
 
 /***/ }),
 /* 48 */
@@ -14168,6 +14183,8 @@ var Entity = __webpack_require__(13);
 
 /**
  * The base class for all Connection types
+ *
+ * @memberof HashBrown.Common.Models
  */
 
 var Connection = function (_Entity) {
@@ -14541,7 +14558,8 @@ var SchemaHelperCommon = __webpack_require__(234);
  *
  * @memberof HashBrown.Client.Helpers
  */
-module.exports = function (_SchemaHelperCommon) {
+
+var SchemaHelper = function (_SchemaHelperCommon) {
     _inherits(SchemaHelper, _SchemaHelperCommon);
 
     function SchemaHelper() {
@@ -14630,6 +14648,8 @@ module.exports = function (_SchemaHelperCommon) {
     return SchemaHelper;
 }(SchemaHelperCommon);
 
+module.exports = SchemaHelper;
+
 /***/ }),
 /* 85 */
 /***/ (function(module, exports, __webpack_require__) {
@@ -14647,6 +14667,8 @@ var Entity = __webpack_require__(13);
 
 /**
  * The base class for all Schema types
+ *
+ * @memberof HashBrown.Common.Models
  */
 
 var Schema = function (_Entity) {
@@ -14727,6 +14749,8 @@ var Entity = __webpack_require__(13);
 
 /**
  * The base class for all Media objects
+ *
+ * @memberof HashBrown.Common.Models
  */
 
 var Media = function (_Entity) {
@@ -14899,8 +14923,11 @@ var ProjectHelper = __webpack_require__(33);
 
 /**
  * The client-side content model
+ *
+ * @memberof HashBrown.Client.Models
  */
-module.exports = function (_ContentCommon) {
+
+var Content = function (_ContentCommon) {
     _inherits(Content, _ContentCommon);
 
     function Content() {
@@ -14942,12 +14969,20 @@ module.exports = function (_ContentCommon) {
     return Content;
 }(ContentCommon);
 
+module.exports = Content;
+
 /***/ }),
 /* 88 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
+
+/**
+ * An editor for Users
+ *
+ * @memberof HashBrown.Client.Views.Editors
+ */
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -15242,7 +15277,8 @@ var LanguageHelperCommon = __webpack_require__(198);
  *
  * @memberof HashBrown.Client.Helpers
  */
-module.exports = function (_LanguageHelperCommon) {
+
+var LanguageHelper = function (_LanguageHelperCommon) {
     _inherits(LanguageHelper, _LanguageHelperCommon);
 
     function LanguageHelper() {
@@ -15300,6 +15336,8 @@ module.exports = function (_LanguageHelperCommon) {
     return LanguageHelper;
 }(LanguageHelperCommon);
 
+module.exports = LanguageHelper;
+
 /***/ }),
 /* 90 */
 /***/ (function(module, exports, __webpack_require__) {
@@ -15316,7 +15354,8 @@ var MessageModal = __webpack_require__(14);
  *
  * @memberof HashBrown.Client.Helpers
  */
-module.exports = function () {
+
+var UIHelper = function () {
     function UIHelper() {
         _classCallCheck(this, UIHelper);
     }
@@ -15845,6 +15884,8 @@ module.exports = function () {
     return UIHelper;
 }();
 
+module.exports = UIHelper;
+
 /***/ }),
 /* 91 */
 /***/ (function(module, exports, __webpack_require__) {
@@ -16161,57 +16202,6 @@ window.reloadAllResources = function reloadAllResources() {
     }
 
     return processQueue();
-};
-
-/**
- * Adds a ready callback to the queue or executes it if given key is already triggered
- */
-var onReadyCallbacks = {};
-var isReady = {};
-
-window.onReady = function onReady(name, callback) {
-    if (isReady[name]) {
-        callback();
-    } else {
-        if (!onReadyCallbacks[name]) {
-            onReadyCallbacks[name] = [];
-        }
-
-        onReadyCallbacks[name].push(callback);
-    }
-};
-
-/**
- * Resets a key
- */
-window.resetReady = function resetReady(name) {
-    delete isReady[name];
-};
-
-/**
- * Triggers a key
- */
-window.triggerReady = function triggerReady(name) {
-    isReady[name] = true;
-
-    if (onReadyCallbacks[name]) {
-        for (var _iterator2 = onReadyCallbacks[name], _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
-            var _ref2;
-
-            if (_isArray2) {
-                if (_i2 >= _iterator2.length) break;
-                _ref2 = _iterator2[_i2++];
-            } else {
-                _i2 = _iterator2.next();
-                if (_i2.done) break;
-                _ref2 = _i2.value;
-            }
-
-            var callback = _ref2;
-
-            callback();
-        }
-    }
 };
 
 // Get package file
@@ -33654,6 +33644,10 @@ if (typeof jQuery !== 'undefined') {
 "use strict";
 
 
+/**
+ * @namespace HashBrown.Common.Models
+ */
+
 module.exports = {
     Connection: __webpack_require__(83),
     Content: __webpack_require__(200),
@@ -33685,6 +33679,8 @@ var Schema = __webpack_require__(85);
 
 /**
  * Schema for content fields
+ *
+ * @memberof HashBrown.Common.Models
  */
 
 var FieldSchema = function (_Schema) {
@@ -33749,6 +33745,12 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var Entity = __webpack_require__(13);
 var Connection = __webpack_require__(83);
+
+/**
+ * The Project class
+ *
+ * @memberof HashBrown.Common.Models
+ */
 
 var Project = function (_Entity) {
     _inherits(Project, _Entity);
@@ -33827,11 +33829,19 @@ module.exports = Project;
 "use strict";
 
 
+/**
+ * A helper for settings
+ *
+ * @memberof HashBrown.Common.Helpers
+ */
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-module.exports = function SettingsHelper() {
+var SettingsHelper = function SettingsHelper() {
   _classCallCheck(this, SettingsHelper);
 };
+
+module.exports = SettingsHelper;
 
 /***/ }),
 /* 195 */
@@ -37299,9 +37309,15 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*jshint curly:t
 "use strict";
 
 
+/**
+ * A helper for language
+ *
+ * @memberof HashBrown.Common.Helpers
+ */
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-module.exports = function () {
+var LanguageHelper = function () {
     function LanguageHelper() {
         _classCallCheck(this, LanguageHelper);
     }
@@ -37392,6 +37408,8 @@ module.exports = function () {
     return LanguageHelper;
 }();
 
+module.exports = LanguageHelper;
+
 /***/ }),
 /* 199 */
 /***/ (function(module, exports, __webpack_require__) {
@@ -37403,7 +37421,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var VERBOSITY = 2;
 
-module.exports = function () {
+/**
+ * A helper for debugging
+ *
+ * @memberof HashBrown.Common.Helpers
+ */
+
+var DebugHelper = function () {
     function DebugHelper() {
         _classCallCheck(this, DebugHelper);
     }
@@ -37547,6 +37571,8 @@ module.exports = function () {
     return DebugHelper;
 }();
 
+module.exports = DebugHelper;
+
 /***/ }),
 /* 200 */
 /***/ (function(module, exports, __webpack_require__) {
@@ -37566,6 +37592,8 @@ var Entity = __webpack_require__(13);
 
 /**
  * The base class for all Content types
+ *
+ * @memberof HashBrown.Common.Models
  */
 
 var Content = function (_Entity) {
@@ -37967,6 +37995,8 @@ var Schema = __webpack_require__(85);
 
 /**
  * Schema for content nodes
+ *
+ * @memberof HashBrown.Common.Models
  */
 
 var ContentSchema = function (_Schema) {
@@ -38018,7 +38048,8 @@ var SettingsHelper = __webpack_require__(34);
  *
  * @memberof HashBrown.Client.Views.Modals
  */
-module.exports = function (_View) {
+
+var MediaBrowser = function (_View) {
     _inherits(MediaBrowser, _View);
 
     function MediaBrowser(params) {
@@ -38301,6 +38332,8 @@ module.exports = function (_View) {
     return MediaBrowser;
 }(View);
 
+module.exports = MediaBrowser;
+
 /***/ }),
 /* 203 */
 /***/ (function(module, exports, __webpack_require__) {
@@ -38323,7 +38356,8 @@ var ProjectHelper = __webpack_require__(33);
  *
  * @memberof HashBrown.Client.Helpers
  */
-module.exports = function (_ConnectionHelperComm) {
+
+var ConnectionHelper = function (_ConnectionHelperComm) {
     _inherits(ConnectionHelper, _ConnectionHelperComm);
 
     function ConnectionHelper() {
@@ -38448,6 +38482,8 @@ module.exports = function (_ConnectionHelperComm) {
     return ConnectionHelper;
 }(ConnectionHelperCommon);
 
+module.exports = ConnectionHelper;
+
 /***/ }),
 /* 204 */
 /***/ (function(module, exports, __webpack_require__) {
@@ -38467,6 +38503,8 @@ var beautify = __webpack_require__(237).js_beautify;
 
 /**
  * A basic JSON editor for any object
+ *
+ * @memberof HashBrown.Client.Views.Editors
  */
 
 var JSONEditor = function (_View) {
@@ -38963,6 +39001,10 @@ module.exports = MediaHelper;
 
 "use strict";
 
+
+/**
+ * @namespace HashBrown.Client
+ */
 
 window.isClient = true;
 window.isServer = false;
@@ -39694,6 +39736,8 @@ var Entity = __webpack_require__(13);
 
 /**
  * The Template model
+ *
+ * @memberof HashBrown.Common.Models
  */
 
 var Template = function (_Entity) {
@@ -39738,9 +39782,13 @@ module.exports = Template;
 "use strict";
 
 
+/**
+ * @namespace HashBrown.Client.Views.Modals
+ */
+
 module.exports = {
-    MediaBrowser: __webpack_require__(202),
-    MessageModal: __webpack_require__(14)
+  MediaBrowser: __webpack_require__(202),
+  MessageModal: __webpack_require__(14)
 };
 
 /***/ }),
@@ -39749,6 +39797,10 @@ module.exports = {
 
 "use strict";
 
+
+/**
+ * @namespace HashBrown.Client.Views.Navigation
+ */
 
 module.exports = {
     CMSPane: __webpack_require__(221),
@@ -39779,6 +39831,12 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var NavbarMain = __webpack_require__(31);
 var NavbarPane = __webpack_require__(32);
+
+/**
+ * The CMS navbar pane
+ * 
+ * @memberof HashBrown.Client.Views.Navigation
+ */
 
 var CMSPane = function (_NavbarPane) {
     _inherits(CMSPane, _NavbarPane);
@@ -39921,6 +39979,12 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var NavbarPane = __webpack_require__(32);
 var NavbarMain = __webpack_require__(31);
+
+/**
+ * The Connection navbar pane
+ * 
+ * @memberof HashBrown.Client.Views.Navigation
+ */
 
 var ConnectionPane = function (_NavbarPane) {
     _inherits(ConnectionPane, _NavbarPane);
@@ -40137,6 +40201,12 @@ var ContentHelper = __webpack_require__(47);
 
 var NavbarPane = __webpack_require__(32);
 var NavbarMain = __webpack_require__(31);
+
+/**
+ * The Content navbar pane
+ * 
+ * @memberof HashBrown.Client.Views.Navigation
+ */
 
 var ContentPane = function (_NavbarPane) {
     _inherits(ContentPane, _NavbarPane);
@@ -40628,9 +40698,15 @@ module.exports = ContentPane;
 "use strict";
 
 
+/**
+ * A helper class for Content
+ *
+ * @memberof HashBrown.Common.Helpers
+ */
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-module.exports = function () {
+var ContentHelper = function () {
     function ContentHelper() {
         _classCallCheck(this, ContentHelper);
     }
@@ -40775,6 +40851,8 @@ module.exports = function () {
     return ContentHelper;
 }();
 
+module.exports = ContentHelper;
+
 /***/ }),
 /* 226 */
 /***/ (function(module, exports, __webpack_require__) {
@@ -40790,6 +40868,12 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var NavbarPane = __webpack_require__(32);
 var NavbarMain = __webpack_require__(31);
+
+/**
+ * The Forms navbar pane
+ * 
+ * @memberof HashBrown.Client.Views.Navigation
+ */
 
 var FormsPane = function (_NavbarPane) {
     _inherits(FormsPane, _NavbarPane);
@@ -41013,6 +41097,12 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var User = __webpack_require__(35);
 var UserEditor = __webpack_require__(88);
 
+/**
+ * The main menu
+ * 
+ * @memberof HashBrown.Client.Views.Navigation
+ */
+
 var MainMenu = function (_View) {
     _inherits(MainMenu, _View);
 
@@ -41172,6 +41262,12 @@ var NavbarPane = __webpack_require__(32);
 var NavbarMain = __webpack_require__(31);
 var MediaBrowser = __webpack_require__(202);
 var MediaHelper = __webpack_require__(205);
+
+/**
+ * The Media navbar pane
+ * 
+ * @memberof HashBrown.Client.Views.Navigation
+ */
 
 var MediaPane = function (_NavbarPane) {
     _inherits(MediaPane, _NavbarPane);
@@ -41369,6 +41465,12 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var NavbarPane = __webpack_require__(32);
 var NavbarMain = __webpack_require__(31);
+
+/**
+ * The Schema navbar pane
+ * 
+ * @memberof HashBrown.Client.Views.Navigation
+ */
 
 var SchemaPane = function (_NavbarPane) {
     _inherits(SchemaPane, _NavbarPane);
@@ -41589,6 +41691,12 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var NavbarPane = __webpack_require__(32);
 var NavbarMain = __webpack_require__(31);
 
+/**
+ * The Settings navbar pane
+ * 
+ * @memberof HashBrown.Client.Views.Navigation
+ */
+
 var SettingsPane = function (_NavbarPane) {
     _inherits(SettingsPane, _NavbarPane);
 
@@ -41631,6 +41739,12 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var NavbarPane = __webpack_require__(32);
 var NavbarMain = __webpack_require__(31);
+
+/**
+ * The Template navbar pane
+ * 
+ * @memberof HashBrown.Client.Views.Navigation
+ */
 
 var TemplatePane = function (_NavbarPane) {
     _inherits(TemplatePane, _NavbarPane);
@@ -41875,6 +41989,10 @@ module.exports = TemplatePane;
 "use strict";
 
 
+/**
+ * @namespace HashBrown.Client.Views.Editors
+ */
+
 module.exports = {
     ConnectionEditor: __webpack_require__(233),
     ContentEditor: __webpack_require__(195),
@@ -41904,6 +42022,8 @@ var ConnectionHelper = __webpack_require__(203);
 
 /**
  * The editor for Connections
+ *
+ * @memberof HashBrown.Client.Views.Editors
  */
 
 var ConnectionEditor = function (_View) {
@@ -42119,8 +42239,11 @@ var ContentSchema = __webpack_require__(201);
 
 /**
  * The common base for SchemaHelper
+ *
+ * @memberof HashBrown.Common.Helpers
  */
-module.exports = function () {
+
+var SchemaHelper = function () {
     function SchemaHelper() {
         _classCallCheck(this, SchemaHelper);
     }
@@ -42160,6 +42283,8 @@ module.exports = function () {
     return SchemaHelper;
 }();
 
+module.exports = SchemaHelper;
+
 /***/ }),
 /* 235 */
 /***/ (function(module, exports, __webpack_require__) {
@@ -42175,9 +42300,10 @@ var SettingsHelper = isServer ? __webpack_require__(270) : __webpack_require__(3
 /**
  * The helper class for Connections
  *
- * @memberof HashBrown.Common.Helpers.ConnectionHelper
+ * @memberof HashBrown.Common.Helpers
  */
-module.exports = function () {
+
+var ConnectionHelper = function () {
     function ConnectionHelper() {
         _classCallCheck(this, ConnectionHelper);
     }
@@ -42326,6 +42452,8 @@ module.exports = function () {
     return ConnectionHelper;
 }();
 
+module.exports = ConnectionHelper;
+
 /***/ }),
 /* 236 */
 /***/ (function(module, exports, __webpack_require__) {
@@ -42336,9 +42464,7 @@ module.exports = function () {
 /**
  * The editor for Forms
  *
- * @class View FormEditor
- *
- * @param {Object} params
+ * @memberof HashBrown.Client.Views.Editors
  */
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -43954,7 +44080,7 @@ var ProjectHelper = __webpack_require__(33);
 /**
  * The providers settings editor
  *
- * @class View ProvidersSettings
+ * @memberof HashBrown.Client.Views.Editors
  */
 
 var ProvidersSettings = function (_View) {
@@ -44076,8 +44202,7 @@ var JSONEditor = __webpack_require__(204);
 /**
  * The editor for schemas
  *
- * @class View SchemaEditor
- * @param {Object} params
+ * @memberof HashBrown.Client.Views.Editors
  */
 
 var SchemaEditor = function (_View) {
@@ -45411,6 +45536,8 @@ module.exports = {
 
 /**
  * A Template editor
+ *
+ * @memberof HashBrown.Client.Views.Editors
  */
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -45531,6 +45658,10 @@ module.exports = TemplateEditor;
 "use strict";
 
 
+/**
+ * @namespace HashBrown.Client.Views.Editors.FieldEditors
+ */
+
 module.exports = {
     ArrayEditor: __webpack_require__(245),
     BooleanEditor: __webpack_require__(246),
@@ -45575,9 +45706,10 @@ var ContentEditor = __webpack_require__(195);
 /**
  * An array editor for editing a list of other field values
  *
- * @memberof Views.Editors.FieldEditors
+ * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
-module.exports = function (_FieldEditor) {
+
+var ArrayEditor = function (_FieldEditor) {
     _inherits(ArrayEditor, _FieldEditor);
 
     function ArrayEditor(params) {
@@ -46045,6 +46177,8 @@ module.exports = function (_FieldEditor) {
     return ArrayEditor;
 }(FieldEditor);
 
+module.exports = ArrayEditor;
+
 /***/ }),
 /* 246 */
 /***/ (function(module, exports, __webpack_require__) {
@@ -46062,8 +46196,11 @@ var FieldEditor = __webpack_require__(9);
 
 /**
  * A simple boolean editor
+ *
+ * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
-module.exports = function (_FieldEditor) {
+
+var BooleanEditor = function (_FieldEditor) {
     _inherits(BooleanEditor, _FieldEditor);
 
     function BooleanEditor(params) {
@@ -46104,6 +46241,8 @@ module.exports = function (_FieldEditor) {
     return BooleanEditor;
 }(FieldEditor);
 
+module.exports = BooleanEditor;
+
 /***/ }),
 /* 247 */
 /***/ (function(module, exports, __webpack_require__) {
@@ -46123,8 +46262,11 @@ var FieldEditor = __webpack_require__(9);
 
 /**
  * An editor for referring to other Content
+ *
+ * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
-module.exports = function (_FieldEditor) {
+
+var ContentReferenceEditor = function (_FieldEditor) {
     _inherits(ContentReferenceEditor, _FieldEditor);
 
     function ContentReferenceEditor(params) {
@@ -46209,6 +46351,8 @@ module.exports = function (_FieldEditor) {
     return ContentReferenceEditor;
 }(FieldEditor);
 
+module.exports = ContentReferenceEditor;
+
 /***/ }),
 /* 248 */
 /***/ (function(module, exports, __webpack_require__) {
@@ -46226,8 +46370,11 @@ var FieldEditor = __webpack_require__(9);
 
 /**
  * An editor for referencing Content Schemas
+ *
+ * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
-module.exports = function (_FieldEditor) {
+
+var ContentSchemaReferenceEditor = function (_FieldEditor) {
     _inherits(ContentSchemaReferenceEditor, _FieldEditor);
 
     function ContentSchemaReferenceEditor(params) {
@@ -46359,6 +46506,8 @@ module.exports = function (_FieldEditor) {
     return ContentSchemaReferenceEditor;
 }(FieldEditor);
 
+module.exports = ContentSchemaReferenceEditor;
+
 /***/ }),
 /* 249 */
 /***/ (function(module, exports, __webpack_require__) {
@@ -46376,8 +46525,11 @@ var FieldEditor = __webpack_require__(9);
 
 /**
  * An editor for date values
+ *
+ * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
-module.exports = function (_FieldEditor) {
+
+var DateEditor = function (_FieldEditor) {
     _inherits(DateEditor, _FieldEditor);
 
     function DateEditor(params) {
@@ -46585,6 +46737,8 @@ module.exports = function (_FieldEditor) {
     return DateEditor;
 }(FieldEditor);
 
+module.exports = DateEditor;
+
 /***/ }),
 /* 250 */
 /***/ (function(module, exports, __webpack_require__) {
@@ -46602,8 +46756,11 @@ var FieldEditor = __webpack_require__(9);
 
 /**
  * A simple list picker
+ *
+ * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
-module.exports = function (_FieldEditor) {
+
+var DropdownEditor = function (_FieldEditor) {
     _inherits(DropdownEditor, _FieldEditor);
 
     function DropdownEditor(params) {
@@ -46673,6 +46830,8 @@ module.exports = function (_FieldEditor) {
     return DropdownEditor;
 }(FieldEditor);
 
+module.exports = DropdownEditor;
+
 /***/ }),
 /* 251 */
 /***/ (function(module, exports, __webpack_require__) {
@@ -46692,8 +46851,11 @@ var FieldEditor = __webpack_require__(9);
 
 /**
  * A field editor for specifying one of the selected languages
+ *
+ * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
-module.exports = function (_FieldEditor) {
+
+var LanguageEditor = function (_FieldEditor) {
     _inherits(LanguageEditor, _FieldEditor);
 
     function LanguageEditor(params) {
@@ -46751,6 +46913,8 @@ module.exports = function (_FieldEditor) {
     return LanguageEditor;
 }(FieldEditor);
 
+module.exports = LanguageEditor;
+
 /***/ }),
 /* 252 */
 /***/ (function(module, exports, __webpack_require__) {
@@ -46772,8 +46936,11 @@ var FieldEditor = __webpack_require__(9);
 
 /**
  * A picker for referencing Media 
+ *
+ * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
-module.exports = function (_FieldEditor) {
+
+var MediaReferenceEditor = function (_FieldEditor) {
     _inherits(MediaReferenceEditor, _FieldEditor);
 
     function MediaReferenceEditor(params) {
@@ -46851,6 +47018,8 @@ module.exports = function (_FieldEditor) {
     return MediaReferenceEditor;
 }(FieldEditor);
 
+module.exports = MediaReferenceEditor;
+
 /***/ }),
 /* 253 */
 /***/ (function(module, exports, __webpack_require__) {
@@ -46864,7 +47033,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var Media = __webpack_require__(86);
 
-module.exports = function () {
+/**
+ * A helper for Media objects
+ *
+ * @memberof HashBrown.Common.Helpers
+ */
+
+var MediaHelper = function () {
     function MediaHelper() {
         _classCallCheck(this, MediaHelper);
     }
@@ -46927,6 +47102,8 @@ module.exports = function () {
     return MediaHelper;
 }();
 
+module.exports = MediaHelper;
+
 /***/ }),
 /* 254 */
 /***/ (function(module, exports, __webpack_require__) {
@@ -46944,8 +47121,11 @@ var FieldEditor = __webpack_require__(9);
 
 /**
  * A simple number editor
+ *
+ * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
-module.exports = function (_FieldEditor) {
+
+var NumberEditor = function (_FieldEditor) {
     _inherits(NumberEditor, _FieldEditor);
 
     function NumberEditor(params) {
@@ -46982,6 +47162,8 @@ module.exports = function (_FieldEditor) {
     return NumberEditor;
 }(FieldEditor);
 
+module.exports = NumberEditor;
+
 /***/ }),
 /* 255 */
 /***/ (function(module, exports, __webpack_require__) {
@@ -46999,8 +47181,11 @@ var FieldEditor = __webpack_require__(9);
 
 /**
  * A simple string editor
+ *
+ * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
-module.exports = function (_FieldEditor) {
+
+var ResourceReferenceEditor = function (_FieldEditor) {
     _inherits(ResourceReferenceEditor, _FieldEditor);
 
     function ResourceReferenceEditor(params) {
@@ -47065,6 +47250,8 @@ module.exports = function (_FieldEditor) {
     return ResourceReferenceEditor;
 }(FieldEditor);
 
+module.exports = ResourceReferenceEditor;
+
 /***/ }),
 /* 256 */
 /***/ (function(module, exports, __webpack_require__) {
@@ -47082,8 +47269,11 @@ var FieldEditor = __webpack_require__(9);
 
 /**
  * A rich text editor
+ *
+ * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
-module.exports = function (_FieldEditor) {
+
+var RichTextEditor = function (_FieldEditor) {
     _inherits(RichTextEditor, _FieldEditor);
 
     function RichTextEditor(params) {
@@ -47355,6 +47545,8 @@ module.exports = function (_FieldEditor) {
     return RichTextEditor;
 }(FieldEditor);
 
+module.exports = RichTextEditor;
+
 /***/ }),
 /* 257 */
 /***/ (function(module, exports, __webpack_require__) {
@@ -47372,8 +47564,11 @@ var FieldEditor = __webpack_require__(9);
 
 /**
  * A simple string editor
+ *
+ * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
-module.exports = function (_FieldEditor) {
+
+var StringEditor = function (_FieldEditor) {
     _inherits(StringEditor, _FieldEditor);
 
     function StringEditor(params) {
@@ -47410,6 +47605,8 @@ module.exports = function (_FieldEditor) {
     return StringEditor;
 }(FieldEditor);
 
+module.exports = StringEditor;
+
 /***/ }),
 /* 258 */
 /***/ (function(module, exports, __webpack_require__) {
@@ -47432,8 +47629,11 @@ var ContentEditor = __webpack_require__(195);
 
 /**
  * A struct editor for editing any arbitrary object value
+ *
+ * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
-module.exports = function (_FieldEditor) {
+
+var StructEditor = function (_FieldEditor) {
     _inherits(StructEditor, _FieldEditor);
 
     function StructEditor(params) {
@@ -47526,6 +47726,8 @@ module.exports = function (_FieldEditor) {
     return StructEditor;
 }(FieldEditor);
 
+module.exports = StructEditor;
+
 /***/ }),
 /* 259 */
 /***/ (function(module, exports, __webpack_require__) {
@@ -47543,8 +47745,11 @@ var FieldEditor = __webpack_require__(9);
 
 /**
  * A CSV string editor
+ *
+ * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
-module.exports = function (_FieldEditor) {
+
+var TagsEditor = function (_FieldEditor) {
     _inherits(TagsEditor, _FieldEditor);
 
     function TagsEditor(params) {
@@ -47683,6 +47888,8 @@ module.exports = function (_FieldEditor) {
     return TagsEditor;
 }(FieldEditor);
 
+module.exports = TagsEditor;
+
 /***/ }),
 /* 260 */
 /***/ (function(module, exports, __webpack_require__) {
@@ -47700,8 +47907,11 @@ var FieldEditor = __webpack_require__(9);
 
 /**
  * An editor for referencing templates
+ *
+ * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
-module.exports = function (_FieldEditor) {
+
+var TemplateReferenceEditor = function (_FieldEditor) {
     _inherits(TemplateReferenceEditor, _FieldEditor);
 
     function TemplateReferenceEditor(params) {
@@ -47812,6 +48022,8 @@ module.exports = function (_FieldEditor) {
     return TemplateReferenceEditor;
 }(FieldEditor);
 
+module.exports = TemplateReferenceEditor;
+
 /***/ }),
 /* 261 */
 /***/ (function(module, exports, __webpack_require__) {
@@ -47829,8 +48041,11 @@ var FieldEditor = __webpack_require__(9);
 
 /**
  * An editor for content URLs
+ *
+ * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
-module.exports = function (_FieldEditor) {
+
+var UrlEditor = function (_FieldEditor) {
     _inherits(UrlEditor, _FieldEditor);
 
     function UrlEditor(params) {
@@ -48060,12 +48275,18 @@ module.exports = function (_FieldEditor) {
     return UrlEditor;
 }(FieldEditor);
 
+module.exports = UrlEditor;
+
 /***/ }),
 /* 262 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
+
+/**
+ * @namespace HashBrown.Client.Helpers
+ */
 
 module.exports = {
     ConnectionHelper: __webpack_require__(203),

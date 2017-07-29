@@ -6088,6 +6088,8 @@ var crypto = __webpack_require__(103);
 
 /**
  * The base class for everything
+ *
+ * @memberof HashBrown.Common.Models
  */
 
 var Entity = function () {
@@ -6271,6 +6273,8 @@ module.exports = Entity;
 
 /**
  * A basic modal for displaying messages to the user
+ *
+ * @memberof HashBrown.Client.Views.Modals
  */
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -6279,7 +6283,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-module.exports = function (_View) {
+var MessageModal = function (_View) {
     _inherits(MessageModal, _View);
 
     function MessageModal(params) {
@@ -6379,6 +6383,8 @@ module.exports = function (_View) {
 
     return MessageModal;
 }(View);
+
+module.exports = MessageModal;
 
 /***/ }),
 /* 15 */
@@ -7784,9 +7790,11 @@ function decrypt(data, password) {
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-module.exports = function ProjectHelper() {
+var ProjectHelper = function ProjectHelper() {
   _classCallCheck(this, ProjectHelper);
 };
+
+module.exports = ProjectHelper;
 
 /***/ }),
 /* 34 */
@@ -7808,7 +7816,8 @@ var SettingsHelperCommon = __webpack_require__(194);
  *
  * @memberof HashBrown.Client.Helpers
  */
-module.exports = function (_SettingsHelperCommon) {
+
+var SettingsHelper = function (_SettingsHelperCommon) {
     _inherits(SettingsHelper, _SettingsHelperCommon);
 
     function SettingsHelper() {
@@ -8018,6 +8027,8 @@ module.exports = function (_SettingsHelperCommon) {
     return SettingsHelper;
 }(SettingsHelperCommon);
 
+module.exports = SettingsHelper;
+
 /***/ }),
 /* 35 */
 /***/ (function(module, exports, __webpack_require__) {
@@ -8033,30 +8044,19 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var Entity = __webpack_require__(13);
 
-var Password = function (_Entity) {
-    _inherits(Password, _Entity);
+/**
+ * A model for Users
+ *
+ * @memberof HashBrown.Common.Models
+ */
 
-    function Password() {
-        _classCallCheck(this, Password);
-
-        return _possibleConstructorReturn(this, _Entity.apply(this, arguments));
-    }
-
-    Password.prototype.structure = function structure() {
-        this.def(String, 'hash');
-        this.def(String, 'salt');
-    };
-
-    return Password;
-}(Entity);
-
-var User = function (_Entity2) {
-    _inherits(User, _Entity2);
+var User = function (_Entity) {
+    _inherits(User, _Entity);
 
     function User(params) {
         _classCallCheck(this, User);
 
-        return _possibleConstructorReturn(this, _Entity2.call(this, params));
+        return _possibleConstructorReturn(this, _Entity.call(this, params));
     }
 
     User.prototype.structure = function structure() {
@@ -13222,6 +13222,8 @@ var Entity = __webpack_require__(13);
 
 /**
  * The base class for all Connection types
+ *
+ * @memberof HashBrown.Common.Models
  */
 
 var Connection = function (_Entity) {
@@ -13585,6 +13587,12 @@ module.exports = Connection;
 "use strict";
 
 
+/**
+ * An editor for Users
+ *
+ * @memberof HashBrown.Client.Views.Editors
+ */
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -13878,7 +13886,8 @@ var LanguageHelperCommon = __webpack_require__(198);
  *
  * @memberof HashBrown.Client.Helpers
  */
-module.exports = function (_LanguageHelperCommon) {
+
+var LanguageHelper = function (_LanguageHelperCommon) {
     _inherits(LanguageHelper, _LanguageHelperCommon);
 
     function LanguageHelper() {
@@ -13936,6 +13945,8 @@ module.exports = function (_LanguageHelperCommon) {
     return LanguageHelper;
 }(LanguageHelperCommon);
 
+module.exports = LanguageHelper;
+
 /***/ }),
 /* 90 */
 /***/ (function(module, exports, __webpack_require__) {
@@ -13952,7 +13963,8 @@ var MessageModal = __webpack_require__(14);
  *
  * @memberof HashBrown.Client.Helpers
  */
-module.exports = function () {
+
+var UIHelper = function () {
     function UIHelper() {
         _classCallCheck(this, UIHelper);
     }
@@ -14481,6 +14493,8 @@ module.exports = function () {
     return UIHelper;
 }();
 
+module.exports = UIHelper;
+
 /***/ }),
 /* 91 */
 /***/ (function(module, exports, __webpack_require__) {
@@ -14797,57 +14811,6 @@ window.reloadAllResources = function reloadAllResources() {
     }
 
     return processQueue();
-};
-
-/**
- * Adds a ready callback to the queue or executes it if given key is already triggered
- */
-var onReadyCallbacks = {};
-var isReady = {};
-
-window.onReady = function onReady(name, callback) {
-    if (isReady[name]) {
-        callback();
-    } else {
-        if (!onReadyCallbacks[name]) {
-            onReadyCallbacks[name] = [];
-        }
-
-        onReadyCallbacks[name].push(callback);
-    }
-};
-
-/**
- * Resets a key
- */
-window.resetReady = function resetReady(name) {
-    delete isReady[name];
-};
-
-/**
- * Triggers a key
- */
-window.triggerReady = function triggerReady(name) {
-    isReady[name] = true;
-
-    if (onReadyCallbacks[name]) {
-        for (var _iterator2 = onReadyCallbacks[name], _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
-            var _ref2;
-
-            if (_isArray2) {
-                if (_i2 >= _iterator2.length) break;
-                _ref2 = _iterator2[_i2++];
-            } else {
-                _i2 = _iterator2.next();
-                if (_i2.done) break;
-                _ref2 = _i2.value;
-            }
-
-            var callback = _ref2;
-
-            callback();
-        }
-    }
 };
 
 // Get package file
@@ -32301,6 +32264,12 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var Entity = __webpack_require__(13);
 var Connection = __webpack_require__(83);
 
+/**
+ * The Project class
+ *
+ * @memberof HashBrown.Common.Models
+ */
+
 var Project = function (_Entity) {
     _inherits(Project, _Entity);
 
@@ -32378,11 +32347,19 @@ module.exports = Project;
 "use strict";
 
 
+/**
+ * A helper for settings
+ *
+ * @memberof HashBrown.Common.Helpers
+ */
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-module.exports = function SettingsHelper() {
+var SettingsHelper = function SettingsHelper() {
   _classCallCheck(this, SettingsHelper);
 };
+
+module.exports = SettingsHelper;
 
 /***/ }),
 /* 195 */,
@@ -32394,9 +32371,15 @@ module.exports = function SettingsHelper() {
 "use strict";
 
 
+/**
+ * A helper for language
+ *
+ * @memberof HashBrown.Common.Helpers
+ */
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-module.exports = function () {
+var LanguageHelper = function () {
     function LanguageHelper() {
         _classCallCheck(this, LanguageHelper);
     }
@@ -32487,6 +32470,8 @@ module.exports = function () {
     return LanguageHelper;
 }();
 
+module.exports = LanguageHelper;
+
 /***/ }),
 /* 199 */
 /***/ (function(module, exports, __webpack_require__) {
@@ -32498,7 +32483,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var VERBOSITY = 2;
 
-module.exports = function () {
+/**
+ * A helper for debugging
+ *
+ * @memberof HashBrown.Common.Helpers
+ */
+
+var DebugHelper = function () {
     function DebugHelper() {
         _classCallCheck(this, DebugHelper);
     }
@@ -32641,6 +32632,8 @@ module.exports = function () {
 
     return DebugHelper;
 }();
+
+module.exports = DebugHelper;
 
 /***/ }),
 /* 200 */,

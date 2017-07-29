@@ -7,7 +7,7 @@ const ContentHelperCommon = require('Common/Helpers/ContentHelper');
  *
  * @memberof HashBrown.Client.Helpers
  */
-module.exports = class ContentHelper extends ContentHelperCommon {
+class ContentHelper extends ContentHelperCommon {
     /**
      * Gets Content by id
      *
@@ -119,3 +119,5 @@ module.exports = class ContentHelper extends ContentHelperCommon {
         return newIndex;
     }
 }
+
+module.exports = ContentHelper;

@@ -3,6 +3,11 @@
 const NavbarPane = require('./NavbarPane');
 const NavbarMain = require('./NavbarMain');
 
+/**
+ * The Settings navbar pane
+ * 
+ * @memberof HashBrown.Client.Views.Navigation
+ */
 class SettingsPane extends NavbarPane {
     /**
      * Init

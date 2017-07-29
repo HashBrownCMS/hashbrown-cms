@@ -1,6 +1,11 @@
 'use strict';
 
-module.exports = class ContentHelper {
+/**
+ * A helper class for Content
+ *
+ * @memberof HashBrown.Common.Helpers
+ */
+class ContentHelper {
     /**
      * Gets all Content objects
      *
@@ -140,3 +145,5 @@ module.exports = class ContentHelper {
         });
     }
 }
+
+module.exports = ContentHelper;

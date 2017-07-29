@@ -1,5 +1,8 @@
 'use strict';
 
+/**
+ * @namespace HashBrown.Client.Views.Editors.FieldEditors
+ */
 module.exports = {
     ArrayEditor: require('./ArrayEditor'),
     BooleanEditor: require('./BooleanEditor'),

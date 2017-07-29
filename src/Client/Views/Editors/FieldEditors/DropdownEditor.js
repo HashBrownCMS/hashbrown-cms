@@ -4,8 +4,10 @@ const FieldEditor = require('./FieldEditor');
 
 /**
  * A simple list picker
+ *
+ * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
-module.exports = class DropdownEditor extends FieldEditor {
+class DropdownEditor extends FieldEditor {
     constructor(params) {
         super(params);
 
@@ -59,3 +61,5 @@ module.exports = class DropdownEditor extends FieldEditor {
         }, 1);
     }
 }
+
+module.exports = DropdownEditor;

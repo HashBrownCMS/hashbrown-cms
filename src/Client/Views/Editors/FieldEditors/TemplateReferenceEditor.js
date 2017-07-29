@@ -4,8 +4,10 @@ const FieldEditor = require('./FieldEditor');
 
 /**
  * An editor for referencing templates
+ *
+ * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
-module.exports = class TemplateReferenceEditor extends FieldEditor {
+class TemplateReferenceEditor extends FieldEditor {
     constructor(params) {
         super(params);
 
@@ -94,3 +96,5 @@ module.exports = class TemplateReferenceEditor extends FieldEditor {
         );
     }
 }
+
+module.exports = TemplateReferenceEditor;

@@ -9,9 +9,9 @@ const ContentEditor = require('Client/Views/Editors/ContentEditor');
 /**
  * An array editor for editing a list of other field values
  *
- * @memberof Views.Editors.FieldEditors
+ * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
-module.exports = class ArrayEditor extends FieldEditor {
+class ArrayEditor extends FieldEditor {
     constructor(params) {
         super(params);
 
@@ -469,3 +469,5 @@ module.exports = class ArrayEditor extends FieldEditor {
         renderNextItem(0);
     }    
 }
+
+module.exports = ArrayEditor;

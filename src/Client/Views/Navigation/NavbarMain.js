@@ -2,6 +2,8 @@
 
 /**
  * The main navbar
+ * 
+ * @memberof HashBrown.Client.Views.Navigation
  */
 class NavbarMain extends View {
     constructor(params) {

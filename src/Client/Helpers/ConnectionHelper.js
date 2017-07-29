@@ -9,7 +9,7 @@ const ProjectHelper = require('Client/Helpers/ProjectHelper');
  *
  * @memberof HashBrown.Client.Helpers
  */
-module.exports = class ConnectionHelper extends ConnectionHelperCommon {
+class ConnectionHelper extends ConnectionHelperCommon {
     /**
      * Gets all connections
      *
@@ -127,3 +127,5 @@ module.exports = class ConnectionHelper extends ConnectionHelperCommon {
         );
     }
 }
+
+module.exports = ConnectionHelper;

@@ -1,5 +1,13 @@
 'use strict';
 
+/**
+ * @namespace HashBrown
+ */
+
+/**
+ * @namespace HashBrown.Common
+ */
+
 const AppModulePath = require('app-module-path'); 
 const Path = require('path');
 

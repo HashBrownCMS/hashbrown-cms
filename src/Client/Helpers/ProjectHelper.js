@@ -5,5 +5,7 @@
  *
  * @memberof HashBrown.Client.Helpers
  */
-module.exports = class ProjectHelper {
+class ProjectHelper {
 }
+
+module.exports = ProjectHelper;

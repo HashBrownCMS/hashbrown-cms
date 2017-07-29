@@ -3,6 +3,11 @@
 const NavbarPane = require('./NavbarPane');
 const NavbarMain = require('./NavbarMain');
 
+/**
+ * The Connection navbar pane
+ * 
+ * @memberof HashBrown.Client.Views.Navigation
+ */
 class ConnectionPane extends NavbarPane {
     /**
      * Event: Click new connection

@@ -2,6 +2,8 @@
 
 /**
  * A Template editor
+ *
+ * @memberof HashBrown.Client.Views.Editors
  */
 class TemplateEditor extends View {
     constructor(params) {

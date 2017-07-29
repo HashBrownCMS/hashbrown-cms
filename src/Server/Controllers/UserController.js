@@ -5,7 +5,7 @@ let ApiController = require('./ApiController');
 /**
  * The controller for Users
  *
- * @memberof HashBrown.Server.Controller
+ * @memberof HashBrown.Server.Controllers
  */
 class UserController extends ApiController {
     /**

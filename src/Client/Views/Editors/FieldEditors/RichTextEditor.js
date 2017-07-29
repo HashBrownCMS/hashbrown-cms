@@ -4,8 +4,10 @@ const FieldEditor = require('./FieldEditor');
 
 /**
  * A rich text editor
+ *
+ * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
-module.exports = class RichTextEditor extends FieldEditor {
+class RichTextEditor extends FieldEditor {
     constructor(params) {
         super(params);
 
@@ -298,3 +300,5 @@ module.exports = class RichTextEditor extends FieldEditor {
         });
     }
 }
+
+module.exports = RichTextEditor;

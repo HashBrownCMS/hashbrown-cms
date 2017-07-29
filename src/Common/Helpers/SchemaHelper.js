@@ -6,8 +6,10 @@ const ContentSchema = require('../Models/ContentSchema');
 
 /**
  * The common base for SchemaHelper
+ *
+ * @memberof HashBrown.Common.Helpers
  */
-module.exports = class SchemaHelper {
+class SchemaHelper {
     /**
      * Gets all parent fields
      *
@@ -38,3 +40,5 @@ module.exports = class SchemaHelper {
         }
     }
 }
+
+module.exports = SchemaHelper;

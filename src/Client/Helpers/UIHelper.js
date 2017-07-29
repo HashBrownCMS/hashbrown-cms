@@ -7,7 +7,7 @@ const MessageModal = require('Client/Views/Modals/MessageModal');
  *
  * @memberof HashBrown.Client.Helpers
  */
-module.exports = class UIHelper {
+class UIHelper {
     /**
      * Creates a switch
      *
@@ -545,3 +545,5 @@ module.exports = class UIHelper {
         });
     }
 }
+
+module.exports = UIHelper;

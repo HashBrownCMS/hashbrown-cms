@@ -4,6 +4,8 @@ const ConnectionHelper = require('Client/Helpers/ConnectionHelper');
 
 /**
  * The editor for Connections
+ *
+ * @memberof HashBrown.Client.Views.Editors
  */
 class ConnectionEditor extends View {
     constructor(params) {

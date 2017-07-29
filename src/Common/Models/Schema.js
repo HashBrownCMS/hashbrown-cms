@@ -4,6 +4,8 @@ let Entity = require('./Entity');
 
 /**
  * The base class for all Schema types
+ *
+ * @memberof HashBrown.Common.Models
  */
 class Schema extends Entity {
     constructor(properties) {

@@ -4,8 +4,10 @@ const FieldEditor = require('./FieldEditor');
 
 /**
  * An editor for date values
+ *
+ * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
-module.exports = class DateEditor extends FieldEditor {
+class DateEditor extends FieldEditor {
     constructor(params) {
         super(params);
 
@@ -262,3 +264,5 @@ module.exports = class DateEditor extends FieldEditor {
         );
     }
 }
+
+module.exports = DateEditor;

@@ -1,5 +1,10 @@
 'use strict';
 
+/**
+ * An editor for Users
+ *
+ * @memberof HashBrown.Client.Views.Editors
+ */
 class UserEditor extends View {
     constructor(params) {
         super(params);

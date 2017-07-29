@@ -4,6 +4,8 @@ let Entity = require('./Entity');
 
 /**
  * The Form class
+ *
+ * @memberof HashBrown.Common.Models
  */
 class Form extends Entity {
     constructor(params) {

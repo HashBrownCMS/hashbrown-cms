@@ -4,8 +4,10 @@ const FieldEditor = require('./FieldEditor');
 
 /**
  * A CSV string editor
+ *
+ * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
-module.exports = class TagsEditor extends FieldEditor {
+class TagsEditor extends FieldEditor {
     constructor(params) {
         super(params);
 
@@ -135,3 +137,5 @@ module.exports = class TagsEditor extends FieldEditor {
         this.renderTags();
     }
 }
+
+module.exports = TagsEditor;

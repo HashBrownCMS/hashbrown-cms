@@ -3,6 +3,11 @@
 const NavbarPane = require('./NavbarPane');
 const NavbarMain = require('./NavbarMain');
 
+/**
+ * The Schema navbar pane
+ * 
+ * @memberof HashBrown.Client.Views.Navigation
+ */
 class SchemaPane extends NavbarPane {
     /**
      * Event: Click remove schema

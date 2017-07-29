@@ -2,13 +2,11 @@
 
 let Entity = require('./Entity');
 
-class Password extends Entity {
-    structure() {
-        this.def(String, 'hash');
-        this.def(String, 'salt');
-    }
-}
-
+/**
+ * A model for Users
+ *
+ * @memberof HashBrown.Common.Models
+ */
 class User extends Entity {
     constructor(params) {
         super(params);

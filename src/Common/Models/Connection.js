@@ -4,6 +4,8 @@ let Entity = require('./Entity');
 
 /**
  * The base class for all Connection types
+ *
+ * @memberof HashBrown.Common.Models
  */
 class Connection extends Entity {
     constructor(params) {

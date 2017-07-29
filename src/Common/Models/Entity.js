@@ -4,6 +4,8 @@ let crypto = require('crypto');
 
 /**
  * The base class for everything
+ *
+ * @memberof HashBrown.Common.Models
  */
 class Entity {
     /**

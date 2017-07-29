@@ -3,6 +3,11 @@
 const NavbarPane = require('./NavbarPane');
 const NavbarMain = require('./NavbarMain');
 
+/**
+ * The Forms navbar pane
+ * 
+ * @memberof HashBrown.Client.Views.Navigation
+ */
 class FormsPane extends NavbarPane {
     /**
      * Event: Click create new form

@@ -6,8 +6,10 @@ const ProjectHelper = require('Client/Helpers/ProjectHelper');
 
 /**
  * The client-side content model
+ *
+ * @memberof HashBrown.Client.Models
  */
-module.exports = class Content extends ContentCommon {
+class Content extends ContentCommon {
     /**
      * Gets settings
      *
@@ -38,3 +40,5 @@ module.exports = class Content extends ContentCommon {
         }
     }
 }
+
+module.exports = Content;

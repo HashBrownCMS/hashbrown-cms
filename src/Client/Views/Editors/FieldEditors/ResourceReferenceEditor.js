@@ -4,8 +4,10 @@ const FieldEditor = require('./FieldEditor');
 
 /**
  * A simple string editor
+ *
+ * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
-module.exports = class ResourceReferenceEditor extends FieldEditor {
+class ResourceReferenceEditor extends FieldEditor {
     constructor(params) {
         super(params);
 
@@ -53,3 +55,5 @@ module.exports = class ResourceReferenceEditor extends FieldEditor {
         );
     }
 }
+
+module.exports = ResourceReferenceEditor;

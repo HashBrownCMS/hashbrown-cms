@@ -5,6 +5,8 @@ let beautify = require('js-beautify').js_beautify;
 
 /**
  * A basic JSON editor for any object
+ *
+ * @memberof HashBrown.Client.Views.Editors
  */
 class JSONEditor extends View {
     constructor(params) {

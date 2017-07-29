@@ -4,8 +4,10 @@ const FieldEditor = require('./FieldEditor');
 
 /**
  * A simple boolean editor
+ *
+ * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
-module.exports = class BooleanEditor extends FieldEditor {
+class BooleanEditor extends FieldEditor {
     constructor(params) {
         super(params);
 
@@ -42,3 +44,5 @@ module.exports = class BooleanEditor extends FieldEditor {
         }, 20);
     }
 }
+
+module.exports = BooleanEditor;

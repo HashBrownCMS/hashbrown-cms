@@ -6,7 +6,7 @@ const ProjectHelper = require('Client/Helpers/ProjectHelper');
 /**
  * The providers settings editor
  *
- * @class View ProvidersSettings
+ * @memberof HashBrown.Client.Views.Editors
  */
 class ProvidersSettings extends View {
     constructor(params) {

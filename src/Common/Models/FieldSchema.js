@@ -4,6 +4,8 @@ let Schema = require('./Schema');
 
 /**
  * Schema for content fields
+ *
+ * @memberof HashBrown.Common.Models
  */
 class FieldSchema extends Schema {
     structure() {

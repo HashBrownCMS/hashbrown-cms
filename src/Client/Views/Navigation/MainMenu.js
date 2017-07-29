@@ -3,6 +3,11 @@
 const User = require('Common/Models/User');
 const UserEditor = require('Client/Views/Editors/UserEditor');
 
+/**
+ * The main menu
+ * 
+ * @memberof HashBrown.Client.Views.Navigation
+ */
 class MainMenu extends View {
     constructor(params) {
         super(params);

@@ -8,8 +8,10 @@ const FieldEditor = require('./FieldEditor');
 
 /**
  * A picker for referencing Media 
+ *
+ * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
-module.exports = class MediaReferenceEditor extends FieldEditor {
+class MediaReferenceEditor extends FieldEditor {
     constructor(params) {
         super(params);
 
@@ -82,3 +84,5 @@ module.exports = class MediaReferenceEditor extends FieldEditor {
         );
     }
 }
+
+module.exports = MediaReferenceEditor;

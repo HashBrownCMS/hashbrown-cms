@@ -3,9 +3,7 @@
 /**
  * The editor for Forms
  *
- * @class View FormEditor
- *
- * @param {Object} params
+ * @memberof HashBrown.Client.Views.Editors
  */
 class FormEditor extends View {
     constructor(params) {

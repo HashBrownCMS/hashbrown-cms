@@ -4,8 +4,10 @@ const FieldEditor = require('./FieldEditor');
 
 /**
  * An editor for referencing Content Schemas
+ *
+ * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
-module.exports = class ContentSchemaReferenceEditor extends FieldEditor {
+class ContentSchemaReferenceEditor extends FieldEditor {
     constructor(params) {
         super(params);
        
@@ -123,3 +125,5 @@ module.exports = class ContentSchemaReferenceEditor extends FieldEditor {
         );
     }
 }
+
+module.exports = ContentSchemaReferenceEditor;

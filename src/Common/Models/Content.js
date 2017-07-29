@@ -4,6 +4,8 @@ let Entity = require('./Entity');
 
 /**
  * The base class for all Content types
+ *
+ * @memberof HashBrown.Common.Models
  */
 class Content extends Entity {
     constructor(params) {

@@ -1,5 +1,10 @@
 'use strict';
 
+/**
+ * A navbar pane
+ * 
+ * @memberof HashBrown.Client.Views.Navigation
+ */
 class Pane {
     /**
      * Init

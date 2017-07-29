@@ -7,6 +7,8 @@ let Entity = require('./Entity');
 
 /**
  * The base class for all Media objects
+ *
+ * @memberof HashBrown.Common.Models
  */
 class Media extends Entity {
     structure() {

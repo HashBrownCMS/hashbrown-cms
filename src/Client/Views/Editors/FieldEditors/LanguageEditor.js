@@ -6,8 +6,10 @@ const FieldEditor = require('./FieldEditor');
 
 /**
  * A field editor for specifying one of the selected languages
+ *
+ * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
-module.exports = class LanguageEditor extends FieldEditor {
+class LanguageEditor extends FieldEditor {
     constructor(params) {
         super(params);
 
@@ -59,3 +61,5 @@ module.exports = class LanguageEditor extends FieldEditor {
         });
     }
 }
+
+module.exports = LanguageEditor;

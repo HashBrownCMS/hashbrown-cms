@@ -2,8 +2,10 @@
 
 /**
  * The base for all field editors
+ *
+ * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
-module.exports = class FieldEditor extends View {
+class FieldEditor extends View {
     /**
      * Renders a field preview template
      *
@@ -52,3 +54,5 @@ module.exports = class FieldEditor extends View {
         return $element;
     }
 }
+
+module.exports = FieldEditor;

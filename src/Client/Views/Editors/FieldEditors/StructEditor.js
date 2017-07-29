@@ -7,8 +7,10 @@ const ContentEditor = require('Client/Views/Editors/ContentEditor');
 
 /**
  * A struct editor for editing any arbitrary object value
+ *
+ * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
-module.exports = class StructEditor extends FieldEditor {
+class StructEditor extends FieldEditor {
     constructor(params) {
         super(params);
 
@@ -98,3 +100,5 @@ module.exports = class StructEditor extends FieldEditor {
         )
     }    
 }
+
+module.exports = StructEditor;

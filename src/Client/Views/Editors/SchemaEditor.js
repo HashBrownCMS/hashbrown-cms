@@ -9,8 +9,7 @@ const JSONEditor = require('Client/Views/Editors/JSONEditor');
 /**
  * The editor for schemas
  *
- * @class View SchemaEditor
- * @param {Object} params
+ * @memberof HashBrown.Client.Views.Editors
  */
 class SchemaEditor extends View {
     constructor(params) {

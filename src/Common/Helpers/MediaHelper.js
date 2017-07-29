@@ -3,7 +3,12 @@
 // Models
 const Media = require('../Models/Media');
 
-module.exports = class MediaHelper {
+/**
+ * A helper for Media objects
+ *
+ * @memberof HashBrown.Common.Helpers
+ */
+class MediaHelper {
     /**
      * Gets the media root path
      *
@@ -58,3 +63,5 @@ module.exports = class MediaHelper {
         return path;
     }
 }
+
+module.exports = MediaHelper;

@@ -3,6 +3,11 @@
 let Entity = require('./Entity');
 let Connection = require('./Connection');
 
+/**
+ * The Project class
+ *
+ * @memberof HashBrown.Common.Models
+ */
 class Project extends Entity {
     constructor(params) {
         super(params);

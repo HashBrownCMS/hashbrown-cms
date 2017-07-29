@@ -4,6 +4,8 @@ let Entity = require('./Entity');
 
 /**
  * The Template model
+ *
+ * @memberof HashBrown.Common.Models
  */
 class Template extends Entity {
     constructor(params) {

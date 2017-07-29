@@ -1,5 +1,9 @@
 'use strict';
 
+/**
+ * @namespace HashBrown.Client
+ */
+
 window.isClient = true;
 window.isServer = false;
 

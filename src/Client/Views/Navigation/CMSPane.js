@@ -3,6 +3,11 @@
 const NavbarMain = require('./NavbarMain');
 const NavbarPane = require('./NavbarPane');
 
+/**
+ * The CMS navbar pane
+ * 
+ * @memberof HashBrown.Client.Views.Navigation
+ */
 class CMSPane extends NavbarPane {
     /**
      * Init

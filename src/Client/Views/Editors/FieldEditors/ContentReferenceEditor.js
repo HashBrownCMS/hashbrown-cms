@@ -6,8 +6,10 @@ const FieldEditor = require('./FieldEditor');
 
 /**
  * An editor for referring to other Content
+ *
+ * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
-module.exports = class ContentReferenceEditor extends FieldEditor {
+class ContentReferenceEditor extends FieldEditor {
     constructor(params) {
         super(params);
 
@@ -64,3 +66,5 @@ module.exports = class ContentReferenceEditor extends FieldEditor {
         ]);
     }
 }
+
+module.exports = ContentReferenceEditor;

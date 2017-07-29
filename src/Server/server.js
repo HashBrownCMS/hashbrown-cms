@@ -1,5 +1,9 @@
 'use strict';
 
+/**
+ * @namespace HashBrown.Server
+ */
+
 // ----------
 // Libs
 // ----------

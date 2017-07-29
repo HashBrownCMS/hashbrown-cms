@@ -2,7 +2,12 @@
 
 const VERBOSITY = 2;
 
-module.exports = class DebugHelper {
+/**
+ * A helper for debugging
+ *
+ * @memberof HashBrown.Common.Helpers
+ */
+class DebugHelper {
     /**
      * Event: Log
      *
@@ -141,3 +146,5 @@ module.exports = class DebugHelper {
         console.trace();
     }
 }
+
+module.exports = DebugHelper;

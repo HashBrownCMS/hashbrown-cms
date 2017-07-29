@@ -6,7 +6,7 @@ let ApiController = require('./ApiController');
 /**
  * The controller for sync
  *
- * @memberof HashBrown.Server.Controller
+ * @memberof HashBrown.Server.Controllers
  */
 class SyncController extends ApiController {
     /**

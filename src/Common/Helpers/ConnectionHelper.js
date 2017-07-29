@@ -6,9 +6,9 @@ const SettingsHelper = isServer ? require('Server/Helpers/SettingsHelper') : req
 /**
  * The helper class for Connections
  *
- * @memberof HashBrown.Common.Helpers.ConnectionHelper
+ * @memberof HashBrown.Common.Helpers
  */
-module.exports = class ConnectionHelper {
+class ConnectionHelper {
     /**
      * Gets all connections
      *
@@ -142,3 +142,5 @@ module.exports = class ConnectionHelper {
         });
     }
 }
+
+module.exports = ConnectionHelper;

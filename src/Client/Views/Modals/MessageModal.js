@@ -2,8 +2,10 @@
 
 /**
  * A basic modal for displaying messages to the user
+ *
+ * @memberof HashBrown.Client.Views.Modals
  */
-module.exports = class MessageModal extends View {
+class MessageModal extends View {
     constructor(params) {
         super(params);
 
@@ -116,3 +118,5 @@ module.exports = class MessageModal extends View {
         });
     }
 }
+
+module.exports = MessageModal;

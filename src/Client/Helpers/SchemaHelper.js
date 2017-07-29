@@ -8,7 +8,7 @@ const SchemaHelperCommon = require('Common/Helpers/SchemaHelper');
  *
  * @memberof HashBrown.Client.Helpers
  */
-module.exports = class SchemaHelper extends SchemaHelperCommon {
+class SchemaHelper extends SchemaHelperCommon {
     /**
      * Gets a Schema with all parent fields
      *
@@ -83,3 +83,5 @@ module.exports = class SchemaHelper extends SchemaHelperCommon {
         }
     }
 }
+
+module.exports = SchemaHelper;

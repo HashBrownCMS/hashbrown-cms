@@ -8,7 +8,7 @@ const LanguageHelperCommon = require('Common/Helpers/LanguageHelper');
  *
  * @memberof HashBrown.Client.Helpers
  */
-module.exports = class LanguageHelper extends LanguageHelperCommon {
+class LanguageHelper extends LanguageHelperCommon {
     /**
      * Gets all selected languages
      *
@@ -52,3 +52,5 @@ module.exports = class LanguageHelper extends LanguageHelperCommon {
         return setSettings(project, null, 'languages', languages);
     }
 }
+
+module.exports = LanguageHelper;

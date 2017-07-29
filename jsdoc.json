@@ -4,7 +4,11 @@
             "outputSourceFiles": false
         }
     },
+    "source": {
+        "include": [ "./hashbrown.js", "./src", "./README.md" ]
+    },
     "opts": {
-        "recurse": true
+        "recurse": true,
+        "destination": "./docs"
     }
 }

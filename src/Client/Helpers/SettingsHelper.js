@@ -7,7 +7,7 @@ const SettingsHelperCommon = require('Common/Helpers/SettingsHelper');
  *
  * @memberof HashBrown.Client.Helpers
  */
-module.exports = class SettingsHelper extends SettingsHelperCommon {
+class SettingsHelper extends SettingsHelperCommon {
     /**
      * Gets all settings
      *
@@ -184,3 +184,5 @@ module.exports = class SettingsHelper extends SettingsHelperCommon {
         })
     }
 }
+
+module.exports = SettingsHelper;

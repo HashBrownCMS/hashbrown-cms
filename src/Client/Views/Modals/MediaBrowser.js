@@ -10,7 +10,7 @@ const SettingsHelper = require('Client/Helpers/SettingsHelper');
  *
  * @memberof HashBrown.Client.Views.Modals
  */
-module.exports = class MediaBrowser extends View {
+class MediaBrowser extends View {
     constructor(params) {
         super(params);
         
@@ -355,3 +355,5 @@ module.exports = class MediaBrowser extends View {
         this.$element.find('.thumbnail[data-id="' + this.value + '"]').toggleClass('active', true);
     }
 }
+
+module.exports = MediaBrowser;

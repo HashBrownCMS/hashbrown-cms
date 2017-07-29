@@ -5,6 +5,11 @@ const NavbarMain = require('./NavbarMain');
 const MediaBrowser = require('Client/Views/Modals/MediaBrowser');
 const MediaHelper = require('Client/Helpers/MediaHelper');
 
+/**
+ * The Media navbar pane
+ * 
+ * @memberof HashBrown.Client.Views.Navigation
+ */
 class MediaPane extends NavbarPane {
     /**
      * Event: On change folder path

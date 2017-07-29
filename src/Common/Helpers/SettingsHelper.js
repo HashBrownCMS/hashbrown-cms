@@ -1,4 +1,11 @@
 'use strict';
 
-module.exports = class SettingsHelper {
+/**
+ * A helper for settings
+ *
+ * @memberof HashBrown.Common.Helpers
+ */
+class SettingsHelper {
 }
+
+module.exports = SettingsHelper;

@@ -3,6 +3,11 @@
 const NavbarPane = require('./NavbarPane');
 const NavbarMain = require('./NavbarMain');
 
+/**
+ * The Template navbar pane
+ * 
+ * @memberof HashBrown.Client.Views.Navigation
+ */
 class TemplatePane extends NavbarPane {
     /**
      * Event: Click add Template
