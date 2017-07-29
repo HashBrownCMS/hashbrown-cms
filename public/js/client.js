@@ -7998,6 +7998,7 @@ var NavbarMain = function (_View) {
             return;
         }
 
+        // Restore tab buttons
         this.$element.find('.tab-buttons button').each(function (i, element) {
             var $button = $(element);
             var key = $button.data('route');
@@ -8007,6 +8008,7 @@ var NavbarMain = function (_View) {
             }
         });
 
+        // Restore pane containers
         this.$element.find('.pane-container').each(function (i, element) {
             var $pane = $(element);
             var key = $pane.data('route');
@@ -8016,6 +8018,7 @@ var NavbarMain = function (_View) {
             }
         });
 
+        // Restore pane items
         this.$element.find('.pane-item-container').each(function (i, element) {
             var $item = $(element);
             var key = $item.data('routing-path');
@@ -15342,6 +15345,10 @@ module.exports = function () {
             }
         }), _.label({ for: id }));
 
+        $element.on('set', function (e, newValue) {
+            $input[0].checked = newValue;
+        });
+
         if (initialValue) {
             $input.attr('checked', true);
         }
@@ -16096,6 +16103,8 @@ window.reloadResource = function reloadResource(name) {
                 resolve(result);
             },
             error: function error(e) {
+                window.resources[name] = [];
+
                 if (e.status == 403) {
                     location = '/login/?path=' + location.pathname + location.hash;
                 } else if (e.status == 404) {
@@ -38140,7 +38149,7 @@ module.exports = function (_View) {
                             uploadModal.hide();
                         });
                     },
-                    error: errorModal
+                    error: UI.errorModal
                 });
             }
 
@@ -38307,6 +38316,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var ConnectionHelperCommon = __webpack_require__(235);
 var Connection = __webpack_require__(83);
+var ProjectHelper = __webpack_require__(33);
 
 /**
  * The client side connection helper
@@ -38377,6 +38387,62 @@ module.exports = function (_ConnectionHelperComm) {
         }
 
         return Promise.reject(new Error('No Connection by id "' + id + '" was found'));
+    };
+
+    /**
+     * Sets the Media provider
+     *
+     * @param {String} id
+     *
+     * @returns {Promise}
+     */
+
+
+    ConnectionHelper.setMediaProvider = function setMediaProvider(id) {
+        return _ConnectionHelperComm.setMediaProvider.call(this, ProjectHelper.currentProject, ProjectHelper.currentEnvironment, id).then(function () {
+            return reloadResource('media');
+        }).then(function () {
+            HashBrown.Client.Views.Navigation.NavbarMain.reload();
+        });
+    };
+
+    /**
+     * Gets the Media provider
+     *
+     * @returns {Promise} Connection
+     */
+
+
+    ConnectionHelper.getMediaProvider = function getMediaProvider() {
+        return _ConnectionHelperComm.getMediaProvider.call(this, ProjectHelper.currentProject, ProjectHelper.currentEnvironment);
+    };
+
+    /**
+     * Sets the Template provider
+     *
+     * @param {String} id
+     *
+     * @returns {Promise}
+     */
+
+
+    ConnectionHelper.setTemplateProvider = function setTemplateProvider(id) {
+        return _ConnectionHelperComm.setTemplateProvider.call(this, ProjectHelper.currentProject, ProjectHelper.currentEnvironment, id).then(function () {
+            return reloadResource('templates');
+        }).then(function () {
+            HashBrown.Client.Views.Navigation.NavbarMain.reload();
+        });
+    };
+
+    /**
+     * Gets the Template provider
+     *
+     * @returns {Promise} Connection
+     */
+
+
+    ConnectionHelper.getTemplateProvider = function getTemplateProvider() {
+        return _ConnectionHelperComm.getTemplateProvider.call(this, ProjectHelper.currentProject, ProjectHelper.currentEnvironment);
     };
 
     return ConnectionHelper;
@@ -38898,8 +38964,10 @@ module.exports = MediaHelper;
 "use strict";
 
 
-// Style
+window.isClient = true;
+window.isServer = false;
 
+// Style
 __webpack_require__(207);
 
 // Helper functions
@@ -39202,8 +39270,9 @@ Router.route('/connections/json/:id', function () {
 "use strict";
 
 
-// Dashboard
+var MediaViewer = __webpack_require__(239);
 
+// Dashboard
 Router.route('/media/', function () {
     ViewHelper.get('NavbarMain').showTab('/media/');
 
@@ -39315,8 +39384,9 @@ Router.route('/settings/providers/', function () {
 "use strict";
 
 
-// Templates
+var TemplateEditor = __webpack_require__(243);
 
+// Templates
 Router.route('/templates/', function () {
     if (currentUserHasScope('templates')) {
         ViewHelper.get('NavbarMain').showTab('/templates/');
@@ -39349,8 +39419,10 @@ Router.route('/templates/:type/:id', function () {
 "use strict";
 
 
-// Dashboard
+var JSONEditor = __webpack_require__(204);
+var FormEditor = __webpack_require__(236);
 
+// Dashboard
 Router.route('/forms/', function () {
     ViewHelper.get('NavbarMain').showTab('/forms/');
 
@@ -39743,8 +39815,6 @@ module.exports = CMSPane;
 /* 222 */
 /***/ (function(module, exports) {
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
 module.exports = function () {
     var _this = this;
 
@@ -39753,304 +39823,6 @@ module.exports = function () {
     var hasSchemasScope = currentUser.hasScope(ProjectHelper.currentProject, 'schemas');
     var hasTemplatesScope = currentUser.hasScope(ProjectHelper.currentProject, 'templates');
     var hasSettingsScope = currentUser.hasScope(ProjectHelper.currentProject, 'settings');
-
-    /**
-     * Fetches pane information and renders it
-     *
-     * @param {Object} params
-     */
-    var renderPane = function renderPane(params) {
-        // Render pane 
-        var $pane = $('.pane-container[data-route="' + params.route + '"] .pane');
-
-        // Pane didn't exist, create it (it will be appended further down)
-        if ($pane.length < 1) {
-            $pane = _.div({ class: 'pane' });
-        }
-
-        var items = params.items;
-        var sortingQueue = [];
-
-        // Render items
-        _.each(items, function (i, item) {
-            var id = item.id || i;
-            var isDirectory = false;
-
-            // Get item name
-            var name = '';
-
-            // This is a Content node
-            if (item.properties && item.createDate) {
-                // All Content nodes are "directories" in that they can be parents of one another
-                isDirectory = true;
-
-                // Use title directly if available
-                if (typeof item.properties.title === 'string') {
-                    name = item.properties.title;
-                } else if (item.properties.title && _typeof(item.properties.title) === 'object') {
-                    // Use the current language title
-                    if (item.properties.title[window.language]) {
-                        name = item.properties.title[window.language];
-
-                        // If no title was found, searh in other languages
-                    } else {
-                        name = '(Untitled)';
-
-                        for (var language in item.properties.title) {
-                            var languageTitle = item.properties.title[language];
-
-                            if (languageTitle) {
-                                name += ' - (' + language + ': ' + languageTitle + ')';
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                // If name still wasn't found, use the id
-                if (!name) {
-                    name = item.id;
-                }
-            } else if (item.title && typeof item.title === 'string') {
-                name = item.title;
-            } else if (item.name && typeof item.name === 'string') {
-                name = item.name;
-            } else {
-                name = id;
-            }
-
-            var routingPath = item.shortPath || item.path || item.id || null;
-            var queueItem = {};
-            var icon = item.icon || params.icon;
-            var $icon = void 0;
-
-            // Implement custom routing paths
-            if (typeof params.itemPath === 'function') {
-                routingPath = params.itemPath(item);
-            }
-
-            // Truncate long names
-            if (name.length > 30) {
-                name = name.substring(0, 30) + '...';
-            }
-
-            // If this item has a Schema id, fetch the appropriate icon
-            if (item.schemaId) {
-                var schema = resources.schemas[item.schemaId];
-
-                if (schema) {
-                    icon = schema.icon;
-                }
-            }
-
-            if (icon) {
-                $icon = _.span({ class: 'fa fa-' + icon });
-            }
-
-            // Item element
-            var $existingElement = $pane.find('.pane-item-container[data-routing-path="' + routingPath + '"]');
-            var $element = _.div({
-                class: 'pane-item-container',
-                'data-routing-path': routingPath
-            });
-
-            // Element exists already, replace
-            if ($existingElement.length > 0) {
-                $existingElement.replaceWith($element);
-
-                // Element didn't exist already, create it and append to pane
-            } else {
-                $pane.append($element);
-            }
-
-            // Populate element
-            _.append($element.empty(), _.a({
-                'data-id': id,
-                'data-name': name,
-                href: '#' + (routingPath ? params.route + routingPath : params.route),
-                class: 'pane-item'
-            }, $icon, _.span({ class: 'pane-item-label' }, name)), _.div({ class: 'children' }), _.div({ class: 'pane-item-insert-below' }));
-
-            // Set sync attributes
-            if (typeof item.locked !== 'undefined') {
-                $element.attr('data-locked', item.locked);
-            }
-
-            if (typeof item.remote !== 'undefined') {
-                $element.attr('data-remote', item.remote);
-            }
-
-            if (typeof item.local !== 'undefined') {
-                $element.attr('data-local', item.local);
-            }
-
-            if (isDirectory) {
-                $element.attr('data-is-directory', true);
-            }
-
-            // Attach item context menu
-            if (params.getItemContextMenu) {
-                $element.find('a').crcontext(params.getItemContextMenu(item));
-            } else if (params.itemContextMenu) {
-                $element.find('a').crcontext(params.itemContextMenu);
-            }
-
-            // Add element to queue item
-            queueItem.$element = $element;
-
-            // Add sort index to element
-            queueItem.$element.attr('data-sort', item.sort || 0);
-
-            // Use specific hierarchy behaviours
-            if (params.hierarchy) {
-                params.hierarchy(item, queueItem);
-            }
-
-            // Add queue item to sorting queue
-            sortingQueue.push(queueItem);
-        });
-
-        // Place items into hierarchy
-        for (var _iterator = sortingQueue, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-            var _ref;
-
-            if (_isArray) {
-                if (_i >= _iterator.length) break;
-                _ref = _iterator[_i++];
-            } else {
-                _i = _iterator.next();
-                if (_i.done) break;
-                _ref = _i.value;
-            }
-
-            var queueItem = _ref;
-
-            if (queueItem.parentDirAttr) {
-                // Find parent item
-                var parentDirAttrKey = Object.keys(queueItem.parentDirAttr)[0];
-                var parentDirAttrValue = queueItem.parentDirAttr[parentDirAttrKey];
-                var parentDirSelector = '.pane-item-container[' + parentDirAttrKey + '="' + parentDirAttrValue + '"]';
-                var $parentDir = $pane.find(parentDirSelector);
-
-                // If parent element already exists, just append the queue item element
-                if ($parentDir.length > 0) {
-                    $parentDir.children('.children').append(queueItem.$element);
-
-                    // If not, create parent elements if specified
-                } else if (queueItem.createDir) {
-                    var dirNames = parentDirAttrValue.split('/').filter(function (item) {
-                        return item != '';
-                    });
-                    var finalDirName = '/';
-
-                    for (var i in dirNames) {
-                        var dirName = dirNames[i];
-
-                        var prevFinalDirName = finalDirName;
-                        finalDirName += dirName + '/';
-
-                        var $dir = $pane.find('[' + parentDirAttrKey + '="' + finalDirName + '"]');
-
-                        if ($dir.length < 1) {
-                            $dir = _.div({ class: 'pane-item-container', 'data-is-directory': true }, _.a({
-                                class: 'pane-item'
-                            }, _.span({ class: 'fa fa-folder' }), _.span({ class: 'pane-item-label' }, dirName)), _.div({ class: 'children' }));
-
-                            $dir.attr(parentDirAttrKey, finalDirName);
-
-                            // Extra parent dir attributes
-                            if (queueItem.parentDirExtraAttr) {
-                                for (var k in queueItem.parentDirExtraAttr) {
-                                    var v = queueItem.parentDirExtraAttr[k];
-
-                                    $dir.attr(k, v);
-                                }
-                            }
-
-                            // Append to previous dir 
-                            var $prevDir = $pane.find('[' + parentDirAttrKey + '="' + prevFinalDirName + '"]');
-
-                            if ($prevDir.length > 0) {
-                                $prevDir.children('.children').prepend($dir);
-
-                                // If no previous dir was found, append directly to pane
-                            } else {
-                                $pane.prepend($dir);
-                            }
-                        }
-
-                        // Attach item context menu
-                        if (params.dirContextMenu) {
-                            $dir.crcontext(params.dirContextMenu);
-                        }
-
-                        // Only append the queue item to the final parent element
-                        if (i >= dirNames.length - 1) {
-                            $parentDir = $dir;
-                        }
-                    }
-
-                    $parentDir.children('.children').append(queueItem.$element);
-                }
-            }
-        }
-
-        // Sort direct children
-        $pane.find('>.pane-item-container').sort(function (a, b) {
-            return parseInt(a.dataset.sort) > parseInt(b.dataset.sort);
-        }).appendTo($pane);
-
-        // Sort nested children
-        $pane.find('.pane-item-container .children').each(function (i, children) {
-            var $children = $(children);
-
-            $children.find('>.pane-item-container').sort(function (a, b) {
-                return parseInt(a.dataset.sort) > parseInt(b.dataset.sort);
-            }).appendTo($children);
-        });
-
-        // Render pane container
-        var $paneContainer = $('.pane-container[data-route="' + params.route + '"]');
-
-        // Pane container didn't already exist, create it
-        if ($paneContainer.length < 1) {
-            // Render pane container
-            $paneContainer = _.div({ class: 'pane-container', 'data-route': params.route }, _.if(params.toolbar, params.toolbar), _.div({ class: 'pane-move-buttons' }, _.button({ class: 'btn btn-move-to-root' }, 'Move to root'), _.button({ class: 'btn btn-new-folder' }, 'New folder')), $pane);
-
-            // Attach pane context menu
-            if (params.paneContextMenu) {
-                $paneContainer.crcontext(params.paneContextMenu);
-            }
-        }
-
-        // Add expand/collapse buttons to items if needed
-        $paneContainer.find('.pane-item-container').each(function (i, element) {
-            var $paneItemContainer = $(element);
-            var $paneItem = $paneItemContainer.children('.pane-item');;
-            var $children = $paneItemContainer.children('.children');
-
-            if ($children.children().length > 0) {
-                var $childrenToggle = _.button({ class: 'btn-children-toggle' }, _.span({ class: 'fa fa-caret-down' }), _.span({ class: 'fa fa-caret-right' }));
-
-                $paneItem.append($childrenToggle);
-
-                $childrenToggle.click(function (e) {
-                    _this.onClickToggleChildren(e);
-                });
-            }
-        });
-
-        if (params.postSort) {
-            params.postSort($paneContainer.find('>.pane, .pane-item-container>.children'));
-        }
-        /*
-                if(this.$element.find('.tab-panes .pane-container').length < 1) {
-                    $paneContainer.addClass('active');
-                    $button.addClass('active');
-                }
-        */
-        return $paneContainer;
-    };
 
     return _.nav({ class: 'navbar-main' },
     // Buttons
@@ -41398,6 +41170,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var NavbarPane = __webpack_require__(32);
 var NavbarMain = __webpack_require__(31);
+var MediaBrowser = __webpack_require__(202);
+var MediaHelper = __webpack_require__(205);
 
 var MediaPane = function (_NavbarPane) {
     _inherits(MediaPane, _NavbarPane);
@@ -41423,7 +41197,7 @@ var MediaPane = function (_NavbarPane) {
             NavbarMain.reload();
 
             location.hash = '/media/' + id;
-        }).catch(errorModal);
+        }).catch(UI.errorModal);
     };
 
     /**
@@ -42120,15 +41894,17 @@ module.exports = {
 "use strict";
 
 
-/**
- * The editor for Connections
- */
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var ConnectionHelper = __webpack_require__(203);
+
+/**
+ * The editor for Connections
+ */
 
 var ConnectionEditor = function (_View) {
     _inherits(ConnectionEditor, _View);
@@ -42179,6 +41955,48 @@ var ConnectionEditor = function (_View) {
         this.model = null;
 
         this.fetch();
+    };
+
+    /**
+     * Renders the Template provider editor
+     */
+
+
+    ConnectionEditor.prototype.renderTemplateProviderEditor = function renderTemplateProviderEditor() {
+        var _this2 = this;
+
+        var $inputSwitch = UI.inputSwitch(false, function (isProvider) {
+            ConnectionHelper.setTemplateProvider(isProvider ? _this2.model.id : null).catch(UI.errorModal);
+        });
+
+        ConnectionHelper.getTemplateProvider().then(function (connection) {
+            if (connection && connection.id === _this2.model.id) {
+                $inputSwitch.trigger('set', true);
+            }
+        });
+
+        return $inputSwitch;
+    };
+
+    /**
+     * Renders the Media provider editor
+     */
+
+
+    ConnectionEditor.prototype.renderMediaProviderEditor = function renderMediaProviderEditor() {
+        var _this3 = this;
+
+        var $inputSwitch = UI.inputSwitch(false, function (isProvider) {
+            ConnectionHelper.setMediaProvider(isProvider ? _this3.model.id : null).catch(UI.errorModal);
+        });
+
+        ConnectionHelper.getMediaProvider().then(function (connection) {
+            if (connection && connection.id === _this3.model.id) {
+                $inputSwitch.trigger('set', true);
+            }
+        });
+
+        return $inputSwitch;
     };
 
     /**
@@ -42245,7 +42063,7 @@ var ConnectionEditor = function (_View) {
 
 
     ConnectionEditor.prototype.renderTypeEditor = function renderTypeEditor() {
-        var _this2 = this;
+        var _this4 = this;
 
         // Generate dropdown options
         var dropdownOptions = [];
@@ -42261,9 +42079,9 @@ var ConnectionEditor = function (_View) {
         }
 
         var $editor = _.div({ class: 'field-editor dropdown-editor' }, UI.inputDropdown('(none)', dropdownOptions, function (newValue) {
-            _this2.model.type = newValue;
+            _this4.model.type = newValue;
 
-            _this2.$element.find('.connection-settings .field-value').html(_this2.renderSettingsEditor());
+            _this4.$element.find('.connection-settings .field-value').html(_this4.renderSettingsEditor());
         }, true));
 
         return $editor;
@@ -42273,7 +42091,7 @@ var ConnectionEditor = function (_View) {
         var view = this;
 
         this.$element.toggleClass('locked', this.model.locked);
-        this.$element.html(_.div({ class: 'object' }, _.div({ class: 'editor-header' }, _.span({ class: 'fa fa-exchange' }), _.h4(this.model.title)), _.div({ class: 'tab-content editor-body' }, _.div({ class: 'field-container connection-title' }, _.div({ class: 'field-key' }, 'Title'), _.div({ class: 'field-value' }, this.renderTitleEditor())), _.div({ class: 'field-container connection-url' }, _.div({ class: 'field-key' }, 'URL'), _.div({ class: 'field-value' }, this.renderUrlEditor())), _.div({ class: 'field-container connection-type' }, _.div({ class: 'field-key' }, 'Type'), _.div({ class: 'field-value' }, this.renderTypeEditor())), _.div({ class: 'field-container connection-settings' }, _.div({ class: 'field-key' }, 'Settings'), _.div({ class: 'field-value' }, this.renderSettingsEditor()))), _.div({ class: 'editor-footer' }, _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-embedded' }, 'Advanced').click(function () {
+        this.$element.html(_.div({ class: 'object' }, _.div({ class: 'editor-header' }, _.span({ class: 'fa fa-exchange' }), _.h4(this.model.title)), _.div({ class: 'tab-content editor-body' }, _.div({ class: 'field-container connection-template-provider' }, _.div({ class: 'field-key' }, 'Is Template provider'), _.div({ class: 'field-value' }, this.renderTemplateProviderEditor())), _.div({ class: 'field-container connection-media-provider' }, _.div({ class: 'field-key' }, 'Is Media provider'), _.div({ class: 'field-value' }, this.renderMediaProviderEditor())), _.div({ class: 'field-container connection-title' }, _.div({ class: 'field-key' }, 'Title'), _.div({ class: 'field-value' }, this.renderTitleEditor())), _.div({ class: 'field-container connection-url' }, _.div({ class: 'field-key' }, 'URL'), _.div({ class: 'field-value' }, this.renderUrlEditor())), _.div({ class: 'field-container connection-type' }, _.div({ class: 'field-key' }, 'Type'), _.div({ class: 'field-value' }, this.renderTypeEditor())), _.div({ class: 'field-container connection-settings' }, _.div({ class: 'field-key' }, 'Settings'), _.div({ class: 'field-value' }, this.renderSettingsEditor()))), _.div({ class: 'editor-footer' }, _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-embedded' }, 'Advanced').click(function () {
             view.onClickAdvanced();
         }), _.if(!this.model.locked, view.$saveBtn = _.button({ class: 'btn btn-primary btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Save '), _.span({ class: 'text-working' }, 'Saving ')).click(function () {
             view.onClickSave();
@@ -42351,6 +42169,14 @@ module.exports = function () {
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+var Connection = __webpack_require__(83);
+var SettingsHelper = isServer ? __webpack_require__(270) : __webpack_require__(34);
+
+/**
+ * The helper class for Connections
+ *
+ * @memberof HashBrown.Common.Helpers.ConnectionHelper
+ */
 module.exports = function () {
     function ConnectionHelper() {
         _classCallCheck(this, ConnectionHelper);
@@ -42385,13 +42211,13 @@ module.exports = function () {
     ConnectionHelper.setTemplateProvider = function setTemplateProvider() {
         var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
         var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
-        var id = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('id');
+        var id = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
 
         return SettingsHelper.getSettings(project, environment, 'providers').then(function (providers) {
             providers = providers || {};
             providers.template = id;
 
-            SettingsHelper.setSettings(project, environment, 'providers', providers);
+            return SettingsHelper.setSettings(project, environment, 'providers', providers);
         });
     };
 
@@ -42429,7 +42255,7 @@ module.exports = function () {
             if (providers.template) {
                 return _this.getConnectionById(project, environment, providers.template);
             } else {
-                return Promise.reject(new Error('Template provider is not defined'));
+                return Promise.resolve(null);
             }
         });
     };
@@ -42448,13 +42274,13 @@ module.exports = function () {
     ConnectionHelper.setMediaProvider = function setMediaProvider() {
         var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
         var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
-        var id = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('id');
+        var id = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
 
         return SettingsHelper.getSettings(project, environment, 'providers').then(function (providers) {
             providers = providers || {};
             providers.media = id;
 
-            SettingsHelper.setSettings(project, environment, 'providers', providers);
+            return SettingsHelper.setSettings(project, environment, 'providers', providers);
         });
     };
 
@@ -42492,7 +42318,7 @@ module.exports = function () {
             if (providers.media) {
                 return _this2.getConnectionById(project, environment, providers.media);
             } else {
-                return Promise.reject(new Error('Media provider is not defined'));
+                return Promise.resolve(null);
             }
         });
     };
@@ -42778,45 +42604,15 @@ var FormEditor = function (_View) {
     FormEditor.prototype.renderEntries = function renderEntries() {
         var _this5 = this;
 
-        return _.button({ class: 'btn btn-primary' }, 'View entries').click(function () {
-            var modal = new HashBrown.Client.Views.Modals.MessageModal({
-                model: {
-                    title: 'Entries',
-                    body: _.table({}, _.each(_this5.model.entries.reverse(), function (i, entry) {
-                        return _.tbody({ class: 'entry' }, _.each(entry, function (key, value) {
-                            return _.tr({ class: 'kvp' }, _.td({ class: 'key' }, key), _.td({ class: 'value' }, value));
-                        }));
-                    }))
-                },
-                buttons: [{
-                    class: 'btn-danger pull-left',
-                    label: 'Clear',
-                    callback: function callback() {
-                        UI.confirmModal('Clear', 'Clear "' + _this5.model.title + '"', 'Are you sure you want to clear all entries?', function () {
-                            apiCall('post', 'forms/clear/' + _this5.model.id).then(function () {
-                                _this5.model.entries = [];
-                                modal.hide();
-                            }).catch(UI.errorModal);
-                        });
-
-                        return false;
-                    }
-                }, {
-                    class: 'btn-primary',
-                    label: 'Get .csv',
-                    callback: function callback() {
-                        location = apiUrl('forms/' + _this5.model.id + '/entries');
-
-                        return false;
-                    }
-                }, {
-                    class: 'btn-default',
-                    label: 'OK'
-                }]
+        return _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-danger' }, 'Clear').click(function () {
+            UI.confirmModal('Clear', 'Clear "' + _this5.model.title + '"', 'Are you sure you want to clear all entries?', function () {
+                apiCall('post', 'forms/clear/' + _this5.model.id).then(function () {
+                    _this5.model.entries = [];
+                }).catch(UI.errorModal);
             });
-
-            modal.$element.addClass('form-entries-list-modal');
-        });
+        }), _.button({ class: 'btn btn-primary' }, 'Get .csv').click(function () {
+            location = apiUrl('forms/' + _this5.model.id + '/entries');
+        }));
     };
 
     /**
@@ -42848,7 +42644,7 @@ var FormEditor = function (_View) {
 
         this.$preview = this.renderPreview();
 
-        $element.append(this.renderField('Entries', this.renderEntries()));
+        $element.append(this.renderField('Entries (' + this.model.entries.length + ')', this.renderEntries()));
         $element.append(this.renderField('POST URL', _.div({ class: 'input-group' }, _.input({ readonly: 'readonly', class: 'form-control post-url', type: 'text', value: postUrl }), _.div({ class: 'input-group-btn' }, _.button({ class: 'btn btn-primary' }, 'Copy').click(function () {
             copyToClipboard($('.post-url').val());
         })))));
@@ -44102,6 +43898,14 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+var Media = __webpack_require__(86);
+
+/**
+ * An editor for displaying Media objects
+ *
+ * @memberof HashBrown.Client.Views.Editors
+ */
+
 var MediaViewer = function (_View) {
     _inherits(MediaViewer, _View);
 
@@ -44116,34 +43920,14 @@ var MediaViewer = function (_View) {
         return _this;
     }
 
-    /**
-     * Event: On change folder path
-     *
-     * @param {String} newFolder
-     */
-
-
-    MediaViewer.prototype.onChangeFolder = function onChangeFolder(newFolder) {
-        apiCall('post', 'media/tree/' + this.model.id, newFolder ? {
-            id: this.model.id,
-            folder: newFolder
-        } : null).then(function () {
-            return reloadResource('media');
-        }).then(function () {
-            ViewHelper.get('NavbarMain').reload();
-        }).catch(errorModal);
-    };
-
     MediaViewer.prototype.render = function render() {
-        var _this2 = this;
-
-        this.model = new Media(this.model);
+        if (this.model instanceof Media === false) {
+            this.model = new Media(this.model);
+        }
 
         var mediaSrc = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + this.model.id;
 
-        this.$element.empty().append(_.div({ class: 'editor-header media-heading' }, _.span({ class: 'fa fa-file-image-o' }), _.h4({ class: 'media-title' }, this.model.name, _.span({ class: 'media-data' }, this.model.getContentTypeHeader()))), _.div({ class: 'media-preview editor-body' }, _.if(this.model.isImage(), _.img({ src: mediaSrc })), _.if(this.model.isVideo(), _.video({ controls: true, src: mediaSrc }))), _.div({ class: 'editor-footer' }, _.input({ class: 'form-control', value: this.model.folder, placeholder: 'Type folder path here' }).change(function (e) {
-            _this2.onChangeFolder($(e.target).val());
-        })));
+        this.$element.empty().append(_.div({ class: 'editor-header media-heading' }, _.span({ class: 'fa fa-file-image-o' }), _.h4({ class: 'media-title' }, this.model.name, _.span({ class: 'media-data' }, this.model.getContentTypeHeader()))), _.div({ class: 'media-preview editor-body' }, _.if(this.model.isImage(), _.img({ src: mediaSrc })), _.if(this.model.isVideo(), _.video({ controls: true, src: mediaSrc }))));
     };
 
     return MediaViewer;
@@ -48293,6 +48077,411 @@ module.exports = {
     SettingsHelper: __webpack_require__(34),
     UIHelper: __webpack_require__(90)
 };
+
+/***/ }),
+/* 263 */,
+/* 264 */,
+/* 265 */,
+/* 266 */,
+/* 267 */,
+/* 268 */,
+/* 269 */,
+/* 270 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var SettingsHelperCommon = __webpack_require__(194);
+
+var SettingsHelper = function (_SettingsHelperCommon) {
+    _inherits(SettingsHelper, _SettingsHelperCommon);
+
+    function SettingsHelper() {
+        _classCallCheck(this, SettingsHelper);
+
+        return _possibleConstructorReturn(this, _SettingsHelperCommon.apply(this, arguments));
+    }
+
+    /**
+     * Migrates old settings format
+     *
+     * @param {String} project
+     * @param {Boolean} commitChanges
+     *
+     * @returns {Promise} Promise
+     */
+    SettingsHelper.migrateOldSettings = function migrateOldSettings() {
+        var _this2 = this;
+
+        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+        var commitChanges = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
+        debug.log('Migrating old settings for project "' + project + '"...', this);
+
+        var collection = [];
+
+        var newProjectSettings = {
+            usedBy: 'project'
+        };
+
+        collection.push(newProjectSettings);
+
+        // First check if project exists
+        return MongoHelper.databaseExists(project).then(function (doesExist) {
+            if (!doesExist) {
+                return Promise.reject(new Error('Project by id "' + project + '" not found'));
+            }
+
+            debug.log('Getting project settings...', _this2, 3);
+
+            // Then get project settings
+            return MongoHelper.find(project, 'settings', {});
+        }).then(function (projectSettings) {
+            if (!projectSettings) {
+                return Promise.reject(new Error('Project settings for "' + project + '" not found'));
+            }
+
+            // Make sure there is a "live" environment
+            if (!projectSettings.environments) {
+                projectSettings.environments = { names: ['live'] };
+            }
+
+            for (var _iterator = projectSettings, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+                var _ref;
+
+                if (_isArray) {
+                    if (_i >= _iterator.length) break;
+                    _ref = _iterator[_i++];
+                } else {
+                    _i = _iterator.next();
+                    if (_i.done) break;
+                    _ref = _i.value;
+                }
+
+                var section = _ref;
+
+                var sectionKey = section.section;
+
+                // We're handling environments a little differently now, so skip this key
+                if (sectionKey === 'environments') {
+                    continue;
+                }
+
+                delete section.section;
+
+                newProjectSettings[sectionKey] = section;
+            }
+
+            // Then parse all environments
+            var parseNextEnvironment = function parseNextEnvironment() {
+                var environment = projectSettings.environments.names.pop();
+
+                if (!environment) {
+                    return Promise.resolve();
+                }
+
+                debug.log('Getting settings for environment "' + environment + '"...', _this2, 3);
+
+                return MongoHelper.find(project, environment + '.settings', {}).then(function (environmentSettings) {
+                    if (!environmentSettings) {
+                        return Promise.reject(new Error('Environment settings for "' + project + '/' + environment + '" not found'));
+                    }
+
+                    var newEnvironmentSettings = {
+                        usedBy: environment
+                    };
+
+                    collection.push(newEnvironmentSettings);
+
+                    for (var _iterator2 = environmentSettings, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
+                        var _ref2;
+
+                        if (_isArray2) {
+                            if (_i2 >= _iterator2.length) break;
+                            _ref2 = _iterator2[_i2++];
+                        } else {
+                            _i2 = _iterator2.next();
+                            if (_i2.done) break;
+                            _ref2 = _i2.value;
+                        }
+
+                        var section = _ref2;
+
+                        var sectionKey = section.section;
+
+                        delete section.section;
+
+                        if (sectionKey === 'sync') {
+                            newProjectSettings.sync = {
+                                project: section.project,
+                                url: section.url,
+                                token: section.token
+                            };
+                        } else {
+                            newEnvironmentSettings[sectionKey] = section;
+                        }
+                    }
+
+                    // Delete old docs
+                    debug.log('Deleting old settings for "' + project + '/' + environment + '"...', _this2, 3);
+
+                    if (!commitChanges) {
+                        return Promise.resolve();
+                    }
+
+                    return MongoHelper.remove(project, environment + '.settings', {});
+                }).then(function () {
+                    return parseNextEnvironment();
+                });
+            };
+
+            return parseNextEnvironment();
+        })
+
+        // Delete old project settings
+        .then(function () {
+            debug.log('Deleting old project settings...', _this2, 3);
+
+            if (!commitChanges) {
+                return Promise.resolve();
+            }
+
+            return MongoHelper.remove(project, 'settings', {});
+        })
+
+        // Insert new collections
+        .then(function () {
+            debug.log('Inserting new collections...', _this2, 3);
+
+            var insertNextSetting = function insertNextSetting() {
+                var setting = collection.pop();
+
+                if (!setting) {
+                    return Promise.resolve();
+                }
+
+                debug.log('Inserting "' + setting.usedBy + '": ' + JSON.stringify(setting) + '...', _this2, 3);
+
+                if (!commitChanges) {
+                    return insertNextSetting();
+                }
+
+                return MongoHelper.insertOne(project, 'settings', setting).then(function () {
+                    return insertNextSetting();
+                });
+            };
+
+            return insertNextSetting();
+        })
+
+        // Done    
+        .then(function () {
+            debug.log('Done migrating settings for project "' + project + '"!', _this2);
+        });
+    };
+
+    /**
+     * Checks if migration is needed
+     * This is determined by the existence of the "section" key within any setting 
+     *
+     * @param {String} project
+     *
+     * @returns {Boolean} Migration is needed or not
+     */
+
+
+    SettingsHelper.checkIfNeedsMigration = function checkIfNeedsMigration() {
+        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+
+        return MongoHelper.findOne(project, 'settings', { section: { $exists: true } }).then(function (projectSettings) {
+            if (projectSettings && Object.keys(projectSettings).length > 0) {
+                return Promise.resolve(true);
+            }
+
+            return Promise.resolve(false);
+        });
+    };
+
+    /**
+     * Migration check for all projects
+     *
+     * @returns {Promise} Result
+     */
+
+
+    SettingsHelper.migrationCheck = function migrationCheck() {
+        var _this3 = this;
+
+        return ProjectHelper.getAllProjects().then(function (projects) {
+            var checkNext = function checkNext() {
+                var project = projects.pop();
+
+                if (!project) {
+                    return Promise.resolve();
+                }
+
+                return _this3.checkIfNeedsMigration(project).then(function (needsMigration) {
+                    if (!needsMigration) {
+                        return Promise.resolve();
+                    }
+
+                    return _this3.migrateOldSettings(project, true);
+                }).then(function () {
+                    return checkNext();
+                });
+            };
+
+            return checkNext();
+        });
+    };
+
+    /**
+     * Gets all settings
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} section
+     *
+     * @return {Promise} Settings
+     */
+
+
+    SettingsHelper.getSettings = function getSettings() {
+        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+        var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+
+        // Is the environment is a wildcard, just discard it
+        if (environment === '*') {
+            environment = null;
+        }
+
+        // If the requested section is "sync", always return the local setting
+        if (section === 'sync') {
+            return MongoHelper.findOne(project, 'settings', { usedBy: 'project' }).then(function (projectSettings) {
+                if (!projectSettings) {
+                    projectSettings = {};
+                }
+
+                return Promise.resolve(projectSettings.sync || {});
+            });
+        }
+
+        // Find the remote resource, if applicable
+        return SyncHelper.getResource(project, environment, 'settings').catch(function (e) {
+            if (e.message) {
+                debug.log(e.message, SettingsHelper);
+            }
+
+            return Promise.resolve(null);
+        })
+
+        // Process local settings, if applicable
+        .then(function (remoteSettings) {
+            // If the remote settings were found, return it
+            if (remoteSettings && !Array.isArray(remoteSettings)) {
+                return Promise.resolve(remoteSettings);
+            }
+
+            // If not, get the local settings instead
+            var query = { usedBy: 'project' };
+
+            if (environment) {
+                query.usedBy = environment;
+            }
+
+            return MongoHelper.findOne(project, 'settings', query);
+        })
+
+        // Return appropriate section or all settings
+        .then(function (settings) {
+            if (!settings) {
+                settings = {};
+            }
+
+            // If a section was specified, only return this content
+            if (section) {
+                return Promise.resolve(settings[section]);
+            }
+
+            return Promise.resolve(settings);
+        });
+    };
+
+    /**
+     * Sets settings
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} section
+     * @param {Object} settings
+     *
+     * @return {Promise} promise
+     */
+
+
+    SettingsHelper.setSettings = function setSettings() {
+        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+        var section = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+        var settings = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : requiredParam('settings');
+
+        debug.log('Setting "' + section + '" to ' + JSON.stringify(settings), this, 3);
+
+        // First get the existing settings object
+        return this.getSettings(project, environment).then(function (oldSettings) {
+            if (!oldSettings) {
+                oldSettings = {};
+            }
+
+            // If the section is "sync", always set the local setting
+            if (section === 'sync') {
+                oldSettings.sync = settings;
+
+                return MongoHelper.updateOne(project, 'settings', { usedBy: 'project' }, oldSettings);
+            }
+
+            // Set the remote setting, if applicable
+            return SyncHelper.setResourceItem(project, environment, 'settings', section, settings).then(function (isSyncEnabled) {
+                // If the setting was synced, resolve immediately
+                if (isSyncEnabled) {
+                    return Promise.resolve();
+                }
+
+                // If sync was not enabled, set the local setting instead
+                var query = { usedBy: 'project' };
+                oldSettings.usedBy = 'project';
+
+                if (environment) {
+                    query.usedBy = environment;
+                    oldSettings.usedBy = environment;
+                }
+
+                // If a section was provided, only set that setting
+                if (section) {
+                    oldSettings[section] = settings;
+
+                    // If not, replace all settings
+                } else {
+                    oldSettings = settings;
+                }
+
+                return MongoHelper.updateOne(project, 'settings', query, oldSettings, { upsert: true });
+            });
+        });
+    };
+
+    return SettingsHelper;
+}(SettingsHelperCommon);
+
+module.exports = SettingsHelper;
 
 /***/ })
 /******/ ]);

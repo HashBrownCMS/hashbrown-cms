@@ -1,5 +1,7 @@
 'use strict';
 
+const TemplateEditor = require('Client/Views/Editors/TemplateEditor');
+
 // Templates
 Router.route('/templates/', function() {
     if(currentUserHasScope('templates')) {

@@ -1,5 +1,8 @@
 'use strict';
 
+window.isClient = true;
+window.isServer = false;
+
 // Style
 require('Style/client');
 

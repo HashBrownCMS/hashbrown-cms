@@ -2,6 +2,7 @@
 
 const ConnectionHelperCommon = require('Common/Helpers/ConnectionHelper');
 const Connection = require('Common/Models/Connection');
+const ProjectHelper = require('Client/Helpers/ProjectHelper');
 
 /**
  * The client side connection helper
@@ -60,5 +61,69 @@ module.exports = class ConnectionHelper extends ConnectionHelperCommon {
         }
 
         return Promise.reject(new Error('No Connection by id "' + id + '" was found'));
+    }
+
+    /**
+     * Sets the Media provider
+     *
+     * @param {String} id
+     *
+     * @returns {Promise}
+     */
+    static setMediaProvider(id) {
+        return super.setMediaProvider(
+            ProjectHelper.currentProject,
+            ProjectHelper.currentEnvironment,
+            id
+        ).then(() => {
+            return reloadResource('media');  
+        })
+        .then(() => {
+            HashBrown.Client.Views.Navigation.NavbarMain.reload();  
+        });
+    }
+    
+    /**
+     * Gets the Media provider
+     *
+     * @returns {Promise} Connection
+     */
+    static getMediaProvider() {
+        return super.getMediaProvider(
+            ProjectHelper.currentProject,
+            ProjectHelper.currentEnvironment
+        );
+    }
+    
+    /**
+     * Sets the Template provider
+     *
+     * @param {String} id
+     *
+     * @returns {Promise}
+     */
+    static setTemplateProvider(id) {
+        return super.setTemplateProvider(
+            ProjectHelper.currentProject,
+            ProjectHelper.currentEnvironment,
+            id
+        ).then(() => {
+            return reloadResource('templates');  
+        })
+        .then(() => {
+            HashBrown.Client.Views.Navigation.NavbarMain.reload();  
+        });
+    }
+    
+    /**
+     * Gets the Template provider
+     *
+     * @returns {Promise} Connection
+     */
+    static getTemplateProvider() {
+        return super.getTemplateProvider(
+            ProjectHelper.currentProject,
+            ProjectHelper.currentEnvironment
+        );
     }
 }

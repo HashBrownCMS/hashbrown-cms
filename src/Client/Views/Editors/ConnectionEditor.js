@@ -1,5 +1,7 @@
 'use strict';
 
+const ConnectionHelper = require('Client/Helpers/ConnectionHelper');
+
 /**
  * The editor for Connections
  */
@@ -43,6 +45,44 @@ class ConnectionEditor extends View {
         this.model = null;
         
         this.fetch();
+    }
+
+    /**
+     * Renders the Template provider editor
+     */
+    renderTemplateProviderEditor() {
+        let $inputSwitch = UI.inputSwitch(false, (isProvider) => {
+            ConnectionHelper.setTemplateProvider(isProvider ? this.model.id : null)
+            .catch(UI.errorModal);
+        });
+
+        ConnectionHelper.getTemplateProvider()
+        .then((connection) => {
+            if(connection && connection.id === this.model.id) {
+                $inputSwitch.trigger('set', true);
+            }
+        });
+
+        return $inputSwitch;
+    }
+    
+    /**
+     * Renders the Media provider editor
+     */
+    renderMediaProviderEditor() {
+        let $inputSwitch = UI.inputSwitch(false, (isProvider) => {
+            ConnectionHelper.setMediaProvider(isProvider ? this.model.id : null)
+            .catch(UI.errorModal);
+        });
+
+        ConnectionHelper.getMediaProvider()
+        .then((connection) => {
+            if(connection && connection.id === this.model.id) {
+                $inputSwitch.trigger('set', true);
+            }
+        });
+
+        return $inputSwitch;
     }
 
     /**
@@ -147,6 +187,18 @@ class ConnectionEditor extends View {
                     _.h4(this.model.title)
                 ),
                 _.div({class: 'tab-content editor-body'},
+                    _.div({class: 'field-container connection-template-provider'},
+                        _.div({class: 'field-key'}, 'Is Template provider'),
+                        _.div({class: 'field-value'},
+                            this.renderTemplateProviderEditor()
+                        )
+                    ),
+                    _.div({class: 'field-container connection-media-provider'},
+                        _.div({class: 'field-key'}, 'Is Media provider'),
+                        _.div({class: 'field-value'},
+                            this.renderMediaProviderEditor()
+                        )
+                    ),
                     _.div({class: 'field-container connection-title'},
                         _.div({class: 'field-key'}, 'Title'),
                         _.div({class: 'field-value'},

@@ -256,6 +256,8 @@ window.reloadResource = function reloadResource(name) {
                 resolve(result);
             },
             error: function(e) {
+                window.resources[name] = [];
+                
                 if(e.status == 403) {
                     location = '/login/?path=' + location.pathname + location.hash;
                 

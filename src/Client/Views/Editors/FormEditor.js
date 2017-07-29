@@ -311,58 +311,20 @@ class FormEditor extends View {
      * @return {Object} element
      */
     renderEntries() {
-        return _.button({class: 'btn btn-primary'}, 'View entries').click(() => {
-            let modal = new HashBrown.Client.Views.Modals.MessageModal({
-                model: {
-                    title: 'Entries',
-                    body: _.table({},
-                        _.each(this.model.entries.reverse(), (i, entry) => {
-                            return _.tbody({class: 'entry'},
-                                _.each(entry, (key, value) => {
-                                    return _.tr({class: 'kvp'},
-                                        _.td({class: 'key'}, key),
-                                        _.td({class: 'value'}, value)
-                                    );
-                                })
-                            );
-                        })  
-                    )
-                },
-                buttons: [
-                    {
-                        class: 'btn-danger pull-left',
-                        label: 'Clear',
-                        callback: () => {
-                            UI.confirmModal('Clear', 'Clear "' + this.model.title + '"', 'Are you sure you want to clear all entries?', () => {
-                                apiCall('post', 'forms/clear/' + this.model.id)
-                                .then(() => {
-                                    this.model.entries = [];
-                                    modal.hide();
-                                })
-                                .catch(UI.errorModal);
-                            });
-                            
-                            return false;
-                        }
-                    },
-                    {
-                        class: 'btn-primary',
-                        label: 'Get .csv',
-                        callback: () => {
-                            location = apiUrl('forms/' + this.model.id + '/entries');
-
-                            return false;
-                        }
-                    },
-                    {
-                        class: 'btn-default',
-                        label: 'OK'
-                    }
-                ]
-            });
-
-            modal.$element.addClass('form-entries-list-modal');
-        });
+        return _.div({class: 'btn-group'},
+            _.button({class: 'btn btn-danger'}, 'Clear').click(() => {
+                UI.confirmModal('Clear', 'Clear "' + this.model.title + '"', 'Are you sure you want to clear all entries?', () => {
+                    apiCall('post', 'forms/clear/' + this.model.id)
+                    .then(() => {
+                        this.model.entries = [];
+                    })
+                    .catch(UI.errorModal);
+                });
+            }),
+            _.button({class: 'btn btn-primary'}, 'Get .csv').click(() => {
+                location = apiUrl('forms/' + this.model.id + '/entries');
+            })
+        );
     }
 
     /**
@@ -398,7 +360,7 @@ class FormEditor extends View {
 
         this.$preview = this.renderPreview();
 
-        $element.append(this.renderField('Entries', this.renderEntries())); 
+        $element.append(this.renderField('Entries (' + this.model.entries.length + ')', this.renderEntries())); 
         $element.append(this.renderField('POST URL',
             _.div({class: 'input-group'},
                 _.input({readonly: 'readonly', class: 'form-control post-url', type: 'text', value: postUrl}),

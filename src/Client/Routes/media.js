@@ -1,5 +1,7 @@
 'use strict';
 
+const MediaViewer = require('Client/Views/Editors/MediaViewer');
+
 // Dashboard
 Router.route('/media/', function() {
     ViewHelper.get('NavbarMain').showTab('/media/');

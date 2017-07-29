@@ -1,5 +1,12 @@
 'use strict';
 
+const Media = require('Common/Models/Media');
+
+/**
+ * An editor for displaying Media objects
+ *
+ * @memberof HashBrown.Client.Views.Editors
+ */
 class MediaViewer extends View {
     constructor(params) {
         super(params);
@@ -9,31 +16,10 @@ class MediaViewer extends View {
         this.fetch();
     }
 
-    /**
-     * Event: On change folder path
-     *
-     * @param {String} newFolder
-     */
-    onChangeFolder(newFolder) {
-        apiCall(
-            'post',
-            'media/tree/' + this.model.id,
-            newFolder ? {
-                id: this.model.id,
-                folder: newFolder
-            } : null
-        )
-        .then(() => {
-            return reloadResource('media');
-        })
-        .then(() => {
-            ViewHelper.get('NavbarMain').reload();
-        })
-        .catch(errorModal);
-    }
-
     render() {
-        this.model = new Media(this.model);        
+        if(this.model instanceof Media === false) {
+            this.model = new Media(this.model);        
+        }
 
         let mediaSrc = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + this.model.id;
 
@@ -54,10 +40,6 @@ class MediaViewer extends View {
                 _.if(this.model.isVideo(),
                     _.video({controls: true, src: mediaSrc})
                 )
-            ),
-            _.div({class: 'editor-footer'}, 
-                _.input({class: 'form-control', value: this.model.folder, placeholder: 'Type folder path here'})
-                    .change((e) => { this.onChangeFolder($(e.target).val()); })
             )
         );
     }

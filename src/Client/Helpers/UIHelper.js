@@ -35,6 +35,10 @@ module.exports = class UIHelper {
             _.label({for: id})
         );
 
+        $element.on('set', (e, newValue) => {
+            $input[0].checked = newValue;
+        });
+
         if(initialValue) {
             $input.attr('checked', true);
         }

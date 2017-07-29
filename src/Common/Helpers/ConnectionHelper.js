@@ -1,5 +1,13 @@
 'use strict';
 
+const Connection = require('Common/Models/Connection');
+const SettingsHelper = isServer ? require('Server/Helpers/SettingsHelper') : require('Client/Helpers/SettingsHelper');
+
+/**
+ * The helper class for Connections
+ *
+ * @memberof HashBrown.Common.Helpers.ConnectionHelper
+ */
 module.exports = class ConnectionHelper {
     /**
      * Gets all connections
@@ -28,14 +36,14 @@ module.exports = class ConnectionHelper {
     static setTemplateProvider(
         project = requiredParam('project'),
         environment = requiredParam('environment'),
-        id = requiredParam('id')
+        id = null
     ) {
         return SettingsHelper.getSettings(project, environment, 'providers')
         .then((providers) => {
             providers = providers || {};
             providers.template = id;
 
-            SettingsHelper.setSettings(project, environment, 'providers', providers)
+            return SettingsHelper.setSettings(project, environment, 'providers', providers)
         });
     }
 
@@ -70,7 +78,7 @@ module.exports = class ConnectionHelper {
             if(providers.template) {
                 return this.getConnectionById(project, environment, providers.template);  
             } else {
-                return Promise.reject(new Error('Template provider is not defined'));
+                return Promise.resolve(null);
             }
         });
     }
@@ -87,14 +95,14 @@ module.exports = class ConnectionHelper {
     static setMediaProvider(
         project = requiredParam('project'),
         environment = requiredParam('environment'),
-        id = requiredParam('id')
+        id = null
     ) {
         return SettingsHelper.getSettings(project, environment, 'providers')
         .then((providers) => {
             providers = providers || {};
             providers.media = id;
 
-            SettingsHelper.setSettings(project, environment, 'providers', providers)
+            return SettingsHelper.setSettings(project, environment, 'providers', providers)
         });
     }
 
@@ -129,7 +137,7 @@ module.exports = class ConnectionHelper {
             if(providers.media) {
                 return this.getConnectionById(project, environment, providers.media);
             } else {
-                return Promise.reject(new Error('Media provider is not defined'));
+                return Promise.resolve(null);
             }
         });
     }

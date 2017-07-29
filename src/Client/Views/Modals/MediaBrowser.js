@@ -153,7 +153,7 @@ module.exports = class MediaBrowser extends View {
                             uploadModal.hide();
                         });
                     },
-                    error: errorModal
+                    error: UI.errorModal
                 });
             }
 

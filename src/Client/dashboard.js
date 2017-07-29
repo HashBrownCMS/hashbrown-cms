@@ -1,5 +1,8 @@
 'use strict';
 
+window.isClient = true;
+window.isServer = false;
+
 // Helper functions
 require('Client/helpers');
 

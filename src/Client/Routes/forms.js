@@ -1,5 +1,8 @@
 'use strict';
 
+const JSONEditor = require('Client/Views/Editors/JSONEditor');
+const FormEditor = require('Client/Views/Editors/FormEditor');
+
 // Dashboard
 Router.route('/forms/', function() {
     ViewHelper.get('NavbarMain').showTab('/forms/');

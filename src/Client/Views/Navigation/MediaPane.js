@@ -2,6 +2,8 @@
 
 const NavbarPane = require('./NavbarPane');
 const NavbarMain = require('./NavbarMain');
+const MediaBrowser = require('Client/Views/Modals/MediaBrowser');
+const MediaHelper = require('Client/Helpers/MediaHelper');
 
 class MediaPane extends NavbarPane {
     /**
@@ -26,7 +28,7 @@ class MediaPane extends NavbarPane {
 
             location.hash = '/media/' + id;
         })
-        .catch(errorModal);
+        .catch(UI.errorModal);
     }
 
     /**

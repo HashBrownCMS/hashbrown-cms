@@ -13981,6 +13981,10 @@ module.exports = function () {
             }
         }), _.label({ for: id }));
 
+        $element.on('set', function (e, newValue) {
+            $input[0].checked = newValue;
+        });
+
         if (initialValue) {
             $input.attr('checked', true);
         }
@@ -14735,6 +14739,8 @@ window.reloadResource = function reloadResource(name) {
                 resolve(result);
             },
             error: function error(e) {
+                window.resources[name] = [];
+
                 if (e.status == 403) {
                     location = '/login/?path=' + location.pathname + location.hash;
                 } else if (e.status == 404) {
@@ -32706,8 +32712,10 @@ module.exports = function () {
 "use strict";
 
 
-// Helper functions
+window.isClient = true;
+window.isServer = false;
 
+// Helper functions
 __webpack_require__(91);
 
 // Libraries

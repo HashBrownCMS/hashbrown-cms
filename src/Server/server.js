@@ -34,6 +34,9 @@ global.requiredParam = function(name) {
     throw new Error('Parameter "' + name + '" is required');
 }
 
+global.isServer = true;
+global.isClient = false;
+
 // ----------
 // Helpers
 // ----------

@@ -120,6 +120,7 @@ class NavbarMain extends View {
 	restore() {
 		if(!this.state) { return; }
 
+        // Restore tab buttons
 		this.$element.find('.tab-buttons button').each((i, element) => {
 			let $button = $(element);
 			let key = $button.data('route');
@@ -129,6 +130,7 @@ class NavbarMain extends View {
 			}
 		});
 		
+        // Restore pane containers
 		this.$element.find('.pane-container').each((i, element) => {
 			let $pane = $(element);
 			let key = $pane.data('route');
@@ -138,6 +140,7 @@ class NavbarMain extends View {
 			}
 		});
 
+        // Restore pane items
 		this.$element.find('.pane-item-container').each((i, element) => {
 			let $item = $(element);
 			let key = $item.data('routing-path');
