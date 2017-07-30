@@ -1,5 +1,7 @@
 'use strict';
 
+const RequestHelper = require('Server/Helpers/RequestHelper');
+
 /**
  * The helper class for all synchronisation services
  *
@@ -20,7 +22,7 @@ class SyncHelper {
         username = requiredParam('username'),
         password = requiredParam('password')
     ) {
-        return SettingsHelper.getSettings(project, '', 'sync')
+        return HashBrown.Helpers.SettingsHelper.getSettings(project, '', 'sync')
         .then((settings) => {
             debug.log('Renewing sync token for ' + project + '...', this);
 
@@ -70,10 +72,10 @@ class SyncHelper {
         remoteItemName = requiredParam('remoteItemName')
     ) {
         if(!remoteItemName) {
-            return SyncHelper.getResource(project, environment, remoteResourceName);
+            return this.getResource(project, environment, remoteResourceName);
         }
 
-        return SettingsHelper.getSettings(project, '', 'sync')
+        return HashBrown.Helpers.SettingsHelper.getSettings(project, '', 'sync')
         .then((settings) => {
             return new Promise((resolve, reject) => {
                 if(settings && settings.enabled) {
@@ -138,7 +140,7 @@ class SyncHelper {
         remoteItemName = requiredParam('remoteItemName'),
         remoteItemData = requiredParam('remoteItemData')
     ) {
-        return SettingsHelper.getSettings(project, '', 'sync')
+        return HashBrown.Helpers.SettingsHelper.getSettings(project, '', 'sync')
         .then((settings) => {
             return new Promise((resolve, reject) => {
                 if(settings && settings.enabled) {
@@ -201,7 +203,7 @@ class SyncHelper {
         remoteResourceName = requiredParam('remoteResourceName'),
         params = {}
     ) {
-        return SettingsHelper.getSettings(project, '', 'sync')
+        return HashBrown.Helpers.SettingsHelper.getSettings(project, '', 'sync')
         .then((settings) => {
             return new Promise((resolve, reject) => {
                 if(settings && settings.enabled) {

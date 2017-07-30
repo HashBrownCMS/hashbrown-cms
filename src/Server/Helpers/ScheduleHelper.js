@@ -1,5 +1,10 @@
 'use strict';
 
+const UserHelper = require('Server/Helpers/UserHelper');
+const ContentHelper = require('Server/Helpers/ContentHelper');
+const ConnectionHelper = require('Server/Helpers/ConnectionHelper');
+const MongoHelper = require('Server/Helpers/MongoHelper');
+
 const Task = require('Server/Models/Task');
 
 let watchInterval;

@@ -17,7 +17,7 @@ Router.route('/content/', function() {
 Router.route('/content/json/:id', function() {
     ViewHelper.get('NavbarMain').highlightItem('/content/', this.id);
     
-    let contentEditor = new HashBrown.Client.Views.Editors.JSONEditor({
+    let contentEditor = new HashBrown.Views.Editors.JSONEditor({
         modelUrl: apiUrl('content/' + this.id),
         apiPath: 'content/' + this.id
     });
@@ -27,10 +27,10 @@ Router.route('/content/json/:id', function() {
 
 // Edit (redirect to default tab)
 Router.route('/content/:id', function() {
-    let content = HashBrown.Client.Helpers.ContentHelper.getContentByIdSync(this.id);
+    let content = HashBrown.Helpers.ContentHelper.getContentByIdSync(this.id);
 
     if(content) {
-        let contentSchema = HashBrown.Client.Helpers.SchemaHelper.getSchemaByIdSync(content.schemaId);
+        let contentSchema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(content.schemaId);
 
         if(contentSchema) {
             location.hash = '/content/' + this.id + '/' + (contentSchema.defaultTabId || 'meta');
@@ -53,7 +53,7 @@ Router.route('/content/:id/:tab', function() {
     if(!contentEditor || !contentEditor.model || contentEditor.model.id != this.id) {
         ViewHelper.get('NavbarMain').highlightItem('/content/', this.id);
    
-        contentEditor = new HashBrown.Client.Views.Editors.ContentEditor({
+        contentEditor = new HashBrown.Views.Editors.ContentEditor({
             modelUrl: apiUrl('content/' + this.id)
         });
         

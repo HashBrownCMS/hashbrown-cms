@@ -105,7 +105,7 @@ class ContentEditor extends View {
             
             this.reload();
             
-            HashBrown.Client.Views.Navigation.NavbarMain.reload();
+            HashBrown.Views.Navigation.NavbarMain.reload();
 
             this.dirty = false;
 
@@ -189,7 +189,7 @@ class ContentEditor extends View {
             editorId += 'Editor';
         }
 
-        return HashBrown.Client.Views.Editors.FieldEditors[editorId];
+        return HashBrown.Views.Editors.FieldEditors[editorId];
     }
 
     /**

@@ -1,5 +1,6 @@
 'use strict';
 
+const MongoHelper = require('Server/Helpers/MongoHelper');
 const SettingsHelperCommon = require('Common/Helpers/SettingsHelper');
 
 /**
@@ -203,7 +204,7 @@ class SettingsHelper extends SettingsHelperCommon {
      * @returns {Promise} Result
      */
     static migrationCheck() {
-        return ProjectHelper.getAllProjects()
+        return HashBrown.Helpers.ProjectHelper.getAllProjects()
         .then((projects) => {
             let checkNext = () => {
                 let project = projects.pop();
@@ -261,7 +262,7 @@ class SettingsHelper extends SettingsHelperCommon {
         }
 
         // Find the remote resource, if applicable
-        return SyncHelper.getResource(project, environment, 'settings')
+        return HashBrown.Helpers.SyncHelper.getResource(project, environment, 'settings')
         .catch((e) => {
             if(e.message) {
                 debug.log(e.message, SettingsHelper);
@@ -335,7 +336,7 @@ class SettingsHelper extends SettingsHelperCommon {
             }
 
             // Set the remote setting, if applicable
-            return SyncHelper.setResourceItem(project, environment, 'settings', section, settings)
+            return HashBrown.Helpers.SyncHelper.setResourceItem(project, environment, 'settings', section, settings)
             .then((isSyncEnabled) => {
                 // If the setting was synced, resolve immediately
                 if(isSyncEnabled) {

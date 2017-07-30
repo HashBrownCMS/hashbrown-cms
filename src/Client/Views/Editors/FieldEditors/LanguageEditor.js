@@ -1,5 +1,6 @@
 'use strict';
 
+const ProjectHelper = require('Client/Helpers/ProjectHelper');
 const LanguageHelper = require('Client/Helpers/LanguageHelper');
 
 const FieldEditor = require('./FieldEditor');

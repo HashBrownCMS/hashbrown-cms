@@ -1,9 +1,9 @@
 'use strict';
 
-let Connection = require('./server/Connection');
-let ConnectionHelper = require('Server/Helpers/ConnectionHelper');
+const ConnectionHelper = require('Server/Helpers/ConnectionHelper');
+const ConfigHelper = require('Server/Helpers/ConfigHelper');
 
-let fs = require('fs');
+const Connection = require('./server/Connection');
 
 let route = '';
 

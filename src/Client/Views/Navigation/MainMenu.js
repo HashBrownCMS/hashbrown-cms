@@ -31,7 +31,7 @@ class MainMenu extends View {
 
         reloadResource('content')
         .then(() => {
-            HashBrown.Client.Views.Navigation.NavbarMain.reload();
+            HashBrown.Views.Navigation.NavbarMain.reload();
 
             let contentEditor = ViewHelper.get('ContentEditor');
 
@@ -129,7 +129,7 @@ class MainMenu extends View {
 
     render() {
         // Render menu
-        this.languages = HashBrown.Client.Helpers.LanguageHelper.selectedLanguages || [];
+        this.languages = HashBrown.Helpers.LanguageHelper.selectedLanguages || [];
 
         _.append(this.$element.empty(),
             // Language picker

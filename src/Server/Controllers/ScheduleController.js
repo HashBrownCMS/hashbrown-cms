@@ -1,7 +1,8 @@
 'use strict';
 
-// Classes
-let ApiController = require('./ApiController');
+const ScheduleHelper = require('Server/Helpers/ScheduleHelper');
+
+const ApiController = require('./ApiController');
 
 /**
  * The Controller for scheduled Tasks

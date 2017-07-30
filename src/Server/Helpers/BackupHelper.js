@@ -4,6 +4,9 @@ const FileSystem = require('fs');
 const Glob = require('glob');
 const Multer = require('multer');
 
+const MediaHelper = require('Server/Helpers/MediaHelper');
+const MongoHelper = require('Server/Helpers/MongoHelper');
+
 const Connection = require('Common/Models/Connection');
 
 /**

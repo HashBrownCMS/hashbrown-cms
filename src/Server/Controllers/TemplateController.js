@@ -1,6 +1,8 @@
 'use strict';
 
-let ApiController = require('./ApiController');
+const ConnectionHelper = require('Server/Helpers/ConnectionHelper');
+
+const ApiController = require('./ApiController');
 
 /**
  * The controller fro templates

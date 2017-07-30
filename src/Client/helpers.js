@@ -227,15 +227,15 @@ window.reloadResource = function reloadResource(name) {
 
     switch(name) {
         case 'templates':
-            model = HashBrown.Common.Models.Template;
+            model = HashBrown.Models.Template;
             break;
 
         case 'users':
-            model = HashBrown.Common.Models.User;
+            model = HashBrown.Models.User;
             break;
 
         case 'media':
-            model = HashBrown.Common.Models.Media;
+            model = HashBrown.Models.Media;
             break;
     }
 

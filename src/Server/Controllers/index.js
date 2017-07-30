@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * @namespace HashBrown.Server.Controllers
+ * @namespace HashBrown.Controllers
  */
 module.exports = {
     ApiController: require('./ApiController'),
@@ -10,11 +10,14 @@ module.exports = {
     Controller: require('./Controller'),
     FormsController: require('./FormsController'),
     MediaController: require('./MediaController'),
+    PluginController: require('./PluginController'),
     ScheduleController: require('./ScheduleController'),
     SchemaController: require('./SchemaController'),
     ServerController: require('./ServerController'),
     SettingsController: require('./SettingsController'),
     SyncController: require('./SyncController'),
     TemplateController: require('./TemplateController'),
-    UserController: require('./UserController')
+    TestController: require('./TestController'),
+    UserController: require('./UserController'),
+    ViewController: require('./ViewController')
 };

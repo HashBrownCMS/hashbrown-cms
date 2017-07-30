@@ -13,7 +13,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
     /**
      * Gets all connections
      *
-     * @return {Promise(Connection[])} promise
+     * @return {Promise} Array of Connections
      */
     static getAllConnections() {
         return Promise.resolve(resources.connections);
@@ -79,7 +79,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
             return reloadResource('media');  
         })
         .then(() => {
-            HashBrown.Client.Views.Navigation.NavbarMain.reload();  
+            HashBrown.Views.Navigation.NavbarMain.reload();  
         });
     }
     
@@ -111,7 +111,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
             return reloadResource('templates');  
         })
         .then(() => {
-            HashBrown.Client.Views.Navigation.NavbarMain.reload();  
+            HashBrown.Views.Navigation.NavbarMain.reload();  
         });
     }
     

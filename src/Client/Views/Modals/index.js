@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * @namespace HashBrown.Client.Views.Modals
+ * @namespace HashBrown.Views.Modals
  */
 module.exports = {
     MediaBrowser: require('./MediaBrowser'),

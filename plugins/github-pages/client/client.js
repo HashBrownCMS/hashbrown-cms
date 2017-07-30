@@ -276,5 +276,5 @@
         );
     }
 
-    HashBrown.Client.Views.Editors.ConnectionEditors['GitHub Pages'] = ConnectionEditor;
+    HashBrown.Views.Editors.ConnectionEditors['GitHub Pages'] = ConnectionEditor;
 })();

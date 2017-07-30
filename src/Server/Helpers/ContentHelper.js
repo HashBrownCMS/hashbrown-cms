@@ -1,6 +1,10 @@
 'use strict';
 
 const ContentHelperCommon = require('Common/Helpers/ContentHelper');
+const ScheduleHelper = require('Server/Helpers/ScheduleHelper');
+const SyncHelper = require('Server/Helpers/SyncHelper');
+const SchemaHelper = require('Server/Helpers/SchemaHelper');
+const MongoHelper = require('Server/Helpers/MongoHelper');
 
 const Content = require('Common/Models/Content');
 const ContentSchema = require('Common/Models/ContentSchema');
@@ -151,58 +155,6 @@ class ContentHelper extends ContentHelperCommon {
         user = requiredParam('user'),
         create = false
     ) {
-        debug.log('Updating content "' + id + '"...', this);
-        
-        let updateContent = () => {
-            // Handle scheduled publish task
-            let handlePublishTask = () => {
-                if(content.publishOn) {
-                    return ScheduleHelper.updateTask(project, environment, 'publish', id, content.publishOn, user);
-                } else {
-                    return ScheduleHelper.removeTask(project, environment, 'publish', id);
-                }
-            };
-
-            // Handle scheduled unpublish task
-            let handleUnpublishTask = () => {
-                if(content.unpublishOn) {
-                    return ScheduleHelper.updateTask(project, environment, 'unpublish', id, content.unpublishOn, user);
-                } else {
-                    return ScheduleHelper.removeTask(project, environment, 'unpublish', id);
-                }
-            };
-
-            // Unset automatic flags
-            content.locked = false;
-            content.remote = false;
-
-            // Content update data
-            content.updatedBy = user.id;
-            content.updateDate = Date.now();
-            
-            // Fallback in case of no "created by" user
-            if(!content.createdBy) {
-                content.createdBy = content.updatedBy;
-            }
-            
-            let collection = environment + '.content';
-
-            return handlePublishTask()
-            .then(handleUnpublishTask())
-            .then(() => {
-                return MongoHelper.updateOne(
-                    project,
-                    collection,
-                    { id: id },
-                    content,
-                    { upsert: create } // Whether or not to create the node if it doesn't already exist
-                );
-            })
-            .then(() => {
-                debug.log('Done updating content "' + id + '"', this);
-            });
-        };
-
         // Check for empty Content object
         if(!content || Object.keys(content).length < 1) {
             return Promise.reject(new Error('Posted content with id "' + id + '" is empty'));
@@ -213,13 +165,61 @@ class ContentHelper extends ContentHelperCommon {
             return Promise.reject(new Error('Content "' + content.id + '" cannot be a child of itself'));
         }
 
-        // Check for allowed Schemas
-        if(content.parentId) {
-            return this.isSchemaAllowedAsChild(project, environment, content.parentId, content.schemaId)
-            .then(updateContent);
-        }
+        return (() => {
+            // If no parent id was specified, let the content trough
+            // TODO: Check if allowed at root
+            if(!content.parentId) { return Promise.resolve(); }
 
-        return updateContent();
+            console.log(this.isSchemaAllowedAsChild);
+
+            // Check for allowed Schemas
+            return this.isSchemaAllowedAsChild(project, environment, content.parentId, content.schemaId);
+        })()
+        .then(() => {
+            // Unset automatic flags
+            content.locked = false;
+            content.remote = false;
+            content.local = false;
+
+            // Content update data
+            content.updatedBy = user.id;
+            content.updateDate = Date.now();
+            
+            // Fallback in case of no "created by" user
+            if(!content.createdBy) {
+                content.createdBy = content.updatedBy;
+            }
+            
+            // Handle scheduled publish task
+            if(content.publishOn) {
+                return ScheduleHelper.updateTask(project, environment, 'publish', id, content.publishOn, user);
+            } else {
+                return ScheduleHelper.removeTask(project, environment, 'publish', id);
+            }
+        })
+        .then(() => {
+            // Handle scheduled unpublish task
+            if(content.unpublishOn) {
+                return ScheduleHelper.updateTask(project, environment, 'unpublish', id, content.unpublishOn, user);
+            } else {
+                return ScheduleHelper.removeTask(project, environment, 'unpublish', id);
+            }
+        })
+        .then(() => {
+            // Insert into database
+            return MongoHelper.updateOne(
+                project,
+                environment + '.content',
+                { id: id },
+                content,
+                { upsert: create } // Whether or not to create the node if it doesn't already exist
+            );
+        })
+        .then(() => {
+            debug.log('Done updating content "' + id + '"', this);
+
+            return Promise.resolve(content);
+        });
     }
 
     /**
@@ -291,49 +291,46 @@ class ContentHelper extends ContentHelperCommon {
         id = requiredParam('id'),
         removeChildren = false
     ) {
+        debug.log('Removing content "' + id + '"...', this);
+
         let collection = environment + '.content';
         
-        return new Promise((resolve, reject) => {
-            MongoHelper.removeOne(
-                project,
-                collection,
-                {
-                    id: id
-                }
-            )
-            .then(() => {
-                if(removeChildren) {
-                    MongoHelper.remove(
-                        project,
-                        collection,
-                        {
-                            parentId: id
-                        }
-                    )
-                    .then(() => {
-                        resolve();
-                    })
-                    .catch(reject);
-                
-                } else {
-                    MongoHelper.update(
-                        project,
-                        collection,
-                        {
-                            parentId: id
-                        },
-                        {
-                            parentId: null
-                        }
-                    )
-                    .then(() => {
-                        resolve();
-                    })
-                    .catch(reject);
+        return MongoHelper.removeOne(
+            project,
+            collection,
+            {
+                id: id
+            }
+        )
+        .then(() => {
+            // Remove children if specified
+            if(removeChildren) {
+                return MongoHelper.remove(
+                    project,
+                    collection,
+                    {
+                        parentId: id
+                    }
+                );
 
-                }
-            })
-            .catch(reject);
+            // If not removing children, we should unset their parent
+            } else {
+                return MongoHelper.update(
+                    project,
+                    collection,
+                    {
+                        parentId: id
+                    },
+                    {
+                        parentId: null
+                    }
+                );
+            }
+        })
+        .then(() => {
+            debug.log('Successfully removed content "' + id + '"...', this);
+
+            return Promise.resolve();  
         });
     }
     
@@ -443,7 +440,7 @@ class ContentHelper extends ContentHelperCommon {
         });
 
         // Create rich text page
-        return SchemaHelper.setSchema(
+        return SchemaHelper.setSchemaById(
             project,
             environment,
             richTextPageSchema.id,
@@ -460,14 +457,14 @@ class ContentHelper extends ContentHelperCommon {
         ))
         
         // Create section page
-        .then(SchemaHelper.setSchema(
+        .then(SchemaHelper.setSchemaById(
             project,
             environment,
             sectionSchema.id,
             sectionSchema, 
             true
         ))
-        .then(SchemaHelper.setSchema(
+        .then(SchemaHelper.setSchemaById(
             project,
             environment,
             sectionPageSchema.id,

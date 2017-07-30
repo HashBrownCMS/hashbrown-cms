@@ -1,5 +1,9 @@
 'use strict';
 
+const ConnectionHelper = require('Server/Helpers/ConnectionHelper');
+const ContentHelper = require('Server/Helpers/ContentHelper');
+const SyncHelper = require('Server/Helpers/SyncHelper');
+
 const ApiController = require('Server/Controllers/ApiController');
 const Content = require('Server/Models/Content');
 

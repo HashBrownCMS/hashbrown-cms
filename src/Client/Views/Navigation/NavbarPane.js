@@ -129,7 +129,7 @@ class Pane {
             $pane.find('.pane-move-buttons .btn-new-folder').on('click', () => {
                 MediaHelper.getMediaById(id)
                 .then((item) => {
-                    let messageModal = new HashBrown.Client.Views.Modals.MessageModal({
+                    let messageModal = new HashBrown.Views.Modals.MessageModal({
                         model: {
                             title: 'Move item',
                             body: _.div({},

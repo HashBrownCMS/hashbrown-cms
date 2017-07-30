@@ -1,5 +1,6 @@
 'use strict';
 
+const ProjectHelper = require('Client/Helpers/ProjectHelper');
 const ContentHelper = require('Client/Helpers/ContentHelper');
 
 const NavbarPane = require('./NavbarPane');
@@ -265,7 +266,7 @@ class ContentPane extends NavbarPane {
 
         }
         
-        let modal = new HashBrown.Client.Views.Modals.MessageModal({
+        let modal = new HashBrown.Views.Modals.MessageModal({
             model: {
                 title: 'Publishing settings for "' + content.prop('title', window.language) + '"'
             },
@@ -427,7 +428,7 @@ class ContentPane extends NavbarPane {
             // Item context menu
             getItemContextMenu: (item) => {
                 let menu = {};
-                let isSyncEnabled = HashBrown.Client.Helpers.SettingsHelper.getCachedSettings(ProjectHelper.currentProject, null, 'sync').enabled;
+                let isSyncEnabled = HashBrown.Helpers.SettingsHelper.getCachedSettings(ProjectHelper.currentProject, null, 'sync').enabled;
                 
                 menu['This content'] = '---';
                 

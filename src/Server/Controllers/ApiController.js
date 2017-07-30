@@ -1,10 +1,11 @@
 'use strict';
 
-// Libs
-let pathToRegexp = require('path-to-regexp');
+const PathToRegexp = require('path-to-regexp');
 
-// Classes
-let Controller = require('./Controller');
+const UserHelper = require('Server/Helpers/UserHelper');
+const ProjectHelper = require('Server/Helpers/ProjectHelper');
+
+const Controller = require('./Controller');
 
 /**
  * The main API controller
@@ -56,7 +57,7 @@ class ApiController extends Controller {
      */
     static setProjectVariables(req) {
         let keys = [];
-        let re = pathToRegexp('/:root/:project/:environment/*', keys);
+        let re = PathToRegexp('/:root/:project/:environment/*', keys);
         let values = re.exec(req.originalUrl);
         let project = null;
         let environment = null;

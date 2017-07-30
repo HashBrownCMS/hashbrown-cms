@@ -3,6 +3,7 @@
 const NavbarPane = require('./NavbarPane');
 const NavbarMain = require('./NavbarMain');
 const MediaBrowser = require('Client/Views/Modals/MediaBrowser');
+const ProjectHelper = require('Client/Helpers/ProjectHelper');
 const MediaHelper = require('Client/Helpers/MediaHelper');
 
 /**
@@ -56,7 +57,7 @@ class MediaPane extends NavbarPane {
             });
         }
 
-        new HashBrown.Client.Views.Modals.MessageModal({
+        new HashBrown.Views.Modals.MessageModal({
             model: {
                 title: 'Delete media',
                 body: 'Are you sure you want to delete the media object "' + name + '"?'
@@ -127,7 +128,7 @@ class MediaPane extends NavbarPane {
 
             // Hierarchy logic
             hierarchy: (item, queueItem) => {
-                let isSyncEnabled = HashBrown.Client.Helpers.SettingsHelper.getCachedSettings(ProjectHelper.currentProject, null, 'sync').enabled;
+                let isSyncEnabled = HashBrown.Helpers.SettingsHelper.getCachedSettings(ProjectHelper.currentProject, null, 'sync').enabled;
 
                 queueItem.$element.attr('data-media-id', item.id);
                

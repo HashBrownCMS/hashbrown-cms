@@ -1,5 +1,7 @@
 'use strict';
 
+const ProjectHelper = require('Client/Helpers/ProjectHelper');
+
 /**
  * The editor for Forms
  *
@@ -40,7 +42,7 @@ class FormEditor extends View {
             });
         })
         .catch((err) => {
-            new HashBrown.Client.Views.Modals.MessageModal({
+            new HashBrown.Views.Modals.MessageModal({
                 model: {
                     title: 'Error',
                     body: err

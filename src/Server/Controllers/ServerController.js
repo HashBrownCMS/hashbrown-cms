@@ -1,6 +1,12 @@
 'use strict';
 
-let ApiController = require('./ApiController');
+const BackupHelper = require('Server/Helpers/BackupHelper');
+const MongoHelper = require('Server/Helpers/MongoHelper');
+const SettingsHelper = require('Server/Helpers/SettingsHelper');
+const UpdateHelper = require('Server/Helpers/UpdateHelper');
+const ProjectHelper = require('Server/Helpers/ProjectHelper');
+
+const ApiController = require('./ApiController');
 
 /**
  * The controller for dashboard related operations

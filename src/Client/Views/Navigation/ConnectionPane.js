@@ -1,5 +1,7 @@
 'use strict';
 
+const ProjectHelper = require('Client/Helpers/ProjectHelper');
+
 const NavbarPane = require('./NavbarPane');
 const NavbarMain = require('./NavbarMain');
 
@@ -51,7 +53,7 @@ class ConnectionPane extends NavbarPane {
             });
         }
 
-        new HashBrown.Client.Views.Modals.MessageModal({
+        new HashBrown.Views.Modals.MessageModal({
             model: {
                 title: 'Delete content',
                 body: 'Are you sure you want to remove the connection "' + name + '"?'
@@ -141,7 +143,7 @@ class ConnectionPane extends NavbarPane {
             // Item context menu
             getItemContextMenu: (item) => {
                 let menu = {};
-                let isSyncEnabled = HashBrown.Client.Helpers.SettingsHelper.getCachedSettings(ProjectHelper.currentProject, null, 'sync').enabled;
+                let isSyncEnabled = HashBrown.Helpers.SettingsHelper.getCachedSettings(ProjectHelper.currentProject, null, 'sync').enabled;
                 
                 menu['This connection'] = '---';
                 menu['Copy id'] = () => { this.onClickCopyItemId(); };

@@ -2,6 +2,9 @@
 
 const FileSystem = require('fs');
 
+const MediaHelper = require('Server/Helpers/MediaHelper');
+const ConnectionHelper = require('Server/Helpers/ConnectionHelper');
+
 const ApiController = require('Server/Controllers/ApiController');
 const Media = require('Server/Models/Media');
 

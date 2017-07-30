@@ -22,7 +22,7 @@ Router.route('/schemas/', function() {
 // Edit
 Router.route('/schemas/:id', function() {
     if(currentUserHasScope('schemas')) {
-        let schemaEditor = new HashBrown.Client.Views.Editors.SchemaEditor({
+        let schemaEditor = new HashBrown.Views.Editors.SchemaEditor({
             modelUrl: apiUrl('schemas/' + this.id)
         });
         
@@ -39,7 +39,7 @@ Router.route('/schemas/:id', function() {
 // Edit (JSON editor)
 Router.route('/schemas/json/:id', function() {
     if(currentUserHasScope('schemas')) {
-        let jsonEditor = new HashBrown.Client.Views.Editors.JSONEditor({
+        let jsonEditor = new HashBrown.Views.Editors.JSONEditor({
             model: resources.schemas[this.id],
             apiPath: 'schemas/' + this.id,
             onSuccess: () => {

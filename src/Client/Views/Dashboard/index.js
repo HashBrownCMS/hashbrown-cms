@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * @namespace HashBrown.Client.Views.Dashboard
+ * @namespace HashBrown.Views.Dashboard
  */
 module.exports = {
     BackupEditor: require('./BackupEditor'),

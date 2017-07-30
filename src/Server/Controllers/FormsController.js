@@ -1,12 +1,12 @@
 'use strict';
 
-// Libs
-let bodyparser = require('body-parser');
+const BodyParser = require('body-parser');
 
-// Classes
-let ApiController = require('./ApiController');
+const FormHelper = require('Server/Helpers/FormHelper');
+const SyncHelper = require('Server/Helpers/SyncHelper');
 
-// Constants
+const ApiController = require('./ApiController');
+
 const SUBMISSION_TIMEOUT_MS = 1000;
 
 // Private vars
@@ -29,7 +29,7 @@ class FormsController extends ApiController {
 
         app.post('/api/:project/:environment/forms/new', this.middleware(), this.postNew);
         app.post('/api/:project/:environment/forms/:id', this.middleware(), this.postForm);
-        app.post('/api/:project/:environment/forms/:id/submit', this.middleware({ authenticate: false, allowCORS: this.checkCORS }), bodyparser.urlencoded({extended: true}), this.postSubmit);
+        app.post('/api/:project/:environment/forms/:id/submit', this.middleware({ authenticate: false, allowCORS: this.checkCORS }), BodyParser.urlencoded({extended: true}), this.postSubmit);
         app.post('/api/:project/:environment/forms/pull/:id', this.middleware(), this.pullForm);
         app.post('/api/:project/:environment/forms/push/:id', this.middleware(), this.pushForm);
         app.post('/api/:project/:environment/forms/clear/:id', this.middleware(), this.postClearAllEntries);

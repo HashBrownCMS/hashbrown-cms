@@ -1,6 +1,8 @@
 'use strict';
 
-let ApiController = require('./ApiController');
+const UserHelper = require('Server/Helpers/UserHelper');
+
+const ApiController = require('./ApiController');
 
 /**
  * The controller for Users

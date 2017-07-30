@@ -1,12 +1,8 @@
 'use strict';
 
 /**
- * @namespace HashBrown.Client
+ * @namespace HashBrown
  */
-
-window.isClient = true;
-window.isServer = false;
-
 // Style
 require('Style/client');
 
@@ -33,18 +29,14 @@ window.resources = {
 // Namespaces
 window.HashBrown = {};
 
-HashBrown.Client = {};
-HashBrown.Client.Models = require('Common/Models');
-HashBrown.Client.Views = {};
-HashBrown.Client.Views.Modals = require('Client/Views/Modals');
-HashBrown.Client.Views.Navigation = require('Client/Views/Navigation');
-HashBrown.Client.Views.Editors = require('Client/Views/Editors');
-HashBrown.Client.Views.Editors.ConnectionEditors = {};
-HashBrown.Client.Views.Editors.FieldEditors = require('Client/Views/Editors/FieldEditors');
-HashBrown.Client.Helpers = require('Client/Helpers');
-
-HashBrown.Common = {};
-HashBrown.Common.Models = require('Common/Models');
+HashBrown.Models = require('Common/Models');
+HashBrown.Views = {};
+HashBrown.Views.Modals = require('Client/Views/Modals');
+HashBrown.Views.Navigation = require('Client/Views/Navigation');
+HashBrown.Views.Editors = require('Client/Views/Editors');
+HashBrown.Views.Editors.ConnectionEditors = {};
+HashBrown.Views.Editors.FieldEditors = require('Client/Views/Editors/FieldEditors');
+HashBrown.Helpers = require('Client/Helpers');
 
 // Helper shortcuts
 window.debug = require('Common/Helpers/DebugHelper');
@@ -52,9 +44,9 @@ window.UI = require('Client/Helpers/UIHelper');
 
 // Preload resources 
 $(document).ready(() => {
-    const SettingsHelper = HashBrown.Client.Helpers.SettingsHelper;
-    const LanguageHelper = HashBrown.Client.Helpers.LanguageHelper;
-    const ProjectHelper = HashBrown.Client.Helpers.ProjectHelper;
+    const SettingsHelper = HashBrown.Helpers.SettingsHelper;
+    const LanguageHelper = HashBrown.Helpers.LanguageHelper;
+    const ProjectHelper = HashBrown.Helpers.ProjectHelper;
 
     SettingsHelper.getSettings(ProjectHelper.currentProject, null, 'sync')
     .then(() => {
@@ -66,12 +58,12 @@ $(document).ready(() => {
     .then(() => {
         for(let user of resources.users) {
             if(user.isCurrent) {
-                HashBrown.Common.Models.User.current = user;
+                HashBrown.Models.User.current = user;
             }
         }
        
-        new HashBrown.Client.Views.Navigation.NavbarMain();
-        new HashBrown.Client.Views.Navigation.MainMenu();
+        new HashBrown.Views.Navigation.NavbarMain();
+        new HashBrown.Views.Navigation.MainMenu();
 
         Router.check = (newRoute, cancel, proceed) => {
             let contentEditor = ViewHelper.get('ContentEditor');

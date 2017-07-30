@@ -4,6 +4,9 @@ const NodeMailer = require('nodemailer');
 const Crypto = require('crypto');
 const XOAuth2 = require('xoauth2');
 
+const MongoHelper = require('Server/Helpers/MongoHelper');
+const ConfigHelper = require('Server/Helpers/ConfigHelper');
+
 const User = require('Server/Models/User');
 
 /**
@@ -152,7 +155,7 @@ class UserHelper {
         .then((user) => {
             user.tokens = [];
 
-            UserHelper.updateUser(username, user.getObject());
+            this.updateUser(username, user.getObject());
         });
     }
 
@@ -297,7 +300,7 @@ class UserHelper {
         let user;
         let project;
         
-        return ProjectHelper.getProject(scope) 
+        return HashBrown.Helpers.ProjectHelper.getProject(scope) 
         .then((result) => {
             project = result;
 
@@ -364,7 +367,7 @@ class UserHelper {
             return Promise.reject(new Error('Passwords must be at least 4 characters'));
         }
         
-        return UserHelper.findInviteToken(inviteToken)
+        return this.findInviteToken(inviteToken)
         .then((user) => {
             user.fullName = user.fullName || fullName;
             user.username = username;
@@ -382,7 +385,7 @@ class UserHelper {
             );
         }).then((existingUser) => {
             if(!existingUser) {
-                return UserHelper.updateUserById(newUser.id, newUser.getObject());
+                return this.updateUserById(newUser.id, newUser.getObject());
             
             } else {
                 return new Promise((resolve, reject) => {
@@ -392,7 +395,7 @@ class UserHelper {
             }
         })
         .then(() => {
-            return UserHelper.loginUser(username, password);
+            return this.loginUser(username, password);
         });
     }
 

@@ -1,6 +1,9 @@
 'use strict';
 
-let ApiController = require('./ApiController');
+const SettingsHelper = require('Server/Helpers/SettingsHelper');
+const ProjectHelper = require('Server/Helpers/ProjectHelper');
+
+const ApiController = require('./ApiController');
 
 /**
  * The controller for settings

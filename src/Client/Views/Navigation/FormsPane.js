@@ -1,5 +1,7 @@
 'use strict';
 
+const ProjectHelper = require('Client/Helpers/ProjectHelper');
+
 const NavbarPane = require('./NavbarPane');
 const NavbarMain = require('./NavbarMain');
 
@@ -47,7 +49,7 @@ class FormsPane extends NavbarPane {
         }
 
         function onError(err) {
-            new HashBrown.Client.Views.Modals.MessageModal({
+            new HashBrown.Views.Modals.MessageModal({
                 model: {
                     title: 'Error',
                     body: err.message
@@ -55,7 +57,7 @@ class FormsPane extends NavbarPane {
             });
         }
 
-        new HashBrown.Client.Views.Modals.MessageModal({
+        new HashBrown.Views.Modals.MessageModal({
             model: {
                 title: 'Delete form',
                 body: 'Are you sure you want to delete the form "' + form.title + '"?'
@@ -149,7 +151,7 @@ class FormsPane extends NavbarPane {
             // Item context menu
             getItemContextMenu: (item) => {
                 let menu = {};
-                let isSyncEnabled = HashBrown.Client.Helpers.SettingsHelper.getCachedSettings(ProjectHelper.currentProject, null, 'sync').enabled;
+                let isSyncEnabled = HashBrown.Helpers.SettingsHelper.getCachedSettings(ProjectHelper.currentProject, null, 'sync').enabled;
                 
                 menu['This form'] = '---';
                 menu['Copy id'] = () => { this.onClickCopyItemId(); };

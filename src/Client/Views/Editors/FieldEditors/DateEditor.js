@@ -89,7 +89,7 @@ class DateEditor extends FieldEditor {
         let hours = [ '00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23' ];
         let minutes = [ '00', '05', '10', '15', '20', '25', '30', '35', '40', '45', '50', '55' ];
 
-        let messageModal = new HashBrown.Client.Views.Modals.MessageModal({
+        let messageModal = new HashBrown.Views.Modals.MessageModal({
             model: {
                 class: 'date-picker'   
             },

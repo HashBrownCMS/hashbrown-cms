@@ -41,8 +41,10 @@ class Schema extends Entity {
      *
      * @returns {Schema} schema
      */
-    static create(parentSchema) {
-        return SchemaHelper.getModel({
+    static create(
+        parentSchema = requiredParam('parentSchema')
+    ) {
+        return HashBrown.Helpers.SchemaHelper.getModel({
             id: Entity.createId(),
             icon: parentSchema.icon || 'file',
             type: parentSchema.type,

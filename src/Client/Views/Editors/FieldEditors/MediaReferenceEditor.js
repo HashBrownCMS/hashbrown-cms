@@ -2,6 +2,7 @@
 
 const Media = require('Common/Models/Media');
 const MediaHelper = require('Client/Helpers/MediaHelper');
+const ProjectHelper = require('Client/Helpers/ProjectHelper');
 const MediaBrowser = require('Client/Views/Modals/MediaBrowser');
 
 const FieldEditor = require('./FieldEditor');

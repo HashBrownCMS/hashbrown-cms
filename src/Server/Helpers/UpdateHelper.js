@@ -1,10 +1,12 @@
 'use strict';
 
-// Libs
 const ChildProcess = require('child_process');
 const ZLib = require('zlib');
 const Path = require('path');
 const FileSystem = require('fs');
+
+const RequestHelper = require('Server/Helpers/RequestHelper');
+
 
 /**
  * The helper class for system updates

@@ -59,8 +59,8 @@ class SchemaEditor extends View {
         
         let editorOptions = [];
 
-        for(let i in HashBrown.Client.Views.Editors.FieldEditors) {
-            let editor = HashBrown.Client.Views.Editors.FieldEditors[i];
+        for(let i in HashBrown.Views.Editors.FieldEditors) {
+            let editor = HashBrown.Views.Editors.FieldEditors[i];
 
             editorOptions[editorOptions.length] = {
                 value: editor.id,
@@ -74,8 +74,8 @@ class SchemaEditor extends View {
         // Backwards compatible check
         editorId = editorId.charAt(0).toUpperCase() + editorId.slice(1);
         
-        if(HashBrown.Client.Views.Editors.FieldEditors[editorId]) {
-            editorName = HashBrown.Client.Views.Editors.FieldEditors[editorId].name;
+        if(HashBrown.Views.Editors.FieldEditors[editorId]) {
+            editorName = HashBrown.Views.Editors.FieldEditors[editorId].name;
         }
 
         let $element = _.div({class: 'editor-picker'},
@@ -279,7 +279,7 @@ class SchemaEditor extends View {
                 }
             }
 
-            let modal = new HashBrown.Client.Views.Modals.MessageModal({
+            let modal = new HashBrown.Views.Modals.MessageModal({
                 model: {
                     class: 'modal-icon-picker',
                     title: 'Pick an icon',

@@ -75,7 +75,7 @@ class SchemaController extends ApiController {
         let schema = req.body;
         let shouldCreate = req.query.create == 'true' || req.query.create == true;
 
-        SchemaHelper.setSchema(req.project, req.environment, id, schema, shouldCreate)
+        SchemaHelper.setSchemaById(req.project, req.environment, id, schema, shouldCreate)
         .then(() => {
             res.status(200).send(schema);
         })
@@ -94,7 +94,7 @@ class SchemaController extends ApiController {
         .then((resourceItem) => {
             if(!resourceItem) { return Promise.reject(new Error('Couldn\'t find remote Schema "' + id + '"')); }
         
-            return SchemaHelper.setSchema(req.project, req.environment, id, resourceItem, true)
+            return SchemaHelper.setSchemaById(req.project, req.environment, id, resourceItem, true)
             .then(() => {
                 res.status(200).send(resourceItem);
             });
@@ -143,7 +143,7 @@ class SchemaController extends ApiController {
     static deleteSchema(req, res) {
         let id = req.params.id;
         
-        SchemaHelper.removeSchema(req.project, req.environment, id)
+        SchemaHelper.removeSchemaById(req.project, req.environment, id)
         .then(() => {
             res.status(200).send('Schema with id "' + id + '" deleted successfully');
         })

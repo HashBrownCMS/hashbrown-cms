@@ -15,6 +15,7 @@
     "body-parser": "^1.14.1",
     "cookie-parser": "^1.4.3",
     "express": "^4.13.3",
+    "express-ws": "^3.0.0",
     "glob": "^7.0.3",
     "greenlock": "^2.1.12",
     "js-beautify": "^1.6.2",

@@ -1,7 +1,6 @@
 'use strict';
 
 const Connection = require('Common/Models/Connection');
-const SettingsHelper = isServer ? require('Server/Helpers/SettingsHelper') : require('Client/Helpers/SettingsHelper');
 
 /**
  * The helper class for Connections
@@ -38,12 +37,12 @@ class ConnectionHelper {
         environment = requiredParam('environment'),
         id = null
     ) {
-        return SettingsHelper.getSettings(project, environment, 'providers')
+        return HashBrown.Helpers.SettingsHelper.getSettings(project, environment, 'providers')
         .then((providers) => {
             providers = providers || {};
             providers.template = id;
 
-            return SettingsHelper.setSettings(project, environment, 'providers', providers)
+            return HashBrown.Helpers.SettingsHelper.setSettings(project, environment, 'providers', providers)
         });
     }
 
@@ -59,12 +58,12 @@ class ConnectionHelper {
         project = requiredParam('project'),
         environment = requiredParam('environment')
     ) {
-        return SettingsHelper.getSettings(project, environment, 'providers')
+        return HashBrown.Helpers.SettingsHelper.getSettings(project, environment, 'providers')
         
         // Previously, providers were set project-wide, so retrieve automatically if needed
         .then((providers) => {
             if(!providers) {
-                return SettingsHelper.getSettings(project, null, 'providers');
+                return HashBrown.Helpers.SettingsHelper.getSettings(project, null, 'providers');
             
             } else {
                 return Promise.resolve(providers);
@@ -97,12 +96,12 @@ class ConnectionHelper {
         environment = requiredParam('environment'),
         id = null
     ) {
-        return SettingsHelper.getSettings(project, environment, 'providers')
+        return HashBrown.Helpers.SettingsHelper.getSettings(project, environment, 'providers')
         .then((providers) => {
             providers = providers || {};
             providers.media = id;
 
-            return SettingsHelper.setSettings(project, environment, 'providers', providers)
+            return HashBrown.Helpers.SettingsHelper.setSettings(project, environment, 'providers', providers)
         });
     }
 
@@ -118,12 +117,12 @@ class ConnectionHelper {
         project = requiredParam('project'),
         environment = requiredParam('environment')
     ) {
-        return SettingsHelper.getSettings(project, environment, 'providers')
+        return HashBrown.Helpers.SettingsHelper.getSettings(project, environment, 'providers')
         
         // Previously, providers were set project-wide, so retrieve automatically if needed
         .then((providers) => {
             if(!providers) {
-                return SettingsHelper.getSettings(project, null, 'providers');
+                return HashBrown.Helpers.SettingsHelper.getSettings(project, null, 'providers');
             
             } else {
                 return Promise.resolve(providers);

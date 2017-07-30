@@ -1,5 +1,7 @@
 'use strict';
 
+const ProjectHelper = require('Client/Helpers/ProjectHelper');
+
 const Media = require('Common/Models/Media');
 
 /**

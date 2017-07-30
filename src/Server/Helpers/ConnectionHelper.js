@@ -1,6 +1,10 @@
 'use strict';
 
 const ConnectionHelperCommon = require('Common/Helpers/ConnectionHelper');
+const ContentHelper = require('Server/Helpers/ContentHelper');
+const MongoHelper = require('Server/Helpers/MongoHelper');
+const SyncHelper = require('Server/Helpers/SyncHelper');
+
 const Connection = require('Common/Models/Connection');
 
 /**
@@ -16,11 +20,11 @@ class ConnectionHelper extends ConnectionHelperCommon {
      * @param {Connection} connection
      */
     static registerConnectionType(name, connection) {
-        if(!ConnectionHelper.connectionTypes) {
-            ConnectionHelper.connectionTypes = {};
+        if(!this.connectionTypes) {
+            this.connectionTypes = {};
         }
 
-        ConnectionHelper.connectionTypes[name] = connection;
+        this.connectionTypes[name] = connection;
     }
 
     /**
@@ -31,7 +35,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
      * @returns {Connection} connection
      */
     static initConnection(data) {
-        let constructor = ConnectionHelper.connectionTypes[data.type];
+        let constructor = this.connectionTypes[data.type];
         let connection;
            
         if(typeof constructor === 'function') {
@@ -67,7 +71,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
                 return Promise.reject(new Error('Content by id "' + content.id + '" has no connections configured'));
             }
 
-            return ConnectionHelper.getConnectionById(project, environment, settings.connections[0]);
+            return this.getConnectionById(project, environment, settings.connections[0]);
         })
         .then((connection) => {
             return connection.generatePreview(project, environment, content, language);
@@ -103,7 +107,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
                 debug.log('Looping through ' + settings.connections.length + ' connections...', this);
                 
                 function nextConnection(i) {
-                    return ConnectionHelper.getConnectionById(project, environment, settings.connections[i])
+                    return this.getConnectionById(project, environment, settings.connections[i])
                     .then((connection) => {
                         debug.log('Publishing through connection "' + settings.connections[i] + '" of type "' + connection.type + '"...', helper);
 
@@ -165,7 +169,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
                 debug.log('Looping through ' + settings.connections.length + ' connections...', this);
                 
                 function nextConnection(i) {
-                    return ConnectionHelper.getConnectionById(project, environment, settings.connections[i])
+                    return this.getConnectionById(project, environment, settings.connections[i])
                     .then((connection) => {
                         if(!unpublishFirst) { return Promise.resolve(); }
                         
@@ -222,7 +226,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
             return SyncHelper.mergeResource(project, environment, 'connections', array)
             .then((connections) => {
                 for(let i in connections) {
-                    connections[i] = ConnectionHelper.initConnection(connections[i]);
+                    connections[i] = this.initConnection(connections[i]);
                 }
 
                 return Promise.resolve(connections);
@@ -256,11 +260,11 @@ class ConnectionHelper extends ConnectionHelperCommon {
             if(!data) {
                 return SyncHelper.getResourceItem(project, environment, 'connections', id)
                 .then((resourceItem) => {
-                      return Promise.resolve(ConnectionHelper.initConnection(resourceItem));
+                      return Promise.resolve(this.initConnection(resourceItem));
                 });
             } 
             
-            return Promise.resolve(ConnectionHelper.initConnection(data));
+            return Promise.resolve(this.initConnection(data));
         });
     }
     

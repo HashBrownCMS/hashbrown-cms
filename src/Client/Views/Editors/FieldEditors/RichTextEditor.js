@@ -1,5 +1,7 @@
 'use strict';
 
+const ProjectHelper = require('Client/Helpers/ProjectHelper');
+
 const FieldEditor = require('./FieldEditor');
 
 /**
@@ -78,7 +80,7 @@ class RichTextEditor extends FieldEditor {
      * Event: Click insert media
      */
     onClickInsertMedia() {
-        let mediaBrowser = new HashBrown.Client.Views.Modals.MediaBrowser();
+        let mediaBrowser = new HashBrown.Views.Modals.MediaBrowser();
 
         mediaBrowser.on('select', (id) => {
             MediaHelper.getMediaById(id)

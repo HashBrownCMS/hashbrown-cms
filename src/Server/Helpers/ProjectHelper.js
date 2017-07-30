@@ -1,5 +1,9 @@
 'use strict';
 
+const MongoHelper = require('Server/Helpers/MongoHelper');
+const BackupHelper = require('Server/Helpers/BackupHelper');
+const SyncHelper = require('Server/Helpers/SyncHelper');
+
 const Project = require('Common/Models/Project');
 
 /**
@@ -37,7 +41,7 @@ class ProjectHelper {
      * returns {Promise} Promise
      */
     static environmentExists(project, environment) {
-        return ProjectHelper.getAllEnvironments(project)
+        return this.getAllEnvironments(project)
         .then((environments) => {
             return Promise.resolve(environments.indexOf(environment) > -1);
         });
@@ -55,11 +59,11 @@ class ProjectHelper {
         let users;
         let backups;
 
-        return SettingsHelper.getSettings(id)
+        return HashBrown.Helpers.SettingsHelper.getSettings(id)
         .then((foundSettings) => {
             settings = foundSettings || {};
 
-            return UserHelper.getAllUsers(id);
+            return HashBrown.Helpers.UserHelper.getAllUsers(id);
         })
         .then((foundUsers) => {
             users = foundUsers;
@@ -189,14 +193,14 @@ class ProjectHelper {
             return MongoHelper.listCollections(project);
         })
 
-        // Iterate through collections and match them with the environemtn name
+        // Iterate through collections and match them with the environment name
         .then((collections) => {
-            function next() {
+            let next = () => {
                 let collection = collections.pop();
 
                 // No more collections, resolve
                 if(!collection) {
-                    debug.log('Deleted environment "' + environment + '" from project "' + project + '" successfully', ProjectHelper);
+                    debug.log('Deleted environment "' + environment + '" from project "' + project + '" successfully', this);
                     return Promise.resolve();
                 }
 
@@ -237,7 +241,7 @@ class ProjectHelper {
                 MongoHelper.insertOne(project.id, 'settings', project.settings)
                 .then(() => {
                     // The user that creates a project gets all scopes
-                    return UserHelper.addUserProjectScope(userId, project.id, [ 'users', 'settings', 'connections', 'schemas' ]);
+                    return HashBrown.Helpers.UserHelper.addUserProjectScope(userId, project.id, [ 'users', 'settings', 'connections', 'schemas' ]);
                 })
                 .then(resolve)
                 .catch(reject);

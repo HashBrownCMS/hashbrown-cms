@@ -1,9 +1,11 @@
 module.exports = function() {
-    let currentUser = HashBrown.Common.Models.User.current;
-    let hasConnectionsScope = currentUser.hasScope(ProjectHelper.currentProject, 'connections');
-    let hasSchemasScope = currentUser.hasScope(ProjectHelper.currentProject, 'schemas');
-    let hasTemplatesScope = currentUser.hasScope(ProjectHelper.currentProject, 'templates');
-    let hasSettingsScope = currentUser.hasScope(ProjectHelper.currentProject, 'settings');
+    let currentUser = HashBrown.Models.User.current;
+    let currentProject = HashBrown.Helpers.ProjectHelper.currentProject;
+
+    let hasConnectionsScope = currentUser.hasScope(currentProject, 'connections');
+    let hasSchemasScope = currentUser.hasScope(currentProject, 'schemas');
+    let hasTemplatesScope = currentUser.hasScope(currentProject, 'templates');
+    let hasSettingsScope = currentUser.hasScope(currentProject, 'settings');
      
     return _.nav({class: 'navbar-main'},
         // Buttons

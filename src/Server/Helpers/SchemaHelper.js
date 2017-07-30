@@ -6,6 +6,7 @@ const ContentSchema = require('Server/Models/ContentSchema');
 
 const SchemaHelperCommon = require('Common/Helpers/SchemaHelper');
 const MongoHelper = require('Server/Helpers/MongoHelper');
+const SyncHelper = require('Server/Helpers/SyncHelper');
 
 const FileSystem = require('fs');
 const Path = require('path');
@@ -393,7 +394,7 @@ class SchemaHelper extends SchemaHelperCommon {
      *
      * @return {Promise} Promise
      */
-    static removeSchema(
+    static removeSchemaById(
         project = requiredParam('project'),
         environment = requiredParam('environment'),
         id = requiredParam('id')
@@ -432,7 +433,7 @@ class SchemaHelper extends SchemaHelperCommon {
                 // If it does use this parent, make it use its grandparent instead
                 customSchema.parentSchemaId = thisSchema.parentSchemaId;
 
-                return this.setSchema(project, environment, customSchema.id, customSchema)
+                return this.setSchemaById(project, environment, customSchema.id, customSchema)
                 .then(() => {
                     return checkNext();  
                 });
@@ -462,9 +463,9 @@ class SchemaHelper extends SchemaHelperCommon {
      * @param {Object} schema
      * @param {Boolean} create
      *
-     * @return {Promise} Promise
+     * @return {Promise} Resulting Schema
      */
-    static setSchema(
+    static setSchemaById(
         project = requiredParam('project'),
         environment = requiredParam('environment'),
         id = requiredParam('id'),
@@ -489,7 +490,9 @@ class SchemaHelper extends SchemaHelperCommon {
             {
                 upsert: create // Creates a schema if none existed
             }
-        );
+        ).then(() => {
+            return Promise.resolve(this.getModel(schema));
+        });
     }
 
     /**
@@ -504,7 +507,7 @@ class SchemaHelper extends SchemaHelperCommon {
     static createSchema(
         project = requiredParam('project'),
         environment = requiredParam('environment'),
-        parentSchema
+        parentSchema = requiredParam('parentSchema')
     ) {
         let collection = environment + '.schemas';
         let newSchema = Schema.create(parentSchema);
@@ -514,9 +517,7 @@ class SchemaHelper extends SchemaHelperCommon {
             collection,
             newSchema.getObject() 
         ).then(() => {
-            return new Promise((resolve) => {
-                resolve(newSchema);
-            });
+            return Promise.resolve(newSchema);
         });
     }
 }

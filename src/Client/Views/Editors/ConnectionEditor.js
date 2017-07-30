@@ -130,7 +130,7 @@ class ConnectionEditor extends View {
      * Renders the settings editor
      */
     renderSettingsEditor() {
-        let editor = HashBrown.Client.Views.Editors.ConnectionEditors[this.model.type];
+        let editor = HashBrown.Views.Editors.ConnectionEditors[this.model.type];
 
         this.model.settings = this.model.settings || {};
 
@@ -155,8 +155,8 @@ class ConnectionEditor extends View {
         // Generate dropdown options
         let dropdownOptions = [];
         
-        for(let label in HashBrown.Client.Views.Editors.ConnectionEditors || []) {
-            let option = HashBrown.Client.Views.Editors.ConnectionEditors[label];
+        for(let label in HashBrown.Views.Editors.ConnectionEditors || []) {
+            let option = HashBrown.Views.Editors.ConnectionEditors[label];
             
             dropdownOptions[dropdownOptions.length] = {
                 label: label,

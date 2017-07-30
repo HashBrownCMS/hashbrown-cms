@@ -102,12 +102,12 @@ class ContentHelper {
         } else {
             return this.getContentById(project, environment, parentId)
             .then((parentContent) => {
-                return SchemaHelper.getSchemaById(project, environment, parentContent.schemaId);
+                return HashBrown.Helpers.SchemaHelper.getSchemaById(project, environment, parentContent.schemaId);
             })
             .then((parentSchema) => {
                 // The Schema was not an allowed child
                 if(parentSchema.allowedChildSchemas.indexOf(childSchemaId) < 0) {
-                    return SchemaHelper.getSchemaById(project, environment, childSchemaId)
+                    return HashBrown.Helpers.SchemaHelper.getSchemaById(project, environment, childSchemaId)
                     .then((childSchema) => {
                         return Promise.reject(new Error('Content with Schema "' + childSchema.name + '" is not an allowed child of Content with Schema "' + parentSchema.name + '"'));
                     });

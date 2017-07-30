@@ -12,14 +12,13 @@ class NavbarMain extends View {
         this.template = require('Client/Templates/Navigation/NavbarMain');
         this.tabPanes = [];
 
-        HashBrown.Client.Views.Navigation.CMSPane.init();
-        HashBrown.Client.Views.Navigation.ContentPane.init();
-        HashBrown.Client.Views.Navigation.MediaPane.init();
-        HashBrown.Client.Views.Navigation.FormsPane.init();
-        HashBrown.Client.Views.Navigation.TemplatePane.init();
-        HashBrown.Client.Views.Navigation.ConnectionPane.init();
-        HashBrown.Client.Views.Navigation.SchemaPane.init();
-        HashBrown.Client.Views.Navigation.SettingsPane.init();
+        HashBrown.Views.Navigation.CMSPane.init();
+        HashBrown.Views.Navigation.ContentPane.init();
+        HashBrown.Views.Navigation.MediaPane.init();
+        HashBrown.Views.Navigation.FormsPane.init();
+        HashBrown.Views.Navigation.TemplatePane.init();
+        HashBrown.Views.Navigation.ConnectionPane.init();
+        HashBrown.Views.Navigation.SchemaPane.init();
 
         this.init();
         
@@ -198,7 +197,7 @@ class NavbarMain extends View {
     getItemIcon(item, settings) {
         // If this item has a Schema id, fetch the appropriate icon
         if(item.schemaId) {
-            let schema = HashBrown.Client.Helpers.SchemaHelper.getSchemaByIdSync(item.schemaId);
+            let schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(item.schemaId);
 
             if(schema) {
                 return schema.icon;

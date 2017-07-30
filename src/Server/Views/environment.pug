@@ -36,8 +36,6 @@ html
         script(src='/js/plugins.js')
         
         script.
-            var ProjectHelper = HashBrown.Client.Helpers.ProjectHelper;
-            
-            ProjectHelper.currentProject = '#{currentProject}';
-            ProjectHelper.currentEnvironment = '#{currentEnvironment}';
+            HashBrown.Helpers.ProjectHelper.currentProject = '#{currentProject}';
+            HashBrown.Helpers.ProjectHelper.currentEnvironment = '#{currentEnvironment}';
         

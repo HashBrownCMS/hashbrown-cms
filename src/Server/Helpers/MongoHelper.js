@@ -17,7 +17,7 @@ const User = require('Server/Models/User');
  */
 class MongoHelper {
     /**
-     * Inits the MongoHelper database
+     * Inits the this database
      *
      * @param {String} databaseName
      *
@@ -70,7 +70,7 @@ class MongoHelper {
                 args.push('--archive=' + archivePath);
                 args.push('--db=' + databaseName);
 
-                let mongorestore = spawn('mongorestore', args);
+                let mongorestore = Spawn('mongorestore', args);
 
                 mongorestore.stdout.on('data', (data) => {
                     debug.log(data.toString(), this);
@@ -127,7 +127,7 @@ class MongoHelper {
 
             args.push('--archive=' + dumpPath + '/' + Date.now() + '.hba');
 
-            let mongodump = spawn('mongodump', args);
+            let mongodump = Spawn('mongodump', args);
 
             mongodump.stdout.on('data', (data) => {
                 debug.log(data.toString(), this);
@@ -160,7 +160,7 @@ class MongoHelper {
         return new Promise((resolve, reject) => {
             debug.log(databaseName + '::listCollections...', this, 4);
 
-            MongoHelper.getDatabase(databaseName)
+            this.getDatabase(databaseName)
             .then(function(db) {
                 db.listCollections().toArray(function(findErr, arr) {
                     if(findErr) {
@@ -233,7 +233,7 @@ class MongoHelper {
      * returns {Promise} Promise
      */
     static databaseExists(databaseName) {
-        return MongoHelper.listDatabases()
+        return this.listDatabases()
         .then((databases) => {
             return Promise.resolve(databases.indexOf(databaseName) > -1);
         });
@@ -248,7 +248,7 @@ class MongoHelper {
      * returns {Promise} Promise
      */
     static collectionExists(databaseName, collectionName) {
-        return MongoHelper.listCollections(databaseName)
+        return this.listCollections(databaseName)
         .then((collections) => {
             return Promise.resolve(collections.indexOf(collectionName) > -1);
         });
@@ -271,7 +271,7 @@ class MongoHelper {
             pattern = pattern || {};
             pattern._id = 0;
 
-            MongoHelper.getDatabase(databaseName)
+            this.getDatabase(databaseName)
             .then(function(db) {
                 db.collection(collectionName).findOne(query, pattern, function(findErr, doc) {
                     if(findErr) {
@@ -305,7 +305,7 @@ class MongoHelper {
             pattern = pattern || {};
             pattern._id = 0;
 
-            MongoHelper.getDatabase(databaseName)
+            this.getDatabase(databaseName)
             .then(function(db) {
                 db.collection(collectionName).find(query, pattern).sort(sort).toArray(function(findErr, docs) {
                     if(findErr) {
@@ -336,7 +336,7 @@ class MongoHelper {
         return new Promise((resolve, reject) => {
             debug.log(databaseName + '/' + collectionName + '::count ' + JSON.stringify(query) + '...', this, 4);
 
-            MongoHelper.getDatabase(databaseName)
+            this.getDatabase(databaseName)
             .then((db) => {
                 db.collection(collectionName).count(query, (findErr, result) => {
                     if(findErr) {
@@ -400,7 +400,7 @@ class MongoHelper {
 
         debug.log(databaseName + '/' + collectionName + '::updateOne ' + JSON.stringify(query) + ' with options ' + JSON.stringify(options || {}) + '...', this, 4);
     
-        return MongoHelper.getDatabase(databaseName)
+        return this.getDatabase(databaseName)
         .then(function(db) {
             db.collection(collectionName).updateOne(query, doc, options || {}, function(findErr) {
                 db.close();
@@ -434,7 +434,7 @@ class MongoHelper {
         return new Promise((resolve, reject) => {
             debug.log(databaseName + '/' + collectionName + '::updateOne ' + JSON.stringify(query) + ' with options ' + JSON.stringify(options || {}) + '...', this, 4);
         
-            MongoHelper.getDatabase(databaseName)
+            this.getDatabase(databaseName)
             .then(function(db) {
                 db.collection(collectionName).update(query, { $set: doc }, options || {}, function(findErr) {
                     if(findErr) {
@@ -468,7 +468,7 @@ class MongoHelper {
         return new Promise((resolve, reject) => {
             debug.log(databaseName + '/' + collectionName + '::insertOne ' + JSON.stringify(doc) + '...', this, 4);
         
-            MongoHelper.getDatabase(databaseName)
+            this.getDatabase(databaseName)
             .then(function(db) {
                 db.collection(collectionName).insertOne(doc, function(insertErr) {
                     if(insertErr) {
@@ -497,7 +497,7 @@ class MongoHelper {
         return new Promise((resolve, reject) => {
             debug.log(databaseName + '/' + collectionName + '::remove ' + JSON.stringify(query) + '...', this, 4);
         
-            MongoHelper.getDatabase(databaseName)
+            this.getDatabase(databaseName)
             .then(function(db) {
                 db.collection(collectionName).remove(query, true, function(findErr) {
                     if(findErr) {
@@ -526,7 +526,7 @@ class MongoHelper {
         return new Promise((resolve, reject) => {
             debug.log(databaseName + '/' + collectionName + '::removeOne ' + JSON.stringify(query) + '...', this, 4);
         
-            MongoHelper.getDatabase(databaseName)
+            this.getDatabase(databaseName)
             .then(function(db) {
                 db.collection(collectionName).remove(query, true, function(findErr) {
                     if(findErr) {
@@ -553,7 +553,7 @@ class MongoHelper {
     static dropCollection(databaseName, collectionName) {
         debug.log(databaseName + '::dropCollection...', this, 4);
 
-        return MongoHelper.getDatabase(databaseName)
+        return this.getDatabase(databaseName)
         .then((db) => {
             return new Promise((resolve, reject) => {
                 db.dropCollection(collectionName, (err) => {
@@ -580,7 +580,7 @@ class MongoHelper {
     static dropDatabase(databaseName) {
         debug.log(databaseName + '::dropDatabase...', this, 4);
 
-        return MongoHelper.getDatabase(databaseName)
+        return this.getDatabase(databaseName)
         .then((db) => {
             return new Promise((resolve, reject) => {
                 db.dropDatabase((err) => {

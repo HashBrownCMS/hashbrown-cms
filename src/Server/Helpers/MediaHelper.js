@@ -6,6 +6,9 @@ const RimRaf = require('rimraf');
 const Multer = require('multer');
 
 const Media = require('Server/Models/Media');
+const MongoHelper = require('Server/Helpers/MongoHelper');
+const SyncHelper = require('Server/Helpers/SyncHelper');
+
 const MediaHelperCommon = require('Common/Helpers/MediaHelper');
 
 /**
