@@ -1,9 +1,8 @@
 'use strict';
 
-// Libs
-let path = require('path');
+const Path = require('path');
 
-let Entity = require('./Entity');
+const Entity = require('./Entity');
 
 /**
  * The base class for all Media objects
@@ -26,7 +25,7 @@ class Media extends Entity {
      * @param {String} filePath
      */
     readFromFilePath(filePath) {
-        let name = path.basename(filePath);
+        let name = Path.basename(filePath);
         let id = filePath;
        
         // Trim file path for id 
@@ -38,7 +37,7 @@ class Media extends Entity {
      
         this.id = id;
         this.name = name;
-        this.url = '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + id;
+        this.url = '/media/' + HashBrown.Helpers.ProjectHelper.currentProject + '/' + HashBrown.Helpers.ProjectHelper.currentEnvironment + '/' + id;
     }
 
     /**

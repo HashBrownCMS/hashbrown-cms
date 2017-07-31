@@ -122,7 +122,7 @@ class Content extends Entity {
         environment = requiredParam('environment')
     ) {
         if(this.parentId) {
-            return ContentHelper.getContentById(project, environment, this.parentId)
+            return HashBrown.Helpers.ContentHelper.getContentById(project, environment, this.parentId)
             .then((parentContent) => {
                 return Promise.resolve(parentContent);
             })
