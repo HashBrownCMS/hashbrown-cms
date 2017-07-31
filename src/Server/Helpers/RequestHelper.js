@@ -104,7 +104,6 @@ class RequestHelper {
     ) {
         return new Promise((resolve, reject) => {
             method = method.toUpperCase();
-            url = URL.parse(url);            
 
             // Convert data
             if(data) {
@@ -118,6 +117,9 @@ class RequestHelper {
                     data = JSON.stringify(data);
                 }
             }
+            
+            // Parse URL
+            url = URL.parse(url);
 
             let headers = {
                 'Accept': '*/*',
@@ -132,8 +134,8 @@ class RequestHelper {
                 let protocol = url.protocol === 'https:' ? HTTPS : HTTP;
 
                 let options = {
-                    host: url.hostname,
-                    path: url.pathname,
+                    host: url.host,
+                    path: url.path,
                     method: method,
                     headers: headers
                 };
@@ -149,8 +151,8 @@ class RequestHelper {
                         let newUrl = URL.parse(res.headers.location);
 
                         // Host name not found, prepend old one
-                        if(!newUrl.hostname) {
-                            newUrl.hostname = url.hostname;
+                        if(!newUrl.host) {
+                            newUrl.host = url.host;
                         }
                        
                         url = newUrl;
@@ -161,11 +163,9 @@ class RequestHelper {
                     
                     // Error happened
                     } else if(res.statusCode >= 400 && res.statusCode < 600) {
-                        console.log(res);
+                        reject(new Error(res.statusMessage + ' (' + url.host + '/' + url.path + ')'));
 
-                        reject(new Error(res.statusMessage + ' (' + url.href + ')'));
-
-                    // No redirect, we reached out destination
+                    // No redirect, we reached our destination
                     } else {
                         let str = '';
                  

@@ -1,7 +1,8 @@
 'use strict';
 
-// Classes
-let ApiController = require('./ApiController');
+const SyncHelper = require('Server/Helpers/SyncHelper');
+
+const ApiController = require('./ApiController');
 
 /**
  * The controller for sync

@@ -6,6 +6,22 @@ const SchemaHelper = require('Server/Helpers/SchemaHelper');
 /**
  * The helpers class for system tests
  *
+ * TODO: Create tests for these helpers:
+ *  BackupHelper
+ *  ConfigHelper
+ *  ConnectionHelper
+ *  FormHelper
+ *  LanguageHelper
+ *  MediaHelper
+ *  PluginHelper
+ *  ProjectHelper
+ *  RequestHelper
+ *  ScheduleHelper
+ *  SettingsHelper
+ *  SyncHelper
+ *  UpdateHelper
+ *  UserHelper
+ *
  * @memberof HashBrown.Server.Helpers
  */
 class TestHelper {

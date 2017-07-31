@@ -26,31 +26,21 @@ class SyncHelper {
         .then((settings) => {
             debug.log('Renewing sync token for ' + project + '...', this);
 
-            return new Promise((resolve, reject) => {
-                let headers = {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json; charset=utf-8'
-                };
+            let headers = {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json; charset=utf-8'
+            };
+            
+            let postData = {
+                username: username,
+                password: password
+            };
                 
-                let postData = {
-                    username: username,
-                    password: password
-                };
+            return RequestHelper.request('post', settings.url + 'user/login?persist=true', postData)
+            .then((data) => {
+                debug.log('Sync token renewed successfully', this);
                     
-                RequestHelper.post(settings.url + 'user/login?persist=true', {
-                    headers: headers,
-                    data: JSON.stringify(postData)
-                }).on('complete', (data, response) => {
-                    if(typeof data !== 'string' || data.length !== 40) {
-                        reject(data);
-                    
-                    } else {
-                        debug.log('Sync token renewed successfully', this);
-                        
-                        resolve(data);
-                    
-                    }
-                });
+                return Promise.resolve(data);
             });
         });
     }
@@ -77,48 +67,33 @@ class SyncHelper {
 
         return HashBrown.Helpers.SettingsHelper.getSettings(project, '', 'sync')
         .then((settings) => {
-            return new Promise((resolve, reject) => {
-                if(settings && settings.enabled) {
-                    let headers = {
-                        'Accept': 'application/json'
-                    };
-                    
-                    let path = settings.project;
-                    
-                    if(environment) {
-                        path += '/' + environment;
+            if(settings && settings.enabled) {
+                let path = settings.project;
+                
+                if(environment) {
+                    path += '/' + environment;
+                }
+
+                let resource = remoteResourceName + '/' + remoteItemName;
+
+                debug.log('Requesting remote resource item ' + resource + ' for ' + path + '...', this, 3);
+
+                return RequestHelper.request('get', settings.url + path + '/' + resource + '?token=' + settings.token)
+                .then((data) => {
+                    if(data instanceof Object) {
+                        data.locked = true;
+                        data.remote = true;
+                        data.local = false;
                     }
 
-                    let resource = remoteResourceName + '/' + remoteItemName;
-
-                    debug.log('Requesting remote resource item ' + resource + ' for ' + path + '...', this, 3);
-
-                    RequestHelper.get(settings.url + path + '/' + resource + '?token=' + settings.token, {
-                        headers: headers
-                    }).on('complete', (data, response) => {
-                        if(data instanceof Error) {
-                            reject(data);
-
-                        } else if(typeof data === 'string') {
-                            reject(new Error(data));
+                    debug.log('Remote resource item ' + resource + ' retrieved successfully', this, 3);
                         
-                        } else {
-                            if(data instanceof Object) {
-                                data.locked = true;
-                                data.remote = true;
-                                data.local = false;
-                            }
+                    return Promise.resolve(data);
+                });
 
-                            debug.log('Remote resource item ' + resource + ' retrieved successfully', this, 3);
-                            
-                            resolve(data);
-                        }
-                    });
-
-                } else {
-                    resolve(null);
-                }
-            });
+            } else {
+                return Promise.resolve(null);
+            }
         });
     }
 
@@ -142,48 +117,36 @@ class SyncHelper {
     ) {
         return HashBrown.Helpers.SettingsHelper.getSettings(project, '', 'sync')
         .then((settings) => {
-            return new Promise((resolve, reject) => {
-                if(settings && settings.enabled) {
-                    let path = settings.project;
-                    
-                    if(environment) {
-                        path += '/' + environment;
-                    }
-                    
-                    let resource = remoteResourceName;
-                    
-                    if(remoteItemName) {
-                        resource += '/' + remoteItemName;
-                    }
-                    
-                    debug.log('Posting remote resource item ' + resource + ' for ' + path + '...', this, 3);
-                   
-                    let headers = {
-                        'Content-Type': 'application/json'
-                    };
-                   
-                    // Send the API request, and make sure to create/upsert any resources that do not yet exist on the remote 
-                    RequestHelper.post(settings.url + path + '/' + resource + '?create=true&token=' + settings.token, {
-                        headers: headers,
-                        data: JSON.stringify(remoteItemData)
-                    }).on('complete', (data, response) => {
-                        if(data instanceof Error) {
-                            reject(data);
-
-                        } else if(typeof data === 'string') {
-                            reject(new Error(data));
-                        
-                        } else {
-                            debug.log('Remote resource item ' + resource + ' posted successfully', this, 3);
-                            
-                            resolve(true);
-                        }
-                    });
-
-                } else {
-                    resolve(false);
+            if(settings && settings.enabled) {
+                let path = settings.project;
+                
+                if(environment) {
+                    path += '/' + environment;
                 }
-            });
+                
+                let resource = remoteResourceName;
+                
+                if(remoteItemName) {
+                    resource += '/' + remoteItemName;
+                }
+                
+                debug.log('Posting remote resource item ' + resource + ' for ' + path + '...', this, 3);
+               
+                let headers = {
+                    'Content-Type': 'application/json'
+                };
+               
+                // Send the API request, and make sure to create/upsert any resources that do not yet exist on the remote 
+                return RequestHelper.request('post', settings.url + path + '/' + resource + '?create=true&token=' + settings.token, remoteItemData)
+                .then((data) => {
+                    debug.log('Remote resource item ' + resource + ' posted successfully', this, 3);
+                    
+                    return Promise.resolve(true);
+                });
+
+            } else {
+                return Promise.resolve(false);
+            }
         });
     }
 
@@ -205,46 +168,29 @@ class SyncHelper {
     ) {
         return HashBrown.Helpers.SettingsHelper.getSettings(project, '', 'sync')
         .then((settings) => {
-            return new Promise((resolve, reject) => {
-                if(settings && settings.enabled) {
-                    let path = settings.project;
-                    
-                    if(environment) {
-                        path += '/' + environment;
-                    }
-                    
-                    debug.log('Requesting remote resource ' + remoteResourceName + ' for ' + path + '...', this, 3);
-                    
-                    params.token = settings.token;
-
-                    let headers = {
-                        'Accept': 'application/json'
-                    };
-                  
-                    let now = Date.now();
-
-                    RequestHelper.get(settings.url + path + '/' + remoteResourceName, {
-                        headers: headers,
-                        query: params
-                    }).on('complete', (data, response) => {
-                        if(data instanceof Error) {
-                            reject(data);
-                        
-                        } else if(typeof data === 'string') {
-                            reject(new Error(data));
-           
-                        } else {
-                            debug.log('Remote resource ' + remoteResourceName + ' retrieved successfully', this, 3);
-                            
-                            resolve(data);
-                        
-                        }
-                    });
-
-                } else {
-                    resolve(null);
+            if(settings && settings.enabled) {
+                let path = settings.project;
+                
+                if(environment) {
+                    path += '/' + environment;
                 }
-            });
+                
+                debug.log('Requesting remote resource ' + remoteResourceName + ' for ' + path + '...', this, 3);
+                
+                params.token = settings.token;
+              
+                let now = Date.now();
+
+                return RequestHelper.request('get', settings.url + path + '/' + remoteResourceName, params)
+                .then((data) => {
+                    debug.log('Remote resource ' + remoteResourceName + ' retrieved successfully', this, 3);
+                        
+                    return Promise.resolve(data);
+                });
+
+            } else {
+                return Promise.resolve(null);
+            }
         });
     }
 
