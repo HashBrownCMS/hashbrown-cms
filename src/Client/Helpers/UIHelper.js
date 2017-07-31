@@ -437,8 +437,25 @@ class UIHelper {
                 class: 'error-modal'
             }
         });
+    }
+    
+    /**
+     * Brings up a warning modal
+     *
+     * @param {String} warning
+     * @param {Function} onClickOK
+     */
+    static warningModal(warning, onClickOK) {
+        if(!warning) { return; }
 
-        throw error;
+        new MessageModal({
+            model: {
+                title: '<span class="fa fa-warning"></span> Warning',
+                body: warning,
+                onSubmit: onClickOK,
+                class: 'warning-modal'
+            }
+        });
     }
 
     /**

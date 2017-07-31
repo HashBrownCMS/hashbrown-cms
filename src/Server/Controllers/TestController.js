@@ -25,6 +25,10 @@ class TestController extends ApiController {
 
         return ApiController.authenticate(req.cookies.token, project, environment, true)
         .then((user) => {
+            if(!user.isAdmin) {
+                return Promise.reject(new Error('The testing tool requires admin privileges'));
+            }
+
             ws.on('message', (msg) => {
                 if(msg !== 'start') { return; }
 
@@ -48,7 +52,6 @@ class TestController extends ApiController {
             });
         })
         .catch((e) => {
-            console.log(e.stack);
             ws.send(e.message);
         });
     }

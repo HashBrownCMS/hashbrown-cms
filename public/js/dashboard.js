@@ -14387,8 +14387,29 @@ var UIHelper = function () {
                 class: 'error-modal'
             }
         });
+    };
 
-        throw error;
+    /**
+     * Brings up a warning modal
+     *
+     * @param {String} warning
+     * @param {Function} onClickOK
+     */
+
+
+    UIHelper.warningModal = function warningModal(warning, onClickOK) {
+        if (!warning) {
+            return;
+        }
+
+        new MessageModal({
+            model: {
+                title: '<span class="fa fa-warning"></span> Warning',
+                body: warning,
+                onSubmit: onClickOK,
+                class: 'warning-modal'
+            }
+        });
     };
 
     /**
@@ -14813,6 +14834,38 @@ window.reloadAllResources = function reloadAllResources() {
 
     return processQueue();
 };
+
+/**
+ * Start the debug socket
+ */
+window.startDebugSocket = function startDebugSocket() {
+    var debugSocket = new WebSocket('ws://' + location.host + '/api/debug');
+
+    debugSocket.onopen = function (ev) {
+        debug.log('Debug socket open', 'HashBrown');
+    };
+
+    debugSocket.onmessage = function (ev) {
+        try {
+            var data = JSON.parse(ev.data);
+
+            switch (data.type) {
+                case 'error':
+                    UI.errorModal(new Error(data.sender + ': ' + data.message));
+                    break;
+
+                case 'warning':
+                    UI.errorModal(new Error(data.sender + ': ' + data.message));
+                    break;
+            }
+        } catch (e) {
+            UI.errorModal(e);
+        }
+    };
+};
+
+// Start debug socket
+startDebugSocket();
 
 // Get package file
 window.app = __webpack_require__(183);
@@ -32501,11 +32554,18 @@ var DebugHelper = function () {
     /**
      * Event: Log
      *
-     * @param {String} senderString
      * @param {String} dateString
+     * @param {String} senderString
      * @param {String} message
+     * @param {String} type
      */
-    DebugHelper.onLog = function onLog(senderString, dateString, message) {};
+    DebugHelper.onLog = function onLog(dateString, senderString, message, type) {
+        if (type) {
+            message = '[' + type.toUpperCase() + '] ' + message;
+        }
+
+        console.log(dateString + ' | ' + senderString + ' | ' + message);
+    };
 
     /**
      * Gets the date string
@@ -32547,7 +32607,7 @@ var DebugHelper = function () {
             secondsString = '0' + secondsString;
         }
 
-        var output = date.getFullYear() + '.' + monthString + '.' + dateString + ' ' + hoursString + ':' + minutesString + ':' + secondsString + ' |';
+        var output = date.getFullYear() + '.' + monthString + '.' + dateString + ' ' + hoursString + ':' + minutesString + ':' + secondsString;
 
         return output;
     };
@@ -32576,7 +32636,7 @@ var DebugHelper = function () {
             }
         }
 
-        return senderName + ' |';
+        return senderName;
     };
 
     /**
@@ -32598,16 +32658,12 @@ var DebugHelper = function () {
         }
 
         if (VERBOSITY >= verbosity) {
-            var senderString = this.parseSender(sender);
-            var dateString = this.getDateString();
-
-            console.log(dateString, senderString, message);
-            this.onLog(dateString, senderString, message);
+            this.onLog(this.getDateString(), this.parseSender(sender), message);
         }
     };
 
     /**
-     * Throws an error
+     * Shows an error
      *
      * @param {String} message
      * @param {Object} sender
@@ -32619,9 +32675,7 @@ var DebugHelper = function () {
             message = message.message || message.trace;
         }
 
-        console.log(this.getDateString(), this.parseSender(sender), message);
-
-        throw new Error(message);
+        this.onLog(this.getDateString(), this.parseSender(sender), message, 'error');
     };
 
     /**
@@ -32630,8 +32684,7 @@ var DebugHelper = function () {
 
 
     DebugHelper.warning = function warning(message, sender) {
-        console.log(this.getDateString(), this.parseSender(sender), message);
-        console.trace();
+        this.onLog(this.getDateString(), this.parseSender(sender), message, 'warning');
     };
 
     return DebugHelper;
@@ -32732,9 +32785,17 @@ apiCall('get', 'user').then(function (user) {
 // Projects
 // --------------------
 .then(function (projects) {
+    projects = projects || [];
+
     // Get next project
     function renderNext(i) {
-        return apiCall('get', 'server/projects/' + projects[i]).then(function (project) {
+        var project = projects.pop();
+
+        if (!project) {
+            return Promise.resolve();
+        }
+
+        return apiCall('get', 'server/projects/' + project).then(function (project) {
             var Project = __webpack_require__(196);
             var ProjectEditor = __webpack_require__(264);
 
@@ -32744,25 +32805,15 @@ apiCall('get', 'user').then(function (user) {
 
             $('.dashboard-container .projects .project-list').append(projectEditor.$element);
 
-            // If there are more projects to render, render the next one
-            if (i < projects.length - 1) {
-                return renderNext(i + 1);
+            return renderNext();
+        }).catch(function (e) {
+            UI.errorModal(e);
 
-                // If not, just resolve normally
-            } else {
-                return Promise.resolve();
-            }
+            return renderNext();
         });
     }
 
-    // Get next project
-    if (projects.length > 0) {
-        return renderNext(0);
-
-        // Resolve normally
-    } else {
-        return Promise.resolve();
-    }
+    return renderNext();
 })
 
 // --------------------

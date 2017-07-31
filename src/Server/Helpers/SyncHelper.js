@@ -26,11 +26,6 @@ class SyncHelper {
         .then((settings) => {
             debug.log('Renewing sync token for ' + project + '...', this);
 
-            let headers = {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json; charset=utf-8'
-            };
-            
             let postData = {
                 username: username,
                 password: password
@@ -89,6 +84,13 @@ class SyncHelper {
                     debug.log('Remote resource item ' + resource + ' retrieved successfully', this, 3);
                         
                     return Promise.resolve(data);
+                })
+                .catch((e) => {
+                    if(e.message) {
+                        debug.error(e.message, this);
+                    }
+
+                    return Promise.resolve(null);
                 });
 
             } else {
@@ -186,6 +188,13 @@ class SyncHelper {
                     debug.log('Remote resource ' + remoteResourceName + ' retrieved successfully', this, 3);
                         
                     return Promise.resolve(data);
+                })
+                .catch((e) => {
+                    if(e.message) {
+                        debug.error(e.message, this);
+                    }
+
+                    return Promise.resolve(null);
                 });
 
             } else {

@@ -26,9 +26,17 @@ apiCall('get', 'user')
 // Projects
 // --------------------
 .then((projects) => {
+    projects = projects || [];
+
     // Get next project
     function renderNext(i) {
-        return apiCall('get', 'server/projects/' + projects[i])
+        let project = projects.pop();
+
+        if(!project) {
+            return Promise.resolve();
+        }
+
+        return apiCall('get', 'server/projects/' + project)
         .then((project) => {
             const Project = require('Common/Models/Project');
             const ProjectEditor = require('Client/Views/Dashboard/ProjectEditor');
@@ -39,26 +47,16 @@ apiCall('get', 'user')
 
             $('.dashboard-container .projects .project-list').append(projectEditor.$element);
 
-            // If there are more projects to render, render the next one
-            if(i < projects.length - 1) {
-                return renderNext(i + 1);
-            
-            // If not, just resolve normally
-            } else {
-                return Promise.resolve();
+            return renderNext();
+        })
+        .catch((e) => {
+            UI.errorModal(e);
 
-            }
+            return renderNext();
         });
     }
     
-    // Get next project
-    if(projects.length > 0) {
-        return renderNext(0);
-
-    // Resolve normally
-    } else {
-        return Promise.resolve();
-    }
+    return renderNext();
 })
 
 // --------------------

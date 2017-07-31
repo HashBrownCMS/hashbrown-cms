@@ -263,13 +263,6 @@ class SettingsHelper extends SettingsHelperCommon {
 
         // Find the remote resource, if applicable
         return HashBrown.Helpers.SyncHelper.getResource(project, environment, 'settings')
-        .catch((e) => {
-            if(e.message) {
-                debug.log(e.message, SettingsHelper);
-            }
-
-            return Promise.resolve(null);  
-        })
 
         // Process local settings, if applicable
         .then((remoteSettings) => {

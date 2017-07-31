@@ -2,6 +2,8 @@
 
 let DebugHelperCommon = require('Common/Helpers/DebugHelper');
 
+let logHandlers = {};
+
 /**
  * The helper class for debugging
  *
@@ -11,12 +13,29 @@ class DebugHelper extends DebugHelperCommon {
     /**
      * Event: Log
      *
-     * @param {String} senderString
      * @param {String} dateString
+     * @param {String} senderString
      * @param {String} message
+     * @param {String} type
      */
-    static onLog(senderString, dateString, message) {
+    static onLog(dateString, senderString, message, type) {
         // TODO (Issue #159): Write to log
+      
+        for(let name in logHandlers) {
+            logHandlers[name](dateString, senderString, message, type);
+        }
+
+        super.onLog(dateString, senderString, message, type);
+    }
+
+    /**
+     * Sets a handler to log output
+     *
+     * @param {String} name
+     * @param {Function} handler
+     */
+    static setLogHandler(name, handler) {
+        logHandlers[name] = handler;
     }
 }
 

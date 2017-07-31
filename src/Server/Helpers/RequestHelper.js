@@ -124,6 +124,7 @@ class RequestHelper {
             let headers = {
                 'Accept': '*/*',
                 'User-Agent': 'HashBrown CMS',
+                'Content-Type': 'application/json; charset=utf-8',
                 'Host': url.hostname
             };
             

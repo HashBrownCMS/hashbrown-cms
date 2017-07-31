@@ -175,7 +175,6 @@ class ProjectEditor extends View {
         });
     }
 
-
     render() {
         let languageCount = this.model.settings.languages.length;
         let userCount = this.model.users.length;

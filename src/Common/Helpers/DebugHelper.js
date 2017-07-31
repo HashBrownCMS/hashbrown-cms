@@ -11,12 +11,17 @@ class DebugHelper {
     /**
      * Event: Log
      *
-     * @param {String} senderString
      * @param {String} dateString
+     * @param {String} senderString
      * @param {String} message
+     * @param {String} type
      */
-    static onLog(senderString, dateString, message) {
-    
+    static onLog(dateString, senderString, message, type) {
+        if(type) {
+            message = '[' + type.toUpperCase() + '] ' + message;
+        }
+
+        console.log(dateString + ' | ' + senderString + ' | ' + message);
     }
 
     /**
@@ -63,8 +68,7 @@ class DebugHelper {
             dateString + ' ' +
             hoursString + ':' + 
             minutesString + ':' + 
-            secondsString +
-            ' |';
+            secondsString;
 
         return output;
     }
@@ -95,7 +99,7 @@ class DebugHelper {
             }
         }
 
-        return senderName + ' |';
+        return senderName;
     }
     
     /**
@@ -114,16 +118,12 @@ class DebugHelper {
         }
 
         if(VERBOSITY >= verbosity) {
-            let senderString = this.parseSender(sender);
-            let dateString = this.getDateString();
-            
-            console.log(dateString, senderString, message);
-            this.onLog(dateString, senderString, message);
+            this.onLog(this.getDateString(), this.parseSender(sender), message);
         }
     }
 
     /**
-     * Throws an error
+     * Shows an error
      *
      * @param {String} message
      * @param {Object} sender
@@ -133,17 +133,14 @@ class DebugHelper {
             message = message.message || message.trace;
         }
 
-        console.log(this.getDateString(), this.parseSender(sender), message);
-
-        throw new Error(message);
+        this.onLog(this.getDateString(), this.parseSender(sender), message, 'error');
     }
 
     /**
      * Shows a warning
      */
     static warning(message, sender) {
-        console.log(this.getDateString(), this.parseSender(sender), message);
-        console.trace();
+        this.onLog(this.getDateString(), this.parseSender(sender), message, 'warning');
     }
 }
 

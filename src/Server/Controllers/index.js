@@ -8,6 +8,7 @@ module.exports = {
     ConnectionController: require('./ConnectionController'),
     ContentController: require('./ContentController'),
     Controller: require('./Controller'),
+    DebugController: require('./DebugController'),
     FormsController: require('./FormsController'),
     MediaController: require('./MediaController'),
     PluginController: require('./PluginController'),
