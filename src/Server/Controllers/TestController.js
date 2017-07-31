@@ -32,23 +32,48 @@ class TestController extends ApiController {
             ws.on('message', (msg) => {
                 if(msg !== 'start') { return; }
 
-                let onMessage = (msg) => {
-                    ws.send(msg);
+                let onMessage = (msg, isSection) => {
+                    ws.send(JSON.stringify({message: msg, isSection: isSection}));
+                };
+                
+                let onError = (e) => {
+                    ws.send(JSON.stringify({error: e.message}));
+
+                    console.log(e.stack);
+
+                    return Promise.resolve();
+                };
+                
+                let onDone = (msg) => {
+                    ws.send(JSON.stringify({isDone: true}));
                 };
 
-                ws.send('Testing ContentHelper...');
-                TestHelper.testContentHelper(project, environment, user, onMessage)
+                onMessage('Testing BackupHelper...', true);
+                return TestHelper.testBackupHelper(project, onMessage)
+                .catch(onError)
                 .then(() => {
-                    ws.send('Testing SchemaHelper...');
-                    return TestHelper.testSchemaHelper(project, environment, user, onMessage);
-                })
+                    onMessage('Testing ConnectionHelper...', true);
+                    return TestHelper.testConnectionHelper(project, environment, onMessage);
+                }).catch(onError)
                 .then(() => {
-                    ws.send('done');
-                })
-                .catch((e) => {
-                    console.log(e.stack);
-                    ws.send(e.message);
-                });
+                    onMessage('Testing ContentHelper...', true);
+                    return TestHelper.testContentHelper(project, environment, user, onMessage);
+                }).catch(onError)
+                .then(() => {
+                    onMessage('Testing FormHelper...', true);
+                    return TestHelper.testFormHelper(project, environment, onMessage);
+                }).catch(onError)
+                .then(() => {
+                    onMessage('Testing SchemaHelper...', true);
+                    return TestHelper.testSchemaHelper(project, environment, onMessage);
+                }).catch(onError)
+                .then(() => {
+                    onMessage('Testing ProjectHelper...', true);
+                    return TestHelper.testProjectHelper(user, onMessage);
+                }).catch(onError)
+                .then(() => {
+                    onDone();
+                }).catch(onError);
             });
         })
         .catch((e) => {

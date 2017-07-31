@@ -50,7 +50,7 @@ $(document).ready(() => {
 
     SettingsHelper.getSettings(ProjectHelper.currentProject, null, 'sync')
     .then(() => {
-        return LanguageHelper.getSelectedLanguages(ProjectHelper.currentProject);
+        return LanguageHelper.getLanguages(ProjectHelper.currentProject);
     })
     .then(() => {
         return reloadAllResources();

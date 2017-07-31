@@ -4,6 +4,7 @@ const ChildProcess = require('child_process');
 const ZLib = require('zlib');
 const Path = require('path');
 const FileSystem = require('fs');
+const SemanticVersion = require('semver');
 
 const RequestHelper = require('Server/Helpers/RequestHelper');
 
@@ -31,7 +32,7 @@ class UpdateHelper {
             let localVersion = require(appRoot + '/package.json').version;
 
             return Promise.resolve({
-                isBehind: this.isVersionBehind(remoteVersion, localVersion),
+                isBehind: this.isVersionBehind(localVersion, remoteVersion),
                 remoteVersion: remoteVersion,
                 localVersion: localVersion,
                 comment: res.body
@@ -40,25 +41,22 @@ class UpdateHelper {
     }
    
     /**
-     * Checks if version b is behind version a
+     * Checks if version a is behind version b
      *
      * @param {String} a
      * @param {String} b
      *
-     * @returns {Boolean} Whether version b is behind version a
+     * @returns {Boolean} Whether version a is behind version b
      */
     static isVersionBehind(a, b) {
         a = a.replace('v', '');
         b = b.replace('v', '');
 
-        let aNums = a.split('.');
-        let bNums = b.split('.');
-
-        if(aNums.length !== 3 || bNums.length !== 3) {
+        if(!SemanticVersion.valid(a) || !SemanticVersion.valid(b)) {
             throw new Error('Couldn\'t compare version numbers');
         }
 
-        return aNums[0] > bNums[0] || aNums[1] > bNums[1] || aNums[2] > bNums[2];
+        return SemanticVersion.lt(a, b);
     }
 
     /**
@@ -77,7 +75,7 @@ class UpdateHelper {
             let remoteVersion = res.tag_name;
             let localVersion = require(appRoot + '/package.json').version;
 
-            if(!this.isVersionBehind(remoteVersion, localVersion)) {
+            if(!this.isVersionBehind(localVersion, remoteVersion)) {
                 return Promise.reject(new Error('Can\'t update, local version is not behind remote version'));
             }
 
@@ -104,11 +102,9 @@ class UpdateHelper {
 
                 git.on('exit', (code) => {
                     if(code == 0 || code == '0') {
-                        debug.log('Check done', this);
                         resolve();
                     } else {
-                        debug.log('Check failed', this);
-                        reject(new Error('git exited with status code ' + code));
+                        reject(new Error('Failed to check out the "stable" branch with GIT'));
                     }
                 });
             })
@@ -133,11 +129,9 @@ class UpdateHelper {
 
                 git.on('exit', (code) => {
                     if(code == 0 || code == '0') {
-                        debug.log('Update successful', this);
                         resolve();
                     } else {
-                        debug.log('Update failed', this);
-                        reject(new Error('git exited with status code ' + code));
+                        reject(new Error('Update failed while trying to run "git pull"'));
                     }
                 });
             })
@@ -164,11 +158,9 @@ class UpdateHelper {
                     code = parseInt(code);
 
                     if(code === 0) {
-                        debug.log('Install successful', this);
                         resolve();
                     } else {
-                        debug.log('Install failed', this);
-                        reject(new Error('npm exited with status code ' + code));
+                        reject(new Error('Install failed while trying to run "npm install"'));
                     }
                 });
             });

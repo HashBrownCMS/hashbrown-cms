@@ -34,7 +34,7 @@ class LanguageEditor extends FieldEditor {
             this.$select = _.select({class: 'form-control'}).change(() => { this.onChange(); })
         );
 
-        LanguageHelper.getSelectedLanguages(ProjectHelper.currentProject)
+        LanguageHelper.getLanguages(ProjectHelper.currentProject)
         .then((languages) => {
             _.append(this.$select,
                 _.each(languages, (i, language) => {

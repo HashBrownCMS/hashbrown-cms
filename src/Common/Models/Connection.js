@@ -149,7 +149,7 @@ class Connection extends Entity {
         
         return connection.removePreview(project, environment, content)
         .then(() => {
-            return LanguageHelper.getSelectedLanguages(project);
+            return LanguageHelper.getLanguages(project);
         })
         .then((languages) => {
             function next(i) {
@@ -197,7 +197,7 @@ class Connection extends Entity {
         
         return ContentHelper.updateContent(project, environment, content)
         .then(() => {
-            return LanguageHelper.getSelectedLanguages(project);
+            return LanguageHelper.getLanguages(project);
         })
         .then((languages) => {
             let next = () => {

@@ -98,7 +98,7 @@ class MongoHelper {
      *
      * @param {String} databaseName
      *
-     * @returns {Promise} Data string
+     * @returns {Promise} Timestamp
      */
     static dump(databaseName) {
         return new Promise((resolve, reject) => {
@@ -125,7 +125,9 @@ class MongoHelper {
                 FileSystem.mkdirSync(dumpPath);
             }
 
-            args.push('--archive=' + dumpPath + '/' + Date.now() + '.hba');
+            let timestamp = Date.now()
+
+            args.push('--archive=' + dumpPath + '/' + timestamp + '.hba');
 
             let mongodump = Spawn('mongodump', args);
 
@@ -142,7 +144,7 @@ class MongoHelper {
                     reject(new Error('mongodump exited with status code ' + code));
                 
                 } else {
-                    resolve();
+                    resolve(timestamp);
 
                 }
             });

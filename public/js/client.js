@@ -10851,7 +10851,7 @@ var Connection = function (_Entity) {
         debug.log('Unpublishing all localised property sets...', this);
 
         return connection.removePreview(project, environment, content).then(function () {
-            return LanguageHelper.getSelectedLanguages(project);
+            return LanguageHelper.getLanguages(project);
         }).then(function (languages) {
             function next(i) {
                 var language = languages[i];
@@ -10901,7 +10901,7 @@ var Connection = function (_Entity) {
         content.hasPreview = false;
 
         return ContentHelper.updateContent(project, environment, content).then(function () {
-            return LanguageHelper.getSelectedLanguages(project);
+            return LanguageHelper.getLanguages(project);
         }).then(function (languages) {
             var next = function next() {
                 var language = languages.pop();
@@ -15430,9 +15430,7 @@ var LanguageHelper = function (_LanguageHelperCommon) {
      *
      * @returns {Array} List of language names
      */
-    LanguageHelper.getSelectedLanguages = function getSelectedLanguages() {
-        var _this2 = this;
-
+    LanguageHelper.getLanguages = function getLanguages() {
         var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
 
         return SettingsHelper.getSettings(project, null, 'languages').then(function (selected) {
@@ -15441,8 +15439,6 @@ var LanguageHelper = function (_LanguageHelperCommon) {
             }
 
             selected.sort();
-
-            _this2.selectedLanguages = selected;
 
             return Promise.resolve(selected);
         });
@@ -31612,7 +31608,7 @@ function compare(a, b) {
 module.exports = {
 	"name": "hashbrown-cms",
 	"repository": "https://github.com/Putaitu/hashbrown-cms.git",
-	"version": "0.8.2",
+	"version": "0.9.0",
 	"description": "The pluggable CMS",
 	"main": "hashbrown.js",
 	"scripts": {
@@ -31642,6 +31638,7 @@ module.exports = {
 		"pug": "^2.0.0-beta11",
 		"restler": "^3.4.0",
 		"rimraf": "^2.5.2",
+		"semver": "^5.4.1",
 		"to-markdown": "^2.0.1",
 		"xoauth2": "^1.2.0"
 	},
@@ -38329,7 +38326,7 @@ var LanguageHelper = function () {
      *
      * @returns {Array} List of language names
      */
-    LanguageHelper.getSelectedLanguages = function getSelectedLanguages() {
+    LanguageHelper.getLanguages = function getLanguages() {
         var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
 
         return Promise.resolve([]);
@@ -38368,7 +38365,7 @@ var LanguageHelper = function () {
         var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
         var content = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('content');
 
-        return this.getSelectedLanguages(project).then(function (languages) {
+        return this.getLanguages(project).then(function (languages) {
             var sets = {};
 
             for (var _iterator = languages, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
@@ -38401,7 +38398,7 @@ var LanguageHelper = function () {
      */
 
 
-    LanguageHelper.getLanguages = function getLanguages() {
+    LanguageHelper.getLanguageOptions = function getLanguageOptions() {
         return ["aa", "ab", "ae", "af", "ak", "am", "an", "ar", "as", "av", "ay", "az", "ba", "be", "bg", "bh", "bi", "bm", "bn", "bo", "br", "bs", "ca", "ce", "ch", "co", "cr", "cs", "cu", "cv", "cy", "da", "de", "dv", "dz", "ee", "el", "en", "eo", "es", "et", "eu", "fa", "ff", "fi", "fj", "fo", "fr", "fy", "ga", "gd", "gl", "gn", "gu", "gv", "ha", "he", "hi", "ho", "hr", "ht", "hu", "hy", "hz", "ia", "id", "ie", "ig", "ii", "ik", "io", "is", "it", "iu", "ja", "jv", "ka", "kg", "ki", "kj", "kk", "kl", "km", "kn", "ko", "kr", "ks", "ku", "kv", "kw", "ky", "la", "lb", "lg", "li", "ln", "lo", "lt", "lu", "lv", "mg", "mh", "mi", "mk", "ml", "mn", "mr", "ms", "mt", "my", "na", "nb", "nd", "ne", "ng", "nl", "nn", "no", "nr", "nv", "ny", "oc", "oj", "om", "or", "os", "pa", "pi", "pl", "ps", "pt", "qu", "rc", "rm", "rn", "ro", "ru", "rw", "sa", "sc", "sd", "se", "sg", "si", "sk", "sl", "sm", "sn", "so", "sq", "sr", "ss", "st", "su", "sv", "sw", "ta", "te", "tg", "th", "ti", "tk", "tl", "tn", "to", "tr", "ts", "tt", "tw", "ty", "ug", "uk", "ur", "uz", "ve", "vi", "vo", "wa", "wo", "xh", "yi", "yo", "za", "zh", "zu"];
     };
 
@@ -39632,7 +39629,7 @@ $(document).ready(function () {
     var ProjectHelper = HashBrown.Helpers.ProjectHelper;
 
     SettingsHelper.getSettings(ProjectHelper.currentProject, null, 'sync').then(function () {
-        return LanguageHelper.getSelectedLanguages(ProjectHelper.currentProject);
+        return LanguageHelper.getLanguages(ProjectHelper.currentProject);
     }).then(function () {
         return reloadAllResources();
     }).then(function () {
@@ -47033,7 +47030,7 @@ var LanguageEditor = function (_FieldEditor) {
             _this2.onChange();
         }));
 
-        LanguageHelper.getSelectedLanguages(ProjectHelper.currentProject).then(function (languages) {
+        LanguageHelper.getLanguages(ProjectHelper.currentProject).then(function (languages) {
             _.append(_this2.$select, _.each(languages, function (i, language) {
                 return _.option({ value: language }, language);
             }));

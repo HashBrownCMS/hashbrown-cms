@@ -2,6 +2,7 @@
 
 const MongoHelper = require('Server/Helpers/MongoHelper');
 const BackupHelper = require('Server/Helpers/BackupHelper');
+const UserHelper = require('Server/Helpers/UserHelper');
 const SyncHelper = require('Server/Helpers/SyncHelper');
 
 const Project = require('Common/Models/Project');
@@ -144,12 +145,21 @@ class ProjectHelper {
      *
      * @returns {Promise} Promise
      */
-    static deleteProject(name) {
-        // Make backup first
-        return BackupHelper.createBackup(name)
-        .then(() => {
-            return MongoHelper.dropDatabase(name);
-        });
+    static deleteProject(
+        id = requriedParam('id'),
+        makeBackup = true
+    ) {
+        // Make backup first, if specified
+        if(makeBackup) {
+            return BackupHelper.createBackup(id)
+            .then(() => {
+                return MongoHelper.dropDatabase(id);
+            });
+
+        // If not, just drop the database
+        } else {
+            return MongoHelper.dropDatabase(id);
+        }
     }
 
     /**
@@ -158,7 +168,7 @@ class ProjectHelper {
      * @param {String} project
      * @param {String} environment
      *
-     * @returns {Promise} Promise
+     * @returns {Promise} New environment
      */
     static addEnvironment(
         project = requiredParam('project'),
@@ -171,7 +181,9 @@ class ProjectHelper {
             'settings',
             { usedBy: environment },
             { upsert: true }
-        );
+        ).then(() => {
+            return Promise.resolve(environment);  
+        });
     }
 
     /**
@@ -234,20 +246,29 @@ class ProjectHelper {
      * @returns {Promise} The new Project
      */
     static createProject(name, userId) {
-        return new Promise((resolve, reject) => {
-            if(name && userId) {
-                let project = Project.create(name);
+        if(!name || !userId) {
+            return Promise.reject(new Error('Projects cannot be created without a name and user id specified. Provided "' + name + '" and "' + userId + '"'));
+        }
+            
+        let project = Project.create(name);
 
-                MongoHelper.insertOne(project.id, 'settings', project.settings)
-                .then(() => {
-                    // The user that creates a project gets all scopes
-                    return HashBrown.Helpers.UserHelper.addUserProjectScope(userId, project.id, [ 'users', 'settings', 'connections', 'schemas' ]);
-                })
-                .then(resolve)
-                .catch(reject);
-            } else {
-                reject(new Error('Projects cannot be created without a name and user id specified. Provided "' + name + '" and "' + userId + '"'));
+        return UserHelper.getUserById(userId)
+        .then((user) => {
+            if(!user.isAdmin) {
+                return Promise.reject(new Error('Only admins can create projects'));
             }
+            
+            return this.projectExists(project.id);
+        })
+        .then((exists) => {
+            if(exists === true) {
+                return Promise.reject('A project by name "' + name + '" already exists');
+            }
+
+            return MongoHelper.insertOne(project.id, 'settings', project.settings);
+        })
+        .then(() => {
+            return Promise.resolve(project);
         });
     }
 }

@@ -16,7 +16,7 @@ class LanguageHelper extends LanguageHelperCommon {
      *
      * @returns {Array} List of language names
      */
-    static getSelectedLanguages(
+    static getLanguages(
         project = requiredParam('project')
     ) {
         return SettingsHelper.getSettings(project, null, 'languages')
@@ -26,8 +26,6 @@ class LanguageHelper extends LanguageHelperCommon {
             }
 
             selected.sort();
-
-            this.selectedLanguages = selected;
 
             return Promise.resolve(selected);
         });

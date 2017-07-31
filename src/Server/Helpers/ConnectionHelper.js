@@ -292,57 +292,6 @@ class ConnectionHelper extends ConnectionHelperCommon {
             }
         );
     }
-    
-    /**
-     * Sets a connection setting by id
-     *
-     * @param {String} project
-     * @param {String} environment
-     * @param {string} id
-     * @param {Object} newSettings
-     *
-     * @return {Promise} promise
-     */
-    static setConnectionSettingById(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        id = requiredParam('id'),
-        newSettings = requiredParam('newSwettings')
-    ) {
-        let collection = environment + '.connections';
-        
-        // First find the connection
-        return MongoHelper.findOne(
-            project,
-            collection,
-            {
-                id: id
-            }
-        )
-        .then(function(oldConnection) {
-            let newConnection = oldConnection;
-
-            // Make sure the settings object exists
-            if(!newConnection.settings) {
-                newConnection.settings = {};
-            }
-
-            // Adopt values at top level
-            for(let k in newSettings) {
-                newConnection.settings[k] = newSettings[k];
-            }
-
-            // Update the Mongo document
-            return MongoHelper.updateOne(
-                project,
-                'connections',
-                {
-                    id: id
-                },
-                newConnection
-            );
-        });
-    }
 
     /**
      * Sets a connection by id
@@ -362,15 +311,14 @@ class ConnectionHelper extends ConnectionHelperCommon {
         connection = requiredParam('connection'),
         create = false
     ) {
-        let collection = environment + '.connections';
-       
         // Unset automatic flags
         connection.locked = false;
         connection.remote = false;
+        connection.local = false;
         
         return MongoHelper.updateOne(
             project,
-            collection,
+            environment + '.connections',
             {
                 id: id
             },
@@ -378,7 +326,9 @@ class ConnectionHelper extends ConnectionHelperCommon {
             {
                 upsert: create
             }
-        );
+        ).then(() => {
+            return Promise.resolve(new Connection(connection));  
+        });
     }
     
     /**
@@ -387,20 +337,21 @@ class ConnectionHelper extends ConnectionHelperCommon {
      * @param {String} project
      * @param {String} environment
      *
-     * @return {Promise} promise
+     * @return {Promise} New Connection
      */
     static createConnection(
         project = requiredParam('project'),
         environment = requiredParam('environment')
     ) {
         let connection = Connection.create();
-        let collection = environment + '.connections';
 
         return MongoHelper.insertOne(
             project,
-            collection,
+            environment + '.connections',
             connection.getObject()
-        );
+        ).then((newConnection) => {
+            return Promise.resolve(connection);
+        });
     }    
 }
 

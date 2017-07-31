@@ -135,13 +135,11 @@ class UserHelper {
                 username: username
             }
         ).then((user) => {
-            return new Promise((resolve, reject) => {
-                if(!user || Object.keys(user).length < 1) {
-                    reject(new Error('No user "' + username + '" found'));
-                } else {
-                    resolve(new User(user));
-                }
-            });
+            if(!user || Object.keys(user).length < 1) {
+                return Promise.reject(new Error('No user "' + username + '" found'));
+            }
+            
+            return Promise.resolve(new User(user));
         });
     }
 
@@ -155,7 +153,7 @@ class UserHelper {
         .then((user) => {
             user.tokens = [];
 
-            this.updateUser(username, user.getObject());
+            return this.updateUser(username, user.getObject());
         });
     }
 

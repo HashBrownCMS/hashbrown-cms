@@ -16,7 +16,7 @@ class LanguageHelper extends LanguageHelperCommon {
      *
      * @returns {Array} List of language names
      */
-    static getSelectedLanguages(
+    static getLanguages(
         project = requiredParam('project')
     ) {
         return SettingsHelper.getSettings(project, null, 'languages')
@@ -26,8 +26,6 @@ class LanguageHelper extends LanguageHelperCommon {
             }
 
             selected.sort();
-
-            this.selectedLanguages = selected;
 
             return Promise.resolve(selected);
         });
@@ -39,7 +37,7 @@ class LanguageHelper extends LanguageHelperCommon {
      * @param {String} project
      * @param {Array} languages
      *
-     * @returns {Promise} promise
+     * @returns {Promise}
      */
     static setLanguages(
         project = requiredParam('project'),
@@ -50,43 +48,6 @@ class LanguageHelper extends LanguageHelperCommon {
         }
 
         return setSettings(project, null, 'languages', languages);
-    }
-    
-    /**
-     * Toggle a language
-     *
-     * @param {String} project
-     * @param {String} language
-     * @param {Boolean} state
-     *
-     * @returns {Promise} Promise
-     */
-    static toggleLanguage(
-        project = requiredParam('project'),
-        language = requiredParam('language'),
-        state = requiredParam('state')
-    ) {
-        return SettingsHelper.getSettings(project, null, 'language')
-        .then((settings) => {
-            if(!settings) {
-                settings = {};
-            }
-            
-            if(!settings.selected || settings.selected.length < 1) {
-                settings.selected = ['en'];
-            }
-        
-            if(!state && settings.selected.indexOf(language) > -1) {
-                settings.selected.splice(settings.selected.indexOf(language), 1);
-
-            } else if(state && settings.selected.indexOf(language) < 0) {
-                settings.selected.push(language);
-                settings.selected.sort();
-
-            }
-
-            return SettingsHelper.setSettings(project, null, 'language', settings);
-        });  
     }
 }
 

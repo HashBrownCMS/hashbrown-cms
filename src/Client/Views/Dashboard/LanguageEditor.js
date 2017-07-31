@@ -36,7 +36,7 @@ class LanguageEditor extends View {
 
         this.$element = this.modal.$element;
 
-        LanguageHelper.getSelectedLanguages(this.projectId)
+        LanguageHelper.getLanguages(this.projectId)
         .then((selectedLanguages) => {
             this.model = selectedLanguages;
 
@@ -59,7 +59,7 @@ class LanguageEditor extends View {
 
     render() {
         _.append(this.$element.find('.modal-body').empty(),
-            UI.inputChipGroup(this.model, LanguageHelper.getLanguages(this.projectId), true)
+            UI.inputChipGroup(this.model, LanguageHelper.getLanguageOptions(this.projectId), true)
         );
     } 
 }

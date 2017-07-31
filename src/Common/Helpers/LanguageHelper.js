@@ -13,7 +13,7 @@ class LanguageHelper {
      *
      * @returns {Array} List of language names
      */
-    static getSelectedLanguages(
+    static getLanguages(
         project = requiredParam('project')
     ) {
         return Promise.resolve([]);
@@ -48,7 +48,7 @@ class LanguageHelper {
         environment = requiredParam('environment'),
         content = requiredParam('content')
     ) {
-        return this.getSelectedLanguages(project)
+        return this.getLanguages(project)
         .then((languages) => {
             let sets = {};
 
@@ -67,7 +67,7 @@ class LanguageHelper {
      *
      * @returns {Array} List of language names
      */
-    static getLanguages() {
+    static getLanguageOptions() {
         return [
             "aa",
             "ab",
