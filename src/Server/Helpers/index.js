@@ -19,7 +19,6 @@ module.exports = {
     RequestHelper: require('./RequestHelper'),
     ScheduleHelper: require('./ScheduleHelper'),
     SchemaHelper: require('./SchemaHelper'),
-    SecurityHelper: require('./SecurityHelper'),
     SettingsHelper: require('./SettingsHelper'),
     SyncHelper: require('./SyncHelper'),
     UpdateHelper: require('./UpdateHelper'),

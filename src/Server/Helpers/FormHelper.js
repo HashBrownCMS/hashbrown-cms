@@ -131,9 +131,7 @@ class FormHelper {
             }
         )
         .then(() => {
-            return new Promise((resolve) => {
-                resolve(new Form(properties));
-            });
+            return Promise.resolve(new Form(properties));
         });
     }
 
@@ -158,9 +156,7 @@ class FormHelper {
             form.getObject()
         )
         .then(() => {
-            return new Promise((resolve) => {
-                resolve(form);
-            });
+            return Promise.resolve(form);
         });
     }
 
