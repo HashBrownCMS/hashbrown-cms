@@ -321,7 +321,7 @@ window.reloadAllResources = function reloadAllResources() {
  * Start the debug socket
  */
 window.startDebugSocket = function startDebugSocket() {
-    let debugSocket = new WebSocket('ws://' + location.host + '/api/debug');
+    let debugSocket = new WebSocket(location.protocol.replace('http', 'ws') + '//' + location.host + '/api/debug');
 
     debugSocket.onopen = (ev) => {
         debug.log('Debug socket open', 'HashBrown');

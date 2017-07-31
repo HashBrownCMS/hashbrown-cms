@@ -128,7 +128,7 @@ class RequestHelper {
                 'Host': url.hostname
             };
             
-            // Makes the actual requesit and checks for redirects
+            // Makes the actual request and checks for redirects
             let redirects = 0;
             
             let makeRequest = () => {
