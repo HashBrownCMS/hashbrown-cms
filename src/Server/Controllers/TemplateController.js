@@ -91,7 +91,7 @@ class TemplateController extends ApiController {
      * Gets an array of all templates
      */
     static getTemplates(req, res) {
-        ConnectionHelper.getTemplateProvider(req.project, req.environment)
+        return ConnectionHelper.getTemplateProvider(req.project, req.environment)
         .then((connection) => {
             if(!connection) { return Promise.reject(new Error('No template provider found')); }
            
@@ -106,7 +106,7 @@ class TemplateController extends ApiController {
                 return connection.getTemplates('partial');
             })
             .catch((e) => {
-                debug.log(e.message, TemplateController);
+                debug.error(e.message, this);
             })
             .then((partialTemplates) => {
                 if(Array.isArray(partialTemplates)) {
@@ -116,7 +116,7 @@ class TemplateController extends ApiController {
                 return Promise.resolve();
             })
             .catch((e) => {
-                debug.log(e.message, TemplateController);
+                debug.error(e.message, this);
             })
             .then(() => {
                 return Promise.resolve(allTemplates);

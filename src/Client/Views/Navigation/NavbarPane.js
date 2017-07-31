@@ -10,7 +10,7 @@ class Pane {
      * Init
      */
     static init() {
-        NavbarMain.addTabButton('My pane', '/my-route', 'question');
+        HashBrown.Views.Navigation.NavbarMain.addTabButton('My pane', '/my-route', 'question');
     }
 
     /**

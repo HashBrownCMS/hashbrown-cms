@@ -119,6 +119,19 @@ class Connection extends Entity {
     }
     
     /**
+     * Sets template by id
+     *
+     * @param {String} type
+     * @param {String} id
+     * @param {Template} newTemplate
+     *
+     * @returns {Promise} Callback
+     */
+    setTemplateById(type, id, newTemplate) {
+        return Promise.resolve();
+    }
+    
+    /**
      * Removes media
      *
      * @param {String} id
@@ -149,29 +162,25 @@ class Connection extends Entity {
         
         return connection.removePreview(project, environment, content)
         .then(() => {
-            return LanguageHelper.getLanguages(project);
+            return HashBrown.Helpers.LanguageHelper.getLanguages(project);
         })
         .then((languages) => {
-            function next(i) {
-                let language = languages[i];
+            let next = () => {
+                let language = languages.pop();
+
+                // No more languauges to publish for
+                if(!language) {
+                    debug.log('Unpublished all localised property sets successfully!', connection);
+                    return Promise.resolve();
+                }
 
                 return connection.deleteContentProperties(content.id, language)
                 .then(() => {
-                    i++;
-
-                    if(i < languages.length) {
-                        return next(i);
-                    
-                    } else {
-                        debug.log('Unpublished all localised property sets successfully!', connection);
-                           
-                        return Promise.resolve();
-                    
-                    }
+                    return next();
                 });
-            }
+            };
 
-            return next(0);
+            return next();
         });
     }
     
@@ -195,9 +204,9 @@ class Connection extends Entity {
 
         content.hasPreview = false;
         
-        return ContentHelper.updateContent(project, environment, content)
+        return HashBrown.Helpers.ContentHelper.updateContent(project, environment, content)
         .then(() => {
-            return LanguageHelper.getLanguages(project);
+            return HashBrown.Helpers.LanguageHelper.getLanguages(project);
         })
         .then((languages) => {
             let next = () => {
@@ -235,9 +244,9 @@ class Connection extends Entity {
     ) {
         content.hasPreview = true;
         
-        return ContentHelper.updateContent(project, environment, content)
+        return HashBrown.Helpers.ContentHelper.updateContent(project, environment, content)
         .then(() => {
-            return LanguageHelper.getAllLocalizedPropertySets(project, environment, content);
+            return HashBrown.Helpers.LanguageHelper.getAllLocalizedPropertySets(project, environment, content);
         })
         .then((sets) => {
             let properties = sets[language];
@@ -273,7 +282,7 @@ class Connection extends Entity {
 
         return connection.removePreview(project, environment, content)
         .then(() => {
-            return LanguageHelper.getAllLocalizedPropertySets(project, environment, content);
+            return HashBrown.Helpers.LanguageHelper.getAllLocalizedPropertySets(project, environment, content);
         })
         .then((sets) => {
             let languages = Object.keys(sets);

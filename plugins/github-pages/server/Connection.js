@@ -1,15 +1,20 @@
 'use strict';
 
-const yamljs = require('./lib/yamljs/Yaml');
-const fs = require('fs');
-const path = require('path');
-const glob = require('glob');
-const rimraf = require('rimraf');
+const Yaml = require('./lib/yamljs/Yaml');
+const FileSystem = require('fs');
+const Path = require('path');
+const Glob = require('glob');
+const RimRaf = require('rimraf');
 
 const Connection = require('Common/Models/Connection');
 const Content = require('Common/Models/Content');
 const Media = require('Common/Models/Media');
 const Template = require('Common/Models/Template');
+
+const RequestHelper = require('Server/Helpers/RequestHelper');
+const UserHelper = require('Server/Helpers/UserHelper');
+const MediaHelper = require('Server/Helpers/MediaHelper');
+const ContentHelper = require('Server/Helpers/ContentHelper');
 
 class GitHubConnection extends Connection {
     constructor(data) {
@@ -60,7 +65,7 @@ class GitHubConnection extends Connection {
         let frontMatter = '';
 
         frontMatter += '---\n';
-        frontMatter += yamljs.stringify(properties, 50); 
+        frontMatter += Yaml.stringify(properties, 50); 
         frontMatter += '---';
 
         return frontMatter;
@@ -75,16 +80,12 @@ class GitHubConnection extends Connection {
      * @return {Promise} Promise
      */
     getContents(path, type) {
-        return new Promise((resolve, reject) => {
-            let headers = {
-                'Accept': 'application/json'
-            };
-            
-            // Local is set, fetch using filesystem
-            if(this.settings.isLocal) {
+        // Local is set, fetch using filesystem
+        if(this.settings.isLocal) {
+            return new Promise((resolve, reject) => {
                 switch(type) {
                     default: case 'dir':
-                        fs.readdir(this.settings.localPath + path, (err, data) => {
+                        FileSystem.readdir(this.settings.localPath + path, (err, data) => {
                             if(err) {
                                 reject(err);
                             
@@ -96,7 +97,7 @@ class GitHubConnection extends Connection {
                         break;
 
                     case 'file':
-                        fs.readFile(this.settings.localPath + path, (err, data) => {
+                        FileSystem.readFile(this.settings.localPath + path, (err, data) => {
                             if(err) {
                                 reject(err);
                             
@@ -107,22 +108,19 @@ class GitHubConnection extends Connection {
                         });
                         break;
                 }
+            });
+        }
 
-            // If not, proceed with REST call
-            } else {
-                RequestHelper.get('https://api.github.com/repos/' + this.settings.repo + '/contents/' + path + '?' + this.getAppendix(), {
-                    headers: headers
-                }).on('complete', (data, response) => {
-                    if(data) {
-                        if(data.message) {
-                            reject(new Error('Couldn\'t find "' + path + '". GitHub response: ' + JSON.stringify(data.message)));
-                        
-                        } else {
-                            resolve(data);
-                        }
-                    }
-                });
+        // If not, proceed with API call
+        return RequestHelper.request('get', 'https://api.github.com/repos/' + this.settings.repo + '/contents/' + path + '?' + this.getAppendix())
+        .then((data) => {
+            if(!data) { return Promise.resolve(); }
+            
+            if(data.message) {
+                return Promise.reject(new Error('Couldn\'t find "' + path + '". GitHub response: ' + JSON.stringify(data.message)));
             }
+            
+            return Promise.resolve(data);
         });
     }
     
@@ -135,15 +133,16 @@ class GitHubConnection extends Connection {
      * @return {Promise} Promise
      */
     postContents(path, content) {
-        return new Promise((resolve, reject) => {
-            if(this.settings.isLocal) {
+        // Post to local
+        if(this.settings.isLocal) {
+            return new Promise((resolve, reject) => {
                 let dirPath = path.slice(0, path.lastIndexOf('/'));
 
                 MediaHelper.mkdirRecursively(this.settings.localPath + dirPath);
 
                 debug.log('Writing file "' + this.settings.localPath + path + '"...', this);
 
-                fs.writeFile(this.settings.localPath + path, content, (err) => {
+                FileSystem.writeFile(this.settings.localPath + path, content, (err) => {
                     if(err) {
                         reject(err);
                     } else {
@@ -151,46 +150,41 @@ class GitHubConnection extends Connection {
                         debug.log('Uploaded file successfully to ' + path, this);
                     }
                 });
+            });
+        }
 
-            } else {
-                let apiPath = 'https://api.github.com/repos/' + this.settings.repo + '/contents/' + path + '?' + this.getAppendix();
-                let headers = {
-                    'Accept': 'application/json'
-                };
+        // Post to repo
+        let apiPath = 'https://api.github.com/repos/' + this.settings.repo + '/contents/' + path + '?' + this.getAppendix();
 
-                // Fetch first to get the SHA
-                debug.log('Getting SHA...', this);
-                
-                RequestHelper.get(apiPath, {
-                    headers: headers
-                }).on('complete', (data, response) => {
-                    let postData = {
-                        sha: data.sha,
-                        path: path,
-                        message: 'Commit from HashBrown CMS',
-                        content: new Buffer(content).toString('base64'),
-                        branch: this.settings.branch || 'gh-pages'
-                    };
+        // Fetch first to get the SHA
+        debug.log('Getting SHA...', this);
+        
+        return RequestHelper.request('get', apiPath)
+        .catch((e) => {
+            // If the file wasn't found, just proceed
+            
+            return Promise.resolve();
+        })
+        .then((data) => {
+            let postData = {
+                sha: data ? data.sha : null,
+                path: path,
+                message: 'Commit from HashBrown CMS',
+                content: new Buffer(content).toString('base64'),
+                branch: this.settings.branch || 'gh-pages'
+            };
 
-                    // Commit the file
-                    debug.log('Committing data...', this);
+            // Commit the file
+            debug.log('Committing data...', this);
 
-                    RequestHelper.put(apiPath, {
-                        headers: headers,
-                        data: JSON.stringify(postData)
-                    }).on('complete', (data, response) => {
-                        if(data.message) {
-                            debug.log('Committing file failed: ' + data.message, this);
-                            reject(newError(data.message));
-                        
-                        } else {
-                            debug.log('Committed file successfully to ' + path, this);
-                            resolve();
-
-                        }
-                    });
-                });
-            }
+            return RequestHelper.request('put', apiPath, postData);
+        })
+        .then((data) => {
+            if(data.message) {
+                return Promise.reject(new Error(data.message));
+            } 
+            
+            return Promise.resolve();
         });
     }
    
@@ -202,63 +196,56 @@ class GitHubConnection extends Connection {
      * @return {Promise} Promise
      */
     deleteContents(path) {
-        return new Promise((resolve, reject) => {
-            if(this.settings.isLocal) {
-                rimraf(this.settings.localPath + path, (err) => {
+        // Delete content locally
+        if(this.settings.isLocal) {
+            return new Promise((resolve, reject) => {
+                RimRaf(this.settings.localPath + path, (err) => {
                     if(err) {
                         reject(err);
                     } else {
                         resolve();
                     }
                 });
+            });
+        }
 
-            } else {
-                let getApiPath = 'https://api.github.com/repos/' + this.settings.repo + '/contents/' + path + '?' + this.getAppendix();
-                let delApiPath = 'https://api.github.com/repos/' + this.settings.repo + '/contents/' + path + '?' + this.getAppendix();
-                let headers = {
-                    'Accept': 'application/json'
-                };
+        // Delete from repo
+        let getApiPath = 'https://api.github.com/repos/' + this.settings.repo + '/contents/' + path + '?' + this.getAppendix();
+        let delApiPath = 'https://api.github.com/repos/' + this.settings.repo + '/contents/' + path + '?' + this.getAppendix();
 
-                debug.log('Removing "' + path + '"...', this, 2);
+        debug.log('Removing "' + path + '"...', this, 2);
 
-                // Fetch first to get the SHA
-                debug.log('Getting SHA...', this, 2);
-                
-                RequestHelper.get(getApiPath, {
-                    headers: headers
-                }).on('complete', (data, response) => {
-                    // Data wasn't found, nothing needs to be deleted
-                    if(!data || !data.sha) {
-                        debug.log('No data found!', this, 2);
-                        resolve();
-                    }
-
-                    let postData = {
-                        sha: data.sha,
-                        path: path,
-                        message: 'Removed by HashBrown CMS',
-                        branch: this.settings.branch || 'gh-pages'
-                    };
-
-                    // Remove the file
-                    debug.log('Removing data...', this, 2);
-
-                    RequestHelper.del(delApiPath, {
-                        headers: headers,
-                        data: JSON.stringify(postData)
-                    }).on('complete', (data, response) => {
-                        if(data.message) {
-                            debug.log('Removing file failed: ' + data.message, this, 2);
-                            reject(new Error(data.message));    
-
-                        } else {
-                            debug.log('Removed file successfully!', this, 2);
-                            resolve();
-
-                        }
-                    });
-                });
+        // Fetch first to get the SHA
+        debug.log('Getting SHA...', this, 2);
+        
+        return RequestHelper.request('get', getApiPath)
+        .then((data) => {
+            // Data wasn't found, nothing needs to be deleted
+            if(!data || !data.sha) {
+                return Promise.resolve();
             }
+
+            let postData = {
+                sha: data.sha,
+                path: path,
+                message: 'Removed by HashBrown CMS',
+                branch: this.settings.branch || 'gh-pages'
+            };
+
+            // Remove the file
+            debug.log('Removing data...', this, 2);
+
+            return RequestHelper.request('delete', delApiPath, postData);
+        })
+        .then((data) => {    
+            if(data.message) {
+                debug.log('Removing file failed: ' + data.message, this, 2);
+                return Promise.reject(new Error(data.message));    
+
+            }
+            
+            debug.log('Removed file successfully!', this, 2);
+            return Promise.resolve();
         });
     }
 
@@ -271,20 +258,16 @@ class GitHubConnection extends Connection {
      * @return {Promise} Promise
      */
     getTree(root, mode) {
-        return new Promise((resolve, reject) => {
-            let headers = {
-                'Accept': 'application/json'
-            };
-            
-            // Local is set, fetch using filesystem
-            if(this.settings.isLocal) {
+        // Local is set, fetch using filesystem
+        if(this.settings.isLocal) {
+            return new Promise((resolve, reject) => {
                 let path = root + '/**/*';
                 
                 if(mode == 'dir') {
                     path += '/';                
                 }
 
-                glob(
+                Glob(
                     path,
                     {
                         cwd: this.settings.localPath,
@@ -300,32 +283,19 @@ class GitHubConnection extends Connection {
                         }     
                     }
                 );
+            });
+        }
 
-            // If not, proceed with REST call
-            } else {
-                let headers = {
-                    'Accept': 'application/json'
-                };
-               
-                let getApiUrl = 'https://api.github.com/repos/' + this.settings.repo + '/git/trees/' + (this.settings.branch || 'gh-pages') + '?recursive=1&access_token=' + this.settings.token;
+        // If not, proceed with API call
+        let getApiUrl = 'https://api.github.com/repos/' + this.settings.repo + '/git/trees/' + (this.settings.branch || 'gh-pages') + '?recursive=1&access_token=' + this.settings.token;
 
-                RequestHelper.get(getApiUrl, {
-                    headers: headers
-                }).on('complete', (data, response) => {
-                    if(data) {
-                        if(data.tree) {
-                            resolve(data.tree);    
-                        
-                        } else {
-                            reject(new Error('No tree in GitHub response'));
-
-                        }
-
-                    } else {
-                        reject(new Error('No data in GitHub response'));
-                    }
-                });
+        return RequestHelper.request('get', getApiUrl)
+        .then((data) => {
+            if(!data || !data.tree) { 
+                return Promise.reject(new Error('No data in GitHub response'));
             }
+
+            return Promise.resolve(data.tree);    
         });
     }
 
@@ -338,7 +308,7 @@ class GitHubConnection extends Connection {
      * @returns {Promise} Template
      */
     getTemplateById(type, id) {
-        let path = GitHubConnection.getTemplateRemotePath(type);
+        let path = this.getTemplateRemotePath(type);
 
         return this.getContents(path)
         .then((files) => {
@@ -434,7 +404,7 @@ class GitHubConnection extends Connection {
         })
         // If template was not found, continue and set appropriate remote paths
         .catch(() => {
-            newTemplate.remotePath = GitHubConnection.getTemplateRemotePath(type) + '/' + newTemplate.name;
+            newTemplate.remotePath = this.getTemplateRemotePath(type) + '/' + newTemplate.name;
 
             return Promise.resolve();
         })
@@ -480,7 +450,7 @@ class GitHubConnection extends Connection {
      *
      * @returns {String} Remote path
      */
-    static getTemplateRemotePath(type) {
+    getTemplateRemotePath(type) {
         switch(type) {
             case 'page':
                 return '_layouts'
@@ -500,7 +470,7 @@ class GitHubConnection extends Connection {
      * @returns {Promise} Array of Templates
      */
     getTemplates(type) {
-        let path = GitHubConnection.getTemplateRemotePath(type);
+        let path = this.getTemplateRemotePath(type);
 
         let templates = [];
 
@@ -543,8 +513,8 @@ class GitHubConnection extends Connection {
 
                 if(isInMediaDir && isFile) {
                     media[media.length] = new Media({
-                        name: path.basename(nodePath),
-                        id: path.dirname(nodePath).replace('media/', '').replace(this.settings.localPath, ''),
+                        name: Path.basename(nodePath),
+                        id: Path.dirname(nodePath).replace('media/', '').replace(this.settings.localPath, ''),
                         url: nodePath,
                         remote: this.settings.isLocal != true
                     });
@@ -572,7 +542,7 @@ class GitHubConnection extends Connection {
                     let file = data[0];
                    
                     media = new Media({
-                        name: file.name || path.basename(file),
+                        name: file.name || Path.basename(file),
                         id: id,
                         url: file.download_url || this.settings.localPath + 'media/' + id + '/' + file,
                         remote: this.settings.isLocal != true
@@ -621,17 +591,17 @@ class GitHubConnection extends Connection {
         // First remove existing media if it exists
         return this.removeMedia(id)
         .then(() => {
-            return new Promise((resolve, reject) => {
                 let tempPath = file.path;
                 
-                // Local behaviour        
-                if(this.settings.isLocal) {
+            // Local behaviour        
+            if(this.settings.isLocal) {
+                return new Promise((resolve, reject) => {
                     let newDirPath = this.settings.localPath + path; 
                     let newFilePath = newDirPath + '/' + file.filename; 
 
                     MediaHelper.mkdirRecursively(newDirPath);
 
-                    fs.rename(tempPath, newFilePath, (err, fileData) => {
+                    FileSystem.rename(tempPath, newFilePath, (err, fileData) => {
                         if(err) {
                             // We couldn't read the temp file, rejecting
                             reject(new Error(err));
@@ -642,57 +612,52 @@ class GitHubConnection extends Connection {
 
                         }
                     });
+                });
+            }
 
-                // Remote behaviour
-                } else {
-                    let apiUrl = 'https://api.github.com/repos/' + this.settings.repo + '/contents/' + path;
-                    let dirApiPath = apiUrl + '?' + this.getAppendix();
-                    let fileApiPath = apiUrl + '/' + file.filename + '?' + this.getAppendix();
-                    
-                    let headers = {
-                        'Accept': 'application/json'
-                    };
+            // Remote behaviour
+            let apiUrl = 'https://api.github.com/repos/' + this.settings.repo + '/contents/' + path;
+            let dirApiPath = apiUrl + '?' + this.getAppendix();
+            let fileApiPath = apiUrl + '/' + file.filename + '?' + this.getAppendix();
 
-                    // Read the file from the temporary storage
-                    fs.readFile(tempPath, (err, fileData) => {
-                        if(err) {
-                            // We couldn't read the temp file, rejecting
-                            reject(new Error(err));
-                        
-                        } else {
-                            // Remove whatever content already exists in the folder
-                            debug.log('Removing existing content if any...', this);
-                            
-                            // Define the POST data
-                            // SHA is not needed, since we emptied the folder first
-                            let postData = {
-                                path: path + '/' + file.filename,
-                                message: 'Commit from HashBrown CMS',
-                                content: new Buffer(fileData).toString('base64'),
-                                branch: this.settings.branch || 'gh-pages'
-                            };
+            return new Promise((resolve, reject) => {
+                // Read the file from the temporary storage
+                FileSystem.readFile(tempPath, (err, fileData) => {
+                    if(err) {
+                        // We couldn't read the temp file, rejecting
+                        reject(new Error(err));
+                    }
 
-                            // Commit the file
-                            debug.log('Committing media data to ' + postData.path + '...', this);
+                    resolve(fileData);
+                });
+            })
+            .then((fileData) => {
+                // Remove whatever content already exists in the folder
+                debug.log('Removing existing content if any...', this);
+                
+                // Define the POST data
+                // SHA is not needed, since we emptied the folder first
+                let postData = {
+                    path: path + '/' + file.filename,
+                    message: 'Commit from HashBrown CMS',
+                    content: new Buffer(fileData).toString('base64'),
+                    branch: this.settings.branch || 'gh-pages'
+                };
 
-                            // PUT the content
-                            RequestHelper.put(fileApiPath, {
-                                headers: headers,
-                                data: JSON.stringify(postData)
-                            }).on('complete', (data, response) => {
-                                if(data.message) {
-                                    debug.log('Committing file failed: ' + data.message, this);
-                                    reject(new Error(data.message));
-                                
-                                } else {
-                                    debug.log('Committed file successfully to ' + fileApiPath, this);
-                                    resolve();
-                                
-                                }
-                            });
-                        }
-                    });
+                // Commit the file
+                debug.log('Committing media data to ' + postData.path + '...', this);
+
+                // PUT the content
+                return RequestHelper.request('put', fileApiPath, postData);
+            })
+            .then((data) => {
+                if(data.message) {
+                    debug.log('Committing file failed: ' + data.message, this);
+                    return Promise.reject(new Error(data.message));
                 }
+
+                debug.log('Committed file successfully to ' + fileApiPath, this);
+                return Promise.resolve();
             });
         });
     }
@@ -707,89 +672,69 @@ class GitHubConnection extends Connection {
     removeMedia(id) {
         let path = 'media/' + id;
 
-        return new Promise((resolve, reject) => {
-            if(this.settings.isLocal) {
-                rimraf(this.settings.localPath + path, (err) => {
+        // Remove file locally
+        if(this.settings.isLocal) {
+            return new Promise((resolve, reject) => {
+                RimRaf(this.settings.localPath + path, (err) => {
                     if(err) {
                         reject(err);
                     } else {
                         resolve();
                     }
                 });
+            });
+        }
 
-            } else {
-                let apiPath = 'https://api.github.com/repos/' + this.settings.repo + '/contents/';
-                let dirApiPath = apiPath + path + '?' + this.getAppendix();
-                let headers = {
-                    'Accept': 'application/json'
+        // Remove file from repo
+        let apiPath = 'https://api.github.com/repos/' + this.settings.repo + '/contents/';
+        let dirApiPath = apiPath + path + '?' + this.getAppendix();
+        
+        // Fetch first to get the SHA
+        debug.log('Getting existing files...', this);
+        
+        return RequestHelper.request('get', dirApiPath)
+        .catch((e) => {
+            // No files found, continue
+
+            return Promise.resolve();
+        })
+        .then((getResponse) => {
+            let removeNext = () => {
+                if(!getResponse || !Array.isArray(getResponse)) {
+                    return Promise.resolve();
+                }
+
+                let media = getResponse.pop();
+
+                // Check if data object is empty
+                if(!media || Object.keys(media).length < 1) {
+                    return Promise.resolve();
+                }
+
+                let fileApiPath = apiPath + path + '/' + media.name + '?' + this.getAppendix();
+                let postData = {
+                    sha: media.sha,
+                    path: path,
+                    message: 'Removed by HashBrown CMS',
+                    branch: this.settings.branch || 'gh-pages'
                 };
-                
-                // Fetch first to get the SHA
-                debug.log('Getting existing files...', this);
-                
-                RequestHelper.get(dirApiPath, {
-                    headers: headers
-                }).on('complete', (data, response) => {
-                    let removeNext = (i) => {
-                        // Check if data object is empty
-                        if(data[i] && typeof data[i] !== 'undefined') {
-                            let sha = data[i].sha;
-                            let fileApiPath = apiPath + path + '/' + data[i].name + '?' + this.getAppendix();
-                            let postData = {
-                                sha: sha,
-                                path: path,
-                                message: 'Removed by HashBrown CMS',
-                                branch: this.settings.branch || 'gh-pages'
-                            };
 
-                            // Remove the file
-                            debug.log('Removing data...', this);
+                // Remove the file
+                debug.log('Removing data...', this);
 
-                            RequestHelper.del(fileApiPath, {
-                                headers: headers,
-                                data: JSON.stringify(postData)
-                            }).on('complete', (data, response) => {
-                                if(data.message) {
-                                    debug.log('Removing file failed: ' + data.message, this);
-                                    reject(new Error(data.message));
-                                    return;
-                                
-                                } else {
-                                    debug.log('Removed file successfully!', this);
-
-                                }
-
-                                // Increment index and check if any more files are queued
-                                i++;
-
-                                // If not, resolve the promise
-                                if(i >= data.length) {
-                                    resolve();
-
-                                // If there are, process next file
-                                } else {
-                                    removeNext(i);
-                                }
-                            });
-
-                        // If we got an empty object, resolve
-                        } else {
-                            resolve();
-                        }
+                return RequestHelper.request('delete', fileApiPath, postData)
+                .then((delResponse) => {
+                    if(delResponse && delResponse.message) {
+                        return Promise.reject(new Error(delResponse.message));
                     }
-
-                    // The response contains 1 or more files, delete them one by one
-                    if(data && data.length > 0) {
-                        removeNext(0);
-
-                    // If it doesn't, just return
-                    } else {
-                        debug.log('Found no files to remove in ' + path, this);
-                        resolve();
                     
-                    }
+                    debug.log('Removed file successfully!', this);
+
+                    return removeNext();
                 });
             }
+
+            return removeNext();
         });
     }
 

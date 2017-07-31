@@ -39,20 +39,6 @@ class ConnectionPane extends NavbarPane {
         let id = $element.data('id');
         let name = $element.data('name');
         
-        function onSuccess() {
-            debug.log('Removed connection with alias "' + id + '"', this); 
-        
-            reloadResource('connections')
-            .then(function() {
-                NavbarMain.reload();
-                
-                // Cancel the ConnectionEditor view if it was displaying the deleted connection
-                if(location.hash == '#/connections/' + id) {
-                    location.hash = '/connections/';
-                }
-            });
-        }
-
         new HashBrown.Views.Modals.MessageModal({
             model: {
                 title: 'Delete content',
@@ -62,16 +48,26 @@ class ConnectionPane extends NavbarPane {
                 {
                     label: 'Cancel',
                     class: 'btn-default',
-                    callback: function() {
-                    }
                 },
                 {
                     label: 'OK',
                     class: 'btn-danger',
-                    callback: function() {
+                    callback: () => {
                         apiCall('delete', 'connections/' + id)
-                        .then(onSuccess)
-                        .catch(UI.erroroModal);
+                        .then(() => {
+                            debug.log('Removed connection with alias "' + id + '"', this); 
+
+                            return reloadResource('connections');
+                        })
+                        .then(() => {
+                            NavbarMain.reload();
+
+                            // Cancel the ConnectionEditor view if it was displaying the deleted connection
+                            if(location.hash == '#/connections/' + id) {
+                                location.hash = '/connections/';
+                            }
+                        })
+                        .catch(UI.errorModal);
                     }
                 }
             ]

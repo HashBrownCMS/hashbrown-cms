@@ -9858,6 +9858,21 @@ var Connection = function (_Entity) {
     };
 
     /**
+     * Sets template by id
+     *
+     * @param {String} type
+     * @param {String} id
+     * @param {Template} newTemplate
+     *
+     * @returns {Promise} Callback
+     */
+
+
+    Connection.prototype.setTemplateById = function setTemplateById(type, id, newTemplate) {
+        return Promise.resolve();
+    };
+
+    /**
      * Removes media
      *
      * @param {String} id
@@ -9891,25 +9906,23 @@ var Connection = function (_Entity) {
         debug.log('Unpublishing all localised property sets...', this);
 
         return connection.removePreview(project, environment, content).then(function () {
-            return LanguageHelper.getLanguages(project);
+            return HashBrown.Helpers.LanguageHelper.getLanguages(project);
         }).then(function (languages) {
-            function next(i) {
-                var language = languages[i];
+            var next = function next() {
+                var language = languages.pop();
+
+                // No more languauges to publish for
+                if (!language) {
+                    debug.log('Unpublished all localised property sets successfully!', connection);
+                    return Promise.resolve();
+                }
 
                 return connection.deleteContentProperties(content.id, language).then(function () {
-                    i++;
-
-                    if (i < languages.length) {
-                        return next(i);
-                    } else {
-                        debug.log('Unpublished all localised property sets successfully!', connection);
-
-                        return Promise.resolve();
-                    }
+                    return next();
                 });
-            }
+            };
 
-            return next(0);
+            return next();
         });
     };
 
@@ -9940,8 +9953,8 @@ var Connection = function (_Entity) {
 
         content.hasPreview = false;
 
-        return ContentHelper.updateContent(project, environment, content).then(function () {
-            return LanguageHelper.getLanguages(project);
+        return HashBrown.Helpers.ContentHelper.updateContent(project, environment, content).then(function () {
+            return HashBrown.Helpers.LanguageHelper.getLanguages(project);
         }).then(function (languages) {
             var next = function next() {
                 var language = languages.pop();
@@ -9982,8 +9995,8 @@ var Connection = function (_Entity) {
 
         content.hasPreview = true;
 
-        return ContentHelper.updateContent(project, environment, content).then(function () {
-            return LanguageHelper.getAllLocalizedPropertySets(project, environment, content);
+        return HashBrown.Helpers.ContentHelper.updateContent(project, environment, content).then(function () {
+            return HashBrown.Helpers.LanguageHelper.getAllLocalizedPropertySets(project, environment, content);
         }).then(function (sets) {
             var properties = sets[language];
 
@@ -10018,7 +10031,7 @@ var Connection = function (_Entity) {
         debug.log('Publishing all localised property sets...', this);
 
         return connection.removePreview(project, environment, content).then(function () {
-            return LanguageHelper.getAllLocalizedPropertySets(project, environment, content);
+            return HashBrown.Helpers.LanguageHelper.getAllLocalizedPropertySets(project, environment, content);
         }).then(function (sets) {
             var languages = Object.keys(sets);
 

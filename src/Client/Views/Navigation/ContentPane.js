@@ -161,7 +161,7 @@ class ContentPane extends NavbarPane {
                 let sortIndex = ContentHelper.getNewSortIndex(parentId);
               
                 // Instatiate a new Content Schema reference editor
-                let schemaReference = new resources.editors.contentSchemaReference({
+                let schemaReference = new HashBrown.Views.Editors.FieldEditors.ContentSchemaReferenceEditor({
                     config: {
                         allowedSchemas: allowedSchemas,
                         parentSchema: parentSchema
@@ -387,6 +387,8 @@ class ContentPane extends NavbarPane {
 
                             }
                         }
+                        
+                        $element.parent().toggleClass('loading', false);
 
                         return Promise.resolve();
                     });
@@ -403,15 +405,21 @@ class ContentPane extends NavbarPane {
                         )
                     ),
                     () => {
+                        $element.parent().toggleClass('loading', true);
+
                         apiCall('delete', 'content/' + id + '?removeChildren=' + $deleteChildrenSwitch.data('checked'))
                         .then(() => {
+                            
                             if(shouldUnpublish && publishing.connections && publishing.connections.length > 0) {
                                 return unpublishConnections();
                             } else {
                                 return onSuccess();
                             }
                         })
-                        .catch(UI.errorModal);
+                        .catch((e) => {
+                            $element.parent().toggleClass('loading', false);
+                            UI.errorModal(e);
+                        });
                     }
                 );
             });

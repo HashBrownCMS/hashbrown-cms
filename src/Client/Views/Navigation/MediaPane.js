@@ -45,18 +45,6 @@ class MediaPane extends NavbarPane {
         let id = $element.data('id');
         let name = $element.data('name');
         
-        function onSuccess() {
-            reloadResource('media')
-            .then(function() {
-                NavbarMain.reload();
-                
-                // Cancel the MediaViever view if it was displaying the deleted object
-                if(location.hash == '#/media/' + id) {
-                    location.hash = '/media/';
-                }
-            });
-        }
-
         new HashBrown.Views.Modals.MessageModal({
             model: {
                 title: 'Delete media',
@@ -72,9 +60,21 @@ class MediaPane extends NavbarPane {
                 {
                     label: 'OK',
                     class: 'btn-danger',
-                    callback: function() {
+                    callback: () => {
+                        $element.parent().toggleClass('loading', true);
+
                         apiCall('delete', 'media/' + id)
-                        .then(onSuccess)
+                        .then(() => {
+                            return reloadResource('media');
+                        })
+                        .then(() => {
+                            NavbarMain.reload();
+
+                            // Cancel the MediaViever view if it was displaying the deleted object
+                            if(location.hash == '#/media/' + id) {
+                                location.hash = '/media/';
+                            }
+                        })
                         .catch(UI.errorModal);
                     }
                 }

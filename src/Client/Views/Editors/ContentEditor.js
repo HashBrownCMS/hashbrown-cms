@@ -84,11 +84,10 @@ class ContentEditor extends View {
                     return apiCall('post', 'content/preview', this.model);
 
                 }
+            }
 
             // Just save normally
-            } else {
-                return apiCall('post', 'content/' + this.model.id, this.model);
-            }
+            return apiCall('post', 'content/' + this.model.id, this.model);
         }
 
         this.$saveBtn.toggleClass('working', true);
@@ -116,7 +115,10 @@ class ContentEditor extends View {
                 );
             }
         })
-        .catch(UI.errorModal);
+        .catch((e) => {
+            this.$saveBtn.toggleClass('saving', false);
+            UI.errorModal();
+        });
     }
 
     /**

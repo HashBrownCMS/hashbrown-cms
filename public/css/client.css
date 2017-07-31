@@ -275,6 +275,7 @@ button, button:focus, button:hover, button:active, button:active:focus, a, a:foc
   .cr-context-menu li {
     line-height: 2; }
   .cr-context-menu a {
+    display: block;
     margin-left: 0.5rem;
     color: #ffffff; }
     .cr-context-menu a:hover {

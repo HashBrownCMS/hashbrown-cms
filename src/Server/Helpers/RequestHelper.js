@@ -105,10 +105,14 @@ class RequestHelper {
         return new Promise((resolve, reject) => {
             method = method.toUpperCase();
 
+            if(method === 'GET') {
+                asQueryString = true;
+            }
+
             // Convert data
             if(data) {
                 // To query string
-                if(asQueryString || method === 'GET') {
+                if(asQueryString) {
                     url += '?' + QueryString.stringify(data);
                     data = null;
 
@@ -128,6 +132,10 @@ class RequestHelper {
                 'Host': url.hostname
             };
             
+            if(data) {
+                headers['Content-Length'] = Buffer.byteLength(data);
+            }
+
             // Makes the actual request and checks for redirects
             let redirects = 0;
             
@@ -135,7 +143,8 @@ class RequestHelper {
                 let protocol = url.protocol === 'https:' ? HTTPS : HTTP;
 
                 let options = {
-                    host: url.host,
+                    port: url.port,
+                    host: url.hostname,
                     path: url.path,
                     method: method,
                     headers: headers
@@ -162,10 +171,6 @@ class RequestHelper {
 
                         makeRequest();
                     
-                    // Error happened
-                    } else if(res.statusCode >= 400 && res.statusCode < 600) {
-                        reject(new Error(res.statusMessage + ' (' + url.host + '/' + url.path + ')'));
-
                     // No redirect, we reached our destination
                     } else {
                         let str = '';
@@ -179,17 +184,22 @@ class RequestHelper {
                         });
 
                         res.on('end', () => {
-                            let res = str;
+                            let result = str;
                            
                             try {
-                                res = JSON.parse(str);
+                                result = JSON.parse(str);
 
                             // If response isn't JSON, just return the string
                             } catch(e) {
                                 
                             }
                             
-                            resolve(res);
+                            // Error happened
+                            if(res.statusCode >= 400 && res.statusCode < 600) {
+                                return reject(new Error(res.statusMessage + ' (' + res.statusCode + ')\nat ' + url.host + '/' + url.path + '\n\n' + str));
+                            }
+                            
+                            resolve(result, res);
                         });
                     }
                 });
@@ -199,7 +209,7 @@ class RequestHelper {
                     reject(e);
                 });
 
-                if(data && method !== 'GET') {
+                if(data) {
                     req.write(data);
                 }
 

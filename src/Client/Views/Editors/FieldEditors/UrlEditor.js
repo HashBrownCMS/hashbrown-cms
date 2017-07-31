@@ -91,14 +91,14 @@ class UrlEditor extends FieldEditor {
                 }
             }
 
-            url += ContentHelper.getSlug(title) + '/';
+            url += HashBrown.Helpers.ContentHelper.getSlug(title) + '/';
         }
 
         let sameUrls = 0;
 
         for(let contentData of window.resources.content) {
             if(contentData.id != contentId) {
-                let content = new Content(contentData);
+                let content = new HashBrown.Models.Content(contentData);
                 let thatUrl = content.prop('url', window.language);
                 let isMatchWithNumber = new RegExp(url.substring(0, url.lastIndexOf('/')) + '-[0-9]+/').test(thatUrl);
                 let isSameUrl = url == thatUrl || isMatchWithNumber;

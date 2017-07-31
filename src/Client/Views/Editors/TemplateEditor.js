@@ -28,7 +28,7 @@ class TemplateEditor extends View {
             return reloadResource('templates');
         })
         .then(() => {
-            NavbarMain.reload();
+            HashBrown.Views.Navigation.NavbarMain.reload();
 
             this.$saveBtn.toggleClass('working', false);
         })

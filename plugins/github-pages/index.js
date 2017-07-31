@@ -2,6 +2,8 @@
 
 const ConnectionHelper = require('Server/Helpers/ConnectionHelper');
 const ConfigHelper = require('Server/Helpers/ConfigHelper');
+const RequestHelper = require('Server/Helpers/RequestHelper');
+const ApiController = require('Server/Controllers/ApiController');
 
 const Connection = require('./server/Connection');
 
@@ -31,24 +33,18 @@ class GitHubPages {
          */
         app.get('/plugins/github/oauth/end', (req, res) => {
             let code = req.query.code;
-            let data = {
+            let postData = {
                 code: code,
                 client_id: config.clientId,
                 client_secret: config.clientSecret
             };
 
-            let headers = {
-                'Accept': 'application/json'
-            };
-
-            RequestHelper.post('https://github.com/login/oauth/access_token', {
-                data: data,
-                headers: headers    
+            RequestHelper.request('post', 'https://github.com/login/oauth/access_token', postData)
+            .then((resData) => {
+                res.send(resData.access_token);
             })
-            .on('complete', (data, response) => {
-                let token = data.access_token;
-                
-                res.send(token);
+            .catch((e) => {
+                res.status(502).send(ApiController.printError(e));
             });
         });
 
@@ -56,14 +52,12 @@ class GitHubPages {
          * Lists all user orgs
          */
         app.get('/plugins/github/orgs', (req, res) => {
-            let headers = {
-                'Accept': 'application/json'
-            };
-           
-            RequestHelper.get('https://api.github.com/user/orgs?access_token=' + req.query.token, {
-                headers: headers
-            }).on('complete', (data, response) => {
-                res.send(data);
+            RequestHelper.request('get', 'https://api.github.com/user/orgs', { access_token: req.query.token })
+            .then((resData) => {
+                res.send(resData);
+            })
+            .catch((e) => {
+                res.status(502).send(ApiController.printError(e));
             });
         });
 
@@ -71,10 +65,6 @@ class GitHubPages {
          * Lists all user repos
          */
         app.get('/plugins/github/repos', (req, res) => {
-            let headers = {
-                'Accept': 'application/json'
-            };
-            
             let apiUrl = '';
             
             if(req.query.org && req.query.org != 'undefined') {
@@ -83,10 +73,12 @@ class GitHubPages {
                 apiUrl = 'https://api.github.com/user/repos';
             }
             
-            RequestHelper.get(apiUrl + '?access_token=' + req.query.token, {
-                headers: headers
-            }).on('complete', (data, response) => {
-                res.send(data);
+            RequestHelper.request('get', apiUrl, { access_token: req.query.token })
+            .then((resData) => {
+                res.send(resData);
+            })
+            .catch((e) => {
+                res.status(502).send(ApiController.printError(e));
             });
         });
 
@@ -94,14 +86,12 @@ class GitHubPages {
          * Lists all branches
          */
         app.get('/plugins/github/:owner/:repo/branches', (req, res) => {
-            let headers = {
-                'Accept': 'application/json'
-            };
-            
-            RequestHelper.get('https://api.github.com/repos/' + req.params.owner + '/' + req.params.repo + '/branches?access_token=' + req.query.token, {
-                headers: headers
-            }).on('complete', (data, response) => {
-                res.send(data);
+            RequestHelper.request('get', 'https://api.github.com/repos/' + req.params.owner + '/' + req.params.repo + '/branches', { access_token: req.query.token })
+            .then((resData) => {
+                res.send(resData);
+            })
+            .catch((e) => {
+                res.status(502).send(ApiController.printError(e));
             });
         });
 
@@ -109,18 +99,13 @@ class GitHubPages {
          * Lists all root directories
          */
         app.get('/plugins/github/:owner/:repo/dirs', (req, res) => {
-            let headers = {
-                'Accept': 'application/json'
-            };
-            
-            RequestHelper.get('https://api.github.com/repos/' + req.params.owner + '/' + req.params.repo + '/contents?access_token=' + req.query.token, {
-                headers: headers
-            }).on('complete', (data, response) => {
+            RequestHelper.request('get', 'https://api.github.com/repos/' + req.params.owner + '/' + req.params.repo + '/contents', { access_token: req.query.token })
+            .then((resData) => {
                 let dirs = [];
 
-                if(data) {
-                    for(let i in data) {
-                        let file = data[i];
+                if(resData) {
+                    for(let i in resData) {
+                        let file = resData[i];
 
                         if(file.type == 'dir') {
                             dirs[dirs.length] = file.path;
@@ -129,6 +114,9 @@ class GitHubPages {
                 }
 
                 res.send(dirs);
+            })
+            .catch((e) => {
+                res.status(502).send(ApiController.printError(e));
             });
         });
     }

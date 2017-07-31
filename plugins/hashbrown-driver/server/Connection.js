@@ -1,7 +1,9 @@
 'use strict';
 
-const fs = require('fs');
-const path = require('path');
+const FileSystem = require('fs');
+const Path = require('path');
+
+const RequestHelper = require('Server/Helpers/RequestHelper');
 
 const Connection = require('Common/Models/Connection');
 const Media = require('Common/Models/Media');
@@ -24,38 +26,26 @@ class HashBrownDriverConnection extends Connection {
      * @returns {Promise(Object)} tree
      */
     getTree() {
-        let headers = {
-            'Accept': 'application/json'
-        };
-            
-        return new Promise((resolve, reject) => {
-            let apiUrl = this.getRemoteUrl() + '/hashbrown/api/content/tree?token=' + this.settings.token;
+        let apiUrl = this.getRemoteUrl() + '/hashbrown/api/content/tree?token=' + this.settings.token;
 
-            RequestHelper.get(apiUrl, {
-                headers: headers
-            }).on('complete', (data, response) => {
-                if(data) {
-                    try {
-                        let tree = data;
-                        
-                        if(typeof data === 'string') {
-                            tree = JSON.parse(data);
-                        }
+        return RequestHelper.request('get', apiUrl)
+        .then((data) => {
+            if(!data) {
+                return Promise.reject(new Error('Response from driver was null'));
+            }
 
-                        resolve(tree);
-              
-                    } catch(e) {
-                        reject(e);
-                        debug.log('Failed API URL was ' + apiUrl, this);
-                        debug.log('Failed API response was ' + data, this);
-              
-                    }
-
-                } else {
-                    reject(new Error('Response from driver was null'));
-
+            try {
+                let tree = data;
+                
+                if(typeof data === 'string') {
+                    tree = JSON.parse(data);
                 }
-            });
+
+                return Promise.resolve(tree);
+      
+            } catch(e) {
+                return Promise.reject(e);
+            }
         });
     }
 
@@ -67,29 +57,9 @@ class HashBrownDriverConnection extends Connection {
      * @returns {Promise} promise
      */
     setTree(json) {
-        let headers = {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json; charset=utf-8'
-        };
-
-        if(typeof json === 'object') {
-            json = JSON.stringify(json);
-        }
-
         debug.log('Posting entire tree to ' + this.getRemoteUrl() + '...', this);
     
-        return new Promise((resolve, reject) => {
-            RequestHelper.post(this.getRemoteUrl() + '/hashbrown/api/content/tree?token=' + this.settings.token, {
-                headers: headers,
-                data: json
-            })
-            .on('success', (data, response) => {
-                resolve(data);
-            })
-            .on('fail', (data, response) => {
-                reject(data);
-            });
-        });
+        return RequestHelper.request('post', this.getRemoteUrl() + '/hashbrown/api/content/tree?token=' + this.settings.token, json);
     }
     
     /**
@@ -103,21 +73,7 @@ class HashBrownDriverConnection extends Connection {
     deleteContentProperties(id, language) {
         debug.log('Deleting Content node "' + id + '"...', this);
         
-        let headers = {
-            'Accept': 'application/json'
-        };
-
-        return new Promise((resolve, reject) => {
-            RequestHelper.del(this.getRemoteUrl() + '/hashbrown/api/content/' + id + '?token=' + this.settings.token, {
-                headers: headers
-            })
-            .on('success', (data, response) => {
-                resolve(data);
-            })
-            .on('fail', (data, response) => {
-                reject(data);
-            });
-        });
+        return RequestHelper.request('delete', this.getRemoteUrl() + '/hashbrown/api/content/' + id + '?token=' + this.settings.token);
     }
     
     /**
@@ -133,27 +89,13 @@ class HashBrownDriverConnection extends Connection {
     postContentProperties(properties, id, language, meta) {
         debug.log('Posting properties of "' + (properties.title || id) + '"...', this);
 
-        let headers = {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json; charset=utf-8'
+        let data = {
+            language: language,
+            properties: properties,
+            meta: meta
         };
 
-        return new Promise((resolve, reject) => {
-            RequestHelper.post(this.getRemoteUrl() + '/hashbrown/api/content/' + id + '/properties?token=' + this.settings.token, {
-                headers: headers,
-                data: JSON.stringify({
-                    language: language,
-                    properties: properties,
-                    meta: meta
-                })
-            })
-            .on('success', (data, response) => {
-                resolve(data);
-            })
-            .on('fail', (data, response) => {
-                reject(data);
-            });
-        });
+        return RequestHelper.request('post', this.getRemoteUrl() + '/hashbrown/api/content/' + id + '/properties?token=' + this.settings.token, data);
     }
     
     /**
@@ -169,11 +111,6 @@ class HashBrownDriverConnection extends Connection {
             
         let tempPath = file.path;
 
-        let headers = {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json; charset=utf-8'
-        };
-            
         debug.log('Setting media object "' + id + '" at ' + this.getRemoteUrl() + '...', this);
     
         // First remove any existing media
@@ -182,29 +119,29 @@ class HashBrownDriverConnection extends Connection {
             return new Promise((resolve, reject) => {
                 let apiUrl = this.getRemoteUrl() + '/hashbrown/api/media/' + id + '?token=' + this.settings.token;
               
-                fs.readFile(tempPath, (err, fileData) => {
-					if(!fileData) {
-						return reject(new Error('Could not read temporary file at "' + tempPath + '"'));
-					}
-
-                    let postData = { 
-                        filename: file.filename,
-                        content: new Buffer(fileData).toString('base64')
+                FileSystem.readFile(tempPath, (err, fileData) => {
+                    if(!fileData || err) {
+                        return reject(new Error('Could not read temporary file at "' + tempPath + '"'));
                     }
-                  
-                    RequestHelper.post(apiUrl, {
-                        headers: headers,
-                        data: JSON.stringify(postData), 
-                    }).on('complete', (data, response) => {
-                        if(!data || data instanceof Error || response.statusCode != 200) {
-                            reject(new Error(data))
-                            return;
-                        }
 
-                        resolve(data);
-                    });
+                    resolve(fileData);
                 });
             });
+        })
+        .then((fileData) => {
+            let postData = { 
+                filename: file.filename,
+                content: new Buffer(fileData).toString('base64')
+            };
+
+            return RequestHelper.request('post', apiUrl, postData);
+        })
+        .then((data, response) => {
+            if(!data || data instanceof Error || response.statusCode != 200) {
+                return Promise.reject(new Error(data));
+            }
+
+            return Promise.resolve(data);
         });
     }
    
@@ -217,24 +154,17 @@ class HashBrownDriverConnection extends Connection {
      * @returns {Promise} Template
      */
     getTemplateById(type, id) {
-        return new Promise((resolve, reject) => {
-            let apiUrl = this.getRemoteUrl() + '/hashbrown/api/templates/' + type + '/' + id + '?token=' + this.settings.token;
-            
-            let headers = {
-                'Accept': 'application/json'
-            };
-            
-            RequestHelper.get(apiUrl, {
-                headers: headers
-            }).on('complete', (template, response) => {
-                if(!template) {
-                    return reject(new Error('Template "' + id + '" was not found'));
-                }
-           
-                template.remote = true;
+        let apiUrl = this.getRemoteUrl() + '/hashbrown/api/templates/' + type + '/' + id + '?token=' + this.settings.token;
+        
+        return RequestHelper.request('get', apiUrl)
+        .then((template) => {
+            if(!template) {
+                return Promise.reject(new Error('Template "' + id + '" was not found'));
+            }
+       
+            template.remote = true;
 
-                resolve(new Template(template));
-            });
+            return Promise.resolve(new Template(template));
         });
     }
 
@@ -246,30 +176,31 @@ class HashBrownDriverConnection extends Connection {
      * @returns {Promise} Array of Templates
      */
     getTemplates(type) {
-        return new Promise((resolve, reject) => {
-            let apiUrl = this.getRemoteUrl() + '/hashbrown/api/templates/' + type + '?token=' + this.settings.token;
-            
-            let headers = {
-                'Accept': 'application/json'
-            };
-            
-            RequestHelper.get(apiUrl, {
-                headers: headers
-            }).on('complete', (data, response) => {
-                if(!data || !Array.isArray(data)) {
-                    return reject(new Error('Templates were not found. Response from remote was: ' + data));
-                }
-           
-                let allTemplates = [];
+        let apiUrl = this.getRemoteUrl() + '/hashbrown/api/templates/' + type + '?token=' + this.settings.token;
+        
+        return RequestHelper.request('get', apiUrl)
+        .catch((e) => {
+            // We only care about server errors
+            if(e.message.indexOf('404') < 0) {
+                debug.error(e, this);
+            }
 
-                for(let template of data) {
-                    template.remote = true;
+            return Promise.resolve([]);
+        })
+        .then((data) => {
+            if(!data || !Array.isArray(data)) {
+                return Promise.reject(new Error('Templates were not found. Response from remote was: ' + data));
+            }
+       
+            let allTemplates = [];
 
-                    allTemplates.push(new Template(template));
-                }
-                
-                resolve(allTemplates);
-            });
+            for(let template of data) {
+                template.remote = true;
+
+                allTemplates.push(new Template(template));
+            }
+            
+            return Promise.resolve(allTemplates);
         });
     }
    
@@ -279,38 +210,26 @@ class HashBrownDriverConnection extends Connection {
      * @returns {Promise} Array of Media objects
      */
     getAllMedia() {
-        let headers = {
-            'Accept': 'application/json'
-        };
-            
-        return new Promise((resolve, reject) => {
-            let apiUrl = this.getRemoteUrl() + '/hashbrown/api/media?token=' + this.settings.token;
-            
-            let headers = {
-                'Accept': 'application/json'
-            };
-            
-            RequestHelper.get(apiUrl, {
-                headers: headers
-            }).on('complete', (data, response) => {
-                if(!data || !Array.isArray(data)) {
-                    reject(new Error('Media was not found'))
-                    return;
-                }
-           
-                let allMedia = [];
+        let apiUrl = this.getRemoteUrl() + '/hashbrown/api/media?token=' + this.settings.token;
+        
+        return RequestHelper.request('get', apiUrl)
+        .then((data) => {
+            if(!data || !Array.isArray(data)) {
+                return Promise.reject(new Error('Media was not found'));
+            }
+       
+            let allMedia = [];
 
-                for(let media of data) {
-                    allMedia.push(new Media({
-                        name: media.name,
-                        id: media.id,
-                        url: this.getRemoteUrl() + '/media/' + media.id + '/' + media.name,
-                        remote: true
-                    }));
-                }
-                
-                resolve(allMedia);
-            });
+            for(let media of data) {
+                allMedia.push(new Media({
+                    name: media.name,
+                    id: media.id,
+                    url: this.getRemoteUrl() + '/media/' + media.id + '/' + media.name,
+                    remote: true
+                }));
+            }
+            
+            return Promise.resolve(allMedia);
         });
     }
 
@@ -324,30 +243,22 @@ class HashBrownDriverConnection extends Connection {
     getMedia(id) {
         if(!id || id == 'undefined' || id == 'null') { return Promise.reject(new Error('Media id was null')); }
 
-        let headers = {
-            'Accept': 'application/json'
-        };
-            
-        return new Promise((resolve, reject) => {
-            let apiUrl = this.getRemoteUrl() + '/hashbrown/api/media/' + id + '?token=' + this.settings.token;
+        let apiUrl = this.getRemoteUrl() + '/hashbrown/api/media/' + id + '?token=' + this.settings.token;
 
-            RequestHelper.get(apiUrl, {
-                headers: headers
-            }).on('complete', (data, response) => {
-                if(!data) {
-                    reject(new Error('Media "' + id + '" was not found'))
-                    return;
-                }
-            
-                let media = new Media({
-                    name: path.basename(data),
-                    id: id,
-                    url: this.getRemoteUrl() + '/media/' + id + '/' + data,
-                    remote: true
-                });
-
-                resolve(media);
+        return RequestHelper.request('get', apiUrl)
+        .then((data) => {
+            if(!data) {
+                return Promise.reject(new Error('Media "' + id + '" was not found'))
+            }
+        
+            let media = new Media({
+                name: Path.basename(data),
+                id: id,
+                url: this.getRemoteUrl() + '/media/' + id + '/' + data,
+                remote: true
             });
+
+            return Promise.resolve(media);
         });
     }
     
@@ -361,21 +272,11 @@ class HashBrownDriverConnection extends Connection {
     removeMedia(id) {
         if(!id || id == 'undefined' || id == 'null') { return Promise.reject(new Error('Media id was null')); }
 
-        let headers = {
-            'Accept': 'application/json'
-        };
-            
         debug.log('Deleting media object "' + id + '" from ' + this.getRemoteUrl() + '...', this);
         
-        return new Promise((resolve, reject) => {
-            let apiUrl = this.getRemoteUrl() + '/hashbrown/api/media/' + id + '?token=' + this.settings.token;
+        let apiUrl = this.getRemoteUrl() + '/hashbrown/api/media/' + id + '?token=' + this.settings.token;
 
-            RequestHelper.del(apiUrl, {
-                headers: headers
-            }).on('complete', (data, response) => {
-                resolve();
-            });
-        });
+        return RequestHelper.request('delete', apiUrl);
     }
 }
 

@@ -8409,7 +8409,7 @@ var Pane = function () {
      * Init
      */
     Pane.init = function init() {
-        NavbarMain.addTabButton('My pane', '/my-route', 'question');
+        HashBrown.Views.Navigation.NavbarMain.addTabButton('My pane', '/my-route', 'question');
     };
 
     /**
@@ -10818,6 +10818,21 @@ var Connection = function (_Entity) {
     };
 
     /**
+     * Sets template by id
+     *
+     * @param {String} type
+     * @param {String} id
+     * @param {Template} newTemplate
+     *
+     * @returns {Promise} Callback
+     */
+
+
+    Connection.prototype.setTemplateById = function setTemplateById(type, id, newTemplate) {
+        return Promise.resolve();
+    };
+
+    /**
      * Removes media
      *
      * @param {String} id
@@ -10851,25 +10866,23 @@ var Connection = function (_Entity) {
         debug.log('Unpublishing all localised property sets...', this);
 
         return connection.removePreview(project, environment, content).then(function () {
-            return LanguageHelper.getLanguages(project);
+            return HashBrown.Helpers.LanguageHelper.getLanguages(project);
         }).then(function (languages) {
-            function next(i) {
-                var language = languages[i];
+            var next = function next() {
+                var language = languages.pop();
+
+                // No more languauges to publish for
+                if (!language) {
+                    debug.log('Unpublished all localised property sets successfully!', connection);
+                    return Promise.resolve();
+                }
 
                 return connection.deleteContentProperties(content.id, language).then(function () {
-                    i++;
-
-                    if (i < languages.length) {
-                        return next(i);
-                    } else {
-                        debug.log('Unpublished all localised property sets successfully!', connection);
-
-                        return Promise.resolve();
-                    }
+                    return next();
                 });
-            }
+            };
 
-            return next(0);
+            return next();
         });
     };
 
@@ -10900,8 +10913,8 @@ var Connection = function (_Entity) {
 
         content.hasPreview = false;
 
-        return ContentHelper.updateContent(project, environment, content).then(function () {
-            return LanguageHelper.getLanguages(project);
+        return HashBrown.Helpers.ContentHelper.updateContent(project, environment, content).then(function () {
+            return HashBrown.Helpers.LanguageHelper.getLanguages(project);
         }).then(function (languages) {
             var next = function next() {
                 var language = languages.pop();
@@ -10942,8 +10955,8 @@ var Connection = function (_Entity) {
 
         content.hasPreview = true;
 
-        return ContentHelper.updateContent(project, environment, content).then(function () {
-            return LanguageHelper.getAllLocalizedPropertySets(project, environment, content);
+        return HashBrown.Helpers.ContentHelper.updateContent(project, environment, content).then(function () {
+            return HashBrown.Helpers.LanguageHelper.getAllLocalizedPropertySets(project, environment, content);
         }).then(function (sets) {
             var properties = sets[language];
 
@@ -10978,7 +10991,7 @@ var Connection = function (_Entity) {
         debug.log('Publishing all localised property sets...', this);
 
         return connection.removePreview(project, environment, content).then(function () {
-            return LanguageHelper.getAllLocalizedPropertySets(project, environment, content);
+            return HashBrown.Helpers.LanguageHelper.getAllLocalizedPropertySets(project, environment, content);
         }).then(function (sets) {
             var languages = Object.keys(sets);
 
@@ -37907,11 +37920,10 @@ var ContentEditor = function (_View) {
                 } else if (saveAction === 'preview') {
                     return apiCall('post', 'content/preview', _this2.model);
                 }
-
-                // Just save normally
-            } else {
-                return apiCall('post', 'content/' + _this2.model.id, _this2.model);
             }
+
+            // Just save normally
+            return apiCall('post', 'content/' + _this2.model.id, _this2.model);
         };
 
         this.$saveBtn.toggleClass('working', true);
@@ -37933,7 +37945,10 @@ var ContentEditor = function (_View) {
             if (saveAction === 'preview') {
                 UI.iframeModal('Preview', postSaveUrl);
             }
-        }).catch(UI.errorModal);
+        }).catch(function (e) {
+            _this2.$saveBtn.toggleClass('saving', false);
+            UI.errorModal();
+        });
     };
 
     /**
@@ -38670,7 +38685,7 @@ var TemplateEditor = function (_View) {
         apiCall('post', 'templates/' + this.model.type + '/' + this.model.id, this.model).then(function () {
             return reloadResource('templates');
         }).then(function () {
-            NavbarMain.reload();
+            HashBrown.Views.Navigation.NavbarMain.reload();
 
             _this2.$saveBtn.toggleClass('working', false);
         }).catch(UI.errorModal);
@@ -41802,22 +41817,11 @@ var ConnectionPane = function (_NavbarPane) {
 
 
     ConnectionPane.onClickRemoveConnection = function onClickRemoveConnection() {
+        var _this2 = this;
+
         var $element = $('.cr-context-menu__target-element');
         var id = $element.data('id');
         var name = $element.data('name');
-
-        function onSuccess() {
-            debug.log('Removed connection with alias "' + id + '"', this);
-
-            reloadResource('connections').then(function () {
-                NavbarMain.reload();
-
-                // Cancel the ConnectionEditor view if it was displaying the deleted connection
-                if (location.hash == '#/connections/' + id) {
-                    location.hash = '/connections/';
-                }
-            });
-        }
 
         new HashBrown.Views.Modals.MessageModal({
             model: {
@@ -41826,13 +41830,23 @@ var ConnectionPane = function (_NavbarPane) {
             },
             buttons: [{
                 label: 'Cancel',
-                class: 'btn-default',
-                callback: function callback() {}
+                class: 'btn-default'
             }, {
                 label: 'OK',
                 class: 'btn-danger',
                 callback: function callback() {
-                    apiCall('delete', 'connections/' + id).then(onSuccess).catch(UI.erroroModal);
+                    apiCall('delete', 'connections/' + id).then(function () {
+                        debug.log('Removed connection with alias "' + id + '"', _this2);
+
+                        return reloadResource('connections');
+                    }).then(function () {
+                        NavbarMain.reload();
+
+                        // Cancel the ConnectionEditor view if it was displaying the deleted connection
+                        if (location.hash == '#/connections/' + id) {
+                            location.hash = '/connections/';
+                        }
+                    }).catch(UI.errorModal);
                 }
             }]
         });
@@ -41901,7 +41915,7 @@ var ConnectionPane = function (_NavbarPane) {
 
 
     ConnectionPane.init = function init() {
-        var _this2 = this;
+        var _this3 = this;
 
         NavbarMain.addTabPane('/connections/', 'Connections', 'exchange', {
             getItems: function getItems() {
@@ -41915,12 +41929,12 @@ var ConnectionPane = function (_NavbarPane) {
 
                 menu['This connection'] = '---';
                 menu['Copy id'] = function () {
-                    _this2.onClickCopyItemId();
+                    _this3.onClickCopyItemId();
                 };
 
                 if (!item.local && !item.remote && !item.locked) {
                     menu['Remove'] = function () {
-                        _this2.onClickRemoveConnection();
+                        _this3.onClickRemoveConnection();
                     };
                 }
 
@@ -41933,19 +41947,19 @@ var ConnectionPane = function (_NavbarPane) {
 
                     if (!item.remote) {
                         menu['Push to remote'] = function () {
-                            _this2.onClickPushConnection();
+                            _this3.onClickPushConnection();
                         };
                     }
 
                     if (item.local) {
                         menu['Remove local copy'] = function () {
-                            _this2.onClickRemoveConnection();
+                            _this3.onClickRemoveConnection();
                         };
                     }
 
                     if (item.remote) {
                         menu['Pull from remote'] = function () {
-                            _this2.onClickPullConnection();
+                            _this3.onClickPullConnection();
                         };
                     }
                 }
@@ -41957,7 +41971,7 @@ var ConnectionPane = function (_NavbarPane) {
             paneContextMenu: {
                 'General': '---',
                 'New connection': function NewConnection() {
-                    _this2.onClickNewConnection();
+                    _this3.onClickNewConnection();
                 }
             }
         });
@@ -42154,7 +42168,7 @@ var ContentPane = function (_NavbarPane) {
                 var sortIndex = ContentHelper.getNewSortIndex(parentId);
 
                 // Instatiate a new Content Schema reference editor
-                var schemaReference = new resources.editors.contentSchemaReference({
+                var schemaReference = new HashBrown.Views.Editors.FieldEditors.ContentSchemaReferenceEditor({
                     config: {
                         allowedSchemas: allowedSchemas,
                         parentSchema: parentSchema
@@ -42351,19 +42365,27 @@ var ContentPane = function (_NavbarPane) {
                             }
                         }
 
+                        $element.parent().toggleClass('loading', false);
+
                         return Promise.resolve();
                     });
                 }
 
                 var $deleteChildrenSwitch = void 0;
                 UI.confirmModal('Remove', 'Remove the content "' + name + '"?', _.div({ class: 'input-group' }, _.span('Remove child content too'), _.div({ class: 'input-group-addon' }, $deleteChildrenSwitch = UI.inputSwitch(true))), function () {
+                    $element.parent().toggleClass('loading', true);
+
                     apiCall('delete', 'content/' + id + '?removeChildren=' + $deleteChildrenSwitch.data('checked')).then(function () {
+
                         if (shouldUnpublish && publishing.connections && publishing.connections.length > 0) {
                             return unpublishConnections();
                         } else {
                             return onSuccess();
                         }
-                    }).catch(UI.errorModal);
+                    }).catch(function (e) {
+                        $element.parent().toggleClass('loading', false);
+                        UI.errorModal(e);
+                    });
                 });
             });
         });
@@ -43094,17 +43116,6 @@ var MediaPane = function (_NavbarPane) {
         var id = $element.data('id');
         var name = $element.data('name');
 
-        function onSuccess() {
-            reloadResource('media').then(function () {
-                NavbarMain.reload();
-
-                // Cancel the MediaViever view if it was displaying the deleted object
-                if (location.hash == '#/media/' + id) {
-                    location.hash = '/media/';
-                }
-            });
-        }
-
         new HashBrown.Views.Modals.MessageModal({
             model: {
                 title: 'Delete media',
@@ -43118,7 +43129,18 @@ var MediaPane = function (_NavbarPane) {
                 label: 'OK',
                 class: 'btn-danger',
                 callback: function callback() {
-                    apiCall('delete', 'media/' + id).then(onSuccess).catch(UI.errorModal);
+                    $element.parent().toggleClass('loading', true);
+
+                    apiCall('delete', 'media/' + id).then(function () {
+                        return reloadResource('media');
+                    }).then(function () {
+                        NavbarMain.reload();
+
+                        // Cancel the MediaViever view if it was displaying the deleted object
+                        if (location.hash == '#/media/' + id) {
+                            location.hash = '/media/';
+                        }
+                    }).catch(UI.errorModal);
                 }
             }]
         });
@@ -48210,7 +48232,7 @@ var UrlEditor = function (_FieldEditor) {
                 }
             }
 
-            url += ContentHelper.getSlug(title) + '/';
+            url += HashBrown.Helpers.ContentHelper.getSlug(title) + '/';
         }
 
         var sameUrls = 0;
@@ -48230,7 +48252,7 @@ var UrlEditor = function (_FieldEditor) {
             var contentData = _ref2;
 
             if (contentData.id != contentId) {
-                var content = new Content(contentData);
+                var content = new HashBrown.Models.Content(contentData);
                 var thatUrl = content.prop('url', window.language);
                 var isMatchWithNumber = new RegExp(url.substring(0, url.lastIndexOf('/')) + '-[0-9]+/').test(thatUrl);
                 var isSameUrl = url == thatUrl || isMatchWithNumber;
