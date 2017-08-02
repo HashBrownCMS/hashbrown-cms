@@ -25,6 +25,9 @@ html
                 img.spinner(src='/svg/logo_pink.svg')
                 .loading-messages
 
+        button.btn.btn-primary.btn-demo-reset(onclick='HashBrown.DemoApi.reset();')
+            | Reset demo
+
         script(src='/lib/jquery/jquery.min.js')
         script(src='/lib/bootstrap/js/bootstrap.min.js')
         script(src='/lib/ckeditor/ckeditor.js')
@@ -34,7 +37,7 @@ html
         script(src='/lib/codemirror/mode/xml/xml.js')
         script(src='/js/client.js')
         script(src='/js/demo.js')
-        
+
         script.
             HashBrown.Helpers.ProjectHelper.currentProject = 'demo';
             HashBrown.Helpers.ProjectHelper.currentEnvironment = 'live';

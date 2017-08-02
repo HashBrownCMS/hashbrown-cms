@@ -8,6 +8,13 @@
     height: 34px;
     padding: 0px;
 
+    &.btn-demo-reset {
+        position: fixed;
+        bottom: 1rem;
+        left: 1rem;
+        z-index: 999;
+    }
+
     &.btn-primary, &.btn-default, &.btn-danger, &.btn-success {
         min-width: 110px;
         padding-top: 0px;

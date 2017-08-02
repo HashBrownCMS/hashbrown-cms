@@ -52,17 +52,7 @@ class Entity {
      * @returns {Object} object
      */
     getObject() {
-        let fields = {};
-
-        for(let k in this) {
-            let v = this[k];
-
-            if(typeof v !== 'function') {
-                fields[k] = v;
-            }
-        }
-
-        return fields;
+        return JSON.parse(JSON.stringify(this));
     }
 
     /**

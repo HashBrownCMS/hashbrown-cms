@@ -1,5 +1,6 @@
 'use strict';
 
+const ContentSchema = require('Common/Models/ContentSchema');
 const FieldSchema = require('Common/Models/FieldSchema');
 const SchemaHelperCommon = require('Common/Helpers/SchemaHelper');
 
@@ -39,7 +40,7 @@ class SchemaHelper extends SchemaHelperCommon {
 
         if(fieldSchema) {
             let nextSchema = this.getSchemaByIdSync(fieldSchema.parentSchemaId);
-            let compiledSchema = new FieldSchema(fieldSchema);
+            let compiledSchema = new FieldSchema(fieldSchema.getObject());
            
             while(nextSchema) {
                 compiledSchema.appendConfig(nextSchema.config);
@@ -62,7 +63,7 @@ class SchemaHelper extends SchemaHelperCommon {
     static getSchemaById(id) {
         return apiCall('get', 'schemas/' + id)
         .then((schema) => {
-            return Promise.resolve(SchemaHelper.getModel(schema));
+            return Promise.resolve(this.getModel(schema));
         });
     }
     
@@ -78,7 +79,11 @@ class SchemaHelper extends SchemaHelperCommon {
             let schema = resources.schemas[i];
 
             if(schema.id == id) {
-                return schema;
+                if(schema instanceof ContentSchema || schema instanceof FieldSchema) {
+                    return schema;
+                }
+
+                return this.getModel(schema);
             }
         }
     }

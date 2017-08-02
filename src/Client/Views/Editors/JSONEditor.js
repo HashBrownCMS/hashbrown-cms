@@ -1,6 +1,7 @@
 'use strict';
 
 const beautify = require('js-beautify').js_beautify;
+const SchemaHelper = require('Client/Helpers/SchemaHelper');
 
 /**
  * A basic JSON editor for any object
@@ -88,11 +89,9 @@ class JSONEditor extends View {
 
             switch(k) {
                 case 'schemaId': case 'parentSchemaId':
-                    for(let id in resources.schemas) {
-                        if(id == v) {
-                            return;
-                        }
-                    }   
+                    if(SchemaHelper.getSchemaByIdSync(v)) {
+                        return;
+                    }
 
                     return 'Schema "' + v + '" not found';
                

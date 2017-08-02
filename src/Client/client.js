@@ -39,8 +39,8 @@ HashBrown.Views.Editors.FieldEditors = require('Client/Views/Editors/FieldEditor
 HashBrown.Helpers = require('Client/Helpers');
 
 // Helper shortcuts
-window.debug = require('Common/Helpers/DebugHelper');
-window.UI = require('Client/Helpers/UIHelper');
+window.debug = HashBrown.Helpers.DebugHelper;
+window.UI = HashBrown.Helpers.UIHelper;
 
 // Preload resources 
 $(document).ready(() => {
@@ -49,7 +49,7 @@ $(document).ready(() => {
     const ProjectHelper = HashBrown.Helpers.ProjectHelper;
 
     // Start debug socket
-    startDebugSocket();
+    debug.startSocket();
 
     SettingsHelper.getSettings(ProjectHelper.currentProject, null, 'sync')
     .then(() => {

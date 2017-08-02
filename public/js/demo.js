@@ -60,70 +60,64 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 270);
+/******/ 	return __webpack_require__(__webpack_require__.s = 272);
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ 270:
+/***/ 272:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-// ----------
-// User
-// ----------
+/**
+ * Demo API
+ */
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-window.currentUserIsAdmin = function () {
-    return true;
-};
-window.currentUserHasScope = function () {
-    return true;
-};
-
-HashBrown.Models.User.current = new HashBrown.Models.User({
-    id: '93afb0e4cd9e7545c589a084079e340766f94xb1',
-    isAdmin: true,
-    isCurrent: true,
-    username: 'demouser',
-    fullName: 'Demo User',
-    email: 'demo@user.com',
-    scopes: {}
-});
-
-// ----------
-// Debug socket
-// ----------
-window.startDebugSocket = function () {};
-
-/**
- * Fake API
- */
-
-var FakeAPI = function () {
-    function FakeAPI() {
-        _classCallCheck(this, FakeAPI);
+var DemoApi = function () {
+    function DemoApi() {
+        _classCallCheck(this, DemoApi);
     }
+
+    /**
+     * Clears the cache
+     */
+    DemoApi.reset = function reset() {
+        localStorage.setItem('demo', null);
+
+        location.reload();
+    };
 
     /**
      * Gets the fake API cache
      */
-    FakeAPI.getCache = function getCache(resource, id) {
-        var cache = localStorage.getItem('demo') || '{}';
 
-        try {
-            cache = JSON.parse(cache);
-        } catch (e) {
-            cache = {};
+
+    DemoApi.getCache = function getCache(resource, id) {
+        var cache = this.cache;
+
+        if (!cache) {
+            try {
+                cache = localStorage.getItem('demo') || '{}';
+                cache = JSON.parse(cache);
+            } catch (e) {
+                cache = {};
+            }
+
+            cache = cache || {};
         }
 
-        cache[resource] = cache[resource] || FakeAPI.getNativeResource(resource);
+        this.cache = cache;
 
         if (!resource) {
             return cache;
+        }
+
+        if (!cache[resource] || !Array.isArray(cache[resource])) {
+            cache[resource] = DemoApi.getNativeResource(resource) || [];
         }
 
         if (!id) {
@@ -144,18 +138,18 @@ var FakeAPI = function () {
      */
 
 
-    FakeAPI.setCache = function setCache(resource, id, data) {
-        var cache = FakeAPI.getCache();
+    DemoApi.setCache = function setCache(resource, id, data) {
+        var cache = DemoApi.getCache();
 
         if (!cache[resource] || !Array.isArray(cache[resource])) {
-            cache[resource] = FakeAPI.getNativeResource(resource) || [];
+            cache[resource] = DemoApi.getNativeResource(resource) || [];
         }
 
         var foundExisting = false;
 
         for (var i in cache[resource]) {
-            if (cache[resource].id == id) {
-                cache[resource] = data;
+            if (cache[resource][i].id == id) {
+                cache[resource][i] = data;
                 foundExisting = true;
                 break;
             }
@@ -173,21 +167,38 @@ var FakeAPI = function () {
      */
 
 
-    FakeAPI.request = function request(method, url, data) {
+    DemoApi.request = function request(method, url, data) {
         url = url.replace('/api/demo/live/', '');
         method = method.toUpperCase();
+
+        debug.log(method + ' ' + url, DemoApi);
 
         return new Promise(function (resolve, reject) {
             switch (method) {
                 case 'GET':
-                    return resolve(FakeAPI.get(url));
+                    return resolve(DemoApi.get(url));
 
                 case 'POST':
-                    return resolve(FakeAPI.post(url, data));
+                    return resolve(DemoApi.post(url, data));
             }
 
             resolve();
         });
+    };
+
+    DemoApi.requestSync = function requestSync(method, url, data) {
+        url = url.replace('/api/demo/live/', '');
+        method = method.toUpperCase();
+
+        debug.log(method + ' ' + url, DemoApi);
+
+        switch (method) {
+            case 'GET':
+                return DemoApi.get(url);
+
+            case 'POST':
+                return DemoApi.post(url, data);
+        }
     };
 
     /**
@@ -195,7 +206,7 @@ var FakeAPI = function () {
      */
 
 
-    FakeAPI.parseUrl = function parseUrl(url) {
+    DemoApi.parseUrl = function parseUrl(url) {
         return {
             resource: url.split('/')[0],
             id: url.split('/')[1]
@@ -207,10 +218,10 @@ var FakeAPI = function () {
      */
 
 
-    FakeAPI.get = function get(url) {
-        var query = FakeAPI.parseUrl(url);
+    DemoApi.get = function get(url) {
+        var query = DemoApi.parseUrl(url);
 
-        return FakeAPI.getCache(query.resource, query.id);
+        return DemoApi.getCache(query.resource, query.id);
     };
 
     /**
@@ -218,10 +229,10 @@ var FakeAPI = function () {
      */
 
 
-    FakeAPI.post = function post(url, data) {
-        var query = FakeAPI.parseUrl(url);
+    DemoApi.post = function post(url, data) {
+        var query = DemoApi.parseUrl(url);
 
-        return FakeAPI.setCache(query.resource, query.id, data);
+        return DemoApi.setCache(query.resource, query.id, data);
     };
 
     /**
@@ -229,8 +240,11 @@ var FakeAPI = function () {
      */
 
 
-    FakeAPI.getNativeResource = function getNativeResource(type) {
+    DemoApi.getNativeResource = function getNativeResource(type) {
         switch (type) {
+            case 'settings':
+                return {};
+
             case 'connections':
                 return [{
                     id: '87afb0x4cd9e75666589a084079e340766f94xb1',
@@ -267,25 +281,25 @@ var FakeAPI = function () {
 
             case 'schemas':
                 var schemas = {
-                    'contentBase': __webpack_require__(271),
-                    'page': __webpack_require__(272),
-                    'array': __webpack_require__(273),
-                    'boolean': __webpack_require__(274),
-                    'contentReference': __webpack_require__(275),
-                    'contentSchemaReference': __webpack_require__(276),
-                    'date': __webpack_require__(277),
-                    'dropdown': __webpack_require__(278),
-                    'fieldBase': __webpack_require__(279),
-                    'language': __webpack_require__(280),
-                    'mediaReference': __webpack_require__(281),
-                    'number': __webpack_require__(282),
-                    'resourceReference': __webpack_require__(283),
-                    'richText': __webpack_require__(284),
-                    'string': __webpack_require__(285),
-                    'struct': __webpack_require__(286),
-                    'tags': __webpack_require__(287),
-                    'templateReference': __webpack_require__(288),
-                    'url': __webpack_require__(289),
+                    'contentBase': __webpack_require__(273),
+                    'page': __webpack_require__(274),
+                    'array': __webpack_require__(275),
+                    'boolean': __webpack_require__(276),
+                    'contentReference': __webpack_require__(277),
+                    'contentSchemaReference': __webpack_require__(278),
+                    'date': __webpack_require__(279),
+                    'dropdown': __webpack_require__(280),
+                    'fieldBase': __webpack_require__(281),
+                    'language': __webpack_require__(282),
+                    'mediaReference': __webpack_require__(283),
+                    'number': __webpack_require__(284),
+                    'resourceReference': __webpack_require__(285),
+                    'richText': __webpack_require__(286),
+                    'string': __webpack_require__(287),
+                    'struct': __webpack_require__(288),
+                    'tags': __webpack_require__(289),
+                    'templateReference': __webpack_require__(290),
+                    'url': __webpack_require__(291),
                     '9e522d637efc8fe2320ff7471c815d2c55a3e439': {
                         'id': '9e522d637efc8fe2320ff7471c815d2c55a3e439',
                         'name': 'Rich Text Page',
@@ -328,83 +342,76 @@ var FakeAPI = function () {
                 }
 
                 return result;
+
+            default:
+                return [];
         }
     };
 
-    return FakeAPI;
+    return DemoApi;
 }();
 
-/**
- * Wraps an API call with a custom path
- *
- * @param {String} method
- * @param {String} url
- * @param {Object} data
- *
- * @returns {Promise} Response
- */
+HashBrown.DemoApi = DemoApi;
 
+// Override normal api call
+window.customApiCall = DemoApi.request;
 
-window.customApiCall = FakeAPI.request;
+// ----------
+// User
+// ----------
+HashBrown.Models.User.current = new HashBrown.Models.User({
+    id: '93afb0e4cd9e7545c589a084079e340766f94xb1',
+    isAdmin: true,
+    isCurrent: true,
+    username: 'demouser',
+    fullName: 'Demo User',
+    email: 'demo@user.com',
+    scopes: {}
+});
 
-/**
- * Gets a Schema by id
- */
-HashBrown.Helpers.SchemaHelper.getSchemaByIdSync = function (id) {
-    var object = FakeAPI.get('schemas', id);
+// ----------
+// Debug socket
+// ----------
+debug.startSocket = function () {};
 
-    return HashBrown.Helpers.SchemaHelper.getModel(object);
-};
-
-HashBrown.Helpers.SchemaHelper.getSchemaById = function (id) {
-    return FakeAPI.request('get', 'schemas/' + id).then(function (object) {
-        return Promise.resolve(HashBrown.Helpers.SchemaHelper.getModel(object));
-    });
-};
-
-/**
- * Gets a Schema with parent fields
- */
+// ----------
+// SchemaHelper
+// ----------
 HashBrown.Helpers.SchemaHelper.getSchemaWithParentFields = function (id) {
-    // Get the Schema by id
-    return HashBrown.Helpers.SchemaHelper.getSchemaById(id)
+    var schema = DemoApi.requestSync('get', 'schemas/' + id);
 
-    // Return object along with any parent objects
-    .then(function (schema) {
-        schema = schema.getObject();
+    if (schema.parentSchemaId) {
+        return HashBrown.Helpers.SchemaHelper.getSchemaWithParentFields(schema.parentSchemaId).then(function (parentSchema) {
+            return new Promise(function (resolve, reject) {
+                setTimeout(function () {
+                    if (typeof parentSchema.getObject === 'function') {
+                        parentSchema = parentSchema.getObject();
+                    }
 
-        // If this Schema has a parent, merge fields with it
-        if (schema.parentSchemaId) {
-            return HashBrown.Helpers.SchemaHelper.getSchemaWithParentFields(schema.parentSchemaId).then(function (parentSchema) {
-                parentSchema = parentSchema.getObject();
+                    var mergedSchema = HashBrown.Helpers.SchemaHelper.mergeSchemas(schema, parentSchema);
 
-                var mergedSchema = HashBrown.Helpers.SchemaHelper.mergeSchemas(schema, parentSchema);
-
-                return Promise.resolve(mergedSchema);
+                    resolve(mergedSchema);
+                }, 100);
             });
-        }
+        });
+    }
 
-        schema = HashBrown.Helpers.SchemaHelper.getModel(schema);
+    schema = HashBrown.Helpers.SchemaHelper.getModel(schema);
 
-        // If this Schema doesn't have a parent, return this Schema
-        return Promise.resolve(schema);
-    });
+    return Promise.resolve(schema);
 };
 
-/**
- * Fetches view model data
- */
+// ----------
+// Crisp UI
+// ----------
 View.prototype.fetch = function fetch() {
     var view = this;
 
     function getModel() {
         // Get model from URL
         if (!view.model && typeof view.modelUrl === 'string') {
-            customApiCall('get', view.modelUrl).then(function (result) {
-                view.model = result;
-
-                view.init();
-            });
+            view.model = DemoApi.requestSync('get', view.modelUrl);
+            view.init();
 
             // Get model with function
         } else if (!view.model && typeof view.modelFunction === 'function') {
@@ -424,9 +431,9 @@ View.prototype.fetch = function fetch() {
     getModel();
 };
 
-/**
- * Reloads a resource
- */
+// ----------
+// Resource loading
+// ----------
 window.reloadResource = function reloadResource(name) {
     var model = null;
     var result = [];
@@ -434,7 +441,7 @@ window.reloadResource = function reloadResource(name) {
     switch (name) {
         case 'content':
             model = HashBrown.Models.Content;
-            result = FakeAPI.get('content');
+            result = HashBrown.DemoApi.requestSync('get', 'content');
             break;
 
         case 'templates':
@@ -451,11 +458,11 @@ window.reloadResource = function reloadResource(name) {
 
         case 'connections':
             model = HashBrown.Models.Connection;
-            result = FakeAPI.get('connections');
+            result = HashBrown.DemoApi.requestSync('get', 'connections');
             break;
 
         case 'schemas':
-            result = FakeAPI.get('schemas');
+            result = HashBrown.DemoApi.requestSync('get', 'schemas');
             break;
     }
 
@@ -477,7 +484,7 @@ window.reloadResource = function reloadResource(name) {
 
 /***/ }),
 
-/***/ 271:
+/***/ 273:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -545,7 +552,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 272:
+/***/ 274:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -587,7 +594,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 273:
+/***/ 275:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -599,7 +606,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 274:
+/***/ 276:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -611,7 +618,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 275:
+/***/ 277:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -623,7 +630,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 276:
+/***/ 278:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -635,7 +642,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 277:
+/***/ 279:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -647,7 +654,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 278:
+/***/ 280:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -659,7 +666,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 279:
+/***/ 281:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -669,7 +676,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 280:
+/***/ 282:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -681,7 +688,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 281:
+/***/ 283:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -693,7 +700,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 282:
+/***/ 284:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -705,7 +712,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 283:
+/***/ 285:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -717,7 +724,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 284:
+/***/ 286:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -729,7 +736,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 285:
+/***/ 287:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -741,7 +748,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 286:
+/***/ 288:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -753,7 +760,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 287:
+/***/ 289:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -765,7 +772,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 288:
+/***/ 290:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -777,7 +784,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 289:
+/***/ 291:
 /***/ (function(module, exports) {
 
 module.exports = {

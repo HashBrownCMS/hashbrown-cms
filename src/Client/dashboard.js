@@ -7,11 +7,11 @@ require('Client/helpers');
 require('crisp-ui');
 
 // Helper shortcuts
-window.debug = require('Common/Helpers/DebugHelper');
+window.debug = require('Client/Helpers/DebugHelper');
 window.UI = require('Client/Helpers/UIHelper');
 
 // Start debug socket
-startDebugSocket();
+debug.startSocket();
 
 // --------------------
 // Get current user

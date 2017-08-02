@@ -438,7 +438,7 @@ class UIHelper {
             }
         });
 
-        console.trace();
+        console.log(error.stack);
     }
     
     /**

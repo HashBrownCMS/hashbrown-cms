@@ -1,46 +1,43 @@
 'use strict';
 
-// ----------
-// User
-// ----------
-window.currentUserIsAdmin = () => { return true; }
-window.currentUserHasScope = () => { return true; }
-
-HashBrown.Models.User.current = new HashBrown.Models.User({
-    id: '93afb0e4cd9e7545c589a084079e340766f94xb1',
-    isAdmin: true,
-    isCurrent: true,
-    username: 'demouser',
-    fullName: 'Demo User',
-    email: 'demo@user.com',
-    scopes: {}
-});
-
-// ----------
-// Debug socket
-// ----------
-window.startDebugSocket = () => {}
-
 /**
- * Fake API
+ * Demo API
  */
-class FakeAPI {
+class DemoApi {
+    /**
+     * Clears the cache
+     */
+    static reset() {
+        localStorage.setItem('demo', null);
+
+        location.reload();
+    }
+
     /**
      * Gets the fake API cache
      */
     static getCache(resource, id) {
-        let cache = localStorage.getItem('demo') || '{}';
-
-        try {
-            cache = JSON.parse(cache);
-        } catch(e) {
-            cache = {};
+        let cache = this.cache;
+        
+        if(!cache) {
+            try {
+                cache = localStorage.getItem('demo') || '{}';
+                cache = JSON.parse(cache);
+            } catch(e) {
+                cache = {};
+            }
+            
+            cache = cache || {};
         }
 
-        cache[resource] = cache[resource] || FakeAPI.getNativeResource(resource);
+        this.cache = cache;
 
         if(!resource) {
             return cache;
+        }
+
+        if(!cache[resource] || !Array.isArray(cache[resource])) {
+            cache[resource] = DemoApi.getNativeResource(resource) || [];
         }
 
         if(!id) {
@@ -60,17 +57,17 @@ class FakeAPI {
      * Sets the fake API
      */
     static setCache(resource, id, data) {
-        let cache = FakeAPI.getCache();
+        let cache = DemoApi.getCache();
 
         if(!cache[resource] || !Array.isArray(cache[resource])) {
-            cache[resource] = FakeAPI.getNativeResource(resource) || [];
+            cache[resource] = DemoApi.getNativeResource(resource) || [];
         }
 
         let foundExisting = false;
 
         for(let i in cache[resource]) {
-            if(cache[resource].id == id) {
-                cache[resource] = data;
+            if(cache[resource][i].id == id) {
+                cache[resource][i] = data;
                 foundExisting = true;
                 break;
             }
@@ -90,17 +87,34 @@ class FakeAPI {
         url = url.replace('/api/demo/live/', '');
         method = method.toUpperCase();
 
+        debug.log(method + ' ' + url, DemoApi);
+
         return new Promise((resolve, reject) => {
             switch(method) {
                 case 'GET':
-                    return resolve(FakeAPI.get(url));
+                    return resolve(DemoApi.get(url));
 
                 case 'POST':
-                    return resolve(FakeAPI.post(url, data));
+                    return resolve(DemoApi.post(url, data));
             }
 
             resolve();
         });
+    }
+
+    static requestSync(method, url, data) {
+        url = url.replace('/api/demo/live/', '');
+        method = method.toUpperCase();
+        
+        debug.log(method + ' ' + url, DemoApi);
+        
+        switch(method) {
+            case 'GET':
+                return DemoApi.get(url);
+
+            case 'POST':
+                return DemoApi.post(url, data);
+        }
     }
 
     /**
@@ -117,18 +131,18 @@ class FakeAPI {
      * Get
      */
     static get(url) {
-        let query = FakeAPI.parseUrl(url);
+        let query = DemoApi.parseUrl(url);
 
-        return FakeAPI.getCache(query.resource, query.id);
+        return DemoApi.getCache(query.resource, query.id);
     }
 
     /**
      * Post
      */
     static post(url, data) {
-        let query = FakeAPI.parseUrl(url);
+        let query = DemoApi.parseUrl(url);
 
-        return FakeAPI.setCache(query.resource, query.id, data);
+        return DemoApi.setCache(query.resource, query.id, data);
     }
 
     /**
@@ -136,6 +150,9 @@ class FakeAPI {
      */
     static getNativeResource(type) {
         switch(type) {
+            case 'settings':
+                return {};
+
             case 'connections':
                 return [
                     {
@@ -237,82 +254,75 @@ class FakeAPI {
                 }
 
                 return result;
+
+            default:
+                return [];
         }
     }
 }
 
-/**
- * Wraps an API call with a custom path
- *
- * @param {String} method
- * @param {String} url
- * @param {Object} data
- *
- * @returns {Promise} Response
- */
-window.customApiCall = FakeAPI.request;
+HashBrown.DemoApi = DemoApi;
 
-/**
- * Gets a Schema by id
- */
-HashBrown.Helpers.SchemaHelper.getSchemaByIdSync = (id) => {
-    let object = FakeAPI.get('schemas', id);
+// Override normal api call
+window.customApiCall = DemoApi.request;
 
-    return HashBrown.Helpers.SchemaHelper.getModel(object);
-}
+// ----------
+// User
+// ----------
+HashBrown.Models.User.current = new HashBrown.Models.User({
+    id: '93afb0e4cd9e7545c589a084079e340766f94xb1',
+    isAdmin: true,
+    isCurrent: true,
+    username: 'demouser',
+    fullName: 'Demo User',
+    email: 'demo@user.com',
+    scopes: {}
+});
 
-HashBrown.Helpers.SchemaHelper.getSchemaById = (id) => {
-    return FakeAPI.request('get', 'schemas/' + id)
-    .then((object) => {
-        return Promise.resolve(HashBrown.Helpers.SchemaHelper.getModel(object));
-    });
-};
+// ----------
+// Debug socket
+// ----------
+debug.startSocket = () => {}
 
-/**
- * Gets a Schema with parent fields
- */
+// ----------
+// SchemaHelper
+// ----------
 HashBrown.Helpers.SchemaHelper.getSchemaWithParentFields = (id) => {
-    // Get the Schema by id
-    return HashBrown.Helpers.SchemaHelper.getSchemaById(id)
+    let schema = DemoApi.requestSync('get', 'schemas/' + id);
 
-    // Return object along with any parent objects
-    .then((schema) => {
-        schema = schema.getObject();
+    if(schema.parentSchemaId) {
+        return HashBrown.Helpers.SchemaHelper.getSchemaWithParentFields(schema.parentSchemaId)
+        .then((parentSchema) => {
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    if(typeof parentSchema.getObject === 'function') {
+                        parentSchema = parentSchema.getObject();
+                    }
 
-        // If this Schema has a parent, merge fields with it
-        if(schema.parentSchemaId) {
-            return HashBrown.Helpers.SchemaHelper.getSchemaWithParentFields(schema.parentSchemaId)
-            .then((parentSchema) => {
-                parentSchema = parentSchema.getObject();
+                    let mergedSchema = HashBrown.Helpers.SchemaHelper.mergeSchemas(schema, parentSchema);
 
-                let mergedSchema = HashBrown.Helpers.SchemaHelper.mergeSchemas(schema, parentSchema);
-
-                return Promise.resolve(mergedSchema);
+                    resolve(mergedSchema);
+                }, 100);
             });
-        }
+        });
+    }
 
-        schema = HashBrown.Helpers.SchemaHelper.getModel(schema);
+    schema = HashBrown.Helpers.SchemaHelper.getModel(schema);
 
-        // If this Schema doesn't have a parent, return this Schema
-        return Promise.resolve(schema);
-    });
+    return Promise.resolve(schema);
 };
 
-/**
- * Fetches view model data
- */
+// ----------
+// Crisp UI
+// ----------
 View.prototype.fetch = function fetch() {
     let view = this;
 
     function getModel() {
         // Get model from URL
         if(!view.model && typeof view.modelUrl === 'string') {
-            customApiCall('get', view.modelUrl)
-            .then((result) => {
-                view.model = result;
-
-                view.init();
-            });
+            view.model = DemoApi.requestSync('get', view.modelUrl);
+            view.init();
         
         // Get model with function
         } else if(!view.model && typeof view.modelFunction === 'function') {
@@ -332,9 +342,9 @@ View.prototype.fetch = function fetch() {
     getModel();    
 }
 
-/**
- * Reloads a resource
- */
+// ----------
+// Resource loading
+// ----------
 window.reloadResource = function reloadResource(name) {
     let model = null;
     let result = [];
@@ -342,7 +352,7 @@ window.reloadResource = function reloadResource(name) {
     switch(name) {
         case 'content':
             model = HashBrown.Models.Content;
-            result = FakeAPI.get('content');
+            result = HashBrown.DemoApi.requestSync('get', 'content');
             break;
 
         case 'templates':
@@ -359,11 +369,11 @@ window.reloadResource = function reloadResource(name) {
 
         case 'connections':
             model = HashBrown.Models.Connection;
-            result = FakeAPI.get('connections');
+            result = HashBrown.DemoApi.requestSync('get', 'connections');
             break;
 
         case 'schemas':
-            result = FakeAPI.get('schemas');
+            result = HashBrown.DemoApi.requestSync('get', 'schemas');
             break;
     }
 
@@ -382,4 +392,3 @@ window.reloadResource = function reloadResource(name) {
         }, 100);
     });
 };
-

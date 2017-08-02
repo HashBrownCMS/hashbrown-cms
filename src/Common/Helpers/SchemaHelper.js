@@ -39,9 +39,11 @@ class SchemaHelper {
 
         if(properties.type == 'content') {
             return new ContentSchema(properties);
+        } else if(properties.type == 'field') {
+            return new FieldSchema(properties);
         }
 
-        return new FieldSchema(properties);
+        return null;
     }
     
     /**
@@ -56,8 +58,8 @@ class SchemaHelper {
         childSchema = requiredParam('childSchema'),
         parentSchema = requiredParam('parentSchema')
     ) {
-        childSchema = this.getModel(childSchema).getObject();
-        parentSchema = this.getModel(parentSchema).getObject();
+        childSchema = JSON.parse(JSON.stringify(childSchema));
+        parentSchema = JSON.parse(JSON.stringify(parentSchema));
 
         let mergedSchema = parentSchema;
 
@@ -103,7 +105,7 @@ class SchemaHelper {
                 break;
         }
 
-        return this.getModel(mergedSchema);
+        return mergedSchema;
     }
 }
 
