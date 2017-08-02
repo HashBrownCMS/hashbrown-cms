@@ -154,6 +154,11 @@ class ViewController extends Controller {
                 res.sendStatus(401);
             });
         });
+
+        // Demo
+        app.get('/demo/', (req, res) => {
+            res.render('demo');
+        });
     }
 }
 

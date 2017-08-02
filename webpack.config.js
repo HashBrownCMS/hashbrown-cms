@@ -11,7 +11,8 @@ module.exports = {
     // Input .js
     entry: {
         client: './src/Client/client.js',
-        dashboard: './src/Client/dashboard.js'
+        dashboard: './src/Client/dashboard.js',
+        demo: './src/Client/demo.js'
     },
     
     // Output .js
@@ -38,7 +39,7 @@ module.exports = {
 
             // JSON
             {
-                test: /\.json$/,
+                test: /\.(json|schema)$/,
                 use: 'json-loader'
             },
 
