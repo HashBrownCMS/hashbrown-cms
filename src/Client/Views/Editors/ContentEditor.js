@@ -1,6 +1,5 @@
 'use strict';
 
-const Content = require('Client/Models/Content');
 const SchemaHelper = require('Client/Helpers/SchemaHelper');
 const ContentHelper = require('Client/Helpers/ContentHelper');
 const ConnectionHelper = require('Client/Helpers/ConnectionHelper');
@@ -454,12 +453,8 @@ class ContentEditor extends View {
 
     render() {
         // Make sure the model data is using the Content model
-        if(!this.model.properties) {
-            this.model.properties = {};
-        }
-
-        if(this.model instanceof Content === false) {
-            this.model = new Content(this.model);
+        if(this.model instanceof HashBrown.Models.Content === false) {
+            this.model = new HashBrown.Models.Content(this.model);
         }
         
         this.$element.toggleClass('locked', this.model.locked);
@@ -471,7 +466,7 @@ class ContentEditor extends View {
         return SchemaHelper.getSchemaWithParentFields(this.model.schemaId)
         .then((schema) => {
             contentSchema = schema;
-            
+           
             return this.model.getSettings('publishing');
         })
         .then((settings) => {

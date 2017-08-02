@@ -347,9 +347,6 @@ window.startDebugSocket = function startDebugSocket() {
     };
 };
 
-// Start debug socket
-startDebugSocket();
-
 // Get package file
 window.app = require('package.json');
 

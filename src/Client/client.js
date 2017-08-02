@@ -29,7 +29,7 @@ window.resources = {
 // Namespaces
 window.HashBrown = {};
 
-HashBrown.Models = require('Common/Models');
+HashBrown.Models = require('Client/Models');
 HashBrown.Views = {};
 HashBrown.Views.Modals = require('Client/Views/Modals');
 HashBrown.Views.Navigation = require('Client/Views/Navigation');
@@ -47,6 +47,9 @@ $(document).ready(() => {
     const SettingsHelper = HashBrown.Helpers.SettingsHelper;
     const LanguageHelper = HashBrown.Helpers.LanguageHelper;
     const ProjectHelper = HashBrown.Helpers.ProjectHelper;
+
+    // Start debug socket
+    startDebugSocket();
 
     SettingsHelper.getSettings(ProjectHelper.currentProject, null, 'sync')
     .then(() => {

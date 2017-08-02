@@ -286,65 +286,6 @@ class SchemaHelper extends SchemaHelperCommon {
     }
    
     /**
-     * Merges two Schemas
-     *
-     * @param Schema childSchema
-     * @param Schema parentSchema
-     *
-     * @returns {Schema} Merged Schema
-     */
-    static mergeSchemas(
-        childSchema = requiredParam('childSchema'),
-        parentSchema = requiredParam('parentSchema')
-    ) {
-        let mergedSchema = parentSchema;
-
-        // Recursive merge
-        function merge(parentValues, childValues) {
-            for(let k in childValues) {
-                if(typeof parentValues[k] === 'object' && typeof childValues[k] === 'object') {
-                    merge(parentValues[k], childValues[k]);
-                
-                } else {
-                    parentValues[k] = childValues[k];
-                
-                }
-            }
-        }
-
-        merge(mergedSchema.fields, childSchema.fields);
-       
-        // Overwrite native values 
-        mergedSchema.id = childSchema.id;
-        mergedSchema.name = childSchema.name;
-        mergedSchema.parentSchemaId = childSchema.parentSchemaId;
-        mergedSchema.icon = childSchema.icon || mergedSchema.icon;
-        
-        // Specific values for schema types
-        switch(mergedSchema.type) {
-            case 'content':
-                let mergedTabs = {};
-                
-                if(!mergedSchema.tabs) {
-                    mergedSchema.tabs = {};
-                }
-
-                if(!childSchema.tabs) {
-                    childSchema.tabs = {};
-                }
-               
-                // Merge tabs
-                merge(mergedSchema.tabs, childSchema.tabs);
-
-                // Set default tab id
-                mergedSchema.defaultTabId = childSchema.defaultTabId || mergedSchema.defaultTabId;
-                break;
-        }
-
-        return mergedSchema;
-    }
-
-    /**
      * Gets all parent fields
      *
      * @param {String} project

@@ -1,7 +1,6 @@
 'use strict';
 
-// Lib
-let beautify = require('js-beautify').js_beautify;
+const beautify = require('js-beautify').js_beautify;
 
 /**
  * A basic JSON editor for any object

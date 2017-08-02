@@ -183,7 +183,7 @@ class SchemaPane extends NavbarPane {
             // Hierarchy logic
             hierarchy: function(item, queueItem) {
                 queueItem.$element.attr('data-schema-id', item.id);
-               
+              
                 if(item.parentSchemaId) {
                     queueItem.parentDirAttr = {'data-schema-id': item.parentSchemaId };
 

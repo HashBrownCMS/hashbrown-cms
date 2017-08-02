@@ -363,7 +363,7 @@ class NavbarMain extends View {
             let parentDirAttrValue = queueItem.parentDirAttr[parentDirAttrKey];
             let parentDirSelector = '.pane-item-container[' + parentDirAttrKey + '="' + parentDirAttrValue + '"]';
             let $parentDir = $pane.find(parentDirSelector);
-      
+
             // If parent element already exists, just append the queue item element
             if($parentDir.length > 0) {
                 $parentDir.children('.children').append(queueItem.$element);

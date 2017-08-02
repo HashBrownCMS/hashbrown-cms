@@ -437,6 +437,8 @@ class UIHelper {
                 class: 'error-modal'
             }
         });
+
+        console.trace();
     }
     
     /**

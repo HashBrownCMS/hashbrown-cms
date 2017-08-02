@@ -10,6 +10,9 @@ require('crisp-ui');
 window.debug = require('Common/Helpers/DebugHelper');
 window.UI = require('Client/Helpers/UIHelper');
 
+// Start debug socket
+startDebugSocket();
+
 // --------------------
 // Get current user
 // --------------------
