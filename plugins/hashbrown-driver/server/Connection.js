@@ -17,7 +17,6 @@ class HashBrownDriverConnection extends Connection {
         super.structure();
 
         this.type = 'hashbrown-driver';
-        this.tree = {};
     } 
 
     /**

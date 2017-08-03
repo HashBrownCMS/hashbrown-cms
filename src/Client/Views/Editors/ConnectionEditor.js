@@ -1,5 +1,6 @@
 'use strict';
 
+const RequestHelper = require('Client/Helpers/RequestHelper');
 const ConnectionHelper = require('Client/Helpers/ConnectionHelper');
 
 /**
@@ -31,7 +32,7 @@ class ConnectionEditor extends View {
 
         view.$saveBtn.toggleClass('saving', true);
 
-        apiCall('post', 'connections/' + view.model.id, view.model)
+        RequestHelper.request('post', 'connections/' + view.model.id, view.model)
         .then(() => {
             view.$saveBtn.toggleClass('saving', false);
        

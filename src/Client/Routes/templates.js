@@ -1,6 +1,7 @@
 'use strict';
 
 const TemplateEditor = require('Client/Views/Editors/TemplateEditor');
+const RequestHelper = require('Client/Helpers/RequestHelper');
 
 // Templates
 Router.route('/templates/', function() {
@@ -27,7 +28,7 @@ Router.route('/templates/:type/:id', function() {
         ViewHelper.get('NavbarMain').highlightItem('/templates/', this.type + '/' + this.id);
         
         let templateEditor = new TemplateEditor({
-            modelUrl: apiUrl('templates/' + this.type + '/' + this.id)
+            modelUrl: RequestHelper.environmentUrl('templates/' + this.type + '/' + this.id)
         });
 
         populateWorkspace(templateEditor.$element);

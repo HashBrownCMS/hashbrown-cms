@@ -1,5 +1,7 @@
 'use strict';
 
+const RequestHelper = require('Client/Helpers/RequestHelper');
+
 // Root
 Router.route('/', function() {
     ViewHelper.get('NavbarMain').showTab('/');
@@ -90,7 +92,7 @@ Router.route('/', function() {
             _.p('Press the button below to get some example content to work with.'),
             _.button({class: 'btn btn-default'}, 'example')
                 .click(() => {
-                    apiCall('post', 'content/example')
+                    RequestHelper.request('post', 'content/example')
                     .then(() => {
                         location.reload();
                     })
@@ -112,17 +114,14 @@ Router.route('/', function() {
 Router.route('/readme/', function() {
     ViewHelper.get('NavbarMain').highlightItem('/', 'readme');
 
-    $.ajax({
-        type: 'GET',
-        url: '/text/readme',
-        success: (html) => {
-            populateWorkspace(
-                _.div({class: 'dashboard-container readme'},
-                    html
-                ),
-                'presentation'
-            );
-        }
+    RequestHelper.customRequest('GET', '/text/readme')
+    .then((html) => {
+        populateWorkspace(
+            _.div({class: 'dashboard-container readme'},
+                html
+            ),
+            'presentation'
+        );
     });
 });
 
@@ -130,16 +129,13 @@ Router.route('/readme/', function() {
 Router.route('/license/', function() {
     ViewHelper.get('NavbarMain').highlightItem('/', 'license');
 
-    $.ajax({
-        type: 'GET',
-        url: '/text/license',
-        success: (html) => {
-            populateWorkspace(
-                _.div({class: 'dashboard-container license'},
-                    html
-                ),
-                'presentation presentation-center'
-            );
-        }
+    RequestHelper.customRequest('GET', '/text/license')
+    .then((html) => {
+        populateWorkspace(
+            _.div({class: 'dashboard-container license'},
+                html
+            ),
+            'presentation presentation-center'
+        );
     });
 });

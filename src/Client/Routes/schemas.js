@@ -1,5 +1,7 @@
 'use strict';
 
+const RequestHelper = require('Client/Helpers/RequestHelper');
+
 // Dashboard
 Router.route('/schemas/', function() {
     if(currentUserHasScope('schemas')) {
@@ -23,7 +25,7 @@ Router.route('/schemas/', function() {
 Router.route('/schemas/:id', function() {
     if(currentUserHasScope('schemas')) {
         let schemaEditor = new HashBrown.Views.Editors.SchemaEditor({
-            modelUrl: apiUrl('schemas/' + this.id)
+            modelUrl: RequestHelper.environmentUrl('schemas/' + this.id)
         });
         
         ViewHelper.get('NavbarMain').highlightItem('/schemas/', this.id);
@@ -43,7 +45,7 @@ Router.route('/schemas/json/:id', function() {
             model: resources.schemas[this.id],
             apiPath: 'schemas/' + this.id,
             onSuccess: () => {
-                return reloadResource('schemas')
+                return RequestHelper.reloadResource('schemas')
                 .then(() => {
                     let navbar = ViewHelper.get('NavbarMain');
                     

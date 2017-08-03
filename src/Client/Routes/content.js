@@ -1,5 +1,7 @@
 'use strict';
 
+const RequestHelper = require('Client/Helpers/RequestHelper');
+
 // Dashboard
 Router.route('/content/', function() {
     ViewHelper.get('NavbarMain').showTab('/content/');
@@ -18,7 +20,7 @@ Router.route('/content/json/:id', function() {
     ViewHelper.get('NavbarMain').highlightItem('/content/', this.id);
     
     let contentEditor = new HashBrown.Views.Editors.JSONEditor({
-        modelUrl: apiUrl('content/' + this.id),
+        modelUrl: RequestHelper.environmentUrl('content/' + this.id),
         apiPath: 'content/' + this.id
     });
 
@@ -54,7 +56,7 @@ Router.route('/content/:id/:tab', function() {
         ViewHelper.get('NavbarMain').highlightItem('/content/', this.id);
    
         contentEditor = new HashBrown.Views.Editors.ContentEditor({
-            modelUrl: apiUrl('content/' + this.id)
+            modelUrl: RequestHelper.environmentUrl('content/' + this.id)
         });
         
         populateWorkspace(contentEditor.$element);

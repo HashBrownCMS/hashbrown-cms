@@ -5,6 +5,7 @@ const NavbarMain = require('./NavbarMain');
 const MediaBrowser = require('Client/Views/Modals/MediaBrowser');
 const ProjectHelper = require('Client/Helpers/ProjectHelper');
 const MediaHelper = require('Client/Helpers/MediaHelper');
+const RequestHelper = require('Client/Helpers/RequestHelper');
 
 /**
  * The Media navbar pane
@@ -18,7 +19,7 @@ class MediaPane extends NavbarPane {
      * @param {String} newFolder
      */
     static onChangeDirectory(id, newFolder) {
-        apiCall(
+        RequestHelper.request(
             'post',
             'media/tree/' + id,
             newFolder ? {
@@ -27,7 +28,7 @@ class MediaPane extends NavbarPane {
             } : null
         )
         .then(() => {
-            return reloadResource('media');
+            return RequestHelper.reloadResource('media');
         })
         .then(() => {
             NavbarMain.reload();
@@ -63,9 +64,9 @@ class MediaPane extends NavbarPane {
                     callback: () => {
                         $element.parent().toggleClass('loading', true);
 
-                        apiCall('delete', 'media/' + id)
+                        RequestHelper.request('delete', 'media/' + id)
                         .then(() => {
-                            return reloadResource('media');
+                            return RequestHelper.reloadResource('media');
                         })
                         .then(() => {
                             NavbarMain.reload();

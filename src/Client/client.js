@@ -6,9 +6,6 @@
 // Style
 require('Style/client');
 
-// Helper functions
-require('Client/helpers');
-
 // Libraries
 require('crisp-ui');
 
@@ -42,8 +39,11 @@ HashBrown.Helpers = require('Client/Helpers');
 window.debug = HashBrown.Helpers.DebugHelper;
 window.UI = HashBrown.Helpers.UIHelper;
 
+// Helper functions
+require('Client/helpers');
+
 // Preload resources 
-$(document).ready(() => {
+document.addEventListener('DOMContentLoaded', () => {
     const SettingsHelper = HashBrown.Helpers.SettingsHelper;
     const LanguageHelper = HashBrown.Helpers.LanguageHelper;
     const ProjectHelper = HashBrown.Helpers.ProjectHelper;
@@ -56,7 +56,7 @@ $(document).ready(() => {
         return LanguageHelper.getLanguages(ProjectHelper.currentProject);
     })
     .then(() => {
-        return reloadAllResources();
+        return HashBrown.Helpers.RequestHelper.reloadAllResources();
     })
     .then(() => {
         for(let user of resources.users) {

@@ -1,14 +1,19 @@
 'use strict';
 
-// Helper functions
-require('Client/helpers');
-
 // Libraries
 require('crisp-ui');
 
+// Namespaces
+window.HashBrown = {};
+
+HashBrown.Helpers = require('Client/Helpers');
+
+// Helper functions
+require('Client/helpers');
+
 // Helper shortcuts
-window.debug = require('Client/Helpers/DebugHelper');
-window.UI = require('Client/Helpers/UIHelper');
+window.debug = HashBrown.Helpers.DebugHelper;
+window.UI = HashBrown.Helpers.UIHelper;
 
 // Start debug socket
 debug.startSocket();
@@ -16,13 +21,13 @@ debug.startSocket();
 // --------------------
 // Get current user
 // --------------------
-apiCall('get', 'user')
+HashBrown.Helpers.RequestHelper.request('get', 'user')
 .then((user) => {
     const User = require('Common/Models/User');
         
     User.current = new User(user);
 
-    return apiCall('get', 'server/projects');
+    return HashBrown.Helpers.RequestHelper.request('get', 'server/projects');
 })
 
 // --------------------
@@ -39,7 +44,7 @@ apiCall('get', 'user')
             return Promise.resolve();
         }
 
-        return apiCall('get', 'server/projects/' + project)
+        return HashBrown.Helpers.RequestHelper.request('get', 'server/projects/' + project)
         .then((project) => {
             const Project = require('Common/Models/Project');
             const ProjectEditor = require('Client/Views/Dashboard/ProjectEditor');
@@ -68,7 +73,7 @@ apiCall('get', 'user')
 .then(() => {
     if(!currentUserIsAdmin()) { return Promise.resolve(); }
 
-    return apiCall('get', 'users');
+    return HashBrown.Helpers.RequestHelper.request('get', 'users');
 })
 .then((users) => {
     const UserEditor = require('Client/Views/Editors/UserEditor');
@@ -105,7 +110,7 @@ apiCall('get', 'user')
                             'Delete user "' + (user.fullName || user.username || user.email || user.id) + '"',
                             'Are you sure you want to remove this user?',
                             () => {
-                                apiCall('delete', 'user/' + user.id)
+                                HashBrown.Helpers.RequestHelper.request('delete', 'user/' + user.id)
                                 .then(() => {
                                     $user.remove(); 
                                 })
@@ -132,9 +137,9 @@ apiCall('get', 'user')
     if(!currentUserIsAdmin()) { return Promise.resolve(); }
 
     $('.btn-restart').click(() => {
-        apiCall('post', 'server/restart')
+        HashBrown.Helpers.RequestHelper.request('post', 'server/restart')
         .then(() => {
-            listenForRestart();
+            HashBrown.Helpers.RequestHelper.listenForRestart();
         });
     });
 })
@@ -147,7 +152,7 @@ apiCall('get', 'user')
 
     let $btnUpdate = _.find('.btn-update');
 
-    return apiCall('get', 'server/update/check')
+    return HashBrown.Helpers.RequestHelper.request('get', 'server/update/check')
     .then((update) => {
         $btnUpdate.removeClass('working');
 
@@ -157,7 +162,7 @@ apiCall('get', 'user')
             $btnUpdate.click(() => {
                 UI.messageModal('Update', 'HashBrown is upgrading from ' + update.localVersion + ' to ' + update.remoteVersion + ' (this may take a minute)...', false);
 
-                apiCall('post', 'server/update/start')
+                HashBrown.Helpers.RequestHelper.request('post', 'server/update/start')
                 .then(() => {
                     const MessageModal = require('Client/Views/Modals/MessageModal');
 
@@ -171,7 +176,7 @@ apiCall('get', 'user')
                                 label: 'Cool!',
                                 class: 'btn-primary',
                                 callback: () => {
-                                    listenForRestart();
+                                    HashBrown.Helpers.RequestHelper.listenForRestart();
                                 }
                             }
                         ]
@@ -201,7 +206,7 @@ $('.navbar-main a').click(function() {
 // Invite a user
 // --------------------
 $('.btn-invite-user').click(() => {
-    customApiCall('get', '/api/users')
+    HashBrown.Helpers.RequestHelper.customRequest('get', '/api/users')
     .then((users) => {
         /**
          * Generate password
@@ -244,7 +249,7 @@ $('.btn-invite-user').click(() => {
                     'Add user',
                     'Do you want to invite a new user with email "' + username + '"?',
                     () => {
-                        customApiCall('post', '/api/user/invite', {
+                        HashBrown.Helpers.RequestHelper.customRequest('post', '/api/user/invite', {
                             email: username,
                         })
                         .then(() => {
@@ -275,7 +280,7 @@ $('.btn-invite-user').click(() => {
                     let password = $passwd.val() || '';
                     let scopes = {};
 
-                    apiCall('post', 'user/new', {
+                    HashBrown.Helpers.RequestHelper.request('post', 'user/new', {
                         username: username,
                         password: password,
                         scopes: {}
@@ -312,7 +317,7 @@ $('.btn-create-project').click(() => {
         let name = modal.$element.find('input').val();
 
         if(name) {
-            apiCall('post', 'server/projects/new', { name: name })
+            HashBrown.Helpers.RequestHelper.request('post', 'server/projects/new', { name: name })
             .then(() => {
                 location.reload();
             })

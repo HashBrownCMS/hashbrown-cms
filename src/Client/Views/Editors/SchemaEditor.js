@@ -4,6 +4,7 @@ let icons = require('../../icons.json').icons;
 const Schema = require('Common/Models/Schema');
 const SchemaHelper = require('Client/Helpers/SchemaHelper');
 const ContentHelper = require('Client/Helpers/ContentHelper');
+const RequestHelper = require('Client/Helpers/RequestHelper');
 const JSONEditor = require('Client/Views/Editors/JSONEditor');
 
 /**
@@ -37,11 +38,11 @@ class SchemaEditor extends View {
 
         this.$saveBtn.toggleClass('working', true);
 
-        apiCall('post', 'schemas/' + this.model.id, this.model)
+        RequestHelper.request('post', 'schemas/' + this.model.id, this.model)
         .then(() => {
             this.$saveBtn.toggleClass('working', false);
         
-            return reloadResource('schemas');
+            return RequestHelper.reloadResource('schemas');
         })
         .then(() => {
             ViewHelper.get('NavbarMain').reload();

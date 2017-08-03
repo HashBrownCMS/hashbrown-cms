@@ -1,5 +1,7 @@
 'use strict';
 
+const RequestHelper = require('Client/Helpers/RequestHelper');
+
 const NavbarPane = require('./NavbarPane');
 const NavbarMain = require('./NavbarMain');
 
@@ -57,9 +59,9 @@ class TemplatePane extends NavbarPane {
                     }
                 }
 
-                apiCall('post', 'templates/' + newTemplate.type + '/' + newTemplate.id, newTemplate)
+                RequestHelper.request('post', 'templates/' + newTemplate.type + '/' + newTemplate.id, newTemplate)
                 .then(() => {
-                    return reloadResource('templates');
+                    return RequestHelper.reloadResource('templates');
                 })
                 .then(() => {
                     NavbarMain.reload();
@@ -93,11 +95,11 @@ class TemplatePane extends NavbarPane {
         }
         
         UI.confirmModal('delete', 'Delete "' + model.name + '"', 'Are you sure you want to delete this template?', () => {
-            apiCall('delete', 'templates/' + model.type + '/' + model.id)
+            RequestHelper.request('delete', 'templates/' + model.type + '/' + model.id)
             .then(() => {
                 $element.parent().remove();
 
-                return reloadResource('templates');
+                return RequestHelper.reloadResource('templates');
             })
             .then(() => {
                 NavbarMain.reload();
@@ -141,9 +143,9 @@ class TemplatePane extends NavbarPane {
                 model.name = e.target.value;
             }),
             () => {
-                apiCall('post', 'templates/' + type + '/' + id, model)
+                RequestHelper.request('post', 'templates/' + type + '/' + id, model)
                 .then((newTemplate) => {
-                    return reloadResource('templates');
+                    return RequestHelper.reloadResource('templates');
                 })
                 .then(() => {
                     NavbarMain.reload();

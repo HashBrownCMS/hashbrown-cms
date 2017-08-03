@@ -1,5 +1,6 @@
 'use strict';
 
+const RequestHelper = require('Client/Helpers/RequestHelper');
 const MessageModal = require('Client/Views/Modals/MessageModal');
 
 /**
@@ -106,7 +107,7 @@ class MigrationEditor extends View {
         this.data.from = this.modal.$element.find('.environment-from').val();
         this.data.to = this.modal.$element.find('.environment-to').val();
 
-        apiCall('post', 'server/migrate/' + this.model.id, this.data)
+        RequestHelper.request('post', 'server/migrate/' + this.model.id, this.data)
         .then(() => {
             UI.messageModal('Success', 'Successfully migrated content from "' + this.data.from + '" to "' + this.data.to + '"');
         })

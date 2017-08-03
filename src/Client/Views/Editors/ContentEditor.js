@@ -3,6 +3,7 @@
 const SchemaHelper = require('Client/Helpers/SchemaHelper');
 const ContentHelper = require('Client/Helpers/ContentHelper');
 const ConnectionHelper = require('Client/Helpers/ConnectionHelper');
+const RequestHelper = require('Client/Helpers/RequestHelper');
 
 /**
  * The editor view for Content objects
@@ -72,21 +73,21 @@ class ContentEditor extends View {
             if(publishing.connections && publishing.connections.length > 0) {
                 // Unpublish
                 if(saveAction === 'unpublish') {
-                    return apiCall('post', 'content/unpublish', this.model);
+                    return RequestHelper.request('post', 'content/unpublish', this.model);
 
                 // Publish
                 } else if(saveAction === 'publish') {
-                    return apiCall('post', 'content/publish', this.model);
+                    return RequestHelper.request('post', 'content/publish', this.model);
                 
                 // Preview
                 } else if(saveAction === 'preview') {
-                    return apiCall('post', 'content/preview', this.model);
+                    return RequestHelper.request('post', 'content/preview', this.model);
 
                 }
             }
 
             // Just save normally
-            return apiCall('post', 'content/' + this.model.id, this.model);
+            return RequestHelper.request('post', 'content/' + this.model.id, this.model);
         }
 
         this.$saveBtn.toggleClass('working', true);
@@ -96,7 +97,7 @@ class ContentEditor extends View {
         .then((url) => {
             postSaveUrl = url;
             
-            return reloadResource('content');
+            return RequestHelper.reloadResource('content');
         })
         .then(() => {
             this.$saveBtn.toggleClass('saving', false);

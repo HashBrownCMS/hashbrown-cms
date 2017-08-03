@@ -2,6 +2,7 @@
 
 const JSONEditor = require('Client/Views/Editors/JSONEditor');
 const FormEditor = require('Client/Views/Editors/FormEditor');
+const RequestHelper = require('Client/Helpers/RequestHelper');
 
 // Dashboard
 Router.route('/forms/', function() {
@@ -21,7 +22,7 @@ Router.route('/forms/:id', function() {
     ViewHelper.get('NavbarMain').highlightItem('/forms/', this.id);
     
     let formEditor = new FormEditor({
-        modelUrl: apiUrl('forms/' + this.id)
+        modelUrl: RequestHelper.environmentUrl('forms/' + this.id)
     });
    
     populateWorkspace(formEditor.$element);
@@ -30,7 +31,7 @@ Router.route('/forms/:id', function() {
 // Edit (JSON editor)
 Router.route('/forms/json/:id', function() {
     let formEditor = new JSONEditor({
-        modelUrl: apiUrl('forms/' + this.id),
+        modelUrl: RequestHelper.environmentUrl('forms/' + this.id),
         apiPath: 'forms/' + this.id
     });
      

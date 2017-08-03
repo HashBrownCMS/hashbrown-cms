@@ -1,5 +1,7 @@
 'use strict';
 
+const RequestHelper = require('Client/Helpers/RequestHelper');
+
 // Dashboard
 Router.route('/connections/', function() {
     if(currentUserHasScope('connections')) {
@@ -23,7 +25,7 @@ Router.route('/connections/', function() {
 Router.route('/connections/:id', function() {
     if(currentUserHasScope('connections')) {
         let connectionEditor = new HashBrown.Views.Editors.ConnectionEditor({
-            modelUrl: apiUrl('connections/' + this.id)
+            modelUrl: RequestHelper.environmentUrl('connections/' + this.id)
         });
        
         ViewHelper.get('NavbarMain').highlightItem('/connections/', this.id);

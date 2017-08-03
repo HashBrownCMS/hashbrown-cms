@@ -1,6 +1,7 @@
 'use strict';
 
 const MessageModal = require('Client/Views/Modals/MessageModal');
+const RequestHelper = require('Client/Helpers/RequestHelper');
 const SettingsHelper = require('Client/Helpers/SettingsHelper');
 const ProjectHelper = require('Client/Helpers/ProjectHelper');
 
@@ -49,6 +50,8 @@ class SyncEditor extends View {
      * Event: Click save. Posts the model to the modelUrl
      */
     onClickSave() {
+        this.model.url = this.$element.find('.url-editor input').val();
+
         SettingsHelper.setSettings(this.projectId, '', 'sync', this.model)
         .then(() => {
             this.modal.hide();
@@ -77,9 +80,6 @@ class SyncEditor extends View {
     renderUrlEditor() {
         return _.div({class: 'url-editor'},
             _.input({class: 'form-control', type: 'text', value: this.model.url || '', placeholder: 'e.g. "https://myserver.com/api/"'})
-                .on('change', (e) => {
-                    this.model.url = $(e.target).val();
-                })
         );
     }
     
@@ -122,7 +122,7 @@ class SyncEditor extends View {
             let username = prompt('Remote instance username');
             let password = prompt('Remote instance password');
 
-            apiCall(
+            RequestHelper.request(
                 'post',
                 view.projectId + '/sync/login',
                 {

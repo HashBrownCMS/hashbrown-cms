@@ -2,6 +2,7 @@
 
 const Media = require('Common/Models/Media');
 
+const RequestHelper = require('Client/Helpers/RequestHelper');
 const ProjectHelper = require('Client/Helpers/ProjectHelper');
 const SettingsHelper = require('Client/Helpers/SettingsHelper');
 
@@ -133,14 +134,15 @@ class MediaBrowser extends View {
 
                 let apiPath = 'media/' + (replaceId ? 'replace/' + replaceId : 'new');
 
+                // TODO: Use the RequestHelper for this
                 $.ajax({
-                    url: apiUrl(apiPath),
+                    url: RequestHelper.environmentUrl(apiPath),
                     type: 'POST',
                     data: new FormData(this),
                     processData: false,
                     contentType: false,
                     success: (ids) => {
-                        reloadResource('media')
+                        RequestHelper.reloadResource('media')
                         .then(() => {
                             uploadModal.$element.find('.spinner-container').toggleClass('hidden', true);
 

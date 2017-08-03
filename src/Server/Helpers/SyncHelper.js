@@ -24,6 +24,10 @@ class SyncHelper {
     ) {
         return HashBrown.Helpers.SettingsHelper.getSettings(project, '', 'sync')
         .then((settings) => {
+            if(!this.validateSettings(settings, true)) {
+                return Promise.reject(new Error('Sync URL not defined'));
+            }
+
             debug.log('Renewing sync token for ' + project + '...', this);
 
             let postData = {
@@ -39,7 +43,29 @@ class SyncHelper {
             });
         });
     }
-    
+   
+    /**
+     * Validates the sync settings
+     *
+     * @param {Object} settings
+     * @param {Boolean} justUrl
+     *
+     * @returns {Boolean} Whether the settigns are valid
+     */
+    static validateSettings(settings, justUrl) {
+        if(!justUrl) {
+            if(!settings) { return false; }
+            if(!settings.enabled) { return false; }
+            if(!settings.token) { return false; }
+            if(!settings.project) { return false; }
+        }
+
+        if(!settings.url) { return false; }
+        if(settings.url.indexOf('http') !== 0) { return false; }
+
+        return true;
+    }
+
     /**
      * Get resource item
      *
@@ -62,7 +88,7 @@ class SyncHelper {
 
         return HashBrown.Helpers.SettingsHelper.getSettings(project, '', 'sync')
         .then((settings) => {
-            if(settings && settings.enabled) {
+            if(this.validateSettings(settings)) {
                 let path = settings.project;
                 
                 if(environment) {
@@ -119,7 +145,7 @@ class SyncHelper {
     ) {
         return HashBrown.Helpers.SettingsHelper.getSettings(project, '', 'sync')
         .then((settings) => {
-            if(settings && settings.enabled) {
+            if(this.validateSettings(settings)) {
                 let path = settings.project;
                 
                 if(environment) {
@@ -170,7 +196,7 @@ class SyncHelper {
     ) {
         return HashBrown.Helpers.SettingsHelper.getSettings(project, '', 'sync')
         .then((settings) => {
-            if(settings && settings.enabled) {
+            if(this.validateSettings(settings)) {
                 let path = settings.project;
                 
                 if(environment) {

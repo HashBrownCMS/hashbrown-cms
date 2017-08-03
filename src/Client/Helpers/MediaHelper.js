@@ -2,6 +2,8 @@
 
 const MediaHelperCommon = require('Common/Helpers/MediaHelper');
 
+const RequestHelper = require('Client/Helpers/RequestHelper');
+
 /**
  * The client side media helper
  *
@@ -14,18 +16,7 @@ class MediaHelper extends MediaHelperCommon {
      * @returns {Promise(Object)} tree
      */
     static getTree() {
-        return new Promise((resolve, reject) => {
-            $.ajax({
-                url: apiUrl('media/tree'),
-                type: 'GET',
-                success: (tree) => {
-                    resolve(tree);
-                },
-                error: () => {
-                    reject();
-                }
-            });
-        });
+        return RequestHelper.request('get', 'media/tree');
     }
 
     /**
@@ -85,19 +76,7 @@ class MediaHelper extends MediaHelperCommon {
      * @returns {Promise} promise
      */
     static setTreeItem(id, item) {
-        return new Promise((resolve, reject) => {
-            $.ajax({
-                url: apiUrl('media/tree/' + id),
-                data: item,
-                type: 'POST',
-                success: () => {
-                    resolve();
-                },
-                error: () => {
-                    reject();
-                }
-            });
-        });
+        return RequestHelper.request('post', 'media/tree/' + id, item);
     }
 }
 

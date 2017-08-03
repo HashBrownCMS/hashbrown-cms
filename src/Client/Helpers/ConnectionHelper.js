@@ -3,6 +3,7 @@
 const ConnectionHelperCommon = require('Common/Helpers/ConnectionHelper');
 const Connection = require('Common/Models/Connection');
 const ProjectHelper = require('Client/Helpers/ProjectHelper');
+const RequestHelper = require('Client/Helpers/RequestHelper');
 
 /**
  * The client side connection helper
@@ -76,7 +77,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
             ProjectHelper.currentEnvironment,
             id
         ).then(() => {
-            return reloadResource('media');  
+            return RequestHelper.reloadResource('media');  
         })
         .then(() => {
             HashBrown.Views.Navigation.NavbarMain.reload();  
@@ -108,7 +109,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
             ProjectHelper.currentEnvironment,
             id
         ).then(() => {
-            return reloadResource('templates');  
+            return RequestHelper.reloadResource('templates');  
         })
         .then(() => {
             HashBrown.Views.Navigation.NavbarMain.reload();  

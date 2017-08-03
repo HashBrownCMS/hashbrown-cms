@@ -2,6 +2,7 @@
 
 const beautify = require('js-beautify').js_beautify;
 const SchemaHelper = require('Client/Helpers/SchemaHelper');
+const RequestHelper = require('Client/Helpers/RequestHelper');
 
 /**
  * A basic JSON editor for any object
@@ -19,7 +20,7 @@ class JSONEditor extends View {
         ).hide();
 
         if(!this.model && !this.modelUrl) {
-            this.modelUrl = apiUrl(this.apiPath);
+            this.modelUrl = RequestHelper.environmentUrl(this.apiPath);
         }
 
         this.fetch();
@@ -47,7 +48,7 @@ class JSONEditor extends View {
         this.$saveBtn.toggleClass('working', true);
 
         if(this.debug()) {
-            apiCall('post', this.apiPath, this.model)
+            RequestHelper.request('post', this.apiPath, this.model)
             .then(() => {
                 this.$saveBtn.toggleClass('working', false);
             })

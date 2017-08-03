@@ -2,6 +2,7 @@
 
 const User = require('Common/Models/User');
 const UserEditor = require('Client/Views/Editors/UserEditor');
+const RequestHelper = require('Client/Helpers/RequestHelper');
 
 /**
  * The main menu
@@ -29,7 +30,7 @@ class MainMenu extends View {
 
         window.language = newLanguage;
 
-        reloadResource('content')
+        RequestHelper.reloadResource('content')
         .then(() => {
             HashBrown.Views.Navigation.NavbarMain.reload();
 

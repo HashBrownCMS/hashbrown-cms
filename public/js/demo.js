@@ -60,12 +60,12 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 272);
+/******/ 	return __webpack_require__(__webpack_require__.s = 273);
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ 272:
+/***/ 273:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -281,25 +281,25 @@ var DemoApi = function () {
 
             case 'schemas':
                 var schemas = {
-                    'contentBase': __webpack_require__(273),
-                    'page': __webpack_require__(274),
-                    'array': __webpack_require__(275),
-                    'boolean': __webpack_require__(276),
-                    'contentReference': __webpack_require__(277),
-                    'contentSchemaReference': __webpack_require__(278),
-                    'date': __webpack_require__(279),
-                    'dropdown': __webpack_require__(280),
-                    'fieldBase': __webpack_require__(281),
-                    'language': __webpack_require__(282),
-                    'mediaReference': __webpack_require__(283),
-                    'number': __webpack_require__(284),
-                    'resourceReference': __webpack_require__(285),
-                    'richText': __webpack_require__(286),
-                    'string': __webpack_require__(287),
-                    'struct': __webpack_require__(288),
-                    'tags': __webpack_require__(289),
-                    'templateReference': __webpack_require__(290),
-                    'url': __webpack_require__(291),
+                    'contentBase': __webpack_require__(274),
+                    'page': __webpack_require__(275),
+                    'array': __webpack_require__(276),
+                    'boolean': __webpack_require__(277),
+                    'contentReference': __webpack_require__(278),
+                    'contentSchemaReference': __webpack_require__(279),
+                    'date': __webpack_require__(280),
+                    'dropdown': __webpack_require__(281),
+                    'fieldBase': __webpack_require__(282),
+                    'language': __webpack_require__(283),
+                    'mediaReference': __webpack_require__(284),
+                    'number': __webpack_require__(285),
+                    'resourceReference': __webpack_require__(286),
+                    'richText': __webpack_require__(287),
+                    'string': __webpack_require__(288),
+                    'struct': __webpack_require__(289),
+                    'tags': __webpack_require__(290),
+                    'templateReference': __webpack_require__(291),
+                    'url': __webpack_require__(292),
                     '9e522d637efc8fe2320ff7471c815d2c55a3e439': {
                         'id': '9e522d637efc8fe2320ff7471c815d2c55a3e439',
                         'name': 'Rich Text Page',
@@ -354,7 +354,7 @@ var DemoApi = function () {
 HashBrown.DemoApi = DemoApi;
 
 // Override normal api call
-window.customApiCall = DemoApi.request;
+HashBrown.Helpers.RequestHelper.customRequest = DemoApi.request;
 
 // ----------
 // User
@@ -434,7 +434,7 @@ View.prototype.fetch = function fetch() {
 // ----------
 // Resource loading
 // ----------
-window.reloadResource = function reloadResource(name) {
+HashBrown.Helpers.RequestHelper.reloadResource = function reloadResource(name) {
     var model = null;
     var result = [];
 
@@ -484,7 +484,7 @@ window.reloadResource = function reloadResource(name) {
 
 /***/ }),
 
-/***/ 273:
+/***/ 274:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -552,7 +552,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 274:
+/***/ 275:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -594,7 +594,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 275:
+/***/ 276:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -606,7 +606,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 276:
+/***/ 277:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -618,7 +618,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 277:
+/***/ 278:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -630,7 +630,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 278:
+/***/ 279:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -642,7 +642,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 279:
+/***/ 280:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -654,7 +654,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 280:
+/***/ 281:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -666,7 +666,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 281:
+/***/ 282:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -676,7 +676,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 282:
+/***/ 283:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -688,7 +688,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 283:
+/***/ 284:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -700,7 +700,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 284:
+/***/ 285:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -712,7 +712,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 285:
+/***/ 286:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -724,7 +724,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 286:
+/***/ 287:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -736,7 +736,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 287:
+/***/ 288:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -748,7 +748,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 288:
+/***/ 289:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -760,7 +760,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 289:
+/***/ 290:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -772,7 +772,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 290:
+/***/ 291:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -784,7 +784,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 291:
+/***/ 292:
 /***/ (function(module, exports) {
 
 module.exports = {

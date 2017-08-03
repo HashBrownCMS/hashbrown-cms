@@ -264,7 +264,7 @@ class DemoApi {
 HashBrown.DemoApi = DemoApi;
 
 // Override normal api call
-window.customApiCall = DemoApi.request;
+HashBrown.Helpers.RequestHelper.customRequest = DemoApi.request;
 
 // ----------
 // User
@@ -345,7 +345,7 @@ View.prototype.fetch = function fetch() {
 // ----------
 // Resource loading
 // ----------
-window.reloadResource = function reloadResource(name) {
+HashBrown.Helpers.RequestHelper.reloadResource = function reloadResource(name) {
     let model = null;
     let result = [];
 

@@ -1,5 +1,7 @@
 'use strict';
 
+const RequestHelper = require('Client/Helpers/RequestHelper');
+
 const MessageModal = require('Client/Views/Modals/MessageModal');
 const InfoEditor = require('Client/Views/Dashboard/InfoEditor');
 const SyncEditor = require('Client/Views/Dashboard/SyncEditor');
@@ -52,7 +54,7 @@ class ProjectEditor extends View {
                     class: 'btn-danger disabled',
                     disabled: true,
                     callback: () => {
-                        apiCall('delete', 'server/projects/' + this.model.id)
+                        RequestHelper.request('delete', 'server/projects/' + this.model.id)
                         .then(() => {
                             location.reload();
                         })
@@ -70,7 +72,7 @@ class ProjectEditor extends View {
      */
     onClickRemoveEnvironment(environmentName) {
         let modal = UI.confirmModal('Remove', 'Remove environment "' + environmentName + '"', 'Are you sure want to remove the environment "' + environmentName + '" from the project "' + (this.model.title || this.model.id) + '"?', () => {
-            apiCall('delete', 'server/projects/' + this.model.id + '/' + environmentName)
+            RequestHelper.request('delete', 'server/projects/' + this.model.id + '/' + environmentName)
             .then(() => {
                 location.reload();
             })
@@ -162,7 +164,7 @@ class ProjectEditor extends View {
 
                         this.model.environments.push(environmentName);
 
-                        apiCall('put', 'server/projects/' + this.model.id + '/' + environmentName)
+                        RequestHelper.request('put', 'server/projects/' + this.model.id + '/' + environmentName)
                         .then(() => {
                             UI.messageModal('Success', 'The new environment "' + environmentName + '" was created successfully', () => { location.reload(); });
                         })

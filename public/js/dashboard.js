@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 265);
+/******/ 	return __webpack_require__(__webpack_require__.s = 266);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -5929,6 +5929,8 @@ var Entity = function () {
                 }
             } catch (e) {
                 debug.log(e.message, this);
+                console.log(properties);
+                console.log(e.stack);
             }
         }
     }
@@ -7958,7 +7960,9 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var SettingsHelperCommon = __webpack_require__(199);
+var RequestHelper = __webpack_require__(293);
+
+var SettingsHelperCommon = __webpack_require__(198);
 
 /**
  * The client side settings helper
@@ -8008,7 +8012,7 @@ var SettingsHelper = function (_SettingsHelperCommon) {
             apiUrl += '/' + section;
         }
 
-        return customApiCall('get', apiUrl)
+        return RequestHelper.customRequest('get', apiUrl)
 
         // Cache settings client-side
         .then(function (settings) {
@@ -8163,7 +8167,7 @@ var SettingsHelper = function (_SettingsHelperCommon) {
             apiUrl += '/' + section;
         }
 
-        return customApiCall('post', apiUrl, settings)
+        return RequestHelper.customRequest('post', apiUrl, settings)
 
         // Cache new settings
         .then(function () {
@@ -9696,7 +9700,197 @@ hash.sha512 = hash.sha.sha512;
 hash.ripemd160 = hash.ripemd.ripemd160;
 
 /***/ }),
-/* 47 */,
+/* 47 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var ContentHelperCommon = __webpack_require__(227);
+
+/**
+ * The client side content helper
+ *
+ * @memberof HashBrown.Client.Helpers
+ */
+
+var ContentHelper = function (_ContentHelperCommon) {
+    _inherits(ContentHelper, _ContentHelperCommon);
+
+    function ContentHelper() {
+        _classCallCheck(this, ContentHelper);
+
+        return _possibleConstructorReturn(this, _ContentHelperCommon.apply(this, arguments));
+    }
+
+    /**
+     * Gets Content by id
+     *
+     * @param {String} id
+     *
+     * @returns {Content} Content node
+     */
+    ContentHelper.getContentByIdSync = function getContentByIdSync(id) {
+        if (!id) {
+            return null;
+        }
+
+        var Content = __webpack_require__(89);
+
+        for (var _iterator = resources.content, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+            var _ref;
+
+            if (_isArray) {
+                if (_i >= _iterator.length) break;
+                _ref = _iterator[_i++];
+            } else {
+                _i = _iterator.next();
+                if (_i.done) break;
+                _ref = _i.value;
+            }
+
+            var content = _ref;
+
+            if (content.id === id) {
+                return new Content(content);
+            }
+        }
+    };
+
+    /**
+     * Gets Content by id
+     *
+     * @param {String} id
+     *
+     * @returns {Promise} Content node
+     */
+
+
+    ContentHelper.getContentById = function getContentById(id) {
+        if (id) {
+            var Content = __webpack_require__(89);
+
+            for (var _iterator2 = resources.content, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
+                var _ref2;
+
+                if (_isArray2) {
+                    if (_i2 >= _iterator2.length) break;
+                    _ref2 = _iterator2[_i2++];
+                } else {
+                    _i2 = _iterator2.next();
+                    if (_i2.done) break;
+                    _ref2 = _i2.value;
+                }
+
+                var content = _ref2;
+
+                if (content.id == id) {
+                    return Promise.resolve(new Content(content));
+                }
+            }
+
+            return Promise.reject(new Error('Content with id "' + id + '" was not found'));
+        } else {
+            return Promise.reject(new Error('Content id was not provided'));
+        }
+    };
+
+    /**
+     * A sanity check for fields
+     *
+     * @param {Object} value
+     * @param {Schema} schema
+     */
+
+
+    ContentHelper.fieldSanityCheck = function fieldSanityCheck(value, schema) {
+        // If the schema value is set to multilingual, but the value isn't an object, convert it
+        if (schema.multilingual && (!value || (typeof value === 'undefined' ? 'undefined' : _typeof(value)) !== 'object')) {
+            var oldValue = value;
+
+            value = {};
+            value[window.language] = oldValue;
+        }
+
+        // If the schema value is not set to multilingual, but the value is an object
+        // containing the _multilingual flag, convert it
+        if (!schema.multilingual && value && (typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object' && value._multilingual) {
+            value = value[window.language];
+        }
+
+        // Update the _multilingual flag
+        if (schema.multilingual && value && !value._multilingual) {
+            value._multilingual = true;
+        } else if (!schema.multilingual && value && value._multilingual) {
+            delete value._multilingual;
+        }
+
+        return value;
+    };
+
+    /**
+     * Get new sort index
+     *
+     * @param {String} parentId
+     * @param {String} aboveId
+     * @param {String} belowId
+     */
+
+
+    ContentHelper.getNewSortIndex = function getNewSortIndex(parentId, aboveId, belowId) {
+        if (aboveId) {
+            return this.getContentByIdSync(aboveId).sort + 1;
+        }
+
+        if (belowId) {
+            return this.getContentByIdSync(belowId).sort - 1;
+        }
+
+        // Filter out content that doesn't have the same parent
+        var nodes = resources.content.filter(function (x) {
+            return x.parentId == parentId || !x.parentId && !parentId;
+        });
+
+        // Find new index
+        // NOTE: The index should be the highest sort number + 10000 to give a bit of leg room for sorting later
+        var newIndex = 10000;
+
+        for (var _iterator3 = nodes, _isArray3 = Array.isArray(_iterator3), _i3 = 0, _iterator3 = _isArray3 ? _iterator3 : _iterator3[Symbol.iterator]();;) {
+            var _ref3;
+
+            if (_isArray3) {
+                if (_i3 >= _iterator3.length) break;
+                _ref3 = _iterator3[_i3++];
+            } else {
+                _i3 = _iterator3.next();
+                if (_i3.done) break;
+                _ref3 = _i3.value;
+            }
+
+            var content = _ref3;
+
+            if (newIndex - 10000 <= content.sort) {
+                newIndex = content.sort + 10000;
+            }
+        }
+
+        return newIndex;
+    };
+
+    return ContentHelper;
+}(ContentHelperCommon);
+
+module.exports = ContentHelper;
+
+/***/ }),
 /* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -10081,8 +10275,303 @@ var Connection = function (_Entity) {
 module.exports = Connection;
 
 /***/ }),
-/* 49 */,
-/* 50 */,
+/* 49 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Path = __webpack_require__(218);
+
+var Entity = __webpack_require__(12);
+
+/**
+ * The base class for all Media objects
+ *
+ * @memberof HashBrown.Common.Models
+ */
+
+var Media = function (_Entity) {
+    _inherits(Media, _Entity);
+
+    function Media() {
+        _classCallCheck(this, Media);
+
+        return _possibleConstructorReturn(this, _Entity.apply(this, arguments));
+    }
+
+    Media.prototype.structure = function structure() {
+        this.def(String, 'id');
+        this.def(Boolean, 'remote', true);
+        this.def(String, 'icon', 'file-image-o');
+        this.def(String, 'name');
+        this.def(String, 'url');
+        this.def(String, 'folder');
+    };
+
+    /**
+     * Read from file path
+     *
+     * @param {String} filePath
+     */
+
+
+    Media.prototype.readFromFilePath = function readFromFilePath(filePath) {
+        var name = Path.basename(filePath);
+        var id = filePath;
+
+        // Trim file path for id 
+        id = id.replace('/' + name, '');
+        id = id.substring(id.lastIndexOf('/') + 1);
+
+        // Remove file extension
+        name = name.replace(/\.[^/.]+$/, '');
+
+        this.id = id;
+        this.name = name;
+        this.url = '/media/' + HashBrown.Helpers.ProjectHelper.currentProject + '/' + HashBrown.Helpers.ProjectHelper.currentEnvironment + '/' + id;
+    };
+
+    /**
+     * Gets the content type header
+     *
+     * @returns {String} Content-Type header
+     */
+
+
+    Media.prototype.getContentTypeHeader = function getContentTypeHeader() {
+        this.name = this.name || '';
+
+        // Image types
+        if (this.name.match(/\.jpg/)) {
+            return 'image/jpeg';
+        } else if (this.name.match(/\.png/)) {
+            return 'image/png';
+        } else if (this.name.match(/\.gif/)) {
+            return 'image/gif';
+        } else if (this.name.match(/\.bmp/)) {
+            return 'image/bmp';
+
+            // Video types
+        } else if (this.name.match(/\.mp4/)) {
+            return 'video/mp4';
+        } else if (this.name.match(/\.avi/)) {
+            return 'video/avi';
+        } else if (this.name.match(/\.mov/)) {
+            return 'video/quicktime';
+        } else if (this.name.match(/\.bmp/)) {
+            return 'video/bmp';
+        } else if (this.name.match(/\.wmv/)) {
+            return 'video/x-ms-wmv';
+        } else if (this.name.match(/\.3gp/)) {
+            return 'video/3gpp';
+        } else if (this.name.match(/\.mkv/)) {
+            return 'video/x-matroska';
+
+            // SVG
+        } else if (this.name.match(/\.svg/)) {
+            return 'image/svg+xml';
+
+            // Everything else
+        } else {
+            return 'application/octet-stream';
+        }
+    };
+
+    /**
+     * Gets whether this is a video
+     *
+     * @returns {Boolean} Is video
+     */
+
+
+    Media.prototype.isVideo = function isVideo() {
+        return this.getContentTypeHeader().indexOf('video') > -1;
+    };
+
+    /**
+     * Gets whether this is an image
+     *
+     * @returns {Boolean} Is image
+     */
+
+
+    Media.prototype.isImage = function isImage() {
+        return this.getContentTypeHeader().indexOf('image') > -1;
+    };
+
+    /**
+     * Applies folder string from tree
+     *
+     * @param {Object} tree
+     */
+
+
+    Media.prototype.applyFolderFromTree = function applyFolderFromTree(tree) {
+        if (tree) {
+            for (var i in tree) {
+                var item = tree[i];
+
+                if (item.id == this.id) {
+                    this.folder = item.folder;
+                    break;
+                }
+            }
+        }
+    };
+
+    /**
+     * Creates a new Media object
+     *
+     * @param {Object} file
+     *
+     * @return {Media} media
+     */
+
+
+    Media.create = function create(file) {
+        var media = new Media({
+            id: Entity.createId()
+        });
+
+        return media;
+    };
+
+    return Media;
+}(Entity);
+
+module.exports = Media;
+
+/***/ }),
+/* 50 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var ContentSchema = __webpack_require__(87);
+var FieldSchema = __webpack_require__(88);
+
+var RequestHelper = __webpack_require__(293);
+
+var SchemaHelperCommon = __webpack_require__(225);
+
+/**
+ * The client side Schema helper
+ *
+ * @memberof HashBrown.Client.Helpers
+ */
+
+var SchemaHelper = function (_SchemaHelperCommon) {
+    _inherits(SchemaHelper, _SchemaHelperCommon);
+
+    function SchemaHelper() {
+        _classCallCheck(this, SchemaHelper);
+
+        return _possibleConstructorReturn(this, _SchemaHelperCommon.apply(this, arguments));
+    }
+
+    /**
+     * Gets a Schema with all parent fields
+     *
+     * @param {String} id
+     *
+     * @returns {Promise} Schema with parent fields
+     */
+    SchemaHelper.getSchemaWithParentFields = function getSchemaWithParentFields(id) {
+        if (!id) {
+            return Promise.resolve(null);
+        }
+
+        return RequestHelper.request('get', 'schemas/' + id + '/?withParentFields=true').then(function (schema) {
+            return Promise.resolve(SchemaHelper.getModel(schema));
+        });
+    };
+
+    /**
+     * Gets a FieldSchema with all parent configs
+     *
+     * @param {String} id
+     *
+     * @returns {FieldSchema} Compiled FieldSchema
+     */
+
+
+    SchemaHelper.getFieldSchemaWithParentConfigs = function getFieldSchemaWithParentConfigs(id) {
+        var fieldSchema = this.getSchemaByIdSync(id);
+
+        if (fieldSchema) {
+            var nextSchema = this.getSchemaByIdSync(fieldSchema.parentSchemaId);
+            var compiledSchema = new FieldSchema(fieldSchema.getObject());
+
+            while (nextSchema) {
+                compiledSchema.appendConfig(nextSchema.config);
+
+                nextSchema = this.getSchemaByIdSync(nextSchema.parentSchemaId);
+            }
+
+            return compiledSchema;
+        }
+    };
+
+    /**
+     * Gets a Schema by id
+     *
+     * @param {String} id
+     *
+     * @return {Promise} Promise
+     */
+
+
+    SchemaHelper.getSchemaById = function getSchemaById(id) {
+        var _this2 = this;
+
+        return RequestHelper.request('get', 'schemas/' + id).then(function (schema) {
+            return Promise.resolve(_this2.getModel(schema));
+        });
+    };
+
+    /**
+     * Gets a Schema by id (sync)
+     *
+     * @param {String} id
+     *
+     * @return {Promise} Promise
+     */
+
+
+    SchemaHelper.getSchemaByIdSync = function getSchemaByIdSync(id) {
+        for (var i in resources.schemas) {
+            var schema = resources.schemas[i];
+
+            if (schema.id == id) {
+                if (schema instanceof ContentSchema || schema instanceof FieldSchema) {
+                    return schema;
+                }
+
+                return this.getModel(schema);
+            }
+        }
+    };
+
+    return SchemaHelper;
+}(SchemaHelperCommon);
+
+module.exports = SchemaHelper;
+
+/***/ }),
 /* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -13582,10 +14071,269 @@ module.exports = withPublic;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
 
 /***/ }),
-/* 86 */,
-/* 87 */,
-/* 88 */,
+/* 86 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Entity = __webpack_require__(12);
+
+/**
+ * The base class for all Schema types
+ *
+ * @memberof HashBrown.Common.Models
+ */
+
+var Schema = function (_Entity) {
+    _inherits(Schema, _Entity);
+
+    function Schema(properties) {
+        _classCallCheck(this, Schema);
+
+        return _possibleConstructorReturn(this, _Entity.call(this, properties));
+    }
+
+    Schema.prototype.structure = function structure() {
+        this.def(Boolean, 'locked');
+        this.def(Boolean, 'local');
+        this.def(Boolean, 'remote');
+        this.def(String, 'id');
+        this.def(String, 'name');
+        this.def(String, 'icon');
+        this.def(String, 'parentSchemaId');
+        this.def(Array, 'hiddenProperties', []);
+    };
+
+    /**
+     * Checks whether a property is hidden
+     *
+     * @param {String} name
+     *
+     * @returns {Boolean} Is hidden
+     */
+
+
+    Schema.prototype.isPropertyHidden = function isPropertyHidden(name) {
+        return this.hiddenProperties.indexOf(name) > -1;
+    };
+
+    /**
+     * Creates a new schema
+     *
+     * @param {Schema} parentSchema
+     *
+     * @returns {Schema} schema
+     */
+
+
+    Schema.create = function create() {
+        var parentSchema = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('parentSchema');
+
+        return HashBrown.Helpers.SchemaHelper.getModel({
+            id: Entity.createId(),
+            icon: parentSchema.icon || 'file',
+            type: parentSchema.type,
+            editorId: parentSchema.editorId,
+            parentSchemaId: parentSchema.id
+        });
+    };
+
+    return Schema;
+}(Entity);
+
+module.exports = Schema;
+
+/***/ }),
+/* 87 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Schema = __webpack_require__(86);
+
+/**
+ * Schema for content nodes
+ *
+ * @memberof HashBrown.Common.Models
+ */
+
+var ContentSchema = function (_Schema) {
+    _inherits(ContentSchema, _Schema);
+
+    function ContentSchema(properties) {
+        _classCallCheck(this, ContentSchema);
+
+        return _possibleConstructorReturn(this, _Schema.call(this, properties));
+    }
+
+    ContentSchema.prototype.structure = function structure() {
+        _Schema.prototype.structure.call(this);
+
+        this.def(String, 'defaultTabId');
+        this.def(Object, 'tabs', {});
+        this.def(Object, 'fields', {});
+        this.def(Array, 'allowedChildSchemas', []);
+
+        this.name = 'New content schema';
+        this.type = 'content';
+    };
+
+    return ContentSchema;
+}(Schema);
+
+module.exports = ContentSchema;
+
+/***/ }),
+/* 88 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Schema = __webpack_require__(86);
+
+/**
+ * Schema for content fields
+ *
+ * @memberof HashBrown.Common.Models
+ */
+
+var FieldSchema = function (_Schema) {
+    _inherits(FieldSchema, _Schema);
+
+    function FieldSchema() {
+        _classCallCheck(this, FieldSchema);
+
+        return _possibleConstructorReturn(this, _Schema.apply(this, arguments));
+    }
+
+    FieldSchema.prototype.structure = function structure() {
+        _Schema.prototype.structure.call(this);
+
+        this.def(String, 'editorId');
+        this.def(String, 'previewTemplate', '');
+        this.def(Object, 'config', {});
+
+        this.name = 'New field schema';
+        this.type = 'field';
+    };
+
+    /**
+     * Appends properties to this config
+     *
+     * @param {Object} config
+     */
+
+
+    FieldSchema.prototype.appendConfig = function appendConfig(config) {
+        function recurse(source, target) {
+            for (var k in source) {
+                // If key doesn't exist, append immediately
+                if (!target[k]) {
+                    target[k] = source[k];
+                } else if (target[k] instanceof Object && source[k] instanceof Object || target[k] instanceof Array && source[k] instanceof Array) {
+                    recurse(source[k], target[k]);
+                }
+            }
+        }
+
+        recurse(config, this.config);
+    };
+
+    return FieldSchema;
+}(Schema);
+
+module.exports = FieldSchema;
+
+/***/ }),
 /* 89 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var ContentCommon = __webpack_require__(208);
+var ContentHelper = __webpack_require__(47);
+var ProjectHelper = __webpack_require__(7);
+
+/**
+ * The client-side content model
+ *
+ * @memberof HashBrown.Client.Models
+ */
+
+var Content = function (_ContentCommon) {
+    _inherits(Content, _ContentCommon);
+
+    function Content() {
+        _classCallCheck(this, Content);
+
+        return _possibleConstructorReturn(this, _ContentCommon.apply(this, arguments));
+    }
+
+    /**
+     * Gets settings
+     *
+     * @param {String} key
+     *
+     * @returns {Promise} Settings
+     */
+    Content.prototype.getSettings = function getSettings(key) {
+        return _ContentCommon.prototype.getSettings.call(this, ProjectHelper.currentProject, ProjectHelper.currentEnvironment, key);
+    };
+
+    /**
+     * Gets parent Content
+     *
+     * @returns {Promise} Parent
+     */
+
+
+    Content.prototype.getParent = function getParent() {
+        if (this.parentId) {
+            return ContentHelper.getContentById(this.parentId).then(function (parentContent) {
+                return Promise.resolve(parentContent);
+            }).catch(function (e) {
+                return Promise.resolve(null);
+            });
+        } else {
+            return Promise.resolve(null);
+        }
+    };
+
+    return Content;
+}(ContentCommon);
+
+module.exports = Content;
+
+/***/ }),
+/* 90 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13677,23 +14425,25 @@ var Project = function (_Entity) {
 module.exports = Project;
 
 /***/ }),
-/* 90 */
+/* 91 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-
-/**
- * An editor for Users
- *
- * @memberof HashBrown.Client.Views.Editors
- */
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var RequestHelper = __webpack_require__(293);
+
+/**
+ * An editor for Users
+ *
+ * @memberof HashBrown.Client.Views.Editors
+ */
 
 var UserEditor = function (_View) {
     _inherits(UserEditor, _View);
@@ -13713,7 +14463,7 @@ var UserEditor = function (_View) {
 
         _this.modal.$element.addClass('modal-user-editor');
 
-        customApiCall('get', '/api/server/projects').then(function (projects) {
+        RequestHelper.customRequest('get', '/api/server/projects').then(function (projects) {
             _this.projects = projects;
             _this.init();
         });
@@ -13745,7 +14495,7 @@ var UserEditor = function (_View) {
             newUserObject.password = this.newPassword;
         }
 
-        apiCall('post', 'user/' + this.model.id, newUserObject).then(function () {
+        RequestHelper.request('post', 'user/' + this.model.id, newUserObject).then(function () {
             _this2.modal.hide();
 
             _this2.trigger('save', _this2.model);
@@ -13960,8 +14710,121 @@ var UserEditor = function (_View) {
 module.exports = UserEditor;
 
 /***/ }),
-/* 91 */,
 /* 92 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var MediaHelperCommon = __webpack_require__(238);
+
+var RequestHelper = __webpack_require__(293);
+
+/**
+ * The client side media helper
+ *
+ * @memberof HashBrown.Client.Helpers
+ */
+
+var MediaHelper = function (_MediaHelperCommon) {
+    _inherits(MediaHelper, _MediaHelperCommon);
+
+    function MediaHelper() {
+        _classCallCheck(this, MediaHelper);
+
+        return _possibleConstructorReturn(this, _MediaHelperCommon.apply(this, arguments));
+    }
+
+    /**
+     * Gets the Media tree
+     *
+     * @returns {Promise(Object)} tree
+     */
+    MediaHelper.getTree = function getTree() {
+        return RequestHelper.request('get', 'media/tree');
+    };
+
+    /**
+     * Gets Media object by id synchronously
+     *
+     * @param {String} id
+     *
+     * @return {Media} Media object
+     */
+
+
+    MediaHelper.getMediaByIdSync = function getMediaByIdSync(id) {
+        for (var i = 0; i < resources.media.length; i++) {
+            var media = resources.media[i];
+
+            if (media.id == id) {
+                return media;
+            }
+        }
+
+        return null;
+    };
+
+    /**
+     * Gets the Media Url
+     */
+
+
+    MediaHelper.getMediaUrl = function getMediaUrl(id) {
+        return '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + id;
+    };
+
+    /**
+     * Gets Media object by id
+     *
+     * @param {String} id
+     *
+     * @return {Promise(Media)}
+     */
+
+
+    MediaHelper.getMediaById = function getMediaById(id) {
+        return new Promise(function (resolve, reject) {
+            for (var i = 0; i < resources.media.length; i++) {
+                var media = resources.media[i];
+
+                if (media.id == id) {
+                    resolve(media);
+                    return;
+                }
+            }
+
+            reject(new Error('Media with id "' + id + '" not found'));
+        });
+    };
+
+    /**
+     * Sets a Media tree item
+     *
+     * @param {String} id
+     * @param {Object} item
+     *
+     * @returns {Promise} promise
+     */
+
+
+    MediaHelper.setTreeItem = function setTreeItem(id, item) {
+        return RequestHelper.request('post', 'media/tree/' + id, item);
+    };
+
+    return MediaHelper;
+}(MediaHelperCommon);
+
+module.exports = MediaHelper;
+
+/***/ }),
+/* 93 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13976,7 +14839,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var SettingsHelper = __webpack_require__(35);
-var LanguageHelperCommon = __webpack_require__(202);
+var LanguageHelperCommon = __webpack_require__(201);
 
 /**
  * The client side language helper
@@ -14041,581 +14904,8 @@ var LanguageHelper = function (_LanguageHelperCommon) {
 module.exports = LanguageHelper;
 
 /***/ }),
-/* 93 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var MessageModal = __webpack_require__(15);
-
-/**
- * A UI helper for creating and handling common interface behaviours
- *
- * @memberof HashBrown.Client.Helpers
- */
-
-var UIHelper = function () {
-    function UIHelper() {
-        _classCallCheck(this, UIHelper);
-    }
-
-    /**
-     * Creates a switch
-     *
-     * @param {Boolean} initialValue
-     * @param {Function} onChange
-     *
-     * @returns {HTMLElement} Switch element
-     */
-    UIHelper.inputSwitch = function inputSwitch(initialValue, onChange) {
-        var id = 'switch-' + (10000 + Math.floor(Math.random() * 10000));
-        var $input = void 0;
-
-        var $element = _.div({ class: 'switch', 'data-checked': initialValue }, $input = _.input({
-            id: id,
-            class: 'form-control switch',
-            type: 'checkbox'
-        }).change(function () {
-            this.parentElement.dataset.checked = this.checked;
-
-            if (onChange) {
-                onChange(this.checked);
-            }
-        }), _.label({ for: id }));
-
-        $element.on('set', function (e, newValue) {
-            $input[0].checked = newValue;
-        });
-
-        if (initialValue) {
-            $input.attr('checked', true);
-        }
-
-        return $element;
-    };
-
-    /**
-     * Creates a group of chips
-     *
-     * @param {Array} items
-     * @param {Array} dropdownItems
-     * @param {Function} onChange
-     * @param {Boolean} isDropdownUnique
-     *
-     * @returns {HtmlElement} Chip group element
-     */
-
-
-    UIHelper.inputChipGroup = function inputChipGroup(items, dropdownItems, onChange, isDropdownUnique) {
-        var $element = _.div({ class: 'chip-group' });
-
-        if (!items) {
-            items = [];
-        }
-
-        function render() {
-            _.append($element.empty(),
-
-            // Render individual chips
-            _.each(items, function (itemIndex, item) {
-                var $chip = _.div({ class: 'chip' },
-
-                // Dropdown
-                _.if(Array.isArray(dropdownItems), _.div({ class: 'chip-label dropdown' }, _.button({ class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, item.label || item.name || item.title || item), _.if(onChange, _.ul({ class: 'dropdown-menu' }, _.each(dropdownItems, function (dropdownItemIndex, dropdownItem) {
-                    // Look for unique dropdown items
-                    if (isDropdownUnique) {
-                        for (var _iterator = items, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-                            var _ref;
-
-                            if (_isArray) {
-                                if (_i >= _iterator.length) break;
-                                _ref = _iterator[_i++];
-                            } else {
-                                _i = _iterator.next();
-                                if (_i.done) break;
-                                _ref = _i.value;
-                            }
-
-                            var _item = _ref;
-
-                            if (_item == dropdownItem) {
-                                return;
-                            }
-                        }
-                    }
-
-                    return _.li(_.a({ href: '#' }, dropdownItem.label || dropdownItem.name || dropdownItem.title || dropdownItem).click(function (e) {
-                        e.preventDefault();
-
-                        items[itemIndex] = dropdownItem;
-
-                        render();
-
-                        if (typeof onChange === 'function') {
-                            onChange(items);
-                        }
-                    }));
-                }))))),
-
-                // Regular string
-                _.if(!Array.isArray(dropdownItems), _.if(!onChange, _.p({ class: 'chip-label' }, item)), _.if(onChange, _.input({ type: 'text', class: 'chip-label', value: item }).change(function (e) {
-                    items[itemIndex] = e.target.value;
-                }))),
-
-                // Remove button
-                _.if(onChange, _.button({ class: 'btn chip-remove' }, _.span({ class: 'fa fa-remove' })).click(function () {
-                    items.splice(itemIndex, 1);
-
-                    render();
-
-                    if (typeof onChange === 'function') {
-                        onChange(items);
-                    }
-                })));
-
-                return $chip;
-            }),
-
-            // Add button
-            _.if(onChange, _.button({ class: 'btn chip-add' }, _.span({ class: 'fa fa-plus' })).click(function () {
-                if (Array.isArray(dropdownItems)) {
-                    if (isDropdownUnique) {
-                        for (var _iterator2 = dropdownItems, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
-                            var _ref2;
-
-                            if (_isArray2) {
-                                if (_i2 >= _iterator2.length) break;
-                                _ref2 = _iterator2[_i2++];
-                            } else {
-                                _i2 = _iterator2.next();
-                                if (_i2.done) break;
-                                _ref2 = _i2.value;
-                            }
-
-                            var dropdownItem = _ref2;
-
-                            var isSelected = false;
-
-                            for (var _iterator3 = items, _isArray3 = Array.isArray(_iterator3), _i3 = 0, _iterator3 = _isArray3 ? _iterator3 : _iterator3[Symbol.iterator]();;) {
-                                var _ref3;
-
-                                if (_isArray3) {
-                                    if (_i3 >= _iterator3.length) break;
-                                    _ref3 = _iterator3[_i3++];
-                                } else {
-                                    _i3 = _iterator3.next();
-                                    if (_i3.done) break;
-                                    _ref3 = _i3.value;
-                                }
-
-                                var item = _ref3;
-
-                                if (item == dropdownItem) {
-                                    isSelected = true;
-                                    break;
-                                }
-                            }
-
-                            if (!isSelected) {
-                                items.push(dropdownItem);
-                                break;
-                            }
-                        }
-                    } else {
-                        items.push(dropdownItems[0]);
-                    }
-                } else if (typeof dropdownItems === 'string') {
-                    items.push(dropdownItems);
-                } else {
-                    items.push('New item');
-                }
-
-                render();
-
-                if (typeof onChange === 'function') {
-                    onChange(items);
-                }
-            })));
-        };
-
-        render();
-
-        return $element;
-    };
-
-    /**
-     * Renders a dropdown
-     *
-     * @param {String|Number} defaultValue
-     * @param {Array|Number} options
-     * @param {Function} onChange
-     * @param {Boolean} useClearButton
-     * @param {Boolean} useSearch
-     *
-     * @returns {HtmlElement} Dropdown element
-     */
-
-
-    UIHelper.inputDropdown = function inputDropdown(defaultValue, options, onChange, useClearButton) {
-        // If "options" parameter is a number, convert to array
-        if (typeof options === 'number') {
-            var amount = options;
-
-            options = [];
-
-            for (var i = 0; i < amount; i++) {
-                options[options.length] = { label: i.toString(), value: i };
-            }
-        }
-
-        // Change event
-        var onClick = function onClick(e, element) {
-            var $button = $(e.target);
-            var $li = $button.parents('li');
-
-            $li.addClass('active').siblings().removeClass('active');
-
-            $toggle.html($button.html());
-            $toggle.click();
-
-            onChange($li.attr('data-value'));
-        };
-
-        // Highlight selected value
-        var highlightSelectedValue = function highlightSelectedValue() {
-            $element.find('ul li').removeClass('active');
-            $toggle.html('(none)');
-
-            if (!defaultValue) {
-                return;
-            }
-
-            for (var _iterator4 = options, _isArray4 = Array.isArray(_iterator4), _i4 = 0, _iterator4 = _isArray4 ? _iterator4 : _iterator4[Symbol.iterator]();;) {
-                var _ref4;
-
-                if (_isArray4) {
-                    if (_i4 >= _iterator4.length) break;
-                    _ref4 = _iterator4[_i4++];
-                } else {
-                    _i4 = _iterator4.next();
-                    if (_i4.done) break;
-                    _ref4 = _i4.value;
-                }
-
-                var option = _ref4;
-
-                if (option.value == defaultValue) {
-                    $toggle.html(option.label);
-                    $element.find('ul li[data-value="' + option.value + '"]').addClass('active');
-                    break;
-                }
-            }
-        };
-
-        // Clear event
-        var onClear = function onClear() {
-            defaultValue = onChange(null);
-
-            highlightSelectedValue();
-        };
-
-        // Base elements
-        var $element = _.div({ class: 'dropdown' });
-        var $toggle = _.button({ class: 'btn btn-default dropdown-toggle', type: 'button', 'data-toggle': 'dropdown' }, '(none)');
-        var $clear = _.button({ class: 'btn btn-default btn-small dropdown-clear' }, _.span({ class: 'fa fa-remove' })).on('click', onClear);
-        var $list = _.ul({ class: 'dropdown-menu-items' });
-
-        // Add an option
-        $element.on('addOption', function (e, option) {
-            var optionLabel = option.label || option.id || option.name || option.toString();
-            var isSelected = option.selected || option.value == defaultValue;
-
-            if (isSelected) {
-                $toggle.html(optionLabel);
-            }
-
-            var $li = _.li({ 'data-value': option.value || optionLabel, class: isSelected ? 'active' : '' }, _.button(optionLabel).on('click', onClick));
-
-            $list.append($li);
-        });
-
-        // Remove an option
-        $element.on('removeOption', function (e, optionValue) {
-            $list.children('[data-value="' + optionValue + '"]').remove();
-        });
-
-        // Change an option
-        $element.on('changeOption', function (e, oldOptionValue, newOption) {
-            $element.trigger('removeOption', oldOptionValue);
-            $element.trigger('addOption', newOption);
-        });
-
-        // Set current option
-        $element.on('setValue', function (e, newValue) {
-            var $option = $list.children('[data-value="' + newValue + '"]');
-
-            if ($option.length > 0) {
-                $toggle.html($option.children('button').html());
-            }
-        });
-
-        // Render
-        _.append($element, $toggle, _.if(useClearButton, $clear), _.div({ class: 'dropdown-menu' }, $list));
-
-        // Render all options
-        for (var _i5 in options || []) {
-            $element.trigger('addOption', options[_i5]);
-        }
-
-        return $element;
-    };
-
-    /**
-     * Renders a dropdown with typeahead
-     *
-     * @param {String} label
-     * @param {Array|Number} options
-     * @param {Function} onClick
-     * @param {Boolean} useClearButton
-     *
-     * @returns {HtmlElement} Dropdown element
-     */
-
-
-    UIHelper.inputDropdownTypeAhead = function inputDropdownTypeAhead(label, options, onClick, useClearButton) {
-        var $element = this.inputDropdown(label, options, onClick, useClearButton);
-        var inputTimeout = void 0;
-
-        // Change input event
-        var onChangeInput = function onChangeInput() {
-            if (inputTimeout) {
-                clearTimeout(inputTimeout);
-            }
-
-            var query = ($element.find('.dropdown-typeahead input').val() || '').toLowerCase();
-            var isQueryEmpty = !query || query.length < 2;
-
-            inputTimeout = setTimeout(function () {
-                $element.find('ul li button').each(function (i, button) {
-                    var $button = $(button);
-                    var label = ($button.html() || '').toLowerCase();
-                    var isMatch = label.indexOf(query) > -1;
-
-                    $button.toggle(isMatch || isQueryEmpty);
-                });
-            }, 250);
-        };
-
-        // Clear input event
-        var onClearInput = function onClearInput(e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            $element.find('.dropdown-typeahead input').val('');
-
-            onChangeInput();
-        };
-
-        $element.addClass('typeahead');
-
-        $element.find('.dropdown-menu').prepend(_.div({ class: 'dropdown-typeahead' }, _.input({ class: 'form-control', placeholder: 'Search...' }).on('keyup paste change propertychange', onChangeInput), _.button({ class: 'dropdown-typeahead-btn-clear' }, _.span({ class: 'fa fa-remove' })).on('click', onClearInput)));
-
-        return $element;
-    };
-
-    /**
-     * Renders a carousel
-     *
-     * @param {Array} items
-     * @param {Boolean} useIndicators
-     * @param {Boolean} useControls
-     * @param {String} height
-     *
-     * @returns {HtmlElement} Carousel element
-     */
-
-
-    UIHelper.carousel = function carousel(items, useIndicators, useControls, height) {
-        var id = 'carousel-' + (10000 + Math.floor(Math.random() * 10000));
-
-        return _.div({ class: 'carousel slide', id: id, 'data-ride': 'carousel', 'data-interval': 0 }, _.if(useIndicators, _.ol({ class: 'carousel-indicators' }, _.each(items, function (i, item) {
-            return _.li({ 'data-target': '#' + id, 'data-slide-to': i, class: i == 0 ? 'active' : '' });
-        }))), _.div({ class: 'carousel-inner', role: 'listbox' }, _.each(items, function (i, item) {
-            return _.div({ class: 'item' + (i == 0 ? ' active' : ''), style: 'height:' + (height || '500px') }, item);
-        })), _.if(useControls, _.a({ href: '#' + id, role: 'button', class: 'left carousel-control', 'data-slide': 'prev' }, _.span({ class: 'fa fa-arrow-left' })), _.a({ href: '#' + id, role: 'button', class: 'right carousel-control', 'data-slide': 'next' }, _.span({ class: 'fa fa-arrow-right' }))));
-    };
-
-    /**
-     * Brings up an error modal
-     *
-     * @param {String|Error} error
-     * @param {Function} onClickOK
-     */
-
-
-    UIHelper.errorModal = function errorModal(error, onClickOK) {
-        if (!error) {
-            return;
-        }
-
-        if (error instanceof String) {
-            error = new Error(error);
-        } else if (error instanceof Object) {
-            if (error.responseText) {
-                error = new Error(error.responseText);
-            }
-        } else if (error instanceof Error == false) {
-            error = new Error(error.toString());
-        }
-
-        new MessageModal({
-            model: {
-                title: '<span class="fa fa-warning"></span> Error',
-                body: error.message + '<br /><br />Please check the JavaScript console for details',
-                onSubmit: onClickOK,
-                class: 'error-modal'
-            }
-        });
-
-        console.log(error.stack);
-    };
-
-    /**
-     * Brings up a warning modal
-     *
-     * @param {String} warning
-     * @param {Function} onClickOK
-     */
-
-
-    UIHelper.warningModal = function warningModal(warning, onClickOK) {
-        if (!warning) {
-            return;
-        }
-
-        new MessageModal({
-            model: {
-                title: '<span class="fa fa-warning"></span> Warning',
-                body: warning,
-                onSubmit: onClickOK,
-                class: 'warning-modal'
-            }
-        });
-    };
-
-    /**
-     * Brings up a message modal
-     *
-     * @param {String} title
-     * @param {String} body
-     */
-
-
-    UIHelper.messageModal = function messageModal(title, body, onSubmit) {
-        return new MessageModal({
-            model: {
-                title: title,
-                body: body,
-                onSubmit: onSubmit
-            }
-        });
-    };
-
-    /**
-     * Brings up an iframe modal
-     *
-     * @param {String} title
-     * @param {String} url
-     * @param {Function} onload
-     * @param {Function} onerror
-     */
-
-
-    UIHelper.iframeModal = function iframeModal(title, url, onload, onerror) {
-        var $iframe = _.iframe({ src: url });
-
-        return new MessageModal({
-            model: {
-                title: title,
-                body: [_.span({ class: 'iframe-modal-error' }, 'If the preview didn\'t show up, please try the "reload" or "open" buttons'), $iframe],
-                class: 'iframe-modal'
-            },
-            buttons: [{
-                label: 'Reload',
-                class: 'btn-primary',
-                callback: function callback() {
-                    $iframe[0].src += '';
-
-                    return false;
-                }
-            }, {
-                label: 'Open',
-                class: 'btn-primary',
-                callback: function callback() {
-                    window.open($iframe[0].src);
-
-                    return false;
-                }
-            }, {
-                label: 'OK',
-                class: 'btn-default'
-            }]
-        });
-    };
-
-    /**
-     * Brings up a confirm modal
-     *
-     * @param {String} type
-     * @param {String} title
-     * @param {String} body
-     * @param {Function} onSubmit
-     */
-
-
-    UIHelper.confirmModal = function confirmModal(type, title, body, onSubmit, onCancel) {
-        var submitClass = 'btn-primary';
-
-        type = (type || '').toLowerCase();
-
-        switch (type) {
-            case 'delete':case 'remove':case 'discard':case 'clear':
-                submitClass = 'btn-danger';
-                break;
-        }
-
-        return new MessageModal({
-            model: {
-                title: title,
-                body: body,
-                onSubmit: onSubmit,
-                class: 'confirm-modal'
-            },
-            buttons: [{
-                label: 'Cancel',
-                class: 'btn-default',
-                callback: onCancel
-            }, {
-                label: type,
-                class: submitClass,
-                callback: onSubmit
-            }]
-        });
-    };
-
-    return UIHelper;
-}();
-
-module.exports = UIHelper;
-
-/***/ }),
 /* 94 */
 /***/ (function(module, exports, __webpack_require__) {
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 window.Promise = __webpack_require__(95);
 window.marked = __webpack_require__(97);
@@ -14695,121 +14985,6 @@ window.copyToClipboard = function copyToClipboard(string) {
 };
 
 /**
- * Wraps an API URL
- *
- * @param {String} url
- *
- * @returns {String} API URL
- */
-window.apiUrl = function apiUrl(url) {
-    var newUrl = '/api/';
-
-    if (ProjectHelper.currentProject) {
-        newUrl += ProjectHelper.currentProject + '/';
-    }
-
-    if (ProjectHelper.currentEnvironment) {
-        newUrl += ProjectHelper.currentEnvironment + '/';
-    }
-
-    newUrl += url;
-
-    return newUrl;
-};
-
-/**
- * Wraps an API call
- *
- * @param {String} method
- * @param {String} url
- * @param {Object} data
- *
- * @returns {Promise} Response
- */
-window.apiCall = function apiCall(method, url, data) {
-    return customApiCall(method, apiUrl(url), data);
-};
-
-/**
- * Wraps an API call with a custom path
- *
- * @param {String} method
- * @param {String} url
- * @param {Object} data
- *
- * @returns {Promise} Response
- */
-window.customApiCall = function customApiCall(method, url, data) {
-    return new Promise(function (resolve, reject) {
-        var xhr = new XMLHttpRequest();
-        xhr.open(method.toUpperCase(), url);
-        xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
-
-        if (data) {
-            if ((typeof data === 'undefined' ? 'undefined' : _typeof(data)) === 'object') {
-                data = JSON.stringify(data);
-            }
-
-            xhr.send(data);
-        } else {
-            xhr.send();
-        }
-
-        xhr.onreadystatechange = function () {
-            var DONE = 4;
-            var OK = 200;
-            var NOT_MODIFIED = 304;
-            var UNAUTHORIZED = 403;
-
-            if (xhr.readyState === DONE) {
-                if (xhr.status === UNAUTHORIZED) {
-                    location = '/login/?path=' + location.pathname + location.hash;
-
-                    reject(new Error('User is not logged in'));
-                } else if (xhr.status == OK || xhr.status == NOT_MODIFIED) {
-                    var response = xhr.responseText;
-
-                    if (response && response != 'OK') {
-                        try {
-                            response = JSON.parse(response);
-                        } catch (e) {
-                            // If the response isn't JSON, then so be it
-
-                        }
-                    }
-
-                    resolve(response);
-                } else {
-                    reject(new Error(xhr.responseText));
-                }
-            }
-        };
-    });
-};
-
-/**
- * Listens for server restart
- */
-window.listenForRestart = function listenForRestart() {
-    UI.messageModal('Restart', 'HashBrown is restarting...', false);
-
-    function poke() {
-        $.ajax({
-            type: 'get',
-            url: '/',
-            success: function success() {
-                location.reload();
-            },
-            error: function error() {
-                poke();
-            }
-        });
-    }
-
-    poke();
-};
-
-/**
  * Clears the workspace
  */
 window.clearWorkspace = function clearWorkspace() {
@@ -14830,103 +15005,6 @@ window.populateWorkspace = function populateWorkspace($html, classes) {
     if (classes) {
         $workspace.addClass(classes);
     }
-};
-
-/**
- * Reloads a resource
- */
-window.reloadResource = function reloadResource(name) {
-    var model = null;
-
-    switch (name) {
-        case 'templates':
-            model = HashBrown.Models.Template;
-            break;
-
-        case 'users':
-            model = HashBrown.Models.User;
-            break;
-
-        case 'media':
-            model = HashBrown.Models.Media;
-            break;
-    }
-
-    return new Promise(function (resolve, reject) {
-        $.ajax({
-            type: 'GET',
-            url: apiUrl(name),
-            success: function success(result) {
-                window.resources[name] = result;
-
-                // If a model is specified, use it to initialise every resource
-                if (model) {
-                    for (var i in window.resources[name]) {
-                        window.resources[name][i] = new model(window.resources[name][i]);
-                    }
-                }
-
-                resolve(result);
-            },
-            error: function error(e) {
-                window.resources[name] = [];
-
-                if (e.status == 403) {
-                    location = '/login/?path=' + location.pathname + location.hash;
-                } else if (e.status == 404) {
-                    resolve([]);
-                } else {
-                    resolve([]);
-
-                    UI.errorModal(new Error(e.responseText));
-                }
-            }
-        });
-    });
-};
-
-/**
- * Reloads all resources
- */
-window.reloadAllResources = function reloadAllResources() {
-    $('.loading-messages').empty();
-
-    var queue = ['content', 'schemas', 'media', 'connections', 'templates', 'forms', 'users'];
-
-    for (var _iterator = queue, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-        var _ref;
-
-        if (_isArray) {
-            if (_i >= _iterator.length) break;
-            _ref = _iterator[_i++];
-        } else {
-            _i = _iterator.next();
-            if (_i.done) break;
-            _ref = _i.value;
-        }
-
-        var item = _ref;
-
-        var $msg = _.div({ class: 'loading-message', 'data-name': item }, item);
-
-        $('.loading-messages').append($msg);
-    }
-
-    function processQueue() {
-        var name = queue.shift();
-
-        return window.reloadResource(name).then(function () {
-            $('.loading-messages [data-name="' + name + '"]').toggleClass('loaded', true);
-
-            if (queue.length < 1) {
-                return Promise.resolve();
-            } else {
-                return processQueue();
-            }
-        });
-    }
-
-    return processQueue();
 };
 
 // Get package file
@@ -32363,8 +32441,7 @@ if (typeof jQuery !== 'undefined') {
 /* 195 */,
 /* 196 */,
 /* 197 */,
-/* 198 */,
-/* 199 */
+/* 198 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -32385,9 +32462,159 @@ var SettingsHelper = function SettingsHelper() {
 module.exports = SettingsHelper;
 
 /***/ }),
+/* 199 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var ConnectionHelperCommon = __webpack_require__(244);
+var Connection = __webpack_require__(48);
+var ProjectHelper = __webpack_require__(7);
+var RequestHelper = __webpack_require__(293);
+
+/**
+ * The client side connection helper
+ *
+ * @memberof HashBrown.Client.Helpers
+ */
+
+var ConnectionHelper = function (_ConnectionHelperComm) {
+    _inherits(ConnectionHelper, _ConnectionHelperComm);
+
+    function ConnectionHelper() {
+        _classCallCheck(this, ConnectionHelper);
+
+        return _possibleConstructorReturn(this, _ConnectionHelperComm.apply(this, arguments));
+    }
+
+    /**
+     * Gets all connections
+     *
+     * @return {Promise} Array of Connections
+     */
+    ConnectionHelper.getAllConnections = function getAllConnections() {
+        return Promise.resolve(resources.connections);
+    };
+
+    /**
+     * Gets a Connection by id (sync)
+     *
+     * @param {string} id
+     *
+     * @return {Promise} Connection
+     */
+
+
+    ConnectionHelper.getConnectionByIdSync = function getConnectionByIdSync() {
+        var id = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('id');
+
+        for (var i in resources.connections) {
+            var connection = resources.connections[i];
+
+            if (connection.id == id) {
+                return connection;
+            }
+        }
+    };
+
+    /**
+     * Gets a Connection by id
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {string} id
+     *
+     * @return {Promise(Connection)} promise
+     */
+
+
+    ConnectionHelper.getConnectionById = function getConnectionById() {
+        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+        var id = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('id');
+
+        for (var i in resources.connections) {
+            var connection = resources.connections[i];
+
+            if (connection.id == id) {
+                return Promise.resolve(connection);
+            }
+        }
+
+        return Promise.reject(new Error('No Connection by id "' + id + '" was found'));
+    };
+
+    /**
+     * Sets the Media provider
+     *
+     * @param {String} id
+     *
+     * @returns {Promise}
+     */
+
+
+    ConnectionHelper.setMediaProvider = function setMediaProvider(id) {
+        return _ConnectionHelperComm.setMediaProvider.call(this, ProjectHelper.currentProject, ProjectHelper.currentEnvironment, id).then(function () {
+            return RequestHelper.reloadResource('media');
+        }).then(function () {
+            HashBrown.Views.Navigation.NavbarMain.reload();
+        });
+    };
+
+    /**
+     * Gets the Media provider
+     *
+     * @returns {Promise} Connection
+     */
+
+
+    ConnectionHelper.getMediaProvider = function getMediaProvider() {
+        return _ConnectionHelperComm.getMediaProvider.call(this, ProjectHelper.currentProject, ProjectHelper.currentEnvironment);
+    };
+
+    /**
+     * Sets the Template provider
+     *
+     * @param {String} id
+     *
+     * @returns {Promise}
+     */
+
+
+    ConnectionHelper.setTemplateProvider = function setTemplateProvider(id) {
+        return _ConnectionHelperComm.setTemplateProvider.call(this, ProjectHelper.currentProject, ProjectHelper.currentEnvironment, id).then(function () {
+            return RequestHelper.reloadResource('templates');
+        }).then(function () {
+            HashBrown.Views.Navigation.NavbarMain.reload();
+        });
+    };
+
+    /**
+     * Gets the Template provider
+     *
+     * @returns {Promise} Connection
+     */
+
+
+    ConnectionHelper.getTemplateProvider = function getTemplateProvider() {
+        return _ConnectionHelperComm.getTemplateProvider.call(this, ProjectHelper.currentProject, ProjectHelper.currentEnvironment);
+    };
+
+    return ConnectionHelper;
+}(ConnectionHelperCommon);
+
+module.exports = ConnectionHelper;
+
+/***/ }),
 /* 200 */,
-/* 201 */,
-/* 202 */
+/* 201 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -32493,6 +32720,70 @@ var LanguageHelper = function () {
 }();
 
 module.exports = LanguageHelper;
+
+/***/ }),
+/* 202 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var DebugHelperCommon = __webpack_require__(203);
+
+/**
+ * The client side debug helper
+ *
+ * @memberof HashBrown.Client.Helpers
+ */
+
+var DebugHelper = function (_DebugHelperCommon) {
+    _inherits(DebugHelper, _DebugHelperCommon);
+
+    function DebugHelper() {
+        _classCallCheck(this, DebugHelper);
+
+        return _possibleConstructorReturn(this, _DebugHelperCommon.apply(this, arguments));
+    }
+
+    /**
+     * Start the debug socket
+     */
+    DebugHelper.startSocket = function startSocket() {
+        var debugSocket = new WebSocket(location.protocol.replace('http', 'ws') + '//' + location.host + '/api/debug');
+
+        debugSocket.onopen = function (ev) {
+            debug.log('Debug socket open', 'HashBrown');
+        };
+
+        debugSocket.onmessage = function (ev) {
+            try {
+                var data = JSON.parse(ev.data);
+
+                switch (data.type) {
+                    case 'error':
+                        UI.errorModal(new Error(data.sender + ': ' + data.message));
+                        break;
+
+                    case 'warning':
+                        UI.errorModal(new Error(data.sender + ': ' + data.message));
+                        break;
+                }
+            } catch (e) {
+                UI.errorModal(e);
+            }
+        };
+    };
+
+    return DebugHelper;
+}(DebugHelperCommon);
+
+module.exports = DebugHelper;
 
 /***/ }),
 /* 203 */
@@ -32658,11 +32949,985 @@ var DebugHelper = function () {
 module.exports = DebugHelper;
 
 /***/ }),
-/* 204 */,
+/* 204 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var MessageModal = __webpack_require__(15);
+
+/**
+ * A UI helper for creating and handling common interface behaviours
+ *
+ * @memberof HashBrown.Client.Helpers
+ */
+
+var UIHelper = function () {
+    function UIHelper() {
+        _classCallCheck(this, UIHelper);
+    }
+
+    /**
+     * Creates a switch
+     *
+     * @param {Boolean} initialValue
+     * @param {Function} onChange
+     *
+     * @returns {HTMLElement} Switch element
+     */
+    UIHelper.inputSwitch = function inputSwitch(initialValue, onChange) {
+        var id = 'switch-' + (10000 + Math.floor(Math.random() * 10000));
+        var $input = void 0;
+
+        var $element = _.div({ class: 'switch', 'data-checked': initialValue }, $input = _.input({
+            id: id,
+            class: 'form-control switch',
+            type: 'checkbox'
+        }).change(function () {
+            this.parentElement.dataset.checked = this.checked;
+
+            if (onChange) {
+                onChange(this.checked);
+            }
+        }), _.label({ for: id }));
+
+        $element.on('set', function (e, newValue) {
+            $input[0].checked = newValue;
+        });
+
+        if (initialValue) {
+            $input.attr('checked', true);
+        }
+
+        return $element;
+    };
+
+    /**
+     * Creates a group of chips
+     *
+     * @param {Array} items
+     * @param {Array} dropdownItems
+     * @param {Function} onChange
+     * @param {Boolean} isDropdownUnique
+     *
+     * @returns {HtmlElement} Chip group element
+     */
+
+
+    UIHelper.inputChipGroup = function inputChipGroup(items, dropdownItems, onChange, isDropdownUnique) {
+        var $element = _.div({ class: 'chip-group' });
+
+        if (!items) {
+            items = [];
+        }
+
+        function render() {
+            _.append($element.empty(),
+
+            // Render individual chips
+            _.each(items, function (itemIndex, item) {
+                var $chip = _.div({ class: 'chip' },
+
+                // Dropdown
+                _.if(Array.isArray(dropdownItems), _.div({ class: 'chip-label dropdown' }, _.button({ class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, item.label || item.name || item.title || item), _.if(onChange, _.ul({ class: 'dropdown-menu' }, _.each(dropdownItems, function (dropdownItemIndex, dropdownItem) {
+                    // Look for unique dropdown items
+                    if (isDropdownUnique) {
+                        for (var _iterator = items, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+                            var _ref;
+
+                            if (_isArray) {
+                                if (_i >= _iterator.length) break;
+                                _ref = _iterator[_i++];
+                            } else {
+                                _i = _iterator.next();
+                                if (_i.done) break;
+                                _ref = _i.value;
+                            }
+
+                            var _item = _ref;
+
+                            if (_item == dropdownItem) {
+                                return;
+                            }
+                        }
+                    }
+
+                    return _.li(_.a({ href: '#' }, dropdownItem.label || dropdownItem.name || dropdownItem.title || dropdownItem).click(function (e) {
+                        e.preventDefault();
+
+                        items[itemIndex] = dropdownItem;
+
+                        render();
+
+                        if (typeof onChange === 'function') {
+                            onChange(items);
+                        }
+                    }));
+                }))))),
+
+                // Regular string
+                _.if(!Array.isArray(dropdownItems), _.if(!onChange, _.p({ class: 'chip-label' }, item)), _.if(onChange, _.input({ type: 'text', class: 'chip-label', value: item }).change(function (e) {
+                    items[itemIndex] = e.target.value;
+                }))),
+
+                // Remove button
+                _.if(onChange, _.button({ class: 'btn chip-remove' }, _.span({ class: 'fa fa-remove' })).click(function () {
+                    items.splice(itemIndex, 1);
+
+                    render();
+
+                    if (typeof onChange === 'function') {
+                        onChange(items);
+                    }
+                })));
+
+                return $chip;
+            }),
+
+            // Add button
+            _.if(onChange, _.button({ class: 'btn chip-add' }, _.span({ class: 'fa fa-plus' })).click(function () {
+                if (Array.isArray(dropdownItems)) {
+                    if (isDropdownUnique) {
+                        for (var _iterator2 = dropdownItems, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
+                            var _ref2;
+
+                            if (_isArray2) {
+                                if (_i2 >= _iterator2.length) break;
+                                _ref2 = _iterator2[_i2++];
+                            } else {
+                                _i2 = _iterator2.next();
+                                if (_i2.done) break;
+                                _ref2 = _i2.value;
+                            }
+
+                            var dropdownItem = _ref2;
+
+                            var isSelected = false;
+
+                            for (var _iterator3 = items, _isArray3 = Array.isArray(_iterator3), _i3 = 0, _iterator3 = _isArray3 ? _iterator3 : _iterator3[Symbol.iterator]();;) {
+                                var _ref3;
+
+                                if (_isArray3) {
+                                    if (_i3 >= _iterator3.length) break;
+                                    _ref3 = _iterator3[_i3++];
+                                } else {
+                                    _i3 = _iterator3.next();
+                                    if (_i3.done) break;
+                                    _ref3 = _i3.value;
+                                }
+
+                                var item = _ref3;
+
+                                if (item == dropdownItem) {
+                                    isSelected = true;
+                                    break;
+                                }
+                            }
+
+                            if (!isSelected) {
+                                items.push(dropdownItem);
+                                break;
+                            }
+                        }
+                    } else {
+                        items.push(dropdownItems[0]);
+                    }
+                } else if (typeof dropdownItems === 'string') {
+                    items.push(dropdownItems);
+                } else {
+                    items.push('New item');
+                }
+
+                render();
+
+                if (typeof onChange === 'function') {
+                    onChange(items);
+                }
+            })));
+        };
+
+        render();
+
+        return $element;
+    };
+
+    /**
+     * Renders a dropdown
+     *
+     * @param {String|Number} defaultValue
+     * @param {Array|Number} options
+     * @param {Function} onChange
+     * @param {Boolean} useClearButton
+     * @param {Boolean} useSearch
+     *
+     * @returns {HtmlElement} Dropdown element
+     */
+
+
+    UIHelper.inputDropdown = function inputDropdown(defaultValue, options, onChange, useClearButton) {
+        // If "options" parameter is a number, convert to array
+        if (typeof options === 'number') {
+            var amount = options;
+
+            options = [];
+
+            for (var i = 0; i < amount; i++) {
+                options[options.length] = { label: i.toString(), value: i };
+            }
+        }
+
+        // Change event
+        var onClick = function onClick(e, element) {
+            var $button = $(e.target);
+            var $li = $button.parents('li');
+
+            $li.addClass('active').siblings().removeClass('active');
+
+            $toggle.html($button.html());
+            $toggle.click();
+
+            onChange($li.attr('data-value'));
+        };
+
+        // Highlight selected value
+        var highlightSelectedValue = function highlightSelectedValue() {
+            $element.find('ul li').removeClass('active');
+            $toggle.html('(none)');
+
+            if (!defaultValue) {
+                return;
+            }
+
+            for (var _iterator4 = options, _isArray4 = Array.isArray(_iterator4), _i4 = 0, _iterator4 = _isArray4 ? _iterator4 : _iterator4[Symbol.iterator]();;) {
+                var _ref4;
+
+                if (_isArray4) {
+                    if (_i4 >= _iterator4.length) break;
+                    _ref4 = _iterator4[_i4++];
+                } else {
+                    _i4 = _iterator4.next();
+                    if (_i4.done) break;
+                    _ref4 = _i4.value;
+                }
+
+                var option = _ref4;
+
+                if (option.value == defaultValue) {
+                    $toggle.html(option.label);
+                    $element.find('ul li[data-value="' + option.value + '"]').addClass('active');
+                    break;
+                }
+            }
+        };
+
+        // Clear event
+        var onClear = function onClear() {
+            defaultValue = onChange(null);
+
+            highlightSelectedValue();
+        };
+
+        // Base elements
+        var $element = _.div({ class: 'dropdown' });
+        var $toggle = _.button({ class: 'btn btn-default dropdown-toggle', type: 'button', 'data-toggle': 'dropdown' }, '(none)');
+        var $clear = _.button({ class: 'btn btn-default btn-small dropdown-clear' }, _.span({ class: 'fa fa-remove' })).on('click', onClear);
+        var $list = _.ul({ class: 'dropdown-menu-items' });
+
+        // Add an option
+        $element.on('addOption', function (e, option) {
+            var optionLabel = option.label || option.id || option.name || option.toString();
+            var isSelected = option.selected || option.value == defaultValue;
+
+            if (isSelected) {
+                $toggle.html(optionLabel);
+            }
+
+            var $li = _.li({ 'data-value': option.value || optionLabel, class: isSelected ? 'active' : '' }, _.button(optionLabel).on('click', onClick));
+
+            $list.append($li);
+        });
+
+        // Remove an option
+        $element.on('removeOption', function (e, optionValue) {
+            $list.children('[data-value="' + optionValue + '"]').remove();
+        });
+
+        // Change an option
+        $element.on('changeOption', function (e, oldOptionValue, newOption) {
+            $element.trigger('removeOption', oldOptionValue);
+            $element.trigger('addOption', newOption);
+        });
+
+        // Set current option
+        $element.on('setValue', function (e, newValue) {
+            var $option = $list.children('[data-value="' + newValue + '"]');
+
+            if ($option.length > 0) {
+                $toggle.html($option.children('button').html());
+            }
+        });
+
+        // Render
+        _.append($element, $toggle, _.if(useClearButton, $clear), _.div({ class: 'dropdown-menu' }, $list));
+
+        // Render all options
+        for (var _i5 in options || []) {
+            $element.trigger('addOption', options[_i5]);
+        }
+
+        return $element;
+    };
+
+    /**
+     * Renders a dropdown with typeahead
+     *
+     * @param {String} label
+     * @param {Array|Number} options
+     * @param {Function} onClick
+     * @param {Boolean} useClearButton
+     *
+     * @returns {HtmlElement} Dropdown element
+     */
+
+
+    UIHelper.inputDropdownTypeAhead = function inputDropdownTypeAhead(label, options, onClick, useClearButton) {
+        var $element = this.inputDropdown(label, options, onClick, useClearButton);
+        var inputTimeout = void 0;
+
+        // Change input event
+        var onChangeInput = function onChangeInput() {
+            if (inputTimeout) {
+                clearTimeout(inputTimeout);
+            }
+
+            var query = ($element.find('.dropdown-typeahead input').val() || '').toLowerCase();
+            var isQueryEmpty = !query || query.length < 2;
+
+            inputTimeout = setTimeout(function () {
+                $element.find('ul li button').each(function (i, button) {
+                    var $button = $(button);
+                    var label = ($button.html() || '').toLowerCase();
+                    var isMatch = label.indexOf(query) > -1;
+
+                    $button.toggle(isMatch || isQueryEmpty);
+                });
+            }, 250);
+        };
+
+        // Clear input event
+        var onClearInput = function onClearInput(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            $element.find('.dropdown-typeahead input').val('');
+
+            onChangeInput();
+        };
+
+        $element.addClass('typeahead');
+
+        $element.find('.dropdown-menu').prepend(_.div({ class: 'dropdown-typeahead' }, _.input({ class: 'form-control', placeholder: 'Search...' }).on('keyup paste change propertychange', onChangeInput), _.button({ class: 'dropdown-typeahead-btn-clear' }, _.span({ class: 'fa fa-remove' })).on('click', onClearInput)));
+
+        return $element;
+    };
+
+    /**
+     * Renders a carousel
+     *
+     * @param {Array} items
+     * @param {Boolean} useIndicators
+     * @param {Boolean} useControls
+     * @param {String} height
+     *
+     * @returns {HtmlElement} Carousel element
+     */
+
+
+    UIHelper.carousel = function carousel(items, useIndicators, useControls, height) {
+        var id = 'carousel-' + (10000 + Math.floor(Math.random() * 10000));
+
+        return _.div({ class: 'carousel slide', id: id, 'data-ride': 'carousel', 'data-interval': 0 }, _.if(useIndicators, _.ol({ class: 'carousel-indicators' }, _.each(items, function (i, item) {
+            return _.li({ 'data-target': '#' + id, 'data-slide-to': i, class: i == 0 ? 'active' : '' });
+        }))), _.div({ class: 'carousel-inner', role: 'listbox' }, _.each(items, function (i, item) {
+            return _.div({ class: 'item' + (i == 0 ? ' active' : ''), style: 'height:' + (height || '500px') }, item);
+        })), _.if(useControls, _.a({ href: '#' + id, role: 'button', class: 'left carousel-control', 'data-slide': 'prev' }, _.span({ class: 'fa fa-arrow-left' })), _.a({ href: '#' + id, role: 'button', class: 'right carousel-control', 'data-slide': 'next' }, _.span({ class: 'fa fa-arrow-right' }))));
+    };
+
+    /**
+     * Brings up an error modal
+     *
+     * @param {String|Error} error
+     * @param {Function} onClickOK
+     */
+
+
+    UIHelper.errorModal = function errorModal(error, onClickOK) {
+        if (!error) {
+            return;
+        }
+
+        if (error instanceof String) {
+            error = new Error(error);
+        } else if (error instanceof Object) {
+            if (error.responseText) {
+                error = new Error(error.responseText);
+            }
+        } else if (error instanceof Error == false) {
+            error = new Error(error.toString());
+        }
+
+        new MessageModal({
+            model: {
+                title: '<span class="fa fa-warning"></span> Error',
+                body: error.message + '<br /><br />Please check the JavaScript console for details',
+                onSubmit: onClickOK,
+                class: 'error-modal'
+            }
+        });
+
+        console.log(error.stack);
+    };
+
+    /**
+     * Brings up a warning modal
+     *
+     * @param {String} warning
+     * @param {Function} onClickOK
+     */
+
+
+    UIHelper.warningModal = function warningModal(warning, onClickOK) {
+        if (!warning) {
+            return;
+        }
+
+        new MessageModal({
+            model: {
+                title: '<span class="fa fa-warning"></span> Warning',
+                body: warning,
+                onSubmit: onClickOK,
+                class: 'warning-modal'
+            }
+        });
+    };
+
+    /**
+     * Brings up a message modal
+     *
+     * @param {String} title
+     * @param {String} body
+     */
+
+
+    UIHelper.messageModal = function messageModal(title, body, onSubmit) {
+        return new MessageModal({
+            model: {
+                title: title,
+                body: body,
+                onSubmit: onSubmit
+            }
+        });
+    };
+
+    /**
+     * Brings up an iframe modal
+     *
+     * @param {String} title
+     * @param {String} url
+     * @param {Function} onload
+     * @param {Function} onerror
+     */
+
+
+    UIHelper.iframeModal = function iframeModal(title, url, onload, onerror) {
+        var $iframe = _.iframe({ src: url });
+
+        return new MessageModal({
+            model: {
+                title: title,
+                body: [_.span({ class: 'iframe-modal-error' }, 'If the preview didn\'t show up, please try the "reload" or "open" buttons'), $iframe],
+                class: 'iframe-modal'
+            },
+            buttons: [{
+                label: 'Reload',
+                class: 'btn-primary',
+                callback: function callback() {
+                    $iframe[0].src += '';
+
+                    return false;
+                }
+            }, {
+                label: 'Open',
+                class: 'btn-primary',
+                callback: function callback() {
+                    window.open($iframe[0].src);
+
+                    return false;
+                }
+            }, {
+                label: 'OK',
+                class: 'btn-default'
+            }]
+        });
+    };
+
+    /**
+     * Brings up a confirm modal
+     *
+     * @param {String} type
+     * @param {String} title
+     * @param {String} body
+     * @param {Function} onSubmit
+     */
+
+
+    UIHelper.confirmModal = function confirmModal(type, title, body, onSubmit, onCancel) {
+        var submitClass = 'btn-primary';
+
+        type = (type || '').toLowerCase();
+
+        switch (type) {
+            case 'delete':case 'remove':case 'discard':case 'clear':
+                submitClass = 'btn-danger';
+                break;
+        }
+
+        return new MessageModal({
+            model: {
+                title: title,
+                body: body,
+                onSubmit: onSubmit,
+                class: 'confirm-modal'
+            },
+            buttons: [{
+                label: 'Cancel',
+                class: 'btn-default',
+                callback: onCancel
+            }, {
+                label: type,
+                class: submitClass,
+                callback: onSubmit
+            }]
+        });
+    };
+
+    return UIHelper;
+}();
+
+module.exports = UIHelper;
+
+/***/ }),
 /* 205 */,
 /* 206 */,
 /* 207 */,
-/* 208 */,
+/* 208 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Entity = __webpack_require__(12);
+
+/**
+ * The base class for all Content types
+ *
+ * @memberof HashBrown.Common.Models
+ */
+
+var Content = function (_Entity) {
+    _inherits(Content, _Entity);
+
+    function Content(params) {
+        _classCallCheck(this, Content);
+
+        params = params || {};
+
+        // Ensure correct type for dates
+        function parseDate(input) {
+            var result = void 0;
+
+            if (typeof input === 'string' && !isNaN(input)) {
+                result = new Date(parseInt(input));
+            } else {
+                result = new Date(input);
+            }
+
+            return result;
+        }
+
+        params.createDate = parseDate(params.createDate);
+        params.updateDate = parseDate(params.updateDate);
+
+        return _possibleConstructorReturn(this, _Entity.call(this, params));
+    }
+
+    Content.prototype.structure = function structure() {
+        // Fundamental fields
+        this.def(Boolean, 'locked');
+        this.def(Boolean, 'local');
+        this.def(Boolean, 'remote');
+        this.def(String, 'id');
+        this.def(String, 'parentId');
+        this.def(String, 'createdBy');
+        this.def(String, 'updatedBy');
+        this.def(Date, 'createDate');
+        this.def(Date, 'updateDate');
+        this.def(Date, 'publishOn');
+        this.def(Date, 'unpublishOn');
+        this.def(String, 'schemaId');
+        this.def(Boolean, 'isPublished');
+        this.def(Boolean, 'hasPreview');
+        this.def(Number, 'sort', -1);
+
+        // Extensible properties
+        this.def(Object, 'properties', {});
+
+        // Settings
+        this.def(Object, 'settings', {
+            publishing: {
+                connections: []
+            }
+        });
+    };
+
+    /**
+     * Creates a new Content object
+     *
+     * @param {String} schemaId
+     * @param {Object} properties
+     *
+     * @returns {Content} New Content object
+     */
+
+
+    Content.create = function create(schemaId, properties) {
+        if (typeof schemaId !== 'string') {
+            debug.error('Schema ID was not provided', this);
+            return;
+        }
+
+        var defaultProperties = {
+            title: 'New content'
+        };
+
+        var content = new Content({
+            id: Entity.createId(),
+            createDate: new Date(),
+            updateDate: new Date(),
+            schemaId: schemaId,
+            properties: properties || defaultProperties
+        });
+
+        return content;
+    };
+
+    /**
+     * Adopts a list of tasks, turning them into un/publish dates
+     *
+     * @param {Array} tasks
+     */
+
+
+    Content.prototype.adoptTasks = function adoptTasks(tasks) {
+        if (tasks) {
+            for (var i in tasks) {
+                switch (tasks[i].type) {
+                    case 'publish':
+                        this.publishOn = tasks[i].date;
+                        break;
+
+                    case 'unpublish':
+                        this.unpublishOn = tasks[i].date;
+                        break;
+                }
+            }
+        }
+    };
+
+    /**
+     * Gets parent Content
+     *
+     * @param {String} project
+     * @param {String} environment
+     *
+     * @returns {Promise} Parent
+     */
+
+
+    Content.prototype.getParent = function getParent() {
+        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+
+        if (this.parentId) {
+            return HashBrown.Helpers.ContentHelper.getContentById(project, environment, this.parentId).then(function (parentContent) {
+                return Promise.resolve(parentContent);
+            }).catch(function (e) {
+                return Promise.resolve(null);
+            });
+        } else {
+            return Promise.resolve(null);
+        }
+    };
+
+    /**
+     * Gets all parents
+     *
+     * @param {String} project
+     * @param {String} environment
+     *
+     * @returns {Promise} parents
+     */
+
+
+    Content.prototype.getParents = function getParents() {
+        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+
+        var parents = [];
+
+        var getNextParent = function getNextParent(content) {
+            return content.getParent(project, environment).then(function (parentContent) {
+                if (parentContent) {
+                    parents.push(parentContent);
+
+                    return getNextParent(parentContent);
+                } else {
+                    return Promise.resolve(parents);
+                }
+            });
+        };
+
+        return getNextParent(this);
+    };
+
+    /**
+     * Gets settings
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} key
+     *
+     * @returns {Promise} settings
+     */
+
+
+    Content.prototype.getSettings = function getSettings() {
+        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+
+        var _this2 = this;
+
+        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+        var key = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('key');
+
+        // Loop through all parent content to find a governing setting
+        return this.getParents(project, environment).then(function (parents) {
+            for (var _iterator = parents, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+                var _ref;
+
+                if (_isArray) {
+                    if (_i >= _iterator.length) break;
+                    _ref = _iterator[_i++];
+                } else {
+                    _i = _iterator.next();
+                    if (_i.done) break;
+                    _ref = _i.value;
+                }
+
+                var parentContent = _ref;
+
+                if (parentContent.settings && parentContent.settings[key] && parentContent.settings[key].applyToChildren) {
+                    var settings = parentContent.settings[key];
+
+                    // Make clone as to avoid interference with inherent values
+                    settings = JSON.parse(JSON.stringify(settings));
+
+                    settings.governedBy = parentContent;
+
+                    return Promise.resolve(settings);
+                }
+            }
+
+            // No parent nodes with governing settings found, return own settings
+            if (!_this2.settings) {
+                _this2.settings = {};
+            }
+
+            if (!_this2.settings[key]) {
+                _this2.settings[key] = {};
+            }
+
+            // Special cases
+            switch (key) {
+                case 'publishing':
+                    _this2.settings.publishing.connections = _this2.settings.publishing.connections || [];
+                    break;
+            }
+
+            return Promise.resolve(_this2.settings[key]);
+        });
+    };
+
+    /**
+     * Gets all meta fields
+     *
+     * @returns {Object} meta
+     */
+
+
+    Content.prototype.getMeta = function getMeta() {
+        return {
+            parentId: this.parentId,
+            createDate: this.createDate,
+            updateDate: this.updateDate,
+            createdBy: this.createdBy,
+            updatedBy: this.updatedBy
+        };
+    };
+
+    /**
+     * Shorthand to get property value
+     *
+     * @param {String} key
+     * @param {String} language
+     *
+     * @returns {Object} value
+     */
+
+
+    Content.prototype.prop = function prop(key, language) {
+        return this.getPropertyValue(key, language);
+    };
+
+    /**
+     * Gets a property value
+     *
+     * @param {String} key
+     * @param {String} language
+     *
+     * @returns {Object} value
+     */
+
+
+    Content.prototype.getPropertyValue = function getPropertyValue(key, language) {
+        if (!this.properties) {
+            this.properties = {};
+        }
+
+        if (language && _typeof(this.properties[key]) === 'object') {
+            return this.properties[key][language];
+        } else {
+            return this.properties[key];
+        }
+    };
+
+    /**
+     * Returns all properties in a given language
+     *
+     * @param {String} language
+     *
+     * @returns {Object} properties
+     */
+
+
+    Content.prototype.getLocalizedProperties = function getLocalizedProperties(language) {
+        // Create references
+        // NOTE: We're cloning the "properties" value to avoid destroying the structure
+        var localizedProperties = {};
+        var allProperties = JSON.parse(JSON.stringify(this.properties));
+
+        // Flatten properties recursively
+        function flattenRecursively(source, target) {
+            // Loop through all keys
+            for (var key in source) {
+                var value = source[key];
+
+                // If the value is an object type, examine it further
+                if (value && (typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object') {
+                    // If multilingual flag is set, assign value directly
+                    if (value._multilingual) {
+                        if (typeof value[language] === 'undefined') {
+                            value[language] = null;
+                        }
+
+                        target[key] = value[language];
+
+                        // If not, recurse into the object
+                    } else {
+                        // If this value was created with the ArrayEditor, filter out Schema ids
+                        // by assigning the "value" of each item directly to the array
+                        if (Array.isArray(value)) {
+                            for (var i in value) {
+                                if (!value[i].value) {
+                                    continue;
+                                }
+
+                                value[i] = value[i].value;
+                            }
+                        }
+
+                        // Prepare target data type for either Object or Array
+                        if (Array.isArray(value)) {
+                            target[key] = [];
+                        } else {
+                            target[key] = {};
+                        }
+
+                        flattenRecursively(value, target[key]);
+                    }
+
+                    // If not, just return the localised value
+                } else {
+                    target[key] = value;
+                }
+            }
+        }
+
+        flattenRecursively(allProperties, localizedProperties);
+
+        return localizedProperties;
+    };
+
+    /**
+     * Gets the content type
+     *
+     * @returns {String} type
+     */
+
+
+    Content.prototype.getType = function getType() {
+        return this.constructor.name;
+    };
+
+    /**
+     * Gets the schema information
+     *
+     * @returns {Promise(Schema)} promise
+     */
+
+
+    Content.prototype.getSchema = function getSchema() {
+        return new Promise(function (callback) {
+            callback(null);
+        });
+    };
+
+    return Content;
+}(Entity);
+
+module.exports = Content;
+
+/***/ }),
 /* 209 */,
 /* 210 */,
 /* 211 */,
@@ -32672,16 +33937,534 @@ module.exports = DebugHelper;
 /* 215 */,
 /* 216 */,
 /* 217 */,
-/* 218 */,
+/* 218 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(process) {// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+// resolves . and .. elements in a path array with directory names there
+// must be no slashes, empty elements, or device names (c:\) in the array
+// (so also no leading and trailing slashes - it does not distinguish
+// relative and absolute paths)
+function normalizeArray(parts, allowAboveRoot) {
+  // if the path tries to go above the root, `up` ends up > 0
+  var up = 0;
+  for (var i = parts.length - 1; i >= 0; i--) {
+    var last = parts[i];
+    if (last === '.') {
+      parts.splice(i, 1);
+    } else if (last === '..') {
+      parts.splice(i, 1);
+      up++;
+    } else if (up) {
+      parts.splice(i, 1);
+      up--;
+    }
+  }
+
+  // if the path is allowed to go above the root, restore leading ..s
+  if (allowAboveRoot) {
+    for (; up--; up) {
+      parts.unshift('..');
+    }
+  }
+
+  return parts;
+}
+
+// Split a filename into [root, dir, basename, ext], unix version
+// 'root' is just a slash, or nothing.
+var splitPathRe = /^(\/?|)([\s\S]*?)((?:\.{1,2}|[^\/]+?|)(\.[^.\/]*|))(?:[\/]*)$/;
+var splitPath = function splitPath(filename) {
+  return splitPathRe.exec(filename).slice(1);
+};
+
+// path.resolve([from ...], to)
+// posix version
+exports.resolve = function () {
+  var resolvedPath = '',
+      resolvedAbsolute = false;
+
+  for (var i = arguments.length - 1; i >= -1 && !resolvedAbsolute; i--) {
+    var path = i >= 0 ? arguments[i] : process.cwd();
+
+    // Skip empty and invalid entries
+    if (typeof path !== 'string') {
+      throw new TypeError('Arguments to path.resolve must be strings');
+    } else if (!path) {
+      continue;
+    }
+
+    resolvedPath = path + '/' + resolvedPath;
+    resolvedAbsolute = path.charAt(0) === '/';
+  }
+
+  // At this point the path should be resolved to a full absolute path, but
+  // handle relative paths to be safe (might happen when process.cwd() fails)
+
+  // Normalize the path
+  resolvedPath = normalizeArray(filter(resolvedPath.split('/'), function (p) {
+    return !!p;
+  }), !resolvedAbsolute).join('/');
+
+  return (resolvedAbsolute ? '/' : '') + resolvedPath || '.';
+};
+
+// path.normalize(path)
+// posix version
+exports.normalize = function (path) {
+  var isAbsolute = exports.isAbsolute(path),
+      trailingSlash = substr(path, -1) === '/';
+
+  // Normalize the path
+  path = normalizeArray(filter(path.split('/'), function (p) {
+    return !!p;
+  }), !isAbsolute).join('/');
+
+  if (!path && !isAbsolute) {
+    path = '.';
+  }
+  if (path && trailingSlash) {
+    path += '/';
+  }
+
+  return (isAbsolute ? '/' : '') + path;
+};
+
+// posix version
+exports.isAbsolute = function (path) {
+  return path.charAt(0) === '/';
+};
+
+// posix version
+exports.join = function () {
+  var paths = Array.prototype.slice.call(arguments, 0);
+  return exports.normalize(filter(paths, function (p, index) {
+    if (typeof p !== 'string') {
+      throw new TypeError('Arguments to path.join must be strings');
+    }
+    return p;
+  }).join('/'));
+};
+
+// path.relative(from, to)
+// posix version
+exports.relative = function (from, to) {
+  from = exports.resolve(from).substr(1);
+  to = exports.resolve(to).substr(1);
+
+  function trim(arr) {
+    var start = 0;
+    for (; start < arr.length; start++) {
+      if (arr[start] !== '') break;
+    }
+
+    var end = arr.length - 1;
+    for (; end >= 0; end--) {
+      if (arr[end] !== '') break;
+    }
+
+    if (start > end) return [];
+    return arr.slice(start, end - start + 1);
+  }
+
+  var fromParts = trim(from.split('/'));
+  var toParts = trim(to.split('/'));
+
+  var length = Math.min(fromParts.length, toParts.length);
+  var samePartsLength = length;
+  for (var i = 0; i < length; i++) {
+    if (fromParts[i] !== toParts[i]) {
+      samePartsLength = i;
+      break;
+    }
+  }
+
+  var outputParts = [];
+  for (var i = samePartsLength; i < fromParts.length; i++) {
+    outputParts.push('..');
+  }
+
+  outputParts = outputParts.concat(toParts.slice(samePartsLength));
+
+  return outputParts.join('/');
+};
+
+exports.sep = '/';
+exports.delimiter = ':';
+
+exports.dirname = function (path) {
+  var result = splitPath(path),
+      root = result[0],
+      dir = result[1];
+
+  if (!root && !dir) {
+    // No dirname whatsoever
+    return '.';
+  }
+
+  if (dir) {
+    // It has a dirname, strip trailing slash
+    dir = dir.substr(0, dir.length - 1);
+  }
+
+  return root + dir;
+};
+
+exports.basename = function (path, ext) {
+  var f = splitPath(path)[2];
+  // TODO: make this comparison case-insensitive on windows?
+  if (ext && f.substr(-1 * ext.length) === ext) {
+    f = f.substr(0, f.length - ext.length);
+  }
+  return f;
+};
+
+exports.extname = function (path) {
+  return splitPath(path)[3];
+};
+
+function filter(xs, f) {
+  if (xs.filter) return xs.filter(f);
+  var res = [];
+  for (var i = 0; i < xs.length; i++) {
+    if (f(xs[i], i, xs)) res.push(xs[i]);
+  }
+  return res;
+}
+
+// String.prototype.substr - negative index don't work in IE8
+var substr = 'ab'.substr(-1) === 'b' ? function (str, start, len) {
+  return str.substr(start, len);
+} : function (str, start, len) {
+  if (start < 0) start = str.length + start;
+  return str.substr(start, len);
+};
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6)))
+
+/***/ }),
 /* 219 */,
 /* 220 */,
 /* 221 */,
 /* 222 */,
 /* 223 */,
 /* 224 */,
-/* 225 */,
+/* 225 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+// Models
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var FieldSchema = __webpack_require__(88);
+var ContentSchema = __webpack_require__(87);
+
+/**
+ * The common base for SchemaHelper
+ *
+ * @memberof HashBrown.Common.Helpers
+ */
+
+var SchemaHelper = function () {
+    function SchemaHelper() {
+        _classCallCheck(this, SchemaHelper);
+    }
+
+    /**
+     * Gets all parent fields
+     *
+     * @param {String} id
+     *
+     * @returns {Promise(Schema)} schema
+     */
+    SchemaHelper.getSchemaWithParentFields = function getSchemaWithParentFields(id) {
+        return new Promise(function (callback) {
+            callback();
+        });
+    };
+
+    /**
+     * Gets the appropriate model
+     *
+     * @param {Object} properties
+     *
+     * @return {Schema} Schema
+     */
+
+
+    SchemaHelper.getModel = function getModel(properties) {
+        if (!properties) {
+            return null;
+        }
+
+        if (properties instanceof ContentSchema || properties instanceof FieldSchema) {
+            return properties;
+        }
+
+        if (properties.type == 'content') {
+            return new ContentSchema(properties);
+        } else if (properties.type == 'field') {
+            return new FieldSchema(properties);
+        }
+
+        return null;
+    };
+
+    /**
+     * Merges two Schemas
+     *
+     * @param Schema childSchema
+     * @param Schema parentSchema
+     *
+     * @returns {Schema} Merged Schema
+     */
+
+
+    SchemaHelper.mergeSchemas = function mergeSchemas() {
+        var childSchema = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('childSchema');
+        var parentSchema = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('parentSchema');
+
+        childSchema = JSON.parse(JSON.stringify(childSchema));
+        parentSchema = JSON.parse(JSON.stringify(parentSchema));
+
+        var mergedSchema = parentSchema;
+
+        // Recursive merge
+        function merge(parentValues, childValues) {
+            for (var k in childValues) {
+                if (_typeof(parentValues[k]) === 'object' && _typeof(childValues[k]) === 'object') {
+                    merge(parentValues[k], childValues[k]);
+                } else {
+                    parentValues[k] = childValues[k];
+                }
+            }
+        }
+
+        merge(mergedSchema.fields, childSchema.fields);
+
+        // Overwrite native values 
+        mergedSchema.id = childSchema.id;
+        mergedSchema.name = childSchema.name;
+        mergedSchema.parentSchemaId = childSchema.parentSchemaId;
+        mergedSchema.icon = childSchema.icon || mergedSchema.icon;
+
+        // Specific values for schema types
+        switch (mergedSchema.type) {
+            case 'content':
+                var mergedTabs = {};
+
+                if (!mergedSchema.tabs) {
+                    mergedSchema.tabs = {};
+                }
+
+                if (!childSchema.tabs) {
+                    childSchema.tabs = {};
+                }
+
+                // Merge tabs
+                merge(mergedSchema.tabs, childSchema.tabs);
+
+                // Set default tab id
+                mergedSchema.defaultTabId = childSchema.defaultTabId || mergedSchema.defaultTabId;
+                break;
+        }
+
+        return mergedSchema;
+    };
+
+    return SchemaHelper;
+}();
+
+module.exports = SchemaHelper;
+
+/***/ }),
 /* 226 */,
-/* 227 */,
+/* 227 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/**
+ * A helper class for Content
+ *
+ * @memberof HashBrown.Common.Helpers
+ */
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var ContentHelper = function () {
+    function ContentHelper() {
+        _classCallCheck(this, ContentHelper);
+    }
+
+    /**
+     * Gets all Content objects
+     *
+     * @param {String} project
+     * @param {String} environment
+     *
+     * @return {Promise} promise
+     */
+    ContentHelper.getAllContents = function getAllContents() {
+        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+
+        return Promise.resolve();
+    };
+
+    /**
+     * Gets a URL-friendly version of a string
+     *
+     * @param {String} string
+     *
+     * @param {String} slug
+     */
+
+
+    ContentHelper.getSlug = function getSlug(string) {
+        return (string || '').toLowerCase().replace(/[æ|ä]/g, 'ae').replace(/[ø|ö]/g, 'oe').replace(/å/g, 'aa').replace(/ü/g, 'ue').replace(/ß/g, 'ss').replace(/[^\w ]+/g, '').replace(/ +/g, '-');
+    };
+
+    /**
+     * Gets a Content object by id
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {Number} id
+     *
+     * @return {Promise} promise
+     */
+
+
+    ContentHelper.getContentById = function getContentById() {
+        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+        var id = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('id');
+
+        return Promise.resolve();
+    };
+
+    /**
+     * Sets a Content object by id
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {Number} id
+     * @param {Object} content
+     *
+     * @return {Promise} promise
+     */
+
+
+    ContentHelper.setContentById = function setContentById() {
+        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+        var id = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('id');
+        var content = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : requiredParam('content');
+
+        return new Promise(function (resolve, reject) {
+            resolve();
+        });
+    };
+
+    /**
+     * Checks if a Schema type is allowed as a child of a Content object
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} parentId
+     * @param {String} childSchemaId
+     *
+     * @returns {Promise} Is the Content node allowed as a child
+     */
+
+
+    ContentHelper.isSchemaAllowedAsChild = function isSchemaAllowedAsChild() {
+        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+        var parentId = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('parentId');
+        var childSchemaId = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : requiredParam('childSchemaId');
+
+        // No parent ID means root, and all Schemas are allowed there
+        if (!parentId) {
+            return Promise.resolve();
+        } else {
+            return this.getContentById(project, environment, parentId).then(function (parentContent) {
+                return HashBrown.Helpers.SchemaHelper.getSchemaById(project, environment, parentContent.schemaId);
+            }).then(function (parentSchema) {
+                // The Schema was not an allowed child
+                if (parentSchema.allowedChildSchemas.indexOf(childSchemaId) < 0) {
+                    return HashBrown.Helpers.SchemaHelper.getSchemaById(project, environment, childSchemaId).then(function (childSchema) {
+                        return Promise.reject(new Error('Content with Schema "' + childSchema.name + '" is not an allowed child of Content with Schema "' + parentSchema.name + '"'));
+                    });
+
+                    // The Schema was an allowed child, resolve
+                } else {
+                    return Promise.resolve();
+                }
+            });
+        }
+    };
+
+    /**
+     * Creates a new content object
+     *
+     * @return {Promise} promise
+     */
+
+
+    ContentHelper.createContent = function createContent() {
+        return new Promise(function (resolve, reject) {
+            resolve();
+        });
+    };
+
+    /**
+     * Removes a content object
+     *
+     * @param {Number} id
+     *
+     * @return {Promise} promise
+     */
+
+
+    ContentHelper.removeContentById = function removeContentById(id) {
+        return new Promise(function (resolve, reject) {
+            resolve();
+        });
+    };
+
+    return ContentHelper;
+}();
+
+module.exports = ContentHelper;
+
+/***/ }),
 /* 228 */,
 /* 229 */,
 /* 230 */,
@@ -32692,13 +34475,263 @@ module.exports = DebugHelper;
 /* 235 */,
 /* 236 */,
 /* 237 */,
-/* 238 */,
+/* 238 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+// Models
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Media = __webpack_require__(49);
+
+/**
+ * A helper for Media objects
+ *
+ * @memberof HashBrown.Common.Helpers
+ */
+
+var MediaHelper = function () {
+    function MediaHelper() {
+        _classCallCheck(this, MediaHelper);
+    }
+
+    /**
+     * Gets the media root path
+     *
+     * @returns {Promise} Path
+     */
+    MediaHelper.getRootPath = function getRootPath() {
+        return ConnectionHelper.getMediaProvider().then(function (connection) {
+            resolve(connection.getMediaPath());
+        }).catch(function () {
+            resolve('');
+        });
+    };
+
+    /**
+     * Gets the Media tree
+     *
+     * @returns {Promise(Object)} tree
+     */
+
+
+    MediaHelper.getTree = function getTree() {
+        return Promise.resolve({});
+    };
+
+    /**
+     * Sets a Media tree item
+     *
+     * @param {String} id
+     * @param {Object} item
+     *
+     * @returns {Promise} promise
+     */
+
+
+    MediaHelper.setTreeItem = function setTreeItem(id, item) {
+        return Promise.resolve();
+    };
+
+    /**
+     * Gets the media temp path
+     *
+     * @param {String} project
+     *
+     * @returns {String} Path
+     */
+
+
+    MediaHelper.getTempPath = function getTempPath() {
+        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+
+        var path = '/storage/' + ProjectHelper.currentProject + '/temp';
+
+        return path;
+    };
+
+    return MediaHelper;
+}();
+
+module.exports = MediaHelper;
+
+/***/ }),
 /* 239 */,
 /* 240 */,
 /* 241 */,
 /* 242 */,
 /* 243 */,
-/* 244 */,
+/* 244 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Connection = __webpack_require__(48);
+
+/**
+ * The helper class for Connections
+ *
+ * @memberof HashBrown.Common.Helpers
+ */
+
+var ConnectionHelper = function () {
+    function ConnectionHelper() {
+        _classCallCheck(this, ConnectionHelper);
+    }
+
+    /**
+     * Gets all connections
+     *
+     * @param {String} project
+     * @param {String} environment
+     *
+     * @returns {Promise(Array)} connections
+     */
+    ConnectionHelper.getAllConnections = function getAllConnections() {
+        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+
+        return Promise.resolve();
+    };
+
+    /**
+     * Sets the Template provider
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} id
+     *
+     * @return {Promise} Promise
+     */
+
+
+    ConnectionHelper.setTemplateProvider = function setTemplateProvider() {
+        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+        var id = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+
+        return HashBrown.Helpers.SettingsHelper.getSettings(project, environment, 'providers').then(function (providers) {
+            providers = providers || {};
+            providers.template = id;
+
+            return HashBrown.Helpers.SettingsHelper.setSettings(project, environment, 'providers', providers);
+        });
+    };
+
+    /**
+     * Gets the Template provider
+     *
+     * @param {String} project
+     * @param {String} environment
+     *
+     * @return {Promise} Connection object
+     */
+
+
+    ConnectionHelper.getTemplateProvider = function getTemplateProvider() {
+        var _this = this;
+
+        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+
+        return HashBrown.Helpers.SettingsHelper.getSettings(project, environment, 'providers')
+
+        // Previously, providers were set project-wide, so retrieve automatically if needed
+        .then(function (providers) {
+            if (!providers) {
+                return HashBrown.Helpers.SettingsHelper.getSettings(project, null, 'providers');
+            } else {
+                return Promise.resolve(providers);
+            }
+        })
+
+        // Return requested provider
+        .then(function (providers) {
+            providers = providers || {};
+
+            if (providers.template) {
+                return _this.getConnectionById(project, environment, providers.template);
+            } else {
+                return Promise.resolve(null);
+            }
+        });
+    };
+
+    /**
+     * Sets the Media provider
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} id
+     *
+     * @return {Promise} Promise
+     */
+
+
+    ConnectionHelper.setMediaProvider = function setMediaProvider() {
+        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+        var id = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+
+        return HashBrown.Helpers.SettingsHelper.getSettings(project, environment, 'providers').then(function (providers) {
+            providers = providers || {};
+            providers.media = id;
+
+            return HashBrown.Helpers.SettingsHelper.setSettings(project, environment, 'providers', providers);
+        });
+    };
+
+    /**
+     * Gets the Media provider
+     *
+     * @param {String} project
+     * @param {String} environment
+     *
+     * @return {Promise} Connection object
+     */
+
+
+    ConnectionHelper.getMediaProvider = function getMediaProvider() {
+        var _this2 = this;
+
+        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+
+        return HashBrown.Helpers.SettingsHelper.getSettings(project, environment, 'providers')
+
+        // Previously, providers were set project-wide, so retrieve automatically if needed
+        .then(function (providers) {
+            if (!providers) {
+                return HashBrown.Helpers.SettingsHelper.getSettings(project, null, 'providers');
+            } else {
+                return Promise.resolve(providers);
+            }
+        })
+
+        // Return requested provider
+        .then(function (providers) {
+            providers = providers || {};
+
+            if (providers.media) {
+                return _this2.getConnectionById(project, environment, providers.media);
+            } else {
+                return Promise.resolve(null);
+            }
+        });
+    };
+
+    return ConnectionHelper;
+}();
+
+module.exports = ConnectionHelper;
+
+/***/ }),
 /* 245 */,
 /* 246 */,
 /* 247 */,
@@ -32725,16 +34758,45 @@ module.exports = DebugHelper;
 "use strict";
 
 
-// Helper functions
+/**
+ * @namespace HashBrown.Helpers
+ */
 
-__webpack_require__(94);
+module.exports = {
+    ConnectionHelper: __webpack_require__(199),
+    ContentHelper: __webpack_require__(47),
+    DebugHelper: __webpack_require__(202),
+    LanguageHelper: __webpack_require__(93),
+    MediaHelper: __webpack_require__(92),
+    ProjectHelper: __webpack_require__(7),
+    RequestHelper: __webpack_require__(293),
+    SchemaHelper: __webpack_require__(50),
+    SettingsHelper: __webpack_require__(35),
+    UIHelper: __webpack_require__(204)
+};
+
+/***/ }),
+/* 266 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
 
 // Libraries
+
 __webpack_require__(186);
 
+// Namespaces
+window.HashBrown = {};
+
+HashBrown.Helpers = __webpack_require__(265);
+
+// Helper functions
+__webpack_require__(94);
+
 // Helper shortcuts
-window.debug = __webpack_require__(292);
-window.UI = __webpack_require__(93);
+window.debug = HashBrown.Helpers.DebugHelper;
+window.UI = HashBrown.Helpers.UIHelper;
 
 // Start debug socket
 debug.startSocket();
@@ -32742,12 +34804,12 @@ debug.startSocket();
 // --------------------
 // Get current user
 // --------------------
-apiCall('get', 'user').then(function (user) {
+HashBrown.Helpers.RequestHelper.request('get', 'user').then(function (user) {
     var User = __webpack_require__(34);
 
     User.current = new User(user);
 
-    return apiCall('get', 'server/projects');
+    return HashBrown.Helpers.RequestHelper.request('get', 'server/projects');
 })
 
 // --------------------
@@ -32764,9 +34826,9 @@ apiCall('get', 'user').then(function (user) {
             return Promise.resolve();
         }
 
-        return apiCall('get', 'server/projects/' + project).then(function (project) {
-            var Project = __webpack_require__(89);
-            var ProjectEditor = __webpack_require__(266);
+        return HashBrown.Helpers.RequestHelper.request('get', 'server/projects/' + project).then(function (project) {
+            var Project = __webpack_require__(90);
+            var ProjectEditor = __webpack_require__(267);
 
             var projectEditor = new ProjectEditor({
                 model: new Project(project)
@@ -32793,9 +34855,9 @@ apiCall('get', 'user').then(function (user) {
         return Promise.resolve();
     }
 
-    return apiCall('get', 'users');
+    return HashBrown.Helpers.RequestHelper.request('get', 'users');
 }).then(function (users) {
-    var UserEditor = __webpack_require__(90);
+    var UserEditor = __webpack_require__(91);
     var User = __webpack_require__(34);
 
     var _loop = function _loop() {
@@ -32824,7 +34886,7 @@ apiCall('get', 'user').then(function (user) {
                 });
             }), _.button({ class: 'btn btn-primary', title: 'Remove user' }, 'Remove').on('click', function () {
                 UI.confirmModal('remove', 'Delete user "' + (user.fullName || user.username || user.email || user.id) + '"', 'Are you sure you want to remove this user?', function () {
-                    apiCall('delete', 'user/' + user.id).then(function () {
+                    HashBrown.Helpers.RequestHelper.request('delete', 'user/' + user.id).then(function () {
                         $user.remove();
                     }).catch(UI.errorModal);
                 });
@@ -32854,8 +34916,8 @@ apiCall('get', 'user').then(function (user) {
     }
 
     $('.btn-restart').click(function () {
-        apiCall('post', 'server/restart').then(function () {
-            listenForRestart();
+        HashBrown.Helpers.RequestHelper.request('post', 'server/restart').then(function () {
+            HashBrown.Helpers.RequestHelper.listenForRestart();
         });
     });
 })
@@ -32870,7 +34932,7 @@ apiCall('get', 'user').then(function (user) {
 
     var $btnUpdate = _.find('.btn-update');
 
-    return apiCall('get', 'server/update/check').then(function (update) {
+    return HashBrown.Helpers.RequestHelper.request('get', 'server/update/check').then(function (update) {
         $btnUpdate.removeClass('working');
 
         if (update.isBehind) {
@@ -32879,7 +34941,7 @@ apiCall('get', 'user').then(function (user) {
             $btnUpdate.click(function () {
                 UI.messageModal('Update', 'HashBrown is upgrading from ' + update.localVersion + ' to ' + update.remoteVersion + ' (this may take a minute)...', false);
 
-                apiCall('post', 'server/update/start').then(function () {
+                HashBrown.Helpers.RequestHelper.request('post', 'server/update/start').then(function () {
                     var MessageModal = __webpack_require__(15);
 
                     new MessageModal({
@@ -32891,7 +34953,7 @@ apiCall('get', 'user').then(function (user) {
                             label: 'Cool!',
                             class: 'btn-primary',
                             callback: function callback() {
-                                listenForRestart();
+                                HashBrown.Helpers.RequestHelper.listenForRestart();
                             }
                         }]
                     });
@@ -32917,7 +34979,7 @@ $('.navbar-main a').click(function () {
 // Invite a user
 // --------------------
 $('.btn-invite-user').click(function () {
-    customApiCall('get', '/api/users').then(function (users) {
+    HashBrown.Helpers.RequestHelper.customRequest('get', '/api/users').then(function (users) {
         /**
          * Generate password
          */
@@ -32955,7 +35017,7 @@ $('.btn-invite-user').click(function () {
             // An email was provided, send invitation    
             if (isEmail) {
                 var _modal = UI.confirmModal('invite', 'Add user', 'Do you want to invite a new user with email "' + username + '"?', function () {
-                    customApiCall('post', '/api/user/invite', {
+                    HashBrown.Helpers.RequestHelper.customRequest('post', '/api/user/invite', {
                         email: username
                     }).then(function () {
                         UI.messageModal('Invite user', 'Invitation was sent to ' + username);
@@ -32976,7 +35038,7 @@ $('.btn-invite-user').click(function () {
                 var password = $passwd.val() || '';
                 var scopes = {};
 
-                apiCall('post', 'user/new', {
+                HashBrown.Helpers.RequestHelper.request('post', 'user/new', {
                     username: username,
                     password: password,
                     scopes: {}
@@ -33005,7 +35067,7 @@ $('.btn-create-project').click(function () {
         var name = modal.$element.find('input').val();
 
         if (name) {
-            apiCall('post', 'server/projects/new', { name: name }).then(function () {
+            HashBrown.Helpers.RequestHelper.request('post', 'server/projects/new', { name: name }).then(function () {
                 location.reload();
             }).catch(UI.errorModal);
         } else {
@@ -33032,7 +35094,7 @@ $('.btn-create-project').click(function () {
 });
 
 /***/ }),
-/* 266 */
+/* 267 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -33044,12 +35106,14 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+var RequestHelper = __webpack_require__(293);
+
 var MessageModal = __webpack_require__(15);
-var InfoEditor = __webpack_require__(267);
-var SyncEditor = __webpack_require__(268);
-var LanguageEditor = __webpack_require__(269);
-var BackupEditor = __webpack_require__(270);
-var MigrationEditor = __webpack_require__(271);
+var InfoEditor = __webpack_require__(268);
+var SyncEditor = __webpack_require__(269);
+var LanguageEditor = __webpack_require__(270);
+var BackupEditor = __webpack_require__(271);
+var MigrationEditor = __webpack_require__(272);
 
 /**
  * The editor for projects as seen on the dashboard
@@ -33102,7 +35166,7 @@ var ProjectEditor = function (_View) {
                 class: 'btn-danger disabled',
                 disabled: true,
                 callback: function callback() {
-                    apiCall('delete', 'server/projects/' + _this2.model.id).then(function () {
+                    RequestHelper.request('delete', 'server/projects/' + _this2.model.id).then(function () {
                         location.reload();
                     }).catch(UI.errorModal);
                 }
@@ -33121,7 +35185,7 @@ var ProjectEditor = function (_View) {
         var _this3 = this;
 
         var modal = UI.confirmModal('Remove', 'Remove environment "' + environmentName + '"', 'Are you sure want to remove the environment "' + environmentName + '" from the project "' + (this.model.title || this.model.id) + '"?', function () {
-            apiCall('delete', 'server/projects/' + _this3.model.id + '/' + environmentName).then(function () {
+            RequestHelper.request('delete', 'server/projects/' + _this3.model.id + '/' + environmentName).then(function () {
                 location.reload();
             }).catch(UI.errorModal);
         });
@@ -33240,7 +35304,7 @@ var ProjectEditor = function (_View) {
 
                     _this7.model.environments.push(environmentName);
 
-                    apiCall('put', 'server/projects/' + _this7.model.id + '/' + environmentName).then(function () {
+                    RequestHelper.request('put', 'server/projects/' + _this7.model.id + '/' + environmentName).then(function () {
                         UI.messageModal('Success', 'The new environment "' + environmentName + '" was created successfully', function () {
                             location.reload();
                         });
@@ -33291,7 +35355,7 @@ var ProjectEditor = function (_View) {
 module.exports = ProjectEditor;
 
 /***/ }),
-/* 267 */
+/* 268 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -33409,7 +35473,7 @@ var InfoEditor = function (_View) {
 module.exports = InfoEditor;
 
 /***/ }),
-/* 268 */
+/* 269 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -33422,6 +35486,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var MessageModal = __webpack_require__(15);
+var RequestHelper = __webpack_require__(293);
 var SettingsHelper = __webpack_require__(35);
 var ProjectHelper = __webpack_require__(7);
 
@@ -33476,6 +35541,8 @@ var SyncEditor = function (_View) {
     SyncEditor.prototype.onClickSave = function onClickSave() {
         var _this2 = this;
 
+        this.model.url = this.$element.find('.url-editor input').val();
+
         SettingsHelper.setSettings(this.projectId, '', 'sync', this.model).then(function () {
             _this2.modal.hide();
 
@@ -33504,11 +35571,7 @@ var SyncEditor = function (_View) {
 
 
     SyncEditor.prototype.renderUrlEditor = function renderUrlEditor() {
-        var _this4 = this;
-
-        return _.div({ class: 'url-editor' }, _.input({ class: 'form-control', type: 'text', value: this.model.url || '', placeholder: 'e.g. "https://myserver.com/api/"' }).on('change', function (e) {
-            _this4.model.url = $(e.target).val();
-        }));
+        return _.div({ class: 'url-editor' }, _.input({ class: 'form-control', type: 'text', value: this.model.url || '', placeholder: 'e.g. "https://myserver.com/api/"' }));
     };
 
     /**
@@ -33519,14 +35582,14 @@ var SyncEditor = function (_View) {
 
 
     SyncEditor.prototype.renderProjectNameEditor = function renderProjectNameEditor() {
-        var _this5 = this;
+        var _this4 = this;
 
         if (!this.model.project) {
             this.model.project = this.projectId;
         }
 
         return _.div({ class: 'project-name-editor' }, _.input({ class: 'form-control', type: 'text', value: this.model.project || '', placeholder: 'e.g. "' + ProjectHelper.currentProject + '"' }).on('change', function (e) {
-            _this5.model.project = $(e.target).val();
+            _this4.model.project = $(e.target).val();
         }));
     };
 
@@ -33553,7 +35616,7 @@ var SyncEditor = function (_View) {
             var username = prompt('Remote instance username');
             var password = prompt('Remote instance password');
 
-            apiCall('post', view.projectId + '/sync/login', {
+            RequestHelper.request('post', view.projectId + '/sync/login', {
                 username: username,
                 password: password
             }).then(function (token) {
@@ -33593,7 +35656,7 @@ var SyncEditor = function (_View) {
 module.exports = SyncEditor;
 
 /***/ }),
-/* 269 */
+/* 270 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -33606,7 +35669,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var MessageModal = __webpack_require__(15);
-var LanguageHelper = __webpack_require__(92);
+var LanguageHelper = __webpack_require__(93);
 
 /**
  * The language settings editor
@@ -33676,7 +35739,7 @@ var LanguageEditor = function (_View) {
 module.exports = LanguageEditor;
 
 /***/ }),
-/* 270 */
+/* 271 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -33687,6 +35750,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var RequestHelper = __webpack_require__(293);
 
 var MessageModal = __webpack_require__(15);
 
@@ -33724,7 +35789,7 @@ var BackupEditor = function (_View) {
                         e.preventDefault();_this.onClickRestoreBackup(backup);
                     })), _.li(
                     // Download backup
-                    _.a({ class: 'dropdown-item', href: apiUrl('server/backups/' + _this.model.id + '/' + backup + '.hba') }, 'Download')), _.li(
+                    _.a({ class: 'dropdown-item', href: RequestHelper.environmentUrl('server/backups/' + _this.model.id + '/' + backup + '.hba') }, 'Download')), _.li(
                     // Delete backup
                     _.a({ href: '#', class: 'dropdown-item' }, 'Delete').click(function (e) {
                         e.preventDefault();_this.onClickDeleteBackup(backup);
@@ -33778,8 +35843,9 @@ var BackupEditor = function (_View) {
 
             var apiPath = 'server/backups/' + view.model.id + '/upload';
 
+            // TODO: Use the RequestHelper for this
             $.ajax({
-                url: apiUrl(apiPath),
+                url: RequestHelper.environmentUrl(apiPath),
                 type: 'POST',
                 data: new FormData(this),
                 processData: false,
@@ -33826,7 +35892,7 @@ var BackupEditor = function (_View) {
             return;
         }
 
-        apiCall('post', 'server/backups/' + this.model.id + '/new').then(function (data) {
+        RequestHelper.request('post', 'server/backups/' + this.model.id + '/new').then(function (data) {
             new MessageModal({
                 model: {
                     title: 'Success',
@@ -33876,7 +35942,7 @@ var BackupEditor = function (_View) {
                 label: 'Restore',
                 class: 'btn-danger',
                 callback: function callback() {
-                    apiCall('post', 'server/backups/' + _this3.model.id + '/' + timestamp + '/restore').then(function () {
+                    RequestHelper.request('post', 'server/backups/' + _this3.model.id + '/' + timestamp + '/restore').then(function () {
                         new MessageModal({
                             model: {
                                 title: 'Success',
@@ -33927,7 +35993,7 @@ var BackupEditor = function (_View) {
                 label: 'Delete',
                 class: 'btn-danger',
                 callback: function callback() {
-                    apiCall('delete', 'server/backups/' + _this4.model.id + '/' + timestamp).then(function () {
+                    RequestHelper.request('delete', 'server/backups/' + _this4.model.id + '/' + timestamp).then(function () {
                         location.reload();
                     }).catch(UI.errorModal);
                 }
@@ -33941,7 +36007,7 @@ var BackupEditor = function (_View) {
 module.exports = BackupEditor;
 
 /***/ }),
-/* 271 */
+/* 272 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -33953,6 +36019,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+var RequestHelper = __webpack_require__(293);
 var MessageModal = __webpack_require__(15);
 
 /**
@@ -34048,7 +36115,7 @@ var MigrationEditor = function (_View) {
         this.data.from = this.modal.$element.find('.environment-from').val();
         this.data.to = this.modal.$element.find('.environment-to').val();
 
-        apiCall('post', 'server/migrate/' + this.model.id, this.data).then(function () {
+        RequestHelper.request('post', 'server/migrate/' + this.model.id, this.data).then(function () {
             UI.messageModal('Success', 'Successfully migrated content from "' + _this3.data.from + '" to "' + _this3.data.to + '"');
         }).catch(UI.errorModal);
     };
@@ -34059,7 +36126,6 @@ var MigrationEditor = function (_View) {
 module.exports = MigrationEditor;
 
 /***/ }),
-/* 272 */,
 /* 273 */,
 /* 274 */,
 /* 275 */,
@@ -34079,68 +36145,244 @@ module.exports = MigrationEditor;
 /* 289 */,
 /* 290 */,
 /* 291 */,
-/* 292 */
+/* 292 */,
+/* 293 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var DebugHelperCommon = __webpack_require__(203);
-
 /**
- * The client side debug helper
+ * A helper class for making HTTP/S requests
  *
  * @memberof HashBrown.Client.Helpers
  */
 
-var DebugHelper = function (_DebugHelperCommon) {
-    _inherits(DebugHelper, _DebugHelperCommon);
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-    function DebugHelper() {
-        _classCallCheck(this, DebugHelper);
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-        return _possibleConstructorReturn(this, _DebugHelperCommon.apply(this, arguments));
+var RequestHelper = function () {
+    function RequestHelper() {
+        _classCallCheck(this, RequestHelper);
     }
 
     /**
-     * Start the debug socket
+     * An environment specific request
+     *
+     * @param {String} method
+     * @param {String} url
+     * @param {Object} data
+     *
+     * @returns {Promise} Response
      */
-    DebugHelper.startSocket = function startSocket() {
-        var debugSocket = new WebSocket(location.protocol.replace('http', 'ws') + '//' + location.host + '/api/debug');
-
-        debugSocket.onopen = function (ev) {
-            debug.log('Debug socket open', 'HashBrown');
-        };
-
-        debugSocket.onmessage = function (ev) {
-            try {
-                var data = JSON.parse(ev.data);
-
-                switch (data.type) {
-                    case 'error':
-                        UI.errorModal(new Error(data.sender + ': ' + data.message));
-                        break;
-
-                    case 'warning':
-                        UI.errorModal(new Error(data.sender + ': ' + data.message));
-                        break;
-                }
-            } catch (e) {
-                UI.errorModal(e);
-            }
-        };
+    RequestHelper.request = function request(method, url, data) {
+        return RequestHelper.customRequest(method, RequestHelper.environmentUrl(url), data);
     };
 
-    return DebugHelper;
-}(DebugHelperCommon);
+    /**
+     * An environment-independent request
+     *
+     * @param {String} method
+     * @param {String} url
+     * @param {Object} data
+     *
+     * @returns {Promise} Response
+     */
 
-module.exports = DebugHelper;
+
+    RequestHelper.customRequest = function customRequest(method, url, data) {
+        return new Promise(function (resolve, reject) {
+            var xhr = new XMLHttpRequest();
+            xhr.open(method.toUpperCase(), url);
+            xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
+
+            if (data) {
+                if ((typeof data === 'undefined' ? 'undefined' : _typeof(data)) === 'object') {
+                    data = JSON.stringify(data);
+                }
+
+                xhr.send(data);
+            } else {
+                xhr.send();
+            }
+
+            xhr.onreadystatechange = function () {
+                var DONE = 4;
+                var OK = 200;
+                var NOT_MODIFIED = 304;
+                var UNAUTHORIZED = 403;
+
+                if (xhr.readyState === DONE) {
+                    if (xhr.status === UNAUTHORIZED) {
+                        location = '/login/?path=' + location.pathname + location.hash;
+
+                        reject(new Error('User is not logged in'));
+                    } else if (xhr.status == OK || xhr.status == NOT_MODIFIED) {
+                        var response = xhr.responseText;
+
+                        if (response && response != 'OK') {
+                            try {
+                                response = JSON.parse(response);
+                            } catch (e) {
+                                // If the response isn't JSON, then so be it
+
+                            }
+                        }
+
+                        resolve(response);
+                    } else {
+                        var error = new Error(xhr.responseText);
+
+                        error.xhr = xhr;
+
+                        reject(error);
+                    }
+                }
+            };
+        });
+    };
+
+    /**
+     * Wraps a URL to include environment
+     *
+     * @param {String} url
+     */
+
+
+    RequestHelper.environmentUrl = function environmentUrl(url) {
+        var newUrl = '/api/';
+
+        if (HashBrown.Helpers.ProjectHelper.currentProject) {
+            newUrl += HashBrown.Helpers.ProjectHelper.currentProject + '/';
+        }
+
+        if (HashBrown.Helpers.ProjectHelper.currentEnvironment) {
+            newUrl += HashBrown.Helpers.ProjectHelper.currentEnvironment + '/';
+        }
+
+        newUrl += url;
+
+        return newUrl;
+    };
+
+    /**
+     * Listens for server restart
+     */
+
+
+    RequestHelper.listenForRestart = function listenForRestart() {
+        UI.messageModal('Restart', 'HashBrown is restarting...', false);
+
+        function poke() {
+            $.ajax({
+                type: 'get',
+                url: '/',
+                success: function success() {
+                    location.reload();
+                },
+                error: function error() {
+                    poke();
+                }
+            });
+        }
+
+        poke();
+    };
+
+    /**
+     * Reloads a resource
+     */
+    RequestHelper.reloadResource = function reloadResource(name) {
+        var model = null;
+
+        switch (name) {
+            case 'connections':
+                model = HashBrown.Models.Connection;
+                break;
+
+            case 'templates':
+                model = HashBrown.Models.Template;
+                break;
+
+            case 'users':
+                model = HashBrown.Models.User;
+                break;
+
+            case 'media':
+                model = HashBrown.Models.Media;
+                break;
+        }
+
+        return RequestHelper.request('get', name).then(function (result) {
+            window.resources[name] = result;
+
+            // If a model is specified, use it to initialise every resource
+            if (model) {
+                for (var i in window.resources[name]) {
+                    window.resources[name][i] = new model(window.resources[name][i]);
+                }
+            }
+
+            return Promise.resolve(result);
+        }).catch(function (e) {
+            // If the error is a 404, it's an intended response from the controller
+            if (e.xhr.status !== 404) {
+                UI.errorModal(e);
+            }
+
+            return Promise.resolve([]);
+        });
+    };
+
+    /**
+     * Reloads all resources
+     */
+    RequestHelper.reloadAllResources = function reloadAllResources() {
+        $('.loading-messages').empty();
+
+        var queue = ['content', 'schemas', 'media', 'connections', 'templates', 'forms', 'users'];
+
+        for (var _iterator = queue, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+            var _ref;
+
+            if (_isArray) {
+                if (_i >= _iterator.length) break;
+                _ref = _iterator[_i++];
+            } else {
+                _i = _iterator.next();
+                if (_i.done) break;
+                _ref = _i.value;
+            }
+
+            var item = _ref;
+
+            var $msg = _.div({ class: 'loading-message', 'data-name': item }, item);
+
+            $('.loading-messages').append($msg);
+        }
+
+        var processQueue = function processQueue() {
+            var name = queue.shift();
+
+            return RequestHelper.reloadResource(name).then(function () {
+                $('.loading-messages [data-name="' + name + '"]').toggleClass('loaded', true);
+
+                if (queue.length < 1) {
+                    return Promise.resolve();
+                } else {
+                    return processQueue();
+                }
+            });
+        };
+
+        return processQueue();
+    };
+
+    return RequestHelper;
+}();
+
+module.exports = RequestHelper;
 
 /***/ })
 /******/ ]);

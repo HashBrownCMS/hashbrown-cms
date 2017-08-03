@@ -2,6 +2,7 @@
 
 const ProjectHelper = require('Client/Helpers/ProjectHelper');
 const ContentHelper = require('Client/Helpers/ContentHelper');
+const RequestHelper = require('Client/Helpers/RequestHelper');
 
 const NavbarPane = require('./NavbarPane');
 const NavbarMain = require('./NavbarMain');
@@ -27,12 +28,12 @@ class ContentPane extends NavbarPane {
         .then((content) => {
             content.parentId = parentId;
          
-            return apiCall('post', 'content/' + id, content);
+            return RequestHelper.request('post', 'content/' + id, content);
         })
 
         // Reload all Content models
         .then(() => {
-            return reloadResource('content');
+            return RequestHelper.reloadResource('content');
         })
 
         // Reload UI
@@ -58,12 +59,12 @@ class ContentPane extends NavbarPane {
             content.sort = newIndex;
             content.parentId = parentId;
          
-            return apiCall('post', 'content/' + id, content);
+            return RequestHelper.request('post', 'content/' + id, content);
         })
 
         // Reload all Content models
         .then(() => {
-            return reloadResource('content');
+            return RequestHelper.reloadResource('content');
         })
 
         // Reload UI
@@ -81,11 +82,11 @@ class ContentPane extends NavbarPane {
         let pullId = $('.cr-context-menu__target-element').data('id');
 
         // API call to pull the Content by id
-        apiCall('post', 'content/pull/' + pullId, {})
+        RequestHelper.request('post', 'content/pull/' + pullId, {})
         
         // Upon success, reload all Content models    
         .then(() => {
-            return reloadResource('content');
+            return RequestHelper.reloadResource('content');
         })
 
         // Reload the UI
@@ -114,11 +115,11 @@ class ContentPane extends NavbarPane {
 		$element.parent().addClass('loading');
 
         // API call to push the Content by id
-        apiCall('post', 'content/push/' + pushId)
+        RequestHelper.request('post', 'content/push/' + pushId)
 
         // Upon success, reload all Content models
         .then(() => {
-            return reloadResource('content');
+            return RequestHelper.reloadResource('content');
         })
 
         // Reload the UI
@@ -195,13 +196,13 @@ class ContentPane extends NavbarPane {
                         }
 
                         // API call to create new Content node
-                        apiCall('post', apiUrl)
+                        RequestHelper.request('post', apiUrl)
                         
                         // Upon success, reload resource and UI elements    
                         .then((result) => {
                             newContent = result;
 
-                            return reloadResource('content');
+                            return RequestHelper.reloadResource('content');
                         })
                         .then(() => {
                             NavbarMain.reload();
@@ -244,7 +245,7 @@ class ContentPane extends NavbarPane {
                 content.settings.publishing = publishing;
         
                 // API call to save the Content model
-                apiCall('post', 'content/' + content.id, content)
+                RequestHelper.request('post', 'content/' + content.id, content)
                 
                 // Upon success, reload the UI    
                 .then(() => {
@@ -361,14 +362,14 @@ class ContentPane extends NavbarPane {
             content.getSettings('publishing')
             .then((publishing) => {
                 function unpublishConnections() {
-                    return apiCall('post', 'content/unpublish', content)
+                    return RequestHelper.request('post', 'content/unpublish', content)
                     .then(() => {
                         return onSuccess();
                     });
                 }
                 
                 function onSuccess() {
-                    return reloadResource('content')
+                    return RequestHelper.reloadResource('content')
                     .then(() => {
                         NavbarMain.reload();
                                 
@@ -407,7 +408,7 @@ class ContentPane extends NavbarPane {
                     () => {
                         $element.parent().toggleClass('loading', true);
 
-                        apiCall('delete', 'content/' + id + '?removeChildren=' + $deleteChildrenSwitch.data('checked'))
+                        RequestHelper.request('delete', 'content/' + id + '?removeChildren=' + $deleteChildrenSwitch.data('checked'))
                         .then(() => {
                             
                             if(shouldUnpublish && publishing.connections && publishing.connections.length > 0) {

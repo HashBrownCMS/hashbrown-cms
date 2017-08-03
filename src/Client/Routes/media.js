@@ -1,6 +1,7 @@
 'use strict';
 
 const MediaViewer = require('Client/Views/Editors/MediaViewer');
+const RequestHelper = require('Client/Helpers/RequestHelper');
 
 // Dashboard
 Router.route('/media/', function() {
@@ -18,7 +19,7 @@ Router.route('/media/', function() {
 // Preview
 Router.route('/media/:id', function() {
     let mediaViewer = new MediaViewer({
-        modelUrl: apiUrl('media/' + this.id)
+        modelUrl: RequestHelper.environmentUrl('media/' + this.id)
     });
     
     ViewHelper.get('NavbarMain').highlightItem('/media/', this.id);

@@ -1,5 +1,7 @@
 'use strict';
 
+const RequestHelper = require('Client/Helpers/RequestHelper');
+
 /**
  * A Template editor
  *
@@ -23,9 +25,9 @@ class TemplateEditor extends View {
 
         this.$saveBtn.toggleClass('working', true);
 
-        apiCall('post', 'templates/' + this.model.type + '/' + this.model.id, this.model)
+        RequestHelper.request('post', 'templates/' + this.model.type + '/' + this.model.id, this.model)
         .then(() => {
-            return reloadResource('templates');
+            return RequestHelper.reloadResource('templates');
         })
         .then(() => {
             HashBrown.Views.Navigation.NavbarMain.reload();

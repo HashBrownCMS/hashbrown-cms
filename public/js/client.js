@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 210);
+/******/ 	return __webpack_require__(__webpack_require__.s = 211);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -6005,6 +6005,8 @@ var Entity = function () {
                 }
             } catch (e) {
                 debug.log(e.message, this);
+                console.log(properties);
+                console.log(e.stack);
             }
         }
     }
@@ -7889,7 +7891,7 @@ var NavbarMain = function (_View) {
 
         var _this = _possibleConstructorReturn(this, _View.call(this, params));
 
-        _this.template = __webpack_require__(231);
+        _this.template = __webpack_require__(232);
         _this.tabPanes = [];
 
         HashBrown.Views.Navigation.CMSPane.init();
@@ -8728,7 +8730,9 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var SettingsHelperCommon = __webpack_require__(199);
+var RequestHelper = __webpack_require__(293);
+
+var SettingsHelperCommon = __webpack_require__(198);
 
 /**
  * The client side settings helper
@@ -8778,7 +8782,7 @@ var SettingsHelper = function (_SettingsHelperCommon) {
             apiUrl += '/' + section;
         }
 
-        return customApiCall('get', apiUrl)
+        return RequestHelper.customRequest('get', apiUrl)
 
         // Cache settings client-side
         .then(function (settings) {
@@ -8933,7 +8937,7 @@ var SettingsHelper = function (_SettingsHelperCommon) {
             apiUrl += '/' + section;
         }
 
-        return customApiCall('post', apiUrl, settings)
+        return RequestHelper.customRequest('post', apiUrl, settings)
 
         // Cache new settings
         .then(function () {
@@ -10480,7 +10484,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var ContentHelperCommon = __webpack_require__(226);
+var ContentHelperCommon = __webpack_require__(227);
 
 /**
  * The client side content helper
@@ -10509,7 +10513,7 @@ var ContentHelper = function (_ContentHelperCommon) {
             return null;
         }
 
-        var Content = __webpack_require__(88);
+        var Content = __webpack_require__(89);
 
         for (var _iterator = resources.content, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
             var _ref;
@@ -10542,7 +10546,7 @@ var ContentHelper = function (_ContentHelperCommon) {
 
     ContentHelper.getContentById = function getContentById(id) {
         if (id) {
-            var Content = __webpack_require__(88);
+            var Content = __webpack_require__(89);
 
             for (var _iterator2 = resources.content, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
                 var _ref2;
@@ -11053,7 +11057,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Path = __webpack_require__(217);
+var Path = __webpack_require__(218);
 
 var Entity = __webpack_require__(12);
 
@@ -11227,9 +11231,12 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var ContentSchema = __webpack_require__(197);
-var FieldSchema = __webpack_require__(87);
-var SchemaHelperCommon = __webpack_require__(224);
+var ContentSchema = __webpack_require__(87);
+var FieldSchema = __webpack_require__(88);
+
+var RequestHelper = __webpack_require__(293);
+
+var SchemaHelperCommon = __webpack_require__(225);
 
 /**
  * The client side Schema helper
@@ -11258,7 +11265,7 @@ var SchemaHelper = function (_SchemaHelperCommon) {
             return Promise.resolve(null);
         }
 
-        return apiCall('get', 'schemas/' + id + '/?withParentFields=true').then(function (schema) {
+        return RequestHelper.request('get', 'schemas/' + id + '/?withParentFields=true').then(function (schema) {
             return Promise.resolve(SchemaHelper.getModel(schema));
         });
     };
@@ -11301,7 +11308,7 @@ var SchemaHelper = function (_SchemaHelperCommon) {
     SchemaHelper.getSchemaById = function getSchemaById(id) {
         var _this2 = this;
 
-        return apiCall('get', 'schemas/' + id).then(function (schema) {
+        return RequestHelper.request('get', 'schemas/' + id).then(function (schema) {
             return Promise.resolve(_this2.getModel(schema));
         });
     };
@@ -14929,6 +14936,53 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var Schema = __webpack_require__(86);
 
 /**
+ * Schema for content nodes
+ *
+ * @memberof HashBrown.Common.Models
+ */
+
+var ContentSchema = function (_Schema) {
+    _inherits(ContentSchema, _Schema);
+
+    function ContentSchema(properties) {
+        _classCallCheck(this, ContentSchema);
+
+        return _possibleConstructorReturn(this, _Schema.call(this, properties));
+    }
+
+    ContentSchema.prototype.structure = function structure() {
+        _Schema.prototype.structure.call(this);
+
+        this.def(String, 'defaultTabId');
+        this.def(Object, 'tabs', {});
+        this.def(Object, 'fields', {});
+        this.def(Array, 'allowedChildSchemas', []);
+
+        this.name = 'New content schema';
+        this.type = 'content';
+    };
+
+    return ContentSchema;
+}(Schema);
+
+module.exports = ContentSchema;
+
+/***/ }),
+/* 88 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Schema = __webpack_require__(86);
+
+/**
  * Schema for content fields
  *
  * @memberof HashBrown.Common.Models
@@ -14982,7 +15036,7 @@ var FieldSchema = function (_Schema) {
 module.exports = FieldSchema;
 
 /***/ }),
-/* 88 */
+/* 89 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14994,7 +15048,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var ContentCommon = __webpack_require__(207);
+var ContentCommon = __webpack_require__(208);
 var ContentHelper = __webpack_require__(47);
 var ProjectHelper = __webpack_require__(7);
 
@@ -15049,7 +15103,7 @@ var Content = function (_ContentCommon) {
 module.exports = Content;
 
 /***/ }),
-/* 89 */
+/* 90 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15141,23 +15195,25 @@ var Project = function (_Entity) {
 module.exports = Project;
 
 /***/ }),
-/* 90 */
+/* 91 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-
-/**
- * An editor for Users
- *
- * @memberof HashBrown.Client.Views.Editors
- */
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var RequestHelper = __webpack_require__(293);
+
+/**
+ * An editor for Users
+ *
+ * @memberof HashBrown.Client.Views.Editors
+ */
 
 var UserEditor = function (_View) {
     _inherits(UserEditor, _View);
@@ -15177,7 +15233,7 @@ var UserEditor = function (_View) {
 
         _this.modal.$element.addClass('modal-user-editor');
 
-        customApiCall('get', '/api/server/projects').then(function (projects) {
+        RequestHelper.customRequest('get', '/api/server/projects').then(function (projects) {
             _this.projects = projects;
             _this.init();
         });
@@ -15209,7 +15265,7 @@ var UserEditor = function (_View) {
             newUserObject.password = this.newPassword;
         }
 
-        apiCall('post', 'user/' + this.model.id, newUserObject).then(function () {
+        RequestHelper.request('post', 'user/' + this.model.id, newUserObject).then(function () {
             _this2.modal.hide();
 
             _this2.trigger('save', _this2.model);
@@ -15424,7 +15480,7 @@ var UserEditor = function (_View) {
 module.exports = UserEditor;
 
 /***/ }),
-/* 91 */
+/* 92 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15436,7 +15492,9 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var MediaHelperCommon = __webpack_require__(237);
+var MediaHelperCommon = __webpack_require__(238);
+
+var RequestHelper = __webpack_require__(293);
 
 /**
  * The client side media helper
@@ -15459,18 +15517,7 @@ var MediaHelper = function (_MediaHelperCommon) {
      * @returns {Promise(Object)} tree
      */
     MediaHelper.getTree = function getTree() {
-        return new Promise(function (resolve, reject) {
-            $.ajax({
-                url: apiUrl('media/tree'),
-                type: 'GET',
-                success: function success(tree) {
-                    resolve(tree);
-                },
-                error: function error() {
-                    reject();
-                }
-            });
-        });
+        return RequestHelper.request('get', 'media/tree');
     };
 
     /**
@@ -15538,19 +15585,7 @@ var MediaHelper = function (_MediaHelperCommon) {
 
 
     MediaHelper.setTreeItem = function setTreeItem(id, item) {
-        return new Promise(function (resolve, reject) {
-            $.ajax({
-                url: apiUrl('media/tree/' + id),
-                data: item,
-                type: 'POST',
-                success: function success() {
-                    resolve();
-                },
-                error: function error() {
-                    reject();
-                }
-            });
-        });
+        return RequestHelper.request('post', 'media/tree/' + id, item);
     };
 
     return MediaHelper;
@@ -15559,7 +15594,7 @@ var MediaHelper = function (_MediaHelperCommon) {
 module.exports = MediaHelper;
 
 /***/ }),
-/* 92 */
+/* 93 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15574,7 +15609,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var SettingsHelper = __webpack_require__(35);
-var LanguageHelperCommon = __webpack_require__(202);
+var LanguageHelperCommon = __webpack_require__(201);
 
 /**
  * The client side language helper
@@ -15639,581 +15674,8 @@ var LanguageHelper = function (_LanguageHelperCommon) {
 module.exports = LanguageHelper;
 
 /***/ }),
-/* 93 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var MessageModal = __webpack_require__(15);
-
-/**
- * A UI helper for creating and handling common interface behaviours
- *
- * @memberof HashBrown.Client.Helpers
- */
-
-var UIHelper = function () {
-    function UIHelper() {
-        _classCallCheck(this, UIHelper);
-    }
-
-    /**
-     * Creates a switch
-     *
-     * @param {Boolean} initialValue
-     * @param {Function} onChange
-     *
-     * @returns {HTMLElement} Switch element
-     */
-    UIHelper.inputSwitch = function inputSwitch(initialValue, onChange) {
-        var id = 'switch-' + (10000 + Math.floor(Math.random() * 10000));
-        var $input = void 0;
-
-        var $element = _.div({ class: 'switch', 'data-checked': initialValue }, $input = _.input({
-            id: id,
-            class: 'form-control switch',
-            type: 'checkbox'
-        }).change(function () {
-            this.parentElement.dataset.checked = this.checked;
-
-            if (onChange) {
-                onChange(this.checked);
-            }
-        }), _.label({ for: id }));
-
-        $element.on('set', function (e, newValue) {
-            $input[0].checked = newValue;
-        });
-
-        if (initialValue) {
-            $input.attr('checked', true);
-        }
-
-        return $element;
-    };
-
-    /**
-     * Creates a group of chips
-     *
-     * @param {Array} items
-     * @param {Array} dropdownItems
-     * @param {Function} onChange
-     * @param {Boolean} isDropdownUnique
-     *
-     * @returns {HtmlElement} Chip group element
-     */
-
-
-    UIHelper.inputChipGroup = function inputChipGroup(items, dropdownItems, onChange, isDropdownUnique) {
-        var $element = _.div({ class: 'chip-group' });
-
-        if (!items) {
-            items = [];
-        }
-
-        function render() {
-            _.append($element.empty(),
-
-            // Render individual chips
-            _.each(items, function (itemIndex, item) {
-                var $chip = _.div({ class: 'chip' },
-
-                // Dropdown
-                _.if(Array.isArray(dropdownItems), _.div({ class: 'chip-label dropdown' }, _.button({ class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, item.label || item.name || item.title || item), _.if(onChange, _.ul({ class: 'dropdown-menu' }, _.each(dropdownItems, function (dropdownItemIndex, dropdownItem) {
-                    // Look for unique dropdown items
-                    if (isDropdownUnique) {
-                        for (var _iterator = items, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-                            var _ref;
-
-                            if (_isArray) {
-                                if (_i >= _iterator.length) break;
-                                _ref = _iterator[_i++];
-                            } else {
-                                _i = _iterator.next();
-                                if (_i.done) break;
-                                _ref = _i.value;
-                            }
-
-                            var _item = _ref;
-
-                            if (_item == dropdownItem) {
-                                return;
-                            }
-                        }
-                    }
-
-                    return _.li(_.a({ href: '#' }, dropdownItem.label || dropdownItem.name || dropdownItem.title || dropdownItem).click(function (e) {
-                        e.preventDefault();
-
-                        items[itemIndex] = dropdownItem;
-
-                        render();
-
-                        if (typeof onChange === 'function') {
-                            onChange(items);
-                        }
-                    }));
-                }))))),
-
-                // Regular string
-                _.if(!Array.isArray(dropdownItems), _.if(!onChange, _.p({ class: 'chip-label' }, item)), _.if(onChange, _.input({ type: 'text', class: 'chip-label', value: item }).change(function (e) {
-                    items[itemIndex] = e.target.value;
-                }))),
-
-                // Remove button
-                _.if(onChange, _.button({ class: 'btn chip-remove' }, _.span({ class: 'fa fa-remove' })).click(function () {
-                    items.splice(itemIndex, 1);
-
-                    render();
-
-                    if (typeof onChange === 'function') {
-                        onChange(items);
-                    }
-                })));
-
-                return $chip;
-            }),
-
-            // Add button
-            _.if(onChange, _.button({ class: 'btn chip-add' }, _.span({ class: 'fa fa-plus' })).click(function () {
-                if (Array.isArray(dropdownItems)) {
-                    if (isDropdownUnique) {
-                        for (var _iterator2 = dropdownItems, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
-                            var _ref2;
-
-                            if (_isArray2) {
-                                if (_i2 >= _iterator2.length) break;
-                                _ref2 = _iterator2[_i2++];
-                            } else {
-                                _i2 = _iterator2.next();
-                                if (_i2.done) break;
-                                _ref2 = _i2.value;
-                            }
-
-                            var dropdownItem = _ref2;
-
-                            var isSelected = false;
-
-                            for (var _iterator3 = items, _isArray3 = Array.isArray(_iterator3), _i3 = 0, _iterator3 = _isArray3 ? _iterator3 : _iterator3[Symbol.iterator]();;) {
-                                var _ref3;
-
-                                if (_isArray3) {
-                                    if (_i3 >= _iterator3.length) break;
-                                    _ref3 = _iterator3[_i3++];
-                                } else {
-                                    _i3 = _iterator3.next();
-                                    if (_i3.done) break;
-                                    _ref3 = _i3.value;
-                                }
-
-                                var item = _ref3;
-
-                                if (item == dropdownItem) {
-                                    isSelected = true;
-                                    break;
-                                }
-                            }
-
-                            if (!isSelected) {
-                                items.push(dropdownItem);
-                                break;
-                            }
-                        }
-                    } else {
-                        items.push(dropdownItems[0]);
-                    }
-                } else if (typeof dropdownItems === 'string') {
-                    items.push(dropdownItems);
-                } else {
-                    items.push('New item');
-                }
-
-                render();
-
-                if (typeof onChange === 'function') {
-                    onChange(items);
-                }
-            })));
-        };
-
-        render();
-
-        return $element;
-    };
-
-    /**
-     * Renders a dropdown
-     *
-     * @param {String|Number} defaultValue
-     * @param {Array|Number} options
-     * @param {Function} onChange
-     * @param {Boolean} useClearButton
-     * @param {Boolean} useSearch
-     *
-     * @returns {HtmlElement} Dropdown element
-     */
-
-
-    UIHelper.inputDropdown = function inputDropdown(defaultValue, options, onChange, useClearButton) {
-        // If "options" parameter is a number, convert to array
-        if (typeof options === 'number') {
-            var amount = options;
-
-            options = [];
-
-            for (var i = 0; i < amount; i++) {
-                options[options.length] = { label: i.toString(), value: i };
-            }
-        }
-
-        // Change event
-        var onClick = function onClick(e, element) {
-            var $button = $(e.target);
-            var $li = $button.parents('li');
-
-            $li.addClass('active').siblings().removeClass('active');
-
-            $toggle.html($button.html());
-            $toggle.click();
-
-            onChange($li.attr('data-value'));
-        };
-
-        // Highlight selected value
-        var highlightSelectedValue = function highlightSelectedValue() {
-            $element.find('ul li').removeClass('active');
-            $toggle.html('(none)');
-
-            if (!defaultValue) {
-                return;
-            }
-
-            for (var _iterator4 = options, _isArray4 = Array.isArray(_iterator4), _i4 = 0, _iterator4 = _isArray4 ? _iterator4 : _iterator4[Symbol.iterator]();;) {
-                var _ref4;
-
-                if (_isArray4) {
-                    if (_i4 >= _iterator4.length) break;
-                    _ref4 = _iterator4[_i4++];
-                } else {
-                    _i4 = _iterator4.next();
-                    if (_i4.done) break;
-                    _ref4 = _i4.value;
-                }
-
-                var option = _ref4;
-
-                if (option.value == defaultValue) {
-                    $toggle.html(option.label);
-                    $element.find('ul li[data-value="' + option.value + '"]').addClass('active');
-                    break;
-                }
-            }
-        };
-
-        // Clear event
-        var onClear = function onClear() {
-            defaultValue = onChange(null);
-
-            highlightSelectedValue();
-        };
-
-        // Base elements
-        var $element = _.div({ class: 'dropdown' });
-        var $toggle = _.button({ class: 'btn btn-default dropdown-toggle', type: 'button', 'data-toggle': 'dropdown' }, '(none)');
-        var $clear = _.button({ class: 'btn btn-default btn-small dropdown-clear' }, _.span({ class: 'fa fa-remove' })).on('click', onClear);
-        var $list = _.ul({ class: 'dropdown-menu-items' });
-
-        // Add an option
-        $element.on('addOption', function (e, option) {
-            var optionLabel = option.label || option.id || option.name || option.toString();
-            var isSelected = option.selected || option.value == defaultValue;
-
-            if (isSelected) {
-                $toggle.html(optionLabel);
-            }
-
-            var $li = _.li({ 'data-value': option.value || optionLabel, class: isSelected ? 'active' : '' }, _.button(optionLabel).on('click', onClick));
-
-            $list.append($li);
-        });
-
-        // Remove an option
-        $element.on('removeOption', function (e, optionValue) {
-            $list.children('[data-value="' + optionValue + '"]').remove();
-        });
-
-        // Change an option
-        $element.on('changeOption', function (e, oldOptionValue, newOption) {
-            $element.trigger('removeOption', oldOptionValue);
-            $element.trigger('addOption', newOption);
-        });
-
-        // Set current option
-        $element.on('setValue', function (e, newValue) {
-            var $option = $list.children('[data-value="' + newValue + '"]');
-
-            if ($option.length > 0) {
-                $toggle.html($option.children('button').html());
-            }
-        });
-
-        // Render
-        _.append($element, $toggle, _.if(useClearButton, $clear), _.div({ class: 'dropdown-menu' }, $list));
-
-        // Render all options
-        for (var _i5 in options || []) {
-            $element.trigger('addOption', options[_i5]);
-        }
-
-        return $element;
-    };
-
-    /**
-     * Renders a dropdown with typeahead
-     *
-     * @param {String} label
-     * @param {Array|Number} options
-     * @param {Function} onClick
-     * @param {Boolean} useClearButton
-     *
-     * @returns {HtmlElement} Dropdown element
-     */
-
-
-    UIHelper.inputDropdownTypeAhead = function inputDropdownTypeAhead(label, options, onClick, useClearButton) {
-        var $element = this.inputDropdown(label, options, onClick, useClearButton);
-        var inputTimeout = void 0;
-
-        // Change input event
-        var onChangeInput = function onChangeInput() {
-            if (inputTimeout) {
-                clearTimeout(inputTimeout);
-            }
-
-            var query = ($element.find('.dropdown-typeahead input').val() || '').toLowerCase();
-            var isQueryEmpty = !query || query.length < 2;
-
-            inputTimeout = setTimeout(function () {
-                $element.find('ul li button').each(function (i, button) {
-                    var $button = $(button);
-                    var label = ($button.html() || '').toLowerCase();
-                    var isMatch = label.indexOf(query) > -1;
-
-                    $button.toggle(isMatch || isQueryEmpty);
-                });
-            }, 250);
-        };
-
-        // Clear input event
-        var onClearInput = function onClearInput(e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            $element.find('.dropdown-typeahead input').val('');
-
-            onChangeInput();
-        };
-
-        $element.addClass('typeahead');
-
-        $element.find('.dropdown-menu').prepend(_.div({ class: 'dropdown-typeahead' }, _.input({ class: 'form-control', placeholder: 'Search...' }).on('keyup paste change propertychange', onChangeInput), _.button({ class: 'dropdown-typeahead-btn-clear' }, _.span({ class: 'fa fa-remove' })).on('click', onClearInput)));
-
-        return $element;
-    };
-
-    /**
-     * Renders a carousel
-     *
-     * @param {Array} items
-     * @param {Boolean} useIndicators
-     * @param {Boolean} useControls
-     * @param {String} height
-     *
-     * @returns {HtmlElement} Carousel element
-     */
-
-
-    UIHelper.carousel = function carousel(items, useIndicators, useControls, height) {
-        var id = 'carousel-' + (10000 + Math.floor(Math.random() * 10000));
-
-        return _.div({ class: 'carousel slide', id: id, 'data-ride': 'carousel', 'data-interval': 0 }, _.if(useIndicators, _.ol({ class: 'carousel-indicators' }, _.each(items, function (i, item) {
-            return _.li({ 'data-target': '#' + id, 'data-slide-to': i, class: i == 0 ? 'active' : '' });
-        }))), _.div({ class: 'carousel-inner', role: 'listbox' }, _.each(items, function (i, item) {
-            return _.div({ class: 'item' + (i == 0 ? ' active' : ''), style: 'height:' + (height || '500px') }, item);
-        })), _.if(useControls, _.a({ href: '#' + id, role: 'button', class: 'left carousel-control', 'data-slide': 'prev' }, _.span({ class: 'fa fa-arrow-left' })), _.a({ href: '#' + id, role: 'button', class: 'right carousel-control', 'data-slide': 'next' }, _.span({ class: 'fa fa-arrow-right' }))));
-    };
-
-    /**
-     * Brings up an error modal
-     *
-     * @param {String|Error} error
-     * @param {Function} onClickOK
-     */
-
-
-    UIHelper.errorModal = function errorModal(error, onClickOK) {
-        if (!error) {
-            return;
-        }
-
-        if (error instanceof String) {
-            error = new Error(error);
-        } else if (error instanceof Object) {
-            if (error.responseText) {
-                error = new Error(error.responseText);
-            }
-        } else if (error instanceof Error == false) {
-            error = new Error(error.toString());
-        }
-
-        new MessageModal({
-            model: {
-                title: '<span class="fa fa-warning"></span> Error',
-                body: error.message + '<br /><br />Please check the JavaScript console for details',
-                onSubmit: onClickOK,
-                class: 'error-modal'
-            }
-        });
-
-        console.log(error.stack);
-    };
-
-    /**
-     * Brings up a warning modal
-     *
-     * @param {String} warning
-     * @param {Function} onClickOK
-     */
-
-
-    UIHelper.warningModal = function warningModal(warning, onClickOK) {
-        if (!warning) {
-            return;
-        }
-
-        new MessageModal({
-            model: {
-                title: '<span class="fa fa-warning"></span> Warning',
-                body: warning,
-                onSubmit: onClickOK,
-                class: 'warning-modal'
-            }
-        });
-    };
-
-    /**
-     * Brings up a message modal
-     *
-     * @param {String} title
-     * @param {String} body
-     */
-
-
-    UIHelper.messageModal = function messageModal(title, body, onSubmit) {
-        return new MessageModal({
-            model: {
-                title: title,
-                body: body,
-                onSubmit: onSubmit
-            }
-        });
-    };
-
-    /**
-     * Brings up an iframe modal
-     *
-     * @param {String} title
-     * @param {String} url
-     * @param {Function} onload
-     * @param {Function} onerror
-     */
-
-
-    UIHelper.iframeModal = function iframeModal(title, url, onload, onerror) {
-        var $iframe = _.iframe({ src: url });
-
-        return new MessageModal({
-            model: {
-                title: title,
-                body: [_.span({ class: 'iframe-modal-error' }, 'If the preview didn\'t show up, please try the "reload" or "open" buttons'), $iframe],
-                class: 'iframe-modal'
-            },
-            buttons: [{
-                label: 'Reload',
-                class: 'btn-primary',
-                callback: function callback() {
-                    $iframe[0].src += '';
-
-                    return false;
-                }
-            }, {
-                label: 'Open',
-                class: 'btn-primary',
-                callback: function callback() {
-                    window.open($iframe[0].src);
-
-                    return false;
-                }
-            }, {
-                label: 'OK',
-                class: 'btn-default'
-            }]
-        });
-    };
-
-    /**
-     * Brings up a confirm modal
-     *
-     * @param {String} type
-     * @param {String} title
-     * @param {String} body
-     * @param {Function} onSubmit
-     */
-
-
-    UIHelper.confirmModal = function confirmModal(type, title, body, onSubmit, onCancel) {
-        var submitClass = 'btn-primary';
-
-        type = (type || '').toLowerCase();
-
-        switch (type) {
-            case 'delete':case 'remove':case 'discard':case 'clear':
-                submitClass = 'btn-danger';
-                break;
-        }
-
-        return new MessageModal({
-            model: {
-                title: title,
-                body: body,
-                onSubmit: onSubmit,
-                class: 'confirm-modal'
-            },
-            buttons: [{
-                label: 'Cancel',
-                class: 'btn-default',
-                callback: onCancel
-            }, {
-                label: type,
-                class: submitClass,
-                callback: onSubmit
-            }]
-        });
-    };
-
-    return UIHelper;
-}();
-
-module.exports = UIHelper;
-
-/***/ }),
 /* 94 */
 /***/ (function(module, exports, __webpack_require__) {
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 window.Promise = __webpack_require__(95);
 window.marked = __webpack_require__(97);
@@ -16293,121 +15755,6 @@ window.copyToClipboard = function copyToClipboard(string) {
 };
 
 /**
- * Wraps an API URL
- *
- * @param {String} url
- *
- * @returns {String} API URL
- */
-window.apiUrl = function apiUrl(url) {
-    var newUrl = '/api/';
-
-    if (ProjectHelper.currentProject) {
-        newUrl += ProjectHelper.currentProject + '/';
-    }
-
-    if (ProjectHelper.currentEnvironment) {
-        newUrl += ProjectHelper.currentEnvironment + '/';
-    }
-
-    newUrl += url;
-
-    return newUrl;
-};
-
-/**
- * Wraps an API call
- *
- * @param {String} method
- * @param {String} url
- * @param {Object} data
- *
- * @returns {Promise} Response
- */
-window.apiCall = function apiCall(method, url, data) {
-    return customApiCall(method, apiUrl(url), data);
-};
-
-/**
- * Wraps an API call with a custom path
- *
- * @param {String} method
- * @param {String} url
- * @param {Object} data
- *
- * @returns {Promise} Response
- */
-window.customApiCall = function customApiCall(method, url, data) {
-    return new Promise(function (resolve, reject) {
-        var xhr = new XMLHttpRequest();
-        xhr.open(method.toUpperCase(), url);
-        xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
-
-        if (data) {
-            if ((typeof data === 'undefined' ? 'undefined' : _typeof(data)) === 'object') {
-                data = JSON.stringify(data);
-            }
-
-            xhr.send(data);
-        } else {
-            xhr.send();
-        }
-
-        xhr.onreadystatechange = function () {
-            var DONE = 4;
-            var OK = 200;
-            var NOT_MODIFIED = 304;
-            var UNAUTHORIZED = 403;
-
-            if (xhr.readyState === DONE) {
-                if (xhr.status === UNAUTHORIZED) {
-                    location = '/login/?path=' + location.pathname + location.hash;
-
-                    reject(new Error('User is not logged in'));
-                } else if (xhr.status == OK || xhr.status == NOT_MODIFIED) {
-                    var response = xhr.responseText;
-
-                    if (response && response != 'OK') {
-                        try {
-                            response = JSON.parse(response);
-                        } catch (e) {
-                            // If the response isn't JSON, then so be it
-
-                        }
-                    }
-
-                    resolve(response);
-                } else {
-                    reject(new Error(xhr.responseText));
-                }
-            }
-        };
-    });
-};
-
-/**
- * Listens for server restart
- */
-window.listenForRestart = function listenForRestart() {
-    UI.messageModal('Restart', 'HashBrown is restarting...', false);
-
-    function poke() {
-        $.ajax({
-            type: 'get',
-            url: '/',
-            success: function success() {
-                location.reload();
-            },
-            error: function error() {
-                poke();
-            }
-        });
-    }
-
-    poke();
-};
-
-/**
  * Clears the workspace
  */
 window.clearWorkspace = function clearWorkspace() {
@@ -16428,103 +15775,6 @@ window.populateWorkspace = function populateWorkspace($html, classes) {
     if (classes) {
         $workspace.addClass(classes);
     }
-};
-
-/**
- * Reloads a resource
- */
-window.reloadResource = function reloadResource(name) {
-    var model = null;
-
-    switch (name) {
-        case 'templates':
-            model = HashBrown.Models.Template;
-            break;
-
-        case 'users':
-            model = HashBrown.Models.User;
-            break;
-
-        case 'media':
-            model = HashBrown.Models.Media;
-            break;
-    }
-
-    return new Promise(function (resolve, reject) {
-        $.ajax({
-            type: 'GET',
-            url: apiUrl(name),
-            success: function success(result) {
-                window.resources[name] = result;
-
-                // If a model is specified, use it to initialise every resource
-                if (model) {
-                    for (var i in window.resources[name]) {
-                        window.resources[name][i] = new model(window.resources[name][i]);
-                    }
-                }
-
-                resolve(result);
-            },
-            error: function error(e) {
-                window.resources[name] = [];
-
-                if (e.status == 403) {
-                    location = '/login/?path=' + location.pathname + location.hash;
-                } else if (e.status == 404) {
-                    resolve([]);
-                } else {
-                    resolve([]);
-
-                    UI.errorModal(new Error(e.responseText));
-                }
-            }
-        });
-    });
-};
-
-/**
- * Reloads all resources
- */
-window.reloadAllResources = function reloadAllResources() {
-    $('.loading-messages').empty();
-
-    var queue = ['content', 'schemas', 'media', 'connections', 'templates', 'forms', 'users'];
-
-    for (var _iterator = queue, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-        var _ref;
-
-        if (_isArray) {
-            if (_i >= _iterator.length) break;
-            _ref = _iterator[_i++];
-        } else {
-            _i = _iterator.next();
-            if (_i.done) break;
-            _ref = _i.value;
-        }
-
-        var item = _ref;
-
-        var $msg = _.div({ class: 'loading-message', 'data-name': item }, item);
-
-        $('.loading-messages').append($msg);
-    }
-
-    function processQueue() {
-        var name = queue.shift();
-
-        return window.reloadResource(name).then(function () {
-            $('.loading-messages [data-name="' + name + '"]').toggleClass('loaded', true);
-
-            if (queue.length < 1) {
-                return Promise.resolve();
-            } else {
-                return processQueue();
-            }
-        });
-    }
-
-    return processQueue();
 };
 
 // Get package file
@@ -33969,8 +33219,9 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var beautify = __webpack_require__(222).js_beautify;
+var beautify = __webpack_require__(223).js_beautify;
 var SchemaHelper = __webpack_require__(50);
+var RequestHelper = __webpack_require__(293);
 
 /**
  * A basic JSON editor for any object
@@ -33990,7 +33241,7 @@ var JSONEditor = function (_View) {
         _this.$error = _.div({ class: 'error' }, _.div({ class: 'error-heading' }), _.div({ class: 'error-body' })).hide();
 
         if (!_this.model && !_this.modelUrl) {
-            _this.modelUrl = apiUrl(_this.apiPath);
+            _this.modelUrl = RequestHelper.environmentUrl(_this.apiPath);
         }
 
         _this.fetch();
@@ -34025,7 +33276,7 @@ var JSONEditor = function (_View) {
         this.$saveBtn.toggleClass('working', true);
 
         if (this.debug()) {
-            apiCall('post', this.apiPath, this.model).then(function () {
+            RequestHelper.request('post', this.apiPath, this.model).then(function () {
                 _this2.$saveBtn.toggleClass('working', false);
             }).catch(UI.errorModal);
         } else {
@@ -37300,55 +36551,9 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Schema = __webpack_require__(86);
-
-/**
- * Schema for content nodes
- *
- * @memberof HashBrown.Common.Models
- */
-
-var ContentSchema = function (_Schema) {
-    _inherits(ContentSchema, _Schema);
-
-    function ContentSchema(properties) {
-        _classCallCheck(this, ContentSchema);
-
-        return _possibleConstructorReturn(this, _Schema.call(this, properties));
-    }
-
-    ContentSchema.prototype.structure = function structure() {
-        _Schema.prototype.structure.call(this);
-
-        this.def(String, 'defaultTabId');
-        this.def(Object, 'tabs', {});
-        this.def(Object, 'fields', {});
-        this.def(Array, 'allowedChildSchemas', []);
-
-        this.name = 'New content schema';
-        this.type = 'content';
-    };
-
-    return ContentSchema;
-}(Schema);
-
-module.exports = ContentSchema;
-
-/***/ }),
-/* 198 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
 var Media = __webpack_require__(49);
 
+var RequestHelper = __webpack_require__(293);
 var ProjectHelper = __webpack_require__(7);
 var SettingsHelper = __webpack_require__(35);
 
@@ -37470,14 +36675,15 @@ var MediaBrowser = function (_View) {
 
                 var apiPath = 'media/' + (replaceId ? 'replace/' + replaceId : 'new');
 
+                // TODO: Use the RequestHelper for this
                 $.ajax({
-                    url: apiUrl(apiPath),
+                    url: RequestHelper.environmentUrl(apiPath),
                     type: 'POST',
                     data: new FormData(this),
                     processData: false,
                     contentType: false,
                     success: function success(ids) {
-                        reloadResource('media').then(function () {
+                        RequestHelper.reloadResource('media').then(function () {
                             uploadModal.$element.find('.spinner-container').toggleClass('hidden', true);
 
                             navbar.reload();
@@ -37644,7 +36850,7 @@ var MediaBrowser = function (_View) {
 module.exports = MediaBrowser;
 
 /***/ }),
-/* 199 */
+/* 198 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37665,7 +36871,7 @@ var SettingsHelper = function SettingsHelper() {
 module.exports = SettingsHelper;
 
 /***/ }),
-/* 200 */
+/* 199 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37677,9 +36883,10 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var ConnectionHelperCommon = __webpack_require__(243);
+var ConnectionHelperCommon = __webpack_require__(244);
 var Connection = __webpack_require__(48);
 var ProjectHelper = __webpack_require__(7);
+var RequestHelper = __webpack_require__(293);
 
 /**
  * The client side connection helper
@@ -37764,7 +36971,7 @@ var ConnectionHelper = function (_ConnectionHelperComm) {
 
     ConnectionHelper.setMediaProvider = function setMediaProvider(id) {
         return _ConnectionHelperComm.setMediaProvider.call(this, ProjectHelper.currentProject, ProjectHelper.currentEnvironment, id).then(function () {
-            return reloadResource('media');
+            return RequestHelper.reloadResource('media');
         }).then(function () {
             HashBrown.Views.Navigation.NavbarMain.reload();
         });
@@ -37792,7 +36999,7 @@ var ConnectionHelper = function (_ConnectionHelperComm) {
 
     ConnectionHelper.setTemplateProvider = function setTemplateProvider(id) {
         return _ConnectionHelperComm.setTemplateProvider.call(this, ProjectHelper.currentProject, ProjectHelper.currentEnvironment, id).then(function () {
-            return reloadResource('templates');
+            return RequestHelper.reloadResource('templates');
         }).then(function () {
             HashBrown.Views.Navigation.NavbarMain.reload();
         });
@@ -37815,7 +37022,7 @@ var ConnectionHelper = function (_ConnectionHelperComm) {
 module.exports = ConnectionHelper;
 
 /***/ }),
-/* 201 */
+/* 200 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37829,7 +37036,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var SchemaHelper = __webpack_require__(50);
 var ContentHelper = __webpack_require__(47);
-var ConnectionHelper = __webpack_require__(200);
+var ConnectionHelper = __webpack_require__(199);
+var RequestHelper = __webpack_require__(293);
 
 /**
  * The editor view for Content objects
@@ -37912,20 +37120,20 @@ var ContentEditor = function (_View) {
             if (publishing.connections && publishing.connections.length > 0) {
                 // Unpublish
                 if (saveAction === 'unpublish') {
-                    return apiCall('post', 'content/unpublish', _this2.model);
+                    return RequestHelper.request('post', 'content/unpublish', _this2.model);
 
                     // Publish
                 } else if (saveAction === 'publish') {
-                    return apiCall('post', 'content/publish', _this2.model);
+                    return RequestHelper.request('post', 'content/publish', _this2.model);
 
                     // Preview
                 } else if (saveAction === 'preview') {
-                    return apiCall('post', 'content/preview', _this2.model);
+                    return RequestHelper.request('post', 'content/preview', _this2.model);
                 }
             }
 
             // Just save normally
-            return apiCall('post', 'content/' + _this2.model.id, _this2.model);
+            return RequestHelper.request('post', 'content/' + _this2.model.id, _this2.model);
         };
 
         this.$saveBtn.toggleClass('working', true);
@@ -37934,7 +37142,7 @@ var ContentEditor = function (_View) {
         setContent().then(function (url) {
             postSaveUrl = url;
 
-            return reloadResource('content');
+            return RequestHelper.reloadResource('content');
         }).then(function () {
             _this2.$saveBtn.toggleClass('saving', false);
 
@@ -38313,7 +37521,7 @@ var ContentEditor = function (_View) {
 module.exports = ContentEditor;
 
 /***/ }),
-/* 202 */
+/* 201 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38419,6 +37627,70 @@ var LanguageHelper = function () {
 }();
 
 module.exports = LanguageHelper;
+
+/***/ }),
+/* 202 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var DebugHelperCommon = __webpack_require__(203);
+
+/**
+ * The client side debug helper
+ *
+ * @memberof HashBrown.Client.Helpers
+ */
+
+var DebugHelper = function (_DebugHelperCommon) {
+    _inherits(DebugHelper, _DebugHelperCommon);
+
+    function DebugHelper() {
+        _classCallCheck(this, DebugHelper);
+
+        return _possibleConstructorReturn(this, _DebugHelperCommon.apply(this, arguments));
+    }
+
+    /**
+     * Start the debug socket
+     */
+    DebugHelper.startSocket = function startSocket() {
+        var debugSocket = new WebSocket(location.protocol.replace('http', 'ws') + '//' + location.host + '/api/debug');
+
+        debugSocket.onopen = function (ev) {
+            debug.log('Debug socket open', 'HashBrown');
+        };
+
+        debugSocket.onmessage = function (ev) {
+            try {
+                var data = JSON.parse(ev.data);
+
+                switch (data.type) {
+                    case 'error':
+                        UI.errorModal(new Error(data.sender + ': ' + data.message));
+                        break;
+
+                    case 'warning':
+                        UI.errorModal(new Error(data.sender + ': ' + data.message));
+                        break;
+                }
+            } catch (e) {
+                UI.errorModal(e);
+            }
+        };
+    };
+
+    return DebugHelper;
+}(DebugHelperCommon);
+
+module.exports = DebugHelper;
 
 /***/ }),
 /* 203 */
@@ -38592,6 +37864,577 @@ module.exports = DebugHelper;
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+var MessageModal = __webpack_require__(15);
+
+/**
+ * A UI helper for creating and handling common interface behaviours
+ *
+ * @memberof HashBrown.Client.Helpers
+ */
+
+var UIHelper = function () {
+    function UIHelper() {
+        _classCallCheck(this, UIHelper);
+    }
+
+    /**
+     * Creates a switch
+     *
+     * @param {Boolean} initialValue
+     * @param {Function} onChange
+     *
+     * @returns {HTMLElement} Switch element
+     */
+    UIHelper.inputSwitch = function inputSwitch(initialValue, onChange) {
+        var id = 'switch-' + (10000 + Math.floor(Math.random() * 10000));
+        var $input = void 0;
+
+        var $element = _.div({ class: 'switch', 'data-checked': initialValue }, $input = _.input({
+            id: id,
+            class: 'form-control switch',
+            type: 'checkbox'
+        }).change(function () {
+            this.parentElement.dataset.checked = this.checked;
+
+            if (onChange) {
+                onChange(this.checked);
+            }
+        }), _.label({ for: id }));
+
+        $element.on('set', function (e, newValue) {
+            $input[0].checked = newValue;
+        });
+
+        if (initialValue) {
+            $input.attr('checked', true);
+        }
+
+        return $element;
+    };
+
+    /**
+     * Creates a group of chips
+     *
+     * @param {Array} items
+     * @param {Array} dropdownItems
+     * @param {Function} onChange
+     * @param {Boolean} isDropdownUnique
+     *
+     * @returns {HtmlElement} Chip group element
+     */
+
+
+    UIHelper.inputChipGroup = function inputChipGroup(items, dropdownItems, onChange, isDropdownUnique) {
+        var $element = _.div({ class: 'chip-group' });
+
+        if (!items) {
+            items = [];
+        }
+
+        function render() {
+            _.append($element.empty(),
+
+            // Render individual chips
+            _.each(items, function (itemIndex, item) {
+                var $chip = _.div({ class: 'chip' },
+
+                // Dropdown
+                _.if(Array.isArray(dropdownItems), _.div({ class: 'chip-label dropdown' }, _.button({ class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, item.label || item.name || item.title || item), _.if(onChange, _.ul({ class: 'dropdown-menu' }, _.each(dropdownItems, function (dropdownItemIndex, dropdownItem) {
+                    // Look for unique dropdown items
+                    if (isDropdownUnique) {
+                        for (var _iterator = items, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+                            var _ref;
+
+                            if (_isArray) {
+                                if (_i >= _iterator.length) break;
+                                _ref = _iterator[_i++];
+                            } else {
+                                _i = _iterator.next();
+                                if (_i.done) break;
+                                _ref = _i.value;
+                            }
+
+                            var _item = _ref;
+
+                            if (_item == dropdownItem) {
+                                return;
+                            }
+                        }
+                    }
+
+                    return _.li(_.a({ href: '#' }, dropdownItem.label || dropdownItem.name || dropdownItem.title || dropdownItem).click(function (e) {
+                        e.preventDefault();
+
+                        items[itemIndex] = dropdownItem;
+
+                        render();
+
+                        if (typeof onChange === 'function') {
+                            onChange(items);
+                        }
+                    }));
+                }))))),
+
+                // Regular string
+                _.if(!Array.isArray(dropdownItems), _.if(!onChange, _.p({ class: 'chip-label' }, item)), _.if(onChange, _.input({ type: 'text', class: 'chip-label', value: item }).change(function (e) {
+                    items[itemIndex] = e.target.value;
+                }))),
+
+                // Remove button
+                _.if(onChange, _.button({ class: 'btn chip-remove' }, _.span({ class: 'fa fa-remove' })).click(function () {
+                    items.splice(itemIndex, 1);
+
+                    render();
+
+                    if (typeof onChange === 'function') {
+                        onChange(items);
+                    }
+                })));
+
+                return $chip;
+            }),
+
+            // Add button
+            _.if(onChange, _.button({ class: 'btn chip-add' }, _.span({ class: 'fa fa-plus' })).click(function () {
+                if (Array.isArray(dropdownItems)) {
+                    if (isDropdownUnique) {
+                        for (var _iterator2 = dropdownItems, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
+                            var _ref2;
+
+                            if (_isArray2) {
+                                if (_i2 >= _iterator2.length) break;
+                                _ref2 = _iterator2[_i2++];
+                            } else {
+                                _i2 = _iterator2.next();
+                                if (_i2.done) break;
+                                _ref2 = _i2.value;
+                            }
+
+                            var dropdownItem = _ref2;
+
+                            var isSelected = false;
+
+                            for (var _iterator3 = items, _isArray3 = Array.isArray(_iterator3), _i3 = 0, _iterator3 = _isArray3 ? _iterator3 : _iterator3[Symbol.iterator]();;) {
+                                var _ref3;
+
+                                if (_isArray3) {
+                                    if (_i3 >= _iterator3.length) break;
+                                    _ref3 = _iterator3[_i3++];
+                                } else {
+                                    _i3 = _iterator3.next();
+                                    if (_i3.done) break;
+                                    _ref3 = _i3.value;
+                                }
+
+                                var item = _ref3;
+
+                                if (item == dropdownItem) {
+                                    isSelected = true;
+                                    break;
+                                }
+                            }
+
+                            if (!isSelected) {
+                                items.push(dropdownItem);
+                                break;
+                            }
+                        }
+                    } else {
+                        items.push(dropdownItems[0]);
+                    }
+                } else if (typeof dropdownItems === 'string') {
+                    items.push(dropdownItems);
+                } else {
+                    items.push('New item');
+                }
+
+                render();
+
+                if (typeof onChange === 'function') {
+                    onChange(items);
+                }
+            })));
+        };
+
+        render();
+
+        return $element;
+    };
+
+    /**
+     * Renders a dropdown
+     *
+     * @param {String|Number} defaultValue
+     * @param {Array|Number} options
+     * @param {Function} onChange
+     * @param {Boolean} useClearButton
+     * @param {Boolean} useSearch
+     *
+     * @returns {HtmlElement} Dropdown element
+     */
+
+
+    UIHelper.inputDropdown = function inputDropdown(defaultValue, options, onChange, useClearButton) {
+        // If "options" parameter is a number, convert to array
+        if (typeof options === 'number') {
+            var amount = options;
+
+            options = [];
+
+            for (var i = 0; i < amount; i++) {
+                options[options.length] = { label: i.toString(), value: i };
+            }
+        }
+
+        // Change event
+        var onClick = function onClick(e, element) {
+            var $button = $(e.target);
+            var $li = $button.parents('li');
+
+            $li.addClass('active').siblings().removeClass('active');
+
+            $toggle.html($button.html());
+            $toggle.click();
+
+            onChange($li.attr('data-value'));
+        };
+
+        // Highlight selected value
+        var highlightSelectedValue = function highlightSelectedValue() {
+            $element.find('ul li').removeClass('active');
+            $toggle.html('(none)');
+
+            if (!defaultValue) {
+                return;
+            }
+
+            for (var _iterator4 = options, _isArray4 = Array.isArray(_iterator4), _i4 = 0, _iterator4 = _isArray4 ? _iterator4 : _iterator4[Symbol.iterator]();;) {
+                var _ref4;
+
+                if (_isArray4) {
+                    if (_i4 >= _iterator4.length) break;
+                    _ref4 = _iterator4[_i4++];
+                } else {
+                    _i4 = _iterator4.next();
+                    if (_i4.done) break;
+                    _ref4 = _i4.value;
+                }
+
+                var option = _ref4;
+
+                if (option.value == defaultValue) {
+                    $toggle.html(option.label);
+                    $element.find('ul li[data-value="' + option.value + '"]').addClass('active');
+                    break;
+                }
+            }
+        };
+
+        // Clear event
+        var onClear = function onClear() {
+            defaultValue = onChange(null);
+
+            highlightSelectedValue();
+        };
+
+        // Base elements
+        var $element = _.div({ class: 'dropdown' });
+        var $toggle = _.button({ class: 'btn btn-default dropdown-toggle', type: 'button', 'data-toggle': 'dropdown' }, '(none)');
+        var $clear = _.button({ class: 'btn btn-default btn-small dropdown-clear' }, _.span({ class: 'fa fa-remove' })).on('click', onClear);
+        var $list = _.ul({ class: 'dropdown-menu-items' });
+
+        // Add an option
+        $element.on('addOption', function (e, option) {
+            var optionLabel = option.label || option.id || option.name || option.toString();
+            var isSelected = option.selected || option.value == defaultValue;
+
+            if (isSelected) {
+                $toggle.html(optionLabel);
+            }
+
+            var $li = _.li({ 'data-value': option.value || optionLabel, class: isSelected ? 'active' : '' }, _.button(optionLabel).on('click', onClick));
+
+            $list.append($li);
+        });
+
+        // Remove an option
+        $element.on('removeOption', function (e, optionValue) {
+            $list.children('[data-value="' + optionValue + '"]').remove();
+        });
+
+        // Change an option
+        $element.on('changeOption', function (e, oldOptionValue, newOption) {
+            $element.trigger('removeOption', oldOptionValue);
+            $element.trigger('addOption', newOption);
+        });
+
+        // Set current option
+        $element.on('setValue', function (e, newValue) {
+            var $option = $list.children('[data-value="' + newValue + '"]');
+
+            if ($option.length > 0) {
+                $toggle.html($option.children('button').html());
+            }
+        });
+
+        // Render
+        _.append($element, $toggle, _.if(useClearButton, $clear), _.div({ class: 'dropdown-menu' }, $list));
+
+        // Render all options
+        for (var _i5 in options || []) {
+            $element.trigger('addOption', options[_i5]);
+        }
+
+        return $element;
+    };
+
+    /**
+     * Renders a dropdown with typeahead
+     *
+     * @param {String} label
+     * @param {Array|Number} options
+     * @param {Function} onClick
+     * @param {Boolean} useClearButton
+     *
+     * @returns {HtmlElement} Dropdown element
+     */
+
+
+    UIHelper.inputDropdownTypeAhead = function inputDropdownTypeAhead(label, options, onClick, useClearButton) {
+        var $element = this.inputDropdown(label, options, onClick, useClearButton);
+        var inputTimeout = void 0;
+
+        // Change input event
+        var onChangeInput = function onChangeInput() {
+            if (inputTimeout) {
+                clearTimeout(inputTimeout);
+            }
+
+            var query = ($element.find('.dropdown-typeahead input').val() || '').toLowerCase();
+            var isQueryEmpty = !query || query.length < 2;
+
+            inputTimeout = setTimeout(function () {
+                $element.find('ul li button').each(function (i, button) {
+                    var $button = $(button);
+                    var label = ($button.html() || '').toLowerCase();
+                    var isMatch = label.indexOf(query) > -1;
+
+                    $button.toggle(isMatch || isQueryEmpty);
+                });
+            }, 250);
+        };
+
+        // Clear input event
+        var onClearInput = function onClearInput(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            $element.find('.dropdown-typeahead input').val('');
+
+            onChangeInput();
+        };
+
+        $element.addClass('typeahead');
+
+        $element.find('.dropdown-menu').prepend(_.div({ class: 'dropdown-typeahead' }, _.input({ class: 'form-control', placeholder: 'Search...' }).on('keyup paste change propertychange', onChangeInput), _.button({ class: 'dropdown-typeahead-btn-clear' }, _.span({ class: 'fa fa-remove' })).on('click', onClearInput)));
+
+        return $element;
+    };
+
+    /**
+     * Renders a carousel
+     *
+     * @param {Array} items
+     * @param {Boolean} useIndicators
+     * @param {Boolean} useControls
+     * @param {String} height
+     *
+     * @returns {HtmlElement} Carousel element
+     */
+
+
+    UIHelper.carousel = function carousel(items, useIndicators, useControls, height) {
+        var id = 'carousel-' + (10000 + Math.floor(Math.random() * 10000));
+
+        return _.div({ class: 'carousel slide', id: id, 'data-ride': 'carousel', 'data-interval': 0 }, _.if(useIndicators, _.ol({ class: 'carousel-indicators' }, _.each(items, function (i, item) {
+            return _.li({ 'data-target': '#' + id, 'data-slide-to': i, class: i == 0 ? 'active' : '' });
+        }))), _.div({ class: 'carousel-inner', role: 'listbox' }, _.each(items, function (i, item) {
+            return _.div({ class: 'item' + (i == 0 ? ' active' : ''), style: 'height:' + (height || '500px') }, item);
+        })), _.if(useControls, _.a({ href: '#' + id, role: 'button', class: 'left carousel-control', 'data-slide': 'prev' }, _.span({ class: 'fa fa-arrow-left' })), _.a({ href: '#' + id, role: 'button', class: 'right carousel-control', 'data-slide': 'next' }, _.span({ class: 'fa fa-arrow-right' }))));
+    };
+
+    /**
+     * Brings up an error modal
+     *
+     * @param {String|Error} error
+     * @param {Function} onClickOK
+     */
+
+
+    UIHelper.errorModal = function errorModal(error, onClickOK) {
+        if (!error) {
+            return;
+        }
+
+        if (error instanceof String) {
+            error = new Error(error);
+        } else if (error instanceof Object) {
+            if (error.responseText) {
+                error = new Error(error.responseText);
+            }
+        } else if (error instanceof Error == false) {
+            error = new Error(error.toString());
+        }
+
+        new MessageModal({
+            model: {
+                title: '<span class="fa fa-warning"></span> Error',
+                body: error.message + '<br /><br />Please check the JavaScript console for details',
+                onSubmit: onClickOK,
+                class: 'error-modal'
+            }
+        });
+
+        console.log(error.stack);
+    };
+
+    /**
+     * Brings up a warning modal
+     *
+     * @param {String} warning
+     * @param {Function} onClickOK
+     */
+
+
+    UIHelper.warningModal = function warningModal(warning, onClickOK) {
+        if (!warning) {
+            return;
+        }
+
+        new MessageModal({
+            model: {
+                title: '<span class="fa fa-warning"></span> Warning',
+                body: warning,
+                onSubmit: onClickOK,
+                class: 'warning-modal'
+            }
+        });
+    };
+
+    /**
+     * Brings up a message modal
+     *
+     * @param {String} title
+     * @param {String} body
+     */
+
+
+    UIHelper.messageModal = function messageModal(title, body, onSubmit) {
+        return new MessageModal({
+            model: {
+                title: title,
+                body: body,
+                onSubmit: onSubmit
+            }
+        });
+    };
+
+    /**
+     * Brings up an iframe modal
+     *
+     * @param {String} title
+     * @param {String} url
+     * @param {Function} onload
+     * @param {Function} onerror
+     */
+
+
+    UIHelper.iframeModal = function iframeModal(title, url, onload, onerror) {
+        var $iframe = _.iframe({ src: url });
+
+        return new MessageModal({
+            model: {
+                title: title,
+                body: [_.span({ class: 'iframe-modal-error' }, 'If the preview didn\'t show up, please try the "reload" or "open" buttons'), $iframe],
+                class: 'iframe-modal'
+            },
+            buttons: [{
+                label: 'Reload',
+                class: 'btn-primary',
+                callback: function callback() {
+                    $iframe[0].src += '';
+
+                    return false;
+                }
+            }, {
+                label: 'Open',
+                class: 'btn-primary',
+                callback: function callback() {
+                    window.open($iframe[0].src);
+
+                    return false;
+                }
+            }, {
+                label: 'OK',
+                class: 'btn-default'
+            }]
+        });
+    };
+
+    /**
+     * Brings up a confirm modal
+     *
+     * @param {String} type
+     * @param {String} title
+     * @param {String} body
+     * @param {Function} onSubmit
+     */
+
+
+    UIHelper.confirmModal = function confirmModal(type, title, body, onSubmit, onCancel) {
+        var submitClass = 'btn-primary';
+
+        type = (type || '').toLowerCase();
+
+        switch (type) {
+            case 'delete':case 'remove':case 'discard':case 'clear':
+                submitClass = 'btn-danger';
+                break;
+        }
+
+        return new MessageModal({
+            model: {
+                title: title,
+                body: body,
+                onSubmit: onSubmit,
+                class: 'confirm-modal'
+            },
+            buttons: [{
+                label: 'Cancel',
+                class: 'btn-default',
+                callback: onCancel
+            }, {
+                label: type,
+                class: submitClass,
+                callback: onSubmit
+            }]
+        });
+    };
+
+    return UIHelper;
+}();
+
+module.exports = UIHelper;
+
+/***/ }),
+/* 205 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
@@ -38636,23 +38479,25 @@ var MediaViewer = function (_View) {
 module.exports = MediaViewer;
 
 /***/ }),
-/* 205 */
+/* 206 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-
-/**
- * A Template editor
- *
- * @memberof HashBrown.Client.Views.Editors
- */
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var RequestHelper = __webpack_require__(293);
+
+/**
+ * A Template editor
+ *
+ * @memberof HashBrown.Client.Views.Editors
+ */
 
 var TemplateEditor = function (_View) {
     _inherits(TemplateEditor, _View);
@@ -38680,8 +38525,8 @@ var TemplateEditor = function (_View) {
 
         this.$saveBtn.toggleClass('working', true);
 
-        apiCall('post', 'templates/' + this.model.type + '/' + this.model.id, this.model).then(function () {
-            return reloadResource('templates');
+        RequestHelper.request('post', 'templates/' + this.model.type + '/' + this.model.id, this.model).then(function () {
+            return RequestHelper.reloadResource('templates');
         }).then(function () {
             HashBrown.Views.Navigation.NavbarMain.reload();
 
@@ -38760,7 +38605,7 @@ var TemplateEditor = function (_View) {
 module.exports = TemplateEditor;
 
 /***/ }),
-/* 206 */
+/* 207 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38772,6 +38617,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+var RequestHelper = __webpack_require__(293);
 var ProjectHelper = __webpack_require__(7);
 
 /**
@@ -38813,11 +38659,11 @@ var FormEditor = function (_View) {
 
         this.$saveBtn.toggleClass('working', true);
 
-        apiCall('post', 'forms/' + this.model.id, this.model).then(function () {
+        RequestHelper.request('post', 'forms/' + this.model.id, this.model).then(function () {
             debug.log('Saved form "' + _this2.model.id + '"', _this2);
             _this2.$saveBtn.toggleClass('working', false);
 
-            reloadResource('forms').then(function () {
+            RequestHelper.reloadResource('forms').then(function () {
                 var navbar = ViewHelper.get('NavbarMain');
 
                 navbar.reload();
@@ -39039,12 +38885,12 @@ var FormEditor = function (_View) {
 
         return _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-danger' }, 'Clear').click(function () {
             UI.confirmModal('Clear', 'Clear "' + _this5.model.title + '"', 'Are you sure you want to clear all entries?', function () {
-                apiCall('post', 'forms/clear/' + _this5.model.id).then(function () {
+                RequestHelper.request('post', 'forms/clear/' + _this5.model.id).then(function () {
                     _this5.model.entries = [];
                 }).catch(UI.errorModal);
             });
         }), _.button({ class: 'btn btn-primary' }, 'Get .csv').click(function () {
-            location = apiUrl('forms/' + _this5.model.id + '/entries');
+            location = RequestHelper.environmentUrl('forms/' + _this5.model.id + '/entries');
         }));
     };
 
@@ -39109,7 +38955,7 @@ var FormEditor = function (_View) {
 module.exports = FormEditor;
 
 /***/ }),
-/* 207 */
+/* 208 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39514,7 +39360,7 @@ var Content = function (_Entity) {
 module.exports = Content;
 
 /***/ }),
-/* 208 */
+/* 209 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39526,20 +39372,20 @@ module.exports = Content;
 
 module.exports = {
     Connection: __webpack_require__(48),
-    Content: __webpack_require__(207),
-    ContentSchema: __webpack_require__(197),
+    Content: __webpack_require__(208),
+    ContentSchema: __webpack_require__(87),
     Entity: __webpack_require__(12),
-    FieldSchema: __webpack_require__(87),
-    index: __webpack_require__(208),
+    FieldSchema: __webpack_require__(88),
+    index: __webpack_require__(209),
     Media: __webpack_require__(49),
-    Project: __webpack_require__(89),
+    Project: __webpack_require__(90),
     Schema: __webpack_require__(86),
-    Template: __webpack_require__(209),
+    Template: __webpack_require__(210),
     User: __webpack_require__(34)
 };
 
 /***/ }),
-/* 209 */
+/* 210 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39595,7 +39441,7 @@ var Template = function (_Entity) {
 module.exports = Template;
 
 /***/ }),
-/* 210 */
+/* 211 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39606,16 +39452,13 @@ module.exports = Template;
  */
 // Style
 
-__webpack_require__(211);
-
-// Helper functions
-__webpack_require__(94);
+__webpack_require__(212);
 
 // Libraries
 __webpack_require__(186);
 
 // Get routes
-__webpack_require__(212);
+__webpack_require__(213);
 
 // Resource cache
 window.resources = {
@@ -39631,21 +39474,24 @@ window.resources = {
 // Namespaces
 window.HashBrown = {};
 
-HashBrown.Models = __webpack_require__(225);
+HashBrown.Models = __webpack_require__(226);
 HashBrown.Views = {};
-HashBrown.Views.Modals = __webpack_require__(228);
-HashBrown.Views.Navigation = __webpack_require__(229);
-HashBrown.Views.Editors = __webpack_require__(241);
+HashBrown.Views.Modals = __webpack_require__(229);
+HashBrown.Views.Navigation = __webpack_require__(230);
+HashBrown.Views.Editors = __webpack_require__(242);
 HashBrown.Views.Editors.ConnectionEditors = {};
-HashBrown.Views.Editors.FieldEditors = __webpack_require__(247);
-HashBrown.Helpers = __webpack_require__(264);
+HashBrown.Views.Editors.FieldEditors = __webpack_require__(248);
+HashBrown.Helpers = __webpack_require__(265);
 
 // Helper shortcuts
 window.debug = HashBrown.Helpers.DebugHelper;
 window.UI = HashBrown.Helpers.UIHelper;
 
+// Helper functions
+__webpack_require__(94);
+
 // Preload resources 
-$(document).ready(function () {
+document.addEventListener('DOMContentLoaded', function () {
     var SettingsHelper = HashBrown.Helpers.SettingsHelper;
     var LanguageHelper = HashBrown.Helpers.LanguageHelper;
     var ProjectHelper = HashBrown.Helpers.ProjectHelper;
@@ -39656,7 +39502,7 @@ $(document).ready(function () {
     SettingsHelper.getSettings(ProjectHelper.currentProject, null, 'sync').then(function () {
         return LanguageHelper.getLanguages(ProjectHelper.currentProject);
     }).then(function () {
-        return reloadAllResources();
+        return HashBrown.Helpers.RequestHelper.reloadAllResources();
     }).then(function () {
         for (var _iterator = resources.users, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
             var _ref;
@@ -39703,26 +39549,10 @@ $(document).ready(function () {
 });
 
 /***/ }),
-/* 211 */
+/* 212 */
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
-
-/***/ }),
-/* 212 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-__webpack_require__(213);
-__webpack_require__(214);
-__webpack_require__(215);
-__webpack_require__(216);
-__webpack_require__(218);
-__webpack_require__(219);
-__webpack_require__(220);
-__webpack_require__(221);
 
 /***/ }),
 /* 213 */
@@ -39731,8 +39561,25 @@ __webpack_require__(221);
 "use strict";
 
 
-// Root
+__webpack_require__(214);
+__webpack_require__(215);
+__webpack_require__(216);
+__webpack_require__(217);
+__webpack_require__(219);
+__webpack_require__(220);
+__webpack_require__(221);
+__webpack_require__(222);
 
+/***/ }),
+/* 214 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var RequestHelper = __webpack_require__(293);
+
+// Root
 Router.route('/', function () {
     ViewHelper.get('NavbarMain').showTab('/');
     ViewHelper.get('NavbarMain').highlightItem('/', 'null');
@@ -39756,7 +39603,7 @@ Router.route('/', function () {
     }
 
     populateWorkspace(_.div({ class: 'dashboard-container welcome' }, _.h1('Welcome to HashBrown'), _.h2('Example content'), _.p('Press the button below to get some example content to work with.'), _.button({ class: 'btn btn-default' }, 'example').click(function () {
-        apiCall('post', 'content/example').then(function () {
+        RequestHelper.request('post', 'content/example').then(function () {
             location.reload();
         }).catch(UI.errorModal);
     }), _.h2('Introduction'), UI.carousel(carouselItems, true, true, '400px'), _.h2('Contextual help'), _.p('You can always click the <span class="fa fa-question-circle"></span> icon in the upper right to get information about the screen you\'re currently on.'), _.h2('Guides'), _.p('If you\'d like a more in-depth walkthrough of the features, please check out the guides.'), _.a({ class: 'btn btn-default', href: 'http://hashbrown.rocks/guides', target: '_blank' }, 'Guides')), 'presentation');
@@ -39766,12 +39613,8 @@ Router.route('/', function () {
 Router.route('/readme/', function () {
     ViewHelper.get('NavbarMain').highlightItem('/', 'readme');
 
-    $.ajax({
-        type: 'GET',
-        url: '/text/readme',
-        success: function success(html) {
-            populateWorkspace(_.div({ class: 'dashboard-container readme' }, html), 'presentation');
-        }
+    RequestHelper.customRequest('GET', '/text/readme').then(function (html) {
+        populateWorkspace(_.div({ class: 'dashboard-container readme' }, html), 'presentation');
     });
 });
 
@@ -39779,24 +39622,21 @@ Router.route('/readme/', function () {
 Router.route('/license/', function () {
     ViewHelper.get('NavbarMain').highlightItem('/', 'license');
 
-    $.ajax({
-        type: 'GET',
-        url: '/text/license',
-        success: function success(html) {
-            populateWorkspace(_.div({ class: 'dashboard-container license' }, html), 'presentation presentation-center');
-        }
+    RequestHelper.customRequest('GET', '/text/license').then(function (html) {
+        populateWorkspace(_.div({ class: 'dashboard-container license' }, html), 'presentation presentation-center');
     });
 });
 
 /***/ }),
-/* 214 */
+/* 215 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-// Dashboard
+var RequestHelper = __webpack_require__(293);
 
+// Dashboard
 Router.route('/content/', function () {
     ViewHelper.get('NavbarMain').showTab('/content/');
 
@@ -39808,7 +39648,7 @@ Router.route('/content/json/:id', function () {
     ViewHelper.get('NavbarMain').highlightItem('/content/', this.id);
 
     var contentEditor = new HashBrown.Views.Editors.JSONEditor({
-        modelUrl: apiUrl('content/' + this.id),
+        modelUrl: RequestHelper.environmentUrl('content/' + this.id),
         apiPath: 'content/' + this.id
     });
 
@@ -39844,7 +39684,7 @@ Router.route('/content/:id/:tab', function () {
         ViewHelper.get('NavbarMain').highlightItem('/content/', this.id);
 
         contentEditor = new HashBrown.Views.Editors.ContentEditor({
-            modelUrl: apiUrl('content/' + this.id)
+            modelUrl: RequestHelper.environmentUrl('content/' + this.id)
         });
 
         populateWorkspace(contentEditor.$element);
@@ -39852,14 +39692,15 @@ Router.route('/content/:id/:tab', function () {
 });
 
 /***/ }),
-/* 215 */
+/* 216 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-// Dashboard
+var RequestHelper = __webpack_require__(293);
 
+// Dashboard
 Router.route('/connections/', function () {
     if (currentUserHasScope('connections')) {
         ViewHelper.get('NavbarMain').showTab('/connections/');
@@ -39874,7 +39715,7 @@ Router.route('/connections/', function () {
 Router.route('/connections/:id', function () {
     if (currentUserHasScope('connections')) {
         var connectionEditor = new HashBrown.Views.Editors.ConnectionEditor({
-            modelUrl: apiUrl('connections/' + this.id)
+            modelUrl: RequestHelper.environmentUrl('connections/' + this.id)
         });
 
         ViewHelper.get('NavbarMain').highlightItem('/connections/', this.id);
@@ -39901,13 +39742,14 @@ Router.route('/connections/json/:id', function () {
 });
 
 /***/ }),
-/* 216 */
+/* 217 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var MediaViewer = __webpack_require__(204);
+var MediaViewer = __webpack_require__(205);
+var RequestHelper = __webpack_require__(293);
 
 // Dashboard
 Router.route('/media/', function () {
@@ -39919,7 +39761,7 @@ Router.route('/media/', function () {
 // Preview
 Router.route('/media/:id', function () {
     var mediaViewer = new MediaViewer({
-        modelUrl: apiUrl('media/' + this.id)
+        modelUrl: RequestHelper.environmentUrl('media/' + this.id)
     });
 
     ViewHelper.get('NavbarMain').highlightItem('/media/', this.id);
@@ -39928,7 +39770,7 @@ Router.route('/media/:id', function () {
 });
 
 /***/ }),
-/* 217 */
+/* 218 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process) {// Copyright Joyent, Inc. and other Node contributors.
@@ -40153,14 +39995,15 @@ var substr = 'ab'.substr(-1) === 'b' ? function (str, start, len) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6)))
 
 /***/ }),
-/* 218 */
+/* 219 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-// Dashboard
+var RequestHelper = __webpack_require__(293);
 
+// Dashboard
 Router.route('/schemas/', function () {
     if (currentUserHasScope('schemas')) {
         ViewHelper.get('NavbarMain').showTab('/schemas/');
@@ -40175,7 +40018,7 @@ Router.route('/schemas/', function () {
 Router.route('/schemas/:id', function () {
     if (currentUserHasScope('schemas')) {
         var schemaEditor = new HashBrown.Views.Editors.SchemaEditor({
-            modelUrl: apiUrl('schemas/' + this.id)
+            modelUrl: RequestHelper.environmentUrl('schemas/' + this.id)
         });
 
         ViewHelper.get('NavbarMain').highlightItem('/schemas/', this.id);
@@ -40193,7 +40036,7 @@ Router.route('/schemas/json/:id', function () {
             model: resources.schemas[this.id],
             apiPath: 'schemas/' + this.id,
             onSuccess: function onSuccess() {
-                return reloadResource('schemas').then(function () {
+                return RequestHelper.reloadResource('schemas').then(function () {
                     var navbar = ViewHelper.get('NavbarMain');
 
                     navbar.reload();
@@ -40210,7 +40053,7 @@ Router.route('/schemas/json/:id', function () {
 });
 
 /***/ }),
-/* 219 */
+/* 220 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40240,13 +40083,14 @@ Router.route('/settings/providers/', function () {
 });
 
 /***/ }),
-/* 220 */
+/* 221 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var TemplateEditor = __webpack_require__(205);
+var TemplateEditor = __webpack_require__(206);
+var RequestHelper = __webpack_require__(293);
 
 // Templates
 Router.route('/templates/', function () {
@@ -40265,7 +40109,7 @@ Router.route('/templates/:type/:id', function () {
         ViewHelper.get('NavbarMain').highlightItem('/templates/', this.type + '/' + this.id);
 
         var templateEditor = new TemplateEditor({
-            modelUrl: apiUrl('templates/' + this.type + '/' + this.id)
+            modelUrl: RequestHelper.environmentUrl('templates/' + this.type + '/' + this.id)
         });
 
         populateWorkspace(templateEditor.$element);
@@ -40275,14 +40119,15 @@ Router.route('/templates/:type/:id', function () {
 });
 
 /***/ }),
-/* 221 */
+/* 222 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var JSONEditor = __webpack_require__(194);
-var FormEditor = __webpack_require__(206);
+var FormEditor = __webpack_require__(207);
+var RequestHelper = __webpack_require__(293);
 
 // Dashboard
 Router.route('/forms/', function () {
@@ -40296,7 +40141,7 @@ Router.route('/forms/:id', function () {
     ViewHelper.get('NavbarMain').highlightItem('/forms/', this.id);
 
     var formEditor = new FormEditor({
-        modelUrl: apiUrl('forms/' + this.id)
+        modelUrl: RequestHelper.environmentUrl('forms/' + this.id)
     });
 
     populateWorkspace(formEditor.$element);
@@ -40305,7 +40150,7 @@ Router.route('/forms/:id', function () {
 // Edit (JSON editor)
 Router.route('/forms/json/:id', function () {
     var formEditor = new JSONEditor({
-        modelUrl: apiUrl('forms/' + this.id),
+        modelUrl: RequestHelper.environmentUrl('forms/' + this.id),
         apiPath: 'forms/' + this.id
     });
 
@@ -40315,7 +40160,7 @@ Router.route('/forms/json/:id', function () {
 });
 
 /***/ }),
-/* 222 */
+/* 223 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*
@@ -40382,7 +40227,7 @@ function get_beautify(js_beautify, css_beautify, html_beautify) {
 
 if (true) {
     // Add support for AMD ( https://github.com/amdjs/amdjs-api/wiki/AMD#defineamd-property- )
-    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(195), __webpack_require__(196), __webpack_require__(223)], __WEBPACK_AMD_DEFINE_RESULT__ = function (js_beautify, css_beautify, html_beautify) {
+    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(195), __webpack_require__(196), __webpack_require__(224)], __WEBPACK_AMD_DEFINE_RESULT__ = function (js_beautify, css_beautify, html_beautify) {
         return get_beautify(js_beautify, css_beautify, html_beautify);
     }.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
@@ -40397,7 +40242,7 @@ if (true) {
 }
 
 /***/ }),
-/* 223 */
+/* 224 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -41525,7 +41370,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var _typeof = ty
 })();
 
 /***/ }),
-/* 224 */
+/* 225 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41537,8 +41382,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var FieldSchema = __webpack_require__(87);
-var ContentSchema = __webpack_require__(197);
+var FieldSchema = __webpack_require__(88);
+var ContentSchema = __webpack_require__(87);
 
 /**
  * The common base for SchemaHelper
@@ -41659,7 +41504,7 @@ var SchemaHelper = function () {
 module.exports = SchemaHelper;
 
 /***/ }),
-/* 225 */
+/* 226 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41670,22 +41515,22 @@ module.exports = SchemaHelper;
  */
 
 module.exports = {
-    Content: __webpack_require__(88),
+    Content: __webpack_require__(89),
     Connection: __webpack_require__(48),
-    ContentSchema: __webpack_require__(197),
+    ContentSchema: __webpack_require__(87),
     Entity: __webpack_require__(12),
-    FieldSchema: __webpack_require__(87),
-    Form: __webpack_require__(227),
-    index: __webpack_require__(208),
+    FieldSchema: __webpack_require__(88),
+    Form: __webpack_require__(228),
+    index: __webpack_require__(209),
     Media: __webpack_require__(49),
-    Project: __webpack_require__(89),
+    Project: __webpack_require__(90),
     Schema: __webpack_require__(86),
-    Template: __webpack_require__(209),
+    Template: __webpack_require__(210),
     User: __webpack_require__(34)
 };
 
 /***/ }),
-/* 226 */
+/* 227 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41847,7 +41692,7 @@ var ContentHelper = function () {
 module.exports = ContentHelper;
 
 /***/ }),
-/* 227 */
+/* 228 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42006,7 +41851,7 @@ var Form = function (_Entity) {
 module.exports = Form;
 
 /***/ }),
-/* 228 */
+/* 229 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42017,12 +41862,12 @@ module.exports = Form;
  */
 
 module.exports = {
-  MediaBrowser: __webpack_require__(198),
+  MediaBrowser: __webpack_require__(197),
   MessageModal: __webpack_require__(15)
 };
 
 /***/ }),
-/* 229 */
+/* 230 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42033,21 +41878,21 @@ module.exports = {
  */
 
 module.exports = {
-    CMSPane: __webpack_require__(230),
-    ConnectionPane: __webpack_require__(232),
-    ContentPane: __webpack_require__(233),
-    FormsPane: __webpack_require__(234),
-    MainMenu: __webpack_require__(235),
-    MediaPane: __webpack_require__(236),
+    CMSPane: __webpack_require__(231),
+    ConnectionPane: __webpack_require__(233),
+    ContentPane: __webpack_require__(234),
+    FormsPane: __webpack_require__(235),
+    MainMenu: __webpack_require__(236),
+    MediaPane: __webpack_require__(237),
     NavbarMain: __webpack_require__(32),
     NavbarPane: __webpack_require__(33),
-    SchemaPane: __webpack_require__(238),
-    SettingsPane: __webpack_require__(239),
-    TemplatePane: __webpack_require__(240)
+    SchemaPane: __webpack_require__(239),
+    SettingsPane: __webpack_require__(240),
+    TemplatePane: __webpack_require__(241)
 };
 
 /***/ }),
-/* 230 */
+/* 231 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42100,7 +41945,7 @@ var CMSPane = function (_NavbarPane) {
 module.exports = CMSPane;
 
 /***/ }),
-/* 231 */
+/* 232 */
 /***/ (function(module, exports) {
 
 module.exports = function () {
@@ -42197,7 +42042,7 @@ module.exports = function () {
 };
 
 /***/ }),
-/* 232 */
+/* 233 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42210,6 +42055,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var ProjectHelper = __webpack_require__(7);
+var RequestHelper = __webpack_require__(293);
 
 var NavbarPane = __webpack_require__(33);
 var NavbarMain = __webpack_require__(32);
@@ -42235,10 +42081,10 @@ var ConnectionPane = function (_NavbarPane) {
     ConnectionPane.onClickNewConnection = function onClickNewConnection() {
         var newConnection = void 0;
 
-        apiCall('post', 'connections/new').then(function (connection) {
+        RequestHelper.request('post', 'connections/new').then(function (connection) {
             newConnection = connection;
 
-            return reloadResource('connections');
+            return RequestHelper.reloadResource('connections');
         }).then(function () {
             NavbarMain.reload();
 
@@ -42270,10 +42116,10 @@ var ConnectionPane = function (_NavbarPane) {
                 label: 'OK',
                 class: 'btn-danger',
                 callback: function callback() {
-                    apiCall('delete', 'connections/' + id).then(function () {
+                    RequestHelper.request('delete', 'connections/' + id).then(function () {
                         debug.log('Removed connection with alias "' + id + '"', _this2);
 
-                        return reloadResource('connections');
+                        return RequestHelper.reloadResource('connections');
                     }).then(function () {
                         NavbarMain.reload();
 
@@ -42297,11 +42143,11 @@ var ConnectionPane = function (_NavbarPane) {
         var pullId = $('.cr-context-menu__target-element').data('id');
 
         // API call to pull the Connection by id
-        apiCall('post', 'connections/pull/' + pullId, {})
+        RequestHelper.request('post', 'connections/pull/' + pullId, {})
 
         // Upon success, reload all Connection models    
         .then(function () {
-            return reloadResource('connections');
+            return RequestHelper.reloadResource('connections');
         })
 
         // Reload the UI
@@ -42331,11 +42177,11 @@ var ConnectionPane = function (_NavbarPane) {
         $element.parent().addClass('loading');
 
         // API call to push the Connection by id
-        apiCall('post', 'connections/push/' + pushId)
+        RequestHelper.request('post', 'connections/push/' + pushId)
 
         // Upon success, reload all Connection models
         .then(function () {
-            return reloadResource('connections');
+            return RequestHelper.reloadResource('connections');
         })
 
         // Reload the UI
@@ -42418,7 +42264,7 @@ var ConnectionPane = function (_NavbarPane) {
 module.exports = ConnectionPane;
 
 /***/ }),
-/* 233 */
+/* 234 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42432,6 +42278,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var ProjectHelper = __webpack_require__(7);
 var ContentHelper = __webpack_require__(47);
+var RequestHelper = __webpack_require__(293);
 
 var NavbarPane = __webpack_require__(33);
 var NavbarMain = __webpack_require__(32);
@@ -42466,12 +42313,12 @@ var ContentPane = function (_NavbarPane) {
         .then(function (content) {
             content.parentId = parentId;
 
-            return apiCall('post', 'content/' + id, content);
+            return RequestHelper.request('post', 'content/' + id, content);
         })
 
         // Reload all Content models
         .then(function () {
-            return reloadResource('content');
+            return RequestHelper.reloadResource('content');
         })
 
         // Reload UI
@@ -42498,12 +42345,12 @@ var ContentPane = function (_NavbarPane) {
             content.sort = newIndex;
             content.parentId = parentId;
 
-            return apiCall('post', 'content/' + id, content);
+            return RequestHelper.request('post', 'content/' + id, content);
         })
 
         // Reload all Content models
         .then(function () {
-            return reloadResource('content');
+            return RequestHelper.reloadResource('content');
         })
 
         // Reload UI
@@ -42522,11 +42369,11 @@ var ContentPane = function (_NavbarPane) {
         var pullId = $('.cr-context-menu__target-element').data('id');
 
         // API call to pull the Content by id
-        apiCall('post', 'content/pull/' + pullId, {})
+        RequestHelper.request('post', 'content/pull/' + pullId, {})
 
         // Upon success, reload all Content models    
         .then(function () {
-            return reloadResource('content');
+            return RequestHelper.reloadResource('content');
         })
 
         // Reload the UI
@@ -42556,11 +42403,11 @@ var ContentPane = function (_NavbarPane) {
         $element.parent().addClass('loading');
 
         // API call to push the Content by id
-        apiCall('post', 'content/push/' + pushId)
+        RequestHelper.request('post', 'content/push/' + pushId)
 
         // Upon success, reload all Content models
         .then(function () {
-            return reloadResource('content');
+            return RequestHelper.reloadResource('content');
         })
 
         // Reload the UI
@@ -42633,13 +42480,13 @@ var ContentPane = function (_NavbarPane) {
                     }
 
                     // API call to create new Content node
-                    apiCall('post', apiUrl)
+                    RequestHelper.request('post', apiUrl)
 
                     // Upon success, reload resource and UI elements    
                     .then(function (result) {
                         newContent = result;
 
-                        return reloadResource('content');
+                        return RequestHelper.reloadResource('content');
                     }).then(function () {
                         NavbarMain.reload();
 
@@ -42678,7 +42525,7 @@ var ContentPane = function (_NavbarPane) {
                 content.settings.publishing = publishing;
 
                 // API call to save the Content model
-                apiCall('post', 'content/' + content.id, content)
+                RequestHelper.request('post', 'content/' + content.id, content)
 
                 // Upon success, reload the UI    
                 .then(function () {
@@ -42776,13 +42623,13 @@ var ContentPane = function (_NavbarPane) {
         ContentHelper.getContentById(id).then(function (content) {
             content.getSettings('publishing').then(function (publishing) {
                 function unpublishConnections() {
-                    return apiCall('post', 'content/unpublish', content).then(function () {
+                    return RequestHelper.request('post', 'content/unpublish', content).then(function () {
                         return onSuccess();
                     });
                 }
 
                 function onSuccess() {
-                    return reloadResource('content').then(function () {
+                    return RequestHelper.reloadResource('content').then(function () {
                         NavbarMain.reload();
 
                         var contentEditor = ViewHelper.get('ContentEditor');
@@ -42810,7 +42657,7 @@ var ContentPane = function (_NavbarPane) {
                 UI.confirmModal('Remove', 'Remove the content "' + name + '"?', _.div({ class: 'input-group' }, _.span('Remove child content too'), _.div({ class: 'input-group-addon' }, $deleteChildrenSwitch = UI.inputSwitch(true))), function () {
                     $element.parent().toggleClass('loading', true);
 
-                    apiCall('delete', 'content/' + id + '?removeChildren=' + $deleteChildrenSwitch.data('checked')).then(function () {
+                    RequestHelper.request('delete', 'content/' + id + '?removeChildren=' + $deleteChildrenSwitch.data('checked')).then(function () {
 
                         if (shouldUnpublish && publishing.connections && publishing.connections.length > 0) {
                             return unpublishConnections();
@@ -42934,7 +42781,7 @@ var ContentPane = function (_NavbarPane) {
 module.exports = ContentPane;
 
 /***/ }),
-/* 234 */
+/* 235 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42947,6 +42794,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var ProjectHelper = __webpack_require__(7);
+var RequestHelper = __webpack_require__(293);
 
 var NavbarPane = __webpack_require__(33);
 var NavbarMain = __webpack_require__(32);
@@ -42970,8 +42818,8 @@ var FormsPane = function (_NavbarPane) {
      * Event: Click create new form
      */
     FormsPane.onClickNewForm = function onClickNewForm() {
-        apiCall('post', 'forms/new').then(function (newFormId) {
-            reloadResource('forms').then(function () {
+        RequestHelper.request('post', 'forms/new').then(function (newFormId) {
+            return RequestHelper.reloadResource('forms').then(function () {
                 NavbarMain.reload();
 
                 location.hash = '/forms/' + newFormId;
@@ -42995,7 +42843,7 @@ var FormsPane = function (_NavbarPane) {
         function onSuccess() {
             debug.log('Removed Form with id "' + form.id + '"', view);
 
-            return reloadResource('forms').then(function () {
+            return RequestHelper.reloadResource('forms').then(function () {
                 NavbarMain.reload();
 
                 // Cancel the FormEditor view
@@ -43025,7 +42873,7 @@ var FormsPane = function (_NavbarPane) {
                 label: 'Delete',
                 class: 'btn-danger',
                 callback: function callback() {
-                    apiCall('delete', 'forms/' + form.id).then(onSuccess).catch(onError);
+                    RequestHelper.request('delete', 'forms/' + form.id).then(onSuccess).catch(onError);
                 }
             }]
         });
@@ -43040,11 +42888,11 @@ var FormsPane = function (_NavbarPane) {
         var pullId = $('.cr-context-menu__target-element').data('id');
 
         // API call to pull the Form by id
-        apiCall('post', 'forms/pull/' + pullId, {})
+        RequestHelper.request('post', 'forms/pull/' + pullId, {})
 
         // Upon success, reload all Form models    
         .then(function () {
-            return reloadResource('forms');
+            return RequestHelper.reloadResource('forms');
         })
 
         // Reload the UI
@@ -43073,8 +42921,8 @@ var FormsPane = function (_NavbarPane) {
 
         $element.parent().addClass('loading');
 
-        apiCall('post', 'forms/push/' + pushId).then(function () {
-            return reloadResource('forms');
+        RequestHelper.request('post', 'forms/push/' + pushId).then(function () {
+            return RequestHelper.reloadResource('forms');
         }).then(function () {
             NavbarMain.reload();
         }).catch(UI.errorModal);
@@ -43164,7 +43012,7 @@ var FormsPane = function (_NavbarPane) {
 module.exports = FormsPane;
 
 /***/ }),
-/* 235 */
+/* 236 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43177,7 +43025,8 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var User = __webpack_require__(34);
-var UserEditor = __webpack_require__(90);
+var UserEditor = __webpack_require__(91);
+var RequestHelper = __webpack_require__(293);
 
 /**
  * The main menu
@@ -43215,7 +43064,7 @@ var MainMenu = function (_View) {
 
         window.language = newLanguage;
 
-        reloadResource('content').then(function () {
+        RequestHelper.reloadResource('content').then(function () {
             HashBrown.Views.Navigation.NavbarMain.reload();
 
             var contentEditor = ViewHelper.get('ContentEditor');
@@ -43328,7 +43177,7 @@ var MainMenu = function (_View) {
 module.exports = MainMenu;
 
 /***/ }),
-/* 236 */
+/* 237 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43342,9 +43191,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var NavbarPane = __webpack_require__(33);
 var NavbarMain = __webpack_require__(32);
-var MediaBrowser = __webpack_require__(198);
+var MediaBrowser = __webpack_require__(197);
 var ProjectHelper = __webpack_require__(7);
-var MediaHelper = __webpack_require__(91);
+var MediaHelper = __webpack_require__(92);
+var RequestHelper = __webpack_require__(293);
 
 /**
  * The Media navbar pane
@@ -43367,11 +43217,11 @@ var MediaPane = function (_NavbarPane) {
      * @param {String} newFolder
      */
     MediaPane.onChangeDirectory = function onChangeDirectory(id, newFolder) {
-        apiCall('post', 'media/tree/' + id, newFolder ? {
+        RequestHelper.request('post', 'media/tree/' + id, newFolder ? {
             id: id,
             folder: newFolder
         } : null).then(function () {
-            return reloadResource('media');
+            return RequestHelper.reloadResource('media');
         }).then(function () {
             NavbarMain.reload();
 
@@ -43404,8 +43254,8 @@ var MediaPane = function (_NavbarPane) {
                 callback: function callback() {
                     $element.parent().toggleClass('loading', true);
 
-                    apiCall('delete', 'media/' + id).then(function () {
-                        return reloadResource('media');
+                    RequestHelper.request('delete', 'media/' + id).then(function () {
+                        return RequestHelper.reloadResource('media');
                     }).then(function () {
                         NavbarMain.reload();
 
@@ -43534,7 +43384,7 @@ MediaPane.canCreateDirectory = true;
 module.exports = MediaPane;
 
 /***/ }),
-/* 237 */
+/* 238 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43618,7 +43468,7 @@ var MediaHelper = function () {
 module.exports = MediaHelper;
 
 /***/ }),
-/* 238 */
+/* 239 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43631,6 +43481,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var ProjectHelper = __webpack_require__(7);
+var RequestHelper = __webpack_require__(293);
 
 var NavbarPane = __webpack_require__(33);
 var NavbarMain = __webpack_require__(32);
@@ -43661,7 +43512,7 @@ var SchemaPane = function (_NavbarPane) {
         function onSuccess() {
             debug.log('Removed schema with id "' + id + '"', this);
 
-            reloadResource('schemas').then(function () {
+            RequestHelper.reloadResource('schemas').then(function () {
                 NavbarMain.reload();
 
                 // Cancel the SchemaEditor view if it was displaying the deleted content
@@ -43685,7 +43536,7 @@ var SchemaPane = function (_NavbarPane) {
                     label: 'OK',
                     class: 'btn-danger',
                     callback: function callback() {
-                        apiCall('delete', 'schemas/' + id).then(onSuccess).catch(UI.errorModal);
+                        RequestHelper.request('delete', 'schemas/' + id).then(onSuccess).catch(UI.errorModal);
                     }
                 }]
             });
@@ -43713,8 +43564,8 @@ var SchemaPane = function (_NavbarPane) {
         var parentId = $('.cr-context-menu__target-element').data('id');
         var parentSchema = window.resources.schemas[parentId];
 
-        apiCall('post', 'schemas/new', parentSchema).then(function (newSchema) {
-            reloadResource('schemas').then(function () {
+        RequestHelper.request('post', 'schemas/new', parentSchema).then(function (newSchema) {
+            return RequestHelper.reloadResource('schemas').then(function () {
                 NavbarMain.reload();
 
                 location.hash = '/schemas/' + newSchema.id;
@@ -43731,8 +43582,8 @@ var SchemaPane = function (_NavbarPane) {
         var schemaEditor = ViewHelper.get('SchemaEditor');
         var pullId = $('.cr-context-menu__target-element').data('id');
 
-        apiCall('post', 'schemas/pull/' + pullId, {}).then(function () {
-            return reloadResource('schemas');
+        RequestHelper.request('post', 'schemas/pull/' + pullId, {}).then(function () {
+            return RequestHelper.reloadResource('schemas');
         }).then(function () {
             NavbarMain.reload();
 
@@ -43758,8 +43609,8 @@ var SchemaPane = function (_NavbarPane) {
 
         $element.parent().addClass('loading');
 
-        apiCall('post', 'schemas/push/' + pushId).then(function () {
-            return reloadResource('schemas');
+        RequestHelper.request('post', 'schemas/push/' + pushId).then(function () {
+            return RequestHelper.reloadResource('schemas');
         }).then(function () {
             NavbarMain.reload();
         }).catch(UI.errorModal);
@@ -43845,7 +43696,7 @@ var SchemaPane = function (_NavbarPane) {
 module.exports = SchemaPane;
 
 /***/ }),
-/* 239 */
+/* 240 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43894,7 +43745,7 @@ var SettingsPane = function (_NavbarPane) {
 module.exports = SettingsPane;
 
 /***/ }),
-/* 240 */
+/* 241 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43905,6 +43756,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var RequestHelper = __webpack_require__(293);
 
 var NavbarPane = __webpack_require__(33);
 var NavbarMain = __webpack_require__(32);
@@ -43965,8 +43818,8 @@ var TemplatePane = function (_NavbarPane) {
                 }
             }
 
-            apiCall('post', 'templates/' + newTemplate.type + '/' + newTemplate.id, newTemplate).then(function () {
-                return reloadResource('templates');
+            RequestHelper.request('post', 'templates/' + newTemplate.type + '/' + newTemplate.id, newTemplate).then(function () {
+                return RequestHelper.reloadResource('templates');
             }).then(function () {
                 NavbarMain.reload();
 
@@ -44012,10 +43865,10 @@ var TemplatePane = function (_NavbarPane) {
         }
 
         UI.confirmModal('delete', 'Delete "' + model.name + '"', 'Are you sure you want to delete this template?', function () {
-            apiCall('delete', 'templates/' + model.type + '/' + model.id).then(function () {
+            RequestHelper.request('delete', 'templates/' + model.type + '/' + model.id).then(function () {
                 $element.parent().remove();
 
-                return reloadResource('templates');
+                return RequestHelper.reloadResource('templates');
             }).then(function () {
                 NavbarMain.reload();
 
@@ -44067,8 +43920,8 @@ var TemplatePane = function (_NavbarPane) {
 
             model.name = e.target.value;
         }), function () {
-            apiCall('post', 'templates/' + type + '/' + id, model).then(function (newTemplate) {
-                return reloadResource('templates');
+            RequestHelper.request('post', 'templates/' + type + '/' + id, model).then(function (newTemplate) {
+                return RequestHelper.reloadResource('templates');
             }).then(function () {
                 NavbarMain.reload();
 
@@ -44152,7 +44005,7 @@ var TemplatePane = function (_NavbarPane) {
 module.exports = TemplatePane;
 
 /***/ }),
-/* 241 */
+/* 242 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44163,19 +44016,19 @@ module.exports = TemplatePane;
  */
 
 module.exports = {
-    ConnectionEditor: __webpack_require__(242),
-    ContentEditor: __webpack_require__(201),
-    FormEditor: __webpack_require__(206),
+    ConnectionEditor: __webpack_require__(243),
+    ContentEditor: __webpack_require__(200),
+    FormEditor: __webpack_require__(207),
     JSONEditor: __webpack_require__(194),
-    MediaViewer: __webpack_require__(204),
-    ProvidersSettings: __webpack_require__(244),
-    SchemaEditor: __webpack_require__(245),
-    TemplateEditor: __webpack_require__(205),
-    UserEditor: __webpack_require__(90)
+    MediaViewer: __webpack_require__(205),
+    ProvidersSettings: __webpack_require__(245),
+    SchemaEditor: __webpack_require__(246),
+    TemplateEditor: __webpack_require__(206),
+    UserEditor: __webpack_require__(91)
 };
 
 /***/ }),
-/* 242 */
+/* 243 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44187,7 +44040,8 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var ConnectionHelper = __webpack_require__(200);
+var RequestHelper = __webpack_require__(293);
+var ConnectionHelper = __webpack_require__(199);
 
 /**
  * The editor for Connections
@@ -44228,7 +44082,7 @@ var ConnectionEditor = function (_View) {
 
         view.$saveBtn.toggleClass('saving', true);
 
-        apiCall('post', 'connections/' + view.model.id, view.model).then(function () {
+        RequestHelper.request('post', 'connections/' + view.model.id, view.model).then(function () {
             view.$saveBtn.toggleClass('saving', false);
 
             location.reload();
@@ -44393,7 +44247,7 @@ var ConnectionEditor = function (_View) {
 module.exports = ConnectionEditor;
 
 /***/ }),
-/* 243 */
+/* 244 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44561,7 +44415,7 @@ var ConnectionHelper = function () {
 module.exports = ConnectionHelper;
 
 /***/ }),
-/* 244 */
+/* 245 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44681,7 +44535,7 @@ var ProvidersSettings = function (_View) {
 module.exports = ProvidersSettings;
 
 /***/ }),
-/* 245 */
+/* 246 */
 /***/ (function(module, exports, __webpack_require__) {
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -44691,11 +44545,12 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 // Icons
-var icons = __webpack_require__(246).icons;
+var icons = __webpack_require__(247).icons;
 
 var Schema = __webpack_require__(86);
 var SchemaHelper = __webpack_require__(50);
 var ContentHelper = __webpack_require__(47);
+var RequestHelper = __webpack_require__(293);
 var JSONEditor = __webpack_require__(194);
 
 /**
@@ -44741,10 +44596,10 @@ var SchemaEditor = function (_View) {
 
         this.$saveBtn.toggleClass('working', true);
 
-        apiCall('post', 'schemas/' + this.model.id, this.model).then(function () {
+        RequestHelper.request('post', 'schemas/' + this.model.id, this.model).then(function () {
             _this2.$saveBtn.toggleClass('working', false);
 
-            return reloadResource('schemas');
+            return RequestHelper.reloadResource('schemas');
         }).then(function () {
             ViewHelper.get('NavbarMain').reload();
         }).catch(UI.errorModal);
@@ -45324,7 +45179,7 @@ var SchemaEditor = function (_View) {
 module.exports = SchemaEditor;
 
 /***/ }),
-/* 246 */
+/* 247 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -46027,7 +45882,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 247 */
+/* 248 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46038,27 +45893,27 @@ module.exports = {
  */
 
 module.exports = {
-    ArrayEditor: __webpack_require__(248),
-    BooleanEditor: __webpack_require__(249),
-    ContentReferenceEditor: __webpack_require__(250),
-    ContentSchemaReferenceEditor: __webpack_require__(251),
-    DateEditor: __webpack_require__(252),
-    DropdownEditor: __webpack_require__(253),
+    ArrayEditor: __webpack_require__(249),
+    BooleanEditor: __webpack_require__(250),
+    ContentReferenceEditor: __webpack_require__(251),
+    ContentSchemaReferenceEditor: __webpack_require__(252),
+    DateEditor: __webpack_require__(253),
+    DropdownEditor: __webpack_require__(254),
     FieldEditor: __webpack_require__(10),
-    LanguageEditor: __webpack_require__(254),
-    MediaReferenceEditor: __webpack_require__(255),
-    NumberEditor: __webpack_require__(256),
-    ResourceReferenceEditor: __webpack_require__(257),
-    RichTextEditor: __webpack_require__(258),
-    StringEditor: __webpack_require__(259),
-    StructEditor: __webpack_require__(260),
-    TagsEditor: __webpack_require__(261),
-    TemplateReferenceEditor: __webpack_require__(262),
-    UrlEditor: __webpack_require__(263)
+    LanguageEditor: __webpack_require__(255),
+    MediaReferenceEditor: __webpack_require__(256),
+    NumberEditor: __webpack_require__(257),
+    ResourceReferenceEditor: __webpack_require__(258),
+    RichTextEditor: __webpack_require__(259),
+    StringEditor: __webpack_require__(260),
+    StructEditor: __webpack_require__(261),
+    TagsEditor: __webpack_require__(262),
+    TemplateReferenceEditor: __webpack_require__(263),
+    UrlEditor: __webpack_require__(264)
 };
 
 /***/ }),
-/* 248 */
+/* 249 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46074,9 +45929,9 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var FieldEditor = __webpack_require__(10);
 var SchemaHelper = __webpack_require__(50);
-var MediaHelper = __webpack_require__(91);
+var MediaHelper = __webpack_require__(92);
 var ContentHelper = __webpack_require__(47);
-var ContentEditor = __webpack_require__(201);
+var ContentEditor = __webpack_require__(200);
 
 /**
  * An array editor for editing a list of other field values
@@ -46555,7 +46410,7 @@ var ArrayEditor = function (_FieldEditor) {
 module.exports = ArrayEditor;
 
 /***/ }),
-/* 249 */
+/* 250 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46619,7 +46474,7 @@ var BooleanEditor = function (_FieldEditor) {
 module.exports = BooleanEditor;
 
 /***/ }),
-/* 250 */
+/* 251 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46631,7 +46486,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Content = __webpack_require__(88);
+var Content = __webpack_require__(89);
 
 var FieldEditor = __webpack_require__(10);
 
@@ -46729,7 +46584,7 @@ var ContentReferenceEditor = function (_FieldEditor) {
 module.exports = ContentReferenceEditor;
 
 /***/ }),
-/* 251 */
+/* 252 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46884,7 +46739,7 @@ var ContentSchemaReferenceEditor = function (_FieldEditor) {
 module.exports = ContentSchemaReferenceEditor;
 
 /***/ }),
-/* 252 */
+/* 253 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47115,7 +46970,7 @@ var DateEditor = function (_FieldEditor) {
 module.exports = DateEditor;
 
 /***/ }),
-/* 253 */
+/* 254 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47208,7 +47063,7 @@ var DropdownEditor = function (_FieldEditor) {
 module.exports = DropdownEditor;
 
 /***/ }),
-/* 254 */
+/* 255 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47221,7 +47076,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var ProjectHelper = __webpack_require__(7);
-var LanguageHelper = __webpack_require__(92);
+var LanguageHelper = __webpack_require__(93);
 
 var FieldEditor = __webpack_require__(10);
 
@@ -47292,7 +47147,7 @@ var LanguageEditor = function (_FieldEditor) {
 module.exports = LanguageEditor;
 
 /***/ }),
-/* 255 */
+/* 256 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47305,9 +47160,9 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var Media = __webpack_require__(49);
-var MediaHelper = __webpack_require__(91);
+var MediaHelper = __webpack_require__(92);
 var ProjectHelper = __webpack_require__(7);
-var MediaBrowser = __webpack_require__(198);
+var MediaBrowser = __webpack_require__(197);
 
 var FieldEditor = __webpack_require__(10);
 
@@ -47398,7 +47253,7 @@ var MediaReferenceEditor = function (_FieldEditor) {
 module.exports = MediaReferenceEditor;
 
 /***/ }),
-/* 256 */
+/* 257 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47458,7 +47313,7 @@ var NumberEditor = function (_FieldEditor) {
 module.exports = NumberEditor;
 
 /***/ }),
-/* 257 */
+/* 258 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47546,7 +47401,7 @@ var ResourceReferenceEditor = function (_FieldEditor) {
 module.exports = ResourceReferenceEditor;
 
 /***/ }),
-/* 258 */
+/* 259 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47843,7 +47698,7 @@ var RichTextEditor = function (_FieldEditor) {
 module.exports = RichTextEditor;
 
 /***/ }),
-/* 259 */
+/* 260 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47903,7 +47758,7 @@ var StringEditor = function (_FieldEditor) {
 module.exports = StringEditor;
 
 /***/ }),
-/* 260 */
+/* 261 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47920,7 +47775,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var FieldEditor = __webpack_require__(10);
 var SchemaHelper = __webpack_require__(50);
 var ContentHelper = __webpack_require__(47);
-var ContentEditor = __webpack_require__(201);
+var ContentEditor = __webpack_require__(200);
 
 /**
  * A struct editor for editing any arbitrary object value
@@ -48024,7 +47879,7 @@ var StructEditor = function (_FieldEditor) {
 module.exports = StructEditor;
 
 /***/ }),
-/* 261 */
+/* 262 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -48186,7 +48041,7 @@ var TagsEditor = function (_FieldEditor) {
 module.exports = TagsEditor;
 
 /***/ }),
-/* 262 */
+/* 263 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -48320,7 +48175,7 @@ var TemplateReferenceEditor = function (_FieldEditor) {
 module.exports = TemplateReferenceEditor;
 
 /***/ }),
-/* 263 */
+/* 264 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -48573,7 +48428,7 @@ var UrlEditor = function (_FieldEditor) {
 module.exports = UrlEditor;
 
 /***/ }),
-/* 264 */
+/* 265 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -48584,19 +48439,19 @@ module.exports = UrlEditor;
  */
 
 module.exports = {
-    ConnectionHelper: __webpack_require__(200),
+    ConnectionHelper: __webpack_require__(199),
     ContentHelper: __webpack_require__(47),
-    DebugHelper: __webpack_require__(292),
-    LanguageHelper: __webpack_require__(92),
-    MediaHelper: __webpack_require__(91),
+    DebugHelper: __webpack_require__(202),
+    LanguageHelper: __webpack_require__(93),
+    MediaHelper: __webpack_require__(92),
     ProjectHelper: __webpack_require__(7),
+    RequestHelper: __webpack_require__(293),
     SchemaHelper: __webpack_require__(50),
     SettingsHelper: __webpack_require__(35),
-    UIHelper: __webpack_require__(93)
+    UIHelper: __webpack_require__(204)
 };
 
 /***/ }),
-/* 265 */,
 /* 266 */,
 /* 267 */,
 /* 268 */,
@@ -48623,68 +48478,244 @@ module.exports = {
 /* 289 */,
 /* 290 */,
 /* 291 */,
-/* 292 */
+/* 292 */,
+/* 293 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var DebugHelperCommon = __webpack_require__(203);
-
 /**
- * The client side debug helper
+ * A helper class for making HTTP/S requests
  *
  * @memberof HashBrown.Client.Helpers
  */
 
-var DebugHelper = function (_DebugHelperCommon) {
-    _inherits(DebugHelper, _DebugHelperCommon);
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-    function DebugHelper() {
-        _classCallCheck(this, DebugHelper);
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-        return _possibleConstructorReturn(this, _DebugHelperCommon.apply(this, arguments));
+var RequestHelper = function () {
+    function RequestHelper() {
+        _classCallCheck(this, RequestHelper);
     }
 
     /**
-     * Start the debug socket
+     * An environment specific request
+     *
+     * @param {String} method
+     * @param {String} url
+     * @param {Object} data
+     *
+     * @returns {Promise} Response
      */
-    DebugHelper.startSocket = function startSocket() {
-        var debugSocket = new WebSocket(location.protocol.replace('http', 'ws') + '//' + location.host + '/api/debug');
-
-        debugSocket.onopen = function (ev) {
-            debug.log('Debug socket open', 'HashBrown');
-        };
-
-        debugSocket.onmessage = function (ev) {
-            try {
-                var data = JSON.parse(ev.data);
-
-                switch (data.type) {
-                    case 'error':
-                        UI.errorModal(new Error(data.sender + ': ' + data.message));
-                        break;
-
-                    case 'warning':
-                        UI.errorModal(new Error(data.sender + ': ' + data.message));
-                        break;
-                }
-            } catch (e) {
-                UI.errorModal(e);
-            }
-        };
+    RequestHelper.request = function request(method, url, data) {
+        return RequestHelper.customRequest(method, RequestHelper.environmentUrl(url), data);
     };
 
-    return DebugHelper;
-}(DebugHelperCommon);
+    /**
+     * An environment-independent request
+     *
+     * @param {String} method
+     * @param {String} url
+     * @param {Object} data
+     *
+     * @returns {Promise} Response
+     */
 
-module.exports = DebugHelper;
+
+    RequestHelper.customRequest = function customRequest(method, url, data) {
+        return new Promise(function (resolve, reject) {
+            var xhr = new XMLHttpRequest();
+            xhr.open(method.toUpperCase(), url);
+            xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
+
+            if (data) {
+                if ((typeof data === 'undefined' ? 'undefined' : _typeof(data)) === 'object') {
+                    data = JSON.stringify(data);
+                }
+
+                xhr.send(data);
+            } else {
+                xhr.send();
+            }
+
+            xhr.onreadystatechange = function () {
+                var DONE = 4;
+                var OK = 200;
+                var NOT_MODIFIED = 304;
+                var UNAUTHORIZED = 403;
+
+                if (xhr.readyState === DONE) {
+                    if (xhr.status === UNAUTHORIZED) {
+                        location = '/login/?path=' + location.pathname + location.hash;
+
+                        reject(new Error('User is not logged in'));
+                    } else if (xhr.status == OK || xhr.status == NOT_MODIFIED) {
+                        var response = xhr.responseText;
+
+                        if (response && response != 'OK') {
+                            try {
+                                response = JSON.parse(response);
+                            } catch (e) {
+                                // If the response isn't JSON, then so be it
+
+                            }
+                        }
+
+                        resolve(response);
+                    } else {
+                        var error = new Error(xhr.responseText);
+
+                        error.xhr = xhr;
+
+                        reject(error);
+                    }
+                }
+            };
+        });
+    };
+
+    /**
+     * Wraps a URL to include environment
+     *
+     * @param {String} url
+     */
+
+
+    RequestHelper.environmentUrl = function environmentUrl(url) {
+        var newUrl = '/api/';
+
+        if (HashBrown.Helpers.ProjectHelper.currentProject) {
+            newUrl += HashBrown.Helpers.ProjectHelper.currentProject + '/';
+        }
+
+        if (HashBrown.Helpers.ProjectHelper.currentEnvironment) {
+            newUrl += HashBrown.Helpers.ProjectHelper.currentEnvironment + '/';
+        }
+
+        newUrl += url;
+
+        return newUrl;
+    };
+
+    /**
+     * Listens for server restart
+     */
+
+
+    RequestHelper.listenForRestart = function listenForRestart() {
+        UI.messageModal('Restart', 'HashBrown is restarting...', false);
+
+        function poke() {
+            $.ajax({
+                type: 'get',
+                url: '/',
+                success: function success() {
+                    location.reload();
+                },
+                error: function error() {
+                    poke();
+                }
+            });
+        }
+
+        poke();
+    };
+
+    /**
+     * Reloads a resource
+     */
+    RequestHelper.reloadResource = function reloadResource(name) {
+        var model = null;
+
+        switch (name) {
+            case 'connections':
+                model = HashBrown.Models.Connection;
+                break;
+
+            case 'templates':
+                model = HashBrown.Models.Template;
+                break;
+
+            case 'users':
+                model = HashBrown.Models.User;
+                break;
+
+            case 'media':
+                model = HashBrown.Models.Media;
+                break;
+        }
+
+        return RequestHelper.request('get', name).then(function (result) {
+            window.resources[name] = result;
+
+            // If a model is specified, use it to initialise every resource
+            if (model) {
+                for (var i in window.resources[name]) {
+                    window.resources[name][i] = new model(window.resources[name][i]);
+                }
+            }
+
+            return Promise.resolve(result);
+        }).catch(function (e) {
+            // If the error is a 404, it's an intended response from the controller
+            if (e.xhr.status !== 404) {
+                UI.errorModal(e);
+            }
+
+            return Promise.resolve([]);
+        });
+    };
+
+    /**
+     * Reloads all resources
+     */
+    RequestHelper.reloadAllResources = function reloadAllResources() {
+        $('.loading-messages').empty();
+
+        var queue = ['content', 'schemas', 'media', 'connections', 'templates', 'forms', 'users'];
+
+        for (var _iterator = queue, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+            var _ref;
+
+            if (_isArray) {
+                if (_i >= _iterator.length) break;
+                _ref = _iterator[_i++];
+            } else {
+                _i = _iterator.next();
+                if (_i.done) break;
+                _ref = _i.value;
+            }
+
+            var item = _ref;
+
+            var $msg = _.div({ class: 'loading-message', 'data-name': item }, item);
+
+            $('.loading-messages').append($msg);
+        }
+
+        var processQueue = function processQueue() {
+            var name = queue.shift();
+
+            return RequestHelper.reloadResource(name).then(function () {
+                $('.loading-messages [data-name="' + name + '"]').toggleClass('loaded', true);
+
+                if (queue.length < 1) {
+                    return Promise.resolve();
+                } else {
+                    return processQueue();
+                }
+            });
+        };
+
+        return processQueue();
+    };
+
+    return RequestHelper;
+}();
+
+module.exports = RequestHelper;
 
 /***/ })
 /******/ ]);

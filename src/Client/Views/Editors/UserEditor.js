@@ -1,5 +1,7 @@
 'use strict';
 
+const RequestHelper = require('Client/Helpers/RequestHelper');
+
 /**
  * An editor for Users
  *
@@ -23,7 +25,7 @@ class UserEditor extends View {
 
         this.modal.$element.addClass('modal-user-editor');
 
-        customApiCall('get', '/api/server/projects')
+        RequestHelper.customRequest('get', '/api/server/projects')
         .then((projects) => {
             this.projects = projects;
             this.init();
@@ -49,7 +51,7 @@ class UserEditor extends View {
             newUserObject.password = this.newPassword;
         }
 
-        apiCall('post', 'user/' + this.model.id, newUserObject)
+        RequestHelper.request('post', 'user/' + this.model.id, newUserObject)
         .then(() => {
             this.modal.hide();
 

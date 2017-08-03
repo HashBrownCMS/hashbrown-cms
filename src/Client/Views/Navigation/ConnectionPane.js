@@ -1,6 +1,7 @@
 'use strict';
 
 const ProjectHelper = require('Client/Helpers/ProjectHelper');
+const RequestHelper = require('Client/Helpers/RequestHelper');
 
 const NavbarPane = require('./NavbarPane');
 const NavbarMain = require('./NavbarMain');
@@ -17,11 +18,11 @@ class ConnectionPane extends NavbarPane {
     static onClickNewConnection() {
         let newConnection;
 
-        apiCall('post', 'connections/new')
+        RequestHelper.request('post', 'connections/new')
         .then((connection) => {
             newConnection = connection;
 
-            return reloadResource('connections');
+            return RequestHelper.reloadResource('connections');
         })
         .then(() => {
             NavbarMain.reload();
@@ -53,11 +54,11 @@ class ConnectionPane extends NavbarPane {
                     label: 'OK',
                     class: 'btn-danger',
                     callback: () => {
-                        apiCall('delete', 'connections/' + id)
+                        RequestHelper.request('delete', 'connections/' + id)
                         .then(() => {
                             debug.log('Removed connection with alias "' + id + '"', this); 
 
-                            return reloadResource('connections');
+                            return RequestHelper.reloadResource('connections');
                         })
                         .then(() => {
                             NavbarMain.reload();
@@ -82,11 +83,11 @@ class ConnectionPane extends NavbarPane {
         let pullId = $('.cr-context-menu__target-element').data('id');
 
         // API call to pull the Connection by id
-        apiCall('post', 'connections/pull/' + pullId, {})
+        RequestHelper.request('post', 'connections/pull/' + pullId, {})
         
         // Upon success, reload all Connection models    
         .then(() => {
-            return reloadResource('connections');
+            return RequestHelper.reloadResource('connections');
         })
 
         // Reload the UI
@@ -115,11 +116,11 @@ class ConnectionPane extends NavbarPane {
 		$element.parent().addClass('loading');
 
         // API call to push the Connection by id
-        apiCall('post', 'connections/push/' + pushId)
+        RequestHelper.request('post', 'connections/push/' + pushId)
 
         // Upon success, reload all Connection models
         .then(() => {
-            return reloadResource('connections');
+            return RequestHelper.reloadResource('connections');
         })
 
         // Reload the UI

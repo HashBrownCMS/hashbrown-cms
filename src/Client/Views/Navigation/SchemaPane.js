@@ -1,6 +1,7 @@
 'use strict';
 
 const ProjectHelper = require('Client/Helpers/ProjectHelper');
+const RequestHelper = require('Client/Helpers/RequestHelper');
 
 const NavbarPane = require('./NavbarPane');
 const NavbarMain = require('./NavbarMain');
@@ -22,7 +23,7 @@ class SchemaPane extends NavbarPane {
         function onSuccess() {
             debug.log('Removed schema with id "' + id + '"', this); 
             
-            reloadResource('schemas')
+            RequestHelper.reloadResource('schemas')
             .then(function() {
                 NavbarMain.reload();
                 
@@ -50,7 +51,7 @@ class SchemaPane extends NavbarPane {
                         label: 'OK',
                         class: 'btn-danger',
                         callback: function() {
-                            apiCall('delete', 'schemas/' + id)
+                            RequestHelper.request('delete', 'schemas/' + id)
                             .then(onSuccess)
                             .catch(UI.errorModal);
                         }
@@ -82,9 +83,9 @@ class SchemaPane extends NavbarPane {
         let parentId = $('.cr-context-menu__target-element').data('id');
         let parentSchema = window.resources.schemas[parentId];
 
-        apiCall('post', 'schemas/new', parentSchema)
+        RequestHelper.request('post', 'schemas/new', parentSchema)
         .then((newSchema) => {
-            reloadResource('schemas')
+            return RequestHelper.reloadResource('schemas')
             .then(() => {
                 NavbarMain.reload();
 
@@ -101,9 +102,9 @@ class SchemaPane extends NavbarPane {
         let schemaEditor = ViewHelper.get('SchemaEditor');
         let pullId = $('.cr-context-menu__target-element').data('id');
 
-        apiCall('post', 'schemas/pull/' + pullId, {})
+        RequestHelper.request('post', 'schemas/pull/' + pullId, {})
         .then(() => {
-            return reloadResource('schemas');
+            return RequestHelper.reloadResource('schemas');
         })
         .then(() => {
             NavbarMain.reload();
@@ -129,9 +130,9 @@ class SchemaPane extends NavbarPane {
 
 		$element.parent().addClass('loading');
 
-        apiCall('post', 'schemas/push/' + pushId)
+        RequestHelper.request('post', 'schemas/push/' + pushId)
         .then(() => {
-            return reloadResource('schemas');
+            return RequestHelper.reloadResource('schemas');
         })
         .then(() => {
             NavbarMain.reload();

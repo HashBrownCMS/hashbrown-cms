@@ -1,5 +1,6 @@
 'use strict';
 
+const RequestHelper = require('Client/Helpers/RequestHelper');
 const ProjectHelper = require('Client/Helpers/ProjectHelper');
 
 /**
@@ -29,12 +30,12 @@ class FormEditor extends View {
     onClickSave() {
         this.$saveBtn.toggleClass('working', true);
 
-        apiCall('post', 'forms/' + this.model.id, this.model)
+        RequestHelper.request('post', 'forms/' + this.model.id, this.model)
         .then(() => {
             debug.log('Saved form "' + this.model.id + '"', this);
             this.$saveBtn.toggleClass('working', false);
         
-            reloadResource('forms')
+            RequestHelper.reloadResource('forms')
             .then(() => {
                 let navbar = ViewHelper.get('NavbarMain');
                 
@@ -314,7 +315,7 @@ class FormEditor extends View {
         return _.div({class: 'btn-group'},
             _.button({class: 'btn btn-danger'}, 'Clear').click(() => {
                 UI.confirmModal('Clear', 'Clear "' + this.model.title + '"', 'Are you sure you want to clear all entries?', () => {
-                    apiCall('post', 'forms/clear/' + this.model.id)
+                    RequestHelper.request('post', 'forms/clear/' + this.model.id)
                     .then(() => {
                         this.model.entries = [];
                     })
@@ -322,7 +323,7 @@ class FormEditor extends View {
                 });
             }),
             _.button({class: 'btn btn-primary'}, 'Get .csv').click(() => {
-                location = apiUrl('forms/' + this.model.id + '/entries');
+                location = RequestHelper.environmentUrl('forms/' + this.model.id + '/entries');
             })
         );
     }

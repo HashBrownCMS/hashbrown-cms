@@ -195,7 +195,11 @@ class RequestHelper {
                             
                             // Error happened
                             if(res.statusCode >= 400 && res.statusCode < 600) {
-                                return reject(new Error(res.statusMessage + ' (' + res.statusCode + ')\nat ' + url.host + '/' + url.path + '\n\n' + str));
+                                let error = new Error(res.statusMessage + ' (' + res.statusCode + ')\nat ' + url.host + '/' + url.path + '\n\n' + str);
+                                
+                                error.statusCode = res.statusCode;
+
+                                return reject(error);
                             }
                             
                             resolve(result, res);

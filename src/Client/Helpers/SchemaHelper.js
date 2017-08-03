@@ -2,6 +2,9 @@
 
 const ContentSchema = require('Common/Models/ContentSchema');
 const FieldSchema = require('Common/Models/FieldSchema');
+
+const RequestHelper = require('Client/Helpers/RequestHelper');
+
 const SchemaHelperCommon = require('Common/Helpers/SchemaHelper');
 
 /**
@@ -22,7 +25,7 @@ class SchemaHelper extends SchemaHelperCommon {
             return Promise.resolve(null);
         }
         
-        return apiCall('get', 'schemas/' + id + '/?withParentFields=true')
+        return RequestHelper.request('get', 'schemas/' + id + '/?withParentFields=true')
         .then((schema) => {
             return Promise.resolve(SchemaHelper.getModel(schema));
         });
@@ -61,7 +64,7 @@ class SchemaHelper extends SchemaHelperCommon {
      * @return {Promise} Promise
      */
     static getSchemaById(id) {
-        return apiCall('get', 'schemas/' + id)
+        return RequestHelper.request('get', 'schemas/' + id)
         .then((schema) => {
             return Promise.resolve(this.getModel(schema));
         });

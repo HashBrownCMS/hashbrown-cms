@@ -10,6 +10,7 @@ module.exports = {
     LanguageHelper: require('./LanguageHelper'),
     MediaHelper: require('./MediaHelper'),
     ProjectHelper: require('./ProjectHelper'),
+    RequestHelper: require('./RequestHelper'),
     SchemaHelper: require('./SchemaHelper'),
     SettingsHelper: require('./SettingsHelper'),
     UIHelper: require('./UIHelper')

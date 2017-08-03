@@ -1,5 +1,7 @@
 'use strict';
 
+const RequestHelper = require('Client/Helpers/RequestHelper');
+
 const MessageModal = require('Client/Views/Modals/MessageModal');
 
 /**
@@ -40,7 +42,7 @@ class BackupEditor extends View {
 									),
 									_.li(
 										// Download backup
-										_.a({class: 'dropdown-item', href: apiUrl('server/backups/' + this.model.id + '/' + backup + '.hba')},
+										_.a({class: 'dropdown-item', href: RequestHelper.environmentUrl('server/backups/' + this.model.id + '/' + backup + '.hba')},
 											'Download'
 										)
 									),
@@ -106,8 +108,9 @@ class BackupEditor extends View {
 
             let apiPath = 'server/backups/' + view.model.id + '/upload';
 
+            // TODO: Use the RequestHelper for this
             $.ajax({
-                url: apiUrl(apiPath),
+                url: RequestHelper.environmentUrl(apiPath),
                 type: 'POST',
                 data: new FormData(this),
                 processData: false,
@@ -154,7 +157,7 @@ class BackupEditor extends View {
     onClickCreateBackup() {
         if(!currentUserIsAdmin()) { return; }
 
-        apiCall('post', 'server/backups/' + this.model.id + '/new')
+        RequestHelper.request('post', 'server/backups/' + this.model.id + '/new')
         .then((data) => {
             new MessageModal({
                 model: {
@@ -202,7 +205,7 @@ class BackupEditor extends View {
                     label: 'Restore',
                     class: 'btn-danger',
                     callback: () => {
-                        apiCall('post', 'server/backups/' + this.model.id + '/' + timestamp + '/restore')
+                        RequestHelper.request('post', 'server/backups/' + this.model.id + '/' + timestamp + '/restore')
                         .then(() => {
                             new MessageModal({
                                 model: {
@@ -252,7 +255,7 @@ class BackupEditor extends View {
                     label: 'Delete',
                     class: 'btn-danger',
                     callback: () => {
-                        apiCall('delete', 'server/backups/' + this.model.id + '/' + timestamp)
+                        RequestHelper.request('delete', 'server/backups/' + this.model.id + '/' + timestamp)
                         .then(() => {
                             location.reload();
                         })

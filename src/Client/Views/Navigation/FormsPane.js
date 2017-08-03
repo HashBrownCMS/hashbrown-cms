@@ -1,6 +1,7 @@
 'use strict';
 
 const ProjectHelper = require('Client/Helpers/ProjectHelper');
+const RequestHelper = require('Client/Helpers/RequestHelper');
 
 const NavbarPane = require('./NavbarPane');
 const NavbarMain = require('./NavbarMain');
@@ -15,9 +16,9 @@ class FormsPane extends NavbarPane {
      * Event: Click create new form
      */
     static onClickNewForm() {
-        apiCall('post', 'forms/new')
+        RequestHelper.request('post', 'forms/new')
         .then((newFormId) => {
-            reloadResource('forms')
+            return RequestHelper.reloadResource('forms')
             .then(() => {
                 NavbarMain.reload();
                 
@@ -39,7 +40,7 @@ class FormsPane extends NavbarPane {
         function onSuccess() {
             debug.log('Removed Form with id "' + form.id + '"', view); 
             
-            return reloadResource('forms')
+            return RequestHelper.reloadResource('forms')
             .then(function() {
                 NavbarMain.reload();
                 
@@ -73,7 +74,7 @@ class FormsPane extends NavbarPane {
                     label: 'Delete',
                     class: 'btn-danger',
                     callback: () => {
-                        apiCall('delete', 'forms/' + form.id)
+                        RequestHelper.request('delete', 'forms/' + form.id)
                         .then(onSuccess)
                         .catch(onError);
                     }
@@ -89,11 +90,11 @@ class FormsPane extends NavbarPane {
         let pullId = $('.cr-context-menu__target-element').data('id');
 
         // API call to pull the Form by id
-        apiCall('post', 'forms/pull/' + pullId, {})
+        RequestHelper.request('post', 'forms/pull/' + pullId, {})
         
         // Upon success, reload all Form models    
         .then(() => {
-            return reloadResource('forms');
+            return RequestHelper.reloadResource('forms');
         })
 
         // Reload the UI
@@ -121,9 +122,9 @@ class FormsPane extends NavbarPane {
 
 		$element.parent().addClass('loading');
 
-        apiCall('post', 'forms/push/' + pushId)
+        RequestHelper.request('post', 'forms/push/' + pushId)
         .then(() => {
-            return reloadResource('forms');
+            return RequestHelper.reloadResource('forms');
         })
         .then(() => {
             NavbarMain.reload();

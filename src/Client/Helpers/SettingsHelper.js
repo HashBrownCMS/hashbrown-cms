@@ -1,5 +1,7 @@
 'use strict';
 
+const RequestHelper = require('Client/Helpers/RequestHelper');
+
 const SettingsHelperCommon = require('Common/Helpers/SettingsHelper');
 
 /**
@@ -36,7 +38,7 @@ class SettingsHelper extends SettingsHelperCommon {
             apiUrl += '/' + section;
         }
 
-        return customApiCall('get', apiUrl)
+        return RequestHelper.customRequest('get', apiUrl)
 
         // Cache settings client-side
         .then((settings) => {
@@ -174,7 +176,7 @@ class SettingsHelper extends SettingsHelperCommon {
             apiUrl += '/' + section;
         }
 
-        return customApiCall('post', apiUrl, settings)
+        return RequestHelper.customRequest('post', apiUrl, settings)
 
         // Cache new settings
         .then(() => {
