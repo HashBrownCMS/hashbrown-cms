@@ -60,12 +60,12 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 273);
+/******/ 	return __webpack_require__(__webpack_require__.s = 274);
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ 273:
+/***/ 274:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -232,6 +232,10 @@ var DemoApi = function () {
     DemoApi.post = function post(url, data) {
         var query = DemoApi.parseUrl(url);
 
+        if (url == 'content/publish' || url == 'content/unpublish' || url == 'content/preview') {
+            return Promise.resolve();
+        }
+
         return DemoApi.setCache(query.resource, query.id, data);
     };
 
@@ -242,6 +246,17 @@ var DemoApi = function () {
 
     DemoApi.getNativeResource = function getNativeResource(type) {
         switch (type) {
+            case 'users':
+                return [{
+                    id: '93afb0e4cd9e7545c589a084079e340766f94xb1',
+                    isAdmin: true,
+                    isCurrent: true,
+                    username: 'demouser',
+                    fullName: 'Demo User',
+                    email: 'demo@user.com',
+                    scopes: {}
+                }];
+
             case 'settings':
                 return {};
 
@@ -255,51 +270,51 @@ var DemoApi = function () {
 
             case 'content':
                 return [{
-                    "id": "a9c44cf7c7bffc1420a43ff7e68e8fbf32261470",
-                    "parentId": "",
-                    "createdBy": "db14905b261792b6dd1f5a442375fc266aa6e7ca",
-                    "updatedBy": "db14905b261792b6dd1f5a442375fc266aa6e7ca",
-                    "createDate": "2017-07-30T10:24:22.140Z",
-                    "updateDate": "2017-07-30T10:24:22.141Z",
-                    "publishOn": null,
-                    "unpublishOn": null,
-                    "schemaId": "9e522d637efc8fe2320ff7471c815d2c55a3e439",
-                    "isPublished": false,
-                    "hasPreview": false,
-                    "sort": 10000,
-                    "properties": {
-                        "url": "/my-home-page/",
-                        "title": "My Home Page",
-                        "text": "<h2>This is a rich text page</h2><p>A simple page for inserting formatted text and media</p>"
+                    'id': 'a9c44cf7c7bffc1420a43ff7e68e8fbf32261470',
+                    'parentId': '',
+                    'createdBy': '93afb0e4cd9e7545c589a084079e340766f94xb1',
+                    'updatedBy': '93afb0e4cd9e7545c589a084079e340766f94xb1',
+                    'createDate': '2017-07-30T10:24:22.140Z',
+                    'updateDate': '2017-07-30T10:24:22.141Z',
+                    'publishOn': null,
+                    'unpublishOn': null,
+                    'schemaId': '9e522d637efc8fe2320ff7471c815d2c55a3e439',
+                    'isPublished': false,
+                    'hasPreview': false,
+                    'sort': 10000,
+                    'properties': {
+                        'url': '/my-home-page/',
+                        'title': 'My Home Page',
+                        'text': '<h2>This is a rich text page</h2><p>A simple page for inserting formatted text and media</p>'
                     },
-                    "settings": {
-                        "publishing": {
-                            "connections": []
+                    'settings': {
+                        'publishing': {
+                            'connections': []
                         }
                     }
                 }];
 
             case 'schemas':
                 var schemas = {
-                    'contentBase': __webpack_require__(274),
-                    'page': __webpack_require__(275),
-                    'array': __webpack_require__(276),
-                    'boolean': __webpack_require__(277),
-                    'contentReference': __webpack_require__(278),
-                    'contentSchemaReference': __webpack_require__(279),
-                    'date': __webpack_require__(280),
-                    'dropdown': __webpack_require__(281),
-                    'fieldBase': __webpack_require__(282),
-                    'language': __webpack_require__(283),
-                    'mediaReference': __webpack_require__(284),
-                    'number': __webpack_require__(285),
-                    'resourceReference': __webpack_require__(286),
-                    'richText': __webpack_require__(287),
-                    'string': __webpack_require__(288),
-                    'struct': __webpack_require__(289),
-                    'tags': __webpack_require__(290),
-                    'templateReference': __webpack_require__(291),
-                    'url': __webpack_require__(292),
+                    'contentBase': __webpack_require__(275),
+                    'page': __webpack_require__(276),
+                    'array': __webpack_require__(277),
+                    'boolean': __webpack_require__(278),
+                    'contentReference': __webpack_require__(279),
+                    'contentSchemaReference': __webpack_require__(280),
+                    'date': __webpack_require__(281),
+                    'dropdown': __webpack_require__(282),
+                    'fieldBase': __webpack_require__(283),
+                    'language': __webpack_require__(284),
+                    'mediaReference': __webpack_require__(285),
+                    'number': __webpack_require__(286),
+                    'resourceReference': __webpack_require__(287),
+                    'richText': __webpack_require__(288),
+                    'string': __webpack_require__(289),
+                    'struct': __webpack_require__(290),
+                    'tags': __webpack_require__(291),
+                    'templateReference': __webpack_require__(292),
+                    'url': __webpack_require__(293),
                     '9e522d637efc8fe2320ff7471c815d2c55a3e439': {
                         'id': '9e522d637efc8fe2320ff7471c815d2c55a3e439',
                         'name': 'Rich Text Page',
@@ -354,20 +369,8 @@ var DemoApi = function () {
 HashBrown.DemoApi = DemoApi;
 
 // Override normal api call
+HashBrown.Helpers.RequestHelper.request = DemoApi.request;
 HashBrown.Helpers.RequestHelper.customRequest = DemoApi.request;
-
-// ----------
-// User
-// ----------
-HashBrown.Models.User.current = new HashBrown.Models.User({
-    id: '93afb0e4cd9e7545c589a084079e340766f94xb1',
-    isAdmin: true,
-    isCurrent: true,
-    username: 'demouser',
-    fullName: 'Demo User',
-    email: 'demo@user.com',
-    scopes: {}
-});
 
 // ----------
 // Debug socket
@@ -450,6 +453,7 @@ HashBrown.Helpers.RequestHelper.reloadResource = function reloadResource(name) {
 
         case 'users':
             model = HashBrown.Models.User;
+            result = HashBrown.DemoApi.requestSync('get', 'users');
             break;
 
         case 'media':
@@ -484,7 +488,7 @@ HashBrown.Helpers.RequestHelper.reloadResource = function reloadResource(name) {
 
 /***/ }),
 
-/***/ 274:
+/***/ 275:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -552,7 +556,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 275:
+/***/ 276:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -594,7 +598,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 276:
+/***/ 277:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -606,7 +610,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 277:
+/***/ 278:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -618,7 +622,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 278:
+/***/ 279:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -630,7 +634,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 279:
+/***/ 280:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -642,7 +646,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 280:
+/***/ 281:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -654,7 +658,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 281:
+/***/ 282:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -666,7 +670,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 282:
+/***/ 283:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -676,7 +680,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 283:
+/***/ 284:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -688,7 +692,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 284:
+/***/ 285:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -700,7 +704,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 285:
+/***/ 286:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -712,7 +716,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 286:
+/***/ 287:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -724,7 +728,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 287:
+/***/ 288:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -736,7 +740,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 288:
+/***/ 289:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -748,7 +752,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 289:
+/***/ 290:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -760,7 +764,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 290:
+/***/ 291:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -772,7 +776,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 291:
+/***/ 292:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -784,7 +788,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 292:
+/***/ 293:
 /***/ (function(module, exports) {
 
 module.exports = {

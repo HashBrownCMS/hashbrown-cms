@@ -142,6 +142,10 @@ class DemoApi {
     static post(url, data) {
         let query = DemoApi.parseUrl(url);
 
+        if(url == 'content/publish' || url == 'content/unpublish' || url == 'content/preview') {
+            return Promise.resolve();
+        }
+
         return DemoApi.setCache(query.resource, query.id, data);
     }
 
@@ -150,6 +154,19 @@ class DemoApi {
      */
     static getNativeResource(type) {
         switch(type) {
+            case 'users':
+                return [
+                    {
+                        id: '93afb0e4cd9e7545c589a084079e340766f94xb1',
+                        isAdmin: true,
+                        isCurrent: true,
+                        username: 'demouser',
+                        fullName: 'Demo User',
+                        email: 'demo@user.com',
+                        scopes: {}
+                    }
+                ];
+
             case 'settings':
                 return {};
 
@@ -166,26 +183,26 @@ class DemoApi {
             case 'content':
                 return [
                     {
-                        "id": "a9c44cf7c7bffc1420a43ff7e68e8fbf32261470",
-                        "parentId": "",
-                        "createdBy": "db14905b261792b6dd1f5a442375fc266aa6e7ca",
-                        "updatedBy": "db14905b261792b6dd1f5a442375fc266aa6e7ca",
-                        "createDate": "2017-07-30T10:24:22.140Z",
-                        "updateDate": "2017-07-30T10:24:22.141Z",
-                        "publishOn": null,
-                        "unpublishOn": null,
-                        "schemaId": "9e522d637efc8fe2320ff7471c815d2c55a3e439",
-                        "isPublished": false,
-                        "hasPreview": false,
-                        "sort": 10000,
-                        "properties": {
-                            "url": "/my-home-page/",
-                                "title": "My Home Page",
-                                "text": "<h2>This is a rich text page</h2><p>A simple page for inserting formatted text and media</p>"
+                        'id': 'a9c44cf7c7bffc1420a43ff7e68e8fbf32261470',
+                        'parentId': '',
+                        'createdBy': '93afb0e4cd9e7545c589a084079e340766f94xb1',
+                        'updatedBy': '93afb0e4cd9e7545c589a084079e340766f94xb1',
+                        'createDate': '2017-07-30T10:24:22.140Z',
+                        'updateDate': '2017-07-30T10:24:22.141Z',
+                        'publishOn': null,
+                        'unpublishOn': null,
+                        'schemaId': '9e522d637efc8fe2320ff7471c815d2c55a3e439',
+                        'isPublished': false,
+                        'hasPreview': false,
+                        'sort': 10000,
+                        'properties': {
+                            'url': '/my-home-page/',
+                                'title': 'My Home Page',
+                                'text': '<h2>This is a rich text page</h2><p>A simple page for inserting formatted text and media</p>'
                         },
-                        "settings": {
-                            "publishing": {
-                                "connections": []
+                        'settings': {
+                            'publishing': {
+                                'connections': []
                             }
                         }
                     }
@@ -264,20 +281,8 @@ class DemoApi {
 HashBrown.DemoApi = DemoApi;
 
 // Override normal api call
+HashBrown.Helpers.RequestHelper.request = DemoApi.request;
 HashBrown.Helpers.RequestHelper.customRequest = DemoApi.request;
-
-// ----------
-// User
-// ----------
-HashBrown.Models.User.current = new HashBrown.Models.User({
-    id: '93afb0e4cd9e7545c589a084079e340766f94xb1',
-    isAdmin: true,
-    isCurrent: true,
-    username: 'demouser',
-    fullName: 'Demo User',
-    email: 'demo@user.com',
-    scopes: {}
-});
 
 // ----------
 // Debug socket
@@ -361,6 +366,7 @@ HashBrown.Helpers.RequestHelper.reloadResource = function reloadResource(name) {
 
         case 'users':
             model = HashBrown.Models.User;
+            result = HashBrown.DemoApi.requestSync('get', 'users');
             break;
 
         case 'media':

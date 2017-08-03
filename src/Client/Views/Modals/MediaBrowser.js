@@ -41,7 +41,7 @@ class MediaBrowser extends View {
         return SettingsHelper.getSettings(ProjectHelper.currentProject, ProjectHelper.currentEnvironment, 'providers')
         .then((result) => {
             if(!result || !result.media) {
-                return Promise.reject(new Error('No Media provider has been set for this project. Please check providers settings.'));
+                return Promise.reject(new Error('No Media provider has been set for this project. Please make sure one of your <a href="#/connections/">Connections</a> have the "is Media provider" parameter switched on.'));
             }  
 
             return Promise.resolve();
