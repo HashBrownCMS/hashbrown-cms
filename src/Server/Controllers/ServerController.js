@@ -328,7 +328,7 @@ class ServerController extends ApiController {
     static postBackupProject(req, res) {
         BackupHelper.createBackup(req.params.project)
         .then((data) => {
-            res.status(200).send(data);
+            res.status(200).send('' + data);
         })
         .catch((e) => {
             res.status(502).send(ServerController.printError(e));

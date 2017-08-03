@@ -18371,14 +18371,11 @@ var DragDrop = function () {
         // Get computed style
         var computedStyle = window.getComputedStyle(this.element);
 
-        // Calculate pointer offset
-        var pointerOffset = {
-            top: elementOffset.top - e.pageY,
-            left: elementOffset.left - e.pageX
+        // Cache the previous pointer position
+        this.prevPointerPos = {
+            x: e.pageX,
+            y: e.pageY
         };
-
-        // Cache the pointer offset
-        this.pointerOffset = pointerOffset;
 
         // Cache the previous parent element
         this.previousParent = this.element.parentElement;
@@ -18430,27 +18427,32 @@ var DragDrop = function () {
         e.preventDefault();
         e.stopPropagation();
 
+        var deltaX = e.pageX - this.prevPointerPos.x;
+        var deltaY = e.pageY - this.prevPointerPos.y;
+
         // Apply new styling to element
         if (!this.config.lockY) {
-            this.element.style.top = e.pageY + this.config.scrollContainer.scrollTop + this.pointerOffset.top;
+            this.element.style.top = parseInt(this.element.style.top) + deltaY;
         }
 
         if (!this.config.lockX) {
-            this.element.style.left = e.pageX + this.config.scrollContainer.scrollLeft + this.pointerOffset.left;
+            this.element.style.left = parseInt(this.element.style.left) + deltaX;
         }
+
+        this.prevPointerPos.x = e.pageX;
+        this.prevPointerPos.y = e.pageY;
 
         // Scroll page if dragging near the top or bottom
         var bounds = this.config.scrollContainer.getBoundingClientRect();
 
-        // TODO: Figure out why this keeps resetting to 0 every frame
         if (e.pageY > bounds.bottom - 50) {
-            this.config.scrollContainer.scrollTop += this.config.dragScrollSpeed;
+            this.config.scrollContainer.scrollTop += deltaY;
         } else if (e.pageY < bounds.top + 50) {
-            this.config.scrollContainer.scrollTop -= this.config.dragScrollSpeed;
+            this.config.scrollContainer.scrollTop += deltaY;
         } else if (e.pageX > bounds.right - 50) {
-            this.config.scrollContainer.scrollLeft += this.config.dragScrollSpeed;
+            this.config.scrollContainer.scrollLeft += deltaX;
         } else if (e.pageX < bounds.left + 50) {
-            this.config.scrollContainer.scrollLeft -= this.config.dragScrollSpeed;
+            this.config.scrollContainer.scrollLeft += deltaX;
         }
 
         // Fire drag event
