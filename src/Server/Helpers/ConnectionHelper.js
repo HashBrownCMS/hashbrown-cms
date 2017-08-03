@@ -67,11 +67,11 @@ class ConnectionHelper extends ConnectionHelperCommon {
     ) {
         return content.getSettings(project, environment, 'publishing')
         .then((settings) => {
-            if(!settings.connections || settings.connections.length < 1) {
-                return Promise.reject(new Error('Content by id "' + content.id + '" has no connections configured'));
+            if(!settings.connectionId) {
+                return Promise.reject(new Error('Content by id "' + content.id + '" has no connection configured'));
             }
 
-            return this.getConnectionById(project, environment, settings.connections[0]);
+            return this.getConnectionById(project, environment, settings.connectionId);
         })
         .then((connection) => {
             return connection.generatePreview(project, environment, content, language);
@@ -103,35 +103,16 @@ class ConnectionHelper extends ConnectionHelperCommon {
         
         return content.getSettings(project, environment, 'publishing')
         .then((settings) => {
-            if(!settings.connections || settings.connections.length < 1) {
+            if(!settings.connectionId) {
                 return Promise.reject(new Error('No connections defined for content "' + content.id + '"'));
             }
             
-            // Clone connections array to prevent destroying settings
-            let connections = settings.connections.slice(0);
-            
-            debug.log('Looping through ' + connections.length + ' connections...', this);
-            
-            let nextConnection = () => {
-                let connectionId = connections.pop();
+            return this.getConnectionById(project, environment, settings.connectionId);
+        })
+        .then((connection) => {
+            debug.log('Publishing through connection "' + connection.id + '" of type "' + connection.type + '"...', helper);
 
-                // No more connections
-                if(!connectionId) {
-                    return Promise.resolve();
-                }
-
-                return this.getConnectionById(project, environment, connectionId)
-                .then((connection) => {
-                    debug.log('Publishing through connection "' + connectionId + '" of type "' + connection.type + '"...', helper);
-
-                    return connection.publishContent(project, environment, content);
-                })
-                .then(() => {
-                    return nextConnection();
-                });
-            };
-
-            return nextConnection();
+            return connection.publishContent(project, environment, content);
         })
         .then(() => {
             debug.log('Published content "' + content.id + '" successfully!', helper);
@@ -164,37 +145,18 @@ class ConnectionHelper extends ConnectionHelperCommon {
         
         return content.getSettings(project, environment, 'publishing')
         .then((settings) => {
-            if(!settings.connections || settings.connections.length < 1) {
-                return Promise.reject(new Error('No connections defined for content "' + content.id + '"'));
+            if(!settings.connectionId) {
+                return Promise.reject(new Error('No connection defined for content "' + content.id + '"'));
             }
             
-            // Clone connections array to prevent destroying settings
-            let connections = settings.connections.slice(0);
-
-            debug.log('Looping through ' + connections.length + ' connections...', this);
+            return this.getConnectionById(project, environment, settings.connectionId)
+        })
+        .then((connection) => {
+            if(!unpublishFirst) { return Promise.resolve(); }
             
-            let nextConnection = () => {
-                let connectionId = connections.pop();
+            debug.log('Unpublishing through connection "' + connection.id + '" of type "' + connection.type + '"...', this);
 
-                // No more connections
-                if(!connectionId) {
-                    return Promise.resolve();
-                }
-
-                return this.getConnectionById(project, environment, connectionId)
-                .then((connection) => {
-                    if(!unpublishFirst) { return Promise.resolve(); }
-                    
-                    debug.log('Unpublishing through connection "' + connectionId + '" of type "' + connection.type + '"...', this);
-
-                    return connection.unpublishContent(project, environment, content);
-                })
-                .then(() => {
-                    return nextConnection();
-                });
-            };
-
-            return nextConnection();
+            return connection.unpublishContent(project, environment, content);
         })
         .then(() => {
             debug.log('Unpublished content "' + content.id + '" successfully!', this);

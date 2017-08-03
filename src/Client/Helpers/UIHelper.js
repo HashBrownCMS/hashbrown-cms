@@ -200,7 +200,7 @@ class UIHelper {
      * @returns {HtmlElement} Dropdown element
      */
     static inputDropdown(defaultValue, options, onChange, useClearButton) {
-        // If "options" parameter is a number, convert to array
+        // If "options" parameter is a number, convert to an array
         if(typeof options === 'number') {
             let amount = options;
 
@@ -258,8 +258,8 @@ class UIHelper {
 
         // Add an option
         $element.on('addOption', (e, option) => {
-            let optionLabel = option.label || option.id || option.name || option.toString();
-            let isSelected = option.selected || option.value == defaultValue;
+            let optionLabel = option.label || option.name || option.title || option.id || option.toString();
+            let isSelected = option.selected || option.value == defaultValue || option.id == defaultValue;
 
             if(isSelected) {
                 $toggle.html(optionLabel);

@@ -247,7 +247,7 @@ class ArrayEditor extends FieldEditor {
             let dropdownOptions = [];
 
             for(let allowedSchemaId of this.config.allowedSchemas) {
-                let allowedSchema = resources.schemas[allowedSchemaId];
+                let allowedSchema = SchemaHelper.getSchemaByIdSync(allowedSchemaId);
 
                 dropdownOptions[dropdownOptions.length] = {
                     value: allowedSchema.id,

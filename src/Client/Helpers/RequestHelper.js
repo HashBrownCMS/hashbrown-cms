@@ -140,6 +140,10 @@ class RequestHelper {
                 model = HashBrown.Models.Connection;
                 break;
 
+            case 'content':
+                model = HashBrown.Models.Content;
+                break;
+
             case 'templates':
                 model = HashBrown.Models.Template;
                 break;

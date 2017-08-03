@@ -91,8 +91,6 @@ class BackupEditor extends View {
             if(numFiles > 0) {
                 let file = this.files[0];
                 
-                console.log(file);
-
                 debug.log('Reading data of file type ' + file.type + '...', view);
             }
         }

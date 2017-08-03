@@ -1,5 +1,7 @@
 'use strict';
 
+const Content = require('Client/Models/Content'); 
+
 const SchemaHelper = require('Client/Helpers/SchemaHelper');
 const ContentHelper = require('Client/Helpers/ContentHelper');
 const ConnectionHelper = require('Client/Helpers/ConnectionHelper');
@@ -61,16 +63,16 @@ class ContentEditor extends View {
 
     /**
      * Event: Click save. Posts the model to the modelUrl
-     *
-     * @param {Object} publishing
      */
-    onClickSave(publishing) {
+    onClickSave() {
         let saveAction = this.$element.find('.editor-footer .select-publishing').val();
         let postSaveUrl;
 
         let setContent = () => {
+            this.model.settingsSanityCheck('publishing');
+
             // Use publishing API
-            if(publishing.connections && publishing.connections.length > 0) {
+            if(this.model.settings.publishing.connectionId) {
                 // Unpublish
                 if(saveAction === 'unpublish') {
                     return RequestHelper.request('post', 'content/unpublish', this.model);
@@ -408,6 +410,8 @@ class ContentEditor extends View {
     renderButtons() {
         let url = this.model.properties.url;
 
+        this.model.settingsSanityCheck('publishing');
+
         if(url instanceof Object) {
             url = url[window.language];
         }
@@ -424,10 +428,10 @@ class ContentEditor extends View {
                     if(
                         this.model.properties &&
                         this.model.properties.url &&
-                        this.publishingSettings.connections.length > 0 &&
+                        this.model.settings.publishing.connectionId &&
                         this.model.isPublished
                     ) {
-                        return _.a({target: '_blank', href: ConnectionHelper.getConnectionByIdSync(this.publishingSettings.connections[0]).url + url, class: 'btn btn-primary'}, 'View');
+                        return _.a({target: '_blank', href: ConnectionHelper.getConnectionByIdSync(this.model.settings.publishing.connectionId).url + url, class: 'btn btn-primary'}, 'View');
                     }
                 }),
 
@@ -437,8 +441,8 @@ class ContentEditor extends View {
                         this.$saveBtn = _.button({class: 'btn btn-save btn-primary'},
                             _.span({class: 'text-default'}, 'Save'),
                             _.span({class: 'text-working'}, 'Saving')
-                        ).click(() => { this.onClickSave(this.publishingSettings); }),
-                        _.if(this.publishingSettings.connections && this.publishingSettings.connections.length > 0,
+                        ).click(() => { this.onClickSave(); }),
+                        _.if(this.model.settings.publishing.connectionId,
                             _.span('&'),
                             _.select({class: 'form-control select-publishing'},
                                 _.option({value: 'publish'}, 'Publish'),
@@ -457,21 +461,15 @@ class ContentEditor extends View {
         if(this.model instanceof HashBrown.Models.Content === false) {
             this.model = new HashBrown.Models.Content(this.model);
         }
-        
+       
         this.$element.toggleClass('locked', this.model.locked);
 
         // Fetch information
         let contentSchema;
-        let publishingSettings;
 
         return SchemaHelper.getSchemaWithParentFields(this.model.schemaId)
         .then((schema) => {
             contentSchema = schema;
-           
-            return this.model.getSettings('publishing');
-        })
-        .then((settings) => {
-            this.publishingSettings = settings;
 
             this.$element.html(
                 // Render editor

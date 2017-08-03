@@ -88,6 +88,7 @@ var DemoApi = function () {
     DemoApi.reset = function reset() {
         localStorage.setItem('demo', null);
 
+        location.hash = '/content/';
         location.reload();
     };
 
@@ -149,17 +150,30 @@ var DemoApi = function () {
 
         for (var i in cache[resource]) {
             if (cache[resource][i].id == id) {
-                cache[resource][i] = data;
+                // Update data
+                if (data) {
+                    cache[resource][i] = data;
+
+                    // Delete data
+                } else {
+                    cache[resource].splice(i, 1);
+                }
+
                 foundExisting = true;
+
                 break;
             }
         }
 
-        if (!foundExisting) {
+        if (!foundExisting && data) {
             cache[resource].push(data);
         }
 
         localStorage.setItem('demo', JSON.stringify(cache));
+
+        console.log(cache);
+
+        return data;
     };
 
     /**
@@ -174,15 +188,9 @@ var DemoApi = function () {
         debug.log(method + ' ' + url, DemoApi);
 
         return new Promise(function (resolve, reject) {
-            switch (method) {
-                case 'GET':
-                    return resolve(DemoApi.get(url));
-
-                case 'POST':
-                    return resolve(DemoApi.post(url, data));
-            }
-
-            resolve();
+            setTimeout(function () {
+                resolve(DemoApi.requestSync(method, url, data));
+            }, 100);
         });
     };
 
@@ -198,7 +206,12 @@ var DemoApi = function () {
 
             case 'POST':
                 return DemoApi.post(url, data);
+
+            case 'DELETE':
+                return DemoApi.delete(url);
         }
+
+        return data;
     };
 
     /**
@@ -207,10 +220,28 @@ var DemoApi = function () {
 
 
     DemoApi.parseUrl = function parseUrl(url) {
-        return {
-            resource: url.split('/')[0],
-            id: url.split('/')[1]
-        };
+        var query = {};
+        var split = url.split('/');
+
+        query.resource = split[0];
+        query.params = url.split('?')[1];
+
+        if (split.length > 1) {
+            query.id = split[1].replace('?' + query.params, '');
+        }
+
+        return query;
+    };
+
+    /**
+     * Delete
+     */
+
+
+    DemoApi.delete = function _delete(url) {
+        var query = DemoApi.parseUrl(url);
+
+        return DemoApi.setCache(query.resource, query.id, null);
     };
 
     /**
@@ -232,9 +263,45 @@ var DemoApi = function () {
     DemoApi.post = function post(url, data) {
         var query = DemoApi.parseUrl(url);
 
+        // Publish
         if (url == 'content/publish' || url == 'content/unpublish' || url == 'content/preview') {
             return Promise.resolve();
         }
+
+        // Create new
+        if (url.indexOf('content/new') > -1) {
+            var schemaId = url.match(/content\/new\/([a-zA-Z0-9]+)/);
+
+            if (!schemaId) {
+                throw new Error('No Schema id specified');
+            }
+
+            schemaId = schemaId[1];
+
+            var sort = url.match(/\?sort=([0-9]*)/);
+
+            if (sort) {
+                sort = sort[2];
+            }
+
+            var parentId = url.match(/\&parent=([0-9a-z]*)/);
+
+            if (parentId) {
+                parentId = parentId[1];
+            }
+
+            data = HashBrown.Models.Content.create(schemaId);
+
+            data.parentId = parentId;
+            data.sort = sort;
+
+            query = {
+                resource: 'content',
+                id: data.id
+            };
+        }
+
+        console.log('--- POST data:', data);
 
         return DemoApi.setCache(query.resource, query.id, data);
     };
@@ -248,7 +315,7 @@ var DemoApi = function () {
         switch (type) {
             case 'users':
                 return [{
-                    id: '93afb0e4cd9e7545c589a084079e340766f94xb1',
+                    id: '4173f094621d4a882f912ccaf1cc6613a386519e',
                     isAdmin: true,
                     isCurrent: true,
                     username: 'demouser',
@@ -258,38 +325,67 @@ var DemoApi = function () {
                 }];
 
             case 'settings':
-                return {};
+                return [{
+                    id: 'providers',
+                    media: '8c75aa0739cf66bcac269f01ab9007e666bd941b',
+                    template: '8c75aa0739cf66bcac269f01ab9007e666bd941b'
+                }];
+
+            case 'media':
+                return [{ "id": "50d05eee9088c589bfd5a5a3a3043c0ebcc4972b", "remote": true, "icon": "file-image-o", "name": "banner-flat-pink.jpg", "url": "media/50d05eee9088c589bfd5a5a3a3043c0ebcc4972b/banner-flat-pink.jpg", "folder": "banners" }];
 
             case 'connections':
                 return [{
-                    id: '87afb0x4cd9e75666589a084079e340766f94xb1',
+                    id: '8c75aa0739cf66bcac269f01ab9007e666bd941b',
                     title: 'My website',
                     url: 'example.com',
                     locked: true
                 }];
 
+            case 'templates':
+                return [{ "id": "sectionPage", "parentId": "", "remote": true, "icon": "code", "name": "sectionPage.html", "type": "page", "remotePath": "_layouts/sectionPage.html", "folder": "", "markup": "" }, { "id": "heroSection", "parentId": "", "remote": true, "icon": "code", "name": "heroSection.html", "type": "partial", "remotePath": "_includes/partials/heroSection.html", "folder": "", "markup": "" }, { "id": "richTextSection", "parentId": "", "remote": true, "icon": "code", "name": "richTextSection.html", "type": "partial", "remotePath": "_includes/partials/richTextSection.html", "folder": "", "markup": "" }];
+
             case 'content':
                 return [{
-                    'id': 'a9c44cf7c7bffc1420a43ff7e68e8fbf32261470',
-                    'parentId': '',
-                    'createdBy': '93afb0e4cd9e7545c589a084079e340766f94xb1',
-                    'updatedBy': '93afb0e4cd9e7545c589a084079e340766f94xb1',
-                    'createDate': '2017-07-30T10:24:22.140Z',
-                    'updateDate': '2017-07-30T10:24:22.141Z',
-                    'publishOn': null,
-                    'unpublishOn': null,
-                    'schemaId': '9e522d637efc8fe2320ff7471c815d2c55a3e439',
-                    'isPublished': false,
-                    'hasPreview': false,
-                    'sort': 10000,
-                    'properties': {
-                        'url': '/my-home-page/',
-                        'title': 'My Home Page',
-                        'text': '<h2>This is a rich text page</h2><p>A simple page for inserting formatted text and media</p>'
+                    "locked": false,
+                    "local": false,
+                    "remote": false,
+                    "id": "91f1ec2b984f291377c2dc488be2ebbefb46dd9a",
+                    "parentId": "",
+                    "createdBy": "4173f094621d4a882f912ccaf1cc6613a386519e",
+                    "updatedBy": "4173f094621d4a882f912ccaf1cc6613a386519e",
+                    "createDate": "2016-09-05T06:52:17.646Z",
+                    "updateDate": "2017-08-03T15:55:10.590Z",
+                    "publishOn": null,
+                    "unpublishOn": null,
+                    "schemaId": "591a897ad572cadae5115ef05726d9ead2725dc5",
+                    "isPublished": true,
+                    "hasPreview": false,
+                    "sort": -1,
+                    "properties": {
+                        "title": "HashBrown CMS",
+                        "url": "/",
+                        "template": "sectionPage",
+                        "sections": [{
+                            "value": {
+                                "template": "heroSection",
+                                "image": "50d05eee9088c589bfd5a5a3a3043c0ebcc4972b",
+                                "text": "## HashBrown CMS\n\nCreate once. Publish anywhere."
+                            },
+                            "schemaId": "f5c4cf4dffb088a2753760ad1da9cd64ff781003"
+                        }, {
+                            "value": {
+                                "template": "richTextSection",
+                                "text": "## Why HashBrown?\n\n### Remote management\n\nSeparate your concerns with a truly modern approach to content management. Your websites won't know what hit them.\n\n### Multiple projects at once\n\nWhy worry about several CMS'es, when you only need one?\n\n### Several environments for each project\n\nWe get it. You need to test your content before you go live.\n\n### Multilingual\n\nRemember the last time you used a truly elegant localisation solution in a CMS? We don't either.\n\n### Plugin support\n\nIf your needs aren't met at the core level, you can add anything you can imagine.\n\n### Content format consistency\n\nWhen you are passing complex, format-agnostic data around, document databases are the way to go. HashBrown knows what's up.\n\n### Painless backups\n\nHashBrown has your back in seconds.\n\n### Small footprint\n\nYou could probably run HashBrown on your toaster at home."
+                            },
+                            "schemaId": "904e8e7570ddb37ea1f31d210db47cd15f92ff92"
+                        }],
+                        "description": "Create once. Publish anywhere."
                     },
-                    'settings': {
-                        'publishing': {
-                            'connections': []
+                    "settings": {
+                        "publishing": {
+                            "connectionId": "8c75aa0739cf66bcac269f01ab9007e666bd941b",
+                            "applyToChildren": true
                         }
                     }
                 }];
@@ -314,28 +410,7 @@ var DemoApi = function () {
                     'struct': __webpack_require__(290),
                     'tags': __webpack_require__(291),
                     'templateReference': __webpack_require__(292),
-                    'url': __webpack_require__(293),
-                    '9e522d637efc8fe2320ff7471c815d2c55a3e439': {
-                        'id': '9e522d637efc8fe2320ff7471c815d2c55a3e439',
-                        'name': 'Rich Text Page',
-                        'icon': 'file',
-                        'parentSchemaId': 'page',
-                        'locked': false,
-                        'hiddenProperties': [],
-                        'defaultTabId': 'content',
-                        'tabs': {},
-                        'fields': {
-                            'properties': {
-                                'text': {
-                                    'label': 'Text',
-                                    'tabId': 'content',
-                                    'schemaId': 'richText'
-                                }
-                            }
-                        },
-                        'allowedChildSchemas': [],
-                        'type': 'content'
-                    }
+                    'url': __webpack_require__(293)
                 };
 
                 var result = [];
@@ -355,6 +430,133 @@ var DemoApi = function () {
 
                     result.push(schemas[k]);
                 }
+
+                // Section page
+                result.push({
+                    "locked": false,
+                    "local": false,
+                    "remote": false,
+                    "id": "591a897ad572cadae5115ef05726d9ead2725dc5",
+                    "name": "Section Page",
+                    "icon": "file",
+                    "parentSchemaId": "page",
+                    "hiddenProperties": [],
+                    "defaultTabId": "content",
+                    "tabs": {},
+                    "fields": {
+                        "properties": {
+                            "template": {
+                                "label": "Template",
+                                "schemaId": "templateReference",
+                                "config": {
+                                    "allowedTemplates": ["sectionPage"],
+                                    "type": "page"
+                                }
+                            },
+                            "sections": {
+                                "label": "Sections",
+                                "tabId": "content",
+                                "schemaId": "array",
+                                "config": {
+                                    "allowedSchemas": ["904e8e7570ddb37ea1f31d210db47cd15f92ff92", "f5c4cf4dffb088a2753760ad1da9cd64ff781003"]
+                                }
+                            }
+                        }
+                    },
+                    "allowedChildSchemas": ["591a897ad572cadae5115ef05726d9ead2725dc5"],
+                    "type": "content"
+                });
+
+                // Section
+                result.push({
+                    "locked": false,
+                    "local": false,
+                    "remote": false,
+                    "id": "7ccbf2d613a4da3e5543abdde33b9eb0e5fbb8f3",
+                    "name": "Section",
+                    "icon": "file",
+                    "parentSchemaId": "struct",
+                    "hiddenProperties": [],
+                    "editorId": "struct",
+                    "previewTemplate": "",
+                    "config": {
+                        "template": {
+                            "label": "Template",
+                            "schemaId": "templateReference",
+                            "config": {
+                                "type": "partial"
+                            }
+                        }
+                    },
+                    "type": "field"
+                });
+
+                // Rich text section
+                result.push({
+                    "locked": false,
+                    "local": false,
+                    "remote": false,
+                    "id": "904e8e7570ddb37ea1f31d210db47cd15f92ff92",
+                    "name": "Rich Text Section",
+                    "icon": "file-text-o",
+                    "parentSchemaId": "7ccbf2d613a4da3e5543abdde33b9eb0e5fbb8f3",
+                    "hiddenProperties": [],
+                    "editorId": "struct",
+                    "previewTemplate": "",
+                    "config": {
+                        "struct": {
+                            "template": {
+                                "label": "Template",
+                                "schemaId": "templateReference",
+                                "config": {
+                                    "allowedTemplates": ["richTextSection"],
+                                    "type": "partial"
+                                }
+                            },
+                            "text": {
+                                "label": "Text",
+                                "tabId": "content",
+                                "schemaId": "richText"
+                            }
+                        }
+                    },
+                    "type": "field"
+                });
+
+                // Hero
+                result.push({
+                    "locked": false,
+                    "local": false,
+                    "remote": false,
+                    "id": "f5c4cf4dffb088a2753760ad1da9cd64ff781003",
+                    "name": "Hero Section",
+                    "icon": "image",
+                    "parentSchemaId": "7ccbf2d613a4da3e5543abdde33b9eb0e5fbb8f3",
+                    "hiddenProperties": [],
+                    "editorId": "struct",
+                    "previewTemplate": "",
+                    "config": {
+                        "struct": {
+                            "template": {
+                                "label": "Template",
+                                "schemaId": "templateReference",
+                                "config": {
+                                    "allowedTemplates": ["heroSection"],
+                                    "type": "partial"
+                                }
+                            },
+                            "image": {
+                                "label": "Image",
+                                "schemaId": "mediaReference"
+                            },
+                            "text": {
+                                "label": "Text",
+                                "schemaId": "richText"
+                            }
+                        }
+                    },
+                    "type": "field"
+                });
 
                 return result;
 
@@ -439,12 +641,11 @@ View.prototype.fetch = function fetch() {
 // ----------
 HashBrown.Helpers.RequestHelper.reloadResource = function reloadResource(name) {
     var model = null;
-    var result = [];
+    var result = HashBrown.DemoApi.requestSync('get', name);
 
     switch (name) {
         case 'content':
             model = HashBrown.Models.Content;
-            result = HashBrown.DemoApi.requestSync('get', 'content');
             break;
 
         case 'templates':
@@ -453,7 +654,6 @@ HashBrown.Helpers.RequestHelper.reloadResource = function reloadResource(name) {
 
         case 'users':
             model = HashBrown.Models.User;
-            result = HashBrown.DemoApi.requestSync('get', 'users');
             break;
 
         case 'media':
@@ -462,11 +662,9 @@ HashBrown.Helpers.RequestHelper.reloadResource = function reloadResource(name) {
 
         case 'connections':
             model = HashBrown.Models.Connection;
-            result = HashBrown.DemoApi.requestSync('get', 'connections');
             break;
 
         case 'schemas':
-            result = HashBrown.DemoApi.requestSync('get', 'schemas');
             break;
     }
 

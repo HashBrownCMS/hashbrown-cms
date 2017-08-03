@@ -3,6 +3,7 @@
 const ProjectHelper = require('Client/Helpers/ProjectHelper');
 const ContentHelper = require('Client/Helpers/ContentHelper');
 const RequestHelper = require('Client/Helpers/RequestHelper');
+const SchemaHelper = require('Client/Helpers/SchemaHelper');
 
 const NavbarPane = require('./NavbarPane');
 const NavbarMain = require('./NavbarMain');
@@ -221,50 +222,37 @@ class ContentPane extends NavbarPane {
      * Render Content publishing modal
      *
      * @param {Content} content
-     * @param {Object} publishing
      */
-    static renderContentPublishingModal(content, publishing) {
+    static renderPublishingModal(content) {
+        let publishing = content.getSettings('publishing');
+        publishing = JSON.parse(JSON.stringify(publishing));
+
         // Event on clicking OK
         function onSubmit() {
-            if(!publishing.governedBy) {
-                publishing.connections = [];
-               
-                // Loop through each input switch and add the corresponding Connection id to the connections list 
-                modal.$element.find('.switch[data-connection-id] input').each(function(i) {
-                    if(this.checked) {
-                        publishing.connections.push(
-                            this.parentElement.dataset.connectionId
-                        );
-                    }
-                });
+            if(publishing.governedBy) { return; }
+           
+            // Commit publishing settings to Content model
+            content.settings.publishing = publishing;
+    
+            // API call to save the Content model
+            RequestHelper.request('post', 'content/' + content.id, content)
+            
+            // Upon success, reload the UI    
+            .then(() => {
+                NavbarMain.reload();
+
+                if(Router.params.id == content.id) {
+                    let contentEditor = ViewHelper.get('ContentEditor');
+
+                    contentEditor.model = content;
+                    return contentEditor.render();
                 
-                // Apply to children flag
-                publishing.applyToChildren = modal.$element.find('#switch-publishing-apply-to-children input')[0].checked;
+                } else {
+                    return Promise.resolve();
 
-                // Commit publishing settings to Content model
-                content.settings.publishing = publishing;
-        
-                // API call to save the Content model
-                RequestHelper.request('post', 'content/' + content.id, content)
-                
-                // Upon success, reload the UI    
-                .then(() => {
-                    NavbarMain.reload();
-
-                    if(Router.params.id == content.id) {
-                        let contentEditor = ViewHelper.get('ContentEditor');
-
-                        contentEditor.model = content.getObject();
-                        return contentEditor.render();
-                    
-                    } else {
-                        return Promise.resolve();
-
-                    }
-                })
-                .catch(UI.errorModal);
-            }
-
+                }
+            })
+            .catch(UI.errorModal);
         }
         
         let modal = new HashBrown.Views.Modals.MessageModal({
@@ -286,8 +274,10 @@ class ContentPane extends NavbarPane {
             ],
             renderBody: () => {
                 if(publishing.governedBy) {
+                    let governor = ContentHelper.getContentByIdSync(publishing.governedBy);
+
                     return _.div({class: 'settings-publishing'},
-                        _.p('(Settings inherited from <a href="#/content/' + publishing.governedBy.id + '">' + publishing.governedBy.prop('title', window.language) + '</a>)')
+                        _.p('(Settings inherited from <a href="#/content/' + governor.id + '">' + governor.prop('title', window.language) + '</a>)')
                     );
                 
                 } else {
@@ -296,19 +286,21 @@ class ContentPane extends NavbarPane {
                         _.div({class: 'input-group'},      
                             _.span('Apply to children'),
                             _.div({class: 'input-group-addon'},
-                                UI.inputSwitch(publishing.applyToChildren == true).attr('id', 'switch-publishing-apply-to-children')
+                                UI.inputSwitch(publishing.applyToChildren === true, (newValue) => {
+                                    publishing.applyToChildren = newValue;   
+                                })
                             )
                         ),
 
-                        // Connections list
-                        _.each(window.resources.connections, (i, connection) => { 
-                            return _.div({class: 'input-group'},      
-                                _.span(connection.title),
-                                _.div({class: 'input-group-addon'},
-                                    UI.inputSwitch(publishing.connections.indexOf(connection.id) > -1).attr('data-connection-id', connection.id)
-                                )
-                            );
-                        })
+                        // Connection picker
+                        _.div({class: 'input-group'},      
+                            _.span('Connection'),
+                            _.div({class: 'input-group-addon'},
+                                UI.inputDropdown(publishing.connectionId, resources.connections, (newValue) => {
+                                    publishing.connectionId = newValue;
+                                })
+                            )
+                        )
                     );
                 }
             }
@@ -322,29 +314,11 @@ class ContentPane extends NavbarPane {
      */
     static onClickContentPublishing() {
         let id = $('.cr-context-menu__target-element').data('id');
-        let content;
 
         // Get Content model
-        ContentHelper.getContentById(id)
-        .then((result) => {
-            content = result;
+        let content = ContentHelper.getContentByIdSync(id);
 
-            if(!content) {
-                return Promise.reject(new Error('Couldn\'t find content with id "' + id + '"')); 
-
-            } else {
-                // Get settings first
-                return content.getSettings('publishing');
-            }
-        })
-        
-        // Upon success, render Content settings modal
-        .then((publishing) => {
-            // Sanity check
-            publishing.applyToChildren = publishing.applyToChildren == true || publishing.applyToChildren == 'true';
-
-            this.renderContentPublishingModal(content, publishing);
-        });
+        this.renderPublishingModal(content);
     }
 
     /**
@@ -356,74 +330,72 @@ class ContentPane extends NavbarPane {
         let $element = $('.cr-context-menu__target-element'); 
         let id = $element.data('id');
         let name = $element.data('name');
-       
+    
         ContentHelper.getContentById(id)
         .then((content) => {
-            content.getSettings('publishing')
-            .then((publishing) => {
-                function unpublishConnections() {
-                    return RequestHelper.request('post', 'content/unpublish', content)
-                    .then(() => {
-                        return onSuccess();
-                    });
-                }
-                
-                function onSuccess() {
-                    return RequestHelper.reloadResource('content')
-                    .then(() => {
-                        NavbarMain.reload();
-                                
-                        let contentEditor = ViewHelper.get('ContentEditor');
-                       
-                        // Change the ContentEditor view if it was displaying the deleted content
-                        if(contentEditor && contentEditor.model && contentEditor.model.id == id) {
-                            // The Content was actually deleted
-                            if(shouldUnpublish) {
-                                location.hash = '/content/';
-                            
-                            // The Content still has a synced remote
-                            } else {
-                                contentEditor.model = null;
-                                contentEditor.fetch();
+            content.settingsSanityCheck('publishing');
 
-                            }
-                        }
+            function unpublishConnection() {
+                return RequestHelper.request('post', 'content/unpublish', content)
+                .then(() => {
+                    return onSuccess();
+                });
+            }
+            
+            function onSuccess() {
+                return RequestHelper.reloadResource('content')
+                .then(() => {
+                    NavbarMain.reload();
+                            
+                    let contentEditor = ViewHelper.get('ContentEditor');
+                   
+                    // Change the ContentEditor view if it was displaying the deleted content
+                    if(contentEditor && contentEditor.model && contentEditor.model.id == id) {
+                        // The Content was actually deleted
+                        if(shouldUnpublish) {
+                            location.hash = '/content/';
                         
-                        $element.parent().toggleClass('loading', false);
+                        // The Content still has a synced remote
+                        } else {
+                            contentEditor.model = null;
+                            contentEditor.fetch();
 
-                        return Promise.resolve();
+                        }
+                    }
+                    
+                    $element.parent().toggleClass('loading', false);
+
+                    return Promise.resolve();
+                });
+            }
+
+            let $deleteChildrenSwitch;
+            UI.confirmModal(
+                'Remove',
+                'Remove the content "' + name + '"?',
+                _.div({class: 'input-group'},      
+                    _.span('Remove child content too'),
+                    _.div({class: 'input-group-addon'},
+                        $deleteChildrenSwitch = UI.inputSwitch(true)
+                    )
+                ),
+                () => {
+                    $element.parent().toggleClass('loading', true);
+
+                    RequestHelper.request('delete', 'content/' + id + '?removeChildren=' + $deleteChildrenSwitch.data('checked'))
+                    .then(() => {
+                        if(shouldUnpublish && content.settings.publishing.connectionId) {
+                            return unpublishConnection();
+                        } else {
+                            return onSuccess();
+                        }
+                    })
+                    .catch((e) => {
+                        $element.parent().toggleClass('loading', false);
+                        UI.errorModal(e);
                     });
                 }
-
-                let $deleteChildrenSwitch;
-                UI.confirmModal(
-                    'Remove',
-                    'Remove the content "' + name + '"?',
-                    _.div({class: 'input-group'},      
-                        _.span('Remove child content too'),
-                        _.div({class: 'input-group-addon'},
-                            $deleteChildrenSwitch = UI.inputSwitch(true)
-                        )
-                    ),
-                    () => {
-                        $element.parent().toggleClass('loading', true);
-
-                        RequestHelper.request('delete', 'content/' + id + '?removeChildren=' + $deleteChildrenSwitch.data('checked'))
-                        .then(() => {
-                            
-                            if(shouldUnpublish && publishing.connections && publishing.connections.length > 0) {
-                                return unpublishConnections();
-                            } else {
-                                return onSuccess();
-                            }
-                        })
-                        .catch((e) => {
-                            $element.parent().toggleClass('loading', false);
-                            UI.errorModal(e);
-                        });
-                    }
-                );
-            });
+            );
         });
     }
 

@@ -30,7 +30,7 @@ class SchemaHelper extends SchemaHelperCommon {
             return Promise.resolve(SchemaHelper.getModel(schema));
         });
     }
-
+    
     /**
      * Gets a FieldSchema with all parent configs
      *

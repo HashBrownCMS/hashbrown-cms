@@ -338,8 +338,8 @@ class SchemaEditor extends View {
         let excludedParents = {};
         excludedParents[this.model.id] = true;
 
-        for(let id in resources.schemas) {
-            let schema = resources.schemas[id];
+        for(let i in resources.schemas) {
+            let schema = resources.schemas[i];
 
             // Check if this Schema has a parent in the excluded list
             // If so, add this id to the excluded list
@@ -359,7 +359,7 @@ class SchemaEditor extends View {
 
             schemaOptions[schemaOptions.length] = {
                 label: schema.name,
-                value: id
+                value: schema.id
             };
         }
 
@@ -451,16 +451,16 @@ class SchemaEditor extends View {
         function onClickAdd() {
             let newSchemaId = '';
 
-            for(let id in resources.schemas) {
-                let schema = resources.schemas[id];
+            for(let i in resources.schemas) {
+                let schema = resources.schemas[i];
                 
                 if(
                     schema.type == 'content' &&
-                    view.model.allowedChildSchemas.indexOf(id) < 0 &&
+                    view.model.allowedChildSchemas.indexOf(schema.id) < 0 &&
                     schema.id != 'contentBase' &&
                     schema.id != 'page'
                 ) {
-                    newSchemaId = id;
+                    newSchemaId = schema.id;
                     break;
                 }
             }
@@ -480,19 +480,19 @@ class SchemaEditor extends View {
                             let $schema = _.div({class: 'chip schema'},
                                 _.div({class: 'chip-label dropdown'},
                                     _.button({class: 'dropdown-toggle', 'data-id': schemaId, 'data-toggle': 'dropdown'},
-                                        resources.schemas[schemaId].name
+                                        SchemaHelper.getSchemaByIdSync(schemaId).name
                                     ),
                                     _.if(!view.model.locked,
                                         _.ul({class: 'dropdown-menu'},
-                                            _.each(resources.schemas, (id, schema) => {
+                                            _.each(resources.schemas, (i, schema) => {
                                                 if(
                                                     schema.type == 'content' &&
-                                                    (id == schemaId || view.model.allowedChildSchemas.indexOf(schema.id) < 0) &&
+                                                    (schema.id == schemaId || view.model.allowedChildSchemas.indexOf(schema.id) < 0) &&
                                                     schema.id != 'contentBase' &&
                                                     schema.id != 'page'
                                                 ) {
                                                     return _.li(
-                                                        _.a({href: '#', 'data-id': id},
+                                                        _.a({href: '#', 'data-id': schema.id},
                                                             schema.name
                                                         ).click(function(e) {
                                                             e.preventDefault();

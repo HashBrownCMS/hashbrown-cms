@@ -5359,6 +5359,10 @@ var RequestHelper = function () {
                 model = HashBrown.Models.Connection;
                 break;
 
+            case 'content':
+                model = HashBrown.Models.Content;
+                break;
+
             case 'templates':
                 model = HashBrown.Models.Template;
                 break;
@@ -7011,7 +7015,11 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+var RequestHelper = __webpack_require__(3);
+
 var ContentHelperCommon = __webpack_require__(190);
+
+var Content = __webpack_require__(55);
 
 /**
  * The client side content helper
@@ -7040,8 +7048,6 @@ var ContentHelper = function (_ContentHelperCommon) {
             return null;
         }
 
-        var Content = __webpack_require__(55);
-
         for (var _iterator = resources.content, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
             var _ref;
 
@@ -7057,7 +7063,7 @@ var ContentHelper = function (_ContentHelperCommon) {
             var content = _ref;
 
             if (content.id === id) {
-                return new Content(content);
+                return content;
             }
         }
     };
@@ -7072,32 +7078,13 @@ var ContentHelper = function (_ContentHelperCommon) {
 
 
     ContentHelper.getContentById = function getContentById(id) {
-        if (id) {
-            var Content = __webpack_require__(55);
-
-            for (var _iterator2 = resources.content, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
-                var _ref2;
-
-                if (_isArray2) {
-                    if (_i2 >= _iterator2.length) break;
-                    _ref2 = _iterator2[_i2++];
-                } else {
-                    _i2 = _iterator2.next();
-                    if (_i2.done) break;
-                    _ref2 = _i2.value;
-                }
-
-                var content = _ref2;
-
-                if (content.id == id) {
-                    return Promise.resolve(new Content(content));
-                }
-            }
-
-            return Promise.reject(new Error('Content with id "' + id + '" was not found'));
-        } else {
-            return Promise.reject(new Error('Content id was not provided'));
+        if (!id) {
+            return Promise.resolve(null);
         }
+
+        return RequestHelper.request('get', 'content/' + id).then(function (content) {
+            return Promise.resolve(new Content(content));
+        });
     };
 
     /**
@@ -7160,19 +7147,19 @@ var ContentHelper = function (_ContentHelperCommon) {
         // NOTE: The index should be the highest sort number + 10000 to give a bit of leg room for sorting later
         var newIndex = 10000;
 
-        for (var _iterator3 = nodes, _isArray3 = Array.isArray(_iterator3), _i3 = 0, _iterator3 = _isArray3 ? _iterator3 : _iterator3[Symbol.iterator]();;) {
-            var _ref3;
+        for (var _iterator2 = nodes, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
+            var _ref2;
 
-            if (_isArray3) {
-                if (_i3 >= _iterator3.length) break;
-                _ref3 = _iterator3[_i3++];
+            if (_isArray2) {
+                if (_i2 >= _iterator2.length) break;
+                _ref2 = _iterator2[_i2++];
             } else {
-                _i3 = _iterator3.next();
-                if (_i3.done) break;
-                _ref3 = _i3.value;
+                _i2 = _iterator2.next();
+                if (_i2.done) break;
+                _ref2 = _i2.value;
             }
 
-            var content = _ref3;
+            var content = _ref2;
 
             if (newIndex - 10000 <= content.sort) {
                 newIndex = content.sort + 10000;
@@ -11019,7 +11006,6 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var ContentCommon = __webpack_require__(94);
-var ContentHelper = __webpack_require__(25);
 var ProjectHelper = __webpack_require__(6);
 
 /**
@@ -11042,29 +11028,43 @@ var Content = function (_ContentCommon) {
      *
      * @param {String} key
      *
-     * @returns {Promise} Settings
+     * @returns {Object} Settings
      */
     Content.prototype.getSettings = function getSettings(key) {
-        return _ContentCommon.prototype.getSettings.call(this, ProjectHelper.currentProject, ProjectHelper.currentEnvironment, key);
+        var parentContent = this.getParent();
+
+        // Loop through parents to find governing setting
+        while (parentContent != null) {
+            parentContent.settingsSanityCheck(key);
+
+            // We found a governing parent, return those settings
+            if (parentContent.settings[key].applyToChildren) {
+                var settings = parentContent.settings;
+
+                // Make clone as to avoid interference with inherent values
+                settings = JSON.parse(JSON.stringify(settings));
+                settings[key].governedBy = parentContent.id;
+
+                return settings[key];
+            }
+
+            parentContent = parentContent.getParent();
+        }
+
+        this.settingsSanityCheck(key);
+
+        return this.settings[key];
     };
 
     /**
      * Gets parent Content
      *
-     * @returns {Promise} Parent
+     * @returns {Content} Parent
      */
 
 
     Content.prototype.getParent = function getParent() {
-        if (this.parentId) {
-            return ContentHelper.getContentById(this.parentId).then(function (parentContent) {
-                return Promise.resolve(parentContent);
-            }).catch(function (e) {
-                return Promise.resolve(null);
-            });
-        } else {
-            return Promise.resolve(null);
-        }
+        return HashBrown.Helpers.ContentHelper.getContentByIdSync(this.parentId);
     };
 
     return Content;
@@ -15007,8 +15007,7 @@ var Content = function (_Entity) {
 
     Content.create = function create(schemaId, properties) {
         if (typeof schemaId !== 'string') {
-            debug.error('Schema ID was not provided', this);
-            return;
+            throw new Error('Schema ID was not provided');
         }
 
         var defaultProperties = {
@@ -15106,6 +15105,28 @@ var Content = function (_Entity) {
     };
 
     /**
+     * Settings sanity check
+     *
+     * @param {String} key
+     */
+
+
+    Content.prototype.settingsSanityCheck = function settingsSanityCheck(key) {
+        this.settings = this.settings || {};
+
+        if (key) {
+            this.settings[key] = this.settings[key] || {};
+        }
+
+        this.settings.publishing = this.settings.publishing || {};
+
+        if (Array.isArray(this.settings.publishing.connections)) {
+            this.settings.publishing.connectionId = this.settings.publishing.connections[0];
+            delete this.settings.publishing.connections;
+        }
+    };
+
+    /**
      * Gets settings
      *
      * @param {String} project
@@ -15124,6 +15145,8 @@ var Content = function (_Entity) {
         var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
         var key = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('key');
 
+        this.settingsSanityCheck(key);
+
         // Loop through all parent content to find a governing setting
         return this.getParents(project, environment).then(function (parents) {
             for (var _iterator = parents, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
@@ -15140,34 +15163,18 @@ var Content = function (_Entity) {
 
                 var parentContent = _ref;
 
-                if (parentContent.settings && parentContent.settings[key] && parentContent.settings[key].applyToChildren) {
+                if (parentContent.settingsApplyToChildren(key)) {
                     var settings = parentContent.settings[key];
 
                     // Make clone as to avoid interference with inherent values
                     settings = JSON.parse(JSON.stringify(settings));
-
-                    settings.governedBy = parentContent;
+                    settings.governedBy = parentContent.id;
 
                     return Promise.resolve(settings);
                 }
             }
 
             // No parent nodes with governing settings found, return own settings
-            if (!_this2.settings) {
-                _this2.settings = {};
-            }
-
-            if (!_this2.settings[key]) {
-                _this2.settings[key] = {};
-            }
-
-            // Special cases
-            switch (key) {
-                case 'publishing':
-                    _this2.settings.publishing.connections = _this2.settings.publishing.connections || [];
-                    break;
-            }
-
             return Promise.resolve(_this2.settings[key]);
         });
     };
@@ -27198,7 +27205,7 @@ var UIHelper = function () {
 
 
     UIHelper.inputDropdown = function inputDropdown(defaultValue, options, onChange, useClearButton) {
-        // If "options" parameter is a number, convert to array
+        // If "options" parameter is a number, convert to an array
         if (typeof options === 'number') {
             var amount = options;
 
@@ -27268,8 +27275,8 @@ var UIHelper = function () {
 
         // Add an option
         $element.on('addOption', function (e, option) {
-            var optionLabel = option.label || option.id || option.name || option.toString();
-            var isSelected = option.selected || option.value == defaultValue;
+            var optionLabel = option.label || option.name || option.title || option.id || option.toString();
+            var isSelected = option.selected || option.value == defaultValue || option.id == defaultValue;
 
             if (isSelected) {
                 $toggle.html(optionLabel);
@@ -36064,8 +36071,6 @@ var BackupEditor = function (_View) {
 
             if (numFiles > 0) {
                 var file = this.files[0];
-
-                console.log(file);
 
                 debug.log('Reading data of file type ' + file.type + '...', view);
             }

@@ -1,6 +1,10 @@
 'use strict';
 
+const RequestHelper = require('Client/Helpers/RequestHelper');
+
 const ContentHelperCommon = require('Common/Helpers/ContentHelper');
+
+const Content = require('Client/Models/Content');
 
 /**
  * The client side content helper
@@ -18,11 +22,9 @@ class ContentHelper extends ContentHelperCommon {
     static getContentByIdSync(id) {
         if(!id) { return null; }
 
-        const Content = require('Client/Models/Content');
-        
         for(let content of resources.content) {
             if(content.id === id) {
-                return new Content(content);
+                return content;
             }
         }
     }
@@ -35,21 +37,12 @@ class ContentHelper extends ContentHelperCommon {
      * @returns {Promise} Content node
      */
     static getContentById(id) {
-        if(id) {
-            const Content = require('Client/Models/Content');
-            
-            for(let content of resources.content) {
-                if(content.id == id) {
-                    return Promise.resolve(new Content(content));
-                }
-            }
-           
-            return Promise.reject(new Error('Content with id "' + id + '" was not found'));
-        
-        } else {
-            return Promise.reject(new Error('Content id was not provided'));
+        if(!id) { return Promise.resolve(null); }
 
-        }
+        return RequestHelper.request('get', 'content/' + id)
+        .then((content) => {
+            return Promise.resolve(new Content(content));
+        });
     }
 
     /**

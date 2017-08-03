@@ -1,5 +1,8 @@
 'use strict';
 
+const SchemaHelper = require('Client/Helpers/SchemaHelper');
+const ContentHelper = require('Client/Helpers/ContentHelper');
+
 const FieldEditor = require('./FieldEditor');
 
 /**
@@ -45,7 +48,7 @@ class ContentSchemaReferenceEditor extends FieldEditor {
         // Fetch parent Content
         if(!thisContent.parentId) { return null; }
         
-        let parentContent = resources.content.filter((c) => { return c.id == thisContent.parentId; })[0];
+        let parentContent = ContentHelper.getContentByIdSync(thisContent.parentId);
 
         if(!parentContent) {
             UI.errorModal(new Error('Content by id "' + thisContent.parentId + '" not found'));
@@ -53,7 +56,7 @@ class ContentSchemaReferenceEditor extends FieldEditor {
         }
 
         // Fetch parent Schema
-        let parentSchema = resources.schemas[parentContent.schemaId];
+        let parentSchema = SchemaHelper.getSchemaByIdSync(parentContent.schemaId);
             
         if(!parentSchema) {
             UI.errorModal(new Error('Schema by id "' + parentContent.schemaId + '" not found'));

@@ -1,7 +1,6 @@
 'use strict';
 
 const ContentCommon = require('Common/Models/Content');
-const ContentHelper = require('Client/Helpers/ContentHelper');
 const ProjectHelper = require('Client/Helpers/ProjectHelper');
 
 /**
@@ -15,29 +14,41 @@ class Content extends ContentCommon {
      *
      * @param {String} key
      *
-     * @returns {Promise} Settings
+     * @returns {Object} Settings
      */
     getSettings(key) {
-        return super.getSettings(ProjectHelper.currentProject, ProjectHelper.currentEnvironment, key);
+        let parentContent = this.getParent();
+
+        // Loop through parents to find governing setting
+        while(parentContent != null) {
+            parentContent.settingsSanityCheck(key);
+
+            // We found a governing parent, return those settings
+            if(parentContent.settings[key].applyToChildren) {
+                let settings = parentContent.settings;
+
+                // Make clone as to avoid interference with inherent values
+                settings = JSON.parse(JSON.stringify(settings));
+                settings[key].governedBy = parentContent.id;
+
+                return settings[key];
+            }
+
+            parentContent = parentContent.getParent();
+        }
+    
+        this.settingsSanityCheck(key);
+
+        return this.settings[key];
     }
 
     /**
      * Gets parent Content
      *
-     * @returns {Promise} Parent
+     * @returns {Content} Parent
      */
     getParent() {
-        if(this.parentId) {
-            return ContentHelper.getContentById(this.parentId)
-            .then((parentContent) => {
-                return Promise.resolve(parentContent);
-            })
-            .catch((e) => {
-                return Promise.resolve(null);
-            });
-        } else {
-            return Promise.resolve(null);
-        }
+        return HashBrown.Helpers.ContentHelper.getContentByIdSync(this.parentId);
     }
 }
 

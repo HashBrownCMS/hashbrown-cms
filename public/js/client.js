@@ -5359,6 +5359,10 @@ var RequestHelper = function () {
                 model = HashBrown.Models.Connection;
                 break;
 
+            case 'content':
+                model = HashBrown.Models.Content;
+                break;
+
             case 'templates':
                 model = HashBrown.Models.Template;
                 break;
@@ -7087,7 +7091,11 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+var RequestHelper = __webpack_require__(3);
+
 var ContentHelperCommon = __webpack_require__(190);
+
+var Content = __webpack_require__(55);
 
 /**
  * The client side content helper
@@ -7116,8 +7124,6 @@ var ContentHelper = function (_ContentHelperCommon) {
             return null;
         }
 
-        var Content = __webpack_require__(55);
-
         for (var _iterator = resources.content, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
             var _ref;
 
@@ -7133,7 +7139,7 @@ var ContentHelper = function (_ContentHelperCommon) {
             var content = _ref;
 
             if (content.id === id) {
-                return new Content(content);
+                return content;
             }
         }
     };
@@ -7148,32 +7154,13 @@ var ContentHelper = function (_ContentHelperCommon) {
 
 
     ContentHelper.getContentById = function getContentById(id) {
-        if (id) {
-            var Content = __webpack_require__(55);
-
-            for (var _iterator2 = resources.content, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
-                var _ref2;
-
-                if (_isArray2) {
-                    if (_i2 >= _iterator2.length) break;
-                    _ref2 = _iterator2[_i2++];
-                } else {
-                    _i2 = _iterator2.next();
-                    if (_i2.done) break;
-                    _ref2 = _i2.value;
-                }
-
-                var content = _ref2;
-
-                if (content.id == id) {
-                    return Promise.resolve(new Content(content));
-                }
-            }
-
-            return Promise.reject(new Error('Content with id "' + id + '" was not found'));
-        } else {
-            return Promise.reject(new Error('Content id was not provided'));
+        if (!id) {
+            return Promise.resolve(null);
         }
+
+        return RequestHelper.request('get', 'content/' + id).then(function (content) {
+            return Promise.resolve(new Content(content));
+        });
     };
 
     /**
@@ -7236,19 +7223,19 @@ var ContentHelper = function (_ContentHelperCommon) {
         // NOTE: The index should be the highest sort number + 10000 to give a bit of leg room for sorting later
         var newIndex = 10000;
 
-        for (var _iterator3 = nodes, _isArray3 = Array.isArray(_iterator3), _i3 = 0, _iterator3 = _isArray3 ? _iterator3 : _iterator3[Symbol.iterator]();;) {
-            var _ref3;
+        for (var _iterator2 = nodes, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
+            var _ref2;
 
-            if (_isArray3) {
-                if (_i3 >= _iterator3.length) break;
-                _ref3 = _iterator3[_i3++];
+            if (_isArray2) {
+                if (_i2 >= _iterator2.length) break;
+                _ref2 = _iterator2[_i2++];
             } else {
-                _i3 = _iterator3.next();
-                if (_i3.done) break;
-                _ref3 = _i3.value;
+                _i2 = _iterator2.next();
+                if (_i2.done) break;
+                _ref2 = _i2.value;
             }
 
-            var content = _ref3;
+            var content = _ref2;
 
             if (newIndex - 10000 <= content.sort) {
                 newIndex = content.sort + 10000;
@@ -9344,7 +9331,7 @@ var NavbarMain = function (_View) {
             var $parentDir = $pane.find(parentDirSelector);
 
             // If parent element already exists, just append the queue item element
-            if ($parentDir.length > 0) {
+            if (parentDirAttrKey && parentDirAttrValue && $parentDir.length > 0) {
                 $parentDir.children('.children').append(queueItem.$element);
 
                 // If not, create parent elements if specified
@@ -11789,7 +11776,6 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var ContentCommon = __webpack_require__(94);
-var ContentHelper = __webpack_require__(25);
 var ProjectHelper = __webpack_require__(6);
 
 /**
@@ -11812,29 +11798,43 @@ var Content = function (_ContentCommon) {
      *
      * @param {String} key
      *
-     * @returns {Promise} Settings
+     * @returns {Object} Settings
      */
     Content.prototype.getSettings = function getSettings(key) {
-        return _ContentCommon.prototype.getSettings.call(this, ProjectHelper.currentProject, ProjectHelper.currentEnvironment, key);
+        var parentContent = this.getParent();
+
+        // Loop through parents to find governing setting
+        while (parentContent != null) {
+            parentContent.settingsSanityCheck(key);
+
+            // We found a governing parent, return those settings
+            if (parentContent.settings[key].applyToChildren) {
+                var settings = parentContent.settings;
+
+                // Make clone as to avoid interference with inherent values
+                settings = JSON.parse(JSON.stringify(settings));
+                settings[key].governedBy = parentContent.id;
+
+                return settings[key];
+            }
+
+            parentContent = parentContent.getParent();
+        }
+
+        this.settingsSanityCheck(key);
+
+        return this.settings[key];
     };
 
     /**
      * Gets parent Content
      *
-     * @returns {Promise} Parent
+     * @returns {Content} Parent
      */
 
 
     Content.prototype.getParent = function getParent() {
-        if (this.parentId) {
-            return ContentHelper.getContentById(this.parentId).then(function (parentContent) {
-                return Promise.resolve(parentContent);
-            }).catch(function (e) {
-                return Promise.resolve(null);
-            });
-        } else {
-            return Promise.resolve(null);
-        }
+        return HashBrown.Helpers.ContentHelper.getContentByIdSync(this.parentId);
     };
 
     return Content;
@@ -15777,8 +15777,7 @@ var Content = function (_Entity) {
 
     Content.create = function create(schemaId, properties) {
         if (typeof schemaId !== 'string') {
-            debug.error('Schema ID was not provided', this);
-            return;
+            throw new Error('Schema ID was not provided');
         }
 
         var defaultProperties = {
@@ -15876,6 +15875,28 @@ var Content = function (_Entity) {
     };
 
     /**
+     * Settings sanity check
+     *
+     * @param {String} key
+     */
+
+
+    Content.prototype.settingsSanityCheck = function settingsSanityCheck(key) {
+        this.settings = this.settings || {};
+
+        if (key) {
+            this.settings[key] = this.settings[key] || {};
+        }
+
+        this.settings.publishing = this.settings.publishing || {};
+
+        if (Array.isArray(this.settings.publishing.connections)) {
+            this.settings.publishing.connectionId = this.settings.publishing.connections[0];
+            delete this.settings.publishing.connections;
+        }
+    };
+
+    /**
      * Gets settings
      *
      * @param {String} project
@@ -15894,6 +15915,8 @@ var Content = function (_Entity) {
         var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
         var key = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('key');
 
+        this.settingsSanityCheck(key);
+
         // Loop through all parent content to find a governing setting
         return this.getParents(project, environment).then(function (parents) {
             for (var _iterator = parents, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
@@ -15910,34 +15933,18 @@ var Content = function (_Entity) {
 
                 var parentContent = _ref;
 
-                if (parentContent.settings && parentContent.settings[key] && parentContent.settings[key].applyToChildren) {
+                if (parentContent.settingsApplyToChildren(key)) {
                     var settings = parentContent.settings[key];
 
                     // Make clone as to avoid interference with inherent values
                     settings = JSON.parse(JSON.stringify(settings));
-
-                    settings.governedBy = parentContent;
+                    settings.governedBy = parentContent.id;
 
                     return Promise.resolve(settings);
                 }
             }
 
             // No parent nodes with governing settings found, return own settings
-            if (!_this2.settings) {
-                _this2.settings = {};
-            }
-
-            if (!_this2.settings[key]) {
-                _this2.settings[key] = {};
-            }
-
-            // Special cases
-            switch (key) {
-                case 'publishing':
-                    _this2.settings.publishing.connections = _this2.settings.publishing.connections || [];
-                    break;
-            }
-
             return Promise.resolve(_this2.settings[key]);
         });
     };
@@ -31040,6 +31047,8 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+var Content = __webpack_require__(55);
+
 var SchemaHelper = __webpack_require__(39);
 var ContentHelper = __webpack_require__(25);
 var ConnectionHelper = __webpack_require__(92);
@@ -31110,20 +31119,20 @@ var ContentEditor = function (_View) {
 
     /**
      * Event: Click save. Posts the model to the modelUrl
-     *
-     * @param {Object} publishing
      */
 
 
-    ContentEditor.prototype.onClickSave = function onClickSave(publishing) {
+    ContentEditor.prototype.onClickSave = function onClickSave() {
         var _this2 = this;
 
         var saveAction = this.$element.find('.editor-footer .select-publishing').val();
         var postSaveUrl = void 0;
 
         var setContent = function setContent() {
+            _this2.model.settingsSanityCheck('publishing');
+
             // Use publishing API
-            if (publishing.connections && publishing.connections.length > 0) {
+            if (_this2.model.settings.publishing.connectionId) {
                 // Unpublish
                 if (saveAction === 'unpublish') {
                     return RequestHelper.request('post', 'content/unpublish', _this2.model);
@@ -31464,6 +31473,8 @@ var ContentEditor = function (_View) {
 
         var url = this.model.properties.url;
 
+        this.model.settingsSanityCheck('publishing');
+
         if (url instanceof Object) {
             url = url[window.language];
         }
@@ -31476,14 +31487,14 @@ var ContentEditor = function (_View) {
 
         // View remote
         _.do(function () {
-            if (_this6.model.properties && _this6.model.properties.url && _this6.publishingSettings.connections.length > 0 && _this6.model.isPublished) {
-                return _.a({ target: '_blank', href: ConnectionHelper.getConnectionByIdSync(_this6.publishingSettings.connections[0]).url + url, class: 'btn btn-primary' }, 'View');
+            if (_this6.model.properties && _this6.model.properties.url && _this6.model.settings.publishing.connectionId && _this6.model.isPublished) {
+                return _.a({ target: '_blank', href: ConnectionHelper.getConnectionByIdSync(_this6.model.settings.publishing.connectionId).url + url, class: 'btn btn-primary' }, 'View');
             }
         }), _.if(!this.model.locked,
         // Save & publish
         _.div({ class: 'btn-group-save-publish raised' }, this.$saveBtn = _.button({ class: 'btn btn-save btn-primary' }, _.span({ class: 'text-default' }, 'Save'), _.span({ class: 'text-working' }, 'Saving')).click(function () {
-            _this6.onClickSave(_this6.publishingSettings);
-        }), _.if(this.publishingSettings.connections && this.publishingSettings.connections.length > 0, _.span('&'), _.select({ class: 'form-control select-publishing' }, _.option({ value: 'publish' }, 'Publish'), _.option({ value: 'preview' }, 'Preview'), _.option({ value: 'unpublish' }, 'Unpublish')).val('publish'))))));
+            _this6.onClickSave();
+        }), _.if(this.model.settings.publishing.connectionId, _.span('&'), _.select({ class: 'form-control select-publishing' }, _.option({ value: 'publish' }, 'Publish'), _.option({ value: 'preview' }, 'Preview'), _.option({ value: 'unpublish' }, 'Unpublish')).val('publish'))))));
     };
 
     ContentEditor.prototype.render = function render() {
@@ -31498,14 +31509,9 @@ var ContentEditor = function (_View) {
 
         // Fetch information
         var contentSchema = void 0;
-        var publishingSettings = void 0;
 
         return SchemaHelper.getSchemaWithParentFields(this.model.schemaId).then(function (schema) {
             contentSchema = schema;
-
-            return _this7.model.getSettings('publishing');
-        }).then(function (settings) {
-            _this7.publishingSettings = settings;
 
             _this7.$element.html(
             // Render editor
@@ -32105,7 +32111,7 @@ var UIHelper = function () {
 
 
     UIHelper.inputDropdown = function inputDropdown(defaultValue, options, onChange, useClearButton) {
-        // If "options" parameter is a number, convert to array
+        // If "options" parameter is a number, convert to an array
         if (typeof options === 'number') {
             var amount = options;
 
@@ -32175,8 +32181,8 @@ var UIHelper = function () {
 
         // Add an option
         $element.on('addOption', function (e, option) {
-            var optionLabel = option.label || option.id || option.name || option.toString();
-            var isSelected = option.selected || option.value == defaultValue;
+            var optionLabel = option.label || option.name || option.title || option.id || option.toString();
+            var isSelected = option.selected || option.value == defaultValue || option.id == defaultValue;
 
             if (isSelected) {
                 $toggle.html(optionLabel);
@@ -42794,6 +42800,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var ProjectHelper = __webpack_require__(6);
 var ContentHelper = __webpack_require__(25);
 var RequestHelper = __webpack_require__(3);
+var SchemaHelper = __webpack_require__(39);
 
 var NavbarPane = __webpack_require__(37);
 var NavbarMain = __webpack_require__(36);
@@ -43016,46 +43023,38 @@ var ContentPane = function (_NavbarPane) {
      * Render Content publishing modal
      *
      * @param {Content} content
-     * @param {Object} publishing
      */
 
 
-    ContentPane.renderContentPublishingModal = function renderContentPublishingModal(content, publishing) {
+    ContentPane.renderPublishingModal = function renderPublishingModal(content) {
+        var publishing = content.getSettings('publishing');
+        publishing = JSON.parse(JSON.stringify(publishing));
+
         // Event on clicking OK
         function onSubmit() {
-            if (!publishing.governedBy) {
-                publishing.connections = [];
-
-                // Loop through each input switch and add the corresponding Connection id to the connections list 
-                modal.$element.find('.switch[data-connection-id] input').each(function (i) {
-                    if (this.checked) {
-                        publishing.connections.push(this.parentElement.dataset.connectionId);
-                    }
-                });
-
-                // Apply to children flag
-                publishing.applyToChildren = modal.$element.find('#switch-publishing-apply-to-children input')[0].checked;
-
-                // Commit publishing settings to Content model
-                content.settings.publishing = publishing;
-
-                // API call to save the Content model
-                RequestHelper.request('post', 'content/' + content.id, content)
-
-                // Upon success, reload the UI    
-                .then(function () {
-                    NavbarMain.reload();
-
-                    if (Router.params.id == content.id) {
-                        var contentEditor = ViewHelper.get('ContentEditor');
-
-                        contentEditor.model = content.getObject();
-                        return contentEditor.render();
-                    } else {
-                        return Promise.resolve();
-                    }
-                }).catch(UI.errorModal);
+            if (publishing.governedBy) {
+                return;
             }
+
+            // Commit publishing settings to Content model
+            content.settings.publishing = publishing;
+
+            // API call to save the Content model
+            RequestHelper.request('post', 'content/' + content.id, content)
+
+            // Upon success, reload the UI    
+            .then(function () {
+                NavbarMain.reload();
+
+                if (Router.params.id == content.id) {
+                    var contentEditor = ViewHelper.get('ContentEditor');
+
+                    contentEditor.model = content;
+                    return contentEditor.render();
+                } else {
+                    return Promise.resolve();
+                }
+            }).catch(UI.errorModal);
         }
 
         var modal = new HashBrown.Views.Modals.MessageModal({
@@ -43074,16 +43073,20 @@ var ContentPane = function (_NavbarPane) {
             }],
             renderBody: function renderBody() {
                 if (publishing.governedBy) {
-                    return _.div({ class: 'settings-publishing' }, _.p('(Settings inherited from <a href="#/content/' + publishing.governedBy.id + '">' + publishing.governedBy.prop('title', window.language) + '</a>)'));
+                    var governor = ContentHelper.getContentByIdSync(publishing.governedBy);
+
+                    return _.div({ class: 'settings-publishing' }, _.p('(Settings inherited from <a href="#/content/' + governor.id + '">' + governor.prop('title', window.language) + '</a>)'));
                 } else {
                     return _.div({ class: 'settings-publishing' },
                     // Apply to children switch
-                    _.div({ class: 'input-group' }, _.span('Apply to children'), _.div({ class: 'input-group-addon' }, UI.inputSwitch(publishing.applyToChildren == true).attr('id', 'switch-publishing-apply-to-children'))),
+                    _.div({ class: 'input-group' }, _.span('Apply to children'), _.div({ class: 'input-group-addon' }, UI.inputSwitch(publishing.applyToChildren === true, function (newValue) {
+                        publishing.applyToChildren = newValue;
+                    }))),
 
-                    // Connections list
-                    _.each(window.resources.connections, function (i, connection) {
-                        return _.div({ class: 'input-group' }, _.span(connection.title), _.div({ class: 'input-group-addon' }, UI.inputSwitch(publishing.connections.indexOf(connection.id) > -1).attr('data-connection-id', connection.id)));
-                    }));
+                    // Connection picker
+                    _.div({ class: 'input-group' }, _.span('Connection'), _.div({ class: 'input-group-addon' }, UI.inputDropdown(publishing.connectionId, resources.connections, function (newValue) {
+                        publishing.connectionId = newValue;
+                    }))));
                 }
             }
         });
@@ -43097,30 +43100,12 @@ var ContentPane = function (_NavbarPane) {
 
 
     ContentPane.onClickContentPublishing = function onClickContentPublishing() {
-        var _this2 = this;
-
         var id = $('.cr-context-menu__target-element').data('id');
-        var content = void 0;
 
         // Get Content model
-        ContentHelper.getContentById(id).then(function (result) {
-            content = result;
+        var content = ContentHelper.getContentByIdSync(id);
 
-            if (!content) {
-                return Promise.reject(new Error('Couldn\'t find content with id "' + id + '"'));
-            } else {
-                // Get settings first
-                return content.getSettings('publishing');
-            }
-        })
-
-        // Upon success, render Content settings modal
-        .then(function (publishing) {
-            // Sanity check
-            publishing.applyToChildren = publishing.applyToChildren == true || publishing.applyToChildren == 'true';
-
-            _this2.renderContentPublishingModal(content, publishing);
-        });
+        this.renderPublishingModal(content);
     };
 
     /**
@@ -43136,53 +43121,52 @@ var ContentPane = function (_NavbarPane) {
         var name = $element.data('name');
 
         ContentHelper.getContentById(id).then(function (content) {
-            content.getSettings('publishing').then(function (publishing) {
-                function unpublishConnections() {
-                    return RequestHelper.request('post', 'content/unpublish', content).then(function () {
-                        return onSuccess();
-                    });
-                }
+            content.settingsSanityCheck('publishing');
 
-                function onSuccess() {
-                    return RequestHelper.reloadResource('content').then(function () {
-                        NavbarMain.reload();
+            function unpublishConnection() {
+                return RequestHelper.request('post', 'content/unpublish', content).then(function () {
+                    return onSuccess();
+                });
+            }
 
-                        var contentEditor = ViewHelper.get('ContentEditor');
+            function onSuccess() {
+                return RequestHelper.reloadResource('content').then(function () {
+                    NavbarMain.reload();
 
-                        // Change the ContentEditor view if it was displaying the deleted content
-                        if (contentEditor && contentEditor.model && contentEditor.model.id == id) {
-                            // The Content was actually deleted
-                            if (shouldUnpublish) {
-                                location.hash = '/content/';
+                    var contentEditor = ViewHelper.get('ContentEditor');
 
-                                // The Content still has a synced remote
-                            } else {
-                                contentEditor.model = null;
-                                contentEditor.fetch();
-                            }
-                        }
+                    // Change the ContentEditor view if it was displaying the deleted content
+                    if (contentEditor && contentEditor.model && contentEditor.model.id == id) {
+                        // The Content was actually deleted
+                        if (shouldUnpublish) {
+                            location.hash = '/content/';
 
-                        $element.parent().toggleClass('loading', false);
-
-                        return Promise.resolve();
-                    });
-                }
-
-                var $deleteChildrenSwitch = void 0;
-                UI.confirmModal('Remove', 'Remove the content "' + name + '"?', _.div({ class: 'input-group' }, _.span('Remove child content too'), _.div({ class: 'input-group-addon' }, $deleteChildrenSwitch = UI.inputSwitch(true))), function () {
-                    $element.parent().toggleClass('loading', true);
-
-                    RequestHelper.request('delete', 'content/' + id + '?removeChildren=' + $deleteChildrenSwitch.data('checked')).then(function () {
-
-                        if (shouldUnpublish && publishing.connections && publishing.connections.length > 0) {
-                            return unpublishConnections();
+                            // The Content still has a synced remote
                         } else {
-                            return onSuccess();
+                            contentEditor.model = null;
+                            contentEditor.fetch();
                         }
-                    }).catch(function (e) {
-                        $element.parent().toggleClass('loading', false);
-                        UI.errorModal(e);
-                    });
+                    }
+
+                    $element.parent().toggleClass('loading', false);
+
+                    return Promise.resolve();
+                });
+            }
+
+            var $deleteChildrenSwitch = void 0;
+            UI.confirmModal('Remove', 'Remove the content "' + name + '"?', _.div({ class: 'input-group' }, _.span('Remove child content too'), _.div({ class: 'input-group-addon' }, $deleteChildrenSwitch = UI.inputSwitch(true))), function () {
+                $element.parent().toggleClass('loading', true);
+
+                RequestHelper.request('delete', 'content/' + id + '?removeChildren=' + $deleteChildrenSwitch.data('checked')).then(function () {
+                    if (shouldUnpublish && content.settings.publishing.connectionId) {
+                        return unpublishConnection();
+                    } else {
+                        return onSuccess();
+                    }
+                }).catch(function (e) {
+                    $element.parent().toggleClass('loading', false);
+                    UI.errorModal(e);
                 });
             });
         });
@@ -43194,7 +43178,7 @@ var ContentPane = function (_NavbarPane) {
 
 
     ContentPane.init = function init() {
-        var _this3 = this;
+        var _this2 = this;
 
         NavbarMain.addTabPane('/content/', 'Content', 'file', {
             getItems: function getItems() {
@@ -43209,22 +43193,22 @@ var ContentPane = function (_NavbarPane) {
                 menu['This content'] = '---';
 
                 menu['New child content'] = function () {
-                    _this3.onClickNewContent($('.cr-context-menu__target-element').data('id'));
+                    _this2.onClickNewContent($('.cr-context-menu__target-element').data('id'));
                 };
 
                 menu['Copy id'] = function () {
-                    _this3.onClickCopyItemId();
+                    _this2.onClickCopyItemId();
                 };
 
                 if (!item.remote && !item.locked) {
                     menu['Move'] = function () {
-                        _this3.onClickMoveItem();
+                        _this2.onClickMoveItem();
                     };
                 }
 
                 if (!item.local && !item.locked) {
                     menu['Remove'] = function () {
-                        _this3.onClickRemoveContent(true);
+                        _this2.onClickRemoveContent(true);
                     };
                 }
 
@@ -43234,13 +43218,13 @@ var ContentPane = function (_NavbarPane) {
                     var targetId = $('.cr-context-menu__target-element').data('id');
                     var parentId = ContentHelper.getContentByIdSync(targetId).parentId;
 
-                    _this3.onClickNewContent(parentId);
+                    _this2.onClickNewContent(parentId);
                 };
 
                 if (!item.remote && !item.locked) {
                     menu['Settings'] = '---';
                     menu['Publishing'] = function () {
-                        _this3.onClickContentPublishing();
+                        _this2.onClickContentPublishing();
                     };
                 }
 
@@ -43253,19 +43237,19 @@ var ContentPane = function (_NavbarPane) {
 
                     if (!item.remote) {
                         menu['Push to remote'] = function () {
-                            _this3.onClickPushContent();
+                            _this2.onClickPushContent();
                         };
                     }
 
                     if (item.local) {
                         menu['Remove local copy'] = function () {
-                            _this3.onClickRemoveContent();
+                            _this2.onClickRemoveContent();
                         };
                     }
 
                     if (item.remote) {
                         menu['Pull from remote'] = function () {
-                            _this3.onClickPullContent();
+                            _this2.onClickPullContent();
                         };
                     }
                 }
@@ -43277,7 +43261,7 @@ var ContentPane = function (_NavbarPane) {
             paneContextMenu: {
                 'General': '---',
                 'New content': function NewContent() {
-                    _this3.onClickNewContent();
+                    _this2.onClickNewContent();
                 }
             },
 
@@ -45121,8 +45105,8 @@ var SchemaEditor = function (_View) {
         var excludedParents = {};
         excludedParents[this.model.id] = true;
 
-        for (var id in resources.schemas) {
-            var schema = resources.schemas[id];
+        for (var i in resources.schemas) {
+            var schema = resources.schemas[i];
 
             // Check if this Schema has a parent in the excluded list
             // If so, add this id to the excluded list
@@ -45139,7 +45123,7 @@ var SchemaEditor = function (_View) {
 
             schemaOptions[schemaOptions.length] = {
                 label: schema.name,
-                value: id
+                value: schema.id
             };
         }
 
@@ -45221,11 +45205,11 @@ var SchemaEditor = function (_View) {
         function onClickAdd() {
             var newSchemaId = '';
 
-            for (var id in resources.schemas) {
-                var schema = resources.schemas[id];
+            for (var i in resources.schemas) {
+                var schema = resources.schemas[i];
 
-                if (schema.type == 'content' && view.model.allowedChildSchemas.indexOf(id) < 0 && schema.id != 'contentBase' && schema.id != 'page') {
-                    newSchemaId = id;
+                if (schema.type == 'content' && view.model.allowedChildSchemas.indexOf(schema.id) < 0 && schema.id != 'contentBase' && schema.id != 'page') {
+                    newSchemaId = schema.id;
                     break;
                 }
             }
@@ -45240,9 +45224,9 @@ var SchemaEditor = function (_View) {
         function render() {
             _.append($element.empty(), _.div({ class: 'schemas chip-group' }, _.each(view.model.allowedChildSchemas, function (i, schemaId) {
                 try {
-                    var $schema = _.div({ class: 'chip schema' }, _.div({ class: 'chip-label dropdown' }, _.button({ class: 'dropdown-toggle', 'data-id': schemaId, 'data-toggle': 'dropdown' }, resources.schemas[schemaId].name), _.if(!view.model.locked, _.ul({ class: 'dropdown-menu' }, _.each(resources.schemas, function (id, schema) {
-                        if (schema.type == 'content' && (id == schemaId || view.model.allowedChildSchemas.indexOf(schema.id) < 0) && schema.id != 'contentBase' && schema.id != 'page') {
-                            return _.li(_.a({ href: '#', 'data-id': id }, schema.name).click(function (e) {
+                    var $schema = _.div({ class: 'chip schema' }, _.div({ class: 'chip-label dropdown' }, _.button({ class: 'dropdown-toggle', 'data-id': schemaId, 'data-toggle': 'dropdown' }, SchemaHelper.getSchemaByIdSync(schemaId).name), _.if(!view.model.locked, _.ul({ class: 'dropdown-menu' }, _.each(resources.schemas, function (i, schema) {
+                        if (schema.type == 'content' && (schema.id == schemaId || view.model.allowedChildSchemas.indexOf(schema.id) < 0) && schema.id != 'contentBase' && schema.id != 'page') {
+                            return _.li(_.a({ href: '#', 'data-id': schema.id }, schema.name).click(function (e) {
                                 e.preventDefault();
 
                                 var $btn = $(this).parents('.dropdown').children('.dropdown-toggle');
@@ -46461,7 +46445,7 @@ var ArrayEditor = function (_FieldEditor) {
 
                 var allowedSchemaId = _ref;
 
-                var allowedSchema = resources.schemas[allowedSchemaId];
+                var allowedSchema = SchemaHelper.getSchemaByIdSync(allowedSchemaId);
 
                 dropdownOptions[dropdownOptions.length] = {
                     value: allowedSchema.id,
@@ -46859,6 +46843,9 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+var SchemaHelper = __webpack_require__(39);
+var ContentHelper = __webpack_require__(25);
+
 var FieldEditor = __webpack_require__(12);
 
 /**
@@ -46920,9 +46907,7 @@ var ContentSchemaReferenceEditor = function (_FieldEditor) {
             return null;
         }
 
-        var parentContent = resources.content.filter(function (c) {
-            return c.id == thisContent.parentId;
-        })[0];
+        var parentContent = ContentHelper.getContentByIdSync(thisContent.parentId);
 
         if (!parentContent) {
             UI.errorModal(new Error('Content by id "' + thisContent.parentId + '" not found'));
@@ -46930,7 +46915,7 @@ var ContentSchemaReferenceEditor = function (_FieldEditor) {
         }
 
         // Fetch parent Schema
-        var parentSchema = resources.schemas[parentContent.schemaId];
+        var parentSchema = SchemaHelper.getSchemaByIdSync(parentContent.schemaId);
 
         if (!parentSchema) {
             UI.errorModal(new Error('Schema by id "' + parentContent.schemaId + '" not found'));

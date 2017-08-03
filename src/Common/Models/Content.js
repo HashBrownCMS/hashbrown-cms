@@ -69,8 +69,7 @@ class Content extends Entity {
      */
     static create(schemaId, properties) {
         if(typeof schemaId !== 'string') {
-            debug.error('Schema ID was not provided', this);
-            return;
+            throw new Error('Schema ID was not provided');
         }
 
         let defaultProperties = {
@@ -167,6 +166,26 @@ class Content extends Entity {
     }
 
     /**
+     * Settings sanity check
+     *
+     * @param {String} key
+     */
+    settingsSanityCheck(key) {
+        this.settings = this.settings || {};
+
+        if(key) {
+            this.settings[key] = this.settings[key] || {};
+        }
+
+        this.settings.publishing = this.settings.publishing || {};
+
+        if(Array.isArray(this.settings.publishing.connections)) {
+            this.settings.publishing.connectionId = this.settings.publishing.connections[0];
+            delete this.settings.publishing.connections;
+        }
+    }
+
+    /**
      * Gets settings
      *
      * @param {String} project
@@ -180,42 +199,24 @@ class Content extends Entity {
         environment = requiredParam('environment'),
         key = requiredParam('key')
     ) {
+        this.settingsSanityCheck(key);
+
         // Loop through all parent content to find a governing setting
         return this.getParents(project, environment)
         .then((parents) => {
             for(let parentContent of parents) {
-                if(
-                    parentContent.settings &&
-                    parentContent.settings[key] &&
-                    parentContent.settings[key].applyToChildren
-                ) {
+                if(parentContent.settingsApplyToChildren(key)) {
                     let settings = parentContent.settings[key];
 
                     // Make clone as to avoid interference with inherent values
                     settings = JSON.parse(JSON.stringify(settings));
-
-                    settings.governedBy = parentContent;
+                    settings.governedBy = parentContent.id;
 
                     return Promise.resolve(settings);
                 }
             }
 
             // No parent nodes with governing settings found, return own settings
-            if(!this.settings) {
-                this.settings = {};
-            }
-
-            if(!this.settings[key]) {
-                this.settings[key] = {};
-            }
-
-            // Special cases
-            switch(key) {
-                case 'publishing':
-                    this.settings.publishing.connections = this.settings.publishing.connections || [];
-                    break;
-            }
-
             return Promise.resolve(this.settings[key]);
         });
     }
