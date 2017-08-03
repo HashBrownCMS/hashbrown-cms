@@ -36,14 +36,14 @@ class ContentEditor extends View {
 
             let top = $field.position().top;
 
-            if(top < 60) {
+            if(top < 40) {
                 // The closest field to the viewport top with an outer height above 100 should follow
                 if(top != 0 && $field.outerHeight() > 100) {
                     $follow = $field;    
 
-                // If a smaller field is closer, cacnel following
+                /*// If a smaller field is closer, cancel following
                 } else {
-                    $follow = null;
+                    $follow = null;*/
 
                 }
             }

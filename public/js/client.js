@@ -31091,14 +31091,14 @@ var ContentEditor = function (_View) {
 
             var top = $field.position().top;
 
-            if (top < 60) {
+            if (top < 40) {
                 // The closest field to the viewport top with an outer height above 100 should follow
                 if (top != 0 && $field.outerHeight() > 100) {
                     $follow = $field;
 
-                    // If a smaller field is closer, cacnel following
-                } else {
-                    $follow = null;
+                    /*// If a smaller field is closer, cancel following
+                    } else {
+                        $follow = null;*/
                 }
             }
         });
@@ -48117,7 +48117,7 @@ var StructEditor = function (_FieldEditor) {
             });
 
             // Return the DOM element
-            return _.div({ class: 'kvp' }, _.div({ class: 'key' }, keySchema.label), _.div({ class: 'value' }, fieldEditorInstance.$element));
+            return _.div({ class: 'kvp' }, _.div({ class: 'key' }, keySchema.label, fieldEditorInstance.$keyContent), _.div({ class: 'value' }, fieldEditorInstance.$element));
         }));
     };
 

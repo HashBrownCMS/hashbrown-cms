@@ -90,7 +90,8 @@ class StructEditor extends FieldEditor {
                 // Return the DOM element
                 return _.div({class: 'kvp'},
                     _.div({class: 'key'},
-                        keySchema.label
+                        keySchema.label,
+                        fieldEditorInstance.$keyContent
                     ),
                     _.div({class: 'value'},
                         fieldEditorInstance.$element

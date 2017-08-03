@@ -657,7 +657,7 @@ img.logo {
           position: fixed;
           top: 70px; }
         .cms-container .workspace .editor .field-container .field-key {
-          width: 200px;
+          width: 140px;
           line-height: 30px;
           flex-shrink: 0; }
           .cms-container .workspace .editor .field-container .field-key .fa {
@@ -1051,7 +1051,7 @@ body.dashboard-container {
   display: flex;
   margin-bottom: 10px; }
   .struct-editor .kvp .key {
-    width: 100px;
+    width: 140px;
     flex-shrink: 0;
     line-height: 34px; }
   .struct-editor .kvp .value {
