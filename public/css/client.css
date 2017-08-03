@@ -1005,7 +1005,8 @@ body.dashboard-container {
   .modal.modal-icon-picker .modal-body .btn-icon {
     text-align: center;
     background-color: transparent;
-    width: 10%; }
+    width: 10%;
+    height: 5rem; }
     .modal.modal-icon-picker .modal-body .btn-icon .fa {
       font-size: 20px; }
     .modal.modal-icon-picker .modal-body .btn-icon .icon-name {

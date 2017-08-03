@@ -4,7 +4,6 @@
         max-width: 900px;
     }
 
-
     .modal-body {
         display: flex;
         flex-wrap: wrap;
@@ -19,6 +18,7 @@
             text-align: center;
             background-color: transparent;
             width: 10%;
+            height: 5rem;
 
             .fa {
                 font-size: 20px;

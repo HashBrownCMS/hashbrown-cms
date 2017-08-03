@@ -7083,172 +7083,121 @@ base.Node = __webpack_require__(172);
 "use strict";
 
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+var ContentSchema = __webpack_require__(53);
+var FieldSchema = __webpack_require__(54);
+
 var RequestHelper = __webpack_require__(3);
 
-var ContentHelperCommon = __webpack_require__(190);
-
-var Content = __webpack_require__(55);
+var SchemaHelperCommon = __webpack_require__(189);
 
 /**
- * The client side content helper
+ * The client side Schema helper
  *
  * @memberof HashBrown.Client.Helpers
  */
 
-var ContentHelper = function (_ContentHelperCommon) {
-    _inherits(ContentHelper, _ContentHelperCommon);
+var SchemaHelper = function (_SchemaHelperCommon) {
+    _inherits(SchemaHelper, _SchemaHelperCommon);
 
-    function ContentHelper() {
-        _classCallCheck(this, ContentHelper);
+    function SchemaHelper() {
+        _classCallCheck(this, SchemaHelper);
 
-        return _possibleConstructorReturn(this, _ContentHelperCommon.apply(this, arguments));
+        return _possibleConstructorReturn(this, _SchemaHelperCommon.apply(this, arguments));
     }
 
     /**
-     * Gets Content by id
+     * Gets a Schema with all parent fields
      *
      * @param {String} id
      *
-     * @returns {Content} Content node
+     * @returns {Promise} Schema with parent fields
      */
-    ContentHelper.getContentByIdSync = function getContentByIdSync(id) {
-        if (!id) {
-            return null;
-        }
-
-        for (var _iterator = resources.content, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-            var _ref;
-
-            if (_isArray) {
-                if (_i >= _iterator.length) break;
-                _ref = _iterator[_i++];
-            } else {
-                _i = _iterator.next();
-                if (_i.done) break;
-                _ref = _i.value;
-            }
-
-            var content = _ref;
-
-            if (content.id === id) {
-                return content;
-            }
-        }
-    };
-
-    /**
-     * Gets Content by id
-     *
-     * @param {String} id
-     *
-     * @returns {Promise} Content node
-     */
-
-
-    ContentHelper.getContentById = function getContentById(id) {
+    SchemaHelper.getSchemaWithParentFields = function getSchemaWithParentFields(id) {
         if (!id) {
             return Promise.resolve(null);
         }
 
-        return RequestHelper.request('get', 'content/' + id).then(function (content) {
-            return Promise.resolve(new Content(content));
+        return RequestHelper.request('get', 'schemas/' + id + '/?withParentFields=true').then(function (schema) {
+            return Promise.resolve(SchemaHelper.getModel(schema));
         });
     };
 
     /**
-     * A sanity check for fields
+     * Gets a FieldSchema with all parent configs
      *
-     * @param {Object} value
-     * @param {Schema} schema
+     * @param {String} id
+     *
+     * @returns {FieldSchema} Compiled FieldSchema
      */
 
 
-    ContentHelper.fieldSanityCheck = function fieldSanityCheck(value, schema) {
-        // If the schema value is set to multilingual, but the value isn't an object, convert it
-        if (schema.multilingual && (!value || (typeof value === 'undefined' ? 'undefined' : _typeof(value)) !== 'object')) {
-            var oldValue = value;
+    SchemaHelper.getFieldSchemaWithParentConfigs = function getFieldSchemaWithParentConfigs(id) {
+        var fieldSchema = this.getSchemaByIdSync(id);
 
-            value = {};
-            value[window.language] = oldValue;
+        if (fieldSchema) {
+            var nextSchema = this.getSchemaByIdSync(fieldSchema.parentSchemaId);
+            var compiledSchema = new FieldSchema(fieldSchema.getObject());
+
+            while (nextSchema) {
+                compiledSchema.appendConfig(nextSchema.config);
+
+                nextSchema = this.getSchemaByIdSync(nextSchema.parentSchemaId);
+            }
+
+            return compiledSchema;
         }
-
-        // If the schema value is not set to multilingual, but the value is an object
-        // containing the _multilingual flag, convert it
-        if (!schema.multilingual && value && (typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object' && value._multilingual) {
-            value = value[window.language];
-        }
-
-        // Update the _multilingual flag
-        if (schema.multilingual && value && !value._multilingual) {
-            value._multilingual = true;
-        } else if (!schema.multilingual && value && value._multilingual) {
-            delete value._multilingual;
-        }
-
-        return value;
     };
 
     /**
-     * Get new sort index
+     * Gets a Schema by id
      *
-     * @param {String} parentId
-     * @param {String} aboveId
-     * @param {String} belowId
+     * @param {String} id
+     *
+     * @return {Promise} Promise
      */
 
 
-    ContentHelper.getNewSortIndex = function getNewSortIndex(parentId, aboveId, belowId) {
-        if (aboveId) {
-            return this.getContentByIdSync(aboveId).sort + 1;
-        }
+    SchemaHelper.getSchemaById = function getSchemaById(id) {
+        var _this2 = this;
 
-        if (belowId) {
-            return this.getContentByIdSync(belowId).sort - 1;
-        }
-
-        // Filter out content that doesn't have the same parent
-        var nodes = resources.content.filter(function (x) {
-            return x.parentId == parentId || !x.parentId && !parentId;
+        return RequestHelper.request('get', 'schemas/' + id).then(function (schema) {
+            return Promise.resolve(_this2.getModel(schema));
         });
-
-        // Find new index
-        // NOTE: The index should be the highest sort number + 10000 to give a bit of leg room for sorting later
-        var newIndex = 10000;
-
-        for (var _iterator2 = nodes, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
-            var _ref2;
-
-            if (_isArray2) {
-                if (_i2 >= _iterator2.length) break;
-                _ref2 = _iterator2[_i2++];
-            } else {
-                _i2 = _iterator2.next();
-                if (_i2.done) break;
-                _ref2 = _i2.value;
-            }
-
-            var content = _ref2;
-
-            if (newIndex - 10000 <= content.sort) {
-                newIndex = content.sort + 10000;
-            }
-        }
-
-        return newIndex;
     };
 
-    return ContentHelper;
-}(ContentHelperCommon);
+    /**
+     * Gets a Schema by id (sync)
+     *
+     * @param {String} id
+     *
+     * @return {Promise} Promise
+     */
 
-module.exports = ContentHelper;
+
+    SchemaHelper.getSchemaByIdSync = function getSchemaByIdSync(id) {
+        for (var i in resources.schemas) {
+            var schema = resources.schemas[i];
+
+            if (schema.id == id) {
+                if (schema instanceof ContentSchema || schema instanceof FieldSchema) {
+                    return schema;
+                }
+
+                return this.getModel(schema);
+            }
+        }
+    };
+
+    return SchemaHelper;
+}(SchemaHelperCommon);
+
+module.exports = SchemaHelper;
 
 /***/ }),
 /* 26 */
@@ -8678,7 +8627,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var RequestHelper = __webpack_require__(3);
 
-var SettingsHelperCommon = __webpack_require__(192);
+var SettingsHelperCommon = __webpack_require__(191);
 
 /**
  * The client side settings helper
@@ -9601,6 +9550,180 @@ module.exports = Pane;
 "use strict";
 
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var RequestHelper = __webpack_require__(3);
+
+var ContentHelperCommon = __webpack_require__(192);
+
+var Content = __webpack_require__(55);
+
+/**
+ * The client side content helper
+ *
+ * @memberof HashBrown.Client.Helpers
+ */
+
+var ContentHelper = function (_ContentHelperCommon) {
+    _inherits(ContentHelper, _ContentHelperCommon);
+
+    function ContentHelper() {
+        _classCallCheck(this, ContentHelper);
+
+        return _possibleConstructorReturn(this, _ContentHelperCommon.apply(this, arguments));
+    }
+
+    /**
+     * Gets Content by id
+     *
+     * @param {String} id
+     *
+     * @returns {Content} Content node
+     */
+    ContentHelper.getContentByIdSync = function getContentByIdSync(id) {
+        if (!id) {
+            return null;
+        }
+
+        for (var _iterator = resources.content, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+            var _ref;
+
+            if (_isArray) {
+                if (_i >= _iterator.length) break;
+                _ref = _iterator[_i++];
+            } else {
+                _i = _iterator.next();
+                if (_i.done) break;
+                _ref = _i.value;
+            }
+
+            var content = _ref;
+
+            if (content.id === id) {
+                return content;
+            }
+        }
+    };
+
+    /**
+     * Gets Content by id
+     *
+     * @param {String} id
+     *
+     * @returns {Promise} Content node
+     */
+
+
+    ContentHelper.getContentById = function getContentById(id) {
+        if (!id) {
+            return Promise.resolve(null);
+        }
+
+        return RequestHelper.request('get', 'content/' + id).then(function (content) {
+            return Promise.resolve(new Content(content));
+        });
+    };
+
+    /**
+     * A sanity check for fields
+     *
+     * @param {Object} value
+     * @param {Schema} schema
+     */
+
+
+    ContentHelper.fieldSanityCheck = function fieldSanityCheck(value, schema) {
+        // If the schema value is set to multilingual, but the value isn't an object, convert it
+        if (schema.multilingual && (!value || (typeof value === 'undefined' ? 'undefined' : _typeof(value)) !== 'object')) {
+            var oldValue = value;
+
+            value = {};
+            value[window.language] = oldValue;
+        }
+
+        // If the schema value is not set to multilingual, but the value is an object
+        // containing the _multilingual flag, convert it
+        if (!schema.multilingual && value && (typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object' && value._multilingual) {
+            value = value[window.language];
+        }
+
+        // Update the _multilingual flag
+        if (schema.multilingual && value && !value._multilingual) {
+            value._multilingual = true;
+        } else if (!schema.multilingual && value && value._multilingual) {
+            delete value._multilingual;
+        }
+
+        return value;
+    };
+
+    /**
+     * Get new sort index
+     *
+     * @param {String} parentId
+     * @param {String} aboveId
+     * @param {String} belowId
+     */
+
+
+    ContentHelper.getNewSortIndex = function getNewSortIndex(parentId, aboveId, belowId) {
+        if (aboveId) {
+            return this.getContentByIdSync(aboveId).sort + 1;
+        }
+
+        if (belowId) {
+            return this.getContentByIdSync(belowId).sort - 1;
+        }
+
+        // Filter out content that doesn't have the same parent
+        var nodes = resources.content.filter(function (x) {
+            return x.parentId == parentId || !x.parentId && !parentId;
+        });
+
+        // Find new index
+        // NOTE: The index should be the highest sort number + 10000 to give a bit of leg room for sorting later
+        var newIndex = 10000;
+
+        for (var _iterator2 = nodes, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
+            var _ref2;
+
+            if (_isArray2) {
+                if (_i2 >= _iterator2.length) break;
+                _ref2 = _iterator2[_i2++];
+            } else {
+                _i2 = _iterator2.next();
+                if (_i2.done) break;
+                _ref2 = _i2.value;
+            }
+
+            var content = _ref2;
+
+            if (newIndex - 10000 <= content.sort) {
+                newIndex = content.sort + 10000;
+            }
+        }
+
+        return newIndex;
+    };
+
+    return ContentHelper;
+}(ContentHelperCommon);
+
+module.exports = ContentHelper;
+
+/***/ }),
+/* 39 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -9767,129 +9890,6 @@ var Media = function (_Entity) {
 }(Entity);
 
 module.exports = Media;
-
-/***/ }),
-/* 39 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var ContentSchema = __webpack_require__(53);
-var FieldSchema = __webpack_require__(54);
-
-var RequestHelper = __webpack_require__(3);
-
-var SchemaHelperCommon = __webpack_require__(189);
-
-/**
- * The client side Schema helper
- *
- * @memberof HashBrown.Client.Helpers
- */
-
-var SchemaHelper = function (_SchemaHelperCommon) {
-    _inherits(SchemaHelper, _SchemaHelperCommon);
-
-    function SchemaHelper() {
-        _classCallCheck(this, SchemaHelper);
-
-        return _possibleConstructorReturn(this, _SchemaHelperCommon.apply(this, arguments));
-    }
-
-    /**
-     * Gets a Schema with all parent fields
-     *
-     * @param {String} id
-     *
-     * @returns {Promise} Schema with parent fields
-     */
-    SchemaHelper.getSchemaWithParentFields = function getSchemaWithParentFields(id) {
-        if (!id) {
-            return Promise.resolve(null);
-        }
-
-        return RequestHelper.request('get', 'schemas/' + id + '/?withParentFields=true').then(function (schema) {
-            return Promise.resolve(SchemaHelper.getModel(schema));
-        });
-    };
-
-    /**
-     * Gets a FieldSchema with all parent configs
-     *
-     * @param {String} id
-     *
-     * @returns {FieldSchema} Compiled FieldSchema
-     */
-
-
-    SchemaHelper.getFieldSchemaWithParentConfigs = function getFieldSchemaWithParentConfigs(id) {
-        var fieldSchema = this.getSchemaByIdSync(id);
-
-        if (fieldSchema) {
-            var nextSchema = this.getSchemaByIdSync(fieldSchema.parentSchemaId);
-            var compiledSchema = new FieldSchema(fieldSchema.getObject());
-
-            while (nextSchema) {
-                compiledSchema.appendConfig(nextSchema.config);
-
-                nextSchema = this.getSchemaByIdSync(nextSchema.parentSchemaId);
-            }
-
-            return compiledSchema;
-        }
-    };
-
-    /**
-     * Gets a Schema by id
-     *
-     * @param {String} id
-     *
-     * @return {Promise} Promise
-     */
-
-
-    SchemaHelper.getSchemaById = function getSchemaById(id) {
-        var _this2 = this;
-
-        return RequestHelper.request('get', 'schemas/' + id).then(function (schema) {
-            return Promise.resolve(_this2.getModel(schema));
-        });
-    };
-
-    /**
-     * Gets a Schema by id (sync)
-     *
-     * @param {String} id
-     *
-     * @return {Promise} Promise
-     */
-
-
-    SchemaHelper.getSchemaByIdSync = function getSchemaByIdSync(id) {
-        for (var i in resources.schemas) {
-            var schema = resources.schemas[i];
-
-            if (schema.id == id) {
-                if (schema instanceof ContentSchema || schema instanceof FieldSchema) {
-                    return schema;
-                }
-
-                return this.getModel(schema);
-            }
-        }
-    };
-
-    return SchemaHelper;
-}(SchemaHelperCommon);
-
-module.exports = SchemaHelper;
 
 /***/ }),
 /* 40 */
@@ -26836,7 +26836,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var beautify = __webpack_require__(229).js_beautify;
-var SchemaHelper = __webpack_require__(39);
+var SchemaHelper = __webpack_require__(25);
 var RequestHelper = __webpack_require__(3);
 
 /**
@@ -30295,175 +30295,13 @@ module.exports = SchemaHelper;
 "use strict";
 
 
-/**
- * A helper class for Content
- *
- * @memberof HashBrown.Common.Helpers
- */
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var ContentHelper = function () {
-    function ContentHelper() {
-        _classCallCheck(this, ContentHelper);
-    }
-
-    /**
-     * Gets all Content objects
-     *
-     * @param {String} project
-     * @param {String} environment
-     *
-     * @return {Promise} promise
-     */
-    ContentHelper.getAllContents = function getAllContents() {
-        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
-        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
-
-        return Promise.resolve();
-    };
-
-    /**
-     * Gets a URL-friendly version of a string
-     *
-     * @param {String} string
-     *
-     * @param {String} slug
-     */
-
-
-    ContentHelper.getSlug = function getSlug(string) {
-        return (string || '').toLowerCase().replace(/[æ|ä]/g, 'ae').replace(/[ø|ö]/g, 'oe').replace(/å/g, 'aa').replace(/ü/g, 'ue').replace(/ß/g, 'ss').replace(/[^\w ]+/g, '').replace(/ +/g, '-');
-    };
-
-    /**
-     * Gets a Content object by id
-     *
-     * @param {String} project
-     * @param {String} environment
-     * @param {Number} id
-     *
-     * @return {Promise} promise
-     */
-
-
-    ContentHelper.getContentById = function getContentById() {
-        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
-        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
-        var id = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('id');
-
-        return Promise.resolve();
-    };
-
-    /**
-     * Sets a Content object by id
-     *
-     * @param {String} project
-     * @param {String} environment
-     * @param {Number} id
-     * @param {Object} content
-     *
-     * @return {Promise} promise
-     */
-
-
-    ContentHelper.setContentById = function setContentById() {
-        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
-        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
-        var id = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('id');
-        var content = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : requiredParam('content');
-
-        return new Promise(function (resolve, reject) {
-            resolve();
-        });
-    };
-
-    /**
-     * Checks if a Schema type is allowed as a child of a Content object
-     *
-     * @param {String} project
-     * @param {String} environment
-     * @param {String} parentId
-     * @param {String} childSchemaId
-     *
-     * @returns {Promise} Is the Content node allowed as a child
-     */
-
-
-    ContentHelper.isSchemaAllowedAsChild = function isSchemaAllowedAsChild() {
-        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
-        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
-        var parentId = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('parentId');
-        var childSchemaId = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : requiredParam('childSchemaId');
-
-        // No parent ID means root, and all Schemas are allowed there
-        if (!parentId) {
-            return Promise.resolve();
-        } else {
-            return this.getContentById(project, environment, parentId).then(function (parentContent) {
-                return HashBrown.Helpers.SchemaHelper.getSchemaById(project, environment, parentContent.schemaId);
-            }).then(function (parentSchema) {
-                // The Schema was not an allowed child
-                if (parentSchema.allowedChildSchemas.indexOf(childSchemaId) < 0) {
-                    return HashBrown.Helpers.SchemaHelper.getSchemaById(project, environment, childSchemaId).then(function (childSchema) {
-                        return Promise.reject(new Error('Content with Schema "' + childSchema.name + '" is not an allowed child of Content with Schema "' + parentSchema.name + '"'));
-                    });
-
-                    // The Schema was an allowed child, resolve
-                } else {
-                    return Promise.resolve();
-                }
-            });
-        }
-    };
-
-    /**
-     * Creates a new content object
-     *
-     * @return {Promise} promise
-     */
-
-
-    ContentHelper.createContent = function createContent() {
-        return new Promise(function (resolve, reject) {
-            resolve();
-        });
-    };
-
-    /**
-     * Removes a content object
-     *
-     * @param {Number} id
-     *
-     * @return {Promise} promise
-     */
-
-
-    ContentHelper.removeContentById = function removeContentById(id) {
-        return new Promise(function (resolve, reject) {
-            resolve();
-        });
-    };
-
-    return ContentHelper;
-}();
-
-module.exports = ContentHelper;
-
-/***/ }),
-/* 191 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Media = __webpack_require__(38);
+var Media = __webpack_require__(39);
 
 var RequestHelper = __webpack_require__(3);
 var ProjectHelper = __webpack_require__(6);
@@ -30762,7 +30600,7 @@ var MediaBrowser = function (_View) {
 module.exports = MediaBrowser;
 
 /***/ }),
-/* 192 */
+/* 191 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -30783,6 +30621,168 @@ var SettingsHelper = function SettingsHelper() {
 module.exports = SettingsHelper;
 
 /***/ }),
+/* 192 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/**
+ * A helper class for Content
+ *
+ * @memberof HashBrown.Common.Helpers
+ */
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var ContentHelper = function () {
+    function ContentHelper() {
+        _classCallCheck(this, ContentHelper);
+    }
+
+    /**
+     * Gets all Content objects
+     *
+     * @param {String} project
+     * @param {String} environment
+     *
+     * @return {Promise} promise
+     */
+    ContentHelper.getAllContents = function getAllContents() {
+        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+
+        return Promise.resolve();
+    };
+
+    /**
+     * Gets a URL-friendly version of a string
+     *
+     * @param {String} string
+     *
+     * @param {String} slug
+     */
+
+
+    ContentHelper.getSlug = function getSlug(string) {
+        return (string || '').toLowerCase().replace(/[æ|ä]/g, 'ae').replace(/[ø|ö]/g, 'oe').replace(/å/g, 'aa').replace(/ü/g, 'ue').replace(/ß/g, 'ss').replace(/[^\w ]+/g, '').replace(/ +/g, '-');
+    };
+
+    /**
+     * Gets a Content object by id
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {Number} id
+     *
+     * @return {Promise} promise
+     */
+
+
+    ContentHelper.getContentById = function getContentById() {
+        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+        var id = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('id');
+
+        return Promise.resolve();
+    };
+
+    /**
+     * Sets a Content object by id
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {Number} id
+     * @param {Object} content
+     *
+     * @return {Promise} promise
+     */
+
+
+    ContentHelper.setContentById = function setContentById() {
+        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+        var id = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('id');
+        var content = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : requiredParam('content');
+
+        return new Promise(function (resolve, reject) {
+            resolve();
+        });
+    };
+
+    /**
+     * Checks if a Schema type is allowed as a child of a Content object
+     *
+     * @param {String} project
+     * @param {String} environment
+     * @param {String} parentId
+     * @param {String} childSchemaId
+     *
+     * @returns {Promise} Is the Content node allowed as a child
+     */
+
+
+    ContentHelper.isSchemaAllowedAsChild = function isSchemaAllowedAsChild() {
+        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
+        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
+        var parentId = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('parentId');
+        var childSchemaId = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : requiredParam('childSchemaId');
+
+        // No parent ID means root, and all Schemas are allowed there
+        if (!parentId) {
+            return Promise.resolve();
+        } else {
+            return this.getContentById(project, environment, parentId).then(function (parentContent) {
+                return HashBrown.Helpers.SchemaHelper.getSchemaById(project, environment, parentContent.schemaId);
+            }).then(function (parentSchema) {
+                // The Schema was not an allowed child
+                if (parentSchema.allowedChildSchemas.indexOf(childSchemaId) < 0) {
+                    return HashBrown.Helpers.SchemaHelper.getSchemaById(project, environment, childSchemaId).then(function (childSchema) {
+                        return Promise.reject(new Error('Content with Schema "' + childSchema.name + '" is not an allowed child of Content with Schema "' + parentSchema.name + '"'));
+                    });
+
+                    // The Schema was an allowed child, resolve
+                } else {
+                    return Promise.resolve();
+                }
+            });
+        }
+    };
+
+    /**
+     * Creates a new content object
+     *
+     * @return {Promise} promise
+     */
+
+
+    ContentHelper.createContent = function createContent() {
+        return new Promise(function (resolve, reject) {
+            resolve();
+        });
+    };
+
+    /**
+     * Removes a content object
+     *
+     * @param {Number} id
+     *
+     * @return {Promise} promise
+     */
+
+
+    ContentHelper.removeContentById = function removeContentById(id) {
+        return new Promise(function (resolve, reject) {
+            resolve();
+        });
+    };
+
+    return ContentHelper;
+}();
+
+module.exports = ContentHelper;
+
+/***/ }),
 /* 193 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -30793,7 +30793,7 @@ module.exports = SettingsHelper;
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var Media = __webpack_require__(38);
+var Media = __webpack_require__(39);
 
 /**
  * A helper for Media objects
@@ -31049,8 +31049,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var Content = __webpack_require__(55);
 
-var SchemaHelper = __webpack_require__(39);
-var ContentHelper = __webpack_require__(25);
+var SchemaHelper = __webpack_require__(25);
+var ContentHelper = __webpack_require__(38);
 var ConnectionHelper = __webpack_require__(92);
 var RequestHelper = __webpack_require__(3);
 
@@ -31653,13 +31653,13 @@ module.exports = LanguageHelper;
 
 module.exports = {
     ConnectionHelper: __webpack_require__(92),
-    ContentHelper: __webpack_require__(25),
+    ContentHelper: __webpack_require__(38),
     DebugHelper: __webpack_require__(198),
     LanguageHelper: __webpack_require__(93),
     MediaHelper: __webpack_require__(56),
     ProjectHelper: __webpack_require__(6),
     RequestHelper: __webpack_require__(3),
-    SchemaHelper: __webpack_require__(39),
+    SchemaHelper: __webpack_require__(25),
     SettingsHelper: __webpack_require__(35),
     UIHelper: __webpack_require__(200)
 };
@@ -39888,7 +39888,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var ProjectHelper = __webpack_require__(6);
 
-var Media = __webpack_require__(38);
+var Media = __webpack_require__(39);
 
 /**
  * An editor for displaying Media objects
@@ -40419,7 +40419,7 @@ module.exports = {
     Entity: __webpack_require__(9),
     FieldSchema: __webpack_require__(54),
     index: __webpack_require__(216),
-    Media: __webpack_require__(38),
+    Media: __webpack_require__(39),
     Project: __webpack_require__(95),
     Schema: __webpack_require__(40),
     Template: __webpack_require__(217),
@@ -42205,7 +42205,7 @@ module.exports = {
     FieldSchema: __webpack_require__(54),
     Form: __webpack_require__(232),
     index: __webpack_require__(216),
-    Media: __webpack_require__(38),
+    Media: __webpack_require__(39),
     Project: __webpack_require__(95),
     Schema: __webpack_require__(40),
     Template: __webpack_require__(217),
@@ -42383,7 +42383,7 @@ module.exports = Form;
  */
 
 module.exports = {
-  MediaBrowser: __webpack_require__(191),
+  MediaBrowser: __webpack_require__(190),
   MessageModal: __webpack_require__(16)
 };
 
@@ -42798,9 +42798,9 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var ProjectHelper = __webpack_require__(6);
-var ContentHelper = __webpack_require__(25);
+var ContentHelper = __webpack_require__(38);
 var RequestHelper = __webpack_require__(3);
-var SchemaHelper = __webpack_require__(39);
+var SchemaHelper = __webpack_require__(25);
 
 var NavbarPane = __webpack_require__(37);
 var NavbarMain = __webpack_require__(36);
@@ -43690,7 +43690,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var NavbarPane = __webpack_require__(37);
 var NavbarMain = __webpack_require__(36);
-var MediaBrowser = __webpack_require__(191);
+var MediaBrowser = __webpack_require__(190);
 var ProjectHelper = __webpack_require__(6);
 var MediaHelper = __webpack_require__(56);
 var RequestHelper = __webpack_require__(3);
@@ -44795,8 +44795,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var icons = __webpack_require__(249).icons;
 
 var Schema = __webpack_require__(40);
-var SchemaHelper = __webpack_require__(39);
-var ContentHelper = __webpack_require__(25);
+var SchemaHelper = __webpack_require__(25);
+var ContentHelper = __webpack_require__(38);
 var RequestHelper = __webpack_require__(3);
 var JSONEditor = __webpack_require__(186);
 
@@ -46175,9 +46175,9 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var FieldEditor = __webpack_require__(12);
-var SchemaHelper = __webpack_require__(39);
+var SchemaHelper = __webpack_require__(25);
 var MediaHelper = __webpack_require__(56);
-var ContentHelper = __webpack_require__(25);
+var ContentHelper = __webpack_require__(38);
 var ContentEditor = __webpack_require__(195);
 
 /**
@@ -46843,8 +46843,8 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var SchemaHelper = __webpack_require__(39);
-var ContentHelper = __webpack_require__(25);
+var SchemaHelper = __webpack_require__(25);
+var ContentHelper = __webpack_require__(38);
 
 var FieldEditor = __webpack_require__(12);
 
@@ -47407,10 +47407,10 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Media = __webpack_require__(38);
+var Media = __webpack_require__(39);
 var MediaHelper = __webpack_require__(56);
 var ProjectHelper = __webpack_require__(6);
-var MediaBrowser = __webpack_require__(191);
+var MediaBrowser = __webpack_require__(190);
 
 var FieldEditor = __webpack_require__(12);
 
@@ -48021,8 +48021,8 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var FieldEditor = __webpack_require__(12);
-var SchemaHelper = __webpack_require__(39);
-var ContentHelper = __webpack_require__(25);
+var SchemaHelper = __webpack_require__(25);
+var ContentHelper = __webpack_require__(38);
 var ContentEditor = __webpack_require__(195);
 
 /**
