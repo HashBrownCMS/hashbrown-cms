@@ -145,7 +145,7 @@ class ConnectionPane extends NavbarPane {
                 menu['This connection'] = '---';
                 menu['Copy id'] = () => { this.onClickCopyItemId(); };
 
-                if(!item.sync.isLocal && !item.sync.isRemote && !item.isLocked) {
+                if(!item.sync.hasRemote && !item.sync.isRemote && !item.isLocked) {
                     menu['Remove'] = () => { this.onClickRemoveConnection(); };
                 }
                 
@@ -158,7 +158,7 @@ class ConnectionPane extends NavbarPane {
                         menu['Push to remote'] = () => { this.onClickPushConnection(); };
                     }
 
-                    if(item.sync.isLocal) {
+                    if(item.sync.hasRemote) {
                         menu['Remove local copy'] = () => { this.onClickRemoveConnection(); };
                     }
                     

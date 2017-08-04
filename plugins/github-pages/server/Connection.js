@@ -44,6 +44,15 @@ class GitHubConnection extends Connection {
     }
 
     /**
+     * Gets whether this connection si serving local content
+     *
+     * @returns {Boolean} Is local
+     */
+    isLocal() {
+        return this.settings.isLocal !== false;
+    }
+
+    /**
      * Gets API URL appendix
      *
      * @returns {String} Appendix

@@ -390,7 +390,7 @@ class SchemaHelper extends SchemaHelperCommon {
         schema.sync = schema.sync || {};
         schema.sync = {
             isRemote: false,
-            isLocal: false
+            hasRemote: false
         };
 
         return MongoHelper.updateOne(

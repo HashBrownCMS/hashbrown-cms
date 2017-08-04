@@ -181,7 +181,7 @@ class ContentHelper extends ContentHelperCommon {
 
             content.sync = {
                 isRemote: false,
-                isLocal: false
+                hasRemote: false
             };
 
             // Content update data

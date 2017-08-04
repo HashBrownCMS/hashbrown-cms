@@ -40,18 +40,23 @@ class MediaController extends ApiController {
 
         ConnectionHelper.getMediaProvider(req.project, req.environment)
         .then((connection) => {
-            return connection.getMedia(id);
-        })
-        .then((media) => {
-            if(media) {
+            return connection.getMedia(id)
+            .then((media) => {
+                if(!media) {
+                    return res.status(404).send('Not found');
+                }
+
                 let contentType = media.getContentTypeHeader();
-                
-                // Piping the data through would be a more elegant solution, but ultimately more work for the server
-                // The remote source might also have unpredictable headers, so it's best to let the remote handle content delivery etirely
-                res.redirect(media.url);
-            } else {
-                res.status(404).send('Not found');
-            }
+               
+                if(connection.isLocal()) {
+                    res.sendFile(media.url);
+
+                } else {
+                    // Piping the data through would be a more elegant solution, but ultimately more work for the server
+                    // The remote source might also have unpredictable headers, so it's best to let the remote handle content delivery entirely
+                    res.redirect(media.url);
+                }
+            });
         })
         .catch((e) => {
             res.status(404).end(ApiController.printError(e, false));  

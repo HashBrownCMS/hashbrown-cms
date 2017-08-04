@@ -52,7 +52,7 @@ module.exports = function() {
                             let routingPath = this.getItemRoutingPath(item, pane.settings);
                             let isDirectory = this.isItemDirectory(item);
                             let queueItem = {};
-                            let isLocal = item.sync ? item.sync.isLocal : false;
+                            let hasRemote = item.sync ? item.sync.hasRemote : false;
                             let isRemote = item.sync ? item.sync.isRemote : false;
 
                             let $item = _.div(
@@ -61,7 +61,7 @@ module.exports = function() {
                                     'data-routing-path': routingPath,
                                     'data-locked': item.isLocked,
                                     'data-remote': isRemote,
-                                    'data-local': isLocal,
+                                    'data-local': hasRemote,
                                     'data-is-directory': isDirectory,
                                     'data-sort': item.sort || 0
                                 },

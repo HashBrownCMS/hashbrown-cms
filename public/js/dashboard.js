@@ -8227,7 +8227,7 @@ var Connection = function (_Entity) {
         params.sync = params.sync || {};
 
         if (typeof params.local !== 'undefined') {
-            params.sync.isLocal = params.remote;
+            params.sync.hasRemote = params.remote;
             delete params.local;
         }
 
@@ -8294,6 +8294,17 @@ var Connection = function (_Entity) {
         }
 
         return url;
+    };
+
+    /**
+     * Gets whether this connection is serving local content
+     *
+     * @returns {Boolean} Is local
+     */
+
+
+    Connection.prototype.isLocal = function isLocal() {
+        return false;
     };
 
     /**
@@ -9222,7 +9233,7 @@ var Schema = function (_Entity) {
         params.sync = params.sync || {};
 
         if (typeof params.local !== 'undefined') {
-            params.sync.isLocal = params.local;
+            params.sync.hasRemote = params.local;
             delete params.local;
         }
 
@@ -15080,7 +15091,7 @@ var Content = function (_Entity) {
         params.sync = params.sync || {};
 
         if (typeof params.local !== 'undefined') {
-            params.sync.isLocal = params.local;
+            params.sync.hasRemote = params.local;
             delete params.local;
         }
 

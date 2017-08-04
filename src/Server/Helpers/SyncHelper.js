@@ -106,7 +106,7 @@ class SyncHelper {
 
                         data.sync = {
                             isRemote: true,
-                            isLocal: false
+                            hasRemote: false
                         };
                     }
 
@@ -278,7 +278,7 @@ class SyncHelper {
 
                         remoteItem.sync = {
                             isRemote: true,
-                            isLocal: false
+                            hasRemote: false
                         };
 
                         remoteIds[remoteItem.id] = true;
@@ -295,7 +295,7 @@ class SyncHelper {
 
                         localItem.sync = {
                             isRemote: false,
-                            isLocal: true
+                            hasRemote: true
                         };
 
                         duplicateIds[localItem.id] = true;

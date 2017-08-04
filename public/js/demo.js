@@ -435,7 +435,7 @@ var DemoApi = function () {
                 result.push(new HashBrown.Models.ContentSchema({
                     "isLocked": false,
                     "sync": {
-                        "isLocal": false,
+                        "hasRemote": false,
                         "isRemote": false
                     },
                     "id": "591a897ad572cadae5115ef05726d9ead2725dc5",
@@ -473,7 +473,7 @@ var DemoApi = function () {
                 result.push(new HashBrown.Models.FieldSchema({
                     "isLocked": false,
                     "sync": {
-                        "isLocal": false,
+                        "hasRemote": false,
                         "isRemote": false
                     },
                     "local": false,
@@ -501,7 +501,7 @@ var DemoApi = function () {
                 result.push(new HashBrown.Models.FieldSchema({
                     "isLocked": false,
                     "sync": {
-                        "isLocal": false,
+                        "hasRemote": false,
                         "isRemote": false
                     },
                     "id": "904e8e7570ddb37ea1f31d210db47cd15f92ff92",
@@ -535,7 +535,7 @@ var DemoApi = function () {
                 result.push(new HashBrown.Models.FieldSchema({
                     "isLocked": false,
                     "sync": {
-                        "isLocal": false,
+                        "hasRemote": false,
                         "isRemote": false
                     },
                     "id": "f5c4cf4dffb088a2753760ad1da9cd64ff781003",

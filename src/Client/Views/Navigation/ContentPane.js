@@ -423,7 +423,7 @@ class ContentPane extends NavbarPane {
                     menu['Move'] = () => { this.onClickMoveItem(); };
                 }
 
-                if(!item.sync.isLocal && !item.isLocked) {
+                if(!item.sync.hasRemote && !item.isLocked) {
                     menu['Remove'] = () => { this.onClickRemoveContent(true); };
                 }
                 
@@ -450,7 +450,7 @@ class ContentPane extends NavbarPane {
                         menu['Push to remote'] = () => { this.onClickPushContent(); };
                     }
 
-                    if(item.sync.isLocal) {
+                    if(item.sync.hasRemote) {
                         menu['Remove local copy'] = () => { this.onClickRemoveContent(); };
                     }
                     

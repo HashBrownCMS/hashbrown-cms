@@ -74,7 +74,24 @@ class HashBrownDriverConnection extends Connection {
         
         return RequestHelper.request('delete', this.getRemoteUrl() + '/hashbrown/api/content/' + id + '?token=' + this.settings.token);
     }
-    
+   
+    /**
+     * Gets whether this connection is serving local conent
+     *
+     * @returns {Boolean} Is local
+     */
+    isLocal() {
+        let url = this.getRemoteUrl();
+
+        if(url.indexOf('file://') === 0) { return true; }
+        if(url.indexOf('http://localhost') === 0) { return true; }
+        if(url.indexOf('https://localhost') === 0) { return true; }
+        if(url.indexOf('http://127.0.0.1') === 0) { return true; }
+        if(url.indexOf('http2://127.0.0.1') === 0) { return true; }
+
+        return false;
+    }
+
     /**
      * Posts content properties to JSON tree
      *

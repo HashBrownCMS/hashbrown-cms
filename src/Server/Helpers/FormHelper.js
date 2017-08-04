@@ -120,7 +120,7 @@ class FormHelper {
 
         properties.sync = {
             isRemote: false,
-            isLocal: false
+            hasRemote: false
         };
         
         return MongoHelper.updateOne(

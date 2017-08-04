@@ -8303,7 +8303,7 @@ var Connection = function (_Entity) {
         params.sync = params.sync || {};
 
         if (typeof params.local !== 'undefined') {
-            params.sync.isLocal = params.remote;
+            params.sync.hasRemote = params.remote;
             delete params.local;
         }
 
@@ -8370,6 +8370,17 @@ var Connection = function (_Entity) {
         }
 
         return url;
+    };
+
+    /**
+     * Gets whether this connection is serving local content
+     *
+     * @returns {Boolean} Is local
+     */
+
+
+    Connection.prototype.isLocal = function isLocal() {
+        return false;
     };
 
     /**
@@ -9992,7 +10003,7 @@ var Schema = function (_Entity) {
         params.sync = params.sync || {};
 
         if (typeof params.local !== 'undefined') {
-            params.sync.isLocal = params.local;
+            params.sync.hasRemote = params.local;
             delete params.local;
         }
 
@@ -15850,7 +15861,7 @@ var Content = function (_Entity) {
         params.sync = params.sync || {};
 
         if (typeof params.local !== 'undefined') {
-            params.sync.isLocal = params.local;
+            params.sync.hasRemote = params.local;
             delete params.local;
         }
 
@@ -42394,7 +42405,7 @@ var Form = function (_Entity) {
         params.sync = params.sync || {};
 
         if (typeof params.local !== 'undefined') {
-            params.sync.isLocal = params.local;
+            params.sync.hasRemote = params.local;
             delete params.local;
         }
 
@@ -42667,7 +42678,7 @@ module.exports = function () {
             var routingPath = _this.getItemRoutingPath(item, pane.settings);
             var isDirectory = _this.isItemDirectory(item);
             var queueItem = {};
-            var isLocal = item.sync ? item.sync.isLocal : false;
+            var hasRemote = item.sync ? item.sync.hasRemote : false;
             var isRemote = item.sync ? item.sync.isRemote : false;
 
             var $item = _.div({
@@ -42675,7 +42686,7 @@ module.exports = function () {
                 'data-routing-path': routingPath,
                 'data-locked': item.isLocked,
                 'data-remote': isRemote,
-                'data-local': isLocal,
+                'data-local': hasRemote,
                 'data-is-directory': isDirectory,
                 'data-sort': item.sort || 0
             }, _.a({
@@ -42890,7 +42901,7 @@ var ConnectionPane = function (_NavbarPane) {
                     _this3.onClickCopyItemId();
                 };
 
-                if (!item.sync.isLocal && !item.sync.isRemote && !item.isLocked) {
+                if (!item.sync.hasRemote && !item.sync.isRemote && !item.isLocked) {
                     menu['Remove'] = function () {
                         _this3.onClickRemoveConnection();
                     };
@@ -42909,7 +42920,7 @@ var ConnectionPane = function (_NavbarPane) {
                         };
                     }
 
-                    if (item.sync.isLocal) {
+                    if (item.sync.hasRemote) {
                         menu['Remove local copy'] = function () {
                             _this3.onClickRemoveConnection();
                         };
@@ -43362,7 +43373,7 @@ var ContentPane = function (_NavbarPane) {
                     };
                 }
 
-                if (!item.sync.isLocal && !item.isLocked) {
+                if (!item.sync.hasRemote && !item.isLocked) {
                     menu['Remove'] = function () {
                         _this2.onClickRemoveContent(true);
                     };
@@ -43397,7 +43408,7 @@ var ContentPane = function (_NavbarPane) {
                         };
                     }
 
-                    if (item.sync.isLocal) {
+                    if (item.sync.hasRemote) {
                         menu['Remove local copy'] = function () {
                             _this2.onClickRemoveContent();
                         };
@@ -43616,7 +43627,7 @@ var FormsPane = function (_NavbarPane) {
                     _this2.onClickCopyItemId();
                 };
 
-                if (!item.sync.isLocal && !item.sync.isRemote && !item.isLocked) {
+                if (!item.sync.hasRemote && !item.sync.isRemote && !item.isLocked) {
                     menu['Remove'] = function () {
                         _this2.onClickRemoveForm();
                     };
@@ -43635,7 +43646,7 @@ var FormsPane = function (_NavbarPane) {
                         };
                     }
 
-                    if (item.sync.isLocal) {
+                    if (item.sync.hasRemote) {
                         menu['Remove local copy'] = function () {
                             _this2.onClickRemoveForm();
                         };
@@ -44214,7 +44225,7 @@ var SchemaPane = function (_NavbarPane) {
                     _this2.onClickCopyItemId();
                 };
 
-                if (!item.sync.isLocal && !item.sync.isRemote && !item.isLocked) {
+                if (!item.sync.hasRemote && !item.sync.isRemote && !item.isLocked) {
                     menu['Remove'] = function () {
                         _this2.onClickRemoveSchema();
                     };
@@ -44233,7 +44244,7 @@ var SchemaPane = function (_NavbarPane) {
                         };
                     }
 
-                    if (item.sync.isLocal) {
+                    if (item.sync.hasRemote) {
                         menu['Remove local copy'] = function () {
                             _this2.onClickRemoveSchema();
                         };

@@ -41,7 +41,7 @@ class Connection extends Entity {
         params.sync = params.sync || {};
 
         if(typeof params.local !== 'undefined') {
-            params.sync.isLocal = params.remote;
+            params.sync.hasRemote = params.remote;
             delete params.local;
         }
 
@@ -102,6 +102,15 @@ class Connection extends Entity {
         }
 
         return url;
+    }
+
+    /**
+     * Gets whether this connection is serving local content
+     *
+     * @returns {Boolean} Is local
+     */
+    isLocal() {
+        return false;
     }
 
     /**

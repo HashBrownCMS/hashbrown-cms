@@ -64,7 +64,7 @@ class Content extends Entity {
         params.sync = params.sync || {};
 
         if(typeof params.local !== 'undefined') {
-            params.sync.isLocal = params.local;
+            params.sync.hasRemote = params.local;
             delete params.local;
         }
 
