@@ -177,9 +177,12 @@ class ContentHelper extends ContentHelperCommon {
         })()
         .then(() => {
             // Unset automatic flags
-            content.locked = false;
-            content.remote = false;
-            content.local = false;
+            content.isLocked = false;
+
+            content.sync = {
+                isRemote: false,
+                isLocal: false
+            };
 
             // Content update data
             content.updatedBy = user.id;

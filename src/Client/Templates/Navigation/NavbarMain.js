@@ -52,14 +52,16 @@ module.exports = function() {
                             let routingPath = this.getItemRoutingPath(item, pane.settings);
                             let isDirectory = this.isItemDirectory(item);
                             let queueItem = {};
+                            let isLocal = item.sync ? item.sync.isLocal : false;
+                            let isRemote = item.sync ? item.sync.isRemote : false;
 
                             let $item = _.div(
                                 {
                                     class: 'pane-item-container',
                                     'data-routing-path': routingPath,
-                                    'data-locked': item.locked,
-                                    'data-remote': item.remote,
-                                    'data-local': item.local,
+                                    'data-locked': item.isLocked,
+                                    'data-remote': isRemote,
+                                    'data-local': isLocal,
                                     'data-is-directory': isDirectory,
                                     'data-sort': item.sort || 0
                                 },

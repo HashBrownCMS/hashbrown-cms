@@ -116,8 +116,12 @@ class FormHelper {
         let collection = environment + '.forms';
 
         // Unset automatic flags
-        properties.locked = false;
-        properties.remote = false;
+        properties.isLocked = false;
+
+        properties.sync = {
+            isRemote: false,
+            isLocal: false
+        };
         
         return MongoHelper.updateOne(
             project,

@@ -14,7 +14,7 @@ require('Client/Routes');
 
 // Resource cache
 window.resources = {
-    connections: {},
+    connections: [],
     content: [],
     schemas: [],
     media: [],

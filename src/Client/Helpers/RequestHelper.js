@@ -76,7 +76,7 @@ class RequestHelper {
                     } else {
                         let error = new Error(xhr.responseText);
 
-                        error.xhr = xhr;
+                        error.statusCode = xhr.status;
 
                         reject(error);
                     
@@ -133,46 +133,56 @@ class RequestHelper {
      * Reloads a resource
      */
     static reloadResource(name) {
-        let model = null;
-
-        switch(name) {
-            case 'connections':
-                model = HashBrown.Models.Connection;
-                break;
-
-            case 'content':
-                model = HashBrown.Models.Content;
-                break;
-
-            case 'templates':
-                model = HashBrown.Models.Template;
-                break;
-
-            case 'users':
-                model = HashBrown.Models.User;
-                break;
-
-            case 'media':
-                model = HashBrown.Models.Media;
-                break;
-        }
-
         return RequestHelper.request('get', name)
         .then((result) => {
             window.resources[name] = result;
 
-            // If a model is specified, use it to initialise every resource
-            if(model) {
-                for(let i in window.resources[name]) {
-                    window.resources[name][i] = new model(window.resources[name][i]);
+            // Apply correct model
+            for(let i in window.resources[name]) {
+                let object = window.resources[name][i];
+                let model = null;
+
+                switch(name) {
+                    case 'connections':
+                        model = new HashBrown.Models.Connection(object);
+                        break;
+
+                    case 'content':
+                        model = new HashBrown.Models.Content(object);
+                        break;
+
+                    case 'templates':
+                        model = new HashBrown.Models.Template(object);
+                        break;
+                    
+                    case 'forms':
+                        model = new HashBrown.Models.Form(object);
+                        break;
+
+                    case 'users':
+                        model = new HashBrown.Models.User(object);
+                        break;
+
+                    case 'media':
+                        model = new HashBrown.Models.Media(object);
+                        break;
+
+                    case 'schemas':
+                        model = HashBrown.Helpers.SchemaHelper.getModel(object);
+                        break;
+
+                    default:
+                        return Promise.reject(new Error('Resource "' + name + '" has no model defined'));
                 }
+                
+                window.resources[name][i] = model;
             }
 
             return Promise.resolve(result);
         })
         .catch((e) => {
             // If the error is a 404, it's an intended response from the controller
-            if(e.xhr.status !== 404) {
+            if(e.statusCode !== 404) {
                 UI.errorModal(e);
             }
 

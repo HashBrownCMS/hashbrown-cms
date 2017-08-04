@@ -9,11 +9,7 @@ let Entity = require('./Entity');
  */
 class Connection extends Entity {
     constructor(params) {
-        super(params);
-        
-        if(!this.url) {
-            this.url = this.getRemoteUrl();
-        }
+        super(Connection.paramsCheck(params));
     }
 
     structure() {
@@ -22,14 +18,45 @@ class Connection extends Entity {
         this.def(String, 'title');
         this.def(String, 'type');
         this.def(String, 'url');
+        this.def(Boolean, 'isLocked');
         
         // Sync
-        this.def(Boolean, 'locked');
-        this.def(Boolean, 'remote');
-        this.def(Boolean, 'local');
+        this.def(Object, 'sync');
         
         // Extensible settings
         this.def(Object, 'settings', {});
+    }
+
+    /**
+     * Checks the format of the params
+     *
+     * @params {Object} params
+     *
+     * @returns {Object} Params
+     */
+    static paramsCheck(params) {
+        params = params || {}
+
+        // Convert from old sync variables
+        params.sync = params.sync || {};
+
+        if(typeof params.local !== 'undefined') {
+            params.sync.isLocal = params.remote;
+            delete params.local;
+        }
+
+        if(typeof params.remote !== 'undefined') {
+            params.sync.isRemote = params.remote;
+            delete params.remote;
+        }
+
+        // Convert from old "locked" state
+        if(typeof params.locked !== 'undefined') {
+            params.isLocked = params.locked;
+            delete params.locked;
+        }
+
+        return params;
     }
 
     /**

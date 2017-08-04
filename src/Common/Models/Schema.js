@@ -8,19 +8,53 @@ let Entity = require('./Entity');
  * @memberof HashBrown.Common.Models
  */
 class Schema extends Entity {
-    constructor(properties) {
-        super(properties);
+    constructor(params) {
+        super(Schema.paramsCheck(params));
     }
     
     structure() {
-        this.def(Boolean, 'locked');
-        this.def(Boolean, 'local');
-        this.def(Boolean, 'remote');
         this.def(String, 'id');
         this.def(String, 'name');
         this.def(String, 'icon');
         this.def(String, 'parentSchemaId');
+        this.def(Boolean, 'isLocked');
+
+        // Sync
+        this.def(Object, 'sync');
+
         this.def(Array, 'hiddenProperties', []);
+    }
+    
+    /**
+     * Checks the format of the params
+     *
+     * @params {Object} params
+     *
+     * @returns {Object} Params
+     */
+    static paramsCheck(params) {
+        params = params || {}
+
+        // Convert from old sync variables
+        params.sync = params.sync || {};
+
+        if(typeof params.local !== 'undefined') {
+            params.sync.isLocal = params.local;
+            delete params.local;
+        }
+
+        if(typeof params.remote !== 'undefined') {
+            params.sync.isRemote = params.remote;
+            delete params.remote;
+        }
+
+        // Convert from old "locked" state
+        if(typeof params.locked !== 'undefined') {
+            params.isLocked = params.locked;
+            delete params.locked;
+        }
+
+        return params;
     }
 
     /**

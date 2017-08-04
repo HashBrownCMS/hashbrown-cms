@@ -102,9 +102,12 @@ class SyncHelper {
                 return RequestHelper.request('get', settings.url + path + '/' + resource + '?token=' + settings.token)
                 .then((data) => {
                     if(data instanceof Object) {
-                        data.locked = true;
-                        data.remote = true;
-                        data.local = false;
+                        data.isLocked = true;
+
+                        data.sync = {
+                            isRemote: true,
+                            isLocal: false
+                        };
                     }
 
                     debug.log('Remote resource item ' + resource + ' retrieved successfully', this, 3);
@@ -266,9 +269,17 @@ class SyncHelper {
                         debug.log('"' + r + '" in remote resource "' + remoteResourceName + '" is not an object: ' + remoteItem, this);
 
                     } else {
-                        remoteItem.locked = true;
-                        remoteItem.remote = true;
-                        remoteItem.local = false;
+                        // Remove old variable names
+                        delete remoteItem.locked;
+                        delete remoteItem.remote;
+                        delete remoteItem.local;
+
+                        remoteItem.isLocked = true;
+
+                        remoteItem.sync = {
+                            isRemote: true,
+                            isLocal: false
+                        };
 
                         remoteIds[remoteItem.id] = true;
 
@@ -280,42 +291,45 @@ class SyncHelper {
                     let localItem = localResource[l];
 
                     if(remoteIds[localItem.id] == true) {
-                        localItem.remote = false;
-                        localItem.locked = false;
-                        localItem.local = true;
+                        localItem.isLocked = false;
+
+                        localItem.sync = {
+                            isRemote: false,
+                            isLocal: true
+                        };
 
                         duplicateIds[localItem.id] = true;
                     }
                 }
 
-                // Merge resources
-                if(remoteResource instanceof Array && localResource instanceof Array) {
-                    mergedResource = [];
+                // Make sure remote and local resources are arrays
+                if(remoteResource instanceof Object) {
+                    remoteResource = Object.values(remoteResource);   
+                }
                     
-                    for(let v of remoteResource) {
-                        if(duplicateIds[v.id] == true) { continue; }
+                if(localResource instanceof Object) {
+                    localResource = Object.values(localResource);   
+                }
 
-                        mergedResource[mergedResource.length] = v;
-                    }
-                    
-                    for(let v of localResource) {
-                        mergedResource[mergedResource.length] = v;
-                    }
+                if(remoteResource instanceof Array === false) {
+                    return Promise.reject(new Error('The remote resource "' + remoteResourceName + '" was not an array'));
+                }
                 
-                } else if(remoteResource instanceof Object && localResource instanceof Object) {
-                    mergedResource = {};
-                    
-                    for(let k in remoteResource) {
-                        mergedResource[k] = remoteResource[k];
-                    }
-                    
-                    for(let k in localResource) {
-                        mergedResource[k] = localResource[k];
-                    }
+                if(localResource instanceof Array === false) {
+                    return Promise.reject(new Error('The local resource "' + remoteResourceName + '" was not an array'));
+                }
+
+                // Merge resources
+                mergedResource = [];
                 
-                } else {
-                    return Promise.reject(new Error('Local and remote resources in "' + remoteResourceName + '" are not of same type'));
+                for(let v of remoteResource) {
+                    if(duplicateIds[v.id] == true) { continue; }
+
+                    mergedResource[mergedResource.length] = v;
+                }
                 
+                for(let v of localResource) {
+                    mergedResource[mergedResource.length] = v;
                 }
             
             } else {
@@ -323,9 +337,7 @@ class SyncHelper {
 
             }
 
-            return new Promise((resolve) => {
-                resolve(mergedResource);
-            });
+            return Promise.resolve(mergedResource);
         });
     }
 }

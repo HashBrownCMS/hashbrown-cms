@@ -384,7 +384,7 @@ class ContentPane extends NavbarPane {
 
                     RequestHelper.request('delete', 'content/' + id + '?removeChildren=' + $deleteChildrenSwitch.data('checked'))
                     .then(() => {
-                        if(shouldUnpublish && content.settings.publishing.connectionId) {
+                        if(shouldUnpublish && content.getSettings('publishing').connectionId) {
                             return unpublishConnection();
                         } else {
                             return onSuccess();
@@ -419,11 +419,11 @@ class ContentPane extends NavbarPane {
                                 
                 menu['Copy id'] = () => { this.onClickCopyItemId(); };
 
-                if(!item.remote && !item.locked) {
+                if(!item.sync.isRemote && !item.isLocked) {
                     menu['Move'] = () => { this.onClickMoveItem(); };
                 }
 
-                if(!item.local && !item.locked) {
+                if(!item.sync.isLocal && !item.isLocked) {
                     menu['Remove'] = () => { this.onClickRemoveContent(true); };
                 }
                 
@@ -436,25 +436,25 @@ class ContentPane extends NavbarPane {
                     this.onClickNewContent(parentId);
                 };
 
-                if(!item.remote && !item.locked) {
+                if(!item.sync.isRemote && !item.isLocked) {
                     menu['Settings'] = '---';
                     menu['Publishing'] = () => { this.onClickContentPublishing(); };
                 }
                 
-                if(item.locked && !item.remote) { isSyncEnabled = false; }
+                if(item.isLocked && !item.sync.isRemote) { isSyncEnabled = false; }
                
                 if(isSyncEnabled) {
                     menu['Sync'] = '---';
                     
-                    if(!item.remote) {
+                    if(!item.sync.isRemote) {
                         menu['Push to remote'] = () => { this.onClickPushContent(); };
                     }
 
-                    if(item.local) {
+                    if(item.sync.isLocal) {
                         menu['Remove local copy'] = () => { this.onClickRemoveContent(); };
                     }
                     
-                    if(item.remote) {
+                    if(item.sync.isRemote) {
                         menu['Pull from remote'] = () => { this.onClickPullContent(); };
                     }
                 }

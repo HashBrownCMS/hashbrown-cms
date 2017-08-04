@@ -5292,7 +5292,7 @@ var RequestHelper = function () {
                     } else {
                         var error = new Error(xhr.responseText);
 
-                        error.xhr = xhr;
+                        error.statusCode = xhr.status;
 
                         reject(error);
                     }
@@ -5352,44 +5352,54 @@ var RequestHelper = function () {
      * Reloads a resource
      */
     RequestHelper.reloadResource = function reloadResource(name) {
-        var model = null;
-
-        switch (name) {
-            case 'connections':
-                model = HashBrown.Models.Connection;
-                break;
-
-            case 'content':
-                model = HashBrown.Models.Content;
-                break;
-
-            case 'templates':
-                model = HashBrown.Models.Template;
-                break;
-
-            case 'users':
-                model = HashBrown.Models.User;
-                break;
-
-            case 'media':
-                model = HashBrown.Models.Media;
-                break;
-        }
-
         return RequestHelper.request('get', name).then(function (result) {
             window.resources[name] = result;
 
-            // If a model is specified, use it to initialise every resource
-            if (model) {
-                for (var i in window.resources[name]) {
-                    window.resources[name][i] = new model(window.resources[name][i]);
+            // Apply correct model
+            for (var i in window.resources[name]) {
+                var object = window.resources[name][i];
+                var model = null;
+
+                switch (name) {
+                    case 'connections':
+                        model = new HashBrown.Models.Connection(object);
+                        break;
+
+                    case 'content':
+                        model = new HashBrown.Models.Content(object);
+                        break;
+
+                    case 'templates':
+                        model = new HashBrown.Models.Template(object);
+                        break;
+
+                    case 'forms':
+                        model = new HashBrown.Models.Form(object);
+                        break;
+
+                    case 'users':
+                        model = new HashBrown.Models.User(object);
+                        break;
+
+                    case 'media':
+                        model = new HashBrown.Models.Media(object);
+                        break;
+
+                    case 'schemas':
+                        model = HashBrown.Helpers.SchemaHelper.getModel(object);
+                        break;
+
+                    default:
+                        return Promise.reject(new Error('Resource "' + name + '" has no model defined'));
                 }
+
+                window.resources[name][i] = model;
             }
 
             return Promise.resolve(result);
         }).catch(function (e) {
             // If the error is a 404, it's an intended response from the controller
-            if (e.xhr.status !== 404) {
+            if (e.statusCode !== 404) {
                 UI.errorModal(e);
             }
 
@@ -7184,6 +7194,10 @@ var SchemaHelper = function (_SchemaHelperCommon) {
         for (var i in resources.schemas) {
             var schema = resources.schemas[i];
 
+            if (!schema) {
+                console.log(i);
+            }
+
             if (schema.id == id) {
                 if (schema instanceof ContentSchema || schema instanceof FieldSchema) {
                     return schema;
@@ -8255,12 +8269,7 @@ var Connection = function (_Entity) {
     function Connection(params) {
         _classCallCheck(this, Connection);
 
-        var _this = _possibleConstructorReturn(this, _Entity.call(this, params));
-
-        if (!_this.url) {
-            _this.url = _this.getRemoteUrl();
-        }
-        return _this;
+        return _possibleConstructorReturn(this, _Entity.call(this, Connection.paramsCheck(params)));
     }
 
     Connection.prototype.structure = function structure() {
@@ -8269,14 +8278,47 @@ var Connection = function (_Entity) {
         this.def(String, 'title');
         this.def(String, 'type');
         this.def(String, 'url');
+        this.def(Boolean, 'isLocked');
 
         // Sync
-        this.def(Boolean, 'locked');
-        this.def(Boolean, 'remote');
-        this.def(Boolean, 'local');
+        this.def(Object, 'sync');
 
         // Extensible settings
         this.def(Object, 'settings', {});
+    };
+
+    /**
+     * Checks the format of the params
+     *
+     * @params {Object} params
+     *
+     * @returns {Object} Params
+     */
+
+
+    Connection.paramsCheck = function paramsCheck(params) {
+        params = params || {};
+
+        // Convert from old sync variables
+        params.sync = params.sync || {};
+
+        if (typeof params.local !== 'undefined') {
+            params.sync.isLocal = params.remote;
+            delete params.local;
+        }
+
+        if (typeof params.remote !== 'undefined') {
+            params.sync.isRemote = params.remote;
+            delete params.remote;
+        }
+
+        // Convert from old "locked" state
+        if (typeof params.locked !== 'undefined') {
+            params.isLocked = params.locked;
+            delete params.locked;
+        }
+
+        return params;
     };
 
     /**
@@ -9915,21 +9957,57 @@ var Entity = __webpack_require__(9);
 var Schema = function (_Entity) {
     _inherits(Schema, _Entity);
 
-    function Schema(properties) {
+    function Schema(params) {
         _classCallCheck(this, Schema);
 
-        return _possibleConstructorReturn(this, _Entity.call(this, properties));
+        return _possibleConstructorReturn(this, _Entity.call(this, Schema.paramsCheck(params)));
     }
 
     Schema.prototype.structure = function structure() {
-        this.def(Boolean, 'locked');
-        this.def(Boolean, 'local');
-        this.def(Boolean, 'remote');
         this.def(String, 'id');
         this.def(String, 'name');
         this.def(String, 'icon');
         this.def(String, 'parentSchemaId');
+        this.def(Boolean, 'isLocked');
+
+        // Sync
+        this.def(Object, 'sync');
+
         this.def(Array, 'hiddenProperties', []);
+    };
+
+    /**
+     * Checks the format of the params
+     *
+     * @params {Object} params
+     *
+     * @returns {Object} Params
+     */
+
+
+    Schema.paramsCheck = function paramsCheck(params) {
+        params = params || {};
+
+        // Convert from old sync variables
+        params.sync = params.sync || {};
+
+        if (typeof params.local !== 'undefined') {
+            params.sync.isLocal = params.local;
+            delete params.local;
+        }
+
+        if (typeof params.remote !== 'undefined') {
+            params.sync.isRemote = params.remote;
+            delete params.remote;
+        }
+
+        // Convert from old "locked" state
+        if (typeof params.locked !== 'undefined') {
+            params.isLocked = params.locked;
+            delete params.locked;
+        }
+
+        return params;
     };
 
     /**
@@ -15715,7 +15793,77 @@ var Content = function (_Entity) {
     function Content(params) {
         _classCallCheck(this, Content);
 
+        return _possibleConstructorReturn(this, _Entity.call(this, Content.paramsCheck(params)));
+    }
+
+    Content.prototype.structure = function structure() {
+        // Fundamental fields
+        this.def(String, 'id');
+        this.def(String, 'parentId');
+        this.def(String, 'createdBy');
+        this.def(String, 'updatedBy');
+        this.def(Date, 'createDate');
+        this.def(Date, 'updateDate');
+        this.def(String, 'schemaId');
+        this.def(Number, 'sort', -1);
+        this.def(Boolean, 'isLocked');
+
+        // Publishing
+        this.def(Date, 'publishOn');
+        this.def(Date, 'unpublishOn');
+        this.def(Boolean, 'isPublished');
+        this.def(Boolean, 'hasPreview');
+
+        // Sync
+        this.def(Object, 'sync');
+
+        // Extensible properties
+        this.def(Object, 'properties', {});
+
+        // Settings
+        this.def(Object, 'settings', {
+            publishing: {
+                connections: []
+            }
+        });
+    };
+
+    /**
+     * Checks the format of the params
+     *
+     * @params {Object} params
+     *
+     * @returns {Object} Params
+     */
+
+
+    Content.paramsCheck = function paramsCheck(params) {
         params = params || {};
+
+        // Convert from old "unpublished" state
+        if (typeof params.unpublished !== 'undefined') {
+            params.isPublished = !params.unpublished;
+            delete params.published;
+        }
+
+        // Convert from old sync variables
+        params.sync = params.sync || {};
+
+        if (typeof params.local !== 'undefined') {
+            params.sync.isLocal = params.local;
+            delete params.local;
+        }
+
+        if (typeof params.remote !== 'undefined') {
+            params.sync.isRemote = params.remote;
+            delete params.remote;
+        }
+
+        // Convert from old "locked" state
+        if (typeof params.locked !== 'undefined') {
+            params.isLocked = params.locked;
+            delete params.locked;
+        }
 
         // Ensure correct type for dates
         function parseDate(input) {
@@ -15733,36 +15881,7 @@ var Content = function (_Entity) {
         params.createDate = parseDate(params.createDate);
         params.updateDate = parseDate(params.updateDate);
 
-        return _possibleConstructorReturn(this, _Entity.call(this, params));
-    }
-
-    Content.prototype.structure = function structure() {
-        // Fundamental fields
-        this.def(Boolean, 'locked');
-        this.def(Boolean, 'local');
-        this.def(Boolean, 'remote');
-        this.def(String, 'id');
-        this.def(String, 'parentId');
-        this.def(String, 'createdBy');
-        this.def(String, 'updatedBy');
-        this.def(Date, 'createDate');
-        this.def(Date, 'updateDate');
-        this.def(Date, 'publishOn');
-        this.def(Date, 'unpublishOn');
-        this.def(String, 'schemaId');
-        this.def(Boolean, 'isPublished');
-        this.def(Boolean, 'hasPreview');
-        this.def(Number, 'sort', -1);
-
-        // Extensible properties
-        this.def(Object, 'properties', {});
-
-        // Settings
-        this.def(Object, 'settings', {
-            publishing: {
-                connections: []
-            }
-        });
+        return params;
     };
 
     /**
@@ -27163,7 +27282,7 @@ var JSONEditor = function (_View) {
 
         _.append(this.$element.empty(), _.div({ class: 'editor-body' }, this.$textarea = _.textarea(), this.$error), _.if(!this.embedded, _.div({ class: 'editor-footer' }, _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-embedded' }, 'Basic').click(function () {
             _this4.onClickBasic();
-        }), _.if(!this.model.locked, this.$saveBtn = _.button({ class: 'btn btn-raised btn-primary' }, _.span({ class: 'text-default' }, 'Save'), _.span({ class: 'text-working' }, 'Saving')).click(function () {
+        }), _.if(!this.model.isLocked, this.$saveBtn = _.button({ class: 'btn btn-raised btn-primary' }, _.span({ class: 'text-default' }, 'Save'), _.span({ class: 'text-working' }, 'Saving')).click(function () {
             _this4.onClickSave();
         }))))));
 
@@ -30220,7 +30339,7 @@ var SchemaHelper = function () {
             return new FieldSchema(properties);
         }
 
-        return null;
+        throw new Error('Schema data is incorrectly formatted: ' + JSON.stringify(properties));
     };
 
     /**
@@ -31131,10 +31250,8 @@ var ContentEditor = function (_View) {
         var postSaveUrl = void 0;
 
         var setContent = function setContent() {
-            _this2.model.settingsSanityCheck('publishing');
-
             // Use publishing API
-            if (_this2.model.settings.publishing.connectionId) {
+            if (_this2.model.getSettings('publishing').connectionId) {
                 // Unpublish
                 if (saveAction === 'unpublish') {
                     return RequestHelper.request('post', 'content/unpublish', _this2.model);
@@ -31304,7 +31421,7 @@ var ContentEditor = function (_View) {
                 });
 
                 fieldEditorInstance.on('change', function (newValue) {
-                    if (!_this3.model.locked) {
+                    if (!_this3.model.isLocked) {
                         _this3.dirty = true;
                     }
 
@@ -31489,14 +31606,14 @@ var ContentEditor = function (_View) {
 
         // View remote
         _.do(function () {
-            if (_this6.model.properties && _this6.model.properties.url && _this6.model.settings.publishing.connectionId && _this6.model.isPublished) {
-                return _.a({ target: '_blank', href: ConnectionHelper.getConnectionByIdSync(_this6.model.settings.publishing.connectionId).url + url, class: 'btn btn-primary' }, 'View');
+            if (_this6.model.properties && _this6.model.properties.url && _this6.model.getSettings('publishing').connectionId && _this6.model.isPublished) {
+                return _.a({ target: '_blank', href: ConnectionHelper.getConnectionByIdSync(_this6.model.getSettings('publishing').connectionId).url + url, class: 'btn btn-primary' }, 'View');
             }
-        }), _.if(!this.model.locked,
+        }), _.if(!this.model.isLocked,
         // Save & publish
         _.div({ class: 'btn-group-save-publish raised' }, this.$saveBtn = _.button({ class: 'btn btn-save btn-primary' }, _.span({ class: 'text-default' }, 'Save'), _.span({ class: 'text-working' }, 'Saving')).click(function () {
             _this6.onClickSave();
-        }), _.if(this.model.settings.publishing.connectionId, _.span('&'), _.select({ class: 'form-control select-publishing' }, _.option({ value: 'publish' }, 'Publish'), _.option({ value: 'preview' }, 'Preview'), _.option({ value: 'unpublish' }, 'Unpublish')).val('publish'))))));
+        }), _.if(this.model.getSettings('publishing').connectionId, _.span('&'), _.select({ class: 'form-control select-publishing' }, _.option({ value: 'publish' }, 'Publish'), _.option({ value: 'preview' }, 'Preview'), _.option({ value: 'unpublish' }, 'Unpublish')).val('publish'))))));
     };
 
     ContentEditor.prototype.render = function render() {
@@ -31507,7 +31624,7 @@ var ContentEditor = function (_View) {
             this.model = new HashBrown.Models.Content(this.model);
         }
 
-        this.$element.toggleClass('locked', this.model.locked);
+        this.$element.toggleClass('locked', this.model.isLocked);
 
         // Fetch information
         var contentSchema = void 0;
@@ -40018,7 +40135,7 @@ var TemplateEditor = function (_View) {
     TemplateEditor.prototype.render = function render() {
         var _this3 = this;
 
-        _.append(this.$element.empty(), _.div({ class: 'editor-header' }, _.span({ class: 'fa fa-code' }), _.h4(this.model.name)), _.div({ class: 'editor-body' }, this.$textarea = _.textarea(), this.$error), _.if(!this.model.locked, _.div({ class: 'editor-footer' }, _.div({ class: 'btn-group' },
+        _.append(this.$element.empty(), _.div({ class: 'editor-header' }, _.span({ class: 'fa fa-code' }), _.h4(this.model.name)), _.div({ class: 'editor-body' }, this.$textarea = _.textarea(), this.$error), _.if(!this.model.isLocked, _.div({ class: 'editor-footer' }, _.div({ class: 'btn-group' },
         // Save
         this.$saveBtn = _.button({ class: 'btn btn-raised btn-primary' }, _.span({ class: 'text-default' }, 'Save'), _.span({ class: 'text-working' }, 'Saving')).click(function () {
             _this3.onClickSave();
@@ -40389,11 +40506,11 @@ var FormEditor = function (_View) {
     FormEditor.prototype.render = function render() {
         var _this6 = this;
 
-        this.$element.toggleClass('locked', this.model.locked);
+        this.$element.toggleClass('locked', this.model.isLocked);
 
         _.append(this.$element.empty(), _.div({ class: 'editor-header' }, _.span({ class: 'fa fa-wpforms' }), _.h4(this.model.title)), this.renderFields(), _.div({ class: 'editor-footer' }, _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-embedded' }, 'Advanced').click(function () {
             _this6.onClickAdvanced();
-        }), _.if(!this.model.locked, this.$saveBtn = _.button({ class: 'btn btn-primary btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Save '), _.span({ class: 'text-working' }, 'Saving ')).click(function () {
+        }), _.if(!this.model.isLocked, this.$saveBtn = _.button({ class: 'btn btn-primary btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Save '), _.span({ class: 'text-working' }, 'Saving ')).click(function () {
             _this6.onClickSave();
         })))));
     };
@@ -40506,7 +40623,7 @@ __webpack_require__(220);
 
 // Resource cache
 window.resources = {
-    connections: {},
+    connections: [],
     content: [],
     schemas: [],
     media: [],
@@ -42241,23 +42358,58 @@ var Form = function (_Entity) {
     function Form(params) {
         _classCallCheck(this, Form);
 
-        return _possibleConstructorReturn(this, _Entity.call(this, params));
+        return _possibleConstructorReturn(this, _Entity.call(this, Form.paramsCheck(params)));
     }
 
     Form.prototype.structure = function structure() {
         // Fundamental fields
-        this.def(Boolean, 'locked');
-        this.def(Boolean, 'remote');
-        this.def(Boolean, 'local');
         this.def(String, 'id');
         this.def(String, 'title');
         this.def(String, 'allowedOrigin');
         this.def(String, 'redirect');
         this.def(Boolean, 'appendRedirect');
+        this.def(Boolean, 'isLocked');
+
+        // Sync
+        this.def(Object, 'sync');
 
         // Mutable fields
         this.def(Object, 'inputs', {});
         this.def(Array, 'entries', []);
+    };
+
+    /**
+     * Checks the format of the params
+     *
+     * @params {Object} params
+     *
+     * @returns {Object} Params
+     */
+
+
+    Form.paramsCheck = function paramsCheck(params) {
+        params = params || {};
+
+        // Convert from old sync variables
+        params.sync = params.sync || {};
+
+        if (typeof params.local !== 'undefined') {
+            params.sync.isLocal = params.local;
+            delete params.local;
+        }
+
+        if (typeof params.remote !== 'undefined') {
+            params.sync.isRemote = params.remote;
+            delete params.remote;
+        }
+
+        // Convert from old "locked" state
+        if (typeof params.locked !== 'undefined') {
+            params.isLocked = params.locked;
+            delete params.locked;
+        }
+
+        return params;
     };
 
     /**
@@ -42515,13 +42667,15 @@ module.exports = function () {
             var routingPath = _this.getItemRoutingPath(item, pane.settings);
             var isDirectory = _this.isItemDirectory(item);
             var queueItem = {};
+            var isLocal = item.sync ? item.sync.isLocal : false;
+            var isRemote = item.sync ? item.sync.isRemote : false;
 
             var $item = _.div({
                 class: 'pane-item-container',
                 'data-routing-path': routingPath,
-                'data-locked': item.locked,
-                'data-remote': item.remote,
-                'data-local': item.local,
+                'data-locked': item.isLocked,
+                'data-remote': isRemote,
+                'data-local': isLocal,
                 'data-is-directory': isDirectory,
                 'data-sort': item.sort || 0
             }, _.a({
@@ -42736,32 +42890,32 @@ var ConnectionPane = function (_NavbarPane) {
                     _this3.onClickCopyItemId();
                 };
 
-                if (!item.local && !item.remote && !item.locked) {
+                if (!item.sync.isLocal && !item.sync.isRemote && !item.isLocked) {
                     menu['Remove'] = function () {
                         _this3.onClickRemoveConnection();
                     };
                 }
 
-                if (item.locked && !item.remote) {
+                if (item.isLocked && !item.sync.isRemote) {
                     isSyncEnabled = false;
                 }
 
                 if (isSyncEnabled) {
                     menu['Sync'] = '---';
 
-                    if (!item.remote) {
+                    if (!item.sync.isRemote) {
                         menu['Push to remote'] = function () {
                             _this3.onClickPushConnection();
                         };
                     }
 
-                    if (item.local) {
+                    if (item.sync.isLocal) {
                         menu['Remove local copy'] = function () {
                             _this3.onClickRemoveConnection();
                         };
                     }
 
-                    if (item.remote) {
+                    if (item.sync.isRemote) {
                         menu['Pull from remote'] = function () {
                             _this3.onClickPullConnection();
                         };
@@ -43161,7 +43315,7 @@ var ContentPane = function (_NavbarPane) {
                 $element.parent().toggleClass('loading', true);
 
                 RequestHelper.request('delete', 'content/' + id + '?removeChildren=' + $deleteChildrenSwitch.data('checked')).then(function () {
-                    if (shouldUnpublish && content.settings.publishing.connectionId) {
+                    if (shouldUnpublish && content.getSettings('publishing').connectionId) {
                         return unpublishConnection();
                     } else {
                         return onSuccess();
@@ -43202,13 +43356,13 @@ var ContentPane = function (_NavbarPane) {
                     _this2.onClickCopyItemId();
                 };
 
-                if (!item.remote && !item.locked) {
+                if (!item.sync.isRemote && !item.isLocked) {
                     menu['Move'] = function () {
                         _this2.onClickMoveItem();
                     };
                 }
 
-                if (!item.local && !item.locked) {
+                if (!item.sync.isLocal && !item.isLocked) {
                     menu['Remove'] = function () {
                         _this2.onClickRemoveContent(true);
                     };
@@ -43223,33 +43377,33 @@ var ContentPane = function (_NavbarPane) {
                     _this2.onClickNewContent(parentId);
                 };
 
-                if (!item.remote && !item.locked) {
+                if (!item.sync.isRemote && !item.isLocked) {
                     menu['Settings'] = '---';
                     menu['Publishing'] = function () {
                         _this2.onClickContentPublishing();
                     };
                 }
 
-                if (item.locked && !item.remote) {
+                if (item.isLocked && !item.sync.isRemote) {
                     isSyncEnabled = false;
                 }
 
                 if (isSyncEnabled) {
                     menu['Sync'] = '---';
 
-                    if (!item.remote) {
+                    if (!item.sync.isRemote) {
                         menu['Push to remote'] = function () {
                             _this2.onClickPushContent();
                         };
                     }
 
-                    if (item.local) {
+                    if (item.sync.isLocal) {
                         menu['Remove local copy'] = function () {
                             _this2.onClickRemoveContent();
                         };
                     }
 
-                    if (item.remote) {
+                    if (item.sync.isRemote) {
                         menu['Pull from remote'] = function () {
                             _this2.onClickPullContent();
                         };
@@ -43462,32 +43616,32 @@ var FormsPane = function (_NavbarPane) {
                     _this2.onClickCopyItemId();
                 };
 
-                if (!item.local && !item.remote && !item.locked) {
+                if (!item.sync.isLocal && !item.sync.isRemote && !item.isLocked) {
                     menu['Remove'] = function () {
                         _this2.onClickRemoveForm();
                     };
                 }
 
-                if (item.locked && !item.remote) {
+                if (item.isLocked && !item.sync.isRemote) {
                     isSyncEnabled = false;
                 }
 
                 if (isSyncEnabled) {
                     menu['Sync'] = '---';
 
-                    if (!item.remote) {
+                    if (!item.sync.isRemote) {
                         menu['Push to remote'] = function () {
                             _this2.onClickPushForm();
                         };
                     }
 
-                    if (item.local) {
+                    if (item.sync.isLocal) {
                         menu['Remove local copy'] = function () {
                             _this2.onClickRemoveForm();
                         };
                     }
 
-                    if (item.remote) {
+                    if (item.sync.isRemote) {
                         menu['Pull from remote'] = function () {
                             _this2.onClickPullForm();
                         };
@@ -43824,6 +43978,7 @@ var MediaPane = function (_NavbarPane) {
                 var isSyncEnabled = HashBrown.Helpers.SettingsHelper.getCachedSettings(ProjectHelper.currentProject, null, 'sync').enabled;
 
                 queueItem.$element.attr('data-media-id', item.id);
+                queueItem.$element.attr('data-remote', true);
 
                 if (item.folder) {
                     queueItem.createDir = true;
@@ -43939,7 +44094,7 @@ var SchemaPane = function (_NavbarPane) {
             });
         }
 
-        if (!schema.locked) {
+        if (!schema.isLocked) {
             new HashBrown.Views.Modals.MessageModal({
                 model: {
                     title: 'Delete schema',
@@ -44059,32 +44214,32 @@ var SchemaPane = function (_NavbarPane) {
                     _this2.onClickCopyItemId();
                 };
 
-                if (!item.local && !item.remote && !item.locked) {
+                if (!item.sync.isLocal && !item.sync.isRemote && !item.isLocked) {
                     menu['Remove'] = function () {
                         _this2.onClickRemoveSchema();
                     };
                 }
 
-                if (item.locked && !item.remote) {
+                if (item.isLocked && !item.sync.isRemote) {
                     isSyncEnabled = false;
                 }
 
                 if (isSyncEnabled) {
                     menu['Sync'] = '---';
 
-                    if (!item.remote) {
+                    if (!item.sync.isRemote) {
                         menu['Push to remote'] = function () {
                             _this2.onClickPushSchema();
                         };
                     }
 
-                    if (item.local) {
+                    if (item.sync.isLocal) {
                         menu['Remove local copy'] = function () {
                             _this2.onClickRemoveSchema();
                         };
                     }
 
-                    if (item.remote) {
+                    if (item.sync.isRemote) {
                         menu['Pull from remote'] = function () {
                             _this2.onClickPullSchema();
                         };
@@ -44378,6 +44533,7 @@ var TemplatePane = function (_NavbarPane) {
             // Hierarchy logic
             hierarchy: function hierarchy(item, queueItem) {
                 queueItem.$element.attr('data-template-id', item.id);
+                queueItem.$element.attr('data-remote', true);
 
                 var rootDirName = item.type.substring(0, 1).toUpperCase() + item.type.substring(1) + 's';
                 var parentDirName = item.parentId;
@@ -44389,7 +44545,7 @@ var TemplatePane = function (_NavbarPane) {
                 }
 
                 queueItem.parentDirAttr = { 'data-template-id': parentDirName };
-                queueItem.parentDirExtraAttr = { 'data-remote': item.remote };
+                queueItem.parentDirExtraAttr = { 'data-remote': true };
             },
 
             // Item context menu
@@ -44650,10 +44806,10 @@ var ConnectionEditor = function (_View) {
     ConnectionEditor.prototype.render = function render() {
         var view = this;
 
-        this.$element.toggleClass('locked', this.model.locked);
+        this.$element.toggleClass('locked', this.model.isLocked);
         this.$element.html(_.div({ class: 'object' }, _.div({ class: 'editor-header' }, _.span({ class: 'fa fa-exchange' }), _.h4(this.model.title)), _.div({ class: 'tab-content editor-body' }, _.div({ class: 'field-container connection-template-provider' }, _.div({ class: 'field-key' }, 'Is Template provider'), _.div({ class: 'field-value' }, this.renderTemplateProviderEditor())), _.div({ class: 'field-container connection-media-provider' }, _.div({ class: 'field-key' }, 'Is Media provider'), _.div({ class: 'field-value' }, this.renderMediaProviderEditor())), _.div({ class: 'field-container connection-title' }, _.div({ class: 'field-key' }, 'Title'), _.div({ class: 'field-value' }, this.renderTitleEditor())), _.div({ class: 'field-container connection-url' }, _.div({ class: 'field-key' }, 'URL'), _.div({ class: 'field-value' }, this.renderUrlEditor())), _.div({ class: 'field-container connection-type' }, _.div({ class: 'field-key' }, 'Type'), _.div({ class: 'field-value' }, this.renderTypeEditor())), _.div({ class: 'field-container connection-settings' }, _.div({ class: 'field-key' }, 'Settings'), _.div({ class: 'field-value' }, this.renderSettingsEditor()))), _.div({ class: 'editor-footer' }, _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-embedded' }, 'Advanced').click(function () {
             view.onClickAdvanced();
-        }), _.if(!this.model.locked, view.$saveBtn = _.button({ class: 'btn btn-primary btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Save '), _.span({ class: 'text-working' }, 'Saving ')).click(function () {
+        }), _.if(!this.model.isLocked, view.$saveBtn = _.button({ class: 'btn btn-primary btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Save '), _.span({ class: 'text-working' }, 'Saving ')).click(function () {
             view.onClickSave();
         }))))));
     };
@@ -44889,9 +45045,9 @@ var SchemaEditor = function (_View) {
             editorName = HashBrown.Views.Editors.FieldEditors[editorId].name;
         }
 
-        var $element = _.div({ class: 'editor-picker' }, _.if(!this.model.locked, UI.inputDropdownTypeAhead(editorId, editorOptions, function (newValue) {
+        var $element = _.div({ class: 'editor-picker' }, _.if(!this.model.isLocked, UI.inputDropdownTypeAhead(editorId, editorOptions, function (newValue) {
             _this3.model.editorId = newValue;
-        })), _.if(this.model.locked, _.p({ class: 'read-only' }, editorName)));
+        })), _.if(this.model.isLocked, _.p({ class: 'read-only' }, editorName)));
 
         return $element;
     };
@@ -44914,7 +45070,7 @@ var SchemaEditor = function (_View) {
             view.model.name = $(this).val();
         }
 
-        var $element = _.div({ class: 'name-editor' }, _.if(!this.model.locked, _.input({ class: 'form-control', type: 'text', value: view.model.name, placeholder: 'Input the schema name here' }).on('change', onInputChange)), _.if(this.model.locked, _.p({ class: 'read-only' }, view.model.name)));
+        var $element = _.div({ class: 'name-editor' }, _.if(!this.model.isLocked, _.input({ class: 'form-control', type: 'text', value: view.model.name, placeholder: 'Input the schema name here' }).on('change', onInputChange)), _.if(this.model.isLocked, _.p({ class: 'read-only' }, view.model.name)));
 
         return $element;
     };
@@ -45014,14 +45170,14 @@ var SchemaEditor = function (_View) {
             $element.html($tabs);
 
             $tabs.append(_.each(view.model.tabs, function (id, label) {
-                return _.div({ class: 'tab chip', 'data-id': id }, _.input({ type: 'text', class: 'chip-label' + (view.model.locked ? ' disabled' : ''), value: label }).change(function (e) {
+                return _.div({ class: 'tab chip', 'data-id': id }, _.input({ type: 'text', class: 'chip-label' + (view.model.isLocked ? ' disabled' : ''), value: label }).change(function (e) {
                     onInputChange($(this));
-                }), _.if(!view.model.locked, _.button({ class: 'btn chip-remove' }, _.span({ class: 'fa fa-remove' })).click(function (e) {
+                }), _.if(!view.model.isLocked, _.button({ class: 'btn chip-remove' }, _.span({ class: 'fa fa-remove' })).click(function (e) {
                     onClickRemove($(this));
                 })));
             }));
 
-            if (!view.model.locked) {
+            if (!view.model.isLocked) {
                 $tabs.append(_.button({ class: 'btn chip-add' }, _.span({ class: 'fa fa-plus' })).click(onClickAdd));
             }
         }
@@ -45082,7 +45238,7 @@ var SchemaEditor = function (_View) {
             });
         }
 
-        var $element = _.div({ class: 'icon-editor' }, _.if(!this.model.locked, _.button({ class: 'btn btn-icon-browse btn-default' + (this.model.locked ? ' disabled' : '') }, _.span({ class: 'fa fa-' + this.model.icon })).click(onClickBrowse)), _.if(this.model.locked, _.span({ class: 'fa fa-' + this.model.icon })));
+        var $element = _.div({ class: 'icon-editor' }, _.if(!this.model.isLocked, _.button({ class: 'btn btn-icon-browse btn-default' + (this.model.isLocked ? ' disabled' : '') }, _.span({ class: 'fa fa-' + this.model.icon })).click(onClickBrowse)), _.if(this.model.isLocked, _.span({ class: 'fa fa-' + this.model.icon })));
 
         return $element;
     };
@@ -45137,7 +45293,7 @@ var SchemaEditor = function (_View) {
         }
 
         // Render element
-        var $element = _.div({ class: 'parent-editor input-group' }, _.if(!this.model.locked, UI.inputDropdownTypeAhead(this.model.parentSchemaId, schemaOptions, function (newValue) {
+        var $element = _.div({ class: 'parent-editor input-group' }, _.if(!this.model.isLocked, UI.inputDropdownTypeAhead(this.model.parentSchemaId, schemaOptions, function (newValue) {
             if (!newValue) {
                 newValue = _this4.model.type == 'field' ? 'fieldBase' : 'contentBase';
             }
@@ -45145,7 +45301,7 @@ var SchemaEditor = function (_View) {
             _this4.model.parentSchemaId = newValue;
 
             return newValue;
-        }, true)), _.if(this.model.locked, _.p({ class: 'read-only' }, parentName)));
+        }, true)), _.if(this.model.isLocked, _.p({ class: 'read-only' }, parentName)));
 
         return $element;
     };
@@ -45173,9 +45329,9 @@ var SchemaEditor = function (_View) {
             tabOptions[tabOptions.length] = { value: value, label: this.compiledSchema.tabs[value] };
         }
 
-        var $element = _.div({ class: 'default-tab-editor' }, _.if(!this.model.locked, UI.inputDropdown(this.model.defaultTabId, tabOptions, function (newValue) {
+        var $element = _.div({ class: 'default-tab-editor' }, _.if(!this.model.isLocked, UI.inputDropdown(this.model.defaultTabId, tabOptions, function (newValue) {
             _this5.model.defaultTabId = newValue;
-        })), _.if(this.model.locked, _.p({ class: 'read-only' }, this.compiledSchema.tabs[this.model.defaultTabId] || '(none)')));
+        })), _.if(this.model.isLocked, _.p({ class: 'read-only' }, this.compiledSchema.tabs[this.model.defaultTabId] || '(none)')));
 
         return $element;
     };
@@ -45226,7 +45382,7 @@ var SchemaEditor = function (_View) {
         function render() {
             _.append($element.empty(), _.div({ class: 'schemas chip-group' }, _.each(view.model.allowedChildSchemas, function (i, schemaId) {
                 try {
-                    var $schema = _.div({ class: 'chip schema' }, _.div({ class: 'chip-label dropdown' }, _.button({ class: 'dropdown-toggle', 'data-id': schemaId, 'data-toggle': 'dropdown' }, SchemaHelper.getSchemaByIdSync(schemaId).name), _.if(!view.model.locked, _.ul({ class: 'dropdown-menu' }, _.each(resources.schemas, function (i, schema) {
+                    var $schema = _.div({ class: 'chip schema' }, _.div({ class: 'chip-label dropdown' }, _.button({ class: 'dropdown-toggle', 'data-id': schemaId, 'data-toggle': 'dropdown' }, SchemaHelper.getSchemaByIdSync(schemaId).name), _.if(!view.model.isLocked, _.ul({ class: 'dropdown-menu' }, _.each(resources.schemas, function (i, schema) {
                         if (schema.type == 'content' && (schema.id == schemaId || view.model.allowedChildSchemas.indexOf(schema.id) < 0) && schema.id != 'contentBase' && schema.id != 'page') {
                             return _.li(_.a({ href: '#', 'data-id': schema.id }, schema.name).click(function (e) {
                                 e.preventDefault();
@@ -45239,7 +45395,7 @@ var SchemaEditor = function (_View) {
                                 onChange();
                             }));
                         }
-                    })))).change(onChange), _.if(!view.model.locked, _.button({ class: 'btn chip-remove' }, _.span({ class: 'fa fa-remove' })).click(function () {
+                    })))).change(onChange), _.if(!view.model.isLocked, _.button({ class: 'btn chip-remove' }, _.span({ class: 'fa fa-remove' })).click(function () {
                         $schema.remove();
 
                         onChange();
@@ -45249,7 +45405,7 @@ var SchemaEditor = function (_View) {
                 } catch (e) {
                     UI.errorModal(e);
                 }
-            }), _.if(!view.model.locked, _.button({ class: 'btn chip-add' }, _.span({ class: 'fa fa-plus' })).click(onClickAdd))));
+            }), _.if(!view.model.isLocked, _.button({ class: 'btn chip-add' }, _.span({ class: 'fa fa-plus' })).click(onClickAdd))));
         }
 
         var $element = _.div({ class: 'allowed-child-schemas-editor' });
@@ -45382,7 +45538,7 @@ var SchemaEditor = function (_View) {
                 $element.append(this.renderField('Tabs', this.renderTabsEditor()));
                 $element.append(this.renderField('Allowed child Schemas', this.renderAllowedChildSchemasEditor()));
 
-                if (!this.model.locked) {
+                if (!this.model.isLocked) {
                     $element.append(this.renderField('Fields', this.renderFieldPropertiesEditor(), true));
                 }
 
@@ -45391,7 +45547,7 @@ var SchemaEditor = function (_View) {
             case 'field':
                 $element.append(this.renderField('Field editor', this.renderEditorPicker()));
 
-                if (!this.model.locked) {
+                if (!this.model.isLocked) {
                     $element.append(this.renderField('Config', this.renderFieldPropertiesEditor(), true));
                     $element.append(this.renderField('Preview template', this.renderTemplateEditor(), true));
                 }
@@ -45409,14 +45565,14 @@ var SchemaEditor = function (_View) {
             this.model = SchemaHelper.getModel(this.model);
         }
 
-        this.$element.toggleClass('locked', this.model.locked);
+        this.$element.toggleClass('locked', this.model.isLocked);
 
         SchemaHelper.getSchemaWithParentFields(this.model.id).then(function (compiledSchema) {
             _this8.compiledSchema = compiledSchema;
 
             _.append(_this8.$element.empty(), _.div({ class: 'editor-header' }, _.span({ class: 'fa fa-' + _this8.compiledSchema.icon }), _.h4(_this8.model.name)), _this8.renderFields(), _.div({ class: 'editor-footer panel panel-default panel-buttons' }, _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-embedded' }, 'Advanced').click(function () {
                 _this8.onClickAdvanced();
-            }), _.if(!_this8.model.locked, _this8.$saveBtn = _.button({ class: 'btn btn-primary btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Save '), _.span({ class: 'text-working' }, 'Saving ')).click(function () {
+            }), _.if(!_this8.model.isLocked, _this8.$saveBtn = _.button({ class: 'btn btn-primary btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Save '), _.span({ class: 'text-working' }, 'Saving ')).click(function () {
                 _this8.onClickSave();
             })))));
         });

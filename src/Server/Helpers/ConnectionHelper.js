@@ -276,9 +276,12 @@ class ConnectionHelper extends ConnectionHelperCommon {
         create = false
     ) {
         // Unset automatic flags
-        connection.locked = false;
-        connection.remote = false;
-        connection.local = false;
+        connection.isLocked = false;
+
+        connection.sync = {
+            isRemote: false,
+            isLocal: false
+        };
         
         return MongoHelper.updateOne(
             project,

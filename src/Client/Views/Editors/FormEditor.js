@@ -385,7 +385,7 @@ class FormEditor extends View {
     }
 
     render() {
-        this.$element.toggleClass('locked', this.model.locked);
+        this.$element.toggleClass('locked', this.model.isLocked);
 
         _.append(this.$element.empty(),
             _.div({class: 'editor-header'},
@@ -398,7 +398,7 @@ class FormEditor extends View {
                     _.button({class: 'btn btn-embedded'},
                         'Advanced'
                     ).click(() => { this.onClickAdvanced(); }),
-                    _.if(!this.model.locked,
+                    _.if(!this.model.isLocked,
                         this.$saveBtn = _.button({class: 'btn btn-primary btn-raised btn-save'},
                             _.span({class: 'text-default'}, 'Save '),
                             _.span({class: 'text-working'}, 'Saving ')

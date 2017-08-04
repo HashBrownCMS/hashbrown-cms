@@ -184,6 +184,7 @@ class TemplatePane extends NavbarPane {
             // Hierarchy logic
             hierarchy: function(item, queueItem) {
                 queueItem.$element.attr('data-template-id', item.id);
+                queueItem.$element.attr('data-remote', true);
                
                 let rootDirName = item.type.substring(0, 1).toUpperCase() + item.type.substring(1) + 's';
                 let parentDirName = item.parentId;
@@ -195,7 +196,7 @@ class TemplatePane extends NavbarPane {
                 }
 
                 queueItem.parentDirAttr = {'data-template-id': parentDirName };
-                queueItem.parentDirExtraAttr = { 'data-remote': item.remote };
+                queueItem.parentDirExtraAttr = { 'data-remote': true };
             },
 
             // Item context menu

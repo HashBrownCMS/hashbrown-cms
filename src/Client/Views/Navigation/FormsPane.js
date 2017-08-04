@@ -157,24 +157,24 @@ class FormsPane extends NavbarPane {
                 menu['This form'] = '---';
                 menu['Copy id'] = () => { this.onClickCopyItemId(); };
 
-                if(!item.local && !item.remote && !item.locked) {
+                if(!item.sync.isLocal && !item.sync.isRemote && !item.isLocked) {
                     menu['Remove'] = () => { this.onClickRemoveForm(); };
                 }
                 
-                if(item.locked && !item.remote) { isSyncEnabled = false; }
+                if(item.isLocked && !item.sync.isRemote) { isSyncEnabled = false; }
 
                 if(isSyncEnabled) {
                     menu['Sync'] = '---';
 
-                    if(!item.remote) {
+                    if(!item.sync.isRemote) {
                         menu['Push to remote'] = () => { this.onClickPushForm(); };
                     }
 
-                    if(item.local) {
+                    if(item.sync.isLocal) {
                         menu['Remove local copy'] = () => { this.onClickRemoveForm(); };
                     }
                     
-                    if(item.remote) {
+                    if(item.sync.isRemote) {
                         menu['Pull from remote'] = () => { this.onClickPullForm(); };
                     }
                 }

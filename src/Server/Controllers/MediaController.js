@@ -46,15 +46,9 @@ class MediaController extends ApiController {
             if(media) {
                 let contentType = media.getContentTypeHeader();
                 
-                if(!media.remote) {
-                    res.sendFile(media.url);
-               
                 // Piping the data through would be a more elegant solution, but ultimately more work for the server
                 // The remote source might also have unpredictable headers, so it's best to let the remote handle content delivery etirely
-                } else {
-                    res.redirect(media.url);
-                
-                }
+                res.redirect(media.url);
             } else {
                 res.status(404).send('Not found');
             }

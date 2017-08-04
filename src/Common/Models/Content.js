@@ -9,7 +9,75 @@ let Entity = require('./Entity');
  */
 class Content extends Entity {
     constructor(params) {
+        super(Content.paramsCheck(params)); 
+    }
+   
+    structure() {
+        // Fundamental fields
+        this.def(String, 'id');
+        this.def(String, 'parentId');
+        this.def(String, 'createdBy');
+        this.def(String, 'updatedBy');
+        this.def(Date, 'createDate');
+        this.def(Date, 'updateDate');
+        this.def(String, 'schemaId');
+        this.def(Number, 'sort', -1);
+        this.def(Boolean, 'isLocked');
+        
+        // Publishing
+        this.def(Date, 'publishOn');
+        this.def(Date, 'unpublishOn');
+        this.def(Boolean, 'isPublished');
+        this.def(Boolean, 'hasPreview');
+
+        // Sync
+        this.def(Object, 'sync');
+
+        // Extensible properties
+        this.def(Object, 'properties', {});
+
+        // Settings
+        this.def(Object, 'settings', {
+            publishing: {
+                connections: []
+            }
+        }); 
+    }
+
+    /**
+     * Checks the format of the params
+     *
+     * @params {Object} params
+     *
+     * @returns {Object} Params
+     */
+    static paramsCheck(params) {
         params = params || {};
+
+        // Convert from old "unpublished" state
+        if(typeof params.unpublished !== 'undefined') {
+            params.isPublished = !params.unpublished;
+            delete params.published;
+        }
+
+        // Convert from old sync variables
+        params.sync = params.sync || {};
+
+        if(typeof params.local !== 'undefined') {
+            params.sync.isLocal = params.local;
+            delete params.local;
+        }
+
+        if(typeof params.remote !== 'undefined') {
+            params.sync.isRemote = params.remote;
+            delete params.remote;
+        }
+
+        // Convert from old "locked" state
+        if(typeof params.locked !== 'undefined') {
+            params.isLocked = params.locked;
+            delete params.locked;
+        }
 
         // Ensure correct type for dates
         function parseDate(input) {
@@ -27,36 +95,7 @@ class Content extends Entity {
         params.createDate = parseDate(params.createDate);
         params.updateDate = parseDate(params.updateDate);
 
-        super(params); 
-    }
-    
-    structure() {
-        // Fundamental fields
-        this.def(Boolean, 'locked');
-        this.def(Boolean, 'local');
-        this.def(Boolean, 'remote');
-        this.def(String, 'id');
-        this.def(String, 'parentId');
-        this.def(String, 'createdBy');
-        this.def(String, 'updatedBy');
-        this.def(Date, 'createDate');
-        this.def(Date, 'updateDate');
-        this.def(Date, 'publishOn');
-        this.def(Date, 'unpublishOn');
-        this.def(String, 'schemaId');
-        this.def(Boolean, 'isPublished');
-        this.def(Boolean, 'hasPreview');
-        this.def(Number, 'sort', -1);
-
-        // Extensible properties
-        this.def(Object, 'properties', {});
-
-        // Settings
-        this.def(Object, 'settings', {
-            publishing: {
-                connections: []
-            }
-        }); 
+        return params;
     }
 
     /**

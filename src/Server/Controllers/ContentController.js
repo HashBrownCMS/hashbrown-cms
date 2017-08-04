@@ -50,7 +50,7 @@ class ContentController extends ApiController {
      */
     static getAllContents(req, res) {
         ContentHelper.getAllContents(req.project, req.environment)
-        .then(function(nodes) {
+        .then((nodes) => {
             res.status(200).send(nodes);
         })
         .catch((e) => {

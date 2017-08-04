@@ -34,7 +34,7 @@ class SchemaPane extends NavbarPane {
             });
         }
 
-        if(!schema.locked) {
+        if(!schema.isLocked) {
             new HashBrown.Views.Modals.MessageModal({
                 model: {
                     title: 'Delete schema',
@@ -156,24 +156,24 @@ class SchemaPane extends NavbarPane {
                 menu['New child schema'] = () => { this.onClickNewSchema(); };
                 menu['Copy id'] = () => { this.onClickCopyItemId(); };
                 
-                if(!item.local && !item.remote && !item.locked) {
+                if(!item.sync.isLocal && !item.sync.isRemote && !item.isLocked) {
                     menu['Remove'] = () => { this.onClickRemoveSchema(); };
                 }
                 
-                if(item.locked && !item.remote) { isSyncEnabled = false; }
+                if(item.isLocked && !item.sync.isRemote) { isSyncEnabled = false; }
 
                 if(isSyncEnabled) {
                     menu['Sync'] = '---';
                     
-                    if(!item.remote) {
+                    if(!item.sync.isRemote) {
                         menu['Push to remote'] = () => { this.onClickPushSchema(); };
                     }
 
-                    if(item.local) {
+                    if(item.sync.isLocal) {
                         menu['Remove local copy'] = () => { this.onClickRemoveSchema(); };
                     }
 
-                    if(item.remote) {
+                    if(item.sync.isRemote) {
                         menu['Pull from remote'] = () => { this.onClickPullSchema(); };
                     }
                 }

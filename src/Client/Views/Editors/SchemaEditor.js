@@ -80,12 +80,12 @@ class SchemaEditor extends View {
         }
 
         let $element = _.div({class: 'editor-picker'},
-            _.if(!this.model.locked,
+            _.if(!this.model.isLocked,
                 UI.inputDropdownTypeAhead(editorId, editorOptions, (newValue) => {
                     this.model.editorId = newValue;
                 })
             ),
-            _.if(this.model.locked,
+            _.if(this.model.isLocked,
                 _.p({class: 'read-only'},
                     editorName
                 )
@@ -110,11 +110,11 @@ class SchemaEditor extends View {
         }
 
         let $element = _.div({class: 'name-editor'},
-            _.if(!this.model.locked,
+            _.if(!this.model.isLocked,
                 _.input({class: 'form-control', type: 'text', value: view.model.name, placeholder: 'Input the schema name here'})
                     .on('change', onInputChange)
             ),
-            _.if(this.model.locked,
+            _.if(this.model.isLocked,
                 _.p({class: 'read-only'},
                     view.model.name
                 )
@@ -225,11 +225,11 @@ class SchemaEditor extends View {
             $tabs.append(
                 _.each(view.model.tabs, (id, label) => {
                     return _.div({class: 'tab chip', 'data-id': id},
-                        _.input({type: 'text', class: 'chip-label' + (view.model.locked ? ' disabled' : ''), value: label})
+                        _.input({type: 'text', class: 'chip-label' + (view.model.isLocked ? ' disabled' : ''), value: label})
                             .change(function(e) {
                                 onInputChange($(this));
                             }),
-                        _.if(!view.model.locked,
+                        _.if(!view.model.isLocked,
                             _.button({class: 'btn chip-remove'}, 
                                 _.span({class: 'fa fa-remove'})
                             ).click(function(e) {
@@ -240,7 +240,7 @@ class SchemaEditor extends View {
                 })
             );
 
-            if(!view.model.locked) {
+            if(!view.model.isLocked) {
                 $tabs.append(
                     _.button({class: 'btn chip-add'},
                         _.span({class: 'fa fa-plus'})
@@ -311,12 +311,12 @@ class SchemaEditor extends View {
         }
 
         let $element = _.div({class: 'icon-editor'},
-            _.if(!this.model.locked,
-                _.button({class: 'btn btn-icon-browse btn-default' + (this.model.locked ? ' disabled' : '')},
+            _.if(!this.model.isLocked,
+                _.button({class: 'btn btn-icon-browse btn-default' + (this.model.isLocked ? ' disabled' : '')},
                     _.span({class: 'fa fa-' + this.model.icon})
                 ).click(onClickBrowse)
             ),
-            _.if(this.model.locked,
+            _.if(this.model.isLocked,
                 _.span({class: 'fa fa-' + this.model.icon})
             )
         );
@@ -372,7 +372,7 @@ class SchemaEditor extends View {
 
         // Render element
         let $element = _.div({class: 'parent-editor input-group'},
-            _.if(!this.model.locked,
+            _.if(!this.model.isLocked,
                 UI.inputDropdownTypeAhead(this.model.parentSchemaId, schemaOptions, (newValue) => {
                     if(!newValue) {
                         newValue = this.model.type == 'field' ? 'fieldBase' : 'contentBase'; 
@@ -383,7 +383,7 @@ class SchemaEditor extends View {
                     return newValue;
                 }, true)
             ),
-            _.if(this.model.locked,
+            _.if(this.model.isLocked,
                 _.p({class: 'read-only'},
                     parentName
                 )
@@ -413,12 +413,12 @@ class SchemaEditor extends View {
         }
 
         let $element = _.div({class: 'default-tab-editor'},
-            _.if(!this.model.locked,
+            _.if(!this.model.isLocked,
                 UI.inputDropdown(this.model.defaultTabId, tabOptions, (newValue) => {
                     this.model.defaultTabId = newValue;
                 })
             ),
-            _.if(this.model.locked,
+            _.if(this.model.isLocked,
                 _.p({class: 'read-only'},
                     this.compiledSchema.tabs[this.model.defaultTabId] || '(none)'
                 )
@@ -482,7 +482,7 @@ class SchemaEditor extends View {
                                     _.button({class: 'dropdown-toggle', 'data-id': schemaId, 'data-toggle': 'dropdown'},
                                         SchemaHelper.getSchemaByIdSync(schemaId).name
                                     ),
-                                    _.if(!view.model.locked,
+                                    _.if(!view.model.isLocked,
                                         _.ul({class: 'dropdown-menu'},
                                             _.each(resources.schemas, (i, schema) => {
                                                 if(
@@ -510,7 +510,7 @@ class SchemaEditor extends View {
                                         )
                                     )
                                 ).change(onChange),
-                                _.if(!view.model.locked,
+                                _.if(!view.model.isLocked,
                                     _.button({class: 'btn chip-remove'},
                                         _.span({class: 'fa fa-remove'})
                                     ).click(() => {
@@ -527,7 +527,7 @@ class SchemaEditor extends View {
                             UI.errorModal(e);
                         }
                     }),
-                    _.if(!view.model.locked,
+                    _.if(!view.model.isLocked,
                         _.button({class: 'btn chip-add'},
                             _.span({class: 'fa fa-plus'})
                         ).click(onClickAdd)
@@ -662,7 +662,7 @@ class SchemaEditor extends View {
                 $element.append(this.renderField('Tabs', this.renderTabsEditor()));
                 $element.append(this.renderField('Allowed child Schemas', this.renderAllowedChildSchemasEditor()));
                 
-                if(!this.model.locked) {
+                if(!this.model.isLocked) {
                     $element.append(this.renderField('Fields', this.renderFieldPropertiesEditor(), true));
                 }
                 
@@ -671,7 +671,7 @@ class SchemaEditor extends View {
             case 'field':
                 $element.append(this.renderField('Field editor', this.renderEditorPicker()));
                 
-                if(!this.model.locked) {
+                if(!this.model.isLocked) {
                     $element.append(this.renderField('Config', this.renderFieldPropertiesEditor(), true));
                     $element.append(this.renderField('Preview template', this.renderTemplateEditor(), true));
                 }
@@ -688,7 +688,7 @@ class SchemaEditor extends View {
             this.model = SchemaHelper.getModel(this.model);
         }
 
-        this.$element.toggleClass('locked', this.model.locked);
+        this.$element.toggleClass('locked', this.model.isLocked);
 
         SchemaHelper.getSchemaWithParentFields(this.model.id)
         .then((compiledSchema) => {
@@ -705,7 +705,7 @@ class SchemaEditor extends View {
                         _.button({class: 'btn btn-embedded'},
                             'Advanced'
                         ).click(() => { this.onClickAdvanced(); }),
-                        _.if(!this.model.locked,
+                        _.if(!this.model.isLocked,
                             this.$saveBtn = _.button({class: 'btn btn-primary btn-raised btn-save'},
                                 _.span({class: 'text-default'}, 'Save '),
                                 _.span({class: 'text-working'}, 'Saving ')

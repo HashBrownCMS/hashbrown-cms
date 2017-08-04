@@ -75,7 +75,7 @@ class TemplateEditor extends View {
                 this.$textarea = _.textarea(),
                 this.$error
             ),
-			_.if(!this.model.locked,
+			_.if(!this.model.isLocked,
 				_.div({class: 'editor-footer'}, 
 					_.div({class: 'btn-group'},
                         // Save

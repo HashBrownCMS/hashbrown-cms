@@ -424,18 +424,20 @@ var DemoApi = function () {
                         schemas[k].type = 'field';
                     }
 
-                    if (schemas[k].locked !== false) {
-                        schemas[k].locked = true;
+                    if (schemas[k].isLocked !== false) {
+                        schemas[k].isLocked = true;
                     }
 
-                    result.push(schemas[k]);
+                    result.push(HashBrown.Helpers.SchemaHelper.getModel(schemas[k]));
                 }
 
                 // Section page
-                result.push({
-                    "locked": false,
-                    "local": false,
-                    "remote": false,
+                result.push(new HashBrown.Models.ContentSchema({
+                    "isLocked": false,
+                    "sync": {
+                        "isLocal": false,
+                        "isRemote": false
+                    },
                     "id": "591a897ad572cadae5115ef05726d9ead2725dc5",
                     "name": "Section Page",
                     "icon": "file",
@@ -465,11 +467,15 @@ var DemoApi = function () {
                     },
                     "allowedChildSchemas": ["591a897ad572cadae5115ef05726d9ead2725dc5"],
                     "type": "content"
-                });
+                }));
 
                 // Section
-                result.push({
-                    "locked": false,
+                result.push(new HashBrown.Models.FieldSchema({
+                    "isLocked": false,
+                    "sync": {
+                        "isLocal": false,
+                        "isRemote": false
+                    },
                     "local": false,
                     "remote": false,
                     "id": "7ccbf2d613a4da3e5543abdde33b9eb0e5fbb8f3",
@@ -489,13 +495,15 @@ var DemoApi = function () {
                         }
                     },
                     "type": "field"
-                });
+                }));
 
                 // Rich text section
-                result.push({
-                    "locked": false,
-                    "local": false,
-                    "remote": false,
+                result.push(new HashBrown.Models.FieldSchema({
+                    "isLocked": false,
+                    "sync": {
+                        "isLocal": false,
+                        "isRemote": false
+                    },
                     "id": "904e8e7570ddb37ea1f31d210db47cd15f92ff92",
                     "name": "Rich Text Section",
                     "icon": "file-text-o",
@@ -521,13 +529,15 @@ var DemoApi = function () {
                         }
                     },
                     "type": "field"
-                });
+                }));
 
                 // Hero
-                result.push({
-                    "locked": false,
-                    "local": false,
-                    "remote": false,
+                result.push(new HashBrown.Models.FieldSchema({
+                    "isLocked": false,
+                    "sync": {
+                        "isLocal": false,
+                        "isRemote": false
+                    },
                     "id": "f5c4cf4dffb088a2753760ad1da9cd64ff781003",
                     "name": "Hero Section",
                     "icon": "image",
@@ -556,7 +566,7 @@ var DemoApi = function () {
                         }
                     },
                     "type": "field"
-                });
+                }));
 
                 return result;
 

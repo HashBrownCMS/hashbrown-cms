@@ -43,7 +43,7 @@ class SchemaHelper {
             return new FieldSchema(properties);
         }
 
-        return null;
+        throw new Error('Schema data is incorrectly formatted: ' + JSON.stringify(properties));
     }
     
     /**

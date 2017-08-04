@@ -5292,7 +5292,7 @@ var RequestHelper = function () {
                     } else {
                         var error = new Error(xhr.responseText);
 
-                        error.xhr = xhr;
+                        error.statusCode = xhr.status;
 
                         reject(error);
                     }
@@ -5352,44 +5352,54 @@ var RequestHelper = function () {
      * Reloads a resource
      */
     RequestHelper.reloadResource = function reloadResource(name) {
-        var model = null;
-
-        switch (name) {
-            case 'connections':
-                model = HashBrown.Models.Connection;
-                break;
-
-            case 'content':
-                model = HashBrown.Models.Content;
-                break;
-
-            case 'templates':
-                model = HashBrown.Models.Template;
-                break;
-
-            case 'users':
-                model = HashBrown.Models.User;
-                break;
-
-            case 'media':
-                model = HashBrown.Models.Media;
-                break;
-        }
-
         return RequestHelper.request('get', name).then(function (result) {
             window.resources[name] = result;
 
-            // If a model is specified, use it to initialise every resource
-            if (model) {
-                for (var i in window.resources[name]) {
-                    window.resources[name][i] = new model(window.resources[name][i]);
+            // Apply correct model
+            for (var i in window.resources[name]) {
+                var object = window.resources[name][i];
+                var model = null;
+
+                switch (name) {
+                    case 'connections':
+                        model = new HashBrown.Models.Connection(object);
+                        break;
+
+                    case 'content':
+                        model = new HashBrown.Models.Content(object);
+                        break;
+
+                    case 'templates':
+                        model = new HashBrown.Models.Template(object);
+                        break;
+
+                    case 'forms':
+                        model = new HashBrown.Models.Form(object);
+                        break;
+
+                    case 'users':
+                        model = new HashBrown.Models.User(object);
+                        break;
+
+                    case 'media':
+                        model = new HashBrown.Models.Media(object);
+                        break;
+
+                    case 'schemas':
+                        model = HashBrown.Helpers.SchemaHelper.getModel(object);
+                        break;
+
+                    default:
+                        return Promise.reject(new Error('Resource "' + name + '" has no model defined'));
                 }
+
+                window.resources[name][i] = model;
             }
 
             return Promise.resolve(result);
         }).catch(function (e) {
             // If the error is a 404, it's an intended response from the controller
-            if (e.xhr.status !== 404) {
+            if (e.statusCode !== 404) {
                 UI.errorModal(e);
             }
 
@@ -7108,6 +7118,10 @@ var SchemaHelper = function (_SchemaHelperCommon) {
         for (var i in resources.schemas) {
             var schema = resources.schemas[i];
 
+            if (!schema) {
+                console.log(i);
+            }
+
             if (schema.id == id) {
                 if (schema instanceof ContentSchema || schema instanceof FieldSchema) {
                     return schema;
@@ -8179,12 +8193,7 @@ var Connection = function (_Entity) {
     function Connection(params) {
         _classCallCheck(this, Connection);
 
-        var _this = _possibleConstructorReturn(this, _Entity.call(this, params));
-
-        if (!_this.url) {
-            _this.url = _this.getRemoteUrl();
-        }
-        return _this;
+        return _possibleConstructorReturn(this, _Entity.call(this, Connection.paramsCheck(params)));
     }
 
     Connection.prototype.structure = function structure() {
@@ -8193,14 +8202,47 @@ var Connection = function (_Entity) {
         this.def(String, 'title');
         this.def(String, 'type');
         this.def(String, 'url');
+        this.def(Boolean, 'isLocked');
 
         // Sync
-        this.def(Boolean, 'locked');
-        this.def(Boolean, 'remote');
-        this.def(Boolean, 'local');
+        this.def(Object, 'sync');
 
         // Extensible settings
         this.def(Object, 'settings', {});
+    };
+
+    /**
+     * Checks the format of the params
+     *
+     * @params {Object} params
+     *
+     * @returns {Object} Params
+     */
+
+
+    Connection.paramsCheck = function paramsCheck(params) {
+        params = params || {};
+
+        // Convert from old sync variables
+        params.sync = params.sync || {};
+
+        if (typeof params.local !== 'undefined') {
+            params.sync.isLocal = params.remote;
+            delete params.local;
+        }
+
+        if (typeof params.remote !== 'undefined') {
+            params.sync.isRemote = params.remote;
+            delete params.remote;
+        }
+
+        // Convert from old "locked" state
+        if (typeof params.locked !== 'undefined') {
+            params.isLocked = params.locked;
+            delete params.locked;
+        }
+
+        return params;
     };
 
     /**
@@ -9145,21 +9187,57 @@ var Entity = __webpack_require__(9);
 var Schema = function (_Entity) {
     _inherits(Schema, _Entity);
 
-    function Schema(properties) {
+    function Schema(params) {
         _classCallCheck(this, Schema);
 
-        return _possibleConstructorReturn(this, _Entity.call(this, properties));
+        return _possibleConstructorReturn(this, _Entity.call(this, Schema.paramsCheck(params)));
     }
 
     Schema.prototype.structure = function structure() {
-        this.def(Boolean, 'locked');
-        this.def(Boolean, 'local');
-        this.def(Boolean, 'remote');
         this.def(String, 'id');
         this.def(String, 'name');
         this.def(String, 'icon');
         this.def(String, 'parentSchemaId');
+        this.def(Boolean, 'isLocked');
+
+        // Sync
+        this.def(Object, 'sync');
+
         this.def(Array, 'hiddenProperties', []);
+    };
+
+    /**
+     * Checks the format of the params
+     *
+     * @params {Object} params
+     *
+     * @returns {Object} Params
+     */
+
+
+    Schema.paramsCheck = function paramsCheck(params) {
+        params = params || {};
+
+        // Convert from old sync variables
+        params.sync = params.sync || {};
+
+        if (typeof params.local !== 'undefined') {
+            params.sync.isLocal = params.local;
+            delete params.local;
+        }
+
+        if (typeof params.remote !== 'undefined') {
+            params.sync.isRemote = params.remote;
+            delete params.remote;
+        }
+
+        // Convert from old "locked" state
+        if (typeof params.locked !== 'undefined') {
+            params.isLocked = params.locked;
+            delete params.locked;
+        }
+
+        return params;
     };
 
     /**
@@ -14945,7 +15023,77 @@ var Content = function (_Entity) {
     function Content(params) {
         _classCallCheck(this, Content);
 
+        return _possibleConstructorReturn(this, _Entity.call(this, Content.paramsCheck(params)));
+    }
+
+    Content.prototype.structure = function structure() {
+        // Fundamental fields
+        this.def(String, 'id');
+        this.def(String, 'parentId');
+        this.def(String, 'createdBy');
+        this.def(String, 'updatedBy');
+        this.def(Date, 'createDate');
+        this.def(Date, 'updateDate');
+        this.def(String, 'schemaId');
+        this.def(Number, 'sort', -1);
+        this.def(Boolean, 'isLocked');
+
+        // Publishing
+        this.def(Date, 'publishOn');
+        this.def(Date, 'unpublishOn');
+        this.def(Boolean, 'isPublished');
+        this.def(Boolean, 'hasPreview');
+
+        // Sync
+        this.def(Object, 'sync');
+
+        // Extensible properties
+        this.def(Object, 'properties', {});
+
+        // Settings
+        this.def(Object, 'settings', {
+            publishing: {
+                connections: []
+            }
+        });
+    };
+
+    /**
+     * Checks the format of the params
+     *
+     * @params {Object} params
+     *
+     * @returns {Object} Params
+     */
+
+
+    Content.paramsCheck = function paramsCheck(params) {
         params = params || {};
+
+        // Convert from old "unpublished" state
+        if (typeof params.unpublished !== 'undefined') {
+            params.isPublished = !params.unpublished;
+            delete params.published;
+        }
+
+        // Convert from old sync variables
+        params.sync = params.sync || {};
+
+        if (typeof params.local !== 'undefined') {
+            params.sync.isLocal = params.local;
+            delete params.local;
+        }
+
+        if (typeof params.remote !== 'undefined') {
+            params.sync.isRemote = params.remote;
+            delete params.remote;
+        }
+
+        // Convert from old "locked" state
+        if (typeof params.locked !== 'undefined') {
+            params.isLocked = params.locked;
+            delete params.locked;
+        }
 
         // Ensure correct type for dates
         function parseDate(input) {
@@ -14963,36 +15111,7 @@ var Content = function (_Entity) {
         params.createDate = parseDate(params.createDate);
         params.updateDate = parseDate(params.updateDate);
 
-        return _possibleConstructorReturn(this, _Entity.call(this, params));
-    }
-
-    Content.prototype.structure = function structure() {
-        // Fundamental fields
-        this.def(Boolean, 'locked');
-        this.def(Boolean, 'local');
-        this.def(Boolean, 'remote');
-        this.def(String, 'id');
-        this.def(String, 'parentId');
-        this.def(String, 'createdBy');
-        this.def(String, 'updatedBy');
-        this.def(Date, 'createDate');
-        this.def(Date, 'updateDate');
-        this.def(Date, 'publishOn');
-        this.def(Date, 'unpublishOn');
-        this.def(String, 'schemaId');
-        this.def(Boolean, 'isPublished');
-        this.def(Boolean, 'hasPreview');
-        this.def(Number, 'sort', -1);
-
-        // Extensible properties
-        this.def(Object, 'properties', {});
-
-        // Settings
-        this.def(Object, 'settings', {
-            publishing: {
-                connections: []
-            }
-        });
+        return params;
     };
 
     /**
@@ -26121,7 +26240,7 @@ var SchemaHelper = function () {
             return new FieldSchema(properties);
         }
 
-        return null;
+        throw new Error('Schema data is incorrectly formatted: ' + JSON.stringify(properties));
     };
 
     /**

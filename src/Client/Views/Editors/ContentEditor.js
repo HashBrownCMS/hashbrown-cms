@@ -69,10 +69,8 @@ class ContentEditor extends View {
         let postSaveUrl;
 
         let setContent = () => {
-            this.model.settingsSanityCheck('publishing');
-
             // Use publishing API
-            if(this.model.settings.publishing.connectionId) {
+            if(this.model.getSettings('publishing').connectionId) {
                 // Unpublish
                 if(saveAction === 'unpublish') {
                     return RequestHelper.request('post', 'content/unpublish', this.model);
@@ -223,7 +221,7 @@ class ContentEditor extends View {
                 });
 
                 fieldEditorInstance.on('change', (newValue) => {
-                    if(!this.model.locked) {
+                    if(!this.model.isLocked) {
                         this.dirty = true;
                     }
 
@@ -428,21 +426,21 @@ class ContentEditor extends View {
                     if(
                         this.model.properties &&
                         this.model.properties.url &&
-                        this.model.settings.publishing.connectionId &&
+                        this.model.getSettings('publishing').connectionId &&
                         this.model.isPublished
                     ) {
-                        return _.a({target: '_blank', href: ConnectionHelper.getConnectionByIdSync(this.model.settings.publishing.connectionId).url + url, class: 'btn btn-primary'}, 'View');
+                        return _.a({target: '_blank', href: ConnectionHelper.getConnectionByIdSync(this.model.getSettings('publishing').connectionId).url + url, class: 'btn btn-primary'}, 'View');
                     }
                 }),
 
-                _.if(!this.model.locked,
+                _.if(!this.model.isLocked,
                     // Save & publish
                     _.div({class: 'btn-group-save-publish raised'},
                         this.$saveBtn = _.button({class: 'btn btn-save btn-primary'},
                             _.span({class: 'text-default'}, 'Save'),
                             _.span({class: 'text-working'}, 'Saving')
                         ).click(() => { this.onClickSave(); }),
-                        _.if(this.model.settings.publishing.connectionId,
+                        _.if(this.model.getSettings('publishing').connectionId,
                             _.span('&'),
                             _.select({class: 'form-control select-publishing'},
                                 _.option({value: 'publish'}, 'Publish'),
@@ -462,7 +460,7 @@ class ContentEditor extends View {
             this.model = new HashBrown.Models.Content(this.model);
         }
        
-        this.$element.toggleClass('locked', this.model.locked);
+        this.$element.toggleClass('locked', this.model.isLocked);
 
         // Fetch information
         let contentSchema;

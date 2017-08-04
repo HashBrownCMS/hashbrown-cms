@@ -25,77 +25,72 @@ class SchemaHelper extends SchemaHelperCommon {
      */
     static getNativeSchemas() {
         return new Promise((resolve, reject) => {
-            if(!this.nativeSchemas) {
-                Glob(appRoot + '/src/Common/Schemas/*/*.schema', function(err, paths) {
-                    if(err) {
-                        reject(new Error(err));
-                    
-                    } else {
-                        let queue = paths || [];
+            Glob(appRoot + '/src/Common/Schemas/*/*.schema', function(err, paths) {
+                if(err) {
+                    reject(new Error(err));
+                
+                } else {
+                    let queue = paths || [];
 
-                        // Native Schemas output
-                        let nativeSchemas = {};
+                    // Native Schemas output
+                    let nativeSchemas = [];
 
-                        if(queue.length > 0) {
-                            let readNextSchema = () => {
-                                let schemaPath = queue[0];
+                    if(queue.length > 0) {
+                        let readNextSchema = () => {
+                            let schemaPath = queue[0];
 
-                                FileSystem.readFile(schemaPath, (err, data) => {
-                                    if(err) {
-                                        throw err;
-                                    }
+                            FileSystem.readFile(schemaPath, (err, data) => {
+                                if(err) {
+                                    throw err;
+                                }
 
-                                    let properties = JSON.parse(data);
-                                    let parentDirName = Path.dirname(schemaPath).split('/').pop();
-                                    let id = Path.basename(schemaPath, '.schema');
+                                let properties = JSON.parse(data);
+                                let parentDirName = Path.dirname(schemaPath).split('/').pop();
+                                let id = Path.basename(schemaPath, '.schema');
 
-                                    // Generated values, will be overwritten every time
-                                    properties.id = id;
+                                // Generated values, will be overwritten every time
+                                properties.id = id;
 
-                                    let schema;
-                                    
-                                    switch(parentDirName) {
-                                        case 'Content':
-                                            schema = new ContentSchema(properties);
-                                            break;
-                                        case 'Field':
-                                            schema = new FieldSchema(properties);
-                                            break;
-                                    }
+                                let schema;
+                                
+                                switch(parentDirName) {
+                                    case 'Content':
+                                        schema = new ContentSchema(properties);
+                                        break;
+                                    case 'Field':
+                                        schema = new FieldSchema(properties);
+                                        break;
+                                }
 
-                                    // Make sure the 'locked' flag is true
-                                    schema.locked = true;
+                                // Make sure the 'locked' flag is true
+                                schema.isLocked = true;
 
-                                    // Add the loaded schema to the output array
-                                    nativeSchemas[schema.id] = schema;
+                                // Add the loaded schema to the output array
+                                nativeSchemas.push(schema);
 
-                                    // Shift the queue (removes the first element of the array)
-                                    queue.shift();
+                                // Shift the queue (removes the first element of the array)
+                                queue.shift();
 
-                                    // If the queue still has items in it, we should continue reading...
-                                    if(queue.length > 0) {
-                                        readNextSchema();
+                                // If the queue still has items in it, we should continue reading...
+                                if(queue.length > 0) {
+                                    readNextSchema();
 
-                                    // ...if not, we'll return all the loaded schemas
-                                    } else {
-                                        resolve(nativeSchemas);
-                                    
-                                    }
-                                });
-                            }
-
-                            readNextSchema();
-
-                        } else {
-                            resolve({});
-
+                                // ...if not, we'll return all the loaded schemas
+                                } else {
+                                    resolve(nativeSchemas);
+                                
+                                }
+                            });
                         }
-                    }
-                }); 
-            } else {
-                resolve(this.nativeSchemas);
 
-            }
+                        readNextSchema();
+
+                    } else {
+                        resolve([]);
+
+                    }
+                }
+            }); 
         });
     }
     
@@ -119,20 +114,9 @@ class SchemaHelper extends SchemaHelperCommon {
             collection,
             {}
         )
-        .then((result) => {
-            let schemas = {};
-
-            for(let i in result) {
-                let schema = this.getModel(result[i]);
-
-                if(schema) {
-                    schemas[schema.id] = schema;
-                
-                } else {
-                    return new Promise((resolve, reject) => {
-                        reject(new Error('Schema data from DB is incorrect format: ' + JSON.stringify(result[i])));
-                    });
-                }
+        .then((schemas) => {
+            for(let i in schemas) {
+                schemas[i] = this.getModel(schemas[i]);
             }
 
             return SyncHelper.mergeResource(project, environment, 'schemas', schemas, { customOnly: true });
@@ -151,29 +135,12 @@ class SchemaHelper extends SchemaHelperCommon {
         project = requiredParam('project'),
         environment = requiredParam('environment')
     ) {
-        let nativeSchemas;
-        let customSchemas;
-
         return this.getNativeSchemas()
-        .then((result) => {
-            nativeSchemas = result;
-
-            return this.getCustomSchemas(project, environment);
-        })
-        .then((result) => {
-            customSchemas = result;
-
-            let allSchemas = {};
-            
-            for(let id in nativeSchemas) {
-                allSchemas[id] = nativeSchemas[id];   
-            }
-            
-            for(let id in customSchemas) {
-                allSchemas[id] = customSchemas[id];
-            }
-
-            return Promise.resolve(allSchemas);
+        .then((nativeSchemas) => {
+            return this.getCustomSchemas(project, environment)
+            .then((customSchemas) => {
+                return Promise.resolve(nativeSchemas.concat(customSchemas));
+            });
         });
     }
 
@@ -232,7 +199,7 @@ class SchemaHelper extends SchemaHelperCommon {
                             // Generated values, will be overwritten every time
                             properties.id = id;
                             properties.type = parentDirName.toLowerCase();
-                            properties.locked = true;
+                            properties.isLocked = true;
 
                             resolve(properties);
                         }
@@ -418,8 +385,13 @@ class SchemaHelper extends SchemaHelperCommon {
         schema = schema || {};
 
         // Unset automatic flags
-        schema.locked = false;
-        schema.remote = false;
+        schema.isLocked = false;
+
+        schema.sync = schema.sync || {};
+        schema.sync = {
+            isRemote: false,
+            isLocal: false
+        };
 
         return MongoHelper.updateOne(
             project,

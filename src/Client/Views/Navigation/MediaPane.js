@@ -132,6 +132,7 @@ class MediaPane extends NavbarPane {
                 let isSyncEnabled = HashBrown.Helpers.SettingsHelper.getCachedSettings(ProjectHelper.currentProject, null, 'sync').enabled;
 
                 queueItem.$element.attr('data-media-id', item.id);
+                queueItem.$element.attr('data-remote', true);
                
                 if(item.folder) {
                     queueItem.createDir = true;
