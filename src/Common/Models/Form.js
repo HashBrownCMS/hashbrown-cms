@@ -1,13 +1,13 @@
 'use strict';
 
-let Entity = require('./Entity');
+const Resource = require('./Resource');
 
 /**
  * The Form class
  *
  * @memberof HashBrown.Common.Models
  */
-class Form extends Entity {
+class Form extends Resource {
     constructor(params) {
         super(Form.paramsCheck(params)); 
     }
@@ -37,28 +37,7 @@ class Form extends Entity {
      * @returns {Object} Params
      */
     static paramsCheck(params) {
-        params = params || {}
-
-        // Convert from old sync variables
-        params.sync = params.sync || {};
-
-        if(typeof params.local !== 'undefined') {
-            params.sync.hasRemote = params.local;
-            delete params.local;
-        }
-
-        if(typeof params.remote !== 'undefined') {
-            params.sync.isRemote = params.remote;
-            delete params.remote;
-        }
-
-        // Convert from old "locked" state
-        if(typeof params.locked !== 'undefined') {
-            params.isLocked = params.locked;
-            delete params.locked;
-        }
-        
-        return params;
+        return super.paramsCheck(params);
     }
 
     /**
@@ -68,7 +47,7 @@ class Form extends Entity {
      */
     static create() {
         let form = new Form({
-            id: Entity.createId(),
+            id: Form.createId(),
             title: 'New form',
             inputs: {},
             entries: []

@@ -337,8 +337,9 @@ class GitHubConnection extends Connection {
                     return this.getTemplateMarkup(template);
                 }
             }
-            
-            return Promise.reject(new Error('Template by id "' + id + '" not found'));
+           
+            debug.error(new Error('Template by id "' + id + '" not found'), this);
+            return Promise.resolve();
         });
     }
    

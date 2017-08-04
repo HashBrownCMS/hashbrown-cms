@@ -1,13 +1,13 @@
 'use strict';
 
-let Entity = require('./Entity');
+const Resource = require('./Resource');
 
 /**
  * The base class for all Schema types
  *
  * @memberof HashBrown.Common.Models
  */
-class Schema extends Entity {
+class Schema extends Resource {
     constructor(params) {
         super(Schema.paramsCheck(params));
     }
@@ -33,28 +33,7 @@ class Schema extends Entity {
      * @returns {Object} Params
      */
     static paramsCheck(params) {
-        params = params || {}
-
-        // Convert from old sync variables
-        params.sync = params.sync || {};
-
-        if(typeof params.local !== 'undefined') {
-            params.sync.hasRemote = params.local;
-            delete params.local;
-        }
-
-        if(typeof params.remote !== 'undefined') {
-            params.sync.isRemote = params.remote;
-            delete params.remote;
-        }
-
-        // Convert from old "locked" state
-        if(typeof params.locked !== 'undefined') {
-            params.isLocked = params.locked;
-            delete params.locked;
-        }
-
-        return params;
+        return super.paramsCheck(params);
     }
 
     /**
@@ -79,7 +58,7 @@ class Schema extends Entity {
         parentSchema = requiredParam('parentSchema')
     ) {
         return HashBrown.Helpers.SchemaHelper.getModel({
-            id: Entity.createId(),
+            id: Schema.createId(),
             icon: parentSchema.icon || 'file',
             type: parentSchema.type,
             editorId: parentSchema.editorId,

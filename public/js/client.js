@@ -8255,7 +8255,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Entity = __webpack_require__(9);
+var Resource = __webpack_require__(294);
 
 /**
  * The base class for all Connection types
@@ -8263,13 +8263,13 @@ var Entity = __webpack_require__(9);
  * @memberof HashBrown.Common.Models
  */
 
-var Connection = function (_Entity) {
-    _inherits(Connection, _Entity);
+var Connection = function (_Resource) {
+    _inherits(Connection, _Resource);
 
     function Connection(params) {
         _classCallCheck(this, Connection);
 
-        return _possibleConstructorReturn(this, _Entity.call(this, Connection.paramsCheck(params)));
+        return _possibleConstructorReturn(this, _Resource.call(this, Connection.paramsCheck(params)));
     }
 
     Connection.prototype.structure = function structure() {
@@ -8297,28 +8297,7 @@ var Connection = function (_Entity) {
 
 
     Connection.paramsCheck = function paramsCheck(params) {
-        params = params || {};
-
-        // Convert from old sync variables
-        params.sync = params.sync || {};
-
-        if (typeof params.local !== 'undefined') {
-            params.sync.hasRemote = params.remote;
-            delete params.local;
-        }
-
-        if (typeof params.remote !== 'undefined') {
-            params.sync.isRemote = params.remote;
-            delete params.remote;
-        }
-
-        // Convert from old "locked" state
-        if (typeof params.locked !== 'undefined') {
-            params.isLocked = params.locked;
-            delete params.locked;
-        }
-
-        return params;
+        return _Resource.paramsCheck.call(this, params);
     };
 
     /**
@@ -8330,7 +8309,7 @@ var Connection = function (_Entity) {
 
     Connection.create = function create() {
         var connection = new Connection({
-            id: Entity.createId(),
+            id: Connection.createId(),
             title: 'New connection',
             settings: {}
         });
@@ -8661,7 +8640,7 @@ var Connection = function (_Entity) {
     };
 
     return Connection;
-}(Entity);
+}(Resource);
 
 module.exports = Connection;
 
@@ -9785,7 +9764,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var Path = __webpack_require__(105);
 
-var Entity = __webpack_require__(9);
+var Resource = __webpack_require__(294);
 
 /**
  * The base class for all Media objects
@@ -9793,18 +9772,36 @@ var Entity = __webpack_require__(9);
  * @memberof HashBrown.Common.Models
  */
 
-var Media = function (_Entity) {
-    _inherits(Media, _Entity);
+var Media = function (_Resource) {
+    _inherits(Media, _Resource);
 
-    function Media() {
+    function Media(params) {
         _classCallCheck(this, Media);
 
-        return _possibleConstructorReturn(this, _Entity.apply(this, arguments));
+        return _possibleConstructorReturn(this, _Resource.call(this, Media.paramsCheck(params)));
     }
+
+    /**
+     * Checks the format of the params
+     *
+     * @params {Object} params
+     *
+     * @returns {Object} Params
+     */
+
+
+    Media.paramsCheck = function paramsCheck(params) {
+        params = _Resource.paramsCheck.call(this, params);
+
+        delete params.remote;
+        delete params.sync;
+        delete params.isRemote;
+
+        return params;
+    };
 
     Media.prototype.structure = function structure() {
         this.def(String, 'id');
-        this.def(Boolean, 'remote', true);
         this.def(String, 'icon', 'file-image-o');
         this.def(String, 'name');
         this.def(String, 'url');
@@ -9933,14 +9930,14 @@ var Media = function (_Entity) {
 
     Media.create = function create(file) {
         var media = new Media({
-            id: Entity.createId()
+            id: Media.createId()
         });
 
         return media;
     };
 
     return Media;
-}(Entity);
+}(Resource);
 
 module.exports = Media;
 
@@ -9957,7 +9954,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Entity = __webpack_require__(9);
+var Resource = __webpack_require__(294);
 
 /**
  * The base class for all Schema types
@@ -9965,13 +9962,13 @@ var Entity = __webpack_require__(9);
  * @memberof HashBrown.Common.Models
  */
 
-var Schema = function (_Entity) {
-    _inherits(Schema, _Entity);
+var Schema = function (_Resource) {
+    _inherits(Schema, _Resource);
 
     function Schema(params) {
         _classCallCheck(this, Schema);
 
-        return _possibleConstructorReturn(this, _Entity.call(this, Schema.paramsCheck(params)));
+        return _possibleConstructorReturn(this, _Resource.call(this, Schema.paramsCheck(params)));
     }
 
     Schema.prototype.structure = function structure() {
@@ -9997,28 +9994,7 @@ var Schema = function (_Entity) {
 
 
     Schema.paramsCheck = function paramsCheck(params) {
-        params = params || {};
-
-        // Convert from old sync variables
-        params.sync = params.sync || {};
-
-        if (typeof params.local !== 'undefined') {
-            params.sync.hasRemote = params.local;
-            delete params.local;
-        }
-
-        if (typeof params.remote !== 'undefined') {
-            params.sync.isRemote = params.remote;
-            delete params.remote;
-        }
-
-        // Convert from old "locked" state
-        if (typeof params.locked !== 'undefined') {
-            params.isLocked = params.locked;
-            delete params.locked;
-        }
-
-        return params;
+        return _Resource.paramsCheck.call(this, params);
     };
 
     /**
@@ -10047,7 +10023,7 @@ var Schema = function (_Entity) {
         var parentSchema = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('parentSchema');
 
         return HashBrown.Helpers.SchemaHelper.getModel({
-            id: Entity.createId(),
+            id: Schema.createId(),
             icon: parentSchema.icon || 'file',
             type: parentSchema.type,
             editorId: parentSchema.editorId,
@@ -10056,7 +10032,7 @@ var Schema = function (_Entity) {
     };
 
     return Schema;
-}(Entity);
+}(Resource);
 
 module.exports = Schema;
 
@@ -15736,6 +15712,8 @@ var LanguageHelper = function (_LanguageHelperCommon) {
      * @returns {Array} List of language names
      */
     LanguageHelper.getLanguages = function getLanguages() {
+        var _this2 = this;
+
         var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
 
         return SettingsHelper.getSettings(project, null, 'languages').then(function (selected) {
@@ -15744,6 +15722,8 @@ var LanguageHelper = function (_LanguageHelperCommon) {
             }
 
             selected.sort();
+
+            _this2.selectedLanguages = selected;
 
             return Promise.resolve(selected);
         });
@@ -15767,7 +15747,7 @@ var LanguageHelper = function (_LanguageHelperCommon) {
             return Promise.reject(new Error('Language array cannot be of type "' + (typeof languages === 'undefined' ? 'undefined' : _typeof(languages)) + '"'));
         }
 
-        return setSettings(project, null, 'languages', languages);
+        return SettingsHelper.setSettings(project, null, 'languages', languages);
     };
 
     return LanguageHelper;
@@ -15790,7 +15770,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Entity = __webpack_require__(9);
+var Resource = __webpack_require__(294);
 
 /**
  * The base class for all Content types
@@ -15798,13 +15778,13 @@ var Entity = __webpack_require__(9);
  * @memberof HashBrown.Common.Models
  */
 
-var Content = function (_Entity) {
-    _inherits(Content, _Entity);
+var Content = function (_Resource) {
+    _inherits(Content, _Resource);
 
     function Content(params) {
         _classCallCheck(this, Content);
 
-        return _possibleConstructorReturn(this, _Entity.call(this, Content.paramsCheck(params)));
+        return _possibleConstructorReturn(this, _Resource.call(this, Content.paramsCheck(params)));
     }
 
     Content.prototype.structure = function structure() {
@@ -15849,32 +15829,7 @@ var Content = function (_Entity) {
 
 
     Content.paramsCheck = function paramsCheck(params) {
-        params = params || {};
-
-        // Convert from old "unpublished" state
-        if (typeof params.unpublished !== 'undefined') {
-            params.isPublished = !params.unpublished;
-            delete params.published;
-        }
-
-        // Convert from old sync variables
-        params.sync = params.sync || {};
-
-        if (typeof params.local !== 'undefined') {
-            params.sync.hasRemote = params.local;
-            delete params.local;
-        }
-
-        if (typeof params.remote !== 'undefined') {
-            params.sync.isRemote = params.remote;
-            delete params.remote;
-        }
-
-        // Convert from old "locked" state
-        if (typeof params.locked !== 'undefined') {
-            params.isLocked = params.locked;
-            delete params.locked;
-        }
+        params = _Resource.paramsCheck.call(this, params);
 
         // Ensure correct type for dates
         function parseDate(input) {
@@ -15915,7 +15870,7 @@ var Content = function (_Entity) {
         };
 
         var content = new Content({
-            id: Entity.createId(),
+            id: Content.createId(),
             createDate: new Date(),
             updateDate: new Date(),
             schemaId: schemaId,
@@ -16063,9 +16018,11 @@ var Content = function (_Entity) {
 
                 var parentContent = _ref;
 
-                if (parentContent.settingsApplyToChildren(key)) {
-                    var settings = parentContent.settings[key];
+                var settings = parentContent.settings[key] || {};
 
+                console.log(parentContent.id, settings);
+
+                if (settings.applyToChildren) {
                     // Make clone as to avoid interference with inherent values
                     settings = JSON.parse(JSON.stringify(settings));
                     settings.governedBy = parentContent.id;
@@ -16218,13 +16175,11 @@ var Content = function (_Entity) {
 
 
     Content.prototype.getSchema = function getSchema() {
-        return new Promise(function (callback) {
-            callback(null);
-        });
+        return Promis.resolve();
     };
 
     return Content;
-}(Entity);
+}(Resource);
 
 module.exports = Content;
 
@@ -16256,36 +16211,61 @@ var Project = function (_Entity) {
     function Project(params) {
         _classCallCheck(this, Project);
 
-        var _this = _possibleConstructorReturn(this, _Entity.call(this, params));
-
-        _this.sanityCheck();
-        return _this;
+        return _possibleConstructorReturn(this, _Entity.call(this, Project.checkParams(params)));
     }
 
-    Project.prototype.sanityCheck = function sanityCheck() {
-        if (!this.settings) {
-            this.settings = {};
-        }
-        if (!this.settings.info) {
-            this.settings.info = {};
-        }
-        if (!this.settings.languages) {
-            this.settings.languages = ['en'];
+    /**
+     * Performs a sanity check of the params
+     *
+     * @param {Object} params
+     *
+     * @returns {Object} Params
+     */
+
+
+    Project.checkParams = function checkParams(params) {
+        params = params || {};
+
+        if (!params.id) {
+            throw new Error('No id was provided for the Project constructor');
         }
 
-        if (!Array.isArray(this.settings.languages)) {
+        if (!params.settings) {
+            params.settings = {};
+        }
+        if (!params.settings.info) {
+            params.settings.info = {};
+        }
+        if (!params.settings.info.name) {
+            params.settings.info.name = params.id;
+        }
+        if (!params.settings.languages) {
+            params.settings.languages = ['en'];
+        }
+        if (!params.settings.sync) {
+            params.settings.sync = {};
+        }
+
+        // Delete old flags
+        delete params.useAutoBackup;
+        delete params.backupStorage;
+
+        // Restore from old languages structure
+        if (!Array.isArray(params.settings.languages)) {
             var languages = [];
 
-            for (var key in this.settings.languages) {
+            for (var key in params.settings.languages) {
                 if (key === 'section') {
                     continue;
                 }
 
-                languages.push(this.settings.languages[key]);
+                languages.push(params.settings.languages[key]);
             }
 
-            this.settings.languages = languages;
+            params.settings.languages = languages;
         }
+
+        return params;
     };
 
     Project.prototype.structure = function structure() {
@@ -16293,19 +16273,35 @@ var Project = function (_Entity) {
         this.def(Array, 'users', []);
         this.def(Object, 'settings', {});
         this.def(Array, 'environments', ['live']);
-        this.def(Boolean, 'useAutoBackup');
         this.def(Array, 'backups', []);
-        this.def(String, 'backupStorage', 'local');
     };
 
+    /**
+     * Creates a database safe name
+     *
+     * @param {String} name
+     *
+     * @returns {String} Safe name
+     */
+
+
+    Project.safeName = function safeName(name) {
+        return name.toLowerCase().replace('.', '_').replace(/[^a-z_]/g, '');
+    };
+
+    /**
+     * Creates a new project
+     *
+     * @param {String} name
+     *
+     * @returns {Project} New Project
+     */
+
+
     Project.create = function create(name) {
-        var project = new Project();
-
-        var id = name.toLowerCase();
-        id = id.replace('.', '_');
-        id = id.replace(/[^a-z_]/g, '');
-
-        project.id = id;
+        var project = new Project({
+            id: Project.safeName(name)
+        });
 
         project.settings.usedBy = 'project';
         project.settings.info = {
@@ -16406,7 +16402,7 @@ var UserEditor = function (_View) {
 
 
     UserEditor.prototype.getScopes = function getScopes() {
-        return ['connections', 'schemas', 'settings', 'templates', 'users'];
+        return ['connections', 'schemas', 'templates'];
     };
 
     /**
@@ -40551,6 +40547,7 @@ module.exports = {
     index: __webpack_require__(216),
     Media: __webpack_require__(39),
     Project: __webpack_require__(95),
+    Resource: __webpack_require__(294),
     Schema: __webpack_require__(40),
     Template: __webpack_require__(217),
     User: __webpack_require__(41)
@@ -40569,7 +40566,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Entity = __webpack_require__(9);
+var Resource = __webpack_require__(294);
 
 /**
  * The Template model
@@ -40577,19 +40574,37 @@ var Entity = __webpack_require__(9);
  * @memberof HashBrown.Common.Models
  */
 
-var Template = function (_Entity) {
-    _inherits(Template, _Entity);
+var Template = function (_Resource) {
+    _inherits(Template, _Resource);
 
     function Template(params) {
         _classCallCheck(this, Template);
 
-        return _possibleConstructorReturn(this, _Entity.call(this, params));
+        return _possibleConstructorReturn(this, _Resource.call(this, Template.paramsCheck(params)));
     }
+
+    /**
+     * Checks the format of the params
+     *
+     * @params {Object} params
+     *
+     * @returns {Object} Params
+     */
+
+
+    Template.paramsCheck = function paramsCheck(params) {
+        params = _Resource.paramsCheck.call(this, params);
+
+        delete params.remote;
+        delete params.sync;
+        delete params.isRemote;
+
+        return params;
+    };
 
     Template.prototype.structure = function structure() {
         this.def(String, 'id');
         this.def(String, 'parentId');
-        this.def(Boolean, 'remote', true);
         this.def(String, 'icon', 'code');
         this.def(String, 'name');
         this.def(String, 'type');
@@ -40608,7 +40623,7 @@ var Template = function (_Entity) {
     };
 
     return Template;
-}(Entity);
+}(Resource);
 
 module.exports = Template;
 
@@ -40949,6 +40964,7 @@ Router.route('/media/:id', function () {
 
 
 var RequestHelper = __webpack_require__(3);
+var SchemaHelper = __webpack_require__(25);
 
 // Dashboard
 Router.route('/schemas/', function () {
@@ -40980,7 +40996,7 @@ Router.route('/schemas/:id', function () {
 Router.route('/schemas/json/:id', function () {
     if (currentUserHasScope('schemas')) {
         var jsonEditor = new HashBrown.Views.Editors.JSONEditor({
-            model: resources.schemas[this.id],
+            model: SchemaHelper.getSchemaByIdSync(this.id),
             apiPath: 'schemas/' + this.id,
             onSuccess: function onSuccess() {
                 return RequestHelper.reloadResource('schemas').then(function () {
@@ -42355,7 +42371,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Entity = __webpack_require__(9);
+var Resource = __webpack_require__(294);
 
 /**
  * The Form class
@@ -42363,13 +42379,13 @@ var Entity = __webpack_require__(9);
  * @memberof HashBrown.Common.Models
  */
 
-var Form = function (_Entity) {
-    _inherits(Form, _Entity);
+var Form = function (_Resource) {
+    _inherits(Form, _Resource);
 
     function Form(params) {
         _classCallCheck(this, Form);
 
-        return _possibleConstructorReturn(this, _Entity.call(this, Form.paramsCheck(params)));
+        return _possibleConstructorReturn(this, _Resource.call(this, Form.paramsCheck(params)));
     }
 
     Form.prototype.structure = function structure() {
@@ -42399,28 +42415,7 @@ var Form = function (_Entity) {
 
 
     Form.paramsCheck = function paramsCheck(params) {
-        params = params || {};
-
-        // Convert from old sync variables
-        params.sync = params.sync || {};
-
-        if (typeof params.local !== 'undefined') {
-            params.sync.hasRemote = params.local;
-            delete params.local;
-        }
-
-        if (typeof params.remote !== 'undefined') {
-            params.sync.isRemote = params.remote;
-            delete params.remote;
-        }
-
-        // Convert from old "locked" state
-        if (typeof params.locked !== 'undefined') {
-            params.isLocked = params.locked;
-            delete params.locked;
-        }
-
-        return params;
+        return _Resource.paramsCheck.call(this, params);
     };
 
     /**
@@ -42432,7 +42427,7 @@ var Form = function (_Entity) {
 
     Form.create = function create() {
         var form = new Form({
-            id: Entity.createId(),
+            id: Form.createId(),
             title: 'New form',
             inputs: {},
             entries: []
@@ -42532,7 +42527,7 @@ var Form = function (_Entity) {
     };
 
     return Form;
-}(Entity);
+}(Resource);
 
 module.exports = Form;
 
@@ -43073,7 +43068,7 @@ var ContentPane = function (_NavbarPane) {
 
             var editor = ViewHelper.get('ContentEditor');
 
-            if (editor && editor.model.id == pullId) {
+            if (editor && editor.model && editor.model.id == pullId) {
                 editor.model = null;
                 editor.fetch();
             }
@@ -44065,6 +44060,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var ProjectHelper = __webpack_require__(6);
 var RequestHelper = __webpack_require__(3);
+var SchemaHelper = __webpack_require__(25);
 
 var NavbarPane = __webpack_require__(37);
 var NavbarMain = __webpack_require__(36);
@@ -44090,7 +44086,7 @@ var SchemaPane = function (_NavbarPane) {
     SchemaPane.onClickRemoveSchema = function onClickRemoveSchema() {
         var $element = $('.cr-context-menu__target-element');
         var id = $element.data('id');
-        var schema = window.resources.schemas[id];
+        var schema = SchemaHelper.getSchemaByIdSync(id);
 
         function onSuccess() {
             debug.log('Removed schema with id "' + id + '"', this);
@@ -44145,7 +44141,7 @@ var SchemaPane = function (_NavbarPane) {
 
     SchemaPane.onClickNewSchema = function onClickNewSchema() {
         var parentId = $('.cr-context-menu__target-element').data('id');
-        var parentSchema = window.resources.schemas[parentId];
+        var parentSchema = SchemaHelper.getSchemaByIdSync(parentId);
 
         RequestHelper.request('post', 'schemas/new', parentSchema).then(function (newSchema) {
             return RequestHelper.reloadResource('schemas').then(function () {
@@ -46960,8 +46956,6 @@ var ContentReferenceEditor = function (_FieldEditor) {
 
             var content = _ref;
 
-            content = new Content(content);
-
             if (areRulesDefined) {
                 var isContentAllowed = this.config.allowedSchemas.indexOf(content.schemaId) > -1;
 
@@ -47124,8 +47118,8 @@ var ContentSchemaReferenceEditor = function (_FieldEditor) {
     ContentSchemaReferenceEditor.prototype.getDropdownOptions = function getDropdownOptions() {
         var contentSchemas = [];
 
-        for (var id in window.resources.schemas) {
-            var schema = window.resources.schemas[id];
+        for (var i in window.resources.schemas) {
+            var schema = window.resources.schemas[i];
             var isNative = schema.id == 'page' || schema.id == 'contentBase';
 
             if (schema.type == 'content' && !isNative && (!this.config || !this.config.allowedSchemas || !Array.isArray(this.config.allowedSchemas) || this.config.allowedSchemas.indexOf(schema.id) > -1)) {
@@ -48843,6 +48837,109 @@ var UrlEditor = function (_FieldEditor) {
 }(FieldEditor);
 
 module.exports = UrlEditor;
+
+/***/ }),
+/* 267 */,
+/* 268 */,
+/* 269 */,
+/* 270 */,
+/* 271 */,
+/* 272 */,
+/* 273 */,
+/* 274 */,
+/* 275 */,
+/* 276 */,
+/* 277 */,
+/* 278 */,
+/* 279 */,
+/* 280 */,
+/* 281 */,
+/* 282 */,
+/* 283 */,
+/* 284 */,
+/* 285 */,
+/* 286 */,
+/* 287 */,
+/* 288 */,
+/* 289 */,
+/* 290 */,
+/* 291 */,
+/* 292 */,
+/* 293 */,
+/* 294 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Entity = __webpack_require__(9);
+
+/**
+ * Basic resource class
+ *
+ * @memberof HashBrown.Common.Models
+ */
+
+var Resource = function (_Entity) {
+    _inherits(Resource, _Entity);
+
+    function Resource() {
+        _classCallCheck(this, Resource);
+
+        return _possibleConstructorReturn(this, _Entity.apply(this, arguments));
+    }
+
+    /**
+     * Checks the format of the params
+     *
+     * @params {Object} params
+     *
+     * @returns {Object} Params
+     */
+    Resource.paramsCheck = function paramsCheck(params) {
+        params = params || {};
+
+        // Convert from old sync variables
+        params.sync = params.sync || {};
+
+        if (typeof params.local !== 'undefined') {
+            if (typeof params.sync.isRemote === 'undefined') {
+                params.sync.hasRemote = params.local;
+            }
+
+            delete params.local;
+        }
+
+        if (typeof params.remote !== 'undefined') {
+            if (typeof params.sync.isRemote === 'undefined') {
+                params.sync.isRemote = params.remote;
+            }
+
+            delete params.remote;
+        }
+
+        // Convert from old "locked" state
+        if (typeof params.locked !== 'undefined') {
+            if (typeof params.isLocked === 'undefined') {
+                params.isLocked = params.locked;
+            }
+
+            delete params.locked;
+        }
+
+        return params;
+    };
+
+    return Resource;
+}(Entity);
+
+module.exports = Resource;
 
 /***/ })
 /******/ ]);

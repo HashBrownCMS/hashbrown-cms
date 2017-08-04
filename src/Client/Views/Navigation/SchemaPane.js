@@ -2,6 +2,7 @@
 
 const ProjectHelper = require('Client/Helpers/ProjectHelper');
 const RequestHelper = require('Client/Helpers/RequestHelper');
+const SchemaHelper = require('Client/Helpers/SchemaHelper');
 
 const NavbarPane = require('./NavbarPane');
 const NavbarMain = require('./NavbarMain');
@@ -18,7 +19,7 @@ class SchemaPane extends NavbarPane {
     static onClickRemoveSchema() {
         let $element = $('.cr-context-menu__target-element'); 
         let id = $element.data('id');
-        let schema = window.resources.schemas[id];
+        let schema = SchemaHelper.getSchemaByIdSync(id);
         
         function onSuccess() {
             debug.log('Removed schema with id "' + id + '"', this); 
@@ -81,7 +82,7 @@ class SchemaPane extends NavbarPane {
      */
     static onClickNewSchema() {
         let parentId = $('.cr-context-menu__target-element').data('id');
-        let parentSchema = window.resources.schemas[parentId];
+        let parentSchema = SchemaHelper.getSchemaByIdSync(parentId);
 
         RequestHelper.request('post', 'schemas/new', parentSchema)
         .then((newSchema) => {

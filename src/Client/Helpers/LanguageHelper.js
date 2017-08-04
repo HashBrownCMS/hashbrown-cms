@@ -27,6 +27,8 @@ class LanguageHelper extends LanguageHelperCommon {
 
             selected.sort();
 
+            this.selectedLanguages = selected;
+
             return Promise.resolve(selected);
         });
     }
@@ -47,7 +49,7 @@ class LanguageHelper extends LanguageHelperCommon {
             return Promise.reject(new Error('Language array cannot be of type "' + typeof languages + '"'));
         }
 
-        return setSettings(project, null, 'languages', languages);
+        return SettingsHelper.setSettings(project, null, 'languages', languages);
     }
 }
 

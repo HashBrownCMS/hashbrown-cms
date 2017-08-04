@@ -1,13 +1,13 @@
 'use strict';
 
-let Entity = require('./Entity');
+const Resource = require('./Resource');
 
 /**
  * The base class for all Connection types
  *
  * @memberof HashBrown.Common.Models
  */
-class Connection extends Entity {
+class Connection extends Resource {
     constructor(params) {
         super(Connection.paramsCheck(params));
     }
@@ -35,28 +35,7 @@ class Connection extends Entity {
      * @returns {Object} Params
      */
     static paramsCheck(params) {
-        params = params || {}
-
-        // Convert from old sync variables
-        params.sync = params.sync || {};
-
-        if(typeof params.local !== 'undefined') {
-            params.sync.hasRemote = params.remote;
-            delete params.local;
-        }
-
-        if(typeof params.remote !== 'undefined') {
-            params.sync.isRemote = params.remote;
-            delete params.remote;
-        }
-
-        // Convert from old "locked" state
-        if(typeof params.locked !== 'undefined') {
-            params.isLocked = params.locked;
-            delete params.locked;
-        }
-
-        return params;
+        return super.paramsCheck(params);
     }
 
     /**
@@ -66,7 +45,7 @@ class Connection extends Entity {
      */
     static create() {
         let connection = new Connection({
-            id: Entity.createId(),
+            id: Connection.createId(),
             title: 'New connection',
             settings: {}
         });

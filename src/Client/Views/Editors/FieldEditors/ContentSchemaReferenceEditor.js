@@ -92,8 +92,8 @@ class ContentSchemaReferenceEditor extends FieldEditor {
     getDropdownOptions() {
         let contentSchemas = [];
 
-        for(let id in window.resources.schemas) {
-            let schema = window.resources.schemas[id];
+        for(let i in window.resources.schemas) {
+            let schema = window.resources.schemas[i];
             let isNative = schema.id == 'page' || schema.id == 'contentBase';
 
             if(

@@ -46,8 +46,6 @@ class MediaController extends ApiController {
                     return res.status(404).send('Not found');
                 }
 
-                let contentType = media.getContentTypeHeader();
-               
                 if(connection.isLocal()) {
                     res.sendFile(media.url);
 

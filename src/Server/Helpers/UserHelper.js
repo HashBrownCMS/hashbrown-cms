@@ -42,22 +42,15 @@ class UserHelper {
         }
 
         return new Promise((resolve, reject) => {
-            let generator = COAuth2.createXOAuth2Generator({
-                user: this.mailConfig.user,
-                clientId: this.mailConfig.clientId,
-                clientSecret: this.mailConfig.clientSecret,
-                refreshToken: this.mailConfig.refreshToken,
-                accessToken: this.cachedAccessToken
-            });
-            
-            generator.on('token', (res) => {
-                this.cachedAccessToken = res.accessToken;
-            });
-
             let mailTransport = NodeMailer.createTransport({
                 service: this.mailConfig.service,
                 auth: {
-                    XOAuth2: generator
+                    OAuth2: {
+                        user: this.mailConfig.user,
+                        clientId: this.mailConfig.clientId,
+                        clientSecret: this.mailConfig.clientSecret,
+                        refreshToken: this.mailConfig.refreshToken
+                    }
                 }
             });
 

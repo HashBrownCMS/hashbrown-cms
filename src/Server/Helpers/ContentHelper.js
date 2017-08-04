@@ -69,7 +69,7 @@ class ContentHelper extends ContentHelperCommon {
      * @param {String} id
      * @param {Boolean} localOnly
      *
-     * @return {Promise} promise
+     * @return {Promise} Promise
      */
     static getContentById(
         project = requiredParam('project'),

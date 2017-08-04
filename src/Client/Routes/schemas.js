@@ -1,6 +1,7 @@
 'use strict';
 
 const RequestHelper = require('Client/Helpers/RequestHelper');
+const SchemaHelper = require('Client/Helpers/SchemaHelper');
 
 // Dashboard
 Router.route('/schemas/', function() {
@@ -42,7 +43,7 @@ Router.route('/schemas/:id', function() {
 Router.route('/schemas/json/:id', function() {
     if(currentUserHasScope('schemas')) {
         let jsonEditor = new HashBrown.Views.Editors.JSONEditor({
-            model: resources.schemas[this.id],
+            model: SchemaHelper.getSchemaByIdSync(this.id),
             apiPath: 'schemas/' + this.id,
             onSuccess: () => {
                 return RequestHelper.reloadResource('schemas')

@@ -35,8 +35,6 @@ class ContentReferenceEditor extends FieldEditor {
         let areRulesDefined = this.config && Array.isArray(this.config.allowedSchemas) && this.config.allowedSchemas.length > 0;
 
         for(let content of resources.content) {
-            content = new Content(content);
-
             if(areRulesDefined) {
                 let isContentAllowed = this.config.allowedSchemas.indexOf(content.schemaId) > -1;
                 

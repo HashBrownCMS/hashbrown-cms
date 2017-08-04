@@ -354,6 +354,7 @@ class SettingsHelper extends SettingsHelperCommon {
                     oldSettings = settings;
                 }
 
+                // Update the database
                 return MongoHelper.updateOne(project, 'settings', query, oldSettings, { upsert: true });
             });
         });

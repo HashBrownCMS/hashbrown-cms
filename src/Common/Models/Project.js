@@ -10,48 +10,78 @@ let Connection = require('./Connection');
  */
 class Project extends Entity {
     constructor(params) {
-        super(params);
-
-        this.sanityCheck();
+        super(Project.checkParams(params));
     }
 
-    sanityCheck() {
-        if(!this.settings) { this.settings = {}; }
-        if(!this.settings.info) { this.settings.info = {}; }
-        if(!this.settings.languages) { this.settings.languages = [ 'en' ]; }
-    
-        if(!Array.isArray(this.settings.languages)) {
+    /**
+     * Performs a sanity check of the params
+     *
+     * @param {Object} params
+     *
+     * @returns {Object} Params
+     */
+    static checkParams(params) {
+        params = params || {};
+
+        if(!params.id) { throw new Error('No id was provided for the Project constructor'); }
+
+        if(!params.settings) { params.settings = {}; }
+        if(!params.settings.info) { params.settings.info = {}; }
+        if(!params.settings.info.name) { params.settings.info.name = params.id; }
+        if(!params.settings.languages) { params.settings.languages = [ 'en' ]; }
+        if(!params.settings.sync) { params.settings.sync = {}; }
+
+        // Delete old flags
+        delete params.useAutoBackup;
+        delete params.backupStorage;
+
+        // Restore from old languages structure
+        if(!Array.isArray(params.settings.languages)) {
             let languages = [];
             
-            for(let key in this.settings.languages) {
+            for(let key in params.settings.languages) {
                 if(key === 'section') { continue; }
 
-                languages.push(this.settings.languages[key]);
+                languages.push(params.settings.languages[key]);
             }
 
-            this.settings.languages = languages;
+            params.settings.languages = languages;
         }
+
+        return params;
     }
 
     structure() {
         this.def(String, 'id');
         this.def(Array, 'users', []);
         this.def(Object, 'settings', {});
-        this.def(Array, 'environments', [ 'live'  ]);
-        this.def(Boolean, 'useAutoBackup');
+        this.def(Array, 'environments', [ 'live' ]);
         this.def(Array, 'backups', []);
-        this.def(String, 'backupStorage', 'local');
     }
 
+    /**
+     * Creates a database safe name
+     *
+     * @param {String} name
+     *
+     * @returns {String} Safe name
+     */
+    static safeName(name) {
+        return name.toLowerCase().replace('.', '_').replace(/[^a-z_]/g, '');
+    }
+    
+    /**
+     * Creates a new project
+     *
+     * @param {String} name
+     *
+     * @returns {Project} New Project
+     */
     static create(name) {
-        let project = new Project();
-
-        let id = name.toLowerCase();
-        id = id.replace('.', '_');
-        id = id.replace(/[^a-z_]/g, '');
+        let project = new Project({
+            id: Project.safeName(name)
+        });
         
-        project.id = id;
-
         project.settings.usedBy = 'project';
         project.settings.info = {
             name: name

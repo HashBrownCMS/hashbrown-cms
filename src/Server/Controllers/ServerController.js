@@ -485,7 +485,7 @@ class ServerController extends ApiController {
         let oldName = req.params.project;
         let newName = req.body.name;
 
-        MongoHelper.renameDatabase(oldName, newName)
+        ProjectHelper.renameProject(oldName, newName)
         .then((msg) => {
             res.status(200).send(msg);
         })

@@ -4,6 +4,7 @@ const MongoHelper = require('Server/Helpers/MongoHelper');
 const BackupHelper = require('Server/Helpers/BackupHelper');
 const UserHelper = require('Server/Helpers/UserHelper');
 const SyncHelper = require('Server/Helpers/SyncHelper');
+const SettingsHelper = require('Server/Helpers/SettingsHelper');
 
 const Project = require('Common/Models/Project');
 
@@ -77,28 +78,15 @@ class ProjectHelper {
             return this.getAllEnvironments(id);
         })
         .then((foundEnvironments) => {
-            let project = new Project();
+            let project = new Project({
+                id: id,
+                backups: backups,
+                settings: settings,
+                environments: foundEnvironments,
+                users: users
+            });
 
-            project.id = id;
-            project.backups = backups;
-
-            project.settings = settings;
-            project.environments = foundEnvironments;
-
-            // Sanity check
-            if(!project.settings.languages) {
-                project.settings.languages = [ 'en' ];
-            }
-            
-            if(!project.settings.info) {
-                project.settings.info = {
-                    name: id
-                };
-            }
-
-            project.users = users;
-            
-            return Promise.resolve(project.getObject());
+            return Promise.resolve(project);
         });
     }
 
@@ -174,15 +162,47 @@ class ProjectHelper {
         project = requiredParam('project'),
         environment = requiredParam('environment')
     ) {
-        debug.log('Adding environment "' + environment + '" to project "' + project + '"...', this);
+        // Check is project is synced first
+        return SettingsHelper.getSettings(project, null, 'sync')
+        .then((sync) => {
+            if(sync.enabled) {
+                return Promise.reject(new Error('Cannot add environments to a synced project'));
+            }
+            
+            debug.log('Adding environment "' + environment + '" to project "' + project + '"...', this);
        
-        return MongoHelper.updateOne(
-            project,
-            'settings',
-            { usedBy: environment },
-            { upsert: true }
-        ).then(() => {
+            return MongoHelper.updateOne(
+                project,
+                'settings',
+                { usedBy: environment },
+                { upsert: true }
+            );
+        })
+        .then(() => {
             return Promise.resolve(environment);  
+        });
+    }
+
+    /**
+     * Renames a project
+     *
+     * @param {String} oldName
+     * @param {String} newName
+     *
+     * @return {Promise} Promise
+     */
+    static renameProject(
+        oldName = requiredParam('oldName'),
+        newName = requiredParam('newName')
+    ) {
+        // Check is project is synced first
+        return SettingsHelper.getSettings(project, null, 'sync')
+        .then((sync) => {
+            if(sync.enabled) {
+                return Promise.reject(new Error('Cannot rename a synced project'));
+            }
+
+            return MongoHelper.renameDatabase(oldName, newName);
         });
     }
 
@@ -194,11 +214,22 @@ class ProjectHelper {
      *
      * @returns {Promise} Promise
      */
-    static deleteEnvironment(project, environment) {
-        debug.log('Deleting environment "' + environment + '" from project "' + project + '"...', this);
+    static deleteEnvironment(
+        project = requiredParam('project'),
+        environment = requiredParam('environment')
+    ) {
+        // Check is project is synced first
+        return SettingsHelper.getSettings(project, null, 'sync')
+        .then((sync) => {
+            if(sync.enabled) {
+                return Promise.reject(new Error('Cannot delete environments from a synced project'));
+            }
+        
+            debug.log('Deleting environment "' + environment + '" from project "' + project + '"...', this);
 
-        // Make backup first
-        return BackupHelper.createBackup(project)
+            // Make a backup
+            return BackupHelper.createBackup(project.id);
+        })
 
         // Get all collections with the environment prefix
         .then(() => {

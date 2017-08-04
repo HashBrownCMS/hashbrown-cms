@@ -1,13 +1,13 @@
 'use strict';
 
-let Entity = require('./Entity');
+const Resource = require('./Resource');
 
 /**
  * The base class for all Content types
  *
  * @memberof HashBrown.Common.Models
  */
-class Content extends Entity {
+class Content extends Resource {
     constructor(params) {
         super(Content.paramsCheck(params)); 
     }
@@ -52,32 +52,7 @@ class Content extends Entity {
      * @returns {Object} Params
      */
     static paramsCheck(params) {
-        params = params || {};
-
-        // Convert from old "unpublished" state
-        if(typeof params.unpublished !== 'undefined') {
-            params.isPublished = !params.unpublished;
-            delete params.published;
-        }
-
-        // Convert from old sync variables
-        params.sync = params.sync || {};
-
-        if(typeof params.local !== 'undefined') {
-            params.sync.hasRemote = params.local;
-            delete params.local;
-        }
-
-        if(typeof params.remote !== 'undefined') {
-            params.sync.isRemote = params.remote;
-            delete params.remote;
-        }
-
-        // Convert from old "locked" state
-        if(typeof params.locked !== 'undefined') {
-            params.isLocked = params.locked;
-            delete params.locked;
-        }
+        params = super.paramsCheck(params);
 
         // Ensure correct type for dates
         function parseDate(input) {
@@ -116,7 +91,7 @@ class Content extends Entity {
         };
 
         let content = new Content({
-            id: Entity.createId(),
+            id: Content.createId(),
             createDate: new Date(),
             updateDate: new Date(),
             schemaId: schemaId,
@@ -244,9 +219,11 @@ class Content extends Entity {
         return this.getParents(project, environment)
         .then((parents) => {
             for(let parentContent of parents) {
-                if(parentContent.settingsApplyToChildren(key)) {
-                    let settings = parentContent.settings[key];
+                let settings = parentContent.settings[key] || {};
+                
+                console.log(parentContent.id, settings);
 
+                if(settings.applyToChildren) {
                     // Make clone as to avoid interference with inherent values
                     settings = JSON.parse(JSON.stringify(settings));
                     settings.governedBy = parentContent.id;
@@ -389,9 +366,7 @@ class Content extends Entity {
      * @returns {Promise(Schema)} promise
      */
     getSchema() {
-        return new Promise((callback) => {
-            callback(null);
-        });
+        return Promis.resolve();
     }
 }
 

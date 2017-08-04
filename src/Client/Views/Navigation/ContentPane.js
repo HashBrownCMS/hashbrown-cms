@@ -98,7 +98,7 @@ class ContentPane extends NavbarPane {
 		
 			let editor = ViewHelper.get('ContentEditor');
 
-			if(editor && editor.model.id == pullId) {
+			if(editor && editor.model && editor.model.id == pullId) {
                 editor.model = null;
 				editor.fetch();
 			}

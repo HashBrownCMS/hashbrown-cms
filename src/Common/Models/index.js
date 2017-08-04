@@ -12,6 +12,7 @@ module.exports = {
     index: require('./index'),
     Media: require('./Media'),
     Project: require('./Project'),
+    Resource: require('./Resource'),
     Schema: require('./Schema'),
     Template: require('./Template'),
     User: require('./User')

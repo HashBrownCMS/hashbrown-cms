@@ -459,7 +459,7 @@ class ContentEditor extends View {
         if(this.model instanceof HashBrown.Models.Content === false) {
             this.model = new HashBrown.Models.Content(this.model);
         }
-       
+      
         this.$element.toggleClass('locked', this.model.isLocked);
 
         // Fetch information

@@ -43,11 +43,20 @@ class LanguageHelper extends LanguageHelperCommon {
         project = requiredParam('project'),
         languages = requiredParam('languages')
     ) {
+        // Check format
         if(!Array.isArray(languages)) {
             return Promise.reject(new Error('Language array cannot be of type "' + typeof languages + '"'));
         }
+        
+        // Check is project is synced first
+        return this.getProject(project)
+        .then((project) => {
+            if(project.settings.sync.enabled) {
+                return Promise.reject(new Error('Cannot change languages of a synced project'));
+            }
 
-        return setSettings(project, null, 'languages', languages);
+            return setSettings(project, null, 'languages', languages);
+        });
     }
 }
 

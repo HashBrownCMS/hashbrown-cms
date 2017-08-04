@@ -2,17 +2,37 @@
 
 const Path = require('path');
 
-const Entity = require('./Entity');
+const Resource = require('./Resource');
 
 /**
  * The base class for all Media objects
  *
  * @memberof HashBrown.Common.Models
  */
-class Media extends Entity {
+class Media extends Resource {
+    constructor(params) {
+        super(Media.paramsCheck(params)); 
+    }
+    
+    /**
+     * Checks the format of the params
+     *
+     * @params {Object} params
+     *
+     * @returns {Object} Params
+     */
+    static paramsCheck(params) {
+        params = super.paramsCheck(params);
+
+        delete params.remote;
+        delete params.sync;
+        delete params.isRemote;
+
+        return params;
+    }
+    
     structure() {
         this.def(String, 'id');
-        this.def(Boolean, 'remote', true);
         this.def(String, 'icon', 'file-image-o');
         this.def(String, 'name');
         this.def(String, 'url');
@@ -130,7 +150,7 @@ class Media extends Entity {
      */
     static create(file) {
         let media = new Media({
-            id: Entity.createId()
+            id: Media.createId()
         });
     
         return media;

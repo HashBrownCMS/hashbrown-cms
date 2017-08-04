@@ -1240,7 +1240,7 @@ body.dashboard-container {
         margin-bottom: 10px;
         width: 100%; }
         .array-editor .items .item > .item-schema-selector .key {
-          width: 100px;
+          width: 140px;
           flex-shrink: 0; }
         .array-editor .items .item > .item-schema-selector .value {
           flex-grow: 1; }

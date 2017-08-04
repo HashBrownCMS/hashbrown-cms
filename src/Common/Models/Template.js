@@ -1,21 +1,37 @@
 'use strict';
 
-let Entity = require('./Entity');
+const Resource = require('./Resource');
 
 /**
  * The Template model
  *
  * @memberof HashBrown.Common.Models
  */
-class Template extends Entity {
+class Template extends Resource {
     constructor(params) {
-        super(params);
+        super(Template.paramsCheck(params));
+    }
+    
+    /**
+     * Checks the format of the params
+     *
+     * @params {Object} params
+     *
+     * @returns {Object} Params
+     */
+    static paramsCheck(params) {
+        params = super.paramsCheck(params);
+
+        delete params.remote;
+        delete params.sync;
+        delete params.isRemote;
+
+        return params;
     }
 
     structure() {
         this.def(String, 'id');
         this.def(String, 'parentId');
-        this.def(Boolean, 'remote', true);
         this.def(String, 'icon', 'code');
         this.def(String, 'name');
         this.def(String, 'type');
