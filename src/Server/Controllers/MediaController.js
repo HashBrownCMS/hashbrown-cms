@@ -125,24 +125,22 @@ class MediaController extends ApiController {
      */
     static getSingleMedia(req, res) {
         let id = req.params.id;
-        let media;
-        let tree;
 
         ConnectionHelper.getMediaProvider(req.project, req.environment)
         .then((connection) => {
-            return connection.getMedia(id);
-        })
-        .then((result) => {
-            media = result;
+            return connection.getMedia(id)
+            .then((media) => {
+                if(!media) {
+                    return Promise.reject(new Error('Connection "' + connection.id + '" failed to fetch media "' + id + '"'));
+                }
 
-            return MediaHelper.getTree(req.project, req.environment);
-        })
-        .then((result) => {
-            tree = result;
+                return MediaHelper.getTree(req.project, req.environment)
+                .then((tree) => {
+                    media.applyFolderFromTree(tree);
 
-            media.applyFolderFromTree(tree);
-
-            res.status(200).send(media);
+                    res.status(200).send(media);
+                })
+            })
         })
         .catch((e) => {
             res.status(404).send(ApiController.printError(e));    

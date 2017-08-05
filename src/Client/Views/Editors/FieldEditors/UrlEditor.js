@@ -96,9 +96,8 @@ class UrlEditor extends FieldEditor {
 
         let sameUrls = 0;
 
-        for(let contentData of window.resources.content) {
-            if(contentData.id != contentId) {
-                let content = new HashBrown.Models.Content(contentData);
+        for(let content of window.resources.content) {
+            if(content.id != contentId) {
                 let thatUrl = content.prop('url', window.language);
                 let isMatchWithNumber = new RegExp(url.substring(0, url.lastIndexOf('/')) + '-[0-9]+/').test(thatUrl);
                 let isSameUrl = url == thatUrl || isMatchWithNumber;

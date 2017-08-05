@@ -117,11 +117,22 @@ class ProjectHelper {
                     names.push(setting.usedBy);
                 }
 
-                if(names.length < 1) {
-                    names.push('live');
+                // If we have some environments, resolve with them
+                if(names.length > 0) {
+                    return Promise.resolve(names);
                 }
 
-                return Promise.resolve(names);
+                // If we don't, make sure there is a "live" one
+                // NOTE: Using the MongoHelper directly here, since using the SettingsHelper would create a cyclic call stack
+                return MongoHelper.insertOne(
+                    project,
+                    'settings',
+                    { usedBy: 'live' },
+                    { upsert: true }
+                )
+                .then(() => {
+                    return Promise.resolve(['live']);  
+                });
             });
         });
     }
@@ -162,7 +173,7 @@ class ProjectHelper {
         project = requiredParam('project'),
         environment = requiredParam('environment')
     ) {
-        // Check is project is synced first
+        // Check if project is synced first
         return SettingsHelper.getSettings(project, null, 'sync')
         .then((sync) => {
             if(sync.enabled) {
@@ -170,13 +181,8 @@ class ProjectHelper {
             }
             
             debug.log('Adding environment "' + environment + '" to project "' + project + '"...', this);
-       
-            return MongoHelper.updateOne(
-                project,
-                'settings',
-                { usedBy: environment },
-                { upsert: true }
-            );
+      
+            return SettingsHelper.setSettings(project, environment, null, {}, true);
         })
         .then(() => {
             return Promise.resolve(environment);  
@@ -195,7 +201,7 @@ class ProjectHelper {
         oldName = requiredParam('oldName'),
         newName = requiredParam('newName')
     ) {
-        // Check is project is synced first
+        // Check if project is synced first
         return SettingsHelper.getSettings(project, null, 'sync')
         .then((sync) => {
             if(sync.enabled) {
@@ -218,7 +224,7 @@ class ProjectHelper {
         project = requiredParam('project'),
         environment = requiredParam('environment')
     ) {
-        // Check is project is synced first
+        // Check if project is synced first
         return SettingsHelper.getSettings(project, null, 'sync')
         .then((sync) => {
             if(sync.enabled) {

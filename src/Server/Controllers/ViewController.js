@@ -148,7 +148,17 @@ class ViewController extends Controller {
             .then((user) => {
                 if(!user.isAdmin) { return res.redirect('/' + req.params.project + '/' + req.params.environment + '/'); }
 
-                res.render('test');
+                FileSystem.readFile(appRoot + '/public/md/ui-checklist.md', (err, file) => {
+                    if(err) {
+                        return res.status(502).send(e.message);
+
+                    }
+                
+                    res.render('test', {
+                        uiChecklistHtml: Marked(file.toString())
+                    });
+                });
+
             })
             .catch(() => {
                 res.sendStatus(401);

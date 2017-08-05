@@ -142,7 +142,7 @@ class UpdateHelper {
             debug.log('Installing dependencies...', this);
             
             return new Promise((resolve, reject) => {
-                let npm = ChildProcess.exec('npm install --production', {
+                let npm = ChildProcess.exec('rm -rf node_modules && npm install --production', {
                     cwd: appRoot
                 });
 

@@ -109,7 +109,7 @@ class RichTextEditor extends FieldEditor {
                         break;
                 }
             })
-            .catch(errorModal);
+            .catch(UI.errorModal);
         });
     }
 

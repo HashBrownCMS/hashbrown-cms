@@ -35,6 +35,14 @@
         background-color: transparent;
     }
 
+    &[type="checkbox"] {
+        width: 1rem;
+        height: 1rem;
+        display: inline-block;
+        min-width: 1rem;
+        cursor: pointer;
+    }
+
     & + .form-control {
         margin-top: 1rem;
     }

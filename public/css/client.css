@@ -777,6 +777,9 @@ img.logo {
       width: calc(100% - 100px);
       text-align: justify; }
 
+/**
+ * General admin modal
+ */
 .modal-project-admin .modal-body {
   position: relative;
   padding-top: 0px;
@@ -796,6 +799,9 @@ img.logo {
   display: block;
   margin-left: auto; }
 
+/**
+ * Migrate content modal
+ */
 .modal-migrate-content .modal-body {
   padding-top: 0px; }
   .modal-migrate-content .modal-body .migration-message {
@@ -821,9 +827,15 @@ img.logo {
       width: 50%;
       margin: 0px auto; }
 
+/**
+ * The dashboard from which users can carry our admin tasks
+ */
 body.dashboard-container {
   background-color: #eeeeee;
-  overflow-y: auto; }
+  overflow-y: auto;
+  /**
+     * UI tests
+     */ }
   body.dashboard-container a {
     color: #e70d3b; }
   body.dashboard-container .update {
@@ -839,6 +851,7 @@ body.dashboard-container {
     text-align: center;
     padding-left: 0px;
     min-height: 64px;
+    margin-bottom: 3rem;
     justify-content: center;
     background-image: url("/img/bg-secondary.jpg");
     background-attachment: fixed;
@@ -990,6 +1003,12 @@ body.dashboard-container {
             min-width: 0px; }
             body.dashboard-container .projects .project-editor .body .environments .environment .btn-primary .fa {
               line-height: 30px; }
+  body.dashboard-container .ui ul {
+    list-style: none; }
+    body.dashboard-container .ui ul li {
+      margin: 1rem 0 0 0; }
+      body.dashboard-container .ui ul li input {
+        margin: 0 1rem 0 0; }
 
 .modal.modal-icon-picker .modal-dialog {
   width: calc(100% - 30px);
@@ -1110,27 +1129,19 @@ body.dashboard-container {
     padding: 15px 0px;
     display: flex; }
     .modal.date-picker .modal-dialog .modal-body .date-picker-time .date-picker-time-separator {
-      font-size: 18px;
       color: #333333;
       font-weight: bold;
-      line-height: 40px; }
-    .modal.date-picker .modal-dialog .modal-body .date-picker-time .dropdown {
+      font-size: 2rem;
+      padding: 0 0.5rem;
+      display: flex;
+      align-items: center; }
+    .modal.date-picker .modal-dialog .modal-body .date-picker-time input {
       display: block;
       flex-grow: 1;
       width: 50%;
-      flex-basis: 50%; }
-      .modal.date-picker .modal-dialog .modal-body .date-picker-time .dropdown.open .dropdown-toggle:before {
-        display: none; }
-      .modal.date-picker .modal-dialog .modal-body .date-picker-time .dropdown button .fa, .modal.date-picker .modal-dialog .modal-body .date-picker-time .dropdown button .caret {
-        display: none; }
-      .modal.date-picker .modal-dialog .modal-body .date-picker-time .dropdown button, .modal.date-picker .modal-dialog .modal-body .date-picker-time .dropdown li {
-        line-height: 40px;
-        height: 40px;
-        width: 100%;
-        background-color: #fff; }
-      .modal.date-picker .modal-dialog .modal-body .date-picker-time .dropdown ul {
-        max-height: 100px;
-        overflow-y: auto; }
+      flex-basis: 50%;
+      text-align: center;
+      font-size: 2rem; }
 
 .date-editor {
   min-width: 130px;
@@ -2253,6 +2264,12 @@ body.dashboard-container {
     cursor: pointer;
     border: 0px;
     background-color: transparent; }
+  .form-control[type="checkbox"] {
+    width: 1rem;
+    height: 1rem;
+    display: inline-block;
+    min-width: 1rem;
+    cursor: pointer; }
   .form-control + .form-control {
     margin-top: 1rem; }
 

@@ -127,7 +127,7 @@ class Connection extends Resource {
      * @param {String} id
      * @param {Object} file
      *
-     * @returns {Promise(Array)} media
+     * @returns {Promise} Array of Media
      */
     setMedia(id, file) {
         return Promise.resolve();
@@ -140,7 +140,7 @@ class Connection extends Resource {
      * @param {String} id
      * @param {Template} newTemplate
      *
-     * @returns {Promise} Callback
+     * @returns {Promise}
      */
     setTemplateById(type, id, newTemplate) {
         return Promise.resolve();
@@ -151,7 +151,7 @@ class Connection extends Resource {
      *
      * @param {String} id
      *
-     * @returns {Promise(Array)} media
+     * @returns {Promise} Array of Media items
      */
     removeMedia(id) {
         return Promise.resolve();
@@ -335,7 +335,7 @@ class Connection extends Resource {
      * @returns {Promise} promise
      */
     deleteContentProperties(id, language) {
-        return Promise.callback();
+        return Promise.resolve();
     }
 
     /**
@@ -348,7 +348,7 @@ class Connection extends Resource {
      * @returns {Promise} promise
      */
     postContentProperties(properties, id, language) {
-        return Promise.callback();
+        return Promise.resolve();
     }
 }
 

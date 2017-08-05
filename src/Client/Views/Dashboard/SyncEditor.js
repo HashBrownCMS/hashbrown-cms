@@ -25,6 +25,15 @@ class SyncEditor extends View {
                     class: 'btn-default'
                 },
                 {
+                    label: 'Apply',
+                    class: 'btn-primary',
+                    callback: () => {
+                        this.onClickApply();
+
+                        return false;
+                    }
+                },
+                {
                     label: 'Save',
                     class: 'btn-primary',
                     callback: () => {
@@ -47,7 +56,7 @@ class SyncEditor extends View {
     }
     
     /**
-     * Event: Click save. Posts the model to the modelUrl
+     * Event: Click save. Posts the model to the modelUrl and closes
      */
     onClickSave() {
         this.model.url = this.$element.find('.url-editor input').val();
@@ -56,6 +65,19 @@ class SyncEditor extends View {
         .then(() => {
             this.modal.hide();
 
+            this.trigger('change', this.model);
+        })
+        .catch(UI.errorModal);
+    }
+    
+    /**
+     * Event: Click apply. Posts the model to the modelUrl
+     */
+    onClickApply() {
+        this.model.url = this.$element.find('.url-editor input').val();
+
+        SettingsHelper.setSettings(this.projectId, '', 'sync', this.model)
+        .then(() => {
             this.trigger('change', this.model);
         })
         .catch(UI.errorModal);
@@ -115,7 +137,7 @@ class SyncEditor extends View {
 
         function onClickRenew() {
             if(!view.model.url) {
-                UI.messageModal('URL missing', 'You need to specify a URL. Please do so and save the settings first.');
+                alert('You need to specify a URL. Please do so and apply the settings first.');
                 return;
             }
             

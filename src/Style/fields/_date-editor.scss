@@ -74,43 +74,21 @@
                 display: flex;
 
                 .date-picker-time-separator {
-                    font-size: 18px;
                     color: $standard-text;
                     font-weight: bold;
-                    line-height: 40px;
+                    font-size: 2rem;
+                    padding: 0 0.5rem;
+                    display: flex;
+                    align-items: center;
                 }
 
-                .dropdown {
+                input {
                     display: block;
                     flex-grow: 1;
                     width: 50%;
                     flex-basis: 50%;
-
-                    &.open {
-                        .dropdown-toggle {
-                            &:before {
-                                display: none;
-                            }
-                        }
-                    }
-
-                    button {
-                        .fa, .caret {
-                            display: none;
-                        }
-                    }
-                            
-                    button, li {
-                        line-height: 40px;
-                        height: 40px;
-                        width: 100%;
-                        background-color: #fff;
-                    }
-
-                    ul {
-                        max-height: 100px;
-                        overflow-y: auto;
-                    }
+                    text-align: center;
+                    font-size: 2rem;
                 }
             }
         }

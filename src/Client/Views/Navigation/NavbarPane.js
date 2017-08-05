@@ -127,7 +127,7 @@ class Pane {
 
         if(this.canCreateDirectory) {
             $pane.find('.pane-move-buttons .btn-new-folder').on('click', () => {
-                MediaHelper.getMediaById(id)
+                HashBrown.Helpers.MediaHelper.getMediaById(id)
                 .then((item) => {
                     let messageModal = new HashBrown.Views.Modals.MessageModal({
                         model: {
@@ -158,7 +158,7 @@ class Pane {
                         ]
                     });
                 })
-                .catch(errorModal);
+                .catch(UI.errorModal);
             });
         }
     }

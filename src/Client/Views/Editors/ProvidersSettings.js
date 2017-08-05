@@ -29,7 +29,7 @@ class ProvidersSettings extends View {
 
             location.reload();
         })
-        .catch(errorModal);
+        .catch(UI.errorModal);
     }
     
     /**

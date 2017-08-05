@@ -58,9 +58,6 @@ class DateEditor extends FieldEditor {
             date = new Date();
         }
 
-        // Make sure minutes are rounded to nearest multiple of 5
-        date.setMinutes(Math.floor(date.getMinutes()/5)*5);
-        
         let days = [
             'Mon',
             'Tue',
@@ -155,13 +152,15 @@ class DateEditor extends FieldEditor {
                         })
                     ),
                     _.div({class: 'date-picker-time'},
-                        UI.inputDropdown(date.getHours() < 10 ? '0' + date.getHours() : date.getHours().toString(), hours, (hour) => {
-                            date.setHours(parseInt(hour));
-                        }),
+                        _.input({type: 'number', min: 0, max: 23, value: date.getHours()})
+                            .on('change', (e) => {
+                                date.setHours(e.currentTarget.value);
+                            }),
                         _.div({class: 'date-picker-time-separator'}, ':'),
-                        UI.inputDropdown(date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes().toString(), minutes, (minute) => {
-                            date.setMinutes(parseInt(minute));
-                        })
+                        _.input({type: 'number', min: 0, max: 59, value: date.getMinutes()})
+                            .on('change', (e) => {
+                                date.setMinutes(e.currentTarget.value);
+                            })
                     )
                 ];
             },

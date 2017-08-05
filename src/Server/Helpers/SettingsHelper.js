@@ -303,6 +303,7 @@ class SettingsHelper extends SettingsHelperCommon {
      * @param {String} environment
      * @param {String} section
      * @param {Object} settings
+     * @param {Boolean} upsertEnvironment
      *
      * @return {Promise} promise
      */
@@ -310,12 +311,21 @@ class SettingsHelper extends SettingsHelperCommon {
         project = requiredParam('project'),
         environment = null,
         section = null,
-        settings = requiredParam('settings')
+        settings = requiredParam('settings'),
+        upsertEnvironment = false
     ) {
         debug.log('Setting "' + section + '" to ' + JSON.stringify(settings), this, 3);
-        
-        // First get the existing settings object
-        return this.getSettings(project, environment)
+       
+        // Check if the environment exists
+        return HashBrown.Helpers.ProjectHelper.environmentExists(project, environment)
+        .then((environmentExists) => {
+            if(environment && !environmentExists && !upsertEnvironment) {
+                return Promise.reject(new Error('Environment "' + environment + '" of project "' + project + '" could not be found'));
+            }
+
+            // First get the existing settings object
+            return this.getSettings(project, environment);
+        })
         .then((oldSettings) => {
             if(!oldSettings) {
                 oldSettings = {};
@@ -337,25 +347,38 @@ class SettingsHelper extends SettingsHelperCommon {
                 }
 
                 // If sync was not enabled, set the local setting instead
-                let query = { usedBy: 'project' };
-                oldSettings.usedBy = 'project';
+                let query = {};
+                let newSettings = oldSettings;
 
-                if(environment) {
-                    query.usedBy = environment;
-                    oldSettings.usedBy = environment;
-                }
-                
                 // If a section was provided, only set that setting
                 if(section) {
-                    oldSettings[section] = settings;
+                    newSettings[section] = settings;
+
+                    // The field isn't necessary here, so remove it if it was set somewhere
+                    delete newSettings[section].usedBy;
 
                 // If not, replace all settings
                 } else {
-                    oldSettings = settings;
+                    newSettings = settings;
                 }
 
+                // Set the environment/project that this setting is used by
+                if(environment) {
+                    newSettings.usedBy = environment;
+                    query.usedBy = environment;
+                } else {
+                    newSettings.usedBy = 'project';
+                    query.usedBy = 'project';
+                }
+                
                 // Update the database
-                return MongoHelper.updateOne(project, 'settings', query, oldSettings, { upsert: true });
+                return MongoHelper.updateOne(
+                    project,
+                    'settings',
+                    query,
+                    newSettings,
+                    { upsert: true }
+                );
             });
         });
     }

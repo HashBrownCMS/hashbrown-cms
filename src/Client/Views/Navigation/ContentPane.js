@@ -296,9 +296,9 @@ class ContentPane extends NavbarPane {
                         _.div({class: 'input-group'},      
                             _.span('Connection'),
                             _.div({class: 'input-group-addon'},
-                                UI.inputDropdown(publishing.connectionId, resources.connections, (newValue) => {
+                                UI.inputDropdown('(none)', resources.connections, (newValue) => {
                                     publishing.connectionId = newValue;
-                                })
+                                }, true).trigger('setValue', publishing.connectionId)
                             )
                         )
                     );

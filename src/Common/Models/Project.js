@@ -55,7 +55,7 @@ class Project extends Entity {
         this.def(String, 'id');
         this.def(Array, 'users', []);
         this.def(Object, 'settings', {});
-        this.def(Array, 'environments', [ 'live' ]);
+        this.def(Array, 'environments', []);
         this.def(Array, 'backups', []);
     }
 

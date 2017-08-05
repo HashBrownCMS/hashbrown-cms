@@ -96,7 +96,8 @@ class GitHubConnection extends Connection {
                     default: case 'dir':
                         FileSystem.readdir(this.settings.localPath + path, (err, data) => {
                             if(err) {
-                                reject(err);
+                                debug.error(err, this);
+                                resolve([]);
                             
                             } else {
                                 resolve(data);
@@ -108,7 +109,8 @@ class GitHubConnection extends Connection {
                     case 'file':
                         FileSystem.readFile(this.settings.localPath + path, (err, data) => {
                             if(err) {
-                                reject(err);
+                                debug.error(err, this);
+                                resolve([]);
                             
                             } else {
                                 resolve(data);

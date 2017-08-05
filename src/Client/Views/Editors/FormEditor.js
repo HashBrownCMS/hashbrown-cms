@@ -35,12 +35,12 @@ class FormEditor extends View {
             debug.log('Saved form "' + this.model.id + '"', this);
             this.$saveBtn.toggleClass('working', false);
         
-            RequestHelper.reloadResource('forms')
-            .then(() => {
-                let navbar = ViewHelper.get('NavbarMain');
-                
-                navbar.reload();
-            });
+            return RequestHelper.reloadResource('forms');
+        })
+        .then(() => {
+            let navbar = ViewHelper.get('NavbarMain');
+            
+            navbar.reload();
         })
         .catch((err) => {
             new HashBrown.Views.Modals.MessageModal({

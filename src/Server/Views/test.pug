@@ -9,11 +9,31 @@ html
         link(href='/favicon.png?v=2', rel='icon', type='image/png')
         link(href='/lib/bootstrap/css/bootstrap.min.css', rel='stylesheet')
         link(href='/lib/font-awesome/css/font-awesome.min.css', rel='stylesheet')
+        link(href='/css/client.css', rel='stylesheet')
         
         title HashBrown CMS
-    body
-        button.btn-start='Start test'
-        ul.messages
+
+    body.dashboard-container
+        ul.nav.nav-tabs.dashboard-header
+            a.dashboard-logo(target='_blank', href='http://hashbrown.rocks')
+                img.logo(src="/svg/logo_pink.svg")
+                span HashBrown
+
+            li.active
+                a(data-toggle="tab", href="#service") Service
+            li
+                a(data-toggle="tab", href="#ui") UI
+
+        .tab-content.test-content
+            .tab-pane.active#service
+                .container.service
+                    button.btn.btn-primary='Run tests'
+                    ul.service-test__messages
+            .tab-pane#ui
+                .container.ui
+                    button.btn.btn-primary='Reset tests'
+                    | !{ uiChecklistHtml }
 
         script(src='/lib/jquery/jquery.min.js')
+        script(src='/lib/bootstrap/js/bootstrap.min.js')
         script(src='/js/test.js')

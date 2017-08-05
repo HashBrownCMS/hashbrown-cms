@@ -258,14 +258,15 @@ class UIHelper {
 
         // Add an option
         $element.on('addOption', (e, option) => {
-            let optionLabel = option.label || option.name || option.title || option.id || option.toString();
+            let optionValue = typeof option.value !== 'undefined' ? option.value : option.id || option;
+            let optionLabel = typeof option.label !== 'undefined' ? option.label : option.name || option.title || option.id || option.toString();
             let isSelected = option.selected || option.value == defaultValue || option.id == defaultValue;
 
             if(isSelected) {
                 $toggle.html(optionLabel);
             }
-
-            let $li = _.li({'data-value': option.value || optionLabel, class: isSelected ? 'active' : ''},
+    
+            let $li = _.li({'data-value': optionValue, class: isSelected ? 'active' : ''},
                 _.button(optionLabel).on('click', onClick)
             );
 

@@ -213,7 +213,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
         id = requiredParam('id')
     ) {
         let collection = environment + '.connections';
-        
+       
         return MongoHelper.findOne(
             project,
             collection,
@@ -224,7 +224,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
             if(!data) {
                 return SyncHelper.getResourceItem(project, environment, 'connections', id)
                 .then((resourceItem) => {
-                      return Promise.resolve(this.initConnection(resourceItem));
+                    return Promise.resolve(this.initConnection(resourceItem));
                 });
             } 
             

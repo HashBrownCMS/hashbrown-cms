@@ -1,3 +1,6 @@
+/**
+ * General admin modal
+ */
 .modal-project-admin {
     .modal-body {
         position: relative;
@@ -24,6 +27,9 @@
     }
 }
 
+/**
+ * Migrate content modal
+ */
 .modal-migrate-content {
     .modal-body {
         padding-top: 0px;
@@ -66,6 +72,9 @@
     }
 }
 
+/**
+ * The dashboard from which users can carry our admin tasks
+ */
 body.dashboard-container {
     background-color: $standard-dark;
     overflow-y: auto;
@@ -91,6 +100,7 @@ body.dashboard-container {
         text-align: center;
         padding-left: 0px;
         min-height: 64px;
+        margin-bottom: 3rem;
         justify-content: center;
 
         @include background('secondary');
@@ -337,6 +347,23 @@ body.dashboard-container {
                         }
                     }
                 } 
+            }
+        }
+    }
+
+    /**
+     * UI tests
+     */
+    .ui {
+        ul {
+            list-style: none;
+
+            li {
+                margin: 1rem 0 0 0;
+
+                input {
+                    margin: 0 1rem 0 0;
+                }
             }
         }
     }

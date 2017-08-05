@@ -408,12 +408,21 @@ class ContentEditor extends View {
     renderButtons() {
         let url = this.model.properties.url;
 
-        this.model.settingsSanityCheck('publishing');
-
         if(url instanceof Object) {
             url = url[window.language];
         }
 
+        let remoteUrl;
+        let connectionId = this.model.getSettings('publishing').connectionId;
+
+        if(connectionId) {
+            let connection = ConnectionHelper.getConnectionByIdSync(connectionId);
+
+            if(connection && connection.url) {
+                remoteUrl = connection.url + url;
+            }
+        }
+            
         _.append($('.editor-footer').empty(), 
             _.div({class: 'btn-group'},
                 // JSON editor
@@ -422,16 +431,9 @@ class ContentEditor extends View {
                 ).click(() => { this.onClickAdvanced(); }),
 
                 // View remote
-                _.do(() => {
-                    if(
-                        this.model.properties &&
-                        this.model.properties.url &&
-                        this.model.getSettings('publishing').connectionId &&
-                        this.model.isPublished
-                    ) {
-                        return _.a({target: '_blank', href: ConnectionHelper.getConnectionByIdSync(this.model.getSettings('publishing').connectionId).url + url, class: 'btn btn-primary'}, 'View');
-                    }
-                }),
+                _.if(this.model.isPublished && remoteUrl,
+                    _.a({target: '_blank', href: remoteUrl, class: 'btn btn-primary'}, 'View')
+                ),
 
                 _.if(!this.model.isLocked,
                     // Save & publish
@@ -440,7 +442,7 @@ class ContentEditor extends View {
                             _.span({class: 'text-default'}, 'Save'),
                             _.span({class: 'text-working'}, 'Saving')
                         ).click(() => { this.onClickSave(); }),
-                        _.if(this.model.getSettings('publishing').connectionId,
+                        _.if(connectionId,
                             _.span('&'),
                             _.select({class: 'form-control select-publishing'},
                                 _.option({value: 'publish'}, 'Publish'),

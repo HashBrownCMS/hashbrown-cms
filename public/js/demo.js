@@ -60,12 +60,12 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 274);
+/******/ 	return __webpack_require__(__webpack_require__.s = 275);
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ 274:
+/***/ 275:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -392,25 +392,25 @@ var DemoApi = function () {
 
             case 'schemas':
                 var schemas = {
-                    'contentBase': __webpack_require__(275),
-                    'page': __webpack_require__(276),
-                    'array': __webpack_require__(277),
-                    'boolean': __webpack_require__(278),
-                    'contentReference': __webpack_require__(279),
-                    'contentSchemaReference': __webpack_require__(280),
-                    'date': __webpack_require__(281),
-                    'dropdown': __webpack_require__(282),
-                    'fieldBase': __webpack_require__(283),
-                    'language': __webpack_require__(284),
-                    'mediaReference': __webpack_require__(285),
-                    'number': __webpack_require__(286),
-                    'resourceReference': __webpack_require__(287),
-                    'richText': __webpack_require__(288),
-                    'string': __webpack_require__(289),
-                    'struct': __webpack_require__(290),
-                    'tags': __webpack_require__(291),
-                    'templateReference': __webpack_require__(292),
-                    'url': __webpack_require__(293)
+                    'contentBase': __webpack_require__(276),
+                    'page': __webpack_require__(277),
+                    'array': __webpack_require__(278),
+                    'boolean': __webpack_require__(279),
+                    'contentReference': __webpack_require__(280),
+                    'contentSchemaReference': __webpack_require__(281),
+                    'date': __webpack_require__(282),
+                    'dropdown': __webpack_require__(283),
+                    'fieldBase': __webpack_require__(284),
+                    'language': __webpack_require__(285),
+                    'mediaReference': __webpack_require__(286),
+                    'number': __webpack_require__(287),
+                    'resourceReference': __webpack_require__(288),
+                    'richText': __webpack_require__(289),
+                    'string': __webpack_require__(290),
+                    'struct': __webpack_require__(291),
+                    'tags': __webpack_require__(292),
+                    'templateReference': __webpack_require__(293),
+                    'url': __webpack_require__(294)
                 };
 
                 var result = [];
@@ -696,7 +696,7 @@ HashBrown.Helpers.RequestHelper.reloadResource = function reloadResource(name) {
 
 /***/ }),
 
-/***/ 275:
+/***/ 276:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -764,7 +764,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 276:
+/***/ 277:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -806,7 +806,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 277:
+/***/ 278:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -818,7 +818,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 278:
+/***/ 279:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -830,7 +830,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 279:
+/***/ 280:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -842,7 +842,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 280:
+/***/ 281:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -854,7 +854,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 281:
+/***/ 282:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -866,7 +866,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 282:
+/***/ 283:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -878,7 +878,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 283:
+/***/ 284:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -888,7 +888,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 284:
+/***/ 285:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -900,7 +900,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 285:
+/***/ 286:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -912,7 +912,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 286:
+/***/ 287:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -924,7 +924,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 287:
+/***/ 288:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -936,7 +936,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 288:
+/***/ 289:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -948,7 +948,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 289:
+/***/ 290:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -960,7 +960,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 290:
+/***/ 291:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -972,7 +972,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 291:
+/***/ 292:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -984,7 +984,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 292:
+/***/ 293:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -996,7 +996,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 293:
+/***/ 294:
 /***/ (function(module, exports) {
 
 module.exports = {
