@@ -243,7 +243,7 @@ class DemoApi {
 
             case 'media':
                 return [
-					{"id":"50d05eee9088c589bfd5a5a3a3043c0ebcc4972b","remote":true,"icon":"file-image-o","name":"banner-flat-pink.jpg","url":"media/50d05eee9088c589bfd5a5a3a3043c0ebcc4972b/banner-flat-pink.jpg","folder":"banners"} 
+					{"id":"50d05eee9088c589bfd5a5a3a3043c0ebcc4972b","remote":true,"icon":"file-image-o","name":"banner.jpg","url":"media/50d05eee9088c589bfd5a5a3a3043c0ebcc4972b/banner-flat-pink.jpg","folder":"banners"} 
                 ];
 
             case 'connections':
