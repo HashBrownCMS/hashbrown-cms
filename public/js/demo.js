@@ -171,8 +171,6 @@ var DemoApi = function () {
 
         localStorage.setItem('demo', JSON.stringify(cache));
 
-        console.log(cache);
-
         return data;
     };
 
@@ -220,6 +218,9 @@ var DemoApi = function () {
 
 
     DemoApi.parseUrl = function parseUrl(url) {
+        url = url.replace('templates/partial', 'templates');
+        url = url.replace('templates/page', 'templates');
+
         var query = {};
         var split = url.split('/');
 
@@ -343,7 +344,37 @@ var DemoApi = function () {
                 }];
 
             case 'templates':
-                return [{ "id": "sectionPage", "parentId": "", "remote": true, "icon": "code", "name": "sectionPage.html", "type": "page", "remotePath": "_layouts/sectionPage.html", "folder": "", "markup": "" }, { "id": "heroSection", "parentId": "", "remote": true, "icon": "code", "name": "heroSection.html", "type": "partial", "remotePath": "_includes/partials/heroSection.html", "folder": "", "markup": "" }, { "id": "richTextSection", "parentId": "", "remote": true, "icon": "code", "name": "richTextSection.html", "type": "partial", "remotePath": "_includes/partials/richTextSection.html", "folder": "", "markup": "" }];
+                return [{
+                    'id': 'sectionPage',
+                    'parentId': '',
+                    'remote': true,
+                    'icon': 'code',
+                    'name': 'sectionPage.html',
+                    'type': 'page',
+                    'remotePath': '_layouts/sectionPage.html',
+                    'folder': '',
+                    'markup': '' + '<!DOCTYPE html>\n' + '<html>\n' + '    {% include main/head.html %}\n' + '\n' + '    <body>\n' + '        {% for section in page.sections %}\n' + '            {% include hashbrown/render_section section = section %}\n' + '        {% endfor %}\n' + '\n' + '        {% include main/scripts.html %}\n' + '    </body>\n' + '</html>'
+                }, {
+                    'id': 'heroSection',
+                    'parentId': '',
+                    'remote': true,
+                    'icon': 'code',
+                    'name': 'heroSection.html',
+                    'type': 'partial',
+                    'remotePath': '_includes/partials/heroSection.html',
+                    'folder': '',
+                    'markup': '' + '<section class="section--hero" style="background-image: url({% include hashbrown/get_media_url_by_id id=include.section.text %})">\n' + '    <div class="container">\n' + '        {{ include.section.text }}\n' + '    </div>\n' + '</section>\n'
+                }, {
+                    'id': 'richTextSection',
+                    'parentId': '',
+                    'remote': true,
+                    'icon': 'code',
+                    'name': 'richTextSection.html',
+                    'type': 'partial',
+                    'remotePath': '_includes/partials/richTextSection.html',
+                    'folder': '',
+                    'markup': '' + '<section class="section--rich-text">\n' + '    <div class="container">\n' + '        {% if include.section.text %}\n' + '            {{ include.section.text }}\n' + '        {% endif %}\n' + '    </div>\n' + '</section>'
+                }];
 
             case 'content':
                 return [{
