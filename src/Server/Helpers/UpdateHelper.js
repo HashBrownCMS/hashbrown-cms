@@ -1,7 +1,6 @@
 'use strict';
 
 const ChildProcess = require('child_process');
-const ZLib = require('zlib');
 const Path = require('path');
 const FileSystem = require('fs');
 const SemanticVersion = require('semver');
@@ -88,7 +87,7 @@ class UpdateHelper {
             debug.log('Checking out stable branch...', this);
 
             return new Promise((resolve, reject) => {
-                let git = exec('git checkout stable', {
+                let git = ChildProcess.exec('git checkout stable', {
                     cwd: appRoot
                 });
 
@@ -115,7 +114,7 @@ class UpdateHelper {
             debug.log('Pulling update from GitHub...', this);
             
             return new Promise((resolve, reject) => {
-                let git = exec('git pull origin stable', {
+                let git = ChildProcess.exec('git pull origin stable', {
                     cwd: appRoot
                 });
 
