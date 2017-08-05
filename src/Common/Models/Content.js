@@ -107,17 +107,17 @@ class Content extends Resource {
      * @param {Array} tasks
      */
     adoptTasks(tasks) {
-        if(tasks) {
-            for(let i in tasks) {
-                switch(tasks[i].type) {
-                    case 'publish':
-                        this.publishOn = tasks[i].date;
-                        break;
+        if(!tasks) { return; }
+        
+        for(let i in tasks) {
+            switch(tasks[i].type) {
+                case 'publish':
+                    this.publishOn = tasks[i].date;
+                    break;
 
-                    case 'unpublish':
-                        this.unpublishOn = tasks[i].date;
-                        break;
-                }
+                case 'unpublish':
+                    this.unpublishOn = tasks[i].date;
+                    break;
             }
         }
     }
@@ -134,17 +134,17 @@ class Content extends Resource {
         project = requiredParam('project'),
         environment = requiredParam('environment')
     ) {
-        if(this.parentId) {
-            return HashBrown.Helpers.ContentHelper.getContentById(project, environment, this.parentId)
-            .then((parentContent) => {
-                return Promise.resolve(parentContent);
-            })
-            .catch((e) => {
-                return Promise.resolve(null);
-            });
-        } else {
+        if(!this.parentId) {
             return Promise.resolve(null);
         }
+        
+        return HashBrown.Helpers.ContentHelper.getContentById(project, environment, this.parentId)
+        .then((parentContent) => {
+            return Promise.resolve(parentContent);
+        })
+        .catch((e) => {
+            return Promise.resolve(null);
+        });
     }
 
     /**
@@ -202,39 +202,12 @@ class Content extends Resource {
     /**
      * Gets settings
      *
-     * @param {String} project
-     * @param {String} environment
      * @param {String} key
      *
-     * @returns {Promise} settings
+     * @returns {Promise} Settings
      */
-    getSettings(
-        project = requiredParam('project'),
-        environment = requiredParam('environment'),
-        key = requiredParam('key')
-    ) {
-        this.settingsSanityCheck(key);
-
-        // Loop through all parent content to find a governing setting
-        return this.getParents(project, environment)
-        .then((parents) => {
-            for(let parentContent of parents) {
-                let settings = parentContent.settings[key] || {};
-                
-                console.log(parentContent.id, settings);
-
-                if(settings.applyToChildren) {
-                    // Make clone as to avoid interference with inherent values
-                    settings = JSON.parse(JSON.stringify(settings));
-                    settings.governedBy = parentContent.id;
-
-                    return Promise.resolve(settings);
-                }
-            }
-
-            // No parent nodes with governing settings found, return own settings
-            return Promise.resolve(this.settings[key]);
-        });
+    getSettings(key) {
+        return Promise.resolve({});
     }
 
     /**
@@ -363,10 +336,10 @@ class Content extends Resource {
     /**
      * Gets the schema information
      *
-     * @returns {Promise(Schema)} promise
+     * @returns {Promise} Schema
      */
     getSchema() {
-        return Promis.resolve();
+        return Promise.resolve();
     }
 }
 

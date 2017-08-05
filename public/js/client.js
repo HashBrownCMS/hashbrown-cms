@@ -15964,17 +15964,19 @@ var Content = function (_Resource) {
 
 
     Content.prototype.adoptTasks = function adoptTasks(tasks) {
-        if (tasks) {
-            for (var i in tasks) {
-                switch (tasks[i].type) {
-                    case 'publish':
-                        this.publishOn = tasks[i].date;
-                        break;
+        if (!tasks) {
+            return;
+        }
 
-                    case 'unpublish':
-                        this.unpublishOn = tasks[i].date;
-                        break;
-                }
+        for (var i in tasks) {
+            switch (tasks[i].type) {
+                case 'publish':
+                    this.publishOn = tasks[i].date;
+                    break;
+
+                case 'unpublish':
+                    this.unpublishOn = tasks[i].date;
+                    break;
             }
         }
     };
@@ -15993,15 +15995,15 @@ var Content = function (_Resource) {
         var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
         var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
 
-        if (this.parentId) {
-            return HashBrown.Helpers.ContentHelper.getContentById(project, environment, this.parentId).then(function (parentContent) {
-                return Promise.resolve(parentContent);
-            }).catch(function (e) {
-                return Promise.resolve(null);
-            });
-        } else {
+        if (!this.parentId) {
             return Promise.resolve(null);
         }
+
+        return HashBrown.Helpers.ContentHelper.getContentById(project, environment, this.parentId).then(function (parentContent) {
+            return Promise.resolve(parentContent);
+        }).catch(function (e) {
+            return Promise.resolve(null);
+        });
     };
 
     /**
@@ -16060,56 +16062,14 @@ var Content = function (_Resource) {
     /**
      * Gets settings
      *
-     * @param {String} project
-     * @param {String} environment
      * @param {String} key
      *
-     * @returns {Promise} settings
+     * @returns {Promise} Settings
      */
 
 
-    Content.prototype.getSettings = function getSettings() {
-        var project = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : requiredParam('project');
-
-        var _this2 = this;
-
-        var environment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : requiredParam('environment');
-        var key = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : requiredParam('key');
-
-        this.settingsSanityCheck(key);
-
-        // Loop through all parent content to find a governing setting
-        return this.getParents(project, environment).then(function (parents) {
-            for (var _iterator = parents, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-                var _ref;
-
-                if (_isArray) {
-                    if (_i >= _iterator.length) break;
-                    _ref = _iterator[_i++];
-                } else {
-                    _i = _iterator.next();
-                    if (_i.done) break;
-                    _ref = _i.value;
-                }
-
-                var parentContent = _ref;
-
-                var settings = parentContent.settings[key] || {};
-
-                console.log(parentContent.id, settings);
-
-                if (settings.applyToChildren) {
-                    // Make clone as to avoid interference with inherent values
-                    settings = JSON.parse(JSON.stringify(settings));
-                    settings.governedBy = parentContent.id;
-
-                    return Promise.resolve(settings);
-                }
-            }
-
-            // No parent nodes with governing settings found, return own settings
-            return Promise.resolve(_this2.settings[key]);
-        });
+    Content.prototype.getSettings = function getSettings(key) {
+        return Promise.resolve({});
     };
 
     /**
@@ -16246,12 +16206,12 @@ var Content = function (_Resource) {
     /**
      * Gets the schema information
      *
-     * @returns {Promise(Schema)} promise
+     * @returns {Promise} Schema
      */
 
 
     Content.prototype.getSchema = function getSchema() {
-        return Promis.resolve();
+        return Promise.resolve();
     };
 
     return Content;
@@ -40035,7 +39995,7 @@ module.exports = ["address", "article", "aside", "blockquote", "canvas", "dd", "
 module.exports = {
 	"name": "hashbrown-cms",
 	"repository": "https://github.com/Putaitu/hashbrown-cms.git",
-	"version": "0.8.6",
+	"version": "0.9.0",
 	"description": "The pluggable CMS",
 	"main": "hashbrown.js",
 	"scripts": {
