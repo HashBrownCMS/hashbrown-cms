@@ -77,18 +77,11 @@ class HashBrownDriverConnection extends Connection {
    
     /**
      * Gets whether this connection is serving local conent
+     * NOTE: As any HashBrown driver site needs to run as a web server, this will always be false
      *
      * @returns {Boolean} Is local
      */
     isLocal() {
-        let url = this.getRemoteUrl();
-
-        if(url.indexOf('file://') === 0) { return true; }
-        if(url.indexOf('http://localhost') === 0) { return true; }
-        if(url.indexOf('https://localhost') === 0) { return true; }
-        if(url.indexOf('http://127.0.0.1') === 0) { return true; }
-        if(url.indexOf('http2://127.0.0.1') === 0) { return true; }
-
         return false;
     }
 
@@ -128,12 +121,13 @@ class HashBrownDriverConnection extends Connection {
         let tempPath = file.path;
 
         debug.log('Setting media object "' + id + '" at ' + this.getRemoteUrl() + '...', this);
+            
+        let apiUrl = this.getRemoteUrl() + '/hashbrown/api/media/' + id + '?token=' + this.settings.token;
     
         // First remove any existing media
         return this.removeMedia(id)
         .then(() => {
             return new Promise((resolve, reject) => {
-                let apiUrl = this.getRemoteUrl() + '/hashbrown/api/media/' + id + '?token=' + this.settings.token;
               
                 FileSystem.readFile(tempPath, (err, fileData) => {
                     if(!fileData || err) {
@@ -151,13 +145,6 @@ class HashBrownDriverConnection extends Connection {
             };
 
             return RequestHelper.request('post', apiUrl, postData);
-        })
-        .then((data, response) => {
-            if(!data || data instanceof Error || response.statusCode != 200) {
-                return Promise.reject(new Error(data));
-            }
-
-            return Promise.resolve(data);
         });
     }
    
@@ -292,7 +279,11 @@ class HashBrownDriverConnection extends Connection {
         
         let apiUrl = this.getRemoteUrl() + '/hashbrown/api/media/' + id + '?token=' + this.settings.token;
 
-        return RequestHelper.request('delete', apiUrl);
+        return RequestHelper.request('delete', apiUrl)
+        .catch((e) => {
+            // If we couldn't delete it, there file wasn't there in the first place
+            return Promise.resolve();  
+        });
     }
 }
 

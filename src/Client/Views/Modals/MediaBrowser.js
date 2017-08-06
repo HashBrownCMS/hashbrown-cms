@@ -2,6 +2,7 @@
 
 const Media = require('Common/Models/Media');
 
+const MediaHelper = require('Client/Helpers/MediaHelper');
 const RequestHelper = require('Client/Helpers/RequestHelper');
 const ProjectHelper = require('Client/Helpers/ProjectHelper');
 const SettingsHelper = require('Client/Helpers/SettingsHelper');
@@ -251,7 +252,7 @@ class MediaBrowser extends View {
                                 ).click(() => {
                                     this.$element.toggleClass('disabled', true);
 
-                                    this.uploadModal(
+                                    MediaBrowser.uploadModal(
                                         (id) => {
                                             this.$element.toggleClass('disabled', false);
 

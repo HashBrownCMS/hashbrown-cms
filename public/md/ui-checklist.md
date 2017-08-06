@@ -177,6 +177,10 @@
   - Expand/collapse toggle
   - Sorted alphabetically
 
+### Browser
+- All media is displayed in folders
+- Can upload new media
+
 ### Editor
 - Can view SVG, image and video files
 

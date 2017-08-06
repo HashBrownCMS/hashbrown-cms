@@ -46,7 +46,7 @@ class TemplatePane extends NavbarPane {
                 )
             ],
             () => {
-                newTemplate.updateFromName();
+                newTemplate.updateId();
 
                 // Sanity check
                 if(!newTemplate.type || !newTemplate.name || newTemplate.name.length < 2) { return false; }
@@ -152,7 +152,7 @@ class TemplatePane extends NavbarPane {
 
                     // Go to new Template if TemplateEditor was showing the old one
                     if(templateEditor && templateEditor.model.id == model.id) {
-                        model.updateFromName();
+                        model.updateId();
                        
                         if(model.id == templateEditor.model.id) {
                             templateEditor.model = null;

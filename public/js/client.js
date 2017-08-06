@@ -30467,6 +30467,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var Media = __webpack_require__(40);
 
+var MediaHelper = __webpack_require__(57);
 var RequestHelper = __webpack_require__(3);
 var ProjectHelper = __webpack_require__(6);
 var SettingsHelper = __webpack_require__(36);
@@ -30690,7 +30691,7 @@ var MediaBrowser = function (_View) {
         }), _.div({ class: 'input-group-btn' }, _.button({ class: 'btn btn-primary' }, 'Upload file').click(function () {
             _this2.$element.toggleClass('disabled', true);
 
-            _this2.uploadModal(function (id) {
+            MediaBrowser.uploadModal(function (id) {
                 _this2.$element.toggleClass('disabled', false);
 
                 _this2.value = id;
@@ -40622,7 +40623,10 @@ var Template = function (_Resource) {
     function Template(params) {
         _classCallCheck(this, Template);
 
-        return _possibleConstructorReturn(this, _Resource.call(this, Template.paramsCheck(params)));
+        var _this = _possibleConstructorReturn(this, _Resource.call(this, Template.paramsCheck(params)));
+
+        _this.updateId();
+        return _this;
     }
 
     /**
@@ -40636,6 +40640,8 @@ var Template = function (_Resource) {
 
     Template.paramsCheck = function paramsCheck(params) {
         params = _Resource.paramsCheck.call(this, params);
+
+        params.id;
 
         delete params.remote;
         delete params.sync;
@@ -40656,11 +40662,11 @@ var Template = function (_Resource) {
     };
 
     /**
-     * Updates id and remotePath from name
+     * Updates id from name
      */
 
 
-    Template.prototype.updateFromName = function updateFromName() {
+    Template.prototype.updateId = function updateId() {
         this.id = this.name.substring(0, this.name.lastIndexOf('.')) || this.name;
     };
 
@@ -44411,7 +44417,7 @@ var TemplatePane = function (_NavbarPane) {
         }))), _.div({ class: 'input-group' }, _.span('Name'), _.div({ class: 'input-group-addon' }, _.input({ class: 'form-control', type: 'text', placeholder: 'Template name' }).on('change keyup paste propertychange', function (e) {
             newTemplate.name = e.target.value;
         })))], function () {
-            newTemplate.updateFromName();
+            newTemplate.updateId();
 
             // Sanity check
             if (!newTemplate.type || !newTemplate.name || newTemplate.name.length < 2) {
@@ -44548,7 +44554,7 @@ var TemplatePane = function (_NavbarPane) {
 
                 // Go to new Template if TemplateEditor was showing the old one
                 if (templateEditor && templateEditor.model.id == model.id) {
-                    model.updateFromName();
+                    model.updateId();
 
                     if (model.id == templateEditor.model.id) {
                         templateEditor.model = null;
@@ -47864,6 +47870,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var ProjectHelper = __webpack_require__(6);
+var MediaHelper = __webpack_require__(57);
 
 var FieldEditor = __webpack_require__(11);
 

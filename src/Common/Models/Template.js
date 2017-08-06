@@ -10,6 +10,8 @@ const Resource = require('./Resource');
 class Template extends Resource {
     constructor(params) {
         super(Template.paramsCheck(params));
+
+        this.updateId();
     }
     
     /**
@@ -21,6 +23,8 @@ class Template extends Resource {
      */
     static paramsCheck(params) {
         params = super.paramsCheck(params);
+
+        params.id 
 
         delete params.remote;
         delete params.sync;
@@ -41,9 +45,9 @@ class Template extends Resource {
     }
 
     /**
-     * Updates id and remotePath from name
+     * Updates id from name
      */
-    updateFromName() {
+    updateId() {
         this.id = this.name.substring(0, this.name.lastIndexOf('.')) || this.name;
     }
 }
