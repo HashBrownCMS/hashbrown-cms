@@ -24,8 +24,6 @@ class Template extends Resource {
     static paramsCheck(params) {
         params = super.paramsCheck(params);
 
-        params.id 
-
         delete params.remote;
         delete params.sync;
         delete params.isRemote;

@@ -333,8 +333,6 @@ class GitHubConnection extends Connection {
                     remote: this.settings.isLocal != true
                 });
 
-                template.updateFromName();
-                
                 if(id == template.id) {
                     return this.getTemplateMarkup(template);
                 }
@@ -497,8 +495,6 @@ class GitHubConnection extends Connection {
                     remotePath: path + '/' + name,
                     remote: this.settings.isLocal != true
                 });
-
-                template.updateFromName();
 
                 templates[templates.length] = template;
             }
