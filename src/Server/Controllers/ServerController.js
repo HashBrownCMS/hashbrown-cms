@@ -33,7 +33,6 @@ class ServerController extends ApiController {
         app.post('/api/server/backups/:project/:timestamp/restore', this.middleware({ needsAdmin: true, setProject: false }), this.postRestoreProjectBackup);
         app.post('/api/server/settings/:project/:section', this.middleware({ needsAdmin: true, setProject: false }), this.postProjectSettings);
         app.post('/api/server/migrate/:project/', this.middleware({ needsAdmin: true, setProject: false }), this.postMigrateContent);
-        app.post('/api/server/rename/:project/', this.middleware({ needsAdmin: true, setProject: false }), this.postRenameProject);
 
         app.put('/api/server/projects/:project/:environment', this.middleware({ needsAdmin: true, setProject: false }), this.putEnvironment);
 
@@ -207,8 +206,11 @@ class ServerController extends ApiController {
      */
     static postProjectSettings(req, res) {
         let settings = req.body;
-    
-        SettingsHelper.setSettings(req.params.project, null, req.params.section, settings)
+   
+        ProjectHelper.checkProject(req.params.project)
+        .then(() => {
+            return SettingsHelper.setSettings(req.params.project, null, req.params.section, settings);
+        })
         .then(() => {
             res.status(200).send(settings);
         })
@@ -472,22 +474,6 @@ class ServerController extends ApiController {
         ProjectHelper.createProject(project.name, req.user.id)
         .then((project) => {
             res.status(200).send(project);
-        })
-        .catch((e) => {
-            res.status(502).send(ServerController.printError(e));
-        });
-    }
-
-    /**
-     * Renames a project
-     */
-    static postRenameProject(req, res) {
-        let oldName = req.params.project;
-        let newName = req.body.name;
-
-        ProjectHelper.renameProject(oldName, newName)
-        .then((msg) => {
-            res.status(200).send(msg);
         })
         .catch((e) => {
             res.status(502).send(ServerController.printError(e));

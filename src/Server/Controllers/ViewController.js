@@ -102,6 +102,7 @@ class ViewController extends Controller {
                 });
             })
             .catch((e) => {
+                debug.error(e, this);
                 res.status(403).redirect('/login');  
             });
         });

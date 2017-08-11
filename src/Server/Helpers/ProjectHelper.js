@@ -50,6 +50,26 @@ class ProjectHelper {
     }
 
     /**
+     * Performs a check of the requested project
+     *
+     * @param {String} project
+     *
+     * @returns {Promise}
+     */
+    static checkProject(
+        project = requiredParam('project')
+    ) {
+        return this.projectExists(project)
+        .then((projectExists) => {
+            if(!projectExists) {
+                return Promise.reject(new Error('Project "' + project + '" could not be found'));
+            }
+
+            return Promise.resolve();
+        });
+    }
+
+    /**
      * Gets a Project object
      *
      * @param {String} id
@@ -61,7 +81,10 @@ class ProjectHelper {
         let users;
         let backups;
 
-        return HashBrown.Helpers.SettingsHelper.getSettings(id)
+        return this.checkProject(id)
+        .then(() => {
+            return HashBrown.Helpers.SettingsHelper.getSettings(id);
+        })
         .then((foundSettings) => {
             settings = foundSettings || {};
 
@@ -98,8 +121,11 @@ class ProjectHelper {
      * @returns {Promise(Array)} environments
      */
     static getAllEnvironments(project) {
-        // First attempt to get remote environments
-        return SyncHelper.getResource(project, null, 'environments')
+        return this.checkProject(project)
+        .then(() => {
+            // First attempt to get remote environments
+            return SyncHelper.getResource(project, null, 'environments')
+        })
         .then((environments) => {
             // If remote environments were found, resolve immediately
             if(environments && Array.isArray(environments)) {
@@ -145,20 +171,23 @@ class ProjectHelper {
      * @returns {Promise} Promise
      */
     static deleteProject(
-        id = requriedParam('id'),
+        id = requiredParam('id'),
         makeBackup = true
     ) {
-        // Make backup first, if specified
-        if(makeBackup) {
-            return BackupHelper.createBackup(id)
-            .then(() => {
-                return MongoHelper.dropDatabase(id);
-            });
+        return this.checkProject(id)
+        .then(() => {
+            // Make backup first, if specified
+            if(makeBackup) {
+                return BackupHelper.createBackup(id)
+                .then(() => {
+                    return MongoHelper.dropDatabase(id);
+                });
 
-        // If not, just drop the database
-        } else {
-            return MongoHelper.dropDatabase(id);
-        }
+            // If not, just drop the database
+            } else {
+                return MongoHelper.dropDatabase(id);
+            }
+        });
     }
 
     /**
@@ -173,8 +202,11 @@ class ProjectHelper {
         project = requiredParam('project'),
         environment = requiredParam('environment')
     ) {
-        // Check if project is synced first
-        return SettingsHelper.getSettings(project, null, 'sync')
+        return this.checkProject(project)
+        .then(() => {
+            // Check if project is synced first
+            return SettingsHelper.getSettings(project, null, 'sync');
+        })
         .then((sync) => {
             if(sync.enabled) {
                 return Promise.reject(new Error('Cannot add environments to a synced project'));
@@ -190,29 +222,6 @@ class ProjectHelper {
     }
 
     /**
-     * Renames a project
-     *
-     * @param {String} oldName
-     * @param {String} newName
-     *
-     * @return {Promise} Promise
-     */
-    static renameProject(
-        oldName = requiredParam('oldName'),
-        newName = requiredParam('newName')
-    ) {
-        // Check if project is synced first
-        return SettingsHelper.getSettings(project, null, 'sync')
-        .then((sync) => {
-            if(sync.enabled) {
-                return Promise.reject(new Error('Cannot rename a synced project'));
-            }
-
-            return MongoHelper.renameDatabase(oldName, newName);
-        });
-    }
-
-    /**
      * Deletes an environment
      *
      * @param {String} project
@@ -224,8 +233,11 @@ class ProjectHelper {
         project = requiredParam('project'),
         environment = requiredParam('environment')
     ) {
-        // Check if project is synced first
-        return SettingsHelper.getSettings(project, null, 'sync')
+        return this.checkProject(project)
+        .then(() => {
+            // Check if project is synced first
+            return SettingsHelper.getSettings(project, null, 'sync');
+        })
         .then((sync) => {
             if(sync.enabled) {
                 return Promise.reject(new Error('Cannot delete environments from a synced project'));
