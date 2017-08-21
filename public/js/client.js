@@ -39996,7 +39996,7 @@ module.exports = ["address", "article", "aside", "blockquote", "canvas", "dd", "
 module.exports = {
 	"name": "hashbrown-cms",
 	"repository": "https://github.com/Putaitu/hashbrown-cms.git",
-	"version": "0.9.1",
+	"version": "0.9.3",
 	"description": "The pluggable CMS",
 	"main": "hashbrown.js",
 	"scripts": {
@@ -45083,22 +45083,18 @@ var SchemaEditor = function (_View) {
             var editor = HashBrown.Views.Editors.FieldEditors[i];
 
             editorOptions[editorOptions.length] = {
-                value: editor.id,
+                value: editor.name,
                 label: editor.name
             };
         }
 
-        var editorName = '(none)';
-        var editorId = this.model.editorId;
+        // The editorId is actually a name more than an id
+        var editorName = this.model.editorId || '(none)';
 
         // Backwards compatible check
-        editorId = editorId.charAt(0).toUpperCase() + editorId.slice(1);
+        editorName = editorName.charAt(0).toUpperCase() + editorName.slice(1);
 
-        if (HashBrown.Views.Editors.FieldEditors[editorId]) {
-            editorName = HashBrown.Views.Editors.FieldEditors[editorId].name;
-        }
-
-        var $element = _.div({ class: 'editor-picker' }, _.if(!this.model.isLocked, UI.inputDropdownTypeAhead(editorId, editorOptions, function (newValue) {
+        var $element = _.div({ class: 'editor-picker' }, _.if(!this.model.isLocked, UI.inputDropdownTypeAhead(editorName, editorOptions, function (newValue) {
             _this3.model.editorId = newValue;
         })), _.if(this.model.isLocked, _.p({ class: 'read-only' }, editorName)));
 

@@ -57,31 +57,27 @@ class SchemaEditor extends View {
      */
     renderEditorPicker() {
         if(this.model.isPropertyHidden('editorId')) { return; }  
-        
+
         let editorOptions = [];
 
         for(let i in HashBrown.Views.Editors.FieldEditors) {
             let editor = HashBrown.Views.Editors.FieldEditors[i];
 
             editorOptions[editorOptions.length] = {
-                value: editor.id,
+                value: editor.name,
                 label: editor.name
             };
         }
 
-        let editorName = '(none)';
-        let editorId = this.model.editorId;
+        // The editorId is actually a name more than an id
+        let editorName = this.model.editorId || '(none)';
         
         // Backwards compatible check
-        editorId = editorId.charAt(0).toUpperCase() + editorId.slice(1);
+        editorName = editorName.charAt(0).toUpperCase() + editorName.slice(1);
         
-        if(HashBrown.Views.Editors.FieldEditors[editorId]) {
-            editorName = HashBrown.Views.Editors.FieldEditors[editorId].name;
-        }
-
         let $element = _.div({class: 'editor-picker'},
             _.if(!this.model.isLocked,
-                UI.inputDropdownTypeAhead(editorId, editorOptions, (newValue) => {
+                UI.inputDropdownTypeAhead(editorName, editorOptions, (newValue) => {
                     this.model.editorId = newValue;
                 })
             ),
