@@ -49,7 +49,7 @@ class GitHubConnection extends Connection {
      * @returns {Boolean} Is local
      */
     isLocal() {
-        return this.settings.isLocal !== false;
+        return this.settings.isLocal === true;
     }
 
     /**
