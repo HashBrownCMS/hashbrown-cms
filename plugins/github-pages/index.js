@@ -67,7 +67,7 @@ class GitHubPages {
         app.get('/plugins/github/repos', (req, res) => {
             let apiUrl = '';
             
-            if(req.query.org && req.query.org != 'undefined') {
+            if(req.query.org && req.query.org !== 'undefined' && req.query.org !== '(none)') {
                 apiUrl = 'https://api.github.com/users/' + req.query.org + '/repos';
             } else {
                 apiUrl = 'https://api.github.com/user/repos';
