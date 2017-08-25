@@ -185,7 +185,8 @@ class FormsPane extends NavbarPane {
             // General context menu
             paneContextMenu: {
                 'Forms': '---',
-                'New form': () => { this.onClickNewForm(); }
+                'New form': () => { this.onClickNewForm(); },
+                'Refresh': () => { this.onClickRefreshResource('forms'); }
             }
         });
     }

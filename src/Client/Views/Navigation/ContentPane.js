@@ -465,7 +465,8 @@ class ContentPane extends NavbarPane {
             // Set general context menu items
             paneContextMenu: {
                 'General': '---',
-                'New content': () => { this.onClickNewContent(); }
+                'New content': () => { this.onClickNewContent(); },
+                'Refresh': () => { this.onClickRefreshResource('content'); }
             },
 
             // Hierarchy logic

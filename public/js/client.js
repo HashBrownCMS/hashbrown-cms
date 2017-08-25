@@ -9509,6 +9509,19 @@ var Pane = function () {
     };
 
     /**
+     * Event: Click refresh resource
+     *
+     * @param {String} resource
+     */
+
+
+    Pane.onClickRefreshResource = function onClickRefreshResource(resource) {
+        HashBrown.Helpers.RequestHelper.reloadResource(resource).then(function () {
+            HashBrown.Views.Navigation.NavbarMain.reload();
+        });
+    };
+
+    /**
      * Event: Change directory
      *
      * @param {String} id
@@ -39996,7 +40009,7 @@ module.exports = ["address", "article", "aside", "blockquote", "canvas", "dd", "
 module.exports = {
 	"name": "hashbrown-cms",
 	"repository": "https://github.com/Putaitu/hashbrown-cms.git",
-	"version": "0.9.3",
+	"version": "0.9.5",
 	"description": "The pluggable CMS",
 	"main": "hashbrown.js",
 	"scripts": {
@@ -42982,6 +42995,9 @@ var ConnectionPane = function (_NavbarPane) {
                 'General': '---',
                 'New connection': function NewConnection() {
                     _this3.onClickNewConnection();
+                },
+                'Refresh': function Refresh() {
+                    _this3.onClickRefreshResource('connections');
                 }
             }
         });
@@ -43470,6 +43486,9 @@ var ContentPane = function (_NavbarPane) {
                 'General': '---',
                 'New content': function NewContent() {
                     _this2.onClickNewContent();
+                },
+                'Refresh': function Refresh() {
+                    _this2.onClickRefreshResource('content');
                 }
             },
 
@@ -43708,6 +43727,9 @@ var FormsPane = function (_NavbarPane) {
                 'Forms': '---',
                 'New form': function NewForm() {
                     _this2.onClickNewForm();
+                },
+                'Refresh': function Refresh() {
+                    _this2.onClickRefreshResource('forms');
                 }
             }
         });
@@ -44076,6 +44098,9 @@ var MediaPane = function (_NavbarPane) {
                 'General': '---',
                 'Upload new media': function UploadNewMedia() {
                     _this2.onClickUploadMedia();
+                },
+                'Refresh': function Refresh() {
+                    _this2.onClickRefreshResource('media');
                 }
             }
         });
@@ -44300,6 +44325,14 @@ var SchemaPane = function (_NavbarPane) {
                 }
 
                 return menu;
+            },
+
+            // Set general context menu items
+            paneContextMenu: {
+                'General': '---',
+                'Refresh': function Refresh() {
+                    _this2.onClickRefreshResource('schemas');
+                }
             },
 
             // Hierarchy logic
@@ -44620,6 +44653,9 @@ var TemplatePane = function (_NavbarPane) {
                 'Template': '---',
                 'Add template': function AddTemplate() {
                     _this2.onClickAddTemplate();
+                },
+                'Refresh': function Refresh() {
+                    _this2.onClickRefreshResource('templates');
                 }
             }
         });

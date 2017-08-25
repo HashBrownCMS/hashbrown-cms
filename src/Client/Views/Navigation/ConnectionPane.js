@@ -173,7 +173,8 @@ class ConnectionPane extends NavbarPane {
             // General context menu
             paneContextMenu: {
                 'General': '---',
-                'New connection': () => { this.onClickNewConnection(); }
+                'New connection': () => { this.onClickNewConnection(); },
+                'Refresh': () => { this.onClickRefreshResource('connections'); }
             }
         });
     }

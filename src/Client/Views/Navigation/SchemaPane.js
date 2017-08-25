@@ -181,6 +181,12 @@ class SchemaPane extends NavbarPane {
 
                 return menu;
             },
+            
+            // Set general context menu items
+            paneContextMenu: {
+                'General': '---',
+                'Refresh': () => { this.onClickRefreshResource('schemas'); }
+            },
 
             // Hierarchy logic
             hierarchy: function(item, queueItem) {

@@ -35086,7 +35086,7 @@ module.exports = ["address", "article", "aside", "blockquote", "canvas", "dd", "
 module.exports = {
 	"name": "hashbrown-cms",
 	"repository": "https://github.com/Putaitu/hashbrown-cms.git",
-	"version": "0.9.3",
+	"version": "0.9.5",
 	"description": "The pluggable CMS",
 	"main": "hashbrown.js",
 	"scripts": {
