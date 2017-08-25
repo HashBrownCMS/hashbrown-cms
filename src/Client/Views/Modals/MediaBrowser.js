@@ -15,11 +15,20 @@ const SettingsHelper = require('Client/Helpers/SettingsHelper');
 class MediaBrowser extends View {
     constructor(params) {
         super(params);
-        
-        this.$element = _.div({class: 'modal fade media-browser'});
 
+        this.currentPath = '/';
+        this.template = require('Client/Templates/Modals/MediaBrowser');
+
+        // First check if an active Connection is set up to be a Media provider
         MediaBrowser.checkMediaProvider()
+
+        // Then get the Media tree
         .then(() => {
+            return MediaHelper.getTree();
+        })
+        .then((tree) => {
+            this.tree = tree;
+
             this.init();
             
             // Make sure the modal is removed when it's cancelled
@@ -233,129 +242,35 @@ class MediaBrowser extends View {
         this.$element.modal('hide');
     }
 
-    render() {
-        // Render the modal
-        let $folders = [];
+    /**
+     * Event: Click upload
+     */
+    onClickUpload() {
+        this.$element.toggleClass('disabled', true);
 
-        _.append(this.$element.empty(),
-            _.div({class: 'modal-dialog'},
-                _.div({class: 'modal-content'},
-                    _.div({class: 'modal-header'},
-                        _.div({class: 'input-group'}, 
-                            _.input({class: 'form-control input-search-media', placeholder: 'Search media'})
-                                .on('change keyup paste', () => {
-                                    this.onSearchMedia();
-                                }),
-                            _.div({class: 'input-group-btn'},
-                                _.button({class: 'btn btn-primary'},
-                                    'Upload file'
-                                ).click(() => {
-                                    this.$element.toggleClass('disabled', true);
+        MediaBrowser.uploadModal(
+            (id) => {
+                this.$element.toggleClass('disabled', false);
 
-                                    MediaBrowser.uploadModal(
-                                        (id) => {
-                                            this.$element.toggleClass('disabled', false);
+                this.value = id;
 
-                                            this.value = id;
-
-                                            this.render();
-                                        },
-                                        () => {
-                                            this.$element.toggleClass('disabled', false);
-                                        }
-                                    );
-                                })
-                            )
-                        )
-                    ),
-                    _.div({class: 'modal-body'},
-                        _.div({class: 'thumbnail-container'},
-                            // Append all files
-                            _.each(resources.media, (i, media) => {
-                                let $media = _.button(
-                                    {
-                                        class: 'thumbnail raised',
-                                        'data-id': media.id,
-                                        'data-name': media.name,
-                                    },
-                                    _.if(media.isVideo(),
-                                        _.video({src: '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + media.id})
-                                    ),
-                                    _.if(media.isImage(),
-                                        _.img({src: '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + media.id})
-                                    ),
-                                    _.label(media.name)  
-                                ).click(() => {
-                                    this.$element.find('.thumbnail').toggleClass('active', false);
-                                    $media.toggleClass('active', true);
-                                });
-                                
-                                if(media.folder && media.folder != '/') {
-                                    let $folder = $folders[media.folder];
-
-                                    if(!$folder) {
-                                        $folder = _.div({class: 'folder', 'data-path': media.folder},
-                                            _.div({class: 'folder-heading'},
-                                                _.button(
-                                                    _.span({class: 'fa fa-folder'}),
-                                                    media.folder
-                                                ).click(() => {
-                                                    $folder.toggleClass('expanded');
-
-                                                    if($folder.hasClass('expanded')) {
-                                                        $folder.find('img, video').each((i, mediaSource) => {
-                                                            $(mediaSource).attr('src', $(mediaSource).data('src'));
-                                                        });
-                                                    }
-                                                })
-                                            ),
-                                            _.div({class: 'folder-items'})
-                                        );
-
-                                        $folders[media.folder] = $folder;
-                                    }
-
-                                    // Prevent the media from loading
-                                    if(media.isImage() || media.isVideo()) {
-                                        let $mediaSource = $media.find('img, video');
-
-                                        $mediaSource.data('src', $mediaSource.attr('src'));
-                                        $mediaSource.attr('src', '#');
-                                    }
-
-                                    // Wait 1 CPU cycle before appending to folders
-                                    setTimeout(() =>{ 
-                                        $folder.find('.folder-items').append($media);
-                                    }, 1);
-                                }
-
-                                return $media;
-                            }),
-
-                            // Append all folders
-                            _.each(Object.keys($folders).sort(), (i, path) => {
-                                return $folders[path];
-                            })
-                        )
-                    ),
-                    _.div({class: 'modal-footer'},
-                        _.button({class: 'btn btn-default'},
-                            'Cancel'
-                        ).click(() => {
-                            this.onClickCancel();
-                        }),
-                        _.button({class: 'btn btn-primary'},
-                            'OK'
-                        ).click(() => {
-                            this.onClickOK();
-                        })
-                    )
-                )
-            )
+                this.render();
+            },
+            () => {
+                this.$element.toggleClass('disabled', false);
+            }
         );
+    }
 
-        // Mark the selected media as active
-        this.$element.find('.thumbnail[data-id="' + this.value + '"]').toggleClass('active', true);
+    /**
+     * Event: Click folder
+     *
+     * @param {String} path
+     */
+    onClickFolder(path) {
+        this.currentPath = path;
+
+        this.render();
     }
 }
 

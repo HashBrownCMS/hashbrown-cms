@@ -1514,53 +1514,51 @@ body.dashboard-container {
   width: calc(100% - 30px);
   max-width: 1040px; }
   .media-browser .modal-dialog .modal-body {
-    padding: 15px 0px; }
+    padding: 0; }
   .media-browser .modal-dialog .modal-footer .form-control {
     float: left; }
-  .media-browser .modal-dialog .thumbnail-container {
-    display: flex;
-    flex-wrap: wrap;
-    overflow-y: auto;
-    max-height: 550px;
-    padding: 0px 15px; }
-    .media-browser .modal-dialog .thumbnail-container .folder {
-      width: 100%;
-      flex-grow: 1;
-      flex-basis: 100%;
-      margin-top: 30px; }
-      .media-browser .modal-dialog .thumbnail-container .folder.expanded .folder-items {
-        display: flex; }
-      .media-browser .modal-dialog .thumbnail-container .folder .folder-heading button {
-        background-color: #eeeeee;
-        margin: 0px;
-        padding: 10px 15px;
+  .media-browser .modal-dialog .panes {
+    overflow-x: auto;
+    max-height: 70vh;
+    border-bottom: 1px solid #333333;
+    display: flex; }
+    .media-browser .modal-dialog .panes .pane {
+      overflow-y: auto;
+      min-width: 30%;
+      flex-basis: 30%;
+      border-right: 1px solid #333333;
+      padding: 1rem; }
+      .media-browser .modal-dialog .panes .pane .file, .media-browser .modal-dialog .panes .pane .folder {
+        position: relative;
+        padding-left: 4rem;
+        line-height: 3rem;
+        display: block;
         border: 0;
-        border-top-left-radius: 2px;
-        border-top-right-radius: 2px;
-        display: inline-block; }
-        .media-browser .modal-dialog .thumbnail-container .folder .folder-heading button .fa {
-          margin-right: 10px; }
-      .media-browser .modal-dialog .thumbnail-container .folder .folder-items {
-        display: none;
-        flex-wrap: wrap;
-        background-color: #eeeeee;
-        border-top-right-radius: 2px;
-        border-bottom-left-radius: 2px;
-        border-bottom-right-radius: 2px; }
-    .media-browser .modal-dialog .thumbnail-container .thumbnail {
-      width: calc(25% - 2em);
-      flex-grow: 0;
-      margin: 1em;
-      position: relative;
-      overflow: hidden; }
-      .media-browser .modal-dialog .thumbnail-container .thumbnail img, .media-browser .modal-dialog .thumbnail-container .thumbnail video {
-        object-fit: cover;
+        background-color: #ffffff;
+        width: 100%;
+        cursor: pointer;
+        text-align: left; }
+        .media-browser .modal-dialog .panes .pane .file:hover, .media-browser .modal-dialog .panes .pane .file.active, .media-browser .modal-dialog .panes .pane .folder:hover, .media-browser .modal-dialog .panes .pane .folder.active {
+          background-color: #e70d3b;
+          color: #ffffff; }
+        .media-browser .modal-dialog .panes .pane .file:before, .media-browser .modal-dialog .panes .pane .folder:before {
+          font-family: 'FontAwesome';
+          position: absolute;
+          left: 1.5rem;
+          top: 1.5rem;
+          transform: translate(-50%, -50%); }
+      .media-browser .modal-dialog .panes .pane .folder:before {
+        content: '\F07B'; }
+      .media-browser .modal-dialog .panes .pane .file:before {
+        content: '\F03E'; }
+      .media-browser .modal-dialog .panes .pane .file img, .media-browser .modal-dialog .panes .pane .file video {
         position: absolute;
-        max-width: 100%;
+        left: 1.5rem;
+        top: 1.5rem;
+        transform: translate(-50%, -50%);
+        max-width: 3rem;
         max-height: 100%;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%); }
+        z-index: 10; }
 
 .schema-editor {
   height: 100%;
@@ -1798,7 +1796,8 @@ body.dashboard-container {
         opacity: 1;
         font-weight: bold;
         color: #ffffff;
-        content: "MOVE HERE";
+        font-family: 'FontAwesome';
+        content: '\F060';
         display: block;
         white-space: nowrap; }
       .navspace .navbar-main .tab-panes .pane-container.select-dir .pane .pane-item-container:not(.moving-item)[data-is-directory="true"] > .pane-item:hover {

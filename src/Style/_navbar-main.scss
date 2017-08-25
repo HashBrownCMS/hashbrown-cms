@@ -166,7 +166,8 @@
                                         opacity: 1;
                                         font-weight: bold;
                                         color: $primary-text;
-                                        content: "MOVE HERE";
+                                        font-family: 'FontAwesome';
+                                        content: '\f060';
                                         display: block;
                                         white-space: nowrap;
                                     }

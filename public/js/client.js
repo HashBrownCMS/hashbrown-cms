@@ -9886,6 +9886,10 @@ var Media = function (_Resource) {
         delete params.sync;
         delete params.isRemote;
 
+        if (!params.folder) {
+            params.folder = '/';
+        }
+
         return params;
     };
 
@@ -9894,7 +9898,7 @@ var Media = function (_Resource) {
         this.def(String, 'icon', 'file-image-o');
         this.def(String, 'name');
         this.def(String, 'url');
-        this.def(String, 'folder');
+        this.def(String, 'folder', '/');
     };
 
     /**
@@ -9928,36 +9932,36 @@ var Media = function (_Resource) {
 
 
     Media.prototype.getContentTypeHeader = function getContentTypeHeader() {
-        this.name = this.name || '';
+        var name = (this.name || '').toLowerCase();
 
         // Image types
-        if (this.name.match(/\.jpg/)) {
+        if (name.match(/\.jpg/)) {
             return 'image/jpeg';
-        } else if (this.name.match(/\.png/)) {
+        } else if (name.match(/\.png/)) {
             return 'image/png';
-        } else if (this.name.match(/\.gif/)) {
+        } else if (name.match(/\.gif/)) {
             return 'image/gif';
-        } else if (this.name.match(/\.bmp/)) {
+        } else if (name.match(/\.bmp/)) {
             return 'image/bmp';
 
             // Video types
-        } else if (this.name.match(/\.mp4/)) {
+        } else if (name.match(/\.mp4/)) {
             return 'video/mp4';
-        } else if (this.name.match(/\.avi/)) {
+        } else if (name.match(/\.avi/)) {
             return 'video/avi';
-        } else if (this.name.match(/\.mov/)) {
+        } else if (name.match(/\.mov/)) {
             return 'video/quicktime';
-        } else if (this.name.match(/\.bmp/)) {
+        } else if (name.match(/\.bmp/)) {
             return 'video/bmp';
-        } else if (this.name.match(/\.wmv/)) {
+        } else if (name.match(/\.wmv/)) {
             return 'video/x-ms-wmv';
-        } else if (this.name.match(/\.3gp/)) {
+        } else if (name.match(/\.3gp/)) {
             return 'video/3gpp';
-        } else if (this.name.match(/\.mkv/)) {
+        } else if (name.match(/\.mkv/)) {
             return 'video/x-matroska';
 
             // SVG
-        } else if (this.name.match(/\.svg/)) {
+        } else if (name.match(/\.svg/)) {
             return 'image/svg+xml';
 
             // Everything else
@@ -30499,9 +30503,18 @@ var MediaBrowser = function (_View) {
 
         var _this = _possibleConstructorReturn(this, _View.call(this, params));
 
-        _this.$element = _.div({ class: 'modal fade media-browser' });
+        _this.currentPath = '/';
+        _this.template = __webpack_require__(295);
 
-        MediaBrowser.checkMediaProvider().then(function () {
+        // First check if an active Connection is set up to be a Media provider
+        MediaBrowser.checkMediaProvider()
+
+        // Then get the Media tree
+        .then(function () {
+            return MediaHelper.getTree();
+        }).then(function (tree) {
+            _this.tree = tree;
+
             _this.init();
 
             // Make sure the modal is removed when it's cancelled
@@ -30693,83 +30706,38 @@ var MediaBrowser = function (_View) {
         this.$element.modal('hide');
     };
 
-    MediaBrowser.prototype.render = function render() {
+    /**
+     * Event: Click upload
+     */
+
+
+    MediaBrowser.prototype.onClickUpload = function onClickUpload() {
         var _this2 = this;
 
-        // Render the modal
-        var $folders = [];
+        this.$element.toggleClass('disabled', true);
 
-        _.append(this.$element.empty(), _.div({ class: 'modal-dialog' }, _.div({ class: 'modal-content' }, _.div({ class: 'modal-header' }, _.div({ class: 'input-group' }, _.input({ class: 'form-control input-search-media', placeholder: 'Search media' }).on('change keyup paste', function () {
-            _this2.onSearchMedia();
-        }), _.div({ class: 'input-group-btn' }, _.button({ class: 'btn btn-primary' }, 'Upload file').click(function () {
-            _this2.$element.toggleClass('disabled', true);
+        MediaBrowser.uploadModal(function (id) {
+            _this2.$element.toggleClass('disabled', false);
 
-            MediaBrowser.uploadModal(function (id) {
-                _this2.$element.toggleClass('disabled', false);
+            _this2.value = id;
 
-                _this2.value = id;
+            _this2.render();
+        }, function () {
+            _this2.$element.toggleClass('disabled', false);
+        });
+    };
 
-                _this2.render();
-            }, function () {
-                _this2.$element.toggleClass('disabled', false);
-            });
-        })))), _.div({ class: 'modal-body' }, _.div({ class: 'thumbnail-container' },
-        // Append all files
-        _.each(resources.media, function (i, media) {
-            var $media = _.button({
-                class: 'thumbnail raised',
-                'data-id': media.id,
-                'data-name': media.name
-            }, _.if(media.isVideo(), _.video({ src: '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + media.id })), _.if(media.isImage(), _.img({ src: '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + media.id })), _.label(media.name)).click(function () {
-                _this2.$element.find('.thumbnail').toggleClass('active', false);
-                $media.toggleClass('active', true);
-            });
+    /**
+     * Event: Click folder
+     *
+     * @param {String} path
+     */
 
-            if (media.folder && media.folder != '/') {
-                var $folder = $folders[media.folder];
 
-                if (!$folder) {
-                    $folder = _.div({ class: 'folder', 'data-path': media.folder }, _.div({ class: 'folder-heading' }, _.button(_.span({ class: 'fa fa-folder' }), media.folder).click(function () {
-                        $folder.toggleClass('expanded');
+    MediaBrowser.prototype.onClickFolder = function onClickFolder(path) {
+        this.currentPath = path;
 
-                        if ($folder.hasClass('expanded')) {
-                            $folder.find('img, video').each(function (i, mediaSource) {
-                                $(mediaSource).attr('src', $(mediaSource).data('src'));
-                            });
-                        }
-                    })), _.div({ class: 'folder-items' }));
-
-                    $folders[media.folder] = $folder;
-                }
-
-                // Prevent the media from loading
-                if (media.isImage() || media.isVideo()) {
-                    var $mediaSource = $media.find('img, video');
-
-                    $mediaSource.data('src', $mediaSource.attr('src'));
-                    $mediaSource.attr('src', '#');
-                }
-
-                // Wait 1 CPU cycle before appending to folders
-                setTimeout(function () {
-                    $folder.find('.folder-items').append($media);
-                }, 1);
-            }
-
-            return $media;
-        }),
-
-        // Append all folders
-        _.each(Object.keys($folders).sort(), function (i, path) {
-            return $folders[path];
-        }))), _.div({ class: 'modal-footer' }, _.button({ class: 'btn btn-default' }, 'Cancel').click(function () {
-            _this2.onClickCancel();
-        }), _.button({ class: 'btn btn-primary' }, 'OK').click(function () {
-            _this2.onClickOK();
-        })))));
-
-        // Mark the selected media as active
-        this.$element.find('.thumbnail[data-id="' + this.value + '"]').toggleClass('active', true);
+        this.render();
     };
 
     return MediaBrowser;
@@ -31655,9 +31623,10 @@ var ContentEditor = function (_View) {
 
         var remoteUrl = void 0;
         var connectionId = this.model.getSettings('publishing').connectionId;
+        var connection = void 0;
 
         if (connectionId) {
-            var connection = ConnectionHelper.getConnectionByIdSync(connectionId);
+            connection = ConnectionHelper.getConnectionByIdSync(connectionId);
 
             if (connection && connection.url) {
                 remoteUrl = connection.url + url;
@@ -31675,7 +31644,7 @@ var ContentEditor = function (_View) {
         // Save & publish
         _.div({ class: 'btn-group-save-publish raised' }, this.$saveBtn = _.button({ class: 'btn btn-save btn-primary' }, _.span({ class: 'text-default' }, 'Save'), _.span({ class: 'text-working' }, 'Saving')).click(function () {
             _this6.onClickSave();
-        }), _.if(connectionId, _.span('&'), _.select({ class: 'form-control select-publishing' }, _.option({ value: 'publish' }, 'Publish'), _.option({ value: 'preview' }, 'Preview'), _.option({ value: 'unpublish' }, 'Unpublish')).val('publish'))))));
+        }), _.if(connection, _.span('&'), _.select({ class: 'form-control select-publishing' }, _.option({ value: 'publish' }, 'Publish'), _.option({ value: 'preview' }, 'Preview'), _.if(this.model.isPublished, _.option({ value: 'unpublish' }, 'Unpublish')), _.option({ value: '' }, '(No action)')).val('publish'))))));
     };
 
     ContentEditor.prototype.render = function render() {
@@ -48912,6 +48881,101 @@ var UrlEditor = function (_FieldEditor) {
 }(FieldEditor);
 
 module.exports = UrlEditor;
+
+/***/ }),
+/* 268 */,
+/* 269 */,
+/* 270 */,
+/* 271 */,
+/* 272 */,
+/* 273 */,
+/* 274 */,
+/* 275 */,
+/* 276 */,
+/* 277 */,
+/* 278 */,
+/* 279 */,
+/* 280 */,
+/* 281 */,
+/* 282 */,
+/* 283 */,
+/* 284 */,
+/* 285 */,
+/* 286 */,
+/* 287 */,
+/* 288 */,
+/* 289 */,
+/* 290 */,
+/* 291 */,
+/* 292 */,
+/* 293 */,
+/* 294 */,
+/* 295 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var ProjectHelper = __webpack_require__(6);
+
+module.exports = function () {
+    var _this = this;
+
+    var paneNames = this.currentPath.match(/[^\/]+/g) || [];
+
+    paneNames.unshift('/');
+
+    var panePath = paneNames[0];
+    var placedFolders = {};
+
+    return _.div({ class: 'modal fade media-browser' }, _.div({ class: 'modal-dialog' }, _.div({ class: 'modal-content' }, _.div({ class: 'modal-header' }, _.div({ class: 'input-group' }, _.input({ class: 'form-control input-search-media', placeholder: 'Search media' }).on('change keyup paste', function () {
+        _this.onSearchMedia();
+    }), _.div({ class: 'input-group-btn' }, _.button({ class: 'btn btn-primary' }, 'Upload file').click(function () {
+        _this.onClickUpload();
+    })))), _.div({ class: 'modal-body' }, _.div({ class: 'panes' },
+
+    // Render all panes
+    _.each(paneNames, function (i, paneName) {
+        var $pane = _.div({ class: 'pane', 'data-path': panePath },
+        // Append all files
+        _.each(resources.media, function (i, media) {
+            // If this Media object doesn't belong in this pane, maybe a parent folder does
+            if (media.folder !== panePath) {
+                var folderName = media.folder;
+                folderName = folderName.replace(panePath, '');
+                folderName = (folderName.match(/[^\/]+/g) || [folderName])[0];
+
+                var folderPath = panePath + folderName + '/';
+
+                if (placedFolders[folderPath] || media.folder === panePath) {
+                    return;
+                }
+
+                placedFolders[folderPath] = true;
+
+                return _.button({ class: 'folder', 'data-path': folderPath }, folderName).click(function (e) {
+                    _this.onClickFolder(folderPath);
+                });
+
+                // This Media object belongs in this pane
+            } else {
+                return _.button({
+                    class: 'file ' + (_this.value == media.id ? 'active' : ''),
+                    'data-id': media.id,
+                    'data-name': media.name
+                }, _.if(media.isVideo(), _.video({ src: '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + media.id })), _.if(media.isImage(), _.img({ src: '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + media.id })), media.name).click(function () {
+                    _this.$element.find('.file').toggleClass('active', false);
+                    $media.toggleClass('active', true);
+                });
+            }
+        }));
+
+        panePath += paneName + '/';
+
+        return $pane;
+    }))), _.div({ class: 'modal-footer' }, _.button({ class: 'btn btn-default' }, 'Cancel').click(function () {
+        _this.onClickCancel();
+    }), _.button({ class: 'btn btn-primary' }, 'OK').click(function () {
+        _this.onClickOK();
+    })))));
+};
 
 /***/ })
 /******/ ]);

@@ -16,7 +16,7 @@
         max-width: 1040px;
 
         .modal-body {
-            padding: 15px 0px;
+            padding: 0;
         }
 
         .modal-footer {
@@ -25,66 +25,64 @@
             }
         }
 
-        .thumbnail-container {
+        .panes {
+            overflow-x: auto;
+            max-height: 70vh;
+            border-bottom: 1px solid $standard-text;
             display: flex;
-            flex-wrap: wrap;
-            overflow-y: auto;
-            max-height: 550px;
-            padding: 0px 15px;
 
-            .folder {
-                width: 100%;
-                flex-grow: 1;
-                flex-basis: 100%;
-                margin-top: 30px;
+            .pane {
+                overflow-y: auto;
+                min-width: 30%;
+                flex-basis: 30%;
+                border-right: 1px solid $standard-text;
+                padding: 1rem;
 
-                &.expanded {
-                    .folder-items {
-                        display: flex;
+                .file, .folder {
+                    position: relative;
+                    padding-left: 4rem;
+                    line-height: 3rem;
+                    display: block;
+                    border: 0;
+                    background-color: $standard;
+                    width: 100%;
+                    cursor: pointer;
+                    text-align: left;
+                    
+                    &:hover, &.active {
+                        background-color: $primary;
+                        color: $primary-text;
+                    }
+
+                    &:before {
+                        font-family: 'FontAwesome';
+                        position: absolute;
+                        left: 1.5rem;
+                        top: 1.5rem;
+                        transform: translate(-50%, -50%);
                     }
                 }
 
-                .folder-heading {
-                    button {
-                        background-color: material-color('grey', '200');
-                        margin: 0px;
-                        padding: 10px 15px;
-                        border: 0;
-                        border-top-left-radius: 2px;
-                        border-top-right-radius: 2px;
-                        display: inline-block;
-
-                        .fa { 
-                            margin-right: 10px;
-                        }
+                .folder {
+                    &:before {
+                        content: '\f07b';
                     }
                 }
 
-                .folder-items {
-                    display: none;
-                    flex-wrap: wrap;
-                    background-color: material-color('grey', '200');
-                    border-top-right-radius: 2px;
-                    border-bottom-left-radius: 2px;
-                    border-bottom-right-radius: 2px;
-                }
-            }
-
-            .thumbnail {
-                width: calc(25% - 2em);
-                flex-grow: 0;
-                margin: 1em;
-                position: relative;
-                overflow: hidden;
-
-                img, video {
-                    object-fit: cover;
-                    position: absolute;
-                    max-width: 100%;
-                    max-height: 100%;
-                    left: 50%;
-                    top: 50%;
-                    transform: translate(-50%, -50%);
+                .file {
+                    &:before {
+                        content: '\f03e';
+                    }
+                    
+                    img, video {
+                        position: absolute;
+                        left: 1.5rem;
+                        top: 1.5rem;
+                        transform: translate(-50%, -50%);
+                        max-width: 3rem;
+                        max-height: 100%;
+                        z-index: 10;
+                    }
                 }
             }
         }

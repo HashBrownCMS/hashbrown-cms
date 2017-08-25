@@ -9103,6 +9103,10 @@ var Media = function (_Resource) {
         delete params.sync;
         delete params.isRemote;
 
+        if (!params.folder) {
+            params.folder = '/';
+        }
+
         return params;
     };
 
@@ -9111,7 +9115,7 @@ var Media = function (_Resource) {
         this.def(String, 'icon', 'file-image-o');
         this.def(String, 'name');
         this.def(String, 'url');
-        this.def(String, 'folder');
+        this.def(String, 'folder', '/');
     };
 
     /**
@@ -9145,36 +9149,36 @@ var Media = function (_Resource) {
 
 
     Media.prototype.getContentTypeHeader = function getContentTypeHeader() {
-        this.name = this.name || '';
+        var name = (this.name || '').toLowerCase();
 
         // Image types
-        if (this.name.match(/\.jpg/)) {
+        if (name.match(/\.jpg/)) {
             return 'image/jpeg';
-        } else if (this.name.match(/\.png/)) {
+        } else if (name.match(/\.png/)) {
             return 'image/png';
-        } else if (this.name.match(/\.gif/)) {
+        } else if (name.match(/\.gif/)) {
             return 'image/gif';
-        } else if (this.name.match(/\.bmp/)) {
+        } else if (name.match(/\.bmp/)) {
             return 'image/bmp';
 
             // Video types
-        } else if (this.name.match(/\.mp4/)) {
+        } else if (name.match(/\.mp4/)) {
             return 'video/mp4';
-        } else if (this.name.match(/\.avi/)) {
+        } else if (name.match(/\.avi/)) {
             return 'video/avi';
-        } else if (this.name.match(/\.mov/)) {
+        } else if (name.match(/\.mov/)) {
             return 'video/quicktime';
-        } else if (this.name.match(/\.bmp/)) {
+        } else if (name.match(/\.bmp/)) {
             return 'video/bmp';
-        } else if (this.name.match(/\.wmv/)) {
+        } else if (name.match(/\.wmv/)) {
             return 'video/x-ms-wmv';
-        } else if (this.name.match(/\.3gp/)) {
+        } else if (name.match(/\.3gp/)) {
             return 'video/3gpp';
-        } else if (this.name.match(/\.mkv/)) {
+        } else if (name.match(/\.mkv/)) {
             return 'video/x-matroska';
 
             // SVG
-        } else if (this.name.match(/\.svg/)) {
+        } else if (name.match(/\.svg/)) {
             return 'image/svg+xml';
 
             // Everything else
