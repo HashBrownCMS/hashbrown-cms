@@ -7272,7 +7272,7 @@ var Entity = function () {
 
                     var thatType = thatValue.constructor;
 
-                    if (thisType !== thatType) {
+                    if (thisType.name !== thatType.name) {
                         throw new TypeError(_this.constructor.name + '.' + name + ' is of type \'' + thisType.name + '\' and cannot implicitly be converted to \'' + thatType.name + '\'.');
                     } else {
                         thisValue = thatValue;
@@ -9050,6 +9050,17 @@ var NavbarMain = function (_View) {
     };
 
     /**
+     * Toggles the tab buttons
+     *
+     * @param {Boolean} isActive
+     */
+
+
+    NavbarMain.prototype.toggleTabButtons = function toggleTabButtons(isActive) {
+        this.$element.toggleClass('hide-tab-buttons', !isActive);
+    };
+
+    /**
      * Shows a tab
      *
      * @param {String} tabName
@@ -9886,6 +9897,10 @@ var Media = function (_Resource) {
         delete params.sync;
         delete params.isRemote;
 
+        if (!params.folder) {
+            params.folder = '/';
+        }
+
         return params;
     };
 
@@ -9894,7 +9909,7 @@ var Media = function (_Resource) {
         this.def(String, 'icon', 'file-image-o');
         this.def(String, 'name');
         this.def(String, 'url');
-        this.def(String, 'folder');
+        this.def(String, 'folder', '/');
     };
 
     /**
@@ -9960,6 +9975,10 @@ var Media = function (_Resource) {
         } else if (name.match(/\.svg/)) {
             return 'image/svg+xml';
 
+            // PDF
+        } else if (name.match(/\.pdf/)) {
+            return 'application/pdf';
+
             // Everything else
         } else {
             return 'application/octet-stream';
@@ -9986,6 +10005,17 @@ var Media = function (_Resource) {
 
     Media.prototype.isImage = function isImage() {
         return this.getContentTypeHeader().indexOf('image') > -1;
+    };
+
+    /**
+     * Gets whether this is a PDF
+     *
+     * @returns {Boolean} Is PDF
+     */
+
+
+    Media.prototype.isPdf = function isPdf() {
+        return this.getContentTypeHeader().indexOf('pdf') > -1;
     };
 
     /**
@@ -10391,6 +10421,49 @@ var MediaHelper = function (_MediaHelperCommon) {
 
     MediaHelper.setTreeItem = function setTreeItem(id, item) {
         return RequestHelper.request('post', 'media/tree/' + id, item);
+    };
+
+    /**
+     * Initialises the media picker mode
+     *
+     * @param {Function} onPickMedia
+     * @param {Function} onChangeResource
+     * @param {Object} allResources
+     */
+
+
+    MediaHelper.initMediaPickerMode = function initMediaPickerMode(onPickMedia, onChangeResource, onError, allResources) {
+        // Claim debug messages
+        UI.errorModal = onError;
+
+        // Use the provided resources instead of reloading them
+        HashBrown.Helpers.RequestHelper.reloadAllResources = function () {
+            resources = allResources;
+
+            return Promise.resolve();
+        };
+
+        // Listen for picked Media
+        window.addEventListener('hashchange', function () {
+            var mediaMatch = location.hash.match(/#\/media\/([0-9a-z]{40})/);
+
+            if (mediaMatch && mediaMatch.length > 1) {
+                onPickMedia(mediaMatch[1]);
+            }
+        });
+
+        // Listen for resource change
+        HashBrown.Views.Navigation.NavbarMain.reload = function () {
+            ViewHelper.get('NavbarMain').reload();
+
+            onChangeResource();
+        };
+
+        // Set visual fixes for media picker mode
+        $('.cms-container').addClass('media-picker-mode');
+
+        // Skip the loading screen
+        $('.cms-container').removeClass('faded');
     };
 
     return MediaHelper;
@@ -27053,13 +27126,19 @@ var SchemaHelper = function () {
             return null;
         }
 
+        // If the properties object is already a recognised model, return it
         if (properties instanceof ContentSchema || properties instanceof FieldSchema) {
             return properties;
         }
 
-        if (properties.type == 'content') {
+        // If the properties object is using an unrecognised model, serialise it
+        if (typeof properties.getObject === 'function') {
+            properties = properties.getObject();
+        }
+
+        if (properties.type === 'content') {
             return new ContentSchema(properties);
-        } else if (properties.type == 'field') {
+        } else if (properties.type === 'field') {
             return new FieldSchema(properties);
         }
 
@@ -30497,21 +30576,31 @@ var MediaBrowser = function (_View) {
     function MediaBrowser(params) {
         _classCallCheck(this, MediaBrowser);
 
+        // First check if an active Connection is set up to be a Media provider
         var _this = _possibleConstructorReturn(this, _View.call(this, params));
 
-        _this.$element = _.div({ class: 'modal fade media-browser' });
+        _this.init();
 
-        MediaBrowser.checkMediaProvider().then(function () {
-            _this.init();
+        // Make sure the modal is removed when it's cancelled
+        _this.$element.on('hidden.bs.modal', function () {
+            _this.$element.remove();
+        });
 
-            // Make sure the modal is removed when it's cancelled
-            _this.$element.on('hidden.bs.modal', function () {
-                _this.$element.remove();
-            });
+        // Show the modal
+        _this.$element.modal('show');
 
-            // Show the modal
-            _this.$element.modal('show');
-        }).catch(UI.errorModal);
+        // Init the media picker mode inside the iframe
+        var iframe = _this.$element.find('iframe')[0];
+
+        iframe.onload = function () {
+            iframe.contentWindow.HashBrown.Helpers.MediaHelper.initMediaPickerMode(function (id) {
+                _this.onPickMedia(id);
+            }, function () {
+                _this.onChangeResource();
+            }, function (e) {
+                UI.errorModal(e);
+            }, resources);
+        };
         return _this;
     }
 
@@ -30533,140 +30622,14 @@ var MediaBrowser = function (_View) {
     };
 
     /**
-     * Open the upload modal
+     * Event: Pick Media
      *
-     * @param {Function} onSuccess
-     * @param {Function} onCancel
-     * @param {String} replaceId
+     * @param {string} id
      */
 
 
-    MediaBrowser.uploadModal = function uploadModal(onSuccess, onCancel, replaceId) {
-        MediaBrowser.checkMediaProvider().then(function () {
-            var navbar = ViewHelper.get('NavbarMain');
-
-            // Event: Change file
-            function onChangeFile() {
-                var input = $(this);
-                var numFiles = this.files ? this.files.length : 1;
-
-                // In the case of a single file selected 
-                if (numFiles == 1) {
-                    var file = this.files[0];
-
-                    var isImage = file.type == 'image/png' || file.type == 'image/jpeg' || file.type == 'image/gif';
-
-                    var isVideo = file.type == 'video/mpeg' || file.type == 'video/mp4' || file.type == 'video/quicktime' || file.type == 'video/x-matroska';
-
-                    if (isImage) {
-                        var reader = new FileReader();
-
-                        uploadModal.$element.find('.spinner-container').toggleClass('hidden', false);
-
-                        reader.onload = function (e) {
-                            uploadModal.$element.find('.media-preview').html(_.img({ src: e.target.result }));
-
-                            uploadModal.$element.find('.spinner-container').toggleClass('hidden', true);
-                        };
-
-                        reader.readAsDataURL(file);
-                    }
-
-                    if (isVideo) {
-                        uploadModal.$element.find('.media-preview').html(_.video({ src: window.URL.createObjectURL(file), controls: 'controls' }));
-                    }
-
-                    debug.log('Previewing data of file type ' + file.type + '...', navbar);
-
-                    // Multiple files selected
-                } else if (numFiles > 1) {
-                    uploadModal.$element.find('.media-preview').html('(Multiple files selected)');
-
-                    // No files selected
-                } else if (numFiles == 0) {
-                    uploadModal.$element.find('.media-preview').html('(No files selected)');
-                }
-            }
-
-            // Event: Click upload
-            function onClickUpload() {
-                uploadModal.$element.find('form').submit();
-
-                return false;
-            }
-
-            // Event: Submit
-            function onSubmit(e) {
-                e.preventDefault();
-
-                uploadModal.$element.find('.spinner-container').toggleClass('hidden', false);
-
-                var apiPath = 'media/' + (replaceId ? 'replace/' + replaceId : 'new');
-
-                // TODO: Use the RequestHelper for this
-                $.ajax({
-                    url: RequestHelper.environmentUrl(apiPath),
-                    type: 'POST',
-                    data: new FormData(this),
-                    processData: false,
-                    contentType: false,
-                    success: function success(ids) {
-                        RequestHelper.reloadResource('media').then(function () {
-                            uploadModal.$element.find('.spinner-container').toggleClass('hidden', true);
-
-                            navbar.reload();
-
-                            if (onSuccess) {
-                                onSuccess(ids || []);
-                            }
-
-                            uploadModal.hide();
-                        });
-                    },
-                    error: UI.errorModal
-                });
-            }
-
-            // Render the upload modal
-            var uploadModal = new HashBrown.Views.Modals.MessageModal({
-                model: {
-                    class: 'modal-upload-media',
-                    title: 'Upload a file',
-                    body: [_.div({ class: 'spinner-container hidden' }, _.span({ class: 'spinner fa fa-refresh' })), _.div({ class: 'media-preview' }), _.form({ class: 'form-control' }, _.input({ type: 'file', name: 'media', multiple: replaceId ? false : true }).change(onChangeFile)).submit(onSubmit)]
-                },
-                buttons: [{
-                    label: 'Cancel',
-                    class: 'btn-default',
-                    callback: onCancel
-                }, {
-                    label: 'Upload',
-                    class: 'btn-primary',
-                    callback: onClickUpload
-                }]
-            });
-
-            // Event: Close modal
-            uploadModal.on('close', function () {
-                if (onCancel) {
-                    onCancel();
-                }
-            });
-        }).catch(UI.errorModal);
-    };
-
-    /**
-     * Event: Search media
-     */
-
-
-    MediaBrowser.prototype.onSearchMedia = function onSearchMedia() {
-        var query = (this.$element.find('.input-search-media').val() || '').toLowerCase();
-
-        this.$element.find('.thumbnail').each(function (i) {
-            var isMatch = !query || ($(this).attr('data-name') || '').toLowerCase().indexOf(query) > -1;
-
-            $(this).toggleClass('hidden', !isMatch);
-        });
+    MediaBrowser.prototype.onPickMedia = function onPickMedia(id) {
+        this.value = id;
     };
 
     /** 
@@ -30675,8 +30638,6 @@ var MediaBrowser = function (_View) {
 
 
     MediaBrowser.prototype.onClickOK = function onClickOK() {
-        this.value = this.$element.find('.thumbnail.active').attr('data-id');
-
         if (this.value) {
             this.trigger('select', this.value);
         }
@@ -30693,83 +30654,30 @@ var MediaBrowser = function (_View) {
         this.$element.modal('hide');
     };
 
-    MediaBrowser.prototype.render = function render() {
+    /**
+     * Event: Change resource
+     */
+
+
+    MediaBrowser.prototype.onChangeResource = function onChangeResource() {
+        RequestHelper.reloadResource('media').then(function () {
+            HashBrown.Views.Navigation.NavbarMain.reload();
+        });
+    };
+
+    /**
+     * Render the media browser
+     */
+
+
+    MediaBrowser.prototype.template = function template() {
         var _this2 = this;
 
-        // Render the modal
-        var $folders = [];
-
-        _.append(this.$element.empty(), _.div({ class: 'modal-dialog' }, _.div({ class: 'modal-content' }, _.div({ class: 'modal-header' }, _.div({ class: 'input-group' }, _.input({ class: 'form-control input-search-media', placeholder: 'Search media' }).on('change keyup paste', function () {
-            _this2.onSearchMedia();
-        }), _.div({ class: 'input-group-btn' }, _.button({ class: 'btn btn-primary' }, 'Upload file').click(function () {
-            _this2.$element.toggleClass('disabled', true);
-
-            MediaBrowser.uploadModal(function (id) {
-                _this2.$element.toggleClass('disabled', false);
-
-                _this2.value = id;
-
-                _this2.render();
-            }, function () {
-                _this2.$element.toggleClass('disabled', false);
-            });
-        })))), _.div({ class: 'modal-body' }, _.div({ class: 'thumbnail-container' },
-        // Append all files
-        _.each(resources.media, function (i, media) {
-            var $media = _.button({
-                class: 'thumbnail raised',
-                'data-id': media.id,
-                'data-name': media.name
-            }, _.if(media.isVideo(), _.video({ src: '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + media.id })), _.if(media.isImage(), _.img({ src: '/media/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/' + media.id })), _.label(media.name)).click(function () {
-                _this2.$element.find('.thumbnail').toggleClass('active', false);
-                $media.toggleClass('active', true);
-            });
-
-            if (media.folder && media.folder != '/') {
-                var $folder = $folders[media.folder];
-
-                if (!$folder) {
-                    $folder = _.div({ class: 'folder', 'data-path': media.folder }, _.div({ class: 'folder-heading' }, _.button(_.span({ class: 'fa fa-folder' }), media.folder).click(function () {
-                        $folder.toggleClass('expanded');
-
-                        if ($folder.hasClass('expanded')) {
-                            $folder.find('img, video').each(function (i, mediaSource) {
-                                $(mediaSource).attr('src', $(mediaSource).data('src'));
-                            });
-                        }
-                    })), _.div({ class: 'folder-items' }));
-
-                    $folders[media.folder] = $folder;
-                }
-
-                // Prevent the media from loading
-                if (media.isImage() || media.isVideo()) {
-                    var $mediaSource = $media.find('img, video');
-
-                    $mediaSource.data('src', $mediaSource.attr('src'));
-                    $mediaSource.attr('src', '#');
-                }
-
-                // Wait 1 CPU cycle before appending to folders
-                setTimeout(function () {
-                    $folder.find('.folder-items').append($media);
-                }, 1);
-            }
-
-            return $media;
-        }),
-
-        // Append all folders
-        _.each(Object.keys($folders).sort(), function (i, path) {
-            return $folders[path];
-        }))), _.div({ class: 'modal-footer' }, _.button({ class: 'btn btn-default' }, 'Cancel').click(function () {
+        return _.div({ class: 'modal fade media-browser' }, _.div({ class: 'modal-dialog' }, _.div({ class: 'modal-content' }, _.div({ class: 'modal-header' }, _.h4({ class: 'modal-title' }, 'Browsing media')), _.div({ class: 'modal-body' }, _.iframe({ src: '/' + ProjectHelper.currentProject + '/' + ProjectHelper.currentEnvironment + '/#/media/' + (this.value || '') })), _.div({ class: 'modal-footer' }, _.button({ class: 'btn btn-default' }, 'Cancel').click(function () {
             _this2.onClickCancel();
         }), _.button({ class: 'btn btn-primary' }, 'OK').click(function () {
             _this2.onClickOK();
         })))));
-
-        // Mark the selected media as active
-        this.$element.find('.thumbnail[data-id="' + this.value + '"]').toggleClass('active', true);
     };
 
     return MediaBrowser;
@@ -31655,9 +31563,10 @@ var ContentEditor = function (_View) {
 
         var remoteUrl = void 0;
         var connectionId = this.model.getSettings('publishing').connectionId;
+        var connection = void 0;
 
         if (connectionId) {
-            var connection = ConnectionHelper.getConnectionByIdSync(connectionId);
+            connection = ConnectionHelper.getConnectionByIdSync(connectionId);
 
             if (connection && connection.url) {
                 remoteUrl = connection.url + url;
@@ -31675,7 +31584,7 @@ var ContentEditor = function (_View) {
         // Save & publish
         _.div({ class: 'btn-group-save-publish raised' }, this.$saveBtn = _.button({ class: 'btn btn-save btn-primary' }, _.span({ class: 'text-default' }, 'Save'), _.span({ class: 'text-working' }, 'Saving')).click(function () {
             _this6.onClickSave();
-        }), _.if(connectionId, _.span('&'), _.select({ class: 'form-control select-publishing' }, _.option({ value: 'publish' }, 'Publish'), _.option({ value: 'preview' }, 'Preview'), _.option({ value: 'unpublish' }, 'Unpublish')).val('publish'))))));
+        }), _.if(connection, _.span('&'), _.select({ class: 'form-control select-publishing' }, _.option({ value: 'publish' }, 'Publish'), _.option({ value: 'preview' }, 'Preview'), _.if(this.model.isPublished, _.option({ value: 'unpublish' }, 'Unpublish')), _.option({ value: '' }, '(No action)')).val('publish'))))));
     };
 
     ContentEditor.prototype.render = function render() {
@@ -31879,6 +31788,8 @@ var DebugHelper = function (_DebugHelperCommon) {
      * Start the debug socket
      */
     DebugHelper.startSocket = function startSocket() {
+        var _this2 = this;
+
         var debugSocket = new WebSocket(location.protocol.replace('http', 'ws') + '//' + location.host + '/api/debug');
 
         debugSocket.onopen = function (ev) {
@@ -31886,22 +31797,31 @@ var DebugHelper = function (_DebugHelperCommon) {
         };
 
         debugSocket.onmessage = function (ev) {
-            try {
-                var data = JSON.parse(ev.data);
-
-                switch (data.type) {
-                    case 'error':
-                        UI.errorModal(new Error(data.sender + ': ' + data.message));
-                        break;
-
-                    case 'warning':
-                        UI.errorModal(new Error(data.sender + ': ' + data.message));
-                        break;
-                }
-            } catch (e) {
-                UI.errorModal(e);
-            }
+            _this2.onSocketMessage(ev);
         };
+    };
+
+    /**
+     * Event: On debug socket message
+     */
+
+
+    DebugHelper.onSocketMessage = function onSocketMessage(ev) {
+        try {
+            var data = JSON.parse(ev.data);
+
+            switch (data.type) {
+                case 'error':
+                    UI.errorModal(new Error(data.sender + ': ' + data.message));
+                    break;
+
+                case 'warning':
+                    UI.errorModal(new Error(data.sender + ': ' + data.message));
+                    break;
+            }
+        } catch (e) {
+            UI.errorModal(ev);
+        }
     };
 
     return DebugHelper;
@@ -40742,6 +40662,8 @@ document.addEventListener('DOMContentLoaded', function () {
     var LanguageHelper = HashBrown.Helpers.LanguageHelper;
     var ProjectHelper = HashBrown.Helpers.ProjectHelper;
 
+    $('.cms-container').addClass('faded');
+
     // Start debug socket
     debug.startSocket();
 
@@ -42602,7 +42524,7 @@ module.exports = Form;
  */
 
 module.exports = {
-  MediaBrowser: __webpack_require__(191),
+  MediaUploader: __webpack_require__(296),
   MessageModal: __webpack_require__(17)
 };
 
@@ -43920,7 +43842,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var NavbarPane = __webpack_require__(38);
 var NavbarMain = __webpack_require__(37);
-var MediaBrowser = __webpack_require__(191);
+var MediaUploader = __webpack_require__(296);
 var ProjectHelper = __webpack_require__(6);
 var MediaHelper = __webpack_require__(43);
 var RequestHelper = __webpack_require__(3);
@@ -44015,23 +43937,26 @@ var MediaPane = function (_NavbarPane) {
 
 
     MediaPane.onClickUploadMedia = function onClickUploadMedia(replaceId) {
-        MediaBrowser.uploadModal(function (ids) {
-            // We got one id back
-            if (typeof ids === 'string') {
-                location.hash = '/media/' + ids;
+        new MediaUploader({
+            onSuccess: function onSuccess(ids) {
+                // We got one id back
+                if (typeof ids === 'string') {
+                    location.hash = '/media/' + ids;
 
-                // We got several ids back
-            } else {
-                location.hash = '/media/' + ids[0];
-            }
+                    // We got several ids back
+                } else {
+                    location.hash = '/media/' + ids[0];
+                }
 
-            // Refresh on replace
-            if (replaceId) {
-                var src = $('.media-preview img').attr('src');
+                // Refresh on replace
+                if (replaceId) {
+                    var src = $('.media-preview img').attr('src');
 
-                $('.media-preview img').attr('src', src + '?date=' + Date.now());
-            }
-        }, function () {}, replaceId);
+                    $('.media-preview img').attr('src', src + '?date=' + Date.now());
+                }
+            },
+            replaceId: replaceId
+        });
     };
 
     /**
@@ -48912,6 +48837,214 @@ var UrlEditor = function (_FieldEditor) {
 }(FieldEditor);
 
 module.exports = UrlEditor;
+
+/***/ }),
+/* 268 */,
+/* 269 */,
+/* 270 */,
+/* 271 */,
+/* 272 */,
+/* 273 */,
+/* 274 */,
+/* 275 */,
+/* 276 */,
+/* 277 */,
+/* 278 */,
+/* 279 */,
+/* 280 */,
+/* 281 */,
+/* 282 */,
+/* 283 */,
+/* 284 */,
+/* 285 */,
+/* 286 */,
+/* 287 */,
+/* 288 */,
+/* 289 */,
+/* 290 */,
+/* 291 */,
+/* 292 */,
+/* 293 */,
+/* 294 */,
+/* 295 */,
+/* 296 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Media = __webpack_require__(40);
+
+var MediaHelper = __webpack_require__(43);
+var RequestHelper = __webpack_require__(3);
+var ProjectHelper = __webpack_require__(6);
+var SettingsHelper = __webpack_require__(36);
+
+/**
+ * A modal for uploading Media objects
+ *
+ * @memberof HashBrown.Client.Views.Modal
+ */
+
+var MediaUploader = function (_View) {
+    _inherits(MediaUploader, _View);
+
+    function MediaUploader(params) {
+        _classCallCheck(this, MediaUploader);
+
+        var _this = _possibleConstructorReturn(this, _View.call(this, params));
+
+        _this.fetch();
+        return _this;
+    }
+
+    /**
+     * Gets whether the Media provider exists
+     *
+     * @returns {Promise} Promise
+     */
+
+
+    MediaUploader.checkMediaProvider = function checkMediaProvider() {
+        return SettingsHelper.getSettings(ProjectHelper.currentProject, ProjectHelper.currentEnvironment, 'providers').then(function (result) {
+            if (!result || !result.media) {
+                return Promise.reject(new Error('No Media provider has been set for this project. Please make sure one of your <a href="#/connections/">Connections</a> have the "is Media provider" parameter switched on.'));
+            }
+
+            return Promise.resolve();
+        });
+    };
+
+    /**
+     * Renders the Media uploader
+     */
+
+
+    MediaUploader.prototype.render = function render() {
+        var _this3 = this;
+
+        MediaUploader.checkMediaProvider().then(function () {
+            // Event: Change file
+            function onChangeFile() {
+                var input = $(this);
+                var numFiles = this.files ? this.files.length : 1;
+
+                // In the case of a single file selected 
+                if (numFiles == 1) {
+                    var file = this.files[0];
+
+                    var isImage = file.type == 'image/png' || file.type == 'image/jpeg' || file.type == 'image/gif';
+
+                    var isVideo = file.type == 'video/mpeg' || file.type == 'video/mp4' || file.type == 'video/quicktime' || file.type == 'video/x-matroska';
+
+                    if (isImage) {
+                        var reader = new FileReader();
+
+                        uploadModal.$element.find('.spinner-container').toggleClass('hidden', false);
+
+                        reader.onload = function (e) {
+                            uploadModal.$element.find('.media-preview').html(_.img({ src: e.target.result }));
+
+                            uploadModal.$element.find('.spinner-container').toggleClass('hidden', true);
+                        };
+
+                        reader.readAsDataURL(file);
+                    }
+
+                    if (isVideo) {
+                        uploadModal.$element.find('.media-preview').html(_.video({ src: window.URL.createObjectURL(file), controls: 'controls' }));
+                    }
+
+                    debug.log('Previewing data of file type ' + file.type + '...', this);
+
+                    // Multiple files selected
+                } else if (numFiles > 1) {
+                    uploadModal.$element.find('.media-preview').html('(Multiple files selected)');
+
+                    // No files selected
+                } else if (numFiles == 0) {
+                    uploadModal.$element.find('.media-preview').html('(No files selected)');
+                }
+            }
+
+            // Event: Click upload
+            function onClickUpload() {
+                uploadModal.$element.find('form').submit();
+
+                return false;
+            }
+
+            // Event: Submit
+            function onSubmit(e) {
+                var _this2 = this;
+
+                e.preventDefault();
+
+                uploadModal.$element.find('.spinner-container').toggleClass('hidden', false);
+
+                var apiPath = 'media/' + (this.replaceId ? 'replace/' + this.replaceId : 'new');
+
+                // TODO: Use the RequestHelper for this
+                $.ajax({
+                    url: RequestHelper.environmentUrl(apiPath),
+                    type: 'POST',
+                    data: new FormData(this),
+                    processData: false,
+                    contentType: false,
+                    success: function success(ids) {
+                        RequestHelper.reloadResource('media').then(function () {
+                            uploadModal.$element.find('.spinner-container').toggleClass('hidden', true);
+
+                            HashBrown.Views.Navigation.NavbarMain.reload();
+
+                            if (typeof _this2.onSuccess === 'function') {
+                                _this2.onSuccess(ids || []);
+                            }
+
+                            uploadModal.hide();
+                        });
+                    },
+                    error: UI.errorModal
+                });
+            }
+
+            // Render the upload modal
+            var uploadModal = new HashBrown.Views.Modals.MessageModal({
+                model: {
+                    class: 'modal-upload-media',
+                    title: 'Upload a file',
+                    body: [_.div({ class: 'spinner-container hidden' }, _.span({ class: 'spinner fa fa-refresh' })), _.div({ class: 'media-preview' }), _.form({ class: 'form-control' }, _.input({ type: 'file', name: 'media', multiple: _this3.replaceId ? false : true }).change(onChangeFile)).submit(onSubmit)]
+                },
+                buttons: [{
+                    label: 'Cancel',
+                    class: 'btn-default',
+                    callback: _this3.onCancel
+                }, {
+                    label: 'Upload',
+                    class: 'btn-primary',
+                    callback: onClickUpload
+                }]
+            });
+
+            // Event: Close modal
+            uploadModal.on('close', function () {
+                if (typeof _this3.onCancel === 'function') {
+                    _this3.onCancel();
+                }
+            });
+        }).catch(UI.errorModal);
+    };
+
+    return MediaUploader;
+}(View);
+
+module.exports = MediaUploader;
 
 /***/ })
 /******/ ]);

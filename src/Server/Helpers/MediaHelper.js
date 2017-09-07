@@ -175,7 +175,7 @@ class MediaHelper extends MediaHelperCommon {
      * @param {String} project
      * @param {String} environment
      *
-     * @return {Promise(Object)} tree
+     * @return {Promise} Tree
      */
     static getTree(
         project = requiredParam('project'),
@@ -190,6 +190,26 @@ class MediaHelper extends MediaHelperCommon {
             }
 
             return Promise.resolve(tree);   
+        })
+        .then((tree) => {
+            // Make sure there is a root folder
+            tree.unshift({folder: '/', id: '*'});
+
+            // Path sanity check
+            for(let item of tree) {
+                // Append initial slash
+                if(item.folder.indexOf('/') !== 0) {
+                    item.folder = '/' + item.folder;
+                }
+
+                // Append end slash
+                item.folder = item.folder + '/';
+
+                // Replace all double slashes with a single slash
+                item.folder = item.folder.replace(/\/+/g, '/');
+            }
+
+            return Promise.resolve(tree);
         });
     }
     

@@ -19,24 +19,31 @@ class DebugHelper extends DebugHelperCommon {
         };
 
         debugSocket.onmessage = (ev) => {
-            try {
-                let data = JSON.parse(ev.data);
-
-                switch(data.type) {
-                    case 'error':
-                        UI.errorModal(new Error(data.sender + ': ' + data.message));
-                        break;
-
-                    case 'warning':
-                        UI.errorModal(new Error(data.sender + ': ' + data.message));
-                        break;
-                }
-
-            } catch(e) {
-                UI.errorModal(e);
-            }
+            this.onSocketMessage(ev);
         };
-    };
+    }
+
+    /**
+     * Event: On debug socket message
+     */
+    static onSocketMessage(ev) {
+        try {
+            let data = JSON.parse(ev.data);
+
+            switch(data.type) {
+                case 'error':
+                    UI.errorModal(new Error(data.sender + ': ' + data.message));
+                    break;
+
+                case 'warning':
+                    UI.errorModal(new Error(data.sender + ': ' + data.message));
+                    break;
+            }
+
+        } catch(e) {
+            UI.errorModal(ev);
+        }
+    }
 }
 
 module.exports = DebugHelper;

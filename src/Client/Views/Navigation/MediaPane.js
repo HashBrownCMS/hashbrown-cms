@@ -2,7 +2,7 @@
 
 const NavbarPane = require('./NavbarPane');
 const NavbarMain = require('./NavbarMain');
-const MediaBrowser = require('Client/Views/Modals/MediaBrowser');
+const MediaUploader = require('Client/Views/Modals/MediaUploader');
 const ProjectHelper = require('Client/Helpers/ProjectHelper');
 const MediaHelper = require('Client/Helpers/MediaHelper');
 const RequestHelper = require('Client/Helpers/RequestHelper');
@@ -96,8 +96,8 @@ class MediaPane extends NavbarPane {
      * Event: Click upload media
      */
     static onClickUploadMedia(replaceId) {
-        MediaBrowser.uploadModal(
-            (ids) => {
+        new MediaUploader({
+            onSuccess: (ids) => {
                 // We got one id back
                 if(typeof ids === 'string') {
                     location.hash = '/media/' + ids;
@@ -115,9 +115,8 @@ class MediaPane extends NavbarPane {
                     $('.media-preview img').attr('src', src + '?date=' + Date.now());
                 }
             },
-            () => {},
-            replaceId
-        );
+            replaceId: replaceId
+        });
     }
     
     /**

@@ -499,6 +499,10 @@ img.logo {
   opacity: 1;
   position: relative;
   z-index: 2; }
+  .cms-container.media-picker-mode .navspace .navbar-main .tab-buttons,
+  .cms-container.media-picker-mode .menuspace,
+  .cms-container.media-picker-mode .workspace .editor .editor-header {
+    display: none; }
   .cms-container.faded {
     pointer-events: none;
     opacity: 0; }
@@ -607,7 +611,6 @@ img.logo {
       .cms-container .workspace .editor .editor-body {
         padding: 15px;
         flex-grow: 1;
-        max-height: calc(100% - 60px);
         overflow: auto;
         position: relative; }
         .cms-container .workspace .editor .editor-body .editor {
@@ -1513,54 +1516,15 @@ body.dashboard-container {
 .media-browser .modal-dialog {
   width: calc(100% - 30px);
   max-width: 1040px; }
-  .media-browser .modal-dialog .modal-body {
-    padding: 15px 0px; }
   .media-browser .modal-dialog .modal-footer .form-control {
     float: left; }
-  .media-browser .modal-dialog .thumbnail-container {
-    display: flex;
-    flex-wrap: wrap;
-    overflow-y: auto;
-    max-height: 550px;
-    padding: 0px 15px; }
-    .media-browser .modal-dialog .thumbnail-container .folder {
+  .media-browser .modal-dialog .modal-body {
+    padding: 0; }
+    .media-browser .modal-dialog .modal-body iframe {
+      border: 0;
       width: 100%;
-      flex-grow: 1;
-      flex-basis: 100%;
-      margin-top: 30px; }
-      .media-browser .modal-dialog .thumbnail-container .folder.expanded .folder-items {
-        display: flex; }
-      .media-browser .modal-dialog .thumbnail-container .folder .folder-heading button {
-        background-color: #eeeeee;
-        margin: 0px;
-        padding: 10px 15px;
-        border: 0;
-        border-top-left-radius: 2px;
-        border-top-right-radius: 2px;
-        display: inline-block; }
-        .media-browser .modal-dialog .thumbnail-container .folder .folder-heading button .fa {
-          margin-right: 10px; }
-      .media-browser .modal-dialog .thumbnail-container .folder .folder-items {
-        display: none;
-        flex-wrap: wrap;
-        background-color: #eeeeee;
-        border-top-right-radius: 2px;
-        border-bottom-left-radius: 2px;
-        border-bottom-right-radius: 2px; }
-    .media-browser .modal-dialog .thumbnail-container .thumbnail {
-      width: calc(25% - 2em);
-      flex-grow: 0;
-      margin: 1em;
-      position: relative;
-      overflow: hidden; }
-      .media-browser .modal-dialog .thumbnail-container .thumbnail img, .media-browser .modal-dialog .thumbnail-container .thumbnail video {
-        object-fit: cover;
-        position: absolute;
-        max-width: 100%;
-        max-height: 100%;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%); }
+      min-height: 70vh;
+      display: block; }
 
 .schema-editor {
   height: 100%;
@@ -1691,6 +1655,8 @@ body.dashboard-container {
   height: 100%;
   width: 100%;
   position: relative; }
+  .navspace .navbar-main.hide-tab-buttons .tab-buttons {
+    display: none; }
   .navspace .navbar-main .tab-panes, .navspace .navbar-main .tab-buttons {
     transition: opacity 0.5s, width 0.5s;
     overflow-x: hidden; }
@@ -1798,7 +1764,8 @@ body.dashboard-container {
         opacity: 1;
         font-weight: bold;
         color: #ffffff;
-        content: "MOVE HERE";
+        font-family: 'FontAwesome';
+        content: '\F060';
         display: block;
         white-space: nowrap; }
       .navspace .navbar-main .tab-panes .pane-container.select-dir .pane .pane-item-container:not(.moving-item)[data-is-directory="true"] > .pane-item:hover {

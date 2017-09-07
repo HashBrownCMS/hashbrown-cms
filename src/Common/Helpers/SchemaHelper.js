@@ -33,13 +33,19 @@ class SchemaHelper {
     static getModel(properties) {
         if(!properties) { return null; }
 
+        // If the properties object is already a recognised model, return it
         if(properties instanceof ContentSchema || properties instanceof FieldSchema) {
             return properties;
         }
 
-        if(properties.type == 'content') {
+        // If the properties object is using an unrecognised model, serialise it
+        if(typeof properties.getObject === 'function') {
+            properties = properties.getObject();
+        }
+
+        if(properties.type === 'content') {
             return new ContentSchema(properties);
-        } else if(properties.type == 'field') {
+        } else if(properties.type === 'field') {
             return new FieldSchema(properties);
         }
 
