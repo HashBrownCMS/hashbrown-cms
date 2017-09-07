@@ -7,27 +7,42 @@ $xs: 'max-width: 767px';
 @import '_helpers';
 
 @import '_colors';
-@import '_theme';
+@import '_typography';
+@import '_util';
 @import '_main';
 @import '_main-menu';
 @import '_welcome';
 @import '_dashboard';
-@import '_icon-picker';
-@import '_select-views';
-@import '_json-editor';
-@import '_content-editor';
-@import '_media-browser';
-@import '_schema-editor';
-@import '_form-editor';
-@import '_user-editor';
 @import '_navbar-main';
-@import '_media-viewer';
 @import '_settings';
+@import '_login';
+
+// Editors
+@import 'editors/_general';
+@import 'editors/_media-viewer';
+@import 'editors/_content-editor';
+@import 'editors/_schema-editor';
+@import 'editors/_form-editor';
+@import 'editors/_json-editor';
+
+// Modals
+@import 'modals/_general';
+@import 'modals/_icon-picker';
+@import 'modals/_settings-modal';
+@import 'modals/_error-modal';
+@import 'modals/_media-browser';
+@import 'modals/_iframe-modal';
+@import 'modals/_upload-media';
+@import 'modals/_user-editor';
 
 // Widgets
 @import 'widgets/_dropdown';
+@import 'widgets/_chips';
+@import 'widgets/_thumbnails';
 @import 'widgets/_tabs';
+@import 'widgets/_panels';
 @import 'widgets/_buttons';
 @import 'widgets/_input';
+@import 'widgets/_switches';
 @import 'widgets/_spinner';
 @import 'widgets/_carousel';

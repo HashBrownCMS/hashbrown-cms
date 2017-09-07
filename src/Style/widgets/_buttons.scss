@@ -1,3 +1,4 @@
+// Single buttons
 .btn {
     border-radius: 2px;
     letter-spacing: 0.1em;
@@ -97,6 +98,32 @@
         padding: 6px;
     }
 
+    &.working {
+        .text-default {
+            display: none;
+        }
+
+        .text-working {
+            display: inline;
+
+            &:after {
+                content: '\f1ce';
+                font-family: 'FontAwesome';
+                margin-left: 6px;
+                display: inline-block;
+                transform-origin: 6px 5.5px;
+                line-height: normal;
+                animation-name: spinner-no-offset;
+                animation-duration: 1s;
+                animation-iteration-count: infinite;
+                animation-timing-function: linear;
+            }
+        }
+    }
+
+    .text-working {
+        display: none;
+    }
 }
 
 // Button group
@@ -114,6 +141,91 @@
     .btn-group-addon {
         min-width: 40px;
         padding: 6px;
+    }
+}
+
+// Round button group
+.btn-round-group {
+    width: 45px;
+
+    &:hover {
+        .btn-group-addon {
+            transform: scale(1);
+        }   
+        
+        .btn {
+            .btn-icon-display {
+                opacity: 1;
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+            
+            .btn-icon-initial {
+                opacity: 0;
+                transform: translate(-50%, -50%) rotate(-90deg);
+            }
+        }
+    }
+
+    .btn {
+        display: block;
+        position: relative;
+        
+        &:hover {
+            label {
+                display: block;
+            }
+        }
+
+        label {
+            display: none;
+            position: absolute;
+            margin: 0px;
+            top: 50%;
+            left: -10px;
+            transform: translate(-100%, -50%);
+            font-size: 12px;
+            border-radius: 2px;
+            color: material-color('grey', '100');
+            background-color: material-color('grey', '600');
+            padding: 5px 10px;
+            text-transform: none;
+            line-height: 1em;
+            max-width: none;
+        }
+        
+        .btn-icon-initial,
+        .btn-icon-display {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            transition: opacity 0.25s ease, transform 0.25s ease;
+        }
+
+        .btn-icon-initial {
+            opacity: 1;
+            transform: translate(-50%, -50%) rotate(0deg);
+        }
+        
+        .btn-icon-display {
+            opacity: 0;
+            transform: translate(-50%, -50%) rotate(-180deg);
+        }
+    }
+
+    .btn-group-addon {
+        transform: scale(0);
+        margin-bottom: 10px;
+        transition: transform 0.25s ease;
+        width: 35px !important;
+        height: 35px !important;
+        line-height: 35px !important;
+        margin-left: 5px;
+        margin-right: 5px;
+
+        .fa {
+            font-size: 13px;
+        }
     }
 }
 
