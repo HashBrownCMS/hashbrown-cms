@@ -42563,8 +42563,9 @@ module.exports = Form;
  */
 
 module.exports = {
-  MediaUploader: __webpack_require__(218),
-  MessageModal: __webpack_require__(17)
+    MediaUploader: __webpack_require__(218),
+    MediaBrowser: __webpack_require__(260),
+    MessageModal: __webpack_require__(17)
 };
 
 /***/ }),
