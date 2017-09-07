@@ -15,75 +15,20 @@
         width: calc(100% - 30px);
         max-width: 1040px;
 
-        .modal-body {
-            padding: 0;
-        }
-
         .modal-footer {
             .form-control {
                 float: left;
             }
         }
 
-        .panes {
-            overflow-x: auto;
-            max-height: 70vh;
-            border-bottom: 1px solid $standard-text;
-            display: flex;
+        .modal-body {
+            padding: 0;
 
-            .pane {
-                overflow-y: auto;
-                min-width: 30%;
-                flex-basis: 30%;
-                border-right: 1px solid $standard-text;
-                padding: 1rem;
-
-                .file, .folder {
-                    position: relative;
-                    padding-left: 4rem;
-                    line-height: 3rem;
-                    display: block;
-                    border: 0;
-                    background-color: $standard;
-                    width: 100%;
-                    cursor: pointer;
-                    text-align: left;
-                    
-                    &:hover, &.active {
-                        background-color: $primary;
-                        color: $primary-text;
-                    }
-
-                    &:before {
-                        font-family: 'FontAwesome';
-                        position: absolute;
-                        left: 1.5rem;
-                        top: 1.5rem;
-                        transform: translate(-50%, -50%);
-                    }
-                }
-
-                .folder {
-                    &:before {
-                        content: '\f07b';
-                    }
-                }
-
-                .file {
-                    &:before {
-                        content: '\f03e';
-                    }
-                    
-                    img, video {
-                        position: absolute;
-                        left: 1.5rem;
-                        top: 1.5rem;
-                        transform: translate(-50%, -50%);
-                        max-width: 3rem;
-                        max-height: 100%;
-                        z-index: 10;
-                    }
-                }
+            iframe {
+                border: 0;
+                width: 100%;
+                min-height: 70vh;
+                display: block;
             }
         }
     }

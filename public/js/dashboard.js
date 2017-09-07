@@ -7196,7 +7196,7 @@ var Entity = function () {
 
                     var thatType = thatValue.constructor;
 
-                    if (thisType !== thatType) {
+                    if (thisType.name !== thatType.name) {
                         throw new TypeError(_this.constructor.name + '.' + name + ' is of type \'' + thisType.name + '\' and cannot implicitly be converted to \'' + thatType.name + '\'.');
                     } else {
                         thisValue = thatValue;
@@ -9181,6 +9181,10 @@ var Media = function (_Resource) {
         } else if (name.match(/\.svg/)) {
             return 'image/svg+xml';
 
+            // PDF
+        } else if (name.match(/\.pdf/)) {
+            return 'application/pdf';
+
             // Everything else
         } else {
             return 'application/octet-stream';
@@ -9207,6 +9211,17 @@ var Media = function (_Resource) {
 
     Media.prototype.isImage = function isImage() {
         return this.getContentTypeHeader().indexOf('image') > -1;
+    };
+
+    /**
+     * Gets whether this is a PDF
+     *
+     * @returns {Boolean} Is PDF
+     */
+
+
+    Media.prototype.isPdf = function isPdf() {
+        return this.getContentTypeHeader().indexOf('pdf') > -1;
     };
 
     /**
@@ -9612,6 +9627,49 @@ var MediaHelper = function (_MediaHelperCommon) {
 
     MediaHelper.setTreeItem = function setTreeItem(id, item) {
         return RequestHelper.request('post', 'media/tree/' + id, item);
+    };
+
+    /**
+     * Initialises the media picker mode
+     *
+     * @param {Function} onPickMedia
+     * @param {Function} onChangeResource
+     * @param {Object} allResources
+     */
+
+
+    MediaHelper.initMediaPickerMode = function initMediaPickerMode(onPickMedia, onChangeResource, onError, allResources) {
+        // Claim debug messages
+        UI.errorModal = onError;
+
+        // Use the provided resources instead of reloading them
+        HashBrown.Helpers.RequestHelper.reloadAllResources = function () {
+            resources = allResources;
+
+            return Promise.resolve();
+        };
+
+        // Listen for picked Media
+        window.addEventListener('hashchange', function () {
+            var mediaMatch = location.hash.match(/#\/media\/([0-9a-z]{40})/);
+
+            if (mediaMatch && mediaMatch.length > 1) {
+                onPickMedia(mediaMatch[1]);
+            }
+        });
+
+        // Listen for resource change
+        HashBrown.Views.Navigation.NavbarMain.reload = function () {
+            ViewHelper.get('NavbarMain').reload();
+
+            onChangeResource();
+        };
+
+        // Set visual fixes for media picker mode
+        $('.cms-container').addClass('media-picker-mode');
+
+        // Skip the loading screen
+        $('.cms-container').removeClass('faded');
     };
 
     return MediaHelper;
@@ -26274,13 +26332,19 @@ var SchemaHelper = function () {
             return null;
         }
 
+        // If the properties object is already a recognised model, return it
         if (properties instanceof ContentSchema || properties instanceof FieldSchema) {
             return properties;
         }
 
-        if (properties.type == 'content') {
+        // If the properties object is using an unrecognised model, serialise it
+        if (typeof properties.getObject === 'function') {
+            properties = properties.getObject();
+        }
+
+        if (properties.type === 'content') {
             return new ContentSchema(properties);
-        } else if (properties.type == 'field') {
+        } else if (properties.type === 'field') {
             return new FieldSchema(properties);
         }
 
@@ -26960,6 +27024,8 @@ var DebugHelper = function (_DebugHelperCommon) {
      * Start the debug socket
      */
     DebugHelper.startSocket = function startSocket() {
+        var _this2 = this;
+
         var debugSocket = new WebSocket(location.protocol.replace('http', 'ws') + '//' + location.host + '/api/debug');
 
         debugSocket.onopen = function (ev) {
@@ -26967,22 +27033,31 @@ var DebugHelper = function (_DebugHelperCommon) {
         };
 
         debugSocket.onmessage = function (ev) {
-            try {
-                var data = JSON.parse(ev.data);
-
-                switch (data.type) {
-                    case 'error':
-                        UI.errorModal(new Error(data.sender + ': ' + data.message));
-                        break;
-
-                    case 'warning':
-                        UI.errorModal(new Error(data.sender + ': ' + data.message));
-                        break;
-                }
-            } catch (e) {
-                UI.errorModal(e);
-            }
+            _this2.onSocketMessage(ev);
         };
+    };
+
+    /**
+     * Event: On debug socket message
+     */
+
+
+    DebugHelper.onSocketMessage = function onSocketMessage(ev) {
+        try {
+            var data = JSON.parse(ev.data);
+
+            switch (data.type) {
+                case 'error':
+                    UI.errorModal(new Error(data.sender + ': ' + data.message));
+                    break;
+
+                case 'warning':
+                    UI.errorModal(new Error(data.sender + ': ' + data.message));
+                    break;
+            }
+        } catch (e) {
+            UI.errorModal(ev);
+        }
     };
 
     return DebugHelper;

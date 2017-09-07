@@ -78,6 +78,47 @@ class MediaHelper extends MediaHelperCommon {
     static setTreeItem(id, item) {
         return RequestHelper.request('post', 'media/tree/' + id, item);
     }
+
+    /**
+     * Initialises the media picker mode
+     *
+     * @param {Function} onPickMedia
+     * @param {Function} onChangeResource
+     * @param {Object} allResources
+     */
+    static initMediaPickerMode(onPickMedia, onChangeResource, onError, allResources) {
+        // Claim debug messages
+        UI.errorModal = onError;
+        
+        // Use the provided resources instead of reloading them
+        HashBrown.Helpers.RequestHelper.reloadAllResources = () => {
+            resources = allResources;
+
+            return Promise.resolve();
+        };
+
+        // Listen for picked Media
+        window.addEventListener('hashchange', () => {
+            let mediaMatch = location.hash.match(/#\/media\/([0-9a-z]{40})/); 
+
+            if(mediaMatch && mediaMatch.length > 1) {
+                onPickMedia(mediaMatch[1]);
+            }
+        }); 
+       
+        // Listen for resource change
+        HashBrown.Views.Navigation.NavbarMain.reload = () => {
+            ViewHelper.get('NavbarMain').reload();
+
+            onChangeResource();
+        };
+
+        // Set visual fixes for media picker mode
+        $('.cms-container').addClass('media-picker-mode');
+
+        // Skip the loading screen
+        $('.cms-container').removeClass('faded');
+    }
 }
 
 module.exports = MediaHelper;

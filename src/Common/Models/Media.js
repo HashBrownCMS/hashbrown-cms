@@ -102,6 +102,10 @@ class Media extends Resource {
         } else if(name.match(/\.svg/)) {
             return 'image/svg+xml';
         
+        // PDF
+        } else if(name.match(/\.pdf/)) {
+            return 'application/pdf';
+
         // Everything else
         } else {
             return 'application/octet-stream';
@@ -126,6 +130,14 @@ class Media extends Resource {
         return this.getContentTypeHeader().indexOf('image') > -1;
     }
 
+    /**
+     * Gets whether this is a PDF
+     *
+     * @returns {Boolean} Is PDF
+     */
+    isPdf() {
+        return this.getContentTypeHeader().indexOf('pdf') > -1;
+    }
 
     /**
      * Applies folder string from tree

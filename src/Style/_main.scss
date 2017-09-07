@@ -285,7 +285,15 @@ img.logo {
     opacity: 1;
     position: relative;
     z-index: 2;
-    
+ 
+    &.media-picker-mode {
+        .navspace .navbar-main .tab-buttons,
+        .menuspace,
+        .workspace .editor .editor-header { 
+            display: none;
+        }
+    }
+
     &.faded {
         pointer-events: none;
         opacity: 0;
@@ -443,7 +451,6 @@ img.logo {
             .editor-body {
                 padding: 15px;
                 flex-grow: 1;
-                max-height: calc(100% - 60px);
                 overflow: auto;
                 position: relative;
 

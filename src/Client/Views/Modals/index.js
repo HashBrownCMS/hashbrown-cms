@@ -4,6 +4,6 @@
  * @namespace HashBrown.Views.Modals
  */
 module.exports = {
-    MediaBrowser: require('./MediaBrowser'),
+    MediaUploader: require('./MediaUploader'),
     MessageModal: require('./MessageModal')
 };

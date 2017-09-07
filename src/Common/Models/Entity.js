@@ -150,7 +150,7 @@ class Entity {
 
                     let thatType = thatValue.constructor;
 
-                    if(thisType !== thatType) {
+                    if(thisType.name !== thatType.name) {
                         throw new TypeError(this.constructor.name + '.' + name + ' is of type \'' + thisType.name + '\' and cannot implicitly be converted to \'' + thatType.name + '\'.');
                     } else {
                         thisValue = thatValue; 
