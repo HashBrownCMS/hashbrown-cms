@@ -42,7 +42,7 @@ class MediaUploader extends View {
         MediaUploader.checkMediaProvider()
         .then(() => {
             // Event: Change file
-            function onChangeFile() {
+            let onChangeFile = () => {
                 let input = $(this);
                 let numFiles = this.files ? this.files.length : 1;
                
@@ -101,42 +101,82 @@ class MediaUploader extends View {
             }
            
             // Event: Click upload
-            function onClickUpload() {
+            let onClickUpload = () => {
                 uploadModal.$element.find('form').submit();
 
                 return false;
             }
 
             // Event: Submit
-            function onSubmit(e) {
+            let onSubmit = (e, content) => {
                 e.preventDefault();
 
                 uploadModal.$element.find('.spinner-container').toggleClass('hidden', false);
 
                 let apiPath = 'media/' + (this.replaceId ? 'replace/' + this.replaceId : 'new');
+                let uploadedIds = [];
 
+                // First upload the Media files
                 // TODO: Use the RequestHelper for this
-                $.ajax({
-                    url: RequestHelper.environmentUrl(apiPath),
-                    type: 'POST',
-                    data: new FormData(this),
-                    processData: false,
-                    contentType: false,
-                    success: (ids) => {
-                        RequestHelper.reloadResource('media')
+                return new Promise((resolve, reject) => {
+                    $.ajax({
+                        url: RequestHelper.environmentUrl(apiPath),
+                        type: 'POST',
+                        data: new FormData(content),
+                        processData: false,
+                        contentType: false,
+                        success: (ids) => {
+                            uploadedIds = ids || [];
+
+                            resolve();
+                        },
+                        error: (e) => {
+                            reject(e);            
+                        }
+                    })
+                })
+
+                // Then update the Media tree
+                .then(() => {
+                    if(!this.folder || this.folder === '/') {
+                        return Promise.resolve();
+                    }
+
+                    let queue = uploadedIds.slice(0);
+
+                    let putNextMediaIntoTree = () => {
+                        let id = queue.pop();
+
+                        if(!id) { return Promise.resolve(); }
+
+                        return RequestHelper.request('post', 'media/tree/' + id, {
+                            id: id,
+                            folder: this.folder
+                        })
                         .then(() => {
-                            uploadModal.$element.find('.spinner-container').toggleClass('hidden', true);
-
-                            HashBrown.Views.Navigation.NavbarMain.reload();
-
-                            if(typeof this.onSuccess === 'function') {
-                                this.onSuccess(ids || []);
-                            }
-                            
-                            uploadModal.hide();
+                            return putNextMediaIntoTree();
                         });
-                    },
-                    error: UI.errorModal
+                    };
+
+                    return putNextMediaIntoTree();
+                })
+
+                // Then reload the Media resource
+                .then(() => {
+                    return RequestHelper.reloadResource('media');
+                })
+
+                // Then update the UI and trigger the success callback
+                .then(() => {
+                    uploadModal.$element.find('.spinner-container').toggleClass('hidden', true);
+
+                    HashBrown.Views.Navigation.NavbarMain.reload();
+
+                    if(typeof this.onSuccess === 'function') {
+                        this.onSuccess(uploadedIds);
+                    }
+                    
+                    uploadModal.hide();
                 });
             }
 
@@ -152,8 +192,12 @@ class MediaUploader extends View {
                         _.div({class: 'media-preview'}),
                         _.form({class: 'form-control'},
                             _.input({type: 'file', name: 'media', multiple: this.replaceId ? false : true})
-                                .change(onChangeFile)
-                        ).submit(onSubmit)
+                                .change((e) => {
+                                    if(typeof this.onChangeFile === 'function') {
+                                        this.onChangeFile(e);
+                                    }
+                                })
+                        ).submit(function(e) { onSubmit(e, this); })
                     ]
                 },
                 buttons: [

@@ -40526,17 +40526,17 @@ var MediaUploader = function (_View) {
 
 
     MediaUploader.prototype.render = function render() {
-        var _this3 = this;
+        var _this2 = this;
 
         MediaUploader.checkMediaProvider().then(function () {
             // Event: Change file
-            function onChangeFile() {
-                var input = $(this);
-                var numFiles = this.files ? this.files.length : 1;
+            var onChangeFile = function onChangeFile() {
+                var input = $(_this2);
+                var numFiles = _this2.files ? _this2.files.length : 1;
 
                 // In the case of a single file selected 
                 if (numFiles == 1) {
-                    var file = this.files[0];
+                    var file = _this2.files[0];
 
                     var isImage = file.type == 'image/png' || file.type == 'image/jpeg' || file.type == 'image/gif';
 
@@ -40560,7 +40560,7 @@ var MediaUploader = function (_View) {
                         uploadModal.$element.find('.media-preview').html(_.video({ src: window.URL.createObjectURL(file), controls: 'controls' }));
                     }
 
-                    debug.log('Previewing data of file type ' + file.type + '...', this);
+                    debug.log('Previewing data of file type ' + file.type + '...', _this2);
 
                     // Multiple files selected
                 } else if (numFiles > 1) {
@@ -40570,60 +40570,106 @@ var MediaUploader = function (_View) {
                 } else if (numFiles == 0) {
                     uploadModal.$element.find('.media-preview').html('(No files selected)');
                 }
-            }
+            };
 
             // Event: Click upload
-            function onClickUpload() {
+            var onClickUpload = function onClickUpload() {
                 uploadModal.$element.find('form').submit();
 
                 return false;
-            }
+            };
 
             // Event: Submit
-            function onSubmit(e) {
-                var _this2 = this;
-
+            var onSubmit = function onSubmit(e, content) {
                 e.preventDefault();
 
                 uploadModal.$element.find('.spinner-container').toggleClass('hidden', false);
 
-                var apiPath = 'media/' + (this.replaceId ? 'replace/' + this.replaceId : 'new');
+                var apiPath = 'media/' + (_this2.replaceId ? 'replace/' + _this2.replaceId : 'new');
+                var uploadedIds = [];
 
+                // First upload the Media files
                 // TODO: Use the RequestHelper for this
-                $.ajax({
-                    url: RequestHelper.environmentUrl(apiPath),
-                    type: 'POST',
-                    data: new FormData(this),
-                    processData: false,
-                    contentType: false,
-                    success: function success(ids) {
-                        RequestHelper.reloadResource('media').then(function () {
-                            uploadModal.$element.find('.spinner-container').toggleClass('hidden', true);
+                return new Promise(function (resolve, reject) {
+                    $.ajax({
+                        url: RequestHelper.environmentUrl(apiPath),
+                        type: 'POST',
+                        data: new FormData(content),
+                        processData: false,
+                        contentType: false,
+                        success: function success(ids) {
+                            uploadedIds = ids || [];
 
-                            HashBrown.Views.Navigation.NavbarMain.reload();
+                            resolve();
+                        },
+                        error: function error(e) {
+                            reject(e);
+                        }
+                    });
+                })
 
-                            if (typeof _this2.onSuccess === 'function') {
-                                _this2.onSuccess(ids || []);
-                            }
+                // Then update the Media tree
+                .then(function () {
+                    if (!_this2.folder || _this2.folder === '/') {
+                        return Promise.resolve();
+                    }
 
-                            uploadModal.hide();
+                    var queue = uploadedIds.slice(0);
+
+                    var putNextMediaIntoTree = function putNextMediaIntoTree() {
+                        var id = queue.pop();
+
+                        if (!id) {
+                            return Promise.resolve();
+                        }
+
+                        return RequestHelper.request('post', 'media/tree/' + id, {
+                            id: id,
+                            folder: _this2.folder
+                        }).then(function () {
+                            return putNextMediaIntoTree();
                         });
-                    },
-                    error: UI.errorModal
+                    };
+
+                    return putNextMediaIntoTree();
+                })
+
+                // Then reload the Media resource
+                .then(function () {
+                    return RequestHelper.reloadResource('media');
+                })
+
+                // Then update the UI and trigger the success callback
+                .then(function () {
+                    uploadModal.$element.find('.spinner-container').toggleClass('hidden', true);
+
+                    HashBrown.Views.Navigation.NavbarMain.reload();
+
+                    if (typeof _this2.onSuccess === 'function') {
+                        _this2.onSuccess(uploadedIds);
+                    }
+
+                    uploadModal.hide();
                 });
-            }
+            };
 
             // Render the upload modal
             var uploadModal = new HashBrown.Views.Modals.MessageModal({
                 model: {
                     class: 'modal-upload-media',
                     title: 'Upload a file',
-                    body: [_.div({ class: 'spinner-container hidden' }, _.span({ class: 'spinner fa fa-refresh' })), _.div({ class: 'media-preview' }), _.form({ class: 'form-control' }, _.input({ type: 'file', name: 'media', multiple: _this3.replaceId ? false : true }).change(onChangeFile)).submit(onSubmit)]
+                    body: [_.div({ class: 'spinner-container hidden' }, _.span({ class: 'spinner fa fa-refresh' })), _.div({ class: 'media-preview' }), _.form({ class: 'form-control' }, _.input({ type: 'file', name: 'media', multiple: _this2.replaceId ? false : true }).change(function (e) {
+                        if (typeof _this2.onChangeFile === 'function') {
+                            _this2.onChangeFile(e);
+                        }
+                    })).submit(function (e) {
+                        onSubmit(e, this);
+                    })]
                 },
                 buttons: [{
                     label: 'Cancel',
                     class: 'btn-default',
-                    callback: _this3.onCancel
+                    callback: _this2.onCancel
                 }, {
                     label: 'Upload',
                     class: 'btn-primary',
@@ -40633,8 +40679,8 @@ var MediaUploader = function (_View) {
 
             // Event: Close modal
             uploadModal.on('close', function () {
-                if (typeof _this3.onCancel === 'function') {
-                    _this3.onCancel();
+                if (typeof _this2.onCancel === 'function') {
+                    _this2.onCancel();
                 }
             });
         }).catch(UI.errorModal);
@@ -43977,6 +44023,8 @@ var MediaPane = function (_NavbarPane) {
 
 
     MediaPane.onClickUploadMedia = function onClickUploadMedia(replaceId) {
+        var folder = $('.cr-context-menu__target-element').data('media-folder') || '/';
+
         new MediaUploader({
             onSuccess: function onSuccess(ids) {
                 // We got one id back
@@ -43995,7 +44043,8 @@ var MediaPane = function (_NavbarPane) {
                     $('.media-preview img').attr('src', src + '?date=' + Date.now());
                 }
             },
-            replaceId: replaceId
+            replaceId: replaceId,
+            folder: folder
         });
     };
 
@@ -44052,9 +44101,6 @@ var MediaPane = function (_NavbarPane) {
                 'Directory': '---',
                 'Upload new media': function UploadNewMedia() {
                     _this2.onClickUploadMedia();
-                },
-                'Remove': function Remove() {
-                    _this2.onClickRemoveMediaDirectory();
                 }
             },
 

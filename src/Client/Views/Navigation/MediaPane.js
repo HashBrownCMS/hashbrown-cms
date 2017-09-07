@@ -96,6 +96,8 @@ class MediaPane extends NavbarPane {
      * Event: Click upload media
      */
     static onClickUploadMedia(replaceId) {
+        let folder = $('.cr-context-menu__target-element').data('media-folder') || '/';
+
         new MediaUploader({
             onSuccess: (ids) => {
                 // We got one id back
@@ -115,7 +117,8 @@ class MediaPane extends NavbarPane {
                     $('.media-preview img').attr('src', src + '?date=' + Date.now());
                 }
             },
-            replaceId: replaceId
+            replaceId: replaceId,
+            folder: folder
         });
     }
     
@@ -154,8 +157,7 @@ class MediaPane extends NavbarPane {
             // Dir context menu
             dirContextMenu: {
                 'Directory': '---',
-                'Upload new media': () => { this.onClickUploadMedia(); },
-                'Remove': () => { this.onClickRemoveMediaDirectory(); }
+                'Upload new media': () => { this.onClickUploadMedia(); }
             },
 
             // General context menu
