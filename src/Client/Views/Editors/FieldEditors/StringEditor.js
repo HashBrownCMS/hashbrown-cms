@@ -5,6 +5,17 @@ const FieldEditor = require('./FieldEditor');
 /**
  * A simple string editor
  *
+ * @description Example:
+ * <pre>
+ * {
+ *     "myString": {
+ *         "label": "My string",
+ *         "tabId": "content",
+ *         "schemaId": "string"
+ *     }
+ * }
+ * </pre>
+ *
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
 class StringEditor extends FieldEditor {

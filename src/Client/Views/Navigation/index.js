@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * @namespace HashBrown.Views.Navigation
+ * @namespace HashBrown.Client.Views.Navigation
  */
 module.exports = {
     CMSPane: require('./CMSPane'),

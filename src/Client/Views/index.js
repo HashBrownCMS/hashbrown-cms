@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * @namespace HashBrown.Views
+ * @namespace HashBrown.Client.Views
  */
 module.exports = {
     Dashboard: require('./Dashboard'),

@@ -5,6 +5,17 @@ const FieldEditor = require('./FieldEditor');
 /**
  * An editor for date values
  *
+ * @description Example:
+ * <pre>
+ * {
+ *     "myDate": {
+ *         "label": "My date",
+ *         "schemaId": "date",
+ *         "tabId": "content"
+ *     }
+ * }
+ * </pre>
+ *
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
 class DateEditor extends FieldEditor {

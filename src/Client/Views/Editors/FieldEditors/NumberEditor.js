@@ -5,6 +5,20 @@ const FieldEditor = require('./FieldEditor');
 /**
  * A simple number editor
  *
+ * @description Example:
+ * <pre>
+ * {
+ *     "myNumber": {
+ *         "label": "My number",
+ *         "tabId": "content",
+ *         "schemaId": "number",
+ *         {
+ *             "step": 0.5
+ *         }
+ *     }
+ * }
+ * </pre>
+ *
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
 class NumberEditor extends FieldEditor {

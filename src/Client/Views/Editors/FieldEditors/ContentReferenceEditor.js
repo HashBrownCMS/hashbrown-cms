@@ -7,6 +7,20 @@ const FieldEditor = require('./FieldEditor');
 /**
  * An editor for referring to other Content
  *
+ * @description Example:
+ * <pre>
+ * {
+ *     "myContentReference": {
+ *         "label": "My content reference",
+ *         "tabId": "content",
+ *         "schemaId": "contentReference",
+ *         "config": {
+ *            "allowedSchemas": [ "page", "myCustomSchema" ]
+ *         }
+ *     }
+ * }
+ * </pre>
+ *
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
 class ContentReferenceEditor extends FieldEditor {

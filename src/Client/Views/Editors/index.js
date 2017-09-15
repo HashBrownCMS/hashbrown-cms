@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * @namespace HashBrown.Views.Editors
+ * @namespace HashBrown.Client.Views.Editors
  */
 module.exports = {
     ConnectionEditor: require('./ConnectionEditor'),

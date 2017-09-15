@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * @namespace HashBrown
+ * @namespace HashBrown.Server
  */
 
 // ----------

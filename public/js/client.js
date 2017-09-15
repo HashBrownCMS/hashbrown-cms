@@ -29439,7 +29439,7 @@ module.exports = LanguageHelper;
 
 
 /**
- * @namespace HashBrown.Helpers
+ * @namespace HashBrown.Client.Helpers
  */
 
 module.exports = {
@@ -38681,8 +38681,9 @@ module.exports = MediaBrowser;
 
 
 /**
- * @namespace HashBrown
+ * @namespace HashBrown.Client
  */
+
 // Style
 
 __webpack_require__(221);
@@ -40387,7 +40388,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var _typeof = ty
 
 
 /**
- * @namespace HashBrown.Models
+ * @namespace HashBrown.Client.Models
  */
 
 module.exports = {
@@ -40586,7 +40587,7 @@ module.exports = Form;
 
 
 /**
- * @namespace HashBrown.Views.Modals
+ * @namespace HashBrown.Client.Views.Modals
  */
 
 module.exports = {
@@ -40603,7 +40604,7 @@ module.exports = {
 
 
 /**
- * @namespace HashBrown.Views.Navigation
+ * @namespace HashBrown.Client.Views.Navigation
  */
 
 module.exports = {
@@ -42666,7 +42667,7 @@ module.exports = TemplatePane;
 
 
 /**
- * @namespace HashBrown.Views.Editors
+ * @namespace HashBrown.Client.Views.Editors
  */
 
 module.exports = {
@@ -44371,7 +44372,7 @@ module.exports = {
 
 
 /**
- * @namespace HashBrown.Views.Editors.FieldEditors
+ * @namespace HashBrown.Client.Views.Editors.FieldEditors
  */
 
 module.exports = {
@@ -44417,6 +44418,20 @@ var ContentEditor = __webpack_require__(195);
 
 /**
  * An array editor for editing a list of other field values
+ *
+ * @description Example:
+ * <pre>
+ * {
+ *     "myArray": {
+ *         "label": "My array",
+ *         "tabId": "content",
+ *         "schemaId": "array",
+ *         "config": {
+ *             "allowedSchemas": [ "string", "mediaReference", "myCustomSchema" ]
+ *         }
+ *     }
+ * }
+ * </pre>
  *
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
@@ -44909,6 +44924,17 @@ var FieldEditor = __webpack_require__(11);
 /**
  * A simple boolean editor
  *
+ * @description Example:
+ * <pre>
+ * {
+ *     "myBoolean": {
+ *         "label": "My boolean",
+ *         "tabId": "content",
+ *         "schemaId": "boolean"
+ *     }
+ * }
+ * </pre>
+ *
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
 
@@ -44974,6 +45000,20 @@ var FieldEditor = __webpack_require__(11);
 
 /**
  * An editor for referring to other Content
+ *
+ * @description Example:
+ * <pre>
+ * {
+ *     "myContentReference": {
+ *         "label": "My content reference",
+ *         "tabId": "content",
+ *         "schemaId": "contentReference",
+ *         "config": {
+ *            "allowedSchemas": [ "page", "myCustomSchema" ]
+ *         }
+ *     }
+ * }
+ * </pre>
  *
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
@@ -45083,6 +45123,20 @@ var FieldEditor = __webpack_require__(11);
 
 /**
  * An editor for referencing Content Schemas
+ *
+ * @descripton Example:
+ * <pre>
+ * {
+ *     "myContentSchemaReference": {
+ *         "label": "My content schema reference",
+ *         "tabId": "content",
+ *         "schemaId": "contentSchemaReference",
+ *         "config": {
+ *             "allowedSchemas": "fromParent" || [ "myCustomSchema" ]
+ *         }
+ *     }
+ * }
+ * </pre>
  *
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
@@ -45236,6 +45290,17 @@ var FieldEditor = __webpack_require__(11);
 
 /**
  * An editor for date values
+ *
+ * @description Example:
+ * <pre>
+ * {
+ *     "myDate": {
+ *         "label": "My date",
+ *         "schemaId": "date",
+ *         "tabId": "content"
+ *     }
+ * }
+ * </pre>
  *
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
@@ -45465,6 +45530,29 @@ var FieldEditor = __webpack_require__(11);
 /**
  * A simple list picker
  *
+ * @description Example:
+ * <pre>
+ * {
+ *     "myDropdown": {
+ *         "label": "My dropdown",
+ *         "tabId": "content",
+ *         "schemaId": "dropdown",
+ *         "config": {
+ *             "options": [
+ *                 {
+ *                     "label": "Option #1",
+ *                     "value": "option-1"
+ *                 },
+ *                 {
+ *                     "label": "Option #2",
+ *                     "value": "option-2"
+ *                 }
+ *             ]
+ *         }
+ *     }
+ * }
+ * </pre>
+ *
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
 
@@ -45561,6 +45649,17 @@ var FieldEditor = __webpack_require__(11);
 /**
  * A field editor for specifying one of the selected languages
  *
+ * @description Example:
+ * <pre>
+ * {
+ *     "myLanguage": {
+ *         "label": "My language",
+ *         "tabId": "content",
+ *         "schemaId": "language"
+ *     }
+ * }
+ * </pre>
+ *
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
 
@@ -45646,6 +45745,17 @@ var FieldEditor = __webpack_require__(11);
 
 /**
  * A picker for referencing Media 
+ *
+ * @description Example:
+ * <pre>
+ * {
+ *     "myMediaReference": {
+ *         "label": "My medie reference",
+ *         "tabId": "content",
+ *         "schemaId": "mediaReference"
+ *     }
+ * }
+ * </pre>
  *
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
@@ -45747,6 +45857,20 @@ var FieldEditor = __webpack_require__(11);
 
 /**
  * A simple number editor
+ *
+ * @description Example:
+ * <pre>
+ * {
+ *     "myNumber": {
+ *         "label": "My number",
+ *         "tabId": "content",
+ *         "schemaId": "number",
+ *         {
+ *             "step": 0.5
+ *         }
+ *     }
+ * }
+ * </pre>
  *
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
@@ -45898,6 +46022,17 @@ var FieldEditor = __webpack_require__(11);
 
 /**
  * A rich text editor
+ *
+ * @description Example:
+ * <pre>
+ * {
+ *     "myRichText": {
+ *         "label": "My rich text",
+ *         "tabId": "content",
+ *         "schemaId": "richText"
+ *     }
+ * }
+ * </pre>
  *
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
@@ -46194,6 +46329,17 @@ var FieldEditor = __webpack_require__(11);
 /**
  * A simple string editor
  *
+ * @description Example:
+ * <pre>
+ * {
+ *     "myString": {
+ *         "label": "My string",
+ *         "tabId": "content",
+ *         "schemaId": "string"
+ *     }
+ * }
+ * </pre>
+ *
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
 
@@ -46258,6 +46404,32 @@ var ContentEditor = __webpack_require__(195);
 
 /**
  * A struct editor for editing any arbitrary object value
+ *
+ * @description Example:
+ * <pre>
+ * {
+ *     "myStruct": {
+ *         "label": "My struct",
+ *         "tabId": "content",
+ *         "schemaId": "struct",
+ *         "config": {
+ *             "struct": {
+ *                 "myString": {
+ *                     "label": "My string",
+ *                     "schemaId": "string"
+ *                 },
+ *                 "myArray": {
+ *                     "label": "My array",
+ *                     "schemaId": "array",
+ *                     "config": {
+ *                         "allowedSchemas": [ "string", "mediaReference", "myCustomSchema" ]
+ *                     }
+ *                 }
+ *             }
+ *         }
+ *     }
+ * }
+ * </pre>
  *
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
@@ -46374,6 +46546,17 @@ var FieldEditor = __webpack_require__(11);
 
 /**
  * A CSV string editor
+ *
+ * @description Example:
+ * <pre>
+ * {
+ *     "myTags": {
+ *         "label": "My tags",
+ *         "tabId": "content",
+ *         "schemaId": "tags"
+ *     }
+ * }
+ * </pre>
  *
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
@@ -46537,6 +46720,21 @@ var FieldEditor = __webpack_require__(11);
 /**
  * An editor for referencing templates
  *
+ * @description Example:
+ * <pre>
+ * {
+ *     "myTemplateReference": {
+ *         "label": "My template reference",
+ *         "tabId": "content",
+ *         "schemaId": "templateReference",
+ *         {
+ *             "type": "page" || "partial",
+ *             "allowedTemplates": [ "myPageTemplate", "myOtherPageTemplate" ]
+ *         }
+ *     }
+ * }
+ * </pre>
+ *
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
 
@@ -46670,6 +46868,17 @@ var FieldEditor = __webpack_require__(11);
 
 /**
  * An editor for content URLs
+ *
+ * @description Example:
+ * <pre>
+ * {
+ *     "myUrl": {
+ *         "label": "My URL",
+ *         "tabId": "content",
+ *         "schemaId": "url"
+ *     }
+ * }
+ * </pre>
  *
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */

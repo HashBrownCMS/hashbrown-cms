@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * @namespace HashBrown.Helpers
+ * @namespace HashBrown.Server.Helpers
  */
 module.exports = {
     AppHelper: require('./AppHelper'),

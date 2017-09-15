@@ -5,6 +5,17 @@ const FieldEditor = require('./FieldEditor');
 /**
  * A simple boolean editor
  *
+ * @description Example:
+ * <pre>
+ * {
+ *     "myBoolean": {
+ *         "label": "My boolean",
+ *         "tabId": "content",
+ *         "schemaId": "boolean"
+ *     }
+ * }
+ * </pre>
+ *
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
 class BooleanEditor extends FieldEditor {

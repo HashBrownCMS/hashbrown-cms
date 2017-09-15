@@ -5,6 +5,21 @@ const FieldEditor = require('./FieldEditor');
 /**
  * An editor for referencing templates
  *
+ * @description Example:
+ * <pre>
+ * {
+ *     "myTemplateReference": {
+ *         "label": "My template reference",
+ *         "tabId": "content",
+ *         "schemaId": "templateReference",
+ *         {
+ *             "type": "page" || "partial",
+ *             "allowedTemplates": [ "myPageTemplate", "myOtherPageTemplate" ]
+ *         }
+ *     }
+ * }
+ * </pre>
+ *
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
 class TemplateReferenceEditor extends FieldEditor {

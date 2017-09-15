@@ -5,6 +5,17 @@ const FieldEditor = require('./FieldEditor');
 /**
  * A CSV string editor
  *
+ * @description Example:
+ * <pre>
+ * {
+ *     "myTags": {
+ *         "label": "My tags",
+ *         "tabId": "content",
+ *         "schemaId": "tags"
+ *     }
+ * }
+ * </pre>
+ *
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
 class TagsEditor extends FieldEditor {

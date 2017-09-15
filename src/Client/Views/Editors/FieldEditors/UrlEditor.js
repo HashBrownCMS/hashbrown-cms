@@ -5,6 +5,17 @@ const FieldEditor = require('./FieldEditor');
 /**
  * An editor for content URLs
  *
+ * @description Example:
+ * <pre>
+ * {
+ *     "myUrl": {
+ *         "label": "My URL",
+ *         "tabId": "content",
+ *         "schemaId": "url"
+ *     }
+ * }
+ * </pre>
+ *
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
 class UrlEditor extends FieldEditor {

@@ -1,8 +1,9 @@
 'use strict';
 
 /**
- * @namespace HashBrown
+ * @namespace HashBrown.Client
  */
+
 // Style
 require('Style/client');
 

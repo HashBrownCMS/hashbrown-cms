@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * @namespace HashBrown.Helpers
+ * @namespace HashBrown.Client.Helpers
  */
 module.exports = {
     ConnectionHelper: require('./ConnectionHelper'),

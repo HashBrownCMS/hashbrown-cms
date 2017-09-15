@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * @namespace HashBrown.Models
+ * @namespace HashBrown.Server.Models
  */
 module.exports = {
     Content: require('./Content'),

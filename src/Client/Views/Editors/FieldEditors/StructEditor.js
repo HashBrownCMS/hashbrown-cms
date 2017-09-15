@@ -8,6 +8,32 @@ const ContentEditor = require('Client/Views/Editors/ContentEditor');
 /**
  * A struct editor for editing any arbitrary object value
  *
+ * @description Example:
+ * <pre>
+ * {
+ *     "myStruct": {
+ *         "label": "My struct",
+ *         "tabId": "content",
+ *         "schemaId": "struct",
+ *         "config": {
+ *             "struct": {
+ *                 "myString": {
+ *                     "label": "My string",
+ *                     "schemaId": "string"
+ *                 },
+ *                 "myArray": {
+ *                     "label": "My array",
+ *                     "schemaId": "array",
+ *                     "config": {
+ *                         "allowedSchemas": [ "string", "mediaReference", "myCustomSchema" ]
+ *                     }
+ *                 }
+ *             }
+ *         }
+ *     }
+ * }
+ * </pre>
+ *
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
 class StructEditor extends FieldEditor {

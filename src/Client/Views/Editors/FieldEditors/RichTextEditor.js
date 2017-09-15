@@ -8,6 +8,17 @@ const FieldEditor = require('./FieldEditor');
 /**
  * A rich text editor
  *
+ * @description Example:
+ * <pre>
+ * {
+ *     "myRichText": {
+ *         "label": "My rich text",
+ *         "tabId": "content",
+ *         "schemaId": "richText"
+ *     }
+ * }
+ * </pre>
+ *
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
 class RichTextEditor extends FieldEditor {

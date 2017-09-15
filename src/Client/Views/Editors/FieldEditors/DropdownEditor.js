@@ -5,6 +5,29 @@ const FieldEditor = require('./FieldEditor');
 /**
  * A simple list picker
  *
+ * @description Example:
+ * <pre>
+ * {
+ *     "myDropdown": {
+ *         "label": "My dropdown",
+ *         "tabId": "content",
+ *         "schemaId": "dropdown",
+ *         "config": {
+ *             "options": [
+ *                 {
+ *                     "label": "Option #1",
+ *                     "value": "option-1"
+ *                 },
+ *                 {
+ *                     "label": "Option #2",
+ *                     "value": "option-2"
+ *                 }
+ *             ]
+ *         }
+ *     }
+ * }
+ * </pre>
+ *
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
 class DropdownEditor extends FieldEditor {

@@ -10,6 +10,17 @@ const FieldEditor = require('./FieldEditor');
 /**
  * A picker for referencing Media 
  *
+ * @description Example:
+ * <pre>
+ * {
+ *     "myMediaReference": {
+ *         "label": "My medie reference",
+ *         "tabId": "content",
+ *         "schemaId": "mediaReference"
+ *     }
+ * }
+ * </pre>
+ *
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
 class MediaReferenceEditor extends FieldEditor {

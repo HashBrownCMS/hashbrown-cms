@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * @namespace HashBrown.Controllers
+ * @namespace HashBrown.Server.Controllers
  */
 module.exports = {
     ApiController: require('./ApiController'),

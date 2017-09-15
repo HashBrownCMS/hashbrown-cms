@@ -8,6 +8,17 @@ const FieldEditor = require('./FieldEditor');
 /**
  * A field editor for specifying one of the selected languages
  *
+ * @description Example:
+ * <pre>
+ * {
+ *     "myLanguage": {
+ *         "label": "My language",
+ *         "tabId": "content",
+ *         "schemaId": "language"
+ *     }
+ * }
+ * </pre>
+ *
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
 class LanguageEditor extends FieldEditor {

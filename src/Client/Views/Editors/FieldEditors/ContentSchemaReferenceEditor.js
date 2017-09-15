@@ -8,6 +8,20 @@ const FieldEditor = require('./FieldEditor');
 /**
  * An editor for referencing Content Schemas
  *
+ * @descripton Example:
+ * <pre>
+ * {
+ *     "myContentSchemaReference": {
+ *         "label": "My content schema reference",
+ *         "tabId": "content",
+ *         "schemaId": "contentSchemaReference",
+ *         "config": {
+ *             "allowedSchemas": "fromParent" || [ "myCustomSchema" ]
+ *         }
+ *     }
+ * }
+ * </pre>
+ *
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
 class ContentSchemaReferenceEditor extends FieldEditor {

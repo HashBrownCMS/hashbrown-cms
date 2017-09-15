@@ -9,6 +9,20 @@ const ContentEditor = require('Client/Views/Editors/ContentEditor');
 /**
  * An array editor for editing a list of other field values
  *
+ * @description Example:
+ * <pre>
+ * {
+ *     "myArray": {
+ *         "label": "My array",
+ *         "tabId": "content",
+ *         "schemaId": "array",
+ *         "config": {
+ *             "allowedSchemas": [ "string", "mediaReference", "myCustomSchema" ]
+ *         }
+ *     }
+ * }
+ * </pre>
+ *
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
 class ArrayEditor extends FieldEditor {

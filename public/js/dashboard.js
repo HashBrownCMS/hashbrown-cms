@@ -24815,7 +24815,7 @@ module.exports = LanguageHelper;
 
 
 /**
- * @namespace HashBrown.Helpers
+ * @namespace HashBrown.Client.Helpers
  */
 
 module.exports = {
