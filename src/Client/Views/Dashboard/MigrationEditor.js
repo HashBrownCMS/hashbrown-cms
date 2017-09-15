@@ -8,7 +8,7 @@ const MessageModal = require('Client/Views/Modals/MessageModal');
  *
  * @memberof HashBrown.Client.Views.Dashboard
  */
-class MigrationEditor extends View {
+class MigrationEditor extends Crisp.View {
     constructor(params) {
         super(params);
 

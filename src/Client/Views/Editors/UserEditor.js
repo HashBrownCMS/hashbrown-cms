@@ -7,7 +7,7 @@ const RequestHelper = require('Client/Helpers/RequestHelper');
  *
  * @memberof HashBrown.Client.Views.Editors
  */
-class UserEditor extends View {
+class UserEditor extends Crisp.View {
     constructor(params) {
         super(params);
 

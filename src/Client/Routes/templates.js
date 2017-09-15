@@ -4,9 +4,9 @@ const TemplateEditor = require('Client/Views/Editors/TemplateEditor');
 const RequestHelper = require('Client/Helpers/RequestHelper');
 
 // Templates
-Router.route('/templates/', function() {
+Crisp.Router.route('/templates/', function() {
     if(currentUserHasScope('templates')) {
-        ViewHelper.get('NavbarMain').showTab('/templates/');
+        Crisp.View.get('NavbarMain').showTab('/templates/');
 
         populateWorkspace(
             _.div({class: 'dashboard-container'},
@@ -23,9 +23,9 @@ Router.route('/templates/', function() {
 });
 
 // Edit
-Router.route('/templates/:type/:id', function() {
+Crisp.Router.route('/templates/:type/:id', function() {
     if(currentUserHasScope('templates')) {
-        ViewHelper.get('NavbarMain').highlightItem('/templates/', this.type + '/' + this.id);
+        Crisp.View.get('NavbarMain').highlightItem('/templates/', this.type + '/' + this.id);
         
         let templateEditor = new TemplateEditor({
             modelUrl: RequestHelper.environmentUrl('templates/' + this.type + '/' + this.id)

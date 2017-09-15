@@ -12,7 +12,7 @@ const RequestHelper = require('Client/Helpers/RequestHelper');
  *
  * @memberof HashBrown.Client.Views.Editors
  */
-class ContentEditor extends View {
+class ContentEditor extends Crisp.View {
     constructor(params) {
         super(params);
 
@@ -167,7 +167,7 @@ class ContentEditor extends View {
     }
 
     static restoreScrollPos() {
-        let editor = ViewHelper.get('ContentEditor');
+        let editor = Crisp.View.get('ContentEditor');
 
         if(editor) {
             editor.restoreScrollPos();
@@ -345,7 +345,7 @@ class ContentEditor extends View {
      * @param {String} tab
      */
     onClickTab(tab) {
-        location.hash = '/content/' + Router.params.id + '/' + tab;
+        location.hash = '/content/' + Crisp.Router.params.id + '/' + tab;
     }
 
     /**
@@ -361,7 +361,7 @@ class ContentEditor extends View {
 
         // Check for active tab
         function isTabActive(tabId) {
-            let targetTab = Router.params.tab || schema.defaultTabId || 'meta';
+            let targetTab = Crisp.Router.params.tab || schema.defaultTabId || 'meta';
 
             return tabId == targetTab;
         }

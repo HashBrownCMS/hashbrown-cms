@@ -12,7 +12,7 @@ const JSONEditor = require('Client/Views/Editors/JSONEditor');
  *
  * @memberof HashBrown.Client.Views.Editors
  */
-class SchemaEditor extends View {
+class SchemaEditor extends Crisp.View {
     constructor(params) {
         super(params);
         
@@ -45,7 +45,7 @@ class SchemaEditor extends View {
             return RequestHelper.reloadResource('schemas');
         })
         .then(() => {
-            ViewHelper.get('NavbarMain').reload();
+            Crisp.View.get('NavbarMain').reload();
         })
         .catch(UI.errorModal);
     }

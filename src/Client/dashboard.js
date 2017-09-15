@@ -2,6 +2,7 @@
 
 // Libraries
 require('crisp-ui');
+window._ = Crisp.Elements;
 
 // Namespaces
 window.HashBrown = {};

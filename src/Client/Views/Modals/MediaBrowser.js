@@ -12,7 +12,7 @@ const SettingsHelper = require('Client/Helpers/SettingsHelper');
  *
  * @memberof HashBrown.Client.Views.Modals
  */
-class MediaBrowser extends View {
+class MediaBrowser extends Crisp.View {
     constructor(params) {
         super(params);
         
@@ -59,7 +59,7 @@ class MediaBrowser extends View {
     static uploadModal(onSuccess, onCancel, replaceId) {
         MediaBrowser.checkMediaProvider()
         .then(() => {
-            let navbar = ViewHelper.get('NavbarMain');
+            let navbar = Crisp.View.get('NavbarMain');
 
             // Event: Change file
             function onChangeFile() {

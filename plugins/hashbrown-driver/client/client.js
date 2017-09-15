@@ -7,8 +7,8 @@
         this.fetch();
     }
 
-    ConnectionEditor.prototype = Object.create(View.prototype);
-    ConnectionEditor.prototype.constructor = View;
+    ConnectionEditor.prototype = Object.create(Crisp.View.prototype);
+    ConnectionEditor.prototype.constructor = Crisp.View;
 
     /**
      * Render token editor

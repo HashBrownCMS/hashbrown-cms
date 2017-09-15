@@ -8,7 +8,7 @@ const ConnectionHelper = require('Client/Helpers/ConnectionHelper');
  *
  * @memberof HashBrown.Client.Views.Editors
  */
-class ConnectionEditor extends View {
+class ConnectionEditor extends Crisp.View {
     constructor(params) {
         super(params);
 

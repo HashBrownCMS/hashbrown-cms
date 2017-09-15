@@ -14,7 +14,7 @@ const MigrationEditor = require('Client/Views/Dashboard/MigrationEditor');
  *
  * @memberof HashBrown.Client.Views.Dashboard
  */
-class ProjectEditor extends View {
+class ProjectEditor extends Crisp.View {
     constructor(params) {
         super(params);
 

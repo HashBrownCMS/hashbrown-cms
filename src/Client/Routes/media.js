@@ -4,8 +4,8 @@ const MediaViewer = require('Client/Views/Editors/MediaViewer');
 const RequestHelper = require('Client/Helpers/RequestHelper');
 
 // Dashboard
-Router.route('/media/', function() {
-    ViewHelper.get('NavbarMain').showTab('/media/');
+Crisp.Router.route('/media/', function() {
+    Crisp.View.get('NavbarMain').showTab('/media/');
     
     populateWorkspace(
         _.div({class: 'dashboard-container'},
@@ -17,12 +17,12 @@ Router.route('/media/', function() {
 });
 
 // Preview
-Router.route('/media/:id', function() {
+Crisp.Router.route('/media/:id', function() {
     let mediaViewer = new MediaViewer({
         modelUrl: RequestHelper.environmentUrl('media/' + this.id)
     });
     
-    ViewHelper.get('NavbarMain').highlightItem('/media/', this.id);
+    Crisp.View.get('NavbarMain').highlightItem('/media/', this.id);
     
     populateWorkspace(mediaViewer.$element);
 });

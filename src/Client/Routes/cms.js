@@ -3,9 +3,9 @@
 const RequestHelper = require('Client/Helpers/RequestHelper');
 
 // Root
-Router.route('/', function() {
-    ViewHelper.get('NavbarMain').showTab('/');
-    ViewHelper.get('NavbarMain').highlightItem('/', 'null');
+Crisp.Router.route('/', function() {
+    Crisp.View.get('NavbarMain').showTab('/');
+    Crisp.View.get('NavbarMain').highlightItem('/', 'null');
 
     let carouselItems = [
         [
@@ -111,8 +111,8 @@ Router.route('/', function() {
 });
 
 // Readme
-Router.route('/readme/', function() {
-    ViewHelper.get('NavbarMain').highlightItem('/', 'readme');
+Crisp.Router.route('/readme/', function() {
+    Crisp.View.get('NavbarMain').highlightItem('/', 'readme');
 
     RequestHelper.customRequest('GET', '/text/readme')
     .then((html) => {
@@ -126,8 +126,8 @@ Router.route('/readme/', function() {
 });
 
 // License
-Router.route('/license/', function() {
-    ViewHelper.get('NavbarMain').highlightItem('/', 'license');
+Crisp.Router.route('/license/', function() {
+    Crisp.View.get('NavbarMain').highlightItem('/', 'license');
 
     RequestHelper.customRequest('GET', '/text/license')
     .then((html) => {

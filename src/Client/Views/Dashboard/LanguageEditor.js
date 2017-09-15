@@ -8,7 +8,7 @@ const LanguageHelper = require('Client/Helpers/LanguageHelper');
  *
  * @memberof HashBrown.Client.Views.Dashboard
  */
-class LanguageEditor extends View {
+class LanguageEditor extends Crisp.View {
     constructor(params) {
         super(params);
 

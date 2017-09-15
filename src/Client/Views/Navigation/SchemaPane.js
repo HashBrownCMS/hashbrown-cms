@@ -100,7 +100,7 @@ class SchemaPane extends NavbarPane {
      * Event: Click pull Schema
      */
     static onClickPullSchema() {
-        let schemaEditor = ViewHelper.get('SchemaEditor');
+        let schemaEditor = Crisp.View.get('SchemaEditor');
         let pullId = $('.cr-context-menu__target-element').data('id');
 
         RequestHelper.request('post', 'schemas/pull/' + pullId, {})
@@ -112,7 +112,7 @@ class SchemaPane extends NavbarPane {
            
 			location.hash = '/schemas/' + pullId;
 		
-			let editor = ViewHelper.get('SchemaEditor');
+			let editor = Crisp.View.get('SchemaEditor');
 
 			if(editor && editor.model.id == pullId) {
                 editor.model = null;

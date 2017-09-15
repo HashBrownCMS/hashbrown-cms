@@ -4,9 +4,9 @@ const RequestHelper = require('Client/Helpers/RequestHelper');
 const SchemaHelper = require('Client/Helpers/SchemaHelper');
 
 // Dashboard
-Router.route('/schemas/', function() {
+Crisp.Router.route('/schemas/', function() {
     if(currentUserHasScope('schemas')) {
-        ViewHelper.get('NavbarMain').showTab('/schemas/');
+        Crisp.View.get('NavbarMain').showTab('/schemas/');
         
         populateWorkspace(
             _.div({class: 'dashboard-container'},
@@ -23,13 +23,13 @@ Router.route('/schemas/', function() {
 });
 
 // Edit
-Router.route('/schemas/:id', function() {
+Crisp.Router.route('/schemas/:id', function() {
     if(currentUserHasScope('schemas')) {
         let schemaEditor = new HashBrown.Views.Editors.SchemaEditor({
             modelUrl: RequestHelper.environmentUrl('schemas/' + this.id)
         });
         
-        ViewHelper.get('NavbarMain').highlightItem('/schemas/', this.id);
+        Crisp.View.get('NavbarMain').highlightItem('/schemas/', this.id);
         
         populateWorkspace(schemaEditor.$element);
     
@@ -40,7 +40,7 @@ Router.route('/schemas/:id', function() {
 });
 
 // Edit (JSON editor)
-Router.route('/schemas/json/:id', function() {
+Crisp.Router.route('/schemas/json/:id', function() {
     if(currentUserHasScope('schemas')) {
         let jsonEditor = new HashBrown.Views.Editors.JSONEditor({
             model: SchemaHelper.getSchemaByIdSync(this.id),
@@ -48,14 +48,14 @@ Router.route('/schemas/json/:id', function() {
             onSuccess: () => {
                 return RequestHelper.reloadResource('schemas')
                 .then(() => {
-                    let navbar = ViewHelper.get('NavbarMain');
+                    let navbar = Crisp.View.get('NavbarMain');
                     
                     navbar.reload();
                 });
             }
         });
 
-        ViewHelper.get('NavbarMain').highlightItem('/schemas/', this.id);
+        Crisp.View.get('NavbarMain').highlightItem('/schemas/', this.id);
         
         populateWorkspace(jsonEditor.$element);
     

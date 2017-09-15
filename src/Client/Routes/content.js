@@ -3,8 +3,8 @@
 const RequestHelper = require('Client/Helpers/RequestHelper');
 
 // Dashboard
-Router.route('/content/', function() {
-    ViewHelper.get('NavbarMain').showTab('/content/');
+Crisp.Router.route('/content/', function() {
+    Crisp.View.get('NavbarMain').showTab('/content/');
     
     populateWorkspace(
         _.div({class: 'dashboard-container'},
@@ -16,8 +16,8 @@ Router.route('/content/', function() {
 });
 
 // Edit (JSON editor)
-Router.route('/content/json/:id', function() {
-    ViewHelper.get('NavbarMain').highlightItem('/content/', this.id);
+Crisp.Router.route('/content/json/:id', function() {
+    Crisp.View.get('NavbarMain').highlightItem('/content/', this.id);
     
     let contentEditor = new HashBrown.Views.Editors.JSONEditor({
         modelUrl: RequestHelper.environmentUrl('content/' + this.id),
@@ -28,7 +28,7 @@ Router.route('/content/json/:id', function() {
 });
 
 // Edit (redirect to default tab)
-Router.route('/content/:id', function() {
+Crisp.Router.route('/content/:id', function() {
     let content = HashBrown.Helpers.ContentHelper.getContentByIdSync(this.id);
 
     if(content) {
@@ -49,11 +49,11 @@ Router.route('/content/:id', function() {
 });
 
 // Edit (with tab specified)
-Router.route('/content/:id/:tab', function() {
-    let contentEditor = ViewHelper.get('ContentEditor');
+Crisp.Router.route('/content/:id/:tab', function() {
+    let contentEditor = Crisp.View.get('ContentEditor');
   
     if(!contentEditor || !contentEditor.model || contentEditor.model.id != this.id) {
-        ViewHelper.get('NavbarMain').highlightItem('/content/', this.id);
+        Crisp.View.get('NavbarMain').highlightItem('/content/', this.id);
    
         contentEditor = new HashBrown.Views.Editors.ContentEditor({
             modelUrl: RequestHelper.environmentUrl('content/' + this.id)

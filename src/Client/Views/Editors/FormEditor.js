@@ -8,7 +8,7 @@ const ProjectHelper = require('Client/Helpers/ProjectHelper');
  *
  * @memberof HashBrown.Client.Views.Editors
  */
-class FormEditor extends View {
+class FormEditor extends Crisp.View {
     constructor(params) {
         super(params);
         
@@ -38,7 +38,7 @@ class FormEditor extends View {
             return RequestHelper.reloadResource('forms');
         })
         .then(() => {
-            let navbar = ViewHelper.get('NavbarMain');
+            let navbar = Crisp.View.get('NavbarMain');
             
             navbar.reload();
         })

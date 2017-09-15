@@ -8,7 +8,7 @@ const ProjectHelper = require('Client/Helpers/ProjectHelper');
  *
  * @memberof HashBrown.Client.Views.Editors
  */
-class ProvidersSettings extends View {
+class ProvidersSettings extends Crisp.View {
     constructor(params) {
         super(params);
 

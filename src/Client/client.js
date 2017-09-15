@@ -8,6 +8,7 @@ require('Style/client');
 
 // Libraries
 require('crisp-ui');
+window._ = Crisp.Elements;
 
 // Get routes
 require('Client/Routes');
@@ -68,8 +69,8 @@ document.addEventListener('DOMContentLoaded', () => {
         new HashBrown.Views.Navigation.NavbarMain();
         new HashBrown.Views.Navigation.MainMenu();
 
-        Router.check = (newRoute, cancel, proceed) => {
-            let contentEditor = ViewHelper.get('ContentEditor');
+        Crisp.Router.check = (newRoute, cancel, proceed) => {
+            let contentEditor = Crisp.View.get('ContentEditor');
 
             if(
                 (!contentEditor || !contentEditor.model) ||
@@ -95,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         $('.cms-container').removeClass('faded');
 
-        Router.init();
+        Crisp.Router.init();
     })
     .catch((e) => {
         UI.errorModal(e);

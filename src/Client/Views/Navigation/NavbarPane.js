@@ -48,7 +48,7 @@ class Pane {
      */
     static onClickMoveItem() {
         let id = $('.cr-context-menu__target-element').data('id');
-        let navbar = ViewHelper.get('NavbarMain');
+        let navbar = Crisp.View.get('NavbarMain');
         let $pane = navbar.$element.find('.pane-container.active');
 
         $pane.find('.pane-item-container a[data-id="' + id + '"]').parent().toggleClass('moving-item', true);
@@ -56,7 +56,7 @@ class Pane {
         
         // Reset
         function reset(newPath) {
-            let mediaViewer = ViewHelper.get('MediaViewer');
+            let mediaViewer = Crisp.View.get('MediaViewer');
 
             $pane.find('.pane-item-container[data-id="' + id + '"]').toggleClass('moving-item', false);
             $pane.toggleClass('select-dir', false);
@@ -66,7 +66,7 @@ class Pane {
             
             if(!newPath) { return; }
 
-            if(id == Router.params.id && mediaViewer) {
+            if(id == Crisp.Router.params.id && mediaViewer) {
                 mediaViewer.$element.find('.editor-footer input').val(newPath);
             }
         }

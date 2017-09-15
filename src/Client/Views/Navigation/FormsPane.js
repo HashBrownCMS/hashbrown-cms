@@ -103,7 +103,7 @@ class FormsPane extends NavbarPane {
 
 			location.hash = '/forms/' + pullId;
 		
-			let editor = ViewHelper.get('FormEditor');
+			let editor = Crisp.View.get('FormEditor');
 
 			if(editor && editor.model.id == pullId) {
                 editor.model = null;

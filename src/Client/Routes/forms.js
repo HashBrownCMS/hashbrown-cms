@@ -5,8 +5,8 @@ const FormEditor = require('Client/Views/Editors/FormEditor');
 const RequestHelper = require('Client/Helpers/RequestHelper');
 
 // Dashboard
-Router.route('/forms/', function() {
-    ViewHelper.get('NavbarMain').showTab('/forms/');
+Crisp.Router.route('/forms/', function() {
+    Crisp.View.get('NavbarMain').showTab('/forms/');
     
     populateWorkspace(
         _.div({class: 'dashboard-container'},
@@ -18,8 +18,8 @@ Router.route('/forms/', function() {
 });
 
 // Edit
-Router.route('/forms/:id', function() {
-    ViewHelper.get('NavbarMain').highlightItem('/forms/', this.id);
+Crisp.Router.route('/forms/:id', function() {
+    Crisp.View.get('NavbarMain').highlightItem('/forms/', this.id);
     
     let formEditor = new FormEditor({
         modelUrl: RequestHelper.environmentUrl('forms/' + this.id)
@@ -29,13 +29,13 @@ Router.route('/forms/:id', function() {
 });
 
 // Edit (JSON editor)
-Router.route('/forms/json/:id', function() {
+Crisp.Router.route('/forms/json/:id', function() {
     let formEditor = new JSONEditor({
         modelUrl: RequestHelper.environmentUrl('forms/' + this.id),
         apiPath: 'forms/' + this.id
     });
      
-    ViewHelper.get('NavbarMain').highlightItem('/forms/', this.id);
+    Crisp.View.get('NavbarMain').highlightItem('/forms/', this.id);
     
     populateWorkspace(formEditor.$element);
 });

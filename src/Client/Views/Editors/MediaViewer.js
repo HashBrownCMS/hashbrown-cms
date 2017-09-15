@@ -9,7 +9,7 @@ const Media = require('Common/Models/Media');
  *
  * @memberof HashBrown.Client.Views.Editors
  */
-class MediaViewer extends View {
+class MediaViewer extends Crisp.View {
     constructor(params) {
         super(params);
         

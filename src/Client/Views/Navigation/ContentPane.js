@@ -79,7 +79,7 @@ class ContentPane extends NavbarPane {
      * Event: Click pull content
      */
     static onClickPullContent() {
-        let contentEditor = ViewHelper.get('ContentEditor');
+        let contentEditor = Crisp.View.get('ContentEditor');
         let pullId = $('.cr-context-menu__target-element').data('id');
 
         // API call to pull the Content by id
@@ -96,7 +96,7 @@ class ContentPane extends NavbarPane {
 
 			location.hash = '/content/' + pullId;
 		
-			let editor = ViewHelper.get('ContentEditor');
+			let editor = Crisp.View.get('ContentEditor');
 
 			if(editor && editor.model && editor.model.id == pullId) {
                 editor.model = null;
@@ -241,8 +241,8 @@ class ContentPane extends NavbarPane {
             .then(() => {
                 NavbarMain.reload();
 
-                if(Router.params.id == content.id) {
-                    let contentEditor = ViewHelper.get('ContentEditor');
+                if(Crisp.Router.params.id == content.id) {
+                    let contentEditor = Crisp.View.get('ContentEditor');
 
                     contentEditor.model = content;
                     return contentEditor.render();
@@ -347,7 +347,7 @@ class ContentPane extends NavbarPane {
                 .then(() => {
                     NavbarMain.reload();
                             
-                    let contentEditor = ViewHelper.get('ContentEditor');
+                    let contentEditor = Crisp.View.get('ContentEditor');
                    
                     // Change the ContentEditor view if it was displaying the deleted content
                     if(contentEditor && contentEditor.model && contentEditor.model.id == id) {

@@ -9,7 +9,7 @@ const RequestHelper = require('Client/Helpers/RequestHelper');
  * 
  * @memberof HashBrown.Client.Views.Navigation
  */
-class MainMenu extends View {
+class MainMenu extends Crisp.View {
     constructor(params) {
         super(params);
         
@@ -34,7 +34,7 @@ class MainMenu extends View {
         .then(() => {
             HashBrown.Views.Navigation.NavbarMain.reload();
 
-            let contentEditor = ViewHelper.get('ContentEditor');
+            let contentEditor = Crisp.View.get('ContentEditor');
 
             if(contentEditor) {
                 contentEditor.model = null;

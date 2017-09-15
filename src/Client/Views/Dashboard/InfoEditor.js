@@ -8,7 +8,7 @@ const SettingsHelper = require('Client/Helpers/SettingsHelper');
  *
  * @memberof HashBrown.Client.Views.Dashboard
  */
-class InfoEditor extends View {
+class InfoEditor extends Crisp.View {
     constructor(params) {
         super(params);
 

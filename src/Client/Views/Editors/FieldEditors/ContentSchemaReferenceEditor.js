@@ -36,7 +36,7 @@ class ContentSchemaReferenceEditor extends FieldEditor {
         if(this.config.parentSchema) { return this.config.parentSchema; }
 
         // Fetch current ContentEditor
-        let contentEditor = ViewHelper.get('ContentEditor');
+        let contentEditor = Crisp.View.get('ContentEditor');
 
         if(!contentEditor) { return null; }
 
@@ -78,7 +78,7 @@ class ContentSchemaReferenceEditor extends FieldEditor {
 
         // Only re-render if the ContentEditor is the parent
         if(this.$element.parents('.content-editor').length > 0) {
-            let contentEditor = ViewHelper.get('ContentEditor');
+            let contentEditor = Crisp.View.get('ContentEditor');
 
             contentEditor.render();
         }

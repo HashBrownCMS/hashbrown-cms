@@ -23,7 +23,7 @@ class UrlEditor extends FieldEditor {
      */
     static getAllParents(contentId) {
         let nodes = [];    
-        let contentEditor = ViewHelper.get('ContentEditor');
+        let contentEditor = Crisp.View.get('ContentEditor');
 
         function iterate(id) {
             let node;
@@ -69,7 +69,7 @@ class UrlEditor extends FieldEditor {
         for(let node of nodes) {
             let title = '';
        
-            if(node.id == Router.params.id) {
+            if(node.id == Crisp.Router.params.id) {
                 title = $('.field-container[data-key="title"] .field-editor input').val();
 
             } else {
@@ -131,7 +131,7 @@ class UrlEditor extends FieldEditor {
      * Regenerates the URL
      */
     regenerate() {
-        let newUrl = this.generateUrl(Router.params.id);
+        let newUrl = this.generateUrl(Crisp.Router.params.id);
 
         this.$input.val(newUrl);
 

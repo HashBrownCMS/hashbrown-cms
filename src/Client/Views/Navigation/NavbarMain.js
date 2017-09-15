@@ -5,7 +5,7 @@
  * 
  * @memberof HashBrown.Client.Views.Navigation
  */
-class NavbarMain extends View {
+class NavbarMain extends Crisp.View {
     constructor(params) {
         super(params);
 
@@ -168,7 +168,7 @@ class NavbarMain extends View {
     }
     
     static reload() {
-        ViewHelper.get('NavbarMain').reload();
+        Crisp.View.get('NavbarMain').reload();
     }
 
     /**
@@ -178,7 +178,7 @@ class NavbarMain extends View {
      * @param {Object} settings
      */
     static addTabPane(route, label, icon, settings) {
-        ViewHelper.get('NavbarMain').tabPanes.push({
+        Crisp.View.get('NavbarMain').tabPanes.push({
             label: label,
             route: route,
             icon: icon,

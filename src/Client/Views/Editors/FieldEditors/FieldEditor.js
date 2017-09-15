@@ -5,7 +5,7 @@
  *
  * @memberof HashBrown.Client.Views.Editors.FieldEditors
  */
-class FieldEditor extends View {
+class FieldEditor extends Crisp.View {
     /**
      * Renders a field preview template
      *

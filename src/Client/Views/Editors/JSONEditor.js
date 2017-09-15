@@ -9,7 +9,7 @@ const RequestHelper = require('Client/Helpers/RequestHelper');
  *
  * @memberof HashBrown.Client.Views.Editors
  */
-class JSONEditor extends View {
+class JSONEditor extends Crisp.View {
     constructor(params) {
         super(params);
 

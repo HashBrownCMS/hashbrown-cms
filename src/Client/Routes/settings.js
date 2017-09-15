@@ -1,9 +1,9 @@
 'use strict';
 
 // Dashboard
-Router.route('/settings/', function() {
+Crisp.Router.route('/settings/', function() {
     if(currentUserHasScope('settings')) {
-        ViewHelper.get('NavbarMain').showTab('/settings/');
+        Crisp.View.get('NavbarMain').showTab('/settings/');
         
         populateWorkspace(
             _.div({class: 'dashboard-container'},
@@ -20,9 +20,9 @@ Router.route('/settings/', function() {
 });
 
 // Providers
-Router.route('/settings/providers/', function() {
+Crisp.Router.route('/settings/providers/', function() {
     if(currentUserHasScope('settings')) {
-        ViewHelper.get('NavbarMain').highlightItem('/settings/', 'providers');
+        Crisp.View.get('NavbarMain').highlightItem('/settings/', 'providers');
         
         populateWorkspace(
             new HashBrown.Views.Editors.ProvidersSettings().$element

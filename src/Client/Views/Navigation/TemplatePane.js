@@ -119,7 +119,7 @@ class TemplatePane extends NavbarPane {
     static onClickRenameTemplate() {
         let id = $('.cr-context-menu__target-element').data('id');
         let type = $('.cr-context-menu__target-element').attr('href').replace('#/templates/', '').replace('/' + id, '');
-        let templateEditor = ViewHelper.get('TemplateEditor');
+        let templateEditor = Crisp.View.get('TemplateEditor');
         let model;
 
         for(let template of resources.templates) {

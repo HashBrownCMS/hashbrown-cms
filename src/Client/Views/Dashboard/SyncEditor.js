@@ -10,7 +10,7 @@ const ProjectHelper = require('Client/Helpers/ProjectHelper');
  *
  * @memberof HashBrown.Client.Views.Dashboard
  */
-class SyncEditor extends View {
+class SyncEditor extends Crisp.View {
     constructor(params) {
         super(params);
 

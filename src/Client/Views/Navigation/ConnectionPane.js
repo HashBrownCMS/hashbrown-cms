@@ -79,7 +79,7 @@ class ConnectionPane extends NavbarPane {
      * Event: Click pull connection
      */
     static onClickPullConnection() {
-        let connectionEditor = ViewHelper.get('ConnectionEditor');
+        let connectionEditor = Crisp.View.get('ConnectionEditor');
         let pullId = $('.cr-context-menu__target-element').data('id');
 
         // API call to pull the Connection by id
@@ -96,7 +96,7 @@ class ConnectionPane extends NavbarPane {
 
 			location.hash = '/connections/' + pullId;
 		
-			let editor = ViewHelper.get('ConnectionEditor');
+			let editor = Crisp.View.get('ConnectionEditor');
 
 			if(editor && editor.model.id == pullId) {
                 editor.model = null;

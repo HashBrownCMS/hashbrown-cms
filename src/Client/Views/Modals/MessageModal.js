@@ -5,11 +5,11 @@
  *
  * @memberof HashBrown.Client.Views.Modals
  */
-class MessageModal extends View {
+class MessageModal extends Crisp.View {
     constructor(params) {
         super(params);
 
-        let otherModals = ViewHelper.getAll('MessageModal');
+        let otherModals = Crisp.View.getAll('MessageModal');
 
         for(let i in otherModals) {
             if(otherModals[i] !== this) {
