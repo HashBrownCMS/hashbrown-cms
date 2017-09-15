@@ -4,7 +4,7 @@ const ContentHelperCommon = require('Common/Helpers/ContentHelper');
 const ScheduleHelper = require('Server/Helpers/ScheduleHelper');
 const SyncHelper = require('Server/Helpers/SyncHelper');
 const SchemaHelper = require('Server/Helpers/SchemaHelper');
-const MongoHelper = require('Server/Helpers/MongoHelper');
+const DatabaseHelper = require('Server/Helpers/DatabaseHelper');
 
 const Content = require('Common/Models/Content');
 const ContentSchema = require('Common/Models/ContentSchema');
@@ -31,7 +31,7 @@ class ContentHelper extends ContentHelperCommon {
     ) {
         let collection = environment + '.content';
 
-        return MongoHelper.find(
+        return DatabaseHelper.find(
             project,
             collection,
             {},
@@ -80,7 +80,7 @@ class ContentHelper extends ContentHelperCommon {
         let collection = environment + '.content';
         let content;
 
-        return MongoHelper.findOne(
+        return DatabaseHelper.findOne(
             project,
             collection,
             {
@@ -127,7 +127,7 @@ class ContentHelper extends ContentHelperCommon {
         environment = requiredParam('environment'),
         content = requiredParam('content')
     ) {
-        return MongoHelper.updateOne(
+        return DatabaseHelper.updateOne(
             project,
             environment + '.content',
             { id: content.id },
@@ -210,7 +210,7 @@ class ContentHelper extends ContentHelperCommon {
         })
         .then(() => {
             // Insert into database
-            return MongoHelper.updateOne(
+            return DatabaseHelper.updateOne(
                 project,
                 environment + '.content',
                 { id: id },
@@ -265,7 +265,7 @@ class ContentHelper extends ContentHelperCommon {
 
             content.sort = sortIndex;
 
-            return MongoHelper.insertOne(
+            return DatabaseHelper.insertOne(
                 project,
                 collection,
                 content.getObject()
@@ -298,7 +298,7 @@ class ContentHelper extends ContentHelperCommon {
 
         let collection = environment + '.content';
         
-        return MongoHelper.removeOne(
+        return DatabaseHelper.removeOne(
             project,
             collection,
             {
@@ -308,7 +308,7 @@ class ContentHelper extends ContentHelperCommon {
         .then(() => {
             // Remove children if specified
             if(removeChildren) {
-                return MongoHelper.remove(
+                return DatabaseHelper.remove(
                     project,
                     collection,
                     {
@@ -318,7 +318,7 @@ class ContentHelper extends ContentHelperCommon {
 
             // If not removing children, we should unset their parent
             } else {
-                return MongoHelper.update(
+                return DatabaseHelper.update(
                     project,
                     collection,
                     {

@@ -1,6 +1,6 @@
 'use strict';
 
-const MongoHelper = require('Server/Helpers/MongoHelper');
+const DatabaseHelper = require('Server/Helpers/DatabaseHelper');
 const BackupHelper = require('Server/Helpers/BackupHelper');
 const UserHelper = require('Server/Helpers/UserHelper');
 const SyncHelper = require('Server/Helpers/SyncHelper');
@@ -20,7 +20,7 @@ class ProjectHelper {
      * @returns {Promise} Array of Project objects
      */
     static getAllProjects() {
-        return MongoHelper.listDatabases();
+        return DatabaseHelper.listDatabases();
     }
 
     /**
@@ -31,7 +31,7 @@ class ProjectHelper {
      * returns {Promise} Promise
      */
     static projectExists(project) {
-        return MongoHelper.databaseExists(project);
+        return DatabaseHelper.databaseExists(project);
     }
     
     /**
@@ -133,7 +133,7 @@ class ProjectHelper {
             }
 
             // If remote environments were not found, return local ones
-            return MongoHelper.find(project, 'settings', {})
+            return DatabaseHelper.find(project, 'settings', {})
             .then((allSettings) => {
                 let names = [];
 
@@ -149,8 +149,8 @@ class ProjectHelper {
                 }
 
                 // If we don't, make sure there is a "live" one
-                // NOTE: Using the MongoHelper directly here, since using the SettingsHelper would create a cyclic call stack
-                return MongoHelper.insertOne(
+                // NOTE: Using the DatabaseHelper directly here, since using the SettingsHelper would create a cyclic call stack
+                return DatabaseHelper.insertOne(
                     project,
                     'settings',
                     { usedBy: 'live' },
@@ -180,12 +180,12 @@ class ProjectHelper {
             if(makeBackup) {
                 return BackupHelper.createBackup(id)
                 .then(() => {
-                    return MongoHelper.dropDatabase(id);
+                    return DatabaseHelper.dropDatabase(id);
                 });
 
             // If not, just drop the database
             } else {
-                return MongoHelper.dropDatabase(id);
+                return DatabaseHelper.dropDatabase(id);
             }
         });
     }
@@ -251,7 +251,7 @@ class ProjectHelper {
 
         // Get all collections with the environment prefix
         .then(() => {
-            return MongoHelper.listCollections(project);
+            return DatabaseHelper.listCollections(project);
         })
 
         // Iterate through collections and match them with the environment name
@@ -267,7 +267,7 @@ class ProjectHelper {
 
                 // This collection matches the environment name, drop it
                 if(collection.name.indexOf(environment + '.') == 0) {
-                    return MongoHelper.dropCollection(project, collection.name)
+                    return DatabaseHelper.dropCollection(project, collection.name)
                     .then(() => {
                         return next();
                     });
@@ -282,7 +282,7 @@ class ProjectHelper {
         
         // Remove environment settings settings
         .then(() => {
-            return MongoHelper.remove(project, 'settings', { usedBy: environment });
+            return DatabaseHelper.remove(project, 'settings', { usedBy: environment });
         });
     }
     
@@ -314,7 +314,7 @@ class ProjectHelper {
                 return Promise.reject('A project by name "' + name + '" already exists');
             }
 
-            return MongoHelper.insertOne(project.id, 'settings', project.settings);
+            return DatabaseHelper.insertOne(project.id, 'settings', project.settings);
         })
         .then(() => {
             return Promise.resolve(project);

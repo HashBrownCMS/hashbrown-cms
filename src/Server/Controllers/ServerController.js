@@ -1,7 +1,7 @@
 'use strict';
 
 const BackupHelper = require('Server/Helpers/BackupHelper');
-const MongoHelper = require('Server/Helpers/MongoHelper');
+const DatabaseHelper = require('Server/Helpers/DatabaseHelper');
 const SettingsHelper = require('Server/Helpers/SettingsHelper');
 const UpdateHelper = require('Server/Helpers/UpdateHelper');
 const ProjectHelper = require('Server/Helpers/ProjectHelper');
@@ -59,7 +59,7 @@ class ServerController extends ApiController {
 
             debug.log('Getting "' + data[source] + '" ' + name + '...', ServerController);
         
-            return MongoHelper.find(project, data[source] + '.' + name, query)
+            return DatabaseHelper.find(project, data[source] + '.' + name, query)
             .then((result) => {
                 if(source === 'from') { 
                     from[name] = result;
@@ -88,7 +88,7 @@ class ServerController extends ApiController {
                 if(data.settings.replace) {
                     debug.log('Updating "' + (item.id || item) + '" into ' + resource + '...', ServerController);
                 
-                    mongoPromise = MongoHelper.updateOne(
+                    mongoPromise = DatabaseHelper.updateOne(
                         project,
                         data.to + '.' + resource,
                         { id: item.id },
@@ -98,7 +98,7 @@ class ServerController extends ApiController {
                 
                 // Don't overwrite, keep target resource
                 } else {
-                    mongoPromise = MongoHelper.count(
+                    mongoPromise = DatabaseHelper.count(
                         project,
                         data.to + '.' + resource,
                         { id: item.id }
@@ -107,7 +107,7 @@ class ServerController extends ApiController {
                         if(amount < 1) {
                             debug.log('Inserting "' + item.id + '" into ' + resource + '...', this);
                             
-                            return MongoHelper.insertOne(
+                            return DatabaseHelper.insertOne(
                                 project,
                                 data.to + '.' + resource,
                                 item

@@ -1,6 +1,6 @@
 'use strict';
 
-const MongoHelper = require('Server/Helpers/MongoHelper');
+const DatabaseHelper = require('Server/Helpers/DatabaseHelper');
 const SettingsHelperCommon = require('Common/Helpers/SettingsHelper');
 
 /**
@@ -32,7 +32,7 @@ class SettingsHelper extends SettingsHelperCommon {
         collection.push(newProjectSettings);
 
         // First check if project exists
-        return MongoHelper.databaseExists(project)
+        return DatabaseHelper.databaseExists(project)
         .then((doesExist) => {
             if(!doesExist) {
                 return Promise.reject(new Error('Project by id "' + project + '" not found'));
@@ -41,7 +41,7 @@ class SettingsHelper extends SettingsHelperCommon {
             debug.log('Getting project settings...', this, 3);
 
             // Then get project settings
-            return MongoHelper.find(
+            return DatabaseHelper.find(
                 project,
                 'settings',
                 {}
@@ -78,7 +78,7 @@ class SettingsHelper extends SettingsHelperCommon {
             
                 debug.log('Getting settings for environment "' + environment + '"...', this, 3);
 
-                return MongoHelper.find(
+                return DatabaseHelper.find(
                     project, 
                     environment + '.settings',
                     {}
@@ -114,7 +114,7 @@ class SettingsHelper extends SettingsHelperCommon {
                     
                     if(!commitChanges) { return Promise.resolve(); }
                     
-                    return MongoHelper.remove(
+                    return DatabaseHelper.remove(
                         project,
                         environment + '.settings',
                         {}
@@ -134,7 +134,7 @@ class SettingsHelper extends SettingsHelperCommon {
 
             if(!commitChanges) { return Promise.resolve(); }
 
-            return MongoHelper.remove(
+            return DatabaseHelper.remove(
                 project,
                 'settings',
                 {}
@@ -156,7 +156,7 @@ class SettingsHelper extends SettingsHelperCommon {
                     
                 if(!commitChanges) { return insertNextSetting(); }
 
-                return MongoHelper.insertOne(
+                return DatabaseHelper.insertOne(
                     project,
                     'settings',
                     setting
@@ -185,7 +185,7 @@ class SettingsHelper extends SettingsHelperCommon {
     static checkIfNeedsMigration(
         project = requiredParam('project')
     ) {
-        return MongoHelper.findOne(
+        return DatabaseHelper.findOne(
             project,
             'settings',
             { section: { $exists: true } }
@@ -251,7 +251,7 @@ class SettingsHelper extends SettingsHelperCommon {
 
         // If the requested section is "sync", always return the local setting
         if(section === 'sync') {
-            return MongoHelper.findOne(project, 'settings', { usedBy: 'project' })
+            return DatabaseHelper.findOne(project, 'settings', { usedBy: 'project' })
             .then((projectSettings) => {
                 if(!projectSettings) {
                     projectSettings = {};
@@ -278,7 +278,7 @@ class SettingsHelper extends SettingsHelperCommon {
                 query.usedBy = environment;
             }
 
-            return MongoHelper.findOne(project, 'settings', query);
+            return DatabaseHelper.findOne(project, 'settings', query);
         })
 
         // Return appropriate section or all settings
@@ -335,7 +335,7 @@ class SettingsHelper extends SettingsHelperCommon {
             if(section === 'sync') {
                 oldSettings.sync = settings;
 
-                return MongoHelper.updateOne(project, 'settings', { usedBy: 'project' }, oldSettings);
+                return DatabaseHelper.updateOne(project, 'settings', { usedBy: 'project' }, oldSettings);
             }
 
             // Set the remote setting, if applicable
@@ -372,7 +372,7 @@ class SettingsHelper extends SettingsHelperCommon {
                 }
                 
                 // Update the database
-                return MongoHelper.updateOne(
+                return DatabaseHelper.updateOne(
                     project,
                     'settings',
                     query,

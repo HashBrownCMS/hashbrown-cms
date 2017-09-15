@@ -6,7 +6,7 @@ const RimRaf = require('rimraf');
 const Multer = require('multer');
 
 const Media = require('Server/Models/Media');
-const MongoHelper = require('Server/Helpers/MongoHelper');
+const DatabaseHelper = require('Server/Helpers/DatabaseHelper');
 const SyncHelper = require('Server/Helpers/SyncHelper');
 
 const MediaHelperCommon = require('Common/Helpers/MediaHelper');
@@ -186,7 +186,7 @@ class MediaHelper extends MediaHelperCommon {
         return SyncHelper.getResource(project, environment, 'media/tree')
         .then((tree) => {
             if(!tree || tree.length < 1) {
-                return MongoHelper.find(project, environment + '.media', {});
+                return DatabaseHelper.find(project, environment + '.media', {});
             }
 
             return Promise.resolve(tree);   
@@ -235,7 +235,7 @@ class MediaHelper extends MediaHelperCommon {
 
             // Remove the item if it's null
             if(!item) {
-                return MongoHelper.removeOne(
+                return DatabaseHelper.removeOne(
                     project,
                     environment + '.media',
                     {
@@ -247,7 +247,7 @@ class MediaHelper extends MediaHelperCommon {
             } else {
                 item.id = id;
 
-                return MongoHelper.updateOne(
+                return DatabaseHelper.updateOne(
                     project,
                     environment + '.media',
                     {

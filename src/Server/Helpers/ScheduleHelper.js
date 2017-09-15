@@ -3,7 +3,7 @@
 const UserHelper = require('Server/Helpers/UserHelper');
 const ContentHelper = require('Server/Helpers/ContentHelper');
 const ConnectionHelper = require('Server/Helpers/ConnectionHelper');
-const MongoHelper = require('Server/Helpers/MongoHelper');
+const DatabaseHelper = require('Server/Helpers/DatabaseHelper');
 
 const Task = require('Server/Models/Task');
 
@@ -138,7 +138,7 @@ class ScheduleHelper {
             query.date = date;
         }
 
-        return MongoHelper.find(
+        return DatabaseHelper.find(
             'schedule',
             'tasks',
             query
@@ -194,7 +194,7 @@ class ScheduleHelper {
 
         debug.log('Updating ' + type + ' task for "' + contentId + '" to ' + date + '...', this, 2);
 
-        return MongoHelper.updateOne(
+        return DatabaseHelper.updateOne(
             'schedule',
             'tasks',
             query,
@@ -228,7 +228,7 @@ class ScheduleHelper {
             environment: environment
         };
         
-        return MongoHelper.findOne(
+        return DatabaseHelper.findOne(
             'schedule',
             'tasks',
             query
@@ -238,7 +238,7 @@ class ScheduleHelper {
            
             debug.log('Removing ' + type + ' task for "' + contentId + '"...', this, 2);
 
-            return MongoHelper.remove(
+            return DatabaseHelper.remove(
                 'schedule',
                 'tasks',
                 query

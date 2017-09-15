@@ -5,7 +5,7 @@ const FieldSchema = require('Server/Models/FieldSchema');
 const ContentSchema = require('Server/Models/ContentSchema');
 
 const SchemaHelperCommon = require('Common/Helpers/SchemaHelper');
-const MongoHelper = require('Server/Helpers/MongoHelper');
+const DatabaseHelper = require('Server/Helpers/DatabaseHelper');
 const SyncHelper = require('Server/Helpers/SyncHelper');
 
 const FileSystem = require('fs');
@@ -109,7 +109,7 @@ class SchemaHelper extends SchemaHelperCommon {
         let collection = environment + '.schemas';
         let result = [];
        
-        return MongoHelper.find(
+        return DatabaseHelper.find(
             project,
             collection,
             {}
@@ -231,7 +231,7 @@ class SchemaHelper extends SchemaHelperCommon {
 
         let promise = this.isNativeSchema(id) ?
             this.getNativeSchema(id) :
-            MongoHelper.findOne(
+            DatabaseHelper.findOne(
                 project,
                 collection
                 ,
@@ -352,7 +352,7 @@ class SchemaHelper extends SchemaHelperCommon {
 
         // Then remove the requested Schema
         .then(() => {
-            return MongoHelper.removeOne(
+            return DatabaseHelper.removeOne(
                 project,
                 collection,
                 {
@@ -393,7 +393,7 @@ class SchemaHelper extends SchemaHelperCommon {
             hasRemote: false
         };
 
-        return MongoHelper.updateOne(
+        return DatabaseHelper.updateOne(
             project,
             collection,
             {
@@ -425,7 +425,7 @@ class SchemaHelper extends SchemaHelperCommon {
         let collection = environment + '.schemas';
         let newSchema = Schema.create(parentSchema);
 
-        return MongoHelper.insertOne(
+        return DatabaseHelper.insertOne(
             project,
             collection,
             newSchema.getObject() 

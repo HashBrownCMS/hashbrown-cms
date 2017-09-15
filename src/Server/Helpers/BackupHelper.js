@@ -5,7 +5,7 @@ const Glob = require('glob');
 const Multer = require('multer');
 
 const MediaHelper = require('Server/Helpers/MediaHelper');
-const MongoHelper = require('Server/Helpers/MongoHelper');
+const DatabaseHelper = require('Server/Helpers/DatabaseHelper');
 
 const Connection = require('Common/Models/Connection');
 
@@ -114,7 +114,7 @@ class BackupHelper {
      * @returns {Promise} Promise
      */
     static restoreBackup(projectName, timestamp) {
-        return MongoHelper.restore(projectName, timestamp);
+        return DatabaseHelper.restore(projectName, timestamp);
     }
     
 
@@ -126,7 +126,7 @@ class BackupHelper {
      * @returns {Promise} Promise
      */
     static createBackup(projectName) {
-        return MongoHelper.dump(projectName);
+        return DatabaseHelper.dump(projectName);
     }
 
     /**

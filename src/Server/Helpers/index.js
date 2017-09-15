@@ -13,7 +13,7 @@ module.exports = {
     FormHelper: require('./FormHelper'),
     LanguageHelper: require('./LanguageHelper'),
     MediaHelper: require('./MediaHelper'),
-    MongoHelper: require('./MongoHelper'),
+    DatabaseHelper: require('./DatabaseHelper'),
     PluginHelper: require('./PluginHelper'),
     ProjectHelper: require('./ProjectHelper'),
     RequestHelper: require('./RequestHelper'),

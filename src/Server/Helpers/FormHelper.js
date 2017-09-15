@@ -1,6 +1,6 @@
 'use strict';
 
-const MongoHelper = require('Server/Helpers/MongoHelper');
+const DatabaseHelper = require('Server/Helpers/DatabaseHelper');
 const SyncHelper = require('Server/Helpers/SyncHelper');
 
 const Form = require('Common/Models/Form');
@@ -27,7 +27,7 @@ class FormHelper {
     ) {
         let collection = environment + '.forms';
     
-        return MongoHelper.findOne(
+        return DatabaseHelper.findOne(
             project,
             collection,
             {
@@ -62,7 +62,7 @@ class FormHelper {
     ) {
         let collection = environment + '.forms';
     
-        return MongoHelper.removeOne(
+        return DatabaseHelper.removeOne(
             project,
             collection,
             {
@@ -85,7 +85,7 @@ class FormHelper {
     ) {
         let collection = environment + '.forms';
         
-        return MongoHelper.find(
+        return DatabaseHelper.find(
             project,
             collection,
             {}
@@ -123,7 +123,7 @@ class FormHelper {
             hasRemote: false
         };
         
-        return MongoHelper.updateOne(
+        return DatabaseHelper.updateOne(
             project,
             collection,
             {
@@ -154,7 +154,7 @@ class FormHelper {
         let form = Form.create();
         let collection = environment + '.forms';
 
-        return MongoHelper.insertOne(
+        return DatabaseHelper.insertOne(
             project,
             collection,
             form.getObject()

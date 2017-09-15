@@ -2,7 +2,7 @@
 
 const ConnectionHelperCommon = require('Common/Helpers/ConnectionHelper');
 const ContentHelper = require('Server/Helpers/ContentHelper');
-const MongoHelper = require('Server/Helpers/MongoHelper');
+const DatabaseHelper = require('Server/Helpers/DatabaseHelper');
 const SyncHelper = require('Server/Helpers/SyncHelper');
 
 const Connection = require('Common/Models/Connection');
@@ -182,7 +182,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
     ) {
         let collection = environment + '.connections';
         
-        return MongoHelper.find(
+        return DatabaseHelper.find(
             project,
             collection,
             {}
@@ -214,7 +214,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
     ) {
         let collection = environment + '.connections';
        
-        return MongoHelper.findOne(
+        return DatabaseHelper.findOne(
             project,
             collection,
             {
@@ -248,7 +248,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
     ) {
         let collection = environment + '.connections';
         
-        return MongoHelper.removeOne(
+        return DatabaseHelper.removeOne(
             project,
             collection,
             {
@@ -283,7 +283,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
             hasRemote: false
         };
         
-        return MongoHelper.updateOne(
+        return DatabaseHelper.updateOne(
             project,
             environment + '.connections',
             {
@@ -312,7 +312,7 @@ class ConnectionHelper extends ConnectionHelperCommon {
     ) {
         let connection = Connection.create();
 
-        return MongoHelper.insertOne(
+        return DatabaseHelper.insertOne(
             project,
             environment + '.connections',
             connection.getObject()

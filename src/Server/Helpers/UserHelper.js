@@ -4,7 +4,7 @@ const NodeMailer = require('nodemailer');
 const Crypto = require('crypto');
 const XOAuth2 = require('xoauth2');
 
-const MongoHelper = require('Server/Helpers/MongoHelper');
+const DatabaseHelper = require('Server/Helpers/DatabaseHelper');
 const ConfigHelper = require('Server/Helpers/ConfigHelper');
 
 const User = require('Server/Models/User');
@@ -101,7 +101,7 @@ class UserHelper {
         
         return this.sendEmail(mailOptions)
         .then((msg) => { 
-            return MongoHelper.insertOne(
+            return DatabaseHelper.insertOne(
                 'users',
                 'users',
                 user.getObject()
@@ -121,7 +121,7 @@ class UserHelper {
      * @returns {Promise(User)} user
      */
     static findUser(username) {
-        return MongoHelper.findOne(
+        return DatabaseHelper.findOne(
             'users',
             'users',
             {
@@ -211,7 +211,7 @@ class UserHelper {
      * @returns {Promise} User
      */
     static findToken(token) {
-        return MongoHelper.find(
+        return DatabaseHelper.find(
             'users',
             'users',
             {}
@@ -239,7 +239,7 @@ class UserHelper {
      * @returns {Promise} User
      */
     static findInviteToken(inviteToken) {
-        return MongoHelper.findOne(
+        return DatabaseHelper.findOne(
             'users',
             'users',
             {
@@ -266,7 +266,7 @@ class UserHelper {
      * @returns {Promise} Promise
      */
     static removeUser(id) {
-        return MongoHelper.removeOne(
+        return DatabaseHelper.removeOne(
             'users',
             'users',
             {
@@ -301,7 +301,7 @@ class UserHelper {
                 });
             
             } else {
-                return MongoHelper.findOne('users', 'users', { id: id });
+                return DatabaseHelper.findOne('users', 'users', { id: id });
             }
         })
         .then((result) => {
@@ -311,7 +311,7 @@ class UserHelper {
 
             delete user.scopes[scope];
             
-            return MongoHelper.updateOne('users', 'users', { id: id }, user);
+            return DatabaseHelper.updateOne('users', 'users', { id: id }, user);
         });
     }
     
@@ -325,7 +325,7 @@ class UserHelper {
      * @returns {Promise} Promise
      */
     static addUserProjectScope(id, project, scopes) {
-        return MongoHelper.findOne('users', 'users', { id: id })
+        return DatabaseHelper.findOne('users', 'users', { id: id })
         .then((user) => {
             user.scopes  = user.scopes || {};
 
@@ -367,7 +367,7 @@ class UserHelper {
 
             newUser = user;
 
-            return MongoHelper.findOne(
+            return DatabaseHelper.findOne(
                 'users',
                 'users',
                 {
@@ -418,7 +418,7 @@ class UserHelper {
         user.isAdmin = admin || false;
         user.scopes = scopes || {};
 
-        return MongoHelper.findOne(
+        return DatabaseHelper.findOne(
             'users',
             'users',
             {
@@ -431,7 +431,7 @@ class UserHelper {
             if(!found) {
                 debug.log('Creating user "' + username + '"...', this);
                 
-                return MongoHelper.insertOne(
+                return DatabaseHelper.insertOne(
                     'users',
                     'users',
                     user.getObject()
@@ -496,7 +496,7 @@ class UserHelper {
             debug.log('Getting all users...', this, 3);
         }
 
-        return MongoHelper.find(
+        return DatabaseHelper.find(
             'users',
             'users',
             query,
@@ -530,7 +530,7 @@ class UserHelper {
 
         debug.log('Getting user "' + id + '"...', this, 3);
 
-        return MongoHelper.findOne(
+        return DatabaseHelper.findOne(
             'users',
             'users',
             {
@@ -555,7 +555,7 @@ class UserHelper {
 
         debug.log('Getting user "' + username + '"...', this, 3);
 
-        return MongoHelper.findOne(
+        return DatabaseHelper.findOne(
             'users',
             'users',
             {
@@ -603,7 +603,7 @@ class UserHelper {
             properties.password = User.createPasswordHashSalt(properties.password);
         }
         
-        return MongoHelper.mergeOne(
+        return DatabaseHelper.mergeOne(
             'users',
             'users',
             {
@@ -630,7 +630,7 @@ class UserHelper {
             properties.password = User.createPasswordHashSalt(properties.password);
         }
 
-        return MongoHelper.mergeOne(
+        return DatabaseHelper.mergeOne(
             'users',
             'users',
             {
