@@ -1,10 +1,8 @@
 'use strict';
 
-// Libraries
-require('crisp-ui');
+// Namespaces
 window._ = Crisp.Elements;
 
-// Namespaces
 window.HashBrown = {};
 
 HashBrown.Helpers = require('Client/Helpers');

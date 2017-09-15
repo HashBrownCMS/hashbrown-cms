@@ -6,10 +6,6 @@
 // Style
 require('Style/client');
 
-// Libraries
-require('crisp-ui');
-window._ = Crisp.Elements;
-
 // Get routes
 require('Client/Routes');
 
@@ -25,6 +21,8 @@ window.resources = {
 };
 
 // Namespaces
+window._ = Crisp.Elements;
+
 window.HashBrown = {};
 
 HashBrown.Models = require('Client/Models');
