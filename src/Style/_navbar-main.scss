@@ -5,11 +5,17 @@
         width: 100%;
         position: relative;
 
+        &.hide-tab-buttons {
+            .tab-buttons { 
+                display: none;
+            }
+        }
+
         .tab-panes, .tab-buttons {
             transition: opacity 0.5s, width 0.5s;
             overflow-x: hidden;
         }
-        
+       
         .tab-buttons {
             width: 160px;
             flex-shrink: 0;
@@ -166,7 +172,8 @@
                                         opacity: 1;
                                         font-weight: bold;
                                         color: $primary-text;
-                                        content: "MOVE HERE";
+                                        font-family: 'FontAwesome';
+                                        content: '\f060';
                                         display: block;
                                         white-space: nowrap;
                                     }

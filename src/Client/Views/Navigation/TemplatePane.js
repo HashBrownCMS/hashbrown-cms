@@ -210,7 +210,8 @@ class TemplatePane extends NavbarPane {
             // General context menu
             paneContextMenu: {
                 'Template': '---',
-                'Add template': () => { this.onClickAddTemplate(); }
+                'Add template': () => { this.onClickAddTemplate(); },
+                'Refresh': () => { this.onClickRefreshResource('templates'); }
             }
         });
     }

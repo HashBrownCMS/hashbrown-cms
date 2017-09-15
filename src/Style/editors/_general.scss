@@ -1,0 +1,229 @@
+.editor {
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+
+    &.locked {
+        .field-container {
+            pointer-events: none;
+            opacity: 0.75;
+            user-select: none;
+        }
+    }
+
+    .editor-header {
+        background-color: $secondary;
+        padding: 20px 0px 0px 20px;
+        color: $secondary-text;
+        height: 61px;
+        flex-shrink: 0;
+        flex-basis: 61px;
+
+        @include background('secondary');
+
+        >h4 {
+            margin: 0px;
+            display: inline-block;
+        }
+
+        >.fa {
+            margin-right: 10px;
+            font-size: 20px;
+            width: 20px;
+            display: inline-block;
+            position: relative;
+            top: 1px;
+        }
+    }
+
+    .editor-body {
+        padding: 15px;
+        flex-grow: 1;
+        overflow: auto;
+        position: relative;
+
+        .editor {
+            height: auto;
+        }
+    }
+
+    .editor-footer {
+        position: relative;
+        z-index: 10;
+        box-shadow: 0px -2px 5px 0px rgba(0, 0, 0, 0.2);
+        flex-shrink: 0;
+        padding: 15px;
+        margin: 0px;
+        border-width: 0px;
+        border-top-width: 1px;
+        border-radius: 0px;
+        background-color: $standard-dark;
+        border-top: 1px solid $standard-darker;
+        color: $standard-text;
+
+        .btn-group {
+            float: right;
+
+            .btn {
+                margin-right: 15px;
+
+                &:last-child {
+                    margin-right: 0px;
+                }
+
+                span {
+                    line-height: 20px;
+                
+                    &.fa {
+                        font-size: 18px;
+                    }
+                }
+            }
+        }
+    }
+
+    >.field-container {
+        .field-editor {
+            display: inline-block;
+            position: relative;
+        }
+    }
+
+    .field-container {
+        display: flex;
+        margin-bottom: 30px;
+     
+        &:last-child {
+            margin-bottom: 0px;
+        }
+
+        &.vertical {
+            display: block;
+        }
+
+        @media($sm) {
+            flex-direction: column;
+        }
+
+        div >.field-container {
+            &:last-child {
+                margin-bottom: 0px;
+            }
+        }
+
+        .field-icon {
+            width: 20px;
+            flex-shrink: 0;
+
+        }
+
+        &.following {
+            .field-key {
+                .field-key-content {
+                    position: fixed;
+                    top: 70px;
+                }
+            }
+        }
+
+        .field-key {
+            width: 140px;
+            line-height: 30px;
+            flex-shrink: 0;
+            
+            .fa {
+                line-height: 30px;
+                margin-right: 10px;
+            }
+        }
+
+        .field-editor {
+            >.field-warning {
+                margin: 0px;
+                line-height: 30px;
+                color: $warning-text;
+                background-color: $warning;
+                display: inline-block;
+                height: 30px;
+                padding: 0px 10px;
+                border-radius: 2px;
+
+                &:before {
+                    font-family: 'FontAwesome';
+                    content: '\f071';
+                    margin-right: 5px;
+                }
+            }
+        }
+
+        .field-value {
+            flex-grow: 1;
+            position: relative;
+     
+            input, select, option, textarea, p {
+                font-size: 14px;
+            }
+
+            select {
+                option {
+                    padding: 5px;
+                }
+            }
+
+            .field-preview {
+                position: absolute;
+                z-index: 50;
+                top: 0px;
+                left: 0px;
+                right: 0px;
+                bottom: 0px;
+                transition: opacity 0.5s ease;
+                background-color: $standard;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            
+                &.editing {
+                    pointer-events: none;
+                    opacity: 0;
+                }
+
+                .field-preview-toolbar {
+                    position: absolute;
+                    top: 0rem;
+                    right: 0rem;
+                    left: 0rem;
+                    padding: 1rem;
+                    text-align: right;
+                }
+            }
+
+            .date-editor {
+                height: 30px;
+                
+                p {
+                    line-height: 30px;
+                    margin: 0px;
+                }
+            }
+
+            .period-editor {
+                .input-group {
+                    width: 300px;
+                
+                    input {
+                        text-align: center;
+                    }
+                }
+
+                .arrow-middle {
+                    padding: 5px;
+
+                    span {
+                        line-height: 20px;
+                    }
+                }
+            }
+        }
+    }
+}

@@ -2,7 +2,7 @@
 
 const NavbarPane = require('./NavbarPane');
 const NavbarMain = require('./NavbarMain');
-const MediaBrowser = require('Client/Views/Modals/MediaBrowser');
+const MediaUploader = require('Client/Views/Modals/MediaUploader');
 const ProjectHelper = require('Client/Helpers/ProjectHelper');
 const MediaHelper = require('Client/Helpers/MediaHelper');
 const RequestHelper = require('Client/Helpers/RequestHelper');
@@ -96,8 +96,10 @@ class MediaPane extends NavbarPane {
      * Event: Click upload media
      */
     static onClickUploadMedia(replaceId) {
-        MediaBrowser.uploadModal(
-            (ids) => {
+        let folder = $('.cr-context-menu__target-element').data('media-folder') || '/';
+
+        new MediaUploader({
+            onSuccess: (ids) => {
                 // We got one id back
                 if(typeof ids === 'string') {
                     location.hash = '/media/' + ids;
@@ -115,9 +117,9 @@ class MediaPane extends NavbarPane {
                     $('.media-preview img').attr('src', src + '?date=' + Date.now());
                 }
             },
-            () => {},
-            replaceId
-        );
+            replaceId: replaceId,
+            folder: folder
+        });
     }
     
     /**
@@ -155,14 +157,14 @@ class MediaPane extends NavbarPane {
             // Dir context menu
             dirContextMenu: {
                 'Directory': '---',
-                'Upload new media': () => { this.onClickUploadMedia(); },
-                'Remove': () => { this.onClickRemoveMediaDirectory(); }
+                'Upload new media': () => { this.onClickUploadMedia(); }
             },
 
             // General context menu
             paneContextMenu: {
                 'General': '---',
-                'Upload new media': () => { this.onClickUploadMedia(); }
+                'Upload new media': () => { this.onClickUploadMedia(); },
+                'Refresh': () => { this.onClickRefreshResource('media'); }
             }
         });
     }

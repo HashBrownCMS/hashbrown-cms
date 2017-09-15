@@ -66,7 +66,16 @@ class NavbarMain extends Crisp.View {
 
         e.currentTarget.parentElement.parentElement.classList.toggle('open');
     }
- 
+
+    /**
+     * Toggles the tab buttons
+     *
+     * @param {Boolean} isActive
+     */
+    toggleTabButtons(isActive) {
+        this.$element.toggleClass('hide-tab-buttons', !isActive);
+    }
+
     /**
      * Shows a tab
      *

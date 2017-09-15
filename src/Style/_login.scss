@@ -1,0 +1,54 @@
+.login-container {
+    background-color: $secondary;
+    height: 100%;
+
+    @include background('secondary');
+
+    .message {
+        position: absolute;
+        top: 4rem;
+        margin: 0px auto;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: $warning;
+        font-weight: 700;
+    }
+
+    .login {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        width: 374px;
+        transform: translate(-50%, -50%);
+        padding: 40px;
+        color: $secondary-text;
+        background-color: transparent;
+        text-align: center;
+
+        .login-heading {
+            margin-bottom: 2rem;
+
+            h2 {
+                margin-top: 0px;
+            }
+        }
+
+        input {
+            &.form-control, &.btn {
+                font-size: 16px;
+                height: 44px;
+                display: block;
+                width: 100%;
+            }
+
+            &.form-control {
+                text-align: center;
+                background-color: $secondary-text;
+                line-height: 44px;
+                margin-bottom: 10px;
+                border: 0px;
+                padding: 0px 8px;
+            }
+        }
+    }
+}

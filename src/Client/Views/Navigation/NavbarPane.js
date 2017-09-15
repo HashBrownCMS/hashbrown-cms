@@ -23,6 +23,18 @@ class Pane {
     }
 
     /**
+     * Event: Click refresh resource
+     *
+     * @param {String} resource
+     */
+    static onClickRefreshResource(resource) {
+        HashBrown.Helpers.RequestHelper.reloadResource(resource)
+        .then(() => {
+            HashBrown.Views.Navigation.NavbarMain.reload();
+        });
+    }
+
+    /**
      * Event: Change directory
      *
      * @param {String} id

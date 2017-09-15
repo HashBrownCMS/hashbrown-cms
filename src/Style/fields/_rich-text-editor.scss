@@ -20,7 +20,25 @@
         padding: 0px !important;
     }   
 
+    .tab-pane {
+        position: relative;
+        min-height: 462px;
+
+        &::before {
+            content: 'LOADING...';
+            position: absolute;
+            display: block;
+            width: 100%;
+            line-height: 2rem;
+            top: 50%;
+            margin-top: -1rem;
+            text-align: center;
+        }
+    }
+
     .CodeMirror {
+        min-height: 462px;
+
         p, pre, span, .cke_editable {
             font-size: 14px;
         }

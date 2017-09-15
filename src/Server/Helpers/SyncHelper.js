@@ -302,19 +302,20 @@ class SyncHelper {
                     }
                 }
 
-                // Make sure remote and local resources are arrays
-                if(remoteResource instanceof Object) {
+                // Make sure remote resource is array
+                if(remoteResource instanceof Object && remoteResource instanceof Array === false) {
                     remoteResource = Object.values(remoteResource);   
                 }
-                    
-                if(localResource instanceof Object) {
-                    localResource = Object.values(localResource);   
-                }
-
+                
                 if(remoteResource instanceof Array === false) {
                     return Promise.reject(new Error('The remote resource "' + remoteResourceName + '" was not an array'));
                 }
                 
+                // Make sure local resource is array
+                if(localResource instanceof Object && remoteResource instanceof Array === false) {
+                    localResource = Object.values(localResource);   
+                }
+
                 if(localResource instanceof Array === false) {
                     return Promise.reject(new Error('The local resource "' + remoteResourceName + '" was not an array'));
                 }

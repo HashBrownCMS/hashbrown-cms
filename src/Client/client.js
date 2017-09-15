@@ -49,6 +49,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const LanguageHelper = HashBrown.Helpers.LanguageHelper;
     const ProjectHelper = HashBrown.Helpers.ProjectHelper;
 
+    $('.cms-container').addClass('faded');
+
     // Start debug socket
     debug.startSocket();
 
@@ -92,7 +94,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 cancel
             );
         };
-
 
         $('.cms-container').removeClass('faded');
 

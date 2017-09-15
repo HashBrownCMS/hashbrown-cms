@@ -414,9 +414,10 @@ class ContentEditor extends Crisp.View {
 
         let remoteUrl;
         let connectionId = this.model.getSettings('publishing').connectionId;
+        let connection;
 
         if(connectionId) {
-            let connection = ConnectionHelper.getConnectionByIdSync(connectionId);
+            connection = ConnectionHelper.getConnectionByIdSync(connectionId);
 
             if(connection && connection.url) {
                 remoteUrl = connection.url + url;
@@ -442,12 +443,15 @@ class ContentEditor extends Crisp.View {
                             _.span({class: 'text-default'}, 'Save'),
                             _.span({class: 'text-working'}, 'Saving')
                         ).click(() => { this.onClickSave(); }),
-                        _.if(connectionId,
+                        _.if(connection,
                             _.span('&'),
                             _.select({class: 'form-control select-publishing'},
                                 _.option({value: 'publish'}, 'Publish'),
                                 _.option({value: 'preview'}, 'Preview'),
-                                _.option({value: 'unpublish'}, 'Unpublish')
+                                _.if(this.model.isPublished, 
+                                    _.option({value: 'unpublish'}, 'Unpublish')
+                                ),
+                                _.option({value: ''}, '(No action)')
                             ).val('publish')
                         )
                     )

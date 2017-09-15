@@ -1,0 +1,43 @@
+.thumbnail {
+    background-position: center;
+    background-size: cover;
+    border: 0px;
+    outline: 5px solid transparent;
+    border-radius: 0px;
+    position: relative;
+    width: 200px;
+    height: 200px;
+    background-color: material-color('grey', '300');
+    position: relative;
+
+    &:before {
+        content: '\f1c5';
+        transform: translate(-50%, -50%);
+        display: block;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        font-family: 'FontAwesome';
+        font-size: 60px;
+        color: material-color('grey', '500');
+    }
+
+    label {
+        opacity: 0.75;
+        min-height: 41.5px;
+        pointer-events: none;
+        position: absolute;
+        left: 0px;
+        bottom: 0px;
+        right: 0px;
+        background-color: #fff;
+        color: material-color('grey', '800');
+        margin: 0px;
+        padding: 1em 0.8em;
+    }
+
+    &.active {
+        outline: 5px solid $primary !important;
+        z-index: 2;
+    }
+}
