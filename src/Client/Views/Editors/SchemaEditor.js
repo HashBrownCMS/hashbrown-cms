@@ -397,12 +397,12 @@ class SchemaEditor extends Crisp.View {
     renderDefaultTabEditor() {
         if(this.model.isPropertyHidden('defaultTabId')) { return; }  
         
+        // Sanity check
+        this.model.defaultTabId = this.model.defaultTabId || this.compiledSchema.defaultTabId || 'meta';
+
         let tabOptions = [
             { value: 'meta', label: 'Meta' }
         ];
-
-        // Sanity check
-        this.model.defaultTabId = this.model.defaultTabId || this.compiledSchema.defaultTabId || 'meta';
 
         for(let value in this.compiledSchema.tabs) {
             tabOptions[tabOptions.length] = { value: value, label: this.compiledSchema.tabs[value] };
@@ -545,6 +545,10 @@ class SchemaEditor extends Crisp.View {
      * @returns {HTMLElement} Editor element
      */
     renderFieldPropertiesEditor() {
+        let model;
+        let $editor = _.div({class: 'field-properties-editor'});
+
+        // Set model to Content fields
         if(this.model.type == 'content') {
             if(!this.model.fields) {
                 this.model.fields = {};
@@ -554,35 +558,101 @@ class SchemaEditor extends Crisp.View {
                 this.model.fields.properties = {};
             }
         
-            this.jsonEditor = new JSONEditor({
-                model: this.model.fields.properties,
-                embedded: true
-            });
-
-            this.jsonEditor.on('change', (newValue) => {
-                this.model.fields.properties = newValue;
-            });
+            model = this.model.fields.properties;
         
+        // Set model to field config
         } else if(this.model.type == 'field') {
             if(!this.model.config) {
                 this.model.config = {};
             }
             
-            this.jsonEditor = new JSONEditor({
-                model: this.model.config,
-                embedded: true
-            });
-
-            this.jsonEditor.on('change', (newValue) => {
-                this.model.config = newValue;
-            });
+            model = this.model.config;
         }
 
-        let $element = _.div({class: 'field-properties-editor'},
-            this.jsonEditor.$element
-        );
+        // Render editor
+        let render = () => {
+            _.append($editor.empty(),
+                _.each(model, (key, value) => {
+                    let $field = _.div({class: 'field-properties'});
 
-        return $element;
+                    let render = () => {
+                        _.append($field.empty(), 
+                            _.div({class: 'field-container'},
+                                _.div({class: 'field-key'}, 'Key'),
+                                _.div({class: 'field-value'},
+                                    _.input({class: 'form-control', type: 'text', value: key, placeholder: 'A variable name, like "newField"', title: 'This is the variable name for the field'})
+                                        .change((e) => {
+                                            delete model[key];
+
+                                            key = e.currentTarget.value;
+
+                                            model[key] = value;
+                                        })
+                                )
+                            ),
+                            _.div({class: 'field-container'},
+                                _.div({class: 'field-key'}, 'Label'),
+                                _.div({class: 'field-value'},
+                                    _.input({class: 'form-control', type: 'text', value: value.label, placeholder: 'A label, like "New field"',  title: 'This is the label that will be visible in the Content editor'})
+                                        .change((e) => {
+                                            value.label = e.currentTarget.value;  
+                                        })
+                                )
+                            ),
+                            _.div({class: 'field-container'},
+                                _.div({class: 'field-key'}, 'Schema'),
+                                _.div({class: 'field-value'},
+                                    UI.inputDropdown(value.schemaId, resources.schemas, (newSchemaId) => {
+                                        value.schemaId = newSchemaId;
+
+                                        render();
+                                    })
+                                )
+                            ),
+                            _.if(this.model.type === 'content',
+                                _.div({class: 'field-container'},
+                                    _.div({class: 'field-key'}, 'Tab'),
+                                    _.div({class: 'field-value'},
+                                        UI.inputDropdown(value.tabId, this.compiledSchema.tabs, (newTabId) => {
+                                            value.tabId = newTabId;
+                                        }, true)
+                                    )
+                                )
+                            ),
+                            _.do(() => {
+                                let schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(value.schemaId);
+
+                                if(!schema) { return; }
+
+                                let editor = HashBrown.Views.Editors.FieldEditors[schema.editorId];
+
+                                if(!editor) { return; }
+
+                                return editor.renderConfigEditor(value.config);
+                            })
+                        )
+                    };
+
+                    render();                
+
+                    return $field;
+                }),
+                _.button({class: 'btn btn-primary btn-raised btn-add-item btn-round'},
+                    _.span({class: 'fa fa-plus'})
+                ).click(() => {
+                    model.newField = {
+                        label: 'New field',
+                        schemaId: 'string'
+                    };
+
+                    render();
+                })
+            );
+        };
+
+        render();
+
+        return $editor;
     }
 
 	/**

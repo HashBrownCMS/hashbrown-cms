@@ -92,7 +92,7 @@ class UIHelper {
                                                 ).click(function(e) {
                                                     e.preventDefault();
                                                         
-                                                    items[itemIndex] = dropdownItem;
+                                                    items[itemIndex] = dropdownItem.value || dropdownItem;
 
                                                     render();
                                 
@@ -157,12 +157,12 @@ class UIHelper {
                                     }
 
                                     if(!isSelected) {
-                                        items.push(dropdownItem);
+                                        items.push(dropdownItem.value || dropdownItem);
                                         break;
                                     }
                                 }
                             } else {
-                                items.push(dropdownItems[0]);
+                                items.push(dropdownItems[0].value || dropdownItems[0]);
                             }
                         
                         } else if(typeof dropdownItems === 'string') {

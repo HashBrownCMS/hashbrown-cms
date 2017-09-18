@@ -1056,6 +1056,14 @@ body.dashboard-container {
     padding: 15px; }
     .schema-editor > .schema .json-editor {
       min-height: 400px; }
+    .schema-editor > .schema .field-properties {
+      margin-left: 2rem;
+      padding-bottom: 2rem;
+      border-bottom: 0.1rem solid #999999;
+      margin-top: 2rem; }
+    .schema-editor > .schema .btn-add-item {
+      margin: 2rem 0 0 auto;
+      display: block; }
     .schema-editor > .schema .field-value .read-only {
       line-height: 30px;
       margin: 0px; }

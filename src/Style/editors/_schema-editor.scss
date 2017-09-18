@@ -16,6 +16,18 @@
             min-height: 400px;
         }
 
+        .field-properties {
+            margin-left: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 0.1rem solid $standard-darker;
+            margin-top: 2rem;
+        }
+
+        .btn-add-item {
+            margin: 2rem 0 0 auto;
+            display: block;
+        }
+
         .field-value {
             .read-only {
                 line-height: 30px;
