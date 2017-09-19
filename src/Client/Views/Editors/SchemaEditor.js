@@ -603,16 +603,6 @@ class SchemaEditor extends Crisp.View {
                                         })
                                 )
                             ),
-                            _.div({class: 'field-container'},
-                                _.div({class: 'field-key'}, 'Schema'),
-                                _.div({class: 'field-value'},
-                                    UI.inputDropdown(value.schemaId, fieldSchemas, (newSchemaId) => {
-                                        value.schemaId = newSchemaId;
-
-                                        render();
-                                    })
-                                )
-                            ),
                             _.if(this.model.type === 'content',
                                 _.div({class: 'field-container'},
                                     _.div({class: 'field-key'}, 'Tab'),
@@ -621,6 +611,16 @@ class SchemaEditor extends Crisp.View {
                                             value.tabId = newTabId;
                                         }, true)
                                     )
+                                )
+                            ),
+                            _.div({class: 'field-container'},
+                                _.div({class: 'field-key'}, 'Schema'),
+                                _.div({class: 'field-value'},
+                                    UI.inputDropdown(value.schemaId, fieldSchemas, (newSchemaId) => {
+                                        value.schemaId = newSchemaId;
+
+                                        render();
+                                    })
                                 )
                             ),
                             _.do(() => {

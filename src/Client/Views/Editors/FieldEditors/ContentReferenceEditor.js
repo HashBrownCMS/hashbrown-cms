@@ -65,6 +65,31 @@ class ContentReferenceEditor extends FieldEditor {
         return allowedContent;
     }
 
+    /**
+     * Renders the config editor
+     *
+     * @param {Object} config
+     *
+     * @returns {HTMLElement} Element
+     */
+    static renderConfigEditor(config) {
+        config.allowedSchemas = config.allowedSchemas || [];
+        
+        let schemaOptions = HashBrown.Helpers.SchemaHelper.getAllSchemasSync('field');
+        
+        return _.div({class: 'field-container'},
+            _.div({class: 'field-key'}, 'Allowed Schemas'),
+            _.div({class: 'field-value'},
+                UI.inputChipGroup(config.allowedSchemas, schemaOptions, (newValue) => {
+                    config.allowedSchemas = newValue;
+                }, true)
+            )
+        );
+    }
+
+    /**
+     * Render this editor
+     */
     render() {
         // Render main element
         this.$element = _.div({class: 'field-editor content-reference-editor'}, [

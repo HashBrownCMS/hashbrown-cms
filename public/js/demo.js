@@ -60,12 +60,12 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 269);
+/******/ 	return __webpack_require__(__webpack_require__.s = 268);
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ 269:
+/***/ 268:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -423,25 +423,25 @@ var DemoApi = function () {
 
             case 'schemas':
                 var schemas = {
-                    'contentBase': __webpack_require__(270),
-                    'page': __webpack_require__(271),
-                    'array': __webpack_require__(272),
-                    'boolean': __webpack_require__(273),
-                    'contentReference': __webpack_require__(274),
-                    'contentSchemaReference': __webpack_require__(275),
-                    'date': __webpack_require__(276),
-                    'dropdown': __webpack_require__(277),
-                    'fieldBase': __webpack_require__(278),
-                    'language': __webpack_require__(279),
-                    'mediaReference': __webpack_require__(280),
-                    'number': __webpack_require__(281),
-                    'resourceReference': __webpack_require__(282),
-                    'richText': __webpack_require__(283),
-                    'string': __webpack_require__(284),
-                    'struct': __webpack_require__(285),
-                    'tags': __webpack_require__(286),
-                    'templateReference': __webpack_require__(287),
-                    'url': __webpack_require__(288)
+                    'contentBase': __webpack_require__(269),
+                    'page': __webpack_require__(270),
+                    'array': __webpack_require__(271),
+                    'boolean': __webpack_require__(272),
+                    'contentReference': __webpack_require__(273),
+                    'contentSchemaReference': __webpack_require__(274),
+                    'date': __webpack_require__(275),
+                    'dropdown': __webpack_require__(276),
+                    'fieldBase': __webpack_require__(277),
+                    'language': __webpack_require__(278),
+                    'mediaReference': __webpack_require__(279),
+                    'number': __webpack_require__(280),
+                    'resourceReference': __webpack_require__(281),
+                    'richText': __webpack_require__(282),
+                    'string': __webpack_require__(283),
+                    'struct': __webpack_require__(284),
+                    'tags': __webpack_require__(285),
+                    'templateReference': __webpack_require__(286),
+                    'url': __webpack_require__(287)
                 };
 
                 var result = [];
@@ -727,136 +727,315 @@ HashBrown.Helpers.RequestHelper.reloadResource = function reloadResource(name) {
 
 /***/ }),
 
+/***/ 269:
+/***/ (function(module, exports) {
+
+module.exports = {
+	"defaultTabId": "meta",
+	"icon": "cogs",
+	"name": "Content Base",
+	"fields": {
+		"createDate": {
+			"disabled": "true",
+			"label": "Created at",
+			"schemaId": "date"
+		},
+		"updateDate": {
+			"disabled": "true",
+			"label": "Updated at",
+			"schemaId": "date"
+		},
+		"createdBy": {
+			"disabled": "true",
+			"label": "Created by",
+			"schemaId": "resourceReference",
+			"config": {
+				"resource": "users",
+				"resourceKeys": [
+					"fullName",
+					"username"
+				]
+			}
+		},
+		"updatedBy": {
+			"disabled": "true",
+			"label": "Updated by",
+			"schemaId": "resourceReference",
+			"config": {
+				"resource": "users",
+				"resourceKeys": [
+					"fullName",
+					"username"
+				]
+			}
+		},
+		"publishOn": {
+			"label": "Publish on",
+			"schemaId": "date"
+		},
+		"unpublishOn": {
+			"label": "Unpublish on",
+			"schemaId": "date"
+		},
+		"schemaId": {
+			"label": "Schema",
+			"schemaId": "contentSchemaReference",
+			"config": {
+				"allowedSchemas": "fromParent"
+			}
+		},
+		"properties": {
+			"title": {
+				"label": "Title",
+				"schemaId": "string"
+			}
+		}
+	}
+};
+
+/***/ }),
+
 /***/ 270:
 /***/ (function(module, exports) {
 
-module.exports = {"defaultTabId":"meta","icon":"cogs","name":"Content Base","fields":{"createDate":{"disabled":"true","label":"Created at","schemaId":"date"},"updateDate":{"disabled":"true","label":"Updated at","schemaId":"date"},"createdBy":{"disabled":"true","label":"Created by","schemaId":"resourceReference","config":{"resource":"users","resourceKeys":["fullName","username"]}},"updatedBy":{"disabled":"true","label":"Updated by","schemaId":"resourceReference","config":{"resource":"users","resourceKeys":["fullName","username"]}},"publishOn":{"label":"Publish on","schemaId":"date"},"unpublishOn":{"label":"Unpublish on","schemaId":"date"},"schemaId":{"label":"Schema","schemaId":"contentSchemaReference","config":{"allowedSchemas":"fromParent"}},"properties":{"title":{"label":"Title","schemaId":"string"}}}}
+module.exports = {
+	"icon": "file",
+	"name": "Page",
+	"parentSchemaId": "contentBase",
+	"tabs": {
+		"content": "Content"
+	},
+	"defaultTabId": "content",
+	"fields": {
+		"properties": {
+			"title": {
+				"label": "Title",
+				"schemaId": "string",
+				"tabId": "content"
+			},
+			"description": {
+				"label": "Description",
+				"schemaId": "string",
+				"tabId": "content"
+			},
+			"template": {
+				"label": "Template",
+				"schemaId": "templateReference",
+				"tabId": "content",
+				"config": {
+					"allowedTemplates": []
+				}
+			},
+			"url": {
+				"label": "URL",
+				"schemaId": "url",
+				"tabId": "content"
+			}
+		}
+	}
+};
 
 /***/ }),
 
 /***/ 271:
 /***/ (function(module, exports) {
 
-module.exports = {"icon":"file","name":"Page","parentSchemaId":"contentBase","tabs":{"content":"Content"},"defaultTabId":"content","fields":{"properties":{"title":{"label":"Title","schemaId":"string","tabId":"content"},"description":{"label":"Description","schemaId":"string","tabId":"content"},"template":{"label":"Template","schemaId":"templateReference","tabId":"content","config":{"allowedTemplates":[]}},"url":{"label":"URL","schemaId":"url","tabId":"content"}}}}
+module.exports = {
+	"parentSchemaId": "fieldBase",
+	"editorId": "ArrayEditor",
+	"icon": "list-ol",
+	"name": "Array"
+};
 
 /***/ }),
 
 /***/ 272:
 /***/ (function(module, exports) {
 
-module.exports = {"parentSchemaId":"fieldBase","editorId":"ArrayEditor","icon":"list-ol","name":"Array"}
+module.exports = {
+	"parentSchemaId": "fieldBase",
+	"editorId": "BooleanEditor",
+	"icon": "toggle-on",
+	"name": "Boolean"
+};
 
 /***/ }),
 
 /***/ 273:
 /***/ (function(module, exports) {
 
-module.exports = {"parentSchemaId":"fieldBase","editorId":"BooleanEditor","icon":"toggle-on","name":"Boolean"}
+module.exports = {
+	"parentSchemaId": "fieldBase",
+	"editorId": "ContentReferenceEditor",
+	"icon": "file",
+	"name": "Content Reference"
+};
 
 /***/ }),
 
 /***/ 274:
 /***/ (function(module, exports) {
 
-module.exports = {"parentSchemaId":"fieldBase","editorId":"ContentReferenceEditor","icon":"file","name":"Content Reference"}
+module.exports = {
+	"parentSchemaId": "fieldBase",
+	"editorId": "ContentSchemaReferenceEditor",
+	"icon": "gears",
+	"name": "Content Schema Reference"
+};
 
 /***/ }),
 
 /***/ 275:
 /***/ (function(module, exports) {
 
-module.exports = {"parentSchemaId":"fieldBase","editorId":"ContentSchemaReferenceEditor","icon":"gears","name":"Content Schema Reference"}
+module.exports = {
+	"parentSchemaId": "fieldBase",
+	"editorId": "DateEditor",
+	"icon": "calendar",
+	"name": "Date"
+};
 
 /***/ }),
 
 /***/ 276:
 /***/ (function(module, exports) {
 
-module.exports = {"parentSchemaId":"fieldBase","editorId":"DateEditor","icon":"calendar","name":"Date"}
+module.exports = {
+	"parentSchemaId": "fieldBase",
+	"editorId": "DropdownEditor",
+	"icon": "list-alt",
+	"name": "Dropdown"
+};
 
 /***/ }),
 
 /***/ 277:
 /***/ (function(module, exports) {
 
-module.exports = {"parentSchemaId":"fieldBase","editorId":"DropdownEditor","icon":"list-alt","name":"Dropdown"}
+module.exports = {
+	"name": "Field Base",
+	"icon": "cogs"
+};
 
 /***/ }),
 
 /***/ 278:
 /***/ (function(module, exports) {
 
-module.exports = {"name":"Field Base","icon":"cogs"}
+module.exports = {
+	"parentSchemaId": "fieldBase",
+	"editorId": "LanguageEditor",
+	"icon": "globe",
+	"name": "Language"
+};
 
 /***/ }),
 
 /***/ 279:
 /***/ (function(module, exports) {
 
-module.exports = {"parentSchemaId":"fieldBase","editorId":"LanguageEditor","icon":"globe","name":"Language"}
+module.exports = {
+	"parentSchemaId": "fieldBase",
+	"editorId": "MediaReferenceEditor",
+	"icon": "file-image-o",
+	"name": "Media Reference"
+};
 
 /***/ }),
 
 /***/ 280:
 /***/ (function(module, exports) {
 
-module.exports = {"parentSchemaId":"fieldBase","editorId":"MediaReferenceEditor","icon":"file-image-o","name":"Media Reference"}
+module.exports = {
+	"parentSchemaId": "fieldBase",
+	"editorId": "NumberEditor",
+	"icon": "sort-numeric-asc",
+	"name": "Number"
+};
 
 /***/ }),
 
 /***/ 281:
 /***/ (function(module, exports) {
 
-module.exports = {"parentSchemaId":"fieldBase","editorId":"NumberEditor","icon":"sort-numeric-asc","name":"Number"}
+module.exports = {
+	"parentSchemaId": "fieldBase",
+	"editorId": "ResourceReferenceEditor",
+	"icon": "book",
+	"name": "Resource Reference"
+};
 
 /***/ }),
 
 /***/ 282:
 /***/ (function(module, exports) {
 
-module.exports = {"parentSchemaId":"fieldBase","editorId":"ResourceReferenceEditor","icon":"book","name":"Resource Reference"}
+module.exports = {
+	"parentSchemaId": "fieldBase",
+	"editorId": "RichTextEditor",
+	"icon": "font",
+	"name": "Rich Text"
+};
 
 /***/ }),
 
 /***/ 283:
 /***/ (function(module, exports) {
 
-module.exports = {"parentSchemaId":"fieldBase","editorId":"RichTextEditor","icon":"font","name":"Rich Text"}
+module.exports = {
+	"parentSchemaId": "fieldBase",
+	"editorId": "StringEditor",
+	"icon": "font",
+	"name": "String"
+};
 
 /***/ }),
 
 /***/ 284:
 /***/ (function(module, exports) {
 
-module.exports = {"parentSchemaId":"fieldBase","editorId":"StringEditor","icon":"font","name":"String"}
+module.exports = {
+	"parentSchemaId": "fieldBase",
+	"editorId": "StructEditor",
+	"icon": "cubes",
+	"name": "Struct"
+};
 
 /***/ }),
 
 /***/ 285:
 /***/ (function(module, exports) {
 
-module.exports = {"parentSchemaId":"fieldBase","editorId":"StructEditor","icon":"cubes","name":"Struct"}
+module.exports = {
+	"parentSchemaId": "fieldBase",
+	"editorId": "TagsEditor",
+	"icon": "tag",
+	"name": "Tags"
+};
 
 /***/ }),
 
 /***/ 286:
 /***/ (function(module, exports) {
 
-module.exports = {"parentSchemaId":"fieldBase","editorId":"TagsEditor","icon":"tag","name":"Tags"}
+module.exports = {
+	"parentSchemaId": "fieldBase",
+	"editorId": "TemplateReferenceEditor",
+	"icon": "code",
+	"name": "Template Reference"
+};
 
 /***/ }),
 
 /***/ 287:
 /***/ (function(module, exports) {
 
-module.exports = {"parentSchemaId":"fieldBase","editorId":"TemplateReferenceEditor","icon":"code","name":"Template Reference"}
-
-/***/ }),
-
-/***/ 288:
-/***/ (function(module, exports) {
-
-module.exports = {"parentSchemaId":"fieldBase","editorId":"UrlEditor","icon":"link","name":"Url"}
+module.exports = {
+	"parentSchemaId": "fieldBase",
+	"editorId": "UrlEditor",
+	"icon": "link",
+	"name": "Url"
+};
 
 /***/ })
 
