@@ -202,16 +202,7 @@ class ArrayEditor extends FieldEditor {
     static renderConfigEditor(config) {
         config.allowedSchemas = config.allowedSchemas || [];
 
-        let schemaOptions = [];
-
-        for(let schema of resources.schemas) {
-            if(schema instanceof HashBrown.Models.ContentSchema) { continue; }
-
-            schemaOptions.push({
-                label: schema.name,
-                value: schema.id
-            });
-        }
+        let schemaOptions = HashBrown.Helpers.SchemaHelper.getAllSchemasSync('field');
 
         return _.div({class: 'field-container'},
             _.div({class: 'field-key'}, 'Allowed Schemas'),

@@ -69,7 +69,24 @@ class SchemaHelper extends SchemaHelperCommon {
             return Promise.resolve(this.getModel(schema));
         });
     }
-    
+   
+    /**
+     * Gets all Schemas by type (sync)
+     *
+     * @param {String} type
+     *
+     * @returns {Array} All Schemas
+     */
+    static getAllSchemasSync(type) {
+        if(!type) { return resources.schemas; }
+
+        return resources.schemas.filter((schema) => {
+            if(schema.id == type + 'Base') { return false; }
+
+            return schema.type === type;
+        });
+    }
+
     /**
      * Gets a Schema by id (sync)
      *

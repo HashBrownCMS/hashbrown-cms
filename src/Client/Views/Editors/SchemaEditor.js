@@ -547,6 +547,7 @@ class SchemaEditor extends Crisp.View {
     renderFieldPropertiesEditor() {
         let model;
         let $editor = _.div({class: 'field-properties-editor'});
+        let fieldSchemas = HashBrown.Helpers.SchemaHelper.getAllSchemasSync('field');
 
         // Set model to Content fields
         if(this.model.type == 'content') {
@@ -573,12 +574,15 @@ class SchemaEditor extends Crisp.View {
         let render = () => {
             _.append($editor.empty(),
                 _.each(model, (key, value) => {
+                    // Sanity check
+                    value.config = value.config || {};
+
                     let $field = _.div({class: 'field-properties'});
 
                     let render = () => {
                         _.append($field.empty(), 
                             _.div({class: 'field-container'},
-                                _.div({class: 'field-key'}, 'Key'),
+                                _.div({class: 'field-key'}, 'Variable name'),
                                 _.div({class: 'field-value'},
                                     _.input({class: 'form-control', type: 'text', value: key, placeholder: 'A variable name, like "newField"', title: 'This is the variable name for the field'})
                                         .change((e) => {
@@ -602,7 +606,7 @@ class SchemaEditor extends Crisp.View {
                             _.div({class: 'field-container'},
                                 _.div({class: 'field-key'}, 'Schema'),
                                 _.div({class: 'field-value'},
-                                    UI.inputDropdown(value.schemaId, resources.schemas, (newSchemaId) => {
+                                    UI.inputDropdown(value.schemaId, fieldSchemas, (newSchemaId) => {
                                         value.schemaId = newSchemaId;
 
                                         render();
