@@ -45189,7 +45189,7 @@ var ContentReferenceEditor = function (_FieldEditor) {
     ContentReferenceEditor.renderConfigEditor = function renderConfigEditor(config) {
         config.allowedSchemas = config.allowedSchemas || [];
 
-        var schemaOptions = HashBrown.Helpers.SchemaHelper.getAllSchemasSync('field');
+        var schemaOptions = HashBrown.Helpers.SchemaHelper.getAllSchemasSync('content');
 
         return _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, 'Allowed Schemas'), _.div({ class: 'field-value' }, UI.inputChipGroup(config.allowedSchemas, schemaOptions, function (newValue) {
             config.allowedSchemas = newValue;
@@ -45387,7 +45387,7 @@ var ContentSchemaReferenceEditor = function (_FieldEditor) {
     ContentSchemaReferenceEditor.renderConfigEditor = function renderConfigEditor(config) {
         config.allowedSchemas = config.allowedSchemas || [];
 
-        var schemaOptions = HashBrown.Helpers.SchemaHelper.getAllSchemasSync('field');
+        var schemaOptions = HashBrown.Helpers.SchemaHelper.getAllSchemasSync('content');
 
         return _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, 'Allowed Schemas'), _.div({ class: 'field-value' }, UI.inputChipGroup(config.allowedSchemas, schemaOptions, function (newValue) {
             config.allowedSchemas = newValue;
@@ -45721,6 +45721,47 @@ var DropdownEditor = function (_FieldEditor) {
 
         this.trigger('change', this.value);
     };
+
+    /**
+     * Renders the config editor
+     *
+     * @param {Object} config
+     *
+     * @returns {HTMLElement} Element
+     */
+
+
+    DropdownEditor.renderConfigEditor = function renderConfigEditor(config) {
+        config.options = config.options || [];
+
+        var $element = _.div({ class: 'field-container' });
+
+        var render = function render() {
+            _.append($element.empty(), _.div({ class: 'field-key' }, 'Options'), _.div({ class: 'field-value' }, _.each(config.options, function (i, option) {
+                return _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, _.input({ class: 'form-control', type: 'text', value: option.label }).change(function (e) {
+                    option.label = e.currentTarget.value;
+                })), _.div({ class: 'field-value' }, _.input({ class: 'form-control', type: 'text', value: option.value }).change(function (e) {
+                    option.value = e.currentTarget.value;
+                })));
+            }), _.button({ class: 'btn btn-round btn-primary raised' }, _.span({ class: 'fa fa-plus' })).click(function () {
+                config.options.push({
+                    label: 'Option label',
+                    value: 'optionValue'
+                });
+
+                render();
+            })));
+        };
+
+        render();
+
+        return $element;
+    };
+
+    /**
+     * Renders this editor
+     */
+
 
     DropdownEditor.prototype.render = function render() {
         var _this2 = this;

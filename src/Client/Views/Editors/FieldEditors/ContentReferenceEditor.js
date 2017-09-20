@@ -75,7 +75,7 @@ class ContentReferenceEditor extends FieldEditor {
     static renderConfigEditor(config) {
         config.allowedSchemas = config.allowedSchemas || [];
         
-        let schemaOptions = HashBrown.Helpers.SchemaHelper.getAllSchemasSync('field');
+        let schemaOptions = HashBrown.Helpers.SchemaHelper.getAllSchemasSync('content');
         
         return _.div({class: 'field-container'},
             _.div({class: 'field-key'}, 'Allowed Schemas'),
