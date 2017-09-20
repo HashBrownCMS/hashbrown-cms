@@ -12,7 +12,7 @@ const FieldEditor = require('./FieldEditor');
  *         "label": "My number",
  *         "tabId": "content",
  *         "schemaId": "number",
- *         {
+ *         "config": {
  *             "step": 0.5
  *         }
  *     }
@@ -36,7 +36,32 @@ class NumberEditor extends FieldEditor {
 
         this.trigger('change', this.value);
     }
-    
+   
+    /**
+     * Renders the config editor
+     *
+     * @param {Object} config
+     *
+     * @returns {HTMLElement} Element
+     */
+    static renderConfigEditor(config)
+    {
+        config.step = config.step || 'any';
+
+        return _.div({class: 'field-container'},
+            _.div({class: 'field-key'}, 'Step'),
+            _.div({class: 'field-value'},
+                _.input({class: 'form-control', type: 'text', value: config.step})
+                    .change((e) => {
+                        config.step = e.currentTarget.value;
+                    })
+            )
+        );
+    }
+
+    /**
+     * Renders this editor
+     */
     render() {
         var editor = this;
 
