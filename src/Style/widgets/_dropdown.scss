@@ -116,6 +116,8 @@
         color: $standard-text;
         left: 0px;
         min-width: 100px;
+        max-height: 20rem;
+        overflow-y: auto;
 
         &, ul {
             >li {

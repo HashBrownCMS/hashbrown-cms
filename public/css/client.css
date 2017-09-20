@@ -1057,6 +1057,7 @@ body.dashboard-container {
     .schema-editor > .schema .json-editor {
       min-height: 400px; }
     .schema-editor > .schema .field-properties {
+      position: relative;
       margin-left: 2rem;
       padding-bottom: 2rem;
       border-bottom: 0.1rem solid #999999;
@@ -1787,7 +1788,9 @@ body.dashboard-container {
     border-radius: 2px;
     color: #333333;
     left: 0px;
-    min-width: 100px; }
+    min-width: 100px;
+    max-height: 20rem;
+    overflow-y: auto; }
     .dropdown .dropdown-menu > li, .dropdown .dropdown-menu ul > li {
       list-style-type: none; }
       .dropdown .dropdown-menu > li.active > a, .dropdown .dropdown-menu > li.active > button, .dropdown .dropdown-menu ul > li.active > a, .dropdown .dropdown-menu ul > li.active > button {
@@ -2112,6 +2115,7 @@ body.dashboard-container {
     border: 0px;
     color: #f44336;
     position: absolute;
+    z-index: 10;
     top: 0px;
     right: 0px;
     padding: 6px; }

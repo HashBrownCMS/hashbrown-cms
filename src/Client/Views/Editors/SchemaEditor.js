@@ -571,7 +571,7 @@ class SchemaEditor extends Crisp.View {
         }
 
         // Render editor
-        let render = () => {
+        let renderEditor = () => {
             _.append($editor.empty(),
                 _.each(model, (key, value) => {
                     // Sanity check
@@ -579,8 +579,24 @@ class SchemaEditor extends Crisp.View {
 
                     let $field = _.div({class: 'field-properties'});
 
-                    let render = () => {
+                    let renderField = () => {
+                        let tabOptions = [];
+
+                        for(let tabId in this.compiledSchema.tabs) {
+                            tabOptions.push({
+                                label: this.compiledSchema.tabs[tabId],
+                                value: tabId
+                            });
+                        }
+
                         _.append($field.empty(), 
+                            _.button({class: 'btn btn-remove'},
+                                _.span({class: 'fa fa-remove'})
+                            ).click(() => {
+                                delete model[key];
+
+                                renderEditor();
+                            }),
                             _.div({class: 'field-container'},
                                 _.div({class: 'field-key'}, 'Variable name'),
                                 _.div({class: 'field-value'},
@@ -607,7 +623,7 @@ class SchemaEditor extends Crisp.View {
                                 _.div({class: 'field-container'},
                                     _.div({class: 'field-key'}, 'Tab'),
                                     _.div({class: 'field-value'},
-                                        UI.inputDropdown(value.tabId, this.compiledSchema.tabs, (newTabId) => {
+                                        UI.inputDropdown(value.tabId, tabOptions, (newTabId) => {
                                             value.tabId = newTabId;
                                         }, true)
                                     )
@@ -619,7 +635,7 @@ class SchemaEditor extends Crisp.View {
                                     UI.inputDropdown(value.schemaId, fieldSchemas, (newSchemaId) => {
                                         value.schemaId = newSchemaId;
 
-                                        render();
+                                        renderField();
                                     })
                                 )
                             ),
@@ -637,7 +653,7 @@ class SchemaEditor extends Crisp.View {
                         )
                     };
 
-                    render();                
+                    renderField();                
 
                     return $field;
                 }),
@@ -649,12 +665,12 @@ class SchemaEditor extends Crisp.View {
                         schemaId: 'string'
                     };
 
-                    render();
+                    renderEditor();
                 })
             );
         };
 
-        render();
+        renderEditor();
 
         return $editor;
     }
@@ -753,6 +769,9 @@ class SchemaEditor extends Crisp.View {
         return $element;
     }
 
+    /**
+     * Renders this editor
+     */
     render() {
         if(this.model instanceof Schema === false) {
             this.model = SchemaHelper.getModel(this.model);

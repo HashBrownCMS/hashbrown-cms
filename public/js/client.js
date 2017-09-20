@@ -29226,6 +29226,7 @@ module.exports = {
     RequestHelper: __webpack_require__(2),
     SchemaHelper: __webpack_require__(15),
     SettingsHelper: __webpack_require__(26),
+    TemplateHelper: __webpack_require__(289),
     UIHelper: __webpack_require__(193)
 };
 
@@ -29548,25 +29549,54 @@ var UIHelper = function () {
 
             // Render individual chips
             _.each(items, function (itemIndex, item) {
+                var label = item.label || item.name || item.title;
+
+                if (!label) {
+                    for (var _iterator = dropdownItems, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+                        var _ref;
+
+                        if (_isArray) {
+                            if (_i >= _iterator.length) break;
+                            _ref = _iterator[_i++];
+                        } else {
+                            _i = _iterator.next();
+                            if (_i.done) break;
+                            _ref = _i.value;
+                        }
+
+                        var dropdownItem = _ref;
+
+                        var value = dropdownItem.id || dropdownItem.value || dropdownItem;
+
+                        if (value === item) {
+                            label = dropdownItem.label || dropdownItem.name || dropdownItem.title || dropdownItem;
+                        }
+                    }
+                }
+
+                if (!label) {
+                    label = item;
+                }
+
                 var $chip = _.div({ class: 'chip' },
 
                 // Dropdown
-                _.if(Array.isArray(dropdownItems), _.div({ class: 'chip-label dropdown' }, _.button({ class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, item.label || item.name || item.title || item), _.if(onChange, _.ul({ class: 'dropdown-menu' }, _.each(dropdownItems, function (dropdownItemIndex, dropdownItem) {
+                _.if(Array.isArray(dropdownItems), _.div({ class: 'chip-label dropdown' }, _.button({ class: 'dropdown-toggle', 'data-toggle': 'dropdown' }, label), _.if(onChange, _.ul({ class: 'dropdown-menu' }, _.each(dropdownItems, function (dropdownItemIndex, dropdownItem) {
                     // Look for unique dropdown items
                     if (isDropdownUnique) {
-                        for (var _iterator = items, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-                            var _ref;
+                        for (var _iterator2 = items, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
+                            var _ref2;
 
-                            if (_isArray) {
-                                if (_i >= _iterator.length) break;
-                                _ref = _iterator[_i++];
+                            if (_isArray2) {
+                                if (_i2 >= _iterator2.length) break;
+                                _ref2 = _iterator2[_i2++];
                             } else {
-                                _i = _iterator.next();
-                                if (_i.done) break;
-                                _ref = _i.value;
+                                _i2 = _iterator2.next();
+                                if (_i2.done) break;
+                                _ref2 = _i2.value;
                             }
 
-                            var _item = _ref;
+                            var _item = _ref2;
 
                             if (_item == dropdownItem) {
                                 return;
@@ -29577,7 +29607,7 @@ var UIHelper = function () {
                     return _.li(_.a({ href: '#' }, dropdownItem.label || dropdownItem.name || dropdownItem.title || dropdownItem).click(function (e) {
                         e.preventDefault();
 
-                        items[itemIndex] = dropdownItem.value || dropdownItem;
+                        items[itemIndex] = dropdownItem.value || dropdownItem.id || dropdownItem;
 
                         render();
 
@@ -29610,35 +29640,35 @@ var UIHelper = function () {
             _.if(onChange, _.button({ class: 'btn chip-add' }, _.span({ class: 'fa fa-plus' })).click(function () {
                 if (Array.isArray(dropdownItems)) {
                     if (isDropdownUnique) {
-                        for (var _iterator2 = dropdownItems, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
-                            var _ref2;
+                        for (var _iterator3 = dropdownItems, _isArray3 = Array.isArray(_iterator3), _i3 = 0, _iterator3 = _isArray3 ? _iterator3 : _iterator3[Symbol.iterator]();;) {
+                            var _ref3;
 
-                            if (_isArray2) {
-                                if (_i2 >= _iterator2.length) break;
-                                _ref2 = _iterator2[_i2++];
+                            if (_isArray3) {
+                                if (_i3 >= _iterator3.length) break;
+                                _ref3 = _iterator3[_i3++];
                             } else {
-                                _i2 = _iterator2.next();
-                                if (_i2.done) break;
-                                _ref2 = _i2.value;
+                                _i3 = _iterator3.next();
+                                if (_i3.done) break;
+                                _ref3 = _i3.value;
                             }
 
-                            var dropdownItem = _ref2;
+                            var dropdownItem = _ref3;
 
                             var isSelected = false;
 
-                            for (var _iterator3 = items, _isArray3 = Array.isArray(_iterator3), _i3 = 0, _iterator3 = _isArray3 ? _iterator3 : _iterator3[Symbol.iterator]();;) {
-                                var _ref3;
+                            for (var _iterator4 = items, _isArray4 = Array.isArray(_iterator4), _i4 = 0, _iterator4 = _isArray4 ? _iterator4 : _iterator4[Symbol.iterator]();;) {
+                                var _ref4;
 
-                                if (_isArray3) {
-                                    if (_i3 >= _iterator3.length) break;
-                                    _ref3 = _iterator3[_i3++];
+                                if (_isArray4) {
+                                    if (_i4 >= _iterator4.length) break;
+                                    _ref4 = _iterator4[_i4++];
                                 } else {
-                                    _i3 = _iterator3.next();
-                                    if (_i3.done) break;
-                                    _ref3 = _i3.value;
+                                    _i4 = _iterator4.next();
+                                    if (_i4.done) break;
+                                    _ref4 = _i4.value;
                                 }
 
-                                var item = _ref3;
+                                var item = _ref4;
 
                                 if (item == dropdownItem) {
                                     isSelected = true;
@@ -29720,19 +29750,19 @@ var UIHelper = function () {
                 return;
             }
 
-            for (var _iterator4 = options, _isArray4 = Array.isArray(_iterator4), _i4 = 0, _iterator4 = _isArray4 ? _iterator4 : _iterator4[Symbol.iterator]();;) {
-                var _ref4;
+            for (var _iterator5 = options, _isArray5 = Array.isArray(_iterator5), _i5 = 0, _iterator5 = _isArray5 ? _iterator5 : _iterator5[Symbol.iterator]();;) {
+                var _ref5;
 
-                if (_isArray4) {
-                    if (_i4 >= _iterator4.length) break;
-                    _ref4 = _iterator4[_i4++];
+                if (_isArray5) {
+                    if (_i5 >= _iterator5.length) break;
+                    _ref5 = _iterator5[_i5++];
                 } else {
-                    _i4 = _iterator4.next();
-                    if (_i4.done) break;
-                    _ref4 = _i4.value;
+                    _i5 = _iterator5.next();
+                    if (_i5.done) break;
+                    _ref5 = _i5.value;
                 }
 
-                var option = _ref4;
+                var option = _ref5;
 
                 if (option.value == defaultValue) {
                     $toggle.html(option.label);
@@ -29794,8 +29824,8 @@ var UIHelper = function () {
         _.append($element, $toggle, _.if(useClearButton, $clear), _.div({ class: 'dropdown-menu' }, $list));
 
         // Render all options
-        for (var _i5 in options || []) {
-            $element.trigger('addOption', options[_i5]);
+        for (var _i6 in options || []) {
+            $element.trigger('addOption', options[_i6]);
         }
 
         return $element;
@@ -43257,15 +43287,28 @@ var SchemaEditor = function (_Crisp$View) {
         }
 
         // Render editor
-        var render = function render() {
+        var renderEditor = function renderEditor() {
             _.append($editor.empty(), _.each(model, function (key, value) {
                 // Sanity check
                 value.config = value.config || {};
 
                 var $field = _.div({ class: 'field-properties' });
 
-                var render = function render() {
-                    _.append($field.empty(), _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, 'Variable name'), _.div({ class: 'field-value' }, _.input({ class: 'form-control', type: 'text', value: key, placeholder: 'A variable name, like "newField"', title: 'This is the variable name for the field' }).change(function (e) {
+                var renderField = function renderField() {
+                    var tabOptions = [];
+
+                    for (var tabId in _this6.compiledSchema.tabs) {
+                        tabOptions.push({
+                            label: _this6.compiledSchema.tabs[tabId],
+                            value: tabId
+                        });
+                    }
+
+                    _.append($field.empty(), _.button({ class: 'btn btn-remove' }, _.span({ class: 'fa fa-remove' })).click(function () {
+                        delete model[key];
+
+                        renderEditor();
+                    }), _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, 'Variable name'), _.div({ class: 'field-value' }, _.input({ class: 'form-control', type: 'text', value: key, placeholder: 'A variable name, like "newField"', title: 'This is the variable name for the field' }).change(function (e) {
                         delete model[key];
 
                         key = e.currentTarget.value;
@@ -43273,12 +43316,12 @@ var SchemaEditor = function (_Crisp$View) {
                         model[key] = value;
                     }))), _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, 'Label'), _.div({ class: 'field-value' }, _.input({ class: 'form-control', type: 'text', value: value.label, placeholder: 'A label, like "New field"', title: 'This is the label that will be visible in the Content editor' }).change(function (e) {
                         value.label = e.currentTarget.value;
-                    }))), _.if(_this6.model.type === 'content', _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, 'Tab'), _.div({ class: 'field-value' }, UI.inputDropdown(value.tabId, _this6.compiledSchema.tabs, function (newTabId) {
+                    }))), _.if(_this6.model.type === 'content', _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, 'Tab'), _.div({ class: 'field-value' }, UI.inputDropdown(value.tabId, tabOptions, function (newTabId) {
                         value.tabId = newTabId;
                     }, true)))), _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, 'Schema'), _.div({ class: 'field-value' }, UI.inputDropdown(value.schemaId, fieldSchemas, function (newSchemaId) {
                         value.schemaId = newSchemaId;
 
-                        render();
+                        renderField();
                     }))), _.do(function () {
                         var schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(value.schemaId);
 
@@ -43296,7 +43339,7 @@ var SchemaEditor = function (_Crisp$View) {
                     }));
                 };
 
-                render();
+                renderField();
 
                 return $field;
             }), _.button({ class: 'btn btn-primary btn-raised btn-add-item btn-round' }, _.span({ class: 'fa fa-plus' })).click(function () {
@@ -43305,11 +43348,11 @@ var SchemaEditor = function (_Crisp$View) {
                     schemaId: 'string'
                 };
 
-                render();
+                renderEditor();
             }));
         };
 
-        render();
+        renderEditor();
 
         return $editor;
     };
@@ -43409,6 +43452,11 @@ var SchemaEditor = function (_Crisp$View) {
 
         return $element;
     };
+
+    /**
+     * Renders this editor
+     */
+
 
     SchemaEditor.prototype.render = function render() {
         var _this8 = this;
@@ -45154,6 +45202,63 @@ var ResourceReferenceEditor = function (_FieldEditor) {
         return _this;
     }
 
+    /**
+     * Renders the config editor
+     *
+     * @param {Object} config
+     *
+     * @returns {HTMLElement} Element
+     */
+
+
+    ResourceReferenceEditor.renderConfigEditor = function renderConfigEditor(config) {
+        config.resourceKeys = config.resourceKeys || [];
+
+        var $element = _.div();
+
+        var render = function render() {
+            var isValidResource = config.resource && resources[config.resource] !== null;
+            var keyOptions = [];
+            var resourceOptions = [];
+
+            for (var resourceName in window.resources) {
+                resourceOptions.push({
+                    value: resourceName,
+                    label: resourceName
+                });
+            }
+
+            if (!isValidResource) {
+                config.resourceKeys = [];
+            } else if (resources[config.resource].length > 0) {
+                for (var resourceKey in resources[config.resource][0]) {
+                    keyOptions.push({
+                        label: resourceKey,
+                        value: resourceKey
+                    });
+                }
+            }
+
+            _.append($element.empty(), _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, 'Resource'), _.div({ class: 'field-value' }, UI.inputDropdown(config.resource, resourceOptions, function (newValue) {
+                config.resource = newValue;
+                config.resourceKeys = [];
+
+                render();
+            }))), _.if(isValidResource, _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, 'Resource keys'), _.div({ class: 'field-value' }, UI.inputChipGroup(config.resourceKeys, keyOptions, function (newValue) {
+                config.resourceKeys = newValue;
+            }, true)))));
+        };
+
+        render();
+
+        return $element;
+    };
+
+    /**
+     * Renders this editor
+     */
+
+
     ResourceReferenceEditor.prototype.render = function render() {
         var resource = resources[this.config.resource];
         var value = void 0;
@@ -45680,6 +45785,86 @@ var StructEditor = function (_FieldEditor) {
         this.trigger('change', this.value);
     };
 
+    /**
+     * Renders the config editor
+     *
+     * @param {Object} config
+     *
+     * @returns {HTMLElement} Element
+     */
+
+
+    StructEditor.renderConfigEditor = function renderConfigEditor(config) {
+        config.struct = config.struct || {};
+
+        var $element = _.div();
+
+        var fieldSchemas = HashBrown.Helpers.SchemaHelper.getAllSchemasSync('field');
+
+        var renderEditor = function renderEditor() {
+            _.append($element.empty(), _.each(config.struct, function (key, value) {
+                // Sanity check
+                value.config = value.config || {};
+
+                var $field = _.div({ class: 'field-properties' });
+
+                var renderField = function renderField() {
+                    _.append($field.empty(), _.button({ class: 'btn btn-remove' }, _.span({ class: 'fa fa-remove' })).click(function () {
+                        delete config.struct[key];
+
+                        renderEditor();
+                    }), _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, 'Variable name'), _.div({ class: 'field-value' }, _.input({ class: 'form-control', type: 'text', value: key, placeholder: 'A variable name, like "newField"', title: 'This is the variable name for the field' }).change(function (e) {
+                        delete config.struct[key];
+
+                        key = e.currentTarget.value;
+
+                        config.struct[key] = value;
+                    }))), _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, 'Label'), _.div({ class: 'field-value' }, _.input({ class: 'form-control', type: 'text', value: value.label, placeholder: 'A label, like "New field"', title: 'This is the label that will be visible in the Content editor' }).change(function (e) {
+                        value.label = e.currentTarget.value;
+                    }))), _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, 'Schema'), _.div({ class: 'field-value' }, UI.inputDropdown(value.schemaId, fieldSchemas, function (newSchemaId) {
+                        value.schemaId = newSchemaId;
+
+                        renderField();
+                    }))), _.do(function () {
+                        var schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(value.schemaId);
+
+                        if (!schema) {
+                            return;
+                        }
+
+                        var editor = HashBrown.Views.Editors.FieldEditors[schema.editorId];
+
+                        if (!editor) {
+                            return;
+                        }
+
+                        return editor.renderConfigEditor(value.config);
+                    }));
+                };
+
+                renderField();
+
+                return $field;
+            }), _.button({ class: 'btn btn-primary btn-raised btn-add-item btn-round' }, _.span({ class: 'fa fa-plus' })).click(function () {
+                config.struct.newField = {
+                    label: 'New field',
+                    schemaId: 'string'
+                };
+
+                renderEditor();
+            }));
+        };
+
+        renderEditor();
+
+        return $element;
+    };
+
+    /**
+     * Renders this editor
+     */
+
+
     StructEditor.prototype.render = function render() {
         var _this2 = this;
 
@@ -45969,6 +46154,44 @@ var TemplateReferenceEditor = function (_FieldEditor) {
 
         this.trigger('change', this.value);
     };
+
+    /**
+     * Renders the config editor
+     *
+     * @param {Object} config
+     *
+     * @returns {HTMLElement} Element
+     */
+
+
+    TemplateReferenceEditor.renderConfigEditor = function renderConfigEditor(config) {
+        config.type = config.type || 'page';
+        config.allowedTemplates = config.allowedTemplates || [];
+
+        var $element = _.div();
+
+        var render = function render() {
+            var templateOptions = HashBrown.Helpers.TemplateHelper.getAllTemplates(config.type);
+
+            _.append($element.empty(), _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, 'Type'), _.div({ class: 'field-value' }, UI.inputDropdown(config.type, [{ label: 'page', value: 'page' }, { label: 'partial', value: 'partial' }], function (newValue) {
+                config.type = newValue;
+                config.allowedTemplates = [];
+
+                render();
+            }))), _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, 'Allowed Templates'), _.div({ class: 'field-value' }, UI.inputChipGroup(config.allowedTemplates, templateOptions, function (newValue) {
+                config.allowedTemplates = newValue;
+            }, true))));
+        };
+
+        render();
+
+        return $element;
+    };
+
+    /**
+     * Renders this editor
+     */
+
 
     TemplateReferenceEditor.prototype.render = function render() {
         var _this2 = this;
@@ -46320,6 +46543,96 @@ var UrlEditor = function (_FieldEditor) {
 }(FieldEditor);
 
 module.exports = UrlEditor;
+
+/***/ }),
+/* 262 */,
+/* 263 */,
+/* 264 */,
+/* 265 */,
+/* 266 */,
+/* 267 */,
+/* 268 */,
+/* 269 */,
+/* 270 */,
+/* 271 */,
+/* 272 */,
+/* 273 */,
+/* 274 */,
+/* 275 */,
+/* 276 */,
+/* 277 */,
+/* 278 */,
+/* 279 */,
+/* 280 */,
+/* 281 */,
+/* 282 */,
+/* 283 */,
+/* 284 */,
+/* 285 */,
+/* 286 */,
+/* 287 */,
+/* 288 */,
+/* 289 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/**
+ * A helper class for Template resources
+ *
+ * @memberof HashBrown.Client.Helpers
+ */
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var TemplateHelper = function () {
+    function TemplateHelper() {
+        _classCallCheck(this, TemplateHelper);
+    }
+
+    /**
+     * Gets all templates
+     *
+     * @param {String} type
+     *
+     * @returns {Array} Templates
+     */
+    TemplateHelper.getAllTemplates = function getAllTemplates(type) {
+        if (!type) {
+            return resources.templates;
+        }
+
+        var templates = [];
+
+        for (var _iterator = resources.templates, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+            var _ref;
+
+            if (_isArray) {
+                if (_i >= _iterator.length) break;
+                _ref = _iterator[_i++];
+            } else {
+                _i = _iterator.next();
+                if (_i.done) break;
+                _ref = _i.value;
+            }
+
+            var template = _ref;
+
+            if (template.type !== type) {
+                continue;
+            }
+
+            templates.push(template);
+        }
+
+        return templates;
+    };
+
+    return TemplateHelper;
+}();
+
+module.exports = TemplateHelper;
 
 /***/ })
 /******/ ]);

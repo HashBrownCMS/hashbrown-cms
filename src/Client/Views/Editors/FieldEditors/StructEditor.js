@@ -69,6 +69,108 @@ class StructEditor extends FieldEditor {
         this.trigger('change', this.value);
     }
 
+    /**
+     * Renders the config editor
+     *
+     * @param {Object} config
+     *
+     * @returns {HTMLElement} Element
+     */
+    static renderConfigEditor(config) {
+        config.struct = config.struct || {};
+
+        let $element = _.div();
+
+        let fieldSchemas = HashBrown.Helpers.SchemaHelper.getAllSchemasSync('field');
+            
+        let renderEditor = () => {
+            _.append($element.empty(),
+                _.each(config.struct, (key, value) => {
+                    // Sanity check
+                    value.config = value.config || {};
+
+                    let $field = _.div({class: 'field-properties'});
+
+                    let renderField = () => {
+                        _.append($field.empty(),
+                            _.button({class: 'btn btn-remove'},
+                                _.span({class: 'fa fa-remove'})
+                            ).click(() => {
+                                delete config.struct[key];
+
+                                renderEditor();
+                            }),
+                            _.div({class: 'field-container'},
+                                _.div({class: 'field-key'}, 'Variable name'),
+                                _.div({class: 'field-value'},
+                                    _.input({class: 'form-control', type: 'text', value: key, placeholder: 'A variable name, like "newField"', title: 'This is the variable name for the field'})
+                                        .change((e) => {
+                                            delete config.struct[key];
+
+                                            key = e.currentTarget.value;
+
+                                            config.struct[key] = value;
+                                        })
+                                )
+                            ),
+                            _.div({class: 'field-container'},
+                                _.div({class: 'field-key'}, 'Label'),
+                                _.div({class: 'field-value'},
+                                    _.input({class: 'form-control', type: 'text', value: value.label, placeholder: 'A label, like "New field"',  title: 'This is the label that will be visible in the Content editor'})
+                                        .change((e) => {
+                                            value.label = e.currentTarget.value;  
+                                        })
+                                )
+                            ),
+                            _.div({class: 'field-container'},
+                                _.div({class: 'field-key'}, 'Schema'),
+                                _.div({class: 'field-value'},
+                                    UI.inputDropdown(value.schemaId, fieldSchemas, (newSchemaId) => {
+                                        value.schemaId = newSchemaId;
+
+                                        renderField();
+                                    })
+                                )
+                            ),
+                            _.do(() => {
+                                let schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(value.schemaId);
+
+                                if(!schema) { return; }
+
+                                let editor = HashBrown.Views.Editors.FieldEditors[schema.editorId];
+
+                                if(!editor) { return; }
+
+                                return editor.renderConfigEditor(value.config);
+                            })
+                        )
+                    };
+
+                    renderField();
+
+                    return $field;
+                }),
+                _.button({class: 'btn btn-primary btn-raised btn-add-item btn-round'},
+                    _.span({class: 'fa fa-plus'})
+                ).click(() => {
+                    config.struct.newField = {
+                        label: 'New field',
+                        schemaId: 'string'
+                    };
+
+                    renderEditor();
+                })
+            );
+        };
+
+        renderEditor();
+
+        return $element;
+    }
+
+    /**
+     * Renders this editor
+     */
     render() {
         // A sanity check to make sure we're working with an object
         if(!this.value || typeof this.value !== 'object') {

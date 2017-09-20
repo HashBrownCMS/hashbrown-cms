@@ -39,7 +39,54 @@ class TemplateReferenceEditor extends FieldEditor {
 
         this.trigger('change', this.value);
     }
-    
+   
+    /**
+     * Renders the config editor
+     *
+     * @param {Object} config
+     *
+     * @returns {HTMLElement} Element
+     */
+    static renderConfigEditor(config) {
+        config.type = config.type || 'page';
+        config.allowedTemplates = config.allowedTemplates || [];
+
+        let $element = _.div();
+
+        let render = () => {
+            let templateOptions = HashBrown.Helpers.TemplateHelper.getAllTemplates(config.type);
+            
+            _.append($element.empty(), 
+                _.div({class: 'field-container'},
+                    _.div({class: 'field-key'}, 'Type'),
+                    _.div({class: 'field-value'},
+                        UI.inputDropdown(config.type, [ { label: 'page', value: 'page' }, { label: 'partial', value: 'partial' } ], (newValue) => {
+                            config.type = newValue;
+                            config.allowedTemplates = [];   
+
+                            render();
+                        })
+                    )
+                ),
+                _.div({class: 'field-container'},
+                    _.div({class: 'field-key'}, 'Allowed Templates'),
+                    _.div({class: 'field-value'},
+                        UI.inputChipGroup(config.allowedTemplates, templateOptions, (newValue) => {
+                            config.allowedTemplates = newValue;
+                        }, true)
+                    )
+                )
+            );
+        };
+
+        render();
+
+        return $element;
+    }
+
+    /**
+     * Renders this editor
+     */
     render() {
         this.$element = _.div({class: 'field-editor template-reference-editor'});
 

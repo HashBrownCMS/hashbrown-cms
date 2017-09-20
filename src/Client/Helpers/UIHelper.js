@@ -66,13 +66,29 @@ class UIHelper {
 
                 // Render individual chips
                 _.each(items, (itemIndex, item) => {
+                    let label = item.label || item.name || item.title;
+                    
+                    if(!label) {
+                        for(let dropdownItem of dropdownItems) {
+                            let value = dropdownItem.id || dropdownItem.value || dropdownItem;
+
+                            if(value === item) {
+                                label = dropdownItem.label || dropdownItem.name || dropdownItem.title || dropdownItem;
+                            }
+                        }
+                    }
+
+                    if(!label) { 
+                        label = item;
+                    }
+
                     let $chip = _.div({class: 'chip'},
 
                         // Dropdown
                         _.if(Array.isArray(dropdownItems),
                             _.div({class: 'chip-label dropdown'},
                                 _.button({class: 'dropdown-toggle', 'data-toggle': 'dropdown'},
-                                    item.label || item.name || item.title || item 
+                                    label
                                 ),
                                 _.if(onChange,
                                     _.ul({class: 'dropdown-menu'},
@@ -92,7 +108,7 @@ class UIHelper {
                                                 ).click(function(e) {
                                                     e.preventDefault();
                                                         
-                                                    items[itemIndex] = dropdownItem.value || dropdownItem;
+                                                    items[itemIndex] = dropdownItem.value || dropdownItem.id || dropdownItem;
 
                                                     render();
                                 
