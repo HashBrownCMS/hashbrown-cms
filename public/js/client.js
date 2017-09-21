@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 213);
+/******/ 	return __webpack_require__(__webpack_require__.s = 214);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -9388,7 +9388,7 @@ var NavbarMain = function (_Crisp$View) {
 
         var _this = _possibleConstructorReturn(this, _Crisp$View.call(this, params));
 
-        _this.template = __webpack_require__(231);
+        _this.template = __webpack_require__(232);
         _this.tabPanes = [];
 
         HashBrown.Views.Navigation.CMSPane.init();
@@ -24841,7 +24841,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var beautify = __webpack_require__(224).js_beautify;
+var beautify = __webpack_require__(225).js_beautify;
 var SchemaHelper = __webpack_require__(15);
 var RequestHelper = __webpack_require__(2);
 
@@ -29226,8 +29226,8 @@ module.exports = {
     RequestHelper: __webpack_require__(2),
     SchemaHelper: __webpack_require__(15),
     SettingsHelper: __webpack_require__(26),
-    TemplateHelper: __webpack_require__(289),
-    UIHelper: __webpack_require__(193)
+    TemplateHelper: __webpack_require__(193),
+    UIHelper: __webpack_require__(194)
 };
 
 /***/ }),
@@ -29470,6 +29470,69 @@ module.exports = DebugHelper;
 
 /***/ }),
 /* 193 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/**
+ * A helper class for Template resources
+ *
+ * @memberof HashBrown.Client.Helpers
+ */
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var TemplateHelper = function () {
+    function TemplateHelper() {
+        _classCallCheck(this, TemplateHelper);
+    }
+
+    /**
+     * Gets all templates
+     *
+     * @param {String} type
+     *
+     * @returns {Array} Templates
+     */
+    TemplateHelper.getAllTemplates = function getAllTemplates(type) {
+        if (!type) {
+            return resources.templates;
+        }
+
+        var templates = [];
+
+        for (var _iterator = resources.templates, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+            var _ref;
+
+            if (_isArray) {
+                if (_i >= _iterator.length) break;
+                _ref = _iterator[_i++];
+            } else {
+                _i = _iterator.next();
+                if (_i.done) break;
+                _ref = _i.value;
+            }
+
+            var template = _ref;
+
+            if (template.type !== type) {
+                continue;
+            }
+
+            templates.push(template);
+        }
+
+        return templates;
+    };
+
+    return TemplateHelper;
+}();
+
+module.exports = TemplateHelper;
+
+/***/ }),
+/* 194 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -30070,12 +30133,12 @@ var UIHelper = function () {
 module.exports = UIHelper;
 
 /***/ }),
-/* 194 */
+/* 195 */
 /***/ (function(module, exports, __webpack_require__) {
 
-window.Promise = __webpack_require__(195);
-window.marked = __webpack_require__(196);
-window.toMarkdown = __webpack_require__(197);
+window.Promise = __webpack_require__(196);
+window.marked = __webpack_require__(197);
+window.toMarkdown = __webpack_require__(198);
 
 var ProjectHelper = __webpack_require__(6);
 var User = __webpack_require__(43);
@@ -30174,13 +30237,13 @@ window.populateWorkspace = function populateWorkspace($html, classes) {
 };
 
 // Get package file
-window.app = __webpack_require__(205);
+window.app = __webpack_require__(206);
 
 // Language
 window.language = localStorage.getItem('language') || 'en';
 
 /***/ }),
-/* 195 */
+/* 196 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process, global, setImmediate) {var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -35511,7 +35574,7 @@ window.language = localStorage.getItem('language') || 'en';
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(8), __webpack_require__(9), __webpack_require__(60).setImmediate))
 
 /***/ }),
-/* 196 */
+/* 197 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {var __WEBPACK_AMD_DEFINE_RESULT__;var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -36700,7 +36763,7 @@ window.language = localStorage.getItem('language') || 'en';
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(9)))
 
 /***/ }),
-/* 197 */
+/* 198 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36716,10 +36779,10 @@ window.language = localStorage.getItem('language') || 'en';
 
 var toMarkdown;
 var converters;
-var mdConverters = __webpack_require__(198);
-var gfmConverters = __webpack_require__(199);
-var HtmlParser = __webpack_require__(200);
-var collapse = __webpack_require__(202);
+var mdConverters = __webpack_require__(199);
+var gfmConverters = __webpack_require__(200);
+var HtmlParser = __webpack_require__(201);
+var collapse = __webpack_require__(203);
 
 /*
  * Utilities
@@ -36927,7 +36990,7 @@ toMarkdown.outer = outer;
 module.exports = toMarkdown;
 
 /***/ }),
-/* 198 */
+/* 199 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37060,7 +37123,7 @@ module.exports = [{
 }];
 
 /***/ }),
-/* 199 */
+/* 200 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37160,7 +37223,7 @@ module.exports = [{
 }];
 
 /***/ }),
-/* 200 */
+/* 201 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -37194,7 +37257,7 @@ function createHtmlParser() {
 
   // For Node.js environments
   if (typeof document === 'undefined') {
-    var jsdom = __webpack_require__(201);
+    var jsdom = __webpack_require__(202);
     Parser.prototype.parseFromString = function (string) {
       return jsdom.jsdom(string, {
         features: {
@@ -37241,25 +37304,25 @@ function shouldUseActiveX() {
 module.exports = canParseHtmlNatively() ? _window.DOMParser : createHtmlParser();
 
 /***/ }),
-/* 201 */
+/* 202 */
 /***/ (function(module, exports) {
 
 /* (ignored) */
 
 /***/ }),
-/* 202 */
+/* 203 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var voidElements = __webpack_require__(203);
+var voidElements = __webpack_require__(204);
 Object.keys(voidElements).forEach(function (name) {
   voidElements[name.toUpperCase()] = 1;
 });
 
 var blockElements = {};
-__webpack_require__(204).forEach(function (name) {
+__webpack_require__(205).forEach(function (name) {
   blockElements[name.toUpperCase()] = 1;
 });
 
@@ -37389,7 +37452,7 @@ function next(prev, current) {
 module.exports = collapseWhitespace;
 
 /***/ }),
-/* 203 */
+/* 204 */
 /***/ (function(module, exports) {
 
 /**
@@ -37417,7 +37480,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 204 */
+/* 205 */
 /***/ (function(module, exports) {
 
 /**
@@ -37428,13 +37491,13 @@ module.exports = {
 module.exports = ["address", "article", "aside", "blockquote", "canvas", "dd", "div", "dl", "dt", "fieldset", "figcaption", "figure", "footer", "form", "h1", "h2", "h3", "h4", "h5", "h6", "header", "hgroup", "hr", "li", "main", "nav", "noscript", "ol", "output", "p", "pre", "section", "table", "tfoot", "ul", "video"];
 
 /***/ }),
-/* 205 */
+/* 206 */
 /***/ (function(module, exports) {
 
 module.exports = {"name":"hashbrown-cms","repository":"https://github.com/Putaitu/hashbrown-cms.git","version":"0.9.8","description":"The pluggable CMS","main":"hashbrown.js","scripts":{"test":"echo \"Error: no test specified\" && exit 1"},"author":"Putaitu Productions","license":"MIT","dependencies":{"app-module-path":"^2.2.0","bluebird":"^3.3.3","body-parser":"^1.14.1","cookie-parser":"^1.4.3","express":"^4.13.3","express-ws":"^3.0.0","glob":"^7.0.3","js-beautify":"^1.6.2","marked":"^0.3.5","mongodb":"^2.1.7","multer":"^1.1.0","nodemailer":"^4.0.1","path-to-regexp":"^1.2.1","pug":"^2.0.0-beta11","rimraf":"^2.5.2","semver":"^5.4.1","to-markdown":"^2.0.1","xoauth2":"^1.2.0"},"devDependencies":{"babel-core":"^6.18.0","babel-loader":"^6.2.7","babel-preset-es2015":"^6.18.0","babel-preset-es2015-native-modules":"^6.9.4","babel-preset-es2015-node5":"^1.2.0","css-loader":"^0.26.1","extract-text-webpack-plugin":"^2.1.2","json-loader":"^0.5.4","node-sass":"^3.13.1","sass-loader":"^6.0.6","sass-material-colors":"0.0.5","style-loader":"^0.13.1","webpack":"^3.0.0"}}
 
 /***/ }),
-/* 206 */
+/* 207 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37486,7 +37549,7 @@ var MediaViewer = function (_Crisp$View) {
 module.exports = MediaViewer;
 
 /***/ }),
-/* 207 */
+/* 208 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37612,7 +37675,7 @@ var TemplateEditor = function (_Crisp$View) {
 module.exports = TemplateEditor;
 
 /***/ }),
-/* 208 */
+/* 209 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37962,7 +38025,7 @@ var FormEditor = function (_Crisp$View) {
 module.exports = FormEditor;
 
 /***/ }),
-/* 209 */
+/* 210 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37978,17 +38041,17 @@ module.exports = {
     ContentSchema: __webpack_require__(55),
     Entity: __webpack_require__(28),
     FieldSchema: __webpack_require__(56),
-    index: __webpack_require__(209),
+    index: __webpack_require__(210),
     Media: __webpack_require__(27),
     Project: __webpack_require__(96),
     Resource: __webpack_require__(14),
     Schema: __webpack_require__(42),
-    Template: __webpack_require__(210),
+    Template: __webpack_require__(211),
     User: __webpack_require__(43)
 };
 
 /***/ }),
-/* 210 */
+/* 211 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38065,7 +38128,7 @@ var Template = function (_Resource) {
 module.exports = Template;
 
 /***/ }),
-/* 211 */
+/* 212 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38291,7 +38354,7 @@ var MediaUploader = function (_Crisp$View) {
 module.exports = MediaUploader;
 
 /***/ }),
-/* 212 */
+/* 213 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38432,7 +38495,7 @@ var MediaBrowser = function (_Crisp$View) {
 module.exports = MediaBrowser;
 
 /***/ }),
-/* 213 */
+/* 214 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38444,10 +38507,10 @@ module.exports = MediaBrowser;
 
 // Style
 
-__webpack_require__(214);
+__webpack_require__(215);
 
 // Get routes
-__webpack_require__(215);
+__webpack_require__(216);
 
 // Resource cache
 window.resources = {
@@ -38465,13 +38528,13 @@ window._ = Crisp.Elements;
 
 window.HashBrown = {};
 
-HashBrown.Models = __webpack_require__(226);
+HashBrown.Models = __webpack_require__(227);
 HashBrown.Views = {};
-HashBrown.Views.Modals = __webpack_require__(228);
-HashBrown.Views.Navigation = __webpack_require__(229);
-HashBrown.Views.Editors = __webpack_require__(240);
+HashBrown.Views.Modals = __webpack_require__(229);
+HashBrown.Views.Navigation = __webpack_require__(230);
+HashBrown.Views.Editors = __webpack_require__(241);
 HashBrown.Views.Editors.ConnectionEditors = {};
-HashBrown.Views.Editors.FieldEditors = __webpack_require__(245);
+HashBrown.Views.Editors.FieldEditors = __webpack_require__(246);
 HashBrown.Helpers = __webpack_require__(190);
 
 // Helper shortcuts
@@ -38479,7 +38542,7 @@ window.debug = HashBrown.Helpers.DebugHelper;
 window.UI = HashBrown.Helpers.UIHelper;
 
 // Helper functions
-__webpack_require__(194);
+__webpack_require__(195);
 
 // Preload resources 
 document.addEventListener('DOMContentLoaded', function () {
@@ -38542,19 +38605,18 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 /***/ }),
-/* 214 */
+/* 215 */
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
 
 /***/ }),
-/* 215 */
+/* 216 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-__webpack_require__(216);
 __webpack_require__(217);
 __webpack_require__(218);
 __webpack_require__(219);
@@ -38562,9 +38624,10 @@ __webpack_require__(220);
 __webpack_require__(221);
 __webpack_require__(222);
 __webpack_require__(223);
+__webpack_require__(224);
 
 /***/ }),
-/* 216 */
+/* 217 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38621,7 +38684,7 @@ Crisp.Router.route('/license/', function () {
 });
 
 /***/ }),
-/* 217 */
+/* 218 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38685,7 +38748,7 @@ Crisp.Router.route('/content/:id/:tab', function () {
 });
 
 /***/ }),
-/* 218 */
+/* 219 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38735,13 +38798,13 @@ Crisp.Router.route('/connections/json/:id', function () {
 });
 
 /***/ }),
-/* 219 */
+/* 220 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var MediaViewer = __webpack_require__(206);
+var MediaViewer = __webpack_require__(207);
 var RequestHelper = __webpack_require__(2);
 
 // Dashboard
@@ -38763,7 +38826,7 @@ Crisp.Router.route('/media/:id', function () {
 });
 
 /***/ }),
-/* 220 */
+/* 221 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38822,7 +38885,7 @@ Crisp.Router.route('/schemas/json/:id', function () {
 });
 
 /***/ }),
-/* 221 */
+/* 222 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38852,13 +38915,13 @@ Crisp.Router.route('/settings/providers/', function () {
 });
 
 /***/ }),
-/* 222 */
+/* 223 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var TemplateEditor = __webpack_require__(207);
+var TemplateEditor = __webpack_require__(208);
 var RequestHelper = __webpack_require__(2);
 
 // Templates
@@ -38888,14 +38951,14 @@ Crisp.Router.route('/templates/:type/:id', function () {
 });
 
 /***/ }),
-/* 223 */
+/* 224 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var JSONEditor = __webpack_require__(181);
-var FormEditor = __webpack_require__(208);
+var FormEditor = __webpack_require__(209);
 var RequestHelper = __webpack_require__(2);
 
 // Dashboard
@@ -38929,7 +38992,7 @@ Crisp.Router.route('/forms/json/:id', function () {
 });
 
 /***/ }),
-/* 224 */
+/* 225 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*
@@ -38996,7 +39059,7 @@ function get_beautify(js_beautify, css_beautify, html_beautify) {
 
 if (true) {
     // Add support for AMD ( https://github.com/amdjs/amdjs-api/wiki/AMD#defineamd-property- )
-    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(182), __webpack_require__(183), __webpack_require__(225)], __WEBPACK_AMD_DEFINE_RESULT__ = function (js_beautify, css_beautify, html_beautify) {
+    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(182), __webpack_require__(183), __webpack_require__(226)], __WEBPACK_AMD_DEFINE_RESULT__ = function (js_beautify, css_beautify, html_beautify) {
         return get_beautify(js_beautify, css_beautify, html_beautify);
     }.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
@@ -39011,7 +39074,7 @@ if (true) {
 }
 
 /***/ }),
-/* 225 */
+/* 226 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -40139,7 +40202,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var _typeof = ty
 })();
 
 /***/ }),
-/* 226 */
+/* 227 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40155,17 +40218,17 @@ module.exports = {
     ContentSchema: __webpack_require__(55),
     Entity: __webpack_require__(28),
     FieldSchema: __webpack_require__(56),
-    Form: __webpack_require__(227),
-    index: __webpack_require__(209),
+    Form: __webpack_require__(228),
+    index: __webpack_require__(210),
     Media: __webpack_require__(27),
     Project: __webpack_require__(96),
     Schema: __webpack_require__(42),
-    Template: __webpack_require__(210),
+    Template: __webpack_require__(211),
     User: __webpack_require__(43)
 };
 
 /***/ }),
-/* 227 */
+/* 228 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40338,7 +40401,7 @@ var Form = function (_Resource) {
 module.exports = Form;
 
 /***/ }),
-/* 228 */
+/* 229 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40349,13 +40412,13 @@ module.exports = Form;
  */
 
 module.exports = {
-    MediaUploader: __webpack_require__(211),
-    MediaBrowser: __webpack_require__(212),
+    MediaUploader: __webpack_require__(212),
+    MediaBrowser: __webpack_require__(213),
     MessageModal: __webpack_require__(16)
 };
 
 /***/ }),
-/* 229 */
+/* 230 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40366,21 +40429,21 @@ module.exports = {
  */
 
 module.exports = {
-    CMSPane: __webpack_require__(230),
-    ConnectionPane: __webpack_require__(232),
-    ContentPane: __webpack_require__(233),
-    FormsPane: __webpack_require__(234),
-    MainMenu: __webpack_require__(235),
-    MediaPane: __webpack_require__(236),
+    CMSPane: __webpack_require__(231),
+    ConnectionPane: __webpack_require__(233),
+    ContentPane: __webpack_require__(234),
+    FormsPane: __webpack_require__(235),
+    MainMenu: __webpack_require__(236),
+    MediaPane: __webpack_require__(237),
     NavbarMain: __webpack_require__(39),
     NavbarPane: __webpack_require__(40),
-    SchemaPane: __webpack_require__(237),
-    SettingsPane: __webpack_require__(238),
-    TemplatePane: __webpack_require__(239)
+    SchemaPane: __webpack_require__(238),
+    SettingsPane: __webpack_require__(239),
+    TemplatePane: __webpack_require__(240)
 };
 
 /***/ }),
-/* 230 */
+/* 231 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40433,7 +40496,7 @@ var CMSPane = function (_NavbarPane) {
 module.exports = CMSPane;
 
 /***/ }),
-/* 231 */
+/* 232 */
 /***/ (function(module, exports) {
 
 module.exports = function () {
@@ -40532,7 +40595,7 @@ module.exports = function () {
 };
 
 /***/ }),
-/* 232 */
+/* 233 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40757,7 +40820,7 @@ var ConnectionPane = function (_NavbarPane) {
 module.exports = ConnectionPane;
 
 /***/ }),
-/* 233 */
+/* 234 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41255,7 +41318,7 @@ var ContentPane = function (_NavbarPane) {
 module.exports = ContentPane;
 
 /***/ }),
-/* 234 */
+/* 235 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41489,7 +41552,7 @@ var FormsPane = function (_NavbarPane) {
 module.exports = FormsPane;
 
 /***/ }),
-/* 235 */
+/* 236 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41654,7 +41717,7 @@ var MainMenu = function (_Crisp$View) {
 module.exports = MainMenu;
 
 /***/ }),
-/* 236 */
+/* 237 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41668,7 +41731,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var NavbarPane = __webpack_require__(40);
 var NavbarMain = __webpack_require__(39);
-var MediaUploader = __webpack_require__(211);
+var MediaUploader = __webpack_require__(212);
 var ProjectHelper = __webpack_require__(6);
 var MediaHelper = __webpack_require__(38);
 var RequestHelper = __webpack_require__(2);
@@ -41868,7 +41931,7 @@ MediaPane.canCreateDirectory = true;
 module.exports = MediaPane;
 
 /***/ }),
-/* 237 */
+/* 238 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42105,7 +42168,7 @@ var SchemaPane = function (_NavbarPane) {
 module.exports = SchemaPane;
 
 /***/ }),
-/* 238 */
+/* 239 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42154,7 +42217,7 @@ var SettingsPane = function (_NavbarPane) {
 module.exports = SettingsPane;
 
 /***/ }),
-/* 239 */
+/* 240 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42418,7 +42481,7 @@ var TemplatePane = function (_NavbarPane) {
 module.exports = TemplatePane;
 
 /***/ }),
-/* 240 */
+/* 241 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42429,19 +42492,19 @@ module.exports = TemplatePane;
  */
 
 module.exports = {
-    ConnectionEditor: __webpack_require__(241),
+    ConnectionEditor: __webpack_require__(242),
     ContentEditor: __webpack_require__(188),
-    FormEditor: __webpack_require__(208),
+    FormEditor: __webpack_require__(209),
     JSONEditor: __webpack_require__(181),
-    MediaViewer: __webpack_require__(206),
-    ProvidersSettings: __webpack_require__(242),
-    SchemaEditor: __webpack_require__(243),
-    TemplateEditor: __webpack_require__(207),
+    MediaViewer: __webpack_require__(207),
+    ProvidersSettings: __webpack_require__(243),
+    SchemaEditor: __webpack_require__(244),
+    TemplateEditor: __webpack_require__(208),
     UserEditor: __webpack_require__(97)
 };
 
 /***/ }),
-/* 241 */
+/* 242 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42660,7 +42723,7 @@ var ConnectionEditor = function (_Crisp$View) {
 module.exports = ConnectionEditor;
 
 /***/ }),
-/* 242 */
+/* 243 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42780,7 +42843,7 @@ var ProvidersSettings = function (_Crisp$View) {
 module.exports = ProvidersSettings;
 
 /***/ }),
-/* 243 */
+/* 244 */
 /***/ (function(module, exports, __webpack_require__) {
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -42790,7 +42853,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 // Icons
-var icons = __webpack_require__(244).icons;
+var icons = __webpack_require__(245).icons;
 
 var Schema = __webpack_require__(42);
 var SchemaHelper = __webpack_require__(15);
@@ -42883,6 +42946,8 @@ var SchemaEditor = function (_Crisp$View) {
 
         var $element = _.div({ class: 'editor-picker' }, _.if(!this.model.isLocked, UI.inputDropdownTypeAhead(editorName, editorOptions, function (newValue) {
             _this3.model.editorId = newValue;
+
+            _this3.render();
         })), _.if(this.model.isLocked, _.p({ class: 'read-only' }, editorName)));
 
         return $element;
@@ -43252,43 +43317,46 @@ var SchemaEditor = function (_Crisp$View) {
     };
 
     /**
-     * Renders the field properties editor
+     * Renders the field config editor
      *
      * @returns {HTMLElement} Editor element
      */
 
 
-    SchemaEditor.prototype.renderFieldPropertiesEditor = function renderFieldPropertiesEditor() {
+    SchemaEditor.prototype.renderFieldConfigEditor = function renderFieldConfigEditor() {
+        var editor = HashBrown.Views.Editors.FieldEditors[this.model.editorId];
+
+        if (!editor) {
+            return;
+        }
+
+        return _.div({ class: 'config' }, editor.renderConfigEditor(this.model.config));
+    };
+
+    /**
+     * Renders the Content field properties editor
+     *
+     * @returns {HTMLElement} Editor element
+     */
+
+
+    SchemaEditor.prototype.renderContentFieldPropertiesEditor = function renderContentFieldPropertiesEditor() {
         var _this6 = this;
 
-        var model = void 0;
         var $editor = _.div({ class: 'field-properties-editor' });
         var fieldSchemas = HashBrown.Helpers.SchemaHelper.getAllSchemasSync('field');
 
-        // Set model to Content fields
-        if (this.model.type == 'content') {
-            if (!this.model.fields) {
-                this.model.fields = {};
-            }
+        if (!this.model.fields) {
+            this.model.fields = {};
+        }
 
-            if (!this.model.fields.properties) {
-                this.model.fields.properties = {};
-            }
-
-            model = this.model.fields.properties;
-
-            // Set model to field config
-        } else if (this.model.type == 'field') {
-            if (!this.model.config) {
-                this.model.config = {};
-            }
-
-            model = this.model.config;
+        if (!this.model.fields.properties) {
+            this.model.fields.properties = {};
         }
 
         // Render editor
         var renderEditor = function renderEditor() {
-            _.append($editor.empty(), _.each(model, function (key, value) {
+            _.append($editor.empty(), _.each(_this6.model.fields.properties, function (key, value) {
                 // Sanity check
                 value.config = value.config || {};
 
@@ -43305,20 +43373,20 @@ var SchemaEditor = function (_Crisp$View) {
                     }
 
                     _.append($field.empty(), _.button({ class: 'btn btn-remove' }, _.span({ class: 'fa fa-remove' })).click(function () {
-                        delete model[key];
+                        delete _this6.model.fields.properties[key];
 
                         renderEditor();
                     }), _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, 'Variable name'), _.div({ class: 'field-value' }, _.input({ class: 'form-control', type: 'text', value: key, placeholder: 'A variable name, like "newField"', title: 'This is the variable name for the field' }).change(function (e) {
-                        delete model[key];
+                        delete _this6.model.fields.properties[key];
 
                         key = e.currentTarget.value;
 
-                        model[key] = value;
+                        _this6.model.fields.properties[key] = value;
                     }))), _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, 'Label'), _.div({ class: 'field-value' }, _.input({ class: 'form-control', type: 'text', value: value.label, placeholder: 'A label, like "New field"', title: 'This is the label that will be visible in the Content editor' }).change(function (e) {
                         value.label = e.currentTarget.value;
-                    }))), _.if(_this6.model.type === 'content', _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, 'Tab'), _.div({ class: 'field-value' }, UI.inputDropdown(value.tabId, tabOptions, function (newTabId) {
+                    }))), _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, 'Tab'), _.div({ class: 'field-value' }, UI.inputDropdown(value.tabId, tabOptions, function (newTabId) {
                         value.tabId = newTabId;
-                    }, true)))), _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, 'Schema'), _.div({ class: 'field-value' }, UI.inputDropdown(value.schemaId, fieldSchemas, function (newSchemaId) {
+                    }, true))), _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, 'Schema'), _.div({ class: 'field-value' }, UI.inputDropdown(value.schemaId, fieldSchemas, function (newSchemaId) {
                         value.schemaId = newSchemaId;
 
                         renderField();
@@ -43343,7 +43411,7 @@ var SchemaEditor = function (_Crisp$View) {
 
                 return $field;
             }), _.button({ class: 'btn btn-primary btn-raised btn-add-item btn-round' }, _.span({ class: 'fa fa-plus' })).click(function () {
-                model.newField = {
+                _this6.model.field.properties.newField = {
                     label: 'New field',
                     schemaId: 'string'
                 };
@@ -43434,7 +43502,7 @@ var SchemaEditor = function (_Crisp$View) {
                 $element.append(this.renderField('Allowed child Schemas', this.renderAllowedChildSchemasEditor()));
 
                 if (!this.model.isLocked) {
-                    $element.append(this.renderField('Fields', this.renderFieldPropertiesEditor(), true));
+                    $element.append(this.renderField('Fields', this.renderContentFieldPropertiesEditor(), true));
                 }
 
                 break;
@@ -43443,7 +43511,7 @@ var SchemaEditor = function (_Crisp$View) {
                 $element.append(this.renderField('Field editor', this.renderEditorPicker()));
 
                 if (!this.model.isLocked) {
-                    $element.append(this.renderField('Config', this.renderFieldPropertiesEditor(), true));
+                    $element.append(this.renderField('Config', this.renderFieldConfigEditor(), true));
                     $element.append(this.renderField('Preview template', this.renderTemplateEditor(), true));
                 }
 
@@ -43484,13 +43552,13 @@ var SchemaEditor = function (_Crisp$View) {
 module.exports = SchemaEditor;
 
 /***/ }),
-/* 244 */
+/* 245 */
 /***/ (function(module, exports) {
 
 module.exports = {"icons":["500px","adjust","adn","align-center","align-justify","align-left","align-right","amazon","ambulance","anchor","android","angellist","angle-double-down","angle-double-left","angle-double-right","angle-double-up","angle-down","angle-left","angle-right","angle-up","apple","archive","area-chart","arrow-circle-down","arrow-circle-left","arrow-circle-o-down","arrow-circle-o-left","arrow-circle-o-right","arrow-circle-o-up","arrow-circle-right","arrow-circle-up","arrow-down","arrow-left","arrow-right","arrow-up","arrows","arrows-alt","arrows-h","arrows-v","asterisk","at","automobile","backward","balance-scale","ban","bank","bar-chart","bar-chart-o","barcode","bars","battery-0","battery-1","battery-2","battery-3","battery-4","battery-empty","battery-full","battery-half","battery-quarter","battery-three-quarters","bed","beer","behance","behance-square","bell","bell-o","bell-slash","bell-slash-o","bicycle","binoculars","birthday-cake","bitbucket","bitbucket-square","bitcoin","black-tie","bluetooth","bluetooth-b","bold","bolt","bomb","book","bookmark","bookmark-o","briefcase","btc","bug","building","building-o","bullhorn","bullseye","bus","buysellads","cab","calculator","calendar","calendar-check-o","calendar-minus-o","calendar-o","calendar-plus-o","calendar-times-o","camera","camera-retro","car","caret-down","caret-left","caret-right","caret-square-o-down","caret-square-o-left","caret-square-o-right","caret-square-o-up","caret-up","cart-arrow-down","cart-plus","cc","cc-amex","cc-diners-club","cc-discover","cc-jcb","cc-mastercard","cc-paypal","cc-stripe","cc-visa","certificate","chain","chain-broken","check","check-circle","check-circle-o","check-square","check-square-o","chevron-circle-down","chevron-circle-left","chevron-circle-right","chevron-circle-up","chevron-down","chevron-left","chevron-right","chevron-up","child","chrome","circle","circle-o","circle-o-notch","circle-thin","clipboard","clock-o","clone","close","cloud","cloud-download","cloud-upload","cny","code","code-fork","codepen","codiepie","coffee","cog","cogs","columns","comment","comment-o","commenting","commenting-o","comments","comments-o","compass","compress","connectdevelop","contao","copy","copyright","creative-commons","credit-card","credit-card-alt","crop","crosshairs","css3","cube","cubes","cut","cutlery","dashboard","dashcube","database","dedent","delicious","desktop","deviantart","diamond","digg","dollar","dot-circle-o","download","dribbble","dropbox","drupal","edge","edit","eject","ellipsis-h","ellipsis-v","empire","envelope","envelope-o","envelope-square","eraser","eur","euro","exchange","exclamation","exclamation-circle","exclamation-triangle","expand","expeditedssl","external-link","external-link-square","eye","eye-slash","eyedropper","facebook","facebook-f","facebook-official","facebook-square","fast-backward","fast-forward","fax","feed","female","fighter-jet","file","file-archive-o","file-audio-o","file-code-o","file-excel-o","file-image-o","file-movie-o","file-o","file-pdf-o","file-photo-o","file-picture-o","file-powerpoint-o","file-sound-o","file-text","file-text-o","file-video-o","file-word-o","file-zip-o","files-o","film","filter","fire","fire-extinguisher","firefox","flag","flag-checkered","flag-o","flash","flask","flickr","floppy-o","folder","folder-o","folder-open","folder-open-o","font","fonticons","fort-awesome","forumbee","forward","foursquare","frown-o","futbol-o","gamepad","gavel","gbp","ge","gear","gears","genderless","get-pocket","gg","gg-circle","gift","git","git-square","github","github-alt","github-square","gittip","glass","globe","google","google-plus","google-plus-square","google-wallet","graduation-cap","gratipay","group","h-square","hacker-news","hand-grab-o","hand-lizard-o","hand-o-down","hand-o-left","hand-o-right","hand-o-up","hand-paper-o","hand-peace-o","hand-pointer-o","hand-rock-o","hand-scissors-o","hand-spock-o","hand-stop-o","hashtag","hdd-o","header","headphones","heart","heart-o","heartbeat","history","home","hospital-o","hotel","hourglass","hourglass-1","hourglass-2","hourglass-3","hourglass-end","hourglass-half","hourglass-o","hourglass-start","houzz","html5","i-cursor","ils","image","inbox","indent","industry","info","info-circle","inr","instagram","institution","internet-explorer","intersex","ioxhost","italic","joomla","jpy","jsfiddle","key","keyboard-o","krw","language","laptop","lastfm","lastfm-square","leaf","leanpub","legal","lemon-o","level-down","level-up","life-bouy","life-buoy","life-ring","life-saver","lightbulb-o","line-chart","link","linkedin","linkedin-square","linux","list","list-alt","list-ol","list-ul","location-arrow","lock","long-arrow-down","long-arrow-left","long-arrow-right","long-arrow-up","magic","magnet","mail-forward","mail-reply","mail-reply-all","male","map","map-marker","map-o","map-pin","map-signs","mars","mars-double","mars-stroke","mars-stroke-h","mars-stroke-v","maxcdn","meanpath","medium","medkit","meh-o","mercury","microphone","microphone-slash","minus","minus-circle","minus-square","minus-square-o","mixcloud","mobile","mobile-phone","modx","money","moon-o","mortar-board","motorcycle","mouse-pointer","music","navicon","neuter","newspaper-o","object-group","object-ungroup","odnoklassniki","odnoklassniki-square","opencart","openid","opera","optin-monster","outdent","pagelines","paint-brush","paper-plane","paper-plane-o","paperclip","paragraph","paste","pause","pause-circle","pause-circle-o","paw","paypal","pencil","pencil-square","pencil-square-o","percent","phone","phone-square","photo","picture-o","pie-chart","pied-piper","pied-piper-alt","pinterest","pinterest-p","pinterest-square","plane","play","play-circle","play-circle-o","plug","plus","plus-circle","plus-square","plus-square-o","power-off","print","product-hunt","puzzle-piece","qq","qrcode","question","question-circle","quote-left","quote-right","ra","random","rebel","recycle","reddit","reddit-alien","reddit-square","refresh","registered","remove","renren","reorder","repeat","reply","reply-all","retweet","rmb","road","rocket","rotate-left","rotate-right","rouble","rss","rss-square","rub","ruble","rupee","safari","save","scissors","scribd","search","search-minus","search-plus","sellsy","send","send-o","server","share","share-alt","share-alt-square","share-square","share-square-o","shekel","sheqel","shield","ship","shirtsinbulk","shopping-bag","shopping-basket","shopping-cart","sign-in","sign-out","signal","simplybuilt","sitemap","skyatlas","skype","slack","sliders","slideshare","smile-o","soccer-ball-o","sort","sort-alpha-asc","sort-alpha-desc","sort-amount-asc","sort-amount-desc","sort-asc","sort-desc","sort-down","sort-numeric-asc","sort-numeric-desc","sort-up","soundcloud","space-shuttle","spinner","spoon","spotify","square","square-o","stack-exchange","stack-overflow","star","star-half","star-half-empty","star-half-full","star-half-o","star-o","steam","steam-square","step-backward","step-forward","stethoscope","sticky-note","sticky-note-o","stop","stop-circle","stop-circle-o","street-view","strikethrough","stumbleupon","stumbleupon-circle","subscript","subway","suitcase","sun-o","superscript","support","table","tablet","tachometer","tag","tags","tasks","taxi","television","tencent-weibo","terminal","text-height","text-width","th","th-large","th-list","thumb-tack","thumbs-down","thumbs-o-down","thumbs-o-up","thumbs-up","ticket","times","times-circle","times-circle-o","tint","toggle-down","toggle-left","toggle-off","toggle-on","toggle-right","toggle-up","trademark","train","transgender","transgender-alt","trash","trash-o","tree","trello","tripadvisor","trophy","truck","try","tty","tumblr","tumblr-square","turkish-lira","tv","twitch","twitter","twitter-square","umbrella","underline","undo","university","unlink","unlock","unlock-alt","unsorted","upload","usb","usd","user","user-md","user-plus","user-secret","user-times","users","venus","venus-double","venus-mars","viacoin","video-camera","vimeo","vimeo-square","vine","vk","volume-down","volume-off","volume-up","warning","wechat","weibo","weixin","whatsapp","wheelchair","wifi","wikipedia-w","windows","won","wordpress","wrench","xing","xing-square","y-combinator","y-combinator-square","yahoo","yc","yc-square","yelp","yen","youtube","youtube-play","youtube-square"]}
 
 /***/ }),
-/* 245 */
+/* 246 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43501,27 +43569,27 @@ module.exports = {"icons":["500px","adjust","adn","align-center","align-justify"
  */
 
 module.exports = {
-    ArrayEditor: __webpack_require__(246),
-    BooleanEditor: __webpack_require__(247),
-    ContentReferenceEditor: __webpack_require__(248),
-    ContentSchemaReferenceEditor: __webpack_require__(249),
-    DateEditor: __webpack_require__(250),
-    DropdownEditor: __webpack_require__(251),
+    ArrayEditor: __webpack_require__(247),
+    BooleanEditor: __webpack_require__(248),
+    ContentReferenceEditor: __webpack_require__(249),
+    ContentSchemaReferenceEditor: __webpack_require__(250),
+    DateEditor: __webpack_require__(251),
+    DropdownEditor: __webpack_require__(252),
     FieldEditor: __webpack_require__(11),
-    LanguageEditor: __webpack_require__(252),
-    MediaReferenceEditor: __webpack_require__(253),
-    NumberEditor: __webpack_require__(254),
-    ResourceReferenceEditor: __webpack_require__(255),
-    RichTextEditor: __webpack_require__(256),
-    StringEditor: __webpack_require__(257),
-    StructEditor: __webpack_require__(258),
-    TagsEditor: __webpack_require__(259),
-    TemplateReferenceEditor: __webpack_require__(260),
-    UrlEditor: __webpack_require__(261)
+    LanguageEditor: __webpack_require__(253),
+    MediaReferenceEditor: __webpack_require__(254),
+    NumberEditor: __webpack_require__(255),
+    ResourceReferenceEditor: __webpack_require__(256),
+    RichTextEditor: __webpack_require__(257),
+    StringEditor: __webpack_require__(258),
+    StructEditor: __webpack_require__(259),
+    TagsEditor: __webpack_require__(260),
+    TemplateReferenceEditor: __webpack_require__(261),
+    UrlEditor: __webpack_require__(262)
 };
 
 /***/ }),
-/* 246 */
+/* 247 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43552,7 +43620,9 @@ var ContentEditor = __webpack_require__(188);
  *         "tabId": "content",
  *         "schemaId": "array",
  *         "config": {
- *             "allowedSchemas": [ "string", "mediaReference", "myCustomSchema" ]
+ *             "allowedSchemas": [ "string", "mediaReference", "myCustomSchema" ],
+ *             "minItems": 5,
+ *             "maxItems": 5
  *         }
  *     }
  * }
@@ -43746,9 +43816,13 @@ var ArrayEditor = function (_FieldEditor) {
 
         var schemaOptions = HashBrown.Helpers.SchemaHelper.getAllSchemasSync('field');
 
-        return _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, 'Allowed Schemas'), _.div({ class: 'field-value' }, UI.inputChipGroup(config.allowedSchemas, schemaOptions, function (newValue) {
+        return _.div(_.div({ class: 'field-container' }, _.div({ class: 'field-key' }, 'Min items'), _.div({ class: 'field-value' }, _.input({ class: 'form-control', type: 'number', min: 0, step: 1, title: 'How many items are required in this array (0 is unlimited)', value: config.minItems || 0 }).change(function (e) {
+            config.minItems = e.currentTarget.value;
+        }))), _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, 'Max items'), _.div({ class: 'field-value' }, _.input({ class: 'form-control', type: 'number', min: 0, step: 1, title: 'How many items are allowed in this array (0 is unlimited)', value: config.maxItems || 0 }).change(function (e) {
+            config.maxItems = e.currentTarget.value;
+        }))), _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, 'Allowed Schemas'), _.div({ class: 'field-value' }, UI.inputChipGroup(config.allowedSchemas, schemaOptions, function (newValue) {
             config.allowedSchemas = newValue;
-        }, true)));
+        }, true))));
     };
 
     /**
@@ -44007,7 +44081,28 @@ var ArrayEditor = function (_FieldEditor) {
                 _this4.trigger('change', _this4.value);
             }, 500);
         }
+
+        // The value was below the required amount
+        if (this.value.items.length < this.config.minItems) {
+            var diff = this.config.minItems - this.value.items.length;
+
+            for (var _i2 = 0; _i2 < diff; _i2++) {
+                this.value.push({ value: null, schemaId: null });
+            }
+        }
+
+        // The value was above the required amount
+        if (this.value.length > this.config.maxItems) {
+            for (var _i3 = this.config.maxItems; _i3 < this.value.length; _i3++) {
+                delete this.value[_i3];
+            }
+        }
     };
+
+    /**
+     * Renders this editor
+     */
+
 
     ArrayEditor.prototype.render = function render() {
         var _this5 = this;
@@ -44051,7 +44146,7 @@ var ArrayEditor = function (_FieldEditor) {
 module.exports = ArrayEditor;
 
 /***/ }),
-/* 247 */
+/* 248 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44126,7 +44221,7 @@ var BooleanEditor = function (_FieldEditor) {
 module.exports = BooleanEditor;
 
 /***/ }),
-/* 248 */
+/* 249 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44272,7 +44367,7 @@ var ContentReferenceEditor = function (_FieldEditor) {
 module.exports = ContentReferenceEditor;
 
 /***/ }),
-/* 249 */
+/* 250 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44466,7 +44561,7 @@ var ContentSchemaReferenceEditor = function (_FieldEditor) {
 module.exports = ContentSchemaReferenceEditor;
 
 /***/ }),
-/* 250 */
+/* 251 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44705,7 +44800,7 @@ var DateEditor = function (_FieldEditor) {
 module.exports = DateEditor;
 
 /***/ }),
-/* 251 */
+/* 252 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44862,7 +44957,7 @@ var DropdownEditor = function (_FieldEditor) {
 module.exports = DropdownEditor;
 
 /***/ }),
-/* 252 */
+/* 253 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44957,7 +45052,7 @@ var LanguageEditor = function (_FieldEditor) {
 module.exports = LanguageEditor;
 
 /***/ }),
-/* 253 */
+/* 254 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44972,7 +45067,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var Media = __webpack_require__(27);
 var MediaHelper = __webpack_require__(38);
 var ProjectHelper = __webpack_require__(6);
-var MediaBrowser = __webpack_require__(212);
+var MediaBrowser = __webpack_require__(213);
 
 var FieldEditor = __webpack_require__(11);
 
@@ -45074,7 +45169,7 @@ var MediaReferenceEditor = function (_FieldEditor) {
 module.exports = MediaReferenceEditor;
 
 /***/ }),
-/* 254 */
+/* 255 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45170,7 +45265,7 @@ var NumberEditor = function (_FieldEditor) {
 module.exports = NumberEditor;
 
 /***/ }),
-/* 255 */
+/* 256 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45315,7 +45410,7 @@ var ResourceReferenceEditor = function (_FieldEditor) {
 module.exports = ResourceReferenceEditor;
 
 /***/ }),
-/* 256 */
+/* 257 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45624,7 +45719,7 @@ var RichTextEditor = function (_FieldEditor) {
 module.exports = RichTextEditor;
 
 /***/ }),
-/* 257 */
+/* 258 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45695,7 +45790,7 @@ var StringEditor = function (_FieldEditor) {
 module.exports = StringEditor;
 
 /***/ }),
-/* 258 */
+/* 259 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45922,7 +46017,7 @@ var StructEditor = function (_FieldEditor) {
 module.exports = StructEditor;
 
 /***/ }),
-/* 259 */
+/* 260 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46095,7 +46190,7 @@ var TagsEditor = function (_FieldEditor) {
 module.exports = TagsEditor;
 
 /***/ }),
-/* 260 */
+/* 261 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46282,7 +46377,7 @@ var TemplateReferenceEditor = function (_FieldEditor) {
 module.exports = TemplateReferenceEditor;
 
 /***/ }),
-/* 261 */
+/* 262 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46543,96 +46638,6 @@ var UrlEditor = function (_FieldEditor) {
 }(FieldEditor);
 
 module.exports = UrlEditor;
-
-/***/ }),
-/* 262 */,
-/* 263 */,
-/* 264 */,
-/* 265 */,
-/* 266 */,
-/* 267 */,
-/* 268 */,
-/* 269 */,
-/* 270 */,
-/* 271 */,
-/* 272 */,
-/* 273 */,
-/* 274 */,
-/* 275 */,
-/* 276 */,
-/* 277 */,
-/* 278 */,
-/* 279 */,
-/* 280 */,
-/* 281 */,
-/* 282 */,
-/* 283 */,
-/* 284 */,
-/* 285 */,
-/* 286 */,
-/* 287 */,
-/* 288 */,
-/* 289 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-/**
- * A helper class for Template resources
- *
- * @memberof HashBrown.Client.Helpers
- */
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var TemplateHelper = function () {
-    function TemplateHelper() {
-        _classCallCheck(this, TemplateHelper);
-    }
-
-    /**
-     * Gets all templates
-     *
-     * @param {String} type
-     *
-     * @returns {Array} Templates
-     */
-    TemplateHelper.getAllTemplates = function getAllTemplates(type) {
-        if (!type) {
-            return resources.templates;
-        }
-
-        var templates = [];
-
-        for (var _iterator = resources.templates, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-            var _ref;
-
-            if (_isArray) {
-                if (_i >= _iterator.length) break;
-                _ref = _iterator[_i++];
-            } else {
-                _i = _iterator.next();
-                if (_i.done) break;
-                _ref = _i.value;
-            }
-
-            var template = _ref;
-
-            if (template.type !== type) {
-                continue;
-            }
-
-            templates.push(template);
-        }
-
-        return templates;
-    };
-
-    return TemplateHelper;
-}();
-
-module.exports = TemplateHelper;
 
 /***/ })
 /******/ ]);

@@ -16,12 +16,15 @@
             min-height: 400px;
         }
 
-        .field-properties {
+        .config, .field-properties {
             position: relative;
             margin-left: 2rem;
             padding-bottom: 2rem;
-            border-bottom: 0.1rem solid $standard-darker;
             margin-top: 2rem;
+        }
+
+        .field-properties {
+            border-bottom: 0.1rem solid $standard-darker;
         }
 
         .btn-add-item {

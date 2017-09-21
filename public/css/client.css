@@ -1056,12 +1056,13 @@ body.dashboard-container {
     padding: 15px; }
     .schema-editor > .schema .json-editor {
       min-height: 400px; }
-    .schema-editor > .schema .field-properties {
+    .schema-editor > .schema .config, .schema-editor > .schema .field-properties {
       position: relative;
       margin-left: 2rem;
       padding-bottom: 2rem;
-      border-bottom: 0.1rem solid #999999;
       margin-top: 2rem; }
+    .schema-editor > .schema .field-properties {
+      border-bottom: 0.1rem solid #999999; }
     .schema-editor > .schema .btn-add-item {
       margin: 2rem 0 0 auto;
       display: block; }

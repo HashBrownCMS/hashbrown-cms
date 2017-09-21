@@ -17,7 +17,9 @@ const ContentEditor = require('Client/Views/Editors/ContentEditor');
  *         "tabId": "content",
  *         "schemaId": "array",
  *         "config": {
- *             "allowedSchemas": [ "string", "mediaReference", "myCustomSchema" ]
+ *             "allowedSchemas": [ "string", "mediaReference", "myCustomSchema" ],
+ *             "minItems": 5,
+ *             "maxItems": 5
  *         }
  *     }
  * }
@@ -204,12 +206,32 @@ class ArrayEditor extends FieldEditor {
 
         let schemaOptions = HashBrown.Helpers.SchemaHelper.getAllSchemasSync('field');
 
-        return _.div({class: 'field-container'},
-            _.div({class: 'field-key'}, 'Allowed Schemas'),
-            _.div({class: 'field-value'},
-                UI.inputChipGroup(config.allowedSchemas, schemaOptions, (newValue) => {
-                    config.allowedSchemas = newValue;
-                }, true)
+        return _.div(
+            _.div({class: 'field-container'},
+                _.div({class: 'field-key'}, 'Min items'),
+                _.div({class: 'field-value'},
+                    _.input({class: 'form-control', type: 'number', min: 0, step: 1, title: 'How many items are required in this array (0 is unlimited)', value: config.minItems || 0})
+                        .change((e) => {
+                            config.minItems = e.currentTarget.value;
+                        })
+                )
+            ),
+            _.div({class: 'field-container'},
+                _.div({class: 'field-key'}, 'Max items'),
+                _.div({class: 'field-value'},
+                    _.input({class: 'form-control', type: 'number', min: 0, step: 1, title: 'How many items are allowed in this array (0 is unlimited)', value: config.maxItems || 0})
+                        .change((e) => {
+                            config.maxItems = e.currentTarget.value;
+                        })
+                )
+            ),
+            _.div({class: 'field-container'},
+                _.div({class: 'field-key'}, 'Allowed Schemas'),
+                _.div({class: 'field-value'},
+                    UI.inputChipGroup(config.allowedSchemas, schemaOptions, (newValue) => {
+                        config.allowedSchemas = newValue;
+                    }, true)
+                )
             )
         );
     }
@@ -465,8 +487,27 @@ class ArrayEditor extends FieldEditor {
                 this.trigger('change', this.value);
             }, 500);
         }
+
+        // The value was below the required amount
+        if(this.value.items.length < this.config.minItems) {
+            let diff = this.config.minItems - this.value.items.length;
+
+            for(let i = 0; i < diff; i++) {
+                this.value.push({ value: null, schemaId: null });
+            }
+        }
+
+        // The value was above the required amount
+        if(this.value.length > this.config.maxItems) {
+            for(let i = this.config.maxItems; i < this.value.length; i++) {
+                delete this.value[i];
+            }
+        }
     }
 
+    /**
+     * Renders this editor
+     */
     render() {
         // Perform sanity check
         this.sanityCheck();

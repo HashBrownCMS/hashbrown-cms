@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 262);
+/******/ 	return __webpack_require__(__webpack_require__.s = 263);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -24589,8 +24589,8 @@ module.exports = {
     RequestHelper: __webpack_require__(2),
     SchemaHelper: __webpack_require__(15),
     SettingsHelper: __webpack_require__(26),
-    TemplateHelper: __webpack_require__(289),
-    UIHelper: __webpack_require__(193)
+    TemplateHelper: __webpack_require__(193),
+    UIHelper: __webpack_require__(194)
 };
 
 /***/ }),
@@ -24833,6 +24833,69 @@ module.exports = DebugHelper;
 
 /***/ }),
 /* 193 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/**
+ * A helper class for Template resources
+ *
+ * @memberof HashBrown.Client.Helpers
+ */
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var TemplateHelper = function () {
+    function TemplateHelper() {
+        _classCallCheck(this, TemplateHelper);
+    }
+
+    /**
+     * Gets all templates
+     *
+     * @param {String} type
+     *
+     * @returns {Array} Templates
+     */
+    TemplateHelper.getAllTemplates = function getAllTemplates(type) {
+        if (!type) {
+            return resources.templates;
+        }
+
+        var templates = [];
+
+        for (var _iterator = resources.templates, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+            var _ref;
+
+            if (_isArray) {
+                if (_i >= _iterator.length) break;
+                _ref = _iterator[_i++];
+            } else {
+                _i = _iterator.next();
+                if (_i.done) break;
+                _ref = _i.value;
+            }
+
+            var template = _ref;
+
+            if (template.type !== type) {
+                continue;
+            }
+
+            templates.push(template);
+        }
+
+        return templates;
+    };
+
+    return TemplateHelper;
+}();
+
+module.exports = TemplateHelper;
+
+/***/ }),
+/* 194 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -25433,12 +25496,12 @@ var UIHelper = function () {
 module.exports = UIHelper;
 
 /***/ }),
-/* 194 */
+/* 195 */
 /***/ (function(module, exports, __webpack_require__) {
 
-window.Promise = __webpack_require__(195);
-window.marked = __webpack_require__(196);
-window.toMarkdown = __webpack_require__(197);
+window.Promise = __webpack_require__(196);
+window.marked = __webpack_require__(197);
+window.toMarkdown = __webpack_require__(198);
 
 var ProjectHelper = __webpack_require__(6);
 var User = __webpack_require__(43);
@@ -25537,13 +25600,13 @@ window.populateWorkspace = function populateWorkspace($html, classes) {
 };
 
 // Get package file
-window.app = __webpack_require__(205);
+window.app = __webpack_require__(206);
 
 // Language
 window.language = localStorage.getItem('language') || 'en';
 
 /***/ }),
-/* 195 */
+/* 196 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process, global, setImmediate) {var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -30874,7 +30937,7 @@ window.language = localStorage.getItem('language') || 'en';
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(8), __webpack_require__(9), __webpack_require__(60).setImmediate))
 
 /***/ }),
-/* 196 */
+/* 197 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {var __WEBPACK_AMD_DEFINE_RESULT__;var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -32063,7 +32126,7 @@ window.language = localStorage.getItem('language') || 'en';
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(9)))
 
 /***/ }),
-/* 197 */
+/* 198 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -32079,10 +32142,10 @@ window.language = localStorage.getItem('language') || 'en';
 
 var toMarkdown;
 var converters;
-var mdConverters = __webpack_require__(198);
-var gfmConverters = __webpack_require__(199);
-var HtmlParser = __webpack_require__(200);
-var collapse = __webpack_require__(202);
+var mdConverters = __webpack_require__(199);
+var gfmConverters = __webpack_require__(200);
+var HtmlParser = __webpack_require__(201);
+var collapse = __webpack_require__(203);
 
 /*
  * Utilities
@@ -32290,7 +32353,7 @@ toMarkdown.outer = outer;
 module.exports = toMarkdown;
 
 /***/ }),
-/* 198 */
+/* 199 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -32423,7 +32486,7 @@ module.exports = [{
 }];
 
 /***/ }),
-/* 199 */
+/* 200 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -32523,7 +32586,7 @@ module.exports = [{
 }];
 
 /***/ }),
-/* 200 */
+/* 201 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -32557,7 +32620,7 @@ function createHtmlParser() {
 
   // For Node.js environments
   if (typeof document === 'undefined') {
-    var jsdom = __webpack_require__(201);
+    var jsdom = __webpack_require__(202);
     Parser.prototype.parseFromString = function (string) {
       return jsdom.jsdom(string, {
         features: {
@@ -32604,25 +32667,25 @@ function shouldUseActiveX() {
 module.exports = canParseHtmlNatively() ? _window.DOMParser : createHtmlParser();
 
 /***/ }),
-/* 201 */
+/* 202 */
 /***/ (function(module, exports) {
 
 /* (ignored) */
 
 /***/ }),
-/* 202 */
+/* 203 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var voidElements = __webpack_require__(203);
+var voidElements = __webpack_require__(204);
 Object.keys(voidElements).forEach(function (name) {
   voidElements[name.toUpperCase()] = 1;
 });
 
 var blockElements = {};
-__webpack_require__(204).forEach(function (name) {
+__webpack_require__(205).forEach(function (name) {
   blockElements[name.toUpperCase()] = 1;
 });
 
@@ -32752,7 +32815,7 @@ function next(prev, current) {
 module.exports = collapseWhitespace;
 
 /***/ }),
-/* 203 */
+/* 204 */
 /***/ (function(module, exports) {
 
 /**
@@ -32780,7 +32843,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 204 */
+/* 205 */
 /***/ (function(module, exports) {
 
 /**
@@ -32791,13 +32854,12 @@ module.exports = {
 module.exports = ["address", "article", "aside", "blockquote", "canvas", "dd", "div", "dl", "dt", "fieldset", "figcaption", "figure", "footer", "form", "h1", "h2", "h3", "h4", "h5", "h6", "header", "hgroup", "hr", "li", "main", "nav", "noscript", "ol", "output", "p", "pre", "section", "table", "tfoot", "ul", "video"];
 
 /***/ }),
-/* 205 */
+/* 206 */
 /***/ (function(module, exports) {
 
 module.exports = {"name":"hashbrown-cms","repository":"https://github.com/Putaitu/hashbrown-cms.git","version":"0.9.8","description":"The pluggable CMS","main":"hashbrown.js","scripts":{"test":"echo \"Error: no test specified\" && exit 1"},"author":"Putaitu Productions","license":"MIT","dependencies":{"app-module-path":"^2.2.0","bluebird":"^3.3.3","body-parser":"^1.14.1","cookie-parser":"^1.4.3","express":"^4.13.3","express-ws":"^3.0.0","glob":"^7.0.3","js-beautify":"^1.6.2","marked":"^0.3.5","mongodb":"^2.1.7","multer":"^1.1.0","nodemailer":"^4.0.1","path-to-regexp":"^1.2.1","pug":"^2.0.0-beta11","rimraf":"^2.5.2","semver":"^5.4.1","to-markdown":"^2.0.1","xoauth2":"^1.2.0"},"devDependencies":{"babel-core":"^6.18.0","babel-loader":"^6.2.7","babel-preset-es2015":"^6.18.0","babel-preset-es2015-native-modules":"^6.9.4","babel-preset-es2015-node5":"^1.2.0","css-loader":"^0.26.1","extract-text-webpack-plugin":"^2.1.2","json-loader":"^0.5.4","node-sass":"^3.13.1","sass-loader":"^6.0.6","sass-material-colors":"0.0.5","style-loader":"^0.13.1","webpack":"^3.0.0"}}
 
 /***/ }),
-/* 206 */,
 /* 207 */,
 /* 208 */,
 /* 209 */,
@@ -32853,7 +32915,8 @@ module.exports = {"name":"hashbrown-cms","repository":"https://github.com/Putait
 /* 259 */,
 /* 260 */,
 /* 261 */,
-/* 262 */
+/* 262 */,
+/* 263 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -32868,7 +32931,7 @@ window.HashBrown = {};
 HashBrown.Helpers = __webpack_require__(190);
 
 // Helper functions
-__webpack_require__(194);
+__webpack_require__(195);
 
 // Helper shortcuts
 window.debug = HashBrown.Helpers.DebugHelper;
@@ -32904,7 +32967,7 @@ HashBrown.Helpers.RequestHelper.request('get', 'user').then(function (user) {
 
         return HashBrown.Helpers.RequestHelper.request('get', 'server/projects/' + project).then(function (project) {
             var Project = __webpack_require__(96);
-            var ProjectEditor = __webpack_require__(263);
+            var ProjectEditor = __webpack_require__(264);
 
             var projectEditor = new ProjectEditor({
                 model: new Project(project)
@@ -33170,7 +33233,7 @@ $('.btn-create-project').click(function () {
 });
 
 /***/ }),
-/* 263 */
+/* 264 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -33185,11 +33248,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var RequestHelper = __webpack_require__(2);
 
 var MessageModal = __webpack_require__(16);
-var InfoEditor = __webpack_require__(264);
-var SyncEditor = __webpack_require__(265);
-var LanguageEditor = __webpack_require__(266);
-var BackupEditor = __webpack_require__(267);
-var MigrationEditor = __webpack_require__(268);
+var InfoEditor = __webpack_require__(265);
+var SyncEditor = __webpack_require__(266);
+var LanguageEditor = __webpack_require__(267);
+var BackupEditor = __webpack_require__(268);
+var MigrationEditor = __webpack_require__(269);
 
 /**
  * The editor for projects as seen on the dashboard
@@ -33431,7 +33494,7 @@ var ProjectEditor = function (_Crisp$View) {
 module.exports = ProjectEditor;
 
 /***/ }),
-/* 264 */
+/* 265 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -33549,7 +33612,7 @@ var InfoEditor = function (_Crisp$View) {
 module.exports = InfoEditor;
 
 /***/ }),
-/* 265 */
+/* 266 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -33755,7 +33818,7 @@ var SyncEditor = function (_Crisp$View) {
 module.exports = SyncEditor;
 
 /***/ }),
-/* 266 */
+/* 267 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -33838,7 +33901,7 @@ var LanguageEditor = function (_Crisp$View) {
 module.exports = LanguageEditor;
 
 /***/ }),
-/* 267 */
+/* 268 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -34104,7 +34167,7 @@ var BackupEditor = function (_Crisp$View) {
 module.exports = BackupEditor;
 
 /***/ }),
-/* 268 */
+/* 269 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -34221,89 +34284,6 @@ var MigrationEditor = function (_Crisp$View) {
 }(Crisp.View);
 
 module.exports = MigrationEditor;
-
-/***/ }),
-/* 269 */,
-/* 270 */,
-/* 271 */,
-/* 272 */,
-/* 273 */,
-/* 274 */,
-/* 275 */,
-/* 276 */,
-/* 277 */,
-/* 278 */,
-/* 279 */,
-/* 280 */,
-/* 281 */,
-/* 282 */,
-/* 283 */,
-/* 284 */,
-/* 285 */,
-/* 286 */,
-/* 287 */,
-/* 288 */,
-/* 289 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-/**
- * A helper class for Template resources
- *
- * @memberof HashBrown.Client.Helpers
- */
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var TemplateHelper = function () {
-    function TemplateHelper() {
-        _classCallCheck(this, TemplateHelper);
-    }
-
-    /**
-     * Gets all templates
-     *
-     * @param {String} type
-     *
-     * @returns {Array} Templates
-     */
-    TemplateHelper.getAllTemplates = function getAllTemplates(type) {
-        if (!type) {
-            return resources.templates;
-        }
-
-        var templates = [];
-
-        for (var _iterator = resources.templates, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-            var _ref;
-
-            if (_isArray) {
-                if (_i >= _iterator.length) break;
-                _ref = _iterator[_i++];
-            } else {
-                _i = _iterator.next();
-                if (_i.done) break;
-                _ref = _i.value;
-            }
-
-            var template = _ref;
-
-            if (template.type !== type) {
-                continue;
-            }
-
-            templates.push(template);
-        }
-
-        return templates;
-    };
-
-    return TemplateHelper;
-}();
-
-module.exports = TemplateHelper;
 
 /***/ })
 /******/ ]);

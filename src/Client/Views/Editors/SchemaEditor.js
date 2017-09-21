@@ -79,6 +79,8 @@ class SchemaEditor extends Crisp.View {
             _.if(!this.model.isLocked,
                 UI.inputDropdownTypeAhead(editorName, editorOptions, (newValue) => {
                     this.model.editorId = newValue;
+
+                    this.render();
                 })
             ),
             _.if(this.model.isLocked,
@@ -540,40 +542,41 @@ class SchemaEditor extends Crisp.View {
     }
 
     /**
-     * Renders the field properties editor
+     * Renders the field config editor
      *
      * @returns {HTMLElement} Editor element
      */
-    renderFieldPropertiesEditor() {
-        let model;
+    renderFieldConfigEditor() {
+        let editor = HashBrown.Views.Editors.FieldEditors[this.model.editorId];
+
+        if(!editor) { return; }
+
+        return _.div({class: 'config'},
+            editor.renderConfigEditor(this.model.config)
+        );
+    }
+
+    /**
+     * Renders the Content field properties editor
+     *
+     * @returns {HTMLElement} Editor element
+     */
+    renderContentFieldPropertiesEditor() {
         let $editor = _.div({class: 'field-properties-editor'});
         let fieldSchemas = HashBrown.Helpers.SchemaHelper.getAllSchemasSync('field');
 
-        // Set model to Content fields
-        if(this.model.type == 'content') {
-            if(!this.model.fields) {
-                this.model.fields = {};
-            }
-            
-            if(!this.model.fields.properties) {
-                this.model.fields.properties = {};
-            }
+        if(!this.model.fields) {
+            this.model.fields = {};
+        }
         
-            model = this.model.fields.properties;
-        
-        // Set model to field config
-        } else if(this.model.type == 'field') {
-            if(!this.model.config) {
-                this.model.config = {};
-            }
-            
-            model = this.model.config;
+        if(!this.model.fields.properties) {
+            this.model.fields.properties = {};
         }
 
         // Render editor
         let renderEditor = () => {
             _.append($editor.empty(),
-                _.each(model, (key, value) => {
+                _.each(this.model.fields.properties, (key, value) => {
                     // Sanity check
                     value.config = value.config || {};
 
@@ -593,7 +596,7 @@ class SchemaEditor extends Crisp.View {
                             _.button({class: 'btn btn-remove'},
                                 _.span({class: 'fa fa-remove'})
                             ).click(() => {
-                                delete model[key];
+                                delete this.model.fields.properties[key];
 
                                 renderEditor();
                             }),
@@ -602,11 +605,11 @@ class SchemaEditor extends Crisp.View {
                                 _.div({class: 'field-value'},
                                     _.input({class: 'form-control', type: 'text', value: key, placeholder: 'A variable name, like "newField"', title: 'This is the variable name for the field'})
                                         .change((e) => {
-                                            delete model[key];
+                                            delete this.model.fields.properties[key];
 
                                             key = e.currentTarget.value;
 
-                                            model[key] = value;
+                                            this.model.fields.properties[key] = value;
                                         })
                                 )
                             ),
@@ -619,14 +622,12 @@ class SchemaEditor extends Crisp.View {
                                         })
                                 )
                             ),
-                            _.if(this.model.type === 'content',
-                                _.div({class: 'field-container'},
-                                    _.div({class: 'field-key'}, 'Tab'),
-                                    _.div({class: 'field-value'},
-                                        UI.inputDropdown(value.tabId, tabOptions, (newTabId) => {
-                                            value.tabId = newTabId;
-                                        }, true)
-                                    )
+                            _.div({class: 'field-container'},
+                                _.div({class: 'field-key'}, 'Tab'),
+                                _.div({class: 'field-value'},
+                                    UI.inputDropdown(value.tabId, tabOptions, (newTabId) => {
+                                        value.tabId = newTabId;
+                                    }, true)
                                 )
                             ),
                             _.div({class: 'field-container'},
@@ -660,7 +661,7 @@ class SchemaEditor extends Crisp.View {
                 _.button({class: 'btn btn-primary btn-raised btn-add-item btn-round'},
                     _.span({class: 'fa fa-plus'})
                 ).click(() => {
-                    model.newField = {
+                    this.model.field.properties.newField = {
                         label: 'New field',
                         schemaId: 'string'
                     };
@@ -749,7 +750,7 @@ class SchemaEditor extends Crisp.View {
                 $element.append(this.renderField('Allowed child Schemas', this.renderAllowedChildSchemasEditor()));
                 
                 if(!this.model.isLocked) {
-                    $element.append(this.renderField('Fields', this.renderFieldPropertiesEditor(), true));
+                    $element.append(this.renderField('Fields', this.renderContentFieldPropertiesEditor(), true));
                 }
                 
                 break;
@@ -758,7 +759,7 @@ class SchemaEditor extends Crisp.View {
                 $element.append(this.renderField('Field editor', this.renderEditorPicker()));
                 
                 if(!this.model.isLocked) {
-                    $element.append(this.renderField('Config', this.renderFieldPropertiesEditor(), true));
+                    $element.append(this.renderField('Config', this.renderFieldConfigEditor(), true));
                     $element.append(this.renderField('Preview template', this.renderTemplateEditor(), true));
                 }
        
