@@ -335,7 +335,7 @@ class SettingsHelper extends SettingsHelperCommon {
             if(section === 'sync') {
                 oldSettings.sync = settings;
 
-                return DatabaseHelper.updateOne(project, 'settings', { usedBy: 'project' }, oldSettings);
+                return DatabaseHelper.updateOne(project, 'settings', { usedBy: 'project' }, oldSettings, { upsert: true });
             }
 
             // Set the remote setting, if applicable
