@@ -23,6 +23,17 @@ class ContentSchema extends Schema {
         this.name = 'New content schema';
         this.type = 'content';
     }
+
+    /**
+     * Checks whether a tab is the default one
+     *
+     * @param {String} tabId
+     *
+     * @returns {Boolean} Is the tab default
+     */
+    isDefaultTab(tabId) {
+        return (!this.defaultTabId && tabId === 'meta') || this.defaultTabId === tabId;
+    }
 }
 
 module.exports = ContentSchema;

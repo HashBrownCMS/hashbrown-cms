@@ -2429,3 +2429,10 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
     padding: 15px;
     text-shadow: none;
     color: #e70d3b; }
+
+/**
+ * A versatile inpit widget
+ */
+.widget--input {
+  display: block;
+  line-height: 3rem; }

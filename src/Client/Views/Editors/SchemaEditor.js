@@ -1,3 +1,5 @@
+'use strict';
+
 // Icons
 let icons = require('../../icons.json').icons;
 
@@ -556,126 +558,6 @@ class SchemaEditor extends Crisp.View {
         );
     }
 
-    /**
-     * Renders the Content field properties editor
-     *
-     * @returns {HTMLElement} Editor element
-     */
-    renderContentFieldPropertiesEditor() {
-        let $editor = _.div({class: 'field-properties-editor'});
-        let fieldSchemas = HashBrown.Helpers.SchemaHelper.getAllSchemasSync('field');
-
-        if(!this.model.fields) {
-            this.model.fields = {};
-        }
-        
-        if(!this.model.fields.properties) {
-            this.model.fields.properties = {};
-        }
-
-        // Render editor
-        let renderEditor = () => {
-            _.append($editor.empty(),
-                _.each(this.model.fields.properties, (key, value) => {
-                    // Sanity check
-                    value.config = value.config || {};
-
-                    let $field = _.div({class: 'field-properties'});
-
-                    let renderField = () => {
-                        let tabOptions = [];
-
-                        for(let tabId in this.compiledSchema.tabs) {
-                            tabOptions.push({
-                                label: this.compiledSchema.tabs[tabId],
-                                value: tabId
-                            });
-                        }
-
-                        _.append($field.empty(), 
-                            _.button({class: 'btn btn-remove'},
-                                _.span({class: 'fa fa-remove'})
-                            ).click(() => {
-                                delete this.model.fields.properties[key];
-
-                                renderEditor();
-                            }),
-                            _.div({class: 'field-container'},
-                                _.div({class: 'field-key'}, 'Variable name'),
-                                _.div({class: 'field-value'},
-                                    _.input({class: 'form-control', type: 'text', value: key, placeholder: 'A variable name, like "newField"', title: 'This is the variable name for the field'})
-                                        .change((e) => {
-                                            delete this.model.fields.properties[key];
-
-                                            key = e.currentTarget.value;
-
-                                            this.model.fields.properties[key] = value;
-                                        })
-                                )
-                            ),
-                            _.div({class: 'field-container'},
-                                _.div({class: 'field-key'}, 'Label'),
-                                _.div({class: 'field-value'},
-                                    _.input({class: 'form-control', type: 'text', value: value.label, placeholder: 'A label, like "New field"',  title: 'This is the label that will be visible in the Content editor'})
-                                        .change((e) => {
-                                            value.label = e.currentTarget.value;  
-                                        })
-                                )
-                            ),
-                            _.div({class: 'field-container'},
-                                _.div({class: 'field-key'}, 'Tab'),
-                                _.div({class: 'field-value'},
-                                    UI.inputDropdown(value.tabId, tabOptions, (newTabId) => {
-                                        value.tabId = newTabId;
-                                    }, true)
-                                )
-                            ),
-                            _.div({class: 'field-container'},
-                                _.div({class: 'field-key'}, 'Schema'),
-                                _.div({class: 'field-value'},
-                                    UI.inputDropdown(value.schemaId, fieldSchemas, (newSchemaId) => {
-                                        value.schemaId = newSchemaId;
-
-                                        renderField();
-                                    })
-                                )
-                            ),
-                            _.do(() => {
-                                let schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(value.schemaId);
-
-                                if(!schema) { return; }
-
-                                let editor = HashBrown.Views.Editors.FieldEditors[schema.editorId];
-
-                                if(!editor) { return; }
-
-                                return editor.renderConfigEditor(value.config);
-                            })
-                        )
-                    };
-
-                    renderField();                
-
-                    return $field;
-                }),
-                _.button({class: 'btn btn-primary btn-raised btn-add-item btn-round'},
-                    _.span({class: 'fa fa-plus'})
-                ).click(() => {
-                    this.model.field.properties.newField = {
-                        label: 'New field',
-                        schemaId: 'string'
-                    };
-
-                    renderEditor();
-                })
-            );
-        };
-
-        renderEditor();
-
-        return $editor;
-    }
-
 	/**
 	 * Render template editor
 	 *
@@ -744,17 +626,6 @@ class SchemaEditor extends Crisp.View {
         $element.append(this.renderField('Parent', this.renderParentEditor()));
         
         switch(this.model.type) {
-            case 'content':
-                $element.append(this.renderField('Default tab', this.renderDefaultTabEditor()));
-                $element.append(this.renderField('Tabs', this.renderTabsEditor()));
-                $element.append(this.renderField('Allowed child Schemas', this.renderAllowedChildSchemasEditor()));
-                
-                if(!this.model.isLocked) {
-                    $element.append(this.renderField('Fields', this.renderContentFieldPropertiesEditor(), true));
-                }
-                
-                break;
-
             case 'field':
                 $element.append(this.renderField('Field editor', this.renderEditorPicker()));
                 
@@ -774,37 +645,28 @@ class SchemaEditor extends Crisp.View {
      * Renders this editor
      */
     render() {
-        if(this.model instanceof Schema === false) {
-            this.model = SchemaHelper.getModel(this.model);
-        }
-
         this.$element.toggleClass('locked', this.model.isLocked);
 
-        SchemaHelper.getSchemaWithParentFields(this.model.id)
-        .then((compiledSchema) => {
-            this.compiledSchema = compiledSchema;
-           
-            _.append(this.$element.empty(),
-                _.div({class: 'editor-header'},
-                    _.span({class: 'fa fa-' + this.compiledSchema.icon}),
-                    _.h4(this.model.name)
-                ),
-                this.renderFields(),
-                _.div({class: 'editor-footer panel panel-default panel-buttons'}, 
-                    _.div({class: 'btn-group'},
-                        _.button({class: 'btn btn-embedded'},
-                            'Advanced'
-                        ).click(() => { this.onClickAdvanced(); }),
-                        _.if(!this.model.isLocked,
-                            this.$saveBtn = _.button({class: 'btn btn-primary btn-raised btn-save'},
-                                _.span({class: 'text-default'}, 'Save '),
-                                _.span({class: 'text-working'}, 'Saving ')
-                            ).click(() => { this.onClickSave(); })
-                        )
+        _.append(this.$element.empty(),
+            _.div({class: 'editor-header'},
+                _.span({class: 'fa fa-' + this.compiledSchema.icon}),
+                _.h4(this.model.name)
+            ),
+            this.renderFields(),
+            _.div({class: 'editor-footer panel panel-default panel-buttons'}, 
+                _.div({class: 'btn-group'},
+                    _.button({class: 'btn btn-embedded'},
+                        'Advanced'
+                    ).click(() => { this.onClickAdvanced(); }),
+                    _.if(!this.model.isLocked,
+                        this.$saveBtn = _.button({class: 'btn btn-primary btn-raised btn-save'},
+                            _.span({class: 'text-default'}, 'Save '),
+                            _.span({class: 'text-working'}, 'Saving ')
+                        ).click(() => { this.onClickSave(); })
                     )
                 )
-            );
-        });
+            )
+        );
     }
 }
 

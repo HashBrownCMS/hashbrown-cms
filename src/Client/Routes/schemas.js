@@ -23,16 +23,42 @@ Crisp.Router.route('/schemas/', function() {
 });
 
 // Edit
-Crisp.Router.route('/schemas/:id', function() {
+Crisp.Router.route('/schemas/:id', () => {
     if(currentUserHasScope('schemas')) {
-        let schemaEditor = new HashBrown.Views.Editors.SchemaEditor({
-            modelUrl: RequestHelper.environmentUrl('schemas/' + this.id)
+        let schema;
+        let compiledSchema;
+
+        Crisp.View.get('NavbarMain').highlightItem('/schemas/', Crisp.Router.params.id);
+       
+        // First get the Schema model
+        SchemaHelper.getSchemaById(Crisp.Router.params.id)
+        .then((result) => {
+            schema = SchemaHelper.getModel(result);
+
+            return SchemaHelper.getSchemaWithParentFields(Crisp.Router.params.id);
+        })
+
+        // Then get the compiled Schema
+        .then((result) => {
+            compiledSchema = SchemaHelper.getModel(result);
+
+            let schemaEditor;
+
+            if(schema instanceof HashBrown.Models.ContentSchema) {
+                schemaEditor = new HashBrown.Views.Editors.ContentSchemaEditor({
+                    model: schema,
+                    compiledSchema: compiledSchema
+                });
+            } else {
+                schemaEditor = new HashBrown.Views.Editors.SchemaEditor({
+                    model: schema,
+                    compiledSchema: compiledSchema
+                });
+            }
+            
+            populateWorkspace(schemaEditor.$element);
         });
-        
-        Crisp.View.get('NavbarMain').highlightItem('/schemas/', this.id);
-        
-        populateWorkspace(schemaEditor.$element);
-    
+            
     } else {
         location.hash = '/';
 

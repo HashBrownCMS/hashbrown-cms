@@ -6,6 +6,7 @@
 module.exports = {
     ConnectionEditor: require('./ConnectionEditor'),
     ContentEditor: require('./ContentEditor'),
+    ContentSchemaEditor: require('./ContentSchemaEditor'),
     FormEditor: require('./FormEditor'),
     JSONEditor: require('./JSONEditor'),
     MediaViewer: require('./MediaViewer'),

@@ -28,6 +28,7 @@ window.HashBrown = {};
 
 HashBrown.Models = require('Client/Models');
 HashBrown.Views = {};
+HashBrown.Views.Widgets = require('Client/Views/Widgets');
 HashBrown.Views.Modals = require('Client/Views/Modals');
 HashBrown.Views.Navigation = require('Client/Views/Navigation');
 HashBrown.Views.Editors = require('Client/Views/Editors');
