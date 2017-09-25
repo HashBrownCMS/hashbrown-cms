@@ -173,6 +173,8 @@ class TemplatePane extends NavbarPane {
      * Init
      */
     static init() {
+        if(!currentUserHasScope('templates')) { return; }
+
         NavbarMain.addTabPane('/templates/', 'Templates', 'code', {
             getItems: () => { return resources.templates; },
 

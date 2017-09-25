@@ -145,6 +145,8 @@ class SchemaPane extends NavbarPane {
      * Init
      */
     static init() {
+        if(!currentUserHasScope('schemas')) { return; }
+
         NavbarMain.addTabPane('/schemas/', 'Schemas', 'gears', {
             getItems: () => { return resources.schemas; },
 

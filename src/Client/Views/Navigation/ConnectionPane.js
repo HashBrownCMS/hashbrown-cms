@@ -134,6 +134,8 @@ class ConnectionPane extends NavbarPane {
      * Init
      */
     static init() {
+        if(!currentUserHasScope('connections')) { return; }
+
         NavbarMain.addTabPane('/connections/', 'Connections', 'exchange', {
             getItems: () => { return resources.connections; },
 
