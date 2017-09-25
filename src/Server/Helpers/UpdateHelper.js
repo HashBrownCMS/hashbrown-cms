@@ -136,7 +136,36 @@ class UpdateHelper {
             })
         })
 
-        // Install dependencies
+        // Install submodules
+        .then(() => {
+            debug.log('Installing submodules...', this);
+            
+            return new Promise((resolve, reject) => {
+                let npm = ChildProcess.exec('git submodule update --recursive --init', {
+                    cwd: appRoot
+                });
+
+                npm.stdout.on('data', (data) => {
+                    debug.log(data, this, 3);
+                });
+
+                npm.stderr.on('data', (data) => {
+                    debug.log(data, this, 3);
+                });
+                
+                npm.on('exit', (code) => {
+                    code = parseInt(code);
+
+                    if(code === 0) {
+                        resolve();
+                    } else {
+                        reject(new Error('Install failed while trying to run "git submodule update"'));
+                    }
+                });
+            });
+        })
+
+        // Install node dependencies
         .then(() => {
             debug.log('Installing dependencies...', this);
             
