@@ -2437,7 +2437,8 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
  * Global editor styling
  */
 .editor__field {
-  display: flex; }
+  display: flex;
+  margin: 0 0 1rem 0; }
   .editor__field.vertical {
     flex-direction: column; }
   .editor__field__key {
@@ -2455,6 +2456,27 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
   margin: 0 0 0.5rem 0; }
 
 /**
+ * A versatile button
+ */
+.widget--button {
+  border: 0;
+  box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1);
+  background-color: #e70d3b;
+  color: #ffffff;
+  height: 2rem;
+  line-height: 2rem;
+  padding: 0 0.5rem;
+  text-transform: uppercase;
+  display: block;
+  margin: 0 0 0.5rem 0; }
+  .widget--button.round {
+    height: 3rem;
+    width: 3rem;
+    border-radius: 50%; }
+  .widget--button.right {
+    margin-left: auto; }
+
+/**
  * A versatile input widget
  */
 .widget--input {
@@ -2462,7 +2484,9 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
   line-height: 2rem; }
   .widget--input[type="text"], .widget--input[type="number"] {
     padding: 0 0.5rem;
-    height: 2rem; }
+    height: 2rem;
+    width: 100%;
+    max-width: 20rem; }
 
 /**
  * A dropdown widget with typeahead
@@ -2470,14 +2494,17 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
 .widget--dropdown {
   display: flex;
   position: relative;
-  max-width: 20rem; }
+  max-width: 20rem;
+  background-color: #e70d3b; }
   .widget--dropdown__value {
     height: 2rem;
-    width: 100%;
+    width: calc(100% - 2rem);
     line-height: 2rem;
     padding: 0 0.5rem;
-    background-color: #e70d3b;
-    color: #ffffff; }
+    color: #ffffff;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden; }
   .widget--dropdown__toggle {
     position: absolute;
     opacity: 0;
@@ -2521,10 +2548,26 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
     border: 0;
     display: block;
     width: 100%;
-    background: transparent; }
+    background: transparent;
+    position: relative;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden; }
     .widget--dropdown__option:hover {
       background-color: #e70d3b;
       color: #ffffff; }
+    .widget--dropdown__option.selected {
+      padding-right: 2rem; }
+      .widget--dropdown__option.selected::after {
+        display: block;
+        line-height: 2rem;
+        width: 2rem;
+        text-align: center;
+        right: 0;
+        top: 0;
+        position: absolute;
+        font-family: 'FontAwesome';
+        content: '\F00C'; }
   .widget--dropdown__clear {
     border: 0;
     height: 2rem;
@@ -2547,4 +2590,4 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
       left: 0;
       height: 100%;
       width: 100%;
-      background-color: rgba(255, 255, 255, 0.1); }
+      background-color: rgba(255, 255, 255, 0.05); }

@@ -5,15 +5,18 @@
     display: flex;
     position: relative;
     max-width: 20rem;
+    background-color: $primary;
 
     // Value
     &__value {
         height: 2rem;
-        width: 100%;
+        width: calc(100% - 2rem);
         line-height: 2rem;
         padding: 0 0.5rem;
-        background-color: $primary;
         color: $primary-text;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
     }
 
     // Toggle
@@ -73,10 +76,30 @@
         display: block;
         width: 100%;
         background: transparent;
+        position: relative;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
 
         &:hover {
             background-color: $primary;
             color: $primary-text;
+        }
+
+        &.selected {
+            padding-right: 2rem;    
+
+            &::after {
+                display: block;
+                line-height: 2rem;
+                width: 2rem;
+                text-align: center;
+                right: 0;
+                top: 0;
+                position: absolute;
+                font-family: 'FontAwesome';
+                content: '\f00c';
+            }
         }
     }
 
@@ -107,7 +130,7 @@
             left: 0;
             height: 100%;
             width: 100%;
-            background-color: rgba(255, 255, 255, 0.1);
+            background-color: rgba(255, 255, 255, 0.05);
         }
     }
 }

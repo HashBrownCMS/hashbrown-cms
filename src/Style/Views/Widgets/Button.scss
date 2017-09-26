@@ -1,0 +1,25 @@
+/**
+ * A versatile button
+ */
+.widget--button {
+    border: 0;
+    box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1); 
+    background-color: $primary;
+    color: $primary-text;
+    height: 2rem;
+    line-height: 2rem;
+    padding: 0 0.5rem;
+    text-transform: uppercase;
+    display: block;
+    margin: 0 0 0.5rem 0;
+
+    &.round {
+        height: 3rem;
+        width: 3rem;
+        border-radius: 50%;
+    }
+
+    &.right {
+        margin-left: auto;
+    }
+}

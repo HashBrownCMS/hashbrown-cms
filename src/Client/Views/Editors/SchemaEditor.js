@@ -394,156 +394,6 @@ class SchemaEditor extends Crisp.View {
     }
 
     /**
-     * Renders the default tab editor
-     *  
-     * @return {Object} element
-     */
-    renderDefaultTabEditor() {
-        if(this.model.isPropertyHidden('defaultTabId')) { return; }  
-        
-        // Sanity check
-        this.model.defaultTabId = this.model.defaultTabId || this.compiledSchema.defaultTabId || 'meta';
-
-        let tabOptions = [
-            { value: 'meta', label: 'Meta' }
-        ];
-
-        for(let value in this.compiledSchema.tabs) {
-            tabOptions[tabOptions.length] = { value: value, label: this.compiledSchema.tabs[value] };
-        }
-
-        let $element = _.div({class: 'default-tab-editor'},
-            _.if(!this.model.isLocked,
-                UI.inputDropdown(this.model.defaultTabId, tabOptions, (newValue) => {
-                    this.model.defaultTabId = newValue;
-                })
-            ),
-            _.if(this.model.isLocked,
-                _.p({class: 'read-only'},
-                    this.compiledSchema.tabs[this.model.defaultTabId] || '(none)'
-                )
-            )
-        );
-        
-        return $element;
-    }
-
-    /**
-     * Renders the allowed child Schemas editor (ContentSchema only)
-     *
-     * @return {HTMLElement} Element
-     */
-    renderAllowedChildSchemasEditor() {
-        if(this.model.isPropertyHidden('allowedChildSchemas')) { return; }  
-       
-        let view = this;
-
-        function onChange() {
-            view.model.allowedChildSchemas = [];
-            
-            $element.find('.schemas .schema .dropdown .dropdown-toggle').each(function() {
-                 view.model.allowedChildSchemas.push($(this).attr('data-id'));
-            });
-
-            render();
-        }
-
-        function onClickAdd() {
-            let newSchemaId = '';
-
-            for(let i in resources.schemas) {
-                let schema = resources.schemas[i];
-                
-                if(
-                    schema.type == 'content' &&
-                    view.model.allowedChildSchemas.indexOf(schema.id) < 0 &&
-                    schema.id != 'contentBase' &&
-                    schema.id != 'page'
-                ) {
-                    newSchemaId = schema.id;
-                    break;
-                }
-            }
-
-            if(newSchemaId) {
-                view.model.allowedChildSchemas.push(newSchemaId);
-
-                render();
-            }
-        }
-
-        function render() {
-            _.append($element.empty(),
-                _.div({class: 'schemas chip-group'},
-                    _.each(view.model.allowedChildSchemas, (i, schemaId) => {
-                        try {
-                            let $schema = _.div({class: 'chip schema'},
-                                _.div({class: 'chip-label dropdown'},
-                                    _.button({class: 'dropdown-toggle', 'data-id': schemaId, 'data-toggle': 'dropdown'},
-                                        SchemaHelper.getSchemaByIdSync(schemaId).name
-                                    ),
-                                    _.if(!view.model.isLocked,
-                                        _.ul({class: 'dropdown-menu'},
-                                            _.each(resources.schemas, (i, schema) => {
-                                                if(
-                                                    schema.type == 'content' &&
-                                                    (schema.id == schemaId || view.model.allowedChildSchemas.indexOf(schema.id) < 0) &&
-                                                    schema.id != 'contentBase' &&
-                                                    schema.id != 'page'
-                                                ) {
-                                                    return _.li(
-                                                        _.a({href: '#', 'data-id': schema.id},
-                                                            schema.name
-                                                        ).click(function(e) {
-                                                            e.preventDefault();
-                                                                
-                                                            let $btn = $(this).parents('.dropdown').children('.dropdown-toggle');
-                                                            
-                                                            $btn.text($(this).text());
-                                                            $btn.attr('data-id', $(this).attr('data-id'));
-
-                                                            onChange();
-                                                        })
-                                                    );
-                                                }
-                                            })
-                                        )
-                                    )
-                                ).change(onChange),
-                                _.if(!view.model.isLocked,
-                                    _.button({class: 'btn chip-remove'},
-                                        _.span({class: 'fa fa-remove'})
-                                    ).click(() => {
-                                        $schema.remove();        
-
-                                        onChange();
-                                    })
-                                )
-                            );
-                            
-                            return $schema;
-
-                        } catch(e) {
-                            UI.errorModal(e);
-                        }
-                    }),
-                    _.if(!view.model.isLocked,
-                        _.button({class: 'btn chip-add'},
-                            _.span({class: 'fa fa-plus'})
-                        ).click(onClickAdd)
-                    )
-                )
-            );
-        }
-
-        let $element = _.div({class: 'allowed-child-schemas-editor'});
-
-        render();
-
-        return $element;
-    }
-
-    /**
      * Renders the field config editor
      *
      * @returns {HTMLElement} Editor element
@@ -599,11 +449,11 @@ class SchemaEditor extends Crisp.View {
     renderField(label, $content, isVertical) {
         if(!$content) { return; }
 
-        return _.div({class: 'field-container ' + (isVertical ? 'vertical' : '')},
-            _.div({class: 'field-key'},
+        return _.div({class: 'editor__field ' + (isVertical ? 'vertical' : '')},
+            _.div({class: 'editor__field__key'},
                 label
             ),
-            _.div({class: 'field-value'},
+            _.div({class: 'editor__field__value'},
                 $content
             )
         );

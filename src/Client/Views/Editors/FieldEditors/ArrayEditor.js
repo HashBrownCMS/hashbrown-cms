@@ -202,10 +202,6 @@ class ArrayEditor extends FieldEditor {
      * @returns {HTMLElement} Element
      */
     static renderConfigEditor(config) {
-        config.allowedSchemas = config.allowedSchemas || [];
-
-        let schemaOptions = HashBrown.Helpers.SchemaHelper.getAllSchemasSync('field');
-
         return [
             _.div({class: 'editor__field'},
                 _.div({class: 'editor__field__key'}, 'Min items'),
@@ -236,9 +232,15 @@ class ArrayEditor extends FieldEditor {
             _.div({class: 'editor__field'},
                 _.div({class: 'editor__field__key'}, 'Allowed Schemas'),
                 _.div({class: 'editor__field__value'},
-                    UI.inputChipGroup(config.allowedSchemas, schemaOptions, (newValue) => {
-                        config.allowedSchemas = newValue;
-                    }, true)
+                    new HashBrown.Views.Widgets.Dropdown({
+                        useMultiple: true,
+                        labelKey: 'name',
+                        valueKey: 'id',
+                        value: config.allowedSchemas,
+                        useClearButton: true,
+                        options: HashBrown.Helpers.SchemaHelper.getAllSchemasSync('field'),
+                        onChange: (newValue) => { config.allowedSchemas = newValue; }
+                    }).$element
                 )
             )
         ];

@@ -36,21 +36,108 @@ class Dropdown extends Widget {
      * @returns {String} Value label
      */
     getValueLabel() {
-        return this.getFlattenedOptions()[this.value] || this.placeholder || '(none)';
+        this.sanityCheck();
+        
+        let label = this.placeholder || '(none)';
+        let options = this.getFlattenedOptions();
+
+        if(this.useMultiple) {
+            let multipleLabel = '';
+
+            for(let key in options) {
+                let value = options[key];
+
+                if(this.value.indexOf(key) > -1) {
+                    multipleLabel += value + ', ';
+                }
+            }
+
+            label = multipleLabel || label;
+
+        } else {
+            label = options[this.value] || label;
+        
+        }
+
+        return label;
+    }
+
+    /**
+     * Performs a sanity check of the value
+     */
+    sanityCheck() {
+        if(this.useMultiple && !Array.isArray(this.value)) {
+            this.value = [];
+        } else if(!this.useMultiple && Array.isArray(this.value)) {
+            this.value = null;
+        }
+    }
+
+    /**
+     * Updates all selected classes
+     */
+    updateSelectedClasses() {
+        let btnOptions = this.element.querySelectorAll('.widget--dropdown__option');
+
+        if(!btnOptions) { return; }
+        
+        for(let i = 0; i < btnOptions.length; i++) {
+            let value = btnOptions[i].dataset.value;
+            let hasValue = Array.isArray(this.value) ? this.value.indexOf(value) > -1 : this.value === value;
+
+            btnOptions[i].classList.toggle('selected', hasValue);
+        }
     }
 
     /**
      * Event: Change value
+     *
+     * @param {Object} newValue
      */
-    onChangeInternal() {
-        let value = this.element.querySelector('.widget--dropdown__value');
+    onChangeInternal(newValue) {
+        this.sanityCheck();
 
-        if(value) {
-            value.innerHTML = this.getFlattenedOptions()[this.value] || this.placeholder || '(none)';
+        // Change multiple value
+        if(this.useMultiple) {
+            // First check if value was already selected, remove if found
+            let foundValue = false;
+            
+            for(let i in this.value) {
+                if(this.value[i] === newValue) {
+                    this.value.splice(i, 1);
+                    foundValue = true;
+                    break;
+                }
+            }
+
+            // If value was not selected, add it
+            if(!foundValue) {
+                if(!newValue) {
+                    this.value = [];
+                } else {
+                    this.value.push(newValue);
+                }
+            }
+
+        // Change single value
+        } else {
+            this.value = newValue;
         }
 
+        // Update classes
+        this.updateSelectedClasses();
+       
+        // Update value label
+        let divValue = this.element.querySelector('.widget--dropdown__value');
+
+        if(divValue) {
+            divValue.innerHTML = this.getValueLabel();
+        }
+
+        // Cancel
         this.onCancel();
 
+        // Change event
         if(typeof this.onChange === 'function') {
             this.onChange(this.value);
         }
@@ -62,7 +149,15 @@ class Dropdown extends Widget {
      * @param {String} query
      */
     onTypeahead(query) {
+        let btnOptions = this.element.querySelectorAll('.widget--dropdown__option');
 
+        if(!btnOptions) { return; }
+        
+        for(let i = 0; i < btnOptions.length; i++) {
+            let isMatch = query < 3 || btnOptions[i].innerHTML.toLowerCase().indexOf(query.toLowerCase()) > -1;
+
+            btnOptions[i].classList.toggle('hidden', !isMatch);
+        }
     }
 
     /**
@@ -74,6 +169,13 @@ class Dropdown extends Widget {
         if(toggle) {
             toggle.checked = false;
         }
+    }
+
+    /**
+     * Post render
+     */
+    postrender() {
+        this.updateSelectedClasses();
     }
 
     /**
@@ -96,11 +198,10 @@ class Dropdown extends Widget {
             // Dropdown options
             _.div({class: 'widget--dropdown__options'},
                 _.each(this.getFlattenedOptions(), (optionValue, optionLabel) => {
-                    return _.button({class: 'widget--dropdown__option'}, 
+                    return _.button({class: 'widget--dropdown__option', 'data-value': optionValue}, 
                         optionLabel
                     ).click((e) => {
-                        this.value = optionValue;
-                        this.onChangeInternal();
+                        this.onChangeInternal(optionValue);
                     });
                 })
             ),
@@ -110,8 +211,7 @@ class Dropdown extends Widget {
                 _.button({class: 'widget--dropdown__clear'},
                     _.span({class: 'fa fa-remove'})
                 ).click((e) => {
-                    this.value = null;
-                    this.onChangeInternal();
+                    this.onChangeInternal(null);
                 })
             ),
 

@@ -39216,115 +39216,6 @@ var SchemaEditor = function (_Crisp$View) {
     };
 
     /**
-     * Renders the default tab editor
-     *  
-     * @return {Object} element
-     */
-
-
-    SchemaEditor.prototype.renderDefaultTabEditor = function renderDefaultTabEditor() {
-        var _this5 = this;
-
-        if (this.model.isPropertyHidden('defaultTabId')) {
-            return;
-        }
-
-        // Sanity check
-        this.model.defaultTabId = this.model.defaultTabId || this.compiledSchema.defaultTabId || 'meta';
-
-        var tabOptions = [{ value: 'meta', label: 'Meta' }];
-
-        for (var value in this.compiledSchema.tabs) {
-            tabOptions[tabOptions.length] = { value: value, label: this.compiledSchema.tabs[value] };
-        }
-
-        var $element = _.div({ class: 'default-tab-editor' }, _.if(!this.model.isLocked, UI.inputDropdown(this.model.defaultTabId, tabOptions, function (newValue) {
-            _this5.model.defaultTabId = newValue;
-        })), _.if(this.model.isLocked, _.p({ class: 'read-only' }, this.compiledSchema.tabs[this.model.defaultTabId] || '(none)')));
-
-        return $element;
-    };
-
-    /**
-     * Renders the allowed child Schemas editor (ContentSchema only)
-     *
-     * @return {HTMLElement} Element
-     */
-
-
-    SchemaEditor.prototype.renderAllowedChildSchemasEditor = function renderAllowedChildSchemasEditor() {
-        if (this.model.isPropertyHidden('allowedChildSchemas')) {
-            return;
-        }
-
-        var view = this;
-
-        function onChange() {
-            view.model.allowedChildSchemas = [];
-
-            $element.find('.schemas .schema .dropdown .dropdown-toggle').each(function () {
-                view.model.allowedChildSchemas.push($(this).attr('data-id'));
-            });
-
-            render();
-        }
-
-        function onClickAdd() {
-            var newSchemaId = '';
-
-            for (var i in resources.schemas) {
-                var schema = resources.schemas[i];
-
-                if (schema.type == 'content' && view.model.allowedChildSchemas.indexOf(schema.id) < 0 && schema.id != 'contentBase' && schema.id != 'page') {
-                    newSchemaId = schema.id;
-                    break;
-                }
-            }
-
-            if (newSchemaId) {
-                view.model.allowedChildSchemas.push(newSchemaId);
-
-                render();
-            }
-        }
-
-        function render() {
-            _.append($element.empty(), _.div({ class: 'schemas chip-group' }, _.each(view.model.allowedChildSchemas, function (i, schemaId) {
-                try {
-                    var $schema = _.div({ class: 'chip schema' }, _.div({ class: 'chip-label dropdown' }, _.button({ class: 'dropdown-toggle', 'data-id': schemaId, 'data-toggle': 'dropdown' }, SchemaHelper.getSchemaByIdSync(schemaId).name), _.if(!view.model.isLocked, _.ul({ class: 'dropdown-menu' }, _.each(resources.schemas, function (i, schema) {
-                        if (schema.type == 'content' && (schema.id == schemaId || view.model.allowedChildSchemas.indexOf(schema.id) < 0) && schema.id != 'contentBase' && schema.id != 'page') {
-                            return _.li(_.a({ href: '#', 'data-id': schema.id }, schema.name).click(function (e) {
-                                e.preventDefault();
-
-                                var $btn = $(this).parents('.dropdown').children('.dropdown-toggle');
-
-                                $btn.text($(this).text());
-                                $btn.attr('data-id', $(this).attr('data-id'));
-
-                                onChange();
-                            }));
-                        }
-                    })))).change(onChange), _.if(!view.model.isLocked, _.button({ class: 'btn chip-remove' }, _.span({ class: 'fa fa-remove' })).click(function () {
-                        $schema.remove();
-
-                        onChange();
-                    })));
-
-                    return $schema;
-                } catch (e) {
-                    UI.errorModal(e);
-                }
-            }), _.if(!view.model.isLocked, _.button({ class: 'btn chip-add' }, _.span({ class: 'fa fa-plus' })).click(onClickAdd))));
-        }
-
-        var $element = _.div({ class: 'allowed-child-schemas-editor' });
-
-        render();
-
-        return $element;
-    };
-
-    /**
      * Renders the field config editor
      *
      * @returns {HTMLElement} Editor element
@@ -39349,13 +39240,13 @@ var SchemaEditor = function (_Crisp$View) {
 
 
     SchemaEditor.prototype.renderTemplateEditor = function renderTemplateEditor() {
-        var _this6 = this;
+        var _this5 = this;
 
         var $element = _.div({ class: 'field-properties-editor' });
 
         setTimeout(function () {
-            _this6.templateEditor = CodeMirror($element[0], {
-                value: _this6.model.previewTemplate || '',
+            _this5.templateEditor = CodeMirror($element[0], {
+                value: _this5.model.previewTemplate || '',
                 mode: {
                     name: 'xml'
                 },
@@ -39366,8 +39257,8 @@ var SchemaEditor = function (_Crisp$View) {
                 indentWithTabs: true
             });
 
-            _this6.templateEditor.on('change', function () {
-                _this6.model.previewTemplate = _this6.templateEditor.getDoc().getValue();
+            _this5.templateEditor.on('change', function () {
+                _this5.model.previewTemplate = _this5.templateEditor.getDoc().getValue();
             });
         }, 1);
 
@@ -39390,7 +39281,7 @@ var SchemaEditor = function (_Crisp$View) {
             return;
         }
 
-        return _.div({ class: 'field-container ' + (isVertical ? 'vertical' : '') }, _.div({ class: 'field-key' }, label), _.div({ class: 'field-value' }, $content));
+        return _.div({ class: 'editor__field ' + (isVertical ? 'vertical' : '') }, _.div({ class: 'editor__field__key' }, label), _.div({ class: 'editor__field__value' }, $content));
     };
 
     /**
@@ -39432,14 +39323,14 @@ var SchemaEditor = function (_Crisp$View) {
 
 
     SchemaEditor.prototype.render = function render() {
-        var _this7 = this;
+        var _this6 = this;
 
         this.$element.toggleClass('locked', this.model.isLocked);
 
         _.append(this.$element.empty(), _.div({ class: 'editor-header' }, _.span({ class: 'fa fa-' + this.compiledSchema.icon }), _.h4(this.model.name)), this.renderFields(), _.div({ class: 'editor-footer panel panel-default panel-buttons' }, _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-embedded' }, 'Advanced').click(function () {
-            _this7.onClickAdvanced();
+            _this6.onClickAdvanced();
         }), _.if(!this.model.isLocked, this.$saveBtn = _.button({ class: 'btn btn-primary btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Save '), _.span({ class: 'text-working' }, 'Saving ')).click(function () {
-            _this7.onClickSave();
+            _this6.onClickSave();
         })))));
     };
 
@@ -41434,7 +41325,8 @@ var Input = function (_Widget) {
             placeholder: this.placeholder,
             title: this.tooltip,
             type: this.type || 'text',
-            class: 'widget widget--input'
+            class: 'widget widget--input',
+            value: this.value
         };
 
         if (this.type === 'number') {
@@ -41521,23 +41413,114 @@ var Dropdown = function (_Widget) {
 
 
     Dropdown.prototype.getValueLabel = function getValueLabel() {
-        return this.getFlattenedOptions()[this.value] || this.placeholder || '(none)';
+        this.sanityCheck();
+
+        var label = this.placeholder || '(none)';
+        var options = this.getFlattenedOptions();
+
+        if (this.useMultiple) {
+            var multipleLabel = '';
+
+            for (var key in options) {
+                var value = options[key];
+
+                if (this.value.indexOf(key) > -1) {
+                    multipleLabel += value + ', ';
+                }
+            }
+
+            label = multipleLabel || label;
+        } else {
+            label = options[this.value] || label;
+        }
+
+        return label;
+    };
+
+    /**
+     * Performs a sanity check of the value
+     */
+
+
+    Dropdown.prototype.sanityCheck = function sanityCheck() {
+        if (this.useMultiple && !Array.isArray(this.value)) {
+            this.value = [];
+        } else if (!this.useMultiple && Array.isArray(this.value)) {
+            this.value = null;
+        }
+    };
+
+    /**
+     * Updates all selected classes
+     */
+
+
+    Dropdown.prototype.updateSelectedClasses = function updateSelectedClasses() {
+        var btnOptions = this.element.querySelectorAll('.widget--dropdown__option');
+
+        if (!btnOptions) {
+            return;
+        }
+
+        for (var i = 0; i < btnOptions.length; i++) {
+            var value = btnOptions[i].dataset.value;
+            var hasValue = Array.isArray(this.value) ? this.value.indexOf(value) > -1 : this.value === value;
+
+            btnOptions[i].classList.toggle('selected', hasValue);
+        }
     };
 
     /**
      * Event: Change value
+     *
+     * @param {Object} newValue
      */
 
 
-    Dropdown.prototype.onChangeInternal = function onChangeInternal() {
-        var value = this.element.querySelector('.widget--dropdown__value');
+    Dropdown.prototype.onChangeInternal = function onChangeInternal(newValue) {
+        this.sanityCheck();
 
-        if (value) {
-            value.innerHTML = this.getFlattenedOptions()[this.value] || this.placeholder || '(none)';
+        // Change multiple value
+        if (this.useMultiple) {
+            // First check if value was already selected, remove if found
+            var foundValue = false;
+
+            for (var i in this.value) {
+                if (this.value[i] === newValue) {
+                    this.value.splice(i, 1);
+                    foundValue = true;
+                    break;
+                }
+            }
+
+            // If value was not selected, add it
+            if (!foundValue) {
+                if (!newValue) {
+                    this.value = [];
+                } else {
+                    this.value.push(newValue);
+                }
+            }
+
+            // Change single value
+        } else {
+            this.value = newValue;
         }
 
+        // Update classes
+        this.updateSelectedClasses();
+
+        // Update value label
+        var divValue = this.element.querySelector('.widget--dropdown__value');
+
+        if (divValue) {
+            divValue.innerHTML = this.getValueLabel();
+        }
+
+        // Cancel
         this.onCancel();
 
+        // Change event
         if (typeof this.onChange === 'function') {
             this.onChange(this.value);
         }
@@ -41550,7 +41533,19 @@ var Dropdown = function (_Widget) {
      */
 
 
-    Dropdown.prototype.onTypeahead = function onTypeahead(query) {};
+    Dropdown.prototype.onTypeahead = function onTypeahead(query) {
+        var btnOptions = this.element.querySelectorAll('.widget--dropdown__option');
+
+        if (!btnOptions) {
+            return;
+        }
+
+        for (var i = 0; i < btnOptions.length; i++) {
+            var isMatch = query < 3 || btnOptions[i].innerHTML.toLowerCase().indexOf(query.toLowerCase()) > -1;
+
+            btnOptions[i].classList.toggle('hidden', !isMatch);
+        }
+    };
 
     /**
      * Event: Cancel
@@ -41563,6 +41558,15 @@ var Dropdown = function (_Widget) {
         if (toggle) {
             toggle.checked = false;
         }
+    };
+
+    /**
+     * Post render
+     */
+
+
+    Dropdown.prototype.postrender = function postrender() {
+        this.updateSelectedClasses();
     };
 
     /**
@@ -41587,16 +41591,14 @@ var Dropdown = function (_Widget) {
 
         // Dropdown options
         _.div({ class: 'widget--dropdown__options' }, _.each(this.getFlattenedOptions(), function (optionValue, optionLabel) {
-            return _.button({ class: 'widget--dropdown__option' }, optionLabel).click(function (e) {
-                _this2.value = optionValue;
-                _this2.onChangeInternal();
+            return _.button({ class: 'widget--dropdown__option', 'data-value': optionValue }, optionLabel).click(function (e) {
+                _this2.onChangeInternal(optionValue);
             });
         })),
 
         // Clear button
         _.if(this.useClearButton, _.button({ class: 'widget--dropdown__clear' }, _.span({ class: 'fa fa-remove' })).click(function (e) {
-            _this2.value = null;
-            _this2.onChangeInternal();
+            _this2.onChangeInternal(null);
         })),
 
         // Obscure
@@ -43964,62 +43966,90 @@ var ContentSchemaEditor = function (_SchemaEditor) {
     }
 
     /**
-     * Renders the Content field properties editor
-     *
-     * @returns {HTMLElement} Editor element
+     * Renders the editor fields
      */
-    ContentSchemaEditor.prototype.renderContentFieldPropertiesEditor = function renderContentFieldPropertiesEditor() {
+    ContentSchemaEditor.prototype.renderFields = function renderFields() {
         var _this2 = this;
 
-        var $editor = _.div({ class: 'field-properties-editor' });
-        var fieldSchemas = HashBrown.Helpers.SchemaHelper.getAllSchemasSync('field');
+        var $element = _SchemaEditor.prototype.renderFields.call(this);
 
-        if (!this.model.fields) {
-            this.model.fields = {};
-        }
+        // Default tab
+        $element.append(this.renderField('Default tab', new HashBrown.Views.Widgets.Dropdown({
+            options: this.compiledSchema.tabs,
+            value: this.model.defaultTabId,
+            useClearButton: true,
+            onChange: function onChange(newValue) {
+                _this2.model.defaultTabId = newValue;
+            }
+        }).$element));
 
-        if (!this.model.fields.properties) {
-            this.model.fields.properties = {};
-        }
+        // Tabs
+        $element.append(this.renderField('Tabs', this.renderTabsEditor()));
 
-        // Render editor
-        var renderEditor = function renderEditor() {
-            _.append($editor.empty(), _.each(_this2.model.fields.properties, function (key, value) {
-                // Sanity check
-                value.config = value.config || {};
+        // Allowed child Schemas
+        $element.append(this.renderField('Allowed child Schemas', new HashBrown.Views.Widgets.Dropdown({
+            options: HashBrown.Helpers.SchemaHelper.getAllSchemasSync('content'),
+            value: this.model.allowedChildSchemas,
+            labelKey: 'name',
+            valueKey: 'id',
+            useMultiple: true,
+            useClearButton: true,
+            useTypeAhead: true,
+            onChange: function onChange(newValue) {
+                _this2.model.allowedChildSchemas = newValue;
+            }
+        }).$element));
 
-                var $field = _.div({ class: 'field-properties' });
+        // Field properties
+        var $fieldProperties = _.div({ class: 'editor__field' });
+
+        $element.append($fieldProperties);
+
+        var renderFieldProperties = function renderFieldProperties() {
+            _.append($fieldProperties.empty(), _.div({ class: 'editor__field__key' }, 'Properties'), _.div({ class: 'editor__field__value' }, _.each(_this2.model.fields.properties, function (fieldKey, fieldValue) {
+                var $field = _.div({ class: 'editor__field' });
 
                 var renderField = function renderField() {
-                    var tabOptions = [];
+                    _.append($field.empty(), _.div({ class: 'editor__field__key' }, new HashBrown.Views.Widgets.Input({
+                        type: 'text',
+                        placeholder: 'A variable name, e.g. "myField"',
+                        tooltip: 'The field variable name',
+                        value: fieldKey,
+                        onChange: function onChange(newKey) {
+                            delete _this2.model.fields.properties[fieldKey];
 
-                    for (var tabId in _this2.compiledSchema.tabs) {
-                        tabOptions.push({
-                            label: _this2.compiledSchema.tabs[tabId],
-                            value: tabId
-                        });
-                    }
+                            fieldKey = newKey;
 
-                    _.append($field.empty(), _.button({ class: 'btn btn-remove' }, _.span({ class: 'fa fa-remove' })).click(function () {
-                        delete _this2.model.fields.properties[key];
+                            _this2.model.fields.properties[fieldKey] = fieldValue;
+                        }
+                    }).$element, new HashBrown.Views.Widgets.Input({
+                        type: 'text',
+                        placeholder: 'A label, e.g. "My field"',
+                        tooltip: 'The field label',
+                        value: fieldValue.label,
+                        onChange: function onChange(newValue) {
+                            fieldValue.label = newValue;
+                        }
+                    }).$element), _.div({ class: 'editor__field__value' }, _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Tab'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Dropdown({
+                        useClearButton: true,
+                        options: _this2.compiledSchema.tabs,
+                        value: fieldValue.tabId,
+                        onChange: function onChange(newValue) {
+                            fieldValue.tabId = newValue;
+                        }
+                    }).$element)), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Schema'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Dropdown({
+                        useTypeAhead: true,
+                        options: HashBrown.Helpers.SchemaHelper.getAllSchemasSync('field'),
+                        value: fieldValue.schemaId,
+                        labelKey: 'name',
+                        valueKey: 'id',
+                        onChange: function onChange(newValue) {
+                            fieldValue.schemaId = newValue;
 
-                        renderEditor();
-                    }), _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, 'Variable name'), _.div({ class: 'field-value' }, _.input({ class: 'form-control', type: 'text', value: key, placeholder: 'A variable name, like "newField"', title: 'This is the variable name for the field' }).change(function (e) {
-                        delete _this2.model.fields.properties[key];
-
-                        key = e.currentTarget.value;
-
-                        _this2.model.fields.properties[key] = value;
-                    }))), _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, 'Label'), _.div({ class: 'field-value' }, _.input({ class: 'form-control', type: 'text', value: value.label, placeholder: 'A label, like "New field"', title: 'This is the label that will be visible in the Content editor' }).change(function (e) {
-                        value.label = e.currentTarget.value;
-                    }))), _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, 'Tab'), _.div({ class: 'field-value' }, UI.inputDropdown(value.tabId, tabOptions, function (newTabId) {
-                        value.tabId = newTabId;
-                    }, true))), _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, 'Schema'), _.div({ class: 'field-value' }, UI.inputDropdown(value.schemaId, fieldSchemas, function (newSchemaId) {
-                        value.schemaId = newSchemaId;
-
-                        renderField();
-                    }))), _.do(function () {
-                        var schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(value.schemaId);
+                            renderField();
+                        }
+                    }).$element)), _.do(function () {
+                        var schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(fieldValue.schemaId);
 
                         if (!schema) {
                             return;
@@ -44031,123 +44061,26 @@ var ContentSchemaEditor = function (_SchemaEditor) {
                             return;
                         }
 
-                        return editor.renderConfigEditor(value.config);
-                    }));
+                        fieldValue.config = fieldValue.config || {};
+
+                        return editor.renderConfigEditor(fieldValue.config);
+                    })));
                 };
 
                 renderField();
 
                 return $field;
-            }), _.button({ class: 'btn btn-primary btn-raised btn-add-item btn-round' }, _.span({ class: 'fa fa-plus' })).click(function () {
-                _this2.model.field.properties.newField = {
+            }), _.button({ title: 'Add a property', class: 'widget widget--button round right' }, _.span({ class: 'fa fa-plus' })).click(function () {
+                _this2.model.fields.properties.newField = {
                     label: 'New field',
-                    schemaId: 'string'
+                    schemaId: 'array'
                 };
 
-                renderEditor();
-            }));
+                renderFieldProperties();
+            })));
         };
 
-        renderEditor();
-
-        return $editor;
-    };
-
-    /**
-     * Event: Change a field key
-     *
-     * @param {String} oldKey
-     * @param {String} newKey
-     */
-
-
-    ContentSchemaEditor.prototype.onChangeFieldKey = function onChangeFieldKey(oldKey, newKey) {};
-
-    /**
-     * Renders the editor fields
-     */
-
-
-    ContentSchemaEditor.prototype.renderFields = function renderFields() {
-        var _this3 = this;
-
-        var $element = _SchemaEditor.prototype.renderFields.call(this);
-
-        $element.append(this.renderField('Default tab', this.renderDefaultTabEditor()));
-        $element.append(this.renderField('Tabs', this.renderTabsEditor()));
-        $element.append(this.renderField('Allowed child Schemas', this.renderAllowedChildSchemasEditor()));
-
-        /*if(!this.model.isLocked) {
-            $element.append(this.renderField('Fields', this.renderContentFieldPropertiesEditor(), true));
-        }*/
-
-        // Render tabs
-        var compiledTabs = JSON.parse(JSON.stringify(this.compiledSchema.tabs));
-        compiledTabs.meta = 'Meta';
-
-        _.append($element, _.div({ class: 'editor__tabs' }, _.ul({ class: 'editor__tabs__buttons nav nav-tabs' }, _.each(compiledTabs, function (tabId, tabLabel) {
-            return _.li({ class: _this3.compiledSchema.isDefaultTab(tabId) ? 'active' : '' }, _.a({ class: 'editor__tabs__button', 'data-toggle': 'tab', href: '#editor__tabs__' + tabId }, tabLabel));
-        })), _.div({ class: 'editor__tabs__panes tab-content' }, _.each(compiledTabs, function (tabId, tabLabel) {
-            return _.div({ class: 'editor__tabs__pane' + (_this3.compiledSchema.isDefaultTab(tabId) ? ' active' : '') + ' tab-pane', id: 'editor__tabs__' + tabId }, _.each(_this3.model.fields.properties, function (fieldKey, fieldValue) {
-                if (!fieldValue || fieldValue.tabId !== tabId && !fieldValue.tabId && tabId !== 'meta') {
-                    return;
-                }
-
-                return _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, new HashBrown.Views.Widgets.Input({
-                    type: 'text',
-                    placeholder: 'A variable name, e.g. "myField"',
-                    tooltip: 'The field variable name',
-                    value: fieldKey,
-                    onChange: function onChange(newKey) {
-                        delete _this3.model.fields.properties[fieldKey];
-
-                        fieldKey = newKey;
-
-                        _this3.model.fields.properties[fieldKey] = fieldValue;
-                    }
-                }).$element, new HashBrown.Views.Widgets.Input({
-                    type: 'text',
-                    placeholder: 'A label, e.g. "My field"',
-                    tooltip: 'The field label',
-                    value: fieldValue.label,
-                    onChange: function onChange(newValue) {
-                        fieldValue.label = newValue;
-                    }
-                }).$element), _.div({ class: 'editor__field__value' }, _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Tab'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Dropdown({
-                    useClearButton: true,
-                    options: _this3.compiledSchema.tabs,
-                    value: fieldValue.tabId,
-                    onChange: function onChange(newValue) {
-                        fieldValue.tabId = newValue;
-                    }
-                }).$element)), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Schema'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Dropdown({
-                    useTypeAhead: true,
-                    options: HashBrown.Helpers.SchemaHelper.getAllSchemasSync('field'),
-                    value: fieldValue.schemaId,
-                    labelKey: 'name',
-                    valueKey: 'id',
-                    onChange: function onChange(newValue) {
-                        fieldValue.schemaId = newValue;
-                    }
-                }).$element)), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Config'), _.div({ class: 'editor__field__value' }, _.do(function () {
-                    var schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(fieldValue.schemaId);
-
-                    if (!schema) {
-                        return;
-                    }
-
-                    var editor = HashBrown.Views.Editors.FieldEditors[schema.editorId];
-
-                    if (!editor) {
-                        return;
-                    }
-
-                    fieldValue.config = fieldValue.config || {};
-
-                    return editor.renderConfigEditor(fieldValue.config);
-                })))));
-            }));
-        }))));
+        renderFieldProperties();
 
         return $element;
     };
@@ -45235,10 +45168,6 @@ var ArrayEditor = function (_FieldEditor) {
 
 
     ArrayEditor.renderConfigEditor = function renderConfigEditor(config) {
-        config.allowedSchemas = config.allowedSchemas || [];
-
-        var schemaOptions = HashBrown.Helpers.SchemaHelper.getAllSchemasSync('field');
-
         return [_.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Min items'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Input({
             type: 'number',
             min: 0,
@@ -45257,9 +45186,17 @@ var ArrayEditor = function (_FieldEditor) {
             onChange: function onChange(newValue) {
                 config.maxItems = newValue;
             }
-        }).$element)), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Allowed Schemas'), _.div({ class: 'editor__field__value' }, UI.inputChipGroup(config.allowedSchemas, schemaOptions, function (newValue) {
-            config.allowedSchemas = newValue;
-        }, true)))];
+        }).$element)), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Allowed Schemas'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Dropdown({
+            useMultiple: true,
+            labelKey: 'name',
+            valueKey: 'id',
+            value: config.allowedSchemas,
+            useClearButton: true,
+            options: HashBrown.Helpers.SchemaHelper.getAllSchemasSync('field'),
+            onChange: function onChange(newValue) {
+                config.allowedSchemas = newValue;
+            }
+        }).$element))];
     };
 
     /**

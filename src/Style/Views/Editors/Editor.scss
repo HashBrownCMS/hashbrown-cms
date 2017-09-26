@@ -5,6 +5,7 @@
     // A container for displaying field keys and values
     &__field {
         display: flex;
+        margin: 0 0 1rem 0;
         
         &.vertical {
             flex-direction: column;

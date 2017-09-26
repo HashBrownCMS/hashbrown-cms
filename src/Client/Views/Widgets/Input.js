@@ -14,7 +14,8 @@ class Input extends Widget {
             placeholder: this.placeholder,
             title: this.tooltip,
             type: this.type || 'text',
-            class: 'widget widget--input'
+            class: 'widget widget--input',
+            value: this.value
         };
 
         if(this.type === 'number') {
