@@ -206,34 +206,42 @@ class ArrayEditor extends FieldEditor {
 
         let schemaOptions = HashBrown.Helpers.SchemaHelper.getAllSchemasSync('field');
 
-        return _.div(
-            _.div({class: 'field-container'},
-                _.div({class: 'field-key'}, 'Min items'),
-                _.div({class: 'field-value'},
-                    _.input({class: 'form-control', type: 'number', min: 0, step: 1, title: 'How many items are required in this array (0 is unlimited)', value: config.minItems || 0})
-                        .change((e) => {
-                            config.minItems = e.currentTarget.value;
-                        })
+        return [
+            _.div({class: 'editor__field'},
+                _.div({class: 'editor__field__key'}, 'Min items'),
+                _.div({class: 'editor__field__value'},
+                    new HashBrown.Views.Widgets.Input({
+                        type: 'number',
+                        min: 0,
+                        step: 1,
+                        tooltip: 'How many items are required in this array (0 is unlimited)',
+                        value: config.minItems,
+                        onChange: (newValue) => { config.minItems = newValue; }
+                    }).$element
                 )
             ),
-            _.div({class: 'field-container'},
-                _.div({class: 'field-key'}, 'Max items'),
-                _.div({class: 'field-value'},
-                    _.input({class: 'form-control', type: 'number', min: 0, step: 1, title: 'How many items are allowed in this array (0 is unlimited)', value: config.maxItems || 0})
-                        .change((e) => {
-                            config.maxItems = e.currentTarget.value;
-                        })
+            _.div({class: 'editor__field'},
+                _.div({class: 'editor__field__key'}, 'Max items'),
+                _.div({class: 'editor__field__value'},
+                    new HashBrown.Views.Widgets.Input({
+                        type: 'number',
+                        min: 0,
+                        step: 1,
+                        tooltip: 'How many items are allowed in this array (0 is unlimited)',
+                        value: config.maxItems,
+                        onChange: (newValue) => { config.maxItems = newValue; }
+                    }).$element
                 )
             ),
-            _.div({class: 'field-container'},
-                _.div({class: 'field-key'}, 'Allowed Schemas'),
-                _.div({class: 'field-value'},
+            _.div({class: 'editor__field'},
+                _.div({class: 'editor__field__key'}, 'Allowed Schemas'),
+                _.div({class: 'editor__field__value'},
                     UI.inputChipGroup(config.allowedSchemas, schemaOptions, (newValue) => {
                         config.allowedSchemas = newValue;
                     }, true)
                 )
             )
-        );
+        ];
     }
 
     /**

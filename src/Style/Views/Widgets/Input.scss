@@ -1,7 +1,13 @@
 /**
- * A versatile inpit widget
+ * A versatile input widget
  */
 .widget--input {
     display: block;
-    line-height: 3rem;
+    line-height: 2rem;
+
+    &[type="text"],
+    &[type="number"] {
+        padding: 0 0.5rem;
+        height: 2rem;
+    }
 }

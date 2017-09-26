@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 262);
+/******/ 	return __webpack_require__(__webpack_require__.s = 267);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -33229,7 +33229,12 @@ module.exports = {
 /* 259 */,
 /* 260 */,
 /* 261 */,
-/* 262 */
+/* 262 */,
+/* 263 */,
+/* 264 */,
+/* 265 */,
+/* 266 */,
+/* 267 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -33280,7 +33285,7 @@ HashBrown.Helpers.RequestHelper.request('get', 'user').then(function (user) {
 
         return HashBrown.Helpers.RequestHelper.request('get', 'server/projects/' + project).then(function (project) {
             var Project = __webpack_require__(96);
-            var ProjectEditor = __webpack_require__(263);
+            var ProjectEditor = __webpack_require__(268);
 
             var projectEditor = new ProjectEditor({
                 model: new Project(project)
@@ -33546,7 +33551,7 @@ $('.btn-create-project').click(function () {
 });
 
 /***/ }),
-/* 263 */
+/* 268 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -33561,11 +33566,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var RequestHelper = __webpack_require__(2);
 
 var MessageModal = __webpack_require__(17);
-var InfoEditor = __webpack_require__(264);
-var SyncEditor = __webpack_require__(265);
-var LanguageEditor = __webpack_require__(266);
-var BackupEditor = __webpack_require__(267);
-var MigrationEditor = __webpack_require__(268);
+var InfoEditor = __webpack_require__(269);
+var SyncEditor = __webpack_require__(270);
+var LanguageEditor = __webpack_require__(271);
+var BackupEditor = __webpack_require__(272);
+var MigrationEditor = __webpack_require__(273);
 
 /**
  * The editor for projects as seen on the dashboard
@@ -33807,7 +33812,7 @@ var ProjectEditor = function (_Crisp$View) {
 module.exports = ProjectEditor;
 
 /***/ }),
-/* 264 */
+/* 269 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -33925,7 +33930,7 @@ var InfoEditor = function (_Crisp$View) {
 module.exports = InfoEditor;
 
 /***/ }),
-/* 265 */
+/* 270 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -34131,7 +34136,7 @@ var SyncEditor = function (_Crisp$View) {
 module.exports = SyncEditor;
 
 /***/ }),
-/* 266 */
+/* 271 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -34214,7 +34219,7 @@ var LanguageEditor = function (_Crisp$View) {
 module.exports = LanguageEditor;
 
 /***/ }),
-/* 267 */
+/* 272 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -34480,7 +34485,7 @@ var BackupEditor = function (_Crisp$View) {
 module.exports = BackupEditor;
 
 /***/ }),
-/* 268 */
+/* 273 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";

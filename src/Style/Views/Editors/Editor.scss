@@ -1,0 +1,24 @@
+/**
+ * Global editor styling
+ */
+.editor {
+    // A container for displaying field keys and values
+    &__field {
+        display: flex;
+        
+        &.vertical {
+            flex-direction: column;
+        }
+
+        &__key {
+            flex-basis: 10rem;
+            flex-shrink: 0;
+            margin-right: 1rem;
+            line-height: 2rem;
+        }
+
+        &__value {
+            flex-grow: 1;
+        }
+    }
+}

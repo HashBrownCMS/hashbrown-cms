@@ -10,7 +10,20 @@ class Input extends Widget {
      * Template
      */
     template() {
-        return _.input({placeholder: this.placeholder, title: this.tooltip, class: 'widget widget--input', type: this.type || 'text', value: this.value})
+        let config = {
+            placeholder: this.placeholder,
+            title: this.tooltip,
+            type: this.type || 'text',
+            class: 'widget widget--input'
+        };
+
+        if(this.type === 'number') {
+            config.step = this.step || 'any';
+            config.min = this.min;
+            config.max = this.max;
+        }
+
+        return _.input(config)
             .on('input', (e) => {
                 this.value = e.currentTarget.value;
 

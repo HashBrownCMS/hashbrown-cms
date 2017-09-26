@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 213);
+/******/ 	return __webpack_require__(__webpack_require__.s = 215);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -9388,7 +9388,7 @@ var NavbarMain = function (_Crisp$View) {
 
         var _this = _possibleConstructorReturn(this, _Crisp$View.call(this, params));
 
-        _this.template = __webpack_require__(231);
+        _this.template = __webpack_require__(236);
         _this.tabPanes = [];
 
         HashBrown.Views.Navigation.CMSPane.init();
@@ -25108,7 +25108,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var beautify = __webpack_require__(224).js_beautify;
+var beautify = __webpack_require__(226).js_beautify;
 var SchemaHelper = __webpack_require__(16);
 var RequestHelper = __webpack_require__(2);
 
@@ -38447,6 +38447,45 @@ module.exports = Template;
 "use strict";
 
 
+/**
+ * A standard widget
+ *
+ * @memberof HashBrown.Client.Views.Widgets
+ */
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Widget = function (_Crisp$View) {
+  _inherits(Widget, _Crisp$View);
+
+  /**
+   * Constructor
+   */
+  function Widget(params) {
+    _classCallCheck(this, Widget);
+
+    var _this = _possibleConstructorReturn(this, _Crisp$View.call(this, params));
+
+    _this.fetch();
+    return _this;
+  }
+
+  return Widget;
+}(Crisp.View);
+
+module.exports = Widget;
+
+/***/ }),
+/* 212 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -38667,7 +38706,7 @@ var MediaUploader = function (_Crisp$View) {
 module.exports = MediaUploader;
 
 /***/ }),
-/* 212 */
+/* 213 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38808,7 +38847,609 @@ var MediaBrowser = function (_Crisp$View) {
 module.exports = MediaBrowser;
 
 /***/ }),
-/* 213 */
+/* 214 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+// Icons
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var icons = __webpack_require__(248).icons;
+
+var Schema = __webpack_require__(42);
+var SchemaHelper = __webpack_require__(16);
+var ContentHelper = __webpack_require__(41);
+var RequestHelper = __webpack_require__(2);
+var JSONEditor = __webpack_require__(180);
+
+/**
+ * The editor for schemas
+ *
+ * @memberof HashBrown.Client.Views.Editors
+ */
+
+var SchemaEditor = function (_Crisp$View) {
+    _inherits(SchemaEditor, _Crisp$View);
+
+    function SchemaEditor(params) {
+        _classCallCheck(this, SchemaEditor);
+
+        var _this = _possibleConstructorReturn(this, _Crisp$View.call(this, params));
+
+        _this.$element = _.div({ class: 'editor schema-editor' });
+
+        _this.fetch();
+        return _this;
+    }
+
+    /**
+     * Event: Click advanced. Routes to the JSON editor
+     */
+
+
+    SchemaEditor.prototype.onClickAdvanced = function onClickAdvanced() {
+        location.hash = location.hash.replace('/schemas/', '/schemas/json/');
+    };
+
+    /**
+     * Event: Click save. Posts the model to the modelUrl
+     */
+
+
+    SchemaEditor.prototype.onClickSave = function onClickSave() {
+        var _this2 = this;
+
+        if (this.jsonEditor && this.jsonEditor.isValid == false) {
+            return;
+        }
+
+        this.$saveBtn.toggleClass('working', true);
+
+        RequestHelper.request('post', 'schemas/' + this.model.id, this.model).then(function () {
+            _this2.$saveBtn.toggleClass('working', false);
+
+            return RequestHelper.reloadResource('schemas');
+        }).then(function () {
+            Crisp.View.get('NavbarMain').reload();
+        }).catch(UI.errorModal);
+    };
+
+    /**
+     * Renders the editor picker
+     *
+     * @return {Object} element
+     */
+
+
+    SchemaEditor.prototype.renderEditorPicker = function renderEditorPicker() {
+        var _this3 = this;
+
+        if (this.model.isPropertyHidden('editorId')) {
+            return;
+        }
+
+        var editorOptions = [];
+
+        for (var i in HashBrown.Views.Editors.FieldEditors) {
+            var editor = HashBrown.Views.Editors.FieldEditors[i];
+
+            editorOptions[editorOptions.length] = {
+                value: editor.name,
+                label: editor.name
+            };
+        }
+
+        // The editorId is actually a name more than an id
+        var editorName = this.model.editorId || '(none)';
+
+        // Backwards compatible check
+        editorName = editorName.charAt(0).toUpperCase() + editorName.slice(1);
+
+        var $element = _.div({ class: 'editor-picker' }, _.if(!this.model.isLocked, UI.inputDropdownTypeAhead(editorName, editorOptions, function (newValue) {
+            _this3.model.editorId = newValue;
+
+            _this3.render();
+        })), _.if(this.model.isLocked, _.p({ class: 'read-only' }, editorName)));
+
+        return $element;
+    };
+
+    /**
+     * Renders the name editor
+     *
+     * @return {Object} element
+     */
+
+
+    SchemaEditor.prototype.renderNameEditor = function renderNameEditor() {
+        if (this.model.isPropertyHidden('name')) {
+            return;
+        }
+
+        var view = this;
+
+        function onInputChange() {
+            view.model.name = $(this).val();
+        }
+
+        var $element = _.div({ class: 'name-editor' }, _.if(!this.model.isLocked, _.input({ class: 'form-control', type: 'text', value: view.model.name, placeholder: 'Input the schema name here' }).on('change', onInputChange)), _.if(this.model.isLocked, _.p({ class: 'read-only' }, view.model.name)));
+
+        return $element;
+    };
+
+    /**
+     * Renders the tabs editor
+     *  
+     * @return {Object} element
+     */
+
+
+    SchemaEditor.prototype.renderTabsEditor = function renderTabsEditor() {
+        if (this.model.isPropertyHidden('tabs')) {
+            return;
+        }
+
+        var view = this;
+
+        function onInputChange($input) {
+            var $chip = $input.parents('.chip');
+            var oldId = $chip.attr('data-id');
+            var newLabel = $input.val();
+            var newId = ContentHelper.getSlug(newLabel);
+            var $defaultTab = view.$element.find('.default-tab-editor .dropdown');
+
+            // Assign new id to data attribute
+            $chip.attr('data-id', newId);
+
+            // Remove old id from model
+            delete view.model.tabs[oldId];
+
+            // Add new id and label to model
+            view.model.tabs[newId] = newLabel;
+
+            // Remove old tab from select element
+            $defaultTab.trigger('changeOption', [oldId, { id: newId, label: newLabel }]);
+
+            // If the default tab id was the old id, update the select element
+            if (view.model.defaultTabId == oldId) {
+                view.model.defaultTabId = newId;
+
+                $defaultTab.trigger('setValue', newId);
+            }
+        }
+
+        function onClickRemove($btn) {
+            var $chip = $btn.parents('.chip');
+            var id = $chip.attr('data-id');
+            var $defaultTab = view.$element.find('.default-tab-editor .dropdown');
+
+            // Remove the id from the tabs list
+            delete view.model.tabs[id];
+
+            // Remove the chip element
+            $chip.remove();
+
+            // Remove the tab from select element
+            $defaultTab.trigger('removeOption', id);
+
+            // If default tab id was this tab, revert to 'meta'
+            if (view.model.defaultTabId == id) {
+                view.model.defaultTabId = 'meta';
+
+                $defaultTab.trigger('setValue', 'meta');
+            }
+        }
+
+        function onClickAdd() {
+            var name = 'New tab';
+            var id = 'new-tab';
+            var $defaultTab = view.$element.find('.default-tab-editor .dropdown');
+
+            // Add new tab to model
+            view.model.tabs[id] = name;
+
+            // Redraw the tab editor
+            render();
+
+            // Add new tab to default tab select element
+            $defaultTab.trigger('addOption', { value: id, label: name });
+        }
+
+        function render() {
+            // Prepend parent tabs if applicable
+            if (view.model.parentSchemaId) {
+                SchemaHelper.getSchemaWithParentFields(view.model.parentSchemaId).then(function (parentSchema) {
+                    var parentTabs = parentSchema.tabs;
+
+                    $tabs.prepend(_.each(parentTabs, function (id, label) {
+                        return _.div({ class: 'tab chip' }, _.p({ class: 'chip-label' }, label + ' (inherited)'));
+                    }));
+                }).catch(UI.errorModal);
+            }
+
+            var $tabs = _.div({ class: 'chip-group' });
+
+            $element.html($tabs);
+
+            $tabs.append(_.each(view.model.tabs, function (id, label) {
+                return _.div({ class: 'tab chip', 'data-id': id }, _.input({ type: 'text', class: 'chip-label' + (view.model.isLocked ? ' disabled' : ''), value: label }).change(function (e) {
+                    onInputChange($(this));
+                }), _.if(!view.model.isLocked, _.button({ class: 'btn chip-remove' }, _.span({ class: 'fa fa-remove' })).click(function (e) {
+                    onClickRemove($(this));
+                })));
+            }));
+
+            if (!view.model.isLocked) {
+                $tabs.append(_.button({ class: 'btn chip-add' }, _.span({ class: 'fa fa-plus' })).click(onClickAdd));
+            }
+        }
+
+        var $element = _.div({ class: 'tabs-editor' });
+
+        render();
+
+        return $element;
+    };
+
+    /**
+     * Renders the icon editor
+     *  
+     * @return {Object} element
+     */
+
+
+    SchemaEditor.prototype.renderIconEditor = function renderIconEditor() {
+        if (this.model.isPropertyHidden('icon')) {
+            return;
+        }
+
+        var view = this;
+
+        function onClickBrowse() {
+            function onSearch() {
+                var query = modal.$element.find('.icon-search input').val().toLowerCase();
+
+                if (query.length > 2 || query.length == 0) {
+                    modal.$element.find('.btn-icon').each(function (i) {
+                        var $btn = $(this);
+                        var name = $btn.children('.icon-name').html();
+
+                        $btn.toggle(name.indexOf(query) > -1);
+                    });
+                }
+            }
+
+            var modal = new HashBrown.Views.Modals.MessageModal({
+                model: {
+                    class: 'modal-icon-picker',
+                    title: 'Pick an icon',
+                    body: [_.div({ class: 'icon-search' }, _.input({ type: 'text', class: 'form-control', placeholder: 'Search for icons' }).on('change', function (e) {
+                        onSearch();
+                    })), _.each(icons, function (i, icon) {
+                        function onClickButton() {
+                            view.model.icon = icon;
+
+                            view.$element.find('.btn-icon-browse .fa').attr('class', 'fa fa-' + icon);
+
+                            modal.hide();
+                        }
+
+                        return _.button({ class: 'btn btn-icon' }, _.span({ class: 'fa fa-' + icon }), _.span({ class: 'icon-name' }, icon)).click(onClickButton);
+                    })]
+                }
+            });
+        }
+
+        var $element = _.div({ class: 'icon-editor' }, _.if(!this.model.isLocked, _.button({ class: 'btn btn-icon-browse btn-default' + (this.model.isLocked ? ' disabled' : '') }, _.span({ class: 'fa fa-' + this.model.icon })).click(onClickBrowse)), _.if(this.model.isLocked, _.span({ class: 'fa fa-' + this.model.icon })));
+
+        return $element;
+    };
+
+    /**
+     * Renders the parent editor
+     *  
+     * @return {Object} element
+     */
+
+
+    SchemaEditor.prototype.renderParentEditor = function renderParentEditor() {
+        var _this4 = this;
+
+        if (this.model.isPropertyHidden('parentSchemaId')) {
+            return;
+        }
+
+        var schemaOptions = [];
+
+        // Filter out irrelevant schemas, self and children of self
+        var excludedParents = {};
+        excludedParents[this.model.id] = true;
+
+        for (var i in resources.schemas) {
+            var schema = resources.schemas[i];
+
+            // Check if this Schema has a parent in the excluded list
+            // If so, add this id to the excluded list
+            // This is to prevent making a Schema a child of its own children
+            if (excludedParents[schema.parentSchemaId] == true) {
+                excludedParents[schema.id] = true;
+                continue;
+            }
+
+            // If this Schema is not of the same type as the model, or has the same id, exclude it
+            if (schema.type != this.model.type || schema.id == this.model.id) {
+                continue;
+            }
+
+            schemaOptions[schemaOptions.length] = {
+                label: schema.name,
+                value: schema.id
+            };
+        }
+
+        // Assign fallback schema name
+        var parentName = '(none)';
+
+        if (schemaOptions[this.model.parentSchemaId]) {
+            parentName = schemaOptions[this.model.parentSchemaId].name;
+        }
+
+        // Render element
+        var $element = _.div({ class: 'parent-editor input-group' }, _.if(!this.model.isLocked, UI.inputDropdownTypeAhead(this.model.parentSchemaId, schemaOptions, function (newValue) {
+            if (!newValue) {
+                newValue = _this4.model.type == 'field' ? 'fieldBase' : 'contentBase';
+            }
+
+            _this4.model.parentSchemaId = newValue;
+
+            return newValue;
+        }, true)), _.if(this.model.isLocked, _.p({ class: 'read-only' }, parentName)));
+
+        return $element;
+    };
+
+    /**
+     * Renders the default tab editor
+     *  
+     * @return {Object} element
+     */
+
+
+    SchemaEditor.prototype.renderDefaultTabEditor = function renderDefaultTabEditor() {
+        var _this5 = this;
+
+        if (this.model.isPropertyHidden('defaultTabId')) {
+            return;
+        }
+
+        // Sanity check
+        this.model.defaultTabId = this.model.defaultTabId || this.compiledSchema.defaultTabId || 'meta';
+
+        var tabOptions = [{ value: 'meta', label: 'Meta' }];
+
+        for (var value in this.compiledSchema.tabs) {
+            tabOptions[tabOptions.length] = { value: value, label: this.compiledSchema.tabs[value] };
+        }
+
+        var $element = _.div({ class: 'default-tab-editor' }, _.if(!this.model.isLocked, UI.inputDropdown(this.model.defaultTabId, tabOptions, function (newValue) {
+            _this5.model.defaultTabId = newValue;
+        })), _.if(this.model.isLocked, _.p({ class: 'read-only' }, this.compiledSchema.tabs[this.model.defaultTabId] || '(none)')));
+
+        return $element;
+    };
+
+    /**
+     * Renders the allowed child Schemas editor (ContentSchema only)
+     *
+     * @return {HTMLElement} Element
+     */
+
+
+    SchemaEditor.prototype.renderAllowedChildSchemasEditor = function renderAllowedChildSchemasEditor() {
+        if (this.model.isPropertyHidden('allowedChildSchemas')) {
+            return;
+        }
+
+        var view = this;
+
+        function onChange() {
+            view.model.allowedChildSchemas = [];
+
+            $element.find('.schemas .schema .dropdown .dropdown-toggle').each(function () {
+                view.model.allowedChildSchemas.push($(this).attr('data-id'));
+            });
+
+            render();
+        }
+
+        function onClickAdd() {
+            var newSchemaId = '';
+
+            for (var i in resources.schemas) {
+                var schema = resources.schemas[i];
+
+                if (schema.type == 'content' && view.model.allowedChildSchemas.indexOf(schema.id) < 0 && schema.id != 'contentBase' && schema.id != 'page') {
+                    newSchemaId = schema.id;
+                    break;
+                }
+            }
+
+            if (newSchemaId) {
+                view.model.allowedChildSchemas.push(newSchemaId);
+
+                render();
+            }
+        }
+
+        function render() {
+            _.append($element.empty(), _.div({ class: 'schemas chip-group' }, _.each(view.model.allowedChildSchemas, function (i, schemaId) {
+                try {
+                    var $schema = _.div({ class: 'chip schema' }, _.div({ class: 'chip-label dropdown' }, _.button({ class: 'dropdown-toggle', 'data-id': schemaId, 'data-toggle': 'dropdown' }, SchemaHelper.getSchemaByIdSync(schemaId).name), _.if(!view.model.isLocked, _.ul({ class: 'dropdown-menu' }, _.each(resources.schemas, function (i, schema) {
+                        if (schema.type == 'content' && (schema.id == schemaId || view.model.allowedChildSchemas.indexOf(schema.id) < 0) && schema.id != 'contentBase' && schema.id != 'page') {
+                            return _.li(_.a({ href: '#', 'data-id': schema.id }, schema.name).click(function (e) {
+                                e.preventDefault();
+
+                                var $btn = $(this).parents('.dropdown').children('.dropdown-toggle');
+
+                                $btn.text($(this).text());
+                                $btn.attr('data-id', $(this).attr('data-id'));
+
+                                onChange();
+                            }));
+                        }
+                    })))).change(onChange), _.if(!view.model.isLocked, _.button({ class: 'btn chip-remove' }, _.span({ class: 'fa fa-remove' })).click(function () {
+                        $schema.remove();
+
+                        onChange();
+                    })));
+
+                    return $schema;
+                } catch (e) {
+                    UI.errorModal(e);
+                }
+            }), _.if(!view.model.isLocked, _.button({ class: 'btn chip-add' }, _.span({ class: 'fa fa-plus' })).click(onClickAdd))));
+        }
+
+        var $element = _.div({ class: 'allowed-child-schemas-editor' });
+
+        render();
+
+        return $element;
+    };
+
+    /**
+     * Renders the field config editor
+     *
+     * @returns {HTMLElement} Editor element
+     */
+
+
+    SchemaEditor.prototype.renderFieldConfigEditor = function renderFieldConfigEditor() {
+        var editor = HashBrown.Views.Editors.FieldEditors[this.model.editorId];
+
+        if (!editor) {
+            return;
+        }
+
+        return _.div({ class: 'config' }, editor.renderConfigEditor(this.model.config));
+    };
+
+    /**
+     * Render template editor
+     *
+     * @returns {HTMLElement} Element
+     */
+
+
+    SchemaEditor.prototype.renderTemplateEditor = function renderTemplateEditor() {
+        var _this6 = this;
+
+        var $element = _.div({ class: 'field-properties-editor' });
+
+        setTimeout(function () {
+            _this6.templateEditor = CodeMirror($element[0], {
+                value: _this6.model.previewTemplate || '',
+                mode: {
+                    name: 'xml'
+                },
+                lineWrapping: true,
+                lineNumbers: true,
+                tabSize: 4,
+                indentUnit: 4,
+                indentWithTabs: true
+            });
+
+            _this6.templateEditor.on('change', function () {
+                _this6.model.previewTemplate = _this6.templateEditor.getDoc().getValue();
+            });
+        }, 1);
+
+        return $element;
+    };
+
+    /**
+     * Renders a single field
+     *
+     * @param {String} label
+     * @param {HTMLElement} content
+     * @param {Boolean} isVertical
+     *
+     * @return {HTMLElement} Editor element
+     */
+
+
+    SchemaEditor.prototype.renderField = function renderField(label, $content, isVertical) {
+        if (!$content) {
+            return;
+        }
+
+        return _.div({ class: 'field-container ' + (isVertical ? 'vertical' : '') }, _.div({ class: 'field-key' }, label), _.div({ class: 'field-value' }, $content));
+    };
+
+    /**
+     * Renders all fields
+     *
+     * @return {Object} element
+     */
+
+
+    SchemaEditor.prototype.renderFields = function renderFields() {
+        var id = parseInt(this.model.id);
+
+        var $element = _.div({ class: 'schema editor-body' });
+
+        $element.empty();
+
+        $element.append(this.renderField('Name', this.renderNameEditor()));
+        $element.append(this.renderField('Icon', this.renderIconEditor()));
+        $element.append(this.renderField('Parent', this.renderParentEditor()));
+
+        switch (this.model.type) {
+            case 'field':
+                $element.append(this.renderField('Field editor', this.renderEditorPicker()));
+
+                if (!this.model.isLocked) {
+                    $element.append(this.renderField('Config', this.renderFieldConfigEditor(), true));
+                    $element.append(this.renderField('Preview template', this.renderTemplateEditor(), true));
+                }
+
+                break;
+        }
+
+        return $element;
+    };
+
+    /**
+     * Renders this editor
+     */
+
+
+    SchemaEditor.prototype.render = function render() {
+        var _this7 = this;
+
+        this.$element.toggleClass('locked', this.model.isLocked);
+
+        _.append(this.$element.empty(), _.div({ class: 'editor-header' }, _.span({ class: 'fa fa-' + this.compiledSchema.icon }), _.h4(this.model.name)), this.renderFields(), _.div({ class: 'editor-footer panel panel-default panel-buttons' }, _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-embedded' }, 'Advanced').click(function () {
+            _this7.onClickAdvanced();
+        }), _.if(!this.model.isLocked, this.$saveBtn = _.button({ class: 'btn btn-primary btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Save '), _.span({ class: 'text-working' }, 'Saving ')).click(function () {
+            _this7.onClickSave();
+        })))));
+    };
+
+    return SchemaEditor;
+}(Crisp.View);
+
+module.exports = SchemaEditor;
+
+/***/ }),
+/* 215 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38820,10 +39461,10 @@ module.exports = MediaBrowser;
 
 // Style
 
-__webpack_require__(214);
+__webpack_require__(216);
 
 // Get routes
-__webpack_require__(215);
+__webpack_require__(217);
 
 // Resource cache
 window.resources = {
@@ -38841,14 +39482,14 @@ window._ = Crisp.Elements;
 
 window.HashBrown = {};
 
-HashBrown.Models = __webpack_require__(226);
+HashBrown.Models = __webpack_require__(228);
 HashBrown.Views = {};
-HashBrown.Views.Widgets = __webpack_require__(292);
-HashBrown.Views.Modals = __webpack_require__(228);
-HashBrown.Views.Navigation = __webpack_require__(229);
-HashBrown.Views.Editors = __webpack_require__(240);
+HashBrown.Views.Widgets = __webpack_require__(230);
+HashBrown.Views.Modals = __webpack_require__(233);
+HashBrown.Views.Navigation = __webpack_require__(234);
+HashBrown.Views.Editors = __webpack_require__(245);
 HashBrown.Views.Editors.ConnectionEditors = {};
-HashBrown.Views.Editors.FieldEditors = __webpack_require__(245);
+HashBrown.Views.Editors.FieldEditors = __webpack_require__(250);
 HashBrown.Helpers = __webpack_require__(189);
 
 // Helper shortcuts
@@ -38919,29 +39560,29 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 /***/ }),
-/* 214 */
+/* 216 */
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
 
 /***/ }),
-/* 215 */
+/* 217 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-__webpack_require__(216);
-__webpack_require__(217);
 __webpack_require__(218);
 __webpack_require__(219);
 __webpack_require__(220);
 __webpack_require__(221);
 __webpack_require__(222);
 __webpack_require__(223);
+__webpack_require__(224);
+__webpack_require__(225);
 
 /***/ }),
-/* 216 */
+/* 218 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38998,7 +39639,7 @@ Crisp.Router.route('/license/', function () {
 });
 
 /***/ }),
-/* 217 */
+/* 219 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39062,7 +39703,7 @@ Crisp.Router.route('/content/:id/:tab', function () {
 });
 
 /***/ }),
-/* 218 */
+/* 220 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39112,7 +39753,7 @@ Crisp.Router.route('/connections/json/:id', function () {
 });
 
 /***/ }),
-/* 219 */
+/* 221 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39140,7 +39781,7 @@ Crisp.Router.route('/media/:id', function () {
 });
 
 /***/ }),
-/* 220 */
+/* 222 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39224,7 +39865,7 @@ Crisp.Router.route('/schemas/json/:id', function () {
 });
 
 /***/ }),
-/* 221 */
+/* 223 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39254,7 +39895,7 @@ Crisp.Router.route('/settings/providers/', function () {
 });
 
 /***/ }),
-/* 222 */
+/* 224 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39290,7 +39931,7 @@ Crisp.Router.route('/templates/:type/:id', function () {
 });
 
 /***/ }),
-/* 223 */
+/* 225 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39331,7 +39972,7 @@ Crisp.Router.route('/forms/json/:id', function () {
 });
 
 /***/ }),
-/* 224 */
+/* 226 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*
@@ -39398,7 +40039,7 @@ function get_beautify(js_beautify, css_beautify, html_beautify) {
 
 if (true) {
     // Add support for AMD ( https://github.com/amdjs/amdjs-api/wiki/AMD#defineamd-property- )
-    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(181), __webpack_require__(182), __webpack_require__(225)], __WEBPACK_AMD_DEFINE_RESULT__ = function (js_beautify, css_beautify, html_beautify) {
+    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(181), __webpack_require__(182), __webpack_require__(227)], __WEBPACK_AMD_DEFINE_RESULT__ = function (js_beautify, css_beautify, html_beautify) {
         return get_beautify(js_beautify, css_beautify, html_beautify);
     }.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
@@ -39413,7 +40054,7 @@ if (true) {
 }
 
 /***/ }),
-/* 225 */
+/* 227 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -40541,7 +41182,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var _typeof = ty
 })();
 
 /***/ }),
-/* 226 */
+/* 228 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40557,7 +41198,7 @@ module.exports = {
     ContentSchema: __webpack_require__(55),
     Entity: __webpack_require__(28),
     FieldSchema: __webpack_require__(56),
-    Form: __webpack_require__(227),
+    Form: __webpack_require__(229),
     index: __webpack_require__(209),
     Media: __webpack_require__(27),
     Project: __webpack_require__(96),
@@ -40567,7 +41208,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 227 */
+/* 229 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40740,7 +41381,237 @@ var Form = function (_Resource) {
 module.exports = Form;
 
 /***/ }),
-/* 228 */
+/* 230 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/**
+ * @namespace HashBrown.Client.Views.Widgets
+ */
+
+module.exports = {
+  Input: __webpack_require__(231),
+  Dropdown: __webpack_require__(232)
+};
+
+/***/ }),
+/* 231 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Widget = __webpack_require__(211);
+
+/**
+ * A versatile input widget
+ */
+
+var Input = function (_Widget) {
+    _inherits(Input, _Widget);
+
+    function Input() {
+        _classCallCheck(this, Input);
+
+        return _possibleConstructorReturn(this, _Widget.apply(this, arguments));
+    }
+
+    /**
+     * Template
+     */
+    Input.prototype.template = function template() {
+        var _this2 = this;
+
+        var config = {
+            placeholder: this.placeholder,
+            title: this.tooltip,
+            type: this.type || 'text',
+            class: 'widget widget--input'
+        };
+
+        if (this.type === 'number') {
+            config.step = this.step || 'any';
+            config.min = this.min;
+            config.max = this.max;
+        }
+
+        return _.input(config).on('input', function (e) {
+            _this2.value = e.currentTarget.value;
+
+            if (typeof _this2.onChange !== 'function') {
+                return;
+            }
+
+            _this2.onChange(_this2.value);
+        });
+    };
+
+    return Input;
+}(Widget);
+
+module.exports = Input;
+
+/***/ }),
+/* 232 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Widget = __webpack_require__(211);
+
+/**
+ * A generic dropdown
+ *
+ * @memberof HashBrown.Client.Views.Widgets
+ */
+
+var Dropdown = function (_Widget) {
+    _inherits(Dropdown, _Widget);
+
+    function Dropdown() {
+        _classCallCheck(this, Dropdown);
+
+        return _possibleConstructorReturn(this, _Widget.apply(this, arguments));
+    }
+
+    /**
+     * Converts options into a flattened structure
+     *
+     * @returns {Object} Options
+     */
+    Dropdown.prototype.getFlattenedOptions = function getFlattenedOptions() {
+        if (!this.labelKey && !this.valueKey && this.options && !Array.isArray(this.options)) {
+            return this.options;
+        }
+
+        var options = {};
+
+        for (var key in this.options) {
+            var value = this.options[key];
+
+            var optionLabel = this.labelKey ? value[this.labelKey] : value;
+            var optionValue = this.valueKey ? value[this.valueKey] : value;
+
+            options[optionValue] = optionLabel;
+        }
+
+        return options;
+    };
+
+    /**
+     * Gets the current value label
+     *
+     * @returns {String} Value label
+     */
+
+
+    Dropdown.prototype.getValueLabel = function getValueLabel() {
+        return this.getFlattenedOptions()[this.value] || this.placeholder || '(none)';
+    };
+
+    /**
+     * Event: Change value
+     */
+
+
+    Dropdown.prototype.onChangeInternal = function onChangeInternal() {
+        var value = this.element.querySelector('.widget--dropdown__value');
+
+        if (value) {
+            value.innerHTML = this.getFlattenedOptions()[this.value] || this.placeholder || '(none)';
+        }
+
+        this.onCancel();
+
+        if (typeof this.onChange === 'function') {
+            this.onChange(this.value);
+        }
+    };
+
+    /**
+     * Event: Typeahead
+     *
+     * @param {String} query
+     */
+
+
+    Dropdown.prototype.onTypeahead = function onTypeahead(query) {};
+
+    /**
+     * Event: Cancel
+     */
+
+
+    Dropdown.prototype.onCancel = function onCancel() {
+        var toggle = this.element.querySelector('.widget--dropdown__toggle');
+
+        if (toggle) {
+            toggle.checked = false;
+        }
+    };
+
+    /**
+     * Template
+     */
+
+
+    Dropdown.prototype.template = function template() {
+        var _this2 = this;
+
+        return _.div({ title: this.tooltip, class: 'widget widget--dropdown dropdown' },
+        // Value
+        _.div({ class: 'widget--dropdown__value' }, this.getValueLabel()),
+
+        // Toggle
+        _.input({ class: 'widget--dropdown__toggle', type: 'checkbox' }),
+
+        // Typeahead input
+        _.if(this.useTypeAhead, _.input({ class: 'widget--dropdown__typeahead', type: 'text' }).on('input', function (e) {
+            _this2.onTypeahead(e.currentTarget.value);
+        })),
+
+        // Dropdown options
+        _.div({ class: 'widget--dropdown__options' }, _.each(this.getFlattenedOptions(), function (optionValue, optionLabel) {
+            return _.button({ class: 'widget--dropdown__option' }, optionLabel).click(function (e) {
+                _this2.value = optionValue;
+                _this2.onChangeInternal();
+            });
+        })),
+
+        // Clear button
+        _.if(this.useClearButton, _.button({ class: 'widget--dropdown__clear' }, _.span({ class: 'fa fa-remove' })).click(function (e) {
+            _this2.value = null;
+            _this2.onChangeInternal();
+        })),
+
+        // Obscure
+        _.div({ class: 'widget--dropdown__obscure' }, _.div({ class: 'widget--dropdown__obscure__inner' }).click(function (e) {
+            _this2.onCancel();
+        })));
+    };
+
+    return Dropdown;
+}(Widget);
+
+module.exports = Dropdown;
+
+/***/ }),
+/* 233 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40751,13 +41622,13 @@ module.exports = Form;
  */
 
 module.exports = {
-    MediaUploader: __webpack_require__(211),
-    MediaBrowser: __webpack_require__(212),
+    MediaUploader: __webpack_require__(212),
+    MediaBrowser: __webpack_require__(213),
     MessageModal: __webpack_require__(17)
 };
 
 /***/ }),
-/* 229 */
+/* 234 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40768,21 +41639,21 @@ module.exports = {
  */
 
 module.exports = {
-    CMSPane: __webpack_require__(230),
-    ConnectionPane: __webpack_require__(232),
-    ContentPane: __webpack_require__(233),
-    FormsPane: __webpack_require__(234),
-    MainMenu: __webpack_require__(235),
-    MediaPane: __webpack_require__(236),
+    CMSPane: __webpack_require__(235),
+    ConnectionPane: __webpack_require__(237),
+    ContentPane: __webpack_require__(238),
+    FormsPane: __webpack_require__(239),
+    MainMenu: __webpack_require__(240),
+    MediaPane: __webpack_require__(241),
     NavbarMain: __webpack_require__(39),
     NavbarPane: __webpack_require__(40),
-    SchemaPane: __webpack_require__(237),
-    SettingsPane: __webpack_require__(238),
-    TemplatePane: __webpack_require__(239)
+    SchemaPane: __webpack_require__(242),
+    SettingsPane: __webpack_require__(243),
+    TemplatePane: __webpack_require__(244)
 };
 
 /***/ }),
-/* 230 */
+/* 235 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40835,7 +41706,7 @@ var CMSPane = function (_NavbarPane) {
 module.exports = CMSPane;
 
 /***/ }),
-/* 231 */
+/* 236 */
 /***/ (function(module, exports) {
 
 module.exports = function () {
@@ -40934,7 +41805,7 @@ module.exports = function () {
 };
 
 /***/ }),
-/* 232 */
+/* 237 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41159,7 +42030,7 @@ var ConnectionPane = function (_NavbarPane) {
 module.exports = ConnectionPane;
 
 /***/ }),
-/* 233 */
+/* 238 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41657,7 +42528,7 @@ var ContentPane = function (_NavbarPane) {
 module.exports = ContentPane;
 
 /***/ }),
-/* 234 */
+/* 239 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41891,7 +42762,7 @@ var FormsPane = function (_NavbarPane) {
 module.exports = FormsPane;
 
 /***/ }),
-/* 235 */
+/* 240 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42056,7 +42927,7 @@ var MainMenu = function (_Crisp$View) {
 module.exports = MainMenu;
 
 /***/ }),
-/* 236 */
+/* 241 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42070,7 +42941,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var NavbarPane = __webpack_require__(40);
 var NavbarMain = __webpack_require__(39);
-var MediaUploader = __webpack_require__(211);
+var MediaUploader = __webpack_require__(212);
 var ProjectHelper = __webpack_require__(6);
 var MediaHelper = __webpack_require__(38);
 var RequestHelper = __webpack_require__(2);
@@ -42270,7 +43141,7 @@ MediaPane.canCreateDirectory = true;
 module.exports = MediaPane;
 
 /***/ }),
-/* 237 */
+/* 242 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42507,7 +43378,7 @@ var SchemaPane = function (_NavbarPane) {
 module.exports = SchemaPane;
 
 /***/ }),
-/* 238 */
+/* 243 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42556,7 +43427,7 @@ var SettingsPane = function (_NavbarPane) {
 module.exports = SettingsPane;
 
 /***/ }),
-/* 239 */
+/* 244 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42820,7 +43691,7 @@ var TemplatePane = function (_NavbarPane) {
 module.exports = TemplatePane;
 
 /***/ }),
-/* 240 */
+/* 245 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42831,20 +43702,20 @@ module.exports = TemplatePane;
  */
 
 module.exports = {
-    ConnectionEditor: __webpack_require__(241),
+    ConnectionEditor: __webpack_require__(246),
     ContentEditor: __webpack_require__(187),
-    ContentSchemaEditor: __webpack_require__(289),
+    ContentSchemaEditor: __webpack_require__(247),
     FormEditor: __webpack_require__(208),
     JSONEditor: __webpack_require__(180),
     MediaViewer: __webpack_require__(206),
-    ProvidersSettings: __webpack_require__(242),
-    SchemaEditor: __webpack_require__(243),
+    ProvidersSettings: __webpack_require__(249),
+    SchemaEditor: __webpack_require__(214),
     TemplateEditor: __webpack_require__(207),
     UserEditor: __webpack_require__(97)
 };
 
 /***/ }),
-/* 241 */
+/* 246 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43063,7 +43934,7 @@ var ConnectionEditor = function (_Crisp$View) {
 module.exports = ConnectionEditor;
 
 /***/ }),
-/* 242 */
+/* 247 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43075,717 +43946,219 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var SettingsHelper = __webpack_require__(26);
-var ProjectHelper = __webpack_require__(6);
+var SchemaEditor = __webpack_require__(214);
 
 /**
- * The providers settings editor
+ * The editor for Content Schemas
  *
  * @memberof HashBrown.Client.Views.Editors
  */
 
-var ProvidersSettings = function (_Crisp$View) {
-    _inherits(ProvidersSettings, _Crisp$View);
+var ContentSchemaEditor = function (_SchemaEditor) {
+    _inherits(ContentSchemaEditor, _SchemaEditor);
 
-    function ProvidersSettings(params) {
-        _classCallCheck(this, ProvidersSettings);
+    function ContentSchemaEditor() {
+        _classCallCheck(this, ContentSchemaEditor);
 
-        var _this = _possibleConstructorReturn(this, _Crisp$View.call(this, params));
-
-        _this.$element = _.div({ class: 'editor providers-settings' });
-
-        _this.fetch();
-        return _this;
+        return _possibleConstructorReturn(this, _SchemaEditor.apply(this, arguments));
     }
 
     /**
-     * Event: Click save. Posts the model to the modelUrl
-     */
-
-
-    ProvidersSettings.prototype.onClickSave = function onClickSave() {
-        var _this2 = this;
-
-        this.$saveBtn.toggleClass('working', true);
-
-        SettingsHelper.setSettings(ProjectHelper.currentProject, ProjectHelper.currentEnvironment, 'providers', this.model).then(function () {
-            _this2.$saveBtn.toggleClass('working', false);
-
-            location.reload();
-        }).catch(UI.errorModal);
-    };
-
-    /**
-     * Renders a single field
-     *
-     * @param {String} label
-     * @param {HTMLElement} content
-     *
-     * @return {HTMLElement} Editor element
-     */
-
-
-    ProvidersSettings.prototype.renderField = function renderField(label, $content) {
-        return _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, label), _.div({ class: 'field-value' }, $content));
-    };
-
-    ProvidersSettings.prototype.render = function render() {
-        var _this3 = this;
-
-        // Fetch providers settings
-        SettingsHelper.getSettings(ProjectHelper.currentProject, ProjectHelper.currentEnvironment, 'providers')
-
-        // Previously, providers were set project-wide, so retrieve automatically if needed
-        .then(function (providersSettings) {
-            if (!providersSettings) {
-                return SettingsHelper.getSettings(ProjectHelper.currentProject, null, 'providers');
-            } else {
-                return Promise.resolve(providersSettings);
-            }
-        }).then(function (providersSettings) {
-            var connectionOptions = [];
-
-            for (var _iterator = resources.connections, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-                var _ref;
-
-                if (_isArray) {
-                    if (_i >= _iterator.length) break;
-                    _ref = _iterator[_i++];
-                } else {
-                    _i = _iterator.next();
-                    if (_i.done) break;
-                    _ref = _i.value;
-                }
-
-                var connection = _ref;
-
-                connectionOptions.push({
-                    label: connection.title,
-                    value: connection.id
-                });
-            }
-
-            _this3.model = providersSettings || {};
-
-            _.append(_this3.$element.empty(), _.div({ class: 'editor-header' }, _.span({ class: 'fa fa-gift' }), _.h4('Providers')), _.div({ class: 'editor-body' }, _this3.renderField('Media', UI.inputDropdownTypeAhead(_this3.model.media, connectionOptions, function (newValue) {
-                _this3.model.media = newValue;
-            }, true)), _this3.renderField('Templates', UI.inputDropdownTypeAhead(_this3.model.template, connectionOptions, function (newValue) {
-                _this3.model.template = newValue;
-            }, true))), _.div({ class: 'editor-footer panel panel-default panel-buttons' }, _.div({ class: 'btn-group' }, _this3.$saveBtn = _.button({ class: 'btn btn-primary btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Save '), _.span({ class: 'text-working' }, 'Saving ')).click(function () {
-                _this3.onClickSave();
-            }))));
-        });
-    };
-
-    return ProvidersSettings;
-}(Crisp.View);
-
-module.exports = ProvidersSettings;
-
-/***/ }),
-/* 243 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-// Icons
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var icons = __webpack_require__(244).icons;
-
-var Schema = __webpack_require__(42);
-var SchemaHelper = __webpack_require__(16);
-var ContentHelper = __webpack_require__(41);
-var RequestHelper = __webpack_require__(2);
-var JSONEditor = __webpack_require__(180);
-
-/**
- * The editor for schemas
- *
- * @memberof HashBrown.Client.Views.Editors
- */
-
-var SchemaEditor = function (_Crisp$View) {
-    _inherits(SchemaEditor, _Crisp$View);
-
-    function SchemaEditor(params) {
-        _classCallCheck(this, SchemaEditor);
-
-        var _this = _possibleConstructorReturn(this, _Crisp$View.call(this, params));
-
-        _this.$element = _.div({ class: 'editor schema-editor' });
-
-        _this.fetch();
-        return _this;
-    }
-
-    /**
-     * Event: Click advanced. Routes to the JSON editor
-     */
-
-
-    SchemaEditor.prototype.onClickAdvanced = function onClickAdvanced() {
-        location.hash = location.hash.replace('/schemas/', '/schemas/json/');
-    };
-
-    /**
-     * Event: Click save. Posts the model to the modelUrl
-     */
-
-
-    SchemaEditor.prototype.onClickSave = function onClickSave() {
-        var _this2 = this;
-
-        if (this.jsonEditor && this.jsonEditor.isValid == false) {
-            return;
-        }
-
-        this.$saveBtn.toggleClass('working', true);
-
-        RequestHelper.request('post', 'schemas/' + this.model.id, this.model).then(function () {
-            _this2.$saveBtn.toggleClass('working', false);
-
-            return RequestHelper.reloadResource('schemas');
-        }).then(function () {
-            Crisp.View.get('NavbarMain').reload();
-        }).catch(UI.errorModal);
-    };
-
-    /**
-     * Renders the editor picker
-     *
-     * @return {Object} element
-     */
-
-
-    SchemaEditor.prototype.renderEditorPicker = function renderEditorPicker() {
-        var _this3 = this;
-
-        if (this.model.isPropertyHidden('editorId')) {
-            return;
-        }
-
-        var editorOptions = [];
-
-        for (var i in HashBrown.Views.Editors.FieldEditors) {
-            var editor = HashBrown.Views.Editors.FieldEditors[i];
-
-            editorOptions[editorOptions.length] = {
-                value: editor.name,
-                label: editor.name
-            };
-        }
-
-        // The editorId is actually a name more than an id
-        var editorName = this.model.editorId || '(none)';
-
-        // Backwards compatible check
-        editorName = editorName.charAt(0).toUpperCase() + editorName.slice(1);
-
-        var $element = _.div({ class: 'editor-picker' }, _.if(!this.model.isLocked, UI.inputDropdownTypeAhead(editorName, editorOptions, function (newValue) {
-            _this3.model.editorId = newValue;
-
-            _this3.render();
-        })), _.if(this.model.isLocked, _.p({ class: 'read-only' }, editorName)));
-
-        return $element;
-    };
-
-    /**
-     * Renders the name editor
-     *
-     * @return {Object} element
-     */
-
-
-    SchemaEditor.prototype.renderNameEditor = function renderNameEditor() {
-        if (this.model.isPropertyHidden('name')) {
-            return;
-        }
-
-        var view = this;
-
-        function onInputChange() {
-            view.model.name = $(this).val();
-        }
-
-        var $element = _.div({ class: 'name-editor' }, _.if(!this.model.isLocked, _.input({ class: 'form-control', type: 'text', value: view.model.name, placeholder: 'Input the schema name here' }).on('change', onInputChange)), _.if(this.model.isLocked, _.p({ class: 'read-only' }, view.model.name)));
-
-        return $element;
-    };
-
-    /**
-     * Renders the tabs editor
-     *  
-     * @return {Object} element
-     */
-
-
-    SchemaEditor.prototype.renderTabsEditor = function renderTabsEditor() {
-        if (this.model.isPropertyHidden('tabs')) {
-            return;
-        }
-
-        var view = this;
-
-        function onInputChange($input) {
-            var $chip = $input.parents('.chip');
-            var oldId = $chip.attr('data-id');
-            var newLabel = $input.val();
-            var newId = ContentHelper.getSlug(newLabel);
-            var $defaultTab = view.$element.find('.default-tab-editor .dropdown');
-
-            // Assign new id to data attribute
-            $chip.attr('data-id', newId);
-
-            // Remove old id from model
-            delete view.model.tabs[oldId];
-
-            // Add new id and label to model
-            view.model.tabs[newId] = newLabel;
-
-            // Remove old tab from select element
-            $defaultTab.trigger('changeOption', [oldId, { id: newId, label: newLabel }]);
-
-            // If the default tab id was the old id, update the select element
-            if (view.model.defaultTabId == oldId) {
-                view.model.defaultTabId = newId;
-
-                $defaultTab.trigger('setValue', newId);
-            }
-        }
-
-        function onClickRemove($btn) {
-            var $chip = $btn.parents('.chip');
-            var id = $chip.attr('data-id');
-            var $defaultTab = view.$element.find('.default-tab-editor .dropdown');
-
-            // Remove the id from the tabs list
-            delete view.model.tabs[id];
-
-            // Remove the chip element
-            $chip.remove();
-
-            // Remove the tab from select element
-            $defaultTab.trigger('removeOption', id);
-
-            // If default tab id was this tab, revert to 'meta'
-            if (view.model.defaultTabId == id) {
-                view.model.defaultTabId = 'meta';
-
-                $defaultTab.trigger('setValue', 'meta');
-            }
-        }
-
-        function onClickAdd() {
-            var name = 'New tab';
-            var id = 'new-tab';
-            var $defaultTab = view.$element.find('.default-tab-editor .dropdown');
-
-            // Add new tab to model
-            view.model.tabs[id] = name;
-
-            // Redraw the tab editor
-            render();
-
-            // Add new tab to default tab select element
-            $defaultTab.trigger('addOption', { value: id, label: name });
-        }
-
-        function render() {
-            // Prepend parent tabs if applicable
-            if (view.model.parentSchemaId) {
-                SchemaHelper.getSchemaWithParentFields(view.model.parentSchemaId).then(function (parentSchema) {
-                    var parentTabs = parentSchema.tabs;
-
-                    $tabs.prepend(_.each(parentTabs, function (id, label) {
-                        return _.div({ class: 'tab chip' }, _.p({ class: 'chip-label' }, label + ' (inherited)'));
-                    }));
-                }).catch(UI.errorModal);
-            }
-
-            var $tabs = _.div({ class: 'chip-group' });
-
-            $element.html($tabs);
-
-            $tabs.append(_.each(view.model.tabs, function (id, label) {
-                return _.div({ class: 'tab chip', 'data-id': id }, _.input({ type: 'text', class: 'chip-label' + (view.model.isLocked ? ' disabled' : ''), value: label }).change(function (e) {
-                    onInputChange($(this));
-                }), _.if(!view.model.isLocked, _.button({ class: 'btn chip-remove' }, _.span({ class: 'fa fa-remove' })).click(function (e) {
-                    onClickRemove($(this));
-                })));
-            }));
-
-            if (!view.model.isLocked) {
-                $tabs.append(_.button({ class: 'btn chip-add' }, _.span({ class: 'fa fa-plus' })).click(onClickAdd));
-            }
-        }
-
-        var $element = _.div({ class: 'tabs-editor' });
-
-        render();
-
-        return $element;
-    };
-
-    /**
-     * Renders the icon editor
-     *  
-     * @return {Object} element
-     */
-
-
-    SchemaEditor.prototype.renderIconEditor = function renderIconEditor() {
-        if (this.model.isPropertyHidden('icon')) {
-            return;
-        }
-
-        var view = this;
-
-        function onClickBrowse() {
-            function onSearch() {
-                var query = modal.$element.find('.icon-search input').val().toLowerCase();
-
-                if (query.length > 2 || query.length == 0) {
-                    modal.$element.find('.btn-icon').each(function (i) {
-                        var $btn = $(this);
-                        var name = $btn.children('.icon-name').html();
-
-                        $btn.toggle(name.indexOf(query) > -1);
-                    });
-                }
-            }
-
-            var modal = new HashBrown.Views.Modals.MessageModal({
-                model: {
-                    class: 'modal-icon-picker',
-                    title: 'Pick an icon',
-                    body: [_.div({ class: 'icon-search' }, _.input({ type: 'text', class: 'form-control', placeholder: 'Search for icons' }).on('change', function (e) {
-                        onSearch();
-                    })), _.each(icons, function (i, icon) {
-                        function onClickButton() {
-                            view.model.icon = icon;
-
-                            view.$element.find('.btn-icon-browse .fa').attr('class', 'fa fa-' + icon);
-
-                            modal.hide();
-                        }
-
-                        return _.button({ class: 'btn btn-icon' }, _.span({ class: 'fa fa-' + icon }), _.span({ class: 'icon-name' }, icon)).click(onClickButton);
-                    })]
-                }
-            });
-        }
-
-        var $element = _.div({ class: 'icon-editor' }, _.if(!this.model.isLocked, _.button({ class: 'btn btn-icon-browse btn-default' + (this.model.isLocked ? ' disabled' : '') }, _.span({ class: 'fa fa-' + this.model.icon })).click(onClickBrowse)), _.if(this.model.isLocked, _.span({ class: 'fa fa-' + this.model.icon })));
-
-        return $element;
-    };
-
-    /**
-     * Renders the parent editor
-     *  
-     * @return {Object} element
-     */
-
-
-    SchemaEditor.prototype.renderParentEditor = function renderParentEditor() {
-        var _this4 = this;
-
-        if (this.model.isPropertyHidden('parentSchemaId')) {
-            return;
-        }
-
-        var schemaOptions = [];
-
-        // Filter out irrelevant schemas, self and children of self
-        var excludedParents = {};
-        excludedParents[this.model.id] = true;
-
-        for (var i in resources.schemas) {
-            var schema = resources.schemas[i];
-
-            // Check if this Schema has a parent in the excluded list
-            // If so, add this id to the excluded list
-            // This is to prevent making a Schema a child of its own children
-            if (excludedParents[schema.parentSchemaId] == true) {
-                excludedParents[schema.id] = true;
-                continue;
-            }
-
-            // If this Schema is not of the same type as the model, or has the same id, exclude it
-            if (schema.type != this.model.type || schema.id == this.model.id) {
-                continue;
-            }
-
-            schemaOptions[schemaOptions.length] = {
-                label: schema.name,
-                value: schema.id
-            };
-        }
-
-        // Assign fallback schema name
-        var parentName = '(none)';
-
-        if (schemaOptions[this.model.parentSchemaId]) {
-            parentName = schemaOptions[this.model.parentSchemaId].name;
-        }
-
-        // Render element
-        var $element = _.div({ class: 'parent-editor input-group' }, _.if(!this.model.isLocked, UI.inputDropdownTypeAhead(this.model.parentSchemaId, schemaOptions, function (newValue) {
-            if (!newValue) {
-                newValue = _this4.model.type == 'field' ? 'fieldBase' : 'contentBase';
-            }
-
-            _this4.model.parentSchemaId = newValue;
-
-            return newValue;
-        }, true)), _.if(this.model.isLocked, _.p({ class: 'read-only' }, parentName)));
-
-        return $element;
-    };
-
-    /**
-     * Renders the default tab editor
-     *  
-     * @return {Object} element
-     */
-
-
-    SchemaEditor.prototype.renderDefaultTabEditor = function renderDefaultTabEditor() {
-        var _this5 = this;
-
-        if (this.model.isPropertyHidden('defaultTabId')) {
-            return;
-        }
-
-        // Sanity check
-        this.model.defaultTabId = this.model.defaultTabId || this.compiledSchema.defaultTabId || 'meta';
-
-        var tabOptions = [{ value: 'meta', label: 'Meta' }];
-
-        for (var value in this.compiledSchema.tabs) {
-            tabOptions[tabOptions.length] = { value: value, label: this.compiledSchema.tabs[value] };
-        }
-
-        var $element = _.div({ class: 'default-tab-editor' }, _.if(!this.model.isLocked, UI.inputDropdown(this.model.defaultTabId, tabOptions, function (newValue) {
-            _this5.model.defaultTabId = newValue;
-        })), _.if(this.model.isLocked, _.p({ class: 'read-only' }, this.compiledSchema.tabs[this.model.defaultTabId] || '(none)')));
-
-        return $element;
-    };
-
-    /**
-     * Renders the allowed child Schemas editor (ContentSchema only)
-     *
-     * @return {HTMLElement} Element
-     */
-
-
-    SchemaEditor.prototype.renderAllowedChildSchemasEditor = function renderAllowedChildSchemasEditor() {
-        if (this.model.isPropertyHidden('allowedChildSchemas')) {
-            return;
-        }
-
-        var view = this;
-
-        function onChange() {
-            view.model.allowedChildSchemas = [];
-
-            $element.find('.schemas .schema .dropdown .dropdown-toggle').each(function () {
-                view.model.allowedChildSchemas.push($(this).attr('data-id'));
-            });
-
-            render();
-        }
-
-        function onClickAdd() {
-            var newSchemaId = '';
-
-            for (var i in resources.schemas) {
-                var schema = resources.schemas[i];
-
-                if (schema.type == 'content' && view.model.allowedChildSchemas.indexOf(schema.id) < 0 && schema.id != 'contentBase' && schema.id != 'page') {
-                    newSchemaId = schema.id;
-                    break;
-                }
-            }
-
-            if (newSchemaId) {
-                view.model.allowedChildSchemas.push(newSchemaId);
-
-                render();
-            }
-        }
-
-        function render() {
-            _.append($element.empty(), _.div({ class: 'schemas chip-group' }, _.each(view.model.allowedChildSchemas, function (i, schemaId) {
-                try {
-                    var $schema = _.div({ class: 'chip schema' }, _.div({ class: 'chip-label dropdown' }, _.button({ class: 'dropdown-toggle', 'data-id': schemaId, 'data-toggle': 'dropdown' }, SchemaHelper.getSchemaByIdSync(schemaId).name), _.if(!view.model.isLocked, _.ul({ class: 'dropdown-menu' }, _.each(resources.schemas, function (i, schema) {
-                        if (schema.type == 'content' && (schema.id == schemaId || view.model.allowedChildSchemas.indexOf(schema.id) < 0) && schema.id != 'contentBase' && schema.id != 'page') {
-                            return _.li(_.a({ href: '#', 'data-id': schema.id }, schema.name).click(function (e) {
-                                e.preventDefault();
-
-                                var $btn = $(this).parents('.dropdown').children('.dropdown-toggle');
-
-                                $btn.text($(this).text());
-                                $btn.attr('data-id', $(this).attr('data-id'));
-
-                                onChange();
-                            }));
-                        }
-                    })))).change(onChange), _.if(!view.model.isLocked, _.button({ class: 'btn chip-remove' }, _.span({ class: 'fa fa-remove' })).click(function () {
-                        $schema.remove();
-
-                        onChange();
-                    })));
-
-                    return $schema;
-                } catch (e) {
-                    UI.errorModal(e);
-                }
-            }), _.if(!view.model.isLocked, _.button({ class: 'btn chip-add' }, _.span({ class: 'fa fa-plus' })).click(onClickAdd))));
-        }
-
-        var $element = _.div({ class: 'allowed-child-schemas-editor' });
-
-        render();
-
-        return $element;
-    };
-
-    /**
-     * Renders the field config editor
+     * Renders the Content field properties editor
      *
      * @returns {HTMLElement} Editor element
      */
+    ContentSchemaEditor.prototype.renderContentFieldPropertiesEditor = function renderContentFieldPropertiesEditor() {
+        var _this2 = this;
 
+        var $editor = _.div({ class: 'field-properties-editor' });
+        var fieldSchemas = HashBrown.Helpers.SchemaHelper.getAllSchemasSync('field');
 
-    SchemaEditor.prototype.renderFieldConfigEditor = function renderFieldConfigEditor() {
-        var editor = HashBrown.Views.Editors.FieldEditors[this.model.editorId];
-
-        if (!editor) {
-            return;
+        if (!this.model.fields) {
+            this.model.fields = {};
         }
 
-        return _.div({ class: 'config' }, editor.renderConfigEditor(this.model.config));
-    };
-
-    /**
-     * Render template editor
-     *
-     * @returns {HTMLElement} Element
-     */
-
-
-    SchemaEditor.prototype.renderTemplateEditor = function renderTemplateEditor() {
-        var _this6 = this;
-
-        var $element = _.div({ class: 'field-properties-editor' });
-
-        setTimeout(function () {
-            _this6.templateEditor = CodeMirror($element[0], {
-                value: _this6.model.previewTemplate || '',
-                mode: {
-                    name: 'xml'
-                },
-                lineWrapping: true,
-                lineNumbers: true,
-                tabSize: 4,
-                indentUnit: 4,
-                indentWithTabs: true
-            });
-
-            _this6.templateEditor.on('change', function () {
-                _this6.model.previewTemplate = _this6.templateEditor.getDoc().getValue();
-            });
-        }, 1);
-
-        return $element;
-    };
-
-    /**
-     * Renders a single field
-     *
-     * @param {String} label
-     * @param {HTMLElement} content
-     * @param {Boolean} isVertical
-     *
-     * @return {HTMLElement} Editor element
-     */
-
-
-    SchemaEditor.prototype.renderField = function renderField(label, $content, isVertical) {
-        if (!$content) {
-            return;
+        if (!this.model.fields.properties) {
+            this.model.fields.properties = {};
         }
 
-        return _.div({ class: 'field-container ' + (isVertical ? 'vertical' : '') }, _.div({ class: 'field-key' }, label), _.div({ class: 'field-value' }, $content));
+        // Render editor
+        var renderEditor = function renderEditor() {
+            _.append($editor.empty(), _.each(_this2.model.fields.properties, function (key, value) {
+                // Sanity check
+                value.config = value.config || {};
+
+                var $field = _.div({ class: 'field-properties' });
+
+                var renderField = function renderField() {
+                    var tabOptions = [];
+
+                    for (var tabId in _this2.compiledSchema.tabs) {
+                        tabOptions.push({
+                            label: _this2.compiledSchema.tabs[tabId],
+                            value: tabId
+                        });
+                    }
+
+                    _.append($field.empty(), _.button({ class: 'btn btn-remove' }, _.span({ class: 'fa fa-remove' })).click(function () {
+                        delete _this2.model.fields.properties[key];
+
+                        renderEditor();
+                    }), _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, 'Variable name'), _.div({ class: 'field-value' }, _.input({ class: 'form-control', type: 'text', value: key, placeholder: 'A variable name, like "newField"', title: 'This is the variable name for the field' }).change(function (e) {
+                        delete _this2.model.fields.properties[key];
+
+                        key = e.currentTarget.value;
+
+                        _this2.model.fields.properties[key] = value;
+                    }))), _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, 'Label'), _.div({ class: 'field-value' }, _.input({ class: 'form-control', type: 'text', value: value.label, placeholder: 'A label, like "New field"', title: 'This is the label that will be visible in the Content editor' }).change(function (e) {
+                        value.label = e.currentTarget.value;
+                    }))), _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, 'Tab'), _.div({ class: 'field-value' }, UI.inputDropdown(value.tabId, tabOptions, function (newTabId) {
+                        value.tabId = newTabId;
+                    }, true))), _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, 'Schema'), _.div({ class: 'field-value' }, UI.inputDropdown(value.schemaId, fieldSchemas, function (newSchemaId) {
+                        value.schemaId = newSchemaId;
+
+                        renderField();
+                    }))), _.do(function () {
+                        var schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(value.schemaId);
+
+                        if (!schema) {
+                            return;
+                        }
+
+                        var editor = HashBrown.Views.Editors.FieldEditors[schema.editorId];
+
+                        if (!editor) {
+                            return;
+                        }
+
+                        return editor.renderConfigEditor(value.config);
+                    }));
+                };
+
+                renderField();
+
+                return $field;
+            }), _.button({ class: 'btn btn-primary btn-raised btn-add-item btn-round' }, _.span({ class: 'fa fa-plus' })).click(function () {
+                _this2.model.field.properties.newField = {
+                    label: 'New field',
+                    schemaId: 'string'
+                };
+
+                renderEditor();
+            }));
+        };
+
+        renderEditor();
+
+        return $editor;
     };
 
     /**
-     * Renders all fields
+     * Event: Change a field key
      *
-     * @return {Object} element
+     * @param {String} oldKey
+     * @param {String} newKey
      */
 
 
-    SchemaEditor.prototype.renderFields = function renderFields() {
-        var id = parseInt(this.model.id);
+    ContentSchemaEditor.prototype.onChangeFieldKey = function onChangeFieldKey(oldKey, newKey) {};
 
-        var $element = _.div({ class: 'schema editor-body' });
+    /**
+     * Renders the editor fields
+     */
 
-        $element.empty();
 
-        $element.append(this.renderField('Name', this.renderNameEditor()));
-        $element.append(this.renderField('Icon', this.renderIconEditor()));
-        $element.append(this.renderField('Parent', this.renderParentEditor()));
+    ContentSchemaEditor.prototype.renderFields = function renderFields() {
+        var _this3 = this;
 
-        switch (this.model.type) {
-            case 'field':
-                $element.append(this.renderField('Field editor', this.renderEditorPicker()));
+        var $element = _SchemaEditor.prototype.renderFields.call(this);
 
-                if (!this.model.isLocked) {
-                    $element.append(this.renderField('Config', this.renderFieldConfigEditor(), true));
-                    $element.append(this.renderField('Preview template', this.renderTemplateEditor(), true));
+        $element.append(this.renderField('Default tab', this.renderDefaultTabEditor()));
+        $element.append(this.renderField('Tabs', this.renderTabsEditor()));
+        $element.append(this.renderField('Allowed child Schemas', this.renderAllowedChildSchemasEditor()));
+
+        /*if(!this.model.isLocked) {
+            $element.append(this.renderField('Fields', this.renderContentFieldPropertiesEditor(), true));
+        }*/
+
+        // Render tabs
+        var compiledTabs = JSON.parse(JSON.stringify(this.compiledSchema.tabs));
+        compiledTabs.meta = 'Meta';
+
+        _.append($element, _.div({ class: 'editor__tabs' }, _.ul({ class: 'editor__tabs__buttons nav nav-tabs' }, _.each(compiledTabs, function (tabId, tabLabel) {
+            return _.li({ class: _this3.compiledSchema.isDefaultTab(tabId) ? 'active' : '' }, _.a({ class: 'editor__tabs__button', 'data-toggle': 'tab', href: '#editor__tabs__' + tabId }, tabLabel));
+        })), _.div({ class: 'editor__tabs__panes tab-content' }, _.each(compiledTabs, function (tabId, tabLabel) {
+            return _.div({ class: 'editor__tabs__pane' + (_this3.compiledSchema.isDefaultTab(tabId) ? ' active' : '') + ' tab-pane', id: 'editor__tabs__' + tabId }, _.each(_this3.model.fields.properties, function (fieldKey, fieldValue) {
+                if (!fieldValue || fieldValue.tabId !== tabId && !fieldValue.tabId && tabId !== 'meta') {
+                    return;
                 }
 
-                break;
-        }
+                return _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, new HashBrown.Views.Widgets.Input({
+                    type: 'text',
+                    placeholder: 'A variable name, e.g. "myField"',
+                    tooltip: 'The field variable name',
+                    value: fieldKey,
+                    onChange: function onChange(newKey) {
+                        delete _this3.model.fields.properties[fieldKey];
+
+                        fieldKey = newKey;
+
+                        _this3.model.fields.properties[fieldKey] = fieldValue;
+                    }
+                }).$element, new HashBrown.Views.Widgets.Input({
+                    type: 'text',
+                    placeholder: 'A label, e.g. "My field"',
+                    tooltip: 'The field label',
+                    value: fieldValue.label,
+                    onChange: function onChange(newValue) {
+                        fieldValue.label = newValue;
+                    }
+                }).$element), _.div({ class: 'editor__field__value' }, _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Tab'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Dropdown({
+                    useClearButton: true,
+                    options: _this3.compiledSchema.tabs,
+                    value: fieldValue.tabId,
+                    onChange: function onChange(newValue) {
+                        fieldValue.tabId = newValue;
+                    }
+                }).$element)), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Schema'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Dropdown({
+                    useTypeAhead: true,
+                    options: HashBrown.Helpers.SchemaHelper.getAllSchemasSync('field'),
+                    value: fieldValue.schemaId,
+                    labelKey: 'name',
+                    valueKey: 'id',
+                    onChange: function onChange(newValue) {
+                        fieldValue.schemaId = newValue;
+                    }
+                }).$element)), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Config'), _.div({ class: 'editor__field__value' }, _.do(function () {
+                    var schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(fieldValue.schemaId);
+
+                    if (!schema) {
+                        return;
+                    }
+
+                    var editor = HashBrown.Views.Editors.FieldEditors[schema.editorId];
+
+                    if (!editor) {
+                        return;
+                    }
+
+                    fieldValue.config = fieldValue.config || {};
+
+                    return editor.renderConfigEditor(fieldValue.config);
+                })))));
+            }));
+        }))));
 
         return $element;
     };
 
-    /**
-     * Renders this editor
-     */
+    return ContentSchemaEditor;
+}(SchemaEditor);
 
-
-    SchemaEditor.prototype.render = function render() {
-        var _this7 = this;
-
-        this.$element.toggleClass('locked', this.model.isLocked);
-
-        _.append(this.$element.empty(), _.div({ class: 'editor-header' }, _.span({ class: 'fa fa-' + this.compiledSchema.icon }), _.h4(this.model.name)), this.renderFields(), _.div({ class: 'editor-footer panel panel-default panel-buttons' }, _.div({ class: 'btn-group' }, _.button({ class: 'btn btn-embedded' }, 'Advanced').click(function () {
-            _this7.onClickAdvanced();
-        }), _.if(!this.model.isLocked, this.$saveBtn = _.button({ class: 'btn btn-primary btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Save '), _.span({ class: 'text-working' }, 'Saving ')).click(function () {
-            _this7.onClickSave();
-        })))));
-    };
-
-    return SchemaEditor;
-}(Crisp.View);
-
-module.exports = SchemaEditor;
+module.exports = ContentSchemaEditor;
 
 /***/ }),
-/* 244 */
+/* 248 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -44488,7 +44861,127 @@ module.exports = {
 };
 
 /***/ }),
-/* 245 */
+/* 249 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var SettingsHelper = __webpack_require__(26);
+var ProjectHelper = __webpack_require__(6);
+
+/**
+ * The providers settings editor
+ *
+ * @memberof HashBrown.Client.Views.Editors
+ */
+
+var ProvidersSettings = function (_Crisp$View) {
+    _inherits(ProvidersSettings, _Crisp$View);
+
+    function ProvidersSettings(params) {
+        _classCallCheck(this, ProvidersSettings);
+
+        var _this = _possibleConstructorReturn(this, _Crisp$View.call(this, params));
+
+        _this.$element = _.div({ class: 'editor providers-settings' });
+
+        _this.fetch();
+        return _this;
+    }
+
+    /**
+     * Event: Click save. Posts the model to the modelUrl
+     */
+
+
+    ProvidersSettings.prototype.onClickSave = function onClickSave() {
+        var _this2 = this;
+
+        this.$saveBtn.toggleClass('working', true);
+
+        SettingsHelper.setSettings(ProjectHelper.currentProject, ProjectHelper.currentEnvironment, 'providers', this.model).then(function () {
+            _this2.$saveBtn.toggleClass('working', false);
+
+            location.reload();
+        }).catch(UI.errorModal);
+    };
+
+    /**
+     * Renders a single field
+     *
+     * @param {String} label
+     * @param {HTMLElement} content
+     *
+     * @return {HTMLElement} Editor element
+     */
+
+
+    ProvidersSettings.prototype.renderField = function renderField(label, $content) {
+        return _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, label), _.div({ class: 'field-value' }, $content));
+    };
+
+    ProvidersSettings.prototype.render = function render() {
+        var _this3 = this;
+
+        // Fetch providers settings
+        SettingsHelper.getSettings(ProjectHelper.currentProject, ProjectHelper.currentEnvironment, 'providers')
+
+        // Previously, providers were set project-wide, so retrieve automatically if needed
+        .then(function (providersSettings) {
+            if (!providersSettings) {
+                return SettingsHelper.getSettings(ProjectHelper.currentProject, null, 'providers');
+            } else {
+                return Promise.resolve(providersSettings);
+            }
+        }).then(function (providersSettings) {
+            var connectionOptions = [];
+
+            for (var _iterator = resources.connections, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+                var _ref;
+
+                if (_isArray) {
+                    if (_i >= _iterator.length) break;
+                    _ref = _iterator[_i++];
+                } else {
+                    _i = _iterator.next();
+                    if (_i.done) break;
+                    _ref = _i.value;
+                }
+
+                var connection = _ref;
+
+                connectionOptions.push({
+                    label: connection.title,
+                    value: connection.id
+                });
+            }
+
+            _this3.model = providersSettings || {};
+
+            _.append(_this3.$element.empty(), _.div({ class: 'editor-header' }, _.span({ class: 'fa fa-gift' }), _.h4('Providers')), _.div({ class: 'editor-body' }, _this3.renderField('Media', UI.inputDropdownTypeAhead(_this3.model.media, connectionOptions, function (newValue) {
+                _this3.model.media = newValue;
+            }, true)), _this3.renderField('Templates', UI.inputDropdownTypeAhead(_this3.model.template, connectionOptions, function (newValue) {
+                _this3.model.template = newValue;
+            }, true))), _.div({ class: 'editor-footer panel panel-default panel-buttons' }, _.div({ class: 'btn-group' }, _this3.$saveBtn = _.button({ class: 'btn btn-primary btn-raised btn-save' }, _.span({ class: 'text-default' }, 'Save '), _.span({ class: 'text-working' }, 'Saving ')).click(function () {
+                _this3.onClickSave();
+            }))));
+        });
+    };
+
+    return ProvidersSettings;
+}(Crisp.View);
+
+module.exports = ProvidersSettings;
+
+/***/ }),
+/* 250 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44499,27 +44992,27 @@ module.exports = {
  */
 
 module.exports = {
-    ArrayEditor: __webpack_require__(246),
-    BooleanEditor: __webpack_require__(247),
-    ContentReferenceEditor: __webpack_require__(248),
-    ContentSchemaReferenceEditor: __webpack_require__(249),
-    DateEditor: __webpack_require__(250),
-    DropdownEditor: __webpack_require__(251),
+    ArrayEditor: __webpack_require__(251),
+    BooleanEditor: __webpack_require__(252),
+    ContentReferenceEditor: __webpack_require__(253),
+    ContentSchemaReferenceEditor: __webpack_require__(254),
+    DateEditor: __webpack_require__(255),
+    DropdownEditor: __webpack_require__(256),
     FieldEditor: __webpack_require__(11),
-    LanguageEditor: __webpack_require__(252),
-    MediaReferenceEditor: __webpack_require__(253),
-    NumberEditor: __webpack_require__(254),
-    ResourceReferenceEditor: __webpack_require__(255),
-    RichTextEditor: __webpack_require__(256),
-    StringEditor: __webpack_require__(257),
-    StructEditor: __webpack_require__(258),
-    TagsEditor: __webpack_require__(259),
-    TemplateReferenceEditor: __webpack_require__(260),
-    UrlEditor: __webpack_require__(261)
+    LanguageEditor: __webpack_require__(257),
+    MediaReferenceEditor: __webpack_require__(258),
+    NumberEditor: __webpack_require__(259),
+    ResourceReferenceEditor: __webpack_require__(260),
+    RichTextEditor: __webpack_require__(261),
+    StringEditor: __webpack_require__(262),
+    StructEditor: __webpack_require__(263),
+    TagsEditor: __webpack_require__(264),
+    TemplateReferenceEditor: __webpack_require__(265),
+    UrlEditor: __webpack_require__(266)
 };
 
 /***/ }),
-/* 246 */
+/* 251 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44746,13 +45239,27 @@ var ArrayEditor = function (_FieldEditor) {
 
         var schemaOptions = HashBrown.Helpers.SchemaHelper.getAllSchemasSync('field');
 
-        return _.div(_.div({ class: 'field-container' }, _.div({ class: 'field-key' }, 'Min items'), _.div({ class: 'field-value' }, _.input({ class: 'form-control', type: 'number', min: 0, step: 1, title: 'How many items are required in this array (0 is unlimited)', value: config.minItems || 0 }).change(function (e) {
-            config.minItems = e.currentTarget.value;
-        }))), _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, 'Max items'), _.div({ class: 'field-value' }, _.input({ class: 'form-control', type: 'number', min: 0, step: 1, title: 'How many items are allowed in this array (0 is unlimited)', value: config.maxItems || 0 }).change(function (e) {
-            config.maxItems = e.currentTarget.value;
-        }))), _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, 'Allowed Schemas'), _.div({ class: 'field-value' }, UI.inputChipGroup(config.allowedSchemas, schemaOptions, function (newValue) {
+        return [_.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Min items'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Input({
+            type: 'number',
+            min: 0,
+            step: 1,
+            tooltip: 'How many items are required in this array (0 is unlimited)',
+            value: config.minItems,
+            onChange: function onChange(newValue) {
+                config.minItems = newValue;
+            }
+        }).$element)), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Max items'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Input({
+            type: 'number',
+            min: 0,
+            step: 1,
+            tooltip: 'How many items are allowed in this array (0 is unlimited)',
+            value: config.maxItems,
+            onChange: function onChange(newValue) {
+                config.maxItems = newValue;
+            }
+        }).$element)), _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Allowed Schemas'), _.div({ class: 'editor__field__value' }, UI.inputChipGroup(config.allowedSchemas, schemaOptions, function (newValue) {
             config.allowedSchemas = newValue;
-        }, true))));
+        }, true)))];
     };
 
     /**
@@ -45076,7 +45583,7 @@ var ArrayEditor = function (_FieldEditor) {
 module.exports = ArrayEditor;
 
 /***/ }),
-/* 247 */
+/* 252 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45151,7 +45658,7 @@ var BooleanEditor = function (_FieldEditor) {
 module.exports = BooleanEditor;
 
 /***/ }),
-/* 248 */
+/* 253 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45297,7 +45804,7 @@ var ContentReferenceEditor = function (_FieldEditor) {
 module.exports = ContentReferenceEditor;
 
 /***/ }),
-/* 249 */
+/* 254 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45491,7 +45998,7 @@ var ContentSchemaReferenceEditor = function (_FieldEditor) {
 module.exports = ContentSchemaReferenceEditor;
 
 /***/ }),
-/* 250 */
+/* 255 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45730,7 +46237,7 @@ var DateEditor = function (_FieldEditor) {
 module.exports = DateEditor;
 
 /***/ }),
-/* 251 */
+/* 256 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45887,7 +46394,7 @@ var DropdownEditor = function (_FieldEditor) {
 module.exports = DropdownEditor;
 
 /***/ }),
-/* 252 */
+/* 257 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45982,7 +46489,7 @@ var LanguageEditor = function (_FieldEditor) {
 module.exports = LanguageEditor;
 
 /***/ }),
-/* 253 */
+/* 258 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45997,7 +46504,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var Media = __webpack_require__(27);
 var MediaHelper = __webpack_require__(38);
 var ProjectHelper = __webpack_require__(6);
-var MediaBrowser = __webpack_require__(212);
+var MediaBrowser = __webpack_require__(213);
 
 var FieldEditor = __webpack_require__(11);
 
@@ -46099,7 +46606,7 @@ var MediaReferenceEditor = function (_FieldEditor) {
 module.exports = MediaReferenceEditor;
 
 /***/ }),
-/* 254 */
+/* 259 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46195,7 +46702,7 @@ var NumberEditor = function (_FieldEditor) {
 module.exports = NumberEditor;
 
 /***/ }),
-/* 255 */
+/* 260 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46340,7 +46847,7 @@ var ResourceReferenceEditor = function (_FieldEditor) {
 module.exports = ResourceReferenceEditor;
 
 /***/ }),
-/* 256 */
+/* 261 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46649,7 +47156,7 @@ var RichTextEditor = function (_FieldEditor) {
 module.exports = RichTextEditor;
 
 /***/ }),
-/* 257 */
+/* 262 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46720,7 +47227,7 @@ var StringEditor = function (_FieldEditor) {
 module.exports = StringEditor;
 
 /***/ }),
-/* 258 */
+/* 263 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46947,7 +47454,7 @@ var StructEditor = function (_FieldEditor) {
 module.exports = StructEditor;
 
 /***/ }),
-/* 259 */
+/* 264 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47120,7 +47627,7 @@ var TagsEditor = function (_FieldEditor) {
 module.exports = TagsEditor;
 
 /***/ }),
-/* 260 */
+/* 265 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47307,7 +47814,7 @@ var TemplateReferenceEditor = function (_FieldEditor) {
 module.exports = TemplateReferenceEditor;
 
 /***/ }),
-/* 261 */
+/* 266 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47568,420 +48075,6 @@ var UrlEditor = function (_FieldEditor) {
 }(FieldEditor);
 
 module.exports = UrlEditor;
-
-/***/ }),
-/* 262 */,
-/* 263 */,
-/* 264 */,
-/* 265 */,
-/* 266 */,
-/* 267 */,
-/* 268 */,
-/* 269 */,
-/* 270 */,
-/* 271 */,
-/* 272 */,
-/* 273 */,
-/* 274 */,
-/* 275 */,
-/* 276 */,
-/* 277 */,
-/* 278 */,
-/* 279 */,
-/* 280 */,
-/* 281 */,
-/* 282 */,
-/* 283 */,
-/* 284 */,
-/* 285 */,
-/* 286 */,
-/* 287 */,
-/* 288 */,
-/* 289 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var SchemaEditor = __webpack_require__(243);
-
-/**
- * The editor for Content Schemas
- *
- * @memberof HashBrown.Client.Views.Editors
- */
-
-var ContentSchemaEditor = function (_SchemaEditor) {
-    _inherits(ContentSchemaEditor, _SchemaEditor);
-
-    function ContentSchemaEditor() {
-        _classCallCheck(this, ContentSchemaEditor);
-
-        return _possibleConstructorReturn(this, _SchemaEditor.apply(this, arguments));
-    }
-
-    /**
-     * Renders the Content field properties editor
-     *
-     * @returns {HTMLElement} Editor element
-     */
-    ContentSchemaEditor.prototype.renderContentFieldPropertiesEditor = function renderContentFieldPropertiesEditor() {
-        var _this2 = this;
-
-        var $editor = _.div({ class: 'field-properties-editor' });
-        var fieldSchemas = HashBrown.Helpers.SchemaHelper.getAllSchemasSync('field');
-
-        if (!this.model.fields) {
-            this.model.fields = {};
-        }
-
-        if (!this.model.fields.properties) {
-            this.model.fields.properties = {};
-        }
-
-        // Render editor
-        var renderEditor = function renderEditor() {
-            _.append($editor.empty(), _.each(_this2.model.fields.properties, function (key, value) {
-                // Sanity check
-                value.config = value.config || {};
-
-                var $field = _.div({ class: 'field-properties' });
-
-                var renderField = function renderField() {
-                    var tabOptions = [];
-
-                    for (var tabId in _this2.compiledSchema.tabs) {
-                        tabOptions.push({
-                            label: _this2.compiledSchema.tabs[tabId],
-                            value: tabId
-                        });
-                    }
-
-                    _.append($field.empty(), _.button({ class: 'btn btn-remove' }, _.span({ class: 'fa fa-remove' })).click(function () {
-                        delete _this2.model.fields.properties[key];
-
-                        renderEditor();
-                    }), _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, 'Variable name'), _.div({ class: 'field-value' }, _.input({ class: 'form-control', type: 'text', value: key, placeholder: 'A variable name, like "newField"', title: 'This is the variable name for the field' }).change(function (e) {
-                        delete _this2.model.fields.properties[key];
-
-                        key = e.currentTarget.value;
-
-                        _this2.model.fields.properties[key] = value;
-                    }))), _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, 'Label'), _.div({ class: 'field-value' }, _.input({ class: 'form-control', type: 'text', value: value.label, placeholder: 'A label, like "New field"', title: 'This is the label that will be visible in the Content editor' }).change(function (e) {
-                        value.label = e.currentTarget.value;
-                    }))), _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, 'Tab'), _.div({ class: 'field-value' }, UI.inputDropdown(value.tabId, tabOptions, function (newTabId) {
-                        value.tabId = newTabId;
-                    }, true))), _.div({ class: 'field-container' }, _.div({ class: 'field-key' }, 'Schema'), _.div({ class: 'field-value' }, UI.inputDropdown(value.schemaId, fieldSchemas, function (newSchemaId) {
-                        value.schemaId = newSchemaId;
-
-                        renderField();
-                    }))), _.do(function () {
-                        var schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(value.schemaId);
-
-                        if (!schema) {
-                            return;
-                        }
-
-                        var editor = HashBrown.Views.Editors.FieldEditors[schema.editorId];
-
-                        if (!editor) {
-                            return;
-                        }
-
-                        return editor.renderConfigEditor(value.config);
-                    }));
-                };
-
-                renderField();
-
-                return $field;
-            }), _.button({ class: 'btn btn-primary btn-raised btn-add-item btn-round' }, _.span({ class: 'fa fa-plus' })).click(function () {
-                _this2.model.field.properties.newField = {
-                    label: 'New field',
-                    schemaId: 'string'
-                };
-
-                renderEditor();
-            }));
-        };
-
-        renderEditor();
-
-        return $editor;
-    };
-
-    /**
-     * Event: Change a field key
-     *
-     * @param {String} oldKey
-     * @param {String} newKey
-     */
-
-
-    ContentSchemaEditor.prototype.onChangeFieldKey = function onChangeFieldKey(oldKey, newKey) {
-        var fieldValue = this.model.fields.properties[oldKey];
-
-        delete this.model.fields.properties[oldKey];
-
-        this.model.fields.properties[newKey] = fieldValue;
-
-        this.render();
-    };
-
-    /**
-     * Renders the editor fields
-     */
-
-
-    ContentSchemaEditor.prototype.renderFields = function renderFields() {
-        var _this3 = this;
-
-        var $element = _SchemaEditor.prototype.renderFields.call(this);
-
-        $element.append(this.renderField('Default tab', this.renderDefaultTabEditor()));
-        $element.append(this.renderField('Tabs', this.renderTabsEditor()));
-        $element.append(this.renderField('Allowed child Schemas', this.renderAllowedChildSchemasEditor()));
-
-        /*if(!this.model.isLocked) {
-            $element.append(this.renderField('Fields', this.renderContentFieldPropertiesEditor(), true));
-        }*/
-
-        // Render tabs
-        var compiledTabs = JSON.parse(JSON.stringify(this.compiledSchema.tabs));
-        compiledTabs.meta = 'Meta';
-
-        _.append($element, _.div({ class: 'editor__tabs' }, _.ul({ class: 'editor__tabs__buttons nav nav-tabs' }, _.each(compiledTabs, function (tabId, tabLabel) {
-            return _.li({ class: _this3.compiledSchema.isDefaultTab(tabId) ? 'active' : '' }, _.a({ class: 'editor__tabs__button', 'data-toggle': 'tab', href: '#editor__tabs__' + tabId }, tabLabel));
-        })), _.div({ class: 'editor__tabs__panes tab-content' }, _.each(compiledTabs, function (tabId, tabLabel) {
-            return _.div({ class: 'editor__tabs__pane' + (_this3.compiledSchema.isDefaultTab(tabId) ? ' active' : '') + ' tab-pane', id: 'editor__tabs__' + tabId }, _.each(_this3.model.fields.properties, function (fieldKey, fieldValue) {
-                if (!fieldValue || fieldValue.tabId !== tabId || !fieldValue.tabId && tabId !== 'meta') {
-                    return;
-                }
-
-                return _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, new HashBrown.Views.Widgets.Input({
-                    type: 'text',
-                    placeholder: 'A variable name, e.g. "myField"',
-                    tooltip: 'The field variable name',
-                    value: fieldKey,
-                    onChange: function onChange(newValue) {
-                        _this3.onChangeFieldKey(fieldKey, newValue);
-                    }
-                }).$element, new HashBrown.Views.Widgets.Input({
-                    type: 'text',
-                    placeholder: 'A label, e.g. "My field"',
-                    tooltip: 'The field label',
-                    value: fieldValue.label,
-                    onChange: function onChange(newValue) {
-                        fieldValue.label = newValue;
-                    }
-                }).$element), _.div({ class: 'editor__field__value' }, _.div({ class: 'editor__field' }, _.div({ class: 'editor__field__key' }, 'Schema'), _.div({ class: 'editor__field__value' }, new HashBrown.Views.Widgets.Dropdown({
-                    useTypeAhead: true,
-                    options: HashBrown.Helpers.SchemaHelper.getAllSchemasSync('field'),
-                    defaultValue: fieldValue.schemaId,
-                    labelKey: 'name',
-                    valueKey: 'id',
-                    onChange: function onChange(newValue) {
-                        fieldValue.schemaId = newValue;
-                    }
-                }).$element))));
-            }));
-        }))));
-
-        return $element;
-    };
-
-    return ContentSchemaEditor;
-}(SchemaEditor);
-
-module.exports = ContentSchemaEditor;
-
-/***/ }),
-/* 290 */,
-/* 291 */,
-/* 292 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-/**
- * @namespace HashBrown.Client.Views.Widgets
- */
-
-module.exports = {
-  Input: __webpack_require__(295),
-  Dropdown: __webpack_require__(293)
-};
-
-/***/ }),
-/* 293 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var Widget = __webpack_require__(294);
-
-/**
- * A generic dropdown
- *
- * @memberof HashBrown.Client.Views.Widgets
- */
-
-var Dropdown = function (_Widget) {
-    _inherits(Dropdown, _Widget);
-
-    function Dropdown() {
-        _classCallCheck(this, Dropdown);
-
-        return _possibleConstructorReturn(this, _Widget.apply(this, arguments));
-    }
-
-    /**
-     * Template
-     */
-    Dropdown.prototype.template = function template() {
-        var _this2 = this;
-
-        var options = {};
-
-        for (var key in this.options) {
-            var value = this.options[key];
-
-            var optionLabel = this.labelKey ? value[this.labelKey] : key;
-            var optionValue = this.valueKey ? value[this.valueKey] : value;
-
-            options[optionValue] = optionLabel;
-        }
-
-        return _.div({ title: this.tooltip, class: 'widget widget--dropdown dropdown' + (this.useTypeAhead ? ' typeahead' : '') }, _.if(this.useTypeAhead, _.input({ class: 'widget--dropdown__input', type: 'text' }).on('input', function (e) {
-            var query = e.currentTarget.value.toLowerCase();
-            var $select = $(e.currentTarget).parent().find('select');
-
-            $select.find('option').each(function (i, option) {
-                var isMatch = query.length < 3 || option.innerHTML.toLowerCase().indexOf(query) > -1;
-
-                $(option).attr('disabled', !isMatch);
-                $(option).toggle(isMatch);
-            });
-        })), _.select({ class: 'widget--dropdown__select', value: this.value || '(none)' }, _.each(options, function (optionValue, optionLabel) {
-            return _.option({ class: 'widget--dropdown__item', value: optionValue }, optionLabel);
-        })).change(function (e) {
-            _this2.value = e.currentTarget.value;
-
-            if (typeof _this2.onChange !== 'function') {
-                return;
-            }
-
-            _this2.onChange(_this2.value);
-        }));
-    };
-
-    return Dropdown;
-}(Widget);
-
-module.exports = Dropdown;
-
-/***/ }),
-/* 294 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-/**
- * A standard widget
- *
- * @memberof HashBrown.Client.Views.Widgets
- */
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var Widget = function (_Crisp$View) {
-  _inherits(Widget, _Crisp$View);
-
-  /**
-   * Constructor
-   */
-  function Widget(params) {
-    _classCallCheck(this, Widget);
-
-    var _this = _possibleConstructorReturn(this, _Crisp$View.call(this, params));
-
-    _this.fetch();
-    return _this;
-  }
-
-  return Widget;
-}(Crisp.View);
-
-module.exports = Widget;
-
-/***/ }),
-/* 295 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var Widget = __webpack_require__(294);
-
-/**
- * A versatile input widget
- */
-
-var Input = function (_Widget) {
-    _inherits(Input, _Widget);
-
-    function Input() {
-        _classCallCheck(this, Input);
-
-        return _possibleConstructorReturn(this, _Widget.apply(this, arguments));
-    }
-
-    /**
-     * Template
-     */
-    Input.prototype.template = function template() {
-        var _this2 = this;
-
-        return _.input({ placeholder: this.placeholder, title: this.tooltip, class: 'widget widget--input', type: this.type || 'text', value: this.value }).on('input', function (e) {
-            _this2.value = e.currentTarget.value;
-
-            if (typeof _this2.onChange !== 'function') {
-                return;
-            }
-
-            _this2.onChange(_this2.value);
-        });
-    };
-
-    return Input;
-}(Widget);
-
-module.exports = Input;
 
 /***/ })
 /******/ ]);

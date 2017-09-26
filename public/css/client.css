@@ -2431,8 +2431,120 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
     color: #e70d3b; }
 
 /**
- * A versatile inpit widget
+ * New BEM styles
+ */
+/**
+ * Global editor styling
+ */
+.editor__field {
+  display: flex; }
+  .editor__field.vertical {
+    flex-direction: column; }
+  .editor__field__key {
+    flex-basis: 10rem;
+    flex-shrink: 0;
+    margin-right: 1rem;
+    line-height: 2rem; }
+  .editor__field__value {
+    flex-grow: 1; }
+
+/**
+ * A generic widget
+ */
+.widget {
+  margin: 0 0 0.5rem 0; }
+
+/**
+ * A versatile input widget
  */
 .widget--input {
   display: block;
-  line-height: 3rem; }
+  line-height: 2rem; }
+  .widget--input[type="text"], .widget--input[type="number"] {
+    padding: 0 0.5rem;
+    height: 2rem; }
+
+/**
+ * A dropdown widget with typeahead
+ */
+.widget--dropdown {
+  display: flex;
+  position: relative;
+  max-width: 20rem; }
+  .widget--dropdown__value {
+    height: 2rem;
+    width: 100%;
+    line-height: 2rem;
+    padding: 0 0.5rem;
+    background-color: #e70d3b;
+    color: #ffffff; }
+  .widget--dropdown__toggle {
+    position: absolute;
+    opacity: 0;
+    top: 0;
+    left: 0;
+    display: block;
+    margin: 0 !important;
+    width: calc(100% - 2rem);
+    height: 100%;
+    cursor: pointer;
+    z-index: 20; }
+  .widget--dropdown__toggle:checked ~ .widget--dropdown__options,
+  .widget--dropdown__toggle:checked ~ .widget--dropdown__typeahead,
+  .widget--dropdown__toggle:checked ~ .widget--dropdown__obscure {
+    display: block; }
+  .widget--dropdown__typeahead {
+    display: none;
+    position: absolute;
+    line-height: 2rem;
+    width: 100%;
+    top: 0;
+    left: 0;
+    height: 2rem;
+    padding: 0 0.5rem;
+    z-index: 910; }
+  .widget--dropdown__options {
+    box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1);
+    z-index: 910;
+    display: none;
+    position: absolute;
+    top: 2rem;
+    left: 0;
+    background-color: #ffffff;
+    width: 100%;
+    max-height: 10rem;
+    overflow-y: auto; }
+  .widget--dropdown__option {
+    line-height: 2rem;
+    padding: 0 0.5rem;
+    text-align: left;
+    border: 0;
+    display: block;
+    width: 100%;
+    background: transparent; }
+    .widget--dropdown__option:hover {
+      background-color: #e70d3b;
+      color: #ffffff; }
+  .widget--dropdown__clear {
+    border: 0;
+    height: 2rem;
+    line-height: 2rem;
+    display: block;
+    padding: 0 0.5rem;
+    position: absolute;
+    z-index: 5;
+    background: transparent;
+    right: 0;
+    top: 0;
+    color: #ffffff; }
+  .widget--dropdown__obscure {
+    position: relative;
+    display: none; }
+    .widget--dropdown__obscure__inner {
+      position: fixed;
+      z-index: 900;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      background-color: rgba(255, 255, 255, 0.1); }

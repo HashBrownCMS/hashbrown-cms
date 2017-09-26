@@ -135,13 +135,6 @@ class ContentSchemaEditor extends SchemaEditor {
      * @param {String} newKey
      */
     onChangeFieldKey(oldKey, newKey) {
-        let fieldValue = this.model.fields.properties[oldKey];
-
-        delete this.model.fields.properties[oldKey];
-
-        this.model.fields.properties[newKey] = fieldValue;
-
-        this.render();
     }
     
     /**
@@ -175,7 +168,7 @@ class ContentSchemaEditor extends SchemaEditor {
                     _.each(compiledTabs, (tabId, tabLabel) => {
                         return _.div({class: 'editor__tabs__pane' + (this.compiledSchema.isDefaultTab(tabId) ? ' active' : '') + ' tab-pane', id: 'editor__tabs__' + tabId},
                             _.each(this.model.fields.properties, (fieldKey, fieldValue) => {
-                                if(!fieldValue || (fieldValue.tabId !== tabId) || (!fieldValue.tabId && tabId !== 'meta')) { return; }
+                                if(!fieldValue || (fieldValue.tabId !== tabId && (!fieldValue.tabId && tabId !== 'meta'))) { return; }
 
                                 return _.div({class: 'editor__field'},
                                     _.div({class: 'editor__field__key'},
@@ -184,7 +177,13 @@ class ContentSchemaEditor extends SchemaEditor {
                                             placeholder: 'A variable name, e.g. "myField"',
                                             tooltip: 'The field variable name',
                                             value: fieldKey,
-                                            onChange: (newValue) => { this.onChangeFieldKey(fieldKey, newValue); }
+                                            onChange: (newKey) => {
+                                                delete this.model.fields.properties[fieldKey];
+
+                                                fieldKey = newKey;
+
+                                                this.model.fields.properties[fieldKey] = fieldValue;
+                                            }
                                         }).$element,
                                         new HashBrown.Views.Widgets.Input({
                                             type: 'text',
@@ -196,18 +195,49 @@ class ContentSchemaEditor extends SchemaEditor {
                                     ),
                                     _.div({class: 'editor__field__value'},
                                         _.div({class: 'editor__field'},
+                                            _.div({class: 'editor__field__key'}, 'Tab'),
+                                            _.div({class: 'editor__field__value'},
+                                                new HashBrown.Views.Widgets.Dropdown({
+                                                    useClearButton: true,
+                                                    options: this.compiledSchema.tabs,
+                                                    value: fieldValue.tabId,
+                                                    onChange: (newValue) => {
+                                                        fieldValue.tabId = newValue;
+                                                    }
+                                                }).$element
+                                            )
+                                        ),
+                                        _.div({class: 'editor__field'},
                                             _.div({class: 'editor__field__key'}, 'Schema'),
                                             _.div({class: 'editor__field__value'},
                                                 new HashBrown.Views.Widgets.Dropdown({
                                                     useTypeAhead: true,
                                                     options: HashBrown.Helpers.SchemaHelper.getAllSchemasSync('field'),
-                                                    defaultValue: fieldValue.schemaId,
+                                                    value: fieldValue.schemaId,
                                                     labelKey: 'name',
                                                     valueKey: 'id',
                                                     onChange: (newValue) => {
                                                         fieldValue.schemaId = newValue;
                                                     }
                                                 }).$element
+                                            )
+                                        ),
+                                        _.div({class: 'editor__field'},
+                                            _.div({class: 'editor__field__key'}, 'Config'),
+                                            _.div({class: 'editor__field__value'},
+                                                _.do(() => {
+                                                    let schema = HashBrown.Helpers.SchemaHelper.getSchemaByIdSync(fieldValue.schemaId);
+
+                                                    if(!schema) { return; }
+
+                                                    let editor = HashBrown.Views.Editors.FieldEditors[schema.editorId];
+
+                                                    if(!editor) { return; }
+
+                                                    fieldValue.config = fieldValue.config || {};
+
+                                                    return editor.renderConfigEditor(fieldValue.config);
+                                                })
                                             )
                                         )
                                     )
