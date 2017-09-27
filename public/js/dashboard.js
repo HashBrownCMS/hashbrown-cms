@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 267);
+/******/ 	return __webpack_require__(__webpack_require__.s = 268);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -7068,7 +7068,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var RequestHelper = __webpack_require__(2);
 
-var SettingsHelperCommon = __webpack_require__(184);
+var SettingsHelperCommon = __webpack_require__(185);
 
 /**
  * The client side settings helper
@@ -9126,7 +9126,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var MediaHelperCommon = __webpack_require__(183);
+var MediaHelperCommon = __webpack_require__(184);
 
 var RequestHelper = __webpack_require__(2);
 
@@ -9289,7 +9289,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var RequestHelper = __webpack_require__(2);
 
-var ContentHelperCommon = __webpack_require__(185);
+var ContentHelperCommon = __webpack_require__(186);
 
 var Content = __webpack_require__(57);
 
@@ -14937,7 +14937,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var ConnectionHelperCommon = __webpack_require__(186);
+var ConnectionHelperCommon = __webpack_require__(187);
 var Connection = __webpack_require__(37);
 var ProjectHelper = __webpack_require__(6);
 var RequestHelper = __webpack_require__(2);
@@ -15091,7 +15091,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var SettingsHelper = __webpack_require__(26);
-var LanguageHelperCommon = __webpack_require__(188);
+var LanguageHelperCommon = __webpack_require__(189);
 
 /**
  * The client side language helper
@@ -24292,7 +24292,8 @@ module.exports = SchemaHelper;
 /* 180 */,
 /* 181 */,
 /* 182 */,
-/* 183 */
+/* 183 */,
+/* 184 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -24376,7 +24377,7 @@ var MediaHelper = function () {
 module.exports = MediaHelper;
 
 /***/ }),
-/* 184 */
+/* 185 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -24397,7 +24398,7 @@ var SettingsHelper = function SettingsHelper() {
 module.exports = SettingsHelper;
 
 /***/ }),
-/* 185 */
+/* 186 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -24559,7 +24560,7 @@ var ContentHelper = function () {
 module.exports = ContentHelper;
 
 /***/ }),
-/* 186 */
+/* 187 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -24727,8 +24728,8 @@ var ConnectionHelper = function () {
 module.exports = ConnectionHelper;
 
 /***/ }),
-/* 187 */,
-/* 188 */
+/* 188 */,
+/* 189 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -24836,7 +24837,7 @@ var LanguageHelper = function () {
 module.exports = LanguageHelper;
 
 /***/ }),
-/* 189 */
+/* 190 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -24849,19 +24850,19 @@ module.exports = LanguageHelper;
 module.exports = {
     ConnectionHelper: __webpack_require__(93),
     ContentHelper: __webpack_require__(41),
-    DebugHelper: __webpack_require__(190),
+    DebugHelper: __webpack_require__(191),
     LanguageHelper: __webpack_require__(94),
     MediaHelper: __webpack_require__(38),
     ProjectHelper: __webpack_require__(6),
     RequestHelper: __webpack_require__(2),
     SchemaHelper: __webpack_require__(16),
     SettingsHelper: __webpack_require__(26),
-    TemplateHelper: __webpack_require__(192),
-    UIHelper: __webpack_require__(193)
+    TemplateHelper: __webpack_require__(193),
+    UIHelper: __webpack_require__(194)
 };
 
 /***/ }),
-/* 190 */
+/* 191 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -24873,7 +24874,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var DebugHelperCommon = __webpack_require__(191);
+var DebugHelperCommon = __webpack_require__(192);
 
 /**
  * The client side debug helper
@@ -24936,7 +24937,7 @@ var DebugHelper = function (_DebugHelperCommon) {
 module.exports = DebugHelper;
 
 /***/ }),
-/* 191 */
+/* 192 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -25099,7 +25100,7 @@ var DebugHelper = function () {
 module.exports = DebugHelper;
 
 /***/ }),
-/* 192 */
+/* 193 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -25162,7 +25163,7 @@ var TemplateHelper = function () {
 module.exports = TemplateHelper;
 
 /***/ }),
-/* 193 */
+/* 194 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -25763,12 +25764,12 @@ var UIHelper = function () {
 module.exports = UIHelper;
 
 /***/ }),
-/* 194 */
+/* 195 */
 /***/ (function(module, exports, __webpack_require__) {
 
-window.Promise = __webpack_require__(195);
-window.marked = __webpack_require__(196);
-window.toMarkdown = __webpack_require__(197);
+window.Promise = __webpack_require__(196);
+window.marked = __webpack_require__(197);
+window.toMarkdown = __webpack_require__(198);
 
 var ProjectHelper = __webpack_require__(6);
 var User = __webpack_require__(43);
@@ -25867,13 +25868,13 @@ window.populateWorkspace = function populateWorkspace($html, classes) {
 };
 
 // Get package file
-window.app = __webpack_require__(205);
+window.app = __webpack_require__(206);
 
 // Language
 window.language = localStorage.getItem('language') || 'en';
 
 /***/ }),
-/* 195 */
+/* 196 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process, global, setImmediate) {var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -31204,7 +31205,7 @@ window.language = localStorage.getItem('language') || 'en';
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7), __webpack_require__(9), __webpack_require__(60).setImmediate))
 
 /***/ }),
-/* 196 */
+/* 197 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {var __WEBPACK_AMD_DEFINE_RESULT__;var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -32393,7 +32394,7 @@ window.language = localStorage.getItem('language') || 'en';
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(9)))
 
 /***/ }),
-/* 197 */
+/* 198 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -32409,10 +32410,10 @@ window.language = localStorage.getItem('language') || 'en';
 
 var toMarkdown;
 var converters;
-var mdConverters = __webpack_require__(198);
-var gfmConverters = __webpack_require__(199);
-var HtmlParser = __webpack_require__(200);
-var collapse = __webpack_require__(202);
+var mdConverters = __webpack_require__(199);
+var gfmConverters = __webpack_require__(200);
+var HtmlParser = __webpack_require__(201);
+var collapse = __webpack_require__(203);
 
 /*
  * Utilities
@@ -32620,7 +32621,7 @@ toMarkdown.outer = outer;
 module.exports = toMarkdown;
 
 /***/ }),
-/* 198 */
+/* 199 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -32753,7 +32754,7 @@ module.exports = [{
 }];
 
 /***/ }),
-/* 199 */
+/* 200 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -32853,7 +32854,7 @@ module.exports = [{
 }];
 
 /***/ }),
-/* 200 */
+/* 201 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -32887,7 +32888,7 @@ function createHtmlParser() {
 
   // For Node.js environments
   if (typeof document === 'undefined') {
-    var jsdom = __webpack_require__(201);
+    var jsdom = __webpack_require__(202);
     Parser.prototype.parseFromString = function (string) {
       return jsdom.jsdom(string, {
         features: {
@@ -32934,25 +32935,25 @@ function shouldUseActiveX() {
 module.exports = canParseHtmlNatively() ? _window.DOMParser : createHtmlParser();
 
 /***/ }),
-/* 201 */
+/* 202 */
 /***/ (function(module, exports) {
 
 /* (ignored) */
 
 /***/ }),
-/* 202 */
+/* 203 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var voidElements = __webpack_require__(203);
+var voidElements = __webpack_require__(204);
 Object.keys(voidElements).forEach(function (name) {
   voidElements[name.toUpperCase()] = 1;
 });
 
 var blockElements = {};
-__webpack_require__(204).forEach(function (name) {
+__webpack_require__(205).forEach(function (name) {
   blockElements[name.toUpperCase()] = 1;
 });
 
@@ -33082,7 +33083,7 @@ function next(prev, current) {
 module.exports = collapseWhitespace;
 
 /***/ }),
-/* 203 */
+/* 204 */
 /***/ (function(module, exports) {
 
 /**
@@ -33110,7 +33111,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 204 */
+/* 205 */
 /***/ (function(module, exports) {
 
 /**
@@ -33121,7 +33122,7 @@ module.exports = {
 module.exports = ["address", "article", "aside", "blockquote", "canvas", "dd", "div", "dl", "dt", "fieldset", "figcaption", "figure", "footer", "form", "h1", "h2", "h3", "h4", "h5", "h6", "header", "hgroup", "hr", "li", "main", "nav", "noscript", "ol", "output", "p", "pre", "section", "table", "tfoot", "ul", "video"];
 
 /***/ }),
-/* 205 */
+/* 206 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -33173,7 +33174,6 @@ module.exports = {
 };
 
 /***/ }),
-/* 206 */,
 /* 207 */,
 /* 208 */,
 /* 209 */,
@@ -33234,7 +33234,8 @@ module.exports = {
 /* 264 */,
 /* 265 */,
 /* 266 */,
-/* 267 */
+/* 267 */,
+/* 268 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -33246,10 +33247,10 @@ window._ = Crisp.Elements;
 
 window.HashBrown = {};
 
-HashBrown.Helpers = __webpack_require__(189);
+HashBrown.Helpers = __webpack_require__(190);
 
 // Helper functions
-__webpack_require__(194);
+__webpack_require__(195);
 
 // Helper shortcuts
 window.debug = HashBrown.Helpers.DebugHelper;
@@ -33285,7 +33286,7 @@ HashBrown.Helpers.RequestHelper.request('get', 'user').then(function (user) {
 
         return HashBrown.Helpers.RequestHelper.request('get', 'server/projects/' + project).then(function (project) {
             var Project = __webpack_require__(96);
-            var ProjectEditor = __webpack_require__(268);
+            var ProjectEditor = __webpack_require__(269);
 
             var projectEditor = new ProjectEditor({
                 model: new Project(project)
@@ -33551,7 +33552,7 @@ $('.btn-create-project').click(function () {
 });
 
 /***/ }),
-/* 268 */
+/* 269 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -33566,11 +33567,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var RequestHelper = __webpack_require__(2);
 
 var MessageModal = __webpack_require__(17);
-var InfoEditor = __webpack_require__(269);
-var SyncEditor = __webpack_require__(270);
-var LanguageEditor = __webpack_require__(271);
-var BackupEditor = __webpack_require__(272);
-var MigrationEditor = __webpack_require__(273);
+var InfoEditor = __webpack_require__(270);
+var SyncEditor = __webpack_require__(271);
+var LanguageEditor = __webpack_require__(272);
+var BackupEditor = __webpack_require__(273);
+var MigrationEditor = __webpack_require__(274);
 
 /**
  * The editor for projects as seen on the dashboard
@@ -33812,7 +33813,7 @@ var ProjectEditor = function (_Crisp$View) {
 module.exports = ProjectEditor;
 
 /***/ }),
-/* 269 */
+/* 270 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -33930,7 +33931,7 @@ var InfoEditor = function (_Crisp$View) {
 module.exports = InfoEditor;
 
 /***/ }),
-/* 270 */
+/* 271 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -34136,7 +34137,7 @@ var SyncEditor = function (_Crisp$View) {
 module.exports = SyncEditor;
 
 /***/ }),
-/* 271 */
+/* 272 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -34219,7 +34220,7 @@ var LanguageEditor = function (_Crisp$View) {
 module.exports = LanguageEditor;
 
 /***/ }),
-/* 272 */
+/* 273 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -34485,7 +34486,7 @@ var BackupEditor = function (_Crisp$View) {
 module.exports = BackupEditor;
 
 /***/ }),
-/* 273 */
+/* 274 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";

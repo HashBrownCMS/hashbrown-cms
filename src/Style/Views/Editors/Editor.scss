@@ -2,6 +2,69 @@
  * Global editor styling
  */
 .editor {
+    // Locked state
+    &.locked &__body > &__field {
+        pointer-events: none;
+        opacity: 0.75;
+        user-select: none;
+    }
+    
+    // Header
+    &__header {
+        background-color: $secondary;
+        padding: 20px 0px 0px 20px;
+        color: $secondary-text;
+        height: 61px;
+        flex-shrink: 0;
+        flex-basis: 61px;
+
+        @include background('secondary');
+
+        &__title {
+            margin: 0px;
+            display: inline-block;
+        }
+
+        &__icon {
+            margin-right: 10px;
+            font-size: 20px;
+            width: 20px;
+            display: inline-block;
+            position: relative;
+            top: 1px;
+        }
+    }
+
+    // Body
+    &__body {
+        padding: 15px;
+        flex-grow: 1;
+        overflow: auto;
+        position: relative;
+    }
+
+    // Footer
+    &__footer {
+        position: relative;
+        z-index: 10;
+        box-shadow: 0px -2px 5px 0px rgba(0, 0, 0, 0.2);
+        flex-shrink: 0;
+        padding: 15px;
+        margin: 0px;
+        border-width: 0px;
+        border-top-width: 1px;
+        border-radius: 0px;
+        background-color: $standard-dark;
+        border-top: 1px solid $standard-darker;
+        color: $standard-text;
+
+        &__buttons {
+            margin: 0 0 0 auto;
+            float: right;
+            display: flex;
+        }
+    }
+
     // A container for displaying field keys and values
     &__field {
         display: flex;

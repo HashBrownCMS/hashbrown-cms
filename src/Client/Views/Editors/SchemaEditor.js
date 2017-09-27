@@ -18,8 +18,6 @@ class SchemaEditor extends Crisp.View {
     constructor(params) {
         super(params);
         
-        this.$element = _.div({class: 'editor schema-editor'});
-
         this.fetch();
     }
     
@@ -335,7 +333,7 @@ class SchemaEditor extends Crisp.View {
     renderFields() {
         let id = parseInt(this.model.id);
 
-        let $element = _.div({class: 'schema editor-body'});
+        let $element = _.div({class: 'editor__body'});
         
         $element.empty();
 
@@ -362,24 +360,22 @@ class SchemaEditor extends Crisp.View {
     /**
      * Renders this editor
      */
-    render() {
-        this.$element.toggleClass('locked', this.model.isLocked);
-
-        _.append(this.$element.empty(),
-            _.div({class: 'editor-header'},
-                _.span({class: 'fa fa-' + this.compiledSchema.icon}),
-                _.h4(this.model.name)
+    template() {
+        return _.div({class: 'editor editor--schema' + (this.model.isLocked ? ' locked' : '')},
+            _.div({class: 'editor__header'},
+                _.span({class: 'editor__header__icon fa fa-' + this.compiledSchema.icon}),
+                _.h4({class: 'editor__header__title'}, this.model.name)
             ),
             this.renderFields(),
-            _.div({class: 'editor-footer panel panel-default panel-buttons'}, 
-                _.div({class: 'btn-group'},
-                    _.button({class: 'btn btn-embedded'},
+            _.div({class: 'editor__footer'}, 
+                _.div({class: 'editor__footer__buttons'},
+                    _.button({class: 'widget widget--button embedded'},
                         'Advanced'
                     ).click(() => { this.onClickAdvanced(); }),
                     _.if(!this.model.isLocked,
-                        this.$saveBtn = _.button({class: 'btn btn-primary btn-raised btn-save'},
-                            _.span({class: 'text-default'}, 'Save '),
-                            _.span({class: 'text-working'}, 'Saving ')
+                        this.$saveBtn = _.button({class: 'widget widget--button editor__footer__buttons__save'},
+                            _.span({class: 'widget--button__text-default'}, 'Save '),
+                            _.span({class: 'widget--button__text-working'}, 'Saving ')
                         ).click(() => { this.onClickSave(); })
                     )
                 )

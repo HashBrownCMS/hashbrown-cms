@@ -4,6 +4,7 @@
 .widget--input {
     display: block;
     line-height: 2rem;
+    margin-bottom: 0.5rem;
 
     &[type="text"],
     &[type="number"] {

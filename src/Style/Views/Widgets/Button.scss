@@ -6,20 +6,32 @@
     box-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.1); 
     background-color: $primary;
     color: $primary-text;
-    height: 2rem;
-    line-height: 2rem;
+    height: 3rem;
+    line-height: 3rem;
     padding: 0 0.5rem;
     text-transform: uppercase;
     display: block;
-    margin: 0 0 0.5rem 0;
+    font-weight: bold;
+    min-width: 10rem;
 
     &.round {
-        height: 3rem;
         width: 3rem;
+        min-width: 0;
         border-radius: 50%;
     }
 
     &.right {
         margin-left: auto;
+    }
+
+    &.embedded {
+        color: $primary;
+        background-color: transparent;
+        box-shadow: none;
+    }
+
+    &.working &__text-default,
+    &:not(.working) &__text-working {
+        display: none;
     }
 }

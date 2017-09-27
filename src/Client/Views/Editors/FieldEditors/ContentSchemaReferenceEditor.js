@@ -141,14 +141,19 @@ class ContentSchemaReferenceEditor extends FieldEditor {
     static renderConfigEditor(config) {
         config.allowedSchemas = config.allowedSchemas || [];
         
-        let schemaOptions = HashBrown.Helpers.SchemaHelper.getAllSchemasSync('content');
-        
-        return _.div({class: 'field-container'},
-            _.div({class: 'field-key'}, 'Allowed Schemas'),
-            _.div({class: 'field-value'},
-                UI.inputChipGroup(config.allowedSchemas, schemaOptions, (newValue) => {
-                    config.allowedSchemas = newValue;
-                }, true)
+        return _.div({class: 'editor__field'},
+            _.div({class: 'editor__field__key'}, 'Allowed Schemas'),
+            _.div({class: 'editor__field__value'},
+                new HashBrown.Views.Widgets.Dropdown({
+                    options: HashBrown.Helpers.SchemaHelper.getAllSchemasSync('content'),
+                    useMultiple: true,
+                    useClearButton: true,
+                    valueKey: 'id',
+                    labelKey: 'name',
+                    onChange: (newValue) => {
+                        config.allowedSchemas = newValue;
+                    }
+                }).$element
             )
         );
     }
