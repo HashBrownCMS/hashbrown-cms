@@ -38985,120 +38985,6 @@ var SchemaEditor = function (_Crisp$View) {
     };
 
     /**
-     * Renders the tabs editor
-     *  
-     * @return {Object} element
-     */
-
-
-    SchemaEditor.prototype.renderTabsEditor = function renderTabsEditor() {
-        if (this.model.isPropertyHidden('tabs')) {
-            return;
-        }
-
-        var view = this;
-
-        function onInputChange($input) {
-            var $chip = $input.parents('.chip');
-            var oldId = $chip.attr('data-id');
-            var newLabel = $input.val();
-            var newId = ContentHelper.getSlug(newLabel);
-            var $defaultTab = view.$element.find('.default-tab-editor .dropdown');
-
-            // Assign new id to data attribute
-            $chip.attr('data-id', newId);
-
-            // Remove old id from model
-            delete view.model.tabs[oldId];
-
-            // Add new id and label to model
-            view.model.tabs[newId] = newLabel;
-
-            // Remove old tab from select element
-            $defaultTab.trigger('changeOption', [oldId, { id: newId, label: newLabel }]);
-
-            // If the default tab id was the old id, update the select element
-            if (view.model.defaultTabId == oldId) {
-                view.model.defaultTabId = newId;
-
-                $defaultTab.trigger('setValue', newId);
-            }
-        }
-
-        function onClickRemove($btn) {
-            var $chip = $btn.parents('.chip');
-            var id = $chip.attr('data-id');
-            var $defaultTab = view.$element.find('.default-tab-editor .dropdown');
-
-            // Remove the id from the tabs list
-            delete view.model.tabs[id];
-
-            // Remove the chip element
-            $chip.remove();
-
-            // Remove the tab from select element
-            $defaultTab.trigger('removeOption', id);
-
-            // If default tab id was this tab, revert to 'meta'
-            if (view.model.defaultTabId == id) {
-                view.model.defaultTabId = 'meta';
-
-                $defaultTab.trigger('setValue', 'meta');
-            }
-        }
-
-        function onClickAdd() {
-            var name = 'New tab';
-            var id = 'new-tab';
-            var $defaultTab = view.$element.find('.default-tab-editor .dropdown');
-
-            // Add new tab to model
-            view.model.tabs[id] = name;
-
-            // Redraw the tab editor
-            render();
-
-            // Add new tab to default tab select element
-            $defaultTab.trigger('addOption', { value: id, label: name });
-        }
-
-        function render() {
-            // Prepend parent tabs if applicable
-            if (view.model.parentSchemaId) {
-                SchemaHelper.getSchemaWithParentFields(view.model.parentSchemaId).then(function (parentSchema) {
-                    var parentTabs = parentSchema.tabs;
-
-                    $tabs.prepend(_.each(parentTabs, function (id, label) {
-                        return _.div({ class: 'tab chip' }, _.p({ class: 'chip-label' }, label + ' (inherited)'));
-                    }));
-                }).catch(UI.errorModal);
-            }
-
-            var $tabs = _.div({ class: 'chip-group' });
-
-            $element.html($tabs);
-
-            $tabs.append(_.each(view.model.tabs, function (id, label) {
-                return _.div({ class: 'tab chip', 'data-id': id }, _.input({ type: 'text', class: 'chip-label' + (view.model.isLocked ? ' disabled' : ''), value: label }).change(function (e) {
-                    onInputChange($(this));
-                }), _.if(!view.model.isLocked, _.button({ class: 'btn chip-remove' }, _.span({ class: 'fa fa-remove' })).click(function (e) {
-                    onClickRemove($(this));
-                })));
-            }));
-
-            if (!view.model.isLocked) {
-                $tabs.append(_.button({ class: 'btn chip-add' }, _.span({ class: 'fa fa-plus' })).click(onClickAdd));
-            }
-        }
-
-        var $element = _.div({ class: 'tabs-editor' });
-
-        render();
-
-        return $element;
-    };
-
-    /**
      * Renders the icon editor
      *  
      * @return {Object} element
@@ -41283,8 +41169,9 @@ module.exports = Form;
  */
 
 module.exports = {
-  Input: __webpack_require__(231),
-  Dropdown: __webpack_require__(232)
+    Dropdown: __webpack_require__(232),
+    Chips: __webpack_require__(294),
+    Input: __webpack_require__(231)
 };
 
 /***/ }),
@@ -43984,7 +43871,31 @@ var ContentSchemaEditor = function (_SchemaEditor) {
         }).$element));
 
         // Tabs
-        $element.append(this.renderField('Tabs', this.renderTabsEditor()));
+        $element.append(this.renderField('Tabs', new HashBrown.Views.Widgets.Chips({
+            disabledValue: Object.values(this.compiledSchema.tabs),
+            value: Object.values(this.model.tabs),
+            placeholder: 'New tab',
+            onChange: function onChange(newValue) {
+                _this2.model.tabs = {};
+
+                for (var _iterator = newValue, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+                    var _ref;
+
+                    if (_isArray) {
+                        if (_i >= _iterator.length) break;
+                        _ref = _iterator[_i++];
+                    } else {
+                        _i = _iterator.next();
+                        if (_i.done) break;
+                        _ref = _i.value;
+                    }
+
+                    var tab = _ref;
+
+                    _this2.model.tabs[tab.toLowerCase().replace(/ /g, '-')] = tab;
+                }
+            }
+        }).$element));
 
         // Allowed child Schemas
         $element.append(this.renderField('Allowed child Schemas', new HashBrown.Views.Widgets.Dropdown({
@@ -48012,6 +47923,138 @@ var UrlEditor = function (_FieldEditor) {
 }(FieldEditor);
 
 module.exports = UrlEditor;
+
+/***/ }),
+/* 267 */,
+/* 268 */,
+/* 269 */,
+/* 270 */,
+/* 271 */,
+/* 272 */,
+/* 273 */,
+/* 274 */,
+/* 275 */,
+/* 276 */,
+/* 277 */,
+/* 278 */,
+/* 279 */,
+/* 280 */,
+/* 281 */,
+/* 282 */,
+/* 283 */,
+/* 284 */,
+/* 285 */,
+/* 286 */,
+/* 287 */,
+/* 288 */,
+/* 289 */,
+/* 290 */,
+/* 291 */,
+/* 292 */,
+/* 293 */,
+/* 294 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Widget = __webpack_require__(211);
+
+/**
+ * A group of chips
+ */
+
+var Chips = function (_Widget) {
+    _inherits(Chips, _Widget);
+
+    function Chips() {
+        _classCallCheck(this, Chips);
+
+        return _possibleConstructorReturn(this, _Widget.apply(this, arguments));
+    }
+
+    /**
+     * Event: Change
+     */
+    Chips.prototype.onChangeInternal = function onChangeInternal() {
+        if (typeof this.onChange !== 'function') {
+            return;
+        }
+
+        this.onChange(this.value);
+    };
+
+    /**
+     * Pre render
+     */
+
+
+    Chips.prototype.prerender = function prerender() {
+        // Check format
+        if (!this.value || !Array.isArray(this.value)) {
+            this.value = [];
+        }
+
+        if (!this.disabledValue || !Array.isArray(this.disabledValue)) {
+            this.disabledValue = [];
+        }
+
+        // Check empty values
+        for (var i = this.value.length - 1; i >= 0; i--) {
+            if (!this.value[i]) {
+                this.value.splice(i, 1);
+            }
+        }
+
+        // CHeck for empty values or duplicates in disabled value
+        for (var _i = this.disabledValue.length - 1; _i >= 0; _i--) {
+            if (!this.disabledValue[_i] || this.value.indexOf(this.disabledValue[_i]) > -1) {
+                this.disabledValue.splice(_i, 1);
+            }
+        }
+    };
+
+    /**
+     * Template
+     */
+
+
+    Chips.prototype.template = function template() {
+        var _this2 = this;
+
+        return _.div({ class: 'widget widget--chips' }, _.each(this.disabledValue, function (i, item) {
+            return _.div({ class: 'widget--chips__chip' }, _.input({ class: 'widget--chips__chip__input', disabled: true, value: item }));
+        }), _.each(this.value, function (i, item) {
+            return _.div({ class: 'widget--chips__chip' }, _.input({ class: 'widget--chips__chip__input', type: 'text', value: item }).on('input', function (e) {
+                _this2.value[i] = e.currentTarget.value || '';
+
+                _this2.onChangeInternal();
+            }), _.button({ class: 'widget--chips__chip__remove fa fa-remove' }).click(function () {
+                _this2.value.splice(i, 1);
+
+                _this2.onChangeInternal();
+
+                _this2.init();
+            }));
+        }), _.button({ class: 'widget widget--button round widget--chips__add' }, _.span({ class: 'fa fa-plus' })).click(function () {
+            _this2.value.push(_this2.placeholder || '(new item)');
+
+            _this2.onChangeInternal();
+
+            _this2.init();
+        }));
+    };
+
+    return Chips;
+}(Widget);
+
+module.exports = Chips;
 
 /***/ })
 /******/ ]);

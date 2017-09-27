@@ -25,7 +25,18 @@ class ContentSchemaEditor extends SchemaEditor {
         }).$element));
         
         // Tabs
-        $element.append(this.renderField('Tabs', this.renderTabsEditor()));
+        $element.append(this.renderField('Tabs', new HashBrown.Views.Widgets.Chips({
+            disabledValue: Object.values(this.compiledSchema.tabs),
+            value: Object.values(this.model.tabs),
+            placeholder: 'New tab',
+            onChange: (newValue) => {
+                this.model.tabs = {};
+
+                for(let tab of newValue) {
+                    this.model.tabs[tab.toLowerCase().replace(/ /g, '-')] = tab;
+                }
+            }
+        }).$element));
         
         // Allowed child Schemas
         $element.append(this.renderField('Allowed child Schemas', new HashBrown.Views.Widgets.Dropdown({

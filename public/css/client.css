@@ -2477,6 +2477,45 @@ select.form-control, select.form-control:active, select.form-control:focus, sele
     margin-left: auto; }
 
 /**
+ * A group of chips
+ */
+.widget--chips__chip {
+  display: inline-block;
+  margin-right: 1rem;
+  position: relative;
+  border-radius: 2rem;
+  line-height: 2rem;
+  height: 2rem;
+  padding: 0 0.5rem;
+  background-color: #e70d3b;
+  color: #ffffff; }
+  .widget--chips__chip__input {
+    border: 0;
+    text-align: center;
+    background-color: transparent; }
+    .widget--chips__chip__input:focus {
+      outline: 0; }
+  .widget--chips__chip__remove {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: block;
+    width: 2rem;
+    height: 2rem;
+    color: #ffffff;
+    border: 0;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    line-height: 2rem; }
+
+.widget--chips__add {
+  line-height: 2rem !important;
+  height: 2rem !important;
+  width: 2rem !important;
+  display: inline-block !important; }
+
+/**
  * A versatile input widget
  */
 .widget--input {

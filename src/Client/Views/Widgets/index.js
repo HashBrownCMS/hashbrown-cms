@@ -5,6 +5,7 @@
  */
 
 module.exports = {
+    Dropdown: require('./Dropdown'),
+    Chips: require('./Chips'),
     Input: require('./Input'),
-    Dropdown: require('./Dropdown')
 };
